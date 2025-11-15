@@ -1595,102 +1595,65 @@ export type Database = {
       bookings: {
         Row: {
           agent_id: string | null
-          base_cost: number | null
-          booking_data: Json
-          booking_reference: string | null
-          booking_source: string | null
-          booking_type: string
-          cancellation_policy_id: string | null
-          cancellation_status: string | null
-          commission_earned: number | null
+          agent_share: number | null
           created_at: string
-          currency: string
-          guest_id: string | null
+          creator_id: string | null
+          creator_share: number | null
+          currency: string | null
           id: string
-          markup_amount: number | null
-          markup_percentage: number | null
-          net_profit: number | null
-          payment_method: string | null
-          payment_status: string | null
+          platform_fee: number | null
+          proposal_id: string | null
           status: string
-          stripe_fee: number | null
-          stripe_payment_intent_id: string | null
-          total_price: number
+          total_amount: number | null
+          traveler_id: string
+          trip_id: string
           updated_at: string
-          user_id: string | null
         }
         Insert: {
           agent_id?: string | null
-          base_cost?: number | null
-          booking_data: Json
-          booking_reference?: string | null
-          booking_source?: string | null
-          booking_type: string
-          cancellation_policy_id?: string | null
-          cancellation_status?: string | null
-          commission_earned?: number | null
+          agent_share?: number | null
           created_at?: string
-          currency?: string
-          guest_id?: string | null
+          creator_id?: string | null
+          creator_share?: number | null
+          currency?: string | null
           id?: string
-          markup_amount?: number | null
-          markup_percentage?: number | null
-          net_profit?: number | null
-          payment_method?: string | null
-          payment_status?: string | null
+          platform_fee?: number | null
+          proposal_id?: string | null
           status?: string
-          stripe_fee?: number | null
-          stripe_payment_intent_id?: string | null
-          total_price: number
+          total_amount?: number | null
+          traveler_id: string
+          trip_id: string
           updated_at?: string
-          user_id?: string | null
         }
         Update: {
           agent_id?: string | null
-          base_cost?: number | null
-          booking_data?: Json
-          booking_reference?: string | null
-          booking_source?: string | null
-          booking_type?: string
-          cancellation_policy_id?: string | null
-          cancellation_status?: string | null
-          commission_earned?: number | null
+          agent_share?: number | null
           created_at?: string
-          currency?: string
-          guest_id?: string | null
+          creator_id?: string | null
+          creator_share?: number | null
+          currency?: string | null
           id?: string
-          markup_amount?: number | null
-          markup_percentage?: number | null
-          net_profit?: number | null
-          payment_method?: string | null
-          payment_status?: string | null
+          platform_fee?: number | null
+          proposal_id?: string | null
           status?: string
-          stripe_fee?: number | null
-          stripe_payment_intent_id?: string | null
-          total_price?: number
+          total_amount?: number | null
+          traveler_id?: string
+          trip_id?: string
           updated_at?: string
-          user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "bookings_agent_id_fkey"
-            columns: ["agent_id"]
+            foreignKeyName: "bookings_proposal_id_fkey1"
+            columns: ["proposal_id"]
             isOneToOne: false
-            referencedRelation: "travel_agents"
+            referencedRelation: "trip_proposals"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "bookings_cancellation_policy_id_fkey"
-            columns: ["cancellation_policy_id"]
+            foreignKeyName: "bookings_trip_id_fkey"
+            columns: ["trip_id"]
             isOneToOne: false
-            referencedRelation: "booking_cancellation_policies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "bookings_guest_id_fkey"
-            columns: ["guest_id"]
-            isOneToOne: false
-            referencedRelation: "guests"
+            referencedRelation: "trips"
             referencedColumns: ["id"]
           },
         ]
@@ -5674,6 +5637,50 @@ export type Database = {
             columns: ["partnership_id"]
             isOneToOne: false
             referencedRelation: "paid_partnerships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_intents: {
+        Row: {
+          amount: number
+          booking_id: string
+          created_at: string
+          currency: string
+          id: string
+          provider: string
+          provider_intent_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          booking_id: string
+          created_at?: string
+          currency?: string
+          id?: string
+          provider?: string
+          provider_intent_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          booking_id?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          provider?: string
+          provider_intent_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_intents_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
             referencedColumns: ["id"]
           },
         ]

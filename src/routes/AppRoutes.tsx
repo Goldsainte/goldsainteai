@@ -30,7 +30,6 @@ const TripDetail = lazy(() => import('@/pages/marketplace/TripDetail'));
 // const Search = lazy(() => import('@/pages/Search'));
 // const Trending = lazy(() => import('@/pages/Trending'));
 const Shop = lazy(() => import('@/pages/Shop'));
-const Dashboard = lazy(() => import('@/pages/Dashboard'));
 const BrowseAgents = lazy(() => import('@/pages/BrowseAgents'));
 const BrowseCreators = lazy(() => import('@/pages/BrowseCreators'));
 const BrowseInfluencers = lazy(() => import('@/pages/BrowseInfluencers'));
@@ -55,11 +54,9 @@ const MyBookingsPage = lazy(() => import('@/pages/MyBookingsPage'));
 const PartnerBookingsPage = lazy(() => import('@/pages/PartnerBookingsPage'));
 const BookingPreferencesRedirect = lazy(() => import('@/pages/redirects/BookingPreferencesRedirect'));
 const FavoritesRedirect = lazy(() => import('@/pages/redirects/FavoritesRedirect'));
-const CommissionDashboard = lazy(() => import('@/pages/CommissionDashboard'));
 const EmailPreview = lazy(() => import('@/pages/EmailPreview'));
 const Collections = lazy(() => import('@/pages/Collections'));
 const CollectionDetail = lazy(() => import('@/pages/CollectionDetail'));
-const BookingHistory = lazy(() => import('@/pages/BookingHistory'));
 const Subscription = lazy(() => import('@/pages/Subscription'));
 const BillingDashboard = lazy(() => import('@/pages/BillingDashboard'));
 const TravelSettings = lazy(() => import('@/pages/TravelSettings'));
@@ -81,7 +78,6 @@ const Messages = lazy(() => import('@/pages/Messages'));
 const PriceAlerts = lazy(() => import('@/pages/PriceAlerts'));
 const BookingDetails = lazy(() => import('@/pages/BookingDetails'));
 const BookingDetailPage = lazy(() => import('@/pages/BookingDetailPage'));
-const ModifyFlight = lazy(() => import('@/pages/ModifyFlight'));
 const HotelDetails = lazy(() => import('@/pages/HotelDetails'));
 const MyJobs = lazy(() => import('@/pages/MyJobs'));
 const MyTrips = lazy(() => import('@/pages/MyTrips'));
@@ -110,7 +106,6 @@ const CoCuratedDashboard = lazy(() => import('@/pages/CoCuratedDashboard'));
 const CoCuratedCreate = lazy(() => import('@/pages/CoCuratedCreate'));
 const CoCuratedMarketplace = lazy(() => import('@/pages/CoCuratedMarketplace'));
 const CoCuratedJourneys = lazy(() => import('@/pages/CoCuratedJourneys'));
-const CoCuratedPackage = lazy(() => import('@/pages/CoCuratedPackage'));
 const CoCuratedBookingSuccess = lazy(() => import('@/pages/CoCuratedBookingSuccess'));
 const TourActivityDetail = lazy(() => import('@/pages/TourActivityDetail'));
 const FineDining = lazy(() => import('@/pages/FineDining'));
@@ -189,14 +184,6 @@ export const AppRoutes = () => (
       </Route>
 
       <Route
-        path="/dashboard"
-        element={(
-          <RouteSectionBoundary section="dashboard">
-            <Dashboard />
-          </RouteSectionBoundary>
-        )}
-      />
-      <Route
         path="/marketplace"
         element={(
           <RouteSectionBoundary section="marketplace">
@@ -250,12 +237,10 @@ export const AppRoutes = () => (
       <Route path="/agent-performance" element={<RequireAgentTerms><AgentPerformanceDashboard /></RequireAgentTerms>} />
       <Route path="/agent-deals" element={<RequireAgentTerms><AgentDealsDashboardPage /></RequireAgentTerms>} />
       <Route path="/booking-preferences" element={<BookingPreferencesRedirect />} />
-      <Route path="/commission-dashboard" element={<CommissionDashboard />} />
       <Route path="/email-preview" element={<EmailPreview />} />
       <Route path="/favorites" element={<FavoritesRedirect />} />
       <Route path="/collections" element={<Collections />} />
       <Route path="/collections/:collectionId" element={<CollectionDetail />} />
-      <Route path="/booking-history" element={<BookingHistory />} />
       <Route path="/subscription" element={<Subscription />} />
       <Route path="/billing-dashboard" element={<BillingDashboard />} />
       <Route path="/travel-settings" element={<CreatorSettingsPage />} />
@@ -303,7 +288,6 @@ export const AppRoutes = () => (
       />
       <Route path="/price-alerts" element={<PriceAlerts />} />
       <Route path="/booking-details/:bookingId" element={<BookingDetails />} />
-      <Route path="/modify-flight/:bookingId" element={<ModifyFlight />} />
       <Route path="/search-results" element={<SearchResults />} />
       <Route path="/hotel/:id" element={<HotelDetails />} />
       <Route path="/hotel-booking" element={<HotelBooking />} />
@@ -340,7 +324,6 @@ export const AppRoutes = () => (
       <Route path="/tour/:tourId" element={<TourActivityDetail />} />
       <Route path="/fine-dining" element={<FineDining />} />
       <Route path="/restaurant/:restaurantId" element={<RestaurantDetail />} />
-      <Route path="/cocurated-package/:packageId" element={<CoCuratedPackage />} />
       <Route path="/cocurated-booking-success" element={<CoCuratedBookingSuccess />} />
       <Route path="/your-activity" element={<YourActivity />} />
     </Route>
