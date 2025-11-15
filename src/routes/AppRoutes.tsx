@@ -4,6 +4,7 @@ import { Route, Routes, Navigate } from 'react-router-dom';
 import Index from '@/pages/Index';
 import Auth from '@/pages/Auth';
 import AuthCallback from '@/pages/AuthCallback';
+import EmailConfirmedPage from '@/pages/EmailConfirmedPage';
 // Legacy social feed - disabled
 // import TravelFeed from '@/pages/TravelFeed';
 import NotFound from '@/pages/NotFound';
@@ -161,6 +162,7 @@ export const AppRoutes = () => (
       <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/auth/callback/apple" element={<AppleCallback />} />
       <Route path="/auth/apple/callback" element={<AppleCallback />} />
+      <Route path="/auth/email-confirmed" element={<EmailConfirmedPage />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/ai-agent-setup" element={<AIAgentOnboarding />} />

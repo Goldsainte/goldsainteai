@@ -20,7 +20,7 @@ const passwordSchema = z.string()
   .regex(/[0-9]/, "Password must contain at least one number")
   .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character");
 
-type AuthStep = 'email' | 'signin' | 'signup' | 'forgot-password' | 'profile';
+type AuthStep = 'email' | 'signin' | 'signup' | 'forgot-password' | 'verify-email' | 'profile';
 
 const Auth = () => {
   const [step, setStep] = useState<AuthStep>('email');
@@ -98,6 +98,37 @@ const Auth = () => {
     const { error } = await signIn(email, password);
     
     if (error) {
+      // Check for unverified email
+      if (error.message.toLowerCase().includes("email not confirmed")) {
+        // Move to verify-email step and resend confirmation
+        setStep("verify-email");
+        
+        try {
+          const { error: resendError } = await supabase.auth.resend({
+            type: "signup",
+            email,
+          });
+          
+          if (resendError) {
+            toast({
+              title: "Email not confirmed",
+              description: "We couldn't resend the confirmation email. Please try again shortly.",
+              variant: "destructive",
+            });
+          } else {
+            toast({
+              title: "Verify your email",
+              description: "We've sent you a new email confirmation link. Please check your inbox.",
+            });
+          }
+        } catch (err) {
+          console.error("Error resending verification email:", err);
+        }
+        
+        setIsLoading(false);
+        return;
+      }
+      
       toast({
         title: "Sign in failed",
         description: error.message || "Please check your credentials and try again.",
@@ -160,21 +191,44 @@ const Auth = () => {
       return;
     }
     
-    const { error } = await signUp(email, password, '', firstName, lastName, phone);
-    
-    if (error) {
+    try {
+      // Use direct supabase.auth.signUp with emailRedirectTo
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/email-confirmed`,
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            phone: phone || null,
+            // account_type will be collected later in profile step
+          },
+        },
+      });
+
+      if (error) {
+        console.error("Sign up error", error);
+        toast({
+          title: "Could not create your account",
+          description: error.message,
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // Supabase has sent a verification email
+      // Move to verify-email step
+      setStep("verify-email");
+      setIsLoading(false);
+    } catch (error: any) {
+      console.error("Unexpected signup error:", error);
       toast({
         title: "Sign up failed",
-        description: error.message || "Please try again.",
+        description: error?.message || "An unexpected error occurred.",
         variant: "destructive",
       });
-      setIsLoading(false);
-    } else {
-      toast({
-        title: "Account created!",
-        description: "Let's complete your profile.",
-      });
-      setStep('profile');
       setIsLoading(false);
     }
   };
@@ -617,6 +671,86 @@ const Auth = () => {
               </button>
             </div>
           </form>
+        )}
+
+        {/* Verify Email Step */}
+        {step === 'verify-email' && (
+          <div className="space-y-4 text-center">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-semibold tracking-tight">
+                Confirm your email
+              </h2>
+              <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+                We've sent a confirmation link to{' '}
+                <span className="font-medium text-foreground">{email}</span>
+              </p>
+              <p className="text-xs text-muted-foreground max-w-md mx-auto mt-2">
+                Please click the link in that email to verify your address and activate
+                your Goldsainte account. Check your spam folder if you don't see it.
+              </p>
+            </div>
+
+            <div className="space-y-3 pt-4">
+              <Button
+                type="button"
+                className="w-full h-12 bg-foreground text-background hover:bg-foreground/90"
+                onClick={async () => {
+                  if (!email) return;
+                  setIsLoading(true);
+                  try {
+                    const { error } = await supabase.auth.resend({
+                      type: "signup",
+                      email,
+                    });
+                    if (error) {
+                      toast({
+                        title: "Could not resend email",
+                        description: error.message,
+                        variant: "destructive",
+                      });
+                    } else {
+                      toast({
+                        title: "Email sent",
+                        description: "We've resent the confirmation email to your inbox.",
+                      });
+                    }
+                  } catch (err: any) {
+                    toast({
+                      title: "Error",
+                      description: err?.message || "Failed to resend email",
+                      variant: "destructive",
+                    });
+                  } finally {
+                    setIsLoading(false);
+                  }
+                }}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  'Resend confirmation email'
+                )}
+              </Button>
+              
+              <button
+                type="button"
+                onClick={() => setStep("email")}
+                className="block w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Use a different email
+              </button>
+            </div>
+
+            <div className="mt-6 pt-6 border-t border-border">
+              <p className="text-xs text-muted-foreground">
+                Once you verify your email, you'll be redirected back to complete your profile.
+              </p>
+            </div>
+          </div>
         )}
 
         {/* Forgot Password Step */}
