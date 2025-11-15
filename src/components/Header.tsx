@@ -50,7 +50,7 @@ export const Header = () => {
   const [profileAvatarUrl, setProfileAvatarUrl] = useState<string | null>(null);
   const { balance } = useCoinBalance();
   const { openModal: openExpediaModal } = useExpediaModal();
-  const accountType = (user?.user_metadata?.account_type as string | undefined)?.toLowerCase();
+  const accountType = ((user as any)?.user_metadata?.account_type as string | undefined)?.toLowerCase() ?? null;
   const showPartnerBookings = accountType === "creator" || accountType === "agent";
   const primaryBookingsPath = showPartnerBookings ? "/partner-bookings" : "/my-bookings";
 
