@@ -1,15 +1,13 @@
 // src/services/earningsService.ts
 import { supabase } from "@/integrations/supabase/client";
 
-export type EarningsStatus = "pending" | "available" | "locked" | "paid";
-
-export interface EarningsSummary {
+export type EarningsSummary = {
+  currency: string;
   pending: number;
   available: number;
   locked: number;
   paid: number;
-  currency: string;
-}
+};
 
 export interface EarningsEntry {
   id: string;
@@ -17,7 +15,7 @@ export interface EarningsEntry {
   role: "agent" | "creator" | "platform";
   amount: number;
   currency: string;
-  status: EarningsStatus;
+  status: "pending" | "available" | "locked" | "paid";
   created_at: string;
   booking?: {
     trip?: {
@@ -37,65 +35,64 @@ export interface PayoutEntry {
   created_at: string;
 }
 
-/**
- * Get earnings summary grouped by status
- */
-export async function getEarningsSummary(): Promise<EarningsSummary> {
+export async function getMyEarningsSummary(): Promise<EarningsSummary> {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) throw new Error("Not authenticated");
 
   const { data, error } = await supabase
     .from("earnings_ledger")
-    .select("status, amount, currency")
+    .select("amount, currency, status")
     .eq("user_id", user.id);
 
   if (error) {
     console.error(error);
-    throw new Error("Could not load earnings summary");
+    throw new Error("Could not load earnings.");
   }
 
-  const summary: EarningsSummary = {
-    pending: 0,
-    available: 0,
-    locked: 0,
-    paid: 0,
-    currency: "USD",
-  };
+  let pending = 0;
+  let available = 0;
+  let locked = 0;
+  let paid = 0;
+  let currency = "USD";
 
-  (data || []).forEach((entry) => {
-    if (entry.status === "pending") summary.pending += entry.amount;
-    else if (entry.status === "available") summary.available += entry.amount;
-    else if (entry.status === "locked") summary.locked += entry.amount;
-    else if (entry.status === "paid") summary.paid += entry.amount;
+  (data || []).forEach((row) => {
+    currency = row.currency || currency;
+    switch (row.status) {
+      case "pending":
+        pending += Number(row.amount || 0);
+        break;
+      case "available":
+        available += Number(row.amount || 0);
+        break;
+      case "locked":
+        locked += Number(row.amount || 0);
+        break;
+      case "paid":
+        paid += Number(row.amount || 0);
+        break;
+    }
   });
 
-  return summary;
+  return { currency, pending, available, locked, paid };
 }
 
-/**
- * Get detailed earnings ledger
- */
-export async function getEarningsLedger(): Promise<EarningsEntry[]> {
+export async function getMyLatestEarnings(limit = 20) {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) throw new Error("Not authenticated");
 
   const { data, error } = await supabase
     .from("earnings_ledger")
-    .select(`
-      *,
-      booking:bookings(
-        trip:trips(title, destination)
-      )
-    `)
+    .select("*, bookings(total_amount, status, trip_id)")
     .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(limit);
 
   if (error) {
     console.error(error);
-    throw new Error("Could not load earnings ledger");
+    throw new Error("Could not load earnings history.");
   }
 
-  return (data || []) as EarningsEntry[];
+  return data ?? [];
 }
 
 /**
@@ -179,43 +176,62 @@ export async function createEarningsForBooking(bookingId: string) {
   }
 }
 
-/**
- * Request a payout (initiates withdrawal to connected account)
- * In production, this would call an edge function to handle Stripe Connect
- */
-export async function requestPayout(amount: number, currency: string = "USD") {
+export async function requestPayout() {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) throw new Error("Not authenticated");
 
-  // Check available balance
-  const summary = await getEarningsSummary();
-  if (summary.available < amount) {
-    throw new Error("Insufficient available balance");
+  // 1. Load available earnings
+  const { data: availableRows, error: availableError } = await supabase
+    .from("earnings_ledger")
+    .select("*")
+    .eq("user_id", user.id)
+    .eq("status", "available");
+
+  if (availableError) {
+    console.error(availableError);
+    throw new Error("Could not load available earnings.");
   }
 
-  // For now, just create a pending payout record
-  // In production, you'd call an edge function that:
-  // 1. Creates payout in payouts table with status='initiated'
-  // 2. Updates relevant earnings_ledger rows to status='locked'
-  // 3. Initiates Stripe Connect payout
-  // 4. Updates payout status based on Stripe response
+  if (!availableRows || availableRows.length === 0) {
+    throw new Error("No available balance to pay out.");
+  }
 
-  const { data, error } = await supabase
+  const total = availableRows.reduce(
+    (sum, row) => sum + Number(row.amount || 0),
+    0,
+  );
+  const currency = availableRows[0].currency || "USD";
+
+  // 2. Create payout record
+  const { data: payout, error: payoutError } = await supabase
     .from("payouts")
     .insert({
       user_id: user.id,
-      amount,
+      amount: total,
       currency,
-      provider: "stripe",
       status: "initiated",
     })
     .select("*")
     .single();
 
-  if (error || !data) {
-    console.error(error);
-    throw new Error("Could not initiate payout");
+  if (payoutError || !payout) {
+    console.error(payoutError);
+    throw new Error("Could not create payout.");
   }
 
-  return data;
+  // 3. Lock earnings & attach payout_id
+  const ids = availableRows.map((row) => row.id);
+
+  const { error: lockError } = await supabase
+    .from("earnings_ledger")
+    .update({ status: "locked", payout_id: payout.id })
+    .in("id", ids);
+
+  if (lockError) {
+    console.error(lockError);
+    throw new Error("Could not lock earnings for payout.");
+  }
+
+  // Later: Edge Function will move payout.status to 'paid' and ledger status to 'paid'
+  return payout;
 }

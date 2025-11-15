@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { getEarningsSummary, getEarningsLedger } from "@/services/earningsService";
+import { getMyEarningsSummary, getMyLatestEarnings } from "@/services/earningsService";
 
 interface RevenueSource {
   type: "booking" | "shop" | "gift" | "affiliate" | "partnership";
@@ -41,8 +41,8 @@ export function useCreatorRevenue(creatorId: string): CreatorRevenue {
     try {
       // Use new earnings system
       const [summary, ledger] = await Promise.all([
-        getEarningsSummary(),
-        getEarningsLedger(),
+        getMyEarningsSummary(),
+        getMyLatestEarnings(),
       ]);
 
       // Aggregate revenue by source from ledger

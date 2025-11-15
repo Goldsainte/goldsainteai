@@ -1,90 +1,47 @@
 // src/components/BookingTimeline.tsx
-import { CheckCircle, Clock, AlertCircle, Circle } from "lucide-react";
+const steps = [
+  { id: "matched", label: "Matched with partner" },
+  { id: "awaiting_payment", label: "Confirm & pay" },
+  { id: "paid", label: "Payment received" },
+  { id: "in_progress", label: "Trip in progress" },
+  { id: "completed", label: "Trip completed" },
+  { id: "disputed", label: "Under review" },
+];
 
-export interface TimelineEvent {
-  id: string;
-  title: string;
-  description?: string;
-  timestamp: string;
-  status: "completed" | "current" | "upcoming" | "failed";
-}
-
-interface BookingTimelineProps {
-  events: TimelineEvent[];
-}
-
-export function BookingTimeline({ events }: BookingTimelineProps) {
-  const getStatusIcon = (status: TimelineEvent["status"]) => {
-    switch (status) {
-      case "completed":
-        return <CheckCircle className="w-4 h-4 text-primary" />;
-      case "current":
-        return <Clock className="w-4 h-4 text-accent" />;
-      case "failed":
-        return <AlertCircle className="w-4 h-4 text-destructive" />;
-      case "upcoming":
-        return <Circle className="w-4 h-4 text-muted-foreground" />;
-    }
-  };
-
-  const getStatusColor = (status: TimelineEvent["status"]) => {
-    switch (status) {
-      case "completed":
-        return "border-primary bg-primary/10";
-      case "current":
-        return "border-accent bg-accent/10";
-      case "failed":
-        return "border-destructive bg-destructive/10";
-      case "upcoming":
-        return "border-muted-foreground/30 bg-muted";
-    }
-  };
-
+export function BookingTimeline({ status }: { status: string }) {
+  const currentIndex = steps.findIndex((s) => s.id === status);
   return (
-    <div className="rounded-3xl bg-card border border-border p-4 space-y-4">
-      <h3 className="text-sm font-semibold text-card-foreground">Booking Timeline</h3>
-      <div className="space-y-4">
-        {events.map((event, index) => {
-          const isLast = index === events.length - 1;
+    <div className="rounded-3xl bg-card border border-border p-4 text-xs">
+      <p className="text-xs font-semibold mb-3">
+        Booking status: <span className="text-primary">{status}</span>
+      </p>
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-0">
+        {steps.map((step, index) => {
+          const done = currentIndex > index;
+          const active = currentIndex === index;
           return (
-            <div key={event.id} className="flex gap-3">
-              {/* Icon & Line */}
-              <div className="flex flex-col items-center">
-                <div
-                  className={`rounded-full border-2 p-1 ${getStatusColor(
-                    event.status
-                  )}`}
-                >
-                  {getStatusIcon(event.status)}
-                </div>
-                {!isLast && (
-                  <div className="w-0.5 h-full min-h-[32px] bg-border mt-1" />
-                )}
+            <div
+              key={step.id}
+              className="flex items-center md:flex-1 md:justify-center gap-1"
+            >
+              <div
+                className={[
+                  "h-5 w-5 rounded-full flex items-center justify-center border text-[9px]",
+                  done
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : active
+                    ? "bg-background text-primary border-primary"
+                    : "bg-muted text-muted-foreground border-muted",
+                ].join(" ")}
+              >
+                {index + 1}
               </div>
-
-              {/* Content */}
-              <div className="flex-1 pb-4">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <h4 className="text-sm font-medium text-card-foreground">
-                      {event.title}
-                    </h4>
-                    {event.description && (
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {event.description}
-                      </p>
-                    )}
-                  </div>
-                  <time className="text-xs text-muted-foreground whitespace-nowrap">
-                    {new Date(event.timestamp).toLocaleDateString(undefined, {
-                      month: "short",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </time>
-                </div>
-              </div>
+              <span className="text-[10px] text-muted-foreground">
+                {step.label}
+              </span>
+              {index < steps.length - 1 && (
+                <div className="hidden md:block flex-1 h-px bg-gradient-to-r from-muted to-transparent ml-2" />
+              )}
             </div>
           );
         })}
