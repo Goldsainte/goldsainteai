@@ -5,6 +5,7 @@ import { HowItWorks } from "@/components/home/HowItWorks";
 import { MarketplaceShowcase } from "@/components/home/MarketplaceShowcase";
 import { PostTripCTA } from "@/components/home/PostTripCTA";
 import { StoryboardPreview } from "@/components/home/StoryboardPreview";
+import { TikTokLabHighlight } from "@/components/home/TikTokLabHighlight";
 
 export default function Index() {
   return (
@@ -32,6 +33,9 @@ export default function Index() {
 
         {/* Storyboard preview – Pinterest vibes, Goldsainte colors */}
         <StoryboardPreview />
+
+        {/* TikTok Travel Lab highlight */}
+        <TikTokLabHighlight />
       </main>
     </>
   );
