@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -55,6 +55,37 @@ export function AgentCreatorCollabs({ collabRequests, agentId, onRefresh }: Agen
     compensation: "",
     estimatedRevenue: "",
   });
+  const [stats, setStats] = useState<{
+    totalDeals: number;
+    pendingDeals: number;
+    activeDeals: number;
+    totalRevenue: number;
+    recentDeals: any[];
+  } | null>(null);
+  const [loadingStats, setLoadingStats] = useState(true);
+
+  useEffect(() => {
+    loadStats();
+  }, []);
+
+  const loadStats = async () => {
+    setLoadingStats(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('agent-deals-stats', {
+        body: {}
+      });
+      
+      if (!error && data) {
+        setStats(data);
+      } else {
+        console.error('Error loading stats:', error);
+      }
+    } catch (error) {
+      console.error('Error loading stats:', error);
+    } finally {
+      setLoadingStats(false);
+    }
+  };
 
   const searchCreators = async (query: string) => {
     if (!query.trim()) {
@@ -103,6 +134,7 @@ export function AgentCreatorCollabs({ collabRequests, agentId, onRefresh }: Agen
       setSearchQuery("");
       setSearchResults([]);
       onRefresh();
+      loadStats();
     } catch (error: any) {
       console.error('Error sending invite:', error);
       toast.error('Failed to send invite');
@@ -120,6 +152,7 @@ export function AgentCreatorCollabs({ collabRequests, agentId, onRefresh }: Agen
 
       toast.success(`Status updated to ${newStatus}`);
       onRefresh();
+      loadStats();
     } catch (error: any) {
       console.error('Error updating status:', error);
       toast.error('Failed to update status');
@@ -137,43 +170,81 @@ export function AgentCreatorCollabs({ collabRequests, agentId, onRefresh }: Agen
     }
   };
 
-  const totalEstimatedRevenue = collabRequests
-    .filter(r => r.status === 'live' || r.status === 'accepted')
-    .reduce((sum, r) => sum + (r.estimated_revenue || 0), 0);
-
-  const totalActualRevenue = collabRequests
-    .filter(r => r.status === 'completed')
-    .reduce((sum, r) => sum + (r.actual_revenue || 0), 0);
-
   return (
     <div className="space-y-6">
-      {/* Revenue Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardDescription className="text-xs">Total Collaborations</CardDescription>
-            <CardTitle className="text-2xl">{collabRequests.length}</CardTitle>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardDescription className="text-xs flex items-center gap-1">
-              <TrendingUp className="h-3 w-3" />
-              Estimated Revenue (Active)
-            </CardDescription>
-            <CardTitle className="text-2xl">${totalEstimatedRevenue.toLocaleString()}</CardTitle>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardDescription className="text-xs flex items-center gap-1">
-              <DollarSign className="h-3 w-3" />
-              Actual Revenue (Completed)
-            </CardDescription>
-            <CardTitle className="text-2xl">${totalActualRevenue.toLocaleString()}</CardTitle>
-          </CardHeader>
-        </Card>
-      </div>
+      {/* Stats Cards */}
+      {loadingStats ? (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <Card key={i}>
+              <CardContent className="p-6">
+                <div className="animate-pulse space-y-2">
+                  <div className="h-4 bg-muted rounded w-20"></div>
+                  <div className="h-8 bg-muted rounded w-16"></div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : stats && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Deals</p>
+                  <p className="text-3xl font-bold mt-1">{stats.totalDeals}</p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Sparkles className="h-6 w-6 text-primary" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Pending</p>
+                  <p className="text-3xl font-bold mt-1">{stats.pendingDeals}</p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-yellow-500/10 flex items-center justify-center">
+                  <Users className="h-6 w-6 text-yellow-500" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Active</p>
+                  <p className="text-3xl font-bold mt-1">{stats.activeDeals}</p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-green-500/10 flex items-center justify-center">
+                  <TrendingUp className="h-6 w-6 text-green-500" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Revenue</p>
+                  <p className="text-3xl font-bold mt-1">${stats.totalRevenue.toFixed(0)}</p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-blue-500/10 flex items-center justify-center">
+                  <DollarSign className="h-6 w-6 text-blue-500" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Invite Creator Button */}
       <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
