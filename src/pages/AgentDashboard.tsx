@@ -8,12 +8,13 @@ import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Briefcase, MapPin, DollarSign, Clock, ArrowLeft, MessageSquare, CheckCircle, Sparkles } from "lucide-react";
+import { Briefcase, MapPin, DollarSign, Clock, ArrowLeft, MessageSquare, CheckCircle, Sparkles, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { JobMessaging } from "@/components/JobMessaging";
 import { StripeConnectOnboarding } from "@/components/StripeConnectOnboarding";
@@ -31,6 +32,8 @@ export default function AgentDashboard() {
   const { isAdmin, isAgent, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
   const [agent, setAgent] = useState<any>(null);
+  const [allAgents, setAllAgents] = useState<any[]>([]);
+  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   const [jobs, setJobs] = useState<any[]>([]);
   const [myBids, setMyBids] = useState<any[]>([]);
   const [collabRequests, setCollabRequests] = useState<any[]>([]);
@@ -65,49 +68,79 @@ export default function AgentDashboard() {
     fetchData();
   }, [user, isAdmin, isAgent, authLoading, roleLoading, navigate]);
 
-  const fetchData = async () => {
+  const fetchData = async (agentIdOverride?: string) => {
     try {
       setLoading(true);
+      let agentId: string | undefined;
 
-      const { data: agentData, error: agentError } = await supabase
-        .from('travel_agents')
-        .select('*')
-        .eq('user_id', user?.id)
-        .maybeSingle();
-
-      if (agentError) throw agentError;
-      
-      // If admin and no agent record, load first available agent for viewing
-      if (!agentData && isAdmin) {
-        const { data: firstAgent, error: firstAgentError } = await supabase
+      // If admin, fetch all agents for selector
+      if (isAdmin) {
+        const { data: agents, error: agentsError } = await supabase
           .from('travel_agents')
-          .select('*')
-          .limit(1)
-          .maybeSingle();
+          .select('id, agency_name, user_id')
+          .order('agency_name');
         
-        if (firstAgentError) throw firstAgentError;
-        if (!firstAgent) {
+        if (agentsError) throw agentsError;
+        setAllAgents(agents || []);
+        
+        // Use override ID, or selected ID, or user's own agent, or first agent
+        const targetAgentId = agentIdOverride || selectedAgentId;
+        let agentToLoad = null;
+        
+        if (targetAgentId) {
+          const { data: targetAgent } = await supabase
+            .from('travel_agents')
+            .select('*')
+            .eq('id', targetAgentId)
+            .single();
+          agentToLoad = targetAgent;
+        } else {
+          // Try to find user's own agent first
+          const { data: ownAgent } = await supabase
+            .from('travel_agents')
+            .select('*')
+            .eq('user_id', user?.id)
+            .maybeSingle();
+          
+          agentToLoad = ownAgent || agents?.[0];
+        }
+        
+        if (!agentToLoad) {
           toast.error('No agent profiles found in system');
           setLoading(false);
           return;
         }
-        setAgent(firstAgent);
+        
+        setAgent(agentToLoad);
+        setSelectedAgentId(agentToLoad.id);
         
         setVerificationStatus({
-          identity_verified: firstAgent.identity_verified || false,
-          background_check_status: firstAgent.background_check_status || "not_started",
-          professional_license_verified: firstAgent.professional_license_verified || false,
-          insurance_verified: firstAgent.insurance_verified || false,
-          trust_score: firstAgent.trust_score || 0,
+          identity_verified: agentToLoad.identity_verified || false,
+          background_check_status: agentToLoad.background_check_status || "not_started",
+          professional_license_verified: agentToLoad.professional_license_verified || false,
+          insurance_verified: agentToLoad.insurance_verified || false,
+          trust_score: agentToLoad.trust_score || 0,
         });
-      } else if (!agentData) {
-        // Non-admin without agent record
-        toast.error('Please complete agent onboarding first');
-        navigate('/agent-onboarding');
-        return;
-      } else {
-        setAgent(agentData);
         
+        agentId = agentToLoad.id;
+
+      } else {
+        // Non-admin: only fetch their own agent
+        const { data: agentData, error: agentError } = await supabase
+          .from('travel_agents')
+          .select('*')
+          .eq('user_id', user?.id)
+          .maybeSingle();
+
+        if (agentError) throw agentError;
+        
+        if (!agentData) {
+          toast.error('Please complete agent onboarding first');
+          navigate('/agent-onboarding');
+          return;
+        }
+        
+        setAgent(agentData);
         setVerificationStatus({
           identity_verified: agentData.identity_verified || false,
           background_check_status: agentData.background_check_status || "not_started",
@@ -115,12 +148,10 @@ export default function AgentDashboard() {
           insurance_verified: agentData.insurance_verified || false,
           trust_score: agentData.trust_score || 0,
         });
+        
+        agentId = agentData.id;
       }
 
-      if (!agentData && !isAdmin) {
-        throw new Error('No agent profile found');
-      }
-      const agentId = agentData?.id || agent?.id;
       if (!agentId) {
         setLoading(false);
         return;
@@ -169,6 +200,12 @@ export default function AgentDashboard() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAgentChange = (agentId: string) => {
+    setSelectedAgentId(agentId);
+    setLoading(true);
+    fetchData(agentId);
   };
 
   const handlePlaceBid = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -274,11 +311,34 @@ export default function AgentDashboard() {
           Back
         </Button>
         
-        <div className="mb-8">
-          <h1 className="text-4xl font-secondary text-primary mb-2">Agent Dashboard</h1>
-          <p className="text-muted-foreground">{agent.agency_name} • Rating: {agent.rating}/5 ({agent.total_reviews} reviews)</p>
-          {!agent.is_verified && (
-            <Badge variant="secondary" className="mt-2">Pending Verification</Badge>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl font-secondary text-primary mb-2">Agent Dashboard</h1>
+            <p className="text-muted-foreground">{agent.agency_name} • Rating: {agent.rating}/5 ({agent.total_reviews} reviews)</p>
+            {!agent.is_verified && (
+              <Badge variant="secondary" className="mt-2">Pending Verification</Badge>
+            )}
+          </div>
+          
+          {isAdmin && (
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="gap-1">
+                <Shield className="h-3 w-3" />
+                Admin View
+              </Badge>
+              <Select value={selectedAgentId || ''} onValueChange={handleAgentChange}>
+                <SelectTrigger className="w-[250px]">
+                  <SelectValue placeholder="Select agent" />
+                </SelectTrigger>
+                <SelectContent>
+                  {allAgents.map((a) => (
+                    <SelectItem key={a.id} value={a.id}>
+                      {a.agency_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           )}
         </div>
 

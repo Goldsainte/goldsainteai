@@ -8,7 +8,8 @@ import { AgentPerformanceBadges } from "@/components/AgentPerformanceBadges";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, TrendingUp, Award, Clock } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ArrowLeft, TrendingUp, Award, Clock, Shield } from "lucide-react";
 import { toast } from "sonner";
 
 export default function AgentPerformanceDashboard() {
@@ -16,6 +17,8 @@ export default function AgentPerformanceDashboard() {
   const { isAdmin, isAgent, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
   const [agent, setAgent] = useState<any>(null);
+  const [allAgents, setAllAgents] = useState<any[]>([]);
+  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,32 +38,60 @@ export default function AgentPerformanceDashboard() {
     fetchAgentData();
   }, [user, isAdmin, isAgent, authLoading, roleLoading, navigate]);
 
-  const fetchAgentData = async () => {
+  const fetchAgentData = async (agentIdOverride?: string) => {
     try {
-      const { data, error } = await supabase
-        .from('travel_agents')
-        .select('*')
-        .eq('user_id', user?.id)
-        .maybeSingle();
-
-      if (error) throw error;
-      
-      // If admin and no agent record, load first available agent for viewing
-      if (!data && isAdmin) {
-        const { data: firstAgent, error: firstAgentError } = await supabase
+      // If admin, fetch all agents for selector
+      if (isAdmin) {
+        const { data: agents, error: agentsError } = await supabase
+          .from('travel_agents')
+          .select('id, agency_name, user_id')
+          .order('agency_name');
+        
+        if (agentsError) throw agentsError;
+        setAllAgents(agents || []);
+        
+        // Use override ID, or selected ID, or user's own agent, or first agent
+        const targetAgentId = agentIdOverride || selectedAgentId;
+        let agentToLoad = null;
+        
+        if (targetAgentId) {
+          const { data: targetAgent } = await supabase
+            .from('travel_agents')
+            .select('*')
+            .eq('id', targetAgentId)
+            .single();
+          agentToLoad = targetAgent;
+        } else {
+          // Try to find user's own agent first
+          const { data: ownAgent } = await supabase
+            .from('travel_agents')
+            .select('*')
+            .eq('user_id', user?.id)
+            .maybeSingle();
+          
+          agentToLoad = ownAgent || agents?.[0];
+        }
+        
+        if (agentToLoad) {
+          setAgent(agentToLoad);
+          setSelectedAgentId(agentToLoad.id);
+        }
+      } else {
+        // Non-admin: only fetch their own agent
+        const { data, error } = await supabase
           .from('travel_agents')
           .select('*')
-          .limit(1)
+          .eq('user_id', user?.id)
           .maybeSingle();
+
+        if (error) throw error;
         
-        if (firstAgentError) throw firstAgentError;
-        setAgent(firstAgent);
-      } else if (!data) {
-        // Non-admin without agent record
-        toast.error('Agent profile required');
-        navigate('/agent-onboarding');
-        return;
-      } else {
+        if (!data) {
+          toast.error('Agent profile required');
+          navigate('/agent-onboarding');
+          return;
+        }
+        
         setAgent(data);
       }
     } catch (error: any) {
@@ -72,6 +103,12 @@ export default function AgentPerformanceDashboard() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAgentChange = (agentId: string) => {
+    setSelectedAgentId(agentId);
+    setLoading(true);
+    fetchAgentData(agentId);
   };
 
   if (authLoading || roleLoading || loading) {
@@ -87,7 +124,7 @@ export default function AgentPerformanceDashboard() {
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="flex items-center gap-2 mb-6">
+        <div className="flex items-center justify-between mb-6">
           <Button
             variant="ghost"
             onClick={() => navigate('/agent-dashboard')}
@@ -95,15 +132,33 @@ export default function AgentPerformanceDashboard() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Agent Dashboard
           </Button>
-          {isAdmin && agent?.user_id !== user?.id && (
-            <Badge variant="outline">Viewing as Admin</Badge>
+          
+          {isAdmin && (
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="gap-1">
+                <Shield className="h-3 w-3" />
+                Admin View
+              </Badge>
+              <Select value={selectedAgentId || ''} onValueChange={handleAgentChange}>
+                <SelectTrigger className="w-[250px]">
+                  <SelectValue placeholder="Select agent to view" />
+                </SelectTrigger>
+                <SelectContent>
+                  {allAgents.map((a) => (
+                    <SelectItem key={a.id} value={a.id}>
+                      {a.agency_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           )}
         </div>
 
         <div className="mb-8">
           <h1 className="text-4xl font-secondary text-primary mb-2">Performance Dashboard</h1>
           <p className="text-muted-foreground">
-            {agent.agency_name} • Track your performance metrics and achievements
+            {agent.agency_name} • Track performance metrics and achievements
           </p>
         </div>
 
