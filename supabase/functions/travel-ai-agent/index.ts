@@ -332,7 +332,7 @@ function parseDates(input: string): { checkIn?: string; checkOut?: string } {
   }
 
   // MM/DD/YYYY range
-  const mdyRange = s.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})\s*(?:to|-|–|—|until)\s*(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/i);
+  const mdyRange = s.match(/(\d{1,2})[/-](\d{1,2})[/-](\d{4})\s*(?:to|-|–|—|until)\s*(\d{1,2})[/-](\d{1,2})[/-](\d{4})/i);
   if (mdyRange) {
     const m1 = Number(mdyRange[1]), d1 = Number(mdyRange[2]), y1 = Number(mdyRange[3]);
     const m2 = Number(mdyRange[4]), d2 = Number(mdyRange[5]), y2 = Number(mdyRange[6]);
@@ -348,7 +348,7 @@ function parseDates(input: string): { checkIn?: string; checkOut?: string } {
   }
   
   // Single MM/DD/YYYY
-  const mdy = s.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+  const mdy = s.match(/(\d{1,2})[/-](\d{1,2})[/-](\d{4})/);
   if (mdy) {
     const date = toISO(Number(mdy[3]), Number(mdy[1]), Number(mdy[2]));
     console.log(`[parseDates] MM/DD/YYYY single: ${date}`);
@@ -364,7 +364,7 @@ async function searchHotels(args: any) {
   // Extract hotel search intent only - DO NOT call any hotel APIs
   // The Expedia widget will handle the actual search
   try {
-    let { location, checkIn, checkOut, guests = 2, max_total_price, currency = 'USD' } = args;
+    const { location, checkIn, checkOut, guests = 2, max_total_price, currency = 'USD' } = args;
     console.log('🔍 [HOTEL INTENT] Extracting travel preferences:', args);
     
     // ⚠️ SECURITY: Server-side date validation using shared validation helper
@@ -1415,7 +1415,7 @@ The user has saved preferences but has chosen to search without strict filtering
     if (isQuickLink && quickLinkState) {
       const { type, step, data } = quickLinkState;
       let nextStep = step;
-      let nextData = { ...data };
+      const nextData = { ...data };
       let shouldSearch = false;
       
       if (type === 'hotels') {
@@ -1662,7 +1662,7 @@ The user has saved preferences but has chosen to search without strict filtering
     const simplifiedMessage = message.toLowerCase().trim();
     
     // Hotel search patterns
-    const hotelPattern = /(?:find|search|show|get|book|need|looking for|look for)\s+(?:me\s+)?(?:hotels?|accommodations?|places to stay|rooms?)\s+(?:in|at|near)\s+([a-zA-Z\s,]+?)(?:\s+(?:from|for|on|between)\s+([\d\-\/]+))?(?:\s+to\s+([\d\-\/]+))?/i;
+    const hotelPattern = /(?:find|search|show|get|book|need|looking for|look for)\s+(?:me\s+)?(?:hotels?|accommodations?|places to stay|rooms?)\s+(?:in|at|near)\s+([a-zA-Z\s,]+?)(?:\s+(?:from|for|on|between)\s+([\d/-]+))?(?:\s+to\s+([\d/-]+))?/i;
     const hotelMatch = simplifiedMessage.match(hotelPattern);
     
     if (hotelMatch && conversationHistory.length < 2) {

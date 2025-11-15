@@ -17,13 +17,13 @@ export const nameSchema = z
   .trim()
   .min(1, { message: "Name is required" })
   .max(100, { message: "Name must be less than 100 characters" })
-  .regex(/^[a-zA-Z\s'-]+$/, { message: "Name can only contain letters, spaces, hyphens, and apostrophes" });
+  .regex(/^[-a-zA-Z\s']+$/, { message: "Name can only contain letters, spaces, hyphens, and apostrophes" });
 
 // Phone validation
 export const phoneSchema = z
   .string()
   .trim()
-  .regex(/^[\d\s\-\+\(\)]+$/, { message: "Please enter a valid phone number" })
+  .regex(/^[\d\s+()-]+$/, { message: "Please enter a valid phone number" })
   .min(10, { message: "Phone number must be at least 10 digits" })
   .max(20, { message: "Phone number must be less than 20 characters" })
   .optional();

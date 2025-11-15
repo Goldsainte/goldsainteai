@@ -26,7 +26,7 @@ const validateInquiry = (data: any): { success: boolean; error?: string; data?: 
   }
   
   // Phone validation (optional but if provided must be valid)
-  if (phone && (phone.length < 10 || phone.length > 20 || !/^[\d\s\-\+\(\)]+$/.test(phone))) {
+  if (phone && (phone.length < 10 || phone.length > 20 || !/^[\d\s+()-]+$/.test(phone))) {
     return { success: false, error: 'Phone number must be 10-20 digits' };
   }
   

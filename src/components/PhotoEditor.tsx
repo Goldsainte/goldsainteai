@@ -66,7 +66,7 @@ export const PhotoEditor = ({ imageUrl, onSave, onCancel }: PhotoEditorProps) =>
 
     // Shake detection for frame effect
     let lastX = 0, lastY = 0, lastZ = 0;
-    let shakeThreshold = 15;
+    const shakeThreshold = 15;
 
     const handleMotion = (event: DeviceMotionEvent) => {
       const { x, y, z } = event.accelerationIncludingGravity || {};

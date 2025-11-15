@@ -1404,30 +1404,6 @@ Remember: You're an AI search concierge that helps find perfect travel options a
               suggested_cities: args.city ? [args.city] : ["Paris", "Tokyo", "London", "Dubai", "New York City"],
               suggested_cuisines: args.cuisine ? [args.cuisine] : ["French Fine Dining", "Japanese Kaiseki", "Italian Trattoria", "Steakhouse"]
             };
-          } else if (functionName === 'search_flights') {
-            // Call Amadeus proxy for flights
-            console.log('✈️ [AMADEUS] Calling flights proxy:', args);
-            const proxyResponse = await fetch(`${supabaseUrl}/functions/v1/amadeus-proxy`, {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${supabaseKey}`,
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ type: 'flights', ...args }),
-            });
-            result = await proxyResponse.json();
-          } else if (functionName === 'search_hotels') {
-            // Call Amadeus proxy for hotels
-            console.log('🏨 [AMADEUS] Calling hotels proxy:', args);
-            const proxyResponse = await fetch(`${supabaseUrl}/functions/v1/amadeus-proxy`, {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${supabaseKey}`,
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ type: 'hotels', ...args }),
-            });
-            result = await proxyResponse.json();
           } else if (!edgeFunctionName) {
             result = { error: `Unknown function: ${functionName}` };
           } else {

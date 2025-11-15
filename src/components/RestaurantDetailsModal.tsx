@@ -55,7 +55,9 @@ const filteredWebsiteUrl = (() => {
       ];
       if (deprioritized.some(d => host === d || host.endsWith(`.${d}`))) u = undefined;
     }
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to normalize restaurant website URL', error);
+  }
   return u;
 })();
 const reservationTarget = restaurant.reservationUrl || googleSearch || filteredWebsiteUrl;

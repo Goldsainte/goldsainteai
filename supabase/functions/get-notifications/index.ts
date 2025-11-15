@@ -36,7 +36,11 @@ serve(async (req) => {
     const isPost = req.method === "POST";
     let body: any = null;
     if (isPost) {
-      try { body = await req.json(); } catch {}
+      try {
+        body = await req.json();
+      } catch (error) {
+        console.warn('Failed to parse notifications request body', error);
+      }
     }
     const action = (isPost ? body?.action : null) ?? url.searchParams.get("action") ?? "list";
     const notificationId = (isPost ? body?.id : null) ?? url.searchParams.get("id");

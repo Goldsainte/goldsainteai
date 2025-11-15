@@ -94,7 +94,9 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
       try {
         const { data: { user } } = await supabase.auth.getUser();
         setCurrentUserId(user?.id || null);
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to load current user for MomentsViewer', error);
+      }
 
       if (open && userId) {
         fetchMoments();
@@ -348,7 +350,9 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
     if (currentMoment?.media_type === 'video' && videoRef.current) {
       videoRef.current.muted = !next;
       if (next) {
-        videoRef.current.play().catch(() => {});
+        videoRef.current.play().catch((error) => {
+          console.warn('Unable to resume video playback', error);
+        });
       }
     }
 
@@ -358,18 +362,26 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
         audio
           .play()
           .then(() => setAutoplayBlocked(false))
-          .catch(() => setAutoplayBlocked(true));
+          .catch((error) => {
+            console.warn('Unable to resume audio playback', error);
+            setAutoplayBlocked(true);
+          });
       } else if (currentMoment?.music_preview_url) {
         const a = new Audio(currentMoment.music_preview_url);
         a.preload = 'auto';
         a.volume = 0.7;
         try {
           a.currentTime = 0;
-        } catch {}
+        } catch (error) {
+          console.warn('Failed to reset audio preview time', error);
+        }
         a
           .play()
           .then(() => setAutoplayBlocked(false))
-          .catch(() => setAutoplayBlocked(true));
+          .catch((error) => {
+            console.warn('Unable to start audio preview', error);
+            setAutoplayBlocked(true);
+          });
         setAudio(a);
       }
     } else {
@@ -595,9 +607,11 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
                   const a = new Audio(currentMoment.music_preview_url);
                   a.preload = 'auto';
                   a.volume = 0.7;
-                  try {
-                    a.currentTime = 0;
-                  } catch {}
+        try {
+          a.currentTime = 0;
+        } catch (error) {
+          console.warn('Failed to reset overlay audio preview time', error);
+        }
                   a.play()
                     .then(() => setAutoplayBlocked(false))
                     .catch((e) => {
@@ -607,11 +621,15 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
                     });
                   setAudio(a);
                 } else if (audio) {
-                  audio.play().catch(() => {});
+                  audio.play().catch((error) => {
+                    console.warn('Unable to resume overlay audio playback', error);
+                  });
                 }
                 if (currentMoment.media_type === 'video' && videoRef.current) {
                   videoRef.current.muted = false;
-                  videoRef.current.play().catch(() => {});
+                  videoRef.current.play().catch((error) => {
+                    console.warn('Unable to resume video playback with audio', error);
+                  });
                 }
               }}
             >
@@ -631,7 +649,10 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
                   if (audio) {
                     audio.play()
                       .then(() => setAutoplayBlocked(false))
-                      .catch(() => toast.error("Unable to play audio"));
+                      .catch((error) => {
+                        console.error('Audio playback failed after user interaction', error);
+                        toast.error("Unable to play audio");
+                      });
                   }
                 }}
                 className="bg-black/60 text-white text-sm px-3 py-1.5 rounded-full backdrop-blur border border-white/20"

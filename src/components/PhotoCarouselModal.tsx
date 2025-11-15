@@ -99,7 +99,9 @@ const PhotoCarouselModal = ({
       }
 
       return () => {
-        unsubscribe && unsubscribe();
+        if (unsubscribe) {
+          unsubscribe();
+        }
       };
     }
   }, [open, startIndex, postId, user]);
@@ -123,11 +125,14 @@ const PhotoCarouselModal = ({
       audio.loop = true;
       audioRef.current = audio;
       
-      audio.play().then(() => {
-        setIsAudioPlaying(true);
-      }).catch(() => {
-        setIsAudioPlaying(false);
-      });
+      audio.play()
+        .then(() => {
+          setIsAudioPlaying(true);
+        })
+        .catch((error) => {
+          console.warn('Unable to start carousel audio preview', error);
+          setIsAudioPlaying(false);
+        });
     }
 
     return () => {
@@ -314,7 +319,9 @@ const PhotoCarouselModal = ({
         await navigator.share({ title: caption || 'Check this out', url: shareUrl });
         return;
       }
-    } catch {}
+    } catch (error) {
+      console.warn('Native share failed for Instagram', error);
+    }
 
     // Try app deep link
     const appUrl = 'instagram://app';
@@ -335,7 +342,9 @@ const PhotoCarouselModal = ({
         await navigator.share({ title: caption || 'Check this out', url: shareUrl });
         return;
       }
-    } catch {}
+    } catch (error) {
+      console.warn('Native share failed for TikTok', error);
+    }
 
     const appUrl = 'tiktok://app';
     const webUrl = 'https://www.tiktok.com/upload';

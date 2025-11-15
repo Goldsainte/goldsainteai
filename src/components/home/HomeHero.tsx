@@ -51,9 +51,10 @@ export function HomeHero() {
         {HERO_IMAGES.map((url, i) => (
           <div
             key={url}
-            className="absolute inset-0 transition-opacity duration-[1800ms]"
+            className="absolute inset-0 transition-opacity"
             style={{
               opacity: i === bgIndex ? 1 : 0,
+              transitionDuration: "1800ms",
             }}
           >
             <img

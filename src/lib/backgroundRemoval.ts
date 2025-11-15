@@ -1,9 +1,3 @@
-import { pipeline, env } from '@huggingface/transformers';
-
-// Configure transformers to use browser cache
-env.allowLocalModels = false;
-env.useBrowserCache = true;
-
 const MAX_IMAGE_DIMENSION = 1024;
 
 function resizeImageIfNeeded(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, image: HTMLImageElement) {
@@ -22,94 +16,102 @@ function resizeImageIfNeeded(canvas: HTMLCanvasElement, ctx: CanvasRenderingCont
     canvas.width = width;
     canvas.height = height;
     ctx.drawImage(image, 0, 0, width, height);
-    return true;
+    return;
   }
 
   canvas.width = width;
   canvas.height = height;
   ctx.drawImage(image, 0, 0);
-  return false;
+}
+
+type RGB = { r: number; g: number; b: number };
+
+function sampleBorderColor(data: Uint8ClampedArray, width: number, height: number): RGB {
+  const samples: RGB[] = [];
+  const stepX = Math.max(1, Math.floor(width / 50));
+  const stepY = Math.max(1, Math.floor(height / 50));
+
+  for (let x = 0; x < width; x += stepX) {
+    const topIndex = (x * 4);
+    const bottomIndex = ((height - 1) * width + x) * 4;
+    samples.push({ r: data[topIndex], g: data[topIndex + 1], b: data[topIndex + 2] });
+    samples.push({ r: data[bottomIndex], g: data[bottomIndex + 1], b: data[bottomIndex + 2] });
+  }
+
+  for (let y = 0; y < height; y += stepY) {
+    const leftIndex = (y * width) * 4;
+    const rightIndex = (y * width + (width - 1)) * 4;
+    samples.push({ r: data[leftIndex], g: data[leftIndex + 1], b: data[leftIndex + 2] });
+    samples.push({ r: data[rightIndex], g: data[rightIndex + 1], b: data[rightIndex + 2] });
+  }
+
+  const total = samples.reduce<RGB>((acc, value) => ({
+    r: acc.r + value.r,
+    g: acc.g + value.g,
+    b: acc.b + value.b,
+  }), { r: 0, g: 0, b: 0 });
+
+  const count = samples.length || 1;
+  return {
+    r: total.r / count,
+    g: total.g / count,
+    b: total.b / count,
+  };
+}
+
+function colorDistance(a: RGB, b: RGB): number {
+  const dr = a.r - b.r;
+  const dg = a.g - b.g;
+  const db = a.b - b.b;
+  return Math.sqrt(dr * dr + dg * dg + db * db);
+}
+
+function applyMask(imageData: ImageData, background: RGB): ImageData {
+  const output = new ImageData(imageData.width, imageData.height);
+  const threshold = 40; // Empirical threshold suitable for most studio-style backgrounds
+
+  for (let i = 0; i < imageData.data.length; i += 4) {
+    const current: RGB = {
+      r: imageData.data[i],
+      g: imageData.data[i + 1],
+      b: imageData.data[i + 2],
+    };
+
+    const distance = colorDistance(current, background);
+    output.data[i] = current.r;
+    output.data[i + 1] = current.g;
+    output.data[i + 2] = current.b;
+    output.data[i + 3] = distance > threshold ? imageData.data[i + 3] : 0;
+  }
+
+  return output;
 }
 
 export const removeBackground = async (imageElement: HTMLImageElement): Promise<Blob> => {
-  try {
-    console.log('Starting background removal process...');
-    const segmenter = await pipeline('image-segmentation', 'Xenova/segformer-b0-finetuned-ade-512-512', {
-      device: 'webgpu',
-    });
-    
-    // Convert HTMLImageElement to canvas
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    
-    if (!ctx) throw new Error('Could not get canvas context');
-    
-    // Resize image if needed and draw it to canvas
-    const wasResized = resizeImageIfNeeded(canvas, ctx, imageElement);
-    console.log(`Image ${wasResized ? 'was' : 'was not'} resized. Final dimensions: ${canvas.width}x${canvas.height}`);
-    
-    // Get image data as base64
-    const imageData = canvas.toDataURL('image/jpeg', 0.8);
-    console.log('Image converted to base64');
-    
-    // Process the image with the segmentation model
-    console.log('Processing with segmentation model...');
-    const result = await segmenter(imageData);
-    
-    console.log('Segmentation result:', result);
-    
-    if (!result || !Array.isArray(result) || result.length === 0 || !result[0].mask) {
-      throw new Error('Invalid segmentation result');
-    }
-    
-    // Create a new canvas for the masked image
-    const outputCanvas = document.createElement('canvas');
-    outputCanvas.width = canvas.width;
-    outputCanvas.height = canvas.height;
-    const outputCtx = outputCanvas.getContext('2d');
-    
-    if (!outputCtx) throw new Error('Could not get output canvas context');
-    
-    // Draw original image
-    outputCtx.drawImage(canvas, 0, 0);
-    
-    // Apply the mask
-    const outputImageData = outputCtx.getImageData(
-      0, 0,
-      outputCanvas.width,
-      outputCanvas.height
-    );
-    const data = outputImageData.data;
-    
-    // Apply inverted mask to alpha channel
-    for (let i = 0; i < result[0].mask.data.length; i++) {
-      // Invert the mask value (1 - value) to keep the subject instead of the background
-      const alpha = Math.round((1 - result[0].mask.data[i]) * 255);
-      data[i * 4 + 3] = alpha;
-    }
-    
-    outputCtx.putImageData(outputImageData, 0, 0);
-    console.log('Mask applied successfully');
-    
-    // Convert canvas to blob
-    return new Promise((resolve, reject) => {
-      outputCanvas.toBlob(
-        (blob) => {
-          if (blob) {
-            console.log('Successfully created final blob');
-            resolve(blob);
-          } else {
-            reject(new Error('Failed to create blob'));
-          }
-        },
-        'image/png',
-        1.0
-      );
-    });
-  } catch (error) {
-    console.error('Error removing background:', error);
-    throw error;
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) {
+    throw new Error('Could not get canvas context');
   }
+
+  resizeImageIfNeeded(canvas, ctx, imageElement);
+
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const backgroundColor = sampleBorderColor(imageData.data, canvas.width, canvas.height);
+  const maskedImage = applyMask(imageData, backgroundColor);
+
+  ctx.putImageData(maskedImage, 0, 0);
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) {
+        resolve(blob);
+      } else {
+        reject(new Error('Failed to create blob'));
+      }
+    }, 'image/png', 1.0);
+  });
 };
 
 export const loadImage = (file: Blob): Promise<HTMLImageElement> => {

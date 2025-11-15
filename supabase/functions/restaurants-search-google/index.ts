@@ -142,7 +142,7 @@ serve(async (req) => {
     }
 
     // Build search query
-    let searchQuery = cuisine 
+    const searchQuery = cuisine
       ? `${cuisine} fine dining restaurant in ${city}`
       : `fine dining restaurant in ${city}`;
 

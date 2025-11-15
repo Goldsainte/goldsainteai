@@ -324,6 +324,7 @@ export default function TripRequestDetailPage() {
     if (!trip.selected_proposal_id) return;
 
     setBookingLoading(true);
+    setError(null);
     try {
       // For now we can derive a simple total price from the accepted proposal
       const accepted = proposals.find(
@@ -373,8 +374,10 @@ export default function TripRequestDetailPage() {
       console.log("Booking created:", booking);
     } catch (err: any) {
       console.error(err);
-      // Optionally surface error in UI
-      // setSomeBookingError(err.message ?? "Could not mark as booked.");
+      const message = typeof err?.message === "string"
+        ? err.message
+        : "Could not mark this trip as booked. Please try again.";
+      setError(message);
     } finally {
       setBookingLoading(false);
     }

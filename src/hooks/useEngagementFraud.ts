@@ -51,17 +51,18 @@ export const useEngagementFraud = () => {
       const result = data as unknown as EngagementCheckResult;
 
       if (!result.allowed) {
-        let toastMessage = result.message || 'Action not allowed';
+        const toastMessage = result.message || 'Action not allowed';
         let toastDescription = '';
 
         switch (result.reason) {
           case 'new_account':
             toastDescription = 'Please wait a bit before engaging with content';
             break;
-          case 'rate_limit':
+          case 'rate_limit': {
             const minutes = Math.ceil((result.retry_after || 3600) / 60);
             toastDescription = `Please try again in ${minutes} minute${minutes > 1 ? 's' : ''}`;
             break;
+          }
           case 'restricted':
             toastDescription = 'Your account has temporary restrictions. Contact support if you believe this is an error.';
             break;
