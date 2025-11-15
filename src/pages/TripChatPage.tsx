@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Loader2, MessageCircle, ArrowLeft } from "lucide-react";
 import { useTripRequestMessages } from "@/hooks/useTripRequestMessages";
-import { validateChatMessage } from "@/utils/chatGuard";
+import { validateChatMessage, validateOnPlatformMessage } from "@/utils/chatGuard";
 
 type TripRequest = {
   id: string;
@@ -144,10 +144,15 @@ export default function TripChatPage() {
 
     const body = inputValue.trim();
 
-    // Validate message for content safety and off-platform contact
     const validation = validateChatMessage(body);
     if (!validation.valid) {
       setError(validation.error || "Message cannot be sent.");
+      return;
+    }
+
+    const guardError = validateOnPlatformMessage(body);
+    if (guardError) {
+      setError(guardError);
       return;
     }
 

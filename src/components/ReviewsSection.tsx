@@ -59,7 +59,7 @@ export const ReviewsSection = ({ hotelId, hotelName, averageRating, totalReviews
   }, [realReviews]);
 
   const sortedReviews = useMemo(() => {
-    let sorted = [...reviews];
+    const sorted = [...reviews];
     
     switch (sortBy) {
       case "highest_rated":

@@ -157,7 +157,7 @@ export const EnhancedSearchBar = ({ initialSearchType = "hotels", isCompact = fa
 
   const handleSearch = () => {
     let searchData: any = { type: searchType };
-    let params = new URLSearchParams({ type: searchType });
+    const params = new URLSearchParams({ type: searchType });
 
     if (searchType === "flights") {
       if (!origin.trim() || !destination.trim() || !departureDate) {

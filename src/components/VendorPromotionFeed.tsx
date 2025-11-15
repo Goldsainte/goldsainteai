@@ -50,6 +50,12 @@ export default function VendorPromotionFeed({
     fetchPromotedVendors();
   }, []);
 
+  useEffect(() => {
+    promotedVendors.forEach((vendor) => {
+      trackImpression(vendor.id);
+    });
+  }, [promotedVendors]);
+
   const fetchPromotedVendors = async () => {
     try {
       const { data, error } = await supabase.functions.invoke('get-promoted-vendors', {
@@ -128,14 +134,8 @@ export default function VendorPromotionFeed({
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {promotedVendors.map((vendor) => {
-          // Track impression when vendor card is visible
-          useEffect(() => {
-            trackImpression(vendor.id);
-          }, []);
-
-          return (
-            <Card key={vendor.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+        {promotedVendors.map((vendor) => (
+          <Card key={vendor.id} className="overflow-hidden hover:shadow-lg transition-shadow">
               <div className="relative">
                 {vendor.promotionalMedia.length > 0 ? (
                   <Carousel className="w-full">
@@ -219,8 +219,7 @@ export default function VendorPromotionFeed({
                 </Button>
               </CardContent>
             </Card>
-          );
-        })}
+        ))}
       </div>
     </div>
   );

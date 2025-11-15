@@ -97,7 +97,7 @@ export const ResultsMapView = ({ location, results, type = 'hotels' }: ResultsMa
           coords.push([lng, lat]);
         }
       });
-      let initialCenter: [number, number] = coords.length
+      const initialCenter: [number, number] = coords.length
         ? [coords.reduce((s, c) => s + c[0], 0) / coords.length, coords.reduce((s, c) => s + c[1], 0) / coords.length]
         : [-80.1936200, 25.7741728]; // default to Miami if no coords
 

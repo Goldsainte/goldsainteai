@@ -21,7 +21,7 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Build AI prompt for content analysis
-    let prompt = `Analyze the following content for policy violations. Check for:
+    const prompt = `Analyze the following content for policy violations. Check for:
 - Nudity or sexual content
 - Hate speech or harassment
 - Graphic violence

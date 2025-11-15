@@ -16,11 +16,11 @@ const corsHeaders = {
 const stripRoutes = (text: string): string => {
   return text
     // Remove parenthetical route references e.g. "(/travel-profile)"
-    .replace(/\s*\(\/[^\)]+\)/g, '')
+    .replace(/\s*\(\/[^)]+\)/g, '')
     // Remove "at /path", "visit /path", etc.
-    .replace(/\s+(?:at|visit|go to|or visit|or go to)\s+\/[^\s\.,)]+/gi, '')
+    .replace(/\s+(?:at|visit|go to|or visit|or go to)\s+\/[^\s.,)]+/gi, '')
     // Remove any remaining naked "/path" strings
-    .replace(/\/[a-z0-9\-\/\?=]+/gi, '')
+    .replace(/\/[a-z0-9/?=-]+/gi, '')
     // Clean up extra spaces
     .replace(/\s{2,}/g, ' ')
     .trim();
@@ -357,7 +357,7 @@ serve(async (req) => {
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    let conversationMessages = [
+    const conversationMessages = [
       { role: "system", content: systemPrompt },
       ...messages,
     ];

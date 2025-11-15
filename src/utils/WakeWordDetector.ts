@@ -13,6 +13,14 @@ export class WakeWordDetector {
   private watchdogTimer: number | null = null;
   private micKeepAliveStream: MediaStream | null = null;
 
+  private swallow(action: () => void, context: string) {
+    try {
+      action();
+    } catch (error) {
+      console.warn(`[WakeWord] ${context}`, error);
+    }
+  }
+
   constructor(onWake: WakeCallback) {
     this.onWake = onWake;
   }
@@ -56,9 +64,7 @@ export class WakeWordDetector {
       const silenceFor = Date.now() - this.lastEventAt;
       if (silenceFor >= 7000) {
         console.warn("[WakeWord] Watchdog restarting after silence");
-        try {
-          this.recognition!.abort();
-        } catch {}
+        this.swallow(() => this.recognition!.abort(), "failed to abort recognition during watchdog restart");
       } else {
         this.armWatchdog();
       }
@@ -121,9 +127,7 @@ export class WakeWordDetector {
         console.log("[WakeWord] Wake word detected!");
         // 🔴 CRITICAL FIX: Stop recognition BEFORE firing callback
         // This prevents Chrome from aborting recognition when TTS/WebRTC starts
-        try {
-          this.recognition?.stop();
-        } catch {}
+        this.swallow(() => this.recognition?.stop(), "failed to stop recognition after wake word");
         this.running = false;
         this.clearWatchdog();
         
@@ -142,9 +146,7 @@ export class WakeWordDetector {
         return;
       }
       // soft restart on other errors
-      try {
-        this.recognition?.abort();
-      } catch {}
+      this.swallow(() => this.recognition?.abort(), "failed to abort recognition after error");
     };
 
     this.recognition.onend = () => {
@@ -160,9 +162,7 @@ export class WakeWordDetector {
           this.backoffMs = Math.min(this.backoffMs * 2, this.maxBackoffMs);
           setTimeout(() => {
             if (this.running) {
-              try {
-                this.recognition!.abort();
-              } catch {}
+              this.swallow(() => this.recognition!.abort(), "failed to abort recognition during restart backoff");
             }
           }, this.backoffMs);
         }
@@ -177,11 +177,8 @@ export class WakeWordDetector {
     }
 
     // Keep AudioContext alive if you have one
-    document.addEventListener("visibilitychange", async () => {
-      try {
-        // if you maintain a shared AudioContext, resume it here
-        // await audioContext.resume();
-      } catch {}
+    document.addEventListener("visibilitychange", () => {
+      // Placeholder hook: resume any shared AudioContext here if needed.
     });
   }
 
@@ -189,10 +186,10 @@ export class WakeWordDetector {
     this.running = false;
     this.clearWatchdog();
     if (this.recognition) {
-      try { this.recognition.onresult = null; } catch {}
-      try { this.recognition.onend = null; } catch {}
-      try { this.recognition.onerror = null; } catch {}
-      try { this.recognition.stop(); } catch {}
+      this.swallow(() => { this.recognition!.onresult = null; }, "failed to clear onresult handler");
+      this.swallow(() => { this.recognition!.onend = null; }, "failed to clear onend handler");
+      this.swallow(() => { this.recognition!.onerror = null; }, "failed to clear onerror handler");
+      this.swallow(() => { this.recognition!.stop(); }, "failed to stop recognition cleanly");
       this.recognition = null;
     }
     if (this.micKeepAliveStream) {

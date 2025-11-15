@@ -20,10 +20,14 @@ export default function Redirect() {
       window.location.replace(decoded);
       // Fallback attempt for Safari COOP edge cases
       setTimeout(() => {
-        try { window.location.href = decoded; } catch {}
+        try {
+          window.location.href = decoded;
+        } catch (error) {
+          console.warn('Failed to update window location during redirect fallback', error);
+        }
       }, 300);
-    } catch (e) {
-      // Silently fail
+    } catch (error) {
+      console.warn('Failed to process redirect target', error);
     }
   }, [params]);
   const to = params.get("to");
@@ -35,7 +39,9 @@ export default function Redirect() {
       const tgt = new URL(decodedHref);
       hostAllowedForManual = ['https:', 'http:', 'mailto:', 'tel:'].includes(tgt.protocol);
     }
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to decode redirect parameter', error);
+  }
   
   return (
     <main className="min-h-[50vh] flex items-center justify-center">

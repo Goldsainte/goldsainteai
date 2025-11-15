@@ -57,12 +57,12 @@ async function generateToken(privateKey: string, teamId: string, keyId: string):
     }
 
     if (bytes[offset++] !== 0x02) throw new Error('Invalid DER signature: missing INTEGER (r)');
-    let rLen = bytes[offset++];
+    const rLen = bytes[offset++];
     let r = bytes.slice(offset, offset + rLen);
     offset += rLen;
 
     if (bytes[offset++] !== 0x02) throw new Error('Invalid DER signature: missing INTEGER (s)');
-    let sLen = bytes[offset++];
+    const sLen = bytes[offset++];
     let s = bytes.slice(offset, offset + sLen);
 
     // Remove sign padding 0x00 if present

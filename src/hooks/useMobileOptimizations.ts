@@ -69,7 +69,7 @@ export const useKeyboardVisibility = (callback: (isVisible: boolean) => void) =>
   useEffect(() => {
     if (!isMobileDevice()) return;
 
-    let initialHeight = window.innerHeight;
+    const initialHeight = window.innerHeight;
 
     const handleResize = () => {
       const currentHeight = window.innerHeight;

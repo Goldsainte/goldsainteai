@@ -23,7 +23,7 @@ const sanitizeText = (text: string): string => {
     .replace(/Ã¶/g, 'ö')
     .replace(/Â´/g, "'")
     .replace(/Â/g, '')
-    .replace(/[^\x00-\x7F]/g, (char) => {
+    .replace(/[^ -~]/g, (char) => {
       const replacements: {[key: string]: string} = {
         '\u2018': "'", '\u2019': "'", '\u201C': '"', '\u201D': '"',
         '\u2014': '-', '\u2013': '-', '\u2026': '...', '\u2022': '*',

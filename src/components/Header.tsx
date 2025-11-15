@@ -49,6 +49,9 @@ export const Header = () => {
   const [profileAvatarUrl, setProfileAvatarUrl] = useState<string | null>(null);
   const { balance } = useCoinBalance();
   const { openModal: openExpediaModal } = useExpediaModal();
+  const accountType = (user?.user_metadata?.account_type as string | undefined)?.toLowerCase();
+  const showPartnerBookings = accountType === "creator" || accountType === "agent";
+  const primaryBookingsPath = showPartnerBookings ? "/partner-bookings" : "/my-bookings";
 
   const handleLanguageChange = (language: string) => {
     setCurrentLanguage(language);
@@ -616,9 +619,46 @@ export const Header = () => {
                         <span className="text-sm font-medium">Request Trip</span>
                       </DropdownMenuItem>
                     </div>
-                    
+
                     <DropdownMenuSeparator className="bg-border/50" />
-                    
+
+                    {user && (
+                      <>
+                        <div className="px-4 py-3 border-b border-border/50">
+                          <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">
+                            Trips & Bookings
+                          </p>
+                        </div>
+                        <div className="py-2">
+                          <DropdownMenuItem
+                            onClick={() => navigate('/my-trip-requests')}
+                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <Calendar className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">Trip Requests</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => navigate('/my-bookings')}
+                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <HandCoins className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">My Bookings</span>
+                          </DropdownMenuItem>
+                          {showPartnerBookings && (
+                            <DropdownMenuItem
+                              onClick={() => navigate('/partner-bookings')}
+                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                            >
+                              <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                              <span className="text-sm font-medium">Partner Bookings</span>
+                            </DropdownMenuItem>
+                          )}
+                        </div>
+
+                        <DropdownMenuSeparator className="bg-border/50" />
+                      </>
+                    )}
+
                     {/* Professional Section */}
                     <div className="px-4 py-3 border-b border-border/50">
                       <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Professional</p>
@@ -865,7 +905,7 @@ export const Header = () => {
               <Search className="h-5 w-5" />
               <span className="text-xs">Search</span>
             </button>
-            
+
             <button
               onClick={() => navigate('/marketplace')}
               className="flex flex-col items-center justify-center gap-1 hover:bg-muted transition-colors min-h-[44px]"
@@ -875,7 +915,17 @@ export const Header = () => {
               <Briefcase className="h-5 w-5" />
               <span className="text-xs">Marketplace</span>
             </button>
-            
+
+            <button
+              onClick={() => (user ? navigate(primaryBookingsPath) : navigate('/auth'))}
+              className="flex flex-col items-center justify-center gap-1 hover:bg-muted transition-colors min-h-[44px]"
+              aria-label="Bookings"
+              data-tour="bookings"
+            >
+              <Calendar className="h-5 w-5" />
+              <span className="text-xs">Bookings</span>
+            </button>
+
             <button
               onClick={() => user ? navigate(`/creator/${user.id}`) : navigate('/auth')}
               className="flex flex-col items-center justify-center gap-1 hover:bg-muted transition-colors min-h-[44px]"

@@ -258,6 +258,10 @@ export default function BookingDetailPage() {
         if (disputesData) {
           setDisputes(disputesData as Dispute[]);
         }
+
+        setBooking((prev) =>
+          prev ? { ...prev, status: "disputed" } : prev,
+        );
       }
     } finally {
       setDisputeSubmitting(false);

@@ -111,7 +111,23 @@ export const AIBookingConcierge = () => {
   const { language } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
-  
+
+  const safelyCancelSpeechSynthesis = () => {
+    try {
+      window.speechSynthesis?.cancel();
+    } catch (error) {
+      console.warn('Failed to cancel speech synthesis', error);
+    }
+  };
+
+  const safelyStopHoldMusic = () => {
+    try {
+      holdMusicRef.current?.stop();
+    } catch (error) {
+      console.warn('Failed to stop hold music', error);
+    }
+  };
+
   // Check if Web Speech API is supported (Safari fallback detection)
   const speechSupported = typeof (window as any).SpeechRecognition !== "undefined" ||
                           typeof (window as any).webkitSpeechRecognition !== "undefined";
@@ -929,8 +945,8 @@ export const AIBookingConcierge = () => {
         // Resume wake word detection after error with delay
         console.log('🔄 Resuming wake word detection after voice error');
         setTimeout(async () => {
-          try { window.speechSynthesis?.cancel(); } catch {}
-          try { holdMusicRef.current?.stop(); } catch {}
+          safelyCancelSpeechSynthesis();
+          safelyStopHoldMusic();
           await new Promise(r => setTimeout(r, 200));
           await startWakeWordDetection();
         }, 200);
@@ -947,8 +963,8 @@ export const AIBookingConcierge = () => {
       }
       console.log('▶️ Resuming wake word detection after delay');
       setTimeout(async () => {
-        try { window.speechSynthesis?.cancel(); } catch {}
-        try { holdMusicRef.current?.stop(); } catch {}
+        safelyCancelSpeechSynthesis();
+        safelyStopHoldMusic();
         await new Promise(r => setTimeout(r, 200));
         await startWakeWordDetection();
       }, 200);
@@ -968,8 +984,8 @@ export const AIBookingConcierge = () => {
       console.log('🎤 [WAKE_WORD] Starting detection...');
       
       // CRITICAL: Stop all audio before starting recognition
-      try { window.speechSynthesis?.cancel(); } catch {}
-      try { holdMusicRef.current?.stop(); } catch {}
+      safelyCancelSpeechSynthesis();
+      safelyStopHoldMusic();
       
       // Wait for audio to settle
       await new Promise(r => setTimeout(r, 100));
@@ -1028,8 +1044,8 @@ export const AIBookingConcierge = () => {
       console.log('🎤 [ENABLE_WAKE] Starting wake word detection');
       
       // 1) Stop any hold music / TTS
-      try { window.speechSynthesis?.cancel(); } catch {}
-      try { holdMusicRef.current?.stop(); } catch {}
+      safelyCancelSpeechSynthesis();
+      safelyStopHoldMusic();
       
       // 2) Wait for audio to settle
       await new Promise(r => setTimeout(r, 100));

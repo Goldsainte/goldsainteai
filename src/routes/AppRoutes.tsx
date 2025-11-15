@@ -46,7 +46,6 @@ const MyTripRequestsPage = lazy(() => import('@/pages/MyTripRequestsPage'));
 const MyBookingsPage = lazy(() => import('@/pages/MyBookingsPage'));
 const PartnerBookingsPage = lazy(() => import('@/pages/PartnerBookingsPage'));
 const BookingPreferencesRedirect = lazy(() => import('@/pages/redirects/BookingPreferencesRedirect'));
-const MyBookingsRedirect = lazy(() => import('@/pages/redirects/MyBookingsRedirect'));
 const FavoritesRedirect = lazy(() => import('@/pages/redirects/FavoritesRedirect'));
 const CommissionDashboard = lazy(() => import('@/pages/CommissionDashboard'));
 const EmailPreview = lazy(() => import('@/pages/EmailPreview'));
@@ -227,9 +226,9 @@ export const AppRoutes = () => (
       <Route path="/trip-request/:id" element={<TripRequestDetailPage />} />
       <Route path="/trip-request/:id/chat" element={<TripChatPage />} />
       <Route path="/my-trip-requests" element={<MyTripRequestsPage />} />
-          <Route path="/my-bookings" element={<MyBookingsPage />} />
-          <Route path="/partner-bookings" element={<PartnerBookingsPage />} />
-          <Route path="/booking/:id" element={<BookingDetailPage />} />
+      <Route path="/my-bookings" element={<MyBookingsPage />} />
+      <Route path="/partner-bookings" element={<PartnerBookingsPage />} />
+      <Route path="/booking/:id" element={<BookingDetailPage />} />
       <Route path="/agent/:agentId" element={<AgentProfile />} />
       <Route path="/agent-onboarding" element={<AgentOnboarding />} />
       <Route path="/agent-dashboard" element={<RequireAgentTerms><AgentDashboard /></RequireAgentTerms>} />
@@ -242,7 +241,6 @@ export const AppRoutes = () => (
       <Route path="/favorites" element={<FavoritesRedirect />} />
       <Route path="/collections" element={<Collections />} />
       <Route path="/collections/:collectionId" element={<CollectionDetail />} />
-      <Route path="/my-bookings" element={<MyBookingsRedirect />} />
       <Route path="/booking-history" element={<BookingHistory />} />
       <Route path="/subscription" element={<Subscription />} />
       <Route path="/billing-dashboard" element={<BillingDashboard />} />

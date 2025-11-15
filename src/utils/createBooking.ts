@@ -78,6 +78,14 @@ export async function createBookingFromProposal(args: {
     throw new Error("Could not create booking.");
   }
 
+  await supabase.from("booking_status_history").insert({
+    booking_id: booking.id,
+    old_status: null,
+    new_status: booking.status,
+    changed_by: user.id,
+    reason: "Booking created from accepted proposal",
+  });
+
   // Update trip + proposal for backwards compatibility
   await supabase
     .from("trip_requests")

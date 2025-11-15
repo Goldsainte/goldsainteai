@@ -64,9 +64,9 @@ export const HelpCenterChat = () => {
   // Sanitize assistant content to remove any route references
   const sanitizeAssistantContent = (content: string): string => {
     return content
-      .replace(/\s*\(\/[^\)]+\)/g, '')
-      .replace(/\s+(?:at|visit|go to|or visit|or go to)\s+\/[^\s\.,)]+/gi, '')
-      .replace(/\/[a-z0-9\-\/\?=]+/gi, '')
+      .replace(/\s*\(\/[^)]+\)/g, '')
+      .replace(/\s+(?:at|visit|go to|or visit|or go to)\s+\/[^\s.,)]+/gi, '')
+      .replace(/\/[a-z0-9/?=-]+/gi, '')
       .replace(/\s{2,}/g, ' ')
       .trim();
   };
