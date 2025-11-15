@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { useUserRole } from "@/hooks/useUserRole";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
-import { Shield, Users, Activity, TrendingUp } from "lucide-react";
+import { Shield, Users, Activity, TrendingUp, AlertCircle } from "lucide-react";
 
 type SubscriptionTier = 'free' | 'premium' | 'enterprise';
 
@@ -31,53 +33,26 @@ interface RateLimitStats {
 
 export default function Admin() {
   const navigate = useNavigate();
+  const { isAdmin, loading: roleLoading } = useUserRole();
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [subscriptions, setSubscriptions] = useState<UserSubscription[]>([]);
   const [rateLimitStats, setRateLimitStats] = useState<RateLimitStats[]>([]);
   const [updating, setUpdating] = useState<string | null>(null);
 
   useEffect(() => {
-    checkAdminStatus();
-  }, []);
-
-  const checkAdminStatus = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast.error("Please log in to access admin dashboard");
-        navigate("/");
-        return;
-      }
-
-      // Check if user has admin role
-      const { data: roles, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin')
-        .single();
-
-      if (error || !roles) {
-        toast.error("Access denied: Admin privileges required");
-        navigate("/");
-        return;
-      }
-
-      setIsAdmin(true);
-      await loadData();
-    } catch (error) {
-      console.error('Admin check error:', error);
-      toast.error("Failed to verify admin status");
-      navigate("/");
-    } finally {
+    if (roleLoading) return;
+    
+    if (!isAdmin) {
       setLoading(false);
+      return;
     }
-  };
+
+    loadData();
+  }, [isAdmin, roleLoading]);
 
   const loadData = async () => {
     try {
+      setLoading(true);
       // Load user subscriptions
       const { data: subs, error: subsError } = await supabase
         .from('user_subscriptions')
@@ -120,6 +95,8 @@ export default function Admin() {
     } catch (error) {
       console.error('Load data error:', error);
       toast.error("Failed to load dashboard data");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -171,6 +148,27 @@ export default function Admin() {
   const totalRequests = rateLimitStats.reduce((sum, stat) => sum + stat.total_requests, 0);
   const premiumUsers = subscriptions.filter(s => s.tier === 'premium').length;
   const enterpriseUsers = subscriptions.filter(s => s.tier === 'enterprise').length;
+
+  if (roleLoading || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Alert variant="destructive" className="max-w-md">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Access denied: Admin privileges required to view this page.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
