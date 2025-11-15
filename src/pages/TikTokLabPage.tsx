@@ -1,6 +1,7 @@
 import { Sparkles, PlayCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { StoryboardPreview } from "@/components/home/StoryboardPreview";
 
 const BRAND_BG = "bg-gradient-to-b from-[#0a2225] via-[#0a2225] to-[#E5DFC6]";
 
@@ -100,6 +101,9 @@ export default function TikTokLabPage() {
           />
         </div>
       </section>
+
+      {/* Storyboard preview */}
+      <StoryboardPreview />
 
       {/* TikTok collab CTA */}
       <section className="mx-auto max-w-6xl px-4 pb-12">
