@@ -39,7 +39,7 @@ export default function PartnerBookingsPage() {
       }
 
       const { data, error } = await supabase
-        .from("bookings")
+        .from("trip_bookings")
         .select(
           `
           id,
