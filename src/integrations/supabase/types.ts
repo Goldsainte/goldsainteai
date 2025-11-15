@@ -8595,6 +8595,66 @@ export type Database = {
           },
         ]
       }
+      trip_requests: {
+        Row: {
+          budget_max: number | null
+          budget_min: number | null
+          created_at: string
+          description: string | null
+          destination: string | null
+          end_date: string | null
+          flexible_dates: boolean | null
+          id: string
+          start_date: string | null
+          status: string
+          tiktok_link: string | null
+          title: string | null
+          travelers_adults: number | null
+          travelers_children: number | null
+          trip_style: string[] | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          budget_max?: number | null
+          budget_min?: number | null
+          created_at?: string
+          description?: string | null
+          destination?: string | null
+          end_date?: string | null
+          flexible_dates?: boolean | null
+          id?: string
+          start_date?: string | null
+          status?: string
+          tiktok_link?: string | null
+          title?: string | null
+          travelers_adults?: number | null
+          travelers_children?: number | null
+          trip_style?: string[] | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          budget_max?: number | null
+          budget_min?: number | null
+          created_at?: string
+          description?: string | null
+          destination?: string | null
+          end_date?: string | null
+          flexible_dates?: boolean | null
+          id?: string
+          start_date?: string | null
+          status?: string
+          tiktok_link?: string | null
+          title?: string | null
+          travelers_adults?: number | null
+          travelers_children?: number | null
+          trip_style?: string[] | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       trip_stories: {
         Row: {
           caption: string
