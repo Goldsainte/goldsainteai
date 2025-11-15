@@ -1,496 +1,427 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Sparkles, Calendar, Users, Link2, Loader2 } from "lucide-react";
 
-type TripFormState = {
-  tripTitle: string;
+type TripForm = {
+  title: string;
   destination: string;
-  departingFrom: string;
   startDate: string;
   endDate: string;
   flexibleDates: boolean;
-  travelers: string;
-  tripType: string;
-  travelStyle: string;
+  adults: string;
+  children: string;
   budgetMin: string;
   budgetMax: string;
+  tripStyle: string;
   description: string;
-  specialRequests: string;
+  tiktokLink: string;
 };
 
-const initialState: TripFormState = {
-  tripTitle: "",
+const EMPTY_FORM: TripForm = {
+  title: "",
   destination: "",
-  departingFrom: "",
   startDate: "",
   endDate: "",
   flexibleDates: false,
-  travelers: "",
-  tripType: "",
-  travelStyle: "",
+  adults: "2",
+  children: "0",
   budgetMin: "",
   budgetMax: "",
+  tripStyle: "",
   description: "",
-  specialRequests: "",
+  tiktokLink: "",
 };
 
 export default function RequestTrip() {
-  const [form, setForm] = useState<TripFormState>(initialState);
-  const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { user, isLoading } = useAuth();
 
+  const [form, setForm] = useState<TripForm>(EMPTY_FORM);
+  const [loadingUser, setLoadingUser] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successId, setSuccessId] = useState<string | null>(null);
+
+  // Ensure user is logged in
   useEffect(() => {
-    if (!isLoading && !user) {
-      toast.error("Please sign in to post a trip request");
-      navigate("/auth");
-    }
-  }, [user, isLoading, navigate]);
+    let isMounted = true;
 
-  function handleChange(
-    field: keyof TripFormState,
-    value: string | boolean
-  ) {
-    setForm((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    async function checkAuth() {
+      setLoadingUser(true);
+      const { data, error } = await supabase.auth.getUser();
+      if (!isMounted) return;
+
+      if (error || !data.user) {
+        navigate("/login?redirect=/marketplace/request-trip", { replace: true });
+        return;
+      }
+
+      setLoadingUser(false);
+    }
+
+    checkAuth();
+    return () => {
+      isMounted = false;
+    };
+  }, [navigate]);
+
+  function updateField<K extends keyof TripForm>(key: K, value: TripForm[K]) {
+    setForm((prev) => ({ ...prev, [key]: value }));
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-
-    if (!user) {
-      setError("Please sign in to post a trip request");
-      navigate("/auth");
-      return;
-    }
-
-    if (!form.destination || !form.tripTitle || !form.travelers) {
-      setError("Please fill in trip title, destination, and number of travelers.");
-      return;
-    }
-
+    setSuccessId(null);
     setSubmitting(true);
 
     try {
-      const { error } = await supabase.from("marketplace_jobs").insert({
-        user_id: user.id,
-        title: form.tripTitle,
-        description: form.description,
-        destination: form.destination,
-        booking_type: "full_planning",
-        number_of_travelers: parseInt(form.travelers),
-        budget_min: form.budgetMin ? parseFloat(form.budgetMin) : null,
-        budget_max: form.budgetMax ? parseFloat(form.budgetMax) : null,
-        currency: "USD",
-        status: "open",
-        travel_dates: {
-          startDate: form.startDate,
-          endDate: form.endDate,
-          flexibleDates: form.flexibleDates,
-        },
-        requirements: {
-          departingFrom: form.departingFrom,
-          tripType: form.tripType,
-          travelStyle: form.travelStyle,
-          specialRequests: form.specialRequests,
-        },
-      } as any);
+      const { data: userData, error: userError } =
+        await supabase.auth.getUser();
+      if (userError || !userData.user) {
+        setError("Please log in to post a trip.");
+        setSubmitting(false);
+        return;
+      }
 
-      if (error) throw error;
+      // Clean up numeric values
+      const adults = parseInt(form.adults || "0", 10) || 0;
+      const children = parseInt(form.children || "0", 10) || 0;
+      const minBudget = parseInt(form.budgetMin || "0", 10) || null;
+      const maxBudget = parseInt(form.budgetMax || "0", 10) || null;
 
-      toast.success("Trip request posted successfully!");
-      setSubmitted(true);
-      setForm(initialState);
-      
-      setTimeout(() => {
-        navigate("/marketplace?tab=requests");
-      }, 2000);
-    } catch (err: any) {
+      const tripStyleArray = form.tripStyle
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+      // 1) Insert trip request
+      const { data: inserted, error: insertError } = await supabase
+        .from("trip_requests")
+        .insert({
+          user_id: userData.user.id,
+          title: form.title || null,
+          destination: form.destination || null,
+          start_date: form.startDate || null,
+          end_date: form.endDate || null,
+          flexible_dates: form.flexibleDates,
+          travelers_adults: adults,
+          travelers_children: children,
+          budget_min: minBudget,
+          budget_max: maxBudget,
+          trip_style: tripStyleArray,
+          description: form.description || null,
+          tiktok_link: form.tiktokLink || null,
+          status: "open",
+        })
+        .select("id")
+        .maybeSingle();
+
+      if (insertError || !inserted) {
+        console.error(insertError);
+        setError(
+          "Something went wrong while posting your trip. Please try again."
+        );
+        setSubmitting(false);
+        return;
+      }
+
+      const tripRequestId = inserted.id as string;
+      setSuccessId(tripRequestId);
+
+      // 2) Optionally call AI matching function in the background
+      try {
+        await supabase.functions.invoke("match-trip-request", {
+          body: { tripRequestId },
+        });
+      } catch (matchError) {
+        console.error("Error invoking match-trip-request:", matchError);
+      }
+
+      setForm(EMPTY_FORM);
+    } catch (err) {
       console.error(err);
-      setError(err.message || "Something went wrong. Please try again.");
-      toast.error("Failed to post trip request");
+      setError("Unexpected error while posting your trip.");
     } finally {
       setSubmitting(false);
     }
   }
 
-  if (isLoading) {
+  if (loadingUser) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-sm text-muted-foreground">Loading...</div>
-      </div>
+      <main className="min-h-screen bg-[#0a2225] text-[#E5DFC6]">
+        <div className="mx-auto max-w-3xl px-4 py-10 text-sm">
+          Checking your account…
+        </div>
+      </main>
     );
   }
 
-  if (!user) return null;
-
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 md:py-10">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <button
-              type="button"
-              onClick={() => navigate(-1)}
-              className="mb-3 text-xs font-medium text-muted-foreground hover:text-foreground"
-            >
-              ← Back to marketplace
-            </button>
-            <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
-              Post your dream trip
-            </h1>
-            <p className="mt-1 max-w-xl text-sm text-muted-foreground md:text-base">
-              Describe your perfect trip and let certified agents and travel
-              creators bid to design it for you—flights, hotels, experiences,
-              and more.
-            </p>
-          </div>
-        </div>
+    <>
+      <Helmet>
+        <title>Post a Trip · Goldsainte</title>
+        <meta
+          name="description"
+          content="Post your dream trip to the Goldsainte marketplace and let AI match you with the right creators and certified travel agents."
+        />
+      </Helmet>
 
-        <div className="flex flex-col gap-6 md:flex-row">
-          <div className="w-full md:w-2/3">
-            <form
-              onSubmit={handleSubmit}
-              className="space-y-6 rounded-2xl bg-card p-5 shadow-sm ring-1 ring-border md:p-6"
-            >
-              <section className="space-y-4">
-                <h2 className="text-sm font-semibold text-foreground">
-                  Trip basics
-                </h2>
+      <main className="min-h-screen bg-gradient-to-b from-[#0a2225] via-[#0a2225] to-[#E5DFC6] text-[#0a2225]">
+        <div className="mx-auto max-w-3xl px-4 py-10 md:py-12">
+          <div className="rounded-3xl border border-[#BFAD72]/40 bg-[#f6f3ea]/95 p-5 shadow-xl md:p-7">
+            {/* Header */}
+            <header className="space-y-2">
+              <div className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47]/10 px-3 py-1 text-[11px] font-medium text-[#0c4d47]">
+                <Sparkles className="h-3 w-3 text-[#BFAD72]" />
+                <span>Post a Trip · AI matching included</span>
+              </div>
+              <h1 className="text-lg font-semibold tracking-tight md:text-xl">
+                Tell us about your dream trip—Goldsainte does the rest.
+              </h1>
+              <p className="text-xs text-[#4a4a4a] md:text-sm">
+                Share your destination, dates, and budget. We'll match your
+                request with TikTok travel creators and certified agents whose
+                style fits your brief.
+              </p>
+            </header>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">
-                    Trip title
+            {/* Example brief */}
+            <aside className="mt-4 rounded-2xl bg-white/70 p-3 text-[11px] text-[#4a4a4a] ring-1 ring-[#E5DFC6]">
+              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#8D8D8D]">
+                Example brief
+              </p>
+              <p className="mt-1 text-xs leading-relaxed">
+                "We're a couple looking for a 6–7 night trip in late September,
+                somewhere in Europe. We love design hotels, wine, and one or two
+                'wow' experiences. Budget around $4,000 per person."
+              </p>
+            </aside>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="mt-5 space-y-4 text-xs">
+              {/* Title + destination */}
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-medium text-[#0a2225]">
+                    Trip name (optional)
                   </label>
-                  <input
-                    type="text"
-                    className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:outline-none focus:ring-1 focus:ring-primary"
-                    placeholder="e.g. Honeymoon in Santorini, Summer 2026"
-                    value={form.tripTitle}
-                    onChange={(e) => handleChange("tripTitle", e.target.value)}
+                  <Input
+                    value={form.title}
+                    onChange={(e) => updateField("title", e.target.value)}
+                    placeholder="Summer in Santorini, Kyoto Slow Travel, etc."
+                    className="rounded-xl border border-[#E5DFC6] bg-white text-xs text-[#0a2225] placeholder:text-[#8D8D8D]"
                   />
-                  <p className="text-[11px] text-muted-foreground">
-                    This is the headline agents and creators will see.
-                  </p>
                 </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-foreground">
-                      Where do you want to go?
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:outline-none focus:ring-1 focus:ring-primary"
-                      placeholder="City / region / multiple destinations"
-                      value={form.destination}
-                      onChange={(e) =>
-                        handleChange("destination", e.target.value)
-                      }
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-foreground">
-                      Departing from
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:outline-none focus:ring-1 focus:ring-primary"
-                      placeholder="Home airport or city"
-                      value={form.departingFrom}
-                      onChange={(e) =>
-                        handleChange("departingFrom", e.target.value)
-                      }
-                    />
-                  </div>
+                <div className="space-y-1">
+                  <label className="text-[11px] font-medium text-[#0a2225]">
+                    Destination
+                  </label>
+                  <Input
+                    required
+                    value={form.destination}
+                    onChange={(e) => updateField("destination", e.target.value)}
+                    placeholder="City, region, or country"
+                    className="rounded-xl border border-[#E5DFC6] bg-white text-xs text-[#0a2225] placeholder:text-[#8D8D8D]"
+                  />
                 </div>
+              </div>
 
-                <div className="grid gap-4 md:grid-cols-3">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-foreground">
-                      Start date
-                    </label>
-                    <input
+              {/* Dates & flexibility */}
+              <div className="grid gap-3 md:grid-cols-[1fr,1fr,auto]">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-medium text-[#0a2225]">
+                    Check-in
+                  </label>
+                  <div className="relative flex items-center">
+                    <Calendar className="pointer-events-none absolute left-3 h-4 w-4 text-[#8D8D8D]" />
+                    <Input
                       type="date"
-                      className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:bg-card focus:outline-none focus:ring-1 focus:ring-primary"
                       value={form.startDate}
-                      onChange={(e) =>
-                        handleChange("startDate", e.target.value)
-                      }
+                      onChange={(e) => updateField("startDate", e.target.value)}
+                      className="w-full rounded-xl border border-[#E5DFC6] bg-white pl-9 text-xs text-[#0a2225]"
                     />
                   </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-foreground">
-                      End date
-                    </label>
-                    <input
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[11px] font-medium text-[#0a2225]">
+                    Check-out
+                  </label>
+                  <div className="relative flex items-center">
+                    <Calendar className="pointer-events-none absolute left-3 h-4 w-4 text-[#8D8D8D]" />
+                    <Input
                       type="date"
-                      className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:bg-card focus:outline-none focus:ring-1 focus:ring-primary"
                       value={form.endDate}
-                      onChange={(e) =>
-                        handleChange("endDate", e.target.value)
-                      }
+                      onChange={(e) => updateField("endDate", e.target.value)}
+                      className="w-full rounded-xl border border-[#E5DFC6] bg-white pl-9 text-xs text-[#0a2225]"
                     />
                   </div>
+                </div>
+                <label className="mt-5 inline-flex items-center gap-2 text-[11px] text-[#4a4a4a]">
+                  <input
+                    type="checkbox"
+                    checked={form.flexibleDates}
+                    onChange={(e) =>
+                      updateField("flexibleDates", e.target.checked)
+                    }
+                    className="h-3.5 w-3.5 rounded border border-[#8D8D8D]"
+                  />
+                  <span>My dates are flexible</span>
+                </label>
+              </div>
 
-                  <div className="flex items-end">
-                    <label className="flex items-center gap-2 text-xs font-medium text-foreground">
-                      <input
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
-                        checked={form.flexibleDates}
-                        onChange={(e) =>
-                          handleChange("flexibleDates", e.target.checked)
-                        }
+              {/* Travelers & budget */}
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-[11px] font-medium text-[#0a2225]">
+                    Travelers
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                      <span className="text-[11px] text-[#4a4a4a]">Adults</span>
+                      <div className="relative flex items-center">
+                        <Users className="pointer-events-none absolute left-3 h-4 w-4 text-[#8D8D8D]" />
+                        <Input
+                          type="number"
+                          min={1}
+                          value={form.adults}
+                          onChange={(e) => updateField("adults", e.target.value)}
+                          className="w-full rounded-xl border border-[#E5DFC6] bg-white pl-9 text-xs text-[#0a2225]"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[11px] text-[#4a4a4a]">
+                        Children
+                      </span>
+                      <Input
+                        type="number"
+                        min={0}
+                        value={form.children}
+                        onChange={(e) => updateField("children", e.target.value)}
+                        className="w-full rounded-xl border border-[#E5DFC6] bg-white text-xs text-[#0a2225]"
                       />
-                      Dates are flexible
-                    </label>
+                    </div>
                   </div>
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-3">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-foreground">
-                      Travelers
-                    </label>
-                    <input
-                      type="number"
-                      min={1}
-                      className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:outline-none focus:ring-1 focus:ring-primary"
-                      placeholder="Number of people"
-                      value={form.travelers}
-                      onChange={(e) =>
-                        handleChange("travelers", e.target.value)
-                      }
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-foreground">
-                      Trip type
-                    </label>
-                    <select
-                      className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:bg-card focus:outline-none focus:ring-1 focus:ring-primary"
-                      value={form.tripType}
-                      onChange={(e) =>
-                        handleChange("tripType", e.target.value)
-                      }
-                    >
-                      <option value="">Select type</option>
-                      <option value="honeymoon">Honeymoon</option>
-                      <option value="family">Family vacation</option>
-                      <option value="business">Business trip</option>
-                      <option value="solo">Solo trip</option>
-                      <option value="friends">Friends trip</option>
-                      <option value="content-retreat">
-                        Creator retreat / content trip
-                      </option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-foreground">
-                      Travel style
-                    </label>
-                    <select
-                      className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:bg-card focus:outline-none focus:ring-1 focus:ring-primary"
-                      value={form.travelStyle}
-                      onChange={(e) =>
-                        handleChange("travelStyle", e.target.value)
-                      }
-                    >
-                      <option value="">Select style</option>
-                      <option value="luxury">Luxury</option>
-                      <option value="premium">Premium</option>
-                      <option value="mid-range">Mid-range</option>
-                      <option value="budget">Budget-conscious</option>
-                      <option value="adventure">Adventure / active</option>
-                      <option value="relaxation">Relaxation / wellness</option>
-                    </select>
+                <div className="space-y-2">
+                  <label className="text-[11px] font-medium text-[#0a2225]">
+                    Budget (per person)
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                      <span className="text-[11px] text-[#4a4a4a]">
+                        Min (optional)
+                      </span>
+                      <Input
+                        type="number"
+                        min={0}
+                        value={form.budgetMin}
+                        onChange={(e) => updateField("budgetMin", e.target.value)}
+                        placeholder="2500"
+                        className="w-full rounded-xl border border-[#E5DFC6] bg-white text-xs text-[#0a2225] placeholder:text-[#8D8D8D]"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[11px] text-[#4a4a4a]">Max</span>
+                      <Input
+                        type="number"
+                        min={0}
+                        required
+                        value={form.budgetMax}
+                        onChange={(e) => updateField("budgetMax", e.target.value)}
+                        placeholder="4000"
+                        className="w-full rounded-xl border border-[#E5DFC6] bg-white text-xs text-[#0a2225] placeholder:text-[#8D8D8D]"
+                      />
+                    </div>
                   </div>
                 </div>
-              </section>
+              </div>
 
-              <section className="space-y-4">
-                <h2 className="text-sm font-semibold text-foreground">
-                  Budget
-                </h2>
-                <p className="text-[11px] text-muted-foreground">
-                  Share a realistic range for the whole trip (per group, not per
-                  person). Agents and creators will use this to design options.
+              {/* Trip style + TikTok link */}
+              <div className="space-y-1">
+                <label className="text-[11px] font-medium text-[#0a2225]">
+                  Trip style (comma separated)
+                </label>
+                <Input
+                  value={form.tripStyle}
+                  onChange={(e) => updateField("tripStyle", e.target.value)}
+                  placeholder="Honeymoon, design hotels, wine, food, wellness…"
+                  className="rounded-xl border border-[#E5DFC6] bg-white text-xs text-[#0a2225] placeholder:text-[#8D8D8D]"
+                />
+                <p className="text-[10px] text-[#8D8D8D]">
+                  We use this along with your description to match you with the
+                  right creators and agents.
                 </p>
+              </div>
 
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-foreground">
-                      Minimum budget (USD)
-                    </label>
-                    <input
-                      type="number"
-                      min={0}
-                      className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:outline-none focus:ring-1 focus:ring-primary"
-                      placeholder="e.g. 4000"
-                      value={form.budgetMin}
-                      onChange={(e) =>
-                        handleChange("budgetMin", e.target.value)
-                      }
-                    />
-                  </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-medium text-[#0a2225] flex items-center gap-1">
+                  TikTok or social link (optional)
+                  <Link2 className="h-3 w-3 text-[#8D8D8D]" />
+                </label>
+                <Input
+                  value={form.tiktokLink}
+                  onChange={(e) => updateField("tiktokLink", e.target.value)}
+                  placeholder="Paste a TikTok or Reel that inspired this trip"
+                  className="rounded-xl border border-[#E5DFC6] bg-white text-xs text-[#0a2225] placeholder:text-[#8D8D8D]"
+                />
+              </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-foreground">
-                      Maximum budget (USD)
-                    </label>
-                    <input
-                      type="number"
-                      min={0}
-                      className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:outline-none focus:ring-1 focus:ring-primary"
-                      placeholder="e.g. 8000"
-                      value={form.budgetMax}
-                      onChange={(e) =>
-                        handleChange("budgetMax", e.target.value)
-                      }
-                    />
-                  </div>
-                </div>
-              </section>
-
-              <section className="space-y-4">
-                <h2 className="text-sm font-semibold text-foreground">
+              {/* Description */}
+              <div className="space-y-1">
+                <label className="text-[11px] font-medium text-[#0a2225]">
                   Tell us about your dream trip
-                </h2>
+                </label>
+                <Textarea
+                  required
+                  rows={5}
+                  value={form.description}
+                  onChange={(e) => updateField("description", e.target.value)}
+                  placeholder="What does a perfect day look like on this trip? Any must-sees, non-negotiables, or things you want to avoid?"
+                  className="rounded-xl border border-[#E5DFC6] bg-white text-xs text-[#0a2225] placeholder:text-[#8D8D8D]"
+                />
+              </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">
-                    What would make this trip perfect?
-                  </label>
-                  <textarea
-                    rows={5}
-                    className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:outline-none focus:ring-1 focus:ring-primary"
-                    placeholder="Share your must-see places, experiences, hotel preferences, airline preferences, non-negotiables, and what a perfect day on this trip looks like."
-                    value={form.description}
-                    onChange={(e) =>
-                      handleChange("description", e.target.value)
-                    }
-                  />
+              {/* Status messages */}
+              {error && (
+                <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[11px] text-red-700">
+                  {error}
                 </div>
+              )}
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">
-                    Special requests or constraints
-                  </label>
-                  <textarea
-                    rows={3}
-                    className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:outline-none focus:ring-1 focus:ring-primary"
-                    placeholder="Accessibility needs, dietary restrictions, loyalty programs (e.g. Marriott, Delta), preferred cabin class, etc."
-                    value={form.specialRequests}
-                    onChange={(e) =>
-                      handleChange("specialRequests", e.target.value)
-                    }
-                  />
+              {successId && (
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-[11px] text-emerald-800">
+                  Your trip has been posted to the marketplace. Goldsainte AI is
+                  matching you with creators and agents now. You'll see their
+                  proposals in your account as they respond.
                 </div>
-              </section>
+              )}
 
-              <section className="space-y-2">
-                <h2 className="text-sm font-semibold text-foreground">
-                  Inspiration (optional)
-                </h2>
-                <p className="text-[11px] text-muted-foreground">
-                  You can add mood boards, sample itineraries, or screenshots in
-                  the next step after posting your request.
-                </p>
-                <div className="flex items-center justify-center rounded-xl border border-dashed border-border bg-muted px-4 py-3 text-[11px] text-muted-foreground">
-                  File uploads coming soon – agents can still respond with full
-                  proposals.
-                </div>
-              </section>
-
-              <div className="space-y-3 pt-2">
-                {error && (
-                  <div className="rounded-xl border border-destructive/50 bg-destructive/10 px-3 py-2 text-xs text-destructive">
-                    {error}
-                  </div>
-                )}
-
-                {submitted && !error && (
-                  <div className="rounded-xl border border-primary/50 bg-primary/10 px-3 py-2 text-xs text-primary">
-                    Your trip request has been posted! Certified agents and
-                    creators will begin submitting proposals soon.
-                  </div>
-                )}
-
-                <button
+              {/* Submit */}
+              <div className="pt-2">
+                <Button
                   type="submit"
                   disabled={submitting}
-                  className="inline-flex w-full items-center justify-center rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="inline-flex w-full items-center justify-center rounded-full bg-[#0c4d47] px-4 py-2.5 text-sm font-semibold text-[#E5DFC6] shadow-sm hover:bg-[#0b3e3a] disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {submitting ? "Posting your trip..." : "Post trip request"}
-                </button>
-
-                <p className="text-[11px] text-muted-foreground">
-                  By posting, you agree to allow certified agents and verified
-                  creators on Goldsainte to view and bid on your trip. You'll be
-                  able to review proposals, chat, and approve payments securely
-                  through the platform.
-                </p>
+                  {submitting && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  {submitting
+                    ? "Posting your trip…"
+                    : "Post this trip to Goldsainte"}
+                </Button>
               </div>
             </form>
           </div>
-
-          <aside className="w-full md:w-1/3">
-            <div className="sticky top-20 space-y-4">
-              <div className="rounded-2xl bg-card p-4 shadow-sm ring-1 ring-border">
-                <h3 className="text-sm font-semibold text-foreground">
-                  How it works
-                </h3>
-                <ol className="mt-2 space-y-2 text-xs text-muted-foreground">
-                  <li>
-                    <span className="font-semibold">1.</span> Tell us where,
-                    when, and how you like to travel.
-                  </li>
-                  <li>
-                    <span className="font-semibold">2.</span> Certified travel
-                    agents and vetted creators see your request and submit
-                    proposals.
-                  </li>
-                  <li>
-                    <span className="font-semibold">3.</span> Compare itineraries,
-                    pricing, and reviews—all in one place.
-                  </li>
-                  <li>
-                    <span className="font-semibold">4.</span> Approve your
-                    favorite proposal, pay securely, and let them handle the
-                    bookings.
-                  </li>
-                </ol>
-              </div>
-
-              <div className="rounded-2xl bg-primary p-4 text-sm text-primary-foreground shadow-sm">
-                <h3 className="text-sm font-semibold">
-                  Designed for complex trips
-                </h3>
-                <p className="mt-2 text-xs opacity-90">
-                  Goldsainte is built for honeymoons, multi-country itineraries,
-                  retreats, creator trips, and once-in-a-lifetime experiences.
-                  Let professionals leverage their airline and hotel
-                  relationships to unlock upgrades and value you can't get on
-                  your own.
-                </p>
-              </div>
-            </div>
-          </aside>
         </div>
-      </div>
-    </div>
+      </main>
+    </>
   );
 }
