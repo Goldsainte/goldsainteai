@@ -176,39 +176,32 @@ export default function TripRequestDetail() {
       return;
     }
 
+    if (!id) return;
+
     try {
-      // Update proposal status to accepted
-      const { error: updateError } = await supabase
-        .from("agent_bids")
-        .update({ status: "accepted" })
-        .eq("id", proposalId);
-
-      if (updateError) throw updateError;
-
-      // Decline all other proposals
-      const otherProposalIds = proposals.filter(p => p.id !== proposalId).map(p => p.id);
-      if (otherProposalIds.length > 0) {
-        const { error: declineError } = await supabase
-          .from("agent_bids")
-          .update({ status: "declined" })
-          .in("id", otherProposalIds);
-
-        if (declineError) throw declineError;
+      // Create booking from proposal using the booking service
+      const { createBookingFromProposal } = await import("@/services/bookingService");
+      
+      // Find the proposal to get trip_id
+      const proposal = proposals.find(p => p.id === proposalId);
+      if (!proposal) {
+        throw new Error("Proposal not found");
       }
 
-      // Update job status to in_progress
-      const { error: jobError } = await supabase
-        .from("marketplace_jobs")
-        .update({ status: "in_progress" })
-        .eq("id", id);
+      const booking = await createBookingFromProposal({
+        tripId: id,
+        proposalId: proposalId,
+      });
 
-      if (jobError) throw jobError;
-
-      toast.success("Proposal accepted! The agent will be notified.");
-      fetchData(); // Refresh data
+      toast.success("Proposal accepted! Redirecting to booking...");
+      
+      // Redirect to booking page
+      setTimeout(() => {
+        navigate(`/bookings/${booking.id}`);
+      }, 1000);
     } catch (err: any) {
       console.error(err);
-      toast.error("Failed to accept proposal");
+      toast.error(err.message || "Failed to accept proposal");
     }
   }
 
