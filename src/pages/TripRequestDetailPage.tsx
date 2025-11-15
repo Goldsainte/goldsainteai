@@ -383,8 +383,7 @@ export default function TripRequestDetailPage() {
                 )}
                 {success && (
                   <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-[11px] text-emerald-800">
-                    Proposal sent. The traveler will see your pitch in their
-                    Goldsainte account. We'll notify them as responses arrive.
+                    Your proposal has been sent. The traveler will review it alongside others and can message you back directly.
                   </div>
                 )}
 
