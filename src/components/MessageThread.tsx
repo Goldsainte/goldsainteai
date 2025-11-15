@@ -119,16 +119,29 @@ export const MessageThread = ({ conversationId, userId, userType }: MessageThrea
 
     setSending(true);
     try {
+      // Sanitize message to prevent contact info sharing
+      const { sanitizeMessageForMarketplace } = await import("@/utils/messageSanitizer");
+      const { safe, flagged, reason } = sanitizeMessageForMarketplace(newMessage.trim());
+
       const { error } = await (supabase as any)
         .from("conversation_messages")
         .insert({
           conversation_id: conversationId,
           sender_id: userId,
           sender_type: userType,
-          message_text: newMessage.trim(),
+          message_text: safe,
         });
 
       if (error) throw error;
+
+      // Notify user if message was sanitized
+      if (flagged) {
+        toast({
+          title: "Message modified",
+          description: "Contact information has been removed. Please keep all communication on-platform.",
+          variant: "default",
+        });
+      }
 
       setNewMessage("");
     } catch (error) {

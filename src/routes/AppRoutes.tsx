@@ -19,6 +19,7 @@ const SearchResults = lazy(() => import('@/pages/SearchResults'));
 const HotelBooking = lazy(() => import('@/pages/HotelBooking'));
 const BookingConfirmation = lazy(() => import('@/pages/BookingConfirmation'));
 const Profile = lazy(() => import('@/pages/Profile'));
+const AdminDashboardPage = lazy(() => import('@/pages/admin/AdminDashboardPage'));
 const TravelProfileRedirect = lazy(() => import('@/pages/redirects/TravelProfileRedirectPage'));
 const ExplorePage = lazy(() => import('@/pages/ExplorePage'));
 const ReelsViewer = lazy(() => import('@/pages/ReelsViewer'));
@@ -329,6 +330,7 @@ export const AppRoutes = () => (
     <Route element={<AdminLayout />}>
       <Route path="/admin" element={<Admin />} />
       <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
+      <Route path="/admin" element={<AdminDashboardPage />} />
       <Route path="/admin/cancellations" element={<AdminCancellations />} />
       <Route path="/admin/analytics/cancellations" element={<AdminCancellationAnalytics />} />
       <Route path="/admin/customer-verifications" element={<AdminCustomerVerifications />} />

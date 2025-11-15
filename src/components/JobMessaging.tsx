@@ -89,14 +89,27 @@ export function JobMessaging({ jobId, receiverId }: JobMessagingProps) {
 
     setSending(true);
     try {
+      // Sanitize message to prevent contact info sharing
+      const { sanitizeMessageForMarketplace } = await import("@/utils/messageSanitizer");
+      const { safe, flagged } = sanitizeMessageForMarketplace(newMessage.trim());
+
       const { error } = await supabase.from("marketplace_messages").insert({
         job_id: jobId,
         sender_id: user.id,
         receiver_id: receiverId,
-        message_text: newMessage.trim(),
+        message_text: safe,
       });
 
       if (error) throw error;
+
+      // Notify user if message was sanitized
+      if (flagged) {
+        toast({
+          title: "Message modified",
+          description: "Contact information has been removed. Please keep all communication on-platform.",
+        });
+      }
+
       setNewMessage("");
     } catch (error: any) {
       toast({

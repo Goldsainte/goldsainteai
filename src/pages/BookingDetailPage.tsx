@@ -6,14 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import {
-  ArrowLeft,
-  Calendar,
-  MapPin,
-  MessageCircle,
-  ShieldAlert,
-  Users,
-} from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, MessageCircle, ShieldAlert, Users } from "lucide-react";
 
 type Booking = {
   id: string;
@@ -66,11 +59,9 @@ export default function BookingDetailPage() {
   const [cancelReasonDetails, setCancelReasonDetails] = useState("");
   const [cancelSubmitting, setCancelSubmitting] = useState(false);
 
-  // dispute form
-  const [disputeType, setDisputeType] = useState<"quality" | "cancellation" | "billing" | "other">("quality");
-  const [disputeSummary, setDisputeSummary] = useState("");
-  const [disputeDetails, setDisputeDetails] = useState("");
+  const [disputeReason, setDisputeReason] = useState("");
   const [disputeSubmitting, setDisputeSubmitting] = useState(false);
+  const [disputeCreated, setDisputeCreated] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -215,53 +206,35 @@ export default function BookingDetailPage() {
     }
   }
 
-  async function submitDispute(e: React.FormEvent) {
+  async function handleOpenDispute(e: React.FormEvent) {
     e.preventDefault();
-    if (!booking || !id || !currentUserId) return;
-
-    if (!disputeSummary.trim()) {
-      setActionError("Please provide a short summary for the dispute.");
-      return;
-    }
+    if (!disputeReason.trim() || !id) return;
 
     setDisputeSubmitting(true);
     setActionError(null);
 
     try {
-      const { error } = await supabase.functions.invoke("booking-actions", {
-        body: {
-          action: "open_dispute",
-          userId: currentUserId,
-          data: {
-            bookingId: booking.id,
-            type: disputeType,
-            summary: disputeSummary.trim(),
-            details: disputeDetails.trim() || undefined,
-          },
-        },
+      const { createDispute } = await import("@/services/disputeService");
+      await createDispute({
+        bookingId: id,
+        reason: disputeReason.trim(),
       });
 
-      if (error) {
-        console.error("Error in open_dispute:", error);
-        setActionError("Could not open dispute. Please try again.");
-      } else {
-        setDisputeSummary("");
-        setDisputeDetails("");
+      setDisputeCreated(true);
+      setDisputeReason("");
 
-        const { data: disputesData } = await supabase
-          .from("disputes")
-          .select("id, status, reason, created_at")
-          .eq("booking_id", id)
-          .order("created_at", { ascending: false });
+      // Refresh disputes
+      const { getBookingDisputes } = await import("@/services/disputeService");
+      const disputesData = await getBookingDisputes(id);
+      setDisputes(disputesData as Dispute[]);
 
-        if (disputesData) {
-          setDisputes(disputesData as Dispute[]);
-        }
-
-        setBooking((prev) =>
-          prev ? { ...prev, status: "disputed" } : prev,
-        );
-      }
+      // Update booking status
+      setBooking((prev) =>
+        prev ? { ...prev, status: "disputed" } : prev,
+      );
+    } catch (err: any) {
+      console.error("Error opening dispute:", err);
+      setActionError(err.message || "Could not open dispute. Please try again.");
     } finally {
       setDisputeSubmitting(false);
     }
@@ -465,78 +438,53 @@ export default function BookingDetailPage() {
               <div className="flex items-center gap-2">
                 <ShieldAlert className="h-4 w-4 text-[#BFAD72]" />
                 <h2 className="text-sm font-semibold">
-                  Open a dispute
+                  {disputeCreated ? "Dispute opened" : "Open a dispute"}
                 </h2>
               </div>
-              <p className="mt-1 text-[11px] text-[#E5DFC6]/80">
-                If something feels off—quality issues, misrepresentation, or serious
-                concerns—you can open a dispute. Our team will review and mediate.
-              </p>
 
-              <form onSubmit={submitDispute} className="mt-3 space-y-2">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-medium">
-                    Dispute type
-                  </label>
-                  <div className="grid grid-cols-2 gap-1 text-[11px]">
-                    {(["quality", "cancellation", "billing", "other"] as const).map(
-                      (type) => (
-                        <button
-                          type="button"
-                          key={type}
-                          onClick={() => setDisputeType(type)}
-                          className={`rounded-full px-2 py-1 border ${
-                            disputeType === type
-                              ? "border-[#BFAD72] bg-[#BFAD72]/10"
-                              : "border-white/10 bg-black/30"
-                          }`}
-                        >
-                          {type === "quality"
-                            ? "Quality"
-                            : type === "cancellation"
-                            ? "Cancellation-related"
-                            : type === "billing"
-                            ? "Billing / payments"
-                            : "Other"}
-                        </button>
-                      )
+              {disputeCreated ? (
+                <div className="mt-3 space-y-2 rounded-2xl bg-[#BFAD72]/10 p-3">
+                  <p className="text-[11px] text-[#E5DFC6]">
+                    Your dispute has been opened. Goldsainte will review this booking and
+                    follow up via email and in-app notifications.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <p className="mt-1 text-[11px] text-[#E5DFC6]/80">
+                    If something feels off—quality issues, misrepresentation, or serious
+                    concerns—you can open a dispute. Our team will review and mediate.
+                  </p>
+
+                  <form onSubmit={handleOpenDispute} className="mt-3 space-y-2">
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-medium">
+                        Tell us what went wrong
+                      </label>
+                      <Textarea
+                        rows={3}
+                        value={disputeReason}
+                        onChange={(e) => setDisputeReason(e.target.value)}
+                        placeholder="Describe the issue with this booking..."
+                        className="rounded-xl border border-[#BFAD72]/40 bg-black/40 text-xs text-[#E5DFC6] placeholder:text-[#E5DFC6]/60"
+                        required
+                      />
+                    </div>
+
+                    {actionError && (
+                      <p className="text-[10px] text-red-400">{actionError}</p>
                     )}
-                  </div>
-                </div>
 
-                <div className="space-y-1">
-                  <label className="text-[11px] font-medium">
-                    Short summary
-                  </label>
-                  <Input
-                    value={disputeSummary}
-                    onChange={(e) => setDisputeSummary(e.target.value)}
-                    placeholder="What went wrong in one sentence?"
-                    className="rounded-xl border border-[#BFAD72]/40 bg-black/40 text-xs text-[#E5DFC6] placeholder:text-[#E5DFC6]/60"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-[11px] font-medium">
-                    Details (optional but recommended)
-                  </label>
-                  <Textarea
-                    rows={3}
-                    value={disputeDetails}
-                    onChange={(e) => setDisputeDetails(e.target.value)}
-                    placeholder="Share dates, screenshots, or anything else that helps our team review fairly."
-                    className="rounded-xl border border-[#BFAD72]/40 bg-black/40 text-xs text-[#E5DFC6] placeholder:text-[#E5DFC6]/60"
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={disputeSubmitting}
-                  className="w-full rounded-full bg-[#BFAD72] text-xs font-semibold text-[#0a2225] hover:bg-[#d4c58d]"
-                >
-                  {disputeSubmitting ? "Submitting..." : "Open dispute"}
-                </Button>
-              </form>
+                    <Button
+                      type="submit"
+                      disabled={disputeSubmitting || !disputeReason.trim()}
+                      className="w-full rounded-full bg-[#BFAD72] text-xs font-semibold text-[#0a2225] hover:bg-[#d4c58d]"
+                    >
+                      {disputeSubmitting ? "Submitting..." : "Open dispute"}
+                    </Button>
+                  </form>
+                </>
+              )}
 
               {disputes.length > 0 && (
                 <div className="mt-3 space-y-1">
@@ -547,7 +495,7 @@ export default function BookingDetailPage() {
                     {disputes.map((d) => (
                       <li key={d.id}>
                         {new Date(d.created_at).toLocaleDateString()} —{" "}
-                        <span className="font-medium">
+                        <span className="font-medium capitalize">
                           ({d.status})
                         </span>{" "}
                         — {d.reason}
