@@ -3,6 +3,8 @@ import { Helmet } from "react-helmet-async";
 import { HomeHero } from "@/components/home/HomeHero";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { MarketplaceShowcase } from "@/components/home/MarketplaceShowcase";
+import { PostTripCTA } from "@/components/home/PostTripCTA";
+import { StoryboardPreview } from "@/components/home/StoryboardPreview";
 
 export default function Index() {
   return (
@@ -11,7 +13,7 @@ export default function Index() {
         <title>Goldsainte · Luxury Travel Marketplace</title>
         <meta
           name="description"
-          content="Goldsainte connects TikTok creators, certified travel agents, and travelers. Browse a luxury marketplace of trips or post your own dream journey."
+          content="Goldsainte connects TikTok creators, certified travel agents, and travelers. Browse a luxury marketplace of trips, post your own dream journey, and let AI matching do the rest."
         />
       </Helmet>
 
@@ -25,11 +27,11 @@ export default function Index() {
         {/* Marketplace showcase with Pinterest-style cards */}
         <MarketplaceShowcase />
 
-        {/* You can add more sections below as needed:
-            - TikTok Travel Lab teaser
-            - Creator / Agent call-to-action strips
-            - Testimonials, etc.
-        */}
+        {/* "Post a Trip" CTA section with AI matching + voice concierge */}
+        <PostTripCTA />
+
+        {/* Storyboard preview – Pinterest vibes, Goldsainte colors */}
+        <StoryboardPreview />
       </main>
     </>
   );
