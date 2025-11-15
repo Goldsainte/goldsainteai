@@ -65,7 +65,7 @@ export default function MyTripRequestsPage() {
         console.error("Error loading my trip_requests:", error);
         setRequests([]);
       } else {
-        setRequests((data ?? []) as TripRequestWithProposals[]);
+        setRequests((data ?? []) as any);
       }
 
       setLoading(false);
