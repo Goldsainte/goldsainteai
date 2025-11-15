@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Loader2, MessageCircle, ArrowLeft } from "lucide-react";
 import { useTripRequestMessages } from "@/hooks/useTripRequestMessages";
+import { validateChatMessage } from "@/utils/chatGuard";
 
 type TripRequest = {
   id: string;
@@ -142,6 +143,14 @@ export default function TripChatPage() {
     if (!inputValue.trim()) return;
 
     const body = inputValue.trim();
+
+    // Validate message for content safety and off-platform contact
+    const validation = validateChatMessage(body);
+    if (!validation.valid) {
+      setError(validation.error || "Message cannot be sent.");
+      return;
+    }
+
     setInputValue("");
     setError(null);
 
@@ -280,6 +289,11 @@ export default function TripChatPage() {
               placeholder="Type a message…"
               className="mb-2 rounded-2xl border border-[#BFAD72]/30 bg-black/40 text-xs text-[#E5DFC6] placeholder:text-[#E5DFC6]/60"
             />
+            <div className="mb-2 rounded-lg border border-[#BFAD72]/20 bg-[#BFAD72]/5 px-3 py-2">
+              <p className="text-[10px] text-[#E5DFC6]/80 leading-relaxed">
+                🔒 <strong>Keep it safe:</strong> For your protection and to support our creators and agents, all communication must stay on Goldsainte. Phone numbers, emails, and off-platform contact will be blocked.
+              </p>
+            </div>
             <div className="flex items-center justify-between gap-2">
               <p className="text-[10px] text-[#E5DFC6]/70">
                 Keep all trip details here so it's easy to refer back later.
