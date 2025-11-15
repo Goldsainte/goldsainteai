@@ -87,6 +87,90 @@ const DESTINATIONS: DestinationConfig[] = [
     moodTags: ['nature', 'adventure', 'scenic', 'unique'],
     imagesPerQuery: 3,
   },
+  {
+    destination: 'Barcelona',
+    region: 'Europe',
+    queries: ['sagrada familia barcelona', 'park guell', 'barcelona beach', 'gothic quarter barcelona'],
+    moodTags: ['culture', 'architecture', 'beach', 'art'],
+    imagesPerQuery: 2,
+  },
+  {
+    destination: 'Rome',
+    region: 'Europe',
+    queries: ['colosseum rome', 'trevi fountain', 'vatican city', 'roman forum', 'rome piazza'],
+    moodTags: ['historic', 'culture', 'architecture', 'romantic'],
+    imagesPerQuery: 2,
+  },
+  {
+    destination: 'London',
+    region: 'Europe',
+    queries: ['london tower bridge', 'big ben', 'london eye', 'piccadilly circus'],
+    moodTags: ['urban', 'historic', 'culture', 'iconic'],
+    imagesPerQuery: 2,
+  },
+  {
+    destination: 'Singapore',
+    region: 'Asia',
+    queries: ['singapore marina bay', 'gardens by the bay', 'singapore skyline', 'sentosa island'],
+    moodTags: ['modern', 'urban', 'luxury', 'futuristic'],
+    imagesPerQuery: 2,
+  },
+  {
+    destination: 'Sydney',
+    region: 'Oceania',
+    queries: ['sydney opera house', 'bondi beach', 'sydney harbour bridge', 'sydney skyline'],
+    moodTags: ['iconic', 'beach', 'urban', 'adventure'],
+    imagesPerQuery: 2,
+  },
+  {
+    destination: 'Cape Town',
+    region: 'Africa',
+    queries: ['table mountain cape town', 'cape town waterfront', 'camps bay beach', 'cape point'],
+    moodTags: ['nature', 'adventure', 'scenic', 'beach'],
+    imagesPerQuery: 2,
+  },
+  {
+    destination: 'Machu Picchu',
+    region: 'South America',
+    queries: ['machu picchu sunrise', 'inca trail peru', 'machu picchu ruins', 'peru mountains'],
+    moodTags: ['historic', 'adventure', 'nature', 'bucket-list'],
+    imagesPerQuery: 2,
+  },
+  {
+    destination: 'Rio de Janeiro',
+    region: 'South America',
+    queries: ['christ the redeemer', 'copacabana beach', 'rio de janeiro sunset', 'sugarloaf mountain'],
+    moodTags: ['beach', 'urban', 'culture', 'vibrant'],
+    imagesPerQuery: 2,
+  },
+  {
+    destination: 'Amsterdam',
+    region: 'Europe',
+    queries: ['amsterdam canals', 'amsterdam tulips', 'amsterdam bike', 'rijksmuseum'],
+    moodTags: ['culture', 'romantic', 'architecture', 'scenic'],
+    imagesPerQuery: 2,
+  },
+  {
+    destination: 'Bangkok',
+    region: 'Asia',
+    queries: ['bangkok grand palace', 'bangkok floating market', 'wat arun temple', 'bangkok street food'],
+    moodTags: ['culture', 'urban', 'adventure', 'food'],
+    imagesPerQuery: 2,
+  },
+  {
+    destination: 'Swiss Alps',
+    region: 'Europe',
+    queries: ['swiss alps mountains', 'matterhorn', 'swiss village', 'alps hiking'],
+    moodTags: ['nature', 'adventure', 'scenic', 'winter'],
+    imagesPerQuery: 3,
+  },
+  {
+    destination: 'Morocco',
+    region: 'Africa',
+    queries: ['marrakech morocco', 'sahara desert morocco', 'chefchaouen blue city', 'morocco market'],
+    moodTags: ['culture', 'desert', 'adventure', 'exotic'],
+    imagesPerQuery: 2,
+  },
 ];
 
 Deno.serve(async (req) => {
@@ -107,7 +191,7 @@ Deno.serve(async (req) => {
 
     const { destinations, limit } = await req.json();
     const targetDestinations = destinations || DESTINATIONS;
-    const maxImages = limit || 50;
+    const maxImages = limit || 200;
 
     console.log(`Starting storyboard media seeding for ${targetDestinations.length} destinations`);
 
