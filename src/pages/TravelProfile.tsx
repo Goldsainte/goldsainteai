@@ -1210,7 +1210,10 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate('/travel-profile')}
+            onClick={async () => {
+              const { data: { user } } = await supabase.auth.getUser();
+              if (user) navigate(`/creator/${user.id}`);
+            }}
             className="hover:bg-accent h-12 w-12 rounded-lg [&>svg]:text-[#BFAD72]"
             aria-label="Profile"
           >

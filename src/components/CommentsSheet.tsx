@@ -175,7 +175,7 @@ export const CommentsSheet = ({ open, onOpenChange, postId, onCommentAdded }: Co
                     {renderTextWithMentionsAndHashtags(
                       comment.comment_text,
                       (username) => {
-                        navigate(`/travel-profile?user=${username}`);
+                        navigate(`/creator/${username}`);
                         onOpenChange(false);
                       },
                       (hashtag) => {
@@ -193,7 +193,7 @@ export const CommentsSheet = ({ open, onOpenChange, postId, onCommentAdded }: Co
                               if ('isInstagram' in part && part.isInstagram) {
                                 window.open(`https://instagram.com/${part.value}`, '_blank');
                               } else {
-                                navigate(`/travel-profile?user=${part.value}`);
+                                navigate(`/creator/${part.value}`);
                                 onOpenChange(false);
                               }
                             } else {

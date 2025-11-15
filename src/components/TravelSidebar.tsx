@@ -164,7 +164,9 @@ export function TravelSidebar() {
                   <Button
                     variant="ghost"
                     onClick={() => {
-                      navigate('/travel-profile');
+                      supabase.auth.getUser().then(({ data: { user } }) => {
+                        if (user) navigate(`/creator/${user.id}`);
+                      });
                       setProfileOpen(false);
                     }}
                     className="w-full justify-start gap-3 px-3 py-2 h-auto hover:bg-muted/50 rounded-lg"

@@ -33,7 +33,7 @@ const HIDE_HEADER_PAGES = new Set([
   // Legacy social feed - disabled
   // "/travel-feed",
   // "/journeys",
-  "/travel-profile",
+  "/creator/:id",
   "/travel-settings",
   "/cocurated-journeys",
   "/fine-dining",
@@ -46,7 +46,7 @@ const HIDE_AI_BOOKING_PAGES = new Set([
   // "/journeys",
   // "/search",
   // "/trending",
-  "/travel-profile",
+  "/creator/:id",
   "/travel-settings",
 ]);
 
@@ -62,7 +62,7 @@ const HIDE_FOOTER_PREFIXES = [
   // "/journeys",
   // "/search",
   // "/trending",
-  "/travel-profile",
+  "/creator/:id",
   "/travel-settings",
   "/crossposting-settings",
   "/creator-dashboard",

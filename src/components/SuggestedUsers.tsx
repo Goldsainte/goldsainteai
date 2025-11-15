@@ -107,7 +107,7 @@ export const SuggestedUsers = () => {
           <div key={user.id} className="flex items-center justify-between">
             <div 
               className="flex items-center gap-3 flex-1 cursor-pointer"
-              onClick={() => navigate(`/travel-profile/${user.username || user.id}`)}
+              onClick={() => navigate(`/creator/${user.username || user.id}`)}
             >
               <Avatar className="w-10 h-10">
                 <AvatarImage src={user.avatar_url || undefined} />

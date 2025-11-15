@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { usePanelStore } from "@/stores/panelStore";
 import { Home, Users, Video, Search, MessageCircle, Bell, BarChart3, User2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const itemCls = "flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-muted/60 text-base";
 
@@ -34,7 +35,11 @@ export default function LeftNav() {
         <NavItemBtn onClick={() => openType("messages")}><MessageCircle className="w-6 h-6" /> Messages</NavItemBtn>
         <NavItemBtn onClick={() => openType("notifications")}><Bell className="w-6 h-6" /> Notifications</NavItemBtn>
         <NavItemLink to="/creator-dashboard"><BarChart3 className="w-6 h-6" /> Dashboard</NavItemLink>
-        <NavItemLink to="/travel-profile"><User2 className="w-6 h-6" /> Profile</NavItemLink>
+        <NavItemBtn onClick={() => {
+          supabase.auth.getUser().then(({ data: { user } }) => {
+            if (user) window.location.href = `/creator/${user.id}`;
+          });
+        }}><User2 className="w-6 h-6" /> Profile</NavItemBtn>
       </nav>
     </div>
   );

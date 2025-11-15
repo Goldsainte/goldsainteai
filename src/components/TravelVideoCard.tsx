@@ -650,7 +650,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         <div className="flex items-center justify-between px-3 py-2">
           <div 
             className="flex items-center gap-2 cursor-pointer flex-1 hover:opacity-70 transition-opacity"
-            onClick={() => navigate(`/travel-profile/${post.user_id}`)}
+            onClick={() => navigate(`/creator/${post.user_id}`)}
           >
             <Avatar className="h-8 w-8">
               <AvatarImage src={post.profiles?.avatar_url || undefined} />
@@ -902,7 +902,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           <div className="text-xs leading-[14px]">
             <span 
               className="font-semibold cursor-pointer hover:opacity-70 mr-1"
-              onClick={() => navigate(`/travel-profile/${post.user_id}`)}
+              onClick={() => navigate(`/creator/${post.user_id}`)}
             >
               {post.profiles?.username || 'Anonymous'}
             </span>
@@ -910,7 +910,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               <span>
                 {renderTextWithMentionsAndHashtags(
                   post.caption,
-                  (username) => navigate(`/travel-profile?user=${username}`),
+                  (username) => navigate(`/creator/${username}`),
                   (hashtag) => navigate(`/search?q=${encodeURIComponent(`#${hashtag}`)}&tab=posts`),
                   post.profiles?.instagram_username || undefined
                 ).map((part, idx) => {
@@ -925,7 +925,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                           if ('isInstagram' in part && part.isInstagram) {
                             window.open(`https://instagram.com/${part.value}`, '_blank');
                           } else {
-                            navigate(`/travel-profile?user=${part.value}`);
+                            navigate(`/creator/${part.value}`);
                           }
                         } else {
                           navigate(`/search?q=${encodeURIComponent(`#${part.value}`)}&tab=posts`);
@@ -956,7 +956,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                   <Avatar
                     key={collab.id}
                     className="h-6 w-6 border-2 border-card cursor-pointer"
-                    onClick={() => navigate(`/travel-profile/${collab.id}`)}
+                    onClick={() => navigate(`/creator/${collab.id}`)}
                   >
                     <AvatarImage src={collab.avatar_url || undefined} />
                     <AvatarFallback className="text-xs">
@@ -1503,7 +1503,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               <div className="flex items-center gap-2">
                 <Avatar 
                   className="h-8 w-8 cursor-pointer"
-                  onClick={() => navigate(`/travel-profile/${post.user_id}`)}
+                  onClick={() => navigate(`/creator/${post.user_id}`)}
                 >
                   <AvatarImage src={post.profiles?.avatar_url || undefined} />
                   <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
@@ -1512,7 +1512,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                 </Avatar>
                 
                 <button 
-                  onClick={() => navigate(`/travel-profile/${post.user_id}`)}
+                  onClick={() => navigate(`/creator/${post.user_id}`)}
                   className="font-semibold text-sm hover:opacity-80 transition-opacity"
                 >
                   {post.profiles?.username || 'Anonymous'}
@@ -1561,7 +1561,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                 <p className="text-[13px] leading-tight font-normal line-clamp-2">
                   {renderTextWithMentionsAndHashtags(
                     post.caption,
-                    (username) => navigate(`/travel-profile?user=${username}`),
+                    (username) => navigate(`/creator/${username}`),
                     (hashtag) => navigate(`/search?q=${encodeURIComponent(`#${hashtag}`)}&tab=posts`),
                     post.profiles?.instagram_username || undefined
                   ).map((part, idx) => {
@@ -1576,7 +1576,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                             if ('isInstagram' in part && part.isInstagram) {
                               window.open(`https://instagram.com/${part.value}`, '_blank');
                             } else {
-                              navigate(`/travel-profile?user=${part.value}`);
+                              navigate(`/creator/${part.value}`);
                             }
                           } else {
                             navigate(`/search?q=${encodeURIComponent(`#${part.value}`)}&tab=posts`);

@@ -1,5 +1,5 @@
 import { lazy } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 
 import Index from '@/pages/Index';
 import Auth from '@/pages/Auth';
@@ -18,7 +18,7 @@ const SearchResults = lazy(() => import('@/pages/SearchResults'));
 const HotelBooking = lazy(() => import('@/pages/HotelBooking'));
 const BookingConfirmation = lazy(() => import('@/pages/BookingConfirmation'));
 const Profile = lazy(() => import('@/pages/Profile'));
-const TravelProfile = lazy(() => import('@/pages/TravelProfile'));
+const TravelProfileRedirect = lazy(() => import('@/pages/redirects/TravelProfileRedirectPage'));
 const ExplorePage = lazy(() => import('@/pages/ExplorePage'));
 const ReelsViewer = lazy(() => import('@/pages/ReelsViewer'));
 const Marketplace = lazy(() => import('@/pages/Marketplace'));
@@ -168,8 +168,8 @@ export const AppRoutes = () => (
         <Route path="/explore" element={<ExplorePage />} />
         <Route path="/reels" element={<ReelsViewer />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/travel-profile" element={<TravelProfile />} />
-        <Route path="/travel-profile/:userId" element={<TravelProfile />} />
+        <Route path="/travel-profile" element={<TravelProfileRedirect />} />
+        <Route path="/travel-profile/:userId" element={<Navigate to="/creator/:userId" replace />} />
       </Route>
 
       <Route
