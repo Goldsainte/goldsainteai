@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Calendar, MapPin, MessageCircle, ShieldAlert, Users } from "lucide-react";
+import { BookingTimeline, type TimelineEvent } from "@/components/BookingTimeline";
 
 type Booking = {
   id: string;
@@ -282,6 +283,91 @@ export default function BookingDetailPage() {
       ? `$${(booking.partner_payout / 100).toFixed(2)} ${booking.currency}`
       : "—";
 
+  // Build timeline events
+  const timelineEvents: TimelineEvent[] = [
+    {
+      id: "created",
+      title: "Booking created",
+      description: "Proposal accepted and booking confirmed",
+      timestamp: booking.created_at,
+      status: "completed",
+    },
+  ];
+
+  // Add payment status
+  if (booking.status === "paid" || booking.status === "in_progress" || booking.status === "completed") {
+    timelineEvents.push({
+      id: "paid",
+      title: "Payment received",
+      description: "Payment successfully processed",
+      timestamp: booking.created_at, // In production, track actual payment timestamp
+      status: "completed",
+    });
+  } else if (booking.status === "awaiting_payment") {
+    timelineEvents.push({
+      id: "payment_pending",
+      title: "Awaiting payment",
+      description: "Payment processing",
+      timestamp: new Date().toISOString(),
+      status: "current",
+    });
+  }
+
+  // Add trip status
+  if (trip?.start_date) {
+    const startDate = new Date(trip.start_date);
+    const now = new Date();
+    
+    if (booking.status === "completed") {
+      timelineEvents.push({
+        id: "trip_completed",
+        title: "Trip completed",
+        description: "Journey finished successfully",
+        timestamp: trip.end_date || trip.start_date,
+        status: "completed",
+      });
+    } else if (startDate > now && booking.status === "paid") {
+      timelineEvents.push({
+        id: "trip_upcoming",
+        title: "Trip upcoming",
+        description: `Departure on ${startDate.toLocaleDateString()}`,
+        timestamp: trip.start_date,
+        status: "upcoming",
+      });
+    } else if (booking.status === "in_progress") {
+      timelineEvents.push({
+        id: "trip_in_progress",
+        title: "Trip in progress",
+        description: "Enjoy your journey!",
+        timestamp: trip.start_date,
+        status: "current",
+      });
+    }
+  }
+
+  // Add cancellation/dispute status
+  if (cancellations.length > 0) {
+    const latest = cancellations[0];
+    timelineEvents.push({
+      id: "cancellation",
+      title: "Cancellation requested",
+      description: latest.reason_short,
+      timestamp: latest.requested_at,
+      status: latest.status === "approved" ? "completed" : "current",
+    });
+  }
+
+  if (disputes.length > 0) {
+    const latest = disputes[0];
+    timelineEvents.push({
+      id: "dispute",
+      title: "Dispute opened",
+      description: latest.reason,
+      timestamp: latest.created_at,
+      status: latest.status === "resolved" ? "completed" : "current",
+    });
+  }
+
   return (
     <>
       <Helmet>
@@ -366,6 +452,9 @@ export default function BookingDetailPage() {
               {actionError}
             </p>
           )}
+
+          {/* Booking Timeline */}
+          <BookingTimeline events={timelineEvents} />
 
           <div className="grid gap-4 md:grid-cols-2 md:items-start">
             {/* Cancellation panel */}

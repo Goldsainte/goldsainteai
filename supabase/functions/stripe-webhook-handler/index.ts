@@ -124,6 +124,80 @@ async function handleCheckoutCompleted(session: any) {
       points: coins,
       transaction_reason: 'coin_purchase',
     });
+  } else if (metadata.type === 'booking' && metadata.booking_id) {
+    // Handle new booking payment system
+    await handleBookingPayment(metadata.booking_id, session);
+  }
+}
+
+async function handleBookingPayment(bookingId: string, session: any) {
+  console.log("Processing booking payment", bookingId);
+  
+  // Get booking details
+  const { data: booking, error: bookingError } = await supabaseClient
+    .from('bookings')
+    .select('*')
+    .eq('id', bookingId)
+    .maybeSingle();
+  
+  if (bookingError || !booking) {
+    console.error('Booking not found:', bookingError);
+    return;
+  }
+  
+  // Update booking status
+  await supabaseClient
+    .from('bookings')
+    .update({ status: 'paid' })
+    .eq('id', bookingId);
+  
+  // Check if ledger entries already exist
+  const { data: existing } = await supabaseClient
+    .from('earnings_ledger')
+    .select('id')
+    .eq('booking_id', bookingId)
+    .limit(1);
+  
+  if (existing && existing.length > 0) {
+    console.log('Ledger entries already exist for booking', bookingId);
+    return;
+  }
+  
+  // Create earnings ledger entries
+  const rows: any[] = [];
+  
+  if (booking.agent_id && booking.agent_share) {
+    rows.push({
+      booking_id: booking.id,
+      user_id: booking.agent_id,
+      role: 'agent',
+      amount: booking.agent_share,
+      currency: booking.currency || 'USD',
+      status: 'pending', // Will be moved to 'available' after trip completes
+    });
+  }
+  
+  if (booking.creator_id && booking.creator_share) {
+    rows.push({
+      booking_id: booking.id,
+      user_id: booking.creator_id,
+      role: 'creator',
+      amount: booking.creator_share,
+      currency: booking.currency || 'USD',
+      status: 'pending',
+    });
+  }
+  
+  if (rows.length > 0) {
+    const { error: ledgerError } = await supabaseClient
+      .from('earnings_ledger')
+      .insert(rows);
+    
+    if (ledgerError) {
+      console.error('Error creating earnings ledger:', ledgerError);
+    } else {
+      console.log('Created earnings ledger entries for booking', bookingId);
+    }
   }
 }
 
