@@ -8607,6 +8607,51 @@ export type Database = {
           },
         ]
       }
+      trip_request_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          is_read: boolean | null
+          proposal_id: string | null
+          sender_id: string
+          trip_request_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          proposal_id?: string | null
+          sender_id: string
+          trip_request_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          proposal_id?: string | null
+          sender_id?: string
+          trip_request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_request_messages_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "trip_proposals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_request_messages_trip_request_id_fkey"
+            columns: ["trip_request_id"]
+            isOneToOne: false
+            referencedRelation: "trip_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trip_request_modifications: {
         Row: {
           created_at: string | null
@@ -8647,6 +8692,7 @@ export type Database = {
       }
       trip_requests: {
         Row: {
+          booked_at: string | null
           budget_max: number | null
           budget_min: number | null
           created_at: string
@@ -8655,6 +8701,7 @@ export type Database = {
           end_date: string | null
           flexible_dates: boolean | null
           id: string
+          selected_proposal_id: string | null
           start_date: string | null
           status: string
           tiktok_link: string | null
@@ -8666,6 +8713,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          booked_at?: string | null
           budget_max?: number | null
           budget_min?: number | null
           created_at?: string
@@ -8674,6 +8722,7 @@ export type Database = {
           end_date?: string | null
           flexible_dates?: boolean | null
           id?: string
+          selected_proposal_id?: string | null
           start_date?: string | null
           status?: string
           tiktok_link?: string | null
@@ -8685,6 +8734,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          booked_at?: string | null
           budget_max?: number | null
           budget_min?: number | null
           created_at?: string
@@ -8693,6 +8743,7 @@ export type Database = {
           end_date?: string | null
           flexible_dates?: boolean | null
           id?: string
+          selected_proposal_id?: string | null
           start_date?: string | null
           status?: string
           tiktok_link?: string | null
@@ -8703,7 +8754,15 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "trip_requests_selected_proposal_id_fkey"
+            columns: ["selected_proposal_id"]
+            isOneToOne: false
+            referencedRelation: "trip_proposals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       trip_stories: {
         Row: {
