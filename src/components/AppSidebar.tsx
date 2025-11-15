@@ -136,7 +136,7 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-              {isAgent && (
+              {(isAdmin || isAgent) && (
                 <>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>

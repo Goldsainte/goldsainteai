@@ -387,6 +387,7 @@ export default function MyJobs() {
                 totalAmount={selectedJob.total_paid_amount}
                 currency={selectedJob.currency || 'USD'}
                 isAgent={false}
+                isAdmin={isAdmin}
               />
             )}
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -16,8 +17,8 @@ import { InfluencerPromotionRequests } from "@/components/InfluencerPromotionReq
 
 export default function CoCuratedDashboard() {
   const { user } = useAuth();
+  const { isAdmin, isAgent, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
-  const [isAgent, setIsAgent] = useState(false);
   const [stats, setStats] = useState({
     totalPackages: 0,
     activePromotions: 0,
@@ -28,28 +29,17 @@ export default function CoCuratedDashboard() {
   const [promotions, setPromotions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const hasAgentAccess = isAdmin || isAgent;
+
   useEffect(() => {
-    checkUserRole();
     fetchStats();
-  }, [user]);
-
-  const checkUserRole = async () => {
-    if (!user) return;
-
-    const { data } = await supabase
-      .from('travel_agents')
-      .select('id')
-      .eq('user_id', user.id)
-      .single();
-
-    setIsAgent(!!data);
-  };
+  }, [user, hasAgentAccess]);
 
   const fetchStats = async () => {
-    if (!user) return;
+    if (!user || roleLoading) return;
 
     try {
-      if (isAgent) {
+      if (hasAgentAccess) {
         // Fetch agent stats
         const { data: agentData } = await supabase
           .from('travel_agents')

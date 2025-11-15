@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/hooks/useUserRole';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -29,6 +30,7 @@ interface TripRequest {
 
 export default function AgentTripRequests() {
   const { user } = useAuth();
+  const { isAdmin, isAgent, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [requests, setRequests] = useState<TripRequest[]>([]);
@@ -38,12 +40,21 @@ export default function AgentTripRequests() {
   const [quoteDetails, setQuoteDetails] = useState('');
 
   useEffect(() => {
+    if (roleLoading) return;
+    
     if (!user) {
       navigate('/auth');
       return;
     }
+
+    if (!isAdmin && !isAgent) {
+      toast({ title: 'Agent access required', variant: 'destructive' });
+      navigate('/');
+      return;
+    }
+    
     fetchAgentProfile();
-  }, [user, navigate]);
+  }, [user, isAdmin, isAgent, roleLoading, navigate]);
 
   const fetchAgentProfile = async () => {
     try {
@@ -136,7 +147,7 @@ export default function AgentTripRequests() {
     }
   };
 
-  if (loading) {
+  if (loading || roleLoading) {
     return (
       <div className="min-h-screen">
         <Header />

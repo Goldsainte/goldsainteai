@@ -38,5 +38,10 @@ export const useUserRole = () => {
     checkRoles();
   }, [user]);
 
-  return { isAdmin, isAgent, loading };
+  return { 
+    isAdmin, 
+    isAgent, 
+    loading,
+    hasAgentAccess: isAdmin || isAgent,
+  };
 };
