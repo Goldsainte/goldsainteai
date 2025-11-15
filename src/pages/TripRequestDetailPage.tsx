@@ -19,6 +19,7 @@ import {
   Check,
   X,
 } from "lucide-react";
+import { createBookingFromProposal } from "@/utils/createBooking";
 
 type TripRequest = {
   id: string;
@@ -324,28 +325,56 @@ export default function TripRequestDetailPage() {
 
     setBookingLoading(true);
     try {
-      const now = new Date().toISOString();
+      // For now we can derive a simple total price from the accepted proposal
+      const accepted = proposals.find(
+        (p) => p.id === trip.selected_proposal_id
+      );
+      if (!accepted || accepted.price_from == null) {
+        throw new Error(
+          "We need an estimated price on the accepted proposal to create a booking."
+        );
+      }
 
-      const { data: updatedTrip, error: tripError } = await supabase
+      const totalPriceCents = accepted.price_from * 100;
+      const platformCommissionCents = Math.round(totalPriceCents * 0.15); // e.g. 15% commission
+
+      const booking = await createBookingFromProposal({
+        tripRequestId: trip.id,
+        proposalId: accepted.id,
+        totalPriceCents,
+        platformCommissionCents,
+      });
+
+      // Refresh local trip + proposals state
+      const { data: updatedTrip } = await supabase
         .from("trip_requests")
-        .update({
-          status: "booked",
-          booked_at: now,
-        })
-        .eq("id", id)
         .select(
           "id, user_id, title, destination, start_date, end_date, flexible_dates, travelers_adults, travelers_children, budget_min, budget_max, trip_style, description, tiktok_link, status, created_at, selected_proposal_id, booked_at"
         )
+        .eq("id", id)
         .maybeSingle();
 
-      if (!tripError && updatedTrip) {
+      if (updatedTrip) {
         setTrip(updatedTrip as TripRequest);
       }
 
-      await supabase
+      const { data: proposalsData } = await supabase
         .from("trip_proposals")
-        .update({ status: "booked" })
-        .eq("id", trip.selected_proposal_id);
+        .select(
+          "id, proposer_id, proposer_role, headline, message, price_from, status, created_at"
+        )
+        .eq("trip_request_id", id)
+        .order("created_at", { ascending: false });
+
+      if (proposalsData) {
+        setProposals((proposalsData ?? []) as TripProposal[]);
+      }
+
+      console.log("Booking created:", booking);
+    } catch (err: any) {
+      console.error(err);
+      // Optionally surface error in UI
+      // setSomeBookingError(err.message ?? "Could not mark as booked.");
     } finally {
       setBookingLoading(false);
     }
