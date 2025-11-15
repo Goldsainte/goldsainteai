@@ -48,6 +48,7 @@ const MyTripsPage = lazy(() => import('@/pages/MyTripsPage'));
 const PostTripPage = lazy(() => import('@/pages/PostTripPage'));
 const AgentTripsPage = lazy(() => import('@/pages/AgentTripsPage'));
 const CreatorTripsPage = lazy(() => import('@/pages/CreatorTripsPage'));
+const TikTokLabPage = lazy(() => import('@/pages/TikTokLabPage'));
 const MyBookingsPage = lazy(() => import('@/pages/MyBookingsPage'));
 const PartnerBookingsPage = lazy(() => import('@/pages/PartnerBookingsPage'));
 const BookingPreferencesRedirect = lazy(() => import('@/pages/redirects/BookingPreferencesRedirect'));
@@ -236,6 +237,7 @@ export const AppRoutes = () => (
       <Route path="/post-trip" element={<PostTripPage />} />
       <Route path="/agent-trips" element={<AgentTripsPage />} />
       <Route path="/creator-trips" element={<CreatorTripsPage />} />
+      <Route path="/tiktok-lab" element={<TikTokLabPage />} />
       <Route path="/my-bookings" element={<MyBookingsPage />} />
       <Route path="/partner-bookings" element={<PartnerBookingsPage />} />
       <Route path="/booking/:id" element={<BookingDetailPage />} />

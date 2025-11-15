@@ -456,6 +456,15 @@ export const Header = () => {
                             </DropdownMenuItem>
                           )}
                           
+                          {/* TikTok Lab - Available to all users */}
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/tiktok-lab')} 
+                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                          >
+                            <Video className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                            <span className="text-sm font-medium">TikTok Lab</span>
+                          </DropdownMenuItem>
+                          
                           <DropdownMenuItem 
                             onClick={() => navigate('/price-alerts')} 
                             className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
@@ -856,6 +865,15 @@ export const Header = () => {
                               <span className="text-sm font-medium">Collab Opportunities</span>
                             </DropdownMenuItem>
                           )}
+                          
+                          {/* TikTok Lab - Available to all users */}
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/tiktok-lab')} 
+                            className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <Video className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">TikTok Lab</span>
+                          </DropdownMenuItem>
                           
                           <DropdownMenuItem 
                             onClick={() => navigate('/price-alerts')} 
