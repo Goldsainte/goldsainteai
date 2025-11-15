@@ -101,7 +101,7 @@ const TravelSettings2 = () => {
             icon={UserCircle}
             title="Edit Profile"
             description="Change your profile details and verification status"
-            onClick={() => navigate('/travel-settings/edit')}
+            onClick={() => navigate('/travel-settings')}
           />
         </div>
 
@@ -157,41 +157,18 @@ const TravelSettings2 = () => {
 
         <Separator className="my-2" />
 
-        {/* Who can see your content */}
+        {/* Content Settings */}
         <div className="py-4">
           <div className="px-4 py-2">
             <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              Who can see your content
+              Content Settings
             </h2>
           </div>
 
           <SettingsItem
-            icon={Lock}
-            title="Account privacy"
-            badge="Public"
-            onClick={() => {}}
-          />
-          <SettingsItem
-            icon={Star}
-            title="Close Friends"
-            badge="0"
-            onClick={() => {}}
-          />
-          <SettingsItem
             icon={Grid2X2}
             title="Crossposting"
             onClick={() => navigate('/crossposting-settings')}
-          />
-          <SettingsItem
-            icon={Ban}
-            title="Blocked"
-            badge="0"
-            onClick={() => {}}
-          />
-          <SettingsItem
-            icon={MapPin}
-            title="Story, live and location"
-            onClick={() => {}}
           />
         </div>
 
