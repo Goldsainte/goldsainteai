@@ -14,6 +14,7 @@ import { ReviewsSection } from "@/components/ReviewsSection";
 import { AgentAvailabilityCalendar } from "@/components/AgentAvailabilityCalendar";
 import { TrustBadges } from "@/components/TrustBadges";
 import { ReportUserModal } from "@/components/ReportUserModal";
+import { TravelStoryboard } from "@/components/storyboards/TravelStoryboard";
 
 export default function AgentProfile() {
   const { agentId } = useParams();
@@ -364,6 +365,16 @@ export default function AgentProfile() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Travel Storyboard */}
+            <div className="mt-6">
+              <TravelStoryboard
+                title="Storyboard Your Next Itinerary"
+                subtitle={`Visual inspiration for trips to ${agent.destinations?.slice(0, 3).join(', ') || 'amazing destinations'}`}
+                maxItems={16}
+                highlightTags={agent.destinations || []}
+              />
+            </div>
 
             {/* Availability Calendar */}
             <AgentAvailabilityCalendar agentId={agentId!} />
