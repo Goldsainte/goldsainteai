@@ -6507,6 +6507,7 @@ export type Database = {
           username: string | null
           warning_count: number | null
           website: string | null
+          welcome_shown: boolean
         }
         Insert: {
           account_status?: string | null
@@ -6567,6 +6568,7 @@ export type Database = {
           username?: string | null
           warning_count?: number | null
           website?: string | null
+          welcome_shown?: boolean
         }
         Update: {
           account_status?: string | null
@@ -6627,6 +6629,7 @@ export type Database = {
           username?: string | null
           warning_count?: number | null
           website?: string | null
+          welcome_shown?: boolean
         }
         Relationships: []
       }

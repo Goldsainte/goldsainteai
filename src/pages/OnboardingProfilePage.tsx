@@ -111,6 +111,21 @@ export default function OnboardingProfilePage() {
         data: { account_type: accountType },
       });
 
+      // Send welcome email via edge function
+      try {
+        await supabase.functions.invoke("send-welcome-email", {
+          body: {
+            email: user.email,
+            accountType,
+            fullName: fullName || null,
+            displayName: displayName || fullName || null,
+          },
+        });
+      } catch (emailError) {
+        console.error("Failed to send welcome email:", emailError);
+        // Don't block onboarding if email fails
+      }
+
       if (accountType === "creator" || accountType === "agent") {
         navigate("/partner", { replace: true });
       } else {
