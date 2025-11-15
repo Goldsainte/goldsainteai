@@ -35,10 +35,10 @@ serve(async (req) => {
       throw new Error("Trip request not found");
     }
 
-    // Get the latest proposal for this trip
+    // Get the latest proposal for this trip with proposer info
     const { data: proposal, error: proposalError } = await supabaseClient
       .from("trip_proposals")
-      .select("proposer_role, headline")
+      .select("proposer_role, headline, price_from, proposer_id")
       .eq("trip_request_id", tripRequestId)
       .order("created_at", { ascending: false })
       .limit(1)
@@ -49,12 +49,23 @@ serve(async (req) => {
       throw new Error("Proposal not found");
     }
 
+    // Get proposer profile info
+    const { data: proposerProfile } = await supabaseClient
+      .from("profiles")
+      .select("first_name, username")
+      .eq("id", proposal.proposer_id)
+      .single();
+
+    const proposerName = proposerProfile?.first_name || proposerProfile?.username || "A creator";
+    const roleLabel = proposal.proposer_role === "creator" ? "TikTok Creator" : "Travel Agent";
+    const priceText = proposal.price_from ? ` starting from $${proposal.price_from} per person` : "";
+
     // Send notification via existing send-notification function
     const { data: notificationResult, error: notificationError } = await supabaseClient.functions.invoke("send-notification", {
       body: {
         userId: tripRequest.user_id,
-        title: "New Trip Proposal Received! 🎉",
-        body: `A ${proposal.proposer_role} sent a proposal for your trip to ${tripRequest.destination || "your destination"}`,
+        title: "Your Goldsainte trip just received a new proposal",
+        body: `${proposerName} (${roleLabel}) sent a proposal for "${tripRequest.title || tripRequest.destination}"${priceText}. ${proposal.headline ? `"${proposal.headline}"` : "View the full pitch in your Trip Requests."}`,
         type: "milestone",
         priority: "high",
         actionUrl: `/trip-request/${tripRequestId}`,
@@ -62,6 +73,8 @@ serve(async (req) => {
           tripRequestId,
           proposalHeadline: proposal.headline,
           proposerRole: proposal.proposer_role,
+          proposerName,
+          priceFrom: proposal.price_from,
         },
       },
     });
