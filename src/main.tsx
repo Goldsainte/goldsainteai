@@ -100,26 +100,38 @@ if (sentryDsn) {
 
 // Error fallback UI
 const ErrorFallback = ({ error }: { error: unknown }) => {
-  const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-  
+  // Try to scrub PII but still show useful info
+  const errorMessage =
+    error instanceof Error ? scrubPII(error.message) : "Unknown error";
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="max-w-md w-full bg-card border border-border rounded-lg p-6 shadow-lg">
-        <h2 className="text-2xl font-bold text-foreground mb-4">Something went wrong</h2>
-        <p className="text-muted-foreground mb-4">
-          We're sorry, but something unexpected happened. Our team has been notified.
+      <div className="max-w-lg w-full bg-card border border-border rounded-lg p-6 shadow-lg space-y-4">
+        <h2 className="text-2xl font-bold text-foreground">
+          Something went wrong
+        </h2>
+
+        <p className="text-muted-foreground text-sm">
+          We hit an unexpected issue while loading the experience.
+          Our team has been notified. You can try reloading the page in the meantime.
         </p>
-        <details className="mb-4">
-          <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground">
-            Error details
-          </summary>
-          <pre className="mt-2 p-2 bg-muted rounded text-xs overflow-auto">
-            {errorMessage}
-          </pre>
-        </details>
+
+        {/* DEV/STAGING ONLY: expose full error for debugging */}
+        {import.meta.env.DEV && (
+          <details className="text-xs bg-muted rounded p-2 border border-border/40">
+            <summary className="cursor-pointer mb-1 text-muted-foreground">
+              Error details (dev only)
+            </summary>
+            <pre className="whitespace-pre-wrap text-[11px] leading-relaxed">
+              {errorMessage}
+            </pre>
+          </details>
+        )}
+
         <button
+          type="button"
           onClick={() => window.location.reload()}
-          className="w-full bg-primary text-primary-foreground py-2 px-4 rounded hover:opacity-90 transition-opacity"
+          className="w-full bg-primary text-primary-foreground py-2 px-4 rounded hover:opacity-90 transition-opacity text-sm font-medium"
         >
           Reload page
         </button>
