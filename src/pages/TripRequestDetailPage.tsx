@@ -1,6 +1,6 @@
 // src/pages/TripRequestDetailPage.tsx
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,9 @@ import {
   Sparkles,
   HandCoins,
   User,
+  MessageCircle,
+  Check,
+  X,
 } from "lucide-react";
 
 type TripRequest = {
@@ -34,6 +37,8 @@ type TripRequest = {
   tiktok_link: string | null;
   status: string;
   created_at: string;
+  selected_proposal_id: string | null;
+  booked_at: string | null;
 };
 
 type ProposalForm = {
@@ -75,6 +80,11 @@ export default function TripRequestDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  const [updatingProposalId, setUpdatingProposalId] = useState<string | null>(
+    null
+  );
+  const [bookingLoading, setBookingLoading] = useState(false);
+
   const isOwner = trip && currentUserId && trip.user_id === currentUserId;
 
   useEffect(() => {
@@ -98,7 +108,7 @@ export default function TripRequestDetailPage() {
       const { data: tripData, error: tripError } = await supabase
         .from("trip_requests")
         .select(
-          "id, user_id, title, destination, start_date, end_date, flexible_dates, travelers_adults, travelers_children, budget_min, budget_max, trip_style, description, tiktok_link, status, created_at"
+          "id, user_id, title, destination, start_date, end_date, flexible_dates, travelers_adults, travelers_children, budget_min, budget_max, trip_style, description, tiktok_link, status, created_at, selected_proposal_id, booked_at"
         )
         .eq("id", id)
         .maybeSingle();
@@ -166,7 +176,7 @@ export default function TripRequestDetailPage() {
         return;
       }
 
-      // Prevent traveler from sending a proposal to themselves
+      // Prevent traveler from responding to their own trip
       if (trip.user_id === userData.user.id) {
         setError(
           "You're the traveler on this trip. You'll receive proposals from creators and agents here."
@@ -198,7 +208,6 @@ export default function TripRequestDetailPage() {
         setSuccess(true);
         setProposal(EMPTY_PROPOSAL);
 
-        // Optimistically reload proposals list
         const { data: proposalsData, error: proposalsError } = await supabase
           .from("trip_proposals")
           .select(
@@ -211,7 +220,6 @@ export default function TripRequestDetailPage() {
           setProposals((proposalsData ?? []) as TripProposal[]);
         }
 
-        // Optional: notify traveler
         try {
           await supabase.functions.invoke("notify-trip-proposal", {
             body: { tripRequestId: id },
@@ -225,6 +233,121 @@ export default function TripRequestDetailPage() {
       setError("Unexpected error while sending your proposal.");
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  // Traveler accepts a proposal
+  async function handleAcceptProposal(proposalId: string) {
+    if (!trip || !id || !currentUserId || trip.user_id !== currentUserId) return;
+    setUpdatingProposalId(proposalId);
+
+    try {
+      // 1) Set this proposal accepted
+      await supabase
+        .from("trip_proposals")
+        .update({ status: "accepted" })
+        .eq("id", proposalId);
+
+      // 2) Optionally mark others as declined
+      await supabase
+        .from("trip_proposals")
+        .update({ status: "declined" })
+        .eq("trip_request_id", id)
+        .neq("id", proposalId)
+        .eq("status", "sent");
+
+      // 3) Update trip to matched + record selected proposal
+      const { data: updatedTrip, error: tripError } = await supabase
+        .from("trip_requests")
+        .update({
+          status: "matched",
+          selected_proposal_id: proposalId,
+        })
+        .eq("id", id)
+        .select(
+          "id, user_id, title, destination, start_date, end_date, flexible_dates, travelers_adults, travelers_children, budget_min, budget_max, trip_style, description, tiktok_link, status, created_at, selected_proposal_id, booked_at"
+        )
+        .maybeSingle();
+
+      if (!tripError && updatedTrip) {
+        setTrip(updatedTrip as TripRequest);
+      }
+
+      // Reload proposals to sync statuses in UI
+      const { data: proposalsData, error: proposalsError } = await supabase
+        .from("trip_proposals")
+        .select(
+          "id, proposer_id, proposer_role, headline, message, price_from, status, created_at"
+        )
+        .eq("trip_request_id", id)
+        .order("created_at", { ascending: false });
+
+      if (!proposalsError && proposalsData) {
+        setProposals((proposalsData ?? []) as TripProposal[]);
+      }
+    } finally {
+      setUpdatingProposalId(null);
+    }
+  }
+
+  // Traveler declines a proposal
+  async function handleDeclineProposal(proposalId: string) {
+    if (!trip || !id || !currentUserId || trip.user_id !== currentUserId) return;
+    setUpdatingProposalId(proposalId);
+
+    try {
+      await supabase
+        .from("trip_proposals")
+        .update({ status: "declined" })
+        .eq("id", proposalId);
+
+      const { data: proposalsData, error: proposalsError } = await supabase
+        .from("trip_proposals")
+        .select(
+          "id, proposer_id, proposer_role, headline, message, price_from, status, created_at"
+        )
+        .eq("trip_request_id", id)
+        .order("created_at", { ascending: false });
+
+      if (!proposalsError && proposalsData) {
+        setProposals((proposalsData ?? []) as TripProposal[]);
+      }
+    } finally {
+      setUpdatingProposalId(null);
+    }
+  }
+
+  // Traveler marks trip as booked
+  async function handleMarkBooked() {
+    if (!trip || !id || !currentUserId || trip.user_id !== currentUserId) return;
+    if (!trip.selected_proposal_id) return;
+
+    setBookingLoading(true);
+    try {
+      const now = new Date().toISOString();
+
+      const { data: updatedTrip, error: tripError } = await supabase
+        .from("trip_requests")
+        .update({
+          status: "booked",
+          booked_at: now,
+        })
+        .eq("id", id)
+        .select(
+          "id, user_id, title, destination, start_date, end_date, flexible_dates, travelers_adults, travelers_children, budget_min, budget_max, trip_style, description, tiktok_link, status, created_at, selected_proposal_id, booked_at"
+        )
+        .maybeSingle();
+
+      if (!tripError && updatedTrip) {
+        setTrip(updatedTrip as TripRequest);
+      }
+
+      await supabase
+        .from("trip_proposals")
+        .update({ status: "booked" })
+        .eq("id", trip.selected_proposal_id);
+    } finally {
+      setBookingLoading(false);
     }
   }
 
@@ -340,9 +463,17 @@ export default function TripRequestDetailPage() {
               </div>
             </section>
 
-            {/* RIGHT: either proposals list (traveler) or proposal form (creator/agent) */}
+            {/* RIGHT: owner → proposals list, responder → proposal form */}
             {isOwner ? (
-              <OwnerProposalsPanel proposals={proposals} />
+              <OwnerProposalsPanel
+                trip={trip}
+                proposals={proposals}
+                updatingProposalId={updatingProposalId}
+                bookingLoading={bookingLoading}
+                onAccept={handleAcceptProposal}
+                onDecline={handleDeclineProposal}
+                onMarkBooked={handleMarkBooked}
+              />
             ) : (
               <ResponderProposalForm
                 submitting={submitting}
@@ -351,6 +482,7 @@ export default function TripRequestDetailPage() {
                 proposal={proposal}
                 onChange={updateProposal}
                 onSubmit={handleSubmitProposal}
+                tripId={trip.id}
               />
             )}
           </div>
@@ -360,16 +492,35 @@ export default function TripRequestDetailPage() {
   );
 }
 
-function OwnerProposalsPanel({ proposals }: { proposals: TripProposal[] }) {
+function OwnerProposalsPanel({
+  trip,
+  proposals,
+  updatingProposalId,
+  bookingLoading,
+  onAccept,
+  onDecline,
+  onMarkBooked,
+}: {
+  trip: TripRequest;
+  proposals: TripProposal[];
+  updatingProposalId: string | null;
+  bookingLoading: boolean;
+  onAccept: (id: string) => void;
+  onDecline: (id: string) => void;
+  onMarkBooked: () => void;
+}) {
+  const accepted = proposals.find((p) => p.status === "accepted");
+  const hasAccepted = !!accepted;
+  const isBooked = trip.status === "booked";
+
   return (
     <section className="rounded-3xl border border-[#BFAD72]/40 bg-[#0a2225]/95 p-5 text-xs text-[#E5DFC6] shadow-xl md:p-6">
       <h2 className="text-sm font-semibold tracking-tight text-[#E5DFC6]">
         Proposals received
       </h2>
       <p className="mt-1 text-[11px] text-[#E5DFC6]/80">
-        These are proposals from creators and agents who'd like to design and
-        book this trip for you. Compare them, then follow up with your
-        favorites.
+        Review proposals from creators and agents. When you accept one, you'll
+        be able to open a private chat and later mark the trip as booked.
       </p>
 
       {proposals.length === 0 ? (
@@ -379,66 +530,139 @@ function OwnerProposalsPanel({ proposals }: { proposals: TripProposal[] }) {
         </div>
       ) : (
         <div className="mt-4 space-y-3">
-          {proposals.map((p) => (
-            <article
-              key={p.id}
-              className="rounded-2xl bg-black/30 px-3 py-3 text-[11px] text-[#E5DFC6] ring-1 ring-[#BFAD72]/30"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <div className="inline-flex items-center gap-2 text-[10px]">
-                  <div className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#BFAD72]/90 text-[#0a2225]">
-                    <User className="h-3.5 w-3.5" />
+          {proposals.map((p) => {
+            const isUpdating = updatingProposalId === p.id;
+            const isAccepted = p.status === "accepted";
+            const isDeclined = p.status === "declined";
+
+            return (
+              <article
+                key={p.id}
+                className="rounded-2xl bg-black/30 px-3 py-3 text-[11px] text-[#E5DFC6] ring-1 ring-[#BFAD72]/30"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="inline-flex items-center gap-2 text-[10px]">
+                    <div className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#BFAD72]/90 text-[#0a2225]">
+                      <User className="h-3.5 w-3.5" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <p className="font-medium">
+                        {p.proposer_role === "creator"
+                          ? "TikTok creator"
+                          : "Travel agent"}
+                      </p>
+                      <p className="text-[#E5DFC6]/70">
+                        Sent {new Date(p.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
-                  <div className="space-y-0.5">
-                    <p className="font-medium">
-                      {p.proposer_role === "creator"
-                        ? "TikTok creator"
-                        : "Travel agent"}
-                    </p>
-                    <p className="text-[#E5DFC6]/70">
-                      Sent{" "}
-                      {new Date(p.created_at).toLocaleDateString()}
-                    </p>
+                  <StatusBadge status={p.status} />
+                </div>
+
+                {p.headline && (
+                  <p className="mt-2 text-[11px] font-medium">{p.headline}</p>
+                )}
+
+                {p.message && (
+                  <p className="mt-1 whitespace-pre-line text-[11px] text-[#E5DFC6]/85">
+                    {p.message}
+                  </p>
+                )}
+
+                {p.price_from !== null && (
+                  <p className="mt-2 text-[10px] text-[#E5DFC6]/80">
+                    Estimated starting price:{" "}
+                    <span className="font-semibold">
+                      ${p.price_from} per person
+                    </span>
+                  </p>
+                )}
+
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+                  <div className="flex flex-wrap gap-2">
+                    {!isBooked && !isAccepted && !isDeclined && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => onAccept(p.id)}
+                          disabled={!!updatingProposalId}
+                          className="inline-flex items-center gap-1 rounded-full bg-emerald-500 px-3 py-1 text-[11px] font-semibold text-white hover:bg-emerald-600 disabled:opacity-60"
+                        >
+                          {isUpdating && (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          )}
+                          {!isUpdating && <Check className="h-3 w-3" />}
+                          Accept
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onDecline(p.id)}
+                          disabled={!!updatingProposalId}
+                          className="inline-flex items-center gap-1 rounded-full bg-black/40 px-3 py-1 text-[11px] font-semibold text-[#E5DFC6] hover:bg-black/60 disabled:opacity-60"
+                        >
+                          {!isUpdating && <X className="h-3 w-3" />}
+                          Decline
+                        </button>
+                      </>
+                    )}
+
+                    {isAccepted && !isBooked && (
+                      <Link
+                        to={`/trip-request/${trip.id}/chat`}
+                        className="inline-flex items-center gap-1 rounded-full bg-[#BFAD72] px-3 py-1 text-[11px] font-semibold text-[#0a2225] hover:bg-[#d4c58d]"
+                      >
+                        <MessageCircle className="h-3 w-3" />
+                        Open chat
+                      </Link>
+                    )}
+
+                    {isBooked && p.status === "booked" && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-semibold text-emerald-800">
+                        <Check className="h-3 w-3" />
+                        Trip booked with this partner
+                      </span>
+                    )}
                   </div>
                 </div>
-                <StatusBadge status={p.status} />
-              </div>
-
-              {p.headline && (
-                <p className="mt-2 text-[11px] font-medium">
-                  {p.headline}
-                </p>
-              )}
-
-              {p.message && (
-                <p className="mt-1 whitespace-pre-line text-[11px] text-[#E5DFC6]/85">
-                  {p.message}
-                </p>
-              )}
-
-              {p.price_from !== null && (
-                <p className="mt-2 text-[10px] text-[#E5DFC6]/80">
-                  Estimated starting price:{" "}
-                  <span className="font-semibold">
-                    ${p.price_from} per person
-                  </span>
-                </p>
-              )}
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
       )}
 
-      <p className="mt-3 text-[10px] text-[#E5DFC6]/70">
-        When you've found the right partner, you can continue the conversation
-        and finalize dates, budget, and exact itinerary together.
-      </p>
+      {hasAccepted && !isBooked && (
+        <div className="mt-4 space-y-2 border-t border-white/10 pt-3">
+          <p className="text-[11px] text-[#E5DFC6]/80">
+            Once dates and details are confirmed with your chosen partner, you
+            can mark this trip as booked.
+          </p>
+          <Button
+            type="button"
+            disabled={bookingLoading}
+            onClick={onMarkBooked}
+            className="inline-flex w-full items-center justify-center rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-600 disabled:opacity-60"
+          >
+            {bookingLoading && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            Mark this trip as booked
+          </Button>
+        </div>
+      )}
+
+      {isBooked && (
+        <p className="mt-3 text-[10px] text-[#E5DFC6]/70">
+          This trip is marked as booked. You can still continue chatting with
+          your partner and, later, move it to completed when the trip happens.
+        </p>
+      )}
     </section>
   );
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const base = "inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-medium";
+  const base =
+    "inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-medium";
 
   if (status === "accepted") {
     return (
@@ -449,8 +673,13 @@ function StatusBadge({ status }: { status: string }) {
   }
   if (status === "declined") {
     return (
-      <span className={`${base} bg-red-50 text-red-700`}>
-        Declined
+      <span className={`${base} bg-red-50 text-red-700`}>Declined</span>
+    );
+  }
+  if (status === "booked") {
+    return (
+      <span className={`${base} bg-emerald-50 text-emerald-800`}>
+        Booked
       </span>
     );
   }
@@ -462,9 +691,7 @@ function StatusBadge({ status }: { status: string }) {
     );
   }
   return (
-    <span className={`${base} bg-[#BFAD72]/15 text-[#BFAD72]`}>
-      Sent
-    </span>
+    <span className={`${base} bg-[#BFAD72]/15 text-[#BFAD72]`}>Sent</span>
   );
 }
 
@@ -478,6 +705,7 @@ type ResponderFormProps = {
     value: ProposalForm[K]
   ) => void;
   onSubmit: (e: React.FormEvent) => void;
+  tripId: string;
 };
 
 function ResponderProposalForm({
