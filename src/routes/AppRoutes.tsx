@@ -43,6 +43,8 @@ const TripRequestsBoardPage = lazy(() => import('@/pages/TripRequestsBoardPage')
 const TripRequestDetailPage = lazy(() => import('@/pages/TripRequestDetailPage'));
 const TripChatPage = lazy(() => import('@/pages/TripChatPage'));
 const MyTripRequestsPage = lazy(() => import('@/pages/MyTripRequestsPage'));
+const MyBookingsPage = lazy(() => import('@/pages/MyBookingsPage'));
+const PartnerBookingsPage = lazy(() => import('@/pages/PartnerBookingsPage'));
 const BookingPreferencesRedirect = lazy(() => import('@/pages/redirects/BookingPreferencesRedirect'));
 const MyBookingsRedirect = lazy(() => import('@/pages/redirects/MyBookingsRedirect'));
 const FavoritesRedirect = lazy(() => import('@/pages/redirects/FavoritesRedirect'));
@@ -224,6 +226,8 @@ export const AppRoutes = () => (
       <Route path="/trip-request/:id" element={<TripRequestDetailPage />} />
       <Route path="/trip-request/:id/chat" element={<TripChatPage />} />
       <Route path="/my-trip-requests" element={<MyTripRequestsPage />} />
+      <Route path="/my-bookings" element={<MyBookingsPage />} />
+      <Route path="/partner-bookings" element={<PartnerBookingsPage />} />
       <Route path="/agent/:agentId" element={<AgentProfile />} />
       <Route path="/agent-onboarding" element={<AgentOnboarding />} />
       <Route path="/agent-dashboard" element={<RequireAgentTerms><AgentDashboard /></RequireAgentTerms>} />

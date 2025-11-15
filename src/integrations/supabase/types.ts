@@ -1397,17 +1397,57 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "booking_cancellations_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "booking_cancellations_policy_applied_id_fkey"
             columns: ["policy_applied_id"]
             isOneToOne: false
             referencedRelation: "booking_cancellation_policies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      booking_disputes: {
+        Row: {
+          admin_notes: string | null
+          booking_id: string
+          created_at: string
+          details: string | null
+          id: string
+          opened_by: string
+          status: string
+          summary: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          booking_id: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          opened_by: string
+          status?: string
+          summary: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          booking_id?: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          opened_by?: string
+          status?: string
+          summary?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_disputes_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings"
             referencedColumns: ["id"]
           },
         ]
@@ -1476,15 +1516,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "booking_modifications_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       booking_refunds: {
         Row: {
@@ -1531,17 +1563,48 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "booking_refunds_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "booking_refunds_cancellation_id_fkey"
             columns: ["cancellation_id"]
             isOneToOne: false
             referencedRelation: "booking_cancellations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      booking_status_history: {
+        Row: {
+          booking_id: string
+          changed_by: string | null
+          created_at: string
+          id: string
+          new_status: string
+          old_status: string | null
+          reason: string | null
+        }
+        Insert: {
+          booking_id: string
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          new_status: string
+          old_status?: string | null
+          reason?: string | null
+        }
+        Update: {
+          booking_id?: string
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          new_status?: string
+          old_status?: string | null
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_status_history_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings"
             referencedColumns: ["id"]
           },
         ]
@@ -5755,15 +5818,7 @@ export type Database = {
           transferred_to_agent?: boolean | null
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "payments_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       points_transactions: {
         Row: {
@@ -7179,13 +7234,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "supplier_reviews_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "supplier_reviews_supplier_id_fkey"
             columns: ["supplier_id"]
             isOneToOne: false
@@ -8245,6 +8293,78 @@ export type Database = {
         }
         Relationships: []
       }
+      trip_bookings: {
+        Row: {
+          created_at: string
+          currency: string
+          id: string
+          partner_id: string
+          partner_payout: number
+          partner_role: string
+          platform_commission: number
+          proposal_id: string
+          status: string
+          stripe_payment_intent_id: string | null
+          stripe_payment_status: string | null
+          stripe_transfer_group: string | null
+          total_price: number
+          traveler_id: string
+          trip_request_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          id?: string
+          partner_id: string
+          partner_payout: number
+          partner_role: string
+          platform_commission: number
+          proposal_id: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_payment_status?: string | null
+          stripe_transfer_group?: string | null
+          total_price: number
+          traveler_id: string
+          trip_request_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          id?: string
+          partner_id?: string
+          partner_payout?: number
+          partner_role?: string
+          platform_commission?: number
+          proposal_id?: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_payment_status?: string | null
+          stripe_transfer_group?: string | null
+          total_price?: number
+          traveler_id?: string
+          trip_request_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "trip_proposals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_trip_request_id_fkey"
+            columns: ["trip_request_id"]
+            isOneToOne: false
+            referencedRelation: "trip_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trip_itineraries: {
         Row: {
           cover_image_url: string | null
@@ -8488,13 +8608,6 @@ export type Database = {
             referencedRelation: "travel_agents"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "trip_photos_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
         ]
       }
       trip_proposals: {
@@ -8599,13 +8712,6 @@ export type Database = {
             columns: ["agent_id"]
             isOneToOne: false
             referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trip_reports_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
             referencedColumns: ["id"]
           },
         ]
@@ -8934,13 +9040,6 @@ export type Database = {
             columns: ["agent_id"]
             isOneToOne: false
             referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trip_videos_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
             referencedColumns: ["id"]
           },
         ]
@@ -9737,13 +9836,6 @@ export type Database = {
           vendor_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "vendor_availability_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "vendor_availability_driver_id_fkey"
             columns: ["driver_id"]
