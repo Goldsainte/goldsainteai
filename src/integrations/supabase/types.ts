@@ -1851,6 +1851,7 @@ export type Database = {
           budget_range_max: number | null
           budget_range_min: number | null
           created_at: string
+          destination: string | null
           generated_itinerary: Json | null
           id: string
           notify_all_emails: boolean | null
@@ -1871,6 +1872,7 @@ export type Database = {
           budget_range_max?: number | null
           budget_range_min?: number | null
           created_at?: string
+          destination?: string | null
           generated_itinerary?: Json | null
           id?: string
           notify_all_emails?: boolean | null
@@ -1891,6 +1893,7 @@ export type Database = {
           budget_range_max?: number | null
           budget_range_min?: number | null
           created_at?: string
+          destination?: string | null
           generated_itinerary?: Json | null
           id?: string
           notify_all_emails?: boolean | null
@@ -7050,6 +7053,45 @@ export type Database = {
           },
         ]
       }
+      storyboard_media_library: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          destination_tags: string[] | null
+          id: string
+          is_featured: boolean | null
+          label: string | null
+          mood_tags: string[] | null
+          thumbnail_url: string | null
+          url: string
+          usage_count: number | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          destination_tags?: string[] | null
+          id?: string
+          is_featured?: boolean | null
+          label?: string | null
+          mood_tags?: string[] | null
+          thumbnail_url?: string | null
+          url: string
+          usage_count?: number | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          destination_tags?: string[] | null
+          id?: string
+          is_featured?: boolean | null
+          label?: string | null
+          mood_tags?: string[] | null
+          thumbnail_url?: string | null
+          url?: string
+          usage_count?: number | null
+        }
+        Relationships: []
+      }
       suggestion_participants: {
         Row: {
           created_at: string
@@ -7752,6 +7794,9 @@ export type Database = {
           languages: string[] | null
           last_active_at: string | null
           license_number: string | null
+          max_budget: number | null
+          max_group_size: number | null
+          min_budget: number | null
           payment_processor: string | null
           payout_schedule: string | null
           phone: string | null
@@ -7764,6 +7809,7 @@ export type Database = {
           professional_license_verified: boolean | null
           profile_image_url: string | null
           rating: number | null
+          regions: string[] | null
           selfie_verification_url: string | null
           service_types: string[] | null
           sms_notifications_enabled: boolean | null
@@ -7774,6 +7820,7 @@ export type Database = {
           stripe_charges_enabled: boolean | null
           stripe_onboarding_completed: boolean | null
           stripe_payouts_enabled: boolean | null
+          target_audience: string[] | null
           tax_id: string | null
           terms_accepted: boolean | null
           terms_accepted_at: string | null
@@ -7826,6 +7873,9 @@ export type Database = {
           languages?: string[] | null
           last_active_at?: string | null
           license_number?: string | null
+          max_budget?: number | null
+          max_group_size?: number | null
+          min_budget?: number | null
           payment_processor?: string | null
           payout_schedule?: string | null
           phone?: string | null
@@ -7838,6 +7888,7 @@ export type Database = {
           professional_license_verified?: boolean | null
           profile_image_url?: string | null
           rating?: number | null
+          regions?: string[] | null
           selfie_verification_url?: string | null
           service_types?: string[] | null
           sms_notifications_enabled?: boolean | null
@@ -7848,6 +7899,7 @@ export type Database = {
           stripe_charges_enabled?: boolean | null
           stripe_onboarding_completed?: boolean | null
           stripe_payouts_enabled?: boolean | null
+          target_audience?: string[] | null
           tax_id?: string | null
           terms_accepted?: boolean | null
           terms_accepted_at?: string | null
@@ -7900,6 +7952,9 @@ export type Database = {
           languages?: string[] | null
           last_active_at?: string | null
           license_number?: string | null
+          max_budget?: number | null
+          max_group_size?: number | null
+          min_budget?: number | null
           payment_processor?: string | null
           payout_schedule?: string | null
           phone?: string | null
@@ -7912,6 +7967,7 @@ export type Database = {
           professional_license_verified?: boolean | null
           profile_image_url?: string | null
           rating?: number | null
+          regions?: string[] | null
           selfie_verification_url?: string | null
           service_types?: string[] | null
           sms_notifications_enabled?: boolean | null
@@ -7922,6 +7978,7 @@ export type Database = {
           stripe_charges_enabled?: boolean | null
           stripe_onboarding_completed?: boolean | null
           stripe_payouts_enabled?: boolean | null
+          target_audience?: string[] | null
           tax_id?: string | null
           terms_accepted?: boolean | null
           terms_accepted_at?: string | null
