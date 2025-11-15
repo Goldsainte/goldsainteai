@@ -73,6 +73,7 @@ const NewCollabRequestPage = lazy(() => import('@/pages/NewCollabRequestPage'));
 const Messages = lazy(() => import('@/pages/Messages'));
 const PriceAlerts = lazy(() => import('@/pages/PriceAlerts'));
 const BookingDetails = lazy(() => import('@/pages/BookingDetails'));
+const BookingDetailPage = lazy(() => import('@/pages/BookingDetailPage'));
 const ModifyFlight = lazy(() => import('@/pages/ModifyFlight'));
 const HotelDetails = lazy(() => import('@/pages/HotelDetails'));
 const MyJobs = lazy(() => import('@/pages/MyJobs'));
@@ -226,8 +227,9 @@ export const AppRoutes = () => (
       <Route path="/trip-request/:id" element={<TripRequestDetailPage />} />
       <Route path="/trip-request/:id/chat" element={<TripChatPage />} />
       <Route path="/my-trip-requests" element={<MyTripRequestsPage />} />
-      <Route path="/my-bookings" element={<MyBookingsPage />} />
-      <Route path="/partner-bookings" element={<PartnerBookingsPage />} />
+          <Route path="/my-bookings" element={<MyBookingsPage />} />
+          <Route path="/partner-bookings" element={<PartnerBookingsPage />} />
+          <Route path="/booking/:id" element={<BookingDetailPage />} />
       <Route path="/agent/:agentId" element={<AgentProfile />} />
       <Route path="/agent-onboarding" element={<AgentOnboarding />} />
       <Route path="/agent-dashboard" element={<RequireAgentTerms><AgentDashboard /></RequireAgentTerms>} />

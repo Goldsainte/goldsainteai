@@ -1342,65 +1342,56 @@ export type Database = {
       }
       booking_cancellations: {
         Row: {
-          admin_notes: string | null
           booking_id: string
-          cancellation_date: string | null
-          cancellation_reason: string | null
-          created_at: string | null
-          currency: string
+          created_at: string
+          decided_at: string | null
+          decision_by: string | null
+          decision_reason: string | null
           id: string
-          original_amount: number
-          policy_applied_id: string | null
-          processed_at: string | null
-          processed_by: string | null
-          refund_amount: number
-          refund_percentage: number
+          reason_details: string | null
+          reason_short: string
+          requested_at: string
+          requested_by: string
+          requested_role: string
           status: string
-          updated_at: string | null
-          user_id: string
+          updated_at: string
         }
         Insert: {
-          admin_notes?: string | null
           booking_id: string
-          cancellation_date?: string | null
-          cancellation_reason?: string | null
-          created_at?: string | null
-          currency?: string
+          created_at?: string
+          decided_at?: string | null
+          decision_by?: string | null
+          decision_reason?: string | null
           id?: string
-          original_amount: number
-          policy_applied_id?: string | null
-          processed_at?: string | null
-          processed_by?: string | null
-          refund_amount: number
-          refund_percentage: number
+          reason_details?: string | null
+          reason_short: string
+          requested_at?: string
+          requested_by: string
+          requested_role: string
           status?: string
-          updated_at?: string | null
-          user_id: string
+          updated_at?: string
         }
         Update: {
-          admin_notes?: string | null
           booking_id?: string
-          cancellation_date?: string | null
-          cancellation_reason?: string | null
-          created_at?: string | null
-          currency?: string
+          created_at?: string
+          decided_at?: string | null
+          decision_by?: string | null
+          decision_reason?: string | null
           id?: string
-          original_amount?: number
-          policy_applied_id?: string | null
-          processed_at?: string | null
-          processed_by?: string | null
-          refund_amount?: number
-          refund_percentage?: number
+          reason_details?: string | null
+          reason_short?: string
+          requested_at?: string
+          requested_by?: string
+          requested_role?: string
           status?: string
-          updated_at?: string | null
-          user_id?: string
+          updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "booking_cancellations_policy_applied_id_fkey"
-            columns: ["policy_applied_id"]
+            foreignKeyName: "booking_cancellations_booking_id_fkey"
+            columns: ["booking_id"]
             isOneToOne: false
-            referencedRelation: "booking_cancellation_policies"
+            referencedRelation: "trip_bookings"
             referencedColumns: ["id"]
           },
         ]
@@ -1561,15 +1552,7 @@ export type Database = {
           stripe_refund_id?: string | null
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "booking_refunds_cancellation_id_fkey"
-            columns: ["cancellation_id"]
-            isOneToOne: false
-            referencedRelation: "booking_cancellations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       booking_status_history: {
         Row: {
