@@ -4478,6 +4478,39 @@ export type Database = {
           },
         ]
       }
+      media_library: {
+        Row: {
+          created_at: string
+          id: string
+          label: string | null
+          owner_id: string | null
+          source: string
+          tags: string[] | null
+          thumb_url: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label?: string | null
+          owner_id?: string | null
+          source: string
+          tags?: string[] | null
+          thumb_url?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string | null
+          owner_id?: string | null
+          source?: string
+          tags?: string[] | null
+          thumb_url?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
       moderation_actions: {
         Row: {
           action_type: string
