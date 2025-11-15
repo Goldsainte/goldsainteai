@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { invokeWithAuth } from "@/lib/supabaseHelpers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -95,33 +96,52 @@ export function CreatorProfileSettings() {
     
     setIsSaving(true);
     try {
-      const profileData = {
-        user_id: userId,
-        display_name: data.display_name || null,
-        handle: data.handle || null,
-        avatar_url: data.avatar_url || null,
-        bio: data.bio || null,
-        primary_niches: data.primary_niches ? data.primary_niches.split(",").map(n => n.trim()).filter(Boolean) : null,
-        primary_regions: data.primary_regions ? data.primary_regions.split(",").map(r => r.trim()).filter(Boolean) : null,
-        tiktok_handle: data.tiktok_handle || null,
-        tiktok_url: data.tiktok_url || null,
+      const payload = {
+        displayName: data.display_name || undefined,
+        handle: data.handle || undefined,
+        avatarUrl: data.avatar_url || undefined,
+        bio: data.bio || undefined,
+        primaryNiches: data.primary_niches 
+          ? data.primary_niches.split(",").map(n => n.trim()).filter(Boolean) 
+          : undefined,
+        primaryRegions: data.primary_regions 
+          ? data.primary_regions.split(",").map(r => r.trim()).filter(Boolean) 
+          : undefined,
+        tiktokHandle: data.tiktok_handle || undefined,
+        tiktokUrl: data.tiktok_url || undefined,
       };
 
-      const { error } = await supabase
-        .from("creator_profiles")
-        .upsert(profileData, { onConflict: "user_id" });
+      const { data: result, error } = await invokeWithAuth(
+        "upsert-creator-profile",
+        { body: payload }
+      );
 
-      if (error) throw error;
+      if (error) {
+        // Check for specific handle taken error
+        if (error.includes("HANDLE_TAKEN") || error.includes("handle is already taken")) {
+          toast({
+            variant: "destructive",
+            title: "Handle unavailable",
+            description: "That handle is already taken. Please choose another.",
+          });
+          return;
+        }
+        
+        throw new Error(error);
+      }
 
       toast({
         title: "Profile updated",
         description: "Your public creator profile has been saved.",
       });
+      
+      // Reload to show updated data
+      await loadProfile();
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error saving profile",
-        description: error.message,
+        description: error.message || "Failed to save profile",
       });
     } finally {
       setIsSaving(false);
