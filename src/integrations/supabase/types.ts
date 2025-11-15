@@ -8494,6 +8494,56 @@ export type Database = {
           },
         ]
       }
+      trip_proposals: {
+        Row: {
+          created_at: string
+          currency: string | null
+          headline: string | null
+          id: string
+          message: string | null
+          price_from: number | null
+          proposer_id: string
+          proposer_role: string
+          status: string
+          trip_request_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string | null
+          headline?: string | null
+          id?: string
+          message?: string | null
+          price_from?: number | null
+          proposer_id: string
+          proposer_role: string
+          status?: string
+          trip_request_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string | null
+          headline?: string | null
+          id?: string
+          message?: string | null
+          price_from?: number | null
+          proposer_id?: string
+          proposer_role?: string
+          status?: string
+          trip_request_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_proposals_trip_request_id_fkey"
+            columns: ["trip_request_id"]
+            isOneToOne: false
+            referencedRelation: "trip_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trip_reports: {
         Row: {
           agent_id: string | null
