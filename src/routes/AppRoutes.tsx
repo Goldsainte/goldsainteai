@@ -139,6 +139,7 @@ const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
 const Onboarding = lazy(() => import('@/pages/Onboarding'));
 const AIAgentOnboarding = lazy(() => import('@/pages/AIAgentOnboarding'));
 const AppleCallback = lazy(() => import('@/pages/AppleCallback'));
+const EarningsDashboard = lazy(() => import('@/pages/EarningsDashboard'));
 
 export const AppRoutes = () => (
   <Routes>
@@ -325,6 +326,7 @@ export const AppRoutes = () => (
       <Route path="/restaurant/:restaurantId" element={<RestaurantDetail />} />
       <Route path="/cocurated-booking-success" element={<CoCuratedBookingSuccess />} />
       <Route path="/your-activity" element={<YourActivity />} />
+      <Route path="/earnings" element={<EarningsDashboard />} />
     </Route>
 
     <Route element={<AdminLayout />}>
