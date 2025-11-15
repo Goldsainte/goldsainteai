@@ -1,4 +1,4 @@
-import { Bell, Check, Trash2 } from 'lucide-react';
+import { Bell, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Popover,
@@ -8,12 +8,10 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useNotifications } from '@/hooks/useNotifications';
-import { useAuth } from '@/contexts/AuthContext';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
 export const NotificationCenter = () => {
-  const { user } = useAuth();
   const navigate = useNavigate();
   const {
     notifications,
@@ -24,18 +22,12 @@ export const NotificationCenter = () => {
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'new_suggestion':
-        return '💡';
-      case 'high_votes':
-        return '🔥';
-      case 'participant_joined':
-        return '👥';
-      case 'message':
-        return '💬';
-      case 'departure_reminder':
+      case 'trip_posted':
         return '✈️';
-      case 'budget_alert':
-        return '💰';
+      case 'proposal_received':
+        return '💼';
+      case 'proposal_accepted':
+        return '✅';
       default:
         return '📢';
     }
@@ -46,9 +38,9 @@ export const NotificationCenter = () => {
       markAsRead(notification.id);
     }
     
-    // Navigate to the trip
-    if (notification.trip_id) {
-      navigate(`/group-trips/${notification.trip_id}`);
+    // Navigate based on payload
+    if (notification.payload?.trip_id) {
+      navigate(`/trip/${notification.payload.trip_id}`);
     }
   };
 
@@ -106,22 +98,22 @@ export const NotificationCenter = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <h4 className="font-medium text-sm">
-                          {notification.title}
+                          {notification.payload?.title || notification.type}
                         </h4>
                         {!notification.read && (
                           <div className="h-2 w-2 rounded-full bg-primary flex-shrink-0 mt-1" />
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {notification.body}
+                        {typeof notification.payload === 'string' 
+                          ? notification.payload 
+                          : notification.payload?.message || 'New notification'}
                       </p>
-                      <div className="flex items-center justify-between mt-2">
-                        <span className="text-xs text-muted-foreground">
-                          {formatDistanceToNow(new Date(notification.created_at), {
-                            addSuffix: true,
-                          })}
-                        </span>
-                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        {formatDistanceToNow(new Date(notification.created_at), {
+                          addSuffix: true,
+                        })}
+                      </p>
                     </div>
                   </div>
                 </div>
