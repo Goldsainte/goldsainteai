@@ -45,8 +45,7 @@ type Cancellation = {
 type Dispute = {
   id: string;
   status: string;
-  type: string;
-  summary: string;
+  reason: string;
   created_at: string;
 };
 
@@ -147,8 +146,8 @@ export default function BookingDetailPage() {
       }
 
       const { data: disputesData } = await supabase
-        .from("booking_disputes")
-        .select("id, status, type, summary, created_at")
+        .from("disputes")
+        .select("id, status, reason, created_at")
         .eq("booking_id", id)
         .order("created_at", { ascending: false });
 
@@ -250,8 +249,8 @@ export default function BookingDetailPage() {
         setDisputeDetails("");
 
         const { data: disputesData } = await supabase
-          .from("booking_disputes")
-          .select("id, status, type, summary, created_at")
+          .from("disputes")
+          .select("id, status, reason, created_at")
           .eq("booking_id", id)
           .order("created_at", { ascending: false });
 
@@ -549,9 +548,9 @@ export default function BookingDetailPage() {
                       <li key={d.id}>
                         {new Date(d.created_at).toLocaleDateString()} —{" "}
                         <span className="font-medium">
-                          {d.type} ({d.status})
+                          ({d.status})
                         </span>{" "}
-                        — {d.summary}
+                        — {d.reason}
                       </li>
                     ))}
                   </ul>

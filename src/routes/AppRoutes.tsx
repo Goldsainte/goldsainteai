@@ -76,7 +76,6 @@ const CreatorProfilePage = lazy(() => import('@/pages/CreatorProfilePage'));
 const NewCollabRequestPage = lazy(() => import('@/pages/NewCollabRequestPage'));
 const Messages = lazy(() => import('@/pages/Messages'));
 const PriceAlerts = lazy(() => import('@/pages/PriceAlerts'));
-const BookingDetails = lazy(() => import('@/pages/BookingDetails'));
 const BookingDetailPage = lazy(() => import('@/pages/BookingDetailPage'));
 const HotelDetails = lazy(() => import('@/pages/HotelDetails'));
 const MyJobs = lazy(() => import('@/pages/MyJobs'));
@@ -287,7 +286,6 @@ export const AppRoutes = () => (
         )}
       />
       <Route path="/price-alerts" element={<PriceAlerts />} />
-      <Route path="/booking-details/:bookingId" element={<BookingDetails />} />
       <Route path="/search-results" element={<SearchResults />} />
       <Route path="/hotel/:id" element={<HotelDetails />} />
       <Route path="/hotel-booking" element={<HotelBooking />} />
