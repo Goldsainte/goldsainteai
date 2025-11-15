@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, User, Menu, Hotel, Plane, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info, Crown, CreditCard } from "lucide-react";
+import { Heart, User, Menu, Hotel, Plane, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info, Crown, CreditCard, PlaneTakeoff } from "lucide-react";
 import CreateContentSheet from "@/components/CreateContentSheet";
 import ContentUploadModal from "@/components/ContentUploadModal";
 import { CreateMomentModal } from "@/components/CreateMomentModal";
@@ -250,14 +250,7 @@ export const Header = () => {
                         <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">{t('navigation.discover')}</p>
                       </div>
                       <div className="py-2">
-                        <DropdownMenuItem 
-                          onClick={() => navigate('/travel-feed')} 
-                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                        >
-                          <Video className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">{t('navigation.journeys')}</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => navigate('/cocurated-journeys')} 
                           className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
@@ -284,6 +277,20 @@ export const Header = () => {
                         >
                           <ShoppingCart className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                           <span className="text-sm font-medium">{t('navigation.marketplace')}</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => navigate('/tiktok-lab')} 
+                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                        >
+                          <Video className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                          <span className="text-sm font-medium">TikTok Lab</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => navigate('/marketplace/request-trip')} 
+                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                        >
+                          <PlaneTakeoff className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                          <span className="text-sm font-medium">Request Trip</span>
                         </DropdownMenuItem>
                       </div>
                       
@@ -425,6 +432,13 @@ export const Header = () => {
                             <Plus className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                             <span className="text-sm font-medium">Create Content</span>
                           </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/creator-dashboard')} 
+                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                          >
+                            <TrendingUp className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                            <span className="text-sm font-medium">Creator Dashboard</span>
+                          </DropdownMenuItem>
                           
                           <DropdownMenuSeparator className="bg-border/50" />
                           
@@ -559,14 +573,7 @@ export const Header = () => {
                       <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Discover</p>
                     </div>
                     <div className="py-2">
-                      <DropdownMenuItem 
-                        onClick={() => navigate('/travel-feed')} 
-                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                      >
-                        <Video className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">Journeys</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         onClick={() => navigate('/cocurated-journeys')} 
                         className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                       >
@@ -593,6 +600,20 @@ export const Header = () => {
                       >
                         <ShoppingCart className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Marketplace</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => navigate('/tiktok-lab')} 
+                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                      >
+                        <Video className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                        <span className="text-sm font-medium">TikTok Lab</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => navigate('/marketplace/request-trip')} 
+                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                      >
+                        <PlaneTakeoff className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                        <span className="text-sm font-medium">Request Trip</span>
                       </DropdownMenuItem>
                     </div>
                     
@@ -843,16 +864,6 @@ export const Header = () => {
             >
               <Search className="h-5 w-5" />
               <span className="text-xs">Search</span>
-            </button>
-            
-            <button
-              onClick={() => navigate('/travel-feed')}
-              className="flex flex-col items-center justify-center gap-1 hover:bg-muted transition-colors min-h-[44px]"
-              aria-label="Journeys"
-              data-tour="places"
-            >
-              <Video className="h-5 w-5" />
-              <span className="text-xs">Journeys</span>
             </button>
             
             <button
