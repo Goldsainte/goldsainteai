@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
 type CreatorTripData = {
@@ -208,9 +208,12 @@ export default function CreatorTripPage() {
                 </div>
               </div>
             </div>
-            <button className="mt-3 w-full rounded-full bg-neutral-100 px-4 py-2 text-xs font-semibold text-neutral-900 hover:bg-neutral-200">
+            <Link
+              to={`/creator/${creator.id}`}
+              className="mt-3 w-full rounded-full bg-neutral-100 px-4 py-2 text-xs font-semibold text-neutral-900 hover:bg-neutral-200 inline-flex items-center justify-center"
+            >
               View creator profile
-            </button>
+            </Link>
           </div>
         </section>
       </div>
