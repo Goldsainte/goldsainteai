@@ -88,7 +88,7 @@ serve(async (req) => {
         });
 
         const { error: emailError } = await resend.emails.send({
-          from: "Goldsainte <onboarding@resend.dev>",
+          from: "Goldsainte <notification@goldsainte.ai>",
           to: [travelerEmail],
           subject: "Your Goldsainte trip just received a new proposal",
           html: emailHtml,
