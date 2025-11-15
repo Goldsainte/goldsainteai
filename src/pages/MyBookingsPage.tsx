@@ -132,7 +132,7 @@ function BookingRowCard({ booking }: { booking: BookingRow }) {
 
   return (
     <Link
-      to={`/trip-request/${trip?.id}`}
+      to={`/booking/${booking.id}`}
       className="flex flex-col gap-2 rounded-3xl bg-[#f6f3ea]/95 p-4 text-xs text-[#0a2225] shadow-sm ring-1 ring-[#E5DFC6] hover:ring-[#BFAD72]"
     >
       <div className="flex items-center justify-between gap-2">
