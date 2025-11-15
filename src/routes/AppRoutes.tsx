@@ -38,6 +38,7 @@ const AgentOnboarding = lazy(() => import('@/pages/AgentOnboarding'));
 const AgentDashboard = lazy(() => import('@/pages/AgentDashboard'));
 const AgentTripRequests = lazy(() => import('@/pages/AgentTripRequests'));
 const AgentPerformanceDashboard = lazy(() => import('@/pages/AgentPerformanceDashboard'));
+const AgentDealsDashboardPage = lazy(() => import('@/pages/AgentDealsDashboardPage'));
 const BookingPreferencesRedirect = lazy(() => import('@/pages/redirects/BookingPreferencesRedirect'));
 const MyBookingsRedirect = lazy(() => import('@/pages/redirects/MyBookingsRedirect'));
 const FavoritesRedirect = lazy(() => import('@/pages/redirects/FavoritesRedirect'));
@@ -218,6 +219,7 @@ export const AppRoutes = () => (
       <Route path="/agent-dashboard" element={<RequireAgentTerms><AgentDashboard /></RequireAgentTerms>} />
       <Route path="/agent-trip-requests" element={<RequireAgentTerms><AgentTripRequests /></RequireAgentTerms>} />
       <Route path="/agent-performance" element={<RequireAgentTerms><AgentPerformanceDashboard /></RequireAgentTerms>} />
+      <Route path="/agent-deals" element={<RequireAgentTerms><AgentDealsDashboardPage /></RequireAgentTerms>} />
       <Route path="/booking-preferences" element={<BookingPreferencesRedirect />} />
       <Route path="/commission-dashboard" element={<CommissionDashboard />} />
       <Route path="/email-preview" element={<EmailPreview />} />
