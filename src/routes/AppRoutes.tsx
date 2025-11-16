@@ -46,8 +46,10 @@ const PostTripPage = lazy(() => import('@/pages/PostTripPage'));
 const AgentTripsPage = lazy(() => import('@/pages/AgentTripsPage'));
 const CreatorTripsPage = lazy(() => import('@/pages/CreatorTripsPage'));
 const StoryboardEditorPage = lazy(() => import('@/pages/StoryboardEditorPage'));
+const TikTokLabStoryboardEditorPage = lazy(() => import('@/pages/TikTokLab/StoryboardEditorPage'));
 const TikTokLabPage = lazy(() => import('@/pages/TikTokLabPage'));
 const StoryboardsPage = lazy(() => import('@/pages/StoryboardsPage'));
+const StoryboardDetailPage = lazy(() => import('@/pages/StoryboardDetailPage'));
 const ConciergePage = lazy(() => import('@/pages/ConciergePage'));
 const HomePage = lazy(() => import('@/pages/HomePage'));
 const MyBookingsPage = lazy(() => import('@/pages/MyBookingsPage'));
@@ -232,6 +234,9 @@ export const AppRoutes = () => (
       <Route path="/creator-trips" element={<CreatorTripsPage />} />
       <Route path="/tiktok-lab" element={<TikTokLabPage />} />
       <Route path="/storyboards" element={<StoryboardsPage />} />
+      <Route path="/storyboards/:id" element={<StoryboardDetailPage />} />
+      <Route path="/tiktok-lab/storyboards/new" element={<TikTokLabStoryboardEditorPage />} />
+      <Route path="/tiktok-lab/storyboards/:id/edit" element={<TikTokLabStoryboardEditorPage />} />
       <Route path="/concierge" element={<ConciergePage />} />
       <Route path="/my-bookings" element={<MyBookingsPage />} />
       <Route path="/partner-bookings" element={<PartnerBookingsPage />} />
