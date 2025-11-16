@@ -7,21 +7,17 @@ import {
   AdminReport,
   AdminSafetyEvent,
 } from "@/services/adminSafetyService";
-import { useUserRole } from "@/hooks/useUserRole";
+import { AdminGuard } from "./AdminGuard";
 
 const BG = "bg-[#0a2225]";
 
-export default function AdminSafetyDashboardPage() {
-  const { isAdmin, loading: roleLoading } = useUserRole();
+function AdminSafetyDashboardContent() {
   const [reports, setReports] = useState<AdminReport[]>([]);
   const [events, setEvents] = useState<AdminSafetyEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (roleLoading) return;
-    if (!isAdmin) return;
-
     let cancelled = false;
 
     async function load() {
@@ -47,25 +43,7 @@ export default function AdminSafetyDashboardPage() {
     return () => {
       cancelled = true;
     };
-  }, [isAdmin, roleLoading]);
-
-  if (roleLoading) {
-    return (
-      <main className={`${BG} min-h-screen flex items-center justify-center`}>
-        <p className="text-[12px] text-[#E5DFC6]/80">Checking access…</p>
-      </main>
-    );
-  }
-
-  if (!isAdmin) {
-    return (
-      <main className={`${BG} min-h-screen flex items-center justify-center`}>
-        <p className="text-[12px] text-[#E5DFC6]/80">
-          You don't have permission to view this page.
-        </p>
-      </main>
-    );
-  }
+  }, []);
 
   return (
     <main className={`${BG} min-h-screen text-[#E5DFC6]`}>
@@ -287,4 +265,12 @@ function truncate(text: string, max: number) {
   if (!text) return "";
   if (text.length <= max) return text;
   return text.slice(0, max) + "…";
+}
+
+export default function AdminSafetyDashboardPage() {
+  return (
+    <AdminGuard>
+      <AdminSafetyDashboardContent />
+    </AdminGuard>
+  );
 }

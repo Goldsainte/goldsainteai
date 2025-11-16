@@ -208,14 +208,108 @@ export default function PostTripPage() {
             />
           </div>
 
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block mb-1">Occasion</label>
+              <Input
+                value={occasion}
+                onChange={(e) => setOccasion(e.target.value)}
+                placeholder="Honeymoon, birthday, etc."
+                className="bg-background/60 border-border"
+              />
+            </div>
+            <div>
+              <label className="block mb-1">Traveler type</label>
+              <Input
+                value={travelerType}
+                onChange={(e) => setTravelerType(e.target.value)}
+                placeholder="Couple, friends, family, etc."
+                className="bg-background/60 border-border"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block mb-1">Travel style (comma separated)</label>
+            <Input
+              value={travelStyle.join(", ")}
+              onChange={(e) => setTravelStyle(e.target.value.split(",").map(s => s.trim()))}
+              placeholder="Ultra-luxury, design hotels, adventure, etc."
+              className="bg-background/60 border-border"
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1">Pace</label>
+            <Input
+              value={pace}
+              onChange={(e) => setPace(e.target.value)}
+              placeholder="Slow, balanced, or packed days"
+              className="bg-background/60 border-border"
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1">Departure city</label>
+            <Input
+              value={departureCity}
+              onChange={(e) => setDepartureCity(e.target.value)}
+              placeholder="Where you'll be flying from"
+              className="bg-background/60 border-border"
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1">Must-haves</label>
+            <Textarea
+              value={mustHaves}
+              onChange={(e) => setMustHaves(e.target.value)}
+              rows={3}
+              className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none"
+              placeholder="Things that are essential for this trip..."
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1">Hard no's</label>
+            <Textarea
+              value={hardNos}
+              onChange={(e) => setHardNos(e.target.value)}
+              rows={3}
+              className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none"
+              placeholder="Things you definitely don't want..."
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1">TikTok links or inspiration</label>
+            <Textarea
+              value={tiktokLinks}
+              onChange={(e) => setTiktokLinks(e.target.value)}
+              rows={3}
+              className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none"
+              placeholder="Paste TikTok links or handles that inspired this trip..."
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1">Content goals</label>
+            <Input
+              value={contentGoals}
+              onChange={(e) => setContentGoals(e.target.value)}
+              placeholder="Do you want to film content, or just enjoy the trip?"
+              className="bg-background/60 border-border"
+            />
+          </div>
+
             <label className="block space-y-1">
-              <span>Trip details & non-negotiables</span>
+              <span>Trip details & additional notes</span>
               <Textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={8}
                 className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none"
-                placeholder={`Tell us about the dates, budget, and what matters most.\n\nYou can paste links to TikToks or Pins for inspiration.`}
+                placeholder={`Any additional details for your travel team...\n\nYou can paste links to TikToks or Pins for inspiration.`}
               />
               {isFromStoryboard && (
                 <p className="text-[10px] text-[#8D8D8D]">
