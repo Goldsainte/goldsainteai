@@ -6508,6 +6508,9 @@ export type Database = {
           content_style_tags: string[] | null
           country: string | null
           created_at: string
+          creator_budget_levels: string[] | null
+          creator_niches: string[] | null
+          creator_pov: string | null
           destinations_focus_tags: string[] | null
           display_name: string | null
           email_notifications: boolean | null
@@ -6515,6 +6518,8 @@ export type Database = {
           followers_count: number | null
           following_count: number | null
           full_name: string | null
+          has_completed_creator_onboarding: boolean | null
+          home_base: string | null
           id: string
           instagram_username: string | null
           is_business_verified: boolean | null
@@ -6570,6 +6575,9 @@ export type Database = {
           content_style_tags?: string[] | null
           country?: string | null
           created_at?: string
+          creator_budget_levels?: string[] | null
+          creator_niches?: string[] | null
+          creator_pov?: string | null
           destinations_focus_tags?: string[] | null
           display_name?: string | null
           email_notifications?: boolean | null
@@ -6577,6 +6585,8 @@ export type Database = {
           followers_count?: number | null
           following_count?: number | null
           full_name?: string | null
+          has_completed_creator_onboarding?: boolean | null
+          home_base?: string | null
           id: string
           instagram_username?: string | null
           is_business_verified?: boolean | null
@@ -6632,6 +6642,9 @@ export type Database = {
           content_style_tags?: string[] | null
           country?: string | null
           created_at?: string
+          creator_budget_levels?: string[] | null
+          creator_niches?: string[] | null
+          creator_pov?: string | null
           destinations_focus_tags?: string[] | null
           display_name?: string | null
           email_notifications?: boolean | null
@@ -6639,6 +6652,8 @@ export type Database = {
           followers_count?: number | null
           following_count?: number | null
           full_name?: string | null
+          has_completed_creator_onboarding?: boolean | null
+          home_base?: string | null
           id?: string
           instagram_username?: string | null
           is_business_verified?: boolean | null
@@ -9229,66 +9244,90 @@ export type Database = {
       trip_requests: {
         Row: {
           booked_at: string | null
+          budget_level: string | null
           budget_max: number | null
           budget_min: number | null
           created_at: string
+          departure_city: string | null
           description: string | null
           destination: string | null
           end_date: string | null
           flexible_dates: boolean | null
           id: string
+          occasion: string | null
           selected_proposal_id: string | null
           start_date: string | null
           status: string
           tiktok_link: string | null
+          tiktok_links: string[] | null
           title: string | null
+          travel_styles: string[] | null
+          traveler_count: number | null
+          traveler_type: string | null
           travelers_adults: number | null
           travelers_children: number | null
           trip_style: string[] | null
           updated_at: string
           user_id: string | null
+          wants_role: string | null
         }
         Insert: {
           booked_at?: string | null
+          budget_level?: string | null
           budget_max?: number | null
           budget_min?: number | null
           created_at?: string
+          departure_city?: string | null
           description?: string | null
           destination?: string | null
           end_date?: string | null
           flexible_dates?: boolean | null
           id?: string
+          occasion?: string | null
           selected_proposal_id?: string | null
           start_date?: string | null
           status?: string
           tiktok_link?: string | null
+          tiktok_links?: string[] | null
           title?: string | null
+          travel_styles?: string[] | null
+          traveler_count?: number | null
+          traveler_type?: string | null
           travelers_adults?: number | null
           travelers_children?: number | null
           trip_style?: string[] | null
           updated_at?: string
           user_id?: string | null
+          wants_role?: string | null
         }
         Update: {
           booked_at?: string | null
+          budget_level?: string | null
           budget_max?: number | null
           budget_min?: number | null
           created_at?: string
+          departure_city?: string | null
           description?: string | null
           destination?: string | null
           end_date?: string | null
           flexible_dates?: boolean | null
           id?: string
+          occasion?: string | null
           selected_proposal_id?: string | null
           start_date?: string | null
           status?: string
           tiktok_link?: string | null
+          tiktok_links?: string[] | null
           title?: string | null
+          travel_styles?: string[] | null
+          traveler_count?: number | null
+          traveler_type?: string | null
           travelers_adults?: number | null
           travelers_children?: number | null
           trip_style?: string[] | null
           updated_at?: string
           user_id?: string | null
+          wants_role?: string | null
         }
         Relationships: [
           {

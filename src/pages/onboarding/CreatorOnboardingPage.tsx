@@ -1,19 +1,75 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
+import { saveCreatorOnboarding } from "@/services/profileService";
 
 type StepId = 1 | 2 | 3 | 4;
+
+const NICHE_OPTIONS = [
+  "European city breaks",
+  "Beach escapes",
+  "Design hotels",
+  "Villas & homes",
+  "Adventure",
+  "Wellness",
+  "Food & wine",
+  "Nightlife",
+  "Family-friendly",
+];
+
+const BUDGET_OPTIONS = ["Affordable-chic", "Classic luxury", "Ultra-luxury"];
 
 export default function CreatorOnboardingPage() {
   const [step, setStep] = useState<StepId>(1);
   const navigate = useNavigate();
 
+  // shared state
+  const [displayName, setDisplayName] = useState("");
+  const [tiktokHandle, setTiktokHandle] = useState("");
+  const [homeBase, setHomeBase] = useState("");
+  const [niches, setNiches] = useState<string[]>([]);
+  const [budgetLevels, setBudgetLevels] = useState<string[]>([]);
+  const [pov, setPov] = useState("");
+  const [policyAccepted, setPolicyAccepted] = useState(false);
+
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const goNext = () => setStep((prev) => (prev < 4 ? ((prev + 1) as StepId) : prev));
   const goPrev = () => setStep((prev) => (prev > 1 ? ((prev - 1) as StepId) : prev));
 
-  const handleFinish = () => {
-    // TODO: ensure profile is saved / flagged as creator
-    navigate("/tiktok-lab");
+  const handleFinish = async () => {
+    setError(null);
+
+    // simple validation
+    if (!displayName.trim() || !tiktokHandle.trim()) {
+      setError("Please add at least your display name and TikTok handle.");
+      setStep(1);
+      return;
+    }
+    if (!policyAccepted) {
+      setError("Please agree to keep conversations and payments on Goldsainte.");
+      setStep(3);
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await saveCreatorOnboarding({
+        display_name: displayName.trim(),
+        tiktok_handle: tiktokHandle.trim(),
+        home_base: homeBase.trim() || undefined,
+        creator_niches: niches,
+        creator_budget_levels: budgetLevels,
+        creator_pov: pov.trim() || undefined,
+      });
+
+      navigate("/tiktok-lab");
+    } catch (err: any) {
+      setError(err.message || "We couldn't finish your onboarding.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -41,10 +97,39 @@ export default function CreatorOnboardingPage() {
           </p>
         </header>
 
+        {error && (
+          <p className="text-[10px] text-red-600 border border-red-200 bg-red-50 rounded-2xl px-3 py-1">
+            {error}
+          </p>
+        )}
+
         <div className="border-t border-[#E5DFC6] pt-4">
-          {step === 1 && <Step1Basics />}
-          {step === 2 && <Step2Niche />}
-          {step === 3 && <Step3Earnings />}
+          {step === 1 && (
+            <Step1Basics
+              displayName={displayName}
+              setDisplayName={setDisplayName}
+              tiktokHandle={tiktokHandle}
+              setTiktokHandle={setTiktokHandle}
+              homeBase={homeBase}
+              setHomeBase={setHomeBase}
+            />
+          )}
+          {step === 2 && (
+            <Step2Niche
+              niches={niches}
+              setNiches={setNiches}
+              budgetLevels={budgetLevels}
+              setBudgetLevels={setBudgetLevels}
+              pov={pov}
+              setPov={setPov}
+            />
+          )}
+          {step === 3 && (
+            <Step3Earnings
+              policyAccepted={policyAccepted}
+              setPolicyAccepted={setPolicyAccepted}
+            />
+          )}
           {step === 4 && <Step4Storyboard />}
         </div>
 
@@ -71,9 +156,10 @@ export default function CreatorOnboardingPage() {
             <button
               type="button"
               onClick={handleFinish}
-              className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-4 py-2 text-[11px] font-semibold hover:bg-[#073331]"
+              disabled={saving}
+              className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-4 py-2 text-[11px] font-semibold hover:bg-[#073331] disabled:opacity-50"
             >
-              Go to TikTok Lab
+              {saving ? "Finishing…" : "Go to TikTok Lab"}
               <ArrowRight className="h-3 w-3" />
             </button>
           )}
@@ -83,7 +169,25 @@ export default function CreatorOnboardingPage() {
   );
 }
 
-function Step1Basics() {
+// ---- Step components re-used but now controlled ----
+
+type Step1Props = {
+  displayName: string;
+  setDisplayName: (v: string) => void;
+  tiktokHandle: string;
+  setTiktokHandle: (v: string) => void;
+  homeBase: string;
+  setHomeBase: (v: string) => void;
+};
+
+function Step1Basics({
+  displayName,
+  setDisplayName,
+  tiktokHandle,
+  setTiktokHandle,
+  homeBase,
+  setHomeBase,
+}: Step1Props) {
   return (
     <div className="space-y-3 text-[11px]">
       <p className="text-[#4a4a4a]">
@@ -95,6 +199,8 @@ function Step1Basics() {
           <span className="font-semibold">Display name</span>
           <input
             type="text"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
             className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none"
             placeholder="e.g. JetLag & Champagne"
           />
@@ -105,6 +211,8 @@ function Step1Basics() {
             <span className="text-[#8D8D8D] text-[11px] mr-1">@</span>
             <input
               type="text"
+              value={tiktokHandle}
+              onChange={(e) => setTiktokHandle(e.target.value)}
               className="flex-1 bg-transparent text-[11px] outline-none"
               placeholder="yourhandle"
             />
@@ -114,6 +222,8 @@ function Step1Basics() {
           <span>Home base (optional)</span>
           <input
             type="text"
+            value={homeBase}
+            onChange={(e) => setHomeBase(e.target.value)}
             className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none"
             placeholder="e.g. New York, London, Dubai"
           />
@@ -123,7 +233,31 @@ function Step1Basics() {
   );
 }
 
-function Step2Niche() {
+type Step2Props = {
+  niches: string[];
+  setNiches: (v: string[]) => void;
+  budgetLevels: string[];
+  setBudgetLevels: (v: string[]) => void;
+  pov: string;
+  setPov: (v: string) => void;
+};
+
+function Step2Niche({
+  niches,
+  setNiches,
+  budgetLevels,
+  setBudgetLevels,
+  pov,
+  setPov,
+}: Step2Props) {
+  const toggleNiche = (value: string) =>
+    setNiches(niches.includes(value) ? niches.filter((v) => v !== value) : [...niches, value]);
+  const toggleBudget = (value: string) =>
+    setBudgetLevels(
+      budgetLevels.includes(value)
+        ? budgetLevels.filter((v) => v !== value)
+        : [...budgetLevels, value]
+    );
   return (
     <div className="space-y-3 text-[11px]">
       <p className="text-[#4a4a4a]">
@@ -134,22 +268,17 @@ function Step2Niche() {
         <fieldset className="space-y-2">
           <legend className="font-semibold">Travel niches</legend>
           <div className="grid grid-cols-2 gap-2">
-            {[
-              "European city breaks",
-              "Beach escapes",
-              "Design hotels",
-              "Villas & homes",
-              "Adventure",
-              "Wellness",
-              "Food & wine",
-              "Nightlife",
-              "Family-friendly",
-            ].map((tag) => (
+            {NICHE_OPTIONS.map((tag) => (
               <label
                 key={tag}
                 className="flex items-center gap-2 text-[10px]"
               >
-                <input type="checkbox" className="h-3 w-3" />
+                <input
+                  type="checkbox"
+                  className="h-3 w-3"
+                  checked={niches.includes(tag)}
+                  onChange={() => toggleNiche(tag)}
+                />
                 <span>{tag}</span>
               </label>
             ))}
@@ -159,17 +288,20 @@ function Step2Niche() {
         <fieldset className="space-y-2 pt-2">
           <legend className="font-semibold">Typical budget level</legend>
           <div className="flex flex-wrap gap-2">
-            {["Affordable-chic", "Classic luxury", "Ultra-luxury"].map(
-              (tag) => (
-                <label
-                  key={tag}
-                  className="flex items-center gap-2 text-[10px]"
-                >
-                  <input type="checkbox" className="h-3 w-3" />
-                  <span>{tag}</span>
-                </label>
-              )
-            )}
+            {BUDGET_OPTIONS.map((tag) => (
+              <label
+                key={tag}
+                className="flex items-center gap-2 text-[10px]"
+              >
+                <input
+                  type="checkbox"
+                  className="h-3 w-3"
+                  checked={budgetLevels.includes(tag)}
+                  onChange={() => toggleBudget(tag)}
+                />
+                <span>{tag}</span>
+              </label>
+            ))}
           </div>
         </fieldset>
 
@@ -177,6 +309,8 @@ function Step2Niche() {
           <span>Your travel point of view</span>
           <textarea
             rows={3}
+            value={pov}
+            onChange={(e) => setPov(e.target.value)}
             className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none"
             placeholder="Describe your travel POV in a few lines. What makes your recommendations unique?"
           />
@@ -186,7 +320,12 @@ function Step2Niche() {
   );
 }
 
-function Step3Earnings() {
+type Step3Props = {
+  policyAccepted: boolean;
+  setPolicyAccepted: (v: boolean) => void;
+};
+
+function Step3Earnings({ policyAccepted, setPolicyAccepted }: Step3Props) {
   return (
     <div className="space-y-3 text-[11px]">
       <p className="text-[#4a4a4a]">
@@ -201,7 +340,12 @@ function Step3Earnings() {
       </ul>
 
       <label className="flex items-start gap-2 pt-2 text-[10px]">
-        <input type="checkbox" className="mt-0.5 h-3 w-3" />
+        <input
+          type="checkbox"
+          className="mt-0.5 h-3 w-3"
+          checked={policyAccepted}
+          onChange={(e) => setPolicyAccepted(e.target.checked)}
+        />
         <span>
           I agree to keep trip conversations and payments on Goldsainte, not in
           external DMs or direct payment links.
