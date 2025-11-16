@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Star, MessageCircle, CheckCircle } from "lucide-react";
 import type { Proposal } from "@/pages/marketplace/TripRequestDetail";
+import { ReportModal } from "@/components/report/ReportModal";
 
 interface ProposalCardProps {
   proposal: Proposal;
@@ -16,6 +18,7 @@ export function ProposalCard({
   formattedBudgetRange,
   isRequestOwner,
 }: ProposalCardProps) {
+  const [reportOpen, setReportOpen] = useState(false);
   const isAccepted = proposal.status === "accepted";
   const isDeclined = proposal.status === "declined";
 
@@ -167,6 +170,24 @@ export function ProposalCard({
           </button>
         )}
       </div>
+
+      {isRequestOwner && (
+        <button
+          type="button"
+          onClick={() => setReportOpen(true)}
+          className="mt-2 text-[10px] text-neutral-500 underline hover:text-neutral-700"
+        >
+          Report this proposal
+        </button>
+      )}
+
+      <ReportModal
+        isOpen={reportOpen}
+        onClose={() => setReportOpen(false)}
+        context={{
+          reportedUserId: proposal.agentId,
+        }}
+      />
     </article>
   );
 }

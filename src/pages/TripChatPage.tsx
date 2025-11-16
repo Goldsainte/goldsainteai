@@ -5,9 +5,11 @@ import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Loader2, MessageCircle, ArrowLeft, AlertCircle } from "lucide-react";
+import { Loader2, MessageCircle, ArrowLeft, AlertCircle, Flag, AlertTriangle } from "lucide-react";
 import { useTripRequestMessages } from "@/hooks/useTripRequestMessages";
 import { validateChatMessage, validateOnPlatformMessage } from "@/utils/chatGuard";
+import { useChatMessageSafety } from "@/hooks/useChatMessageSafety";
+import { ReportModal } from "@/components/report/ReportModal";
 
 type TripRequest = {
   id: string;
@@ -35,8 +37,11 @@ export default function TripChatPage() {
   const [loading, setLoading] = useState(true);
   const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [safetyWarning, setSafetyWarning] = useState<string | null>(null);
+  const [reportOpen, setReportOpen] = useState(false);
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const { runCheck, logEvent } = useChatMessageSafety(id);
 
   // Use the messaging hook
   const {
@@ -144,6 +149,17 @@ export default function TripChatPage() {
 
     const body = inputValue.trim();
 
+    // Run safety check
+    const safety = runCheck(body);
+    if (safety.hasIssues) {
+      setSafetyWarning(
+        "For everyone's safety, please keep messaging and payments inside Goldsainte and avoid sharing phone numbers, personal emails or external payment details."
+      );
+      await logEvent(safety.issues, body);
+    } else {
+      setSafetyWarning(null);
+    }
+
     const validation = validateChatMessage(body);
     if (!validation.valid) {
       setError(validation.error || "Message cannot be sent.");
@@ -229,6 +245,14 @@ export default function TripChatPage() {
                 </p>
               </div>
             </div>
+            <button
+              type="button"
+              onClick={() => setReportOpen(true)}
+              className="inline-flex items-center gap-1 text-[11px] text-[#E5DFC6]/70 hover:text-[#E5DFC6]"
+            >
+              <Flag className="h-3 w-3" />
+              <span>Report</span>
+            </button>
           </header>
 
           {/* Chat safety banner */}
@@ -300,6 +324,12 @@ export default function TripChatPage() {
             onSubmit={handleSend}
             className="mt-3 rounded-3xl border border-[#BFAD72]/40 bg-[#0a2225]/95 p-3 text-xs"
           >
+            {safetyWarning && (
+              <div className="mb-2 flex items-center gap-2 rounded-xl border border-[#BFAD72]/40 bg-[#BFAD72]/10 px-3 py-2 text-[10px] text-[#E5DFC6]">
+                <AlertTriangle className="h-3 w-3 text-[#BFAD72] flex-shrink-0" />
+                <span>{safetyWarning}</span>
+              </div>
+            )}
             {error && (
               <div className="mb-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[11px] text-red-700">
                 {error}
@@ -331,6 +361,15 @@ export default function TripChatPage() {
             </div>
           </form>
         </div>
+
+        <ReportModal
+          isOpen={reportOpen}
+          onClose={() => setReportOpen(false)}
+          context={{
+            conversationId: id,
+            reportedUserId: isTraveler ? proposal?.proposer_id : trip?.user_id,
+          }}
+        />
       </main>
     </>
   );
