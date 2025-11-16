@@ -1,0 +1,248 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
+
+type StepId = 1 | 2 | 3 | 4;
+
+export default function CreatorOnboardingPage() {
+  const [step, setStep] = useState<StepId>(1);
+  const navigate = useNavigate();
+
+  const goNext = () => setStep((prev) => (prev < 4 ? ((prev + 1) as StepId) : prev));
+  const goPrev = () => setStep((prev) => (prev > 1 ? ((prev - 1) as StepId) : prev));
+
+  const handleFinish = () => {
+    // TODO: ensure profile is saved / flagged as creator
+    navigate("/tiktok-lab");
+  };
+
+  return (
+    <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225] flex items-center justify-center px-4">
+      <div className="w-full max-w-xl rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-6 space-y-4">
+        <header className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <div className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#0c4d47]">
+              <Sparkles className="h-3 w-3 text-[#E5DFC6]" />
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
+                Creator onboarding
+              </p>
+              <p className="text-[12px] font-semibold">
+                {step === 1 && "Welcome, creator"}
+                {step === 2 && "Your travel niche & style"}
+                {step === 3 && "How you earn on Goldsainte"}
+                {step === 4 && "Your first storyboard"}
+              </p>
+            </div>
+          </div>
+          <p className="text-[10px] text-[#8D8D8D]">
+            Step {step} of 4
+          </p>
+        </header>
+
+        <div className="border-t border-[#E5DFC6] pt-4">
+          {step === 1 && <Step1Basics />}
+          {step === 2 && <Step2Niche />}
+          {step === 3 && <Step3Earnings />}
+          {step === 4 && <Step4Storyboard />}
+        </div>
+
+        <footer className="flex items-center justify-between pt-2">
+          <button
+            type="button"
+            onClick={goPrev}
+            disabled={step === 1}
+            className="inline-flex items-center gap-1 text-[10px] text-[#8D8D8D] disabled:opacity-40"
+          >
+            <ArrowLeft className="h-3 w-3" />
+            Back
+          </button>
+          {step < 4 ? (
+            <button
+              type="button"
+              onClick={goNext}
+              className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-4 py-2 text-[11px] font-semibold hover:bg-[#073331]"
+            >
+              Continue
+              <ArrowRight className="h-3 w-3" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleFinish}
+              className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-4 py-2 text-[11px] font-semibold hover:bg-[#073331]"
+            >
+              Go to TikTok Lab
+              <ArrowRight className="h-3 w-3" />
+            </button>
+          )}
+        </footer>
+      </div>
+    </main>
+  );
+}
+
+function Step1Basics() {
+  return (
+    <div className="space-y-3 text-[11px]">
+      <p className="text-[#4a4a4a]">
+        Let's set the stage for your travel universe. We'll use this to
+        personalize requests and show agents who they're partnering with.
+      </p>
+      <div className="space-y-2">
+        <label className="block space-y-1">
+          <span className="font-semibold">Display name</span>
+          <input
+            type="text"
+            className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none"
+            placeholder="e.g. JetLag & Champagne"
+          />
+        </label>
+        <label className="block space-y-1">
+          <span className="font-semibold">TikTok handle</span>
+          <div className="flex items-center rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2">
+            <span className="text-[#8D8D8D] text-[11px] mr-1">@</span>
+            <input
+              type="text"
+              className="flex-1 bg-transparent text-[11px] outline-none"
+              placeholder="yourhandle"
+            />
+          </div>
+        </label>
+        <label className="block space-y-1">
+          <span>Home base (optional)</span>
+          <input
+            type="text"
+            className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none"
+            placeholder="e.g. New York, London, Dubai"
+          />
+        </label>
+      </div>
+    </div>
+  );
+}
+
+function Step2Niche() {
+  return (
+    <div className="space-y-3 text-[11px]">
+      <p className="text-[#4a4a4a]">
+        Tell us what kind of trips feel the most "you". This helps Goldsainte
+        match you with the right travelers and agents.
+      </p>
+      <div className="space-y-2">
+        <fieldset className="space-y-2">
+          <legend className="font-semibold">Travel niches</legend>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              "European city breaks",
+              "Beach escapes",
+              "Design hotels",
+              "Villas & homes",
+              "Adventure",
+              "Wellness",
+              "Food & wine",
+              "Nightlife",
+              "Family-friendly",
+            ].map((tag) => (
+              <label
+                key={tag}
+                className="flex items-center gap-2 text-[10px]"
+              >
+                <input type="checkbox" className="h-3 w-3" />
+                <span>{tag}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset className="space-y-2 pt-2">
+          <legend className="font-semibold">Typical budget level</legend>
+          <div className="flex flex-wrap gap-2">
+            {["Affordable-chic", "Classic luxury", "Ultra-luxury"].map(
+              (tag) => (
+                <label
+                  key={tag}
+                  className="flex items-center gap-2 text-[10px]"
+                >
+                  <input type="checkbox" className="h-3 w-3" />
+                  <span>{tag}</span>
+                </label>
+              )
+            )}
+          </div>
+        </fieldset>
+
+        <label className="block space-y-1 pt-2">
+          <span>Your travel point of view</span>
+          <textarea
+            rows={3}
+            className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none"
+            placeholder="Describe your travel POV in a few lines. What makes your recommendations unique?"
+          />
+        </label>
+      </div>
+    </div>
+  );
+}
+
+function Step3Earnings() {
+  return (
+    <div className="space-y-3 text-[11px]">
+      <p className="text-[#4a4a4a]">
+        When a traveler books a trip inspired by your storyboard, you earn a
+        share of the booking value. Travel agents handle pricing and logistics;
+        Goldsainte manages payments and payouts.
+      </p>
+      <ul className="list-disc list-inside text-[#4a4a4a] space-y-1">
+        <li>Secure payments and escrow for travelers.</li>
+        <li>Automatic payouts for you and the travel agent.</li>
+        <li>No invoices, no chasing DMs, no off-platform payment links.</li>
+      </ul>
+
+      <label className="flex items-start gap-2 pt-2 text-[10px]">
+        <input type="checkbox" className="mt-0.5 h-3 w-3" />
+        <span>
+          I agree to keep trip conversations and payments on Goldsainte, not in
+          external DMs or direct payment links.
+        </span>
+      </label>
+    </div>
+  );
+}
+
+function Step4Storyboard() {
+  return (
+    <div className="space-y-3 text-[11px]">
+      <p className="text-[#4a4a4a]">
+        Your trips are ready to become storyboards — the bookable version of
+        your content.
+      </p>
+      <p className="text-[#4a4a4a]">
+        Start with one great trip you've filmed recently. We'll help you
+        outline the destination, key moments and starting budget so agents can
+        plug in rates.
+      </p>
+
+      <div className="flex flex-col gap-2 pt-2">
+        <button
+          type="button"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-4 py-2 text-[11px] font-semibold hover:bg-[#073331]"
+        >
+          Create a storyboard manually
+        </button>
+        <button
+          type="button"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#f7f3ea] text-[#0a2225] px-4 py-2 text-[11px] font-semibold border border-[#E5DFC6]"
+        >
+          (Coming soon) Paste a TikTok link
+        </button>
+      </div>
+
+      <p className="text-[10px] text-[#8D8D8D]">
+        After onboarding, you'll land in TikTok Lab where you can manage
+        storyboards, see requests and track earnings.
+      </p>
+    </div>
+  );
+}
