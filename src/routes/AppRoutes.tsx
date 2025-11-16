@@ -47,6 +47,8 @@ const AgentTripsPage = lazy(() => import('@/pages/AgentTripsPage'));
 const CreatorTripsPage = lazy(() => import('@/pages/CreatorTripsPage'));
 const StoryboardEditorPage = lazy(() => import('@/pages/StoryboardEditorPage'));
 const TikTokLabPage = lazy(() => import('@/pages/TikTokLabPage'));
+const StoryboardsPage = lazy(() => import('@/pages/StoryboardsPage'));
+const ConciergePage = lazy(() => import('@/pages/ConciergePage'));
 const HomePage = lazy(() => import('@/pages/HomePage'));
 const MyBookingsPage = lazy(() => import('@/pages/MyBookingsPage'));
 const PartnerBookingsPage = lazy(() => import('@/pages/PartnerBookingsPage'));
@@ -229,6 +231,8 @@ export const AppRoutes = () => (
       <Route path="/agent-trips" element={<AgentTripsPage />} />
       <Route path="/creator-trips" element={<CreatorTripsPage />} />
       <Route path="/tiktok-lab" element={<TikTokLabPage />} />
+      <Route path="/storyboards" element={<StoryboardsPage />} />
+      <Route path="/concierge" element={<ConciergePage />} />
       <Route path="/my-bookings" element={<MyBookingsPage />} />
       <Route path="/partner-bookings" element={<PartnerBookingsPage />} />
       <Route path="/booking/:id" element={<BookingDetailPage />} />

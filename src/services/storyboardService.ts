@@ -152,3 +152,43 @@ export async function updateStoryboardItem(
 
   return data as StoryboardItem;
 }
+
+// Gallery view types and functions
+export type StoryboardGalleryItem = {
+  id: string;
+  trip_id: string | null;
+  title: string | null;
+  description: string | null;
+  theme_tags: string[] | null;
+  visibility: string;
+  owner_id: string;
+  hero_image_url: string | null;
+  duration_label: string | null;
+  scenes_preview: string[] | null;
+};
+
+export async function getPublishedStoryboards(): Promise<StoryboardGalleryItem[]> {
+  const { data, error } = await supabase
+    .from("storyboards")
+    .select("*")
+    .eq("visibility", "public_template")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error loading published storyboards", error);
+    throw new Error("Could not load storyboards.");
+  }
+
+  return (data || []).map((row) => ({
+    id: row.id,
+    trip_id: row.trip_id,
+    title: row.title,
+    description: row.description,
+    theme_tags: row.theme_tags,
+    visibility: row.visibility,
+    owner_id: row.owner_id,
+    hero_image_url: null, // Can be populated from first storyboard_item if needed
+    duration_label: null,
+    scenes_preview: null,
+  }));
+}
