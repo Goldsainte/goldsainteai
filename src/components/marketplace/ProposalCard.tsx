@@ -123,6 +123,23 @@ export function ProposalCard({
         </p>
       </div>
 
+      {/* Policy notice for travelers */}
+      {isRequestOwner && !isDeclined && !isAccepted && (
+        <div className="mt-3 rounded-2xl bg-neutral-50 border border-neutral-200 p-2.5 text-[10px] text-neutral-600">
+          <p>
+            <span className="font-semibold text-neutral-900">
+              By accepting this proposal
+            </span>
+            , your trip and payments stay protected by Goldsainte.
+          </p>
+          <p className="mt-1">
+            For your safety, please do not send direct bank transfers or share
+            phone numbers to finalize payment. All payments and changes should
+            go through this platform.
+          </p>
+        </div>
+      )}
+
       {/* Actions */}
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
         <button

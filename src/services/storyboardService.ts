@@ -159,12 +159,15 @@ export type StoryboardGalleryItem = {
   trip_id: string | null;
   title: string | null;
   description: string | null;
+  destination: string | null;
   theme_tags: string[] | null;
+  vibe_tags: string[] | null;
   visibility: string;
   owner_id: string;
   hero_image_url: string | null;
   duration_label: string | null;
   scenes_preview: string[] | null;
+  ideal_traveler: string | null;
 };
 
 export async function getPublishedStoryboards(): Promise<StoryboardGalleryItem[]> {
@@ -184,11 +187,48 @@ export async function getPublishedStoryboards(): Promise<StoryboardGalleryItem[]
     trip_id: row.trip_id,
     title: row.title,
     description: row.description,
+    destination: row.description, // Using description as destination for now
     theme_tags: row.theme_tags,
+    vibe_tags: row.theme_tags,
     visibility: row.visibility,
     owner_id: row.owner_id,
     hero_image_url: null, // Can be populated from first storyboard_item if needed
     duration_label: null,
     scenes_preview: null,
+    ideal_traveler: null,
   }));
+}
+
+/**
+ * Get a single storyboard by ID for detail view or prefill
+ */
+export async function getStoryboardById(id: string): Promise<StoryboardGalleryItem | null> {
+  const { data, error } = await supabase
+    .from("storyboards")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Error loading storyboard", error);
+    throw new Error("Could not load storyboard.");
+  }
+
+  if (!data) return null;
+
+  return {
+    id: data.id,
+    trip_id: data.trip_id,
+    title: data.title,
+    description: data.description,
+    destination: data.description, // Using description as destination for now
+    theme_tags: data.theme_tags,
+    vibe_tags: data.theme_tags,
+    visibility: data.visibility,
+    owner_id: data.owner_id,
+    hero_image_url: null,
+    duration_label: null,
+    scenes_preview: null,
+    ideal_traveler: null,
+  };
 }
