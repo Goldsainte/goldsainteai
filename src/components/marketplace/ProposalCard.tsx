@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { Star, MessageCircle, CheckCircle } from "lucide-react";
+import { Star, MessageCircle } from "lucide-react";
 import type { Proposal } from "@/pages/marketplace/TripRequestDetail";
 import { ReportModal } from "@/components/report/ReportModal";
+import { ProposalStatusBadge } from "@/components/proposals/ProposalStatusBadge";
+import { TripProposalStatus } from "@/services/proposalService";
 
 interface ProposalCardProps {
   proposal: Proposal;
@@ -21,6 +23,10 @@ export function ProposalCard({
   const [reportOpen, setReportOpen] = useState(false);
   const isAccepted = proposal.status === "accepted";
   const isDeclined = proposal.status === "declined";
+  
+  // Check if proposal has valid_until and if it's still valid
+  const validUntil = proposal.validUntil ? new Date(proposal.validUntil) : null;
+  const isExpired = validUntil && validUntil < new Date();
 
   return (
     <article className="rounded-2xl bg-white p-4 text-xs shadow-sm ring-1 ring-neutral-200/80">
@@ -45,12 +51,7 @@ export function ProposalCard({
                 ? "Certified agent"
                 : "Travel creator"}
             </span>
-            {isAccepted && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700 ring-1 ring-emerald-200">
-                <CheckCircle className="h-3 w-3" />
-                Accepted
-              </span>
-            )}
+            <ProposalStatusBadge status={proposal.status as TripProposalStatus} />
           </div>
 
           <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[11px] text-neutral-600">
@@ -69,12 +70,6 @@ export function ProposalCard({
           </div>
         </div>
 
-        {/* Status pill */}
-        {isDeclined && (
-          <span className="inline-flex rounded-full bg-neutral-50 px-2 py-0.5 text-[10px] font-medium text-neutral-400 ring-1 ring-neutral-200">
-            Declined
-          </span>
-        )}
       </div>
 
       {/* Budget + timeline */}

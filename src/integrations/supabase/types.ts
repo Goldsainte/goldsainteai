@@ -1549,11 +1549,15 @@ export type Database = {
         Row: {
           agent_id: string | null
           agent_share: number | null
+          cancelled_at: string | null
           created_at: string
           creator_id: string | null
           creator_share: number | null
           currency: string | null
+          disputed_at: string | null
+          escrow_released_at: string | null
           id: string
+          payout_status: string
           platform_fee: number | null
           proposal_id: string | null
           status: string
@@ -1565,11 +1569,15 @@ export type Database = {
         Insert: {
           agent_id?: string | null
           agent_share?: number | null
+          cancelled_at?: string | null
           created_at?: string
           creator_id?: string | null
           creator_share?: number | null
           currency?: string | null
+          disputed_at?: string | null
+          escrow_released_at?: string | null
           id?: string
+          payout_status?: string
           platform_fee?: number | null
           proposal_id?: string | null
           status?: string
@@ -1581,11 +1589,15 @@ export type Database = {
         Update: {
           agent_id?: string | null
           agent_share?: number | null
+          cancelled_at?: string | null
           created_at?: string
           creator_id?: string | null
           creator_share?: number | null
           currency?: string | null
+          disputed_at?: string | null
+          escrow_released_at?: string | null
           id?: string
+          payout_status?: string
           platform_fee?: number | null
           proposal_id?: string | null
           status?: string
@@ -9012,8 +9024,10 @@ export type Database = {
       }
       trip_proposals: {
         Row: {
+          accepted_at: string | null
           created_at: string
           currency: string | null
+          declined_at: string | null
           headline: string | null
           id: string
           message: string | null
@@ -9023,10 +9037,14 @@ export type Database = {
           status: string
           trip_request_id: string
           updated_at: string
+          valid_until: string | null
+          withdrawn_at: string | null
         }
         Insert: {
+          accepted_at?: string | null
           created_at?: string
           currency?: string | null
+          declined_at?: string | null
           headline?: string | null
           id?: string
           message?: string | null
@@ -9036,10 +9054,14 @@ export type Database = {
           status?: string
           trip_request_id: string
           updated_at?: string
+          valid_until?: string | null
+          withdrawn_at?: string | null
         }
         Update: {
+          accepted_at?: string | null
           created_at?: string
           currency?: string | null
+          declined_at?: string | null
           headline?: string | null
           id?: string
           message?: string | null
@@ -9049,6 +9071,8 @@ export type Database = {
           status?: string
           trip_request_id?: string
           updated_at?: string
+          valid_until?: string | null
+          withdrawn_at?: string | null
         }
         Relationships: [
           {
