@@ -59,10 +59,8 @@ const PartnerBookingsPage = lazy(() => import('@/pages/PartnerBookingsPage'));
 const BookingPreferencesRedirect = lazy(() => import('@/pages/redirects/BookingPreferencesRedirect'));
 const FavoritesRedirect = lazy(() => import('@/pages/redirects/FavoritesRedirect'));
 const EmailPreview = lazy(() => import('@/pages/EmailPreview'));
-const Collections = lazy(() => import('@/pages/Collections'));
-const CollectionDetail = lazy(() => import('@/pages/CollectionDetail'));
-const Subscription = lazy(() => import('@/pages/Subscription'));
 const BillingDashboard = lazy(() => import('@/pages/BillingDashboard'));
+const TikTokLabStoryboardsPage = lazy(() => import('@/pages/TikTokLab/StoryboardsPage'));
 const TravelSettings = lazy(() => import('@/pages/TravelSettings'));
 const TravelSettings2 = lazy(() => import('@/pages/TravelSettings2'));
 const CreatorSettingsPage = lazy(() => import('@/pages/CreatorSettingsPage'));
@@ -235,12 +233,14 @@ export const AppRoutes = () => (
       <Route path="/agent-trips" element={<AgentTripsPage />} />
       <Route path="/creator-trips" element={<CreatorTripsPage />} />
       <Route path="/tiktok-lab" element={<TikTokLabPage />} />
+      <Route path="/tiktok-lab/storyboards" element={<TikTokLabStoryboardsPage />} />
+      <Route path="/tiktok-lab/storyboards/new" element={<TikTokLabStoryboardEditorPage />} />
+      <Route path="/tiktok-lab/storyboards/:id/edit" element={<TikTokLabStoryboardEditorPage />} />
       <Route path="/storyboards" element={<StoryboardsPage />} />
       <Route path="/storyboards/:id" element={<StoryboardDetailPage />} />
-      <Route path="/tiktok-lab/storyboards/new" element={<TikTokLabStoryboardEditorPage />} />
       <Route path="/marketplace-guidelines" element={<MarketplaceGuidelinesPage />} />
-      <Route path="/tiktok-lab/storyboards/:id/edit" element={<TikTokLabStoryboardEditorPage />} />
       <Route path="/concierge" element={<ConciergePage />} />
+      <Route path="/creators" element={<BrowseCreators />} />
       <Route path="/my-bookings" element={<MyBookingsPage />} />
       <Route path="/partner-bookings" element={<PartnerBookingsPage />} />
       <Route path="/booking/:id" element={<BookingDetailPage />} />
@@ -252,12 +252,14 @@ export const AppRoutes = () => (
       <Route path="/agent-trip-requests" element={<RequireAgentTerms><AgentTripRequests /></RequireAgentTerms>} />
       <Route path="/agent-performance" element={<RequireAgentTerms><AgentPerformanceDashboard /></RequireAgentTerms>} />
       <Route path="/agent-deals" element={<RequireAgentTerms><AgentDealsDashboardPage /></RequireAgentTerms>} />
-      <Route path="/booking-preferences" element={<BookingPreferencesRedirect />} />
       <Route path="/email-preview" element={<EmailPreview />} />
-      <Route path="/favorites" element={<FavoritesRedirect />} />
-      <Route path="/collections" element={<Collections />} />
-      <Route path="/collections/:collectionId" element={<CollectionDetail />} />
-      <Route path="/subscription" element={<Subscription />} />
+      {/* Legacy redirects */}
+      <Route path="/favorites" element={<Navigate to="/dashboard?tab=favorites" replace />} />
+      <Route path="/collections" element={<Navigate to="/storyboards" replace />} />
+      <Route path="/collections/:collectionId" element={<Navigate to="/storyboards" replace />} />
+      <Route path="/subscription" element={<Navigate to="/marketplace" replace />} />
+      <Route path="/subscriptions" element={<Navigate to="/marketplace" replace />} />
+      <Route path="/booking-preferences" element={<Navigate to="/dashboard?tab=preferences" replace />} />
       <Route path="/billing-dashboard" element={<BillingDashboard />} />
       <Route path="/travel-settings" element={<CreatorSettingsPage />} />
       <Route path="/travel-settings-2" element={<TravelSettings2 />} />
