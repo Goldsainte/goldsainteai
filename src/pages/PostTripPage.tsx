@@ -21,6 +21,15 @@ export default function PostTripPage() {
   const [endDate, setEndDate] = useState("");
   const [travelersCount, setTravelersCount] = useState<number | undefined>();
   const [budgetRange, setBudgetRange] = useState("");
+  const [occasion, setOccasion] = useState("");
+  const [travelerType, setTravelerType] = useState("");
+  const [travelStyle, setTravelStyle] = useState<string[]>([]);
+  const [pace, setPace] = useState("");
+  const [mustHaves, setMustHaves] = useState("");
+  const [hardNos, setHardNos] = useState("");
+  const [tiktokLinks, setTiktokLinks] = useState("");
+  const [contentGoals, setContentGoals] = useState("");
+  const [departureCity, setDepartureCity] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

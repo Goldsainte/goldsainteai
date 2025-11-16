@@ -6531,6 +6531,7 @@ export type Database = {
           preferred_currency: string | null
           preferred_language: string | null
           restriction_expires_at: string | null
+          role: string | null
           show_account_type: boolean | null
           sms_notifications: boolean | null
           stripe_account_id: string | null
@@ -6592,6 +6593,7 @@ export type Database = {
           preferred_currency?: string | null
           preferred_language?: string | null
           restriction_expires_at?: string | null
+          role?: string | null
           show_account_type?: boolean | null
           sms_notifications?: boolean | null
           stripe_account_id?: string | null
@@ -6653,6 +6655,7 @@ export type Database = {
           preferred_currency?: string | null
           preferred_language?: string | null
           restriction_expires_at?: string | null
+          role?: string | null
           show_account_type?: boolean | null
           sms_notifications?: boolean | null
           stripe_account_id?: string | null
