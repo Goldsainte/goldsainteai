@@ -1,7 +1,8 @@
-import { Sparkles, PlayCircle } from "lucide-react";
+import { Sparkles, PlayCircle, DollarSign } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { StoryboardPreview } from "@/components/home/StoryboardPreview";
+import { AccountHealthCard } from "@/components/account/AccountHealthCard";
 
 const BRAND_BG = "bg-gradient-to-b from-[#0a2225] via-[#0a2225] to-[#E5DFC6]";
 
@@ -99,6 +100,75 @@ export default function TikTokLabPage() {
             title="Agents make it bookable"
             body="Certified agents plug in flights, stays, and on-the-ground experiences — then you book the entire journey in one place."
           />
+        </div>
+      </section>
+
+      {/* Latest storyboards */}
+      <section className="mx-auto max-w-6xl px-4 py-8 md:py-12">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg md:text-xl font-semibold">
+            Latest storyboards
+          </h2>
+          <Button
+            asChild
+            variant="outline"
+            className="rounded-full border-[#BFAD72]/60 bg-black/40 text-xs text-[#E5DFC6] hover:bg-black/70"
+          >
+            <Link to="/tiktok-lab/storyboards">View all storyboards</Link>
+          </Button>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="rounded-2xl bg-black/30 border border-[#BFAD72]/30 p-3 space-y-2">
+            <div className="aspect-video rounded-lg bg-gradient-to-br from-[#0c4d47] to-[#0a2225]" />
+            <p className="text-[11px] font-semibold">Positano magic</p>
+            <p className="text-[10px] text-[#E5DFC6]/70">5-day Amalfi coast summer vibe</p>
+          </div>
+          <div className="rounded-2xl bg-black/30 border border-[#BFAD72]/30 p-3 space-y-2">
+            <div className="aspect-video rounded-lg bg-gradient-to-br from-[#0c4d47] to-[#0a2225]" />
+            <p className="text-[11px] font-semibold">Tokyo, but make it slow</p>
+            <p className="text-[10px] text-[#E5DFC6]/70">Off-the-beaten-path food + design</p>
+          </div>
+          <div className="rounded-2xl bg-black/30 border border-[#BFAD72]/30 p-3 space-y-2">
+            <div className="aspect-video rounded-lg bg-gradient-to-br from-[#0c4d47] to-[#0a2225]" />
+            <p className="text-[11px] font-semibold">Morocco content trip</p>
+            <p className="text-[10px] text-[#E5DFC6]/70">4-day itinerary for creators + agents</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Creator/Agent dashboard cards */}
+      <section className="mx-auto max-w-6xl px-4 py-8 md:py-12">
+        <div className="grid gap-4 md:grid-cols-2">
+          {/* Earnings card */}
+          <div className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 text-[11px] space-y-2">
+            <div className="flex items-center gap-2">
+              <DollarSign className="h-4 w-4 text-[#0c4d47]" />
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
+                  Your earnings
+                </p>
+                <p className="text-[12px] font-semibold text-[#0a2225]">This month</p>
+              </div>
+            </div>
+            <div className="pt-2 border-t border-[#E5DFC6]">
+              <div className="flex items-baseline gap-2">
+                <span className="text-[20px] font-semibold text-[#0a2225]">$0</span>
+                <span className="text-[10px] text-[#8D8D8D]">USD</span>
+              </div>
+              <p className="text-[10px] text-[#4a4a4a] mt-1">
+                Upload storyboards → partner with agents → earn per booking.
+              </p>
+            </div>
+            <Button
+              asChild
+              className="w-full rounded-full bg-[#0c4d47] text-[#E5DFC6] text-[11px] font-semibold hover:bg-[#073331]"
+            >
+              <Link to="/tiktok-lab/earnings">View earnings details</Link>
+            </Button>
+          </div>
+
+          {/* Account health card */}
+          <AccountHealthCard role="creator" />
         </div>
       </section>
 
