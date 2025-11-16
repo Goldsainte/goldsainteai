@@ -25,6 +25,7 @@ export async function saveCreatorOnboarding(
     creator_budget_levels: payload.creator_budget_levels,
     creator_pov: payload.creator_pov || null,
     role: "creator",
+    account_type: "creator", // Set account_type to match the role
     has_completed_creator_onboarding: true,
   };
 
