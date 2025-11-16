@@ -9,10 +9,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { useExpediaModal } from "@/contexts/ExpediaModalContext";
 
-import baliSerenity from "@/assets/bali-serenity.jpg";
-import luxuryBeach from "@/assets/luxury-beach.jpg";
-import creatorBeachSelfie from "@/assets/creator-beach-selfie.jpg";
-import pinkBeach from "@/assets/pink-beach-aerial.jpg";
+import heroAmalfi from "@/assets/home/hero-amalfi-coast.jpg";
+import heroJungleVilla from "@/assets/home/hero-jungle-villa.jpg";
+import heroCreatorPortrait from "@/assets/home/hero-creator-portrait.jpg";
+import heroOverwater from "@/assets/home/hero-overwater-villa.jpg";
+
+import storyboardPositano from "@/assets/home/storyboard-positano.jpg";
+import storyboardBali from "@/assets/home/storyboard-bali.jpg";
+import storyboardMaldives from "@/assets/home/storyboard-maldives.jpg";
+import storyboardSeoul from "@/assets/home/storyboard-seoul.jpg";
 
 /**
  * HomePage
@@ -98,24 +103,24 @@ export default function HomePage() {
           {/* Right: Pinterest-style collage */}
           <div className="grid grid-cols-2 gap-3 h-80 md:h-96">
             <HeroImageCard
-              label="Sunrise over-water suites"
+              label="Amalfi light, slow afternoons"
               size="normal"
-              image={baliSerenity}
+              image={heroAmalfi}
             />
             <HeroImageCard
-              label="Private coves & long lunches"
+              label="Jungle villas & plunge pools"
               size="tall"
-              image={luxuryBeach}
+              image={heroJungleVilla}
             />
             <HeroImageCard
               label="Creators on location"
               size="tall"
-              image={creatorBeachSelfie}
+              image={heroCreatorPortrait}
             />
             <HeroImageCard
-              label="Helicopter views & pink sands"
+              label="Over-water suites at sunrise"
               size="normal"
-              image={pinkBeach}
+              image={heroOverwater}
             />
           </div>
         </div>
@@ -212,41 +217,41 @@ export default function HomePage() {
               tag="Traveler brief → Creator storyboard"
               title="48 hours in Positano, filmed like a mini–series"
               scenes={[
-                "Boat arrival & first Aperol",
-                "Balcony breakfast overlooking the cliffside",
-                "Golden-hour shoot on the steps",
+                "Boat arrival & first Aperol on the terrace",
+                "Balcony breakfast overlooking the cliffside village",
+                "Golden-hour shoot on the steps before dinner at the beach club",
               ]}
-              image={luxuryBeach}
+              image={storyboardPositano}
             />
             <StoryboardCard
               tag="Creator + Agent collab"
               title="Bali slow-luxury: jungle suites & ocean detours"
               scenes={[
-                "Morning plunge pool & coffee",
-                "Rice terrace picnic with drone shots",
-                "Private dinner under lanterns",
+                "Morning plunge pool, pour-over coffee, first shot of the day",
+                "Rice terrace picnic with drone footage and quiet time",
+                "Private dinner under lanterns with live acoustic set",
               ]}
-              image={baliSerenity}
+              image={storyboardBali}
             />
             <StoryboardCard
-              tag="TikTok–first honeymoon"
+              tag="TikTok-first honeymoon"
               title="Maldives in three acts: arrival, reveal, unwind"
               scenes={[
-                "Hydroplane arrival & over-water walkway",
-                "Room reveal & champagne on the deck",
-                "No-phones sunset sandbank finale",
+                "Hydroplane arrival & barefoot walk down the over-water jetty",
+                "Suite reveal with champagne and floating breakfast plan",
+                "No-phones sunset sandbank finale and last swim under the stars",
               ]}
-              image={pinkBeach}
+              image={storyboardMaldives}
             />
             <StoryboardCard
-              tag="Creator POV"
-              title="Seoul food tour with night–market energy"
+              tag="Creator POV · City series"
+              title="Seoul after dark: street food & skyline shots"
               scenes={[
-                "Street food crawl intro shot",
-                "Hidden cocktail bar in an alley",
-                "Rooftop skyline sign-off",
+                "Market intro: skewers, steam, neon signage in the background",
+                "Hidden speakeasy with skyline view and moody b-roll",
+                "Rooftop sign-off with time-lapse of the city at night",
               ]}
-              image={creatorBeachSelfie}
+              image={storyboardSeoul}
             />
           </div>
         </div>
