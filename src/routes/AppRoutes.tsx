@@ -32,6 +32,8 @@ const Shop = lazy(() => import('@/pages/Shop'));
 const BrowseAgents = lazy(() => import('@/pages/BrowseAgents'));
 const BrowseCreators = lazy(() => import('@/pages/BrowseCreators'));
 const BrowseInfluencers = lazy(() => import('@/pages/BrowseInfluencers'));
+const CreatorsPage = lazy(() => import('@/pages/CreatorsPage'));
+const CreatorOnboardingPage = lazy(() => import('@/pages/onboarding/CreatorOnboardingPage'));
 const AgentProfile = lazy(() => import('@/pages/AgentProfile'));
 const AgentOnboarding = lazy(() => import('@/pages/AgentOnboarding'));
 const AgentDashboard = lazy(() => import('@/pages/AgentDashboard'));
@@ -150,6 +152,7 @@ export const AppRoutes = () => (
     <Route element={<MarketingLayout />}>
       <Route index element={<HomePage />} />
       <Route path="/about" element={<About />} />
+      <Route path="/creators" element={<CreatorsPage />} />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/what-we-do" element={<WhatWeDo />} />
       <Route path="/dispute-resolution" element={<DisputeResolution />} />
@@ -172,6 +175,7 @@ export const AppRoutes = () => (
       <Route path="/auth/email-confirmed" element={<EmailConfirmedPage />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/onboarding" element={<Onboarding />} />
+      <Route path="/onboarding/creator" element={<CreatorOnboardingPage />} />
       <Route path="/onboarding/profile" element={<OnboardingProfilePage />} />
       <Route path="/ai-agent-setup" element={<AIAgentOnboarding />} />
     </Route>
