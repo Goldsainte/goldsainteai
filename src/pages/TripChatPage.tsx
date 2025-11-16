@@ -1,11 +1,11 @@
 // src/pages/TripChatPage.tsx
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Loader2, MessageCircle, ArrowLeft } from "lucide-react";
+import { Loader2, MessageCircle, ArrowLeft, AlertCircle } from "lucide-react";
 import { useTripRequestMessages } from "@/hooks/useTripRequestMessages";
 import { validateChatMessage, validateOnPlatformMessage } from "@/utils/chatGuard";
 
@@ -230,6 +230,24 @@ export default function TripChatPage() {
               </div>
             </div>
           </header>
+
+          {/* Chat safety banner */}
+          <div className="mb-3 rounded-2xl border border-[#BFAD72]/40 bg-black/40 px-3 py-2 text-[10px]">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="h-3.5 w-3.5 text-[#BFAD72] flex-shrink-0 mt-0.5" />
+              <div className="flex-1 space-y-1">
+                <p className="font-semibold text-[#E5DFC6]">Stay in the room.</p>
+                <p className="text-[#E5DFC6]/80">
+                  For everyone's safety, keep messaging and payments inside Goldsainte.
+                  Sharing phone numbers, personal emails, social handles or external
+                  payment links in chat is not allowed.{" "}
+                  <Link to="/marketplace-guidelines" className="text-[#BFAD72] underline">
+                    Learn more
+                  </Link>
+                </p>
+              </div>
+            </div>
+          </div>
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto rounded-3xl border border-[#BFAD72]/40 bg-[#0a2225]/95 p-4">

@@ -22,6 +22,7 @@ export function OnboardingWelcomeModal() {
       "Post a trip brief and get matched with creators + agents who fit your vibe.",
       "Review proposals and storyboards before you commit to anything.",
       "Book through Goldsainte so payments, changes, and disputes stay protected.",
+      "Keep all messaging and payments on-platform — phone numbers and personal emails stay private until your trip is confirmed.",
     ];
     primaryCta = { label: "Post your first trip", href: "/post-trip" };
   } else if (accountType === "creator") {
@@ -30,6 +31,7 @@ export function OnboardingWelcomeModal() {
       "Browse traveler briefs and raise your hand for trips that match your audience.",
       "Use TikTok Lab & storyboards to design the journey like a shot list.",
       "Partner with agents to make trips actually bookable — and track your earnings.",
+      "All bookings stay on-platform so your commissions are protected and your work is credited.",
     ];
     primaryCta = { label: "Open your Partner Console", href: "/partner" };
   } else if (accountType === "agent") {
@@ -38,6 +40,7 @@ export function OnboardingWelcomeModal() {
       "Review briefs from travelers who actually want curated experiences.",
       "Partner with creators to bring your itineraries to life on TikTok.",
       "Manage bookings, payouts, and disputes from a single partner console.",
+      "Keep payments and messaging on-platform to protect your earnings and traveler safety.",
     ];
     primaryCta = { label: "Open your Partner Console", href: "/partner" };
   }
