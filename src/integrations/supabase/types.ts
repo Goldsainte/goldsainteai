@@ -1785,6 +1785,39 @@ export type Database = {
           },
         ]
       }
+      chat_safety_events: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          event_type: string
+          id: string
+          message_id: string | null
+          original_text: string
+          reasons: string[]
+          sender_id: string
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          event_type: string
+          id?: string
+          message_id?: string | null
+          original_text: string
+          reasons: string[]
+          sender_id: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          message_id?: string | null
+          original_text?: string
+          reasons?: string[]
+          sender_id?: string
+        }
+        Relationships: []
+      }
       chat_threads: {
         Row: {
           created_at: string
@@ -6965,6 +6998,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      reports: {
+        Row: {
+          booking_id: string | null
+          conversation_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          message_id: string | null
+          report_type: string
+          reported_user_id: string | null
+          reporter_id: string
+          status: string
+        }
+        Insert: {
+          booking_id?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          message_id?: string | null
+          report_type: string
+          reported_user_id?: string | null
+          reporter_id: string
+          status?: string
+        }
+        Update: {
+          booking_id?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          message_id?: string | null
+          report_type?: string
+          reported_user_id?: string | null
+          reporter_id?: string
+          status?: string
+        }
+        Relationships: []
       }
       search_cache: {
         Row: {
