@@ -25,6 +25,7 @@ export type Proposal = {
   status: ProposalStatus;
   message: string;
   agentId: string;
+  validUntil?: string | null;
 };
 
 type TripRequest = {
@@ -149,6 +150,7 @@ export default function TripRequestDetail() {
           status: bid.status as ProposalStatus,
           message: bid.message || "",
           agentId: bid.agent_id,
+          validUntil: bid.valid_until || null,
         };
       });
 

@@ -8,14 +8,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Calendar, MapPin, MessageCircle, ShieldAlert, Users } from "lucide-react";
 import { BookingTimeline } from "@/components/BookingTimeline";
+import { BookingStatusBadge, BookingStateExplainer } from "@/components/bookings/BookingStatusBadge";
+import { PayoutStatusCard } from "@/components/bookings/PayoutStatusCard";
 
 type Booking = {
   id: string;
   status: string;
+  payout_status?: string;
   currency: string;
   total_price: number;
   partner_payout: number;
   created_at: string;
+  escrow_released_at?: string | null;
   trip_requests: {
     id: string;
     title: string | null;
@@ -313,9 +317,7 @@ export default function BookingDetailPage() {
                 </h1>
               </div>
               <div className="flex flex-col items-end gap-1 text-right">
-                <span className="rounded-full bg-black/40 px-3 py-1 text-[10px] font-medium">
-                  Status: {booking.status}
-                </span>
+                <BookingStatusBadge status={booking.status as any} />
                 <p className="text-[11px]">
                   Total: <span className="font-semibold">{total}</span>
                 </p>
@@ -326,6 +328,13 @@ export default function BookingDetailPage() {
                 )}
               </div>
             </div>
+
+            {/* Booking state explainer */}
+            {!isPartner && (
+              <div className="mt-4 rounded-2xl bg-[#f7f3ea] p-3">
+                <BookingStateExplainer status={booking.status as any} />
+              </div>
+            )}
 
             {trip && (
               <div className="mt-4 flex flex-wrap gap-3 text-[11px] text-[#E5DFC6]/85">
@@ -371,6 +380,14 @@ export default function BookingDetailPage() {
 
           {/* Booking Timeline */}
           <BookingTimeline status={booking.status} />
+
+          {/* Payout Status Card for partners */}
+          {isPartner && (
+            <PayoutStatusCard 
+              payoutStatus={(booking.payout_status as any) || "not_eligible"} 
+              nextPayoutDate={booking.escrow_released_at}
+            />
+          )}
 
           <div className="grid gap-4 md:grid-cols-2 md:items-start">
             {/* Cancellation panel */}
