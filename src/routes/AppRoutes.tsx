@@ -48,6 +48,7 @@ const MyTripsPage = lazy(() => import('@/pages/MyTripsPage'));
 const PostTripPage = lazy(() => import('@/pages/PostTripPage'));
 const AgentTripsPage = lazy(() => import('@/pages/AgentTripsPage'));
 const CreatorTripsPage = lazy(() => import('@/pages/CreatorTripsPage'));
+const TikTokLabDashboardPage = lazy(() => import('@/pages/tiktok/TikTokLabDashboardPage'));
 const StoryboardEditorPage = lazy(() => import('@/pages/StoryboardEditorPage'));
 const TikTokLabStoryboardEditorPage = lazy(() => import('@/pages/TikTokLab/StoryboardEditorPage'));
 const TikTokLabPage = lazy(() => import('@/pages/TikTokLabPage'));
@@ -236,7 +237,7 @@ export const AppRoutes = () => (
       <Route path="/post-trip" element={<PostTripPage />} />
       <Route path="/agent-trips" element={<AgentTripsPage />} />
       <Route path="/creator-trips" element={<CreatorTripsPage />} />
-      <Route path="/tiktok-lab" element={<TikTokLabPage />} />
+      <Route path="/tiktok-lab" element={<TikTokLabDashboardPage />} />
       <Route path="/tiktok-lab/storyboards" element={<TikTokLabStoryboardsPage />} />
       <Route path="/tiktok-lab/storyboards/new" element={<TikTokLabStoryboardEditorPage />} />
       <Route path="/tiktok-lab/storyboards/:id/edit" element={<TikTokLabStoryboardEditorPage />} />

@@ -9,6 +9,7 @@ export type TripMatch = {
   tiktok_followers: number | null;
   bio: string | null;
   score: number;
+  reasons?: string[];
 };
 
 export function useTripMatches(tripId: string | undefined) {
@@ -25,18 +26,30 @@ export function useTripMatches(tripId: string | undefined) {
       setError(null);
 
       try {
-        const { data, error } = await supabase.functions.invoke("ai-trip-matches", {
-          body: { tripId },
+        const { data, error } = await supabase.functions.invoke("concierge-suggest-partners", {
+          body: { trip_request_id: tripId },
         });
 
         if (cancelled) return;
 
         if (error) {
-          console.error("ai-trip-matches error", error);
+          console.error("concierge-suggest-partners error", error);
           setError("Could not load AI matches.");
           setMatches([]);
         } else {
-          setMatches((data?.matches ?? []) as TripMatch[]);
+          // Transform creators to TripMatch format
+          const creatorMatches: TripMatch[] = (data?.creators || []).map((c: any) => ({
+            provider_id: c.creator.id,
+            provider_type: "creator" as const,
+            full_name: c.creator.display_name,
+            tiktok_handle: c.creator.tiktok_handle,
+            tiktok_followers: null,
+            bio: null,
+            score: c.score,
+            reasons: c.reasons,
+          }));
+
+          setMatches(creatorMatches);
         }
       } catch (err: any) {
         if (!cancelled) {
