@@ -9,32 +9,25 @@ import infinityPoolImg from "@/assets/maximilien-t-scharner-FD0Ga_KJTwM-unsplash
 
 const steps = [
   {
-    k: "step-1",
-    label: "Step 1",
-    title: "Tell us your dream trip",
-    body: "In a few lines, share where you'd love to go, who's coming with you, and how you want it to feel — from quiet retreats to once-in-a-lifetime celebrations.",
-    pill: "Traveler",
+    k: "travelers",
+    label: "For travelers",
+    title: "Post the trip. We build the team.",
+    body: "Share your dates, budget and the TikToks, Pins or moods that inspired the trip. Goldsainte surfaces creators + agents whose style and markets actually fit you. Review proposals and storyboards, then book the one that feels right — all inside Goldsainte.",
+    pill: "Travelers",
   },
   {
-    k: "step-2",
-    label: "Step 2",
-    title: "Goldsainte AI matches your team",
-    body: "Our AI concierge quietly works in the background, pairing you with TikTok creators and certified travel agents who specialize in your style of travel.",
-    pill: "Goldsainte AI",
+    k: "creators",
+    label: "For creators",
+    title: "Storyboard the journey, not just the post.",
+    body: "Set up your creator profile with TikTok handle, niche and destinations you love. Respond to briefs where your audience and aesthetic make sense. Co-design trips with agents and earn a creator share on every booked journey.",
+    pill: "Creators",
   },
   {
-    k: "step-3",
-    label: "Step 3",
-    title: "Co-design the storyboard",
-    body: "Creators bring the trip to life with visual storyboards, while agents layer in flights, villas, transfers and hidden-door experiences using their private rates.",
-    pill: "Creators × Agents",
-  },
-  {
-    k: "step-4",
-    label: "Step 4",
-    title: "Book safely on Goldsainte",
-    body: "Approve the itinerary, pay securely in one place, and keep every message on-platform. Our trust & safety team and escrow flow protect every booking.",
-    pill: "On-platform only",
+    k: "agents",
+    label: "For travel agents",
+    title: "Curate, contract, and quietly run the show.",
+    body: "Share your agency details, contract markets and sweet-spot budgets. Receive traveler and creator-led concepts that match your strengths. Build bookable itineraries, manage bookings and track payouts in one console.",
+    pill: "Travel Agents",
   },
 ];
 
@@ -68,7 +61,7 @@ export function HowItWorksSection() {
           </p>
 
           <div className="mt-2 space-y-3">
-            {steps.map((step, index) => (
+            {steps.map((step) => (
               <div
                 key={step.k}
                 className="group rounded-3xl border border-[#E5DFC6] bg-white/90 p-4 md:p-5 transition-all hover:-translate-y-0.5 hover:shadow-xl"
@@ -87,18 +80,6 @@ export function HowItWorksSection() {
                 <p className="text-[11px] leading-relaxed text-[#4a4a4a]">
                   {step.body}
                 </p>
-
-                {index === 0 && (
-                  <div className="mt-3 inline-flex items-center rounded-full bg-[#0c4d47] px-3 py-1 text-[10px] font-semibold text-[#E5DFC6]">
-                    Start by posting a trip brief
-                  </div>
-                )}
-                {index === 2 && (
-                  <p className="mt-2 text-[10px] text-[#8D8D8D]">
-                    Storyboards feel like Pinterest for your trip — scenes,
-                    hotels, experiences and moments you can react to in real time.
-                  </p>
-                )}
               </div>
             ))}
           </div>
