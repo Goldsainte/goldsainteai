@@ -2,6 +2,7 @@
 import { Helmet } from "react-helmet-async";
 import { HomeHero } from "@/components/home/HomeHero";
 import { HowItWorks } from "@/components/home/HowItWorks";
+import { HowItWorksSection } from "@/components/home/HowItWorksSection";
 import { MarketplaceShowcase } from "@/components/home/MarketplaceShowcase";
 import { PostTripCTA } from "@/components/home/PostTripCTA";
 import { StoryboardPreview } from "@/components/home/StoryboardPreview";
@@ -22,8 +23,8 @@ export default function Index() {
         {/* Hero with Expedia search + brand positioning */}
         <HomeHero />
 
-        {/* How it works (three-sided marketplace) */}
-        <HowItWorks />
+        {/* How it works - new elevated version */}
+        <HowItWorksSection />
 
         {/* Marketplace showcase with Pinterest-style cards */}
         <MarketplaceShowcase />
