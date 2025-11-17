@@ -18,6 +18,7 @@ const SearchResults = lazy(() => import('@/pages/SearchResults'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const AdminDashboardPage = lazy(() => import('@/pages/admin/AdminDashboardPage'));
 const AdminSafetyDashboardPage = lazy(() => import('@/pages/admin/AdminSafetyDashboardPage'));
+const AdminAgentsPage = lazy(() => import('@/pages/admin/AdminAgentsPage'));
 const TravelProfileRedirect = lazy(() => import('@/pages/redirects/TravelProfileRedirectPage'));
 const ExplorePage = lazy(() => import('@/pages/ExplorePage'));
 const ReelsViewer = lazy(() => import('@/pages/ReelsViewer'));
@@ -365,8 +366,9 @@ export const AppRoutes = () => (
     <Route element={<AdminLayout />}>
       <Route path="/admin" element={<Admin />} />
       <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
-        <Route path="/admin" element={<AdminDashboardPage />} />
-        <Route path="/admin/safety" element={<AdminSafetyDashboardPage />} />
+      <Route path="/admin" element={<AdminDashboardPage />} />
+      <Route path="/admin/safety" element={<AdminSafetyDashboardPage />} />
+      <Route path="/admin/agents" element={<AdminAgentsPage />} />
       <Route path="/admin/cancellations" element={<AdminCancellations />} />
       <Route path="/admin/analytics/cancellations" element={<AdminCancellationAnalytics />} />
       <Route path="/admin/customer-verifications" element={<AdminCustomerVerifications />} />
