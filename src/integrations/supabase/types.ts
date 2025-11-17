@@ -1396,6 +1396,41 @@ export type Database = {
           },
         ]
       }
+      booking_messages: {
+        Row: {
+          booking_id: string
+          content: string
+          created_at: string
+          id: string
+          sender_id: string
+          updated_at: string
+        }
+        Insert: {
+          booking_id: string
+          content: string
+          created_at?: string
+          id?: string
+          sender_id: string
+          updated_at?: string
+        }
+        Update: {
+          booking_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          sender_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_messages_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       booking_modifications: {
         Row: {
           amadeus_order_id: string | null
