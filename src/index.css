@@ -21,8 +21,8 @@ body {
 
 /* Responsive type scale using clamp */
 :root {
-  --fs-body: clamp(15px, 1.6vw, 17px);
-  --fs-small: clamp(13px, 1.4vw, 15px);
+  --fs-body: clamp(16px, 1.8vw, 18px);
+  --fs-small: clamp(14px, 1.6vw, 16px);
   --fs-h1: clamp(22px, 4vw, 34px);
   --fs-h2: clamp(18px, 3vw, 28px);
   --fs-h3: clamp(16px, 2.4vw, 22px);
