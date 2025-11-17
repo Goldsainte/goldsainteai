@@ -9290,6 +9290,7 @@ export type Database = {
       }
       trip_requests: {
         Row: {
+          accommodation_style: string | null
           booked_at: string | null
           budget_level: string | null
           budget_max: number | null
@@ -9299,10 +9300,14 @@ export type Database = {
           description: string | null
           destination: string | null
           end_date: string | null
+          flexibility: string | null
           flexible_dates: boolean | null
           id: string
+          interests: string[] | null
           occasion: string | null
+          pace: string | null
           selected_proposal_id: string | null
+          special_notes: string | null
           start_date: string | null
           status: string
           tiktok_link: string | null
@@ -9319,6 +9324,7 @@ export type Database = {
           wants_role: string | null
         }
         Insert: {
+          accommodation_style?: string | null
           booked_at?: string | null
           budget_level?: string | null
           budget_max?: number | null
@@ -9328,10 +9334,14 @@ export type Database = {
           description?: string | null
           destination?: string | null
           end_date?: string | null
+          flexibility?: string | null
           flexible_dates?: boolean | null
           id?: string
+          interests?: string[] | null
           occasion?: string | null
+          pace?: string | null
           selected_proposal_id?: string | null
+          special_notes?: string | null
           start_date?: string | null
           status?: string
           tiktok_link?: string | null
@@ -9348,6 +9358,7 @@ export type Database = {
           wants_role?: string | null
         }
         Update: {
+          accommodation_style?: string | null
           booked_at?: string | null
           budget_level?: string | null
           budget_max?: number | null
@@ -9357,10 +9368,14 @@ export type Database = {
           description?: string | null
           destination?: string | null
           end_date?: string | null
+          flexibility?: string | null
           flexible_dates?: boolean | null
           id?: string
+          interests?: string[] | null
           occasion?: string | null
+          pace?: string | null
           selected_proposal_id?: string | null
+          special_notes?: string | null
           start_date?: string | null
           status?: string
           tiktok_link?: string | null
