@@ -348,3 +348,9 @@ verify_jwt = true
 [functions.agent-verification-webhook]
 verify_jwt = false
 
+[functions.unsplash-search]
+verify_jwt = false
+
+[functions.viator-search]
+verify_jwt = false
+
