@@ -1,8 +1,9 @@
 // src/pages/trips/PostTripPage.tsx
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { getStoryboardForPrefill } from "@/services/storyboardsService";
 import { toast } from "sonner";
 
 type BudgetLevel = "accessible" | "elevated" | "ultra_luxury";
@@ -11,6 +12,8 @@ type WantsRole = "creator" | "agent" | "both";
 
 export default function PostTripPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const fromStoryboard = searchParams.get("fromStoryboard");
 
   const [destination, setDestination] = useState("");
   const [title, setTitle] = useState("");
@@ -29,6 +32,9 @@ export default function PostTripPage() {
   const [specialNotes, setSpecialNotes] = useState("");
   const [wantsRole, setWantsRole] = useState<WantsRole>("both");
 
+  const [preFilledFrom, setPreFilledFrom] = useState<string | null>(null);
+  const [preFillError, setPreFillError] = useState<string | null>(null);
+
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,6 +48,55 @@ export default function PostTripPage() {
     "Family-friendly",
     "Honeymoon / romance",
   ];
+
+  // Prefill from storyboard if present
+  useEffect(() => {
+    let cancelled = false;
+
+    async function prefillFromStoryboard(id: string) {
+      try {
+        const data = await getStoryboardForPrefill(id);
+        if (cancelled || !data) return;
+
+        setPreFilledFrom(data.title || "Storyboard");
+        if (data.destination) setDestination((prev) => prev || data.destination!);
+        if (data.title) setTitle((prev) => prev || data.title!);
+        if (data.default_starts_on)
+          setStartsOn((prev) => prev || data.default_starts_on!);
+        if (data.default_ends_on)
+          setEndsOn((prev) => prev || data.default_ends_on!);
+        if (data.default_budget_min != null)
+          setBudgetMin((prev) =>
+            prev || String(Math.round(data.default_budget_min!))
+          );
+        if (data.default_budget_max != null)
+          setBudgetMax((prev) =>
+            prev || String(Math.round(data.default_budget_max!))
+          );
+        if (data.default_budget_level)
+          setBudgetLevel(
+            (data.default_budget_level as BudgetLevel) || "elevated"
+          );
+        if (data.default_pace)
+          setPace((data.default_pace as Pace) || "balanced");
+        if (data.default_interests && data.default_interests.length > 0)
+          setInterests((prev) => (prev.length ? prev : data.default_interests!));
+      } catch (err: any) {
+        if (!cancelled)
+          setPreFillError(
+            err.message || "We couldn't prefill from this storyboard."
+          );
+      }
+    }
+
+    if (fromStoryboard) {
+      prefillFromStoryboard(fromStoryboard);
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [fromStoryboard]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -130,6 +185,19 @@ export default function PostTripPage() {
       </section>
 
       <section className="mx-auto max-w-3xl px-4 pb-16 md:pb-20">
+        {preFilledFrom && (
+          <div className="mb-3 rounded-2xl bg-[#f7f3ea] border border-[#E5DFC6] px-3 py-2 text-[10px] text-[#4a4a4a]">
+            This form is pre-filled from the storyboard{" "}
+            <span className="font-semibold">{preFilledFrom}</span>. You can
+            adjust any detail before posting your trip.
+          </div>
+        )}
+        {preFillError && (
+          <p className="mb-2 text-[10px] text-red-600">
+            {preFillError}
+          </p>
+        )}
+
         <form
           className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 space-y-5 text-[11px]"
           onSubmit={handleSubmit}
