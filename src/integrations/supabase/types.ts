@@ -1547,16 +1547,20 @@ export type Database = {
       }
       bookings: {
         Row: {
+          agent_earnings: number | null
           agent_id: string | null
           agent_share: number | null
           cancelled_at: string | null
           created_at: string
+          creator_earnings: number | null
           creator_id: string | null
           creator_share: number | null
           currency: string | null
           disputed_at: string | null
           escrow_released_at: string | null
           id: string
+          payout_expected_at: string | null
+          payout_paid_at: string | null
           payout_status: string
           platform_fee: number | null
           proposal_id: string | null
@@ -1567,16 +1571,20 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          agent_earnings?: number | null
           agent_id?: string | null
           agent_share?: number | null
           cancelled_at?: string | null
           created_at?: string
+          creator_earnings?: number | null
           creator_id?: string | null
           creator_share?: number | null
           currency?: string | null
           disputed_at?: string | null
           escrow_released_at?: string | null
           id?: string
+          payout_expected_at?: string | null
+          payout_paid_at?: string | null
           payout_status?: string
           platform_fee?: number | null
           proposal_id?: string | null
@@ -1587,16 +1595,20 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          agent_earnings?: number | null
           agent_id?: string | null
           agent_share?: number | null
           cancelled_at?: string | null
           created_at?: string
+          creator_earnings?: number | null
           creator_id?: string | null
           creator_share?: number | null
           currency?: string | null
           disputed_at?: string | null
           escrow_released_at?: string | null
           id?: string
+          payout_expected_at?: string | null
+          payout_paid_at?: string | null
           payout_status?: string
           platform_fee?: number | null
           proposal_id?: string | null
