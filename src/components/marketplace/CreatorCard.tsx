@@ -23,7 +23,7 @@ export const CreatorCard = ({ creator }: CreatorCardProps) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/marketplace/creator/${creator.id}`);
+    navigate(`/creators/${creator.id}`);
   };
 
   const formatNumber = (num: number) => {

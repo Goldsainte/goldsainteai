@@ -26,7 +26,7 @@ export const AgentCard = ({ agent }: AgentCardProps) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/agent/${agent.id}`);
+    navigate(`/agents/${agent.id}`);
   };
 
   const getInitials = (name: string) => {
