@@ -42,6 +42,7 @@ const AgentProfile = lazy(() => import('@/pages/AgentProfile'));
 const AgentOnboarding = lazy(() => import('@/pages/AgentOnboarding'));
 const AgentDashboard = lazy(() => import('@/pages/AgentDashboard'));
 const AgentTripRequests = lazy(() => import('@/pages/AgentTripRequests'));
+const AgentStoryboardBuilderPage = lazy(() => import('@/pages/agents/AgentStoryboardBuilderPage'));
 const AgentPerformanceDashboard = lazy(() => import('@/pages/AgentPerformanceDashboard'));
 const AgentDealsDashboardPage = lazy(() => import('@/pages/AgentDealsDashboardPage'));
 const TripRequestsBoardPage = lazy(() => import('@/pages/TripRequestsBoardPage'));
@@ -276,6 +277,7 @@ export const AppRoutes = () => (
       <Route path="/agent/:agentId" element={<AgentProfile />} />
       <Route path="/agent-onboarding" element={<AgentOnboarding />} />
       <Route path="/agent-dashboard" element={<RequireAgentTerms><AgentDashboard /></RequireAgentTerms>} />
+      <Route path="/agent-dashboard/storyboards/new" element={<RequireAgentTerms><AgentStoryboardBuilderPage /></RequireAgentTerms>} />
       <Route path="/agent-trip-requests" element={<RequireAgentTerms><AgentTripRequests /></RequireAgentTerms>} />
       <Route path="/agent-performance" element={<RequireAgentTerms><AgentPerformanceDashboard /></RequireAgentTerms>} />
       <Route path="/agent-deals" element={<RequireAgentTerms><AgentDealsDashboardPage /></RequireAgentTerms>} />

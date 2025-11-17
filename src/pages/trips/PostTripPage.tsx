@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getStoryboardForPrefill } from "@/services/storyboardsService";
 import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
 import { toast } from "sonner";
+import { StoryboardBuilder } from "@/components/storyboards/StoryboardBuilder";
 
 type BudgetLevel = "accessible" | "elevated" | "ultra_luxury";
 type Pace = "slow" | "balanced" | "packed";
@@ -39,6 +40,7 @@ export default function PostTripPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSafetyModal, setShowSafetyModal] = useState(false);
+  const [storyboardId, setStoryboardId] = useState<string | null>(null);
 
   const interestOptions = [
     "Food & wine",
@@ -458,6 +460,20 @@ export default function PostTripPage() {
                 placeholder="Allergies, accessibility needs, non-negotiables, things you absolutely don't want..."
               />
             </div>
+          </div>
+
+          {/* Section 4.5: Visual Storyboard */}
+          <div className="space-y-3">
+            <h2 className="text-[12px] font-semibold">Build your visual storyboard</h2>
+            <p className="text-[10px] text-[#4a4a4a]">
+              Add photos, experiences, and links that capture what you're envisioning.
+              This becomes the creative brief your agent or creator works from.
+            </p>
+            <StoryboardBuilder
+              mode="traveler"
+              initialTitle={title || destination}
+              onSaved={(id) => setStoryboardId(id)}
+            />
           </div>
 
           {/* Section 5: Who should respond */}
