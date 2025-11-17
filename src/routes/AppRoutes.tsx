@@ -44,7 +44,7 @@ const TripRequestsBoardPage = lazy(() => import('@/pages/TripRequestsBoardPage')
 const TripRequestDetailPage = lazy(() => import('@/pages/TripRequestDetailPage'));
 const TripChatPage = lazy(() => import('@/pages/TripChatPage'));
 const MyTripRequestsPage = lazy(() => import('@/pages/MyTripRequestsPage'));
-const MyTripsPage = lazy(() => import('@/pages/MyTripsPage'));
+const MyTripsPage = lazy(() => import('@/pages/trips/MyTripsPage'));
 const PostTripPage = lazy(() => import('@/pages/PostTripPage'));
 const AgentTripsPage = lazy(() => import('@/pages/AgentTripsPage'));
 const CreatorTripsPage = lazy(() => import('@/pages/CreatorTripsPage'));
