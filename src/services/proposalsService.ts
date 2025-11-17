@@ -182,3 +182,75 @@ export async function declineProposal(proposalId: string) {
     throw new Error("We couldn't update this proposal.");
   }
 }
+
+export type ProposalListItem = {
+  id: string;
+  status: string;
+  price_from: number | null;
+  currency: string | null;
+  nights: number | null;
+  headline: string | null;
+  created_at: string;
+  valid_until: string | null;
+  proposer_id: string | null;
+  proposer_role: string | null;
+  
+  proposer: {
+    id: string;
+    display_name: string | null;
+  } | null;
+};
+
+export async function getProposalsForTrip(
+  tripRequestId: string
+): Promise<ProposalListItem[]> {
+  const { data, error } = await supabase
+    .from("trip_proposals")
+    .select(
+      `
+      id,
+      status,
+      price_from,
+      currency,
+      nights,
+      headline,
+      created_at,
+      valid_until,
+      proposer_id,
+      proposer_role
+    `
+    )
+    .eq("trip_request_id", tripRequestId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error loading proposals list", error);
+    throw new Error("Could not load proposals.");
+  }
+
+  if (!data || data.length === 0) return [];
+
+  // Fetch proposer profiles separately
+  const proposerIds = [...new Set(data.map(p => p.proposer_id).filter(Boolean))] as string[];
+  
+  let proposerProfiles: Record<string, { id: string; display_name: string | null }> = {};
+  
+  if (proposerIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, display_name")
+      .in("id", proposerIds);
+    
+    if (profiles) {
+      proposerProfiles = profiles.reduce((acc, p) => {
+        acc[p.id] = p;
+        return acc;
+      }, {} as Record<string, { id: string; display_name: string | null }>);
+    }
+  }
+
+  return data.map(p => ({
+    ...p,
+    proposer: p.proposer_id ? proposerProfiles[p.proposer_id] || null : null,
+  }));
+}

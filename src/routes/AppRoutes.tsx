@@ -46,8 +46,10 @@ const TripChatPage = lazy(() => import('@/pages/TripChatPage'));
 const MyTripRequestsPage = lazy(() => import('@/pages/MyTripRequestsPage'));
 const MyTripsPage = lazy(() => import('@/pages/trips/MyTripsPage'));
 const PostTripPage = lazy(() => import('@/pages/trips/PostTripPage'));
+const TripRequestDetailPageNew = lazy(() => import('@/pages/trips/TripRequestDetailPage'));
 const PartnerTripsPage = lazy(() => import('@/pages/tiktok/PartnerTripsPage'));
 const ProposalDetailPage = lazy(() => import('@/pages/proposals/ProposalDetailPage'));
+const ProposalsForTripPage = lazy(() => import('@/pages/proposals/ProposalsForTripPage'));
 const StoryboardSharePage = lazy(() => import('@/pages/public/StoryboardSharePage'));
 const AgentTripsPage = lazy(() => import('@/pages/AgentTripsPage'));
 const CreatorTripsPage = lazy(() => import('@/pages/CreatorTripsPage'));
@@ -240,6 +242,8 @@ export const AppRoutes = () => (
       <Route path="/my-trip-requests" element={<MyTripRequestsPage />} />
       <Route path="/my-trips" element={<MyTripsPage />} />
       <Route path="/post-trip" element={<PostTripPage />} />
+      <Route path="/trip-requests/:tripRequestId" element={<TripRequestDetailPageNew />} />
+      <Route path="/proposals" element={<ProposalsForTripPage />} />
       <Route path="/proposals/:proposalId" element={<ProposalDetailPage />} />
       <Route path="/s/:slugOrId" element={<StoryboardSharePage />} />
       <Route path="/agent-trips" element={<AgentTripsPage />} />
