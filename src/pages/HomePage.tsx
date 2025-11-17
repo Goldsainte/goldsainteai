@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useExpediaModal } from "@/contexts/ExpediaModalContext";
+import { HowItWorksSection } from "@/components/home/HowItWorksSection";
 
 import heroAmalfi from "@/assets/home/hero-amalfi-coast.jpg";
 import heroJungleVilla from "@/assets/home/hero-jungle-villa.jpg";
@@ -127,64 +128,7 @@ export default function HomePage() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="mx-auto max-w-6xl px-4 pb-10 md:pb-12">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
-          <div>
-            <p className="text-[11px] tracking-[0.18em] uppercase text-[#8D8D8D] mb-1">
-              How it works
-            </p>
-            <h2 className="font-display text-xl text-[#0a2225]">
-              One marketplace. Three roles. One clean journey.
-            </h2>
-            <p className="text-[11px] text-[#4a4a4a] max-w-xl mt-1.5">
-              The same roles you choose during sign-up — Traveler, Creator,
-              Travel Agent — shape how Goldsainte works for you. Everyone plays
-              their part; the trip stays in one beautifully managed thread.
-            </p>
-          </div>
-          <p className="text-[10px] text-[#8D8D8D] max-w-xs">
-            No phone numbers. No "just DM me." All messaging, payments and
-            disputes stay on-platform, so your trip — and everyone's earnings —
-            are protected.
-          </p>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-3 text-xs">
-          <HowItWorksCard
-            eyebrow="For travelers"
-            title="Post the trip. We build the team."
-            steps={[
-              "Share your dates, budget and the TikToks, Pins or moods that inspired the trip.",
-              "Goldsainte surfaces creators + agents whose style and markets actually fit you.",
-              "Review proposals and storyboards, then book the one that feels right — all inside Goldsainte.",
-            ]}
-            link="/post-trip"
-            cta="Post your first trip"
-          />
-          <HowItWorksCard
-            eyebrow="For creators"
-            title="Storyboard the journey, not just the post."
-            steps={[
-              "Set up your creator profile with TikTok handle, niche and destinations you love.",
-              "Respond to briefs where your audience and aesthetic make sense.",
-              "Co-design trips with agents and earn a creator share on every booked journey.",
-            ]}
-            link="/partner"
-            cta="Open creator console"
-          />
-          <HowItWorksCard
-            eyebrow="For travel agents"
-            title="Curate, contract, and quietly run the show."
-            steps={[
-              "Share your agency details, contract markets and sweet-spot budgets.",
-              "Receive traveler and creator-led concepts that match your strengths.",
-              "Build bookable itineraries, manage bookings and track payouts in one console.",
-            ]}
-            link="/partner"
-            cta="Open agent console"
-          />
-        </div>
-      </section>
+      <HowItWorksSection />
 
       {/* STORYBOARDS STRIP */}
       <section className="mx-auto max-w-6xl px-4 pb-12 md:pb-16">
