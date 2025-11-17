@@ -92,7 +92,7 @@ export default function MyTripRequestsPage() {
           {/* Header */}
           <header className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47]/15 px-3 py-1 text-[11px] font-medium text-[#E5DFC6] ring-1 ring-[#BFAD72]/60">
+              <div className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47]/15 px-3 py-1 text-sm font-medium text-[#E5DFC6] ring-1 ring-[#BFAD72]/60">
                 <Sparkles className="h-3 w-3 text-[#BFAD72]" />
                 <span>Your Goldsainte trips</span>
               </div>
@@ -106,8 +106,8 @@ export default function MyTripRequestsPage() {
               </p>
             </div>
             <Link
-              to="/marketplace/request-trip"
-              className="mt-1 inline-flex items-center justify-center rounded-full bg-[#BFAD72] px-4 py-2 text-[11px] font-semibold text-[#0a2225] shadow-sm hover:bg-[#d4c58d] md:mt-0"
+              to="/post-trip"
+              className="mt-1 inline-flex items-center justify-center rounded-full bg-[#BFAD72] px-4 py-2 text-sm font-semibold text-[#0a2225] shadow-sm hover:bg-[#d4c58d] md:mt-0"
             >
               Post another trip
             </Link>
@@ -129,7 +129,7 @@ export default function MyTripRequestsPage() {
                 You haven't posted any trips yet.
                 <br />
                 <Link
-                  to="/marketplace/request-trip"
+                  to="/post-trip"
                   className="mt-2 inline-block text-[#BFAD72] underline"
                 >
                   Post your first trip to the marketplace
@@ -194,7 +194,7 @@ function TripRequestRow({ req }: { req: TripRequestWithProposals }) {
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <p className="text-[10px] text-[#8D8D8D]">
+          <p className="text-xs text-[#8D8D8D]">
             Posted {new Date(req.created_at).toLocaleDateString()}
           </p>
           <h2 className="mt-1 line-clamp-2 text-sm font-semibold">
@@ -202,14 +202,14 @@ function TripRequestRow({ req }: { req: TripRequestWithProposals }) {
           </h2>
         </div>
         <span
-          className={`inline-flex items-center rounded-full px-3 py-1 text-[10px] font-medium ring-1 ${statusColor}`}
+          className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ${statusColor}`}
         >
           {statusLabel}
         </span>
       </div>
 
       <div className="grid gap-3 md:grid-cols-3">
-        <div className="space-y-1 text-[11px] text-[#4a4a4a]">
+        <div className="space-y-1 text-sm text-[#4a4a4a]">
           <p className="flex items-center gap-1">
             <MapPin className="h-3 w-3 text-[#8D8D8D]" />
             <span>{req.destination || "Destination TBD"}</span>
@@ -219,7 +219,7 @@ function TripRequestRow({ req }: { req: TripRequestWithProposals }) {
             <span className="line-clamp-1">{dates}</span>
           </p>
         </div>
-        <div className="space-y-1 text-[11px] text-[#4a4a4a]">
+        <div className="space-y-1 text-sm text-[#4a4a4a]">
           <p className="flex items-center gap-1">
             <Users className="h-3 w-3 text-[#8D8D8D]" />
             <span>{travelers || "Unknown"} travelers</span>
@@ -229,7 +229,7 @@ function TripRequestRow({ req }: { req: TripRequestWithProposals }) {
             <span>{budget}</span>
           </p>
         </div>
-        <div className="space-y-1 text-[11px] text-[#4a4a4a]">
+        <div className="space-y-1 text-sm text-[#4a4a4a]">
           <p>
             <span className="font-medium">{proposalCount}</span> proposal
             {proposalCount === 1 ? "" : "s"} received
@@ -243,7 +243,7 @@ function TripRequestRow({ req }: { req: TripRequestWithProposals }) {
         </div>
       </div>
 
-      <div className="flex items-center justify-between text-[11px] text-[#0c4d47]">
+      <div className="flex items-center justify-between text-sm text-[#0c4d47]">
         <span>View full brief & proposals →</span>
       </div>
     </Link>

@@ -37,7 +37,7 @@ export const TopDestinationsSection = ({ destinations, onDestinationClick }: Top
           <Card
             key={dest.destination}
             className="relative h-40 sm:h-48 md:h-56 rounded-xl overflow-hidden cursor-pointer group border-luxury-gold/20 hover:shadow-xl transition-all duration-500"
-            onClick={() => onDestinationClick ? onDestinationClick(dest.destination) : navigate(`/cocurated-journeys?destination=${dest.destination}`)}
+            onClick={() => onDestinationClick ? onDestinationClick(dest.destination) : navigate('/tiktok-lab/storyboards')}
           >
             <img
               src={dest.imageUrl || getLuxuryImage(dest.destination)}

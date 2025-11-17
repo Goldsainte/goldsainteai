@@ -132,31 +132,28 @@ test.describe('Critical Production Flows - P0 Validation', () => {
       await expect(page.locator('[href*="/profile"], button:has-text("Sign out")').first()).toBeVisible();
     });
 
-    test('should access subscription page with auth headers', async ({ page }) => {
-      // Login first
-      await page.goto('/auth');
-      const email = `sub-test-${Date.now()}@goldsainte.test`;
-      
-      await page.locator('input[type="email"]').fill(email);
-      await page.locator('input[type="password"]').first().fill(testPassword);
-      await page.locator('button:has-text("Sign up")').first().click();
-      await page.waitForURL(/\/(home|travel-feed|profile)/, { timeout: 15000 });
-      
-      // Navigate to subscription page
-      await page.goto('/subscription');
-      await expect(page.locator('h1, h2')).toContainText(/subscription|plan/i, { timeout: 10000 });
-      
-      // Verify subscription tiers are visible
-      const premiumTier = page.locator('text=/premium|pro/i');
-      await expect(premiumTier.first()).toBeVisible({ timeout: 10000 });
-      
-      // Click upgrade button
-      const upgradeButton = page.locator('button:has-text("Upgrade"), button:has-text("Subscribe")').first();
-      await upgradeButton.click();
-      
-      // Should redirect to Stripe checkout (not error page)
-      await page.waitForURL(/checkout\.stripe\.com/, { timeout: 15000 });
-      expect(page.url()).toContain('checkout.stripe.com');
+  });
+
+  test.describe('Traveler workflows', () => {
+    test('homepage hero CTA routes to the post trip form', async ({ page }) => {
+      await page.goto('/');
+      await page.getByRole('link', { name: /Post a dream trip/i }).click();
+      await expect(page).toHaveURL(/\/post-trip/);
+      await expect(page.getByRole('heading', { name: /trip you'\s*re dreaming of/i })).toBeVisible();
+    });
+
+    test('floating concierge opens Madison widget and planner link', async ({ page }) => {
+      await page.goto('/');
+      const conciergeButton = page.getByTestId('voice-concierge-button');
+      await expect(conciergeButton).toBeVisible();
+      await conciergeButton.click();
+
+      const widgetHeader = page.locator('text=/Goldsainte Concierge/i');
+      await expect(widgetHeader).toBeVisible();
+
+      const fullPlanner = page.getByRole('button', { name: /Open full trip planner/i });
+      await fullPlanner.click();
+      await expect(page).toHaveURL(/\/concierge/);
     });
   });
 
@@ -237,7 +234,7 @@ test.describe('Critical Production Flows - P0 Validation', () => {
 
   test.describe('Critical Navigation & Error-Free Basics', () => {
     test('should navigate main routes without errors', async ({ page }) => {
-      const routes = ['/', '/travel-feed', '/explore', '/journeys', '/reels'];
+      const routes = ['/', '/explore', '/creators', '/agents', '/post-trip', '/trip-requests', '/tiktok-lab/storyboards'];
       
       for (const route of routes) {
         await page.goto(route);

@@ -23,8 +23,8 @@ import { usePresence } from "@/hooks/usePresence";
 import { ensureCSRFToken } from "@/lib/security/csrf";
 import { AppRoutes } from "@/routes/AppRoutes";
 
-const AIBookingConcierge = lazy(() =>
-  import("@/components/AIBookingConcierge").then((m) => ({ default: m.AIBookingConcierge })),
+const VoiceConciergeWidget = lazy(() =>
+  import("@/components/concierge/VoiceConciergeWidget").then((m) => ({ default: m.VoiceConciergeWidget })),
 );
 
 const queryClient = new QueryClient();
@@ -38,12 +38,9 @@ const HIDE_HEADER_PAGES = new Set([
   // "/journeys",
   "/creator/:id",
   "/travel-settings",
-  "/cocurated-journeys",
-  "/fine-dining",
-  "/hotel-booking",
 ]);
 
-const HIDE_AI_BOOKING_PAGES = new Set([
+const HIDE_CONCIERGE_WIDGET_PAGES = new Set([
   // Legacy social feed - disabled
   // "/travel-feed",
   // "/journeys",
@@ -67,19 +64,14 @@ const HIDE_FOOTER_PREFIXES = [
   // "/trending",
   "/creator/:id",
   "/travel-settings",
-  "/crossposting-settings",
   "/creator-dashboard",
   "/your-activity",
-  "/browse-influencers",
-  "/browse-creators",
   "/activity-logs",
   "/customer-verification",
   "/emergency-contacts",
   "/agent-performance",
   "/agent-deals",
-  "/commission-dashboard",
   "/email-preview",
-  "/test-group-payment",
   // Legacy Instagram demo - disabled
   // "/instagram-api",
   // "/instagram-callback",
@@ -133,7 +125,7 @@ function AppContent() {
 
   const hideHeader = shouldHideForPath(location.pathname, HIDE_HEADER_PAGES);
   const hideFooter = shouldHideForPath(location.pathname, HIDE_FOOTER_PREFIXES);
-  const hideAIBooking = shouldHideForPath(location.pathname, HIDE_AI_BOOKING_PAGES);
+  const hideConciergeWidget = shouldHideForPath(location.pathname, HIDE_CONCIERGE_WIDGET_PAGES);
 
   return (
     <div className="min-h-screen w-full max-w-full flex flex-col overflow-x-hidden box-border viewport-guard">
@@ -148,9 +140,9 @@ function AppContent() {
         <SentryTestButton />
       </main>
       {hideFooter ? null : <Footer />}
-      {hideAIBooking ? null : (
+      {hideConciergeWidget ? null : (
         <Suspense fallback={null}>
-          <AIBookingConcierge />
+          <VoiceConciergeWidget />
         </Suspense>
       )}
     </div>

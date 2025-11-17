@@ -1,7 +1,6 @@
 import { lazy } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 
-import Index from '@/pages/Index';
 import Auth from '@/pages/Auth';
 import AuthCallback from '@/pages/AuthCallback';
 import EmailConfirmedPage from '@/pages/EmailConfirmedPage';
@@ -24,9 +23,7 @@ const AgentPublicProfilePage = lazy(() => import('@/pages/agents/AgentPublicProf
 const CreatorPublicProfilePage = lazy(() => import('@/pages/creators/CreatorPublicProfilePage'));
 const TravelProfileRedirect = lazy(() => import('@/pages/redirects/TravelProfileRedirectPage'));
 const ExplorePage = lazy(() => import('@/pages/ExplorePage'));
-const ReelsViewer = lazy(() => import('@/pages/ReelsViewer'));
 const Marketplace = lazy(() => import('@/pages/Marketplace'));
-const RequestTrip = lazy(() => import('@/pages/marketplace/RequestTrip'));
 const TripRequestDetail = lazy(() => import('@/pages/marketplace/TripRequestDetail'));
 const TripDetail = lazy(() => import('@/pages/marketplace/TripDetail'));
 // Legacy social feed - disabled
@@ -35,7 +32,6 @@ const TripDetail = lazy(() => import('@/pages/marketplace/TripDetail'));
 const Shop = lazy(() => import('@/pages/Shop'));
 const BrowseAgents = lazy(() => import('@/pages/BrowseAgents'));
 const BrowseCreators = lazy(() => import('@/pages/BrowseCreators'));
-const BrowseInfluencers = lazy(() => import('@/pages/BrowseInfluencers'));
 const CreatorsPage = lazy(() => import('@/pages/CreatorsPage'));
 const CreatorOnboardingPage = lazy(() => import('@/pages/onboarding/CreatorOnboardingPage'));
 const AgentProfile = lazy(() => import('@/pages/AgentProfile'));
@@ -64,8 +60,7 @@ const AgentApplyPage = lazy(() => import('@/pages/agents/AgentApplyPage'));
 const StoryboardEditorPage = lazy(() => import('@/pages/StoryboardEditorPage'));
 const TikTokLabStoryboardEditorPage = lazy(() => import('@/pages/TikTokLab/StoryboardEditorPage'));
 const TikTokLabPage = lazy(() => import('@/pages/TikTokLabPage'));
-const StoryboardsPage = lazy(() => import('@/pages/StoryboardsPage'));
-const StoryboardDetailPage = lazy(() => import('@/pages/StoryboardDetailPage'));
+const TikTokLabStoryboardDetailPage = lazy(() => import('@/pages/TikTokLab/StoryboardDetailPage'));
 const ConciergePage = lazy(() => import('@/pages/ConciergePage'));
 const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
 const MarketplaceGuidelinesPage = lazy(() => import('@/pages/MarketplaceGuidelinesPage'));
@@ -73,8 +68,6 @@ const HomePage = lazy(() => import('@/pages/HomePage'));
 const MyBookingsPage = lazy(() => import('@/pages/MyBookingsPage'));
 const PartnerBookingsPage = lazy(() => import('@/pages/PartnerBookingsPage'));
 const BookingDetailPage = lazy(() => import('@/pages/bookings/BookingDetailPage'));
-const BookingPreferencesRedirect = lazy(() => import('@/pages/redirects/BookingPreferencesRedirect'));
-const FavoritesRedirect = lazy(() => import('@/pages/redirects/FavoritesRedirect'));
 const EmailPreview = lazy(() => import('@/pages/EmailPreview'));
 const BillingDashboard = lazy(() => import('@/pages/BillingDashboard'));
 const TikTokLabStoryboardsPage = lazy(() => import('@/pages/TikTokLab/StoryboardsPage'));
@@ -82,7 +75,6 @@ const TravelSettings = lazy(() => import('@/pages/TravelSettings'));
 const TravelSettings2 = lazy(() => import('@/pages/TravelSettings2'));
 const CreatorSettingsPage = lazy(() => import('@/pages/CreatorSettingsPage'));
 const MusicVolumeSettings = lazy(() => import('@/pages/MusicVolumeSettings'));
-const CrosspostingSettings = lazy(() => import('@/pages/CrosspostingSettings'));
 // Legacy Instagram demo - disabled
 // const InstagramCallback = lazy(() => import('@/pages/InstagramCallback'));
 // const InstagramAPI = lazy(() => import('@/pages/InstagramAPI'));
@@ -100,7 +92,6 @@ const PartnerConsolePage = lazy(() => import('@/pages/partner/PartnerConsolePage
 const MyJobs = lazy(() => import('@/pages/MyJobs'));
 const MyTrips = lazy(() => import('@/pages/MyTrips'));
 const GroupTrips = lazy(() => import('@/pages/GroupTrips'));
-const TestGroupPayment = lazy(() => import('@/pages/TestGroupPayment'));
 const JournalListing = lazy(() => import('@/pages/JournalListing'));
 const JournalArticle = lazy(() => import('@/pages/JournalArticle'));
 const CreatorArticles = lazy(() => import('@/pages/CreatorArticles'));
@@ -123,10 +114,8 @@ const EmergencyContacts = lazy(() => import('@/pages/EmergencyContacts'));
 const CoCuratedDashboard = lazy(() => import('@/pages/CoCuratedDashboard'));
 const CoCuratedCreate = lazy(() => import('@/pages/CoCuratedCreate'));
 const CoCuratedMarketplace = lazy(() => import('@/pages/CoCuratedMarketplace'));
-const CoCuratedJourneys = lazy(() => import('@/pages/CoCuratedJourneys'));
 const CoCuratedBookingSuccess = lazy(() => import('@/pages/CoCuratedBookingSuccess'));
 const TourActivityDetail = lazy(() => import('@/pages/TourActivityDetail'));
-const FineDining = lazy(() => import('@/pages/FineDining'));
 const RestaurantDetail = lazy(() => import('@/pages/RestaurantDetail'));
 const YourActivity = lazy(() => import('@/pages/YourActivity'));
 const Admin = lazy(() => import('@/pages/Admin'));
@@ -144,7 +133,6 @@ const PlatformAnalyticsDashboard = lazy(() => import('@/components/PlatformAnaly
 const SystemHealth = lazy(() => import('@/pages/SystemHealth'));
 const Redirect = lazy(() => import('@/pages/Redirect'));
 const About = lazy(() => import('@/pages/About'));
-const AuthPage = lazy(() => import('@/pages/AuthPage'));
 const OnboardingProfilePage = lazy(() => import('@/pages/OnboardingProfilePage'));
 const TermsPage = lazy(() => import('@/pages/Terms'));
 const WhatWeDo = lazy(() => import('@/pages/WhatWeDo'));
@@ -168,6 +156,7 @@ export const AppRoutes = () => (
       <Route path="/about" element={<About />} />
       <Route path="/creators" element={<CreatorsPage />} />
       <Route path="/creators/:id" element={<CreatorPublicProfilePage />} />
+      <Route path="/agents" element={<BrowseAgents />} />
       <Route path="/agents/:id" element={<AgentPublicProfilePage />} />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/what-we-do" element={<WhatWeDo />} />
@@ -182,7 +171,7 @@ export const AppRoutes = () => (
     </Route>
 
     <Route element={<AuthLayout />}>
-      <Route path="/auth" element={<AuthPage />} />
+      <Route path="/auth" element={<Auth />} />
       <Route path="/login" element={<Auth />} />
       <Route path="/signup" element={<Auth />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
@@ -203,7 +192,6 @@ export const AppRoutes = () => (
         <Route path="/journeys" element={<TravelFeed />} />
         */}
         <Route path="/explore" element={<ExplorePage />} />
-        <Route path="/reels" element={<ReelsViewer />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/travel-profile" element={<TravelProfileRedirect />} />
         <Route path="/travel-profile/:userId" element={<Navigate to="/creator/:userId" replace />} />
@@ -219,11 +207,7 @@ export const AppRoutes = () => (
       />
       <Route
         path="/marketplace/request-trip"
-        element={(
-          <RouteSectionBoundary section="marketplace">
-            <RequestTrip />
-          </RouteSectionBoundary>
-        )}
+        element={<Navigate to="/post-trip" replace />}
       />
       <Route
         path="/marketplace/request/:id"
@@ -243,7 +227,6 @@ export const AppRoutes = () => (
       />
       <Route path="/browse-agents" element={<BrowseAgents />} />
       <Route path="/browse-creators" element={<BrowseCreators />} />
-      <Route path="/browse-influencers" element={<BrowseInfluencers />} />
       <Route path="/trip-requests" element={<TripRequestsBoardPage />} />
       <Route path="/trip-request/:id" element={<TripRequestDetailPage />} />
       <Route path="/trip-request/:id/chat" element={<TripChatPage />} />
@@ -261,14 +244,12 @@ export const AppRoutes = () => (
       <Route path="/apply/agent" element={<AgentApplyPage />} />
       <Route path="/tiktok-lab/earnings" element={<TikTokEarningsPage />} />
       <Route path="/tiktok-lab/storyboards" element={<TikTokLabStoryboardsPage />} />
+      <Route path="/tiktok-lab/storyboards/:id" element={<TikTokLabStoryboardDetailPage />} />
       <Route path="/tiktok-lab/storyboards/new" element={<TikTokLabStoryboardEditorPage />} />
       <Route path="/tiktok-lab/storyboards/:id/edit" element={<TikTokLabStoryboardEditorPage />} />
       <Route path="/notifications" element={<NotificationsPage />} />
-      <Route path="/storyboards" element={<StoryboardsPage />} />
-      <Route path="/storyboards/:id" element={<StoryboardDetailPage />} />
       <Route path="/marketplace-guidelines" element={<MarketplaceGuidelinesPage />} />
       <Route path="/concierge" element={<ConciergePage />} />
-      <Route path="/creators" element={<BrowseCreators />} />
       <Route path="/my-bookings" element={<MyBookingsPage />} />
       <Route path="/partner-bookings" element={<PartnerBookingsPage />} />
       <Route path="/bookings/:bookingId" element={<BookingDetailPage />} />
@@ -282,19 +263,11 @@ export const AppRoutes = () => (
       <Route path="/agent-performance" element={<RequireAgentTerms><AgentPerformanceDashboard /></RequireAgentTerms>} />
       <Route path="/agent-deals" element={<RequireAgentTerms><AgentDealsDashboardPage /></RequireAgentTerms>} />
       <Route path="/email-preview" element={<EmailPreview />} />
-      {/* Legacy redirects */}
-      <Route path="/favorites" element={<Navigate to="/dashboard?tab=favorites" replace />} />
-      <Route path="/collections" element={<Navigate to="/storyboards" replace />} />
-      <Route path="/collections/:collectionId" element={<Navigate to="/storyboards" replace />} />
-      <Route path="/subscription" element={<Navigate to="/marketplace" replace />} />
-      <Route path="/subscriptions" element={<Navigate to="/marketplace" replace />} />
-      <Route path="/booking-preferences" element={<Navigate to="/dashboard?tab=preferences" replace />} />
       <Route path="/billing-dashboard" element={<BillingDashboard />} />
       <Route path="/travel-settings" element={<CreatorSettingsPage />} />
       <Route path="/travel-settings-2" element={<TravelSettings2 />} />
       <Route path="/travel-settings/general" element={<TravelSettings />} />
       <Route path="/travel-settings/music-volume" element={<MusicVolumeSettings />} />
-      <Route path="/crossposting-settings" element={<CrosspostingSettings />} />
       {/* Legacy Instagram demo routes - DISABLED
       <Route path="/instagram-callback" element={<InstagramCallback />} />
       <Route path="/instagram-api" element={<InstagramAPI />} />
@@ -337,7 +310,6 @@ export const AppRoutes = () => (
       <Route path="/my-trips" element={<MyTrips />} />
       <Route path="/group-trips" element={<GroupTrips />} />
       <Route path="/group-trips/:tripId" element={<GroupTrips />} />
-      <Route path="/test-group-payment" element={<TestGroupPayment />} />
       <Route path="/journal" element={<JournalListing />} />
       <Route path="/journal/:slug" element={<JournalArticle />} />
       <Route path="/creator-articles" element={<CreatorArticles />} />
@@ -361,9 +333,7 @@ export const AppRoutes = () => (
       <Route path="/cocurated-dashboard" element={<CoCuratedDashboard />} />
       <Route path="/cocurated-create" element={<CoCuratedCreate />} />
       <Route path="/cocurated-marketplace" element={<CoCuratedMarketplace />} />
-      <Route path="/cocurated-journeys" element={<CoCuratedJourneys />} />
       <Route path="/tour/:tourId" element={<TourActivityDetail />} />
-      <Route path="/fine-dining" element={<FineDining />} />
       <Route path="/restaurant/:restaurantId" element={<RestaurantDetail />} />
       <Route path="/cocurated-booking-success" element={<CoCuratedBookingSuccess />} />
       <Route path="/your-activity" element={<YourActivity />} />

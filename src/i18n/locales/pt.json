@@ -155,6 +155,7 @@
     "discover": "Descobrir",
     "journeys": "Viagens",
     "cocuratedJourneys": "Viagens CoCuradas",
+    "storyboards": "Storyboards",
     "browseCreators": "Navegar Criadores",
     "browseAgents": "Navegar Agentes",
     "marketplace": "Mercado",
@@ -165,7 +166,7 @@
     "shop": "Loja",
     "affiliateLinks": "Links de Afiliados",
     "company": "Empresa",
-    "subscription": "Assinatura",
+    "concierge": "Concierge",
     "about": "Sobre"
   },
   "footer": {
@@ -178,6 +179,7 @@
     "discover": "Descobrir",
     "journeys": "Viagens",
     "cocuratedJourneys": "Viagens CoCuradas",
+    "storyboards": "Storyboards",
     "seasonalDeals": "Ofertas Sazonais e de Férias",
     "travelAgentServices": "Serviços de Agentes de Viagem",
     "cocuratedPackages": "Pacotes CoCurados",

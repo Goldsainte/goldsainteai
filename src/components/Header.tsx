@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, User, Menu, Hotel, Plane, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info, Crown, CreditCard, PlaneTakeoff, HandCoins } from "lucide-react";
+import { User, Menu, Hotel, Plane, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info, Sparkles, CreditCard, PlaneTakeoff, HandCoins } from "lucide-react";
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import CreateContentSheet from "@/components/CreateContentSheet";
 import ContentUploadModal from "@/components/ContentUploadModal";
@@ -255,11 +255,11 @@ export const Header = () => {
                       </div>
                       <div className="py-2">
                         <DropdownMenuItem
-                          onClick={() => navigate('/cocurated-journeys')} 
+                          onClick={() => navigate('/tiktok-lab/storyboards')}
                           className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <Plane className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">{t('navigation.cocuratedJourneys')}</span>
+                          <span className="text-sm font-medium">{t('navigation.storyboards')}</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => navigate('/browse-creators')} 
@@ -289,12 +289,12 @@ export const Header = () => {
                           <Video className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                           <span className="text-sm font-medium">TikTok Lab</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => navigate('/marketplace/request-trip')} 
+                        <DropdownMenuItem
+                          onClick={() => navigate('/post-trip')}
                           className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <PlaneTakeoff className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">Request Trip</span>
+                          <span className="text-sm font-medium">Post a Trip</span>
                         </DropdownMenuItem>
                       </div>
                       
@@ -328,38 +328,38 @@ export const Header = () => {
                         <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">{t('navigation.shopAndEarn')}</p>
                       </div>
                       <div className="py-2">
-                        <DropdownMenuItem 
-                          onClick={() => navigate('/shop')} 
+                        <DropdownMenuItem
+                          onClick={() => navigate('/shop')}
                           className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <ShoppingCart className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                           <span className="text-sm font-medium">{t('navigation.shop')}</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => navigate('/affiliate-manager')} 
+                        <DropdownMenuItem
+                          onClick={() => navigate('/affiliate-manager')}
                           className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <Link2 className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                           <span className="text-sm font-medium">{t('navigation.affiliateLinks')}</span>
                         </DropdownMenuItem>
                       </div>
-                      
+
                       <DropdownMenuSeparator className="bg-border/50" />
-                      
+
                       {/* Company Section */}
                       <div className="px-4 py-3 border-b border-border/50">
                         <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">{t('navigation.company')}</p>
                       </div>
                       <div className="py-2">
-                        <DropdownMenuItem 
-                          onClick={() => navigate('/subscription')} 
+                        <DropdownMenuItem
+                          onClick={() => navigate('/concierge')}
                           className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
-                          <Crown className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">{t('navigation.subscription')}</span>
+                          <Sparkles className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                          <span className="text-sm font-medium">{t('navigation.concierge')}</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => navigate('/about')} 
+                        <DropdownMenuItem
+                          onClick={() => navigate('/about')}
                           className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <Info className="h-5 w-5 text-muted-foreground flex-shrink-0" />
@@ -408,8 +408,8 @@ export const Header = () => {
                             <User className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                             <span className="text-sm font-medium">Profile</span>
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => navigate('/dashboard')} 
+                          <DropdownMenuItem
+                            onClick={() => navigate('/traveler')}
                             className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                           >
                             <LayoutDashboard className="h-5 w-5 text-muted-foreground flex-shrink-0" />
@@ -629,11 +629,11 @@ export const Header = () => {
                     </div>
                     <div className="py-2">
                       <DropdownMenuItem
-                        onClick={() => navigate('/cocurated-journeys')} 
+                        onClick={() => navigate('/tiktok-lab/storyboards')}
                         className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                       >
                         <Plane className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">CoCurated Journeys</span>
+                        <span className="text-sm font-medium">{t('navigation.storyboards')}</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => navigate('/browse-creators')} 
@@ -663,12 +663,12 @@ export const Header = () => {
                         <Video className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">TikTok Lab</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => navigate('/marketplace/request-trip')} 
+                      <DropdownMenuItem
+                        onClick={() => navigate('/post-trip')}
                         className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                       >
                         <PlaneTakeoff className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">Request Trip</span>
+                        <span className="text-sm font-medium">Post a Trip</span>
                       </DropdownMenuItem>
                     </div>
 
@@ -762,12 +762,12 @@ export const Header = () => {
                       <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Company</p>
                     </div>
                     <div className="py-2 pb-3">
-                      <DropdownMenuItem 
-                        onClick={() => navigate('/subscription')} 
+                      <DropdownMenuItem
+                        onClick={() => navigate('/concierge')}
                         className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                       >
-                        <Crown className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">Subscription</span>
+                        <Sparkles className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                        <span className="text-sm font-medium">Concierge</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => navigate('/about')} 
@@ -818,8 +818,8 @@ export const Header = () => {
                         </div>
 
                         <div className="py-2">
-                          <DropdownMenuItem 
-                            onClick={() => navigate('/dashboard')} 
+                          <DropdownMenuItem
+                            onClick={() => navigate('/traveler')}
                             className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                           >
                             <LayoutDashboard className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />

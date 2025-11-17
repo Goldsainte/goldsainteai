@@ -33,7 +33,7 @@ export default function LeftNav() {
         <NavItemLink to="/browse-creators"><Users className="w-6 h-6" /> Browse Creators</NavItemLink>
         <NavItemLink to="/browse-agents"><Building className="w-6 h-6" /> Browse Agents</NavItemLink>
         <NavItemLink to="/tiktok-lab"><Video className="w-6 h-6" /> TikTok Lab</NavItemLink>
-        <NavItemLink to="/marketplace/request-trip"><PlaneTakeoff className="w-6 h-6" /> Request Trip</NavItemLink>
+        <NavItemLink to="/post-trip"><PlaneTakeoff className="w-6 h-6" /> Post a Trip</NavItemLink>
         <NavItemLink to="/my-trip-requests"><FileText className="w-6 h-6" /> My Trips</NavItemLink>
         <NavItemBtn onClick={() => openType("search")}><Search className="w-6 h-6" /> Search</NavItemBtn>
         <NavItemBtn onClick={() => openType("messages")}><MessageCircle className="w-6 h-6" /> Messages</NavItemBtn>

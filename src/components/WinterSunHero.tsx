@@ -26,10 +26,10 @@ export const WinterSunHero = () => {
         <p className="text-white/90 text-base sm:text-lg md:text-xl mb-8 max-w-2xl">
           {t('home.winterSun.subtitle')}
         </p>
-        <Button 
+        <Button
           size="lg"
           className="bg-luxury-gold text-luxury-emerald hover:bg-luxury-gold/90 transition-all duration-300"
-          onClick={() => navigate('/cocurated-journeys')}
+          onClick={() => navigate('/tiktok-lab/storyboards')}
         >
           {t('home.winterSun.cta')}
         </Button>
