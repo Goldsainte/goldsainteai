@@ -50,7 +50,7 @@ const collageImages = [
 
 export function HowItWorksSection() {
   return (
-    <section className="bg-[#f7f3ea] py-16 md:py-20">
+    <section className="bg-[#f7f3ea] py-16 md:py-20 border-8 border-red-500">
       <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 md:flex-row md:items-start">
         {/* LEFT: copy + steps */}
         <div className="w-full md:w-[52%] space-y-6">
