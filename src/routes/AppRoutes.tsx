@@ -49,12 +49,14 @@ const PostTripPage = lazy(() => import('@/pages/PostTripPage'));
 const AgentTripsPage = lazy(() => import('@/pages/AgentTripsPage'));
 const CreatorTripsPage = lazy(() => import('@/pages/CreatorTripsPage'));
 const TikTokLabDashboardPage = lazy(() => import('@/pages/tiktok/TikTokLabDashboardPage'));
+const TikTokEarningsPage = lazy(() => import('@/pages/tiktok/TikTokEarningsPage'));
 const StoryboardEditorPage = lazy(() => import('@/pages/StoryboardEditorPage'));
 const TikTokLabStoryboardEditorPage = lazy(() => import('@/pages/TikTokLab/StoryboardEditorPage'));
 const TikTokLabPage = lazy(() => import('@/pages/TikTokLabPage'));
 const StoryboardsPage = lazy(() => import('@/pages/StoryboardsPage'));
 const StoryboardDetailPage = lazy(() => import('@/pages/StoryboardDetailPage'));
 const ConciergePage = lazy(() => import('@/pages/ConciergePage'));
+const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
 const MarketplaceGuidelinesPage = lazy(() => import('@/pages/MarketplaceGuidelinesPage'));
 const HomePage = lazy(() => import('@/pages/HomePage'));
 const MyBookingsPage = lazy(() => import('@/pages/MyBookingsPage'));
@@ -238,9 +240,11 @@ export const AppRoutes = () => (
       <Route path="/agent-trips" element={<AgentTripsPage />} />
       <Route path="/creator-trips" element={<CreatorTripsPage />} />
       <Route path="/tiktok-lab" element={<TikTokLabDashboardPage />} />
+      <Route path="/tiktok-lab/earnings" element={<TikTokEarningsPage />} />
       <Route path="/tiktok-lab/storyboards" element={<TikTokLabStoryboardsPage />} />
       <Route path="/tiktok-lab/storyboards/new" element={<TikTokLabStoryboardEditorPage />} />
       <Route path="/tiktok-lab/storyboards/:id/edit" element={<TikTokLabStoryboardEditorPage />} />
+      <Route path="/notifications" element={<NotificationsPage />} />
       <Route path="/storyboards" element={<StoryboardsPage />} />
       <Route path="/storyboards/:id" element={<StoryboardDetailPage />} />
       <Route path="/marketplace-guidelines" element={<MarketplaceGuidelinesPage />} />
