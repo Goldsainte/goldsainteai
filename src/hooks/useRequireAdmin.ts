@@ -16,14 +16,14 @@ export function useRequireAdmin() {
         return;
       }
 
-      const { data: profile } = await supabase
-        .from("profiles")
+      // SECURITY: Check user_roles table, NOT profiles.role
+      const { data: roles } = await supabase
+        .from("user_roles")
         .select("role")
-        .eq("id", user.id)
-        .maybeSingle();
+        .eq("user_id", user.id);
 
       if (!cancelled) {
-        setAllowed(profile?.role === "admin");
+        setAllowed(roles?.some(r => r.role === "admin") || false);
         setChecking(false);
       }
     }
