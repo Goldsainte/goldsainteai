@@ -48,13 +48,13 @@ export function HowItWorksSection() {
       <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 md:flex-row md:items-start">
         {/* LEFT: copy + steps */}
         <div className="w-full md:w-[52%] space-y-6">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-[#8D8D8D]">
+          <p className="text-xs uppercase tracking-[0.18em] text-[#8D8D8D]">
             Elevated travel, made simple
           </p>
           <h2 className="font-display text-[26px] leading-snug text-[#0a2225] md:text-[30px]">
             How Goldsainte works
           </h2>
-          <p className="text-[12px] leading-relaxed text-[#4a4a4a] max-w-lg">
+          <p className="text-sm leading-relaxed text-[#4a4a4a] max-w-lg">
             Goldsainte sits between inspiration and execution. Travelers share a
             dream, TikTok creators bring it to life visually, and certified
             agents quietly engineer the logistics behind the scenes.
@@ -67,24 +67,24 @@ export function HowItWorksSection() {
                 className="group rounded-3xl border border-[#E5DFC6] bg-white/90 p-4 md:p-5 transition-all hover:-translate-y-0.5 hover:shadow-xl"
               >
                 <div className="mb-2 flex items-center justify-between gap-2">
-                  <span className="text-[10px] uppercase tracking-[0.18em] text-[#8D8D8D]">
+                  <span className="text-xs uppercase tracking-[0.18em] text-[#8D8D8D]">
                     {step.label}
                   </span>
-                  <span className="rounded-full border border-[#BFAD72]/60 bg-[#E5DFC6]/60 px-2 py-0.5 text-[9px] text-[#0a2225]">
+                  <span className="rounded-full border border-[#BFAD72]/60 bg-[#E5DFC6]/60 px-2 py-0.5 text-xs text-[#0a2225]">
                     {step.pill}
                   </span>
                 </div>
-                <p className="font-display text-[15px] text-[#0a2225] mb-1">
+                <p className="font-display text-base text-[#0a2225] mb-1">
                   {step.title}
                 </p>
-                <p className="text-[11px] leading-relaxed text-[#4a4a4a]">
+                <p className="text-sm leading-relaxed text-[#4a4a4a]">
                   {step.body}
                 </p>
               </div>
             ))}
           </div>
 
-          <div className="pt-4 text-[11px] text-[#8D8D8D]">
+          <div className="pt-4 text-xs text-[#8D8D8D]">
             All communication and payments stay inside Goldsainte. No phone
             numbers, no side deals — just beautifully organized trips.
           </div>
@@ -106,11 +106,11 @@ export function HowItWorksSection() {
                   />
                 ))}
               </div>
-              <div className="mt-4 rounded-2xl bg-[#0c4d47] px-4 py-3 text-[11px] text-[#E5DFC6]">
+              <div className="mt-4 rounded-2xl bg-[#0c4d47] px-4 py-3 text-sm text-[#E5DFC6]">
                 <p className="font-semibold mb-1">
                   Every trip begins with a storyboard.
                 </p>
-                <p className="text-[10px] text-[#E5DFC6]/90">
+                <p className="text-xs text-[#E5DFC6]/90">
                   Creators curate scenes like these; agents turn them into a
                   bookable itinerary — flights, suites, drivers, dinners. You
                   see the trip before you ever click "Book".
