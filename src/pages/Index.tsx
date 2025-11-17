@@ -19,7 +19,7 @@ export default function Index() {
         />
       </Helmet>
 
-      <main className="min-h-screen bg-gradient-to-b from-[#0a2225] via-[#0a2225] to-[#E5DFC6] text-foreground">
+      <main className="min-h-screen bg-[#f7f3ea] text-foreground">
         {/* Hero with Expedia search + brand positioning */}
         <HomeHero />
 
