@@ -21,6 +21,7 @@ const AdminSafetyDashboardPage = lazy(() => import('@/pages/admin/AdminSafetyDas
 const AdminAgentsPage = lazy(() => import('@/pages/admin/AdminAgentsPage'));
 const AdminHomePage = lazy(() => import('@/pages/admin/AdminHomePage'));
 const AgentPublicProfilePage = lazy(() => import('@/pages/agents/AgentPublicProfilePage'));
+const CreatorPublicProfilePage = lazy(() => import('@/pages/creators/CreatorPublicProfilePage'));
 const TravelProfileRedirect = lazy(() => import('@/pages/redirects/TravelProfileRedirectPage'));
 const ExplorePage = lazy(() => import('@/pages/ExplorePage'));
 const ReelsViewer = lazy(() => import('@/pages/ReelsViewer'));
@@ -165,6 +166,7 @@ export const AppRoutes = () => (
       <Route index element={<HomePage />} />
       <Route path="/about" element={<About />} />
       <Route path="/creators" element={<CreatorsPage />} />
+      <Route path="/creators/:id" element={<CreatorPublicProfilePage />} />
       <Route path="/agents/:id" element={<AgentPublicProfilePage />} />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/what-we-do" element={<WhatWeDo />} />

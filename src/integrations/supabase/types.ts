@@ -6656,12 +6656,15 @@ export type Database = {
           content_style_tags: string[] | null
           country: string | null
           created_at: string
+          creator_avg_views: number | null
           creator_budget_levels: string[] | null
+          creator_followers: number | null
           creator_niches: string[] | null
           creator_pov: string | null
           destinations_focus_tags: string[] | null
           display_name: string | null
           email_notifications: boolean | null
+          featured_photos: string[] | null
           first_name: string | null
           followers_count: number | null
           following_count: number | null
@@ -6669,6 +6672,7 @@ export type Database = {
           has_completed_creator_onboarding: boolean | null
           home_base: string | null
           id: string
+          instagram_handle: string | null
           instagram_username: string | null
           is_business_verified: boolean | null
           is_profile_complete: boolean | null
@@ -6729,12 +6733,15 @@ export type Database = {
           content_style_tags?: string[] | null
           country?: string | null
           created_at?: string
+          creator_avg_views?: number | null
           creator_budget_levels?: string[] | null
+          creator_followers?: number | null
           creator_niches?: string[] | null
           creator_pov?: string | null
           destinations_focus_tags?: string[] | null
           display_name?: string | null
           email_notifications?: boolean | null
+          featured_photos?: string[] | null
           first_name?: string | null
           followers_count?: number | null
           following_count?: number | null
@@ -6742,6 +6749,7 @@ export type Database = {
           has_completed_creator_onboarding?: boolean | null
           home_base?: string | null
           id: string
+          instagram_handle?: string | null
           instagram_username?: string | null
           is_business_verified?: boolean | null
           is_profile_complete?: boolean | null
@@ -6802,12 +6810,15 @@ export type Database = {
           content_style_tags?: string[] | null
           country?: string | null
           created_at?: string
+          creator_avg_views?: number | null
           creator_budget_levels?: string[] | null
+          creator_followers?: number | null
           creator_niches?: string[] | null
           creator_pov?: string | null
           destinations_focus_tags?: string[] | null
           display_name?: string | null
           email_notifications?: boolean | null
+          featured_photos?: string[] | null
           first_name?: string | null
           followers_count?: number | null
           following_count?: number | null
@@ -6815,6 +6826,7 @@ export type Database = {
           has_completed_creator_onboarding?: boolean | null
           home_base?: string | null
           id?: string
+          instagram_handle?: string | null
           instagram_username?: string | null
           is_business_verified?: boolean | null
           is_profile_complete?: boolean | null
