@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getStoryboardForPrefill } from "@/services/storyboardsService";
+import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
 import { toast } from "sonner";
 
 type BudgetLevel = "accessible" | "elevated" | "ultra_luxury";
@@ -37,6 +38,7 @@ export default function PostTripPage() {
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showSafetyModal, setShowSafetyModal] = useState(false);
 
   const interestOptions = [
     "Food & wine",
@@ -98,8 +100,19 @@ export default function PostTripPage() {
     };
   }, [fromStoryboard]);
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmitClick(e: React.FormEvent) {
     e.preventDefault();
+    
+    // Basic validation before showing modal
+    if (!destination || !startsOn || !endsOn) {
+      setError("Please fill in destination and dates.");
+      return;
+    }
+    
+    setShowSafetyModal(true);
+  }
+
+  async function handleSubmitConfirmed() {
     setError(null);
     setSubmitting(true);
 
@@ -107,10 +120,6 @@ export default function PostTripPage() {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError || !user) {
         throw new Error("Please sign in before posting a trip.");
-      }
-
-      if (!destination || !startsOn || !endsOn) {
-        throw new Error("Please fill in destination and dates.");
       }
 
       const { error: insertError, data } = await supabase
@@ -200,7 +209,7 @@ export default function PostTripPage() {
 
         <form
           className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 space-y-5 text-[11px]"
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmitClick}
         >
           {/* Section 1: Where & when */}
           <div className="space-y-3">
@@ -506,6 +515,14 @@ export default function PostTripPage() {
           </div>
         </form>
       </section>
+
+      <TrustSafetyModal
+        open={showSafetyModal}
+        onOpenChange={setShowSafetyModal}
+        context="trip_posting"
+        onConfirm={handleSubmitConfirmed}
+        onCancel={() => setShowSafetyModal(false)}
+      />
     </main>
   );
 }
