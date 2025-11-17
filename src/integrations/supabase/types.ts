@@ -240,6 +240,7 @@ export type Database = {
       }
       agent_applications: {
         Row: {
+          admin_notes: string | null
           agency_name: string | null
           agent_id: string
           created_at: string | null
@@ -260,6 +261,7 @@ export type Database = {
           years_experience: number | null
         }
         Insert: {
+          admin_notes?: string | null
           agency_name?: string | null
           agent_id: string
           created_at?: string | null
@@ -280,6 +282,7 @@ export type Database = {
           years_experience?: number | null
         }
         Update: {
+          admin_notes?: string | null
           agency_name?: string | null
           agent_id?: string
           created_at?: string | null
