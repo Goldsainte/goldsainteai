@@ -8,7 +8,7 @@ import { HotelDetailsModal } from "./HotelDetailsModal";
 import { DateSelectionModal } from "./DateSelectionModal";
 import { useFavorites } from "@/hooks/useFavorites";
 import { getHotelImage } from "@/lib/imageHelpers";
-import { encodeData } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface SimplePropertyCardProps {
   property: any;
@@ -127,7 +127,8 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
       currency: currency,
     };
     
-    navigate(`/hotel-booking?data=${encodeData(bookingData)}`);
+    toast.success("We'll finish this booking inside your trip brief.");
+    navigate('/post-trip', { state: { hotel: bookingData } });
   };
 
   const favoriteId = isFavorite('hotel', property);

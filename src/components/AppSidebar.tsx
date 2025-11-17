@@ -1,4 +1,4 @@
-import { Home, Search, Heart, User, LogIn, LogOut, LayoutDashboard, Briefcase, ShieldCheck, Package, TrendingUp, Info, DollarSign, Users } from "lucide-react";
+import { Home, Search, User, LogIn, LogOut, LayoutDashboard, Briefcase, ShieldCheck, Package, TrendingUp, Info, DollarSign, Users } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import logomark from "@/assets/logomark-gold.png";
@@ -21,14 +21,13 @@ import { format } from "date-fns";
 
 const items = [
   { title: "Home", url: "/", icon: Home },
-  { title: "Search", url: "/search", icon: Search },
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, authRequired: true },
+  { title: "Explore", url: "/explore", icon: Search },
+  { title: "Traveler Console", url: "/traveler", icon: LayoutDashboard, authRequired: true },
   { title: "Marketplace", url: "/marketplace", icon: Briefcase, authRequired: true },
   { title: "CoCurate™", url: "/cocurated-marketplace", icon: Package, tourId: "cocurated" },
   { title: "My Jobs", url: "/my-jobs", icon: Briefcase, authRequired: true },
   { title: "Browse Agents", url: "/browse-agents", icon: Users },
-  { title: "Creator Earnings", url: "/creator-dashboard", icon: DollarSign, authRequired: true },
-  { title: "Favorites", url: "/favorites", icon: Heart },
+  { title: "Creator Earnings", url: "/tiktok-lab/earnings", icon: DollarSign, authRequired: true },
   { title: "About", url: "/about", icon: Info },
 ];
 
@@ -113,21 +112,6 @@ export function AppSidebar() {
               )}
               {isAdmin && (
                 <>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <NavLink
-                        to="/commission-dashboard"
-                        className={({ isActive }) =>
-                          isActive
-                            ? "bg-accent/10 text-accent font-medium"
-                            : "hover:bg-muted/50"
-                        }
-                      >
-                        <DollarSign className="h-5 w-5" />
-                        {open && <span>Commission</span>}
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
                       <NavLink

@@ -21,7 +21,7 @@ const categories = [
 ];
 
 const popularRoutes = [
-  { path: '/dashboard', label: 'My Dashboard', icon: BookOpen },
+  { path: '/my-trip-requests', label: 'My Trip Requests', icon: BookOpen },
   { path: '/browse-agents', label: 'Browse Agents', icon: Briefcase },
   { path: '/cocurated-marketplace', label: 'CoCurated Packages', icon: Sparkles },
   { path: '/agent-onboarding', label: 'Become an Agent', icon: Users },

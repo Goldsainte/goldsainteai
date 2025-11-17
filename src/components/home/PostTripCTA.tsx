@@ -41,7 +41,7 @@ export function PostTripCTA() {
             <div className="flex flex-col gap-2 pt-2 md:flex-row md:items-center">
               <button
                 type="button"
-                onClick={() => navigate("/marketplace/request-trip")}
+                onClick={() => navigate("/post-trip")}
                 className="inline-flex items-center justify-center rounded-full bg-[#BFAD72] px-5 py-2 text-xs font-semibold text-[#0a2225] shadow-sm hover:bg-[#d4c58d]"
               >
                 <ArrowRightCircle className="mr-2 h-4 w-4" />

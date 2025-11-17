@@ -95,8 +95,8 @@ export default function TikTokLabStoryboardsPage() {
           ) : storyboards.length === 0 ? (
             <div className="rounded-3xl bg-white/90 border border-[#E5DFC6] p-8 text-center space-y-3">
               <ImageIcon className="h-10 w-10 mx-auto text-[#BFAD72]" />
-              <h2 className="text-[14px] font-semibold">No storyboards yet</h2>
-              <p className="text-[11px] text-[#4a4a4a] max-w-md mx-auto">
+              <h2 className="text-lg font-semibold">No storyboards yet</h2>
+              <p className="text-sm text-[#4a4a4a] max-w-md mx-auto">
                 Create your first storyboard from your existing travel content. Each storyboard
                 becomes a bookable trip template your audience can request.
               </p>
@@ -114,17 +114,17 @@ export default function TikTokLabStoryboardsPage() {
               {storyboards.map((storyboard) => (
                 <Link
                   key={storyboard.id}
-                  to={`/storyboards/${storyboard.id}`}
+                  to={`/tiktok-lab/storyboards/${storyboard.id}`}
                   className="group rounded-2xl bg-white/90 border border-[#E5DFC6] p-4 space-y-2 hover:border-[#BFAD72] transition-colors"
                 >
                   <div className="h-32 rounded-xl bg-gradient-to-br from-[#0a2225] to-[#0c4d47] flex items-center justify-center">
                     <ImageIcon className="h-8 w-8 text-[#BFAD72]/50" />
                   </div>
-                  <h3 className="text-[12px] font-semibold line-clamp-1">
+                  <h3 className="text-base font-semibold line-clamp-1">
                     {storyboard.title || 'Untitled storyboard'}
                   </h3>
                   {storyboard.description && (
-                    <p className="text-[10px] text-[#8D8D8D] line-clamp-2">
+                    <p className="text-xs text-[#8D8D8D] line-clamp-2">
                       {storyboard.description}
                     </p>
                   )}

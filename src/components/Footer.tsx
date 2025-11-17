@@ -30,7 +30,7 @@ export const Footer = () => {
             <AccordionContent>
               <ul className="space-y-3 text-sm text-muted-foreground">
                 <li><Link to="/help" className="hover:text-primary transition-colors">{t('footer.helpCenter')}</Link></li>
-                <li><Link to="/dashboard" className="hover:text-primary transition-colors">{t('footer.manageTrips')}</Link></li>
+                <li><Link to="/my-trip-requests" className="hover:text-primary transition-colors">{t('footer.manageTrips')}</Link></li>
                 <li><Link to="/messages" className="hover:text-primary transition-colors">{t('footer.contactCustomerService')}</Link></li>
                 <li><Link to="/trust-safety" className="hover:text-primary transition-colors">{t('footer.safetyResourceCenter')}</Link></li>
                 <li><Link to="/cancellation-refund-policy" className="hover:text-primary transition-colors">{t('footer.cancellationRefunds')}</Link></li>
@@ -45,7 +45,7 @@ export const Footer = () => {
               <ul className="space-y-3 text-sm text-muted-foreground">
                 <li><Link to="/browse-creators" className="hover:text-primary transition-colors">Creator Marketplace</Link></li>
                 <li><Link to="/tiktok-lab" className="hover:text-primary transition-colors">TikTok Travel Lab</Link></li>
-                <li><Link to="/cocurated-journeys" className="hover:text-primary transition-colors">{t('footer.cocuratedJourneys')}</Link></li>
+                <li><Link to="/tiktok-lab/storyboards" className="hover:text-primary transition-colors">{t('footer.storyboards')}</Link></li>
                 <li><Link to="/browse-agents" className="hover:text-primary transition-colors">{t('footer.travelAgentServices')}</Link></li>
                 <li><Link to="/cocurated-marketplace" className="hover:text-primary transition-colors">{t('footer.cocuratedPackages')}</Link></li>
                 <li><Link to="/marketplace" className="hover:text-primary transition-colors">{t('footer.marketplace')}</Link></li>
@@ -106,7 +106,7 @@ export const Footer = () => {
             <h4 className="font-semibold mb-4 text-base">{t('footer.support')}</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li><Link to="/help" className="hover:text-primary transition-colors">{t('footer.helpCenter')}</Link></li>
-              <li><Link to="/dashboard" className="hover:text-primary transition-colors">{t('footer.manageTrips')}</Link></li>
+              <li><Link to="/my-trip-requests" className="hover:text-primary transition-colors">{t('footer.manageTrips')}</Link></li>
               <li><Link to="/messages" className="hover:text-primary transition-colors">{t('footer.contactCustomerService')}</Link></li>
               <li><Link to="/trust-safety" className="hover:text-primary transition-colors">{t('footer.safetyResourceCenter')}</Link></li>
               <li><Link to="/cancellation-refund-policy" className="hover:text-primary transition-colors">{t('footer.cancellationRefunds')}</Link></li>
@@ -119,7 +119,7 @@ export const Footer = () => {
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li><Link to="/browse-creators" className="hover:text-primary transition-colors">Creator Marketplace</Link></li>
               <li><Link to="/tiktok-lab" className="hover:text-primary transition-colors">TikTok Travel Lab</Link></li>
-              <li><Link to="/cocurated-journeys" className="hover:text-primary transition-colors">{t('footer.cocuratedJourneys')}</Link></li>
+              <li><Link to="/tiktok-lab/storyboards" className="hover:text-primary transition-colors">{t('footer.storyboards')}</Link></li>
               <li><Link to="/browse-agents" className="hover:text-primary transition-colors">{t('footer.travelAgentServices')}</Link></li>
               <li><Link to="/cocurated-marketplace" className="hover:text-primary transition-colors">{t('footer.cocuratedPackages')}</Link></li>
               <li><Link to="/marketplace" className="hover:text-primary transition-colors">{t('footer.marketplace')}</Link></li>

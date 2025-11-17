@@ -6,7 +6,7 @@ import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CreditCard, Settings, Heart, Briefcase, ArrowLeft, MapPin, Globe, Phone, User, Mail, Share2, LayoutDashboard, ArrowUpRight } from "lucide-react";
+import { CreditCard, Settings, Sparkles, Briefcase, ArrowLeft, MapPin, Globe, Phone, User, Mail, Share2, LayoutDashboard, ArrowUpRight } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { EditProfileDialog } from "@/components/EditProfileDialog";
@@ -160,7 +160,7 @@ export default function Profile() {
           <div className="grid grid-cols-3 gap-2">
             <Button
               variant="secondary"
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/traveler')}
               className="w-full"
             >
               <LayoutDashboard className="h-4 w-4 mr-2" />
@@ -234,9 +234,9 @@ export default function Profile() {
               <CardTitle>Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <Button onClick={() => navigate('/favorites')} variant="outline" className="w-full justify-start gap-2">
-                <Heart className="h-4 w-4" />
-                View Favorites
+              <Button onClick={() => navigate('/my-trip-requests')} variant="outline" className="w-full justify-start gap-2">
+                <Sparkles className="h-4 w-4" />
+                View Trip Requests
               </Button>
               <Button onClick={() => navigate('/my-trips')} variant="outline" className="w-full justify-start gap-2">
                 <MapPin className="h-4 w-4" />

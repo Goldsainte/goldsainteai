@@ -170,6 +170,7 @@
     "discover": "اكتشف",
     "journeys": "رحلات",
     "cocuratedJourneys": "رحلات CoCurated",
+    "storyboards": "Storyboards",
     "browseCreators": "تصفح المبدعين",
     "browseAgents": "تصفح الوكلاء",
     "marketplace": "السوق",
@@ -180,7 +181,7 @@
     "shop": "المتجر",
     "affiliateLinks": "روابط الشركاء",
     "company": "الشركة",
-    "subscription": "الاشتراك",
+    "concierge": "Concierge",
     "about": "عن"
   },
   "footer": {
@@ -193,6 +194,7 @@
     "discover": "اكتشف",
     "journeys": "رحلات",
     "cocuratedJourneys": "رحلات CoCurated",
+    "storyboards": "Storyboards",
     "seasonalDeals": "عروض الموسم والعطلات",
     "travelAgentServices": "خدمات وكيل السفر",
     "cocuratedPackages": "حزم CoCurated",

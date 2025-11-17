@@ -170,6 +170,7 @@
     "discover": "発見",
     "journeys": "ジャーニー",
     "cocuratedJourneys": "CoCuratedジャーニー",
+    "storyboards": "Storyboards",
     "browseCreators": "クリエイターを閲覧",
     "browseAgents": "エージェントを閲覧",
     "marketplace": "マーケットプレイス",
@@ -180,7 +181,7 @@
     "shop": "ショップ",
     "affiliateLinks": "アフィリエイトリンク",
     "company": "会社",
-    "subscription": "サブスクリプション",
+    "concierge": "Concierge",
     "about": "について"
   },
   "footer": {
@@ -193,6 +194,7 @@
     "discover": "発見",
     "journeys": "ジャーニー",
     "cocuratedJourneys": "CoCuratedジャーニー",
+    "storyboards": "Storyboards",
     "seasonalDeals": "季節と休日のお得情報",
     "travelAgentServices": "旅行エージェントサービス",
     "cocuratedPackages": "CoCuratedパッケージ",

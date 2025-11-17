@@ -83,7 +83,7 @@ export async function getStoryboardPublicBySlugOrId(
   slugOrId: string
 ): Promise<StoryboardPublic | null> {
   // Try slug first
-  let { data, error } = await supabase
+  const { data: slugData, error } = await supabase
     .from("storyboards")
     .select(
       `
@@ -98,6 +98,8 @@ export async function getStoryboardPublicBySlugOrId(
     )
     .eq("slug", slugOrId)
     .maybeSingle();
+
+  let data = slugData;
 
   if (error) {
     console.error("Error loading storyboard by slug", error);

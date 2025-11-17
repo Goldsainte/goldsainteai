@@ -16,16 +16,14 @@ export const siteRoutes: RouteInfo[] = [
   { path: '/onboarding', label: 'Onboarding', description: 'First-time user setup', category: 'core', requiresAuth: true },
   { path: '/ai-agent-setup', label: 'AI Agent Setup', description: 'Configure your personal AI agent', category: 'core', requiresAuth: true },
   { path: '/profile', label: 'Profile', description: 'Your account profile', category: 'core', requiresAuth: true },
-  { path: '/dashboard', label: 'Dashboard', description: 'View bookings, favorites, and preferences', category: 'core', requiresAuth: true },
   { path: '/billing-dashboard', label: 'Billing', description: 'View billing history and manage payments', category: 'core', requiresAuth: true },
   { path: '/messages', label: 'Messages', description: 'Chat with agents and support', category: 'core', requiresAuth: true },
   
   // Booking & Travel
   { path: '/search-results', label: 'Search Results', description: 'Browse search results', category: 'booking' },
-  { path: '/hotel-booking', label: 'Hotel Booking', description: 'Book a hotel', category: 'booking' },
+  { path: '/post-trip', label: 'Post Trip', description: 'Share your dream trip with the marketplace', category: 'booking', requiresAuth: true },
   { path: '/booking-confirmation', label: 'Booking Confirmation', description: 'Confirm your booking', category: 'booking', requiresAuth: true },
   { path: '/my-trips', label: 'My Trips', description: 'View your trips', category: 'booking', requiresAuth: true },
-  { path: '/collections', label: 'Collections', description: 'Saved collections', category: 'booking', requiresAuth: true },
   
   // Creator & TikTok Ecosystem (formerly Social / Journeys)
   // Legacy internal social feed routes - DISABLED
@@ -46,7 +44,7 @@ export const siteRoutes: RouteInfo[] = [
   
   // CoCurated
   { path: '/cocurated-marketplace', label: 'CoCurated Marketplace', description: 'Expertly designed travel packages', category: 'cocurated' },
-  { path: '/cocurated-journeys', label: 'CoCurated Journeys', description: 'CoCurated content feed', category: 'cocurated' },
+  { path: '/tiktok-lab/storyboards', label: 'Storyboards', description: 'Manage collaborative trip storyboards', category: 'cocurated', requiresAuth: true },
   { path: '/cocurated-dashboard', label: 'CoCurated Dashboard', description: 'Manage your packages', category: 'cocurated', requiresAuth: true },
   { path: '/cocurated-create', label: 'Create Package', description: 'Create a new CoCurated package', category: 'cocurated', requiresAuth: true },
   
@@ -63,7 +61,6 @@ export const siteRoutes: RouteInfo[] = [
   // Commerce
   { path: '/shop', label: 'Shop', description: 'Browse products', category: 'commerce' },
   { path: '/affiliate-manager', label: 'Affiliate Manager', description: 'Manage affiliate links', category: 'commerce', requiresAuth: true },
-  { path: '/commission-dashboard', label: 'Commission Dashboard', description: 'View earnings', category: 'commerce', requiresAuth: true },
   
   // Transportation Vendors
   { path: '/transportation-vendor-partners', label: 'Vendor Partners', description: 'Transportation vendor info', category: 'marketplace' },

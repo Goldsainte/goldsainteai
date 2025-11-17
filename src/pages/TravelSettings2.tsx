@@ -3,11 +3,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { 
-  ChevronLeft, 
+import {
+  ChevronLeft,
   ChevronRight,
   UserCircle,
-  Bookmark,
   Archive,
   Activity,
   Bell,
@@ -18,7 +17,8 @@ import {
   Ban,
   MapPin,
   Loader2,
-  Music2
+  Music2,
+  Sparkles
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
@@ -123,9 +123,10 @@ const TravelSettings2 = () => {
           </div>
 
           <SettingsItem
-            icon={Bookmark}
-            title="Saved"
-            onClick={() => navigate('/favorites')}
+            icon={Sparkles}
+            title="Trip requests"
+            description="Review the briefs you've shared with Madison"
+            onClick={() => navigate('/my-trip-requests')}
           />
           <SettingsItem
             icon={Archive}
@@ -167,8 +168,9 @@ const TravelSettings2 = () => {
 
           <SettingsItem
             icon={Grid2X2}
-            title="Crossposting"
-            onClick={() => navigate('/crossposting-settings')}
+            title="Storyboards"
+            description="Manage collaborative trip templates in TikTok Lab"
+            onClick={() => navigate('/tiktok-lab/storyboards')}
           />
         </div>
 

@@ -34,8 +34,8 @@ export default function RestaurantDetail() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <h2 className="font-secondary text-2xl mb-4">Restaurant not found</h2>
-          <Button onClick={() => navigate('/fine-dining')}>
-            Back to Restaurants
+          <Button onClick={() => navigate('/tiktok-lab/storyboards')}>
+            Back to Storyboards
           </Button>
         </div>
       </div>
@@ -48,7 +48,7 @@ export default function RestaurantDetail() {
       <header className="border-b bg-white sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <button
-            onClick={() => navigate('/fine-dining')}
+            onClick={() => navigate('/post-trip')}
             className="flex items-center gap-2 text-luxury-emerald hover:text-luxury-emerald/80"
           >
             <ArrowLeft className="h-5 w-5" />

@@ -292,7 +292,7 @@ function StoryboardsPanel() {
           Create a storyboard
         </Link>
         <Link
-          to="/storyboards"
+          to="/tiktok-lab/storyboards"
           className="inline-flex items-center gap-2 rounded-2xl bg-[#f7f3ea] border border-[#E5DFC6] text-[10px] px-3 py-1.5"
         >
           See public wall
