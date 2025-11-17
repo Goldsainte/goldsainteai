@@ -19,7 +19,7 @@ export function HomeHero() {
           </div>
 
           <h1 className="font-display text-[28px] leading-snug md:text-[34px]">
-            Where inspiration becomes a storyboard — and the perfect creator + agent
+            Where <em>inspiration</em> becomes a <em>storyboard</em> — and the perfect <em>creator + agent</em>{" "}
             team builds the trip.
           </h1>
 
