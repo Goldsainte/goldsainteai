@@ -7795,6 +7795,7 @@ export type Database = {
           id: string
           owner_id: string
           owner_role: string | null
+          related_concierge_session_id: string | null
           related_trip_proposal_id: string | null
           related_trip_request_id: string | null
           slug: string | null
@@ -7820,6 +7821,7 @@ export type Database = {
           id?: string
           owner_id: string
           owner_role?: string | null
+          related_concierge_session_id?: string | null
           related_trip_proposal_id?: string | null
           related_trip_request_id?: string | null
           slug?: string | null
@@ -7845,6 +7847,7 @@ export type Database = {
           id?: string
           owner_id?: string
           owner_role?: string | null
+          related_concierge_session_id?: string | null
           related_trip_proposal_id?: string | null
           related_trip_request_id?: string | null
           slug?: string | null
@@ -7856,6 +7859,13 @@ export type Database = {
           visibility?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "storyboards_related_concierge_session_id_fkey"
+            columns: ["related_concierge_session_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_sessions"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "storyboards_related_trip_proposal_id_fkey"
             columns: ["related_trip_proposal_id"]

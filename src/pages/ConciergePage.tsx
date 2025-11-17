@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { MADISON_NAME, MADISON_PLANNER_INTRO } from "@/lib/madisonPersona";
 import { Loader2, Send, Plane, Sparkles, LayoutTemplate } from "lucide-react";
+import { StartStoryboardFromChat } from "@/components/concierge/StartStoryboardFromChat";
 
 type Message = {
   id: string;
@@ -13,6 +14,7 @@ type Message = {
 
 export default function ConciergePage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -27,15 +29,24 @@ export default function ConciergePage() {
         return;
       }
 
-      // Load or create latest session
-      const { data: existing } = await supabase
-        .from("concierge_sessions")
-        .select("id")
-        .eq("user_id", user.id)
-        .order("last_active_at", { ascending: false })
-        .limit(1);
+      // Check if sessionId was passed from voice widget
+      const params = new URLSearchParams(location.search);
+      const fromSession = params.get("sessionId");
 
-      let sid = existing?.[0]?.id;
+      let sid = fromSession;
+
+      // If no session passed, load or create latest session
+      if (!sid) {
+        const { data: existing } = await supabase
+          .from("concierge_sessions")
+          .select("id")
+          .eq("user_id", user.id)
+          .order("last_active_at", { ascending: false })
+          .limit(1);
+
+        sid = existing?.[0]?.id;
+      }
+
       if (!sid) {
         const { data: created, error } = await supabase
           .from("concierge_sessions")
@@ -210,24 +221,45 @@ export default function ConciergePage() {
                 begin shaping it together.
               </p>
             ) : (
-              messages.map((m) => (
-                <div
-                  key={m.id}
-                  className={`flex ${
-                    m.role === "assistant" ? "justify-start" : "justify-end"
-                  }`}
-                >
+              messages.map((m, idx) => {
+                const isAssistant = m.role === "assistant";
+                const lastAssistantIndex = messages.reduce(
+                  (lastIdx, msg, i) => (msg.role === "assistant" ? i : lastIdx),
+                  -1
+                );
+                const isLastAssistant = isAssistant && idx === lastAssistantIndex;
+
+                return (
                   <div
-                    className={`max-w-[80%] rounded-2xl px-3 py-2 ${
-                      m.role === "assistant"
-                        ? "bg-[#f7f3ea] text-[#0a2225]"
-                        : "bg-[#0c4d47] text-[#E5DFC6]"
+                    key={m.id}
+                    className={`flex ${
+                      m.role === "assistant" ? "justify-start" : "justify-end"
                     }`}
                   >
-                    {m.content}
+                    <div
+                      className={`max-w-[80%] rounded-2xl px-3 py-2 ${
+                        m.role === "assistant"
+                          ? "bg-[#f7f3ea] text-[#0a2225]"
+                          : "bg-[#0c4d47] text-[#E5DFC6]"
+                      }`}
+                    >
+                      {m.content}
+
+                      {isLastAssistant && sessionId && (
+                        <div className="pt-2 border-t border-[#E5DFC6]/60 mt-2">
+                          <p className="mb-1 text-[10px] text-[#4a4a4a]">
+                            Ready to see this as a visual plan?
+                          </p>
+                          <StartStoryboardFromChat
+                            sessionId={sessionId}
+                            ownerRole="traveler"
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
 
