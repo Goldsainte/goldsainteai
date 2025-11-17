@@ -41,6 +41,7 @@ serve(async (req) => {
       headers: {
         "Content-Type": "application/json",
         "Accept": "application/json;version=2.0",
+        "Accept-Language": "en-US",
         "exp-api-key": VIATOR_API_KEY,
       },
       body: JSON.stringify(body),
