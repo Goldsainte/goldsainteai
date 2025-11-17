@@ -29,6 +29,13 @@ const steps = [
     body: "Share your agency details, contract markets and sweet-spot budgets. Receive traveler and creator-led concepts that match your strengths. Build bookable itineraries, manage bookings and track payouts in one console.",
     pill: "Travel Agents",
   },
+  {
+    k: "ai-matching",
+    label: "AI matching",
+    title: "Find your perfect match, instantly.",
+    body: "Share your destination, dates, and travel style. Our AI scores thousands of creator and agent profiles in seconds, surfacing only those whose expertise, aesthetic, and markets align with your vision. No endless scrolling—just curated matches, ready to collaborate.",
+    pill: "AI Matching",
+  },
 ];
 
 const collageImages = [
