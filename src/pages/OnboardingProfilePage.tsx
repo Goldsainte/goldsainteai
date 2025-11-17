@@ -107,6 +107,25 @@ export default function OnboardingProfilePage() {
 
       if (upsertError) throw upsertError;
 
+      // Phase 2: Insert role into secure user_roles table
+      const roleMapping = {
+        'traveler': 'user' as const,
+        'creator': 'brand' as const,
+        'agent': 'agent' as const,
+      };
+
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .insert({
+          user_id: user.id,
+          role: roleMapping[accountType],
+        });
+
+      if (roleError && roleError.code !== '23505') {
+        // Ignore duplicate key errors (user already has this role)
+        console.error('Failed to set user role:', roleError);
+      }
+
       await supabase.auth.updateUser({
         data: { account_type: accountType },
       });
