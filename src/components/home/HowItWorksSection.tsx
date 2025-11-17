@@ -1,4 +1,11 @@
 // src/components/home/HowItWorksSection.tsx
+import treehouseImg from "@/assets/austin-distel-riQNJpiaGgE-unsplash.jpeg";        // hammock / jungle
+import resortPoolImg from "@/assets/christian-lambert-vmIWr0NnpCQ-unsplash.jpeg";   // resort pool
+import snowTreeImg from "@/assets/nicolas-meunier-WKGmcxLdXC4-unsplash.jpeg";       // snow & tree
+import landRoverImg from "@/assets/alexandre-barbosa-2V5Gq6Y95Ao-unsplash.jpeg";    // group + Land Rover
+import snowyTravelerImg from "@/assets/erik-mclean-sG_rwogcBCw-unsplash.jpg";       // traveler in snow
+import friendsHikeImg from "@/assets/felix-rostig-UmV2wr-Vbq8-unsplash.jpeg";       // friends hiking
+import infinityPoolImg from "@/assets/maximilien-t-scharner-FD0Ga_KJTwM-unsplash.jpeg"; // infinity pool
 
 const steps = [
   {
@@ -31,13 +38,23 @@ const steps = [
   },
 ];
 
+const collageImages = [
+  treehouseImg,
+  infinityPoolImg,
+  resortPoolImg,
+  friendsHikeImg,
+  landRoverImg,
+  snowTreeImg,
+  snowyTravelerImg,
+];
+
 
 export function HowItWorksSection() {
   return (
     <section className="bg-[#f7f3ea] py-16 md:py-20">
-      <div className="mx-auto max-w-4xl px-4">
+      <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 md:flex-row md:items-start">
         {/* LEFT: copy + steps */}
-        <div className="w-full space-y-6">
+        <div className="w-full md:w-[52%] space-y-6">
           <p className="text-[11px] uppercase tracking-[0.18em] text-[#8D8D8D]">
             Elevated travel, made simple
           </p>
@@ -89,6 +106,36 @@ export function HowItWorksSection() {
           <div className="pt-4 text-[11px] text-[#8D8D8D]">
             All communication and payments stay inside Goldsainte. No phone
             numbers, no side deals — just beautifully organized trips.
+          </div>
+        </div>
+
+        {/* RIGHT: elevated collage */}
+        <div className="w-full md:w-[48%]">
+          <div className="relative mx-auto max-w-md">
+            {/* subtle frame */}
+            <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-[32px] border border-[#E5DFC6]/70" />
+            <div className="relative overflow-hidden rounded-[32px] bg-white/90 p-3">
+              <div className="columns-2 gap-3 space-y-3">
+                {collageImages.map((src, i) => (
+                  <img
+                    key={i}
+                    src={src}
+                    alt="Goldsainte travel inspiration"
+                    className="w-full rounded-2xl object-cover"
+                  />
+                ))}
+              </div>
+              <div className="mt-4 rounded-2xl bg-[#0c4d47] px-4 py-3 text-[11px] text-[#E5DFC6]">
+                <p className="font-semibold mb-1">
+                  Every trip begins with a storyboard.
+                </p>
+                <p className="text-[10px] text-[#E5DFC6]/90">
+                  Creators curate scenes like these; agents turn them into a
+                  bookable itinerary — flights, suites, drivers, dinners. You
+                  see the trip before you ever click "Book".
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
