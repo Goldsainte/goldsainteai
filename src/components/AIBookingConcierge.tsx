@@ -31,6 +31,7 @@ import { VoiceStatusChip } from "./concierge/VoiceStatusChip";
 import { VoiceStatusMessage } from "./concierge/VoiceStatusMessage";
 import { ResultCards } from "./concierge/ResultCards";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { StartStoryboardFromChat } from "./concierge/StartStoryboardFromChat";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -43,6 +44,7 @@ export const AIBookingConcierge = () => {
   const [isMinimized, setIsMinimized] = useState(false);
   const [agentProfile, setAgentProfile] = useState<any>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [voiceMode, setVoiceMode] = useState(false);
@@ -212,6 +214,45 @@ export const AIBookingConcierge = () => {
     loadAgentProfile();
   }, [user]);
 
+  // Initialize or load concierge session
+  useEffect(() => {
+    if (!isOpen || sessionId) return;
+    
+    const initSession = async () => {
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) return;
+      
+      // Try to load existing session
+      const { data: existing } = await supabase
+        .from('concierge_sessions')
+        .select('id')
+        .eq('user_id', currentUser.id)
+        .eq('mode', 'voice')
+        .order('last_active_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (existing?.id) {
+        setSessionId(existing.id);
+      } else {
+        // Create new session
+        const { data: created } = await supabase
+          .from('concierge_sessions')
+          .insert({
+            user_id: currentUser.id,
+            mode: 'voice',
+            title: 'Chat with Madison'
+          })
+          .select('id')
+          .single();
+        
+        if (created) setSessionId(created.id);
+      }
+    };
+    
+    initSession();
+  }, [isOpen, sessionId]);
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -360,6 +401,15 @@ export const AIBookingConcierge = () => {
       // Add placeholder for assistant message
       setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
 
+      // Persist user message to database if we have a session
+      if (sessionId) {
+        await supabase.from('concierge_messages').insert({
+          session_id: sessionId,
+          role: 'user',
+          content: userMessage
+        });
+      }
+
       const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-booking-concierge`;
       console.log('[AIBookingConcierge] Calling edge function:', CHAT_URL);
       
@@ -401,16 +451,27 @@ export const AIBookingConcierge = () => {
       const data = await resp.json();
       console.log('[AIBookingConcierge] Response data:', data);
       
+      const assistantContent = data.content || data.message || "I apologize, I encountered an issue. Please try again.";
+      
       // Update assistant message with response
       setMessages(prev => {
         const newMessages = [...prev];
         newMessages[newMessages.length - 1] = {
           ...newMessages[newMessages.length - 1],
-          content: data.content || data.message || "I apologize, I encountered an issue. Please try again.",
+          content: assistantContent,
           toolResults: Array.isArray(data.toolResults) ? data.toolResults : []
         };
         return newMessages;
       });
+
+      // Persist assistant message to database if we have a session
+      if (sessionId) {
+        await supabase.from('concierge_messages').insert({
+          session_id: sessionId,
+          role: 'assistant',
+          content: assistantContent
+        });
+      }
 
       saveConversationData();
     } catch (error) {
@@ -1301,30 +1362,53 @@ export const AIBookingConcierge = () => {
                 <VoiceStatusMessage status="listening" />
               )}
 
-              {messages.map((msg, idx) => (
-                <div key={idx} className="w-full">
-                  <div
-                    className={`flex gap-1.5 sm:gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                  >
-                    {msg.role === 'assistant' && (
-                      <div className="flex-shrink-0">
-                        <img 
-                          src={logomark} 
-                          alt="Goldsainte" 
-                          className="w-5 h-5 sm:w-6 sm:h-6 object-contain rounded-full bg-gradient-to-br from-primary to-accent p-0.5 sm:p-1"
-                        />
+              {messages.map((msg, idx) => {
+                const isAssistant = msg.role === 'assistant';
+                // Find if this is the last assistant message
+                const laterAssistantExists = messages.slice(idx + 1).some(m => m.role === 'assistant');
+                const isLastAssistant = isAssistant && !laterAssistantExists;
+                
+                return (
+                  <div key={idx} className="w-full">
+                    <div
+                      className={`flex gap-1.5 sm:gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      {msg.role === 'assistant' && (
+                        <div className="flex-shrink-0">
+                          <img 
+                            src={logomark} 
+                            alt="Goldsainte" 
+                            className="w-5 h-5 sm:w-6 sm:h-6 object-contain rounded-full bg-gradient-to-br from-primary to-accent p-0.5 sm:p-1"
+                          />
+                        </div>
+                      )}
+                      <div
+                        className={`max-w-[80%] sm:max-w-[75%] break-words rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 ${
+                          msg.role === 'user'
+                            ? 'bg-gradient-to-r from-primary to-accent text-primary-foreground'
+                            : 'bg-muted text-foreground'
+                        }`}
+                      >
+                        <p className="text-[11px] sm:text-xs md:text-sm whitespace-pre-wrap break-words leading-relaxed">{msg.content}</p>
+                      </div>
+                    </div>
+                    
+                    {/* Add storyboard CTA after last assistant message */}
+                    {isLastAssistant && sessionId && msg.content && (
+                      <div className="mt-2 ml-7 sm:ml-8 pt-2 border-t border-border/40">
+                        <p className="text-[10px] text-muted-foreground/80 mb-2">
+                          Want me to open a storyboard with these ideas?
+                        </p>
+                        <StartStoryboardFromChat sessionId={sessionId} ownerRole="traveler" />
+                        
+                        <button
+                          onClick={() => navigate(`/concierge?sessionId=${sessionId}`)}
+                          className="mt-2 text-[10px] text-primary underline underline-offset-2 hover:text-primary/80"
+                        >
+                          Open full trip planner →
+                        </button>
                       </div>
                     )}
-                    <div
-                      className={`max-w-[80%] sm:max-w-[75%] break-words rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 ${
-                        msg.role === 'user'
-                          ? 'bg-gradient-to-r from-primary to-accent text-primary-foreground'
-                          : 'bg-muted text-foreground'
-                      }`}
-                    >
-                      <p className="text-[11px] sm:text-xs md:text-sm whitespace-pre-wrap break-words leading-relaxed">{msg.content}</p>
-                    </div>
-                  </div>
                   
                   {/* Display tool results */}
                   {msg.toolResults && msg.toolResults.length > 0 && msg.toolResults.map((result, resultIdx) => {
@@ -1485,7 +1569,8 @@ export const AIBookingConcierge = () => {
                     return null;
                   })}
                 </div>
-              ))}
+              );
+            })}
               {isLoading && (
                 <div className="flex justify-start gap-1.5 sm:gap-2">
                   <div className="flex-shrink-0">
