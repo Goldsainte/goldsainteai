@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Heart, User, Menu, Hotel, Plane, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info, Crown, CreditCard, PlaneTakeoff, HandCoins } from "lucide-react";
-import { NotificationBell } from '@/components/NotificationBell';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 import CreateContentSheet from "@/components/CreateContentSheet";
 import ContentUploadModal from "@/components/ContentUploadModal";
 import { CreateMomentModal } from "@/components/CreateMomentModal";
