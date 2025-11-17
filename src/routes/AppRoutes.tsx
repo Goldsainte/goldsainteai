@@ -19,6 +19,8 @@ const Profile = lazy(() => import('@/pages/Profile'));
 const AdminDashboardPage = lazy(() => import('@/pages/admin/AdminDashboardPage'));
 const AdminSafetyDashboardPage = lazy(() => import('@/pages/admin/AdminSafetyDashboardPage'));
 const AdminAgentsPage = lazy(() => import('@/pages/admin/AdminAgentsPage'));
+const AdminHomePage = lazy(() => import('@/pages/admin/AdminHomePage'));
+const AgentPublicProfilePage = lazy(() => import('@/pages/agents/AgentPublicProfilePage'));
 const TravelProfileRedirect = lazy(() => import('@/pages/redirects/TravelProfileRedirectPage'));
 const ExplorePage = lazy(() => import('@/pages/ExplorePage'));
 const ReelsViewer = lazy(() => import('@/pages/ReelsViewer'));
@@ -163,6 +165,7 @@ export const AppRoutes = () => (
       <Route index element={<HomePage />} />
       <Route path="/about" element={<About />} />
       <Route path="/creators" element={<CreatorsPage />} />
+      <Route path="/agents/:id" element={<AgentPublicProfilePage />} />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/what-we-do" element={<WhatWeDo />} />
       <Route path="/dispute-resolution" element={<DisputeResolution />} />
@@ -364,9 +367,8 @@ export const AppRoutes = () => (
     </Route>
 
     <Route element={<AdminLayout />}>
-      <Route path="/admin" element={<Admin />} />
+      <Route path="/admin" element={<AdminHomePage />} />
       <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
-      <Route path="/admin" element={<AdminDashboardPage />} />
       <Route path="/admin/safety" element={<AdminSafetyDashboardPage />} />
       <Route path="/admin/agents" element={<AdminAgentsPage />} />
       <Route path="/admin/cancellations" element={<AdminCancellations />} />
