@@ -33,7 +33,8 @@ serve(async (req) => {
       searchTerm: q,
       destId: location,
       topX: "1-20",
-      sortOrder: "REVIEW_AVG_RATING_D"
+      sortOrder: "REVIEW_AVG_RATING_D",
+      currency: "USD"
     };
 
     const response = await fetch(viatorUrl, {
@@ -50,7 +51,17 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Viator API error:", response.status, errorText);
-      throw new Error(`Viator API error: ${response.status}`);
+      
+      let errorMessage = `Viator API error: ${response.status}`;
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorMessage = errorJson.message || errorMessage;
+      } catch {}
+      
+      return new Response(
+        JSON.stringify({ error: errorMessage }),
+        { status: response.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const data = await response.json();

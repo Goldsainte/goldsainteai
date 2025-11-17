@@ -48,6 +48,7 @@ export function StoryboardBuilder({
   const [experienceResults, setExperienceResults] = useState<ViatorProduct[]>([]);
   const [saving, setSaving] = useState(false);
   const [linkInput, setLinkInput] = useState("");
+  const [searchError, setSearchError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!storyboardId) return;
@@ -57,6 +58,7 @@ export function StoryboardBuilder({
   async function runSearch() {
     if (!search.trim()) return;
     setLoadingSearch(true);
+    setSearchError(null);
 
     try {
       if (activeTab === "photos") {
@@ -65,6 +67,7 @@ export function StoryboardBuilder({
         });
         
         if (error) throw error;
+        if (data?.error) throw new Error(data.error);
         setPhotoResults(data?.results || []);
       } else if (activeTab === "experiences") {
         const { data, error } = await supabase.functions.invoke("viator-search", {
@@ -72,10 +75,12 @@ export function StoryboardBuilder({
         });
         
         if (error) throw error;
+        if (data?.error) throw new Error(data.error);
         setExperienceResults(data?.results || []);
       }
     } catch (error) {
       console.error("Search error:", error);
+      setSearchError(error instanceof Error ? error.message : "Search failed. Please try again.");
     } finally {
       setLoadingSearch(false);
     }
@@ -275,10 +280,22 @@ export function StoryboardBuilder({
         </div>
       )}
 
+      {searchError && (
+        <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-800">
+          {searchError}
+        </div>
+      )}
+
       {/* Results area */}
       {activeTab === "photos" && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-          {photoResults.map((p) => (
+        <>
+          {photoResults.length === 0 && !loadingSearch && search && !searchError && (
+            <p className="mb-4 py-8 text-center text-sm text-muted-foreground">
+              No photos found. Try a different search term.
+            </p>
+          )}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+            {photoResults.map((p) => (
             <button
               key={p.id}
               type="button"
@@ -297,12 +314,19 @@ export function StoryboardBuilder({
               </div>
             </button>
           ))}
-        </div>
+          </div>
+        </>
       )}
 
       {activeTab === "experiences" && (
-        <div className="grid gap-3 mb-4">
-          {experienceResults.map((ex, idx) => (
+        <>
+          {experienceResults.length === 0 && !loadingSearch && search && !searchError && (
+            <p className="mb-4 py-8 text-center text-sm text-muted-foreground">
+              No experiences found. Try a different search term or destination.
+            </p>
+          )}
+          <div className="grid gap-3 mb-4">
+            {experienceResults.map((ex, idx) => (
             <button
               key={ex.productCode || idx}
               type="button"
@@ -331,7 +355,8 @@ export function StoryboardBuilder({
               </div>
             </button>
           ))}
-        </div>
+          </div>
+        </>
       )}
 
       {activeTab === "links" && (
