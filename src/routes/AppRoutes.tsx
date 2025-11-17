@@ -61,6 +61,7 @@ const MarketplaceGuidelinesPage = lazy(() => import('@/pages/MarketplaceGuidelin
 const HomePage = lazy(() => import('@/pages/HomePage'));
 const MyBookingsPage = lazy(() => import('@/pages/MyBookingsPage'));
 const PartnerBookingsPage = lazy(() => import('@/pages/PartnerBookingsPage'));
+const BookingDetailPage = lazy(() => import('@/pages/bookings/BookingDetailPage'));
 const BookingPreferencesRedirect = lazy(() => import('@/pages/redirects/BookingPreferencesRedirect'));
 const FavoritesRedirect = lazy(() => import('@/pages/redirects/FavoritesRedirect'));
 const EmailPreview = lazy(() => import('@/pages/EmailPreview'));
@@ -83,7 +84,6 @@ const CreatorProfilePage = lazy(() => import('@/pages/CreatorProfilePage'));
 const NewCollabRequestPage = lazy(() => import('@/pages/NewCollabRequestPage'));
 const Messages = lazy(() => import('@/pages/Messages'));
 const PriceAlerts = lazy(() => import('@/pages/PriceAlerts'));
-const BookingDetailPage = lazy(() => import('@/pages/BookingDetailPage'));
 const TravelerDashboardPage = lazy(() => import('@/pages/traveler/TravelerDashboardPage'));
 const PartnerConsolePage = lazy(() => import('@/pages/partner/PartnerConsolePage'));
 const MyJobs = lazy(() => import('@/pages/MyJobs'));
@@ -252,7 +252,7 @@ export const AppRoutes = () => (
       <Route path="/creators" element={<BrowseCreators />} />
       <Route path="/my-bookings" element={<MyBookingsPage />} />
       <Route path="/partner-bookings" element={<PartnerBookingsPage />} />
-      <Route path="/booking/:id" element={<BookingDetailPage />} />
+      <Route path="/bookings/:bookingId" element={<BookingDetailPage />} />
       <Route path="/traveler" element={<TravelerDashboardPage />} />
       <Route path="/partner" element={<PartnerConsolePage />} />
       <Route path="/agent/:agentId" element={<AgentProfile />} />
