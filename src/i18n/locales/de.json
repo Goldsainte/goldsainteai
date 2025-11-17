@@ -149,6 +149,21 @@
       "subtitle": "Treten Sie unserem Netzwerk bei und verdienen Sie Provisionen für Luxusreisebuchungen",
       "apply": "Jetzt Bewerben",
       "browse": "Agenten Durchsuchen"
+    },
+    "gallery": {
+      "beachEscapes": "Beach Escapes",
+      "beachSubtitle": "Luxury beachfront properties",
+      "cityRetreats": "City Retreats",
+      "citySubtitle": "Urban luxury hotels",
+      "desertOases": "Desert Oases",
+      "desertSubtitle": "Exclusive desert resorts"
+    },
+    "hotelSections": {
+      "europeTitle": "Most popular hotels in Europe",
+      "usTitle": "Most popular hotels in US"
+    },
+    "restaurantSections": {
+      "usTitle": "Fine Dining Across America"
     }
   },
   "navigation": {

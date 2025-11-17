@@ -149,6 +149,21 @@
       "subtitle": "Junte-se à nossa rede e ganhe comissões em reservas de viagens de luxo",
       "apply": "Candidatar-se Agora",
       "browse": "Navegar Agentes"
+    },
+    "gallery": {
+      "beachEscapes": "Beach Escapes",
+      "beachSubtitle": "Luxury beachfront properties",
+      "cityRetreats": "City Retreats",
+      "citySubtitle": "Urban luxury hotels",
+      "desertOases": "Desert Oases",
+      "desertSubtitle": "Exclusive desert resorts"
+    },
+    "hotelSections": {
+      "europeTitle": "Most popular hotels in Europe",
+      "usTitle": "Most popular hotels in US"
+    },
+    "restaurantSections": {
+      "usTitle": "Fine Dining Across America"
     }
   },
   "navigation": {

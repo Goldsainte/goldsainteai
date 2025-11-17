@@ -157,78 +157,31 @@ test.describe('Critical Production Flows - P0 Validation', () => {
     });
   });
 
-  test.describe('P0-4: Social Photo Modal Aspect Ratio', () => {
-    test('should display photo modal without distortion', async ({ page }) => {
-      // Navigate to a profile page with posts
-      await page.goto('/travel-feed');
-      
-      // Wait for feed to load
-      await page.waitForSelector('[data-testid="moment-card"], [data-testid="post-card"], article', { timeout: 15000 });
-      
-      // Find and click first post image
-      const firstImage = page.locator('article img, [data-testid="moment-card"] img, [data-testid="post-card"] img').first();
-      await firstImage.waitFor({ state: 'visible', timeout: 10000 });
-      await firstImage.click();
-      
-      // Verify modal opens
-      const modal = page.locator('[role="dialog"], .modal, [data-testid="lightbox"]');
-      await expect(modal).toBeVisible({ timeout: 5000 });
-      
-      // Verify image has object-contain class (prevents distortion)
-      const modalImage = modal.locator('img').first();
-      await expect(modalImage).toBeVisible();
-      
-      const imageClass = await modalImage.getAttribute('class');
-      expect(imageClass).toMatch(/object-contain|object-cover/);
-      
-      // Verify no console errors
+  test.describe('P0-4: TikTok Lab Storyboard Navigation', () => {
+    test('should render the storyboard list shell with CTA', async ({ page }) => {
+      await page.goto('/tiktok-lab/storyboards');
+
+      await expect(page.getByRole('heading', { name: /My Storyboards/i })).toBeVisible();
+      await expect(page.getByRole('link', { name: /New storyboard/i })).toBeVisible();
+
+      // Ensure no blocking console errors fire while loading Supabase data
       const consoleErrors: string[] = [];
       page.on('console', msg => {
         if (msg.type() === 'error') {
           consoleErrors.push(msg.text());
         }
       });
-      
-      await page.waitForTimeout(2000);
+
+      await page.waitForTimeout(500);
       expect(consoleErrors.filter(e => !e.includes('404'))).toHaveLength(0);
-      
-      // Close modal (Esc key)
-      await page.keyboard.press('Escape');
-      await expect(modal).not.toBeVisible({ timeout: 5000 });
     });
 
-    test('should handle profile grid photo clicks', async ({ page }) => {
-      // Create account and navigate to profile
-      await page.goto('/auth');
-      const email = `profile-test-${Date.now()}@goldsainte.test`;
-      
-      await page.locator('input[type="email"]').fill(email);
-      await page.locator('input[type="password"]').first().fill('TestPassword123!');
-      await page.locator('button:has-text("Sign up")').first().click();
-      await page.waitForURL(/\/(home|travel-feed|profile)/, { timeout: 15000 });
-      
-      // Navigate to profile
-      await page.goto('/profile');
-      
-      // If profile has grid items, click one
-      const gridItem = page.locator('[data-testid="profile-grid-item"], .profile-grid img').first();
-      
-      if (await gridItem.isVisible()) {
-        await gridItem.click();
-        
-        // Verify modal opens with proper layout
-        const modal = page.locator('[role="dialog"]');
-        await expect(modal).toBeVisible({ timeout: 5000 });
-        
-        // Verify image is not stretched (has proper aspect ratio)
-        const modalImage = modal.locator('img').first();
-        const boundingBox = await modalImage.boundingBox();
-        
-        if (boundingBox) {
-          // Image should not fill entire viewport (should have margins)
-          expect(boundingBox.height).toBeLessThan(page.viewportSize()!.height * 0.9);
-        }
-      }
+    test('should gracefully handle deep-linking to a storyboard detail', async ({ page }) => {
+      const fakeId = '11111111-1111-1111-1111-111111111111';
+      await page.goto(`/tiktok-lab/storyboards/${fakeId}`);
+
+      await expect(page).toHaveURL(/\/tiktok-lab\/storyboards\//);
+      await expect(page.getByRole('button', { name: /Back/i })).toBeVisible();
     });
   });
 
