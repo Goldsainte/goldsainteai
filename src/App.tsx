@@ -153,7 +153,7 @@ function AppContent() {
           <AIBookingConcierge />
         </Suspense>
       )}
-      <VoiceConciergeWidget onEscalateToPlanner={() => window.location.href = "/concierge"} />
+      <VoiceConciergeWidget />
     </div>
   );
 }
