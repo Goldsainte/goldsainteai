@@ -7548,10 +7548,20 @@ export type Database = {
       storyboards: {
         Row: {
           created_at: string
+          default_budget_level: string | null
+          default_budget_max: number | null
+          default_budget_min: number | null
+          default_ends_on: string | null
+          default_interests: string[] | null
+          default_pace: string | null
+          default_starts_on: string | null
           description: string | null
+          destination: string | null
+          hero_image_url: string | null
           id: string
           owner_id: string
           owner_role: string | null
+          slug: string | null
           theme_tags: string[] | null
           title: string | null
           trip_id: string | null
@@ -7560,10 +7570,20 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          default_budget_level?: string | null
+          default_budget_max?: number | null
+          default_budget_min?: number | null
+          default_ends_on?: string | null
+          default_interests?: string[] | null
+          default_pace?: string | null
+          default_starts_on?: string | null
           description?: string | null
+          destination?: string | null
+          hero_image_url?: string | null
           id?: string
           owner_id: string
           owner_role?: string | null
+          slug?: string | null
           theme_tags?: string[] | null
           title?: string | null
           trip_id?: string | null
@@ -7572,10 +7592,20 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          default_budget_level?: string | null
+          default_budget_max?: number | null
+          default_budget_min?: number | null
+          default_ends_on?: string | null
+          default_interests?: string[] | null
+          default_pace?: string | null
+          default_starts_on?: string | null
           description?: string | null
+          destination?: string | null
+          hero_image_url?: string | null
           id?: string
           owner_id?: string
           owner_role?: string | null
+          slug?: string | null
           theme_tags?: string[] | null
           title?: string | null
           trip_id?: string | null
@@ -9093,9 +9123,13 @@ export type Database = {
           created_at: string
           currency: string | null
           declined_at: string | null
+          exclusions: string | null
           headline: string | null
           id: string
+          inclusions: string | null
           message: string | null
+          nights: number | null
+          payment_schedule: Json | null
           price_from: number | null
           proposer_id: string
           proposer_role: string
@@ -9110,9 +9144,13 @@ export type Database = {
           created_at?: string
           currency?: string | null
           declined_at?: string | null
+          exclusions?: string | null
           headline?: string | null
           id?: string
+          inclusions?: string | null
           message?: string | null
+          nights?: number | null
+          payment_schedule?: Json | null
           price_from?: number | null
           proposer_id: string
           proposer_role: string
@@ -9127,9 +9165,13 @@ export type Database = {
           created_at?: string
           currency?: string | null
           declined_at?: string | null
+          exclusions?: string | null
           headline?: string | null
           id?: string
+          inclusions?: string | null
           message?: string | null
+          nights?: number | null
+          payment_schedule?: Json | null
           price_from?: number | null
           proposer_id?: string
           proposer_role?: string
@@ -11233,6 +11275,10 @@ export type Database = {
       }
     }
     Functions: {
+      accept_proposal_rpc: {
+        Args: { proposal_id_input: string }
+        Returns: Json
+      }
       award_loyalty_points: {
         Args: {
           entity_id?: string
