@@ -18,6 +18,7 @@ import {
   type ProposalDetail,
 } from "@/services/proposalsService";
 import { TrustSafetyInline } from "@/components/trust/TrustSafetyInline";
+import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
 
 type AccountType = "traveler" | "creator" | "agent" | "admin" | null;
 
@@ -70,6 +71,7 @@ export default function ProposalDetailPage() {
   const [actionLoading, setActionLoading] = useState<"accept" | "decline" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [showSafetyModal, setShowSafetyModal] = useState(false);
 
   const navigate = useNavigate();
 
@@ -116,7 +118,11 @@ export default function ProposalDetailPage() {
   const isPartner =
     !isTraveler && (accountType === "creator" || accountType === "agent");
 
-  async function handleAccept() {
+  function handleAcceptClick() {
+    setShowSafetyModal(true);
+  }
+
+  async function handleAcceptConfirmed() {
     if (!proposalId || !proposal) return;
     setActionError(null);
     setActionLoading("accept");
@@ -420,7 +426,7 @@ export default function ProposalDetailPage() {
                         <div className="flex flex-wrap gap-2">
                           <button
                             type="button"
-                            onClick={handleAccept}
+                            onClick={handleAcceptClick}
                             disabled={actionLoading === "accept"}
                             className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-4 py-1.5 text-[10px] font-semibold hover:bg-[#073331] disabled:opacity-60"
                           >
@@ -468,6 +474,14 @@ export default function ProposalDetailPage() {
           </div>
         </section>
       )}
+
+      <TrustSafetyModal
+        open={showSafetyModal}
+        onOpenChange={setShowSafetyModal}
+        context="proposal_acceptance"
+        onConfirm={handleAcceptConfirmed}
+        onCancel={() => setShowSafetyModal(false)}
+      />
     </main>
   );
 }
