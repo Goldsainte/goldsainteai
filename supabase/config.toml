@@ -342,3 +342,9 @@ verify_jwt = false
 [functions.ai-storyboard-suggestions]
 verify_jwt = true
 
+[functions.agent-start-verification]
+verify_jwt = true
+
+[functions.agent-verification-webhook]
+verify_jwt = false
+

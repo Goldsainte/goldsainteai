@@ -238,6 +238,98 @@ export type Database = {
         }
         Relationships: []
       }
+      agent_applications: {
+        Row: {
+          agency_name: string | null
+          agent_id: string
+          created_at: string | null
+          id: string
+          instagram_handle: string | null
+          kyc_provider: string | null
+          kyc_session_id: string | null
+          license_authority: string | null
+          license_number: string | null
+          notes: string | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          specialties: string[] | null
+          tiktok_handle: string | null
+          verification_status: string | null
+          website: string | null
+          years_experience: number | null
+        }
+        Insert: {
+          agency_name?: string | null
+          agent_id: string
+          created_at?: string | null
+          id?: string
+          instagram_handle?: string | null
+          kyc_provider?: string | null
+          kyc_session_id?: string | null
+          license_authority?: string | null
+          license_number?: string | null
+          notes?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          specialties?: string[] | null
+          tiktok_handle?: string | null
+          verification_status?: string | null
+          website?: string | null
+          years_experience?: number | null
+        }
+        Update: {
+          agency_name?: string | null
+          agent_id?: string
+          created_at?: string | null
+          id?: string
+          instagram_handle?: string | null
+          kyc_provider?: string | null
+          kyc_session_id?: string | null
+          license_authority?: string | null
+          license_number?: string | null
+          notes?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          specialties?: string[] | null
+          tiktok_handle?: string | null
+          verification_status?: string | null
+          website?: string | null
+          years_experience?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_applications_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_applications_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: true
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_applications_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_applications_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agent_availability: {
         Row: {
           agent_id: string
@@ -6544,6 +6636,12 @@ export type Database = {
           account_status: string | null
           account_type: string | null
           agency_name: string | null
+          agent_agency_name: string | null
+          agent_license_authority: string | null
+          agent_license_number: string | null
+          agent_specialties: string[] | null
+          agent_verification_status: string | null
+          agent_years_experience: number | null
           ai_calls_reset_at: string | null
           ai_calls_used: number | null
           ai_subscription_tier: string | null
@@ -6611,6 +6709,12 @@ export type Database = {
           account_status?: string | null
           account_type?: string | null
           agency_name?: string | null
+          agent_agency_name?: string | null
+          agent_license_authority?: string | null
+          agent_license_number?: string | null
+          agent_specialties?: string[] | null
+          agent_verification_status?: string | null
+          agent_years_experience?: number | null
           ai_calls_reset_at?: string | null
           ai_calls_used?: number | null
           ai_subscription_tier?: string | null
@@ -6678,6 +6782,12 @@ export type Database = {
           account_status?: string | null
           account_type?: string | null
           agency_name?: string | null
+          agent_agency_name?: string | null
+          agent_license_authority?: string | null
+          agent_license_number?: string | null
+          agent_specialties?: string[] | null
+          agent_verification_status?: string | null
+          agent_years_experience?: number | null
           ai_calls_reset_at?: string | null
           ai_calls_used?: number | null
           ai_subscription_tier?: string | null
