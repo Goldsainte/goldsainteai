@@ -161,7 +161,7 @@ export const AIBookingConcierge = () => {
         // Set default greeting even without user
         setMessages([{
           role: 'assistant',
-          content: `Hello! I'm your Goldsainte AI Concierge. I can help you search for flights, hotels, rental cars, restaurants, events, and more. What are you looking for today?`
+          content: `Welcome — I'm Madison, your Goldsainte travel concierge.\nI'm here to help you turn inspiration into something bookable.\n\nTell me what sparked the idea — a TikTok, a photo, a vibe, a mood—\nand I'll shape it into a visual storyboard you can refine, share, and book.\n\nWhen you're ready, I can also match you with creators whose style matches yours, and certified agents who can bring the journey to life with five-star precision.`
         }]);
         return;
       }
@@ -206,7 +206,7 @@ export const AIBookingConcierge = () => {
         console.log('Setting Madison\'s intro greeting');
         setMessages([{
           role: 'assistant',
-          content: `Hi, I'm Madison — your Goldsainte travel concierge. Think of me as your friendly, well-connected travel insider. I can help you explore destinations, find the best flights and hotels, and even recommend great spots to eat, sip, or unwind. To get started, just say something like: "Find me a flight to Miami next weekend," or "Show me boutique hotels in Paris." Ready to plan something amazing?`
+          content: `Welcome — I'm Madison, your Goldsainte travel concierge.\nI'm here to help you turn inspiration into something bookable.\n\nTell me what sparked the idea — a TikTok, a photo, a vibe, a mood—\nand I'll shape it into a visual storyboard you can refine, share, and book.\n\nWhen you're ready, I can also match you with creators whose style matches yours, and certified agents who can bring the journey to life with five-star precision.`
         }]);
       }
     };
@@ -509,6 +509,9 @@ export const AIBookingConcierge = () => {
 
   const sendProgrammaticMessage = async (messageContent: string) => {
     console.log('[AIBookingConcierge] Sending programmatic message:', messageContent);
+    
+    // Dismiss welcome card on interaction
+    setShowWelcomeCard(false);
     
     const userMessage: Message = { role: 'user', content: messageContent };
     setMessages(prev => [...prev, userMessage]);
@@ -1348,7 +1351,13 @@ export const AIBookingConcierge = () => {
             <div className="space-y-2 sm:space-y-3">
               {/* Welcome Card - Shows before first interaction */}
               {showWelcomeCard && messages.length <= 1 && (
-                <WelcomeCard onDismiss={() => setShowWelcomeCard(false)} />
+                <WelcomeCard 
+                  onDismiss={() => setShowWelcomeCard(false)}
+                  onPromptClick={(prompt) => {
+                    setInput(prompt);
+                    setTimeout(() => handleSend(), 100);
+                  }}
+                />
               )}
 
               {/* Voice Status Message */}
