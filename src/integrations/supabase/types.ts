@@ -11392,6 +11392,10 @@ export type Database = {
           total_requests: number
         }[]
       }
+      get_creator_tiktok_lab_metrics: {
+        Args: { creator_id_input: string }
+        Returns: Json
+      }
       get_total_users_count: { Args: never; Returns: number }
       get_user_active_alerts_count: {
         Args: { p_user_id: string }
