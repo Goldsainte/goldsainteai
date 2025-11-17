@@ -2281,6 +2281,103 @@ export type Database = {
         }
         Relationships: []
       }
+      concierge_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          metadata: Json
+          role: string
+          session_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          role: string
+          session_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          role?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concierge_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      concierge_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          last_active_at: string
+          linked_storyboard_id: string | null
+          linked_trip_request_id: string | null
+          mode: string
+          title: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_active_at?: string
+          linked_storyboard_id?: string | null
+          linked_trip_request_id?: string | null
+          mode: string
+          title?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_active_at?: string
+          linked_storyboard_id?: string | null
+          linked_trip_request_id?: string | null
+          mode?: string
+          title?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concierge_sessions_linked_storyboard_id_fkey"
+            columns: ["linked_storyboard_id"]
+            isOneToOne: false
+            referencedRelation: "storyboards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concierge_sessions_linked_trip_request_id_fkey"
+            columns: ["linked_trip_request_id"]
+            isOneToOne: false
+            referencedRelation: "trip_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concierge_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concierge_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       content_moderation_flags: {
         Row: {
           ai_analysis: Json | null

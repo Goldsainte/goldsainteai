@@ -18,7 +18,7 @@ import { SentryStatusChip } from "@/components/system/SentryStatusChip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ExpediaModalProvider } from "@/contexts/ExpediaModalContext";
-import { AiConciergeDock } from "@/components/AiConciergeDock";
+import { VoiceConciergeWidget } from "@/components/concierge/VoiceConciergeWidget";
 import { usePresence } from "@/hooks/usePresence";
 import { ensureCSRFToken } from "@/lib/security/csrf";
 import { AppRoutes } from "@/routes/AppRoutes";
@@ -153,7 +153,7 @@ function AppContent() {
           <AIBookingConcierge />
         </Suspense>
       )}
-      <AiConciergeDock />
+      <VoiceConciergeWidget onEscalateToPlanner={() => window.location.href = "/concierge"} />
     </div>
   );
 }
