@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { BrowserRouter, useLocation, useNavigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -18,10 +18,14 @@ import { SentryStatusChip } from "@/components/system/SentryStatusChip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ExpediaModalProvider } from "@/contexts/ExpediaModalContext";
-import { VoiceConciergeWidget } from "@/components/concierge/VoiceConciergeWidget";
+
 import { usePresence } from "@/hooks/usePresence";
 import { ensureCSRFToken } from "@/lib/security/csrf";
 import { AppRoutes } from "@/routes/AppRoutes";
+
+const AIBookingConcierge = lazy(() =>
+  import("@/components/AIBookingConcierge").then((m) => ({ default: m.AIBookingConcierge })),
+);
 
 const queryClient = new QueryClient();
 
@@ -37,6 +41,16 @@ const HIDE_HEADER_PAGES = new Set([
   "/cocurated-journeys",
   "/fine-dining",
   "/hotel-booking",
+]);
+
+const HIDE_AI_BOOKING_PAGES = new Set([
+  // Legacy social feed - disabled
+  // "/travel-feed",
+  // "/journeys",
+  // "/search",
+  // "/trending",
+  "/creator/:id",
+  "/travel-settings",
 ]);
 
 const HIDE_FOOTER_PREFIXES = [
@@ -119,6 +133,7 @@ function AppContent() {
 
   const hideHeader = shouldHideForPath(location.pathname, HIDE_HEADER_PAGES);
   const hideFooter = shouldHideForPath(location.pathname, HIDE_FOOTER_PREFIXES);
+  const hideAIBooking = shouldHideForPath(location.pathname, HIDE_AI_BOOKING_PAGES);
 
   return (
     <div className="min-h-screen w-full max-w-full flex flex-col overflow-x-hidden box-border viewport-guard">
@@ -133,7 +148,11 @@ function AppContent() {
         <SentryTestButton />
       </main>
       {hideFooter ? null : <Footer />}
-      <VoiceConciergeWidget />
+      {hideAIBooking ? null : (
+        <Suspense fallback={null}>
+          <AIBookingConcierge />
+        </Suspense>
+      )}
     </div>
   );
 }
