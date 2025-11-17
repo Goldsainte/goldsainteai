@@ -248,7 +248,7 @@ export default function ConciergePage() {
                       {isLastAssistant && sessionId && (
                         <div className="pt-2 border-t border-[#E5DFC6]/60 mt-2">
                           <p className="mb-1 text-[10px] text-[#4a4a4a]">
-                            Ready to see this as a visual plan?
+                            This is shaping up beautifully. Ready to see it as a visual storyboard?
                           </p>
                           <StartStoryboardFromChat
                             sessionId={sessionId}
