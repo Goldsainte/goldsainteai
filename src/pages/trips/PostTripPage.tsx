@@ -59,28 +59,9 @@ export default function PostTripPage() {
         if (cancelled || !data) return;
 
         setPreFilledFrom(data.title || "Storyboard");
-        if (data.destination) setDestination((prev) => prev || data.destination!);
+        // Note: Storyboard prefill fields don't exist in database yet
+        // Only title is currently available
         if (data.title) setTitle((prev) => prev || data.title!);
-        if (data.default_starts_on)
-          setStartsOn((prev) => prev || data.default_starts_on!);
-        if (data.default_ends_on)
-          setEndsOn((prev) => prev || data.default_ends_on!);
-        if (data.default_budget_min != null)
-          setBudgetMin((prev) =>
-            prev || String(Math.round(data.default_budget_min!))
-          );
-        if (data.default_budget_max != null)
-          setBudgetMax((prev) =>
-            prev || String(Math.round(data.default_budget_max!))
-          );
-        if (data.default_budget_level)
-          setBudgetLevel(
-            (data.default_budget_level as BudgetLevel) || "elevated"
-          );
-        if (data.default_pace)
-          setPace((data.default_pace as Pace) || "balanced");
-        if (data.default_interests && data.default_interests.length > 0)
-          setInterests((prev) => (prev.length ? prev : data.default_interests!));
       } catch (err: any) {
         if (!cancelled)
           setPreFillError(

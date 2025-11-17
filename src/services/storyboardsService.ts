@@ -17,22 +17,12 @@ export type StoryboardForPrefill = {
 export async function getStoryboardForPrefill(
   id: string
 ): Promise<StoryboardForPrefill | null> {
+  // Note: The storyboard table doesn't currently have prefill fields
+  // This function will need database schema updates to work properly
+  // For now, just fetch basic storyboard info
   const { data, error } = await supabase
     .from("storyboards")
-    .select(
-      `
-      id,
-      title,
-      destination,
-      default_starts_on,
-      default_ends_on,
-      default_budget_min,
-      default_budget_max,
-      default_budget_level,
-      default_pace,
-      default_interests
-    `
-    )
+    .select("id, title, description")
     .eq("id", id)
     .maybeSingle();
 
@@ -43,16 +33,17 @@ export async function getStoryboardForPrefill(
 
   if (!data) return null;
 
+  // Return minimal data until schema is updated
   return {
     id: data.id,
     title: data.title,
-    destination: data.destination,
-    default_starts_on: data.default_starts_on,
-    default_ends_on: data.default_ends_on,
-    default_budget_min: data.default_budget_min,
-    default_budget_max: data.default_budget_max,
-    default_budget_level: data.default_budget_level,
-    default_pace: data.default_pace,
-    default_interests: data.default_interests,
+    destination: null,
+    default_starts_on: null,
+    default_ends_on: null,
+    default_budget_min: null,
+    default_budget_max: null,
+    default_budget_level: null,
+    default_pace: null,
+    default_interests: null,
   };
 }

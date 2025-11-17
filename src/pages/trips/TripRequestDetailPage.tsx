@@ -103,7 +103,7 @@ export default function TripRequestDetailPage() {
     };
   }, [tripRequestId]);
 
-  const isTraveler = trip && currentUserId === trip.traveler_id;
+  const isTraveler = trip && currentUserId === trip.user_id;
   const isPartner = !isTraveler && (accountType === "creator" || accountType === "agent");
 
   const budgetSummary =
@@ -165,12 +165,12 @@ export default function TripRequestDetailPage() {
                       {trip.destination}
                     </span>
                   )}
-                  {trip.starts_on && (
+                  {trip.start_date && (
                     <span className="inline-flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
-                      {formatDate(trip.starts_on)}
-                      {trip.ends_on &&
-                        ` – ${formatDate(trip.ends_on)}`}
+                      {formatDate(trip.start_date)}
+                      {trip.end_date &&
+                        ` – ${formatDate(trip.end_date)}`}
                     </span>
                   )}
                   {(trip.travelers_adults || trip.travelers_children) && (

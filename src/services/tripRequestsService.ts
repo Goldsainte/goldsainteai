@@ -3,11 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 
 export type TripRequestDetail = {
   id: string;
-  traveler_id: string;
+  user_id: string | null;
   title: string | null;
   destination: string | null;
-  starts_on: string | null;
-  ends_on: string | null;
+  start_date: string | null;
+  end_date: string | null;
   budget_min: number | null;
   budget_max: number | null;
   budget_level: string | null;
@@ -44,11 +44,11 @@ export async function getTripRequestDetail(
     .select(
       `
       id,
-      traveler_id,
+      user_id,
       title,
       destination,
-      starts_on,
-      ends_on,
+      start_date,
+      end_date,
       budget_min,
       budget_max,
       budget_level,
@@ -63,11 +63,6 @@ export async function getTripRequestDetail(
       wants_role,
       status,
       created_at,
-      traveler:traveler_id (
-        id,
-        display_name,
-        avatar_url
-      ),
       trip_proposals(*)
     `
     )
@@ -80,6 +75,17 @@ export async function getTripRequestDetail(
   }
   if (!data) return null;
 
+  // Fetch traveler profile separately since there's no FK relationship
+  let traveler = null;
+  if (data.user_id) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("id, display_name, avatar_url")
+      .eq("id", data.user_id)
+      .maybeSingle();
+    traveler = profile;
+  }
+
   const proposals = (data.trip_proposals || []) as any[];
 
   const total = proposals.length;
@@ -88,11 +94,11 @@ export async function getTripRequestDetail(
 
   return {
     id: data.id,
-    traveler_id: data.traveler_id,
+    user_id: data.user_id,
     title: data.title,
     destination: data.destination,
-    starts_on: data.starts_on,
-    ends_on: data.ends_on,
+    start_date: data.start_date,
+    end_date: data.end_date,
     budget_min: data.budget_min,
     budget_max: data.budget_max,
     budget_level: data.budget_level,
@@ -107,7 +113,7 @@ export async function getTripRequestDetail(
     wants_role: data.wants_role,
     status: data.status,
     created_at: data.created_at,
-    traveler: data.traveler,
+    traveler,
     proposals_summary: { total, pending, accepted },
   };
 }
