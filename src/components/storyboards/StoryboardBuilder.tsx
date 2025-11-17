@@ -1,0 +1,444 @@
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Loader2, Plus, Link as LinkIcon, Image, MapPin } from "lucide-react";
+
+type StoryboardBuilderProps = {
+  storyboardId?: string;
+  initialTitle?: string;
+  mode: "traveler" | "creator" | "agent";
+  onSaved?: (storyboardId: string) => void;
+};
+
+type Item = {
+  id?: string;
+  kind: "photo" | "video" | "experience" | "note";
+  source: "unsplash" | "viator" | "youtube" | "tiktok" | "instagram" | "manual";
+  data: any;
+};
+
+type UnsplashPhoto = {
+  id: string;
+  urls: { small: string; full?: string };
+  alt_description: string | null;
+  location?: { name?: string | null };
+};
+
+type ViatorProduct = {
+  productCode?: string;
+  title?: string;
+  shortDescription?: string;
+  thumbnailURL?: string;
+  destination?: string;
+};
+
+export function StoryboardBuilder({
+  storyboardId,
+  initialTitle,
+  mode,
+  onSaved,
+}: StoryboardBuilderProps) {
+  const [title, setTitle] = useState(initialTitle || "");
+  const [items, setItems] = useState<Item[]>([]);
+  const [activeTab, setActiveTab] = useState<"photos" | "experiences" | "links">(
+    "photos"
+  );
+  const [search, setSearch] = useState("");
+  const [loadingSearch, setLoadingSearch] = useState(false);
+  const [photoResults, setPhotoResults] = useState<UnsplashPhoto[]>([]);
+  const [experienceResults, setExperienceResults] = useState<ViatorProduct[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [linkInput, setLinkInput] = useState("");
+
+  useEffect(() => {
+    if (!storyboardId) return;
+    // TODO: load existing items for edit mode
+  }, [storyboardId]);
+
+  async function runSearch() {
+    if (!search.trim()) return;
+    setLoadingSearch(true);
+
+    try {
+      if (activeTab === "photos") {
+        const { data, error } = await supabase.functions.invoke("unsplash-search", {
+          body: { q: search },
+        });
+        
+        if (error) throw error;
+        setPhotoResults(data?.results || []);
+      } else if (activeTab === "experiences") {
+        const { data, error } = await supabase.functions.invoke("viator-search", {
+          body: { q: search },
+        });
+        
+        if (error) throw error;
+        setExperienceResults(data?.results || []);
+      }
+    } catch (error) {
+      console.error("Search error:", error);
+    } finally {
+      setLoadingSearch(false);
+    }
+  }
+
+  function addPhoto(p: UnsplashPhoto) {
+    setItems((prev) => [
+      ...prev,
+      {
+        kind: "photo",
+        source: "unsplash",
+        data: {
+          unsplash_id: p.id,
+          thumb_url: p.urls.small,
+          full_url: p.urls.full || p.urls.small,
+          alt: p.alt_description,
+          location: p.location?.name || null,
+        },
+      },
+    ]);
+  }
+
+  function addExperience(prod: ViatorProduct) {
+    setItems((prev) => [
+      ...prev,
+      {
+        kind: "experience",
+        source: "viator",
+        data: {
+          product_code: prod.productCode,
+          title: prod.title,
+          summary: prod.shortDescription,
+          thumbnail: prod.thumbnailURL,
+          destination: prod.destination,
+        },
+      },
+    ]);
+  }
+
+  function addLink() {
+    if (!linkInput.trim()) return;
+
+    const url = linkInput.trim();
+    let source: Item["source"] = "manual";
+    if (url.includes("tiktok.com")) source = "tiktok";
+    else if (url.includes("youtube.com") || url.includes("youtu.be"))
+      source = "youtube";
+    else if (url.includes("instagram.com")) source = "instagram";
+
+    setItems((prev) => [
+      ...prev,
+      {
+        kind: "video",
+        source,
+        data: { url },
+      },
+    ]);
+    setLinkInput("");
+  }
+
+  async function saveStoryboard() {
+    if (!title.trim() || items.length === 0) return;
+    setSaving(true);
+
+    try {
+      let sbId = storyboardId;
+
+      if (!sbId) {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) throw new Error("Not signed in");
+
+        const { data, error } = await supabase
+          .from("storyboards")
+          .insert({
+            owner_id: user.id,
+            owner_role: mode,
+            title,
+          })
+          .select("id")
+          .single();
+
+        if (error) throw error;
+        sbId = data.id;
+      }
+
+      // Insert items
+      const rows = items.map((item, index) => ({
+        storyboard_id: sbId,
+        kind: item.kind,
+        source: item.source,
+        sort_index: index,
+        data: item.data,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from("storyboard_items")
+        .insert(rows);
+
+      if (itemsError) throw itemsError;
+
+      if (onSaved && sbId) onSaved(sbId);
+    } catch (err) {
+      console.error("Error saving storyboard", err);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="rounded-[32px] border border-[#E5DFC6] bg-white/95 p-4 md:p-6">
+      <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div className="flex-1">
+          <p className="text-xs uppercase tracking-[0.18em] text-[#8D8D8D]">
+            Build your storyboard
+          </p>
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder={
+              mode === "traveler"
+                ? "Summer in Italy with my best friends"
+                : mode === "creator"
+                ? "Santorini content trip package"
+                : "Safari + wine country honeymoon"
+            }
+            className="mt-1 w-full border-b border-[#E5DFC6] bg-transparent text-sm font-display text-[#0a2225] outline-none placeholder:text-[#8D8D8D]"
+          />
+        </div>
+        <button
+          onClick={saveStoryboard}
+          disabled={saving || !title.trim() || items.length === 0}
+          className="inline-flex items-center gap-2 self-start rounded-full bg-[#0c4d47] px-4 py-2 text-xs font-semibold text-[#E5DFC6] hover:bg-[#073331] disabled:opacity-60"
+        >
+          {saving ? (
+            <>
+              <Loader2 className="h-3 w-3 animate-spin" /> Saving…
+            </>
+          ) : (
+            <>
+              <Plus className="h-3 w-3" /> Save storyboard
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Tabs */}
+      <div className="mb-3 flex gap-2 text-xs">
+        <TabButton
+          active={activeTab === "photos"}
+          onClick={() => setActiveTab("photos")}
+        >
+          <Image className="h-3 w-3" /> Photos
+        </TabButton>
+        <TabButton
+          active={activeTab === "experiences"}
+          onClick={() => setActiveTab("experiences")}
+        >
+          <MapPin className="h-3 w-3" /> Experiences
+        </TabButton>
+        <TabButton
+          active={activeTab === "links"}
+          onClick={() => setActiveTab("links")}
+        >
+          <LinkIcon className="h-3 w-3" /> TikTok / Reels / YouTube
+        </TabButton>
+      </div>
+
+      {/* Search bar */}
+      {activeTab !== "links" && (
+        <div className="mb-4 flex gap-2">
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && runSearch()}
+            placeholder={
+              activeTab === "photos"
+                ? "Search destinations, hotels, moods…"
+                : "Search activities, tours, experiences…"
+            }
+            className="flex-1 rounded-full border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-xs outline-none placeholder:text-[#8D8D8D]"
+          />
+          <button
+            onClick={runSearch}
+            disabled={loadingSearch || !search.trim()}
+            className="inline-flex items-center gap-1 rounded-full bg-[#0c4d47] px-4 py-2 text-xs text-[#E5DFC6] disabled:opacity-60"
+          >
+            {loadingSearch ? (
+              <>
+                <Loader2 className="h-3 w-3 animate-spin" /> Searching…
+              </>
+            ) : (
+              "Search"
+            )}
+          </button>
+        </div>
+      )}
+
+      {/* Results area */}
+      {activeTab === "photos" && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+          {photoResults.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              onClick={() => addPhoto(p)}
+              className="relative overflow-hidden rounded-2xl group"
+            >
+              <img
+                src={p.urls.small}
+                alt={p.alt_description || "Photo"}
+                className="h-32 w-full object-cover group-hover:opacity-80"
+              />
+              <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/40 to-transparent p-2 opacity-0 group-hover:opacity-100 transition">
+                <span className="rounded-full bg-white/90 px-2 py-0.5 text-[10px]">
+                  Add to storyboard
+                </span>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {activeTab === "experiences" && (
+        <div className="grid gap-3 mb-4">
+          {experienceResults.map((ex, idx) => (
+            <button
+              key={ex.productCode || idx}
+              type="button"
+              onClick={() => addExperience(ex)}
+              className="flex items-start gap-3 rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] p-3 text-left hover:border-[#BFAD72]"
+            >
+              {ex.thumbnailURL && (
+                <img
+                  src={ex.thumbnailURL}
+                  alt={ex.title || ""}
+                  className="h-16 w-16 rounded-xl object-cover"
+                />
+              )}
+              <div>
+                <p className="text-xs font-semibold text-[#0a2225]">
+                  {ex.title}
+                </p>
+                <p className="text-xs text-[#4a4a4a] line-clamp-2">
+                  {ex.shortDescription}
+                </p>
+                {ex.destination && (
+                  <p className="mt-0.5 text-[10px] text-[#8D8D8D]">
+                    {ex.destination}
+                  </p>
+                )}
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {activeTab === "links" && (
+        <div className="mb-4 space-y-2">
+          <p className="text-xs text-[#4a4a4a]">
+            Paste any TikTok, Reel or YouTube link that inspired this trip. We'll
+            keep them together with your photos & experiences.
+          </p>
+          <div className="flex gap-2">
+            <input
+              value={linkInput}
+              onChange={(e) => setLinkInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && addLink()}
+              placeholder="https://www.tiktok.com/…"
+              className="flex-1 rounded-full border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-xs outline-none placeholder:text-[#8D8D8D]"
+            />
+            <button
+              onClick={addLink}
+              disabled={!linkInput.trim()}
+              className="inline-flex items-center gap-1 rounded-full bg-[#0c4d47] px-4 py-2 text-xs text-[#E5DFC6] disabled:opacity-60"
+            >
+              Add
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Current items preview */}
+      <div className="mt-4 border-t border-[#E5DFC6] pt-3">
+        <p className="mb-2 text-xs uppercase tracking-[0.18em] text-[#8D8D8D]">
+          Storyboard preview
+        </p>
+        {items.length === 0 ? (
+          <p className="text-xs text-[#8D8D8D]">
+            Start dropping in photos, experiences and links — this becomes the
+            visual brief your agent or creator works from.
+          </p>
+        ) : (
+          <div className="columns-2 md:columns-3 gap-3 space-y-3">
+            {items.map((item, idx) => {
+              if (item.kind === "photo") {
+                return (
+                  <img
+                    key={idx}
+                    src={item.data.thumb_url}
+                    alt={item.data.alt || "Photo"}
+                    className="w-full rounded-2xl object-cover"
+                  />
+                );
+              }
+              if (item.kind === "experience") {
+                return (
+                  <div
+                    key={idx}
+                    className="break-inside-avoid rounded-2xl bg-[#f7f3ea] border border-[#E5DFC6] p-2 text-xs"
+                  >
+                    <p className="font-semibold mb-1">
+                      {item.data.title || "Experience"}
+                    </p>
+                    <p className="text-[#4a4a4a] line-clamp-3">
+                      {item.data.summary}
+                    </p>
+                  </div>
+                );
+              }
+              if (item.kind === "video") {
+                return (
+                  <div
+                    key={idx}
+                    className="break-inside-avoid rounded-2xl bg-[#0a2225] p-2 text-xs text-[#E5DFC6]"
+                  >
+                    <p className="text-[10px] uppercase tracking-[0.14em] mb-1">
+                      {item.source.toUpperCase()}
+                    </p>
+                    <p className="line-clamp-2 break-words">{item.data.url}</p>
+                  </div>
+                );
+              }
+              return null;
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function TabButton({
+  active,
+  children,
+  onClick,
+}: {
+  active: boolean;
+  children: React.ReactNode;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 ${
+        active
+          ? "border-[#0c4d47] bg-[#0c4d47] text-[#E5DFC6]"
+          : "border-[#E5DFC6] bg-white text-[#4a4a4a]"
+      } text-xs`}
+    >
+      {children}
+    </button>
+  );
+}

@@ -7583,13 +7583,17 @@ export type Database = {
           caption: string | null
           category_tag: string | null
           created_at: string
+          data: Json | null
           day_number: number | null
           id: string
+          kind: string | null
           layout_type: string
           location_label: string | null
           media_attribution: string | null
           media_url: string | null
           order_index: number
+          sort_index: number | null
+          source: string | null
           storyboard_id: string
           time_of_day: string | null
         }
@@ -7597,13 +7601,17 @@ export type Database = {
           caption?: string | null
           category_tag?: string | null
           created_at?: string
+          data?: Json | null
           day_number?: number | null
           id?: string
+          kind?: string | null
           layout_type?: string
           location_label?: string | null
           media_attribution?: string | null
           media_url?: string | null
           order_index?: number
+          sort_index?: number | null
+          source?: string | null
           storyboard_id: string
           time_of_day?: string | null
         }
@@ -7611,13 +7619,17 @@ export type Database = {
           caption?: string | null
           category_tag?: string | null
           created_at?: string
+          data?: Json | null
           day_number?: number | null
           id?: string
+          kind?: string | null
           layout_type?: string
           location_label?: string | null
           media_attribution?: string | null
           media_url?: string | null
           order_index?: number
+          sort_index?: number | null
+          source?: string | null
           storyboard_id?: string
           time_of_day?: string | null
         }
@@ -7686,7 +7698,10 @@ export type Database = {
           id: string
           owner_id: string
           owner_role: string | null
+          related_trip_proposal_id: string | null
+          related_trip_request_id: string | null
           slug: string | null
+          subtitle: string | null
           theme_tags: string[] | null
           title: string | null
           trip_id: string | null
@@ -7708,7 +7723,10 @@ export type Database = {
           id?: string
           owner_id: string
           owner_role?: string | null
+          related_trip_proposal_id?: string | null
+          related_trip_request_id?: string | null
           slug?: string | null
+          subtitle?: string | null
           theme_tags?: string[] | null
           title?: string | null
           trip_id?: string | null
@@ -7730,7 +7748,10 @@ export type Database = {
           id?: string
           owner_id?: string
           owner_role?: string | null
+          related_trip_proposal_id?: string | null
+          related_trip_request_id?: string | null
           slug?: string | null
+          subtitle?: string | null
           theme_tags?: string[] | null
           title?: string | null
           trip_id?: string | null
@@ -7738,6 +7759,20 @@ export type Database = {
           visibility?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "storyboards_related_trip_proposal_id_fkey"
+            columns: ["related_trip_proposal_id"]
+            isOneToOne: false
+            referencedRelation: "trip_proposals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "storyboards_related_trip_request_id_fkey"
+            columns: ["related_trip_request_id"]
+            isOneToOne: false
+            referencedRelation: "trip_requests"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "storyboards_trip_id_fkey"
             columns: ["trip_id"]
