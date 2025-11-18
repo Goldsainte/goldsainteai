@@ -1,7 +1,7 @@
 // src/components/home/HowItWorksSection.tsx
-import treehouseImg from "@/assets/austin-distel-riQNJpiaGgE-unsplash.jpeg";        // hammock / jungle
-import resortPoolImg from "@/assets/christian-lambert-vmIWr0NnpCQ-unsplash.jpeg";   // resort pool
-import snowTreeImg from "@/assets/nicolas-meunier-WKGmcxLdXC4-unsplash.jpeg";       // snow & tree
+import beachFlowersImg from "@/assets/beach-flowers.jpg";                         // beach with red flowers
+import tokyoStreetImg from "@/assets/tokyo-street.jpg";                             // Tokyo street scene
+import photographerPlaneImg from "@/assets/photographer-plane.jpg";                 // photographer with plane
 import landRoverImg from "@/assets/alexandre-barbosa-2V5Gq6Y95Ao-unsplash.jpeg";    // group + Land Rover
 import snowyTravelerImg from "@/assets/erik-mclean-sG_rwogcBCw-unsplash.jpg";       // traveler in snow
 import friendsHikeImg from "@/assets/felix-rostig-UmV2wr-Vbq8-unsplash.jpeg";       // friends hiking
@@ -39,12 +39,12 @@ const steps = [
 ];
 
 const collageImages = [
-  treehouseImg,
+  beachFlowersImg,
   infinityPoolImg,
-  resortPoolImg,
+  tokyoStreetImg,
   friendsHikeImg,
   landRoverImg,
-  snowTreeImg,
+  photographerPlaneImg,
   snowyTravelerImg,
 ];
 
