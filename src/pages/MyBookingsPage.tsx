@@ -264,12 +264,15 @@ function BookingRowCard({
                 creator_id: reviewTarget === "creator" ? booking.creator_id : null,
               };
 
+              const { data: { user: currentUser } } = await supabase.auth.getUser();
+              if (!currentUser) throw new Error("Not authenticated");
+
               const { error } = await supabase.from("agent_reviews").insert({
                 job_id: booking.id,
                 agent_id: booking.id,
-                rating: reviewData.rating,
-                review_text: reviewData.comment || "",
-                user_id: user.id,
+                rating: rating,
+                review_text: comment || "",
+                user_id: currentUser.id,
               });
               if (error) throw error;
 

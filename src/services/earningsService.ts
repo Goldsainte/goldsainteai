@@ -167,7 +167,7 @@ export async function createEarningsForBooking(bookingId: string) {
       booking_id: booking.id,
       user_id: booking.agent_id,
       role: "agent",
-      amount: booking.agent_commission_amount_cents ?? booking.agent_share,
+      amount: booking.agent_earnings ?? booking.agent_share,
       currency: booking.currency || "USD",
       status: "pending",
     });
@@ -178,7 +178,7 @@ export async function createEarningsForBooking(bookingId: string) {
       booking_id: booking.id,
       user_id: booking.creator_id,
       role: "creator",
-      amount: booking.creator_commission_amount_cents ?? booking.creator_share,
+      amount: booking.creator_earnings ?? booking.creator_share,
       currency: booking.currency || "USD",
       status: "pending",
     });
