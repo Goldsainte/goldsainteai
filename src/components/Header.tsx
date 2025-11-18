@@ -593,35 +593,6 @@ export const Header = () => {
                     align="end" 
                     className="w-80 max-h-[75vh] overflow-y-auto bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100] animate-in fade-in-0 zoom-in-95 duration-200"
                   >
-                    {/* Travel Section */}
-                    <div className="px-4 py-3 border-b border-border/50">
-                      <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em] letterspacing-wide">Travel</p>
-                    </div>
-                    <div className="py-2">
-                      <DropdownMenuItem 
-                        onClick={() => handleServiceClick('hotels')} 
-                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                      >
-                        <Hotel className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">Hotels & Stays</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => handleServiceClick('flights')} 
-                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                      >
-                        <Plane className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">Flights</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => handleServiceClick('events')} 
-                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                      >
-                        <Ticket className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">Events</span>
-                      </DropdownMenuItem>
-                    </div>
-                    
-                    <DropdownMenuSeparator className="bg-border/50" />
                     
                     {/* Discover Section */}
                     <div className="px-4 py-3 border-b border-border/50">
@@ -723,39 +694,10 @@ export const Header = () => {
                         <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Become an Agent</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => navigate('/transportation-vendor-partners')} 
-                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                      >
-                        <Car className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">Become a Transport Vendor</span>
-                      </DropdownMenuItem>
                     </div>
                     
                     <DropdownMenuSeparator className="bg-border/50" />
                     
-                    {/* Shop & Commerce Section */}
-                    <div className="px-4 py-3 border-b border-border/50">
-                      <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Shop & Earn</p>
-                    </div>
-                    <div className="py-2 pb-3">
-                      <DropdownMenuItem 
-                        onClick={() => navigate('/shop')} 
-                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                      >
-                        <ShoppingCart className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">Shop</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => navigate('/affiliate-manager')} 
-                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                      >
-                        <Link2 className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">Affiliate Links</span>
-                      </DropdownMenuItem>
-                    </div>
-                    
-                    <DropdownMenuSeparator className="bg-border/50" />
                     
                     {/* Company Section */}
                     <div className="px-4 py-3 border-b border-border/50">
