@@ -1,0 +1,70 @@
+// src/components/home/HowItWorksTimeline.tsx
+export function HowItWorksTimeline() {
+  const steps = [
+    {
+      label: "Step 1",
+      title: "Share your inspiration",
+      body: "Paste TikToks, Reels, YouTube clips or mood images. Tell us who's traveling, when, and how you want the trip to feel.",
+    },
+    {
+      label: "Step 2",
+      title: "Madison drafts your storyboard",
+      body: "Goldsainte's AI concierge, Madison, sketches a visual storyboard with destinations, hotel vibes, and experiences that match your brief.",
+    },
+    {
+      label: "Step 3",
+      title: "Creators and agents collaborate",
+      body: "Matched TikTok creators refine the aesthetic; certified travel agents plug in real flights, stays and experiences—all inside the same storyboard.",
+    },
+    {
+      label: "Step 4",
+      title: "You review, chat and book on Goldsainte",
+      body: "You compare proposals, chat with your team, and confirm the trip. Payments go through Goldsainte's escrow for added protection.",
+    },
+  ];
+
+  return (
+    <section className="bg-[#f7f3ea] py-16 md:py-20">
+      <div className="mx-auto max-w-5xl px-4">
+        <h2 className="text-center font-display text-[28px] leading-snug text-[#0a2225] md:text-[34px] mb-12 md:mb-16">
+          How Goldsainte works
+        </h2>
+
+        <div className="space-y-12 md:space-y-16">
+          {steps.map((step, index) => (
+            <div key={index} className="relative">
+              <div className="flex flex-col md:flex-row md:items-start gap-6">
+                {/* Step number circle */}
+                <div className="flex-shrink-0">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#BFAD72] bg-white">
+                    <span className="font-display text-lg text-[#0a2225]">
+                      {index + 1}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Step content */}
+                <div className="flex-1">
+                  <div className="text-xs uppercase tracking-[0.18em] text-[#8D8D8D] mb-2">
+                    {step.label}
+                  </div>
+                  <h3 className="font-display text-xl text-[#0a2225] mb-3">
+                    {step.title}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-[#4a4a4a] max-w-2xl">
+                    {step.body}
+                  </p>
+                </div>
+              </div>
+
+              {/* Connecting line (not on last step) */}
+              {index < steps.length - 1 && (
+                <div className="absolute left-6 top-12 bottom-0 w-px bg-[#E5DFC6] -translate-x-px md:h-12" />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}

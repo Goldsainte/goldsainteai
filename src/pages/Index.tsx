@@ -1,12 +1,11 @@
 // src/pages/Index.tsx
 import { Helmet } from "react-helmet-async";
 import { HomeHero } from "@/components/home/HomeHero";
-import { HowItWorks } from "@/components/home/HowItWorks";
-import { HowItWorksSection } from "@/components/home/HowItWorksSection";
-import { MarketplaceShowcase } from "@/components/home/MarketplaceShowcase";
-import { PostTripCTA } from "@/components/home/PostTripCTA";
-import { StoryboardPreview } from "@/components/home/StoryboardPreview";
-import { TikTokLabHighlight } from "@/components/home/TikTokLabHighlight";
+import { WhoItsFor } from "@/components/home/WhoItsFor";
+import { HowItWorksTimeline } from "@/components/home/HowItWorksTimeline";
+import { StoryboardsHighlight } from "@/components/home/StoryboardsHighlight";
+import { TrustAndSafety } from "@/components/home/TrustAndSafety";
+import { RoleSpecificCTAs } from "@/components/home/RoleSpecificCTAs";
 
 export default function Index() {
   return (
@@ -15,7 +14,7 @@ export default function Index() {
         <title>Goldsainte · Luxury Travel Marketplace</title>
         <meta
           name="description"
-          content="Goldsainte connects TikTok creators, certified travel agents, and travelers. Browse a luxury marketplace of trips, post your own dream journey, and let AI matching do the rest."
+          content="Goldsainte connects travelers, TikTok creators, and certified travel agents through storyboards. Turn inspiration into bookable trips with AI matching, escrow protection, and on-platform collaboration."
         />
       </Helmet>
 
@@ -23,20 +22,20 @@ export default function Index() {
         {/* Hero with Expedia search + brand positioning */}
         <HomeHero />
 
-        {/* How it works - new elevated version */}
-        <HowItWorksSection />
+        {/* Who Goldsainte is for - 3-column section */}
+        <WhoItsFor />
 
-        {/* Marketplace showcase with Pinterest-style cards */}
-        <MarketplaceShowcase />
+        {/* How Goldsainte works - 4-step timeline */}
+        <HowItWorksTimeline />
 
-        {/* "Post a Trip" CTA section with AI matching + voice concierge */}
-        <PostTripCTA />
+        {/* Storyboards highlight - core differentiator */}
+        <StoryboardsHighlight />
 
-        {/* Storyboard preview – Pinterest vibes, Goldsainte colors */}
-        <StoryboardPreview />
+        {/* Trust, safety & payments reassurance */}
+        <TrustAndSafety />
 
-        {/* Goldsainte Creator Lab highlight */}
-        <TikTokLabHighlight />
+        {/* Role-specific CTAs - three-way sign up */}
+        <RoleSpecificCTAs />
       </main>
     </>
   );
