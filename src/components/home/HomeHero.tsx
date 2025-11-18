@@ -10,12 +10,17 @@ export function HomeHero() {
       <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 pb-12 pt-16 md:flex-row md:items-center md:pt-20">
         {/* LEFT: Copy & CTAs */}
         <div className="w-full md:w-[52%] space-y-5">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#0C4D47]">
-            <span>Travelers</span>
-            <span className="h-[1px] w-4 bg-[#0C4D47]/30" />
-            <span>Creators</span>
-            <span className="h-[1px] w-4 bg-[#0C4D47]/30" />
-            <span>Agents</span>
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#0C4D47]">
+              <span>Travelers</span>
+              <span className="h-[1px] w-4 bg-[#0C4D47]/30" />
+              <span>Creators</span>
+              <span className="h-[1px] w-4 bg-[#0C4D47]/30" />
+              <span>Agents</span>
+            </div>
+            <div className="inline-flex items-center rounded-full border border-[#0c4d47] bg-[#0c4d47] px-3 py-1 text-xs tracking-wide text-[#bfad72]">
+              <span>Elevated travel, made simple</span>
+            </div>
           </div>
 
           <h1 className="font-display text-3xl leading-snug md:text-4xl lg:text-[42px]">
