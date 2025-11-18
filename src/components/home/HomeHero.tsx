@@ -10,11 +10,11 @@ export function HomeHero() {
       <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 pb-12 pt-16 md:flex-row md:items-center md:pt-20">
         {/* LEFT: Copy & CTAs */}
         <div className="w-full md:w-[52%] space-y-5">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-white/80 px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#8D8D8D]">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#0C4D47]">
             <span>Travelers</span>
-            <span className="h-[1px] w-4 bg-[#E5DFC6]" />
+            <span className="h-[1px] w-4 bg-[#0C4D47]/30" />
             <span>Creators</span>
-            <span className="h-[1px] w-4 bg-[#E5DFC6]" />
+            <span className="h-[1px] w-4 bg-[#0C4D47]/30" />
             <span>Agents</span>
           </div>
 
@@ -42,13 +42,13 @@ export function HomeHero() {
             <div className="inline-flex flex-wrap gap-2 text-sm">
               <Link
                 to="/creators"
-                className="rounded-full border border-[#BFAD72] bg-white px-4 py-2 font-semibold text-[#0a2225] hover:bg-[#f7f3ea]"
+                className="rounded-full border border-[#BFAD72] bg-white px-4 py-2 font-semibold text-[#0a2225] transition-all hover:bg-[#BFAD72] hover:text-white"
               >
                 Browse creators
               </Link>
               <Link
                 to="/agents"
-                className="rounded-full border border-[#E5DFC6] bg-white px-4 py-2 font-semibold text-[#0a2225] hover:bg-[#f7f3ea]"
+                className="rounded-full border border-[#E5DFC6] bg-white px-4 py-2 font-semibold text-[#0a2225] transition-all hover:bg-[#BFAD72] hover:text-white"
               >
                 Browse agents
               </Link>
