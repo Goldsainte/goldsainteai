@@ -76,7 +76,10 @@ export default function MyBookingsPage() {
         console.error("Error loading bookings:", error);
         setBookings([]);
       } else {
-        setBookings((data ?? []) as BookingRow[]);
+        setBookings((data ?? []).map((b: any) => ({
+          ...b,
+          total_price_cents: b.total_amount ? b.total_amount * 100 : 0
+        })) as BookingRow[]);
       }
 
       setLoading(false);
@@ -261,7 +264,13 @@ function BookingRowCard({
                 creator_id: reviewTarget === "creator" ? booking.creator_id : null,
               };
 
-              const { error } = await supabase.from("reviews").insert(payload);
+              const { error } = await supabase.from("agent_reviews").insert({
+                job_id: booking.id,
+                agent_id: booking.id,
+                rating: reviewData.rating,
+                review_text: reviewData.comment || "",
+                user_id: user.id,
+              });
               if (error) throw error;
 
               toast({

@@ -26,8 +26,8 @@ export default function AdminCreatorsPage() {
       try {
         const { data, error: profileError } = await supabase
           .from("profiles")
-          .select("id, display_name, tiktok_handle, avg_rating, rating_count")
-          .eq("account_type", "creator")
+          .select("id, full_name, username")
+          .eq("role", "creator")
           .order("created_at", { ascending: false });
 
         if (profileError) throw profileError;
@@ -37,7 +37,7 @@ export default function AdminCreatorsPage() {
         if (ids.length) {
           const { data: bookings } = await supabase
             .from("bookings")
-            .select("id, creator_id, creator_commission_amount_cents")
+            .select("id, creator_id, creator_earnings")
             .in("creator_id", ids);
 
           (bookings || []).forEach((row) => {
@@ -45,7 +45,7 @@ export default function AdminCreatorsPage() {
             const current = bookingStats.get(row.creator_id) || { count: 0, earnings: 0 };
             bookingStats.set(row.creator_id, {
               count: current.count + 1,
-              earnings: current.earnings + (row.creator_commission_amount_cents || 0),
+              earnings: current.earnings + ((row.creator_earnings || 0) * 100),
             });
           });
         }
@@ -57,10 +57,10 @@ export default function AdminCreatorsPage() {
             const stats = bookingStats.get(row.id) || { count: 0, earnings: 0 };
             return {
               id: row.id,
-              name: row.display_name || "Goldsainte creator",
-              handle: row.tiktok_handle || null,
-              avgRating: row.avg_rating,
-              ratingCount: row.rating_count,
+              name: row.full_name || row.username || "Goldsainte creator",
+              handle: null,
+              avgRating: 0,
+              ratingCount: 0,
               totalBookings: stats.count,
               totalEarningsCents: stats.earnings,
             };
