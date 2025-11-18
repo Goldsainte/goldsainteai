@@ -9,7 +9,7 @@ export function TikTokLabHighlight() {
         <div className="space-y-3 md:space-y-4">
           <div className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-[11px] font-medium text-[#0a2225] ring-1 ring-[#BFAD72]/60">
             <Sparkles className="h-3 w-3 text-[#BFAD72]" />
-            <span>TikTok Travel Lab · For creators & agents</span>
+            <span>Goldsainte Creator Lab · For creators & agents</span>
           </div>
 
           <h2 className="text-base font-semibold tracking-tight text-[#0a2225] md:text-lg">
@@ -17,7 +17,7 @@ export function TikTokLabHighlight() {
           </h2>
 
           <p className="text-xs text-[#4a4a4a] md:text-sm">
-            The TikTok Travel Lab is your creative workspace inside Goldsainte.
+            The Goldsainte Creator Lab is your creative workspace inside Goldsainte.
             Draft hooks and captions, pin imagery to a storyboard, and connect
             each idea to a real, bookable itinerary in the marketplace.
           </p>
@@ -34,7 +34,7 @@ export function TikTokLabHighlight() {
               className="inline-flex items-center justify-center rounded-full bg-[#0c4d47] px-5 py-2 text-xs font-semibold text-[#E5DFC6] shadow-sm hover:bg-[#0b3e3a]"
             >
               <PenSquare className="mr-2 h-4 w-4" />
-              Open TikTok Travel Lab
+              Open Goldsainte Creator Lab
             </Link>
           </div>
         </div>

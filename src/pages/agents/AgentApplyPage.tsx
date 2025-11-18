@@ -35,7 +35,8 @@ export default function AgentApplyPage() {
     async function loadStatus() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        navigate("/auth?redirect=/apply/agent");
+        sessionStorage.setItem('returnTo', '/apply/agent');
+        navigate("/auth?returnTo=/apply/agent");
         return;
       }
 

@@ -35,7 +35,7 @@ export default function Index() {
         {/* Storyboard preview – Pinterest vibes, Goldsainte colors */}
         <StoryboardPreview />
 
-        {/* TikTok Travel Lab highlight */}
+        {/* Goldsainte Creator Lab highlight */}
         <TikTokLabHighlight />
       </main>
     </>

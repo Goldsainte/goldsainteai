@@ -159,7 +159,7 @@ export default function CreatorOnboardingPage() {
               disabled={saving}
               className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-4 py-2 text-[11px] font-semibold hover:bg-[#073331] disabled:opacity-50"
             >
-              {saving ? "Finishing…" : "Go to TikTok Lab"}
+              {saving ? "Finishing…" : "Go to Goldsainte Creator Lab"}
               <ArrowRight className="h-3 w-3" />
             </button>
           )}
@@ -384,7 +384,7 @@ function Step4Storyboard() {
       </div>
 
       <p className="text-[10px] text-[#8D8D8D]">
-        After onboarding, you'll land in TikTok Lab where you can manage
+        After onboarding, you'll land in Goldsainte Creator Lab where you can manage
         storyboards, see requests and track earnings.
       </p>
     </div>

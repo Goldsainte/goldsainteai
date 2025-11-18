@@ -32,6 +32,8 @@ import { VoiceStatusMessage } from "./concierge/VoiceStatusMessage";
 import { ResultCards } from "./concierge/ResultCards";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { StartStoryboardFromChat } from "./concierge/StartStoryboardFromChat";
+import { ConciergeIntroModal } from "./concierge/ConciergeIntroModal";
+import { MusicIndicator } from "./concierge/MusicIndicator";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -61,6 +63,11 @@ export const AIBookingConcierge = () => {
   const [showBgMusicPrompt, setShowBgMusicPrompt] = useState(false);
   const [showWelcomeCard, setShowWelcomeCard] = useState(true);
   const [hasPlayedIntro, setHasPlayedIntro] = useState(false);
+  const [showIntroModal, setShowIntroModal] = useState(false);
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const [hasSeenIntro, setHasSeenIntro] = useState(() => {
+    return localStorage.getItem('conciergeIntroSeen') === 'true';
+  });
   const [preferences, setPreferences] = useState<ChatPreferences>(() => {
     const saved = localStorage.getItem('aiChatPreferences');
     return saved ? JSON.parse(saved) : DEFAULT_PREFERENCES;
@@ -296,12 +303,25 @@ export const AIBookingConcierge = () => {
     console.log('[Concierge] Widget open state changed:', isOpen);
     if (isOpen && bgMusicRef.current) {
       console.log('[Concierge] Starting background music...');
-      bgMusicRef.current.start();
+      
+      // Show intro modal on first open
+      if (!hasSeenIntro) {
+        setShowIntroModal(true);
+      } else {
+        // Arm and start music directly if user has seen intro
+        bgMusicRef.current.arm().then(() => {
+          bgMusicRef.current?.start();
+          setIsMusicPlaying(true);
+        }).catch(err => {
+          console.warn('[Concierge] Failed to start background music:', err);
+        });
+      }
     } else if (!isOpen && bgMusicRef.current) {
       console.log('[Concierge] Stopping background music...');
       bgMusicRef.current.stop();
+      setIsMusicPlaying(false);
     }
-  }, [isOpen]);
+  }, [isOpen, hasSeenIntro]);
 
   // Play/stop hold music based on voice status
   useEffect(() => {
@@ -1214,6 +1234,37 @@ export const AIBookingConcierge = () => {
     }, 500);
   };
 
+  const handleEnableFeatures = async () => {
+    // Mark intro as seen
+    localStorage.setItem('conciergeIntroSeen', 'true');
+    setHasSeenIntro(true);
+    
+    // Arm and start background music
+    try {
+      await bgMusicRef.current?.arm();
+      await bgMusicRef.current?.start();
+      setIsMusicPlaying(true);
+      console.log('[Concierge] Background music started after intro');
+    } catch (err) {
+      console.warn('[Concierge] Failed to start background music:', err);
+    }
+  };
+
+  const handleMusicToggle = async () => {
+    if (isMusicPlaying) {
+      bgMusicRef.current?.stop();
+      setIsMusicPlaying(false);
+    } else {
+      try {
+        await bgMusicRef.current?.arm();
+        await bgMusicRef.current?.start();
+        setIsMusicPlaying(true);
+      } catch (err) {
+        console.warn('[Concierge] Failed to toggle music:', err);
+      }
+    }
+  };
+
   // Start wake word detection globally on component mount (not tied to widget open state)
   useEffect(() => {
     console.log('🎤 [GLOBAL] Starting wake word detection on mount');
@@ -1309,6 +1360,11 @@ export const AIBookingConcierge = () => {
           </div>
         </div>
         <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
+          <MusicIndicator
+            isPlaying={isMusicPlaying}
+            onToggle={handleMusicToggle}
+            className="text-primary-foreground border-primary-foreground/20"
+          />
           <VoiceStatusChip
             state={
               voiceMode || wakeWordActive ? 'listening' : 
@@ -1357,6 +1413,7 @@ export const AIBookingConcierge = () => {
                     setInput(prompt);
                     setTimeout(() => handleSend(), 100);
                   }}
+                  onStartVoice={toggleVoiceMode}
                 />
               )}
 
@@ -1769,6 +1826,13 @@ export const AIBookingConcierge = () => {
         voiceChatRef={voiceChatRef}
         wakeWordDetectorRef={wakeWordDetectorRef}
         holdMusicRef={holdMusicRef}
+      />
+
+      {/* Intro Modal */}
+      <ConciergeIntroModal
+        open={showIntroModal}
+        onClose={() => setShowIntroModal(false)}
+        onEnableFeatures={handleEnableFeatures}
       />
     </Card>
   );

@@ -36,7 +36,7 @@ export function FeedSidebar() {
   const navItems = [
     { to: "/home", icon: Home, label: "Home" },
     { to: "/browse-creators", icon: Users, label: "Creator Marketplace" },
-    { to: "/tiktok-lab", icon: Video, label: "TikTok Lab" },
+    { to: "/tiktok-lab", icon: Video, label: "Goldsainte Creator Lab" },
     { to: "/messages", icon: MessageCircle, label: "Messages" },
     { to: "/creator-dashboard", icon: BarChart3, label: "Dashboard" },
   ];

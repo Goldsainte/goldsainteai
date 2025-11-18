@@ -93,7 +93,7 @@ export default function BrowseCreators() {
             to="/tiktok-lab"
             className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-neutral-800"
           >
-            Go to TikTok Travel Lab
+            Go to Goldsainte Creator Lab
           </Link>
         </header>
 

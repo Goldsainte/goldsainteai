@@ -152,7 +152,7 @@ export default function BookingDetailPage() {
             className="inline-flex items-center gap-1 text-[10px] text-[#8D8D8D]"
           >
             <ArrowLeft className="h-3 w-3" />
-            Back to TikTok Lab
+            Back to Goldsainte Creator Lab
           </Link>
         </div>
 

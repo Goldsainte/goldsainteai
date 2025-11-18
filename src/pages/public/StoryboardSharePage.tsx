@@ -59,8 +59,9 @@ export default function StoryboardSharePage() {
     const target = `/post-trip?fromStoryboard=${storyboard.id}`;
 
     if (!userId) {
-      // If not logged in, redirect via sign-in page with redirect param
-      navigate(`/auth?redirect=${encodeURIComponent(target)}`);
+      // If not logged in, redirect via sign-in page with returnTo param
+      sessionStorage.setItem('returnTo', target);
+      navigate(`/auth?returnTo=${encodeURIComponent(target)}`);
     } else {
       navigate(target);
     }
