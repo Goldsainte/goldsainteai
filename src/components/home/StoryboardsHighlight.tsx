@@ -47,8 +47,8 @@ export function StoryboardsHighlight() {
     <section className="bg-white border-y border-[#E5DFC6]/30 py-16 md:py-20">
       <div className="mx-auto max-w-6xl px-4">
         <div className="text-center mb-12">
-          <h2 className="font-display text-3xl leading-snug text-[#0a2225] md:text-4xl lg:text-[42px] mb-4">
-            Storyboards: where every Goldsainte trip begins
+          <h2 className="font-display text-[26px] leading-snug text-[#0a2225] md:text-[31px] lg:text-[36px] mb-4">
+            Storyboards: The Blueprint for Every <span className="italic">Goldsainte AI</span> Journey
           </h2>
           <p className="mx-auto max-w-3xl text-sm leading-relaxed text-[#4a4a4a] md:text-base">
             Every trip on Goldsainte starts as a storyboard—a visual brief that blends your saved TikToks, 
