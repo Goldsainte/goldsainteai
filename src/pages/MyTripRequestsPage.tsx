@@ -39,6 +39,8 @@ export default function MyTripRequestsPage() {
         return;
       }
 
+      console.log("[MyTripRequests] User ID:", userData.user.id);
+
       const { data, error } = await supabase
         .from("trip_requests")
         .select(
@@ -61,6 +63,8 @@ export default function MyTripRequestsPage() {
         .order("created_at", { ascending: false });
 
       if (!isMounted) return;
+
+      console.log("[MyTripRequests] Query result:", { data, error, count: data?.length });
 
       if (error) {
         console.error("Error loading my trip_requests:", error);
