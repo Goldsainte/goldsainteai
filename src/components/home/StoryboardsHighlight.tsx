@@ -9,7 +9,7 @@ export function StoryboardsHighlight() {
       id: 1,
       title: "Amalfi Coast Long Weekend",
       subtitle: "Creator + Agent collab",
-      image: "https://images.unsplash.com/photo-1534113414509-0bd4d47a3f3a?w=800&auto=format&fit=crop",
+      image: "/home/jack-ward-rknrvCrfS1k-unsplash.jpg",
     },
     {
       id: 2,
