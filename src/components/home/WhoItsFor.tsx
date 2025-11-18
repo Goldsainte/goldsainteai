@@ -23,7 +23,7 @@ export function WhoItsFor() {
         <div className="flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-12">
           {/* Left: Text content (60%) */}
           <div className="lg:w-[60%]">
-            <h2 className="font-display text-3xl leading-snug md:text-4xl lg:text-[42px] text-[#0a2225] mb-12">
+            <h2 className="inline-block rounded-full border border-[#E5DFC6] bg-[#BFAD72] text-[#0C4D47] font-display text-3xl leading-snug md:text-4xl lg:text-[42px] px-4 md:px-6 py-2 md:py-3 text-center whitespace-normal break-words mb-12">
               Who Goldsainte is for
             </h2>
 
