@@ -20,47 +20,68 @@ export function WhoItsFor() {
             </h2>
 
             {/* Three roles in columns */}
-            <div className="grid gap-10 md:grid-cols-3 md:gap-8">
+            <div className="grid gap-6 md:grid-cols-3 md:gap-6">
               {/* Travelers */}
-              <div className="relative">
-                <div className="text-[10px] uppercase tracking-[0.18em] text-[#8D8D8D] mb-3">
+              <div className="relative border border-[#BFAD72] rounded-2xl p-6 bg-white/50 transition-all duration-300 hover:shadow-sm">
+                <div className="text-[10px] uppercase tracking-[0.18em] text-[#8D8D8D] mb-4">
                   TRAVELERS
                 </div>
-                <div className="space-y-3 text-sm leading-[1.7] text-[#4a4a4a]">
-                  <p>Turn TikToks, Reels and screenshots into a real itinerary.</p>
-                  <p>Get matched with creators and certified agents who fit your style and budget.</p>
-                  <p>Book inside a protected, luxury marketplace with escrow and support.</p>
-                </div>
+                <ul className="space-y-3 text-sm leading-[1.7] text-[#4a4a4a]">
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#BFAD72]"></span>
+                    <span>Turn TikToks, Reels and screenshots into a real itinerary.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#BFAD72]"></span>
+                    <span>Get matched with creators and certified agents who fit your style and budget.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#BFAD72]"></span>
+                    <span>Book inside a protected, luxury marketplace with escrow and support.</span>
+                  </li>
+                </ul>
               </div>
-
-              {/* Divider */}
-              <div className="hidden md:block absolute left-1/3 top-0 bottom-0 w-px bg-[#E5DFC6]/50" />
 
               {/* Creators */}
-              <div className="relative">
-                <div className="text-[10px] uppercase tracking-[0.18em] text-[#8D8D8D] mb-3">
+              <div className="relative border border-[#BFAD72] rounded-2xl p-6 bg-white/50 transition-all duration-300 hover:shadow-sm">
+                <div className="text-[10px] uppercase tracking-[0.18em] text-[#8D8D8D] mb-4">
                   CREATORS
                 </div>
-                <div className="space-y-3 text-sm leading-[1.7] text-[#4a4a4a]">
-                  <p>Turn your best travel content into bookable storyboards.</p>
-                  <p>Partner with vetted agents who handle rates, contracts and logistics.</p>
-                  <p>Earn a share on every trip booked—without becoming a travel agent.</p>
-                </div>
+                <ul className="space-y-3 text-sm leading-[1.7] text-[#4a4a4a]">
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#BFAD72]"></span>
+                    <span>Turn your best travel content into bookable storyboards.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#BFAD72]"></span>
+                    <span>Partner with vetted agents who handle rates, contracts and logistics.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#BFAD72]"></span>
+                    <span>Earn a share on every trip booked—without becoming a travel agent.</span>
+                  </li>
+                </ul>
               </div>
 
-              {/* Divider */}
-              <div className="hidden md:block absolute left-2/3 top-0 bottom-0 w-px bg-[#E5DFC6]/50" />
-
               {/* Travel Agents */}
-              <div className="relative">
-                <div className="text-[10px] uppercase tracking-[0.18em] text-[#8D8D8D] mb-3">
+              <div className="relative border border-[#BFAD72] rounded-2xl p-6 bg-white/50 transition-all duration-300 hover:shadow-sm">
+                <div className="text-[10px] uppercase tracking-[0.18em] text-[#8D8D8D] mb-4">
                   TRAVEL AGENTS
                 </div>
-                <div className="space-y-3 text-sm leading-[1.7] text-[#4a4a4a]">
-                  <p>Receive high-intent briefs from travelers who already know what they want to feel.</p>
-                  <p>Collaborate with creators on storyboards that pre-sell your itineraries.</p>
-                  <p>Manage payments and protection through Goldsainte's escrow and identity checks.</p>
-                </div>
+                <ul className="space-y-3 text-sm leading-[1.7] text-[#4a4a4a]">
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#BFAD72]"></span>
+                    <span>Receive high-intent briefs from travelers who already know what they want to feel.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#BFAD72]"></span>
+                    <span>Collaborate with creators on storyboards that pre-sell your itineraries.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#BFAD72]"></span>
+                    <span>Manage payments and protection through Goldsainte's escrow and identity checks.</span>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
