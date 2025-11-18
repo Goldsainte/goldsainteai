@@ -1,13 +1,14 @@
-import { MessageSquare, Sparkles, Users, FileText } from "lucide-react";
+import { MessageSquare, Sparkles, Users, FileText, Mic } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 interface WelcomeCardProps {
   onDismiss: () => void;
   onPromptClick: (prompt: string) => void;
+  onStartVoice?: () => void;
 }
 
-export const WelcomeCard = ({ onDismiss, onPromptClick }: WelcomeCardProps) => {
+export const WelcomeCard = ({ onDismiss, onPromptClick, onStartVoice }: WelcomeCardProps) => {
   const starterPrompts = [
     "Help me plan a trip based on a TikTok I saved.",
     "Build a storyboard for a Bali honeymoon.",
@@ -28,10 +29,25 @@ export const WelcomeCard = ({ onDismiss, onPromptClick }: WelcomeCardProps) => {
             I help travelers turn inspiration into storyboards, match with creators and certified agents, and shape every detail of a luxury trip — all inside Goldsainte.
           </p>
         </div>
+
+        {/* Voice Mode CTA */}
+        {onStartVoice && (
+          <Button
+            onClick={() => {
+              onStartVoice();
+              onDismiss();
+            }}
+            size="lg"
+            className="w-full gap-2 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 animate-pulse"
+          >
+            <Mic className="w-4 h-4" />
+            Start Voice Conversation
+          </Button>
+        )}
         
         <div className="space-y-1.5">
           <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-2">
-            Try asking:
+            Or try asking:
           </p>
           <div className="grid grid-cols-1 gap-1.5">
             {starterPrompts.slice(0, 3).map((prompt, idx) => (

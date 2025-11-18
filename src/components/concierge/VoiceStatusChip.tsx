@@ -14,21 +14,21 @@ interface VoiceStatusChipProps {
 export const VoiceStatusChip = ({ state, onClick, className }: VoiceStatusChipProps) => {
   const config = {
     idle: {
-      icon: <Circle className="w-3.5 h-3.5" />,
-      text: "Voice Ready",
-      tooltip: "Click to enable voice",
-      emoji: "🎧",
+      icon: <Circle className="w-4 h-4" />,
+      text: "Try Voice",
+      tooltip: "Click to start voice conversation with Madison",
+      emoji: "🎤",
     },
     listening: {
-      icon: <Radio className="w-3.5 h-3.5 animate-pulse" />,
+      icon: <Radio className="w-4 h-4 animate-pulse" />,
       text: "Listening...",
-      tooltip: "Click to pause",
+      tooltip: "Click to pause voice mode",
       emoji: "🟢",
     },
     muted: {
-      icon: <VolumeX className="w-3.5 h-3.5" />,
+      icon: <VolumeX className="w-4 h-4" />,
       text: "Voice Off",
-      tooltip: "Click to unmute",
+      tooltip: "Click to unmute voice",
       emoji: "🔇",
     },
   };
@@ -39,17 +39,18 @@ export const VoiceStatusChip = ({ state, onClick, className }: VoiceStatusChipPr
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
-          variant="secondary"
+          variant={state === 'idle' ? 'default' : 'secondary'}
           size="sm"
           onClick={onClick}
           className={cn(
-            "gap-1.5 text-xs font-medium transition-all",
+            "gap-2 text-xs font-medium transition-all",
+            state === 'idle' && "bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 animate-pulse",
             state === 'listening' && "bg-gradient-to-r from-primary/10 to-accent/10 border-primary/30",
             className
           )}
         >
-          <span className="text-sm">{current.emoji}</span>
-          <span className="hidden sm:inline">{current.text}</span>
+          <span className="text-base">{current.emoji}</span>
+          <span>{current.text}</span>
           {current.icon}
         </Button>
       </TooltipTrigger>
