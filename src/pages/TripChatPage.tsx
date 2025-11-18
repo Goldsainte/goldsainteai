@@ -64,7 +64,9 @@ export default function TripChatPage() {
       const { data: userData, error: userError } =
         await supabase.auth.getUser();
       if (!userData?.user || userError) {
-        navigate(`/login?redirect=/trip-request/${id}/chat`, {
+        const target = `/trip-request/${id}/chat`;
+        sessionStorage.setItem('returnTo', target);
+        navigate(`/auth?returnTo=${encodeURIComponent(target)}`, {
           replace: true,
         });
         return;

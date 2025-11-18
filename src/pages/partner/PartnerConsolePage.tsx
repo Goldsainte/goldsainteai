@@ -28,7 +28,8 @@ export default function PartnerConsolePage() {
 
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        navigate("/login?redirect=/partner", { replace: true });
+        sessionStorage.setItem('returnTo', '/partner');
+        navigate("/auth?returnTo=/partner", { replace: true });
         return;
       }
 

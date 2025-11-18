@@ -62,7 +62,8 @@ export default function AdminAgentsPage() {
 
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        navigate("/auth?redirect=/admin/agents");
+        sessionStorage.setItem('returnTo', '/admin/agents');
+        navigate("/auth?returnTo=/admin/agents");
         return;
       }
 

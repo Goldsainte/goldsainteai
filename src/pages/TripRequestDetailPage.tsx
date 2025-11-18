@@ -98,7 +98,9 @@ export default function TripRequestDetailPage() {
       const { data: userData, error: userError } =
         await supabase.auth.getUser();
       if (!userData?.user || userError) {
-        navigate(`/login?redirect=/trip-request/${id}`, { replace: true });
+        const target = `/trip-request/${id}`;
+        sessionStorage.setItem('returnTo', target);
+        navigate(`/auth?returnTo=${encodeURIComponent(target)}`, { replace: true });
         return;
       }
 

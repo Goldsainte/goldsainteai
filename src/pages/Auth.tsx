@@ -40,8 +40,10 @@ const Auth = () => {
   useEffect(() => {
     if (user && !authLoading) {
       const params = new URLSearchParams(window.location.search);
-      const returnTo = params.get('returnTo');
+      const returnTo = params.get('returnTo') || params.get('redirect') || sessionStorage.getItem('returnTo');
+      
       if (returnTo && returnTo.startsWith('/')) {
+        sessionStorage.removeItem('returnTo');
         navigate(returnTo, { replace: true });
         return;
       }
@@ -247,6 +249,12 @@ const Auth = () => {
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true);
+      
+      // Persist returnTo before OAuth
+      const params = new URLSearchParams(window.location.search);
+      const returnTo = params.get('returnTo') || '/';
+      sessionStorage.setItem('returnTo', returnTo);
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -268,6 +276,12 @@ const Auth = () => {
   const handleFacebookSignIn = async () => {
     try {
       setIsLoading(true);
+      
+      // Persist returnTo before OAuth
+      const params = new URLSearchParams(window.location.search);
+      const returnTo = params.get('returnTo') || '/';
+      sessionStorage.setItem('returnTo', returnTo);
+      
       const origin = encodeURIComponent(window.location.origin);
       const timestamp = Date.now();
       window.location.href = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/facebook-signin-init?origin=${origin}&cb=${timestamp}`;
@@ -284,6 +298,12 @@ const Auth = () => {
   const handleTikTokSignIn = async () => {
     try {
       setIsLoading(true);
+      
+      // Persist returnTo before OAuth
+      const params = new URLSearchParams(window.location.search);
+      const returnTo = params.get('returnTo') || '/';
+      sessionStorage.setItem('returnTo', returnTo);
+      
       const origin = encodeURIComponent(window.location.origin);
       const timestamp = Date.now();
       window.location.href = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tiktok-signin-init?origin=${origin}&cb=${timestamp}`;
@@ -300,6 +320,12 @@ const Auth = () => {
   const handleAppleSignIn = async () => {
     try {
       setIsLoading(true);
+      
+      // Persist returnTo before OAuth
+      const params = new URLSearchParams(window.location.search);
+      const returnTo = params.get('returnTo') || '/';
+      sessionStorage.setItem('returnTo', returnTo);
+      
       const origin = encodeURIComponent(window.location.origin);
       window.location.href = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/apple-signin-init?origin=${origin}&cb=${Date.now()}`;
     } catch (error: any) {

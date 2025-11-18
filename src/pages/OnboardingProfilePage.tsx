@@ -28,7 +28,8 @@ export default function OnboardingProfilePage() {
 
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (!user || userError) {
-        navigate("/auth?redirect=/onboarding/profile", { replace: true });
+        sessionStorage.setItem('returnTo', '/onboarding/profile');
+        navigate("/auth?returnTo=/onboarding/profile", { replace: true });
         return;
       }
 
@@ -88,7 +89,8 @@ export default function OnboardingProfilePage() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        navigate("/auth?redirect=/onboarding/profile", { replace: true });
+        sessionStorage.setItem('returnTo', '/onboarding/profile');
+        navigate("/auth?returnTo=/onboarding/profile", { replace: true });
         return;
       }
 
