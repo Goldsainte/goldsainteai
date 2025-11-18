@@ -190,16 +190,16 @@ export default function TripRequestDetail() {
         throw new Error("Proposal not found");
       }
 
-      const booking = await createBookingFromProposal({
+      await createBookingFromProposal({
         tripId: id,
         proposalId: proposalId,
       });
 
-      toast.success("Proposal accepted! Redirecting to booking...");
+      toast.success("Proposal accepted! Booking created successfully.");
       
-      // Redirect to booking page
+      // Redirect to bookings page
       setTimeout(() => {
-        navigate(`/bookings/${booking.id}`);
+        navigate("/bookings");
       }, 1000);
     } catch (err: any) {
       console.error(err);
