@@ -34,7 +34,8 @@ export default function MyTripRequestsPage() {
         await supabase.auth.getUser();
 
       if (userError || !userData.user) {
-        navigate("/login?redirect=/my-trip-requests", { replace: true });
+        sessionStorage.setItem('returnTo', '/my-trip-requests');
+        navigate("/auth?returnTo=/my-trip-requests", { replace: true });
         return;
       }
 

@@ -24,7 +24,8 @@ export default function TravelerDashboardPage() {
 
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        navigate("/login?redirect=/traveler", { replace: true });
+        sessionStorage.setItem('returnTo', '/traveler');
+        navigate("/auth?returnTo=/traveler", { replace: true });
         return;
       }
 

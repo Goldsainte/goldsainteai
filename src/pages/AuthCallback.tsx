@@ -34,7 +34,12 @@ const AuthCallback = () => {
           });
         }
 
-        navigate('/');
+        // Honor returnTo from query params or sessionStorage
+        const params = new URLSearchParams(window.location.search);
+        const returnTo = params.get('returnTo') || sessionStorage.getItem('returnTo');
+        sessionStorage.removeItem('returnTo');
+        
+        navigate(returnTo?.startsWith('/') ? returnTo : '/', { replace: true });
       } else {
         navigate('/auth');
       }

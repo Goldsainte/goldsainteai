@@ -23,7 +23,10 @@ export default function AdminHomePage() {
   useEffect(() => {
     async function loadAdmin() {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return navigate("/auth?redirect=/admin");
+      if (!user) {
+        sessionStorage.setItem('returnTo', '/admin');
+        return navigate("/auth?returnTo=/admin");
+      }
 
       const { data: profile } = await supabase
         .from("profiles")

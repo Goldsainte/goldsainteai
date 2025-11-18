@@ -33,7 +33,8 @@ export default function TripRequestsBoardPage() {
       const { data: userData, error: userError } =
         await supabase.auth.getUser();
       if (userError || !userData.user) {
-        navigate("/login?redirect=/trip-requests", { replace: true });
+        sessionStorage.setItem('returnTo', '/trip-requests');
+        navigate("/auth?returnTo=/trip-requests", { replace: true });
         return;
       }
 

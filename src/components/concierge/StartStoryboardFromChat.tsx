@@ -17,7 +17,8 @@ export function StartStoryboardFromChat({ sessionId, ownerRole = "traveler" }: P
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        navigate("/auth?redirect=/concierge");
+        sessionStorage.setItem('returnTo', '/concierge');
+        navigate("/auth?returnTo=/concierge");
         return;
       }
 

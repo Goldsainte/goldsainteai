@@ -16,7 +16,9 @@ export function useRequireOnboarding() {
       const { data: { user } } = await supabase.auth.getUser();
 
       if (!user) {
-        navigate(`/auth?redirect=${encodeURIComponent(location.pathname)}`, {
+        const target = location.pathname;
+        sessionStorage.setItem('returnTo', target);
+        navigate(`/auth?returnTo=${encodeURIComponent(target)}`, {
           replace: true,
         });
         return;
