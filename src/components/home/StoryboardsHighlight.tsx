@@ -47,7 +47,7 @@ export function StoryboardsHighlight() {
     <section className="bg-white border-y border-[#E5DFC6]/30 py-16 md:py-20">
       <div className="mx-auto max-w-6xl px-4">
         <div className="text-center mb-12">
-          <h2 className="font-display text-[28px] leading-snug text-[#0a2225] md:text-[34px] mb-4">
+          <h2 className="font-display text-3xl leading-snug text-[#0a2225] md:text-4xl lg:text-[42px] mb-4">
             Storyboards: where every Goldsainte trip begins
           </h2>
           <p className="mx-auto max-w-3xl text-sm leading-relaxed text-[#4a4a4a] md:text-base">

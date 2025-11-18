@@ -43,7 +43,7 @@ export function HowItWorksTimeline() {
   return (
     <section className="bg-[#f7f3ea] py-20 md:py-24">
       <div className="mx-auto max-w-5xl px-4">
-        <h2 className="text-center font-display text-[28px] leading-snug text-[#0a2225] md:text-[34px] mb-16">
+        <h2 className="text-center font-display text-3xl leading-snug text-[#0a2225] md:text-4xl lg:text-[42px] mb-16">
           How Goldsainte works
         </h2>
 
