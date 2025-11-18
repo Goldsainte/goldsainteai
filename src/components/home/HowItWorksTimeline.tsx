@@ -1,4 +1,6 @@
 // src/components/home/HowItWorksTimeline.tsx
+import { HomePhotoStrip } from "./HomePhotoStrip";
+
 export function HowItWorksTimeline() {
   const steps = [
     {
@@ -23,46 +25,69 @@ export function HowItWorksTimeline() {
     },
   ];
 
+  const photoCollageImages = [
+    {
+      src: "/home/nicolas-meunier-WKGmcxLdXC4-unsplash.jpeg",
+      alt: "City street with banners",
+    },
+    {
+      src: "/home/alexandre-barbosa-2V5Gq6Y95Ao-unsplash.jpeg",
+      alt: "Snow-covered tree and mountains",
+    },
+    {
+      src: "/home/justin-clark-JkT5-MulyiE-unsplash.jpg",
+      alt: "Creator with plane overhead",
+    },
+  ];
+
   return (
-    <section className="bg-[#f7f3ea] py-16 md:py-20">
+    <section className="bg-[#f7f3ea] py-20 md:py-24">
       <div className="mx-auto max-w-5xl px-4">
-        <h2 className="text-center font-display text-[28px] leading-snug text-[#0a2225] md:text-[34px] mb-12 md:mb-16">
+        <h2 className="text-center font-display text-[28px] leading-snug text-[#0a2225] md:text-[34px] mb-16">
           How Goldsainte works
         </h2>
 
-        <div className="space-y-12 md:space-y-16">
-          {steps.map((step, index) => (
-            <div key={index} className="relative">
-              <div className="flex flex-col md:flex-row md:items-start gap-6">
-                {/* Step number circle */}
-                <div className="flex-shrink-0">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#BFAD72] bg-white">
-                    <span className="font-display text-lg text-[#0a2225]">
-                      {index + 1}
-                    </span>
+        <div className="flex flex-col lg:flex-row gap-12">
+          {/* Left: Timeline (50%) */}
+          <div className="lg:w-1/2 space-y-20">
+            {steps.map((step, index) => (
+              <div key={index} className="relative">
+                <div className="flex items-start gap-6">
+                  {/* Step circle */}
+                  <div className="flex-shrink-0">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-[#BFAD72] bg-white">
+                      <span className="font-display text-xl text-[#0a2225]">
+                        {index + 1}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Step content */}
+                  <div className="flex-1 pt-2">
+                    <div className="text-[10px] uppercase tracking-[0.18em] text-[#8D8D8D]/70 mb-2">
+                      {step.label}
+                    </div>
+                    <h3 className="font-display text-2xl md:text-3xl text-[#0a2225] mb-3">
+                      {step.title}
+                    </h3>
+                    <p className="text-sm md:text-base leading-[1.7] text-[#4a4a4a] max-w-[600px]">
+                      {step.body}
+                    </p>
                   </div>
                 </div>
 
-                {/* Step content */}
-                <div className="flex-1">
-                  <div className="text-xs uppercase tracking-[0.18em] text-[#8D8D8D] mb-2">
-                    {step.label}
-                  </div>
-                  <h3 className="font-display text-xl text-[#0a2225] mb-3">
-                    {step.title}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-[#4a4a4a] max-w-2xl">
-                    {step.body}
-                  </p>
-                </div>
+                {/* Connecting line */}
+                {index < steps.length - 1 && (
+                  <div className="absolute left-7 top-14 bottom-0 w-0.5 bg-[#E5DFC6] -translate-x-px h-20" />
+                )}
               </div>
+            ))}
+          </div>
 
-              {/* Connecting line (not on last step) */}
-              {index < steps.length - 1 && (
-                <div className="absolute left-6 top-12 bottom-0 w-px bg-[#E5DFC6] -translate-x-px md:h-12" />
-              )}
-            </div>
-          ))}
+          {/* Right: Photo collage (50%) */}
+          <div className="lg:w-1/2">
+            <HomePhotoStrip images={photoCollageImages} layout="vertical" />
+          </div>
         </div>
       </div>
     </section>

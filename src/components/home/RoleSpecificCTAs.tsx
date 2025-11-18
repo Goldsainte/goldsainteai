@@ -11,6 +11,7 @@ export function RoleSpecificCTAs() {
       body: "Tell Madison what you're dreaming about and let creators and agents do the heavy lifting.",
       buttonText: "Start my trip brief",
       link: "/post-trip",
+      backgroundImage: "/home/christian-lambert-vmIWr0NnpCQ-unsplash.jpeg",
     },
     {
       icon: Video,
@@ -18,6 +19,7 @@ export function RoleSpecificCTAs() {
       body: "Set up your creator profile, connect TikTok, and start turning your audience into curated journeys.",
       buttonText: "Creator sign up",
       link: "/auth?mode=signup&role=creator",
+      backgroundImage: "/home/justin-clark-JkT5-MulyiE-unsplash.jpg",
     },
     {
       icon: Briefcase,
@@ -25,11 +27,12 @@ export function RoleSpecificCTAs() {
       body: "Share your credentials, specialties and preferred markets. Once verified, you'll receive curated briefs from qualified travelers.",
       buttonText: "Agent application",
       link: "/apply/agent",
+      backgroundImage: "/home/nicolas-meunier-WKGmcxLdXC4-unsplash.jpeg",
     },
   ];
 
   return (
-    <section className="bg-white border-t border-[#E5DFC6]/30 py-16 md:py-20">
+    <section className="bg-white border-t border-[#E5DFC6]/30 py-20 md:py-24">
       <div className="mx-auto max-w-6xl px-4">
         <h2 className="text-center font-display text-[28px] leading-snug text-[#0a2225] md:text-[34px] mb-12">
           Choose how you join Goldsainte
@@ -41,30 +44,44 @@ export function RoleSpecificCTAs() {
             return (
               <div
                 key={index}
-                className="flex flex-col rounded-3xl border border-[#E5DFC6] bg-[#f7f3ea]/50 p-6 md:p-8"
+                className="group flex flex-col rounded-2xl border border-[#E5DFC6] bg-white shadow-sm overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
               >
-                <div className="mb-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0c4d47]/10">
-                    <Icon className="h-6 w-6 text-[#0c4d47]" />
+                {/* Background image banner */}
+                <div className="relative h-32 overflow-hidden">
+                  <img
+                    src={role.backgroundImage}
+                    alt=""
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                  
+                  {/* Icon overlay */}
+                  <div className="absolute bottom-4 left-6">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm shadow-sm">
+                      <Icon className="h-6 w-6 text-[#0c4d47]" />
+                    </div>
                   </div>
                 </div>
-                
-                <h3 className="font-display text-xl text-[#0a2225] mb-3">
-                  {role.title}
-                </h3>
-                
-                <p className="text-sm leading-relaxed text-[#4a4a4a] mb-6 flex-1">
-                  {role.body}
-                </p>
 
-                <Button
-                  asChild
-                  className="w-full bg-[#0c4d47] text-[#E5DFC6] hover:bg-[#073331]"
-                >
-                  <Link to={role.link}>
-                    {role.buttonText}
-                  </Link>
-                </Button>
+                {/* Content */}
+                <div className="flex flex-col flex-1 p-8">
+                  <h3 className="font-display text-xl text-[#0a2225] mb-3">
+                    {role.title}
+                  </h3>
+                  
+                  <p className="text-sm leading-[1.7] text-[#4a4a4a] mb-6 flex-1">
+                    {role.body}
+                  </p>
+
+                  <Button
+                    asChild
+                    className="w-full bg-[#0c4d47] text-[#E5DFC6] hover:bg-[#073331] transition-colors duration-300"
+                  >
+                    <Link to={role.link}>
+                      {role.buttonText}
+                    </Link>
+                  </Button>
+                </div>
               </div>
             );
           })}
