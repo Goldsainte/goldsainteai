@@ -29,7 +29,7 @@ export default function CreatorsPage() {
                 to="/tiktok-lab"
                 className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-4 py-2 text-[11px] font-semibold hover:bg-[#073331]"
               >
-                Start in TikTok Lab
+                Start in Goldsainte Creator Lab
                 <ArrowRight className="h-3 w-3" />
               </Link>
               <a
@@ -223,7 +223,7 @@ export default function CreatorsPage() {
                 </p>
                 <p className="text-[#4a4a4a]">
                   Goldsainte handles secure payments, escrow and payouts. You
-                  track your earnings in TikTok Lab — clearly, without guessing.
+                  track your earnings in Goldsainte Creator Lab — clearly, without guessing.
                 </p>
               </div>
             </li>

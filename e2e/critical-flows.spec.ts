@@ -157,7 +157,7 @@ test.describe('Critical Production Flows - P0 Validation', () => {
     });
   });
 
-  test.describe('P0-4: TikTok Lab Storyboard Navigation', () => {
+  test.describe('P0-4: Goldsainte Creator Lab Storyboard Navigation', () => {
     test('should render the storyboard list shell with CTA', async ({ page }) => {
       await page.goto('/tiktok-lab/storyboards');
 

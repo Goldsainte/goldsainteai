@@ -90,7 +90,7 @@ export default function TravelerDashboardPage() {
               to="/tiktok-lab"
               className="rounded-full border border-border bg-card px-3 py-1 hover:bg-accent"
             >
-              Open TikTok Lab
+              Open Goldsainte Creator Lab
             </Link>
           </div>
         </header>
@@ -219,7 +219,7 @@ export default function TravelerDashboardPage() {
               Ready to turn your next TikTok inspo into a real booking?
             </p>
             <p className="text-[11px] text-muted-foreground">
-              Use TikTok Lab to pair your favorite creators with Goldsainte
+              Use Goldsainte Creator Lab to pair your favorite creators with Goldsainte
               agents — then see everything land back here in your dashboard.
             </p>
           </div>
@@ -227,7 +227,7 @@ export default function TravelerDashboardPage() {
             to="/tiktok-lab"
             className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-[11px] hover:bg-accent/50"
           >
-            Open TikTok Lab
+            Open Goldsainte Creator Lab
             <ArrowRight className="h-3 w-3" />
           </Link>
         </section>

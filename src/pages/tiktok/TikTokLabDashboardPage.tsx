@@ -126,7 +126,7 @@ export default function TikTokLabDashboardPage() {
             <div className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-[11px] border border-[#E5DFC6]">
               <Sparkles className="h-3 w-3 text-[#BFAD72]" />
               <span className="tracking-[0.16em] uppercase text-[#8D8D8D]">
-                TikTok Lab
+                Goldsainte Creator Lab
               </span>
             </div>
             <h1 className="font-display text-[24px] md:text-[28px] leading-tight">

@@ -53,7 +53,7 @@ export default function TikTokLabStoryboardsPage() {
   return (
     <>
       <Helmet>
-        <title>My Storyboards · TikTok Lab</title>
+        <title>My Storyboards · Goldsainte Creator Lab</title>
         <meta
           name="description"
           content="Manage your storyboards and turn your travel content into bookable trips."

@@ -94,7 +94,7 @@ export default function PartnerConsolePage() {
               to="/tiktok-lab"
               className="rounded-full bg-primary text-primary-foreground px-3 py-1 font-semibold hover:bg-primary/90"
             >
-              Open TikTok Lab
+              Open Goldsainte Creator Lab
             </Link>
             <Link
               to="/earnings"
@@ -162,7 +162,7 @@ export default function PartnerConsolePage() {
 
             {pipeline.proposals.length === 0 && !loading ? (
               <p className="text-[11px] text-muted-foreground">
-                No active proposals yet. Head to TikTok Lab or the trip
+                No active proposals yet. Head to Goldsainte Creator Lab or the trip
                 marketplace to find briefs to respond to.
               </p>
             ) : (
@@ -250,14 +250,14 @@ export default function PartnerConsolePage() {
           </div>
         </section>
 
-        {/* TikTok Lab CTA */}
+        {/* Goldsainte Creator Lab CTA */}
         <section className="rounded-3xl bg-accent text-accent-foreground p-4 md:p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs">
           <div className="space-y-1 max-w-xl">
             <p className="text-[11px] text-muted-foreground uppercase tracking-[0.2em]">
               Grow with Goldsainte
             </p>
             <p className="text-sm font-semibold">
-              Use TikTok Lab to design better boards and close more trips.
+              Use Goldsainte Creator Lab to design better boards and close more trips.
             </p>
             <p className="text-[11px] text-muted-foreground">
               Creators: storyboard each journey like a TikTok series. Agents:
@@ -269,7 +269,7 @@ export default function PartnerConsolePage() {
             to="/tiktok-lab"
             className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-[11px] hover:bg-accent/50"
           >
-            Open TikTok Lab
+            Open Goldsainte Creator Lab
             <ArrowRight className="h-3 w-3" />
           </Link>
         </section>

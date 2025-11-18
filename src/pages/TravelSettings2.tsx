@@ -169,7 +169,7 @@ const TravelSettings2 = () => {
           <SettingsItem
             icon={Grid2X2}
             title="Storyboards"
-            description="Manage collaborative trip templates in TikTok Lab"
+            description="Manage collaborative trip templates in Goldsainte Creator Lab"
             onClick={() => navigate('/tiktok-lab/storyboards')}
           />
         </div>

@@ -15,7 +15,7 @@ export default function TikTokLabPage() {
           <div className="space-y-5">
             <div className="inline-flex items-center gap-2 rounded-full bg-black/40 px-3 py-1 text-[11px] text-[#E5DFC6]/80 border border-[#BFAD72]/40">
               <Sparkles className="h-3 w-3 text-[#BFAD72]" />
-              TikTok Lab · by Goldsainte
+              Goldsainte Creator Lab · by Goldsainte
             </div>
             <h1 className="text-3xl md:text-4xl font-semibold tracking-tight">
               Turn TikTok travel into{" "}
@@ -82,7 +82,7 @@ export default function TikTokLabPage() {
       {/* How it works */}
       <section className="mx-auto max-w-6xl px-4 py-8 md:py-12">
         <h2 className="text-lg md:text-xl font-semibold mb-4">
-          How TikTok Lab works
+          How Goldsainte Creator Lab works
         </h2>
         <div className="grid gap-4 md:grid-cols-3 text-xs">
           <HowItWorksCard

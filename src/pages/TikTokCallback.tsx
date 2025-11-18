@@ -98,7 +98,7 @@ export default function TikTokCallback() {
                   Success!
                 </h2>
                 <p className="mt-2 text-sm text-neutral-600">
-                  Redirecting to TikTok Lab...
+                  Redirecting to Goldsainte Creator Lab...
                 </p>
               </div>
             </>
@@ -126,7 +126,7 @@ export default function TikTokCallback() {
                   Connection Failed
                 </h2>
                 <p className="mt-2 text-sm text-neutral-600">
-                  Redirecting back to TikTok Lab...
+                  Redirecting back to Goldsainte Creator Lab...
                 </p>
               </div>
             </>

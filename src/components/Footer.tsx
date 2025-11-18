@@ -44,7 +44,7 @@ export const Footer = () => {
             <AccordionContent>
               <ul className="space-y-3 text-sm text-muted-foreground">
                 <li><Link to="/browse-creators" className="hover:text-primary transition-colors">Creator Marketplace</Link></li>
-                <li><Link to="/tiktok-lab" className="hover:text-primary transition-colors">TikTok Travel Lab</Link></li>
+                <li><Link to="/tiktok-lab" className="hover:text-primary transition-colors">Goldsainte Creator Lab</Link></li>
                 <li><Link to="/tiktok-lab/storyboards" className="hover:text-primary transition-colors">{t('footer.storyboards')}</Link></li>
                 <li><Link to="/browse-agents" className="hover:text-primary transition-colors">{t('footer.travelAgentServices')}</Link></li>
                 <li><Link to="/cocurated-marketplace" className="hover:text-primary transition-colors">{t('footer.cocuratedPackages')}</Link></li>
@@ -118,7 +118,7 @@ export const Footer = () => {
             <h4 className="font-semibold mb-4 text-base">{t('footer.discover')}</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li><Link to="/browse-creators" className="hover:text-primary transition-colors">Creator Marketplace</Link></li>
-              <li><Link to="/tiktok-lab" className="hover:text-primary transition-colors">TikTok Travel Lab</Link></li>
+              <li><Link to="/tiktok-lab" className="hover:text-primary transition-colors">Goldsainte Creator Lab</Link></li>
               <li><Link to="/tiktok-lab/storyboards" className="hover:text-primary transition-colors">{t('footer.storyboards')}</Link></li>
               <li><Link to="/browse-agents" className="hover:text-primary transition-colors">{t('footer.travelAgentServices')}</Link></li>
               <li><Link to="/cocurated-marketplace" className="hover:text-primary transition-colors">{t('footer.cocuratedPackages')}</Link></li>
