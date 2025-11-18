@@ -2,10 +2,10 @@
 import beachFlowersImg from "@/assets/beach-flowers.jpg";                         // beach with red flowers
 import tokyoStreetImg from "@/assets/tokyo-street.jpg";                             // Tokyo street scene
 import photographerPlaneImg from "@/assets/photographer-plane.jpg";                 // photographer with plane
-import landRoverImg from "@/assets/alexandre-barbosa-2V5Gq6Y95Ao-unsplash.jpeg";    // group + Land Rover
+import elephantsSafariImg from "@/assets/elephants-safari.jpg";                     // elephants walking
 import snowyTravelerImg from "@/assets/erik-mclean-sG_rwogcBCw-unsplash.jpg";       // traveler in snow
 import friendsHikeImg from "@/assets/felix-rostig-UmV2wr-Vbq8-unsplash.jpeg";       // friends hiking
-import infinityPoolImg from "@/assets/maximilien-t-scharner-FD0Ga_KJTwM-unsplash.jpeg"; // infinity pool
+import resortPoolPalmsImg from "@/assets/resort-pool-palms.jpg";                    // resort pool with palms
 
 const steps = [
   {
@@ -40,10 +40,10 @@ const steps = [
 
 const collageImages = [
   beachFlowersImg,
-  infinityPoolImg,
+  resortPoolPalmsImg,
   tokyoStreetImg,
   friendsHikeImg,
-  landRoverImg,
+  elephantsSafariImg,
   photographerPlaneImg,
   snowyTravelerImg,
 ];
