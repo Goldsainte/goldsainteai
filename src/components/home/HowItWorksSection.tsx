@@ -55,7 +55,7 @@ export function HowItWorksSection() {
       <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 md:flex-row md:items-start">
         {/* LEFT: copy + steps */}
         <div className="w-full md:w-[52%] space-y-6">
-          <div className="inline-flex items-center rounded-full border border-[#0c4d47] bg-[#0c4d47] px-3 py-1 text-xs tracking-wide text-[#bfad72]">
+          <div className="inline-flex items-center rounded-full border border-[#0c4d47] bg-[#0c4d47] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#bfad72]">
             <span>Elevated travel, made simple</span>
           </div>
           <h2 className="font-display text-[26px] leading-snug text-[#0a2225] md:text-[30px]">
