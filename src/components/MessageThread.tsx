@@ -136,12 +136,7 @@ export const MessageThread = ({ conversationId, userId, userType }: MessageThrea
 
       if (error) throw error;
 
-      await supabase.from("messages").insert({
-        conversation_id: conversationId,
-        sender_id: userId,
-        body: safe,
-        safety_flag: flagged ? reason || "contact_removed" : null,
-      });
+      // conversation_messages table already updated above, no additional logging needed
 
       // Notify user if message was sanitized
       if (flagged) {
@@ -182,11 +177,7 @@ export const MessageThread = ({ conversationId, userId, userType }: MessageThrea
 
       if (error) throw error;
 
-      await supabase.from("messages").insert({
-        conversation_id: conversationId,
-        sender_id: userId,
-        body: "[voice message]",
-      });
+      // conversation_messages table already updated above, no additional logging needed
 
       setShowVoiceRecorder(false);
     } catch (error) {

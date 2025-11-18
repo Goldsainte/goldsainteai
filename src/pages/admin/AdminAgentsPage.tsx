@@ -38,10 +38,8 @@ export default function AdminAgentsPage() {
       try {
         const { data, error: profileError } = await supabase
           .from("profiles")
-          .select(
-            "id, display_name, email, kyc_status, agent_verification_status, agent_license_number, agent_license_authority, agent_license_state, avg_rating, rating_count"
-          )
-          .eq("account_type", "agent")
+          .select("id, full_name, username")
+          .eq("role", "agent")
           .order("created_at", { ascending: false });
 
         if (profileError) throw profileError;
@@ -69,15 +67,15 @@ export default function AdminAgentsPage() {
         setAgents(
           (data || []).map((row) => ({
             id: row.id,
-            name: row.display_name || "Goldsainte agent",
-            email: row.email || null,
-            kycStatus: row.kyc_status || "none",
-            verificationStatus: row.agent_verification_status || "pending",
-            licenseNumber: row.agent_license_number,
-            licenseAuthority: row.agent_license_authority,
-            licenseState: row.agent_license_state,
-            avgRating: row.avg_rating,
-            ratingCount: row.rating_count,
+            name: row.full_name || row.username || "Goldsainte agent",
+            email: null,
+            kycStatus: "none",
+            verificationStatus: "pending",
+            licenseNumber: null,
+            licenseAuthority: null,
+            licenseState: null,
+            avgRating: 0,
+            ratingCount: 0,
             totalBookings: bookingCounts.get(row.id) || 0,
           }))
         );

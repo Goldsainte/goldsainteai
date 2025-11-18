@@ -400,7 +400,7 @@ export default function TripRequestDetailPage() {
       const platformCommissionCents = Math.round(totalPriceCents * 0.15); // e.g. 15% commission
 
       const booking = await createBookingFromProposal({
-        tripRequestId: trip.id,
+        tripId: trip.id,
         proposalId: accepted.id,
         totalPriceCents,
         platformCommissionCents,
