@@ -19,22 +19,42 @@ const AuthCallback = () => {
       }
 
       if (session) {
-        // Check if profile exists
+        // Check if profile exists and if it's complete
         const { data: profile } = await supabase
           .from('profiles')
-          .select('id')
+          .select('id, is_profile_complete, account_type, first_name, last_name, phone')
           .eq('id', session.user.id)
           .maybeSingle();
 
         if (!profile) {
-          // Create profile if it doesn't exist
+          // Create minimal profile for new OAuth users
           await supabase.from('profiles').insert({
             id: session.user.id,
             username: session.user.user_metadata?.username || session.user.email?.split('@')[0],
             avatar_url: session.user.user_metadata?.avatar_url,
-            account_type: 'personal'
+            is_profile_complete: false,
+            account_type: null
           });
+          
+          // Redirect to complete profile since this is a new user
+          navigate('/auth/complete-profile', { replace: true });
+          return;
         }
+
+        // Check if profile needs completion
+        const needsCompletion = !profile.is_profile_complete || 
+                                !profile.account_type ||
+                                !['traveler', 'creator', 'agent'].includes(profile.account_type) ||
+                                !profile.first_name ||
+                                !profile.last_name ||
+                                !profile.phone;
+
+        if (needsCompletion) {
+          navigate('/auth/complete-profile', { replace: true });
+          return;
+        }
+
+        // Profile is complete, proceed with normal redirect
         const redirectFromQuery = getRedirectPathFromSearch(location.search);
         const storedRedirect = typeof window !== 'undefined'
           ? sanitizeRedirectPath(sessionStorage.getItem(AUTH_REDIRECT_STORAGE_KEY))
