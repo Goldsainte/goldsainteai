@@ -1,6 +1,6 @@
 // src/components/home/HowItWorksSection.tsx
 import beachFlowersImg from "@/assets/beach-flowers.jpg";                         // beach with red flowers
-import tokyoStreetImg from "@/assets/tokyo-street.jpg";                             // Tokyo street scene
+import santoriniGreeceImg from "@/assets/santorini-greece.jpg";                     // Santorini Greece
 import photographerPlaneImg from "@/assets/photographer-plane.jpg";                 // photographer with plane
 import elephantsSafariImg from "@/assets/elephants-safari.jpg";                     // elephants walking
 import snowyTravelerImg from "@/assets/erik-mclean-sG_rwogcBCw-unsplash.jpg";       // traveler in snow
@@ -41,7 +41,7 @@ const steps = [
 const collageImages = [
   beachFlowersImg,
   resortPoolPalmsImg,
-  tokyoStreetImg,
+  santoriniGreeceImg,
   friendsHikeImg,
   elephantsSafariImg,
   photographerPlaneImg,
