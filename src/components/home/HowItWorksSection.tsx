@@ -55,13 +55,13 @@ export function HowItWorksSection() {
       <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 md:flex-row md:items-start">
         {/* LEFT: copy + steps */}
         <div className="w-full md:w-[52%] space-y-6">
-          <p className="text-sm uppercase tracking-[0.18em] text-[#8D8D8D]">
+          <p className="text-xs uppercase tracking-[0.18em] text-[#8D8D8D]">
             Elevated travel, made simple
           </p>
-          <h2 className="font-display text-3xl leading-snug text-[#0a2225] md:text-4xl">
+          <h2 className="font-display text-[26px] leading-snug text-[#0a2225] md:text-[30px]">
             How Goldsainte works
           </h2>
-          <p className="text-base leading-relaxed text-[#4a4a4a] max-w-lg md:text-lg">
+          <p className="text-sm leading-relaxed text-[#4a4a4a] max-w-lg">
             Goldsainte sits between inspiration and execution. Travelers share a
             dream, TikTok creators bring it to life visually, and certified
             agents quietly engineer the logistics behind the scenes.
@@ -91,7 +91,7 @@ export function HowItWorksSection() {
             ))}
           </div>
 
-          <div className="pt-4 text-sm text-[#8D8D8D]">
+          <div className="pt-4 text-xs text-[#8D8D8D]">
             All communication and payments stay inside Goldsainte. No phone
             numbers, no side deals — just beautifully organized trips.
           </div>

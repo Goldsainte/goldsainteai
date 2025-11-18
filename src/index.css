@@ -19,14 +19,14 @@ body {
   padding-top: max(env(safe-area-inset-top), 0);
 }
 
-/* Responsive type scale using clamp - optimized for readability */
+/* Responsive type scale using clamp */
 :root {
-  --fs-body: clamp(17px, 2vw, 20px);
-  --fs-small: clamp(15px, 1.8vw, 18px);
-  --fs-h1: clamp(28px, 5vw, 48px);
-  --fs-h2: clamp(24px, 4vw, 36px);
-  --fs-h3: clamp(20px, 3vw, 28px);
-  --fs-h4: clamp(18px, 2.5vw, 24px);
+  --fs-body: clamp(16px, 1.8vw, 18px);
+  --fs-small: clamp(14px, 1.6vw, 16px);
+  --fs-h1: clamp(22px, 4vw, 34px);
+  --fs-h2: clamp(18px, 3vw, 28px);
+  --fs-h3: clamp(16px, 2.4vw, 22px);
+  --fs-h4: clamp(15px, 2vw, 19px);
   
   /* Mobile bottom navigation height */
   --bottom-nav-height: 4rem; /* 64px */
