@@ -20,7 +20,7 @@ export function WhoItsFor() {
             </h2>
 
             {/* Three roles in columns */}
-            <div className="grid gap-6 md:grid-cols-3 md:gap-6">
+            <div className="grid gap-6 md:grid-cols-2 md:gap-8">
               {/* Travelers */}
               <div className="relative border border-[#BFAD72] rounded-2xl p-6 bg-white/50 transition-all duration-300 hover:shadow-sm">
                 <div className="inline-flex items-center rounded-full bg-[#0c4d47] px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-[#BFAD72] mb-4">
