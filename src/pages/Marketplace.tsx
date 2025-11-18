@@ -1,25 +1,32 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { useAuth } from "@/contexts/AuthContext";
-import { MarketplaceHero, SearchFilters } from "@/components/marketplace/MarketplaceHero";
-import { TripCard } from "@/components/marketplace/TripCard";
-import { CreatorCard } from "@/components/marketplace/CreatorCard";
-import { AgentCard } from "@/components/marketplace/AgentCard";
+import { MarketplaceHeader } from "@/components/marketplace/MarketplaceHeader";
+import { MarketplaceSearch } from "@/components/marketplace/MarketplaceSearch";
+import { MarketplaceFilters } from "@/components/marketplace/MarketplaceFilters";
+import { MarketplaceTabs } from "@/components/marketplace/MarketplaceTabs";
+import { TripGrid } from "@/components/marketplace/TripGrid";
+import { CreatorGrid } from "@/components/marketplace/CreatorGrid";
+import { AgentGrid } from "@/components/marketplace/AgentGrid";
+import { TripRequestGrid } from "@/components/marketplace/TripRequestGrid";
+import { EmptyState } from "@/components/marketplace/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { ComprehensiveJobForm } from "@/components/ComprehensiveJobForm";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Briefcase, DollarSign } from "lucide-react";
-import { toast } from "sonner";
 
-type Tab = "trips" | "creators" | "agents" | "requests";
+type Tab = "trips" | "creators" | "agents" | "trip-requests";
+
+export interface SearchFilters {
+  destination?: string;
+  startDate?: string;
+  endDate?: string;
+  travelers?: number;
+  category?: string;
+}
 
 export default function Marketplace() {
-  const { user, isLoading: authLoading } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   
@@ -30,34 +37,33 @@ export default function Marketplace() {
     destination: searchParams.get("destination") || "",
     travelers: parseInt(searchParams.get("travelers") || "1"),
   });
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(
-    searchParams.get("create") === "true"
-  );
-
-  useEffect(() => {
-    if (!authLoading && !user) {
-      navigate("/auth");
-    }
-  }, [user, authLoading, navigate]);
 
   useEffect(() => {
     const params = new URLSearchParams();
     params.set("tab", activeTab);
     if (filters.destination) params.set("destination", filters.destination);
-    if (filters.travelers > 1) params.set("travelers", filters.travelers.toString());
+    if (filters.travelers && filters.travelers > 1) {
+      params.set("travelers", filters.travelers.toString());
+    }
     setSearchParams(params, { replace: true });
   }, [activeTab, filters, setSearchParams]);
 
   const { data: trips, isLoading: isLoadingTrips } = useQuery({
-    queryKey: ["packaged-trips", filters],
+    queryKey: ["marketplace-trips", filters],
     queryFn: async () => {
       let query = supabase
-        .from("packaged_trips" as any)
-        .select(`*,profiles:creator_id(full_name,username),travel_agents:agent_id(agency_name)`)
+        .from("packaged_trips")
+        .select(`
+          *,
+          profiles:creator_id(full_name,username),
+          travel_agents:agent_id(agency_name)
+        `)
         .eq("status", "published");
 
       if (filters.destination) {
-        query = query.or(`destination.ilike.%${filters.destination}%,title.ilike.%${filters.destination}%`);
+        query = query.or(
+          `destination.ilike.%${filters.destination}%,title.ilike.%${filters.destination}%`
+        );
       }
 
       const { data, error } = await query.order("created_at", { ascending: false });
@@ -75,7 +81,10 @@ export default function Marketplace() {
         rating: trip.rating,
         review_count: trip.review_count,
         tags: trip.tags || [],
-        creator_name: trip.travel_agents?.agency_name || trip.profiles?.full_name || trip.profiles?.username,
+        creator_name:
+          trip.travel_agents?.agency_name ||
+          trip.profiles?.full_name ||
+          trip.profiles?.username,
         is_verified: trip.is_verified,
         max_participants: trip.max_participants,
       })) || [];
@@ -84,112 +93,150 @@ export default function Marketplace() {
   });
 
   const { data: creators, isLoading: isLoadingCreators } = useQuery({
-    queryKey: ["creators"],
+    queryKey: ["marketplace-creators"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("travel_posts")
-        .select(`user_id,view_count,location,profiles:user_id(id,full_name,username,avatar_url,bio,identity_verified)`)
-        .eq("status", "active");
+        .from("profiles")
+        .select("id,full_name,username,avatar_url,bio")
+        .eq("role", "creator");
 
       if (error) throw error;
-
-      const creatorMap = new Map();
-      data?.forEach((post: any) => {
-        if (!post.profiles) return;
-        const userId = post.user_id;
-        if (!creatorMap.has(userId)) {
-          creatorMap.set(userId, {
-            id: userId,
-            ...post.profiles,
-            stats: { trips_created: 0, avg_views: 0, total_views: 0 },
-            specialties: new Set(),
-          });
-        }
-        const creator = creatorMap.get(userId);
-        creator.stats.trips_created += 1;
-        creator.stats.total_views += post.view_count || 0;
-        if (post.location) creator.specialties.add(post.location);
-      });
-
-      return Array.from(creatorMap.values()).map((c: any) => ({
-        ...c,
-        stats: { ...c.stats, avg_views: Math.round(c.stats.total_views / (c.stats.trips_created || 1)) },
-        specialties: Array.from(c.specialties).slice(0, 4),
-      })).filter((c: any) => c.stats.trips_created > 0);
+      return data || [];
     },
     enabled: activeTab === "creators",
   });
 
   const { data: agents, isLoading: isLoadingAgents } = useQuery({
-    queryKey: ["agents"],
+    queryKey: ["marketplace-agents"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("travel_agents").select("*").eq("is_active", true).order("rating", { ascending: false });
+      const { data, error } = await supabase
+        .from("travel_agents")
+        .select("*")
+        .eq("is_active", true)
+        .order("rating", { ascending: false });
+
       if (error) throw error;
       return data || [];
     },
     enabled: activeTab === "agents",
   });
 
-  const { data: requests, isLoading: isLoadingRequests, refetch: refetchRequests } = useQuery({
-    queryKey: ["marketplace-jobs"],
+  const { data: tripRequests, isLoading: isLoadingRequests } = useQuery({
+    queryKey: ["marketplace-trip-requests"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("marketplace_jobs").select(`*,profiles:user_id(full_name,avatar_url)`).eq("status", "open").order("created_at", { ascending: false });
+      const { data, error } = await supabase
+        .from("marketplace_jobs")
+        .select("*")
+        .eq("status", "open")
+        .order("created_at", { ascending: false });
+
       if (error) throw error;
       return data || [];
     },
-    enabled: activeTab === "requests",
+    enabled: activeTab === "trip-requests",
   });
 
-  const handleSearch = (newFilters: SearchFilters) => setFilters(newFilters);
-  const handleTabChange = (tab: Tab) => setActiveTab(tab);
-  
-  const handleJobSubmit = async (formData: any) => {
-    try {
-      const { error } = await supabase.from("marketplace_jobs").insert({
-        user_id: user!.id,
-        title: formData.title,
-        description: formData.description,
-        destination: formData.destinationCity || formData.destinations,
-        budget_min: formData.budgetMin,
-        budget_max: formData.budgetMax,
-        currency: formData.currency,
-        status: "open",
-      } as any);
-      
-      if (error) throw error;
-      
-      toast.success("Trip request posted!");
-      setIsCreateDialogOpen(false);
-      refetchRequests();
-    } catch (error) {
-      toast.error("Failed to post trip request");
-      console.error(error);
-    }
+  const handleSearch = (newFilters: SearchFilters) => {
+    setFilters(newFilters);
   };
 
-  if (authLoading) return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
-  if (!user) return null;
+  const handleTabChange = (tab: Tab) => {
+    setActiveTab(tab);
+  };
 
-  return (
-    <div className="min-h-screen bg-background">
-      <MarketplaceHero onSearch={handleSearch} activeTab={activeTab} />
-      <section className="mx-auto max-w-6xl px-4 py-6 md:py-8">
-        <div className="mb-6 flex items-center justify-between gap-4">
-          <div className="inline-flex rounded-full bg-muted p-1">
-            {(["trips", "creators", "agents", "requests"] as Tab[]).map(tab => (
-              <button key={tab} onClick={() => handleTabChange(tab)} className={`rounded-full px-5 py-2 text-sm font-medium transition-colors whitespace-nowrap ${activeTab === tab ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
-                {tab === "requests" ? "Trip Requests" : tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
+  const renderContent = () => {
+    if (activeTab === "trips") {
+      if (isLoadingTrips) {
+        return (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[...Array(6)].map((_, i) => (
+              <Skeleton key={i} className="h-96 rounded-2xl" />
             ))}
           </div>
-        </div>
+        );
+      }
+      if (!trips?.length) {
+        return <EmptyState type="trips" onAction={() => navigate("/post-trip")} />;
+      }
+      return <TripGrid trips={trips} />;
+    }
 
-        {activeTab === "trips" && (isLoadingTrips ? <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{[...Array(6)].map((_, i) => <Skeleton key={i} className="h-96" />)}</div> : trips?.length ? <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{trips.map((t: any) => <TripCard key={t.id} trip={t} />)}</div> : <div className="text-center py-20"><p>No trips found</p></div>)}
-        {activeTab === "creators" && (isLoadingCreators ? <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{[...Array(6)].map((_, i) => <Skeleton key={i} className="h-96" />)}</div> : creators?.length ? <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{creators.map((c: any) => <CreatorCard key={c.id} creator={c} />)}</div> : <div className="text-center py-20"><p>No creators found</p></div>)}
-        {activeTab === "agents" && (isLoadingAgents ? <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{[...Array(6)].map((_, i) => <Skeleton key={i} className="h-96" />)}</div> : agents?.length ? <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{agents.map((a: any) => <AgentCard key={a.id} agent={a} />)}</div> : <div className="text-center py-20"><p>No agents found</p></div>)}
-        {activeTab === "requests" && (isLoadingRequests ? <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{[...Array(6)].map((_, i) => <Skeleton key={i} className="h-64" />)}</div> : requests?.length ? <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{requests.map((r: any) => <Card key={r.id} className="cursor-pointer hover:shadow-lg" onClick={() => navigate(`/marketplace/request/${r.id}`)}><CardHeader><CardTitle>{r.title}</CardTitle><CardDescription><MapPin className="inline h-3 w-3 mr-1"/>{r.destination}</CardDescription></CardHeader><CardContent><p className="text-sm line-clamp-2">{r.description}</p></CardContent></Card>)}</div> : <div className="text-center py-20"><p>No requests found</p><Button onClick={() => setIsCreateDialogOpen(true)} className="mt-4">Post a Trip Request</Button></div>)}
-      </section>
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}><DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto"><ComprehensiveJobForm onSubmit={handleJobSubmit} onCancel={() => setIsCreateDialogOpen(false)} /></DialogContent></Dialog>
-    </div>
+    if (activeTab === "creators") {
+      if (isLoadingCreators) {
+        return (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[...Array(6)].map((_, i) => (
+              <Skeleton key={i} className="h-96 rounded-2xl" />
+            ))}
+          </div>
+        );
+      }
+      if (!creators?.length) {
+        return <EmptyState type="creators" onAction={() => navigate("/creators")} />;
+      }
+      return <CreatorGrid creators={creators} />;
+    }
+
+    if (activeTab === "agents") {
+      if (isLoadingAgents) {
+        return (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[...Array(6)].map((_, i) => (
+              <Skeleton key={i} className="h-96 rounded-2xl" />
+            ))}
+          </div>
+        );
+      }
+      if (!agents?.length) {
+        return <EmptyState type="agents" onAction={() => navigate("/browse-agents")} />;
+      }
+      return <AgentGrid agents={agents} />;
+    }
+
+    if (activeTab === "trip-requests") {
+      if (isLoadingRequests) {
+        return (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[...Array(6)].map((_, i) => (
+              <Skeleton key={i} className="h-64 rounded-2xl" />
+            ))}
+          </div>
+        );
+      }
+      if (!tripRequests?.length) {
+        return (
+          <EmptyState type="trip-requests" onAction={() => navigate("/post-trip")} />
+        );
+      }
+      return <TripRequestGrid requests={tripRequests} />;
+    }
+
+    return null;
+  };
+
+  return (
+    <>
+      <Helmet>
+        <title>Marketplace · Goldsainte</title>
+        <meta
+          name="description"
+          content="Browse curated trips, verified creators, certified agents, and traveler briefs. Book luxury experiences or post your dream trip."
+        />
+      </Helmet>
+
+      <div className="min-h-screen bg-[#f7f3ea]">
+        <MarketplaceHeader />
+        <MarketplaceSearch onSearch={handleSearch} filters={filters} />
+
+        <div className="mx-auto max-w-6xl px-4 py-8">
+          <div className="mb-8 flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+            <MarketplaceTabs activeTab={activeTab} onTabChange={handleTabChange} />
+            <MarketplaceFilters filters={filters} onFilterChange={setFilters} />
+          </div>
+
+          {renderContent()}
+        </div>
+      </div>
+    </>
   );
 }
