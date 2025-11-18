@@ -106,12 +106,13 @@ function AppContent() {
     return () => window.removeEventListener("welcomeDismissed", handler);
   }, [navigate]);
 
-  useEffect(() => {
-    const hasSeenWelcome = localStorage.getItem("goldsainte-welcome-seen");
-    if (!hasSeenWelcome && location.pathname === "/") {
-      setShowWelcomeModal(true);
-    }
-  }, [location.pathname]);
+  // Disabled auto-show of WelcomeModal on homepage to show new content immediately
+  // useEffect(() => {
+  //   const hasSeenWelcome = localStorage.getItem("goldsainte-welcome-seen");
+  //   if (!hasSeenWelcome && location.pathname === "/") {
+  //     setShowWelcomeModal(true);
+  //   }
+  // }, [location.pathname]);
 
   useEffect(() => {
     const badge = document.querySelector(
