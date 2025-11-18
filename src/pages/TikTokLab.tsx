@@ -202,7 +202,7 @@ export default function TikTokLab() {
         <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
-              TikTok Travel Lab
+              Goldsainte Creator Lab
             </h1>
             <p className="mt-1 max-w-xl text-sm text-neutral-600">
               Build TikTok-ready travel stories, connect your TikTok, and link

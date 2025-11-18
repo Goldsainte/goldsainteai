@@ -74,7 +74,7 @@ export const helpCenterFAQs: FAQ[] = [
   {
     id: 'payment-commission',
     question: 'When do I receive my commissions?',
-    answer: 'Commissions are visible inside TikTok Lab → Earnings (/tiktok-lab/earnings). Payouts are processed according to your Stripe Connect settings.',
+    answer: 'Commissions are visible inside Goldsainte Creator Lab → Earnings (/tiktok-lab/earnings). Payouts are processed according to your Stripe Connect settings.',
     category: 'payments'
   },
   

@@ -62,7 +62,7 @@ export default function TikTokEarningsPage() {
             className="inline-flex items-center gap-1 text-[10px] text-[#8D8D8D]"
           >
             <ArrowLeft className="h-3 w-3" />
-            Back to TikTok Lab
+            Back to Goldsainte Creator Lab
           </Link>
         </div>
         <div className="flex items-center justify-between gap-4">

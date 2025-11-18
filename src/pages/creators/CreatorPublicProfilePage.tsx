@@ -246,7 +246,7 @@ export default function CreatorPublicProfilePage() {
               creator.featured_photos.length === 0) && (
               <div className="rounded-2xl bg-[#E5DFC6]/60 px-4 py-6 text-[11px] text-[#4a4a4a]">
                 This creator hasn&apos;t added storyboard photos yet. Once they
-                build trips in TikTok Lab, their highlights will appear here.
+                build trips in Goldsainte Creator Lab, their highlights will appear here.
               </div>
             )}
           </div>

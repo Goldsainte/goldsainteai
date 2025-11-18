@@ -17,7 +17,7 @@ export function StoryboardPreview() {
             </p>
           </div>
           <p className="text-[11px] text-[#8D8D8D] md:text-right">
-            Coming to your profile, creator pages, and TikTok Travel Lab.
+            Coming to your profile, creator pages, and Goldsainte Creator Lab.
           </p>
         </div>
 

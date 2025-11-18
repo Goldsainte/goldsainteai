@@ -29,7 +29,7 @@ export function OnboardingWelcomeModal() {
     title = "Welcome to the creator side of Goldsainte";
     bullets = [
       "Browse traveler briefs and raise your hand for trips that match your audience.",
-      "Use TikTok Lab & storyboards to design the journey like a shot list.",
+      "Use Goldsainte Creator Lab & storyboards to design the journey like a shot list.",
       "Partner with agents to make trips actually bookable — and track your earnings.",
       "All bookings stay on-platform so your commissions are protected and your work is credited.",
     ];

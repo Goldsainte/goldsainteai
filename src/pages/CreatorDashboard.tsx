@@ -98,7 +98,7 @@ export default function CreatorDashboard() {
               to="/tiktok-lab"
               className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
             >
-              Open TikTok Travel Lab
+              Open Goldsainte Creator Lab
             </Link>
             <Link
               to="/browse-creators"
@@ -129,7 +129,7 @@ export default function CreatorDashboard() {
                 </span>
                 <span className="text-[11px] text-muted-foreground">
                   {stats.tiktokConnected
-                    ? "You're ready to publish from TikTok Travel Lab."
+                    ? "You're ready to publish from Goldsainte Creator Lab."
                     : "Connect TikTok to start publishing stories."}
                 </span>
               </div>
@@ -147,7 +147,7 @@ export default function CreatorDashboard() {
             <SummaryStat
               label="Trip stories created"
               value={loading ? "…" : stats.totalTripStories.toString()}
-              helper="Stories built in TikTok Travel Lab"
+              helper="Stories built in Goldsainte Creator Lab"
             />
             <SummaryStat
               label="Trips linked to TikTok"
@@ -183,7 +183,7 @@ export default function CreatorDashboard() {
                 Recent TikTok trip stories
               </h2>
               <p className="mt-1 text-[11px] text-muted-foreground">
-                These are stories you've created in TikTok Travel Lab and linked
+                These are stories you've created in Goldsainte Creator Lab and linked
                 to trips.
               </p>
             </div>
