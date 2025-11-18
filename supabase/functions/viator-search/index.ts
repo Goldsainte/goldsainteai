@@ -19,23 +19,29 @@ serve(async (req) => {
 
     const { q, location } = await req.json();
     
-    if (!q && !location) {
+    // Build request body with only defined values
+    const body: any = {
+      topX: "1-20",
+      sortOrder: "REVIEW_AVG_RATING_D",
+      currency: "USD"
+    };
+
+    // Only include search parameters that have values
+    if (q) body.searchTerm = q;
+    if (location) body.destId = location;
+
+    // Validate at least one search parameter exists
+    if (!body.searchTerm && !body.destId) {
       return new Response(
-        JSON.stringify({ error: "Query or location required" }),
+        JSON.stringify({ 
+          error: "At least one search parameter required: query (q) or location (destId)" 
+        }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     // Viator API v2 search endpoint
     const viatorUrl = "https://api.viator.com/partner/products/search";
-    
-    const body = {
-      searchTerm: q,
-      destId: location,
-      topX: "1-20",
-      sortOrder: "REVIEW_AVG_RATING_D",
-      currency: "USD"
-    };
 
     const response = await fetch(viatorUrl, {
       method: "POST",
