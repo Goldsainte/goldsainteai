@@ -24,7 +24,7 @@ export function WhoItsFor() {
           {/* Left: Text content (60%) */}
           <div className="lg:w-[60%]">
           <h2 className="text-left font-display text-[27px] leading-snug md:text-[32px] lg:text-[38px] text-[#0a2225] mb-12">
-            WHO IS <span className="italic">GOLDSAINTE AI</span> FOR
+            Who is <span className="italic">Goldsainte AI</span> for...
           </h2>
 
             {/* Three roles in columns */}
