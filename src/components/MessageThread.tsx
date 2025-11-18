@@ -10,6 +10,7 @@ import { Send, Paperclip, Video, MoreVertical, Check, CheckCheck, Mic } from "lu
 import { VoiceMessageRecorder } from "./VoiceMessageRecorder";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
 
 interface Message {
   id: string;
@@ -34,6 +35,7 @@ export const MessageThread = ({ conversationId, userId, userType }: MessageThrea
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
+  const [safetyModalOpen, setSafetyModalOpen] = useState(false);
 
   useEffect(() => {
     fetchMessages();
@@ -134,6 +136,13 @@ export const MessageThread = ({ conversationId, userId, userType }: MessageThrea
 
       if (error) throw error;
 
+      await supabase.from("messages").insert({
+        conversation_id: conversationId,
+        sender_id: userId,
+        body: safe,
+        safety_flag: flagged ? reason || "contact_removed" : null,
+      });
+
       // Notify user if message was sanitized
       if (flagged) {
         toast({
@@ -173,6 +182,12 @@ export const MessageThread = ({ conversationId, userId, userType }: MessageThrea
 
       if (error) throw error;
 
+      await supabase.from("messages").insert({
+        conversation_id: conversationId,
+        sender_id: userId,
+        body: "[voice message]",
+      });
+
       setShowVoiceRecorder(false);
     } catch (error) {
       console.error("Error sending voice message:", error);
@@ -203,7 +218,14 @@ export const MessageThread = ({ conversationId, userId, userType }: MessageThrea
               <p className="text-xs text-muted-foreground font-normal">Online</p>
             </div>
           </CardTitle>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            <button
+              type="button"
+              onClick={() => setSafetyModalOpen(true)}
+              className="rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground hover:bg-muted"
+            >
+              Safety tips
+            </button>
             <Button variant="ghost" size="icon">
               <Video className="h-4 w-4" />
             </Button>
@@ -270,8 +292,8 @@ export const MessageThread = ({ conversationId, userId, userType }: MessageThrea
         {showVoiceRecorder ? (
           <div className="flex items-center gap-2">
             <VoiceMessageRecorder onSend={handleVoiceMessageSend} />
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="sm"
               onClick={() => setShowVoiceRecorder(false)}
             >
@@ -302,7 +324,16 @@ export const MessageThread = ({ conversationId, userId, userType }: MessageThrea
             </Button>
           </form>
         )}
+        <p className="mt-2 text-[10px] text-muted-foreground text-center sm:text-left">
+          For your safety, keep all trip details and payments inside Goldsainte.
+        </p>
       </div>
+
+      <TrustSafetyModal
+        open={safetyModalOpen}
+        onClose={() => setSafetyModalOpen(false)}
+        context="chat"
+      />
     </Card>
   );
 };

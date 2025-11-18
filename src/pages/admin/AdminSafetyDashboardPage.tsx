@@ -7,7 +7,6 @@ import {
   AdminReport,
   AdminSafetyEvent,
 } from "@/services/adminSafetyService";
-import { AdminGuard } from "./AdminGuard";
 
 const BG = "bg-[#0a2225]";
 
@@ -235,7 +234,7 @@ function formatEventType(type: string) {
 function StatusPill({ status }: { status: string }) {
   const normalized = status.toLowerCase();
   let bg = "#31434a";
-  let text = "#E5DFC6";
+  const text = "#E5DFC6";
 
   if (normalized === "open") {
     bg = "#783d3d";
@@ -268,9 +267,5 @@ function truncate(text: string, max: number) {
 }
 
 export default function AdminSafetyDashboardPage() {
-  return (
-    <AdminGuard>
-      <AdminSafetyDashboardContent />
-    </AdminGuard>
-  );
+  return <AdminSafetyDashboardContent />;
 }

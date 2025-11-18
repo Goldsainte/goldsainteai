@@ -7,7 +7,7 @@ import { Hotel, Star, MapPin, Eye, Sparkles } from "lucide-react";
 import { HotelDetailsModal } from "./HotelDetailsModal";
 import { DateSelectionModal } from "./DateSelectionModal";
 import { getHotelImage } from "@/lib/imageHelpers";
-import { encodeData } from "@/lib/utils";
+import { toast } from "sonner";
 import { getCurrencyFromLocation } from "@/lib/currencyHelpers";
 
 interface HotelCardProps {
@@ -55,7 +55,8 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
       currency: offer?.price?.currency || 'USD',
     };
     
-    navigate(`/hotel-booking?data=${encodeData(bookingData)}`);
+    toast.success("We'll finish this booking inside your trip brief.");
+    navigate('/post-trip', { state: { hotel: bookingData } });
   };
 
   return (

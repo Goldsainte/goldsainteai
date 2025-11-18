@@ -16,10 +16,10 @@ export const SimpleHeader = () => {
         <div className="flex items-center gap-1.5 md:gap-2">
           {user ? (
             <>
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="icon"
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate('/traveler')}
                 className="rounded-full h-11 w-11"
               >
                 <User className="h-5 w-5" />

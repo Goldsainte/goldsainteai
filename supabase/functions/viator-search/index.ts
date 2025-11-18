@@ -56,7 +56,9 @@ serve(async (req) => {
       try {
         const errorJson = JSON.parse(errorText);
         errorMessage = errorJson.message || errorMessage;
-      } catch {}
+      } catch (parseError) {
+        console.warn("Failed to parse Viator error payload", parseError);
+      }
       
       return new Response(
         JSON.stringify({ error: errorMessage }),

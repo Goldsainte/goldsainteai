@@ -1,359 +1,432 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { MarketplaceShell } from "@/components/marketplace/MarketplaceShell";
 import { supabase } from "@/integrations/supabase/client";
-import { Footer } from "@/components/Footer";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, ArrowLeft } from "lucide-react";
-import { toast } from "sonner";
-import { useAuth } from "@/contexts/AuthContext";
-import { EnhancedAgentCard } from "@/components/EnhancedAgentCard";
-import { RealTimeBookingNotifications } from "@/components/RealTimeBookingNotifications";
+import type { Database } from "@/integrations/supabase/types";
+import { useNavigate } from "react-router-dom";
 
+type AgentRow = Database["public"]["Tables"]["travel_agents"]["Row"];
+
+type Agent = {
+  id: string;
+  displayName: string;
+  agencyName: string | null;
+  avatarUrl: string | null;
+  baseCity: string | null;
+  baseCountry: string | null;
+  languages: string[];
+  destinations: string[];
+  specialties: string[];
+  minBudget: number | null;
+  maxBudget: number | null;
+  yearsExperience: number | null;
+  rating: number | null;
+  totalReviews: number | null;
+};
+
+type AgentFilters = {
+  search: string;
+  destination?: string;
+  specialty?: string;
+  language?: string;
+  minRating?: number;
+  minBudget?: number;
+  maxBudget?: number;
+};
+
+const defaultFilters: AgentFilters = { search: "" };
+
+function sanitizeStringArray(value?: (string | null)[] | null): string[] {
+  if (!value) {
+    return [];
+  }
+  return value
+    .filter((entry): entry is string => typeof entry === "string" && entry.trim().length > 0)
+    .map((entry) => entry.trim());
+}
+
+function splitLocation(value: string | null): { city: string | null; country: string | null } {
+  if (!value) {
+    return { city: null, country: null };
+  }
+  const parts = value.split(",");
+  const city = parts[0]?.trim() || null;
+  const country = parts.slice(1).join(",").trim() || null;
+  return { city, country };
+}
+
+function mapAgent(row: AgentRow): Agent {
+  const location = splitLocation(row.business_address);
+  const destinations = sanitizeStringArray(row.destinations);
+  const destinationFallback = sanitizeStringArray(row.regions);
+  const specialties = sanitizeStringArray(row.specializations);
+  const specialtyFallback = sanitizeStringArray(row.service_types);
+  return {
+    id: row.id,
+    displayName: row.primary_contact_name || row.agency_name || "Travel agent",
+    agencyName: row.agency_name,
+    avatarUrl: row.profile_image_url,
+    baseCity: location.city,
+    baseCountry: location.country,
+    languages: sanitizeStringArray(row.languages),
+    destinations: destinations.length ? destinations : destinationFallback,
+    specialties: specialties.length ? specialties : specialtyFallback,
+    minBudget: row.min_budget,
+    maxBudget: row.max_budget,
+    yearsExperience: row.experience_years,
+    rating: row.rating,
+    totalReviews: row.total_reviews,
+  };
+}
 
 export default function BrowseAgents() {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const [agents, setAgents] = useState<any[]>([]);
-  const [filteredAgents, setFilteredAgents] = useState<any[]>([]);
+  const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterSpecialization, setFilterSpecialization] = useState("all");
-  const [sortBy, setSortBy] = useState("rating");
-  const [minRating, setMinRating] = useState<number>(0);
-  const [experienceRange, setExperienceRange] = useState<"all" | "0-2" | "3-5" | "5+">("all");
-  const [selectedLanguage, setSelectedLanguage] = useState<string>("all");
-  const [myAgentProfile, setMyAgentProfile] = useState<any | null>(null);
-  const [agentMetrics, setAgentMetrics] = useState<Record<string, any>>({});
-  const [agentBadges, setAgentBadges] = useState<Record<string, any[]>>({});
+  const [filters, setFilters] = useState<AgentFilters>(defaultFilters);
+  const [sortBy, setSortBy] = useState<"rating" | "bookings" | "experience">(
+    "rating"
+  );
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchAgents();
-  }, []);
-
-  useEffect(() => {
-    applyFilters();
-  }, [agents, searchQuery, filterSpecialization, sortBy, minRating, experienceRange, selectedLanguage]);
-
-  // Fetch my agent profile for current user (to guide onboarding/visibility)
-  useEffect(() => {
-    const fetchMyProfile = async () => {
-      if (!user) {
-        setMyAgentProfile(null);
-        return;
-      }
-      const { data } = await supabase
-        .from('travel_agents')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      setMyAgentProfile(data || null);
-    };
-    fetchMyProfile();
-  }, [user]);
-
-  const fetchAgents = async () => {
-    try {
+    async function loadAgents() {
       setLoading(true);
-
       const { data, error } = await supabase
-        .from('travel_agents')
-        .select('*')
-        .eq('is_verified', true)
-        .eq('is_active', true);
+        .from("travel_agents")
+        .select(
+          `
+            id,
+            agency_name,
+            profile_image_url,
+            business_address,
+            regions,
+            destinations,
+            specializations,
+            service_types,
+            languages,
+            min_budget,
+            max_budget,
+            experience_years,
+            rating,
+            total_reviews,
+            primary_contact_name
+          `
+        );
 
-      if (error) throw error;
-      setAgents(data || []);
-
-      // Fetch metrics and badges for all agents
-      if (data && data.length > 0) {
-        const agentIds = data.map(a => a.id);
-        
-        // Fetch performance metrics
-        const { data: metricsData } = await supabase
-          .from('agent_performance_metrics')
-          .select('*')
-          .in('agent_id', agentIds);
-        
-        const metricsMap: Record<string, any> = {};
-        metricsData?.forEach(m => {
-          metricsMap[m.agent_id] = m;
-        });
-        setAgentMetrics(metricsMap);
-
-        // Fetch badges
-        const { data: badgesData } = await supabase
-          .from('agent_badges')
-          .select('*')
-          .in('agent_id', agentIds)
-          .gte('valid_until', new Date().toISOString());
-        
-        const badgesMap: Record<string, any[]> = {};
-        badgesData?.forEach(b => {
-          if (!badgesMap[b.agent_id]) badgesMap[b.agent_id] = [];
-          badgesMap[b.agent_id].push(b);
-        });
-        setAgentBadges(badgesMap);
+      if (!error && data) {
+        setAgents(data.map(mapAgent));
       }
-    } catch (error: any) {
-      console.error('Error fetching agents:', error);
-      toast.error('Failed to load agents');
-    } finally {
       setLoading(false);
     }
-  };
 
-  const applyFilters = () => {
-    let filtered = [...agents];
+    loadAgents();
+  }, []);
 
-    // Search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(agent => 
-        agent.agency_name?.toLowerCase().includes(query) ||
-        agent.bio?.toLowerCase().includes(query) ||
-        agent.specializations?.some((s: string) => s.toLowerCase().includes(query)) ||
-        agent.destinations?.some((d: string) => d.toLowerCase().includes(query))
-      );
-    }
+  const filteredAgents = useMemo(() => {
+    let result = [...agents];
+    const search = filters.search.trim().toLowerCase();
 
-    // Specialization filter
-    if (filterSpecialization !== "all") {
-      filtered = filtered.filter(agent =>
-        agent.specializations?.includes(filterSpecialization)
-      );
-    }
-
-    // Rating filter
-    if (minRating > 0) {
-      filtered = filtered.filter(agent => (agent.rating || 0) >= minRating);
-    }
-
-    // Experience filter
-    if (experienceRange !== "all") {
-      filtered = filtered.filter(agent => {
-        const exp = agent.experience_years || 0;
-        if (experienceRange === "0-2") return exp <= 2;
-        if (experienceRange === "3-5") return exp >= 3 && exp <= 5;
-        if (experienceRange === "5+") return exp > 5;
-        return true;
+    if (search) {
+      result = result.filter((agent) => {
+        const name = agent.displayName.toLowerCase();
+        const agency = (agent.agencyName || "").toLowerCase();
+        const city = (agent.baseCity || "").toLowerCase();
+        const country = (agent.baseCountry || "").toLowerCase();
+        const destinations = agent.destinations.join(" ").toLowerCase();
+        const specialties = agent.specialties.join(" ").toLowerCase();
+        return (
+          name.includes(search) ||
+          agency.includes(search) ||
+          city.includes(search) ||
+          country.includes(search) ||
+          destinations.includes(search) ||
+          specialties.includes(search)
+        );
       });
     }
 
-    // Language filter
-    if (selectedLanguage !== "all") {
-      filtered = filtered.filter(agent =>
-        agent.languages?.includes(selectedLanguage)
+    if (filters.destination) {
+      const needle = filters.destination.toLowerCase();
+      result = result.filter((agent) =>
+        agent.destinations.some((dest) => dest.toLowerCase().includes(needle))
       );
     }
 
-    // Sort
-    filtered.sort((a, b) => {
-      if (sortBy === "rating") {
-        return (b.rating || 0) - (a.rating || 0);
-      } else if (sortBy === "reviews") {
-        return (b.total_reviews || 0) - (a.total_reviews || 0);
-      } else if (sortBy === "experience") {
-        return (b.experience_years || 0) - (a.experience_years || 0);
+    if (filters.specialty) {
+      const needle = filters.specialty.toLowerCase();
+      result = result.filter((agent) =>
+        agent.specialties.some((spec) => spec.toLowerCase().includes(needle))
+      );
+    }
+
+    if (filters.language) {
+      const needle = filters.language.toLowerCase();
+      result = result.filter((agent) =>
+        agent.languages.some((lang) => lang.toLowerCase().includes(needle))
+      );
+    }
+
+    if (filters.minRating != null) {
+      result = result.filter(
+        (agent) => agent.rating != null && agent.rating >= filters.minRating!
+      );
+    }
+
+    if (filters.minBudget != null) {
+      result = result.filter(
+        (agent) => agent.minBudget != null && agent.minBudget >= filters.minBudget!
+      );
+    }
+
+    if (filters.maxBudget != null) {
+      result = result.filter(
+        (agent) => agent.maxBudget != null && agent.maxBudget <= filters.maxBudget!
+      );
+    }
+
+    if (sortBy === "rating") {
+      result.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    } else if (sortBy === "bookings") {
+      result.sort((a, b) => (b.totalReviews || 0) - (a.totalReviews || 0));
+    } else if (sortBy === "experience") {
+      result.sort((a, b) => (b.yearsExperience || 0) - (a.yearsExperience || 0));
+    }
+
+    return result;
+  }, [agents, filters, sortBy]);
+
+  const sortControl = (
+    <select
+      className="rounded-full border px-3 py-1 text-xs"
+      value={sortBy}
+      onChange={(event) =>
+        setSortBy(event.target.value as "rating" | "bookings" | "experience")
       }
-      return 0;
-    });
-
-    setFilteredAgents(filtered);
-  };
-
-  // Get unique specializations and languages
-  const allSpecializations = Array.from(
-    new Set(agents.flatMap(agent => agent.specializations || []))
-  );
-  
-  const allLanguages = Array.from(
-    new Set(agents.flatMap(agent => agent.languages || []))
+    >
+      <option value="rating">Sort by rating</option>
+      <option value="bookings">Sort by completed trips</option>
+      <option value="experience">Sort by experience</option>
+    </select>
   );
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+  const filtersPanel = (
+    <div className="space-y-4 text-xs">
+      <div className="space-y-1">
+        <label className="text-[11px] font-medium text-slate-700">
+          Destination focus
+        </label>
+        <input
+          type="text"
+          placeholder="e.g. Italy, Maldives"
+          className="w-full rounded-lg border px-2 py-1 text-xs"
+          value={filters.destination ?? ""}
+          onChange={(event) =>
+            setFilters((prev) => ({ ...prev, destination: event.target.value }))
+          }
+        />
+      </div>
+
+      <div className="space-y-1">
+        <label className="text-[11px] font-medium text-slate-700">Specialty</label>
+        <input
+          type="text"
+          placeholder="Honeymoons, family, safari..."
+          className="w-full rounded-lg border px-2 py-1 text-xs"
+          value={filters.specialty ?? ""}
+          onChange={(event) =>
+            setFilters((prev) => ({ ...prev, specialty: event.target.value }))
+          }
+        />
+      </div>
+
+      <div className="space-y-1">
+        <label className="text-[11px] font-medium text-slate-700">Language</label>
+        <input
+          type="text"
+          placeholder="e.g. English"
+          className="w-full rounded-lg border px-2 py-1 text-xs"
+          value={filters.language ?? ""}
+          onChange={(event) =>
+            setFilters((prev) => ({ ...prev, language: event.target.value }))
+          }
+        />
+      </div>
+
+      <div className="space-y-1">
+        <label className="text-[11px] font-medium text-slate-700">Min rating</label>
+        <input
+          type="number"
+          min={1}
+          max={5}
+          step={0.1}
+          placeholder="e.g. 4.5"
+          className="w-full rounded-lg border px-2 py-1 text-xs"
+          value={filters.minRating ?? ""}
+          onChange={(event) =>
+            setFilters((prev) => ({
+              ...prev,
+              minRating: event.target.value ? Number(event.target.value) : undefined,
+            }))
+          }
+        />
+      </div>
+
+      <div className="space-y-2">
+        <div className="text-[11px] font-medium text-slate-700">
+          Typical trip budget
+        </div>
+        <div className="flex gap-2">
+          <input
+            type="number"
+            placeholder="Min"
+            className="w-1/2 rounded-lg border px-2 py-1 text-xs"
+            value={filters.minBudget ?? ""}
+            onChange={(event) =>
+              setFilters((prev) => ({
+                ...prev,
+                minBudget: event.target.value ? Number(event.target.value) : undefined,
+              }))
+            }
+          />
+          <input
+            type="number"
+            placeholder="Max"
+            className="w-1/2 rounded-lg border px-2 py-1 text-xs"
+            value={filters.maxBudget ?? ""}
+            onChange={(event) =>
+              setFilters((prev) => ({
+                ...prev,
+                maxBudget: event.target.value ? Number(event.target.value) : undefined,
+              }))
+            }
+          />
         </div>
       </div>
-    );
-  }
+
+      <button
+        type="button"
+        className="mt-2 w-full rounded-full border px-3 py-1 text-[11px] text-slate-700"
+        onClick={() => setFilters({ ...defaultFilters })}
+      >
+        Clear filters
+      </button>
+    </div>
+  );
+
+  const headerRight = (
+    <div className="flex flex-col gap-3 sm:flex-row">
+      <input
+        type="text"
+        placeholder="Search agents by destination, specialty, or agency"
+        className="w-full rounded-full border px-4 py-2 text-xs sm:w-64"
+        value={filters.search}
+        onChange={(event) =>
+          setFilters((prev) => ({ ...prev, search: event.target.value }))
+        }
+      />
+      <button
+        type="button"
+        className="rounded-full border px-3 py-2 text-xs font-medium text-slate-700"
+        onClick={() => navigate("/post-trip")}
+      >
+        Post a trip brief
+      </button>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      
-      <main className="flex-1 container mx-auto px-4 sm:px-6 py-6 md:py-8">
-        <Button
-          variant="ghost"
-          onClick={() => navigate(-1)}
-          className="mb-4 md:mb-6 min-h-[44px]"
-          size="default"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
-        </Button>
-
-        <div className="mb-6 md:mb-8 space-y-2">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-secondary text-primary leading-tight">Browse Travel Agents</h1>
-          <p className="text-sm md:text-base text-muted-foreground">Find the perfect agent for your travel needs</p>
+    <MarketplaceShell
+      title="Browse verified travel agents"
+      subtitle="Find agents whose destinations, budgets, and style fit the trips you want to run through Goldsainte."
+      filters={filtersPanel}
+      headerRight={headerRight}
+      resultCount={filteredAgents.length}
+      sortControl={sortControl}
+    >
+      {loading ? (
+        <div className="py-10 text-sm text-slate-500">Loading travel agents…</div>
+      ) : filteredAgents.length === 0 ? (
+        <div className="py-10 text-sm text-slate-500">
+          No agents match these filters yet. Try widening your search.
         </div>
-
-        {user && !myAgentProfile && (
-          <Card className="mb-6">
-            <CardContent className="pt-6">
-              <p className="text-sm text-muted-foreground mb-3">
-                You're not listed yet. Complete agent onboarding to appear here and bid on jobs.
-              </p>
-              <Button onClick={() => navigate('/agent-onboarding')}>Complete Agent Onboarding</Button>
-            </CardContent>
-          </Card>
-        )}
-
-        {user && myAgentProfile && (!myAgentProfile.is_active || !myAgentProfile.is_verified) && (
-          <Card className="mb-6">
-            <CardContent className="pt-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div>
-                  <p className="text-sm">Your profile status</p>
-                  <div className="flex gap-2 mt-1">
-                    <Badge variant={myAgentProfile.is_active ? 'secondary' : 'destructive'}>
-                      Active: {myAgentProfile.is_active ? 'Yes' : 'No'}
-                    </Badge>
-                    <Badge variant={myAgentProfile.is_verified ? 'secondary' : 'outline'}>
-                      Verified: {myAgentProfile.is_verified ? 'Yes' : 'Pending'}
-                    </Badge>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {filteredAgents.map((agent) => (
+            <button
+              key={agent.id}
+              type="button"
+              onClick={() => navigate(`/agent/${agent.id}`)}
+              className="flex flex-col justify-between rounded-2xl border bg-white/80 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+            >
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 overflow-hidden rounded-full bg-slate-100">
+                  {agent.avatarUrl ? (
+                    <img
+                      src={agent.avatarUrl}
+                      alt={agent.displayName}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : null}
+                </div>
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-semibold text-slate-900">
+                    {agent.displayName}
+                  </div>
+                  <div className="truncate text-[11px] text-slate-500">
+                    {agent.agencyName || "Independent agent"}
                   </div>
                 </div>
-                <Button variant="outline" onClick={() => navigate('/agent-dashboard')}>Manage Profile</Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Filters */}
-        <Card className="mb-6">
-          <CardContent className="pt-4 md:pt-6">
-            <div className="space-y-4">
-              {/* Primary Filters */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search agents..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9 min-h-[44px]"
-                  />
-                </div>
-
-                <Select value={filterSpecialization} onValueChange={setFilterSpecialization}>
-                  <SelectTrigger className="min-h-[44px]">
-                    <SelectValue placeholder="Specialization" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Specializations</SelectItem>
-                    {allSpecializations.map(spec => (
-                      <SelectItem key={spec} value={spec}>{spec}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="min-h-[44px]">
-                    <SelectValue placeholder="Sort by" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="rating">Highest Rated</SelectItem>
-                    <SelectItem value="reviews">Most Reviews</SelectItem>
-                    <SelectItem value="experience">Most Experience</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
 
-              {/* Advanced Filters */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 pt-3 md:pt-4 border-t">
-                <div>
-                  <label className="text-xs sm:text-sm font-medium mb-2 block">Minimum Rating</label>
-                  <Select value={minRating.toString()} onValueChange={(v) => setMinRating(Number(v))}>
-                    <SelectTrigger className="min-h-[44px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="0">Any Rating</SelectItem>
-                      <SelectItem value="3">3+ Stars</SelectItem>
-                      <SelectItem value="4">4+ Stars</SelectItem>
-                      <SelectItem value="4.5">4.5+ Stars</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label className="text-xs sm:text-sm font-medium mb-2 block">Experience</label>
-                  <Select value={experienceRange} onValueChange={(v: any) => setExperienceRange(v)}>
-                    <SelectTrigger className="min-h-[44px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Any Experience</SelectItem>
-                      <SelectItem value="0-2">0-2 Years</SelectItem>
-                      <SelectItem value="3-5">3-5 Years</SelectItem>
-                      <SelectItem value="5+">5+ Years</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label className="text-xs sm:text-sm font-medium mb-2 block">Language</label>
-                  <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
-                    <SelectTrigger className="min-h-[44px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Any Language</SelectItem>
-                      {allLanguages.map(lang => (
-                        <SelectItem key={lang} value={lang}>{lang}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-slate-600">
+                {(agent.baseCity || agent.baseCountry) && (
+                  <span className="rounded-full bg-slate-50 px-2 py-1">
+                    {[agent.baseCity, agent.baseCountry].filter(Boolean).join(", ")}
+                  </span>
+                )}
+                {agent.rating != null && (
+                  <span className="rounded-full bg-slate-50 px-2 py-1">
+                    {agent.rating.toFixed(1)}★ rating
+                  </span>
+                )}
+                {agent.totalReviews != null && agent.totalReviews > 0 && (
+                  <span className="rounded-full bg-slate-50 px-2 py-1">
+                    {agent.totalReviews} Goldsainte reviews
+                  </span>
+                )}
+                {agent.yearsExperience != null && (
+                  <span className="rounded-full bg-slate-50 px-2 py-1">
+                    {agent.yearsExperience}+ yrs experience
+                  </span>
+                )}
               </div>
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* Results */}
-        {filteredAgents.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <Search className="h-16 w-16 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No agents found</h3>
-              <p className="text-muted-foreground text-center">
-                Try adjusting your search or filters
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {filteredAgents.map((agent) => (
-              <EnhancedAgentCard
-                key={agent.id}
-                agent={agent}
-                metrics={agentMetrics[agent.id]}
-                badges={agentBadges[agent.id]}
-                onClick={() => navigate(`/agent/${agent.id}`)}
-              />
-            ))}
-          </div>
-        )}
+              <div className="mt-3 flex flex-wrap gap-1">
+                {agent.specialties.slice(0, 3).map((spec) => (
+                  <span
+                    key={spec}
+                    className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] text-emerald-800"
+                  >
+                    {spec}
+                  </span>
+                ))}
+              </div>
 
-        {/* Real-time booking notifications */}
-        <RealTimeBookingNotifications />
-      </main>
-    </div>
+              {(agent.minBudget != null || agent.maxBudget != null) && (
+                <div className="mt-3 text-[10px] text-slate-500">
+                  Typical trip budget: {agent.minBudget ? `$${agent.minBudget.toLocaleString()}` : "—"} – {" "}
+                  {agent.maxBudget ? `$${agent.maxBudget.toLocaleString()}` : "—"}
+                </div>
+              )}
+
+              {agent.languages.length > 0 && (
+                <div className="mt-2 text-[10px] text-slate-500">
+                  Languages: {agent.languages.join(", ")}
+                </div>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </MarketplaceShell>
   );
 }

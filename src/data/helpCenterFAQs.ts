@@ -10,13 +10,13 @@ export const helpCenterFAQs: FAQ[] = [
   {
     id: 'nav-dashboard',
     question: 'How do I view my bookings?',
-    answer: 'Go to your Dashboard by clicking the Dashboard button in the header, then select the "Bookings" tab. Or visit /dashboard?tab=bookings directly.',
+    answer: 'Open /my-trips from the header (Profile → My Trips) or visit the traveler dashboard at /traveler to review every booking and proposal in one place.',
     category: 'navigation'
   },
   {
-    id: 'nav-favorites',
-    question: 'Where are my saved items?',
-    answer: 'Your favorites are in your Dashboard under the "Favorites" tab. Click Dashboard → Favorites tab, or go to /dashboard?tab=favorites.',
+    id: 'nav-trip-requests',
+    question: 'Where do I see my trip requests?',
+    answer: 'Open /my-trip-requests to review every brief you have posted. You can also tap Profile → View Trip Requests from anywhere in the app.',
     category: 'navigation'
   },
   {
@@ -48,13 +48,13 @@ export const helpCenterFAQs: FAQ[] = [
   {
     id: 'booking-modify',
     question: 'Can I modify my booking?',
-    answer: 'Yes! Go to Dashboard → Bookings, click on your booking, and select "Modify Flight" or contact your agent for assistance with other modifications.',
+    answer: 'Yes! Go to /my-trips, click on your booking, and select "Modify" or contact your agent for assistance with other adjustments.',
     category: 'bookings'
   },
   {
     id: 'booking-confirmation',
     question: 'Where is my booking confirmation?',
-    answer: 'Check your email for the confirmation. You can also find it in Dashboard → Bookings → click on your booking to view details.',
+    answer: 'Check your email for the confirmation. You can also find it in /my-trips by clicking the booking to view all details.',
     category: 'bookings'
   },
   
@@ -74,7 +74,7 @@ export const helpCenterFAQs: FAQ[] = [
   {
     id: 'payment-commission',
     question: 'When do I receive my commissions?',
-    answer: 'Commissions are visible in your Commission Dashboard (/commission-dashboard). Payouts are processed according to your Stripe Connect settings.',
+    answer: 'Commissions are visible inside TikTok Lab → Earnings (/tiktok-lab/earnings). Payouts are processed according to your Stripe Connect settings.',
     category: 'payments'
   },
   
@@ -82,7 +82,7 @@ export const helpCenterFAQs: FAQ[] = [
   {
     id: 'cancel-how',
     question: 'How do I cancel my booking?',
-    answer: 'Go to Dashboard → Bookings, select your booking, and click "Cancel". Refund eligibility depends on the cancellation policy shown during booking.',
+    answer: 'Go to /my-trips, select your booking, and click "Cancel". Refund eligibility depends on the policy shown during booking.',
     category: 'cancellations'
   },
   {
@@ -114,7 +114,7 @@ export const helpCenterFAQs: FAQ[] = [
   {
     id: 'account-preferences',
     question: 'How do I update my preferences?',
-    answer: 'Go to Dashboard → Preferences tab to manage your travel preferences, AI agent settings, and notification preferences.',
+    answer: 'Open /travel-settings/general to manage your travel preferences, AI assistant defaults, and notification settings.',
     category: 'account'
   },
   
@@ -122,7 +122,7 @@ export const helpCenterFAQs: FAQ[] = [
   {
     id: 'ai-agent-what',
     question: 'What is the Personal AI Agent?',
-    answer: 'Your AI agent learns your travel preferences and helps find personalized recommendations. Set it up at /ai-agent-setup or through Dashboard → Preferences.',
+    answer: 'Your AI agent learns your travel preferences and helps find personalized recommendations. Set it up at /ai-agent-setup or through /travel-settings/general.',
     category: 'ai-features'
   },
   {

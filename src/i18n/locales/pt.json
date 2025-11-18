@@ -149,12 +149,28 @@
       "subtitle": "Junte-se à nossa rede e ganhe comissões em reservas de viagens de luxo",
       "apply": "Candidatar-se Agora",
       "browse": "Navegar Agentes"
+    },
+    "gallery": {
+      "beachEscapes": "Beach Escapes",
+      "beachSubtitle": "Luxury beachfront properties",
+      "cityRetreats": "City Retreats",
+      "citySubtitle": "Urban luxury hotels",
+      "desertOases": "Desert Oases",
+      "desertSubtitle": "Exclusive desert resorts"
+    },
+    "hotelSections": {
+      "europeTitle": "Most popular hotels in Europe",
+      "usTitle": "Most popular hotels in US"
+    },
+    "restaurantSections": {
+      "usTitle": "Fine Dining Across America"
     }
   },
   "navigation": {
     "discover": "Descobrir",
     "journeys": "Viagens",
     "cocuratedJourneys": "Viagens CoCuradas",
+    "storyboards": "Storyboards",
     "browseCreators": "Navegar Criadores",
     "browseAgents": "Navegar Agentes",
     "marketplace": "Mercado",
@@ -165,7 +181,7 @@
     "shop": "Loja",
     "affiliateLinks": "Links de Afiliados",
     "company": "Empresa",
-    "subscription": "Assinatura",
+    "concierge": "Concierge",
     "about": "Sobre"
   },
   "footer": {
@@ -178,6 +194,7 @@
     "discover": "Descobrir",
     "journeys": "Viagens",
     "cocuratedJourneys": "Viagens CoCuradas",
+    "storyboards": "Storyboards",
     "seasonalDeals": "Ofertas Sazonais e de Férias",
     "travelAgentServices": "Serviços de Agentes de Viagem",
     "cocuratedPackages": "Pacotes CoCurados",

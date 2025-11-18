@@ -263,12 +263,12 @@ export default function CoCuratedDashboard() {
                   )}
                   
                   <Button
-                    onClick={() => navigate('/browse-influencers')}
+                    onClick={() => navigate('/creators')}
                     size="lg"
                     className="w-full"
                   >
                     <Users className="h-5 w-5 mr-2" />
-                    Browse & Invite Influencers
+                    Browse & Invite Creators
                   </Button>
                 </div>
               </TabsContent>

@@ -170,6 +170,7 @@
     "discover": "발견",
     "journeys": "여정",
     "cocuratedJourneys": "CoCurated 여정",
+    "storyboards": "Storyboards",
     "browseCreators": "크리에이터 둘러보기",
     "browseAgents": "에이전트 둘러보기",
     "marketplace": "마켓플레이스",
@@ -180,7 +181,7 @@
     "shop": "상점",
     "affiliateLinks": "제휴 링크",
     "company": "회사",
-    "subscription": "구독",
+    "concierge": "Concierge",
     "about": "소개"
   },
   "footer": {
@@ -193,6 +194,7 @@
     "discover": "발견",
     "journeys": "여정",
     "cocuratedJourneys": "CoCurated 여정",
+    "storyboards": "Storyboards",
     "seasonalDeals": "계절 및 휴일 특가",
     "travelAgentServices": "여행 에이전트 서비스",
     "cocuratedPackages": "CoCurated 패키지",

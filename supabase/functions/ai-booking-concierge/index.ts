@@ -1427,12 +1427,11 @@ Remember: You're an AI search concierge that helps find perfect travel options a
               message: `Ready to book! I'll redirect you to Expedia to complete your reservation with all details pre-filled.`
             };
           } else if (functionName === 'search_fine_dining_restaurants') {
-            // For now, return a message directing users to the fine dining page
-            // In production, you'd want to duplicate the curated data or use an API
+            // For now, route travelers to the storyboard + trip brief flow
             result = {
               success: true,
-              message: "I recommend visiting our Fine Dining page to explore our curated collection of 2,520+ luxury restaurants across 30 global destinations. You can filter by city and cuisine type to find the perfect dining experience.",
-              page_url: "/fine-dining",
+              message: "Share the restaurants you have in mind inside a storyboard or trip brief and Madison will match you with the right creator + agent team.",
+              page_url: "/post-trip",
               suggested_cities: args.city ? [args.city] : ["Paris", "Tokyo", "London", "Dubai", "New York City"],
               suggested_cuisines: args.cuisine ? [args.cuisine] : ["French Fine Dining", "Japanese Kaiseki", "Italian Trattoria", "Steakhouse"]
             };

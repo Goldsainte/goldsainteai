@@ -22,7 +22,11 @@ export default function StoryboardDetailPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) {
+      setError('Storyboard ID is missing.');
+      setLoading(false);
+      return;
+    }
 
     let cancelled = false;
     async function load() {
@@ -33,7 +37,7 @@ export default function StoryboardDetailPage() {
           .from("storyboards")
           .select("*")
           .eq("id", id)
-          .maybeSingle();
+          .single();
 
         if (!cancelled) {
           if (fetchError) throw fetchError;
@@ -74,7 +78,7 @@ export default function StoryboardDetailPage() {
           <p>{error || "This storyboard is not available."}</p>
           <button
             type="button"
-            onClick={() => navigate("/storyboards")}
+            onClick={() => navigate("/tiktok-lab/storyboards")}
             className="mt-1 inline-flex items-center gap-1 text-[#0c4d47] font-semibold"
           >
             <ArrowLeft className="h-3 w-3" />

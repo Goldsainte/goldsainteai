@@ -149,12 +149,28 @@
       "subtitle": "Treten Sie unserem Netzwerk bei und verdienen Sie Provisionen für Luxusreisebuchungen",
       "apply": "Jetzt Bewerben",
       "browse": "Agenten Durchsuchen"
+    },
+    "gallery": {
+      "beachEscapes": "Beach Escapes",
+      "beachSubtitle": "Luxury beachfront properties",
+      "cityRetreats": "City Retreats",
+      "citySubtitle": "Urban luxury hotels",
+      "desertOases": "Desert Oases",
+      "desertSubtitle": "Exclusive desert resorts"
+    },
+    "hotelSections": {
+      "europeTitle": "Most popular hotels in Europe",
+      "usTitle": "Most popular hotels in US"
+    },
+    "restaurantSections": {
+      "usTitle": "Fine Dining Across America"
     }
   },
   "navigation": {
     "discover": "Entdecken",
     "journeys": "Reisen",
     "cocuratedJourneys": "CoCurated Reisen",
+    "storyboards": "Storyboards",
     "browseCreators": "Creators Durchsuchen",
     "browseAgents": "Agenten Durchsuchen",
     "marketplace": "Marktplatz",
@@ -165,7 +181,7 @@
     "shop": "Shop",
     "affiliateLinks": "Affiliate-Links",
     "company": "Unternehmen",
-    "subscription": "Abonnement",
+    "concierge": "Concierge",
     "about": "Über uns"
   },
   "footer": {
@@ -178,6 +194,7 @@
     "discover": "Entdecken",
     "journeys": "Reisen",
     "cocuratedJourneys": "CoCurated Reisen",
+    "storyboards": "Storyboards",
     "seasonalDeals": "Saison- und Feiertagsangebote",
     "travelAgentServices": "Reiseagentur-Services",
     "cocuratedPackages": "CoCurated Pakete",

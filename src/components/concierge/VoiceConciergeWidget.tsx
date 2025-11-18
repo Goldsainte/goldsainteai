@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { MessageCircle, X, Mic, MicOff, Music2, Send, Loader2 } from "lucide-react";
+import { X, Mic, MicOff, Send, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { MADISON_NAME, MADISON_VOICE_INTRO } from "@/lib/madisonPersona";
 import { StartStoryboardFromChat } from "./StartStoryboardFromChat";
+import { VoiceConciergeButton } from "@/components/VoiceConciergeButton";
 
 type Message = {
   id: string;
@@ -16,12 +17,12 @@ export function VoiceConciergeWidget() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [listening, setListening] = useState(false);
-  const [musicOn, setMusicOn] = useState(true);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [requiresLogin, setRequiresLogin] = useState(false);
 
   function startListening() {
     setListening(true);
@@ -41,7 +42,20 @@ export function VoiceConciergeWidget() {
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        setRequiresLogin(true);
+        setMessages([
+          {
+            id: "login",
+            role: "assistant",
+            content: MADISON_VOICE_INTRO.trim(),
+            created_at: new Date().toISOString(),
+          },
+        ]);
+        return;
+      }
+
+      setRequiresLogin(false);
 
       const { data: existing } = await supabase
         .from("concierge_sessions")
@@ -99,6 +113,11 @@ export function VoiceConciergeWidget() {
   }
 
   async function handleSend() {
+    if (requiresLogin) {
+      navigate('/login?redirect=/concierge');
+      return;
+    }
+
     if (!sessionId || !input.trim()) return;
     const userMessage = input.trim();
     setInput("");
@@ -164,129 +183,103 @@ export function VoiceConciergeWidget() {
   return (
     <>
       {/* Floating button */}
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="fixed bottom-4 right-4 z-40 inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-4 py-2 text-[11px] font-semibold text-[#E5DFC6] shadow-lg hover:bg-[#073331]"
-      >
-        <MessageCircle className="h-4 w-4" />
-        Hey Goldsainte
-      </button>
-
-      {/* Jazz background */}
-      {musicOn && open && (
-        <audio loop autoPlay className="hidden">
-          <source src="/audio/jazz-lounge.mp3" type="audio/mpeg" />
-        </audio>
-      )}
+      <VoiceConciergeButton onClick={() => setOpen(true)} />
 
       {/* Panel */}
       {open && (
-        <div className="fixed bottom-20 right-4 z-40 w-80 max-w-[90vw] rounded-3xl border border-[#E5DFC6] bg-[#0a2225] text-[#E5DFC6] shadow-2xl">
-          <div className="flex items-center justify-between px-3 py-2">
-            <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-[0.18em] text-[#BFAD72]">
-                Goldsainte Concierge
-              </span>
-              <span className="text-[12px] font-semibold">
-                {MADISON_NAME}
-              </span>
+        <div className="fixed bottom-20 right-4 z-40 w-[320px] max-w-[90vw] rounded-[28px] border border-[#E5DFC6] bg-white text-[#0a2225] shadow-2xl">
+          <div className="flex items-center justify-between border-b border-[#E5DFC6] px-4 py-3">
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] text-[#8D8D8D]">Goldsainte Concierge</p>
+              <p className="text-sm font-semibold">{MADISON_NAME}</p>
             </div>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setMusicOn((m) => !m)}
-                className="rounded-full bg-white/10 p-1 hover:bg-white/20"
-                aria-label="Toggle music"
-              >
-                <Music2 className="h-3 w-3" />
-              </button>
-              <button
-                type="button"
-                onClick={handleClose}
-                className="rounded-full bg-white/10 p-1 hover:bg-white/20"
-                aria-label="Close"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={handleClose}
+              className="rounded-full bg-[#f7f3ea] p-1 hover:bg-[#f0e8d9]"
+              aria-label="Close concierge"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
           </div>
 
-          <div className="px-3 pb-3 text-[11px]">
+          <div className="px-4 pb-4 pt-3 text-sm space-y-3">
             {loading ? (
-              <div className="flex items-center gap-2 py-4 text-[#E5DFC6]/70">
-                <Loader2 className="h-3 w-3 animate-spin" />
-                Loading conversation…
+              <div className="flex items-center gap-2 py-6 text-[#8D8D8D]">
+                <Loader2 className="h-3 w-3 animate-spin" /> Loading Madison…
               </div>
             ) : (
               <>
-                <div className="max-h-[240px] overflow-y-auto space-y-2 mb-3">
+                <div className="max-h-[260px] overflow-y-auto space-y-2">
                   {messages.map((m, idx) => {
                     const isAssistant = m.role === "assistant";
                     const isLastAssistant = isAssistant && idx === lastAssistantIndex;
 
                     return (
-                      <div key={m.id}>
+                      <div key={m.id} className={`flex ${isAssistant ? "justify-start" : "justify-end"}`}>
                         <div
-                          className={`rounded-2xl px-3 py-2 ${
+                          className={`max-w-[85%] rounded-2xl px-3 py-2 ${
                             isAssistant
-                              ? "bg-[#E5DFC6]/10 text-[#E5DFC6]"
-                              : "bg-[#BFAD72] text-[#0a2225] ml-auto max-w-[80%]"
+                              ? "bg-[#f7f3ea] text-[#0a2225]"
+                              : "bg-[#0c4d47] text-[#E5DFC6]"
                           }`}
                         >
                           {m.content}
+                          {isLastAssistant && sessionId && (
+                            <div className="mt-2 border-t border-black/10 pt-2">
+                              <p className="mb-1 text-xs text-[#4a4a4a]">
+                                Want Madison to lay this out visually?
+                              </p>
+                              <StartStoryboardFromChat sessionId={sessionId} ownerRole="traveler" />
+                            </div>
+                          )}
                         </div>
-                        {isLastAssistant && sessionId && (
-                          <div className="mt-2 pt-2 border-t border-[#E5DFC6]/20">
-                            <p className="mb-1 text-[10px] text-[#E5DFC6]/70">
-                              Ready to see this as a visual plan?
-                            </p>
-                            <StartStoryboardFromChat
-                              sessionId={sessionId}
-                              ownerRole="traveler"
-                            />
-                          </div>
-                        )}
                       </div>
                     );
                   })}
                 </div>
 
-                <div className="flex items-center gap-2 mb-2">
-                  <input
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSend();
-                      }
-                    }}
-                    placeholder={`Tell ${MADISON_NAME} what you're planning…`}
-                    className="flex-1 rounded-full border border-[#E5DFC6]/30 bg-[#0a2225] px-3 py-1.5 text-[10px] outline-none placeholder:text-[#E5DFC6]/50"
-                  />
+                {requiresLogin ? (
                   <button
                     type="button"
-                    onClick={handleSend}
-                    disabled={sending || !input.trim()}
-                    className="rounded-full bg-[#BFAD72] p-1.5 hover:bg-[#d4c58d] disabled:opacity-50"
+                    onClick={() => navigate('/login?redirect=/concierge')}
+                    className="w-full rounded-full bg-[#0c4d47] px-4 py-2 text-sm font-semibold text-[#E5DFC6]"
                   >
-                    {sending ? (
-                      <Loader2 className="h-3 w-3 animate-spin text-[#0a2225]" />
-                    ) : (
-                      <Send className="h-3 w-3 text-[#0a2225]" />
-                    )}
+                    Sign in to plan with Madison
                   </button>
-                </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <input
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSend();
+                        }
+                      }}
+                      placeholder={`Tell ${MADISON_NAME} what you're planning…`}
+                      className="flex-1 rounded-full border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-1.5 text-xs outline-none placeholder:text-[#8D8D8D]"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleSend}
+                      disabled={sending || !input.trim()}
+                      className="rounded-full bg-[#0c4d47] p-1.5 text-white hover:bg-[#073331] disabled:opacity-40"
+                    >
+                      {sending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />}
+                    </button>
+                  </div>
+                )}
 
-                <div className="flex items-center justify-between pt-2 border-t border-[#E5DFC6]/20">
+                <div className="flex items-center justify-between border-t border-[#E5DFC6] pt-2">
                   <button
                     type="button"
                     onClick={listening ? stopListening : startListening}
-                    className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[10px] ${
+                    className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs ${
                       listening
-                        ? "bg-[#BFAD72] text-[#0a2225]"
-                        : "bg-[#E5DFC6]/20 text-[#E5DFC6]"
+                        ? "bg-[#0c4d47] text-[#E5DFC6]"
+                        : "bg-[#f7f3ea] text-[#0a2225]"
                     }`}
                   >
                     {listening ? (
@@ -295,20 +288,18 @@ export function VoiceConciergeWidget() {
                       </>
                     ) : (
                       <>
-                        <Mic className="h-3 w-3" /> Voice
+                        <Mic className="h-3 w-3" /> Voice note
                       </>
                     )}
                   </button>
 
-                  {sessionId && (
-                    <button
-                      type="button"
-                      onClick={() => navigate(`/concierge?sessionId=${sessionId}`)}
-                      className="text-[10px] underline underline-offset-2 text-[#BFAD72] hover:text-[#d4c58d]"
-                    >
-                      Open full trip planner
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => navigate(sessionId ? `/concierge?sessionId=${sessionId}` : '/concierge')}
+                    className="text-xs font-semibold text-[#0c4d47] underline underline-offset-2"
+                  >
+                    Open full trip planner
+                  </button>
                 </div>
               </>
             )}

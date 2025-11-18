@@ -132,112 +132,62 @@ test.describe('Critical Production Flows - P0 Validation', () => {
       await expect(page.locator('[href*="/profile"], button:has-text("Sign out")').first()).toBeVisible();
     });
 
-    test('should access subscription page with auth headers', async ({ page }) => {
-      // Login first
-      await page.goto('/auth');
-      const email = `sub-test-${Date.now()}@goldsainte.test`;
-      
-      await page.locator('input[type="email"]').fill(email);
-      await page.locator('input[type="password"]').first().fill(testPassword);
-      await page.locator('button:has-text("Sign up")').first().click();
-      await page.waitForURL(/\/(home|travel-feed|profile)/, { timeout: 15000 });
-      
-      // Navigate to subscription page
-      await page.goto('/subscription');
-      await expect(page.locator('h1, h2')).toContainText(/subscription|plan/i, { timeout: 10000 });
-      
-      // Verify subscription tiers are visible
-      const premiumTier = page.locator('text=/premium|pro/i');
-      await expect(premiumTier.first()).toBeVisible({ timeout: 10000 });
-      
-      // Click upgrade button
-      const upgradeButton = page.locator('button:has-text("Upgrade"), button:has-text("Subscribe")').first();
-      await upgradeButton.click();
-      
-      // Should redirect to Stripe checkout (not error page)
-      await page.waitForURL(/checkout\.stripe\.com/, { timeout: 15000 });
-      expect(page.url()).toContain('checkout.stripe.com');
+  });
+
+  test.describe('Traveler workflows', () => {
+    test('homepage hero CTA routes to the post trip form', async ({ page }) => {
+      await page.goto('/');
+      await page.getByRole('link', { name: /Post a dream trip/i }).click();
+      await expect(page).toHaveURL(/\/post-trip/);
+      await expect(page.getByRole('heading', { name: /trip you'\s*re dreaming of/i })).toBeVisible();
+    });
+
+    test('floating concierge opens Madison widget and planner link', async ({ page }) => {
+      await page.goto('/');
+      const conciergeButton = page.getByTestId('voice-concierge-button');
+      await expect(conciergeButton).toBeVisible();
+      await conciergeButton.click();
+
+      const widgetHeader = page.locator('text=/Goldsainte Concierge/i');
+      await expect(widgetHeader).toBeVisible();
+
+      const fullPlanner = page.getByRole('button', { name: /Open full trip planner/i });
+      await fullPlanner.click();
+      await expect(page).toHaveURL(/\/concierge/);
     });
   });
 
-  test.describe('P0-4: Social Photo Modal Aspect Ratio', () => {
-    test('should display photo modal without distortion', async ({ page }) => {
-      // Navigate to a profile page with posts
-      await page.goto('/travel-feed');
-      
-      // Wait for feed to load
-      await page.waitForSelector('[data-testid="moment-card"], [data-testid="post-card"], article', { timeout: 15000 });
-      
-      // Find and click first post image
-      const firstImage = page.locator('article img, [data-testid="moment-card"] img, [data-testid="post-card"] img').first();
-      await firstImage.waitFor({ state: 'visible', timeout: 10000 });
-      await firstImage.click();
-      
-      // Verify modal opens
-      const modal = page.locator('[role="dialog"], .modal, [data-testid="lightbox"]');
-      await expect(modal).toBeVisible({ timeout: 5000 });
-      
-      // Verify image has object-contain class (prevents distortion)
-      const modalImage = modal.locator('img').first();
-      await expect(modalImage).toBeVisible();
-      
-      const imageClass = await modalImage.getAttribute('class');
-      expect(imageClass).toMatch(/object-contain|object-cover/);
-      
-      // Verify no console errors
+  test.describe('P0-4: TikTok Lab Storyboard Navigation', () => {
+    test('should render the storyboard list shell with CTA', async ({ page }) => {
+      await page.goto('/tiktok-lab/storyboards');
+
+      await expect(page.getByRole('heading', { name: /My Storyboards/i })).toBeVisible();
+      await expect(page.getByRole('link', { name: /New storyboard/i })).toBeVisible();
+
+      // Ensure no blocking console errors fire while loading Supabase data
       const consoleErrors: string[] = [];
       page.on('console', msg => {
         if (msg.type() === 'error') {
           consoleErrors.push(msg.text());
         }
       });
-      
-      await page.waitForTimeout(2000);
+
+      await page.waitForTimeout(500);
       expect(consoleErrors.filter(e => !e.includes('404'))).toHaveLength(0);
-      
-      // Close modal (Esc key)
-      await page.keyboard.press('Escape');
-      await expect(modal).not.toBeVisible({ timeout: 5000 });
     });
 
-    test('should handle profile grid photo clicks', async ({ page }) => {
-      // Create account and navigate to profile
-      await page.goto('/auth');
-      const email = `profile-test-${Date.now()}@goldsainte.test`;
-      
-      await page.locator('input[type="email"]').fill(email);
-      await page.locator('input[type="password"]').first().fill('TestPassword123!');
-      await page.locator('button:has-text("Sign up")').first().click();
-      await page.waitForURL(/\/(home|travel-feed|profile)/, { timeout: 15000 });
-      
-      // Navigate to profile
-      await page.goto('/profile');
-      
-      // If profile has grid items, click one
-      const gridItem = page.locator('[data-testid="profile-grid-item"], .profile-grid img').first();
-      
-      if (await gridItem.isVisible()) {
-        await gridItem.click();
-        
-        // Verify modal opens with proper layout
-        const modal = page.locator('[role="dialog"]');
-        await expect(modal).toBeVisible({ timeout: 5000 });
-        
-        // Verify image is not stretched (has proper aspect ratio)
-        const modalImage = modal.locator('img').first();
-        const boundingBox = await modalImage.boundingBox();
-        
-        if (boundingBox) {
-          // Image should not fill entire viewport (should have margins)
-          expect(boundingBox.height).toBeLessThan(page.viewportSize()!.height * 0.9);
-        }
-      }
+    test('should gracefully handle deep-linking to a storyboard detail', async ({ page }) => {
+      const fakeId = '11111111-1111-1111-1111-111111111111';
+      await page.goto(`/tiktok-lab/storyboards/${fakeId}`);
+
+      await expect(page).toHaveURL(/\/tiktok-lab\/storyboards\//);
+      await expect(page.getByRole('button', { name: /Back/i })).toBeVisible();
     });
   });
 
   test.describe('Critical Navigation & Error-Free Basics', () => {
     test('should navigate main routes without errors', async ({ page }) => {
-      const routes = ['/', '/travel-feed', '/explore', '/journeys', '/reels'];
+      const routes = ['/', '/explore', '/creators', '/agents', '/post-trip', '/trip-requests', '/tiktok-lab/storyboards'];
       
       for (const route of routes) {
         await page.goto(route);

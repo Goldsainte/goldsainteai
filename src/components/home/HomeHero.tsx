@@ -10,7 +10,7 @@ export function HomeHero() {
       <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 pb-12 pt-16 md:flex-row md:items-center md:pt-20">
         {/* LEFT: Copy & CTAs */}
         <div className="w-full md:w-[52%] space-y-5">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-white/80 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-[#8D8D8D]">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-white/80 px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#8D8D8D]">
             <span>Travelers</span>
             <span className="h-[1px] w-4 bg-[#E5DFC6]" />
             <span>Creators</span>
@@ -18,12 +18,12 @@ export function HomeHero() {
             <span>Agents</span>
           </div>
 
-          <h1 className="font-display text-[28px] leading-snug md:text-[34px]">
+          <h1 className="font-display text-3xl leading-snug md:text-4xl lg:text-[42px]">
             Where <em>inspiration</em> becomes a <em>storyboard</em> — and the perfect <em>creator + agent</em>{" "}
             team builds the trip.
           </h1>
 
-          <p className="max-w-xl text-[12px] leading-relaxed text-[#4a4a4a]">
+          <p className="max-w-xl text-sm md:text-base leading-relaxed text-[#4a4a4a]">
             Goldsainte turns inspiration into itinerary. Post your dream trip, match
             instantly with creators and certified agents whose style fits yours,
             co-design the journey through a shared storyboard, and book the entire
@@ -34,12 +34,12 @@ export function HomeHero() {
           <div className="flex flex-wrap items-center gap-3 pt-1">
             <Link
               to="/post-trip"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-6 py-2.5 text-[11px] font-semibold text-[#E5DFC6] shadow-sm hover:bg-[#073331]"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-6 py-2.5 text-sm font-semibold text-[#E5DFC6] shadow-sm hover:bg-[#073331]"
             >
               Post a dream trip
             </Link>
 
-            <div className="inline-flex flex-wrap gap-2 text-[11px]">
+            <div className="inline-flex flex-wrap gap-2 text-sm">
               <Link
                 to="/creators"
                 className="rounded-full border border-[#BFAD72] bg-white px-4 py-2 font-semibold text-[#0a2225] hover:bg-[#f7f3ea]"
@@ -56,7 +56,7 @@ export function HomeHero() {
           </div>
 
           {/* AI concierge mention (not a second widget, just an entry point link) */}
-          <p className="pt-2 text-[11px] text-[#8D8D8D]">
+          <p className="pt-2 text-sm text-[#8D8D8D]">
             Prefer a gentle assist?{" "}
             <Link
               to="/concierge"
@@ -67,7 +67,7 @@ export function HomeHero() {
           </p>
 
           {/* Trust / promise line */}
-          <p className="pt-1 text-[10px] text-[#8D8D8D] max-w-sm">
+          <p className="pt-1 text-xs text-[#8D8D8D] max-w-sm">
             All messaging and payments stay on-platform. No phone numbers, no side
             deals — just beautifully organized, protected bookings.
           </p>
@@ -107,11 +107,11 @@ export function HomeHero() {
               </div>
 
               {/* Caption card */}
-              <div className="mt-3 rounded-2xl bg-[#0c4d47] px-4 py-3 text-[11px] text-[#E5DFC6]">
+              <div className="mt-3 rounded-2xl bg-[#0c4d47] px-4 py-3 text-sm text-[#E5DFC6]">
                 <p className="font-semibold mb-1">
                   Every trip begins with a storyboard.
                 </p>
-                <p className="text-[10px] text-[#E5DFC6]/90">
+                <p className="text-xs text-[#E5DFC6]/90">
                   Drop in TikToks, Reels, YouTube videos, Unsplash photos and Viator
                   experiences. Creators refine the mood; agents engineer the itinerary.
                   You see the journey before you ever click "Book".

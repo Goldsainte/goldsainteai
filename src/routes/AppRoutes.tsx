@@ -1,7 +1,6 @@
 import { lazy } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 
-import Index from '@/pages/Index';
 import Auth from '@/pages/Auth';
 import AuthCallback from '@/pages/AuthCallback';
 import EmailConfirmedPage from '@/pages/EmailConfirmedPage';
@@ -13,20 +12,24 @@ import { RequireAgentTerms } from '@/components/RequireAgentTerms';
 
 import { MarketingLayout, AuthLayout, MemberLayout, AdminLayout } from './Layouts';
 import { RouteSectionBoundary } from './RouteSectionBoundary';
+import { RequireAuth } from '@/components/routing/RequireAuth';
+import { AdminGuard } from '@/hooks/useAdminGuard';
 
 const SearchResults = lazy(() => import('@/pages/SearchResults'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const AdminDashboardPage = lazy(() => import('@/pages/admin/AdminDashboardPage'));
 const AdminSafetyDashboardPage = lazy(() => import('@/pages/admin/AdminSafetyDashboardPage'));
 const AdminAgentsPage = lazy(() => import('@/pages/admin/AdminAgentsPage'));
+const AdminCreatorsPage = lazy(() => import('@/pages/admin/AdminCreatorsPage'));
+const AdminBookingsPage = lazy(() => import('@/pages/admin/AdminBookingsPage'));
+const AdminDisputesPage = lazy(() => import('@/pages/admin/AdminDisputesPage'));
 const AdminHomePage = lazy(() => import('@/pages/admin/AdminHomePage'));
+const AdminMarketplaceOversightPage = lazy(() => import('@/pages/admin/AdminMarketplaceOversightPage'));
 const AgentPublicProfilePage = lazy(() => import('@/pages/agents/AgentPublicProfilePage'));
 const CreatorPublicProfilePage = lazy(() => import('@/pages/creators/CreatorPublicProfilePage'));
 const TravelProfileRedirect = lazy(() => import('@/pages/redirects/TravelProfileRedirectPage'));
 const ExplorePage = lazy(() => import('@/pages/ExplorePage'));
-const ReelsViewer = lazy(() => import('@/pages/ReelsViewer'));
 const Marketplace = lazy(() => import('@/pages/Marketplace'));
-const RequestTrip = lazy(() => import('@/pages/marketplace/RequestTrip'));
 const TripRequestDetail = lazy(() => import('@/pages/marketplace/TripRequestDetail'));
 const TripDetail = lazy(() => import('@/pages/marketplace/TripDetail'));
 // Legacy social feed - disabled
@@ -35,12 +38,12 @@ const TripDetail = lazy(() => import('@/pages/marketplace/TripDetail'));
 const Shop = lazy(() => import('@/pages/Shop'));
 const BrowseAgents = lazy(() => import('@/pages/BrowseAgents'));
 const BrowseCreators = lazy(() => import('@/pages/BrowseCreators'));
-const BrowseInfluencers = lazy(() => import('@/pages/BrowseInfluencers'));
 const CreatorsPage = lazy(() => import('@/pages/CreatorsPage'));
 const CreatorOnboardingPage = lazy(() => import('@/pages/onboarding/CreatorOnboardingPage'));
 const AgentProfile = lazy(() => import('@/pages/AgentProfile'));
 const AgentOnboarding = lazy(() => import('@/pages/AgentOnboarding'));
 const AgentDashboard = lazy(() => import('@/pages/AgentDashboard'));
+const AgentEarningsPage = lazy(() => import('@/pages/agent/AgentEarningsPage'));
 const AgentTripRequests = lazy(() => import('@/pages/AgentTripRequests'));
 const AgentStoryboardBuilderPage = lazy(() => import('@/pages/agents/AgentStoryboardBuilderPage'));
 const AgentPerformanceDashboard = lazy(() => import('@/pages/AgentPerformanceDashboard'));
@@ -64,8 +67,7 @@ const AgentApplyPage = lazy(() => import('@/pages/agents/AgentApplyPage'));
 const StoryboardEditorPage = lazy(() => import('@/pages/StoryboardEditorPage'));
 const TikTokLabStoryboardEditorPage = lazy(() => import('@/pages/TikTokLab/StoryboardEditorPage'));
 const TikTokLabPage = lazy(() => import('@/pages/TikTokLabPage'));
-const StoryboardsPage = lazy(() => import('@/pages/StoryboardsPage'));
-const StoryboardDetailPage = lazy(() => import('@/pages/StoryboardDetailPage'));
+const TikTokLabStoryboardDetailPage = lazy(() => import('@/pages/TikTokLab/StoryboardDetailPage'));
 const ConciergePage = lazy(() => import('@/pages/ConciergePage'));
 const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
 const MarketplaceGuidelinesPage = lazy(() => import('@/pages/MarketplaceGuidelinesPage'));
@@ -73,8 +75,6 @@ const HomePage = lazy(() => import('@/pages/HomePage'));
 const MyBookingsPage = lazy(() => import('@/pages/MyBookingsPage'));
 const PartnerBookingsPage = lazy(() => import('@/pages/PartnerBookingsPage'));
 const BookingDetailPage = lazy(() => import('@/pages/bookings/BookingDetailPage'));
-const BookingPreferencesRedirect = lazy(() => import('@/pages/redirects/BookingPreferencesRedirect'));
-const FavoritesRedirect = lazy(() => import('@/pages/redirects/FavoritesRedirect'));
 const EmailPreview = lazy(() => import('@/pages/EmailPreview'));
 const BillingDashboard = lazy(() => import('@/pages/BillingDashboard'));
 const TikTokLabStoryboardsPage = lazy(() => import('@/pages/TikTokLab/StoryboardsPage'));
@@ -82,7 +82,6 @@ const TravelSettings = lazy(() => import('@/pages/TravelSettings'));
 const TravelSettings2 = lazy(() => import('@/pages/TravelSettings2'));
 const CreatorSettingsPage = lazy(() => import('@/pages/CreatorSettingsPage'));
 const MusicVolumeSettings = lazy(() => import('@/pages/MusicVolumeSettings'));
-const CrosspostingSettings = lazy(() => import('@/pages/CrosspostingSettings'));
 // Legacy Instagram demo - disabled
 // const InstagramCallback = lazy(() => import('@/pages/InstagramCallback'));
 // const InstagramAPI = lazy(() => import('@/pages/InstagramAPI'));
@@ -97,10 +96,10 @@ const Messages = lazy(() => import('@/pages/Messages'));
 const PriceAlerts = lazy(() => import('@/pages/PriceAlerts'));
 const TravelerDashboardPage = lazy(() => import('@/pages/traveler/TravelerDashboardPage'));
 const PartnerConsolePage = lazy(() => import('@/pages/partner/PartnerConsolePage'));
+const PartnerEscrowPage = lazy(() => import('@/pages/partners/EscrowMilestonesPage'));
 const MyJobs = lazy(() => import('@/pages/MyJobs'));
 const MyTrips = lazy(() => import('@/pages/MyTrips'));
 const GroupTrips = lazy(() => import('@/pages/GroupTrips'));
-const TestGroupPayment = lazy(() => import('@/pages/TestGroupPayment'));
 const JournalListing = lazy(() => import('@/pages/JournalListing'));
 const JournalArticle = lazy(() => import('@/pages/JournalArticle'));
 const CreatorArticles = lazy(() => import('@/pages/CreatorArticles'));
@@ -123,10 +122,8 @@ const EmergencyContacts = lazy(() => import('@/pages/EmergencyContacts'));
 const CoCuratedDashboard = lazy(() => import('@/pages/CoCuratedDashboard'));
 const CoCuratedCreate = lazy(() => import('@/pages/CoCuratedCreate'));
 const CoCuratedMarketplace = lazy(() => import('@/pages/CoCuratedMarketplace'));
-const CoCuratedJourneys = lazy(() => import('@/pages/CoCuratedJourneys'));
 const CoCuratedBookingSuccess = lazy(() => import('@/pages/CoCuratedBookingSuccess'));
 const TourActivityDetail = lazy(() => import('@/pages/TourActivityDetail'));
-const FineDining = lazy(() => import('@/pages/FineDining'));
 const RestaurantDetail = lazy(() => import('@/pages/RestaurantDetail'));
 const YourActivity = lazy(() => import('@/pages/YourActivity'));
 const Admin = lazy(() => import('@/pages/Admin'));
@@ -144,7 +141,6 @@ const PlatformAnalyticsDashboard = lazy(() => import('@/components/PlatformAnaly
 const SystemHealth = lazy(() => import('@/pages/SystemHealth'));
 const Redirect = lazy(() => import('@/pages/Redirect'));
 const About = lazy(() => import('@/pages/About'));
-const AuthPage = lazy(() => import('@/pages/AuthPage'));
 const OnboardingProfilePage = lazy(() => import('@/pages/OnboardingProfilePage'));
 const TermsPage = lazy(() => import('@/pages/Terms'));
 const WhatWeDo = lazy(() => import('@/pages/WhatWeDo'));
@@ -168,6 +164,7 @@ export const AppRoutes = () => (
       <Route path="/about" element={<About />} />
       <Route path="/creators" element={<CreatorsPage />} />
       <Route path="/creators/:id" element={<CreatorPublicProfilePage />} />
+      <Route path="/agents" element={<BrowseAgents />} />
       <Route path="/agents/:id" element={<AgentPublicProfilePage />} />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/what-we-do" element={<WhatWeDo />} />
@@ -182,7 +179,7 @@ export const AppRoutes = () => (
     </Route>
 
     <Route element={<AuthLayout />}>
-      <Route path="/auth" element={<AuthPage />} />
+      <Route path="/auth" element={<Auth />} />
       <Route path="/login" element={<Auth />} />
       <Route path="/signup" element={<Auth />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
@@ -203,7 +200,6 @@ export const AppRoutes = () => (
         <Route path="/journeys" element={<TravelFeed />} />
         */}
         <Route path="/explore" element={<ExplorePage />} />
-        <Route path="/reels" element={<ReelsViewer />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/travel-profile" element={<TravelProfileRedirect />} />
         <Route path="/travel-profile/:userId" element={<Navigate to="/creator/:userId" replace />} />
@@ -219,11 +215,7 @@ export const AppRoutes = () => (
       />
       <Route
         path="/marketplace/request-trip"
-        element={(
-          <RouteSectionBoundary section="marketplace">
-            <RequestTrip />
-          </RouteSectionBoundary>
-        )}
+        element={<Navigate to="/post-trip" replace />}
       />
       <Route
         path="/marketplace/request/:id"
@@ -243,16 +235,71 @@ export const AppRoutes = () => (
       />
       <Route path="/browse-agents" element={<BrowseAgents />} />
       <Route path="/browse-creators" element={<BrowseCreators />} />
-      <Route path="/browse-influencers" element={<BrowseInfluencers />} />
-      <Route path="/trip-requests" element={<TripRequestsBoardPage />} />
-      <Route path="/trip-request/:id" element={<TripRequestDetailPage />} />
-      <Route path="/trip-request/:id/chat" element={<TripChatPage />} />
-      <Route path="/my-trip-requests" element={<MyTripRequestsPage />} />
+      <Route
+        path="/trip-requests"
+        element={(
+          <RequireAuth>
+            <TripRequestsBoardPage />
+          </RequireAuth>
+        )}
+      />
+      <Route
+        path="/trip-request/:id"
+        element={(
+          <RequireAuth>
+            <TripRequestDetailPage />
+          </RequireAuth>
+        )}
+      />
+      <Route
+        path="/trip-request/:id/chat"
+        element={(
+          <RequireAuth>
+            <TripChatPage />
+          </RequireAuth>
+        )}
+      />
+      <Route
+        path="/my-trip-requests"
+        element={(
+          <RequireAuth>
+            <MyTripRequestsPage />
+          </RequireAuth>
+        )}
+      />
       <Route path="/my-trips" element={<MyTripsPage />} />
-      <Route path="/post-trip" element={<PostTripPage />} />
-      <Route path="/trip-requests/:tripRequestId" element={<TripRequestDetailPageNew />} />
-      <Route path="/proposals" element={<ProposalsForTripPage />} />
-      <Route path="/proposals/:proposalId" element={<ProposalDetailPage />} />
+      <Route
+        path="/post-trip"
+        element={(
+          <RequireAuth>
+            <PostTripPage />
+          </RequireAuth>
+        )}
+      />
+      <Route
+        path="/trip-requests/:tripRequestId"
+        element={(
+          <RequireAuth>
+            <TripRequestDetailPageNew />
+          </RequireAuth>
+        )}
+      />
+      <Route
+        path="/proposals"
+        element={(
+          <RequireAuth>
+            <ProposalsForTripPage />
+          </RequireAuth>
+        )}
+      />
+      <Route
+        path="/proposals/:proposalId"
+        element={(
+          <RequireAuth>
+            <ProposalDetailPage />
+          </RequireAuth>
+        )}
+      />
       <Route path="/s/:slugOrId" element={<StoryboardSharePage />} />
       <Route path="/agent-trips" element={<AgentTripsPage />} />
       <Route path="/creator-trips" element={<CreatorTripsPage />} />
@@ -261,40 +308,46 @@ export const AppRoutes = () => (
       <Route path="/apply/agent" element={<AgentApplyPage />} />
       <Route path="/tiktok-lab/earnings" element={<TikTokEarningsPage />} />
       <Route path="/tiktok-lab/storyboards" element={<TikTokLabStoryboardsPage />} />
+      <Route path="/tiktok-lab/storyboards/:id" element={<TikTokLabStoryboardDetailPage />} />
       <Route path="/tiktok-lab/storyboards/new" element={<TikTokLabStoryboardEditorPage />} />
       <Route path="/tiktok-lab/storyboards/:id/edit" element={<TikTokLabStoryboardEditorPage />} />
       <Route path="/notifications" element={<NotificationsPage />} />
-      <Route path="/storyboards" element={<StoryboardsPage />} />
-      <Route path="/storyboards/:id" element={<StoryboardDetailPage />} />
       <Route path="/marketplace-guidelines" element={<MarketplaceGuidelinesPage />} />
       <Route path="/concierge" element={<ConciergePage />} />
-      <Route path="/creators" element={<BrowseCreators />} />
       <Route path="/my-bookings" element={<MyBookingsPage />} />
       <Route path="/partner-bookings" element={<PartnerBookingsPage />} />
       <Route path="/bookings/:bookingId" element={<BookingDetailPage />} />
       <Route path="/traveler" element={<TravelerDashboardPage />} />
       <Route path="/partner" element={<PartnerConsolePage />} />
+      <Route
+        path="/partner/escrow"
+        element={(
+          <RequireAuth>
+            <PartnerEscrowPage />
+          </RequireAuth>
+        )}
+      />
       <Route path="/agent/:agentId" element={<AgentProfile />} />
       <Route path="/agent-onboarding" element={<AgentOnboarding />} />
       <Route path="/agent-dashboard" element={<RequireAgentTerms><AgentDashboard /></RequireAgentTerms>} />
+      <Route
+        path="/agent/earnings"
+        element={(
+          <RequireAuth>
+            <AgentEarningsPage />
+          </RequireAuth>
+        )}
+      />
       <Route path="/agent-dashboard/storyboards/new" element={<RequireAgentTerms><AgentStoryboardBuilderPage /></RequireAgentTerms>} />
       <Route path="/agent-trip-requests" element={<RequireAgentTerms><AgentTripRequests /></RequireAgentTerms>} />
       <Route path="/agent-performance" element={<RequireAgentTerms><AgentPerformanceDashboard /></RequireAgentTerms>} />
       <Route path="/agent-deals" element={<RequireAgentTerms><AgentDealsDashboardPage /></RequireAgentTerms>} />
       <Route path="/email-preview" element={<EmailPreview />} />
-      {/* Legacy redirects */}
-      <Route path="/favorites" element={<Navigate to="/dashboard?tab=favorites" replace />} />
-      <Route path="/collections" element={<Navigate to="/storyboards" replace />} />
-      <Route path="/collections/:collectionId" element={<Navigate to="/storyboards" replace />} />
-      <Route path="/subscription" element={<Navigate to="/marketplace" replace />} />
-      <Route path="/subscriptions" element={<Navigate to="/marketplace" replace />} />
-      <Route path="/booking-preferences" element={<Navigate to="/dashboard?tab=preferences" replace />} />
       <Route path="/billing-dashboard" element={<BillingDashboard />} />
       <Route path="/travel-settings" element={<CreatorSettingsPage />} />
       <Route path="/travel-settings-2" element={<TravelSettings2 />} />
       <Route path="/travel-settings/general" element={<TravelSettings />} />
       <Route path="/travel-settings/music-volume" element={<MusicVolumeSettings />} />
-      <Route path="/crossposting-settings" element={<CrosspostingSettings />} />
       {/* Legacy Instagram demo routes - DISABLED
       <Route path="/instagram-callback" element={<InstagramCallback />} />
       <Route path="/instagram-api" element={<InstagramAPI />} />
@@ -337,7 +390,6 @@ export const AppRoutes = () => (
       <Route path="/my-trips" element={<MyTrips />} />
       <Route path="/group-trips" element={<GroupTrips />} />
       <Route path="/group-trips/:tripId" element={<GroupTrips />} />
-      <Route path="/test-group-payment" element={<TestGroupPayment />} />
       <Route path="/journal" element={<JournalListing />} />
       <Route path="/journal/:slug" element={<JournalArticle />} />
       <Route path="/creator-articles" element={<CreatorArticles />} />
@@ -361,20 +413,28 @@ export const AppRoutes = () => (
       <Route path="/cocurated-dashboard" element={<CoCuratedDashboard />} />
       <Route path="/cocurated-create" element={<CoCuratedCreate />} />
       <Route path="/cocurated-marketplace" element={<CoCuratedMarketplace />} />
-      <Route path="/cocurated-journeys" element={<CoCuratedJourneys />} />
       <Route path="/tour/:tourId" element={<TourActivityDetail />} />
-      <Route path="/fine-dining" element={<FineDining />} />
       <Route path="/restaurant/:restaurantId" element={<RestaurantDetail />} />
       <Route path="/cocurated-booking-success" element={<CoCuratedBookingSuccess />} />
       <Route path="/your-activity" element={<YourActivity />} />
       <Route path="/earnings" element={<EarningsDashboard />} />
     </Route>
 
-    <Route element={<AdminLayout />}>
+    <Route
+      element={(
+        <AdminGuard>
+          <AdminLayout />
+        </AdminGuard>
+      )}
+    >
       <Route path="/admin" element={<AdminHomePage />} />
       <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
       <Route path="/admin/safety" element={<AdminSafetyDashboardPage />} />
       <Route path="/admin/agents" element={<AdminAgentsPage />} />
+      <Route path="/admin/creators" element={<AdminCreatorsPage />} />
+      <Route path="/admin/bookings" element={<AdminBookingsPage />} />
+      <Route path="/admin/disputes" element={<AdminDisputesPage />} />
+      <Route path="/admin/marketplace" element={<AdminMarketplaceOversightPage />} />
       <Route path="/admin/cancellations" element={<AdminCancellations />} />
       <Route path="/admin/analytics/cancellations" element={<AdminCancellationAnalytics />} />
       <Route path="/admin/customer-verifications" element={<AdminCustomerVerifications />} />

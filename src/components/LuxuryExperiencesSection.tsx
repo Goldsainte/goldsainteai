@@ -75,7 +75,7 @@ export const LuxuryExperiencesSection = () => {
               className={`relative overflow-hidden cursor-pointer group border-luxury-gold/20 ${
                 index === 2 ? 'sm:col-span-2 lg:col-span-1' : ''
               } ${index === 0 ? 'lg:col-span-2' : ''}`}
-              onClick={() => navigate(`/cocurated-journeys?destination=${experience.destination}&category=${experience.category}`)}
+              onClick={() => navigate('/tiktok-lab/storyboards')}
             >
               <div className="relative h-56 sm:h-64 md:h-72 lg:h-80">
                 <img

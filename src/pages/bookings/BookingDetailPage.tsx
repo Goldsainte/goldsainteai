@@ -13,6 +13,15 @@ import { getBookingDetail, type BookingDetail } from "@/services/bookingsService
 import { BookingConversation } from "@/components/chat/BookingConversation";
 import { TrustSafetyInline } from "@/components/trust/TrustSafetyInline";
 
+const CONFIRMED_STATUSES = new Set([
+  "proposal_accepted",
+  "pending_payment",
+  "deposit_paid",
+  "paid_in_full",
+  "completed",
+  "confirmed",
+]);
+
 function formatMoney(amount: number | null | undefined, currency?: string | null) {
   if (!amount) return "—";
   const cur = currency || "USD";
@@ -204,7 +213,15 @@ export default function BookingDetailPage() {
       </section>
 
       {booking && (
-        <section className="mx-auto max-w-5xl px-4 pb-16 md:pb-20">
+        <section className="mx-auto max-w-5xl px-4 pb-16 md:pb-20 space-y-5">
+          {booking.status && CONFIRMED_STATUSES.has(booking.status) && (
+            <div className="rounded-3xl border border-[#E5DFC6] bg-white/95 p-4 text-[11px] text-[#4a4a4a]">
+              <p className="text-[12px] font-semibold text-[#0c4d47]">Your booking is confirmed.</p>
+              <p className="mt-1">
+                All future changes, questions, and approvals should stay inside Goldsainte so we can step in if anything needs review.
+              </p>
+            </div>
+          )}
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
             {/* Left: timeline + chat */}
             <div className="space-y-5">

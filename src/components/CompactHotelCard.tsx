@@ -9,7 +9,6 @@ import { HotelImageGallery } from "./HotelImageGallery";
 import { VirtualTour360 } from "./VirtualTour360";
 import { useFavorites } from "@/hooks/useFavorites";
 import { getHotelImage } from "@/lib/imageHelpers";
-import { encodeData } from "@/lib/utils";
 import { format, addDays } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 

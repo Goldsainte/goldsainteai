@@ -7,6 +7,7 @@ import { getStoryboardForPrefill } from "@/services/storyboardsService";
 import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
 import { toast } from "sonner";
 import { StoryboardBuilder } from "@/components/storyboards/StoryboardBuilder";
+import { useAuth } from "@/contexts/AuthContext";
 
 type BudgetLevel = "accessible" | "elevated" | "ultra_luxury";
 type Pace = "slow" | "balanced" | "packed";
@@ -16,6 +17,7 @@ export default function PostTripPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const fromStoryboard = searchParams.get("fromStoryboard");
+  const { user } = useAuth();
 
   const [destination, setDestination] = useState("");
   const [title, setTitle] = useState("");
@@ -102,29 +104,23 @@ export default function PostTripPage() {
     };
   }, [fromStoryboard]);
 
-  function handleSubmitClick(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    
-    // Basic validation before showing modal
+
     if (!destination || !startsOn || !endsOn) {
       setError("Please fill in destination and dates.");
       return;
     }
-    
-    setShowSafetyModal(true);
-  }
 
-  async function handleSubmitConfirmed() {
     setError(null);
     setSubmitting(true);
 
     try {
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError || !user) {
+      if (!user) {
         throw new Error("Please sign in before posting a trip.");
       }
 
-      const { error: insertError, data } = await supabase
+      const { error: insertError } = await supabase
         .from("trip_requests")
         .insert({
           user_id: user.id,
@@ -151,8 +147,8 @@ export default function PostTripPage() {
 
       if (insertError) throw insertError;
 
-      toast.success("Trip posted! Partners will start sending proposals.");
-      navigate(`/my-trips`);
+      toast.success("Your trip has been posted. Creators and agents will respond here.");
+      navigate("/my-trip-requests");
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Something went wrong posting your trip.");
@@ -173,7 +169,7 @@ export default function PostTripPage() {
         <div className="flex items-center justify-between mb-4">
           <Link
             to="/"
-            className="inline-flex items-center gap-1 text-[10px] text-[#8D8D8D]"
+            className="inline-flex items-center gap-1 text-xs text-[#8D8D8D]"
           >
             <ArrowLeft className="h-3 w-3" />
             Back to home
@@ -181,13 +177,13 @@ export default function PostTripPage() {
         </div>
 
         <div className="space-y-2">
-          <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
+          <p className="text-xs uppercase tracking-[0.16em] text-[#8D8D8D]">
             Post a trip
           </p>
           <h1 className="font-display text-[22px] md:text-[24px] leading-tight">
             Tell us about the trip you&apos;re dreaming of
           </h1>
-          <p className="text-[11px] md:text-[12px] text-[#4a4a4a] max-w-lg">
+          <p className="text-sm md:text-base text-[#4a4a4a] max-w-lg">
             A few details now help Goldsainte AI and our partners send
             thoughtful proposals later. It&apos;s okay if not everything is
             decided — just share what you know.
@@ -197,70 +193,71 @@ export default function PostTripPage() {
 
       <section className="mx-auto max-w-3xl px-4 pb-16 md:pb-20">
         {preFilledFrom && (
-          <div className="mb-3 rounded-2xl bg-[#f7f3ea] border border-[#E5DFC6] px-3 py-2 text-[10px] text-[#4a4a4a]">
+          <div className="mb-3 rounded-2xl bg-[#f7f3ea] border border-[#E5DFC6] px-3 py-2 text-xs text-[#4a4a4a]">
             This form is pre-filled from the storyboard{" "}
             <span className="font-semibold">{preFilledFrom}</span>. You can
             adjust any detail before posting your trip.
           </div>
         )}
         {preFillError && (
-          <p className="mb-2 text-[10px] text-red-600">
+          <p className="mb-2 text-xs text-red-600">
             {preFillError}
           </p>
         )}
 
-        <form
-          className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 space-y-5 text-[11px]"
-          onSubmit={handleSubmitClick}
-        >
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)]">
+          <form
+            className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 space-y-5 text-sm"
+            onSubmit={handleSubmit}
+          >
           {/* Section 1: Where & when */}
           <div className="space-y-3">
-            <h2 className="text-[12px] font-semibold">Where and when</h2>
+            <h2 className="text-base font-semibold">Where and when</h2>
             <div className="grid gap-3 md:grid-cols-2">
               <div className="md:col-span-2">
-                <label className="block mb-1 text-[10px] text-[#4a4a4a]">
+                <label className="block mb-1 text-xs text-[#4a4a4a]">
                   Destination <span className="text-red-600">*</span>
                 </label>
                 <input
                   type="text"
                   value={destination}
                   onChange={(e) => setDestination(e.target.value)}
-                  className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none focus:border-[#BFAD72]"
+                  className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-sm outline-none focus:border-[#BFAD72]"
                   placeholder="Amalfi Coast, Paris & Provence, Bali..."
                 />
               </div>
               <div>
-                <label className="block mb-1 text-[10px] text-[#4a4a4a]">
+                <label className="block mb-1 text-xs text-[#4a4a4a]">
                   Start date <span className="text-red-600">*</span>
                 </label>
                 <input
                   type="date"
                   value={startsOn}
                   onChange={(e) => setStartsOn(e.target.value)}
-                  className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none focus:border-[#BFAD72]"
+                  className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-sm outline-none focus:border-[#BFAD72]"
                 />
               </div>
               <div>
-                <label className="block mb-1 text-[10px] text-[#4a4a4a]">
+                <label className="block mb-1 text-xs text-[#4a4a4a]">
                   End date <span className="text-red-600">*</span>
                 </label>
                 <input
                   type="date"
                   value={endsOn}
                   onChange={(e) => setEndsOn(e.target.value)}
-                  className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none focus:border-[#BFAD72]"
+                  className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-sm outline-none focus:border-[#BFAD72]"
                 />
               </div>
             </div>
             <div>
-              <label className="block mb-1 text-[10px] text-[#4a4a4a]">
+              <label className="block mb-1 text-xs text-[#4a4a4a]">
                 Trip nickname (optional)
               </label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none focus:border-[#BFAD72]"
+                className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-sm outline-none focus:border-[#BFAD72]"
                 placeholder="Example: Amalfi anniversary escape"
               />
             </div>
@@ -268,10 +265,10 @@ export default function PostTripPage() {
 
           {/* Section 2: Who & budget */}
           <div className="space-y-3">
-            <h2 className="text-[12px] font-semibold">Who is traveling & budget</h2>
+            <h2 className="text-base font-semibold">Who is traveling & budget</h2>
             <div className="grid gap-3 md:grid-cols-3">
               <div>
-                <label className="block mb-1 text-[10px] text-[#4a4a4a]">
+                <label className="block mb-1 text-xs text-[#4a4a4a]">
                   Adults
                 </label>
                 <input
@@ -279,11 +276,11 @@ export default function PostTripPage() {
                   min={1}
                   value={adults}
                   onChange={(e) => setAdults(e.target.value)}
-                  className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none focus:border-[#BFAD72]"
+                  className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-sm outline-none focus:border-[#BFAD72]"
                 />
               </div>
               <div>
-                <label className="block mb-1 text-[10px] text-[#4a4a4a]">
+                <label className="block mb-1 text-xs text-[#4a4a4a]">
                   Children
                 </label>
                 <input
@@ -291,18 +288,18 @@ export default function PostTripPage() {
                   min={0}
                   value={children}
                   onChange={(e) => setChildren(e.target.value)}
-                  className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none focus:border-[#BFAD72]"
+                  className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-sm outline-none focus:border-[#BFAD72]"
                 />
               </div>
               <div>
-                <label className="block mb-1 text-[10px] text-[#4a4a4a]">
+                <label className="block mb-1 text-xs text-[#4a4a4a]">
                   Occasion (optional)
                 </label>
                 <input
                   type="text"
                   value={occasion}
                   onChange={(e) => setOccasion(e.target.value)}
-                  className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none focus:border-[#BFAD72]"
+                  className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-sm outline-none focus:border-[#BFAD72]"
                   placeholder="Honeymoon, birthday, reset..."
                 />
               </div>
@@ -310,7 +307,7 @@ export default function PostTripPage() {
 
             <div className="grid gap-3 md:grid-cols-3">
               <div>
-                <label className="block mb-1 text-[10px] text-[#4a4a4a]">
+                <label className="block mb-1 text-xs text-[#4a4a4a]">
                   Budget from (total)
                 </label>
                 <input
@@ -318,12 +315,12 @@ export default function PostTripPage() {
                   min={0}
                   value={budgetMin}
                   onChange={(e) => setBudgetMin(e.target.value)}
-                  className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none focus:border-[#BFAD72]"
+                  className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-sm outline-none focus:border-[#BFAD72]"
                   placeholder="e.g. 7000"
                 />
               </div>
               <div>
-                <label className="block mb-1 text-[10px] text-[#4a4a4a]">
+                <label className="block mb-1 text-xs text-[#4a4a4a]">
                   Budget to (total)
                 </label>
                 <input
@@ -331,12 +328,12 @@ export default function PostTripPage() {
                   min={0}
                   value={budgetMax}
                   onChange={(e) => setBudgetMax(e.target.value)}
-                  className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none focus:border-[#BFAD72]"
+                  className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-sm outline-none focus:border-[#BFAD72]"
                   placeholder="e.g. 12000"
                 />
               </div>
               <div>
-                <label className="block mb-1 text-[10px] text-[#4a4a4a]">
+                <label className="block mb-1 text-xs text-[#4a4a4a]">
                   Budget style
                 </label>
                 <div className="flex flex-wrap gap-1">
@@ -351,7 +348,7 @@ export default function PostTripPage() {
                       key={value}
                       type="button"
                       onClick={() => setBudgetLevel(value)}
-                      className={`px-3 py-1 rounded-full border text-[10px] ${
+                      className={`px-3 py-1 rounded-full border text-xs ${
                         budgetLevel === value
                           ? "bg-[#0c4d47] border-[#0c4d47] text-[#E5DFC6]"
                           : "bg-[#f7f3ea] border-[#E5DFC6] text-[#4a4a4a]"
@@ -367,23 +364,23 @@ export default function PostTripPage() {
 
           {/* Section 3: Style & interests */}
           <div className="space-y-3">
-            <h2 className="text-[12px] font-semibold">Style & interests</h2>
+            <h2 className="text-base font-semibold">Style & interests</h2>
 
             <div>
-              <label className="block mb-1 text-[10px] text-[#4a4a4a]">
+              <label className="block mb-1 text-xs text-[#4a4a4a]">
                 Accommodation style (optional)
               </label>
               <input
                 type="text"
                 value={accommodationStyle}
                 onChange={(e) => setAccommodationStyle(e.target.value)}
-                className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none focus:border-[#BFAD72]"
+                className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-sm outline-none focus:border-[#BFAD72]"
                 placeholder="Design hotels, villas, all-inclusive, etc."
               />
             </div>
 
             <div>
-              <label className="block mb-1 text-[10px] text-[#4a4a4a]">
+              <label className="block mb-1 text-xs text-[#4a4a4a]">
                 Trip pace
               </label>
               <div className="flex flex-wrap gap-1">
@@ -398,7 +395,7 @@ export default function PostTripPage() {
                     key={value}
                     type="button"
                     onClick={() => setPace(value)}
-                    className={`px-3 py-1 rounded-full border text-[10px] ${
+                    className={`px-3 py-1 rounded-full border text-xs ${
                       pace === value
                         ? "bg-[#0c4d47] border-[#0c4d47] text-[#E5DFC6]"
                         : "bg-[#f7f3ea] border-[#E5DFC6] text-[#4a4a4a]"
@@ -411,7 +408,7 @@ export default function PostTripPage() {
             </div>
 
             <div>
-              <label className="block mb-1 text-[10px] text-[#4a4a4a]">
+              <label className="block mb-1 text-xs text-[#4a4a4a]">
                 What matters most on this trip?
               </label>
               <div className="flex flex-wrap gap-1">
@@ -420,7 +417,7 @@ export default function PostTripPage() {
                     key={label}
                     type="button"
                     onClick={() => toggleInterest(label)}
-                    className={`px-3 py-1 rounded-full border text-[10px] ${
+                    className={`px-3 py-1 rounded-full border text-xs ${
                       interests.includes(label)
                         ? "bg-[#0c4d47] border-[#0c4d47] text-[#E5DFC6]"
                         : "bg-[#f7f3ea] border-[#E5DFC6] text-[#4a4a4a]"
@@ -435,28 +432,28 @@ export default function PostTripPage() {
 
           {/* Section 4: Flexibility & notes */}
           <div className="space-y-3">
-            <h2 className="text-[12px] font-semibold">Flexibility & notes</h2>
+            <h2 className="text-base font-semibold">Flexibility & notes</h2>
 
             <div>
-              <label className="block mb-1 text-[10px] text-[#4a4a4a]">
+              <label className="block mb-1 text-xs text-[#4a4a4a]">
                 How flexible are you? (optional)
               </label>
               <textarea
                 value={flexibility}
                 onChange={(e) => setFlexibility(e.target.value)}
-                className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none focus:border-[#BFAD72] min-h-[70px]"
+                className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-sm outline-none focus:border-[#BFAD72] min-h-[70px]"
                 placeholder="Example: Dates can move by a few days, happy to consider nearby towns if it improves value..."
               />
             </div>
 
             <div>
-              <label className="block mb-1 text-[10px] text-[#4a4a4a]">
+              <label className="block mb-1 text-xs text-[#4a4a4a]">
                 Anything else you want your creator or agent to know? (optional)
               </label>
               <textarea
                 value={specialNotes}
                 onChange={(e) => setSpecialNotes(e.target.value)}
-                className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none focus:border-[#BFAD72] min-h-[90px]"
+                className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-sm outline-none focus:border-[#BFAD72] min-h-[90px]"
                 placeholder="Allergies, accessibility needs, non-negotiables, things you absolutely don't want..."
               />
             </div>
@@ -464,8 +461,8 @@ export default function PostTripPage() {
 
           {/* Section 4.5: Visual Storyboard */}
           <div className="space-y-3">
-            <h2 className="text-[12px] font-semibold">Build your visual storyboard</h2>
-            <p className="text-[10px] text-[#4a4a4a]">
+            <h2 className="text-base font-semibold">Build your visual storyboard</h2>
+            <p className="text-xs text-[#4a4a4a]">
               Add photos, experiences, and links that capture what you're envisioning.
               This becomes the creative brief your agent or creator works from.
             </p>
@@ -478,8 +475,8 @@ export default function PostTripPage() {
 
           {/* Section 5: Who should respond */}
           <div className="space-y-3">
-            <h2 className="text-[12px] font-semibold">Who would you like to respond?</h2>
-            <p className="text-[10px] text-[#4a4a4a]">
+            <h2 className="text-base font-semibold">Who would you like to respond?</h2>
+            <p className="text-xs text-[#4a4a4a]">
               Goldsainte works with TikTok creators who inspire trips and
               certified travel agents who price and manage them. You can choose
               who you&apos;d like to hear from.
@@ -496,7 +493,7 @@ export default function PostTripPage() {
                   key={value}
                   type="button"
                   onClick={() => setWantsRole(value)}
-                  className={`px-3 py-1 rounded-full border text-[10px] ${
+                  className={`px-3 py-1 rounded-full border text-xs ${
                     wantsRole === value
                       ? "bg-[#0c4d47] border-[#0c4d47] text-[#E5DFC6]"
                       : "bg-[#f7f3ea] border-[#E5DFC6] text-[#4a4a4a]"
@@ -509,35 +506,54 @@ export default function PostTripPage() {
           </div>
 
           {error && (
-            <p className="text-[10px] text-red-600">
+            <p className="text-xs text-red-600">
               {error}
             </p>
           )}
 
-          <div className="flex items-center justify-between pt-2">
-            <p className="text-[9px] text-[#8D8D8D] max-w-xs">
-              After you post your trip, Goldsainte AI and our partners will use
-              these details to send proposals. You&apos;ll see everything in
-              your &quot;My Trips&quot; and notifications.
-            </p>
+          <div className="flex flex-col gap-3 pt-2 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-xs text-[#8D8D8D] max-w-xs">
+                After you post your trip, Goldsainte AI and our partners will use
+                these details to send proposals. You&apos;ll see everything in
+                your &quot;My Trips&quot; and notifications.
+              </p>
+              <p className="text-[10px] text-[#8D8D8D] mt-1">
+                By posting, you agree to keep all booking and payment communication inside Goldsainte.
+              </p>
+            </div>
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-5 py-2 text-[11px] font-semibold hover:bg-[#073331] disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-5 py-2 text-sm font-semibold hover:bg-[#073331] disabled:opacity-60"
             >
               {submitting ? "Posting..." : "Post this trip"}
               <ArrowRight className="h-3 w-3" />
             </button>
           </div>
         </form>
+        <aside className="rounded-3xl border border-[#E5DFC6] bg-white/90 p-4 md:p-5 text-sm space-y-3 self-start">
+          <p className="text-xs uppercase tracking-[0.16em] text-[#8D8D8D]">Trust &amp; safety</p>
+          <h2 className="text-base font-semibold text-[#0a2225]">How Goldsainte keeps this safe</h2>
+          <p className="text-sm text-[#4a4a4a]">
+            Your trip brief is shared only with vetted creators and verified travel professionals. We keep all proposals, messages,
+            and payments on-platform so there’s a clear record of what was agreed and what was delivered.
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowSafetyModal(true)}
+            className="text-sm font-semibold text-[#0c4d47] underline-offset-4 hover:underline"
+          >
+            View safety guidelines
+          </button>
+        </aside>
+        </div>
       </section>
 
       <TrustSafetyModal
         open={showSafetyModal}
-        onOpenChange={setShowSafetyModal}
-        context="trip_posting"
-        onConfirm={handleSubmitConfirmed}
-        onCancel={() => setShowSafetyModal(false)}
+        onClose={() => setShowSafetyModal(false)}
+        context="trip"
       />
     </main>
   );

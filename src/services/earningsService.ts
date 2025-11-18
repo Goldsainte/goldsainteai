@@ -35,6 +35,23 @@ export interface PayoutEntry {
   created_at: string;
 }
 
+export interface PartnerEarningBooking {
+  id: string;
+  status: string;
+  commission_mode: string | null;
+  escrow_status: string | null;
+  currency: string | null;
+  created_at: string;
+  amount_cents: number;
+}
+
+export interface PartnerEarningSnapshot {
+  currency: string;
+  pending: number;
+  released: number;
+  bookings: PartnerEarningBooking[];
+}
+
 export async function getMyEarningsSummary(): Promise<EarningsSummary> {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) throw new Error("Not authenticated");
@@ -150,7 +167,7 @@ export async function createEarningsForBooking(bookingId: string) {
       booking_id: booking.id,
       user_id: booking.agent_id,
       role: "agent",
-      amount: booking.agent_share,
+      amount: booking.agent_commission_amount_cents ?? booking.agent_share,
       currency: booking.currency || "USD",
       status: "pending",
     });
@@ -161,7 +178,7 @@ export async function createEarningsForBooking(bookingId: string) {
       booking_id: booking.id,
       user_id: booking.creator_id,
       role: "creator",
-      amount: booking.creator_share,
+      amount: booking.creator_commission_amount_cents ?? booking.creator_share,
       currency: booking.currency || "USD",
       status: "pending",
     });
@@ -234,4 +251,53 @@ export async function requestPayout() {
 
   // Later: Edge Function will move payout.status to 'paid' and ledger status to 'paid'
   return payout;
+}
+
+export async function getPartnerBookingEarnings(role: "creator" | "agent"): Promise<PartnerEarningSnapshot> {
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) throw new Error("Not authenticated");
+
+  const column = role === "creator" ? "creator_id" : "agent_id";
+  const amountColumn = role === "creator"
+    ? "creator_commission_amount_cents"
+    : "agent_commission_amount_cents";
+
+  const { data, error } = await supabase
+    .from("bookings")
+    .select(`id, status, escrow_status, commission_mode, currency, created_at, ${amountColumn}`)
+    .eq(column, user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    throw new Error("Could not load partner earnings");
+  }
+
+  const bookings: PartnerEarningBooking[] = (data || []).map((row: any) => ({
+    id: row.id,
+    status: row.status,
+    commission_mode: row.commission_mode,
+    escrow_status: row.escrow_status,
+    currency: row.currency,
+    created_at: row.created_at,
+    amount_cents: Number(row[amountColumn] || 0),
+  }));
+
+  let pending = 0;
+  let released = 0;
+
+  bookings.forEach((booking) => {
+    if (booking.escrow_status === "RELEASED") {
+      released += booking.amount_cents;
+    } else {
+      pending += booking.amount_cents;
+    }
+  });
+
+  return {
+    currency: bookings[0]?.currency || "USD",
+    pending,
+    released,
+    bookings,
+  };
 }

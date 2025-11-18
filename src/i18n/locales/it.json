@@ -149,12 +149,28 @@
       "subtitle": "Unisciti alla nostra rete e guadagna commissioni sulle prenotazioni di viaggi di lusso",
       "apply": "Candidati Ora",
       "browse": "Sfoglia Agenti"
+    },
+    "gallery": {
+      "beachEscapes": "Beach Escapes",
+      "beachSubtitle": "Luxury beachfront properties",
+      "cityRetreats": "City Retreats",
+      "citySubtitle": "Urban luxury hotels",
+      "desertOases": "Desert Oases",
+      "desertSubtitle": "Exclusive desert resorts"
+    },
+    "hotelSections": {
+      "europeTitle": "Most popular hotels in Europe",
+      "usTitle": "Most popular hotels in US"
+    },
+    "restaurantSections": {
+      "usTitle": "Fine Dining Across America"
     }
   },
   "navigation": {
     "discover": "Scopri",
     "journeys": "Viaggi",
     "cocuratedJourneys": "Viaggi CoCurati",
+    "storyboards": "Storyboards",
     "browseCreators": "Sfoglia Creator",
     "browseAgents": "Sfoglia Agenti",
     "marketplace": "Mercato",
@@ -165,7 +181,7 @@
     "shop": "Negozio",
     "affiliateLinks": "Link di Affiliazione",
     "company": "Azienda",
-    "subscription": "Abbonamento",
+    "concierge": "Concierge",
     "about": "Chi Siamo"
   },
   "footer": {
@@ -178,6 +194,7 @@
     "discover": "Scopri",
     "journeys": "Viaggi",
     "cocuratedJourneys": "Viaggi CoCurati",
+    "storyboards": "Storyboards",
     "seasonalDeals": "Offerte Stagionali e Festive",
     "travelAgentServices": "Servizi di Agenti di Viaggio",
     "cocuratedPackages": "Pacchetti CoCurati",

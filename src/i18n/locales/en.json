@@ -175,6 +175,7 @@
     "discover": "Discover",
     "journeys": "Journeys",
     "cocuratedJourneys": "CoCurated Journeys",
+    "storyboards": "Storyboards",
     "browseCreators": "Browse Creators",
     "browseAgents": "Browse Agents",
     "marketplace": "Marketplace",
@@ -185,7 +186,7 @@
     "shop": "Shop",
     "affiliateLinks": "Affiliate Links",
     "company": "Company",
-    "subscription": "Subscription",
+    "concierge": "Concierge",
     "about": "About"
   },
   "footer": {
@@ -198,6 +199,7 @@
     "discover": "Discover",
     "journeys": "Journeys",
     "cocuratedJourneys": "CoCurated Journeys",
+    "storyboards": "Storyboards",
     "seasonalDeals": "Seasonal & Holiday Deals",
     "travelAgentServices": "Travel Agent Services",
     "cocuratedPackages": "Co-Curated Packages",
