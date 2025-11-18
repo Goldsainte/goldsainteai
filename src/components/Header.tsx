@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { User, Menu, Hotel, Plane, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info, Sparkles, CreditCard, PlaneTakeoff, HandCoins } from "lucide-react";
+import { User, Menu, Hotel, Plane, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info, Sparkles, CreditCard, PlaneTakeoff, HandCoins, ShieldCheck } from "lucide-react";
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import CreateContentSheet from "@/components/CreateContentSheet";
 import ContentUploadModal from "@/components/ContentUploadModal";
@@ -51,7 +51,9 @@ export const Header = () => {
   const { balance } = useCoinBalance();
   const { openModal: openExpediaModal } = useExpediaModal();
   const accountType = ((user as any)?.user_metadata?.account_type as string | undefined)?.toLowerCase() ?? null;
-  const showPartnerBookings = accountType === "creator" || accountType === "agent";
+  const isCreator = accountType === "creator";
+  const isAgent = accountType === "agent";
+  const showPartnerBookings = isCreator || isAgent;
   const primaryBookingsPath = showPartnerBookings ? "/partner-bookings" : "/my-bookings";
 
   const handleLanguageChange = (language: string) => {
@@ -620,12 +622,12 @@ export const Header = () => {
                         <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Browse Agents</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => navigate('/marketplace')} 
+                      <DropdownMenuItem
+                        onClick={() => navigate('/trip-requests')}
                         className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                       >
                         <ShoppingCart className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">Marketplace</span>
+                        <span className="text-sm font-medium">Trip Requests Marketplace</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => navigate('/tiktok-lab')} 
@@ -654,11 +656,18 @@ export const Header = () => {
                         </div>
                         <div className="py-2">
                           <DropdownMenuItem
+                            onClick={() => navigate('/trip-requests')}
+                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">Trip Requests</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
                             onClick={() => navigate('/my-trip-requests')}
                             className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                           >
                             <Calendar className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">Trip Requests</span>
+                            <span className="text-sm font-medium">My Trip Requests</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => navigate('/my-bookings')}
@@ -674,6 +683,33 @@ export const Header = () => {
                             >
                               <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                               <span className="text-sm font-medium">Partner Bookings</span>
+                            </DropdownMenuItem>
+                          )}
+                          {showPartnerBookings && (
+                            <DropdownMenuItem
+                              onClick={() => navigate('/partner/escrow')}
+                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                            >
+                              <ShieldCheck className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                              <span className="text-sm font-medium">Escrow & Milestones</span>
+                            </DropdownMenuItem>
+                          )}
+                          {isAgent && (
+                            <DropdownMenuItem
+                              onClick={() => navigate('/agent/earnings')}
+                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                            >
+                              <Coins className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                              <span className="text-sm font-medium">Agent Earnings</span>
+                            </DropdownMenuItem>
+                          )}
+                          {isCreator && (
+                            <DropdownMenuItem
+                              onClick={() => navigate('/tiktok-lab/earnings')}
+                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                            >
+                              <Sparkles className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                              <span className="text-sm font-medium">Creator Earnings</span>
                             </DropdownMenuItem>
                           )}
                         </div>
@@ -858,13 +894,22 @@ export const Header = () => {
                         {isAdmin && (
                           <>
                             <DropdownMenuSeparator className="bg-border/50" />
-                            <div className="py-2">
-                              <DropdownMenuItem 
-                                onClick={() => navigate('/admin/agent-approvals')} 
-                                className="mx-2 px-4 py-4 min-h-[48px] cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 touch-manipulation"
-                              >
-                                <span className="text-sm font-semibold text-secondary">Admin Panel</span>
-                              </DropdownMenuItem>
+                            <div className="py-2 flex flex-col gap-1">
+                              {[
+                                { label: 'Admin overview', path: '/admin' },
+                                { label: 'Agents dashboard', path: '/admin/agents' },
+                                { label: 'Creators dashboard', path: '/admin/creators' },
+                                { label: 'Bookings & revenue', path: '/admin/bookings' },
+                                { label: 'Disputes', path: '/admin/disputes' },
+                              ].map((item) => (
+                                <DropdownMenuItem
+                                  key={item.path}
+                                  onClick={() => navigate(item.path)}
+                                  className="mx-2 px-4 py-3 min-h-[44px] cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 touch-manipulation"
+                                >
+                                  <span className="text-sm font-semibold text-secondary">{item.label}</span>
+                                </DropdownMenuItem>
+                              ))}
                             </div>
                           </>
                         )}

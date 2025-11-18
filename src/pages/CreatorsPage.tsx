@@ -1,249 +1,452 @@
-import { ArrowRight, Sparkles, Camera, Wallet, Globe2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { MarketplaceShell } from "@/components/marketplace/MarketplaceShell";
+import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+import { useNavigate } from "react-router-dom";
+
+type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
+
+type Creator = {
+  id: string;
+  displayName: string;
+  avatarUrl: string | null;
+  tiktokHandle: string | null;
+  followers: number | null;
+  avgViews: number | null;
+  city: string | null;
+  country: string | null;
+  languages: string[];
+  niches: string[];
+};
+
+type CreatorFilters = {
+  search: string;
+  followersMin?: number;
+  followersMax?: number;
+  engagementMin?: number;
+  country?: string;
+  language?: string;
+  niche?: string;
+};
+
+const defaultFilters: CreatorFilters = {
+  search: "",
+};
+
+function sanitizeStringArray(value?: (string | null)[] | null): string[] {
+  if (!value) {
+    return [];
+  }
+  return value
+    .filter((entry): entry is string => typeof entry === "string" && entry.trim().length > 0)
+    .map((entry) => entry.trim());
+}
+
+function normalizeLanguages(profile: ProfileRow): string[] {
+  const values: string[] = [];
+  if (profile.preferred_language) {
+    values.push(profile.preferred_language);
+  }
+
+  const pref = profile.preferences;
+  if (pref && typeof pref === "object" && !Array.isArray(pref)) {
+    const languagesRaw = (pref as { languages?: unknown }).languages;
+    if (Array.isArray(languagesRaw)) {
+      languagesRaw.forEach((lng) => {
+        if (typeof lng === "string" && lng.trim()) {
+          values.push(lng.trim());
+        }
+      });
+    } else if (typeof languagesRaw === "string" && languagesRaw.trim()) {
+      values.push(languagesRaw.trim());
+    }
+  }
+
+  return Array.from(new Set(sanitizeStringArray(values)));
+}
+
+function normalizeLocation(value: string | null): { city: string | null; country: string | null } {
+  if (!value) {
+    return { city: null, country: null };
+  }
+  const parts = value.split(",");
+  const city = parts[0]?.trim() || null;
+  const country = parts.slice(1).join(",").trim() || null;
+  return { city, country };
+}
+
+function mapProfileToCreator(row: ProfileRow): Creator {
+  const followers =
+    row.tiktok_followers ?? row.followers_count ?? row.creator_followers ?? null;
+  const avgViews = row.creator_avg_views ?? null;
+  const homeBaseLocation = normalizeLocation(row.home_base);
+  const primaryNiches = sanitizeStringArray(row.creator_niches);
+  const fallbackNiches = sanitizeStringArray(row.content_style_tags);
+  const nicheTags = primaryNiches.length ? primaryNiches : fallbackNiches;
+  const languages = normalizeLanguages(row);
+
+  return {
+    id: row.id,
+    displayName: row.display_name || row.full_name || row.username || "Creator",
+    avatarUrl: row.avatar_url,
+    tiktokHandle: row.tiktok_handle ?? row.tiktok_username ?? row.username,
+    followers,
+    avgViews,
+    city: homeBaseLocation.city,
+    country: row.country ?? homeBaseLocation.country,
+    languages,
+    niches: nicheTags ?? [],
+  };
+}
+
+function computeEngagementRate(creator: Creator): number | null {
+  if (creator.followers && creator.avgViews && creator.followers > 0) {
+    return (creator.avgViews / creator.followers) * 100;
+  }
+  return null;
+}
 
 export default function CreatorsPage() {
-  return (
-    <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
-      {/* Hero */}
-      <section className="mx-auto max-w-5xl px-4 pt-16 pb-10 md:pt-20 md:pb-14">
-        <div className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-[11px] border border-[#E5DFC6] mb-4">
-          <Sparkles className="h-3 w-3 text-[#BFAD72]" />
-          <span className="tracking-[0.16em] uppercase text-[#8D8D8D]">
-            For TikTok travel creators
-          </span>
+  const [creators, setCreators] = useState<Creator[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState<CreatorFilters>(defaultFilters);
+  const [sortBy, setSortBy] = useState<"followers" | "engagement" | "relevance">(
+    "followers"
+  );
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    async function loadCreators() {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("profiles")
+        .select(
+          `
+            id,
+            display_name,
+            avatar_url,
+            tiktok_handle,
+            tiktok_username,
+            tiktok_followers,
+            followers_count,
+            creator_followers,
+            creator_avg_views,
+            home_base,
+            country,
+            creator_niches,
+            content_style_tags,
+            preferred_language,
+            preferences,
+            full_name,
+            username
+          `
+        )
+        .eq("account_type", "creator");
+
+      if (!error && data) {
+        setCreators(data.map(mapProfileToCreator));
+      }
+      setLoading(false);
+    }
+
+    loadCreators();
+  }, []);
+
+  const filteredCreators = useMemo(() => {
+    let result = [...creators];
+    const search = filters.search.trim().toLowerCase();
+
+    if (search) {
+      result = result.filter((creator) => {
+        const name = creator.displayName.toLowerCase();
+        const handle = (creator.tiktokHandle || "").toLowerCase();
+        const city = (creator.city || "").toLowerCase();
+        const country = (creator.country || "").toLowerCase();
+        const languages = creator.languages.join(" ").toLowerCase();
+        const niches = creator.niches.join(" ").toLowerCase();
+        return (
+          name.includes(search) ||
+          handle.includes(search) ||
+          city.includes(search) ||
+          country.includes(search) ||
+          languages.includes(search) ||
+          niches.includes(search)
+        );
+      });
+    }
+
+    if (filters.followersMin != null) {
+      result = result.filter(
+        (creator) =>
+          creator.followers != null && creator.followers >= filters.followersMin!
+      );
+    }
+
+    if (filters.followersMax != null) {
+      result = result.filter(
+        (creator) =>
+          creator.followers != null && creator.followers <= filters.followersMax!
+      );
+    }
+
+    if (filters.engagementMin != null) {
+      result = result.filter((creator) => {
+        const rate = computeEngagementRate(creator);
+        return rate != null && rate >= filters.engagementMin!;
+      });
+    }
+
+    if (filters.country) {
+      const needle = filters.country.toLowerCase();
+      result = result.filter((creator) =>
+        (creator.country || "").toLowerCase().includes(needle)
+      );
+    }
+
+    if (filters.language) {
+      const needle = filters.language.toLowerCase();
+      result = result.filter((creator) =>
+        creator.languages.some((lng) => lng.toLowerCase().includes(needle))
+      );
+    }
+
+    if (filters.niche) {
+      const needle = filters.niche.toLowerCase();
+      result = result.filter((creator) =>
+        creator.niches.some((n) => n.toLowerCase().includes(needle))
+      );
+    }
+
+    if (sortBy === "followers") {
+      result.sort((a, b) => (b.followers || 0) - (a.followers || 0));
+    } else if (sortBy === "engagement") {
+      result.sort(
+        (a, b) => (computeEngagementRate(b) || 0) - (computeEngagementRate(a) || 0)
+      );
+    }
+
+    return result;
+  }, [creators, filters, sortBy]);
+
+  const sortControl = (
+    <select
+      className="rounded-full border px-3 py-1 text-xs"
+      value={sortBy}
+      onChange={(event) =>
+        setSortBy(event.target.value as "followers" | "engagement" | "relevance")
+      }
+    >
+      <option value="followers">Sort by followers</option>
+      <option value="engagement">Sort by engagement rate</option>
+      <option value="relevance">Sort by relevance</option>
+    </select>
+  );
+
+  const filtersPanel = (
+    <div className="space-y-4 text-xs">
+      <div className="space-y-2">
+        <div className="text-[11px] font-medium text-slate-700">Followers</div>
+        <div className="flex gap-2">
+          <input
+            type="number"
+            placeholder="Min"
+            className="w-1/2 rounded-lg border px-2 py-1 text-xs"
+            value={filters.followersMin ?? ""}
+            onChange={(event) =>
+              setFilters((prev) => ({
+                ...prev,
+                followersMin: event.target.value ? Number(event.target.value) : undefined,
+              }))
+            }
+          />
+          <input
+            type="number"
+            placeholder="Max"
+            className="w-1/2 rounded-lg border px-2 py-1 text-xs"
+            value={filters.followersMax ?? ""}
+            onChange={(event) =>
+              setFilters((prev) => ({
+                ...prev,
+                followersMax: event.target.value ? Number(event.target.value) : undefined,
+              }))
+            }
+          />
         </div>
+      </div>
 
-        <div className="grid gap-8 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-center">
-          <div className="space-y-4">
-            <h1 className="font-display text-[28px] md:text-[32px] leading-tight">
-              Turn your trips into a bookable library.
-            </h1>
-            <p className="text-[12px] md:text-[13px] text-[#4a4a4a] max-w-xl">
-              Goldsainte lets you turn the trips you already film into curated,
-              bookable storyboards. Travel agents handle the logistics. Your
-              audience books. You get paid.
-            </p>
+      <div className="space-y-1">
+        <label className="text-[11px] font-medium text-slate-700">
+          Min engagement rate (%)
+        </label>
+        <input
+          type="number"
+          placeholder="e.g. 3"
+          className="w-full rounded-lg border px-2 py-1 text-xs"
+          value={filters.engagementMin ?? ""}
+          onChange={(event) =>
+            setFilters((prev) => ({
+              ...prev,
+              engagementMin: event.target.value ? Number(event.target.value) : undefined,
+            }))
+          }
+        />
+      </div>
 
-            <div className="flex flex-wrap items-center gap-3 pt-1">
-              <Link
-                to="/tiktok-lab"
-                className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-4 py-2 text-[11px] font-semibold hover:bg-[#073331]"
-              >
-                Start in Goldsainte Creator Lab
-                <ArrowRight className="h-3 w-3" />
-              </Link>
-              <a
-                href="#how-it-works"
-                className="inline-flex items-center gap-1 text-[11px] text-[#0c4d47] underline underline-offset-4"
-              >
-                See how it works
-              </a>
-            </div>
+      <div className="space-y-1">
+        <label className="text-[11px] font-medium text-slate-700">Creator location</label>
+        <input
+          type="text"
+          placeholder="Country or city"
+          className="w-full rounded-lg border px-2 py-1 text-xs"
+          value={filters.country ?? ""}
+          onChange={(event) =>
+            setFilters((prev) => ({ ...prev, country: event.target.value }))
+          }
+        />
+      </div>
 
-            <p className="text-[10px] text-[#8D8D8D] pt-2 max-w-sm">
-              No brand contracts required. You keep creative control; vetted
-              travel agents plug in pricing and handle bookings on your behalf.
-            </p>
-          </div>
+      <div className="space-y-1">
+        <label className="text-[11px] font-medium text-slate-700">Language</label>
+        <input
+          type="text"
+          placeholder="e.g. English"
+          className="w-full rounded-lg border px-2 py-1 text-xs"
+          value={filters.language ?? ""}
+          onChange={(event) =>
+            setFilters((prev) => ({ ...prev, language: event.target.value }))
+          }
+        />
+      </div>
 
-          {/* Visual card */}
-          <div className="relative">
-            <div className="rounded-3xl bg-white shadow-lg shadow-black/5 border border-[#E5DFC6] p-4 space-y-3">
-              <div className="flex items-center justify-between gap-2">
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
-                    Creator snapshot
-                  </p>
-                  <p className="text-[12px] font-semibold">Your trip library</p>
-                </div>
-                <span className="rounded-full bg-[#0c4d47] text-[#E5DFC6] px-3 py-1 text-[10px]">
-                  Bookable content
-                </span>
-              </div>
+      <div className="space-y-1">
+        <label className="text-[11px] font-medium text-slate-700">Travel niche</label>
+        <input
+          type="text"
+          placeholder="Luxury, family, solo..."
+          className="w-full rounded-lg border px-2 py-1 text-xs"
+          value={filters.niche ?? ""}
+          onChange={(event) =>
+            setFilters((prev) => ({ ...prev, niche: event.target.value }))
+          }
+        />
+      </div>
 
-              <div className="grid grid-cols-3 gap-2 text-[10px]">
-                <div className="rounded-2xl bg-[#f7f3ea] p-2">
-                  <p className="text-[#8D8D8D] mb-1">Storyboards</p>
-                  <p className="text-[14px] font-semibold">12</p>
-                  <p className="text-[#8D8D8D]">live</p>
-                </div>
-                <div className="rounded-2xl bg-[#f7f3ea] p-2">
-                  <p className="text-[#8D8D8D] mb-1">Requests</p>
-                  <p className="text-[14px] font-semibold">34</p>
-                  <p className="text-[#8D8D8D]">this month</p>
-                </div>
-                <div className="rounded-2xl bg-[#f7f3ea] p-2">
-                  <p className="text-[#8D8D8D] mb-1">Earnings</p>
-                  <p className="text-[14px] font-semibold">$4,280</p>
-                  <p className="text-[#8D8D8D]">pending</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 text-[10px] text-[#4a4a4a] border-t border-[#E5DFC6] pt-2">
-                <Camera className="h-3 w-3 text-[#BFAD72]" />
-                <span>
-                  Turn a TikTok into a storyboard in minutes — we do the
-                  structuring; agents do the pricing.
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Value pillars */}
-      <section className="mx-auto max-w-5xl px-4 pb-12 md:pb-16">
-        <div className="grid gap-4 md:grid-cols-3 text-[11px]">
-          <div className="rounded-3xl bg-white border border-[#E5DFC6] p-4 space-y-2">
-            <div className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#f7f3ea]">
-              <Wallet className="h-3 w-3 text-[#0c4d47]" />
-            </div>
-            <p className="text-[12px] font-semibold">
-              Earn when your audience books
-            </p>
-            <p className="text-[#4a4a4a]">
-              Share your Goldsainte link in bio or comments. When someone books
-              a trip inspired by your storyboard, you earn a share — without
-              chasing brand deals.
-            </p>
-          </div>
-
-          <div className="rounded-3xl bg-white border border-[#E5DFC6] p-4 space-y-2">
-            <div className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#f7f3ea]">
-              <Globe2 className="h-3 w-3 text-[#0c4d47]" />
-            </div>
-            <p className="text-[12px] font-semibold">
-              Agents handle logistics
-            </p>
-            <p className="text-[#4a4a4a]">
-              Verified travel agents plug in live pricing, secure rates and take
-              care of bookings. You stay in your lane as creative director of
-              the trip.
-            </p>
-          </div>
-
-          <div className="rounded-3xl bg-white border border-[#E5DFC6] p-4 space-y-2">
-            <div className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#f7f3ea]">
-              <Sparkles className="h-3 w-3 text-[#0c4d47]" />
-            </div>
-            <p className="text-[12px] font-semibold">
-              A luxury storefront for your trips
-            </p>
-            <p className="text-[#4a4a4a]">
-              Your profile becomes a curated wall of trips, not random links.
-              Travelers can request exactly what they saw in your videos.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section
-        id="how-it-works"
-        className="mx-auto max-w-5xl px-4 pb-16 md:pb-20"
+      <button
+        type="button"
+        className="mt-2 w-full rounded-full border px-3 py-1 text-[11px] text-slate-700"
+        onClick={() => setFilters({ ...defaultFilters })}
       >
-        <div className="rounded-3xl bg-white border border-[#E5DFC6] p-4 md:p-6 text-[11px] space-y-4">
-          <div className="flex items-center justify-between gap-2">
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
-                How it works
-              </p>
-              <p className="text-[13px] font-semibold">
-                From TikTok clip to bookable trip
-              </p>
-            </div>
-          </div>
+        Clear filters
+      </button>
+    </div>
+  );
 
-          <ol className="space-y-3">
-            <li className="flex gap-3">
-              <div className="mt-0.5 h-5 w-5 flex items-center justify-center rounded-full bg-[#0c4d47] text-[#E5DFC6] text-[10px]">
-                1
-              </div>
-              <div>
-                <p className="text-[12px] font-semibold">
-                  Set up your Goldsainte profile
-                </p>
-                <p className="text-[#4a4a4a]">
-                  Claim your creator profile, connect TikTok and add your travel
-                  niches — cities, hotel types and trip styles.
-                </p>
-              </div>
-            </li>
-            <li className="flex gap-3">
-              <div className="mt-0.5 h-5 w-5 flex items-center justify-center rounded-full bg-[#0c4d47] text-[#E5DFC6] text-[10px]">
-                2
-              </div>
-              <div>
-                <p className="text-[12px] font-semibold">
-                  Turn content into storyboards
-                </p>
-                <p className="text-[#4a4a4a]">
-                  For each trip you feature, create a storyboard: destination,
-                  3–7 key moments and a starting budget. Goldsainte AI can help
-                  you outline it.
-                </p>
-              </div>
-            </li>
-            <li className="flex gap-3">
-              <div className="mt-0.5 h-5 w-5 flex items-center justify-center rounded-full bg-[#0c4d47] text-[#E5DFC6] text-[10px]">
-                3
-              </div>
-              <div>
-                <p className="text-[12px] font-semibold">
-                  Partner with travel agents
-                </p>
-                <p className="text-[#4a4a4a]">
-                  Verified agents attach to your storyboard, add live hotel and
-                  flight options, and make it instantly bookable.
-                </p>
-              </div>
-            </li>
-            <li className="flex gap-3">
-              <div className="mt-0.5 h-5 w-5 flex items-center justify-center rounded-full bg-[#0c4d47] text-[#E5DFC6] text-[10px]">
-                4
-              </div>
-              <div>
-                <p className="text-[12px] font-semibold">
-                  Share your Goldsainte link
-                </p>
-                <p className="text-[#4a4a4a]">
-                  Add your Goldsainte link to your bio or pin it under relevant
-                  videos. Followers land on a clean, luxury storefront of your
-                  curated trips.
-                </p>
-              </div>
-            </li>
-            <li className="flex gap-3">
-              <div className="mt-0.5 h-5 w-5 flex items-center justify-center rounded-full bg-[#0c4d47] text-[#E5DFC6] text-[10px]">
-                5
-              </div>
-              <div>
-                <p className="text-[12px] font-semibold">
-                  Earn from every booking
-                </p>
-                <p className="text-[#4a4a4a]">
-                  Goldsainte handles secure payments, escrow and payouts. You
-                  track your earnings in Goldsainte Creator Lab — clearly, without guessing.
-                </p>
-              </div>
-            </li>
-          </ol>
+  const headerRight = (
+    <div className="flex flex-col gap-3 sm:flex-row">
+      <input
+        type="text"
+        placeholder="Search creators by destination, vibe, or handle"
+        className="w-full rounded-full border px-4 py-2 text-xs sm:w-64"
+        value={filters.search}
+        onChange={(event) =>
+          setFilters((prev) => ({ ...prev, search: event.target.value }))
+        }
+      />
+      <button
+        type="button"
+        className="rounded-full border px-3 py-2 text-xs font-medium text-slate-700"
+        onClick={() => navigate("/post-trip")}
+      >
+        Post a trip brief
+      </button>
+    </div>
+  );
 
-          <div className="pt-2 border-t border-[#E5DFC6] flex flex-wrap items-center justify-between gap-3">
-            <p className="text-[10px] text-[#8D8D8D] max-w-sm">
-              You never have to send invoices or collect payments in DMs. We
-              protect the traveler, you and the agent in one place.
-            </p>
-            <Link
-              to="/signup?role=creator"
-              className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-4 py-2 text-[11px] font-semibold hover:bg-[#073331]"
-            >
-              Become a Goldsainte creator
-              <ArrowRight className="h-3 w-3" />
-            </Link>
-          </div>
+  return (
+    <MarketplaceShell
+      title="Discover TikTok travel creators"
+      subtitle="Find creators whose audience, aesthetic, and markets match the trips you want to sell."
+      filters={filtersPanel}
+      headerRight={headerRight}
+      resultCount={filteredCreators.length}
+      sortControl={sortControl}
+    >
+      {loading ? (
+        <div className="py-10 text-sm text-slate-500">Loading creators…</div>
+      ) : filteredCreators.length === 0 ? (
+        <div className="py-10 text-sm text-slate-500">
+          No creators match these filters yet. Try widening your search.
         </div>
-      </section>
-    </main>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {filteredCreators.map((creator) => {
+            const engagementRate = computeEngagementRate(creator);
+            return (
+              <button
+                key={creator.id}
+                type="button"
+                onClick={() => navigate(`/creators/${creator.id}`)}
+                className="flex flex-col justify-between rounded-2xl border bg-white/80 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 overflow-hidden rounded-full bg-slate-100">
+                    {creator.avatarUrl ? (
+                      <img
+                        src={creator.avatarUrl}
+                        alt={creator.displayName}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : null}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-semibold text-slate-900">
+                      {creator.displayName}
+                    </div>
+                    <div className="truncate text-[11px] text-slate-500">
+                      {creator.tiktokHandle ? `@${creator.tiktokHandle}` : "TikTok creator"}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-slate-600">
+                  {creator.followers != null && (
+                    <span className="rounded-full bg-slate-50 px-2 py-1">
+                      {creator.followers.toLocaleString()} followers
+                    </span>
+                  )}
+                  {engagementRate != null && (
+                    <span className="rounded-full bg-slate-50 px-2 py-1">
+                      {engagementRate.toFixed(1)}% engagement
+                    </span>
+                  )}
+                  {(creator.city || creator.country) && (
+                    <span className="rounded-full bg-slate-50 px-2 py-1">
+                      {[creator.city, creator.country].filter(Boolean).join(", ")}
+                    </span>
+                  )}
+                </div>
+
+                <div className="mt-3 flex flex-wrap gap-1">
+                  {creator.niches.slice(0, 3).map((niche) => (
+                    <span
+                      key={niche}
+                      className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] text-emerald-800"
+                    >
+                      {niche}
+                    </span>
+                  ))}
+                </div>
+
+                {creator.languages.length > 0 && (
+                  <div className="mt-3 text-[10px] text-slate-500">
+                    Languages: {creator.languages.join(", ")}
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </MarketplaceShell>
   );
 }

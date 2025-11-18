@@ -7,6 +7,7 @@ import { getStoryboardForPrefill } from "@/services/storyboardsService";
 import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
 import { toast } from "sonner";
 import { StoryboardBuilder } from "@/components/storyboards/StoryboardBuilder";
+import { useAuth } from "@/contexts/AuthContext";
 
 type BudgetLevel = "accessible" | "elevated" | "ultra_luxury";
 type Pace = "slow" | "balanced" | "packed";
@@ -16,6 +17,7 @@ export default function PostTripPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const fromStoryboard = searchParams.get("fromStoryboard");
+  const { user } = useAuth();
 
   const [destination, setDestination] = useState("");
   const [title, setTitle] = useState("");
@@ -102,29 +104,23 @@ export default function PostTripPage() {
     };
   }, [fromStoryboard]);
 
-  function handleSubmitClick(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    
-    // Basic validation before showing modal
+
     if (!destination || !startsOn || !endsOn) {
       setError("Please fill in destination and dates.");
       return;
     }
-    
-    setShowSafetyModal(true);
-  }
 
-  async function handleSubmitConfirmed() {
     setError(null);
     setSubmitting(true);
 
     try {
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError || !user) {
+      if (!user) {
         throw new Error("Please sign in before posting a trip.");
       }
 
-      const { error: insertError, data } = await supabase
+      const { error: insertError } = await supabase
         .from("trip_requests")
         .insert({
           user_id: user.id,
@@ -151,9 +147,8 @@ export default function PostTripPage() {
 
       if (insertError) throw insertError;
 
-      const newRequestId = data?.id as string | undefined;
       toast.success("Your trip has been posted. Creators and agents will respond here.");
-      navigate(newRequestId ? `/trip-request/${newRequestId}` : '/my-trip-requests');
+      navigate("/my-trip-requests");
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Something went wrong posting your trip.");
@@ -210,10 +205,11 @@ export default function PostTripPage() {
           </p>
         )}
 
-        <form
-          className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 space-y-5 text-sm"
-          onSubmit={handleSubmitClick}
-        >
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)]">
+          <form
+            className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 space-y-5 text-sm"
+            onSubmit={handleSubmit}
+          >
           {/* Section 1: Where & when */}
           <div className="space-y-3">
             <h2 className="text-base font-semibold">Where and when</h2>
@@ -515,30 +511,49 @@ export default function PostTripPage() {
             </p>
           )}
 
-          <div className="flex items-center justify-between pt-2">
-            <p className="text-xs text-[#8D8D8D] max-w-xs">
-              After you post your trip, Goldsainte AI and our partners will use
-              these details to send proposals. You&apos;ll see everything in
-              your &quot;My Trips&quot; and notifications.
-            </p>
+          <div className="flex flex-col gap-3 pt-2 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-xs text-[#8D8D8D] max-w-xs">
+                After you post your trip, Goldsainte AI and our partners will use
+                these details to send proposals. You&apos;ll see everything in
+                your &quot;My Trips&quot; and notifications.
+              </p>
+              <p className="text-[10px] text-[#8D8D8D] mt-1">
+                By posting, you agree to keep all booking and payment communication inside Goldsainte.
+              </p>
+            </div>
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-5 py-2 text-sm font-semibold hover:bg-[#073331] disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-5 py-2 text-sm font-semibold hover:bg-[#073331] disabled:opacity-60"
             >
               {submitting ? "Posting..." : "Post this trip"}
               <ArrowRight className="h-3 w-3" />
             </button>
           </div>
         </form>
+        <aside className="rounded-3xl border border-[#E5DFC6] bg-white/90 p-4 md:p-5 text-sm space-y-3 self-start">
+          <p className="text-xs uppercase tracking-[0.16em] text-[#8D8D8D]">Trust &amp; safety</p>
+          <h2 className="text-base font-semibold text-[#0a2225]">How Goldsainte keeps this safe</h2>
+          <p className="text-sm text-[#4a4a4a]">
+            Your trip brief is shared only with vetted creators and verified travel professionals. We keep all proposals, messages,
+            and payments on-platform so there’s a clear record of what was agreed and what was delivered.
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowSafetyModal(true)}
+            className="text-sm font-semibold text-[#0c4d47] underline-offset-4 hover:underline"
+          >
+            View safety guidelines
+          </button>
+        </aside>
+        </div>
       </section>
 
       <TrustSafetyModal
         open={showSafetyModal}
-        onOpenChange={setShowSafetyModal}
-        context="trip_posting"
-        onConfirm={handleSubmitConfirmed}
-        onCancel={() => setShowSafetyModal(false)}
+        onClose={() => setShowSafetyModal(false)}
+        context="trip"
       />
     </main>
   );

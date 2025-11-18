@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Calendar, MapPin, Users, Sparkles } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 type TripRequest = {
   id: string;
@@ -19,7 +20,7 @@ type TripRequest = {
 };
 
 export default function TripRequestsBoardPage() {
-  const navigate = useNavigate();
+  const { user } = useAuth();
   const [requests, setRequests] = useState<TripRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -27,16 +28,8 @@ export default function TripRequestsBoardPage() {
     let isMounted = true;
 
     async function load() {
+      if (!user) return;
       setLoading(true);
-
-      // Ensure user is authenticated
-      const { data: userData, error: userError } =
-        await supabase.auth.getUser();
-      if (userError || !userData.user) {
-        sessionStorage.setItem('returnTo', '/trip-requests');
-        navigate("/auth?returnTo=/trip-requests", { replace: true });
-        return;
-      }
 
       const { data, error } = await supabase
         .from("trip_requests")
@@ -57,11 +50,13 @@ export default function TripRequestsBoardPage() {
       setLoading(false);
     }
 
-    load();
+    if (user) {
+      load();
+    }
     return () => {
       isMounted = false;
     };
-  }, [navigate]);
+  }, [user]);
 
   return (
     <>

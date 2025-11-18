@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import {
   Calendar,
   MapPin,
@@ -47,6 +48,10 @@ type ProposalForm = {
   headline: string;
   message: string;
   priceFrom: string;
+  collaborating: boolean;
+  collaboratorId: string;
+  creatorShare: string;
+  agentShare: string;
 };
 
 type TripProposal = {
@@ -65,6 +70,10 @@ const EMPTY_PROPOSAL: ProposalForm = {
   headline: "",
   message: "",
   priceFrom: "",
+  collaborating: false,
+  collaboratorId: "",
+  creatorShare: "42.5",
+  agentShare: "42.5",
 };
 
 export default function TripRequestDetailPage() {
@@ -190,6 +199,51 @@ export default function TripRequestDetailPage() {
 
       const priceFrom = parseInt(proposal.priceFrom || "0", 10) || null;
 
+      let creatorId: string | null = null;
+      let agentId: string | null = null;
+      let creatorCommissionPct: number | null = null;
+      let agentCommissionPct: number | null = null;
+
+      if (proposal.proposerRole === "agent") {
+        agentId = userData.user.id;
+      } else {
+        creatorId = userData.user.id;
+      }
+
+      if (proposal.collaborating) {
+        const collaboratorId = proposal.collaboratorId.trim();
+        if (!collaboratorId) {
+          setError("Please provide your collaborator's Goldsainte ID.");
+          setSubmitting(false);
+          return;
+        }
+
+        if (proposal.proposerRole === "agent") {
+          creatorId = collaboratorId;
+        } else {
+          agentId = collaboratorId;
+        }
+
+        const creatorShare = parseFloat(proposal.creatorShare || "0");
+        const agentShare = parseFloat(proposal.agentShare || "0");
+        const totalShare = creatorShare + agentShare;
+
+        if (Math.abs(totalShare - 85) > 0.1) {
+          setError("Creator and agent shares must add up to 85%.");
+          setSubmitting(false);
+          return;
+        }
+
+        creatorCommissionPct = creatorShare;
+        agentCommissionPct = agentShare;
+      } else {
+        if (proposal.proposerRole === "agent") {
+          agentCommissionPct = 80;
+        } else {
+          creatorCommissionPct = 80;
+        }
+      }
+
       const { error: insertError } = await supabase
         .from("trip_proposals")
         .insert({
@@ -200,6 +254,10 @@ export default function TripRequestDetailPage() {
           message: proposal.message || null,
           price_from: priceFrom,
           status: "sent",
+          creator_id: creatorId,
+          agent_id: agentId,
+          creator_commission_pct: creatorCommissionPct,
+          agent_commission_pct: agentCommissionPct,
         });
 
       if (insertError) {
@@ -838,6 +896,80 @@ function ResponderProposalForm({
             This doesn't lock you in—it just helps the traveler compare options.
             You can refine pricing together later.
           </p>
+        </div>
+
+        {/* Collaboration + commission split */}
+        <div className="space-y-3 rounded-2xl border border-[#BFAD72]/30 bg-black/20 p-3">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-[11px] font-semibold text-[#E5DFC6]">
+                Partnering with another pro?
+              </p>
+              <p className="text-[10px] text-[#E5DFC6]/70">
+                Collaborations drop Goldsainte's fee to 15% and require a clear
+                creator + agent split.
+              </p>
+            </div>
+            <Switch
+              checked={proposal.collaborating}
+              onCheckedChange={(checked) => onChange("collaborating", checked)}
+            />
+          </div>
+
+          {proposal.collaborating ? (
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-[10px] font-medium text-[#E5DFC6]">
+                  Collaborator ID
+                </label>
+                <Input
+                  value={proposal.collaboratorId}
+                  onChange={(e) => onChange("collaboratorId", e.target.value)}
+                  placeholder={`Enter your ${proposal.proposerRole === "agent" ? "creator" : "agent"}'s Goldsainte ID`}
+                  className="rounded-xl border border-[#BFAD72]/40 bg-[#0a2225] text-xs text-[#E5DFC6] placeholder:text-[#E5DFC6]/60"
+                />
+              </div>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-medium text-[#E5DFC6]">
+                    Creator share (% of traveler payment)
+                  </label>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={85}
+                    step="0.5"
+                    value={proposal.creatorShare}
+                    onChange={(e) => onChange("creatorShare", e.target.value)}
+                    className="rounded-xl border border-[#BFAD72]/40 bg-[#0a2225] text-xs text-[#E5DFC6] placeholder:text-[#E5DFC6]/60"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-medium text-[#E5DFC6]">
+                    Agent share (% of traveler payment)
+                  </label>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={85}
+                    step="0.5"
+                    value={proposal.agentShare}
+                    onChange={(e) => onChange("agentShare", e.target.value)}
+                    className="rounded-xl border border-[#BFAD72]/40 bg-[#0a2225] text-xs text-[#E5DFC6] placeholder:text-[#E5DFC6]/60"
+                  />
+                </div>
+              </div>
+              <p className="text-[10px] text-[#E5DFC6]/70">
+                Goldsainte keeps 15% in co-owned trips. Creator + agent shares must
+                total 85%.
+              </p>
+            </div>
+          ) : (
+            <p className="text-[10px] text-[#E5DFC6]/70">
+              Flying solo? Goldsainte holds a 20% platform fee and sends the
+              remaining 80% to you when funds clear escrow.
+            </p>
+          )}
         </div>
 
         {/* Errors & success */}

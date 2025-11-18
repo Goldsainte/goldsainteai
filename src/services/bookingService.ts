@@ -1,5 +1,10 @@
 // src/services/bookingService.ts
 import { supabase } from "@/integrations/supabase/client";
+import {
+  calculateCommissions,
+  deriveCommissionMode,
+} from "@/lib/booking/commission";
+import { buildDefaultMilestones } from "@/lib/booking/milestones";
 
 export type BookingStatus =
   | "pending"
@@ -20,7 +25,9 @@ export async function createBookingFromProposal(params: {
   // Load proposal
   const { data: proposal, error: proposalError } = await supabase
     .from("trip_proposals")
-    .select("id, trip_request_id, proposer_id, proposer_role, price_from")
+    .select(
+      "id, trip_request_id, proposer_id, proposer_role, price_from, currency, creator_id, agent_id, creator_commission_pct, agent_commission_pct"
+    )
     .eq("id", params.proposalId)
     .maybeSingle();
 
@@ -31,7 +38,7 @@ export async function createBookingFromProposal(params: {
   // Load trip to confirm traveler
   const { data: trip, error: tripError } = await supabase
     .from("trips")
-    .select("id, traveler_id")
+    .select("id, traveler_id, start_date, end_date")
     .eq("id", params.tripId)
     .maybeSingle();
 
@@ -44,16 +51,21 @@ export async function createBookingFromProposal(params: {
   }
 
   const total = proposal.price_from ?? 0;
-  // Simple fee structure: 15% platform, 85% to partners
-  const platformFee = total * 0.15;
-  const partnerShare = total - platformFee;
 
-  const agentId = proposal.proposer_role === "agent"
-    ? proposal.proposer_id
-    : null;
-  const creatorId = proposal.proposer_role === "creator"
-    ? proposal.proposer_id
-    : null;
+  const agentId = proposal.agent_id
+    ?? (proposal.proposer_role === "agent" ? proposal.proposer_id : null);
+  const creatorId = proposal.creator_id
+    ?? (proposal.proposer_role === "creator" ? proposal.proposer_id : null);
+
+  const commissionMode = deriveCommissionMode({ creatorId, agentId });
+  const commission = calculateCommissions({
+    totalPriceCents: total,
+    commissionMode,
+    proposalCreatorPct: proposal.creator_commission_pct ?? undefined,
+    proposalAgentPct: proposal.agent_commission_pct ?? undefined,
+  });
+
+  const partnerShare = commission.creatorAmount + commission.agentAmount;
 
   const { data: booking, error: bookingError } = await supabase
     .from("bookings")
@@ -65,9 +77,22 @@ export async function createBookingFromProposal(params: {
       proposal_id: proposal.id,
       status: "awaiting_payment",
       total_amount: total,
-      platform_fee: platformFee,
-      agent_share: agentId ? partnerShare : null,
-      creator_share: creatorId ? partnerShare : null,
+      total_price_cents: total,
+      currency: proposal.currency ?? "USD",
+      platform_fee: commission.platformFeeAmount,
+      platform_fee_amount_cents: commission.platformFeeAmount,
+      platform_fee_pct: commission.platformPct,
+      commission_mode: commissionMode,
+      agent_share: agentId ? commission.agentAmount : null,
+      creator_share: creatorId ? commission.creatorAmount : null,
+      agent_commission_amount_cents: agentId ? commission.agentAmount : null,
+      creator_commission_amount_cents: creatorId ? commission.creatorAmount : null,
+      agent_commission_pct: agentId ? commission.agentPct : null,
+      creator_commission_pct: creatorId ? commission.creatorPct : null,
+      escrow_status: "HELD",
+      escrow_held_amount_cents: partnerShare,
+      escrow_released_amount_cents: 0,
+      escrow_on_hold_amount_cents: 0,
     })
     .select("*")
     .single();
@@ -94,6 +119,19 @@ export async function createBookingFromProposal(params: {
     .from("trips")
     .update({ status: "booked" })
     .eq("id", trip.id);
+
+  if (booking?.id) {
+    const milestones = buildDefaultMilestones({
+      bookingId: booking.id,
+      createdAt: booking.created_at,
+      departureDate: trip.start_date,
+      completionDate: trip.end_date,
+    });
+
+    if (milestones.length) {
+      await supabase.from("booking_milestones").insert(milestones);
+    }
+  }
 
   return booking;
 }
@@ -150,3 +188,4 @@ export async function getMyTravelerBookingsDetailed() {
 
   return data ?? [];
 }
+

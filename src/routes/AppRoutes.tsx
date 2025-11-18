@@ -12,13 +12,19 @@ import { RequireAgentTerms } from '@/components/RequireAgentTerms';
 
 import { MarketingLayout, AuthLayout, MemberLayout, AdminLayout } from './Layouts';
 import { RouteSectionBoundary } from './RouteSectionBoundary';
+import { RequireAuth } from '@/components/routing/RequireAuth';
+import { AdminGuard } from '@/hooks/useAdminGuard';
 
 const SearchResults = lazy(() => import('@/pages/SearchResults'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const AdminDashboardPage = lazy(() => import('@/pages/admin/AdminDashboardPage'));
 const AdminSafetyDashboardPage = lazy(() => import('@/pages/admin/AdminSafetyDashboardPage'));
 const AdminAgentsPage = lazy(() => import('@/pages/admin/AdminAgentsPage'));
+const AdminCreatorsPage = lazy(() => import('@/pages/admin/AdminCreatorsPage'));
+const AdminBookingsPage = lazy(() => import('@/pages/admin/AdminBookingsPage'));
+const AdminDisputesPage = lazy(() => import('@/pages/admin/AdminDisputesPage'));
 const AdminHomePage = lazy(() => import('@/pages/admin/AdminHomePage'));
+const AdminMarketplaceOversightPage = lazy(() => import('@/pages/admin/AdminMarketplaceOversightPage'));
 const AgentPublicProfilePage = lazy(() => import('@/pages/agents/AgentPublicProfilePage'));
 const CreatorPublicProfilePage = lazy(() => import('@/pages/creators/CreatorPublicProfilePage'));
 const TravelProfileRedirect = lazy(() => import('@/pages/redirects/TravelProfileRedirectPage'));
@@ -37,6 +43,7 @@ const CreatorOnboardingPage = lazy(() => import('@/pages/onboarding/CreatorOnboa
 const AgentProfile = lazy(() => import('@/pages/AgentProfile'));
 const AgentOnboarding = lazy(() => import('@/pages/AgentOnboarding'));
 const AgentDashboard = lazy(() => import('@/pages/AgentDashboard'));
+const AgentEarningsPage = lazy(() => import('@/pages/agent/AgentEarningsPage'));
 const AgentTripRequests = lazy(() => import('@/pages/AgentTripRequests'));
 const AgentStoryboardBuilderPage = lazy(() => import('@/pages/agents/AgentStoryboardBuilderPage'));
 const AgentPerformanceDashboard = lazy(() => import('@/pages/AgentPerformanceDashboard'));
@@ -89,6 +96,7 @@ const Messages = lazy(() => import('@/pages/Messages'));
 const PriceAlerts = lazy(() => import('@/pages/PriceAlerts'));
 const TravelerDashboardPage = lazy(() => import('@/pages/traveler/TravelerDashboardPage'));
 const PartnerConsolePage = lazy(() => import('@/pages/partner/PartnerConsolePage'));
+const PartnerEscrowPage = lazy(() => import('@/pages/partners/EscrowMilestonesPage'));
 const MyJobs = lazy(() => import('@/pages/MyJobs'));
 const MyTrips = lazy(() => import('@/pages/MyTrips'));
 const GroupTrips = lazy(() => import('@/pages/GroupTrips'));
@@ -227,15 +235,71 @@ export const AppRoutes = () => (
       />
       <Route path="/browse-agents" element={<BrowseAgents />} />
       <Route path="/browse-creators" element={<BrowseCreators />} />
-      <Route path="/trip-requests" element={<TripRequestsBoardPage />} />
-      <Route path="/trip-request/:id" element={<TripRequestDetailPage />} />
-      <Route path="/trip-request/:id/chat" element={<TripChatPage />} />
-      <Route path="/my-trip-requests" element={<MyTripRequestsPage />} />
+      <Route
+        path="/trip-requests"
+        element={(
+          <RequireAuth>
+            <TripRequestsBoardPage />
+          </RequireAuth>
+        )}
+      />
+      <Route
+        path="/trip-request/:id"
+        element={(
+          <RequireAuth>
+            <TripRequestDetailPage />
+          </RequireAuth>
+        )}
+      />
+      <Route
+        path="/trip-request/:id/chat"
+        element={(
+          <RequireAuth>
+            <TripChatPage />
+          </RequireAuth>
+        )}
+      />
+      <Route
+        path="/my-trip-requests"
+        element={(
+          <RequireAuth>
+            <MyTripRequestsPage />
+          </RequireAuth>
+        )}
+      />
       <Route path="/my-trips" element={<MyTripsPage />} />
-      <Route path="/post-trip" element={<PostTripPage />} />
-      <Route path="/trip-requests/:tripRequestId" element={<TripRequestDetailPageNew />} />
-      <Route path="/proposals" element={<ProposalsForTripPage />} />
-      <Route path="/proposals/:proposalId" element={<ProposalDetailPage />} />
+      <Route
+        path="/post-trip"
+        element={(
+          <RequireAuth>
+            <PostTripPage />
+          </RequireAuth>
+        )}
+      />
+      <Route
+        path="/trip-requests/:tripRequestId"
+        element={(
+          <RequireAuth>
+            <TripRequestDetailPageNew />
+          </RequireAuth>
+        )}
+      />
+      <Route
+        path="/proposals"
+        element={(
+          <RequireAuth>
+            <ProposalsForTripPage />
+          </RequireAuth>
+        )}
+      />
+      <Route
+        path="/proposals/:proposalId"
+        element={(
+          <RequireAuth>
+            <ProposalDetailPage />
+          </RequireAuth>
+        )}
+      />
       <Route path="/s/:slugOrId" element={<StoryboardSharePage />} />
       <Route path="/agent-trips" element={<AgentTripsPage />} />
       <Route path="/creator-trips" element={<CreatorTripsPage />} />
@@ -255,9 +319,25 @@ export const AppRoutes = () => (
       <Route path="/bookings/:bookingId" element={<BookingDetailPage />} />
       <Route path="/traveler" element={<TravelerDashboardPage />} />
       <Route path="/partner" element={<PartnerConsolePage />} />
+      <Route
+        path="/partner/escrow"
+        element={(
+          <RequireAuth>
+            <PartnerEscrowPage />
+          </RequireAuth>
+        )}
+      />
       <Route path="/agent/:agentId" element={<AgentProfile />} />
       <Route path="/agent-onboarding" element={<AgentOnboarding />} />
       <Route path="/agent-dashboard" element={<RequireAgentTerms><AgentDashboard /></RequireAgentTerms>} />
+      <Route
+        path="/agent/earnings"
+        element={(
+          <RequireAuth>
+            <AgentEarningsPage />
+          </RequireAuth>
+        )}
+      />
       <Route path="/agent-dashboard/storyboards/new" element={<RequireAgentTerms><AgentStoryboardBuilderPage /></RequireAgentTerms>} />
       <Route path="/agent-trip-requests" element={<RequireAgentTerms><AgentTripRequests /></RequireAgentTerms>} />
       <Route path="/agent-performance" element={<RequireAgentTerms><AgentPerformanceDashboard /></RequireAgentTerms>} />
@@ -340,11 +420,21 @@ export const AppRoutes = () => (
       <Route path="/earnings" element={<EarningsDashboard />} />
     </Route>
 
-    <Route element={<AdminLayout />}>
+    <Route
+      element={(
+        <AdminGuard>
+          <AdminLayout />
+        </AdminGuard>
+      )}
+    >
       <Route path="/admin" element={<AdminHomePage />} />
       <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
       <Route path="/admin/safety" element={<AdminSafetyDashboardPage />} />
       <Route path="/admin/agents" element={<AdminAgentsPage />} />
+      <Route path="/admin/creators" element={<AdminCreatorsPage />} />
+      <Route path="/admin/bookings" element={<AdminBookingsPage />} />
+      <Route path="/admin/disputes" element={<AdminDisputesPage />} />
+      <Route path="/admin/marketplace" element={<AdminMarketplaceOversightPage />} />
       <Route path="/admin/cancellations" element={<AdminCancellations />} />
       <Route path="/admin/analytics/cancellations" element={<AdminCancellationAnalytics />} />
       <Route path="/admin/customer-verifications" element={<AdminCustomerVerifications />} />

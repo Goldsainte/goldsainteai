@@ -1,10 +1,12 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
+import { AUTH_REDIRECT_STORAGE_KEY, getRedirectPathFromSearch, sanitizeRedirectPath } from '@/lib/auth/redirect';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleAuthCallback = async () => {
@@ -33,20 +35,24 @@ const AuthCallback = () => {
             account_type: 'personal'
           });
         }
+        const redirectFromQuery = getRedirectPathFromSearch(location.search);
+        const storedRedirect = typeof window !== 'undefined'
+          ? sanitizeRedirectPath(sessionStorage.getItem(AUTH_REDIRECT_STORAGE_KEY))
+          : null;
+        const destination = redirectFromQuery ?? storedRedirect ?? '/';
 
-        // Honor returnTo from query params or sessionStorage
-        const params = new URLSearchParams(window.location.search);
-        const returnTo = params.get('returnTo') || sessionStorage.getItem('returnTo');
-        sessionStorage.removeItem('returnTo');
-        
-        navigate(returnTo?.startsWith('/') ? returnTo : '/', { replace: true });
+        if (typeof window !== 'undefined') {
+          sessionStorage.removeItem(AUTH_REDIRECT_STORAGE_KEY);
+        }
+
+        navigate(destination, { replace: true });
       } else {
         navigate('/auth');
       }
     };
 
     handleAuthCallback();
-  }, [navigate]);
+  }, [navigate, location.search]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">

@@ -114,8 +114,7 @@ export function VoiceConciergeWidget() {
 
   async function handleSend() {
     if (requiresLogin) {
-      sessionStorage.setItem('returnTo', '/concierge');
-      navigate('/auth?returnTo=/concierge');
+      navigate('/login?redirect=/concierge');
       return;
     }
 
@@ -243,10 +242,7 @@ export function VoiceConciergeWidget() {
                 {requiresLogin ? (
                   <button
                     type="button"
-                    onClick={() => {
-                      sessionStorage.setItem('returnTo', '/concierge');
-                      navigate('/auth?returnTo=/concierge');
-                    }}
+                    onClick={() => navigate('/login?redirect=/concierge')}
                     className="w-full rounded-full bg-[#0c4d47] px-4 py-2 text-sm font-semibold text-[#E5DFC6]"
                   >
                     Sign in to plan with Madison

@@ -36,17 +36,20 @@ Update the `profiles` rows so each user unlocks the correct dashboards:
 - Refresh `/my-trip-requests` and confirm the new brief appears at the top.
 - Trigger Madison from the floating “Hey Goldsainte” button, send a prompt, and open the full `/concierge` planner from the widget link.
 - Visit `/tiktok-lab/storyboards` and open a storyboard detail page.
+- After booking is marked completed, open `/my-bookings` and leave reviews for both the agent and creator.
 
 ### Creator checklist
 - Visit `/creators` from the header/mobile menu and filter/browse.
 - Complete the creator onboarding form if needed (Profile → “Creator settings”).
 - Open `/tiktok-lab/storyboards` and `/tiktok-lab/storyboards/:id` to edit media.
 - Confirm `/tiktok-lab/earnings` loads once the SQL seed marks the account as a creator.
+- Verify the per-booking payouts reflect collaborative vs. solo commissions.
 
 ### Agent checklist
 - From the header select “Professional → Become an Agent” to reach `/agent-onboarding`.
 - After the profile is marked as an agent, ensure `/agent-dashboard`, `/agent-trip-requests`, `/trip-requests`, and `/apply/agent` all render without auth loops.
 - Check `/trip-requests` to verify open traveler briefs are visible and `/trip-request/:id` shows the detail view.
+- Visit `/agent/earnings` for the booking payout ledger and `/partner/escrow` to monitor milestone releases.
 
 ## 4. Helpful references
 - `supabase/seed-test-users.sql` — opinionated inserts for local-only data seeding.

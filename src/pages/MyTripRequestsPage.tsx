@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Calendar, MapPin, Users, HandCoins, Sparkles } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 type TripRequestWithProposals = {
   id: string;
@@ -20,7 +21,7 @@ type TripRequestWithProposals = {
 };
 
 export default function MyTripRequestsPage() {
-  const navigate = useNavigate();
+  const { user } = useAuth();
   const [requests, setRequests] = useState<TripRequestWithProposals[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -28,18 +29,8 @@ export default function MyTripRequestsPage() {
     let isMounted = true;
 
     async function load() {
+      if (!user) return;
       setLoading(true);
-
-      const { data: userData, error: userError } =
-        await supabase.auth.getUser();
-
-      if (userError || !userData.user) {
-        sessionStorage.setItem('returnTo', '/my-trip-requests');
-        navigate("/auth?returnTo=/my-trip-requests", { replace: true });
-        return;
-      }
-
-      console.log("[MyTripRequests] User ID:", userData.user.id);
 
       const { data, error } = await supabase
         .from("trip_requests")
@@ -59,7 +50,7 @@ export default function MyTripRequestsPage() {
           trip_proposals ( status )
         `
         )
-        .eq("user_id", userData.user.id)
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       if (!isMounted) return;
@@ -76,11 +67,13 @@ export default function MyTripRequestsPage() {
       setLoading(false);
     }
 
-    load();
+    if (user) {
+      load();
+    }
     return () => {
       isMounted = false;
     };
-  }, [navigate]);
+  }, [user]);
 
   return (
     <>

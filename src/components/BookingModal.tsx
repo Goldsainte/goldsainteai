@@ -16,6 +16,7 @@ import { getCurrencySymbol } from "@/lib/currencyHelpers";
 import { useNavigate } from "react-router-dom";
 import { BookingPolicyBanner } from "./BookingPolicyBanner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
 
 const bookingFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -47,6 +48,7 @@ export const BookingModal = ({
   const { user } = useAuth();
   const [userProfile, setUserProfile] = useState<any>(null);
   const navigate = useNavigate();
+  const [safetyModalOpen, setSafetyModalOpen] = useState(false);
 
   const form = useForm<z.infer<typeof bookingFormSchema>>({
     resolver: zodResolver(bookingFormSchema),
@@ -121,6 +123,21 @@ export const BookingModal = ({
           <DialogDescription>Choose how you'd like to proceed with your reservation</DialogDescription>
         </DialogHeader>
 
+        <div className="rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] p-4 text-sm text-[#4a4a4a] space-y-2 mb-4">
+          <p className="text-sm font-semibold text-[#0a2225]">Before you confirm</p>
+          <p>
+            Please make sure you're comfortable with the itinerary, total price, and cancellation terms. All payments and important
+            updates should stay inside Goldsainte so we can help if anything needs to be reviewed.
+          </p>
+          <button
+            type="button"
+            onClick={() => setSafetyModalOpen(true)}
+            className="text-sm font-semibold text-[#0c4d47] underline-offset-4 hover:underline"
+          >
+            Review safety &amp; liability details
+          </button>
+        </div>
+
         <BookingPolicyBanner bookingType={bookingType} />
 
         {/* Booking Options */}
@@ -169,6 +186,12 @@ export const BookingModal = ({
         <div className="text-xs text-muted-foreground text-center pt-4 border-t">
           Goldsainte connects you with the best booking options. We don't process payments directly.
         </div>
+
+        <TrustSafetyModal
+          open={safetyModalOpen}
+          onClose={() => setSafetyModalOpen(false)}
+          context="booking"
+        />
       </DialogContent>
     </Dialog>
   );

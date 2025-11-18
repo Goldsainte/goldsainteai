@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -12,6 +12,7 @@ import logomark from '@/assets/logomark-gold.png';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { AccountTypeStep } from '@/components/auth/AccountTypeStep';
+import { AUTH_REDIRECT_STORAGE_KEY, getRedirectPathFromSearch, sanitizeRedirectPath } from '@/lib/auth/redirect';
 
 const passwordSchema = z.string()
   .min(8, "Password must be at least 8 characters")
@@ -33,18 +34,30 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp, user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const redirectTarget = useMemo(() => getRedirectPathFromSearch(location.search), [location.search]);
+
+  const persistRedirectTargetForOAuth = () => {
+    if (typeof window === 'undefined') return;
+    const destination = redirectTarget ?? '/';
+    sessionStorage.setItem(AUTH_REDIRECT_STORAGE_KEY, destination);
+  };
 
   // Redirect if already logged in
   useEffect(() => {
     if (user && !authLoading) {
-      const params = new URLSearchParams(window.location.search);
-      const returnTo = params.get('returnTo') || params.get('redirect') || sessionStorage.getItem('returnTo');
-      
-      if (returnTo && returnTo.startsWith('/')) {
-        sessionStorage.removeItem('returnTo');
-        navigate(returnTo, { replace: true });
+      const storedRedirect = typeof window !== 'undefined'
+        ? sanitizeRedirectPath(sessionStorage.getItem(AUTH_REDIRECT_STORAGE_KEY))
+        : null;
+      const destination = redirectTarget ?? storedRedirect;
+
+      if (destination) {
+        if (typeof window !== 'undefined') {
+          sessionStorage.removeItem(AUTH_REDIRECT_STORAGE_KEY);
+        }
+        navigate(destination, { replace: true });
         return;
       }
 
@@ -55,7 +68,7 @@ const Auth = () => {
             .select('id')
             .eq('user_id', user.id)
             .maybeSingle();
-          
+
           if (data) {
             navigate('/', { replace: true });
           } else {
@@ -68,7 +81,16 @@ const Auth = () => {
       };
       checkAIAgent();
     }
-  }, [user, authLoading, navigate]);
+  }, [user, authLoading, navigate, redirectTarget]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (redirectTarget) {
+      sessionStorage.setItem(AUTH_REDIRECT_STORAGE_KEY, redirectTarget);
+    } else {
+      sessionStorage.removeItem(AUTH_REDIRECT_STORAGE_KEY);
+    }
+  }, [redirectTarget]);
 
   const handleContinueWithEmail = () => {
     if (!email.trim()) {
@@ -249,12 +271,7 @@ const Auth = () => {
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true);
-      
-      // Persist returnTo before OAuth
-      const params = new URLSearchParams(window.location.search);
-      const returnTo = params.get('returnTo') || '/';
-      sessionStorage.setItem('returnTo', returnTo);
-      
+      persistRedirectTargetForOAuth();
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -276,12 +293,7 @@ const Auth = () => {
   const handleFacebookSignIn = async () => {
     try {
       setIsLoading(true);
-      
-      // Persist returnTo before OAuth
-      const params = new URLSearchParams(window.location.search);
-      const returnTo = params.get('returnTo') || '/';
-      sessionStorage.setItem('returnTo', returnTo);
-      
+      persistRedirectTargetForOAuth();
       const origin = encodeURIComponent(window.location.origin);
       const timestamp = Date.now();
       window.location.href = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/facebook-signin-init?origin=${origin}&cb=${timestamp}`;
@@ -298,12 +310,7 @@ const Auth = () => {
   const handleTikTokSignIn = async () => {
     try {
       setIsLoading(true);
-      
-      // Persist returnTo before OAuth
-      const params = new URLSearchParams(window.location.search);
-      const returnTo = params.get('returnTo') || '/';
-      sessionStorage.setItem('returnTo', returnTo);
-      
+      persistRedirectTargetForOAuth();
       const origin = encodeURIComponent(window.location.origin);
       const timestamp = Date.now();
       window.location.href = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tiktok-signin-init?origin=${origin}&cb=${timestamp}`;
@@ -320,12 +327,7 @@ const Auth = () => {
   const handleAppleSignIn = async () => {
     try {
       setIsLoading(true);
-      
-      // Persist returnTo before OAuth
-      const params = new URLSearchParams(window.location.search);
-      const returnTo = params.get('returnTo') || '/';
-      sessionStorage.setItem('returnTo', returnTo);
-      
+      persistRedirectTargetForOAuth();
       const origin = encodeURIComponent(window.location.origin);
       window.location.href = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/apple-signin-init?origin=${origin}&cb=${Date.now()}`;
     } catch (error: any) {
@@ -379,6 +381,19 @@ const Auth = () => {
       .maybeSingle();
 
     const accountType = profile?.account_type;
+
+    const storedRedirect = typeof window !== 'undefined'
+      ? sanitizeRedirectPath(sessionStorage.getItem(AUTH_REDIRECT_STORAGE_KEY))
+      : null;
+    const destination = redirectTarget ?? storedRedirect;
+
+    if (destination) {
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem(AUTH_REDIRECT_STORAGE_KEY);
+      }
+      navigate(destination, { replace: true });
+      return;
+    }
 
     if (accountType === 'agent') {
       navigate('/agent-dashboard', { replace: true });

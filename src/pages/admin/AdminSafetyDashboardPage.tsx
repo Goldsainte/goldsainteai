@@ -7,7 +7,6 @@ import {
   AdminReport,
   AdminSafetyEvent,
 } from "@/services/adminSafetyService";
-import { AdminGuard } from "./AdminGuard";
 
 const BG = "bg-[#0a2225]";
 
@@ -268,9 +267,5 @@ function truncate(text: string, max: number) {
 }
 
 export default function AdminSafetyDashboardPage() {
-  return (
-    <AdminGuard>
-      <AdminSafetyDashboardContent />
-    </AdminGuard>
-  );
+  return <AdminSafetyDashboardContent />;
 }

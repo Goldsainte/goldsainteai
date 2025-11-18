@@ -10,7 +10,8 @@ insert into public.profiles as p (
   role,
   onboarding_completed,
   is_profile_complete,
-  welcome_shown
+  welcome_shown,
+  kyc_status
 )
 select
   u.id,
@@ -20,7 +21,8 @@ select
   'traveler',
   true,
   true,
-  true
+  true,
+  'verified'
 from auth.users u
 where u.email = 'traveler@example.com'
 on conflict (id) do update set
@@ -30,7 +32,8 @@ on conflict (id) do update set
   display_name = excluded.display_name,
   onboarding_completed = true,
   is_profile_complete = true,
-  welcome_shown = true;
+  welcome_shown = true,
+  kyc_status = 'verified';
 
 -- Creator test profile
 insert into public.profiles as p (
@@ -45,7 +48,8 @@ insert into public.profiles as p (
   home_base,
   onboarding_completed,
   is_profile_complete,
-  has_completed_creator_onboarding
+  has_completed_creator_onboarding,
+  kyc_status
 )
 select
   u.id,
@@ -59,7 +63,8 @@ select
   'NYC → Paris',
   true,
   true,
-  true
+  true,
+  'verified'
 from auth.users u
 where u.email = 'creator@example.com'
 on conflict (id) do update set
@@ -71,7 +76,8 @@ on conflict (id) do update set
   home_base = excluded.home_base,
   has_completed_creator_onboarding = true,
   onboarding_completed = true,
-  is_profile_complete = true;
+  is_profile_complete = true,
+  kyc_status = 'verified';
 
 -- Agent test profile
 insert into public.profiles as p (
@@ -86,7 +92,11 @@ insert into public.profiles as p (
   agent_years_experience,
   agent_verification_status,
   onboarding_completed,
-  is_profile_complete
+  is_profile_complete,
+  agent_license_state,
+  professional_insurance_provider,
+  professional_insurance_policy,
+  kyc_status
 )
 select
   u.id,
@@ -100,7 +110,11 @@ select
   8,
   'approved',
   true,
-  true
+  true,
+  'NY',
+  'Chubb',
+  'POLICY-12345',
+  'verified'
 from auth.users u
 where u.email = 'agent@example.com'
 on conflict (id) do update set
@@ -112,4 +126,8 @@ on conflict (id) do update set
   agent_years_experience = excluded.agent_years_experience,
   agent_verification_status = excluded.agent_verification_status,
   onboarding_completed = true,
-  is_profile_complete = true;
+  is_profile_complete = true,
+  agent_license_state = excluded.agent_license_state,
+  professional_insurance_provider = excluded.professional_insurance_provider,
+  professional_insurance_policy = excluded.professional_insurance_policy,
+  kyc_status = 'verified';

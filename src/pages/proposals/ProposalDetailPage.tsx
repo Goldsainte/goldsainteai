@@ -118,10 +118,6 @@ export default function ProposalDetailPage() {
   const isPartner =
     !isTraveler && (accountType === "creator" || accountType === "agent");
 
-  function handleAcceptClick() {
-    setShowSafetyModal(true);
-  }
-
   async function handleAcceptConfirmed() {
     if (!proposalId || !proposal) return;
     setActionError(null);
@@ -417,16 +413,29 @@ export default function ProposalDetailPage() {
                 {isTraveler ? (
                   <>
                     {proposal.status === "pending" && (
-                      <div className="space-y-2">
+                      <div className="space-y-3">
+                        <div className="rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea]/80 p-3 space-y-1">
+                          <p className="text-[11px] font-semibold text-[#0a2225]">Before you confirm</p>
+                          <p className="text-[10px] text-[#4a4a4a]">
+                            Please make sure you&apos;re comfortable with the itinerary, total price, and cancellation terms. Keep all future
+                            changes, payments, and approvals inside Goldsainte so everything stays protected.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => setShowSafetyModal(true)}
+                            className="text-[10px] font-semibold text-[#0c4d47] underline-offset-4 hover:underline"
+                          >
+                            Review safety &amp; liability details
+                          </button>
+                        </div>
                         <p className="text-[10px] text-[#4a4a4a]">
-                          If this feels right, you can accept and move into
-                          Goldsainte&apos;s protected booking flow. If not, you can
+                          If this feels right, you can accept and move into Goldsainte&apos;s protected booking flow. If not, you can
                           decline and wait for other options.
                         </p>
                         <div className="flex flex-wrap gap-2">
                           <button
                             type="button"
-                            onClick={handleAcceptClick}
+                            onClick={handleAcceptConfirmed}
                             disabled={actionLoading === "accept"}
                             className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-4 py-1.5 text-[10px] font-semibold hover:bg-[#073331] disabled:opacity-60"
                           >
@@ -450,14 +459,22 @@ export default function ProposalDetailPage() {
                       </div>
                     )}
 
-                    {proposal.status !== "pending" && (
+                    {proposal.status !== "pending" && proposal.status === "accepted" && (
+                      <div className="rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea]/80 p-3 space-y-1">
+                        <p className="text-[11px] font-semibold text-[#0c4d47]">Your booking is confirmed.</p>
+                        <p className="text-[10px] text-[#4a4a4a]">
+                          All future changes, questions, and approvals should be handled inside Goldsainte to keep your trip protected.
+                        </p>
+                      </div>
+                    )}
+
+                    {proposal.status !== "pending" && proposal.status !== "accepted" && (
                       <p className="text-[10px] text-[#4a4a4a]">
                         This proposal is{" "}
                         <span className="font-semibold">
                           {humanStatus(proposal.status)}
                         </span>
-                        . If your plans have changed significantly, you can post
-                        a new trip or review other proposals from your trip
+                        . If your plans have changed significantly, you can post a new trip or review other proposals from your trip
                         view.
                       </p>
                     )}
@@ -477,10 +494,8 @@ export default function ProposalDetailPage() {
 
       <TrustSafetyModal
         open={showSafetyModal}
-        onOpenChange={setShowSafetyModal}
-        context="proposal_acceptance"
-        onConfirm={handleAcceptConfirmed}
-        onCancel={() => setShowSafetyModal(false)}
+        onClose={() => setShowSafetyModal(false)}
+        context="booking"
       />
     </main>
   );
