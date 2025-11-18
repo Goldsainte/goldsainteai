@@ -1526,44 +1526,6 @@ export type Database = {
           },
         ]
       }
-      booking_milestones: {
-        Row: {
-          booking_id: string
-          created_at: string
-          due_at: string | null
-          id: string
-          label: string
-          percentage: number
-          status: string
-        }
-        Insert: {
-          booking_id: string
-          created_at?: string
-          due_at?: string | null
-          id?: string
-          label: string
-          percentage: number
-          status?: string
-        }
-        Update: {
-          booking_id?: string
-          created_at?: string
-          due_at?: string | null
-          id?: string
-          label?: string
-          percentage?: number
-          status?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "booking_milestones_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       booking_modifications: {
         Row: {
           amadeus_order_id: string | null
@@ -1627,30 +1589,6 @@ export type Database = {
           status?: string
           updated_at?: string
           user_id?: string
-        }
-        Relationships: []
-      }
-      cancellation_policies: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          name: string
-          rules: Json
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          name: string
-          rules: Json
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          name?: string
-          rules?: Json
         }
         Relationships: []
       }
@@ -1743,31 +1681,18 @@ export type Database = {
           agent_id: string | null
           agent_share: number | null
           cancelled_at: string | null
-          cancellation_policy_id: string | null
-          commission_mode: string | null
           created_at: string
           creator_earnings: number | null
           creator_id: string | null
           creator_share: number | null
           currency: string | null
-          escrow_held_amount_cents: number | null
-          escrow_on_hold_amount_cents: number | null
-          escrow_released_amount_cents: number | null
-          escrow_status: string | null
           disputed_at: string | null
           escrow_released_at: string | null
           id: string
-          platform_fee_amount_cents: number | null
-          platform_fee_pct: number | null
           payout_expected_at: string | null
           payout_paid_at: string | null
           payout_status: string
           platform_fee: number | null
-          total_price_cents: number | null
-          creator_commission_pct: number | null
-          creator_commission_amount_cents: number | null
-          agent_commission_pct: number | null
-          agent_commission_amount_cents: number | null
           proposal_id: string | null
           status: string
           total_amount: number | null
@@ -1780,31 +1705,18 @@ export type Database = {
           agent_id?: string | null
           agent_share?: number | null
           cancelled_at?: string | null
-          cancellation_policy_id?: string | null
-          commission_mode?: string | null
           created_at?: string
           creator_earnings?: number | null
           creator_id?: string | null
           creator_share?: number | null
           currency?: string | null
-          escrow_held_amount_cents?: number | null
-          escrow_on_hold_amount_cents?: number | null
-          escrow_released_amount_cents?: number | null
-          escrow_status?: string | null
           disputed_at?: string | null
           escrow_released_at?: string | null
           id?: string
-          platform_fee_amount_cents?: number | null
-          platform_fee_pct?: number | null
           payout_expected_at?: string | null
           payout_paid_at?: string | null
           payout_status?: string
           platform_fee?: number | null
-          total_price_cents?: number | null
-          creator_commission_pct?: number | null
-          creator_commission_amount_cents?: number | null
-          agent_commission_pct?: number | null
-          agent_commission_amount_cents?: number | null
           proposal_id?: string | null
           status?: string
           total_amount?: number | null
@@ -1817,31 +1729,18 @@ export type Database = {
           agent_id?: string | null
           agent_share?: number | null
           cancelled_at?: string | null
-          cancellation_policy_id?: string | null
-          commission_mode?: string | null
           created_at?: string
           creator_earnings?: number | null
           creator_id?: string | null
           creator_share?: number | null
           currency?: string | null
-          escrow_held_amount_cents?: number | null
-          escrow_on_hold_amount_cents?: number | null
-          escrow_released_amount_cents?: number | null
-          escrow_status?: string | null
           disputed_at?: string | null
           escrow_released_at?: string | null
           id?: string
-          platform_fee_amount_cents?: number | null
-          platform_fee_pct?: number | null
           payout_expected_at?: string | null
           payout_paid_at?: string | null
           payout_status?: string
           platform_fee?: number | null
-          total_price_cents?: number | null
-          creator_commission_pct?: number | null
-          creator_commission_amount_cents?: number | null
-          agent_commission_pct?: number | null
-          agent_commission_amount_cents?: number | null
           proposal_id?: string | null
           status?: string
           total_amount?: number | null
@@ -3190,36 +3089,30 @@ export type Database = {
           created_at: string
           id: string
           raised_by: string
+          reason: string | null
           resolution: string | null
-          resolved_at: string | null
           status: string
-          summary: string
-          details: string | null
-          type: string
+          updated_at: string
         }
         Insert: {
           booking_id: string
           created_at?: string
           id?: string
           raised_by: string
+          reason?: string | null
           resolution?: string | null
-          resolved_at?: string | null
           status?: string
-          summary: string
-          details?: string | null
-          type: string
+          updated_at?: string
         }
         Update: {
           booking_id?: string
           created_at?: string
           id?: string
           raised_by?: string
+          reason?: string | null
           resolution?: string | null
-          resolved_at?: string | null
           status?: string
-          summary?: string
-          details?: string | null
-          type?: string
+          updated_at?: string
         }
         Relationships: [
           {
@@ -4876,47 +4769,6 @@ export type Database = {
             columns: ["job_id"]
             isOneToOne: false
             referencedRelation: "marketplace_jobs"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      messages: {
-        Row: {
-          body: string
-          booking_id: string | null
-          conversation_id: string | null
-          created_at: string
-          id: string
-          recipient_id: string | null
-          safety_flag: string | null
-          sender_id: string
-        }
-        Insert: {
-          body: string
-          booking_id?: string | null
-          conversation_id?: string | null
-          created_at?: string
-          id?: string
-          recipient_id?: string | null
-          safety_flag?: string | null
-          sender_id: string
-        }
-        Update: {
-          body?: string
-          booking_id?: string | null
-          conversation_id?: string | null
-          created_at?: string
-          id?: string
-          recipient_id?: string | null
-          safety_flag?: string | null
-          sender_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "messages_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
             referencedColumns: ["id"]
           },
         ]
@@ -6887,7 +6739,6 @@ export type Database = {
           agent_agency_name: string | null
           agent_license_authority: string | null
           agent_license_number: string | null
-          agent_license_state: string | null
           agent_specialties: string[] | null
           agent_verification_status: string | null
           agent_years_experience: number | null
@@ -6917,7 +6768,6 @@ export type Database = {
           full_name: string | null
           has_completed_creator_onboarding: boolean | null
           home_base: string | null
-          kyc_status: string | null
           id: string
           instagram_handle: string | null
           instagram_username: string | null
@@ -6930,8 +6780,6 @@ export type Database = {
           location: string | null
           onboarding_completed: boolean
           payout_schedule: string | null
-          professional_insurance_provider: string | null
-          professional_insurance_policy: string | null
           phone: string | null
           preferences: Json | null
           preferred_currency: string | null
@@ -6957,8 +6805,6 @@ export type Database = {
           tiktok_username: string | null
           updated_at: string
           username: string | null
-          avg_rating: number | null
-          rating_count: number | null
           warning_count: number | null
           website: string | null
           welcome_shown: boolean
@@ -6970,7 +6816,6 @@ export type Database = {
           agent_agency_name?: string | null
           agent_license_authority?: string | null
           agent_license_number?: string | null
-          agent_license_state?: string | null
           agent_specialties?: string[] | null
           agent_verification_status?: string | null
           agent_years_experience?: number | null
@@ -7000,7 +6845,6 @@ export type Database = {
           full_name?: string | null
           has_completed_creator_onboarding?: boolean | null
           home_base?: string | null
-          kyc_status?: string | null
           id: string
           instagram_handle?: string | null
           instagram_username?: string | null
@@ -7013,8 +6857,6 @@ export type Database = {
           location?: string | null
           onboarding_completed?: boolean
           payout_schedule?: string | null
-          professional_insurance_provider?: string | null
-          professional_insurance_policy?: string | null
           phone?: string | null
           preferences?: Json | null
           preferred_currency?: string | null
@@ -7040,8 +6882,6 @@ export type Database = {
           tiktok_username?: string | null
           updated_at?: string
           username?: string | null
-          avg_rating?: number | null
-          rating_count?: number | null
           warning_count?: number | null
           website?: string | null
           welcome_shown?: boolean
@@ -7053,7 +6893,6 @@ export type Database = {
           agent_agency_name?: string | null
           agent_license_authority?: string | null
           agent_license_number?: string | null
-          agent_license_state?: string | null
           agent_specialties?: string[] | null
           agent_verification_status?: string | null
           agent_years_experience?: number | null
@@ -7083,7 +6922,6 @@ export type Database = {
           full_name?: string | null
           has_completed_creator_onboarding?: boolean | null
           home_base?: string | null
-          kyc_status?: string | null
           id?: string
           instagram_handle?: string | null
           instagram_username?: string | null
@@ -7096,8 +6934,6 @@ export type Database = {
           location?: string | null
           onboarding_completed?: boolean
           payout_schedule?: string | null
-          professional_insurance_provider?: string | null
-          professional_insurance_policy?: string | null
           phone?: string | null
           preferences?: Json | null
           preferred_currency?: string | null
@@ -7123,8 +6959,6 @@ export type Database = {
           tiktok_username?: string | null
           updated_at?: string
           username?: string | null
-          avg_rating?: number | null
-          rating_count?: number | null
           warning_count?: number | null
           website?: string | null
           welcome_shown?: boolean
@@ -7502,47 +7336,6 @@ export type Database = {
           status?: string
         }
         Relationships: []
-      }
-      reviews: {
-        Row: {
-          agent_id: string | null
-          booking_id: string
-          comment: string | null
-          created_at: string
-          creator_id: string | null
-          id: string
-          rating: number
-          reviewer_id: string
-        }
-        Insert: {
-          agent_id?: string | null
-          booking_id: string
-          comment?: string | null
-          created_at?: string
-          creator_id?: string | null
-          id?: string
-          rating: number
-          reviewer_id: string
-        }
-        Update: {
-          agent_id?: string | null
-          booking_id?: string
-          comment?: string | null
-          created_at?: string
-          creator_id?: string | null
-          id?: string
-          rating?: number
-          reviewer_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "reviews_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       search_cache: {
         Row: {
@@ -9594,8 +9387,6 @@ export type Database = {
       trip_proposals: {
         Row: {
           accepted_at: string | null
-          agent_commission_pct: number | null
-          agent_id: string | null
           created_at: string
           currency: string | null
           declined_at: string | null
@@ -9609,8 +9400,6 @@ export type Database = {
           price_from: number | null
           proposer_id: string
           proposer_role: string
-          creator_commission_pct: number | null
-          creator_id: string | null
           status: string
           trip_request_id: string
           updated_at: string
@@ -9619,8 +9408,6 @@ export type Database = {
         }
         Insert: {
           accepted_at?: string | null
-          agent_commission_pct?: number | null
-          agent_id?: string | null
           created_at?: string
           currency?: string | null
           declined_at?: string | null
@@ -9634,8 +9421,6 @@ export type Database = {
           price_from?: number | null
           proposer_id: string
           proposer_role: string
-          creator_commission_pct?: number | null
-          creator_id?: string | null
           status?: string
           trip_request_id: string
           updated_at?: string
@@ -9644,8 +9429,6 @@ export type Database = {
         }
         Update: {
           accepted_at?: string | null
-          agent_commission_pct?: number | null
-          agent_id?: string | null
           created_at?: string
           currency?: string | null
           declined_at?: string | null
@@ -9659,8 +9442,6 @@ export type Database = {
           price_from?: number | null
           proposer_id?: string
           proposer_role?: string
-          creator_commission_pct?: number | null
-          creator_id?: string | null
           status?: string
           trip_request_id?: string
           updated_at?: string
