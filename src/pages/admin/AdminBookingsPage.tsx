@@ -31,7 +31,7 @@ export default function AdminBookingsPage() {
         const { data, error: bookingsError } = await supabase
           .from("bookings")
           .select(
-            "id, traveler_id, creator_id, agent_id, total_price_cents, currency, platform_fee_amount_cents, creator_commission_amount_cents, agent_commission_amount_cents, commission_mode, status"
+            "id, traveler_id, creator_id, agent_id, total_amount, currency, platform_fee, creator_earnings, agent_earnings, status"
           )
           .order("created_at", { ascending: false })
           .limit(50);
@@ -49,10 +49,10 @@ export default function AdminBookingsPage() {
         if (profileIds.size) {
           const { data: profiles } = await supabase
             .from("profiles")
-            .select("id, display_name")
+            .select("id, full_name, username")
             .in("id", Array.from(profileIds));
 
-          profileMap = new Map((profiles || []).map((p) => [p.id, p.display_name || ""]));
+          profileMap = new Map((profiles || []).map((p) => [p.id, p.full_name || p.username || ""]));
         }
 
         if (cancelled) return;
@@ -63,12 +63,12 @@ export default function AdminBookingsPage() {
             traveler: profileMap.get(row.traveler_id || "") || "Guest",
             creator: row.creator_id ? profileMap.get(row.creator_id) || "Creator" : "—",
             agent: row.agent_id ? profileMap.get(row.agent_id) || "Agent" : "—",
-            totalPriceCents: row.total_price_cents,
+            totalPriceCents: row.total_amount,
             currency: row.currency,
-            platformFeeCents: row.platform_fee_amount_cents,
-            creatorAmountCents: row.creator_commission_amount_cents,
-            agentAmountCents: row.agent_commission_amount_cents,
-            commissionMode: row.commission_mode,
+            platformFeeCents: row.platform_fee,
+            creatorAmountCents: row.creator_earnings,
+            agentAmountCents: row.agent_earnings,
+            commissionMode: null,
             status: row.status,
           }))
         );

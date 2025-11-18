@@ -86,14 +86,14 @@ export default function AdminHomePage() {
             .gte("trips.start_date", new Date().toISOString().split("T")[0]),
           supabase
             .from("bookings")
-            .select("platform_fee_amount_cents, created_at")
+            .select("platform_fee, created_at")
             .gte("created_at", thirtyDaysAgo.toISOString()),
         ]);
 
         if (cancelled) return;
 
         const revenueCents = (revenueRows.data || []).reduce(
-          (sum, row) => sum + (row.platform_fee_amount_cents ?? 0),
+          (sum, row) => sum + (row.platform_fee ?? 0),
           0
         );
 

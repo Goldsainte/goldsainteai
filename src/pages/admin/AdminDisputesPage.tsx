@@ -30,7 +30,7 @@ export default function AdminDisputesPage() {
       try {
         const { data, error: disputeError } = await supabase
           .from("disputes")
-          .select("id, booking_id, raised_by, type, status, summary, created_at")
+          .select("id, booking_id, raised_by, reason, status, resolution, created_at")
           .order("created_at", { ascending: false });
 
         if (disputeError) throw disputeError;
@@ -42,19 +42,19 @@ export default function AdminDisputesPage() {
           bookingIds.length
             ? supabase
                 .from("bookings")
-                .select("id, escrow_status, total_price_cents, currency")
+                .select("id, payout_status, total_amount, currency")
                 .in("id", bookingIds)
             : Promise.resolve({ data: [] }),
           userIds.length
             ? supabase
                 .from("profiles")
-                .select("id, display_name")
+                .select("id, full_name, username")
                 .in("id", userIds)
             : Promise.resolve({ data: [] }),
         ]);
 
         const bookingMap = new Map((bookingRows.data || []).map((row: any) => [row.id, row]));
-        const profileMap = new Map((profileRows.data || []).map((row: any) => [row.id, row.display_name || "User"]));
+        const profileMap = new Map((profileRows.data || []).map((row: any) => [row.id, row.full_name || row.username || "User"]));
 
         if (cancelled) return;
 
@@ -65,12 +65,12 @@ export default function AdminDisputesPage() {
               id: row.id,
               bookingId: row.booking_id,
               raisedBy: profileMap.get(row.raised_by) || "Guest",
-              type: row.type,
+              type: row.reason || "dispute",
               status: row.status,
               createdAt: row.created_at,
-              summary: row.summary,
-              escrowStatus: booking.escrow_status || null,
-              totalPriceCents: booking.total_price_cents || null,
+              summary: row.resolution || "",
+              escrowStatus: booking.payout_status || null,
+              totalPriceCents: booking.total_amount || null,
               currency: booking.currency || "USD",
             };
           })
@@ -113,12 +113,12 @@ export default function AdminDisputesPage() {
       if (nextStatus === "RESOLVED") {
         await supabase
           .from("bookings")
-          .update({ escrow_status: "RELEASED" })
+          .update({ payout_status: "released" })
           .eq("id", dispute.bookingId);
       } else if (nextStatus === "UNDER_REVIEW") {
         await supabase
           .from("bookings")
-          .update({ escrow_status: "ON_HOLD" })
+          .update({ payout_status: "on_hold" })
           .eq("id", dispute.bookingId);
       }
 

@@ -402,8 +402,6 @@ export default function TripRequestDetailPage() {
       const booking = await createBookingFromProposal({
         tripId: trip.id,
         proposalId: accepted.id,
-        totalPriceCents,
-        platformCommissionCents,
       });
 
       // Refresh local trip + proposals state

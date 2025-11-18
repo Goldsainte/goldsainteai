@@ -77,22 +77,12 @@ export async function createBookingFromProposal(params: {
       proposal_id: proposal.id,
       status: "awaiting_payment",
       total_amount: total,
-      total_price_cents: total,
       currency: proposal.currency ?? "USD",
       platform_fee: commission.platformFeeAmount,
-      platform_fee_amount_cents: commission.platformFeeAmount,
-      platform_fee_pct: commission.platformPct,
-      commission_mode: commissionMode,
-      agent_share: agentId ? commission.agentAmount : null,
+      creator_earnings: creatorId ? commission.creatorAmount : null,
+      agent_earnings: agentId ? commission.agentAmount : null,
       creator_share: creatorId ? commission.creatorAmount : null,
-      agent_commission_amount_cents: agentId ? commission.agentAmount : null,
-      creator_commission_amount_cents: creatorId ? commission.creatorAmount : null,
-      agent_commission_pct: agentId ? commission.agentPct : null,
-      creator_commission_pct: creatorId ? commission.creatorPct : null,
-      escrow_status: "HELD",
-      escrow_held_amount_cents: partnerShare,
-      escrow_released_amount_cents: 0,
-      escrow_on_hold_amount_cents: 0,
+      agent_share: agentId ? commission.agentAmount : null,
     })
     .select("*")
     .single();
@@ -121,16 +111,16 @@ export async function createBookingFromProposal(params: {
     .eq("id", trip.id);
 
   if (booking?.id) {
-    const milestones = buildDefaultMilestones({
-      bookingId: booking.id,
-      createdAt: booking.created_at,
-      departureDate: trip.start_date,
-      completionDate: trip.end_date,
-    });
-
-    if (milestones.length) {
-      await supabase.from("booking_milestones").insert(milestones);
-    }
+    // Milestones disabled - table doesn't exist yet
+    // const milestones = buildDefaultMilestones({
+    //   bookingId: booking.id,
+    //   createdAt: booking.created_at,
+    //   departureDate: trip.start_date,
+    //   completionDate: trip.end_date,
+    // });
+    // if (milestones.length) {
+    //   await supabase.from("booking_milestones").insert(milestones);
+    // }
   }
 
   return booking;
