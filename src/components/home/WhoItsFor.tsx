@@ -23,16 +23,9 @@ export function WhoItsFor() {
         <div className="flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-12">
           {/* Left: Text content (60%) */}
           <div className="lg:w-[60%]">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#0C4D47] mb-4">
-              <span>Travelers</span>
-              <span className="h-[1px] w-4 bg-[#0C4D47]/30" />
-              <span>Creators</span>
-              <span className="h-[1px] w-4 bg-[#0C4D47]/30" />
-              <span>Agents</span>
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#0C4D47] mb-12">
+              <span>Who Goldsainte is for</span>
             </div>
-            <h2 className="font-display text-[28px] leading-snug text-[#0a2225] md:text-[34px] mb-12">
-              Who Goldsainte is for
-            </h2>
 
             {/* Three roles in columns */}
             <div className="grid gap-10 md:grid-cols-3 md:gap-8">
