@@ -22,26 +22,26 @@ export function TrustAndSafety() {
   ];
 
   return (
-    <section className="bg-[#f7f3ea] py-16 md:py-20">
+    <section className="bg-white py-20 md:py-24">
       <div className="mx-auto max-w-5xl px-4">
         <h2 className="text-center font-display text-[28px] leading-snug text-[#0a2225] md:text-[34px] mb-12">
           Trust, safety & payments
         </h2>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-8 md:grid-cols-2 md:gap-10">
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
               <div
                 key={index}
-                className="flex items-start gap-4 rounded-2xl border border-[#E5DFC6] bg-white/70 p-6"
+                className="flex items-start gap-4 rounded-xl border border-[#E5DFC6]/30 bg-white p-5 shadow-sm"
               >
                 <div className="flex-shrink-0">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0c4d47]/10">
-                    <Icon className="h-5 w-5 text-[#0c4d47]" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0c4d47]/10">
+                    <Icon className="h-4 w-4 text-[#0c4d47]" />
                   </div>
                 </div>
-                <p className="text-sm leading-relaxed text-[#4a4a4a]">
+                <p className="text-xs leading-[1.7] text-[#4a4a4a]">
                   {feature.text}
                 </p>
               </div>
