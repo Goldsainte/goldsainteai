@@ -23,7 +23,7 @@ export function WhoItsFor() {
         <div className="flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-12">
           {/* Left: Text content (60%) */}
           <div className="lg:w-[60%]">
-          <h2 className="text-center font-display text-[27px] leading-snug md:text-[32px] lg:text-[38px] text-[#0a2225] mb-12">
+          <h2 className="text-left font-display text-[27px] leading-snug md:text-[32px] lg:text-[38px] text-[#0a2225] mb-12">
             WHO IS <span className="italic">GOLDSAINTE AI</span> FOR
           </h2>
 
