@@ -142,6 +142,7 @@ const PlatformAnalyticsDashboard = lazy(() => import('@/components/PlatformAnaly
 const SystemHealth = lazy(() => import('@/pages/SystemHealth'));
 const Redirect = lazy(() => import('@/pages/Redirect'));
 const About = lazy(() => import('@/pages/About'));
+const BrandProfilePage = lazy(() => import('@/pages/BrandProfilePage'));
 const OnboardingProfilePage = lazy(() => import('@/pages/OnboardingProfilePage'));
 const TermsPage = lazy(() => import('@/pages/Terms'));
 const WhatWeDo = lazy(() => import('@/pages/WhatWeDo'));
@@ -237,6 +238,7 @@ export const AppRoutes = () => (
       />
       <Route path="/browse-agents" element={<BrowseAgents />} />
       <Route path="/browse-creators" element={<BrowseCreators />} />
+      <Route path="/brands/:profileId" element={<BrandProfilePage />} />
       <Route
         path="/trip-requests"
         element={(

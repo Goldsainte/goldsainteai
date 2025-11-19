@@ -1,6 +1,6 @@
 interface MarketplaceTabsProps {
   activeTab: string;
-  onTabChange: (tab: "trips" | "creators" | "agents" | "trip-requests") => void;
+  onTabChange: (tab: "trips" | "creators" | "agents" | "brands" | "trip-requests") => void;
 }
 
 export function MarketplaceTabs({ activeTab, onTabChange }: MarketplaceTabsProps) {
@@ -8,6 +8,7 @@ export function MarketplaceTabs({ activeTab, onTabChange }: MarketplaceTabsProps
     { id: "trips", label: "Trips" },
     { id: "creators", label: "Creators" },
     { id: "agents", label: "Agents" },
+    { id: "brands", label: "Brands" },
     { id: "trip-requests", label: "Trip Requests" },
   ] as const;
 

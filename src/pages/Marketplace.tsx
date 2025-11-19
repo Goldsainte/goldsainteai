@@ -10,12 +10,14 @@ import { TripGrid } from "@/components/marketplace/TripGrid";
 import { CreatorGrid } from "@/components/marketplace/CreatorGrid";
 import { AgentGrid } from "@/components/marketplace/AgentGrid";
 import { TripRequestGrid } from "@/components/marketplace/TripRequestGrid";
+import { BrandGrid } from "@/components/marketplace/BrandGrid";
+import type { BrandSummary } from "@/components/marketplace/BrandCard";
 import { EmptyState } from "@/components/marketplace/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 
-type Tab = "trips" | "creators" | "agents" | "trip-requests";
+type Tab = "trips" | "creators" | "agents" | "brands" | "trip-requests";
 
 export interface SearchFilters {
   destination?: string;
@@ -136,6 +138,33 @@ export default function Marketplace() {
     enabled: activeTab === "trip-requests",
   });
 
+  const { data: brands, isLoading: isLoadingBrands } = useQuery<BrandSummary[]>({
+    queryKey: ["marketplace-brands"],
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke("ai-brand-discovery", {
+        body: { userId: user?.id },
+      });
+
+      if (error) throw error;
+
+      const matches = (data?.matches || []) as any[];
+
+      return matches.map((b: any) => ({
+        profile_id: b.profile_id,
+        name: b.name,
+        avatar_url: b.avatar_url,
+        bio: b.bio,
+        categories: b.categories,
+        regions: b.regions,
+        supplier_type: b.supplier_type,
+        supplier_rating: b.supplier_rating,
+        supplier_reviews: b.supplier_reviews,
+        match_score: b.match_score,
+      }));
+    },
+    enabled: activeTab === "brands" && !!user,
+  });
+
   const handleSearch = (newFilters: SearchFilters) => {
     setFilters(newFilters);
   };
@@ -191,6 +220,29 @@ export default function Marketplace() {
         return <EmptyState type="agents" onAction={() => navigate("/browse-agents")} />;
       }
       return <AgentGrid agents={agents} />;
+    }
+
+    if (activeTab === "brands") {
+      if (isLoadingBrands) {
+        return (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[...Array(6)].map((_, i) => (
+              <Skeleton key={i} className="h-64 rounded-2xl" />
+            ))}
+          </div>
+        );
+      }
+
+      if (!brands?.length) {
+        return (
+          <EmptyState
+            type="agents"
+            onAction={() => navigate("/marketplace")}
+          />
+        );
+      }
+
+      return <BrandGrid brands={brands} />;
     }
 
     if (activeTab === "trip-requests") {

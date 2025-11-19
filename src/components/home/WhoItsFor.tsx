@@ -13,13 +13,15 @@ export function WhoItsFor() {
               <span>Creators</span>
               <span className="h-[1px] w-4 bg-[#0C4D47]/30" />
               <span>Agents</span>
+              <span className="h-[1px] w-4 bg-[#0C4D47]/30" />
+              <span>Brands</span>
             </div>
 
             <h2 className="text-left font-display text-3xl leading-snug md:text-4xl lg:text-[42px] text-[#0a2225] mb-12">
               Who is <span className="italic">Goldsainte AI</span> for...
             </h2>
 
-            {/* Three roles in columns */}
+            {/* Four roles in columns */}
             <div className="grid gap-6 md:grid-cols-2 md:gap-8">
               {/* Travelers */}
               <div className="relative border border-[#BFAD72] rounded-2xl p-6 bg-white/50 transition-all duration-300 hover:shadow-sm">
@@ -80,6 +82,27 @@ export function WhoItsFor() {
                   <li className="flex items-start gap-2">
                     <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#BFAD72]"></span>
                     <span>Manage payments and protection through Goldsainte's escrow and identity checks.</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Brands */}
+              <div className="relative border border-[#BFAD72] rounded-2xl p-6 bg-white/50 transition-all duration-300 hover:shadow-sm">
+                <div className="inline-flex items-center rounded-full bg-[#0c4d47] px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-[#BFAD72] mb-4">
+                  BRANDS
+                </div>
+                <ul className="space-y-3 text-sm leading-[1.7] text-[#4a4a4a]">
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#BFAD72]"></span>
+                    <span>Reach affluent travelers at the moment of trip inspiration and planning.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#BFAD72]"></span>
+                    <span>Get AI-matched to travelers whose aesthetic and preferences align with your brand.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#BFAD72]"></span>
+                    <span>Collaborate with vetted creators and agents for authentic, bookable partnerships.</span>
                   </li>
                 </ul>
               </div>
