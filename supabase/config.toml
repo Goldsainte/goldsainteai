@@ -1,5 +1,8 @@
 project_id = "iwdevxltjuedijrcdejs"
 
+[functions.ai-brand-discovery]
+verify_jwt = false
+
 [functions.get-promoted-vendors]
 verify_jwt = false
 

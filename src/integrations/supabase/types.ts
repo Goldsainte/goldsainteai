@@ -307,6 +307,20 @@ export type Database = {
             foreignKeyName: "agent_applications_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: true
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "agent_applications_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: true
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "agent_applications_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -316,6 +330,20 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_applications_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "agent_applications_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "agent_applications_reviewed_by_fkey"
@@ -2219,6 +2247,20 @@ export type Database = {
             foreignKeyName: "commission_payout_requests_processed_by_fkey"
             columns: ["processed_by"]
             isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "commission_payout_requests_processed_by_fkey"
+            columns: ["processed_by"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "commission_payout_requests_processed_by_fkey"
+            columns: ["processed_by"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -2228,6 +2270,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commission_payout_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "commission_payout_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "commission_payout_requests_user_id_fkey"
@@ -2361,6 +2417,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "trip_requests"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concierge_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "concierge_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "concierge_sessions_user_id_fkey"
@@ -3355,6 +3425,20 @@ export type Database = {
             foreignKeyName: "favorites_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "favorites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "favorites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -3701,6 +3785,20 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "influencer_promotions_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "influencer_promotions_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "influencer_promotions_influencer_id_fkey"
             columns: ["influencer_id"]
@@ -5093,6 +5191,20 @@ export type Database = {
             foreignKeyName: "moments_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "moments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "moments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -5836,6 +5948,20 @@ export type Database = {
             foreignKeyName: "packaged_trips_creator_id_fkey"
             columns: ["creator_id"]
             isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "packaged_trips_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "packaged_trips_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -5890,6 +6016,20 @@ export type Database = {
             foreignKeyName: "paid_partnerships_brand_id_fkey"
             columns: ["brand_id"]
             isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "paid_partnerships_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "paid_partnerships_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -5899,6 +6039,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paid_partnerships_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "paid_partnerships_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "paid_partnerships_creator_id_fkey"
@@ -7489,6 +7643,20 @@ export type Database = {
           wholesale_cost?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "shared_commission_bookings_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "shared_commission_bookings_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "shared_commission_bookings_customer_id_fkey"
             columns: ["customer_id"]
@@ -11494,6 +11662,27 @@ export type Database = {
       }
     }
     Views: {
+      brand_profiles_discovery: {
+        Row: {
+          account_type: string | null
+          avatar_url: string | null
+          bio: string | null
+          categories: string[] | null
+          country: string | null
+          created_at: string | null
+          name: string | null
+          profile_id: string | null
+          regions: string[] | null
+          supplier_name: string | null
+          supplier_rating: number | null
+          supplier_reviews: number | null
+          supplier_type: string | null
+          supplier_verified: boolean | null
+          tags: string[] | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
       platform_analytics: {
         Row: {
           active_agents: number | null
