@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import OpenAI from "https://esm.sh/openai@4.38.2";
+import { enforceRateLimit } from "../_utils/rate-limit.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -113,6 +114,17 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     if (tripError || !trip) throw tripError ?? new Error("Trip not found");
+
+    const rateLimitResponse = await enforceRateLimit({
+      keyType: "ai",
+      userId: trip.user_id,
+      req,
+      corsHeaders,
+    });
+
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
 
     const { data: travelerEmbedding } = await supabase
       .from("traveler_embeddings")

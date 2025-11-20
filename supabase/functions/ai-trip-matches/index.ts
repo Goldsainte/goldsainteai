@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { enforceRateLimit } from "../_utils/rate-limit.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -51,7 +52,7 @@ Deno.serve(async (req) => {
     // Load the trip
     const { data: trip, error: tripError } = await supabase
       .from("trips")
-      .select("id, destination, description, budget_range")
+      .select("id, user_id, destination, description, budget_range")
       .eq("id", tripId)
       .maybeSingle();
 
@@ -61,6 +62,17 @@ Deno.serve(async (req) => {
         JSON.stringify({ error: "Trip not found" }),
         { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    const rateLimitResponse = await enforceRateLimit({
+      keyType: "ai",
+      userId: trip.user_id,
+      req,
+      corsHeaders,
+    });
+
+    if (rateLimitResponse) {
+      return rateLimitResponse;
     }
 
     const destination = (trip.destination || "").toLowerCase();
