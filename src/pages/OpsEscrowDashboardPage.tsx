@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -57,6 +59,13 @@ export default function OpsEscrowDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<BookingStatus | "all">("in_escrow");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bulkStatus, setBulkStatus] = useState<BookingStatus | "">("");
+  const [bulkReason, setBulkReason] = useState("");
+  const [bulkUpdating, setBulkUpdating] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -75,9 +84,29 @@ export default function OpsEscrowDashboardPage() {
   }, []);
 
   const filtered = useMemo(() => {
-    if (statusFilter === "all") return rows;
-    return rows.filter((r) => r.booking_status === statusFilter);
-  }, [rows, statusFilter]);
+    let data = statusFilter === "all" ? rows : rows.filter((r) => r.booking_status === statusFilter);
+
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      data = data.filter((r) =>
+        (r.destination || "").toLowerCase().includes(term) ||
+        (r.brand_name || "").toLowerCase().includes(term) ||
+        r.booking_id.toLowerCase().includes(term)
+      );
+    }
+
+    if (dateFrom) {
+      const fromDate = new Date(dateFrom).getTime();
+      data = data.filter((r) => new Date(r.booking_created_at).getTime() >= fromDate);
+    }
+
+    if (dateTo) {
+      const toDate = new Date(dateTo).getTime();
+      data = data.filter((r) => new Date(r.booking_created_at).getTime() <= toDate);
+    }
+
+    return data;
+  }, [rows, statusFilter, searchTerm, dateFrom, dateTo]);
 
   const totals = useMemo(() => {
     let inEscrow = 0;
@@ -119,6 +148,24 @@ export default function OpsEscrowDashboardPage() {
     refunded: "bg-purple-50 text-purple-800 border-purple-200",
   };
 
+  const allSelected =
+    filtered.length > 0 && filtered.every((r) => selectedIds.includes(r.booking_id));
+
+  const toggleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(filtered.map((r) => r.booking_id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const toggleSelectRow = (id: string, checked: boolean) => {
+    setSelectedIds((prev) => {
+      if (checked) return Array.from(new Set([...prev, id]));
+      return prev.filter((item) => item !== id);
+    });
+  };
+
   const handleStatusUpdate = async (
     bookingId: string,
     newStatus: BookingStatus
@@ -130,6 +177,7 @@ export default function OpsEscrowDashboardPage() {
         {
           p_booking_id: bookingId,
           p_new_status: newStatus,
+          p_reason: "Updated from Ops dashboard",
         }
       );
       if (error) throw error;
@@ -148,6 +196,74 @@ export default function OpsEscrowDashboardPage() {
     }
   };
 
+  const handleBulkUpdate = async () => {
+    if (!bulkStatus || selectedIds.length === 0) return;
+    setBulkUpdating(true);
+    try {
+      const { error } = await supabase.rpc(
+        "admin_bulk_update_trip_booking_status",
+        {
+          p_booking_ids: selectedIds,
+          p_new_status: bulkStatus,
+          p_reason: bulkReason || "Bulk update from Ops dashboard",
+        }
+      );
+      if (error) throw error;
+
+      setRows((prev) =>
+        prev.map((r) =>
+          selectedIds.includes(r.booking_id)
+            ? { ...r, booking_status: bulkStatus, booking_updated_at: new Date().toISOString() }
+            : r
+        )
+      );
+      setSelectedIds([]);
+      setBulkStatus("");
+      setBulkReason("");
+    } catch (err) {
+      console.error("Failed to bulk update", err);
+    } finally {
+      setBulkUpdating(false);
+    }
+  };
+
+  const handleExportCsv = () => {
+    if (filtered.length === 0) return;
+    const headers = [
+      "booking_id",
+      "status",
+      "destination",
+      "brand_name",
+      "collection_title",
+      "amount",
+      "currency",
+      "created_at",
+    ];
+
+    const rowsCsv = filtered.map((r) => {
+      const values = [
+        r.booking_id,
+        r.booking_status,
+        r.destination ?? "",
+        r.brand_name ?? "",
+        r.collection_title ?? "",
+        (r.amount_total_cents / 100).toFixed(2),
+        r.currency,
+        r.booking_created_at,
+      ];
+      return values.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",");
+    });
+
+    const csv = [headers.join(","), ...rowsCsv].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "trip_bookings.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <>
       <Helmet>
@@ -164,25 +280,48 @@ export default function OpsEscrowDashboardPage() {
               Track trip payments in escrow, payouts to partners, and refunds.
             </p>
           </div>
-          <Select
-            value={statusFilter}
-            onValueChange={(v) =>
-              setStatusFilter(v as BookingStatus | "all")
-            }
-          >
-            <SelectTrigger className="w-40 h-8 text-xs">
-              <SelectValue placeholder="Filter status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
-              <SelectItem value="in_escrow">In escrow</SelectItem>
-              <SelectItem value="payment_pending">Payment pending</SelectItem>
-              <SelectItem value="paid_out">Paid out</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
-              <SelectItem value="refunded">Refunded</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex flex-wrap items-center gap-2">
+            <Input
+              placeholder="Search destination, brand, or booking ID"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="h-8 w-64 text-xs"
+            />
+            <Input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className="h-8 w-40 text-xs"
+            />
+            <Input
+              type="date"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+              className="h-8 w-40 text-xs"
+            />
+            <Select
+              value={statusFilter}
+              onValueChange={(v) =>
+                setStatusFilter(v as BookingStatus | "all")
+              }
+            >
+              <SelectTrigger className="w-36 h-8 text-xs">
+                <SelectValue placeholder="Filter status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All statuses</SelectItem>
+                <SelectItem value="in_escrow">In escrow</SelectItem>
+                <SelectItem value="payment_pending">Payment pending</SelectItem>
+                <SelectItem value="paid_out">Paid out</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+                <SelectItem value="refunded">Refunded</SelectItem>
+                <SelectItem value="draft">Draft</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="outline" className="h-8 text-xs" onClick={handleExportCsv}>
+              Export CSV
+            </Button>
+          </div>
         </header>
 
         {/* Summary cards */}
@@ -231,10 +370,52 @@ export default function OpsEscrowDashboardPage() {
               Bookings
             </p>
           </div>
+          <div className="flex flex-wrap items-center gap-2 px-4 py-3">
+            <Checkbox
+              checked={allSelected}
+              onCheckedChange={(checked) => toggleSelectAll(!!checked)}
+              className="h-4 w-4"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              {selectedIds.length} selected
+            </p>
+            <Select value={bulkStatus} onValueChange={(v) => setBulkStatus(v as BookingStatus)}>
+              <SelectTrigger className="w-40 h-8 text-xs">
+                <SelectValue placeholder="Bulk status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="in_escrow">In escrow</SelectItem>
+                <SelectItem value="paid_out">Paid out</SelectItem>
+                <SelectItem value="refunded">Refunded</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
+            <Input
+              placeholder="Reason (optional)"
+              value={bulkReason}
+              onChange={(e) => setBulkReason(e.target.value)}
+              className="h-8 w-56 text-xs"
+            />
+            <Button
+              size="sm"
+              className="h-8 text-xs"
+              disabled={!bulkStatus || selectedIds.length === 0 || bulkUpdating}
+              onClick={handleBulkUpdate}
+            >
+              Apply to selected
+            </Button>
+          </div>
           <div className="max-h-[520px] overflow-auto">
             <Table>
               <TableHeader>
                 <TableRow className="text-[11px] text-muted-foreground">
+                  <TableHead className="w-10">
+                    <Checkbox
+                      checked={allSelected}
+                      onCheckedChange={(checked) => toggleSelectAll(!!checked)}
+                      className="h-4 w-4"
+                    />
+                  </TableHead>
                   <TableHead>Trip</TableHead>
                   <TableHead>Brand / Collection</TableHead>
                   <TableHead>Amount</TableHead>
@@ -246,13 +427,13 @@ export default function OpsEscrowDashboardPage() {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-xs text-center">
+                    <TableCell colSpan={7} className="text-xs text-center">
                       Loading…
                     </TableCell>
                   </TableRow>
                 ) : filtered.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-xs text-center">
+                    <TableCell colSpan={7} className="text-xs text-center">
                       No bookings found for this filter.
                     </TableCell>
                   </TableRow>
@@ -265,6 +446,13 @@ export default function OpsEscrowDashboardPage() {
                     
                     return (
                       <TableRow key={r.booking_id} className="text-xs">
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedIds.includes(r.booking_id)}
+                            onCheckedChange={(checked) => toggleSelectRow(r.booking_id, !!checked)}
+                            className="h-4 w-4"
+                          />
+                        </TableCell>
                         <TableCell>
                           <div className="space-y-0.5">
                             <p className="font-semibold text-foreground">

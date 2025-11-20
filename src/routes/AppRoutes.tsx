@@ -58,6 +58,8 @@ const TripRequestDetailPage = lazy(() => import('@/pages/TripRequestDetailPage')
 const TripChatPage = lazy(() => import('@/pages/TripChatPage'));
 const MyTripRequestsPage = lazy(() => import('@/pages/MyTripRequestsPage'));
 const MyTripMatchesPage = lazy(() => import('@/pages/MyTripMatches'));
+const TripInboxPage = lazy(() => import('@/pages/TripInboxPage'));
+const TravelerHomePage = lazy(() => import('@/pages/TravelerHomePage'));
 const MyTripsPage = lazy(() => import('@/pages/trips/MyTripsPage'));
 const PostTripPage = lazy(() => import('@/pages/trips/PostTripPage'));
 const TripRequestDetailPageNew = lazy(() => import('@/pages/trips/TripRequestDetailPage'));
@@ -156,6 +158,9 @@ const PrivacyCookies = lazy(() => import('@/pages/PrivacyCookies'));
 const HelpCenter = lazy(() => import('@/pages/HelpCenter'));
 const CommunityGuidelines = lazy(() => import('@/pages/CommunityGuidelines'));
 const TrustSafety = lazy(() => import('@/pages/TrustSafety'));
+const LegalTermsPage = lazy(() => import('@/pages/LegalTermsPage'));
+const LegalPrivacyPage = lazy(() => import('@/pages/LegalPrivacyPage'));
+const TrustSafetyPage = lazy(() => import('@/pages/TrustSafetyPage'));
 const CancellationRefundPolicy = lazy(() => import('@/pages/CancellationRefundPolicy'));
 const CorporateContact = lazy(() => import('@/pages/CorporateContact'));
 const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
@@ -180,6 +185,9 @@ export const AppRoutes = () => (
       <Route path="/help" element={<HelpCenter />} />
       <Route path="/community-guidelines" element={<CommunityGuidelines />} />
       <Route path="/trust-safety" element={<TrustSafety />} />
+      <Route path="/trust-and-safety" element={<TrustSafetyPage />} />
+      <Route path="/legal/terms" element={<LegalTermsPage />} />
+      <Route path="/legal/privacy" element={<LegalPrivacyPage />} />
       <Route path="/cancellation-refund-policy" element={<CancellationRefundPolicy />} />
       <Route path="/corporate-contact" element={<CorporateContact />} />
       <Route path="/shop" element={<Shop />} />
@@ -283,6 +291,22 @@ export const AppRoutes = () => (
         element={(
           <RequireAuth>
             <MyTripMatchesPage />
+          </RequireAuth>
+        )}
+      />
+      <Route
+        path="/traveler"
+        element={(
+          <RequireAuth>
+            <TravelerHomePage />
+          </RequireAuth>
+        )}
+      />
+      <Route
+        path="/trips"
+        element={(
+          <RequireAuth>
+            <TripInboxPage />
           </RequireAuth>
         )}
       />
