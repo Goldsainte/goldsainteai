@@ -7,7 +7,7 @@ import { RoleSpecificCTAs } from "@/components/home/RoleSpecificCTAs";
 
 export default function HomePage() {
   return (
-    <main className="bg-[#f7f3ea] text-[#0a2225] min-h-screen">
+    <main className="bg-[#f7f3ea] text-[#0a2225] min-h-screen overflow-x-hidden pb-20 sm:pb-0">
       <HomeHero />
       <WhoItsFor />
       <HowItWorksTimeline />

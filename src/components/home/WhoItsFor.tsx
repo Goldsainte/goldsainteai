@@ -1,23 +1,25 @@
 // src/components/home/WhoItsFor.tsx
 export function WhoItsFor() {
   return (
-    <section className="bg-white border-y border-[#E5DFC6]/30 py-20 md:py-24">
-      <div className="mx-auto max-w-6xl px-4">
+    <section className="bg-white border-y border-[#E5DFC6]/30 py-16 sm:py-20 md:py-24">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-12">
           {/* Left: Text content (52%) */}
           <div className="lg:w-[52%]">
-            {/* Pill badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#0C4D47] mb-5">
-              <span>Travelers</span>
-              <span className="h-[1px] w-4 bg-[#0C4D47]/30" />
-              <span>Creators</span>
-              <span className="h-[1px] w-4 bg-[#0C4D47]/30" />
-              <span>Agents</span>
-              <span className="h-[1px] w-4 bg-[#0C4D47]/30" />
-              <span>Brands</span>
+            {/* Pill badge - single row scrollable on mobile */}
+            <div className="overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 mb-5">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-2.5 py-1 text-[10px] sm:text-xs uppercase tracking-[0.12em] sm:tracking-[0.18em] text-[#0C4D47] whitespace-nowrap">
+                <span>Travelers</span>
+                <span className="h-[1px] w-3 sm:w-4 bg-[#0C4D47]/30" />
+                <span>Creators</span>
+                <span className="h-[1px] w-3 sm:w-4 bg-[#0C4D47]/30" />
+                <span>Agents</span>
+                <span className="h-[1px] w-3 sm:w-4 bg-[#0C4D47]/30" />
+                <span>Brands</span>
+              </div>
             </div>
 
-            <h2 className="text-left font-display text-3xl leading-snug md:text-4xl lg:text-[42px] text-[#0a2225] mb-12">
+            <h2 className="text-left font-display text-2xl leading-snug sm:text-3xl md:text-4xl lg:text-[42px] text-[#0a2225] mb-8 sm:mb-12 max-w-full">
               Built for every side of luxury travel
             </h2>
 
