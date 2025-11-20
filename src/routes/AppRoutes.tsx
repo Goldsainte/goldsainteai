@@ -20,6 +20,7 @@ const SearchResults = lazy(() => import('@/pages/SearchResults'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const BrandOnboardingPage = lazy(() => import('@/pages/BrandOnboardingPage'));
 const BrandConsolePage = lazy(() => import('@/pages/BrandConsolePage'));
+const BrandCollectionDetailPage = lazy(() => import('@/pages/BrandCollectionDetailPage'));
 const AdminDashboardPage = lazy(() => import('@/pages/admin/AdminDashboardPage'));
 const AdminSafetyDashboardPage = lazy(() => import('@/pages/admin/AdminSafetyDashboardPage'));
 const AdminAgentsPage = lazy(() => import('@/pages/admin/AdminAgentsPage'));
@@ -242,6 +243,7 @@ export const AppRoutes = () => (
       <Route path="/browse-agents" element={<BrowseAgents />} />
       <Route path="/browse-creators" element={<BrowseCreators />} />
       <Route path="/brands/:profileId" element={<BrandProfilePage />} />
+      <Route path="/brands/:profileId/collections/:collectionId" element={<BrandCollectionDetailPage />} />
       <Route
         path="/trip-requests"
         element={(

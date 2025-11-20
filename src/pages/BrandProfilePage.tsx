@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { TravelStoryboard } from "@/components/storyboards/TravelStoryboard";
@@ -16,9 +16,21 @@ interface BrandProfile {
   supplier_reviews?: number | null;
 }
 
+interface BrandCollection {
+  id: string;
+  title: string;
+  description: string | null;
+  cover_image_url: string | null;
+  tags: string[] | null;
+  is_published: boolean;
+  sort_order: number | null;
+}
+
 export default function BrandProfilePage() {
   const { profileId } = useParams();
+  const navigate = useNavigate();
   const [brand, setBrand] = useState<BrandProfile | null>(null);
+  const [collections, setCollections] = useState<BrandCollection[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -41,7 +53,21 @@ export default function BrandProfilePage() {
         if (response.ok) {
           const data = await response.json();
           if (data && data.length > 0) {
-            setBrand(data[0] as BrandProfile);
+            const brandData = data[0] as BrandProfile;
+            setBrand(brandData);
+            
+            // Load collections for this brand
+            const { data: collData } = await supabase
+              .from("brand_collections")
+              .select("id, title, description, cover_image_url, tags, is_published, sort_order")
+              .eq("brand_profile_id", brandData.profile_id)
+              .eq("is_published", true)
+              .order("sort_order", { ascending: true })
+              .order("created_at", { ascending: false });
+
+            if (collData) {
+              setCollections(collData as BrandCollection[]);
+            }
           } else {
             setBrand(null);
           }
@@ -141,6 +167,65 @@ export default function BrandProfilePage() {
             <p className="mt-2 text-sm leading-relaxed text-[#0a2225]">
               {brand.bio}
             </p>
+          </section>
+        )}
+
+        {collections.length > 0 && (
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151]">
+                Collections
+              </h2>
+              <p className="text-[11px] text-[#8C8470]">
+                {collections.length} {collections.length === 1 ? 'board' : 'boards'}
+              </p>
+            </div>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {collections.map((c) => (
+                <div
+                  key={c.id}
+                  onClick={() => navigate(`/brands/${brand.profile_id}/collections/${c.id}`)}
+                  className="cursor-pointer rounded-2xl overflow-hidden border border-[#E5DFC6] bg-white hover:border-[#BFAD72] transition-colors"
+                >
+                  <div className="h-36 bg-[#F5F0E0]">
+                    {c.cover_image_url ? (
+                      <img
+                        src={c.cover_image_url}
+                        alt={c.title}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-full w-full bg-gradient-to-br from-[#F5F0E0] to-[#E5DFC6]" />
+                    )}
+                  </div>
+                  <div className="p-4 space-y-2">
+                    <h3 className="text-sm font-semibold text-[#0a2225]">{c.title}</h3>
+                    {c.description && (
+                      <p className="text-xs text-[#4a4a4a] line-clamp-2">
+                        {c.description}
+                      </p>
+                    )}
+                    {c.tags && c.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {c.tags.slice(0, 3).map((tag) => (
+                          <span
+                            key={tag}
+                            className="text-[10px] uppercase tracking-wide border border-[#E5DFC6] rounded-full px-2 py-0.5 text-[#7A7151]"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                        {c.tags.length > 3 && (
+                          <span className="text-[10px] uppercase tracking-wide text-[#8C8470]">
+                            +{c.tags.length - 3} more
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </section>
         )}
 
