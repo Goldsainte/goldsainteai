@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { enforceRateLimit } from "../_utils/rate-limit.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -22,6 +23,17 @@ Deno.serve(async (req) => {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    const rateLimitResponse = await enforceRateLimit({
+      keyType: "ai",
+      userId,
+      req,
+      corsHeaders,
+    });
+
+    if (rateLimitResponse) {
+      return rateLimitResponse;
     }
 
     const supabase = createClient(
