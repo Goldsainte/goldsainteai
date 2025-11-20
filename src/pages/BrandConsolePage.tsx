@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Upload, ChevronUp, ChevronDown, Image as ImageIcon } from "lucide-react";
+import { CollectionStatsWidget } from "@/components/brand/CollectionStatsWidget";
 
 interface BrandConsoleProfile {
   profile_id: string;
@@ -181,6 +182,10 @@ export default function BrandConsolePage() {
           </div>
         ) : (
           <>
+            {profile?.profile_id && (
+              <CollectionStatsWidget brandProfileId={profile.profile_id} />
+            )}
+
             {/* Metrics summary */}
             <section className="grid gap-4 md:grid-cols-4">
               <MetricCard

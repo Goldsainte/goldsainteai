@@ -82,38 +82,42 @@ export default function Onboarding() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 py-12 px-4">
-      <div className="container mx-auto max-w-5xl">
+    <div className="min-h-screen bg-gradient-to-b from-[#0a2225] via-[#0a2225]/95 to-[#0a2225]/80 py-12 px-4 text-[#E5DFC6]">
+      <div className="container mx-auto max-w-4xl space-y-6">
         <Button
           variant="ghost"
           onClick={() => navigate(-1)}
-          className="mb-6"
+          className="mb-2 text-[#E5DFC6] hover:text-white"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back
         </Button>
-        
-        <div className="flex flex-col items-center mb-8">
-          <img src={logomark} alt="Logo" className="h-16 w-16 mb-4" />
-          <h1 className="text-4xl font-secondary text-primary mb-2">Welcome to Goldsainte AI</h1>
-          <p className="text-lg text-muted-foreground text-center max-w-2xl">
-            Let's personalize your travel experience. Fill out your preferences so we can provide you with the best recommendations.
-          </p>
+
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-3">
+            <img src={logomark} alt="Logo" className="h-12 w-12" />
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.3em] text-[#E5DFC6]/70">Goldsainte traveler</p>
+              <h1 className="font-secondary text-3xl md:text-4xl leading-tight">Tell us how you like to travel</h1>
+            </div>
+          </div>
+          <div className="rounded-3xl bg-white/10 p-4 text-sm text-[#E5DFC6]/80">
+            <p className="font-semibold text-[#E5DFC6]">Madison</p>
+            <p className="mt-1">Think of this as a conversation. Tap the pills that feel right — energy level, what makes a place go viral to you, city vs. nature. We’ll turn it into your traveler DNA.</p>
+          </div>
         </div>
 
-        <Card className="border-[#E5DFC6] bg-white/95 backdrop-blur">
+        <Card className="border-[#E5DFC6]/60 bg-white text-[#0a2225]">
           <CardHeader>
-            <CardTitle className="text-2xl font-display text-[#0a2225]">Tell us about your travel style</CardTitle>
+            <CardTitle className="text-2xl font-display">Your travel DNA</CardTitle>
             <CardDescription className="text-[#4a4a4a]">
-              Help us personalize your experience and match you with the perfect trips, creators, and agents.
+              Mobile-first, single-column, with pill buttons so you can answer quickly.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <TravelerStyleVibeStep 
-              onComplete={handleSubmit}
-            />
-            
-            <div className="mt-6 text-center">
+          <CardContent className="space-y-4">
+            <TravelerStyleVibeStep onComplete={handleSubmit} />
+
+            <div className="text-center">
               <button
                 onClick={handleSkip}
                 className="text-sm text-[#7A7151] hover:text-[#0a2225] transition-colors"

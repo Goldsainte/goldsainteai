@@ -58,6 +58,8 @@ const TripRequestDetailPage = lazy(() => import('@/pages/TripRequestDetailPage')
 const TripChatPage = lazy(() => import('@/pages/TripChatPage'));
 const MyTripRequestsPage = lazy(() => import('@/pages/MyTripRequestsPage'));
 const MyTripMatchesPage = lazy(() => import('@/pages/MyTripMatches'));
+const TripInboxPage = lazy(() => import('@/pages/TripInboxPage'));
+const TravelerHomePage = lazy(() => import('@/pages/TravelerHomePage'));
 const MyTripsPage = lazy(() => import('@/pages/trips/MyTripsPage'));
 const PostTripPage = lazy(() => import('@/pages/trips/PostTripPage'));
 const TripRequestDetailPageNew = lazy(() => import('@/pages/trips/TripRequestDetailPage'));
@@ -289,6 +291,22 @@ export const AppRoutes = () => (
         element={(
           <RequireAuth>
             <MyTripMatchesPage />
+          </RequireAuth>
+        )}
+      />
+      <Route
+        path="/traveler"
+        element={(
+          <RequireAuth>
+            <TravelerHomePage />
+          </RequireAuth>
+        )}
+      />
+      <Route
+        path="/trips"
+        element={(
+          <RequireAuth>
+            <TripInboxPage />
           </RequireAuth>
         )}
       />
