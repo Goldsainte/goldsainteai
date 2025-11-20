@@ -9970,6 +9970,10 @@ export type Database = {
           occasion: string | null
           pace: string | null
           selected_proposal_id: string | null
+          source_brand_profile_id: string | null
+          source_collection_id: string | null
+          source_metadata: Json | null
+          source_type: string | null
           special_notes: string | null
           start_date: string | null
           status: string
@@ -10004,6 +10008,10 @@ export type Database = {
           occasion?: string | null
           pace?: string | null
           selected_proposal_id?: string | null
+          source_brand_profile_id?: string | null
+          source_collection_id?: string | null
+          source_metadata?: Json | null
+          source_type?: string | null
           special_notes?: string | null
           start_date?: string | null
           status?: string
@@ -10038,6 +10046,10 @@ export type Database = {
           occasion?: string | null
           pace?: string | null
           selected_proposal_id?: string | null
+          source_brand_profile_id?: string | null
+          source_collection_id?: string | null
+          source_metadata?: Json | null
+          source_type?: string | null
           special_notes?: string | null
           start_date?: string | null
           status?: string
@@ -10060,6 +10072,41 @@ export type Database = {
             columns: ["selected_proposal_id"]
             isOneToOne: false
             referencedRelation: "trip_proposals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_requests_source_brand_profile_id_fkey"
+            columns: ["source_brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "trip_requests_source_brand_profile_id_fkey"
+            columns: ["source_brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "trip_requests_source_brand_profile_id_fkey"
+            columns: ["source_brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_requests_source_brand_profile_id_fkey"
+            columns: ["source_brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_requests_source_collection_id_fkey"
+            columns: ["source_collection_id"]
+            isOneToOne: false
+            referencedRelation: "brand_collections"
             referencedColumns: ["id"]
           },
         ]

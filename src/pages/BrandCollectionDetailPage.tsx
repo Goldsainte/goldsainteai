@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { TravelStoryboard } from "@/components/storyboards/TravelStoryboard";
+import { TripRequestModal } from "@/components/trips/TripRequestModal";
 import { ArrowLeft, MapPin, MessageCircle } from "lucide-react";
 
 interface BrandProfile {
@@ -31,6 +32,7 @@ export default function BrandCollectionDetailPage() {
   const [brand, setBrand] = useState<BrandProfile | null>(null);
   const [collection, setCollection] = useState<BrandCollection | null>(null);
   const [loading, setLoading] = useState(true);
+  const [tripModalOpen, setTripModalOpen] = useState(false);
 
   // Load brand + collection
   useEffect(() => {
@@ -96,23 +98,16 @@ export default function BrandCollectionDetailPage() {
     [collection, brand]
   );
 
-  const handleTripInquiry = async () => {
+  const storyboardContext = useMemo(
+    () => ({
+      tags: collection?.tags ?? brand?.tags ?? [],
+    }),
+    [collection, brand]
+  );
+
+  const handleTripInquiry = () => {
     if (!brand || !collection) return;
-
-    // Log a trip inquiry originating from this collection
-    void supabase.rpc("log_brand_engagement", {
-      p_brand_profile_id: brand.profile_id,
-      p_event_type: "trip_inquiry",
-      p_context_type: "brand_collection",
-      p_context_id: collection.id,
-      p_metadata: {
-        source: "brand_collection",
-        collection_title: collection.title,
-      },
-    });
-
-    // Navigate to trip requests
-    navigate("/marketplace?tab=trip-requests", { replace: false });
+    setTripModalOpen(true);
   };
 
   if (loading) {
@@ -269,6 +264,16 @@ export default function BrandCollectionDetailPage() {
           />
         </section>
       </main>
+
+      {brand && collection && (
+        <TripRequestModal
+          open={tripModalOpen}
+          onClose={() => setTripModalOpen(false)}
+          brand={brand}
+          collection={collection}
+          storyboardContext={storyboardContext}
+        />
+      )}
     </>
   );
 }
