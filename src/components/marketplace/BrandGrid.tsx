@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { BrandSummary, BrandCard } from "./BrandCard";
+import { supabase } from "@/integrations/supabase/client";
 
 interface BrandGridProps {
   brands: BrandSummary[];
@@ -42,6 +43,26 @@ export function BrandGrid({ brands }: BrandGridProps) {
       }),
     [brands, search, categoryFilter, regionFilter]
   );
+
+  // Track brand discovery - fire once per session when brands are first shown
+  const hasTrackedRef = useRef(false);
+
+  useEffect(() => {
+    if (hasTrackedRef.current || filtered.length === 0) return;
+    hasTrackedRef.current = true;
+
+    // Log first 20 visible brands as "discovered"
+    // Session-level deduplication prevents duplicate tracking on page reloads
+    filtered.slice(0, 20).forEach((b) => {
+      void supabase.rpc("log_brand_engagement", {
+        p_brand_profile_id: b.profile_id,
+        p_event_type: "discovered",
+        p_context_type: "marketplace",
+        p_context_id: null,
+        p_metadata: {},
+      });
+    });
+  }, [filtered]);
 
   return (
     <div className="space-y-4">

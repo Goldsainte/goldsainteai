@@ -1793,6 +1793,192 @@ export type Database = {
           },
         ]
       }
+      brand_collections: {
+        Row: {
+          brand_profile_id: string
+          cover_image_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_published: boolean
+          sort_order: number | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          brand_profile_id: string
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_published?: boolean
+          sort_order?: number | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          brand_profile_id?: string
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_published?: boolean
+          sort_order?: number | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_collections_brand_profile_id_fkey"
+            columns: ["brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "brand_collections_brand_profile_id_fkey"
+            columns: ["brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "brand_collections_brand_profile_id_fkey"
+            columns: ["brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_collections_brand_profile_id_fkey"
+            columns: ["brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_engagement_daily_stats: {
+        Row: {
+          brand_profile_id: string
+          discovered_count: number
+          event_date: string
+          moodboard_save_count: number
+          profile_view_count: number
+          trip_inquiry_count: number
+        }
+        Insert: {
+          brand_profile_id: string
+          discovered_count?: number
+          event_date: string
+          moodboard_save_count?: number
+          profile_view_count?: number
+          trip_inquiry_count?: number
+        }
+        Update: {
+          brand_profile_id?: string
+          discovered_count?: number
+          event_date?: string
+          moodboard_save_count?: number
+          profile_view_count?: number
+          trip_inquiry_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_engagement_daily_stats_brand_profile_id_fkey"
+            columns: ["brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "brand_engagement_daily_stats_brand_profile_id_fkey"
+            columns: ["brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "brand_engagement_daily_stats_brand_profile_id_fkey"
+            columns: ["brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_engagement_daily_stats_brand_profile_id_fkey"
+            columns: ["brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_engagement_events: {
+        Row: {
+          actor_user_id: string | null
+          brand_profile_id: string
+          context_id: string | null
+          context_type: string | null
+          created_at: string
+          event_type: Database["public"]["Enums"]["brand_engagement_type"]
+          id: string
+          metadata: Json
+        }
+        Insert: {
+          actor_user_id?: string | null
+          brand_profile_id: string
+          context_id?: string | null
+          context_type?: string | null
+          created_at?: string
+          event_type: Database["public"]["Enums"]["brand_engagement_type"]
+          id?: string
+          metadata?: Json
+        }
+        Update: {
+          actor_user_id?: string | null
+          brand_profile_id?: string
+          context_id?: string | null
+          context_type?: string | null
+          created_at?: string
+          event_type?: Database["public"]["Enums"]["brand_engagement_type"]
+          id?: string
+          metadata?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_engagement_events_brand_profile_id_fkey"
+            columns: ["brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "brand_engagement_events_brand_profile_id_fkey"
+            columns: ["brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "brand_engagement_events_brand_profile_id_fkey"
+            columns: ["brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_engagement_events_brand_profile_id_fkey"
+            columns: ["brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brand_partnerships: {
         Row: {
           brand_id: string
@@ -11872,6 +12058,16 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_user_restricted: { Args: { target_user_id: string }; Returns: boolean }
+      log_brand_engagement: {
+        Args: {
+          p_brand_profile_id: string
+          p_context_id?: string
+          p_context_type?: string
+          p_event_type: Database["public"]["Enums"]["brand_engagement_type"]
+          p_metadata?: Json
+        }
+        Returns: undefined
+      }
       mark_conversation_messages_read: {
         Args: { p_conversation_id: string; p_user_type: string }
         Returns: undefined
@@ -11975,6 +12171,11 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user" | "agent" | "brand"
+      brand_engagement_type:
+        | "discovered"
+        | "profile_view"
+        | "moodboard_save"
+        | "trip_inquiry"
       subscription_tier: "free" | "premium" | "enterprise"
       supplier_type:
         | "hotel"
@@ -12112,6 +12313,12 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user", "agent", "brand"],
+      brand_engagement_type: [
+        "discovered",
+        "profile_view",
+        "moodboard_save",
+        "trip_inquiry",
+      ],
       subscription_tier: ["free", "premium", "enterprise"],
       supplier_type: [
         "hotel",

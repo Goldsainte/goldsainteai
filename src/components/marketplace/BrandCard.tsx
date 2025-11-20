@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Star, MapPin } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface BrandSummary {
   profile_id: string;
@@ -22,6 +23,15 @@ export function BrandCard({ brand }: BrandCardProps) {
   const navigate = useNavigate();
 
   const handleClick = () => {
+    // Fire-and-forget tracking - log profile_view event
+    void supabase.rpc("log_brand_engagement", {
+      p_brand_profile_id: brand.profile_id,
+      p_event_type: "profile_view",
+      p_context_type: "marketplace",
+      p_context_id: null,
+      p_metadata: {},
+    });
+
     navigate(`/brands/${brand.profile_id}`);
   };
 
