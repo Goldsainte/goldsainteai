@@ -12,9 +12,9 @@ interface TripInboxRow {
   id: string;
   destination: string | null;
   status: string | null;
-  date_range: string | null;
+  start_date: string | null;
+  end_date: string | null;
   created_at: string;
-  assignments?: { role: string; profiles?: { full_name?: string | null } | null }[];
 }
 
 const statusCopy: Record<string, string> = {
@@ -35,9 +35,7 @@ export default function TripInboxPage() {
     const load = async () => {
       const { data } = await supabase
         .from("trip_requests")
-        .select(
-          "id, destination, status, date_range, created_at, assignments:trip_assignments(role, profiles(full_name))"
-        )
+        .select("id, destination, status, start_date, end_date, created_at")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
@@ -78,8 +76,6 @@ export default function TripInboxPage() {
     return (
       <div className="grid gap-3 md:grid-cols-2">
         {rows.map((trip) => {
-          const creator = trip.assignments?.find((a) => a.role === "creator");
-          const agent = trip.assignments?.find((a) => a.role === "agent");
           return (
             <Card key={trip.id} className="rounded-3xl border-[#E5DFC6] bg-white">
               <CardContent className="space-y-2 py-4">
@@ -92,19 +88,11 @@ export default function TripInboxPage() {
                 <h3 className="text-lg font-semibold text-[#0a2225]">
                   {trip.destination || "Destination TBD"}
                 </h3>
-                <p className="text-sm text-[#4a4a4a]">{trip.date_range || "Flexible dates"}</p>
-                <div className="flex flex-wrap gap-2 text-[11px] text-[#7A7151]">
-                  {creator?.profiles?.full_name && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-[#F5F0E0] px-3 py-1">
-                      <Sparkles className="h-3 w-3" /> {creator.profiles.full_name}
-                    </span>
-                  )}
-                  {agent?.profiles?.full_name && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-[#F5F0E0] px-3 py-1">
-                      <MapPin className="h-3 w-3" /> {agent.profiles.full_name}
-                    </span>
-                  )}
-                </div>
+                <p className="text-sm text-[#4a4a4a]">
+                  {trip.start_date && trip.end_date
+                    ? `${new Date(trip.start_date).toLocaleDateString()} - ${new Date(trip.end_date).toLocaleDateString()}`
+                    : "Flexible dates"}
+                </p>
                 <Button asChild variant="ghost" className="rounded-full text-xs">
                   <Link to={`/trip/${trip.id}`}>Open trip</Link>
                 </Button>
