@@ -6,10 +6,8 @@ import { Button } from "@/components/ui/button";
 import { TravelStoryboard } from "@/components/storyboards/TravelStoryboard";
 import { TripRequestModal } from "@/components/trips/TripRequestModal";
 import { ArrowLeft, MapPin, MessageCircle } from "lucide-react";
-import {
-  CollectionActions,
-  CollectionItemsSection,
-} from "@/components/collections/CollectionDetailEnhancements";
+// CollectionActions and CollectionItemsSection components removed - not implemented yet
+// TODO: Implement these components when collection detail features are ready
 
 interface BrandProfile {
   profile_id: string;
@@ -237,7 +235,6 @@ export default function BrandCollectionDetailPage() {
               </div>
             </div>
             <div className="flex flex-col items-end gap-2 md:flex-row md:items-center">
-              <CollectionActions collectionId={collection.id} />
               <Button
                 size="sm"
                 className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] px-4 py-2 text-xs font-semibold uppercase tracking-wide text-[#E5DFC6]"
@@ -292,7 +289,7 @@ export default function BrandCollectionDetailPage() {
           </div>
         </section>
 
-        <CollectionItemsSection collectionId={collection.id} />
+        {/* Collection items section - to be implemented */}
 
         {/* Inspiration section – reuse TravelStoryboard */}
         <section className="space-y-3">
