@@ -6,14 +6,15 @@
 export type AccountType = "traveler" | "creator" | "agent" | "brand";
 
 export function getPostAuthDestination(
-  accountType: string | null | undefined
+  accountType: string | null | undefined,
+  onboardingCompleted?: boolean
 ): string {
   if (accountType === "creator" || accountType === "agent") {
     return "/partner";
   }
   
   if (accountType === "brand") {
-    return "/console/brand";
+    return onboardingCompleted ? "/console/brand" : "/brand/onboarding";
   }
   
   // Default: traveler goes to onboarding to set preferences

@@ -197,7 +197,7 @@ export const AppRoutes = () => (
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/onboarding/creator" element={<CreatorOnboardingPage />} />
-      <Route path="/onboarding/brand" element={<BrandOnboardingPage />} />
+      <Route path="/brand/onboarding" element={<BrandOnboardingPage />} />
       <Route path="/onboarding/profile" element={<OnboardingProfilePage />} />
       <Route path="/ai-agent-setup" element={<AIAgentOnboarding />} />
     </Route>
