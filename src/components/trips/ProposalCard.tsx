@@ -87,9 +87,14 @@ export function ProposalCard({
 
       if (tripError) throw tripError;
 
-      // 3. Create booking draft (using existing schema)
-      // Note: TypeScript types need regeneration - using type assertion
+      // 3. Create booking draft with commission calculations
       const { data: userData } = await supabase.auth.getUser();
+      const totalPriceCents = proposal.price_from || 0;
+      
+      // Calculate 15% platform commission
+      const platformCommission = Math.round(totalPriceCents * 0.15);
+      const partnerPayout = totalPriceCents - platformCommission;
+      
       const { error: bookingError } = await supabase.from("trip_bookings").upsert(
         [{
           trip_request_id: tripRequestId,
@@ -97,9 +102,9 @@ export function ProposalCard({
           traveler_id: userData.user?.id || "",
           partner_id: proposal.proposer_id,
           partner_role: proposal.proposer_role || "creator_agent",
-          total_price: proposal.price_from || 0,
-          platform_commission: 0,
-          partner_payout: 0,
+          total_price: totalPriceCents,
+          platform_commission: platformCommission,
+          partner_payout: partnerPayout,
           currency: proposal.currency || "usd",
           status: "draft",
         }] as any,

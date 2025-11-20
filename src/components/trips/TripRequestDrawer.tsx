@@ -25,6 +25,7 @@ import {
 import { TripStatusControls } from "@/components/trips/TripStatusControls";
 import { useTripRequestMessages } from "@/hooks/useTripRequestMessages";
 import { TripChatProposal } from "@/components/trips/TripChatProposal";
+import { TripBookingPanel } from "@/components/trips/TripBookingPanel";
 import type { TripRequestStatus, TripRole } from "@/lib/trips/statusMachine";
 import { toast } from "@/hooks/use-toast";
 
@@ -59,6 +60,9 @@ export interface TripRequestDetail {
     status: string;
     total_price: number;
     currency: string;
+    payment_url?: string | null;
+    platform_commission?: number;
+    partner_payout?: number;
   }>;
 }
 
@@ -89,6 +93,7 @@ export function TripRequestDrawer({
   const [newNote, setNewNote] = useState("");
   const [savingNote, setSavingNote] = useState(false);
   const [messageContent, setMessageContent] = useState("");
+  const [booking, setBooking] = useState<any>(trip.trip_bookings?.[0] || null);
 
   // Get current user for chat
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -472,6 +477,14 @@ export function TripRequestDrawer({
                   </p>
                 </div>
               </div>
+
+              {/* Booking & Payment */}
+              <TripBookingPanel
+                tripRequestId={trip.id}
+                booking={booking}
+                acceptedAt={trip.accepted_at}
+                onBookingUpdated={(updated) => setBooking(updated)}
+              />
             </div>
           </div>
 
