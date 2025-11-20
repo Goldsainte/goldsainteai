@@ -135,27 +135,37 @@ export function TripRequestModal({
         },
       };
 
-      const { error: insertError } = await supabase
+      const { data, error: insertError } = await supabase
         .from("trip_requests")
-        .insert(payload);
+        .insert(payload)
+        .select("id")
+        .single();
 
       if (insertError) throw insertError;
 
+      const tripRequestId = data.id as string;
+
       // Log trip_inquiry event
-      await supabase.rpc("log_brand_engagement", {
+      void supabase.rpc("log_brand_engagement", {
         p_brand_profile_id: brand.profile_id,
         p_event_type: "trip_inquiry",
         p_context_type: "brand_collection",
         p_context_id: collection.id,
         p_metadata: {
+          trip_request_id: tripRequestId,
           trip_request_created: true,
           collection_title: collection.title,
         },
       });
 
+      // Trigger AI matching (non-blocking for user)
+      void supabase.functions.invoke("ai-trip-matching", {
+        body: { tripRequestId },
+      });
+
       toast({
         title: "Trip request submitted",
-        description: "We'll match you with creators and agents who can bring this to life.",
+        description: "We're matching you with creators and agents who fit your vibe.",
       });
 
       onClose();

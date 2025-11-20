@@ -9868,6 +9868,135 @@ export type Database = {
           },
         ]
       }
+      trip_request_assignments: {
+        Row: {
+          assigned_by: string | null
+          assignee_profile_id: string
+          assignee_role: string
+          created_at: string
+          id: string
+          trip_request_id: string
+        }
+        Insert: {
+          assigned_by?: string | null
+          assignee_profile_id: string
+          assignee_role: string
+          created_at?: string
+          id?: string
+          trip_request_id: string
+        }
+        Update: {
+          assigned_by?: string | null
+          assignee_profile_id?: string
+          assignee_role?: string
+          created_at?: string
+          id?: string
+          trip_request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_request_assignments_assignee_profile_id_fkey"
+            columns: ["assignee_profile_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "trip_request_assignments_assignee_profile_id_fkey"
+            columns: ["assignee_profile_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "trip_request_assignments_assignee_profile_id_fkey"
+            columns: ["assignee_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_request_assignments_assignee_profile_id_fkey"
+            columns: ["assignee_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_request_assignments_trip_request_id_fkey"
+            columns: ["trip_request_id"]
+            isOneToOne: false
+            referencedRelation: "trip_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trip_request_matches: {
+        Row: {
+          candidate_profile_id: string
+          created_at: string
+          id: string
+          match_score: number
+          reasons: string | null
+          role: string
+          trip_request_id: string
+        }
+        Insert: {
+          candidate_profile_id: string
+          created_at?: string
+          id?: string
+          match_score: number
+          reasons?: string | null
+          role: string
+          trip_request_id: string
+        }
+        Update: {
+          candidate_profile_id?: string
+          created_at?: string
+          id?: string
+          match_score?: number
+          reasons?: string | null
+          role?: string
+          trip_request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_request_matches_candidate_profile_id_fkey"
+            columns: ["candidate_profile_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "trip_request_matches_candidate_profile_id_fkey"
+            columns: ["candidate_profile_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "trip_request_matches_candidate_profile_id_fkey"
+            columns: ["candidate_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_request_matches_candidate_profile_id_fkey"
+            columns: ["candidate_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_request_matches_trip_request_id_fkey"
+            columns: ["trip_request_id"]
+            isOneToOne: false
+            referencedRelation: "trip_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trip_request_messages: {
         Row: {
           body: string
