@@ -47,7 +47,10 @@ export default function OnboardingProfilePage() {
 
         if (profile) {
           if (profile.onboarding_completed) {
-            const destination = getPostAuthDestination(profile.account_type);
+        const destination = getPostAuthDestination(
+          profile.account_type,
+          profile.onboarding_completed
+        );
             navigate(destination, { replace: true });
             return;
           }

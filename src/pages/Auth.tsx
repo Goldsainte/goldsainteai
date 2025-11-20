@@ -377,11 +377,9 @@ const Auth = () => {
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("account_type")
+      .select("account_type, onboarding_completed")
       .eq("id", user.id)
       .maybeSingle();
-
-    const accountType = profile?.account_type;
 
     const storedRedirect = typeof window !== 'undefined'
       ? sanitizeRedirectPath(sessionStorage.getItem(AUTH_REDIRECT_STORAGE_KEY))
@@ -396,13 +394,12 @@ const Auth = () => {
       return;
     }
 
-    if (accountType === 'agent') {
-      navigate('/agent-dashboard', { replace: true });
-    } else if (accountType === 'creator') {
-      navigate('/creator-dashboard', { replace: true });
-    } else {
-      navigate('/', { replace: true });
-    }
+    // Use centralized routing logic
+    const postAuthDestination = getPostAuthDestination(
+      profile?.account_type,
+      profile?.onboarding_completed
+    );
+    navigate(postAuthDestination, { replace: true });
   };
 
   // Show loading state while auth is processing or redirecting

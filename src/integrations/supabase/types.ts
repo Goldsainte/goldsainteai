@@ -2080,6 +2080,7 @@ export type Database = {
       }
       brand_profiles: {
         Row: {
+          bio: string | null
           brand_name: string
           brand_type: string | null
           created_at: string | null
@@ -2087,11 +2088,13 @@ export type Database = {
           owner_user_id: string
           regions: string[] | null
           style_tags: string[] | null
+          tagline: string | null
           updated_at: string | null
           verification_status: string | null
           website: string | null
         }
         Insert: {
+          bio?: string | null
           brand_name: string
           brand_type?: string | null
           created_at?: string | null
@@ -2099,11 +2102,13 @@ export type Database = {
           owner_user_id: string
           regions?: string[] | null
           style_tags?: string[] | null
+          tagline?: string | null
           updated_at?: string | null
           verification_status?: string | null
           website?: string | null
         }
         Update: {
+          bio?: string | null
           brand_name?: string
           brand_type?: string | null
           created_at?: string | null
@@ -2111,6 +2116,7 @@ export type Database = {
           owner_user_id?: string
           regions?: string[] | null
           style_tags?: string[] | null
+          tagline?: string | null
           updated_at?: string | null
           verification_status?: string | null
           website?: string | null

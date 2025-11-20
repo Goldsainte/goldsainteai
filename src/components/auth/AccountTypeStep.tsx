@@ -51,7 +51,7 @@ export function AccountTypeStep({ onComplete }: Props) {
           last_name: lastName.trim(),
           phone: phone.trim(),
           account_type: accountType,
-          is_profile_complete: accountType !== "traveler", // travelers complete onboarding separately
+          is_profile_complete: accountType !== "brand",
           updated_at: new Date().toISOString(),
         });
 
@@ -59,7 +59,7 @@ export function AccountTypeStep({ onComplete }: Props) {
         console.error("Error updating profile", upsertError);
         setError("Could not save your profile. Please try again.");
       } else {
-        // For brands, create brand_profiles entry
+        // For brands, create placeholder brand_profiles entry
         if (accountType === "brand") {
           const { error: brandError } = await supabase
             .from("brand_profiles")
@@ -82,7 +82,7 @@ export function AccountTypeStep({ onComplete }: Props) {
   };
 
   const baseButton =
-    "flex-1 rounded-2xl border px-3 py-2 text-xs text-left transition-all";
+    "flex-1 rounded-2xl border px-3 py-2 text-xs text-left transition-all flex flex-col gap-1";
 
   return (
     <div className="space-y-4">
@@ -91,10 +91,11 @@ export function AccountTypeStep({ onComplete }: Props) {
           Tell us who you are
         </h2>
         <p className="text-xs text-muted-foreground">
-          Goldsainte works best when we know your role in the marketplace.
+          Goldsainte works best when we understand your role in the marketplace.
         </p>
       </div>
 
+      {/* Role selection */}
       <div className="grid grid-cols-1 gap-2 text-xs">
         <button
           type="button"
@@ -107,7 +108,7 @@ export function AccountTypeStep({ onComplete }: Props) {
         >
           <div className="font-medium">Traveler</div>
           <div className="text-[11px] text-muted-foreground">
-            You want to post trips, get matched with agents and creators, and book experiences.
+            You want inspiration, trip ideas, and help turning moodboards into real itineraries.
           </div>
         </button>
 
@@ -120,9 +121,9 @@ export function AccountTypeStep({ onComplete }: Props) {
           }`}
           onClick={() => setAccountType("creator")}
         >
-          <div className="font-medium">TikTok Creator</div>
+          <div className="font-medium">Creator</div>
           <div className="text-[11px] text-muted-foreground">
-            You create travel content and want to collaborate with agents to sell trips.
+            You make travel content and want hosted stays, brand collabs, and access to Goldsainte trips.
           </div>
         </button>
 
@@ -137,7 +138,7 @@ export function AccountTypeStep({ onComplete }: Props) {
         >
           <div className="font-medium">Travel Agent</div>
           <div className="text-[11px] text-muted-foreground">
-            You're a certified travel professional selling and managing trips.
+            You design and book trips for clients and want a pipeline of qualified trip requests.
           </div>
         </button>
 
@@ -150,42 +151,50 @@ export function AccountTypeStep({ onComplete }: Props) {
           }`}
           onClick={() => setAccountType("brand")}
         >
-          <div className="font-medium">Brand Partner</div>
+          <div className="font-medium">Brand / Hotel</div>
           <div className="text-[11px] text-muted-foreground">
-            You're a hotel, resort, or lifestyle brand showcasing experiences.
+            You&apos;re a hotel, resort, or lifestyle brand and want a curated presence, collections, and performance insights on Goldsainte.
           </div>
         </button>
       </div>
 
-      <div className="grid gap-2 text-xs">
-        <div className="grid gap-1">
-          <Label>First name</Label>
+      {/* Basic identity fields */}
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div className="space-y-1">
+          <Label htmlFor="firstName">First name</Label>
           <Input
+            id="firstName"
+            placeholder="Jordan"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            placeholder="Taylor"
           />
         </div>
-        <div className="grid gap-1">
-          <Label>Last name</Label>
+        <div className="space-y-1">
+          <Label htmlFor="lastName">Last name</Label>
           <Input
+            id="lastName"
+            placeholder="Smith"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-            placeholder="West"
-          />
-        </div>
-        <div className="grid gap-1">
-          <Label>Mobile number</Label>
-          <Input
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="+1 555 555 5555"
           />
         </div>
       </div>
 
+      <div className="space-y-1">
+        <Label htmlFor="phone">Mobile number</Label>
+        <Input
+          id="phone"
+          placeholder="+1 (555) 000-0000"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
+        <p className="text-[11px] text-muted-foreground">
+          Used for security and important updates about your trips and brand activity.
+        </p>
+      </div>
+
       {error && (
-        <p className="text-[11px] text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+        <p className="text-xs text-destructive" role="alert">
           {error}
         </p>
       )}
