@@ -332,6 +332,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "agent_applications_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: true
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
+          },
+          {
             foreignKeyName: "agent_applications_reviewed_by_fkey"
             columns: ["reviewed_by"]
             isOneToOne: false
@@ -358,6 +365,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_applications_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
           },
         ]
       }
@@ -1517,6 +1531,13 @@ export type Database = {
             referencedRelation: "trip_bookings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "booking_cancellations_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["booking_id"]
+          },
         ]
       }
       booking_messages: {
@@ -1701,6 +1722,13 @@ export type Database = {
             referencedRelation: "trip_bookings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "booking_status_history_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["booking_id"]
+          },
         ]
       }
       bookings: {
@@ -1859,6 +1887,13 @@ export type Database = {
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "brand_collections_brand_profile_id_fkey"
+            columns: ["brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
+          },
         ]
       }
       brand_engagement_daily_stats: {
@@ -1914,6 +1949,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_engagement_daily_stats_brand_profile_id_fkey"
+            columns: ["brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
           },
         ]
       }
@@ -1976,6 +2018,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_engagement_events_brand_profile_id_fkey"
+            columns: ["brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
           },
         ]
       }
@@ -2458,6 +2507,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "commission_payout_requests_processed_by_fkey"
+            columns: ["processed_by"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
+          },
+          {
             foreignKeyName: "commission_payout_requests_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -2484,6 +2540,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commission_payout_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
           },
         ]
       }
@@ -2631,6 +2694,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concierge_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
           },
         ]
       }
@@ -3635,6 +3705,13 @@ export type Database = {
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "favorites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
+          },
         ]
       }
       flight_price_alerts: {
@@ -3998,6 +4075,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "influencer_promotions_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
           },
           {
             foreignKeyName: "influencer_promotions_package_id_fkey"
@@ -5401,6 +5485,13 @@ export type Database = {
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "moments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
+          },
         ]
       }
       notifications: {
@@ -6158,6 +6249,13 @@ export type Database = {
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "packaged_trips_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
+          },
         ]
       }
       paid_partnerships: {
@@ -6227,6 +6325,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "paid_partnerships_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
+          },
+          {
             foreignKeyName: "paid_partnerships_creator_id_fkey"
             columns: ["creator_id"]
             isOneToOne: false
@@ -6253,6 +6358,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paid_partnerships_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
           },
           {
             foreignKeyName: "paid_partnerships_post_id_fkey"
@@ -7856,6 +7968,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shared_commission_bookings_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
           },
           {
             foreignKeyName: "shared_commission_bookings_package_id_fkey"
@@ -10005,6 +10124,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "trip_request_assignments_assignee_profile_id_fkey"
+            columns: ["assignee_profile_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
+          },
+          {
             foreignKeyName: "trip_request_assignments_trip_request_id_fkey"
             columns: ["trip_request_id"]
             isOneToOne: false
@@ -10069,6 +10195,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_request_matches_candidate_profile_id_fkey"
+            columns: ["candidate_profile_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
           },
           {
             foreignKeyName: "trip_request_matches_trip_request_id_fkey"
@@ -10325,6 +10458,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_requests_source_brand_profile_id_fkey"
+            columns: ["source_brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
           },
           {
             foreignKeyName: "trip_requests_source_collection_id_fkey"
@@ -12186,11 +12326,62 @@ export type Database = {
         }
         Relationships: []
       }
+      trip_bookings_ops_view: {
+        Row: {
+          accepted_at: string | null
+          amount_total_cents: number | null
+          booking_created_at: string | null
+          booking_id: string | null
+          booking_status: string | null
+          booking_updated_at: string | null
+          brand_avatar_url: string | null
+          brand_name: string | null
+          brand_profile_id: string | null
+          budget_max: number | null
+          budget_min: number | null
+          collection_tags: string[] | null
+          collection_title: string | null
+          currency: string | null
+          destination: string | null
+          end_date: string | null
+          partner_payout: number | null
+          payment_provider: string | null
+          payment_reference: string | null
+          payment_url: string | null
+          platform_commission: number | null
+          proposal_id: string | null
+          start_date: string | null
+          travelers_adults: number | null
+          travelers_children: number | null
+          trip_request_id: string | null
+          trip_status: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "trip_proposals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_trip_request_id_fkey"
+            columns: ["trip_request_id"]
+            isOneToOne: false
+            referencedRelation: "trip_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       accept_proposal_rpc: {
         Args: { proposal_id_input: string }
         Returns: Json
+      }
+      admin_update_trip_booking_status: {
+        Args: { p_booking_id: string; p_new_status: string }
+        Returns: undefined
       }
       award_loyalty_points: {
         Args: {
