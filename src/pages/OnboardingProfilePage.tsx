@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { getPostAuthDestination } from "@/lib/auth/postAuthRouting";
 import { supabase } from "@/integrations/supabase/client";
 import { Sparkles } from "lucide-react";
 
-type AccountType = "traveler" | "creator" | "agent";
+type AccountType = "traveler" | "creator" | "agent" | "brand";
 
 export default function OnboardingProfilePage() {
   const navigate = useNavigate();
@@ -46,11 +47,8 @@ export default function OnboardingProfilePage() {
 
         if (profile) {
           if (profile.onboarding_completed) {
-            if (profile.account_type === "creator" || profile.account_type === "agent") {
-              navigate("/partner", { replace: true });
-            } else {
-              navigate("/traveler", { replace: true });
-            }
+            const destination = getPostAuthDestination(profile.account_type);
+            navigate(destination, { replace: true });
             return;
           }
 
@@ -147,11 +145,9 @@ export default function OnboardingProfilePage() {
         // Don't block onboarding if email fails
       }
 
-      if (accountType === "creator" || accountType === "agent") {
-        navigate("/partner", { replace: true });
-      } else {
-        navigate("/traveler", { replace: true });
-      }
+      // Navigate based on role using centralized routing
+      const destination = getPostAuthDestination(accountType);
+      navigate(destination, { replace: true });
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Could not save your profile.");

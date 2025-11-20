@@ -2078,6 +2078,45 @@ export type Database = {
           },
         ]
       }
+      brand_profiles: {
+        Row: {
+          brand_name: string
+          brand_type: string | null
+          created_at: string | null
+          id: string
+          owner_user_id: string
+          regions: string[] | null
+          style_tags: string[] | null
+          updated_at: string | null
+          verification_status: string | null
+          website: string | null
+        }
+        Insert: {
+          brand_name: string
+          brand_type?: string | null
+          created_at?: string | null
+          id?: string
+          owner_user_id: string
+          regions?: string[] | null
+          style_tags?: string[] | null
+          updated_at?: string | null
+          verification_status?: string | null
+          website?: string | null
+        }
+        Update: {
+          brand_name?: string
+          brand_type?: string | null
+          created_at?: string | null
+          id?: string
+          owner_user_id?: string
+          regions?: string[] | null
+          style_tags?: string[] | null
+          updated_at?: string | null
+          verification_status?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       business_verifications: {
         Row: {
           business_address: Json | null
