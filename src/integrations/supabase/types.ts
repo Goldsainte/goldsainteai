@@ -10155,6 +10155,8 @@ export type Database = {
       }
       trip_requests: {
         Row: {
+          accepted_at: string | null
+          accepted_proposal_id: string | null
           accommodation_style: string | null
           booked_at: string | null
           budget_level: string | null
@@ -10193,6 +10195,8 @@ export type Database = {
           wants_role: string | null
         }
         Insert: {
+          accepted_at?: string | null
+          accepted_proposal_id?: string | null
           accommodation_style?: string | null
           booked_at?: string | null
           budget_level?: string | null
@@ -10231,6 +10235,8 @@ export type Database = {
           wants_role?: string | null
         }
         Update: {
+          accepted_at?: string | null
+          accepted_proposal_id?: string | null
           accommodation_style?: string | null
           booked_at?: string | null
           budget_level?: string | null
@@ -10269,6 +10275,13 @@ export type Database = {
           wants_role?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "trip_requests_accepted_proposal_id_fkey"
+            columns: ["accepted_proposal_id"]
+            isOneToOne: false
+            referencedRelation: "trip_proposals"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "trip_requests_selected_proposal_id_fkey"
             columns: ["selected_proposal_id"]
