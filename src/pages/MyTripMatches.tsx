@@ -34,6 +34,8 @@ interface TripMatch {
     source_brand_profile_id: string;
     source_collection_id: string | null;
     source_metadata: Record<string, any>;
+    accepted_proposal_id?: string | null;
+    accepted_at?: string | null;
   };
 }
 
@@ -47,6 +49,69 @@ export default function MyTripMatches() {
   const [loading, setLoading] = useState(true);
   const [profileId, setProfileId] = useState<string | null>(null);
   const [activeTripId, setActiveTripId] = useState<string | null>(null);
+  const [activeTripDetail, setActiveTripDetail] = useState<TripRequestDetail | null>(null);
+
+  // Load active trip detail with proposal/booking data
+  useEffect(() => {
+    if (!activeTripId) {
+      setActiveTripDetail(null);
+      return;
+    }
+
+    async function loadTripDetail() {
+      const activeMatch = matches.find((m) => m.trip_requests.id === activeTripId);
+      if (!activeMatch) return;
+
+      const trip = activeMatch.trip_requests;
+      const brandInfo = getBrandInfo(trip.source_metadata);
+
+      // Fetch accepted proposal if exists
+      let acceptedProposal = null;
+      if (trip.accepted_proposal_id) {
+        const { data } = await supabase
+          .from("trip_proposals")
+          .select("id, status, headline, price_from, currency")
+          .eq("id", trip.accepted_proposal_id)
+          .single();
+        acceptedProposal = data;
+      }
+
+      // Fetch trip bookings
+      const { data: bookings } = await supabase
+        .from("trip_bookings")
+        .select("id, status, total_price, currency")
+        .eq("trip_request_id", trip.id);
+
+      const tripDetail: TripRequestDetail = {
+        id: trip.id,
+        created_at: trip.created_at,
+        status: trip.status as TripRequestStatus,
+        user_name: null,
+        brand_profile_id: trip.source_brand_profile_id,
+        brand_name: brandInfo.brandName,
+        brand_avatar_url: activeMatch.brandAvatarUrl,
+        collection_id: trip.source_collection_id,
+        collection_title: brandInfo.collectionTitle,
+        collection_tags: extractTags(trip.source_metadata),
+        destination: trip.destination,
+        date_range: formatDateRange(trip.start_date, trip.end_date),
+        travelers_count: getTravelersCount(
+          trip.travelers_adults,
+          trip.travelers_children
+        ),
+        budget_range: formatBudgetRange(trip.budget_min, trip.budget_max),
+        notes: trip.source_metadata?.special_notes || trip.source_metadata?.description || null,
+        accepted_proposal_id: trip.accepted_proposal_id,
+        accepted_at: trip.accepted_at,
+        accepted_proposal: acceptedProposal,
+        trip_bookings: bookings || [],
+      };
+
+      setActiveTripDetail(tripDetail);
+    }
+
+    loadTripDetail();
+  }, [activeTripId, matches]);
 
   useEffect(() => {
     async function loadMatches() {
@@ -94,7 +159,9 @@ export default function MyTripMatches() {
             status,
             source_brand_profile_id,
             source_collection_id,
-            source_metadata
+            source_metadata,
+            accepted_proposal_id,
+            accepted_at
           )
         `
         )
@@ -298,43 +365,17 @@ export default function MyTripMatches() {
       </div>
 
       {/* Trip Request Drawer */}
-      {activeTripId && (() => {
-        const activeMatch = matches.find((m) => m.trip_requests.id === activeTripId);
-        if (!activeMatch) return null;
-
-        const trip = activeMatch.trip_requests;
-        const brandInfo = getBrandInfo(trip.source_metadata);
-
-        const tripDetail: TripRequestDetail = {
-          id: trip.id,
-          created_at: trip.created_at,
-          status: trip.status as TripRequestStatus,
-          user_name: null,
-          brand_profile_id: trip.source_brand_profile_id,
-          brand_name: brandInfo.brandName,
-          brand_avatar_url: activeMatch.brandAvatarUrl,
-          collection_id: trip.source_collection_id,
-          collection_title: brandInfo.collectionTitle,
-          collection_tags: extractTags(trip.source_metadata),
-          destination: trip.destination,
-          date_range: formatDateRange(trip.start_date, trip.end_date),
-          travelers_count: getTravelersCount(
-            trip.travelers_adults,
-            trip.travelers_children
-          ),
-          budget_range: formatBudgetRange(trip.budget_min, trip.budget_max),
-          notes: trip.source_metadata?.special_notes || trip.source_metadata?.description || null,
-        };
-
-        return (
-          <TripRequestDrawer
-            open={true}
-            onClose={() => setActiveTripId(null)}
-            role="creator_agent"
-            trip={tripDetail}
-          />
-        );
-      })()}
+      {activeTripDetail && (
+        <TripRequestDrawer
+          open={true}
+          onClose={() => {
+            setActiveTripId(null);
+            setActiveTripDetail(null);
+          }}
+          role="creator_agent"
+          trip={activeTripDetail}
+        />
+      )}
     </div>
   );
 }

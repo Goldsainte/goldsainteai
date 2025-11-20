@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { TripStatusControls } from "@/components/trips/TripStatusControls";
 import { useTripRequestMessages } from "@/hooks/useTripRequestMessages";
+import { TripChatProposal } from "@/components/trips/TripChatProposal";
 import type { TripRequestStatus, TripRole } from "@/lib/trips/statusMachine";
 import { toast } from "@/hooks/use-toast";
 
@@ -43,6 +44,22 @@ export interface TripRequestDetail {
   travelers_count: number | null;
   budget_range: string | null;
   notes: string | null;
+  // Proposal and booking info
+  accepted_proposal_id?: string | null;
+  accepted_at?: string | null;
+  accepted_proposal?: {
+    id: string;
+    status: string;
+    headline: string | null;
+    price_from: number | null;
+    currency: string | null;
+  } | null;
+  trip_bookings?: Array<{
+    id: string;
+    status: string;
+    total_price: number;
+    currency: string;
+  }>;
 }
 
 interface TripRequestDrawerProps {
