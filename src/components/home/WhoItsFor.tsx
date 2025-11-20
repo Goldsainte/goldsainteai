@@ -18,7 +18,7 @@ export function WhoItsFor() {
             </div>
 
             <h2 className="text-left font-display text-3xl leading-snug md:text-4xl lg:text-[42px] text-[#0a2225] mb-12">
-              Who is <span className="italic">Goldsainte AI</span> for...
+              Built for every side of luxury travel
             </h2>
 
             {/* Four roles in columns */}
