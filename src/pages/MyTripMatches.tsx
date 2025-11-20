@@ -76,10 +76,10 @@ export default function MyTripMatches() {
         acceptedProposal = data;
       }
 
-      // Fetch trip bookings
+      // Fetch trip bookings with payment fields
       const { data: bookings } = await supabase
         .from("trip_bookings")
-        .select("id, status, total_price, currency")
+        .select("id, status, total_price, currency, payment_url, platform_commission, partner_payout")
         .eq("trip_request_id", trip.id);
 
       const tripDetail: TripRequestDetail = {

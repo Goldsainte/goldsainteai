@@ -9391,9 +9391,12 @@ export type Database = {
           created_at: string
           currency: string
           id: string
+          metadata: Json | null
           partner_id: string
           partner_payout: number
           partner_role: string
+          payment_client_secret: string | null
+          payment_url: string | null
           platform_commission: number
           proposal_id: string
           status: string
@@ -9409,9 +9412,12 @@ export type Database = {
           created_at?: string
           currency?: string
           id?: string
+          metadata?: Json | null
           partner_id: string
           partner_payout: number
           partner_role: string
+          payment_client_secret?: string | null
+          payment_url?: string | null
           platform_commission: number
           proposal_id: string
           status?: string
@@ -9427,9 +9433,12 @@ export type Database = {
           created_at?: string
           currency?: string
           id?: string
+          metadata?: Json | null
           partner_id?: string
           partner_payout?: number
           partner_role?: string
+          payment_client_secret?: string | null
+          payment_url?: string | null
           platform_commission?: number
           proposal_id?: string
           status?: string
