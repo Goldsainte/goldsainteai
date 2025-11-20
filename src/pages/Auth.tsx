@@ -12,6 +12,7 @@ import logomark from '@/assets/logomark-gold.png';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { AccountTypeStep } from '@/components/auth/AccountTypeStep';
+import { getPostAuthDestination } from '@/lib/auth/postAuthRouting';
 import { AUTH_REDIRECT_STORAGE_KEY, getRedirectPathFromSearch, sanitizeRedirectPath } from '@/lib/auth/redirect';
 
 const passwordSchema = z.string()

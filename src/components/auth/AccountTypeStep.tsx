@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 
-type AccountType = "traveler" | "creator" | "agent";
+type AccountType = "traveler" | "creator" | "agent" | "brand";
 
 interface Props {
   onComplete: () => void;
@@ -51,7 +51,7 @@ export function AccountTypeStep({ onComplete }: Props) {
           last_name: lastName.trim(),
           phone: phone.trim(),
           account_type: accountType,
-          is_profile_complete: true,
+          is_profile_complete: accountType !== "traveler", // travelers complete onboarding separately
           updated_at: new Date().toISOString(),
         });
 
@@ -59,6 +59,21 @@ export function AccountTypeStep({ onComplete }: Props) {
         console.error("Error updating profile", upsertError);
         setError("Could not save your profile. Please try again.");
       } else {
+        // For brands, create brand_profiles entry
+        if (accountType === "brand") {
+          const { error: brandError } = await supabase
+            .from("brand_profiles")
+            .insert({
+              owner_user_id: user.id,
+              brand_name: `${firstName.trim()} ${lastName.trim()}`,
+            });
+          
+          if (brandError && brandError.code !== '23505') {
+            console.error("Error creating brand profile:", brandError);
+            // Continue anyway - they can complete brand onboarding later
+          }
+        }
+        
         onComplete();
       }
     } finally {
@@ -123,6 +138,21 @@ export function AccountTypeStep({ onComplete }: Props) {
           <div className="font-medium">Travel Agent</div>
           <div className="text-[11px] text-muted-foreground">
             You're a certified travel professional selling and managing trips.
+          </div>
+        </button>
+
+        <button
+          type="button"
+          className={`${baseButton} ${
+            accountType === "brand"
+              ? "border-primary bg-primary/5"
+              : "border-border bg-card"
+          }`}
+          onClick={() => setAccountType("brand")}
+        >
+          <div className="font-medium">Brand Partner</div>
+          <div className="text-[11px] text-muted-foreground">
+            You're a hotel, resort, or lifestyle brand showcasing experiences.
           </div>
         </button>
       </div>

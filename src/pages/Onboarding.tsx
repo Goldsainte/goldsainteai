@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ComprehensivePreferencesForm } from "@/components/ComprehensivePreferencesForm";
+import { TravelerStyleVibeStep, TravelerPreferences } from "@/components/onboarding/TravelerStyleVibeStep";
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
 import logomark from "@/assets/logomark-gold.png";
@@ -21,23 +21,54 @@ export default function Onboarding() {
     }
   }, [user, authLoading, navigate]);
 
-  const handleSubmit = async (formData: any) => {
+  const handleSubmit = async (preferences: TravelerPreferences) => {
     setIsSaving(true);
     
     try {
+      if (!user?.id) throw new Error("No user");
+
+      // Map preferences to user_travel_preferences structure
       const prefsData = {
-        user_id: user?.id,
-        ...formData,
+        user_id: user.id,
+        travel_style: preferences.explorationStyle,
+        budget_preference: preferences.budgetRange,
+        travel_companions: preferences.travelCompanions,
+        dietary_restrictions: preferences.dietaryRestrictions,
+        booking_preferences: {
+          energy_level: preferences.energyLevel,
+          vibe_triggers: preferences.vibeTriggers,
+          trip_duration: preferences.tripDuration,
+          passport_visa_notes: preferences.passportVisaNotes,
+          avoid_regions: preferences.avoidRegions,
+          activities: preferences.activities,
+          special_interests: preferences.specialInterests,
+          dealbreakers: preferences.dealbreakers,
+          must_haves: preferences.accommodationMustHaves,
+          planning_style: preferences.planningStyle,
+          is_creator_like_traveler: preferences.createsContent,
+          inspiration_creators: preferences.inspirationCreators,
+        },
       };
 
-      const { error } = await supabase
-        .from('user_booking_preferences')
-        .insert(prefsData);
+      const { error: prefsError } = await supabase
+        .from('user_travel_preferences')
+        .upsert(prefsData, { onConflict: 'user_id' });
 
-      if (error) throw error;
+      if (prefsError) throw prefsError;
 
-      toast.success('Welcome! Your preferences have been saved.');
-      navigate('/');
+      // Mark onboarding as complete
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ 
+          onboarding_completed: true,
+          is_profile_complete: true 
+        })
+        .eq('id', user.id);
+
+      if (profileError) throw profileError;
+
+      toast.success('Welcome! Your travel preferences have been saved.');
+      navigate('/traveler');
     } catch (error: any) {
       console.error('Error saving preferences:', error);
       toast.error('Failed to save preferences. Please try again.');
@@ -70,24 +101,22 @@ export default function Onboarding() {
           </p>
         </div>
 
-        <Card>
+        <Card className="border-[#E5DFC6] bg-white/95 backdrop-blur">
           <CardHeader>
-            <CardTitle className="text-2xl">Set Your Travel Preferences</CardTitle>
-            <CardDescription>
-              These preferences will be used to customize your search results and help our AI provide better recommendations.
-              You can always update them later in your account settings.
+            <CardTitle className="text-2xl font-display text-[#0a2225]">Tell us about your travel style</CardTitle>
+            <CardDescription className="text-[#4a4a4a]">
+              Help us personalize your experience and match you with the perfect trips, creators, and agents.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ComprehensivePreferencesForm 
-              onSubmit={handleSubmit}
-              isLoading={isSaving}
+            <TravelerStyleVibeStep 
+              onComplete={handleSubmit}
             />
             
             <div className="mt-6 text-center">
               <button
                 onClick={handleSkip}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm text-[#7A7151] hover:text-[#0a2225] transition-colors"
                 disabled={isSaving}
               >
                 Skip for now (you can set preferences later)
