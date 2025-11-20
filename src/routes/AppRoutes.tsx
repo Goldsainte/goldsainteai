@@ -18,6 +18,8 @@ import { AdminGuard } from '@/hooks/useAdminGuard';
 
 const SearchResults = lazy(() => import('@/pages/SearchResults'));
 const Profile = lazy(() => import('@/pages/Profile'));
+const BrandOnboardingPage = lazy(() => import('@/pages/BrandOnboardingPage'));
+const BrandConsolePage = lazy(() => import('@/pages/BrandConsolePage'));
 const AdminDashboardPage = lazy(() => import('@/pages/admin/AdminDashboardPage'));
 const AdminSafetyDashboardPage = lazy(() => import('@/pages/admin/AdminSafetyDashboardPage'));
 const AdminAgentsPage = lazy(() => import('@/pages/admin/AdminAgentsPage'));
@@ -192,6 +194,7 @@ export const AppRoutes = () => (
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/onboarding/creator" element={<CreatorOnboardingPage />} />
+      <Route path="/onboarding/brand" element={<BrandOnboardingPage />} />
       <Route path="/onboarding/profile" element={<OnboardingProfilePage />} />
       <Route path="/ai-agent-setup" element={<AIAgentOnboarding />} />
     </Route>
@@ -373,6 +376,7 @@ export const AppRoutes = () => (
         )}
       />
       <Route path="/creator-dashboard" element={<CreatorDashboard />} />
+      <Route path="/console/brand" element={<BrandConsolePage />} />
       {/* Legacy social feed routes - DISABLED
       <Route path="/search" element={<Search />} />
       <Route path="/trending" element={<Trending />} />
