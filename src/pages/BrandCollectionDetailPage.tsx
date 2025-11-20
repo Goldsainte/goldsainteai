@@ -6,6 +6,10 @@ import { Button } from "@/components/ui/button";
 import { TravelStoryboard } from "@/components/storyboards/TravelStoryboard";
 import { TripRequestModal } from "@/components/trips/TripRequestModal";
 import { ArrowLeft, MapPin, MessageCircle } from "lucide-react";
+import {
+  CollectionActions,
+  CollectionItemsSection,
+} from "@/components/collections/CollectionDetailEnhancements";
 
 interface BrandProfile {
   profile_id: string;
@@ -25,6 +29,13 @@ interface BrandCollection {
   is_published: boolean;
 }
 
+interface RelatedCollection {
+  id: string;
+  title: string;
+  cover_image_url: string | null;
+  tags: string[] | null;
+}
+
 export default function BrandCollectionDetailPage() {
   const { profileId, collectionId } = useParams();
   const navigate = useNavigate();
@@ -33,6 +44,7 @@ export default function BrandCollectionDetailPage() {
   const [collection, setCollection] = useState<BrandCollection | null>(null);
   const [loading, setLoading] = useState(true);
   const [tripModalOpen, setTripModalOpen] = useState(false);
+  const [related, setRelated] = useState<RelatedCollection[]>([]);
 
   // Load brand + collection
   useEffect(() => {
@@ -79,6 +91,33 @@ export default function BrandCollectionDetailPage() {
 
     void load();
   }, [profileId, collectionId]);
+
+  // Load related collections once the current collection is known
+  useEffect(() => {
+    if (!brand || !collection) return;
+
+    const loadRelated = async () => {
+      const tagFilter = collection.tags && collection.tags.length > 0;
+      const query = supabase
+        .from("brand_collections")
+        .select("id, title, cover_image_url, tags")
+        .eq("brand_profile_id", brand.profile_id)
+        .neq("id", collection.id)
+        .order("sort_order", { ascending: true })
+        .limit(6);
+
+      if (tagFilter) {
+        query.contains("tags", collection.tags);
+      }
+
+      const { data, error } = await query;
+      if (!error && data) {
+        setRelated(data as RelatedCollection[]);
+      }
+    };
+
+    void loadRelated();
+  }, [brand, collection]);
 
   // Log collection view once we have the brand + collection
   useEffect(() => {
@@ -197,15 +236,17 @@ export default function BrandCollectionDetailPage() {
                 )}
               </div>
             </div>
-
-            <Button
-              size="sm"
-              className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] px-4 py-2 text-xs font-semibold uppercase tracking-wide text-[#E5DFC6]"
-              onClick={handleTripInquiry}
-            >
-              <MessageCircle className="h-4 w-4" />
-              Start a Trip from this Collection
-            </Button>
+            <div className="flex flex-col items-end gap-2 md:flex-row md:items-center">
+              <CollectionActions collectionId={collection.id} />
+              <Button
+                size="sm"
+                className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] px-4 py-2 text-xs font-semibold uppercase tracking-wide text-[#E5DFC6]"
+                onClick={handleTripInquiry}
+              >
+                <MessageCircle className="h-4 w-4" />
+                Start a Trip from this Collection
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -251,6 +292,8 @@ export default function BrandCollectionDetailPage() {
           </div>
         </section>
 
+        <CollectionItemsSection collectionId={collection.id} />
+
         {/* Inspiration section – reuse TravelStoryboard */}
         <section className="space-y-3">
           <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151]">
@@ -263,6 +306,45 @@ export default function BrandCollectionDetailPage() {
             highlightTags={highlightTags}
           />
         </section>
+
+        {related.length > 0 && (
+          <section className="space-y-3">
+            <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151]">
+              Related collections
+            </h2>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {related.map((item) => (
+                <Link
+                  to={`/brands/${brand.profile_id}/collections/${item.id}`}
+                  key={item.id}
+                  className="group overflow-hidden rounded-2xl border border-[#E5DFC6] bg-white"
+                >
+                  <div className="h-32 w-full overflow-hidden bg-[#F5F0E0]">
+                    {item.cover_image_url ? (
+                      <img
+                        src={item.cover_image_url}
+                        alt={item.title}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-xs text-[#8C8470]">
+                        Preview coming soon
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-1 p-3">
+                    <p className="text-sm font-semibold text-[#0a2225]">{item.title}</p>
+                    {item.tags && item.tags.length > 0 && (
+                      <p className="text-[11px] text-[#7A7151]">
+                        {item.tags.slice(0, 3).join(" • ")}
+                      </p>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
 
       {brand && collection && (
