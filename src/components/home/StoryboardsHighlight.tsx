@@ -44,13 +44,13 @@ export function StoryboardsHighlight() {
   ];
 
   return (
-    <section className="bg-white border-y border-[#E5DFC6]/30 py-16 md:py-20">
-      <div className="mx-auto max-w-6xl px-4">
-        <div className="text-center mb-12">
-          <h2 className="font-display text-[26px] leading-snug text-[#0a2225] md:text-[31px] lg:text-[36px] mb-4">
+    <section className="bg-white border-y border-[#E5DFC6]/30 py-16 sm:py-20">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="font-display text-xl leading-snug sm:text-2xl text-[#0a2225] md:text-[31px] lg:text-[36px] mb-3 sm:mb-4 max-w-full px-2">
             Storyboards: The Blueprint for Every <span className="italic">Goldsainte AI</span> Journey
           </h2>
-          <p className="mx-auto max-w-3xl text-sm leading-relaxed text-[#4a4a4a] md:text-base">
+          <p className="mx-auto max-w-3xl text-sm leading-[1.6] text-[#4a4a4a] md:text-base px-2">
             Every trip on Goldsainte starts as a storyboard—a visual brief that blends your saved TikToks, 
             creator content, mood images and curated experiences. It's how travelers express what they want 
             to feel, and how creators and agents collaborate without chaos.
