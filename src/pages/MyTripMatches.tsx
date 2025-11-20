@@ -1,8 +1,17 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, MapPin, Users, DollarSign, Calendar, Star } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { NewTripForYouCard } from "@/components/trips/NewTripForYouCard";
+import { TripStatusControls } from "@/components/trips/TripStatusControls";
+import {
+  formatDateRange,
+  formatBudgetRange,
+  getTravelersCount,
+  extractTags,
+  getBrandInfo,
+} from "@/lib/trips/enrichTripRequest";
+import { TripRequestStatus } from "@/lib/trips/statusMachine";
 
 interface TripMatch {
   id: string;
@@ -11,21 +20,28 @@ interface TripMatch {
   reasons: string;
   trip_requests: {
     id: string;
-    title: string;
     destination: string | null;
+    start_date: string | null;
+    end_date: string | null;
     budget_min: number | null;
     budget_max: number | null;
     travelers_adults: number;
     travelers_children: number;
     created_at: string;
     status: string;
+    source_brand_profile_id: string;
+    source_collection_id: string | null;
     source_metadata: Record<string, any>;
   };
 }
 
+interface EnrichedMatch extends TripMatch {
+  brandAvatarUrl: string | null;
+}
+
 export default function MyTripMatches() {
   const navigate = useNavigate();
-  const [matches, setMatches] = useState<TripMatch[]>([]);
+  const [matches, setMatches] = useState<EnrichedMatch[]>([]);
   const [loading, setLoading] = useState(true);
   const [profileId, setProfileId] = useState<string | null>(null);
 
@@ -56,52 +72,80 @@ export default function MyTripMatches() {
       // Load matches where this user is a candidate
       const { data, error } = await supabase
         .from("trip_request_matches")
-        .select(`
+        .select(
+          `
           id,
           trip_request_id,
           match_score,
           reasons,
           trip_requests (
             id,
-            title,
             destination,
+            start_date,
+            end_date,
             budget_min,
             budget_max,
             travelers_adults,
             travelers_children,
             created_at,
             status,
+            source_brand_profile_id,
+            source_collection_id,
             source_metadata
           )
-        `)
+        `
+        )
         .eq("candidate_profile_id", profile.id)
         .order("match_score", { ascending: false });
 
       if (error) {
         console.error("Error loading matches:", error);
-      } else {
-        setMatches(data as any || []);
+        setLoading(false);
+        return;
       }
 
+      // Enrich with brand avatars
+      const typedMatches = data as any as TripMatch[];
+      const brandProfileIds = [
+        ...new Set(
+          typedMatches.map((m) => m.trip_requests.source_brand_profile_id)
+        ),
+      ];
+
+      const { data: brandProfiles } = await supabase
+        .from("profiles")
+        .select("id, avatar_url")
+        .in("id", brandProfileIds);
+
+      const brandAvatarMap = new Map(
+        brandProfiles?.map((p) => [p.id, p.avatar_url]) ?? []
+      );
+
+      const enrichedMatches: EnrichedMatch[] = typedMatches.map((match) => ({
+        ...match,
+        brandAvatarUrl:
+          brandAvatarMap.get(match.trip_requests.source_brand_profile_id) ||
+          null,
+      }));
+
+      setMatches(enrichedMatches);
       setLoading(false);
     }
 
     loadMatches();
   }, [navigate]);
 
-  const formatBudget = (min: number | null, max: number | null) => {
-    if (!min && !max) return "Budget flexible";
-    if (!max) return `From $${(min! / 1000).toFixed(0)}k`;
-    if (!min) return `Up to $${(max / 1000).toFixed(0)}k`;
-    return `$${(min / 1000).toFixed(0)}k–$${(max / 1000).toFixed(0)}k`;
-  };
-
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
+  const handleStatusChange = (tripRequestId: string, newStatus: TripRequestStatus) => {
+    setMatches((prev) =>
+      prev.map((match) =>
+        match.trip_requests.id === tripRequestId
+          ? {
+              ...match,
+              trip_requests: { ...match.trip_requests, status: newStatus },
+            }
+          : match
+      )
+    );
   };
 
   if (loading) {
