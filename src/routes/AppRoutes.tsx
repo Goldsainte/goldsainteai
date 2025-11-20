@@ -29,6 +29,7 @@ const AdminBookingsPage = lazy(() => import('@/pages/admin/AdminBookingsPage'));
 const AdminDisputesPage = lazy(() => import('@/pages/admin/AdminDisputesPage'));
 const AdminHomePage = lazy(() => import('@/pages/admin/AdminHomePage'));
 const AdminMarketplaceOversightPage = lazy(() => import('@/pages/admin/AdminMarketplaceOversightPage'));
+const OpsEscrowDashboardPage = lazy(() => import('@/pages/OpsEscrowDashboardPage'));
 const AgentPublicProfilePage = lazy(() => import('@/pages/agents/AgentPublicProfilePage'));
 const CreatorPublicProfilePage = lazy(() => import('@/pages/creators/CreatorPublicProfilePage'));
 const TravelProfileRedirect = lazy(() => import('@/pages/redirects/TravelProfileRedirectPage'));
@@ -454,6 +455,7 @@ export const AppRoutes = () => (
       <Route path="/admin/bookings" element={<AdminBookingsPage />} />
       <Route path="/admin/disputes" element={<AdminDisputesPage />} />
       <Route path="/admin/marketplace" element={<AdminMarketplaceOversightPage />} />
+      <Route path="/admin/escrow" element={<OpsEscrowDashboardPage />} />
       <Route path="/admin/cancellations" element={<AdminCancellations />} />
       <Route path="/admin/analytics/cancellations" element={<AdminCancellationAnalytics />} />
       <Route path="/admin/customer-verifications" element={<AdminCustomerVerifications />} />
