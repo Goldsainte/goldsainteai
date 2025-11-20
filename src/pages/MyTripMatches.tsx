@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, MapPin, Star, Users, DollarSign } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { NewTripForYouCard } from "@/components/trips/NewTripForYouCard";
 import { TripStatusControls } from "@/components/trips/TripStatusControls";
 import {
@@ -207,10 +208,10 @@ export default function MyTripMatches() {
                   <div className="p-6">
                     {/* Header row */}
                     <div className="mb-4 flex items-start justify-between">
-                      <div className="flex-1">
+                    <div className="flex-1">
                         <div className="mb-1 flex items-center gap-2">
                           <h3 className="font-serif text-xl text-[#0a2225]">
-                            {trip.title}
+                            {trip.destination || "Trip Request"}
                           </h3>
                           <div className="flex items-center gap-1 rounded-full bg-[#F5F0E0] px-2 py-0.5">
                             <Star className="h-3 w-3 fill-[#BFAD72] text-[#BFAD72]" />
@@ -228,7 +229,10 @@ export default function MyTripMatches() {
                       </div>
 
                       <span className="text-[10px] uppercase tracking-wide text-[#7A7151]">
-                        {formatDate(trip.created_at)}
+                        {new Date(trip.created_at).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                        })}
                       </span>
                     </div>
 
@@ -258,7 +262,7 @@ export default function MyTripMatches() {
 
                       <div className="flex items-center gap-1.5">
                         <DollarSign className="h-4 w-4 text-[#BFAD72]" />
-                        {formatBudget(trip.budget_min, trip.budget_max)}
+                        {formatBudgetRange(trip.budget_min, trip.budget_max)}
                       </div>
                     </div>
 
