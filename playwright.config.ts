@@ -63,9 +63,9 @@ export default defineConfig({
     },
   ],
 
-  // Web server configuration for local development
-  webServer: process.env.CI ? undefined : {
-    command: 'npm run dev',
+  // Web server configuration (run for both local + CI so tests always have a target)
+  webServer: {
+    command: 'npm run dev -- --host --port 8080',
     url: 'http://localhost:8080',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
