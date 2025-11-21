@@ -23,8 +23,8 @@ import { usePresence } from "@/hooks/usePresence";
 import { ensureCSRFToken } from "@/lib/security/csrf";
 import { AppRoutes } from "@/routes/AppRoutes";
 
-const VoiceConciergeWidget = lazy(() =>
-  import("@/components/concierge/VoiceConciergeWidget").then((m) => ({ default: m.VoiceConciergeWidget })),
+const AIBookingConcierge = lazy(() =>
+  import("@/components/AIBookingConcierge").then((m) => ({ default: m.AIBookingConcierge })),
 );
 
 const queryClient = new QueryClient();
@@ -143,7 +143,7 @@ function AppContent() {
       {hideFooter ? null : <Footer />}
       {hideConciergeWidget ? null : (
         <Suspense fallback={null}>
-          <VoiceConciergeWidget />
+          <AIBookingConcierge />
         </Suspense>
       )}
     </div>
