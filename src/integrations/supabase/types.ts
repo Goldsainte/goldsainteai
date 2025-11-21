@@ -10192,7 +10192,9 @@ export type Database = {
           match_score: number
           reasons: string | null
           role: string
+          status: string
           trip_request_id: string
+          updated_at: string
         }
         Insert: {
           candidate_profile_id: string
@@ -10201,7 +10203,9 @@ export type Database = {
           match_score: number
           reasons?: string | null
           role: string
+          status?: string
           trip_request_id: string
+          updated_at?: string
         }
         Update: {
           candidate_profile_id?: string
@@ -10210,7 +10214,9 @@ export type Database = {
           match_score?: number
           reasons?: string | null
           role?: string
+          status?: string
           trip_request_id?: string
+          updated_at?: string
         }
         Relationships: [
           {
