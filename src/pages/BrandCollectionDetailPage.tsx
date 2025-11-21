@@ -5,7 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { TravelStoryboard } from "@/components/storyboards/TravelStoryboard";
 import { TripRequestModal } from "@/components/trips/TripRequestModal";
-import { ArrowLeft, MapPin, MessageCircle } from "lucide-react";
+import { CollectionHeroCollage } from "@/components/brand/CollectionHeroCollage";
+import { TripSummaryChips } from "@/components/brand/TripSummaryChips";
+import { CollectionSidebar } from "@/components/brand/CollectionSidebar";
+import { ArrowLeft, MapPin } from "lucide-react";
 
 interface BrandProfile {
   profile_id: string;
@@ -181,115 +184,116 @@ export default function BrandCollectionDetailPage() {
         </title>
       </Helmet>
 
-      <div className="border-b border-[#E5DFC6]/40 bg-white">
-        <div className="mx-auto max-w-5xl px-4 py-6 space-y-3">
-          <div className="flex items-center justify-between">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-xs text-[#4a4a4a]"
-            >
-              <ArrowLeft className="h-3 w-3" />
-              Back
-            </Button>
+      <div className="bg-[#FDF9F0]">
+        <div className="mx-auto max-w-6xl px-4 py-8 md:py-12">
+          <Link
+            to={`/brands/${brand.profile_id}`}
+            className="inline-flex items-center gap-2 text-[12px] text-[#7A7151] underline-offset-4 hover:underline"
+          >
+            <ArrowLeft className="h-3 w-3" />
+            Back to {brand.name}
+          </Link>
 
-            <Link
-              to={`/brands/${brand.profile_id}`}
-              className="text-xs text-[#7A7151] underline-offset-4 hover:underline"
-            >
-              View brand profile
-            </Link>
+          {/* Hero collage */}
+          <div className="mt-6">
+            <CollectionHeroCollage
+              mainImageUrl={collection.cover_image_url || "/placeholder.svg"}
+              secondaryImageUrl={collection.cover_image_url}
+              tertiaryImageUrl={collection.cover_image_url}
+              title={collection.title}
+            />
           </div>
 
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 overflow-hidden rounded-full bg-[#F5F0E0]">
-                {brand.avatar_url ? (
-                  <img
-                    src={brand.avatar_url}
-                    alt={brand.name}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-xs font-semibold text-[#0a2225]">
-                    {brand.name.slice(0, 2).toUpperCase()}
-                  </div>
-                )}
-              </div>
-              <div>
-                <p className="text-[11px] uppercase tracking-wide text-[#7A7151]">
-                  Collection by {brand.name}
-                </p>
-                <h1 className="font-display text-xl text-[#0a2225]">
-                  {collection.title}
-                </h1>
+          {/* Title + tags + CTA row */}
+          <div className="mt-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div className="space-y-2">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[#A4987C]">
+                Brand collection
+              </p>
+              <h1 className="font-secondary text-2xl text-[#0a2225] md:text-3xl">
+                {collection.title}
+              </h1>
+              <p className="text-[13px] text-[#6E6650]">
+                By {brand.name}
                 {brand.regions && brand.regions.length > 0 && (
-                  <p className="mt-1 flex items-center gap-1 text-[11px] text-[#4a4a4a]">
-                    <MapPin className="h-3 w-3" />
+                  <span className="ml-1 inline-flex items-center gap-1">
+                    <MapPin className="inline h-3 w-3" />
                     {brand.regions.slice(0, 3).join(" • ")}
-                  </p>
+                  </span>
                 )}
-              </div>
+              </p>
+              {highlightTags && highlightTags.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {highlightTags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full bg-[#F5EFE1] px-2 py-[2px] text-[11px] text-[#574E3D]"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
-            <div className="flex flex-col items-end gap-2 md:flex-row md:items-center">
+
+            {/* Mobile CTA */}
+            <div className="md:hidden">
               <Button
-                size="sm"
-                className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] px-4 py-2 text-xs font-semibold uppercase tracking-wide text-[#E5DFC6]"
                 onClick={handleTripInquiry}
+                className="w-full rounded-full bg-[#0a2225] px-4 py-2.5 text-[13px] font-medium text-[#FDFBF5] hover:bg-[#123338]"
               >
-                <MessageCircle className="h-4 w-4" />
-                Start a Trip from this Collection
+                Request a trip like this
               </Button>
             </div>
           </div>
         </div>
       </div>
 
-      <main className="mx-auto max-w-5xl px-4 py-8 space-y-8">
-        {/* Hero image + description */}
-        <section className="grid gap-6 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-          <div className="overflow-hidden rounded-2xl bg-[#F5F0E0]">
-            {collection.cover_image_url ? (
-              <img
-                src={collection.cover_image_url}
-                alt={collection.title}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex h-full min-h-[200px] items-center justify-center text-sm text-[#8C8470]">
-                This collection doesn&apos;t have a cover image yet.
-              </div>
-            )}
-          </div>
-          <div className="space-y-3">
-            {collection.description && (
-              <p className="text-sm leading-relaxed text-[#0a2225] whitespace-pre-line">
-                {collection.description}
-              </p>
-            )}
-            {highlightTags && highlightTags.length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
-                {highlightTags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full border border-[#E5DFC6] bg-[#FDFBF5] px-3 py-1 text-[11px] uppercase tracking-wide text-[#7A7151]"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
+      <main className="mx-auto max-w-6xl px-4 py-8">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)]">
+          {/* Left column */}
+          <div className="space-y-6">
+            {/* Overview */}
+            <section>
+              <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#A4987C]">
+                Overview
+              </h2>
+              {collection.description && (
+                <p className="mt-3 text-[13px] leading-relaxed text-[#4A4A4A] whitespace-pre-line">
+                  {collection.description}
+                </p>
+              )}
+            </section>
+
+            {/* Trip blueprint chips */}
+            <TripSummaryChips
+              duration="3 nights · 4 days"
+              season="Best between October and March"
+              style="Design-led · wellness-forward"
+              budgetBand="From $4,200 per person"
+              pace="Slow mornings, long sunsets"
+            />
+
             <p className="text-[11px] text-[#8C8470]">
               Use this collection as a starting point. Your Goldsainte creator
               or agent can adapt it to your dates, budget, and preferences.
             </p>
           </div>
-        </section>
+
+          {/* Right sidebar (desktop only) */}
+          <div className="hidden lg:block">
+            <CollectionSidebar
+              brandName={brand.name}
+              startingPriceLabel="From $4,200 pp"
+              onRequestTrip={handleTripInquiry}
+              className="sticky top-8"
+            />
+          </div>
+        </div>
 
         {/* Inspiration section – reuse TravelStoryboard */}
-        <section className="space-y-3">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151]">
+        <section className="mt-8 space-y-3">
+          <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#A4987C]">
             Inspiration from this collection
           </h2>
           <TravelStoryboard
@@ -301,8 +305,8 @@ export default function BrandCollectionDetailPage() {
         </section>
 
         {related.length > 0 && (
-          <section className="space-y-3">
-            <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151]">
+          <section className="mt-8 space-y-3">
+            <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#A4987C]">
               Related collections
             </h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
