@@ -62,13 +62,19 @@ export function MadisonChat() {
 
       const response: any = data;
 
+      // Build message content with storyboard link if available
+      let messageContent = response?.message ?? "I'm having trouble responding right now. Can you try again?";
+      
+      if (response?.action === "trip_created" && response.storyboard?.id && response.trip?.id) {
+        const storyboardUrl = `/trip/${response.trip.id}/storyboard?from=madison`;
+        messageContent += `\n\n[View your storyboard →](${storyboardUrl})`;
+      }
+
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content:
-            response?.message ??
-            "I'm having trouble responding right now. Can you try again?",
+          content: messageContent,
           timestamp: new Date(),
         },
       ]);
@@ -156,7 +162,27 @@ export function MadisonChat() {
                     : "bg-muted text-foreground"
                 }`}
               >
-                <p className="whitespace-pre-wrap">{msg.content}</p>
+                <p className="whitespace-pre-wrap">
+                  {msg.content.split(/(\[.*?\]\(.*?\))/).map((part, i) => {
+                    const linkMatch = part.match(/\[(.*?)\]\((.*?)\)/);
+                    if (linkMatch) {
+                      return (
+                        <a
+                          key={i}
+                          href={linkMatch[2]}
+                          className="underline font-semibold hover:opacity-80 transition-opacity"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            navigate(linkMatch[2]);
+                          }}
+                        >
+                          {linkMatch[1]}
+                        </a>
+                      );
+                    }
+                    return <span key={i}>{part}</span>;
+                  })}
+                </p>
                 <p className="mt-1 text-[10px] opacity-70">
                   {msg.timestamp.toLocaleTimeString([], {
                     hour: "2-digit",
