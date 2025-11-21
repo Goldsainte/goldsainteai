@@ -20,6 +20,7 @@ export default function ConciergePage() {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [fromTripId, setFromTripId] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -30,9 +31,14 @@ export default function ConciergePage() {
         return;
       }
 
-      // Check if sessionId was passed from voice widget
+      // Check if sessionId was passed from voice widget or trip context
       const params = new URLSearchParams(location.search);
       const fromSession = params.get("sessionId");
+      const tripFromParam = params.get("fromTripId");
+
+      if (tripFromParam) {
+        setFromTripId(tripFromParam);
+      }
 
       let sid = fromSession;
 
@@ -163,6 +169,19 @@ export default function ConciergePage() {
             and agents, or shape a storyboard from the content and ideas you
             already love.
           </p>
+
+          {fromTripId && (
+            <div className="mt-2 inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-white/80 px-3 py-1 text-[10px] text-[#4a4a4a]">
+              <Sparkles className="h-3 w-3 text-[#0c4d47]" />
+              <span>Working from this trip</span>
+              <Link
+                to={`/trip/${fromTripId}`}
+                className="font-semibold underline text-[#0c4d47]"
+              >
+                View trip
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Quick actions */}
