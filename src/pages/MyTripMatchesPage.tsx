@@ -2,9 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { NewTripForYouCard } from "@/components/trips/NewTripForYouCard";
-import { Button } from "@/components/ui/button";
+import { InProgressTripCard } from "@/components/trips/InProgressTripCard";
+import { CompletedTripCard } from "@/components/trips/CompletedTripCard";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+
+type TripStatus = "new" | "in_progress" | "completed";
 
 interface TripMatch {
   id: string;
@@ -30,10 +34,30 @@ interface TripMatch {
   };
 }
 
+const TabPill: React.FC<{
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}> = ({ active, onClick, children }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={cn(
+      "rounded-full px-4 py-1.5",
+      active
+        ? "bg-[#0a2225] text-[#FDFBF5]"
+        : "text-[#6E6650] hover:bg-[#F5EFE1]"
+    )}
+  >
+    {children}
+  </button>
+);
+
 export default function MyTripMatchesPage() {
   const [matches, setMatches] = useState<TripMatch[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<TripStatus>("new");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -75,7 +99,6 @@ export default function MyTripMatchesPage() {
           )
         `)
         .eq("candidate_profile_id", user.id)
-        .in("status", ["new", "accepted"])
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -134,7 +157,6 @@ export default function MyTripMatchesPage() {
           : "Trip declined.",
       });
 
-      // Reload matches
       await loadMatches();
     } catch (err: any) {
       console.error("Error updating status:", err);
@@ -157,131 +179,164 @@ export default function MyTripMatchesPage() {
   }
 
   const newMatches = matches.filter((m) => m.status === "new");
-  const acceptedMatches = matches.filter((m) => m.status === "accepted");
+  const inProgressMatches = matches.filter((m) => m.status === "accepted");
+  const completedMatches = matches.filter((m) => m.trip_requests.status === "completed");
+
+  const renderContent = () => {
+    if (activeTab === "new") {
+      if (!newMatches.length) {
+        return (
+          <p className="mt-6 text-sm text-[#6E6650]">
+            No new trips right now. New matches will appear here as travelers
+            request journeys aligned with your style.
+          </p>
+        );
+      }
+      return (
+        <div className="mt-6 grid gap-5 md:grid-cols-2">
+          {newMatches.map((match) => {
+            const metadata = match.trip_requests.source_metadata || {};
+            const brandName = metadata.brand_name || "Unknown Brand";
+            const collectionTitle = metadata.collection_title || "Trip Request";
+            const tags = metadata.tags || [];
+
+            const dateRange = match.trip_requests.start_date && match.trip_requests.end_date
+              ? `${new Date(match.trip_requests.start_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${new Date(match.trip_requests.end_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
+              : null;
+
+            const travelers = 
+              (match.trip_requests.travelers_adults || 0) + 
+              (match.trip_requests.travelers_children || 0);
+
+            const budgetRange = match.trip_requests.budget_min && match.trip_requests.budget_max
+              ? `$${match.trip_requests.budget_min.toLocaleString()} – $${match.trip_requests.budget_max.toLocaleString()}`
+              : null;
+
+            return (
+              <NewTripForYouCard
+                key={match.id}
+                matchId={match.id}
+                tripRequestId={match.trip_request_id}
+                createdAt={match.created_at}
+                sourceBrandProfileId={match.trip_requests.source_brand_profile_id || ""}
+                brandName={brandName}
+                sourceCollectionId={match.trip_requests.source_collection_id}
+                collectionTitle={collectionTitle}
+                collectionTags={tags}
+                destination={match.trip_requests.destination}
+                dateRange={dateRange}
+                travelersCount={travelers}
+                budgetRange={budgetRange}
+                status={match.trip_requests.status as any}
+                matchScore={match.match_score}
+                matchReasons={match.reasons}
+                matchStatus={match.status}
+                onOpenRequest={() => navigate(`/trip-requests/${match.trip_request_id}`)}
+                onAccept={() => handleUpdateStatus(match.id, "accepted")}
+                onDecline={() => handleUpdateStatus(match.id, "declined")}
+              />
+            );
+          })}
+        </div>
+      );
+    }
+
+    if (activeTab === "in_progress") {
+      if (!inProgressMatches.length) {
+        return (
+          <p className="mt-6 text-sm text-[#6E6650]">
+            Trips move here once you accept them and begin working with the traveler.
+          </p>
+        );
+      }
+      return (
+        <div className="mt-6 space-y-4">
+          {inProgressMatches.map((match) => {
+            const metadata = match.trip_requests.source_metadata || {};
+            const brandName = metadata.brand_name || "Unknown Brand";
+            const collectionTitle = metadata.collection_title || "Trip Request";
+
+            const dateRange = match.trip_requests.start_date && match.trip_requests.end_date
+              ? `${new Date(match.trip_requests.start_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${new Date(match.trip_requests.end_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
+              : null;
+
+            const budgetRange = match.trip_requests.budget_min && match.trip_requests.budget_max
+              ? `$${match.trip_requests.budget_min.toLocaleString()} – $${match.trip_requests.budget_max.toLocaleString()}`
+              : null;
+
+            return (
+              <InProgressTripCard
+                key={match.id}
+                collectionTitle={collectionTitle}
+                brandName={brandName}
+                notes={metadata.notes}
+                checkIn={dateRange?.split(" – ")[0]}
+                checkOut={dateRange?.split(" – ")[1]}
+                budgetRange={budgetRange}
+              />
+            );
+          })}
+        </div>
+      );
+    }
+
+    if (!completedMatches.length) {
+      return (
+        <p className="mt-6 text-sm text-[#6E6650]">
+          Once a trip is marked completed, it will appear here.
+        </p>
+      );
+    }
+    return (
+      <div className="mt-6 space-y-4">
+        {completedMatches.map((match) => {
+          const metadata = match.trip_requests.source_metadata || {};
+          const brandName = metadata.brand_name || "Unknown Brand";
+          const collectionTitle = metadata.collection_title || "Trip Request";
+
+          return (
+            <CompletedTripCard
+              key={match.id}
+              collectionTitle={collectionTitle}
+              brandName={brandName}
+              notes={metadata.notes}
+            />
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
-      <div className="mb-8">
-        <h1 className="font-secondary text-3xl text-[#0a2225]">My Trip Matches</h1>
-        <p className="mt-2 text-sm text-[#6E6650]">
-          Trips matched to your profile based on style, expertise, and location
-        </p>
+    <div className="min-h-screen bg-[#FDF9F0] pb-16">
+      <div className="mx-auto max-w-6xl px-4 pt-10">
+        <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.22em] text-[#A4987C]">Trips</p>
+            <h1 className="font-secondary text-2xl text-[#0a2225] md:text-3xl">
+              Trips aligned with your style
+            </h1>
+            <p className="mt-2 max-w-xl text-sm text-[#6E6650]">
+              New matches arrive here when a traveler's brief and a brand collection fit your world. 
+              Accept what feels right, then move trips forward in your own cadence.
+            </p>
+          </div>
+        </div>
+
+        <div className="inline-flex rounded-full border border-[#E5DFC6] bg-[#FDFBF5] p-1 text-[12px]">
+          <TabPill active={activeTab === "new"} onClick={() => setActiveTab("new")}>
+            New
+          </TabPill>
+          <TabPill active={activeTab === "in_progress"} onClick={() => setActiveTab("in_progress")}>
+            In progress
+          </TabPill>
+          <TabPill active={activeTab === "completed"} onClick={() => setActiveTab("completed")}>
+            Completed
+          </TabPill>
+        </div>
+
+        {renderContent()}
       </div>
-
-      {matches.length === 0 ? (
-        <div className="rounded-2xl border border-[#E5DFC6] bg-[#FDFBF5] p-8 text-center">
-          <p className="text-[#6E6650]">No trip matches yet.</p>
-          <p className="mt-2 text-sm text-[#8C8470]">
-            Complete your profile to receive personalized trip recommendations
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-8">
-          {newMatches.length > 0 && (
-            <section>
-              <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-[#A4987C]">
-                New Opportunities ({newMatches.length})
-              </h2>
-              <div className="space-y-4">
-                {newMatches.map((match) => {
-                  const metadata = match.trip_requests.source_metadata || {};
-                  const brandName = metadata.brand_name || "Unknown Brand";
-                  const collectionTitle = metadata.collection_title || "Trip Request";
-                  const tags = metadata.tags || [];
-
-                  const dateRange = match.trip_requests.start_date && match.trip_requests.end_date
-                    ? `${new Date(match.trip_requests.start_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${new Date(match.trip_requests.end_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
-                    : null;
-
-                  const travelers = 
-                    (match.trip_requests.travelers_adults || 0) + 
-                    (match.trip_requests.travelers_children || 0);
-
-                  const budgetRange = match.trip_requests.budget_min && match.trip_requests.budget_max
-                    ? `$${match.trip_requests.budget_min.toLocaleString()} – $${match.trip_requests.budget_max.toLocaleString()}`
-                    : null;
-
-                  return (
-                    <NewTripForYouCard
-                      key={match.id}
-                      matchId={match.id}
-                      tripRequestId={match.trip_request_id}
-                      createdAt={match.created_at}
-                      sourceBrandProfileId={match.trip_requests.source_brand_profile_id || ""}
-                      brandName={brandName}
-                      sourceCollectionId={match.trip_requests.source_collection_id}
-                      collectionTitle={collectionTitle}
-                      collectionTags={tags}
-                      destination={match.trip_requests.destination}
-                      dateRange={dateRange}
-                      travelersCount={travelers}
-                      budgetRange={budgetRange}
-                      status={match.trip_requests.status as any}
-                      matchScore={match.match_score}
-                      matchReasons={match.reasons}
-                      matchStatus={match.status}
-                      onOpenRequest={() => navigate(`/trip-requests/${match.trip_request_id}`)}
-                      onAccept={() => handleUpdateStatus(match.id, "accepted")}
-                      onDecline={() => handleUpdateStatus(match.id, "declined")}
-                    />
-                  );
-                })}
-              </div>
-            </section>
-          )}
-
-          {acceptedMatches.length > 0 && (
-            <section>
-              <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-[#A4987C]">
-                Accepted Trips ({acceptedMatches.length})
-              </h2>
-              <div className="space-y-4">
-                {acceptedMatches.map((match) => {
-                  const metadata = match.trip_requests.source_metadata || {};
-                  const brandName = metadata.brand_name || "Unknown Brand";
-                  const collectionTitle = metadata.collection_title || "Trip Request";
-                  const tags = metadata.tags || [];
-
-                  const dateRange = match.trip_requests.start_date && match.trip_requests.end_date
-                    ? `${new Date(match.trip_requests.start_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${new Date(match.trip_requests.end_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
-                    : null;
-
-                  const travelers = 
-                    (match.trip_requests.travelers_adults || 0) + 
-                    (match.trip_requests.travelers_children || 0);
-
-                  const budgetRange = match.trip_requests.budget_min && match.trip_requests.budget_max
-                    ? `$${match.trip_requests.budget_min.toLocaleString()} – $${match.trip_requests.budget_max.toLocaleString()}`
-                    : null;
-
-                  return (
-                    <NewTripForYouCard
-                      key={match.id}
-                      matchId={match.id}
-                      tripRequestId={match.trip_request_id}
-                      createdAt={match.created_at}
-                      sourceBrandProfileId={match.trip_requests.source_brand_profile_id || ""}
-                      brandName={brandName}
-                      sourceCollectionId={match.trip_requests.source_collection_id}
-                      collectionTitle={collectionTitle}
-                      collectionTags={tags}
-                      destination={match.trip_requests.destination}
-                      dateRange={dateRange}
-                      travelersCount={travelers}
-                      budgetRange={budgetRange}
-                      status={match.trip_requests.status as any}
-                      matchScore={match.match_score}
-                      matchReasons={match.reasons}
-                      matchStatus={match.status}
-                      onOpenRequest={() => navigate(`/trip-requests/${match.trip_request_id}`)}
-                    />
-                  );
-                })}
-              </div>
-            </section>
-          )}
-        </div>
-      )}
 
       {updating && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20">
