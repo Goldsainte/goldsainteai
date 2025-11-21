@@ -13,6 +13,7 @@ import { TripRequestGrid } from "@/components/marketplace/TripRequestGrid";
 import { BrandGrid } from "@/components/marketplace/BrandGrid";
 import type { BrandSummary } from "@/components/marketplace/BrandCard";
 import { EmptyState } from "@/components/marketplace/EmptyState";
+import { BrandEmptyState } from "@/components/brand/BrandEmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -234,12 +235,7 @@ export default function Marketplace() {
       }
 
       if (!brands?.length) {
-        return (
-          <EmptyState
-            type="brands"
-            onAction={() => navigate("/marketplace")}
-          />
-        );
+        return <BrandEmptyState />;
       }
 
       return <BrandGrid brands={brands} />;
