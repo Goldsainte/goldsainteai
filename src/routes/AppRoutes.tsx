@@ -1,5 +1,6 @@
-import { lazy } from 'react';
+import { lazy, Suspense } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
+import { LoadingFallback } from '@/components/LoadingFallback';
 
 import Auth from '@/pages/Auth';
 import AuthCallback from '@/pages/AuthCallback';
@@ -172,7 +173,14 @@ const EarningsDashboard = lazy(() => import('@/pages/EarningsDashboard'));
 export const AppRoutes = () => (
   <Routes>
     <Route element={<MarketingLayout />}>
-      <Route index element={<HomePage />} />
+      <Route 
+        index 
+        element={
+          <Suspense fallback={<LoadingFallback message="Loading homepage..." />}>
+            <HomePage />
+          </Suspense>
+        } 
+      />
       <Route path="/about" element={<About />} />
       <Route path="/creators" element={<CreatorsPage />} />
       <Route path="/creators/:id" element={<CreatorPublicProfilePage />} />
