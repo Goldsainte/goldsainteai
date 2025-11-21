@@ -270,7 +270,7 @@ async function handleCreateTrip(
 
   return {
     message: `Perfect! I've started planning your ${destination} trip. I've also started a storyboard with experiences you'll love. Ready to see it?`,
-    action: "trip_created",
+    action: "create_trip",
     trip,
     storyboard,
     metadata: {
