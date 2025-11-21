@@ -13,22 +13,46 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: { persistSession: false },
 });
 
-// Very simple intent detection: "I want to go/travel/visit X"
+// Enhanced intent detection: catches multiple natural language patterns
 function detectTravelIntent(message: string): boolean {
   if (!message) return false;
-  return /want to\s+(go|travel|visit)/i.test(message);
+  
+  const intentPatterns = [
+    // Original pattern: "I want to go/travel/visit"
+    /want to\s+(go|travel|visit)/i,
+    
+    // "I'd like to" / "I would like to"
+    /(I'd|I would)\s+like to\s+(go|travel|visit)/i,
+    
+    // "I'm planning to"
+    /I'm\s+planning to\s+(go|travel|visit)/i,
+    
+    // "Can you help me plan a trip to"
+    /(help|assist).*plan.*trip\s+to/i,
+    
+    // "I'm thinking about"
+    /thinking about\s+(going|traveling|visiting)/i,
+  ];
+  
+  return intentPatterns.some(pattern => pattern.test(message));
 }
 
-// Very simple destination extractor: "to Morocco", "to New York", etc.
+// Case-insensitive destination extractor with normalization
 function extractDestination(message: string): string | null {
   if (!message) return null;
 
-  // Look for "to <Capitalized words>"
-  const match = message.match(/\bto\s+([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)*)/);
+  // Look for "to <location>" - case-insensitive
+  const match = message.match(/\bto\s+([a-zA-Z]+(?:\s+[a-zA-Z]+)*)/i);
   if (!match) return null;
 
   const dest = match[1].trim();
-  return dest.length > 0 ? dest : null;
+  
+  // Normalize capitalization: "morocco" → "Morocco", "new york" → "New York"
+  return dest.length > 0 
+    ? dest.split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+          .join(' ')
+    : null;
 }
 
 serve(async (req) => {
