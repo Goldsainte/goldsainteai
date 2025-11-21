@@ -287,12 +287,16 @@ export const AppRoutes = () => (
         )}
       />
       <Route
-        path="/trip-matches"
+        path="/dashboard/trips"
         element={(
           <RequireAuth>
             <MyTripMatchesPage />
           </RequireAuth>
         )}
+      />
+      <Route
+        path="/trip-matches"
+        element={<Navigate to="/dashboard/trips" replace />}
       />
       <Route
         path="/traveler"
