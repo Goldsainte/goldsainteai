@@ -342,7 +342,7 @@ export default function CreatorsPage() {
   );
 
   const headerRight = (
-    <div className="flex flex-col gap-3 sm:flex-row">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
       <input
         type="text"
         placeholder="Search creators by destination, vibe, or handle"
@@ -352,20 +352,29 @@ export default function CreatorsPage() {
           setFilters((prev) => ({ ...prev, search: event.target.value }))
         }
       />
-      <button
-        type="button"
-        className="rounded-full border px-3 py-2 text-xs font-medium text-slate-700"
-        onClick={() => navigate("/post-trip")}
-      >
-        Post a trip brief
-      </button>
+      <div className="flex gap-2">
+        <button
+          type="button"
+          className="rounded-full border px-3 py-2 text-xs font-medium text-slate-700 bg-white hover:bg-slate-50"
+          onClick={() => navigate("/post-trip")}
+        >
+          Post a trip brief
+        </button>
+        <button
+          type="button"
+          className="rounded-full bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-black"
+          onClick={() => navigate("/tiktok-lab")}
+        >
+          Go to Goldsainte Creator Lab
+        </button>
+      </div>
     </div>
   );
 
   return (
     <MarketplaceShell
-      title="Discover TikTok travel creators"
-      subtitle="Find creators whose audience, aesthetic, and markets match the trips you want to sell."
+      title="Creator Marketplace"
+      subtitle="Discover TikTok travel creators and partner with them to sell trips through Goldsainte."
       filters={filtersPanel}
       headerRight={headerRight}
       resultCount={filteredCreators.length}
