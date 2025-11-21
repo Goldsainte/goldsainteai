@@ -206,7 +206,6 @@ export default function OpsEscrowDashboardPage() {
         });
         if (updateError) throw updateError;
       }
-      if (error) throw error;
 
       setRows((prev) =>
         prev.map((r) =>
