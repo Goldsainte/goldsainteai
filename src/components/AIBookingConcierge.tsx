@@ -34,6 +34,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { StartStoryboardFromChat } from "./concierge/StartStoryboardFromChat";
 import { ConciergeIntroModal } from "./concierge/ConciergeIntroModal";
 import { MusicIndicator } from "./concierge/MusicIndicator";
+import { useMadisonConversation } from "@/hooks/useMadisonConversation";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -120,6 +121,7 @@ export const AIBookingConcierge = () => {
   const { language } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
+  const { conversationId } = useMadisonConversation();
 
   /**
    * Check with the madison-chat edge function whether this message
@@ -483,106 +485,53 @@ export const AIBookingConcierge = () => {
     saveConversationData();
 
     try {
-      // Check if this message should auto-create a trip
-      const handledByMadison = await checkMadisonTripIntent(userMessage);
-      if (handledByMadison) {
-        // We created a trip and navigated away — stop here
-        setIsLoading(false);
-        setIsProcessing(false);
-        return;
-      }
+      console.log('[AIBookingConcierge] Calling madison edge function with conversationId:', conversationId);
 
-      // Add placeholder for assistant message
-      setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
-
-      // Persist user message to database if we have a session
-      if (sessionId) {
-        await supabase.from('concierge_messages').insert({
-          session_id: sessionId,
-          role: 'user',
-          content: userMessage
-        });
-      }
-
-      const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-booking-concierge`;
-      console.log('[AIBookingConcierge] Calling edge function:', CHAT_URL);
-      
-      const resp = await fetch(CHAT_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
-        body: JSON.stringify({ 
-          messages: [...messages, { role: 'user', content: userMessage }],
-          stream: false,  // Disable streaming to allow tool execution
-          agentProfile: agentProfile,  // Pass agent profile to backend
-          preferences: preferences,  // Pass all user preferences
-          language: language  // Pass selected language
-        }),
+      // Call the madison edge function for natural conversation
+      const { data, error } = await supabase.functions.invoke("madison", {
+        body: {
+          message: userMessage,
+          userId: user?.id,
+          inputType: 'text',
+          conversationId: conversationId
+        }
       });
 
-      console.log('[AIBookingConcierge] Response status:', resp.status);
-
-      if (!resp.ok) {
-        const errorText = await resp.text();
-        console.error('[AIBookingConcierge] Error response:', errorText);
-        
-        // Handle specific error codes
-        if (resp.status === 429) {
-          throw new Error("Rate limit exceeded. Please wait a moment and try again.");
-        }
-        if (resp.status === 402) {
-          throw new Error("Service temporarily unavailable. Please try again later.");
-        }
-        if (resp.status === 504 || resp.status === 524) {
-          throw new Error("Request timed out while searching. This can happen with complex travel searches. Please try again or simplify your request.");
-        }
-        
+      if (error) {
+        console.error('[AIBookingConcierge] madison error:', error);
         throw new Error("Failed to get response. Please try again.");
       }
 
-      const data = await resp.json();
-      console.log('[AIBookingConcierge] Response data:', data);
-      
-      const assistantContent = data.content || data.message || "I apologize, I encountered an issue. Please try again.";
-      
-      // Update assistant message with response
-      setMessages(prev => {
-        const newMessages = [...prev];
-        newMessages[newMessages.length - 1] = {
-          ...newMessages[newMessages.length - 1],
-          content: assistantContent,
-          toolResults: Array.isArray(data.toolResults) ? data.toolResults : []
-        };
-        return newMessages;
-      });
+      console.log('[AIBookingConcierge] madison response:', data);
 
-      // Persist assistant message to database if we have a session
-      if (sessionId) {
-        await supabase.from('concierge_messages').insert({
-          session_id: sessionId,
-          role: 'assistant',
-          content: assistantContent
+      // Extract the assistant's message
+      const assistantContent = data?.message || "I apologize, I encountered an issue. Please try again.";
+      
+      // Add assistant message to chat
+      setMessages(prev => [...prev, { role: 'assistant', content: assistantContent }]);
+
+      // Check if madison created a trip
+      if (data?.action === 'create_trip' && data?.trip) {
+        const destination = data.trip.destination || "your destination";
+        toast({
+          title: "Trip created",
+          description: `Planning your trip to ${destination}`,
         });
+        
+        // Navigate to storyboard editor with concierge context
+        navigate(`/trip/${data.trip.id}/storyboard?from=concierge`);
       }
 
       saveConversationData();
     } catch (error) {
-      console.error('Error:', error);
+      console.error('[AIBookingConcierge] Error:', error);
       const errorMessage = error instanceof Error ? error.message : "Something went wrong. Please try again.";
       
-      // Update the assistant message with error
-      setMessages(prev => {
-        const newMessages = [...prev];
-        if (newMessages[newMessages.length - 1]?.role === 'assistant' && !newMessages[newMessages.length - 1].content) {
-          newMessages[newMessages.length - 1] = {
-            role: 'assistant',
-            content: `I apologize, but ${errorMessage.toLowerCase()}`
-          };
-        }
-        return newMessages;
-      });
+      // Add error message to chat
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: `I apologize, but ${errorMessage.toLowerCase()}` 
+      }]);
       
       toast({
         title: "Error",
@@ -613,81 +562,52 @@ export const AIBookingConcierge = () => {
     saveConversationData();
 
     try {
-      // Add placeholder for assistant message
-      setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+      console.log('[AIBookingConcierge] Sending programmatic message to madison with conversationId:', conversationId);
 
-      const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-booking-concierge`;
-      console.log('[AIBookingConcierge] Calling edge function:', CHAT_URL);
-      
-      const resp = await fetch(CHAT_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
-        body: JSON.stringify({ 
-          messages: [...messages, userMessage],
-          stream: false,
-          agentProfile: agentProfile,
-          preferences: preferences,  // Pass all user preferences
-          language: language  // Pass selected language
-        }),
+      // Call the madison edge function for natural conversation
+      const { data, error } = await supabase.functions.invoke("madison", {
+        body: {
+          message: messageContent,
+          userId: user?.id,
+          inputType: 'text',
+          conversationId: conversationId
+        }
       });
 
-      console.log('[AIBookingConcierge] Response status:', resp.status);
-
-      if (!resp.ok) {
-        const errorText = await resp.text();
-        console.error('[AIBookingConcierge] Error response:', errorText);
-        
-        if (resp.status === 429) {
-          toast({
-            title: "Rate limit exceeded",
-            description: "Too many requests. Please try again in a moment.",
-            variant: "destructive",
-          });
-          throw new Error("Rate limit exceeded");
-        }
-        if (resp.status === 402) {
-          toast({
-            title: "AI usage limit reached",
-            description: "Please add credits to continue using AI features.",
-            variant: "destructive",
-          });
-          throw new Error("Payment required");
-        }
-        
-        throw new Error("Failed to get response");
+      if (error) {
+        console.error('[AIBookingConcierge] madison error:', error);
+        throw new Error("Failed to get response. Please try again.");
       }
 
-      const data = await resp.json();
-      console.log('[AIBookingConcierge] Response data:', data);
+      console.log('[AIBookingConcierge] madison response:', data);
+
+      // Extract the assistant's message
+      const assistantContent = data?.message || "I apologize, I encountered an issue. Please try again.";
       
-      // Update assistant message with response
-      setMessages(prev => {
-        const newMessages = [...prev];
-        newMessages[newMessages.length - 1] = {
-          ...newMessages[newMessages.length - 1],
-          content: data.content || data.message || "I apologize, I encountered an issue. Please try again.",
-          toolResults: Array.isArray(data.toolResults) ? data.toolResults : []
-        };
-        return newMessages;
-      });
+      // Add assistant message to chat
+      setMessages(prev => [...prev, { role: 'assistant', content: assistantContent }]);
+
+      // Check if madison created a trip
+      if (data?.action === 'create_trip' && data?.trip) {
+        const destination = data.trip.destination || "your destination";
+        toast({
+          title: "Trip created",
+          description: `Planning your trip to ${destination}`,
+        });
+        
+        // Navigate to storyboard editor with concierge context
+        navigate(`/trip/${data.trip.id}/storyboard?from=concierge`);
+      }
 
       saveConversationData();
     } catch (error) {
       console.error('[AIBookingConcierge] Error:', error);
       
-      setMessages(prev => {
-        const newMessages = [...prev];
-        if (newMessages[newMessages.length - 1]?.role === 'assistant' && !newMessages[newMessages.length - 1].content) {
-          newMessages[newMessages.length - 1] = {
-            role: 'assistant',
-            content: "I apologize, but I encountered an error. Please try again."
-          };
-        }
-        return newMessages;
-      });
+      // Add error message to chat
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: "I apologize, but I encountered an error. Please try again."
+      }]);
       
       toast({
         title: "Error",
