@@ -1,5 +1,5 @@
-import { MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import logomark from "@/assets/logomark-gold.png";
 
 interface VoiceConciergeButtonProps {
   onClick?: () => void;
@@ -14,12 +14,15 @@ export function VoiceConciergeButton({ onClick, className }: VoiceConciergeButto
       data-testid="voice-concierge-button"
       aria-label="Open Madison concierge"
       className={cn(
-        "fixed bottom-4 right-4 z-40 inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-4 py-2 text-sm font-semibold text-[#E5DFC6] shadow-lg transition hover:bg-[#073331] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0c4d47]",
+        "fixed bottom-4 right-4 z-40 flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-lg transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
         className,
       )}
     >
-      <MessageCircle className="h-4 w-4" aria-hidden="true" />
-      Hey Goldsainte
+      <img 
+        src={logomark} 
+        alt="Goldsainte" 
+        className="h-12 w-12 object-contain"
+      />
     </button>
   );
 }
