@@ -345,6 +345,9 @@ verify_jwt = false
 [functions.match-agent-creators]
 verify_jwt = false
 
+[functions.madison]
+verify_jwt = false
+
 [functions.ai-storyboard-suggestions]
 verify_jwt = true
 
