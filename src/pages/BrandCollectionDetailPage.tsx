@@ -287,8 +287,6 @@ export default function BrandCollectionDetailPage() {
           </div>
         </section>
 
-        <CollectionItemsSection collectionId={collection.id} />
-
         {/* Inspiration section – reuse TravelStoryboard */}
         <section className="space-y-3">
           <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151]">

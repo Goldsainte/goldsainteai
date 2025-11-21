@@ -93,7 +93,11 @@ export default function TripInboxPage() {
                 <h3 className="text-lg font-semibold text-[#0a2225]">
                   {trip.destination || "Destination TBD"}
                 </h3>
-                <p className="text-sm text-[#4a4a4a]">{trip.date_range || "Flexible dates"}</p>
+                <p className="text-sm text-[#4a4a4a]">
+                  {trip.start_date && trip.end_date
+                    ? `${new Date(trip.start_date).toLocaleDateString()} - ${new Date(trip.end_date).toLocaleDateString()}`
+                    : "Flexible dates"}
+                </p>
                 <div className="flex flex-wrap gap-2 text-[11px] text-[#7A7151]">
                   {creator?.profiles?.full_name && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-[#F5F0E0] px-3 py-1">
