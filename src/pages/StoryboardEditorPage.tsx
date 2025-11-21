@@ -1,6 +1,6 @@
 // src/pages/StoryboardEditorPage.tsx
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import {
   getOrCreateTripStoryboard,
   getStoryboardItems,
@@ -17,6 +17,8 @@ import { supabase } from "@/integrations/supabase/client";
 
 export default function StoryboardEditorPage() {
   const { tripId } = useParams<{ tripId: string }>();
+  const [searchParams] = useSearchParams();
+  const fromConcierge = searchParams.get("from") === "concierge";
   const [storyboard, setStoryboard] = useState<Storyboard | null>(null);
   const [items, setItems] = useState<StoryboardItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -123,7 +125,22 @@ export default function StoryboardEditorPage() {
               <Sparkles className="h-3 w-3" />
               Goldsainte storyboard
             </p>
-            <h1 className="text-lg font-semibold">
+
+            {fromConcierge && (
+              <div className="mt-1 flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center rounded-full bg-[#12363a] px-2 py-0.5 text-[10px] font-medium text-[#E5DFC6] border border-[#1f4a50]">
+                  Created from Madison concierge
+                </span>
+                <Link
+                  to="/concierge"
+                  className="text-[10px] text-[#BFAD72] underline hover:text-[#e3d59a]"
+                >
+                  Open this trip in Madison
+                </Link>
+              </div>
+            )}
+
+            <h1 className="mt-2 text-lg font-semibold">
               Design the trip like a TikTok storyboard
             </h1>
             <p className="text-[11px] text-[#E5DFC6]/80 max-w-md">

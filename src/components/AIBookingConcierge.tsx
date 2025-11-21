@@ -159,8 +159,8 @@ export const AIBookingConcierge = () => {
           description: `Planning your trip to ${destination}`,
         });
 
-        // Navigate to the new trip
-        navigate(`/trips/${(data.trip as any).id}`);
+        // Navigate to storyboard editor with concierge context
+        navigate(`/trip/${(data.trip as any).id}/storyboard?from=concierge`);
 
         return true;
       }
