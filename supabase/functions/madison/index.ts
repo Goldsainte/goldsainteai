@@ -345,28 +345,103 @@ async function handleStoryboardHelp() {
   };
 }
 
+async function callLovableAI(
+  userMessage: string,
+  conversationHistory: Array<{ role: string; content: string }>,
+  systemPrompt: string,
+): Promise<string> {
+  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+  
+  if (!LOVABLE_API_KEY) {
+    console.error("[Madison] LOVABLE_API_KEY not configured");
+    return "I'm having trouble connecting right now. Can you try again?";
+  }
+
+  try {
+    const messages = [
+      { role: "system", content: systemPrompt },
+      ...conversationHistory,
+      { role: "user", content: userMessage },
+    ];
+
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages,
+        temperature: 0.7,
+        max_tokens: 500,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("[Madison] Lovable AI error:", response.status, errorText);
+      return "I'm having trouble responding right now. Can you try again?";
+    }
+
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content ?? "I'm having trouble responding right now. Can you try again?";
+  } catch (error) {
+    console.error("[Madison] Lovable AI fetch error:", error);
+    return "I'm having trouble responding right now. Can you try again?";
+  }
+}
+
 async function handleGeneralChat(
-  _message: string,
+  message: string,
   _userId: string | null,
   conversationId: string | null,
   supabase: any,
 ) {
-  // Load conversation history for future context
+  // Load conversation history
+  let history: Array<{ role: string; content: string }> = [];
+  
   if (conversationId) {
-    const { data: history } = await supabase
+    const { data: messages } = await supabase
       .from("chat_messages")
       .select("role, content")
       .eq("conversation_id", conversationId)
       .order("created_at", { ascending: true })
       .limit(10);
 
-    console.log("[Madison] Conversation history length:", history?.length ?? 0);
+    history = messages || [];
+    console.log("[Madison] Conversation history length:", history.length);
   }
 
-  // Placeholder Madison personality
+  // Madison's personality system prompt
+  const systemPrompt = `You are Madison, Goldsainte's AI travel concierge. You embody warm, human luxury hospitality.
+
+Voice & Tone:
+- Warm but never over-familiar
+- Use short paragraphs (2-3 sentences max)
+- Say "I" when speaking personally, "we" for Goldsainte
+- NO emojis
+- Sensory language used sparingly for luxury feel
+
+Your Role:
+- Help travelers shape inspiration into trip plans
+- When they express trip interest, offer to create a visual storyboard
+- Encourage all communication stay on-platform for safety
+- Be concise but warm, no jargon
+
+Key Phrases:
+- "This already feels like a beautiful trip"
+- "Ready to see this as a visual storyboard?"
+- "Everything stays safely inside Goldsainte"
+
+Current Context:
+The user is chatting with you. Listen carefully and respond naturally to their questions, confirmations like "yes", or destination mentions. Keep the conversation flowing smoothly.`;
+
+  // Call Lovable AI for intelligent response
+  const aiResponse = await callLovableAI(message, history, systemPrompt);
+
   return {
-    message:
-      "I'm Madison, your AI travel concierge. I can help you plan trips, create storyboards, and shape itineraries around the way you want to travel. Where would you like to go?",
+    message: aiResponse,
     action: "general_chat",
   };
 }
