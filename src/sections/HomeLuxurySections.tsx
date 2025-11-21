@@ -20,7 +20,7 @@ import trustBg from "@/assets/luxury-destinations.jpg";
 export const BuiltForEverySideSection: React.FC = () => {
   return (
     <section className="bg-[#FDF9F0] px-4 py-16 md:py-24">
-      <div className="mx-auto flex max-w-6xl flex-col gap-10 md:flex-row md:items-start">
+      <div className="mx-auto flex max-w-6xl flex-col gap-10 md:flex-row md:items-center">
         {/* LEFT SIDE: COPY + PERSONAS */}
         <div className="space-y-8 md:w-3/5">
           <div className="space-y-3">
