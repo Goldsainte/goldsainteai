@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, Clock, FileText } from "lucide-react";
 import { toast } from "sonner";
-import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
 import { useActivityLogger } from "@/hooks/useActivityLogger";
 
 interface AgentBidFormProps {
@@ -148,16 +147,14 @@ export function AgentBidForm({
         .single();
 
       // Send notification to job owner
-      if (jobData?.user_id) {
+      if (jobData?.user_id && bidData?.id) {
         try {
-          await invokeEdgeFunction('notify-new-bid', {
+          await supabase.functions.invoke('notify-new-bid', {
             body: {
-              jobId: jobId,
-              bidId: agentData.id,
+              bidId: bidData.id,
+              jobId,
               customerId: jobData.user_id,
             },
-            timeout: 10000,
-            showToastOnError: false,
           });
         } catch (notifyError) {
           console.error('Error sending notification:', notifyError);
