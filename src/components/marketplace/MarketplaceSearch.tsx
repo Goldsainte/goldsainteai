@@ -29,14 +29,14 @@ export function MarketplaceSearch({ onSearch, filters }: MarketplaceSearchProps)
       <div className="mx-auto max-w-4xl px-4 py-6">
         <div className="flex flex-col gap-4 rounded-2xl border border-[#E5DFC6] bg-white p-3 shadow-sm md:flex-row md:items-center md:divide-x md:divide-[#E5DFC6]/30">
           {/* Where */}
-          <div className="flex flex-1 flex-col gap-1.5 px-3">
+          <div className="flex min-w-0 flex-1 flex-col gap-1.5 px-3">
             <label className="text-xs font-semibold uppercase tracking-wider text-[#8D8D8D]">
               Where
             </label>
-            <div className="relative">
+            <div className="relative min-w-0">
               <MapPin className="absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D8D8D]" />
               <Input
-                className="border-0 bg-transparent p-0 pl-6 text-sm text-[#0a2225] placeholder:text-[#8D8D8D] focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="w-full truncate border-0 bg-transparent p-0 pl-6 text-sm text-[#0a2225] placeholder:text-[#8D8D8D] focus-visible:ring-0 focus-visible:ring-offset-0"
                 placeholder="Search destinations..."
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
