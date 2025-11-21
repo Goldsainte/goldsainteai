@@ -866,8 +866,81 @@ export const AIBookingConcierge = () => {
               setMessages(prev => [...prev, { role: 'user', content: message.transcript }]);
               saveConversationData();
               
-              // Detect Uber intent and bridge to text mode
               const transcript = message.transcript.toLowerCase();
+              const fullTranscript = message.transcript; // Keep original for Madison
+              
+              // ========================================
+              // 🆕 TRIP CREATION INTENT (HIGHEST PRIORITY)
+              // ========================================
+              const hasTripIntent = 
+                /want to\s+(go|travel|visit)/i.test(transcript) ||
+                /(I'd|I would)\s+like to\s+(go|travel|visit)/i.test(transcript) ||
+                /I'm\s+planning to\s+(go|travel|visit)/i.test(transcript) ||
+                /(help|assist).*plan.*trip\s+to/i.test(transcript) ||
+                /thinking about\s+(going|traveling|visiting)/i.test(transcript);
+              
+              const hasDestination = /\bto\s+([a-zA-Z]+(?:\s+[a-zA-Z]+)*)/i.test(transcript);
+              
+              if (hasTripIntent && hasDestination) {
+                console.log('[Voice] 🌍 Trip creation intent detected, sending to Madison...');
+                
+                toast({
+                  title: "Creating Your Trip",
+                  description: "Let me start planning your adventure!",
+                  duration: 3000
+                });
+                
+                setTimeout(async () => {
+                  try {
+                    const { data, error } = await supabase.functions.invoke("madison", {
+                      body: {
+                        message: fullTranscript,
+                        userId: user?.id,
+                        inputType: 'voice',
+                        conversationId: conversationId
+                      }
+                    });
+
+                    if (error) throw error;
+
+                    console.log('[Voice] Madison response:', data);
+
+                    if (data?.message) {
+                      setMessages(prev => [...prev, { 
+                        role: 'assistant', 
+                        content: data.message 
+                      }]);
+                      saveConversationData();
+                    }
+
+                    if (data?.action === 'create_trip' && data?.trip) {
+                      const destination = data.trip.destination || "your destination";
+                      
+                      toast({
+                        title: "Trip Created! 🎉",
+                        description: `Planning your ${destination} adventure!`,
+                      });
+
+                      setTimeout(() => {
+                        navigate(`/trip/${data.trip.id}/storyboard?from=voice`);
+                      }, 2000);
+                    }
+                  } catch (err) {
+                    console.error('[Voice] Error calling Madison:', err);
+                    toast({
+                      title: "Error",
+                      description: "Failed to create trip. Please try again.",
+                      variant: "destructive",
+                    });
+                  }
+                }, 500);
+                
+                return; // Skip Uber check
+              }
+              
+              // ========================================
+              // UBER INTENT (EXISTING CODE)
+              // ========================================
               const hasUberIntent = 
                 transcript.includes('uber') || 
                 transcript.includes('ride') || 
