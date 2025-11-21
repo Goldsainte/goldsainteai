@@ -11,6 +11,7 @@ const corsHeaders = {
 const INTENT_PATTERNS = {
   createTrip:
     /(?:want to|would like to|i'd like to|plan(?:ning)?|going to|i'm planning to|travel(?:ing)? to|visit(?:ing)?|can you help.*plan.*trip to|i'm thinking about (?:going|traveling|visiting))\s+(?:to\s+)?([A-Z][a-zA-Z\s]+)/i,
+  confirmStoryboard: /^(yes|yeah|yep|sure|ok|okay|absolutely|definitely|let's do it|let's go|create it|make it|do it)$/i,
   showTrips: /(?:show|see|view|list)\s+(?:my\s+)?trips?/i,
   weatherInfo:
     /(?:weather|temperature|forecast)\s+(?:in|at|for)\s+([A-Z][a-zA-Z\s]+)/i,
@@ -93,8 +94,22 @@ serve(async (req) => {
       }
     }
 
-    // 3) Detect intent
-    const intent = detectIntent(message);
+    // 3) Load recent conversation history for context-aware intent detection
+    let recentMessages: any[] = [];
+    if (conversationId && userId) {
+      const { data: history } = await supabase
+        .from("chat_messages")
+        .select("role, content")
+        .eq("conversation_id", conversationId)
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+      recentMessages = (history || []).reverse();
+      console.log("[Madison] Recent messages for context:", recentMessages.length);
+    }
+
+    // 4) Detect intent with context
+    const intent = detectIntent(message, recentMessages);
     console.log("[Madison] Intent detected:", intent);
 
     // 4) Route to handler
@@ -115,6 +130,29 @@ serve(async (req) => {
             userId,
             intent.data.destination,
           );
+        }
+        break;
+
+      case "confirm_storyboard":
+        // Extract destination from recent conversation
+        const destination = extractDestinationFromHistory(recentMessages);
+        
+        if (destination) {
+          if (isGuest) {
+            response = {
+              message: `I'd love to create your ${destination} storyboard! To save it, you'll need a free account. Would you like to sign up?`,
+              action: "auth_required",
+              metadata: { destination }
+            };
+          } else {
+            response = await handleCreateTrip(supabase, userId, destination);
+          }
+        } else {
+          // Couldn't find destination - ask for clarification
+          response = {
+            message: "I'd love to create a storyboard for you! Which destination were you thinking about?",
+            action: "clarify_destination",
+          };
         }
         break;
 
@@ -192,7 +230,7 @@ serve(async (req) => {
 
 // ------------- INTENT DETECTION -------------
 
-function detectIntent(message: string): { type: string; data: any } {
+function detectIntent(message: string, recentMessages: any[] = []): { type: string; data: any } {
   const tripMatch = message.match(INTENT_PATTERNS.createTrip);
   if (tripMatch) {
     // Extract destination and normalize capitalization
@@ -206,6 +244,20 @@ function detectIntent(message: string): { type: string; data: any } {
       type: "create_trip",
       data: { destination },
     };
+  }
+
+  // Check for storyboard confirmation (yes/yeah/sure)
+  if (INTENT_PATTERNS.confirmStoryboard.test(message.trim())) {
+    // Look for storyboard-related question in recent messages
+    const hasStoryboardQuestion = recentMessages.some(
+      (msg) =>
+        msg.role === "assistant" &&
+        /storyboard|visual|create|build|ready to see/i.test(msg.content)
+    );
+    
+    if (hasStoryboardQuestion) {
+      return { type: "confirm_storyboard", data: {} };
+    }
   }
 
   if (INTENT_PATTERNS.showTrips.test(message)) {
@@ -225,6 +277,23 @@ function detectIntent(message: string): { type: string; data: any } {
   }
 
   return { type: "general_chat", data: {} };
+}
+
+function extractDestinationFromHistory(recentMessages: any[]): string | null {
+  // Look for destination mentions in recent user messages
+  for (let i = recentMessages.length - 1; i >= 0; i--) {
+    const msg = recentMessages[i];
+    if (msg.role === "user") {
+      // Look for capitalized words (likely destinations)
+      const words = msg.content.split(/\s+/);
+      for (const word of words) {
+        if (word.length > 2 && /^[A-Z][a-z]+$/.test(word)) {
+          return word;
+        }
+      }
+    }
+  }
+  return null;
 }
 
 // ------------- INTENT HANDLERS -------------
