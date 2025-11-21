@@ -42,6 +42,7 @@ export const PaymentMilestonesManager = ({
   const { toast } = useToast();
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [loading, setLoading] = useState(true);
+  const [approvingId, setApprovingId] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newMilestone, setNewMilestone] = useState({
     title: "",
@@ -73,6 +74,42 @@ export const PaymentMilestonesManager = ({
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleApproveMilestone = async (milestoneId: string) => {
+    try {
+      setApprovingId(milestoneId);
+
+      const { error } = await supabase
+        .from("payment_milestones")
+        .update({ status: "approved" })
+        .eq("id", milestoneId);
+
+      if (error) throw error;
+
+      await supabase.functions.invoke('notify-milestone-approved', {
+        body: {
+          milestoneId,
+          jobId,
+        },
+      });
+
+      toast({
+        title: "Milestone approved",
+        description: "Agent has been notified.",
+      });
+
+      fetchMilestones();
+    } catch (error: any) {
+      console.error("Error approving milestone:", error);
+      toast({
+        title: "Failed to approve milestone",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setApprovingId(null);
     }
   };
 
@@ -311,6 +348,15 @@ export const PaymentMilestonesManager = ({
                         </p>
                       )}
                     </div>
+                    {!isAgent && milestone.status !== "approved" && milestone.status !== "paid" && (
+                      <Button
+                        size="sm"
+                        onClick={() => handleApproveMilestone(milestone.id)}
+                        disabled={approvingId === milestone.id}
+                      >
+                        {approvingId === milestone.id ? "Approving..." : "Approve"}
+                      </Button>
+                    )}
                   </div>
                   <div className="grid grid-cols-3 gap-4 text-sm">
                     <div>

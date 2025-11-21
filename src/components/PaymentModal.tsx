@@ -60,6 +60,15 @@ export const PaymentModal = ({
         if (checkoutError) throw checkoutError;
         
         if (checkoutData?.url) {
+          await supabase.functions.invoke('notify-payment-received', {
+            body: {
+              jobId,
+              amount,
+              currency,
+            },
+            headers: authHeaders,
+          });
+
           // Same-tab navigation to avoid popup blockers
           window.location.href = checkoutData.url;
           toast.success('Redirecting to secure payment...');

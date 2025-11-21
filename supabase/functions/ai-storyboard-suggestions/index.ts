@@ -1,5 +1,8 @@
 // supabase/functions/ai-storyboard-suggestions/index.ts
 import { serve } from "https://deno.land/std@0.192.0/http/server.ts";
+import { createErrorResponse } from "../_shared/errorHandler.ts";
+import { storyboardRequestSchema, validateInput } from "../_shared/validationSchemas.ts";
+import { enforceRateLimit } from "../_utils/rate-limit.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.48.0";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -14,22 +17,66 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: { persistSession: false },
 });
 
+// Helper to extract user ID from JWT
+function extractUserId(req: Request): string | null {
+  const authHeader = req.headers.get('authorization');
+  if (!authHeader?.startsWith('Bearer ')) return null;
+
+  try {
+    const token = authHeader.substring(7);
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.sub || null;
+  } catch {
+    return null;
+  }
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // RATE LIMITING (AI functions - 5 per minute)
+  const userId = extractUserId(req);
+  const rateLimitResponse = await enforceRateLimit({
+    keyType: 'ai',
+    userId,
+    req,
+    corsHeaders,
+    maxRequestsOverride: 5,
+    windowSecondsOverride: 60,
+  });
+
+  if (rateLimitResponse) {
+    return rateLimitResponse;
+  }
+
   if (req.method !== "POST") {
-    return new Response("Method not allowed", { 
+    return new Response("Method not allowed", {
       status: 405,
-      headers: corsHeaders 
+      headers: corsHeaders
     });
   }
 
   try {
-    const { tripId, storyboardId } = await req.json();
-    
+    const body = await req.json();
+
+    const validation = validateInput(storyboardRequestSchema, body);
+
+    if (!validation.success) {
+      console.error("[ai-storyboard-suggestions] Validation errors:", validation.errors);
+      return new Response(
+        JSON.stringify({ error: "Invalid input", details: validation.errors }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        },
+      );
+    }
+
+    const { tripId, storyboardId } = validation.data;
+
     console.log(`[ai-storyboard-suggestions] Received request for tripId: ${tripId}, storyboardId: ${storyboardId}`);
     
     if (!tripId || !storyboardId) {
@@ -52,13 +99,7 @@ serve(async (req) => {
 
     if (tripError) {
       console.error("[ai-storyboard-suggestions] Error loading trip:", tripError);
-      return new Response(
-        JSON.stringify({ error: "Failed to load trip" }),
-        { 
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        },
-      );
+      return createErrorResponse(tripError, 500, corsHeaders);
     }
 
     if (!trip) {
@@ -149,13 +190,7 @@ serve(async (req) => {
 
     if (insertError) {
       console.error("[ai-storyboard-suggestions] Error inserting items:", insertError);
-      return new Response(
-        JSON.stringify({ error: "Failed to create storyboard items", details: insertError.message }),
-        { 
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        },
-      );
+      return createErrorResponse(insertError, 500, corsHeaders);
     }
 
     console.log("[ai-storyboard-suggestions] Successfully created storyboard items");
@@ -168,12 +203,6 @@ serve(async (req) => {
     );
   } catch (err) {
     console.error("[ai-storyboard-suggestions] Unexpected error:", err);
-    return new Response(
-      JSON.stringify({ error: "Unexpected error", details: err instanceof Error ? err.message : String(err) }),
-      { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      },
-    );
+    return createErrorResponse(err, 500, corsHeaders);
   }
 });
