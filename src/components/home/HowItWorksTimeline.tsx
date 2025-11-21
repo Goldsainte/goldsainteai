@@ -41,9 +41,9 @@ export function HowItWorksTimeline() {
   ];
 
   return (
-    <section className="bg-[#f7f3ea] py-16 sm:py-20 md:py-24">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
-        <h2 className="text-left font-display text-2xl leading-snug sm:text-3xl text-[#0a2225] md:text-4xl lg:text-[42px] mb-10 sm:mb-16 max-w-full">
+    <section className="bg-[#f7f3ea] py-20 md:py-24">
+      <div className="mx-auto max-w-5xl px-4">
+        <h2 className="text-left font-display text-3xl leading-snug text-[#0a2225] md:text-4xl lg:text-[42px] mb-16">
           How <span className="italic">Goldsainte AI</span> works
         </h2>
 
@@ -67,10 +67,10 @@ export function HowItWorksTimeline() {
                     <div className="text-[10px] uppercase tracking-[0.18em] text-[#8D8D8D]/70 mb-2">
                       {step.label}
                     </div>
-                    <h3 className="font-display text-xl sm:text-2xl md:text-3xl text-[#0a2225] mb-3 max-w-full">
+                    <h3 className="font-display text-2xl md:text-3xl text-[#0a2225] mb-3">
                       {step.title}
                     </h3>
-                    <p className="text-sm md:text-base leading-[1.6] text-[#4a4a4a] max-w-full pr-2">
+                    <p className="text-sm md:text-base leading-[1.7] text-[#4a4a4a] max-w-[600px]">
                       {step.body}
                     </p>
                   </div>

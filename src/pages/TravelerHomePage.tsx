@@ -42,41 +42,46 @@ export default function TravelerHomePage() {
       const [{ data: recs }, { data: trips }, { data: saves }] = await Promise.all([
         supabase
           .from("brand_collections")
-          .select("id, title, description, cover_image_url, tags")
-          .eq("is_published", true)
+          .select("id, title, description, cover_image_url, tags, collection_stats(views_count, saves_count, trip_inquiries_count)")
           .order("created_at", { ascending: false })
           .limit(6),
         supabase
           .from("trip_requests")
-          .select("id, destination, status, start_date, end_date, created_at")
+          .select(
+            "id, destination, status, date_range, created_at, assignments:trip_assignments(assignee_profile_id, role, profiles(full_name))"
+          )
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(6),
         supabase
-          .from("brand_collections")
-          .select("id, title, description, cover_image_url, tags")
-          .eq("is_published", true)
+          .from("moodboard_collection_saves")
+          .select("id, brand_collections(id, title, description, cover_image_url, tags)")
+          .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(6),
       ]);
 
       setCollections((recs as CollectionRow[]) ?? []);
 
-      const mappedTrips: TripRow[] = (trips ?? []).map((row: any) => ({
-        id: row.id,
-        destination: row.destination,
-        status: row.status,
-        date_range: row.start_date && row.end_date
-          ? `${new Date(row.start_date).toLocaleDateString()} - ${new Date(row.end_date).toLocaleDateString()}`
-          : null,
-        created_at: row.created_at,
-        assigned_creator_name: null,
-        assigned_agent_name: null,
-      }));
+      const mappedTrips: TripRow[] = (trips ?? []).map((row: any) => {
+        const creator = row.assignments?.find((a: any) => a.role === "creator");
+        const agent = row.assignments?.find((a: any) => a.role === "agent");
+        return {
+          id: row.id,
+          destination: row.destination,
+          status: row.status,
+          date_range: row.date_range,
+          created_at: row.created_at,
+          assigned_creator_name: creator?.profiles?.full_name,
+          assigned_agent_name: agent?.profiles?.full_name,
+        };
+      });
       setActiveTrips(mappedTrips);
 
-      // Show same collections as recommended (no user-specific saves table yet)
-      setSavedCollections((saves as CollectionRow[]) ?? []);
+      const mappedSaves = (saves ?? [])
+        .map((s: any) => s.brand_collections as CollectionRow)
+        .filter(Boolean);
+      setSavedCollections(mappedSaves);
     };
 
     void load();
@@ -152,10 +157,10 @@ export default function TravelerHomePage() {
                     </span>
                   ))}
                 </div>
-                <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                <div className="flex items-center justify-between text-[11px] text-[#7A7151]">
                   <span className="inline-flex items-center gap-1">
                     <Sparkles className="h-3 w-3" />
-                    Featured
+                    {collection.collection_stats?.trip_inquiries_count ?? 0} inquiries
                   </span>
                   <Link
                     to={`/collection/${collection.id}`}

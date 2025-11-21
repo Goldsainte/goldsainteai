@@ -18,7 +18,7 @@ export default function Index() {
         />
       </Helmet>
 
-      <main className="min-h-screen bg-[#f7f3ea] text-foreground overflow-x-hidden pb-20 sm:pb-0">
+      <main className="min-h-screen bg-[#f7f3ea] text-foreground">
         {/* Hero with Expedia search + brand positioning */}
         <HomeHero />
 

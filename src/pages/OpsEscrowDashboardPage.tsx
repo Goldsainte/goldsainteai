@@ -177,6 +177,7 @@ export default function OpsEscrowDashboardPage() {
         {
           p_booking_id: bookingId,
           p_new_status: newStatus,
+          p_reason: "Updated from Ops dashboard",
         }
       );
       if (error) throw error;
@@ -199,19 +200,15 @@ export default function OpsEscrowDashboardPage() {
     if (!bulkStatus || selectedIds.length === 0) return;
     setBulkUpdating(true);
     try {
-      // Loop through selected IDs and update individually (bulk RPC not implemented yet)
-      for (const id of selectedIds) {
-        const { error } = await supabase.rpc(
-          "admin_update_trip_booking_status",
-          {
-            p_booking_id: id,
-            p_new_status: bulkStatus,
-          }
-        );
-        if (error) {
-          console.error(`Failed to update booking ${id}`, error);
+      const { error } = await supabase.rpc(
+        "admin_bulk_update_trip_booking_status",
+        {
+          p_booking_ids: selectedIds,
+          p_new_status: bulkStatus,
+          p_reason: bulkReason || "Bulk update from Ops dashboard",
         }
-      }
+      );
+      if (error) throw error;
 
       setRows((prev) =>
         prev.map((r) =>

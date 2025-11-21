@@ -32,13 +32,13 @@ export function RoleSpecificCTAs() {
   ];
 
   return (
-    <section className="bg-white border-t border-[#E5DFC6]/30 py-16 sm:py-20 md:py-24 mb-20 sm:mb-0">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <h2 className="text-center font-display text-2xl leading-snug sm:text-3xl text-[#0a2225] md:text-4xl lg:text-[42px] mb-8 sm:mb-12 max-w-full px-2">
+    <section className="bg-white border-t border-[#E5DFC6]/30 py-20 md:py-24">
+      <div className="mx-auto max-w-6xl px-4">
+        <h2 className="text-center font-display text-3xl leading-snug text-[#0a2225] md:text-4xl lg:text-[42px] mb-12">
           Choose how you join Goldsainte
         </h2>
 
-        <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
+        <div className="grid gap-8 md:grid-cols-3">
           {roles.map((role, index) => {
             const Icon = role.icon;
             return (

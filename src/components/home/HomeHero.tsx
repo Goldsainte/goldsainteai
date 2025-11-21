@@ -10,23 +10,20 @@ export function HomeHero() {
       <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 pb-12 pt-16 md:flex-row md:items-center md:pt-20">
         {/* LEFT: Copy & CTAs */}
         <div className="w-full md:w-[52%] space-y-5">
-          {/* Single-row pills with horizontal scroll on mobile */}
-          <div className="overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-2.5 py-1 text-[10px] sm:text-xs uppercase tracking-[0.12em] sm:tracking-[0.18em] text-[#0C4D47] whitespace-nowrap">
-              <span>Travelers</span>
-              <span className="h-[1px] w-3 sm:w-4 bg-[#0C4D47]/30" />
-              <span>Creators</span>
-              <span className="h-[1px] w-3 sm:w-4 bg-[#0C4D47]/30" />
-              <span>Agents</span>
-            </div>
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#0C4D47]">
+            <span>Travelers</span>
+            <span className="h-[1px] w-4 bg-[#0C4D47]/30" />
+            <span>Creators</span>
+            <span className="h-[1px] w-4 bg-[#0C4D47]/30" />
+            <span>Agents</span>
           </div>
 
-          <h1 className="font-display text-2xl leading-snug sm:text-3xl md:text-4xl lg:text-[42px] max-w-full">
+          <h1 className="font-display text-3xl leading-snug md:text-4xl lg:text-[42px]">
             Where <em>inspiration</em> becomes a <em>storyboard</em> — and the perfect <em>creator + agent</em>{" "}
             team builds the trip.
           </h1>
 
-          <p className="max-w-xl text-sm md:text-base leading-[1.6] text-[#4a4a4a]">
+          <p className="max-w-xl text-sm md:text-base leading-relaxed text-[#4a4a4a]">
             Goldsainte turns inspiration into itinerary. Post your dream trip, match
             instantly with creators and certified agents whose style fits yours,
             co-design the journey through a shared storyboard, and book the entire
