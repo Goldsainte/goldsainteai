@@ -121,6 +121,57 @@ export const AIBookingConcierge = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  /**
+   * Check with the madison-chat edge function whether this message
+   * should create a trip + storyboard. If so, navigate to the trip page.
+   *
+   * Returns true if it handled navigation (trip created), false otherwise.
+   */
+  const checkMadisonTripIntent = async (userMessage: string): Promise<boolean> => {
+    try {
+      if (!user?.id) {
+        console.warn("[AIBookingConcierge] No user ID, skipping madison-chat intent check");
+        return false;
+      }
+
+      console.log("[AIBookingConcierge] Calling madison-chat for intent detection");
+
+      const { data, error } = await supabase.functions.invoke("madison-chat", {
+        body: {
+          message: userMessage,
+          userId: user.id,
+        },
+      });
+
+      if (error) {
+        console.error("[AIBookingConcierge] madison-chat error:", error);
+        return false;
+      }
+
+      console.log("[AIBookingConcierge] madison-chat response:", data);
+
+      if (data && data.action === "create_trip" && data.trip) {
+        const destination =
+          (data.trip as any).destination || "your destination";
+
+        toast({
+          title: "Trip created",
+          description: `Planning your trip to ${destination}`,
+        });
+
+        // Navigate to the new trip
+        navigate(`/trips/${(data.trip as any).id}`);
+
+        return true;
+      }
+
+      return false;
+    } catch (err) {
+      console.error("[AIBookingConcierge] Error in checkMadisonTripIntent:", err);
+      return false;
+    }
+  };
+
   const safelyCancelSpeechSynthesis = () => {
     try {
       window.speechSynthesis?.cancel();
@@ -418,6 +469,15 @@ export const AIBookingConcierge = () => {
     saveConversationData();
 
     try {
+      // Check if this message should auto-create a trip
+      const handledByMadison = await checkMadisonTripIntent(userMessage);
+      if (handledByMadison) {
+        // We created a trip and navigated away — stop here
+        setIsLoading(false);
+        setIsProcessing(false);
+        return;
+      }
+
       // Add placeholder for assistant message
       setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
 
