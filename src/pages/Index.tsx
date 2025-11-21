@@ -1,11 +1,13 @@
 // src/pages/Index.tsx
 import { Helmet } from "react-helmet-async";
 import { HomeHero } from "@/components/home/HomeHero";
-import { WhoItsFor } from "@/components/home/WhoItsFor";
-import { HowItWorksTimeline } from "@/components/home/HowItWorksTimeline";
 import { StoryboardsHighlight } from "@/components/home/StoryboardsHighlight";
-import { TrustAndSafety } from "@/components/home/TrustAndSafety";
 import { RoleSpecificCTAs } from "@/components/home/RoleSpecificCTAs";
+import {
+  BuiltForEverySideSection,
+  HowGoldsainteWorksSection,
+  TrustSafetyPaymentsSection,
+} from "@/sections/HomeLuxurySections";
 
 export default function Index() {
   return (
@@ -22,17 +24,17 @@ export default function Index() {
         {/* Hero with Expedia search + brand positioning */}
         <HomeHero />
 
-        {/* Who Goldsainte is for - 3-column section */}
-        <WhoItsFor />
+        {/* Built for every side - luxury redesign */}
+        <BuiltForEverySideSection />
 
-        {/* How Goldsainte works - 4-step timeline */}
-        <HowItWorksTimeline />
+        {/* How Goldsainte AI works - luxury redesign */}
+        <HowGoldsainteWorksSection />
 
         {/* Storyboards highlight - core differentiator */}
         <StoryboardsHighlight />
 
-        {/* Trust, safety & payments reassurance */}
-        <TrustAndSafety />
+        {/* Trust, safety & payments - luxury redesign */}
+        <TrustSafetyPaymentsSection />
 
         {/* Role-specific CTAs - three-way sign up */}
         <RoleSpecificCTAs />
