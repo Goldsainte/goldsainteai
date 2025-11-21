@@ -1,8 +1,5 @@
 // supabase/functions/booking-actions/index.ts
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.48.0';
-import { createErrorResponse } from '../_shared/errorHandler.ts';
-import { cancellationSchema, disputeSchema, validateInput } from '../_shared/validationSchemas.ts';
-import { enforceRateLimit } from '../_utils/rate-limit.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,20 +8,6 @@ const corsHeaders = {
 
 type Action = 'request_cancellation' | 'open_dispute' | 'admin_update_status';
 
-// Helper to extract user ID from JWT
-function extractUserId(req: Request): string | null {
-  const authHeader = req.headers.get('authorization');
-  if (!authHeader?.startsWith('Bearer ')) return null;
-
-  try {
-    const token = authHeader.substring(7);
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.sub || null;
-  } catch {
-    return null;
-  }
-}
-
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -32,22 +15,6 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const userIdFromToken = extractUserId(req);
-
-    // Apply rate limit (20 requests per minute)
-    const rateLimitResponse = await enforceRateLimit({
-      keyType: 'api',
-      userId: userIdFromToken,
-      req,
-      corsHeaders,
-      maxRequestsOverride: 20,
-      windowSecondsOverride: 60,
-    });
-
-    if (rateLimitResponse) {
-      return rateLimitResponse;
-    }
-
     if (req.method !== 'POST') {
       return new Response(
         JSON.stringify({ error: 'Method not allowed' }),
@@ -64,12 +31,12 @@ Deno.serve(async (req) => {
 
     const payload = await req.json();
     const action: Action = payload.action;
-    const requestUserId: string | undefined = payload.userId;
+    const userId: string | undefined = payload.userId;
     const data = payload.data;
 
-    console.log('booking-actions invoked:', { action, userId: requestUserId });
+    console.log('booking-actions invoked:', { action, userId });
 
-    if (!action || !requestUserId) {
+    if (!action || !userId) {
       return new Response(
         JSON.stringify({ error: 'Missing action or userId' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -77,17 +44,13 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'request_cancellation') {
-      const validation = validateInput(cancellationSchema, data);
-
-      if (!validation.success) {
-        console.error('Validation errors:', validation.errors);
+      const { bookingId, role, reasonShort, reasonDetails } = data || {};
+      if (!bookingId || !role || !reasonShort) {
         return new Response(
-          JSON.stringify({ error: 'Invalid input', details: validation.errors }),
+          JSON.stringify({ error: 'Missing cancellation fields' }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-
-      const { bookingId, reasonShort, reasonDetails } = validation.data;
 
       // Ensure this user is part of the booking
       const { data: booking, error: bookingError } = await supabase
@@ -104,8 +67,8 @@ Deno.serve(async (req) => {
         );
       }
 
-      const isTraveler = booking.traveler_id === requestUserId;
-      const isPartner = booking.partner_id === requestUserId;
+      const isTraveler = booking.traveler_id === userId;
+      const isPartner = booking.partner_id === userId;
       if (!isTraveler && !isPartner) {
         return new Response(
           JSON.stringify({ error: 'Not authorized for this booking' }),
@@ -119,7 +82,7 @@ Deno.serve(async (req) => {
         .from('booking_cancellations')
         .insert({
           booking_id: bookingId,
-          requested_by: requestUserId,
+          requested_by: userId,
           requested_role,
           reason_short: reasonShort,
           reason_details: reasonDetails || null,
@@ -140,7 +103,7 @@ Deno.serve(async (req) => {
         booking_id: bookingId,
         old_status: booking.status,
         new_status: booking.status,
-        changed_by: requestUserId,
+        changed_by: userId,
         reason: `Cancellation requested: ${reasonShort}`,
       });
 
@@ -153,17 +116,13 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'open_dispute') {
-      const validation = validateInput(disputeSchema, data);
-
-      if (!validation.success) {
-        console.error('Validation errors:', validation.errors);
+      const { bookingId, type, summary, details } = data || {};
+      if (!bookingId || !type || !summary) {
         return new Response(
-          JSON.stringify({ error: 'Invalid input', details: validation.errors }),
+          JSON.stringify({ error: 'Missing dispute fields' }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-
-      const { bookingId, type, summary, details } = validation.data;
 
       const { data: booking, error: bookingError } = await supabase
         .from('trip_bookings')
@@ -179,8 +138,8 @@ Deno.serve(async (req) => {
         );
       }
 
-      const isTraveler = booking.traveler_id === requestUserId;
-      const isPartner = booking.partner_id === requestUserId;
+      const isTraveler = booking.traveler_id === userId;
+      const isPartner = booking.partner_id === userId;
 
       if (!isTraveler && !isPartner) {
         return new Response(
@@ -193,7 +152,7 @@ Deno.serve(async (req) => {
         .from('booking_disputes')
         .insert({
           booking_id: bookingId,
-          opened_by: requestUserId,
+          opened_by: userId,
           type,
           summary,
           details: details || null,
@@ -219,7 +178,7 @@ Deno.serve(async (req) => {
         booking_id: bookingId,
         old_status: booking.status,
         new_status: 'disputed',
-        changed_by: requestUserId,
+        changed_by: userId,
         reason: `Dispute opened: ${summary}`,
       });
 
@@ -243,6 +202,10 @@ Deno.serve(async (req) => {
       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (err) {
-    return createErrorResponse(err, 500, corsHeaders);
+    console.error('booking-actions error:', err);
+    return new Response(
+      JSON.stringify({ error: 'Unexpected error', details: String(err) }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
   }
 });
