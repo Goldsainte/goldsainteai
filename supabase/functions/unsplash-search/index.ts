@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+import { enforceRateLimit } from "../_utils/rate-limit.ts";
+import { buildSafeErrorResponse } from "../_shared/httpError.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -10,6 +12,14 @@ serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  // 🔒 Rate limiting
+  const limited = await enforceRateLimit({
+    keyType: "api",
+    req,
+    corsHeaders,
+  });
+  if (limited) return limited;
 
   try {
     const UNSPLASH_KEY = Deno.env.get("UNSPLASH_ACCESS_KEY");
@@ -53,15 +63,6 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error("unsplash-search error:", error);
-    return new Response(
-      JSON.stringify({ 
-        error: error instanceof Error ? error.message : "Unknown error" 
-      }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, "Content-Type": "application/json" } 
-      }
-    );
+    return buildSafeErrorResponse("unsplash-search", error, corsHeaders);
   }
 });

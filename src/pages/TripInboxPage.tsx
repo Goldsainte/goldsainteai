@@ -12,7 +12,8 @@ interface TripInboxRow {
   id: string;
   destination: string | null;
   status: string | null;
-  date_range: string | null;
+  start_date: string | null;
+  end_date: string | null;
   created_at: string;
   assignments?: { role: string; profiles?: { full_name?: string | null } | null }[];
 }
@@ -35,9 +36,9 @@ export default function TripInboxPage() {
     const load = async () => {
       const { data } = await supabase
         .from("trip_requests")
-        .select(
-          "id, destination, status, date_range, created_at, assignments:trip_assignments(role, profiles(full_name))"
-        )
+      .select(
+        "id, destination, status, start_date, end_date, created_at"
+      )
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 

@@ -6,10 +6,6 @@ import { Button } from "@/components/ui/button";
 import { TravelStoryboard } from "@/components/storyboards/TravelStoryboard";
 import { TripRequestModal } from "@/components/trips/TripRequestModal";
 import { ArrowLeft, MapPin, MessageCircle } from "lucide-react";
-import {
-  CollectionActions,
-  CollectionItemsSection,
-} from "@/components/collections/CollectionDetailEnhancements";
 
 interface BrandProfile {
   profile_id: string;
@@ -237,7 +233,6 @@ export default function BrandCollectionDetailPage() {
               </div>
             </div>
             <div className="flex flex-col items-end gap-2 md:flex-row md:items-center">
-              <CollectionActions collectionId={collection.id} />
               <Button
                 size="sm"
                 className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] px-4 py-2 text-xs font-semibold uppercase tracking-wide text-[#E5DFC6]"

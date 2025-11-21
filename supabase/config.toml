@@ -1,7 +1,7 @@
 project_id = "iwdevxltjuedijrcdejs"
 
-[functions.ai-brand-discovery]
-verify_jwt = false
+[functions.amadeus-proxy]
+verify_jwt = true
 
 [functions.get-promoted-vendors]
 verify_jwt = false
@@ -40,22 +40,22 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.tripadvisor-search-hotels]
-verify_jwt = false
+verify_jwt = true
 
 [functions.tripadvisor-search-restaurants]
-verify_jwt = false
+verify_jwt = true
 
 [functions.notify-agents-new-job]
 verify_jwt = false
 
 [functions.unified-search-flights]
-verify_jwt = false
+verify_jwt = true
 
 [functions.unified-search-hotels]
-verify_jwt = false
+verify_jwt = true
 
 [functions.booking-com-rapid-search]
-verify_jwt = false
+verify_jwt = true
 
 [functions.create-checkout]
 verify_jwt = false

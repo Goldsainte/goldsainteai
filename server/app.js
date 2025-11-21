@@ -1,6 +1,10 @@
 import { createServer as createHttpServer } from "node:http";
 import { createHmac, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
 import { URL } from "node:url";
+import { loadConfig } from "./config.js";
+
+// Load and validate config at startup (fail-fast)
+const config = loadConfig();
 
 const SESSION_COOKIE = "gs_session";
 const CSRF_HEADER = "x-csrf-token";
@@ -13,6 +17,51 @@ const sessionStore = new Map();
 const csrfStore = new Map();
 const presenceStore = new Map();
 const presenceStreams = new Map();
+
+// 🔒 Rate limiting stores
+const rateBuckets = new Map();
+const RATE_LIMITS = {
+  "/api/presence/heartbeat": { max: 60, windowMs: 60_000 }, // 60 req/min
+  "/api/csrf-token": { max: 30, windowMs: 60_000 },
+  "/api/auth/session": { max: 30, windowMs: 60_000 },
+};
+
+function checkNodeRateLimit(req, pathname) {
+  const cfg = RATE_LIMITS[pathname];
+  if (!cfg) return null;
+
+  const forwarded = req.headers["x-forwarded-for"];
+  const realIp = req.headers["x-real-ip"];
+  const ip = (forwarded?.split(",")[0] ?? "").trim() || realIp || "unknown";
+
+  const key = `${pathname}:${ip}`;
+  const now = Date.now();
+  const bucket = rateBuckets.get(key) || {
+    count: 0,
+    reset: now + cfg.windowMs,
+  };
+
+  if (now > bucket.reset) {
+    bucket.count = 0;
+    bucket.reset = now + cfg.windowMs;
+  }
+
+  bucket.count += 1;
+  rateBuckets.set(key, bucket);
+
+  if (bucket.count > cfg.max) {
+    return {
+      status: 429,
+      headers: {
+        "Content-Type": "application/json",
+        "Retry-After": Math.ceil((bucket.reset - now) / 1000).toString(),
+      },
+      body: JSON.stringify({ error: "rate_limit_exceeded" }),
+    };
+  }
+
+  return null;
+}
 
 function serverLog(level, message, context) {
   const payload = { level, message, context, timestamp: new Date().toISOString() };
@@ -316,8 +365,9 @@ function buildHandler() {
 
       sendJson(res, 404, { error: "Not found" }, { origin });
     } catch (error) {
-      serverLog("error", "Request handling failed", { error: error?.message });
-      sendJson(res, 500, { error: "Internal server error" }, { origin });
+      const correlationId = randomUUID();
+      serverLog("error", "Request handling failed", { correlationId, error: error?.message });
+      sendJson(res, 500, { error: "Internal server error", correlationId }, { origin });
     }
   };
 }
