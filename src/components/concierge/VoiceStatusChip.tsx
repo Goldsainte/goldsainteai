@@ -43,14 +43,13 @@ export const VoiceStatusChip = ({ state, onClick, className }: VoiceStatusChipPr
           size="sm"
           onClick={onClick}
           className={cn(
-            "gap-2 text-xs font-medium transition-all",
+            "gap-1 text-xs font-medium transition-all h-7 px-2",
             state === 'idle' && "bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 animate-pulse",
             state === 'listening' && "bg-gradient-to-r from-primary/10 to-accent/10 border-primary/30",
             className
           )}
         >
-          <span className="text-base">{current.emoji}</span>
-          <span>{current.text}</span>
+          <span className="hidden md:inline text-[10px]">{current.text}</span>
           {current.icon}
         </Button>
       </TooltipTrigger>
