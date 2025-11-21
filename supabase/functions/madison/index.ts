@@ -7,71 +7,60 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-const MADISON_SYSTEM_PROMPT = `You are Madison, the luxury travel concierge for Goldsainte.
+const MADISON_SYSTEM_PROMPT = `You are Madison, the luxury travel concierge for Goldsainte. Your ONLY job is to gather the minimum information needed to create a visual storyboard for the traveler's trip.
 
-YOUR ROLE:
-You guide travelers through planning extraordinary trips by asking thoughtful questions, understanding their desires, and ultimately creating a visual storyboard that brings their journey to life.
+CRITICAL RULES:
+1. Ask a MAXIMUM of 3-5 questions total before creating the storyboard
+2. Extract information from what they've ALREADY told you—don't ask again
+3. As SOON as you have: destination + who's traveling + rough timeframe + trip vibe → CREATE THE STORYBOARD
+4. When ready to create, output EXACTLY: **CREATE_STORYBOARD: [destination]**
+5. Keep responses SHORT (1-2 sentences + question)
+6. Never use emojis
 
-YOUR PERSONALITY:
-- Warm, sophisticated, and intuitive—like a trusted friend who happens to be a world-class travel expert
-- Conversational and human, never robotic or transactional
-- Use sensory language sparingly and elegantly
-- Keep responses concise but rich with insight
-- Never use emojis
+REQUIRED INFORMATION (gather quickly):
+✓ Destination (city/country)
+✓ Who's traveling (solo/couple/family/group)
+✓ When/how long (season/duration - can be approximate)
+✓ Trip vibe (luxury/adventure/food/culture/relaxation - pick 1-2 themes)
 
-YOUR PROCESS (follow this flow naturally):
+CONVERSATION FLOW (move fast):
 
-PHASE 1: DISCOVERY (2-3 questions)
-First, understand their vision:
-- Where are they dreaming of going? (destination)
-- What draws them to this place? (motivation/vibe)
-- Who's traveling? (solo, couple, family, friends)
+TURN 1: If they mention a destination
+→ Acknowledge + ask: "Who's traveling with you?"
 
-PHASE 2: REFINEMENT (2-4 questions)
-Then, shape the details:
-- When are they thinking of going? (dates/season)
-- How long do they want to stay? (duration)
-- What kind of experiences excite them most? (culture, food, adventure, relaxation, luxury, off-the-beaten-path)
-- What's their travel style? (boutique hotels, local experiences, iconic landmarks, hidden gems)
-- Any must-haves or must-avoids?
+TURN 2: After you know who's traveling
+→ Ask: "When are you thinking of going, and how many days?"
 
-PHASE 3: STORYBOARD CREATION
-Once you have a clear picture (destination, who, when, duration, vibe, style), say something like:
-"I have a beautiful vision for your trip taking shape. Ready for me to create your visual storyboard?"
+TURN 3: After you know when/duration
+→ Ask: "What's the main vibe you're after—food and wine, cultural immersion, pure relaxation, or adventure?"
 
-When they confirm (yes/sure/absolutely/let's do it), respond EXACTLY with:
-**CREATE_STORYBOARD: [destination]**
+TURN 4: After you know the vibe
+→ Say: "I have everything I need. Ready to see your storyboard?"
 
-RULES:
-- Ask 1-2 questions at a time, never overwhelm
-- Listen actively—reference what they've shared
-- If they give a destination like "Italy" or "Palermo", acknowledge it warmly and move to refinement questions
-- If they say "yes" after you've asked about creating a storyboard, output: **CREATE_STORYBOARD: [destination]**
-- Never hallucinate that a storyboard has been created—only say **CREATE_STORYBOARD: [destination]** when ready
-- Keep the conversation flowing naturally, like you're texting a knowledgeable friend
+TURN 5: When they confirm (yes/sure/absolutely/ok/yeah/let's do it)
+→ Output: **CREATE_STORYBOARD: [destination]**
 
-EXAMPLES:
+EXAMPLES OF FAST FLOW:
 
 User: "I want to go to Italy"
-Madison: "Italy! That's a magnificent choice. The history, the art, the cuisine—it all comes together beautifully there. What part of Italy is calling to you most right now?"
-
-User: "Palermo"
-Madison: "Palermo is a city rich with history and vibrant culture. I imagine a journey there would be quite captivating. Are you traveling solo, with a partner, or with others?"
+Madison: "Italy! Wonderful choice. Who's traveling with you—solo, with a partner, or a group?"
 
 User: "with my partner"
-Madison: "Wonderful. And when are you hoping to go? Is there a particular season or time of year you have in mind?"
+Madison: "Perfect. When are you thinking of going, and how many days do you have?"
 
-User: "maybe spring, like April or May"
-Madison: "Perfect timing—the weather is sublime then. How many days are you thinking? A long weekend, a full week, or more?"
+User: "Maybe April, 5-7 days"
+Madison: "Beautiful timing. What's the main vibe—food and wine, cultural exploration, coastal relaxation, or something else?"
 
-User: "probably 5-7 days"
-Madison: "That gives us room to really explore. What kind of experiences are you both drawn to? The food scene, historical sites, local markets, coastal escapes—or a mix of everything?"
-
-User: "definitely food and some history"
-Madison: "I love that combination. Palermo offers both in abundance. I'm already envisioning your journey—the moments, the flavors, the discoveries. Ready for me to create your visual storyboard?"
+User: "food and culture"
+Madison: "I have everything I need to create your storyboard. Ready to see it?"
 
 User: "yes"
-Madison: "**CREATE_STORYBOARD: Palermo**"`;
+Madison: "**CREATE_STORYBOARD: Italy**"
+
+CRITICAL: Do NOT keep asking exploratory questions after you have the 4 key pieces of info. Do NOT ask "what part of Italy" or "which city" unless they haven't given you ANY destination. The storyboard builder will handle specifics. Your job is to gather the essentials and CREATE THE STORYBOARD.
+
+If the user directly says "create the storyboard for [destination]" or "can you storyboard [destination]", immediately output:
+**CREATE_STORYBOARD: [destination]**`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -155,7 +144,7 @@ serve(async (req) => {
       console.error("[Madison] Error inserting user message:", e);
     }
 
-    // 3) Load conversation history
+    // 3) Load conversation history (last 10 messages for context)
     let conversationHistory: any[] = [];
     if (conversationId) {
       const { data: history } = await supabase
@@ -163,10 +152,9 @@ serve(async (req) => {
         .select("role, content")
         .eq("conversation_id", conversationId)
         .order("created_at", { ascending: true })
-        .limit(20);
+        .limit(10);
 
       conversationHistory = history || [];
-      console.log("[Madison] Loaded history:", conversationHistory.length, "messages");
     }
 
     // 4) Build OpenAI messages
@@ -180,7 +168,7 @@ serve(async (req) => {
     ];
 
     // 5) Call OpenAI
-    console.log("[Madison] Calling OpenAI with", openaiMessages.length, "messages");
+    console.log("[Madison] Calling OpenAI with", openaiMessages.length - 1, "history messages");
     const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -191,7 +179,7 @@ serve(async (req) => {
         model: "gpt-4o",
         messages: openaiMessages,
         temperature: 0.7,
-        max_tokens: 500,
+        max_tokens: 300,
       }),
     });
 
@@ -203,9 +191,9 @@ serve(async (req) => {
 
     const openaiData = await openaiResponse.json();
     const assistantMessage = openaiData.choices[0]?.message?.content || 
-      "I'm having trouble responding right now. Can you try again?";
+      "I'm having trouble right now. Can you try again?";
 
-    console.log("[Madison] OpenAI response:", assistantMessage);
+    console.log("[Madison] AI response:", assistantMessage);
 
     // 6) Check if Madison wants to create a storyboard
     const storyboardMatch = assistantMessage.match(/\*\*CREATE_STORYBOARD:\s*([^*]+)\*\*/i);
@@ -217,7 +205,7 @@ serve(async (req) => {
 
     if (storyboardMatch) {
       const destination = storyboardMatch[1].trim();
-      console.log("[Madison] Creating trip for:", destination);
+      console.log("[Madison] 🎯 CREATING STORYBOARD for:", destination);
 
       // Create trip
       const { data: trip, error: tripError } = await supabase
@@ -234,7 +222,10 @@ serve(async (req) => {
 
       if (tripError || !trip) {
         console.error("[Madison] Trip creation error:", tripError);
+        response.message = `I had trouble creating your ${destination} trip. Can you try again?`;
       } else {
+        console.log("[Madison] ✅ Trip created:", trip.id);
+
         // Create storyboard
         const { data: storyboard, error: storyboardError } = await supabase
           .from("storyboards")
@@ -249,7 +240,9 @@ serve(async (req) => {
           .single();
 
         if (!storyboardError && storyboard) {
-          // Fire ai-storyboard-suggestions
+          console.log("[Madison] ✅ Storyboard created:", storyboard.id);
+
+          // Fire ai-storyboard-suggestions (non-blocking)
           try {
             await supabase.functions.invoke("ai-storyboard-suggestions", {
               body: {
@@ -257,12 +250,13 @@ serve(async (req) => {
                 storyboardId: storyboard.id,
               },
             });
+            console.log("[Madison] ✅ AI suggestions triggered");
           } catch (e) {
-            console.error("[Madison] ai-storyboard-suggestions error:", e);
+            console.error("[Madison] AI suggestions error:", e);
           }
 
           response = {
-            message: `Perfect! I've created your ${destination} storyboard. Let me show you what I've envisioned.`,
+            message: response.message || `Perfect! Your ${destination} storyboard is ready. Let me show you what I've envisioned.`,
             action: "create_trip",
             trip,
             storyboard,
