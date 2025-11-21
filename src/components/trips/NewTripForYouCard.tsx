@@ -6,6 +6,7 @@ import { TripRequestStatus } from "@/lib/trips/statusMachine";
 
 export interface NewTripForYouCardProps {
   tripRequestId: string;
+  matchId: string; // NEW: ID of the trip_request_matches row
   createdAt: string;
 
   // Brand/collection attribution
@@ -26,9 +27,12 @@ export interface NewTripForYouCardProps {
   status: TripRequestStatus;
   matchScore?: number;
   matchReasons?: string;
+  matchStatus?: "new" | "accepted" | "declined"; // NEW: Match-level status
 
   // Actions
   onOpenRequest: () => void;
+  onAccept?: () => void; // NEW
+  onDecline?: () => void; // NEW
 }
 
 export function NewTripForYouCard(props: NewTripForYouCardProps) {
@@ -47,7 +51,10 @@ export function NewTripForYouCard(props: NewTripForYouCardProps) {
     status,
     matchScore,
     matchReasons,
+    matchStatus = "new",
     onOpenRequest,
+    onAccept,
+    onDecline,
   } = props;
 
   const displayDate = new Date(createdAt).toLocaleDateString(undefined, {
@@ -184,14 +191,37 @@ export function NewTripForYouCard(props: NewTripForYouCardProps) {
           </span>
         )}
 
-        <Button
-          size="sm"
-          variant="outline"
-          className="text-xs"
-          onClick={onOpenRequest}
-        >
-          Open request
-        </Button>
+        <div className="flex items-center gap-2">
+          {matchStatus === "new" && onDecline && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-xs"
+              onClick={onDecline}
+            >
+              Not a fit
+            </Button>
+          )}
+          
+          {matchStatus === "new" && onAccept ? (
+            <Button
+              size="sm"
+              className="text-xs"
+              onClick={onAccept}
+            >
+              Accept trip
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-xs"
+              onClick={onOpenRequest}
+            >
+              {matchStatus === "accepted" ? "View details" : "Open request"}
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -360,3 +360,6 @@ verify_jwt = false
 [functions.viator-search]
 verify_jwt = false
 
+[functions.update-trip-match-status]
+verify_jwt = true
+
