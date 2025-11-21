@@ -363,3 +363,6 @@ verify_jwt = false
 [functions.update-trip-match-status]
 verify_jwt = true
 
+[functions.madison-chat]
+verify_jwt = false
+
