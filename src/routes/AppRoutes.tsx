@@ -29,6 +29,7 @@ const AdminBookingsPage = lazy(() => import('@/pages/admin/AdminBookingsPage'));
 const AdminDisputesPage = lazy(() => import('@/pages/admin/AdminDisputesPage'));
 const AdminHomePage = lazy(() => import('@/pages/admin/AdminHomePage'));
 const AdminMarketplaceOversightPage = lazy(() => import('@/pages/admin/AdminMarketplaceOversightPage'));
+const SeedCreators = lazy(() => import('@/pages/admin/SeedCreators'));
 const OpsEscrowDashboardPage = lazy(() => import('@/pages/OpsEscrowDashboardPage'));
 const AgentPublicProfilePage = lazy(() => import('@/pages/agents/AgentPublicProfilePage'));
 const CreatorPublicProfilePage = lazy(() => import('@/pages/creators/CreatorPublicProfilePage'));
@@ -488,6 +489,7 @@ export const AppRoutes = () => (
       <Route path="/admin/customer-verifications" element={<AdminCustomerVerifications />} />
       <Route path="/admin/inquiries" element={<AdminInquiries />} />
       <Route path="/admin/seed" element={<AdminSeed />} />
+      <Route path="/admin/seed-creators" element={<SeedCreators />} />
       <Route path="/admin/upload-email-assets" element={<UploadEmailAssets />} />
       <Route path="/admin/upload-apple-music-key" element={<UploadAppleMusicKey />} />
       <Route path="/admin/upload-apple-signin-key" element={<UploadAppleSignInKey />} />

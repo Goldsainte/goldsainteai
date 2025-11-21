@@ -101,7 +101,7 @@ export default function Marketplace() {
       const { data, error } = await supabase
         .from("profiles")
         .select("id,full_name,username,avatar_url,bio")
-        .eq("role", "creator");
+        .eq("account_type", "creator");
 
       if (error) throw error;
       return data || [];
