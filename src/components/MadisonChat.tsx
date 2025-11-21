@@ -33,7 +33,7 @@ export function MadisonChat() {
   }, [messages]);
 
   const sendMessage = async () => {
-    if (!input.trim() || !user) return;
+    if (!input.trim()) return;
 
     const userMessage = input.trim();
     setInput("");
@@ -52,7 +52,7 @@ export function MadisonChat() {
       const { data, error } = await supabase.functions.invoke("madison", {
         body: {
           message: userMessage,
-          userId: user.id,
+          userId: user?.id || null,
           inputType: "text",
           conversationId: conversationId || crypto.randomUUID(),
         },
@@ -72,6 +72,14 @@ export function MadisonChat() {
           timestamp: new Date(),
         },
       ]);
+
+      if (response?.action === "auth_required") {
+        toast({
+          title: "Sign up to continue",
+          description: "Create an account to save trips and storyboards.",
+        });
+        return;
+      }
 
       if (response?.action === "trip_created" && response.trip) {
         const destination =
