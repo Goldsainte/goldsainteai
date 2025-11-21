@@ -32,16 +32,12 @@ serve(async (req) => {
   try {
     const body = await req.json().catch(() => null);
 
-    if (
-      !body ||
-      typeof body.message !== "string" ||
-      typeof body.userId !== "string"
-    ) {
+    if (!body || typeof body.message !== "string") {
       console.error("[Madison] Invalid body:", body);
       return new Response(
         JSON.stringify({
           success: false,
-          error: "message (string) and userId (string) are required",
+          error: "message (string) is required",
         }),
         {
           status: 400,
@@ -51,9 +47,10 @@ serve(async (req) => {
     }
 
     const message: string = body.message;
-    const userId: string = body.userId;
+    const userId: string | null = body.userId || null; // Allow unauthenticated
     const inputType: string = body.inputType || "text";
     const conversationId: string | null = body.conversationId ?? null;
+    const isGuest = !userId;
 
     console.log("[Madison] Input:", {
       message,
@@ -68,8 +65,8 @@ serve(async (req) => {
       { auth: { persistSession: false } },
     );
 
-    // 1) Ensure conversation row exists (if conversationId provided)
-    if (conversationId) {
+    // 1) Ensure conversation row exists (only for authenticated users)
+    if (conversationId && userId) {
       await supabase
         .from("conversations")
         .upsert(
@@ -81,17 +78,19 @@ serve(async (req) => {
         );
     }
 
-    // 2) Save incoming user message to chat_messages
-    try {
-      await supabase.from("chat_messages").insert({
-        conversation_id: conversationId,
-        user_id: userId,
-        role: "user",
-        content: message,
-        input_type: inputType,
-      });
-    } catch (e) {
-      console.error("[Madison] Error inserting user chat_messages:", e);
+    // 2) Save incoming user message to chat_messages (only for authenticated users)
+    if (userId) {
+      try {
+        await supabase.from("chat_messages").insert({
+          conversation_id: conversationId,
+          user_id: userId,
+          role: "user",
+          content: message,
+          input_type: inputType,
+        });
+      } catch (e) {
+        console.error("[Madison] Error inserting user chat_messages:", e);
+      }
     }
 
     // 3) Detect intent
@@ -103,15 +102,32 @@ serve(async (req) => {
 
     switch (intent.type) {
       case "create_trip":
-        response = await handleCreateTrip(
-          supabase,
-          userId,
-          intent.data.destination,
-        );
+        // Guest users need to sign up to create trips
+        if (isGuest) {
+          response = {
+            message: "To create and save trips, you'll need to sign up for a free account. Would you like me to guide you through the process?",
+            action: "auth_required",
+            metadata: { destination: intent.data.destination }
+          };
+        } else {
+          response = await handleCreateTrip(
+            supabase,
+            userId,
+            intent.data.destination,
+          );
+        }
         break;
 
       case "show_trips":
-        response = await handleShowTrips(supabase, userId);
+        // Guest users have no trips
+        if (isGuest) {
+          response = {
+            message: "You'll need to sign up to save and view your trips. Creating an account is free and takes just a moment!",
+            action: "auth_required"
+          };
+        } else {
+          response = await handleShowTrips(supabase, userId);
+        }
         break;
 
       case "weather_info":
@@ -132,17 +148,19 @@ serve(async (req) => {
         break;
     }
 
-    // 5) Save assistant response
-    try {
-      await supabase.from("chat_messages").insert({
-        conversation_id: conversationId,
-        user_id: userId,
-        role: "assistant",
-        content: response.message,
-        metadata: response.metadata ?? null,
-      });
-    } catch (e) {
-      console.error("[Madison] Error inserting assistant chat_messages:", e);
+    // 5) Save assistant response (only for authenticated users)
+    if (userId) {
+      try {
+        await supabase.from("chat_messages").insert({
+          conversation_id: conversationId,
+          user_id: userId,
+          role: "assistant",
+          content: response.message,
+          metadata: response.metadata ?? null,
+        });
+      } catch (e) {
+        console.error("[Madison] Error inserting assistant chat_messages:", e);
+      }
     }
 
     // 6) Respond to client
@@ -213,7 +231,7 @@ function detectIntent(message: string): { type: string; data: any } {
 
 async function handleCreateTrip(
   supabase: any,
-  userId: string,
+  userId: string | null,
   destination: string,
 ) {
   console.log("[Madison] Creating trip for:", destination);
@@ -281,7 +299,7 @@ async function handleCreateTrip(
   };
 }
 
-async function handleShowTrips(supabase: any, userId: string) {
+async function handleShowTrips(supabase: any, userId: string | null) {
   const { data: trips, error } = await supabase
     .from("trips")
     .select("id, destination, start_date, status")
@@ -329,7 +347,7 @@ async function handleStoryboardHelp() {
 
 async function handleGeneralChat(
   _message: string,
-  _userId: string,
+  _userId: string | null,
   conversationId: string | null,
   supabase: any,
 ) {
