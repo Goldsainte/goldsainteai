@@ -1344,13 +1344,13 @@ export const AIBookingConcierge = () => {
     >
       {/* Header */}
       <div className="bg-gradient-to-r from-primary to-accent p-3 sm:p-4 rounded-t-lg flex items-center justify-between">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 max-w-[140px] sm:max-w-none">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
           <div className="relative flex-shrink-0">
-            <img src={logomark} alt="Goldsainte" className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 object-contain" />
+            <img src={logomark} alt="Goldsainte" className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 object-contain" />
           </div>
           <div className="min-w-0 flex-1">
             <h3 className="font-serif text-base sm:text-lg md:text-xl font-bold text-primary-foreground truncate">AI Concierge</h3>
-            <p className="text-[10px] sm:text-xs text-primary-foreground/80 truncate">Powered by Goldsainte</p>
+            <p className="text-[10px] sm:text-xs text-primary-foreground/80 truncate hidden sm:block">Powered by Goldsainte</p>
           </div>
         </div>
         <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
