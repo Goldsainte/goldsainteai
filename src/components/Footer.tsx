@@ -43,7 +43,7 @@ export const Footer = () => {
             <AccordionTrigger className="text-sm font-semibold">{t('footer.discover')}</AccordionTrigger>
             <AccordionContent>
               <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><Link to="/browse-creators" className="hover:text-primary transition-colors">Creator Marketplace</Link></li>
+                <li><Link to="/creators" className="hover:text-primary transition-colors">Creator Marketplace</Link></li>
                 <li><Link to="/tiktok-lab" className="hover:text-primary transition-colors">TikTok Travel Lab</Link></li>
                 <li><Link to="/tiktok-lab/storyboards" className="hover:text-primary transition-colors">{t('footer.storyboards')}</Link></li>
                 <li><Link to="/browse-agents" className="hover:text-primary transition-colors">{t('footer.travelAgentServices')}</Link></li>
@@ -117,7 +117,7 @@ export const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4 text-base">{t('footer.discover')}</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
-              <li><Link to="/browse-creators" className="hover:text-primary transition-colors">Creator Marketplace</Link></li>
+              <li><Link to="/creators" className="hover:text-primary transition-colors">Creator Marketplace</Link></li>
               <li><Link to="/tiktok-lab" className="hover:text-primary transition-colors">TikTok Travel Lab</Link></li>
               <li><Link to="/tiktok-lab/storyboards" className="hover:text-primary transition-colors">{t('footer.storyboards')}</Link></li>
               <li><Link to="/browse-agents" className="hover:text-primary transition-colors">{t('footer.travelAgentServices')}</Link></li>
@@ -146,7 +146,7 @@ export const Footer = () => {
             <h4 className="font-semibold mb-4 text-base">{t('footer.partners')}</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li><Link to="/agent-onboarding" className="hover:text-primary transition-colors">{t('footer.becomeAgent')}</Link></li>
-              <li><Link to="/browse-creators" className="hover:text-primary transition-colors">{t('footer.influencerProgram')}</Link></li>
+              <li><Link to="/creators" className="hover:text-primary transition-colors">{t('footer.influencerProgram')}</Link></li>
               <li><Link to="/shop" className="hover:text-primary transition-colors">{t('footer.affiliateProgram')}</Link></li>
               <li><Link to="/transportation-vendor-partners" className="hover:text-primary transition-colors">{t('footer.listYourCompany')}</Link></li>
             </ul>

@@ -42,7 +42,6 @@ const TripDetail = lazy(() => import('@/pages/marketplace/TripDetail'));
 // const Trending = lazy(() => import('@/pages/Trending'));
 const Shop = lazy(() => import('@/pages/Shop'));
 const BrowseAgents = lazy(() => import('@/pages/BrowseAgents'));
-const BrowseCreators = lazy(() => import('@/pages/BrowseCreators'));
 const CreatorsPage = lazy(() => import('@/pages/CreatorsPage'));
 const CreatorOnboardingPage = lazy(() => import('@/pages/onboarding/CreatorOnboardingPage'));
 const AgentProfile = lazy(() => import('@/pages/AgentProfile'));
@@ -251,7 +250,7 @@ export const AppRoutes = () => (
         )}
       />
       <Route path="/browse-agents" element={<BrowseAgents />} />
-      <Route path="/browse-creators" element={<BrowseCreators />} />
+      <Route path="/browse-creators" element={<Navigate to="/creators" replace />} />
       <Route path="/brands/:profileId" element={<BrandProfilePage />} />
       <Route path="/brands/:profileId/collections/:collectionId" element={<BrandCollectionDetailPage />} />
       <Route
