@@ -491,7 +491,7 @@ export const AIBookingConcierge = () => {
       const { data, error } = await supabase.functions.invoke("madison", {
         body: {
           message: userMessage,
-          userId: user?.id,
+          userId: user?.id || null, // Allow unauthenticated users
           inputType: 'text',
           conversationId: conversationId
         }
@@ -520,6 +520,14 @@ export const AIBookingConcierge = () => {
         
         // Navigate to storyboard editor with concierge context
         navigate(`/trip/${data.trip.id}/storyboard?from=concierge`);
+      }
+      
+      // Handle auth required response
+      if (data?.action === 'auth_required') {
+        toast({
+          title: "Sign up to continue",
+          description: "Create a free account to save your trips!",
+        });
       }
 
       saveConversationData();
@@ -892,14 +900,14 @@ export const AIBookingConcierge = () => {
                 
                 setTimeout(async () => {
                   try {
-                    const { data, error } = await supabase.functions.invoke("madison", {
-                      body: {
-                        message: fullTranscript,
-                        userId: user?.id,
-                        inputType: 'voice',
-                        conversationId: conversationId
-                      }
-                    });
+                const { data, error } = await supabase.functions.invoke("madison", {
+                  body: {
+                    message: fullTranscript,
+                    userId: user?.id || null, // Allow unauthenticated users
+                    inputType: 'voice',
+                    conversationId: conversationId
+                  }
+                });
 
                     if (error) throw error;
 
@@ -924,6 +932,14 @@ export const AIBookingConcierge = () => {
                       setTimeout(() => {
                         navigate(`/trip/${data.trip.id}/storyboard?from=voice`);
                       }, 2000);
+                    }
+                    
+                    // Handle auth required
+                    if (data?.action === 'auth_required') {
+                      toast({
+                        title: "Sign up to save trips",
+                        description: "Create a free account to plan and save your adventures!",
+                      });
                     }
                   } catch (err) {
                     console.error('[Voice] Error calling Madison:', err);
