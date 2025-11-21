@@ -29,6 +29,11 @@ type ViatorProduct = {
   shortDescription?: string;
   thumbnailURL?: string;
   destination?: string;
+  rating?: number;
+  reviewCount?: number;
+  fromPrice?: number;
+  currency?: string;
+  productUrl?: string | null;
 };
 
 export function StoryboardBuilder({
@@ -115,9 +120,23 @@ export function StoryboardBuilder({
           summary: prod.shortDescription,
           thumbnail: prod.thumbnailURL,
           destination: prod.destination,
+          rating: prod.rating,
+          fromPrice: prod.fromPrice,
+          currency: prod.currency,
         },
       },
     ]);
+  }
+
+  function buildViatorBookingUrl(prod: ViatorProduct): string {
+    // If Viator returned a direct product URL, use it
+    if (prod.productUrl) return prod.productUrl;
+    
+    // Otherwise construct a search URL with product details
+    const searchText = `${prod.title || ""} ${prod.destination || ""}`.trim();
+    if (!searchText) return "https://www.viator.com/";
+    
+    return `https://www.viator.com/searchResults/all?text=${encodeURIComponent(searchText)}`;
   }
 
   function addLink() {
@@ -340,18 +359,49 @@ export function StoryboardBuilder({
                   className="h-16 w-16 rounded-xl object-cover"
                 />
               )}
-              <div>
+              <div className="flex-1">
                 <p className="text-xs font-semibold text-[#0a2225]">
                   {ex.title}
                 </p>
                 <p className="text-xs text-[#4a4a4a] line-clamp-2">
                   {ex.shortDescription}
                 </p>
+                
+                {ex.rating && (
+                  <div className="mt-1 flex items-center gap-1">
+                    <span className="text-[10px] text-[#BFAD72]">★</span>
+                    <span className="text-[10px] text-[#4a4a4a]">
+                      {ex.rating.toFixed(1)}
+                    </span>
+                    {ex.reviewCount && (
+                      <span className="text-[10px] text-[#8D8D8D]">
+                        ({ex.reviewCount} reviews)
+                      </span>
+                    )}
+                  </div>
+                )}
+                
                 {ex.destination && (
                   <p className="mt-0.5 text-[10px] text-[#8D8D8D]">
                     {ex.destination}
                   </p>
                 )}
+                
+                {ex.fromPrice && (
+                  <p className="mt-1 text-[10px] font-semibold text-[#0a2225]">
+                    From {ex.currency || "USD"} {ex.fromPrice.toFixed(0)}
+                  </p>
+                )}
+                
+                <a
+                  href={buildViatorBookingUrl(ex)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="mt-2 inline-block text-[10px] font-semibold text-[#BFAD72] underline hover:text-[#e3d59a]"
+                >
+                  View & book on Viator →
+                </a>
               </div>
             </button>
           ))}
