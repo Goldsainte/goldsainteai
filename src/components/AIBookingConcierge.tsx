@@ -154,6 +154,20 @@ export const AIBookingConcierge = () => {
         const destination =
           (data.trip as any).destination || "your destination";
 
+        // Extract Madison's response message
+        const assistantMessage: string =
+          data.message ??
+          `Amazing choice! I've started planning your trip to ${destination}. I've also created a storyboard so we can design your itinerary.`;
+
+        // Show Madison's confirmation in the chat UI
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: assistantMessage,
+          },
+        ]);
+
         toast({
           title: "Trip created",
           description: `Planning your trip to ${destination}`,
