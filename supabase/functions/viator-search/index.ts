@@ -84,9 +84,23 @@ serve(async (req) => {
 
     const data = await response.json();
 
+    // Normalize Viator response with enriched fields
+    const results = (data?.data || data?.products || []).map((p: any) => ({
+      productCode: p.productCode,
+      title: p.title,
+      shortDescription: p.shortDescription,
+      thumbnailURL: p.thumbnailURL || p.defaultImage?.url,
+      destination: p.destination || p.primaryDestination?.name,
+      rating: p.reviewsStats?.avgRating,
+      reviewCount: p.reviewsStats?.numReviews,
+      fromPrice: p.pricingInfo?.fromPrice || p.pricingInfo?.fromPriceFrom,
+      currency: p.pricingInfo?.currencyCode || "USD",
+      productUrl: p.productUrl || null,
+    }));
+
     return new Response(
       JSON.stringify({ 
-        results: data?.data || data?.products || [] 
+        results 
       }),
       { 
         status: 200, 
