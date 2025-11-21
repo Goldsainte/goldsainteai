@@ -2,7 +2,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 
 // Real images from assets
-import heroMain from "@/assets/luxury-infinity-pool.jpg";
+import heroMain from "@/assets/sections/built-for-every-side-main.jpg";
 import heroRightTop from "@/assets/resort-pool-palms.jpg";
 import heroRightBottom from "@/assets/elephants-safari.jpg";
 
@@ -21,8 +21,8 @@ export const BuiltForEverySideSection: React.FC = () => {
   return (
     <section className="bg-[#FDF9F0] px-4 py-16 md:py-24">
       <div className="mx-auto flex max-w-6xl flex-col gap-10 md:flex-row md:items-start">
-        {/* Left: copy + persona cards */}
-        <div className="md:w-3/5 space-y-8">
+        {/* LEFT SIDE: COPY + PERSONAS */}
+        <div className="space-y-8 md:w-3/5">
           <div className="space-y-3">
             <p className="inline-flex rounded-full bg-[#C7B892]/30 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-[#7A7151]">
               Travelers — Creators — Agents — Brands
@@ -74,36 +74,40 @@ export const BuiltForEverySideSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Right: elevated image collage */}
-        <div className="md:w-2/5">
-          <div className="relative mx-auto w-full max-w-sm rounded-[32px] bg-white p-3 shadow-[0_24px_60px_rgba(10,34,37,0.18)]">
-            {/* subtle stacked card */}
+        {/* RIGHT SIDE: COLLAGE (VERTICALLY CENTERED) */}
+        <div className="md:w-2/5 flex items-center justify-center">
+          <div className="relative w-full max-w-md md:max-w-lg rounded-[32px] bg-white p-3 shadow-[0_24px_60px_rgba(10,34,37,0.18)]">
+            {/* subtle stacked card in the back */}
             <div className="pointer-events-none absolute inset-3 translate-x-3 translate-y-4 rounded-[28px] border border-[#E5DFC6] bg-[#FDF9F0]" />
 
             <div className="relative space-y-3 rounded-[28px] bg-white p-3">
+              {/* TOP HERO IMAGE — NOW THE ALPINE TREE PHOTO */}
               <div className="overflow-hidden rounded-[24px]">
                 <img
                   src={heroMain}
-                  alt="Lush, design-led retreat surrounded by greenery"
-                  className="h-60 w-full object-cover md:h-72"
+                  alt="Alpine tree in snow at golden hour, with two travelers"
+                  className="h-64 w-full object-cover md:h-80"
                 />
               </div>
+
+              {/* BOTTOM TWO IMAGES */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="overflow-hidden rounded-[20px]">
                   <img
                     src={heroRightTop}
-                    alt="Poolside at a modern luxury resort"
+                    alt="Poolside scene at a modern resort"
                     className="h-32 w-full object-cover md:h-36"
                   />
                 </div>
                 <div className="overflow-hidden rounded-[20px]">
                   <img
                     src={heroRightBottom}
-                    alt="Safari scene with elephants at golden hour"
+                    alt="Elephants walking across a golden savannah"
                     className="h-32 w-full object-cover md:h-36"
                   />
                 </div>
               </div>
+
               <p className="rounded-[18px] bg-[#F5EFE1] px-4 py-3 text-[11px] leading-relaxed text-[#6E6650]">
                 Each role brings something essential — travelers frame the
                 story, creators refine the aesthetic, agents engineer the
