@@ -6,13 +6,12 @@ export function MarketplaceHeader() {
     <section className="border-b border-[#E5DFC6]/30 bg-white">
       <div className="mx-auto max-w-6xl px-4 py-8 md:py-12">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
+          <div className="max-w-3xl space-y-3">
             <h1 className="font-display text-3xl text-[#0a2225] md:text-4xl">
               Discover your perfect trip
             </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#4a4a4a] md:text-base">
-              Browse curated trips from creators & agents, or post your dream journey and
-              let verified experts bid to build it.
+            <p className="text-sm text-[#4a4a4a] md:text-base">
+              Browse curated trips from creators & agents, or post your dream journey and let verified experts bid to build it.
             </p>
           </div>
 

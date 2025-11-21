@@ -236,7 +236,7 @@ export default function Marketplace() {
       if (!brands?.length) {
         return (
           <EmptyState
-            type="agents"
+            type="brands"
             onAction={() => navigate("/marketplace")}
           />
         );

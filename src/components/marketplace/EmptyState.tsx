@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Compass, Users, Briefcase, MapPin } from "lucide-react";
 
 interface EmptyStateProps {
-  type: "trips" | "creators" | "agents" | "trip-requests";
+  type: "trips" | "creators" | "agents" | "brands" | "trip-requests";
   onAction: () => void;
 }
 
@@ -25,6 +25,12 @@ export function EmptyState({ type, onAction }: EmptyStateProps) {
       title: "No agents found",
       description: "Certified travel agents will appear here once verified.",
       actionLabel: "Browse all agents",
+    },
+    brands: {
+      icon: Briefcase,
+      title: "No brands found",
+      description: "Verified hotels, residences and brands will appear here once they're live on Goldsainte.",
+      actionLabel: "Browse all brands",
     },
     "trip-requests": {
       icon: Compass,

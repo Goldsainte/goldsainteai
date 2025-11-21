@@ -15,6 +15,10 @@ const quickFilters = [
   "Family",
   "Solo Travel",
   "Wellness",
+  "Design-led",
+  "Eco-conscious",
+  "Adults only",
+  "City breaks",
 ];
 
 export function MarketplaceFilters({ filters, onFilterChange }: MarketplaceFiltersProps) {
