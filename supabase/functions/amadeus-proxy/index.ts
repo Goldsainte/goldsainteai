@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { enforceRateLimit } from "../_utils/rate-limit.ts";
+import { buildSafeErrorResponse } from "../_shared/httpError.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -163,6 +165,14 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // 🔒 Rate limiting
+  const limited = await enforceRateLimit({
+    keyType: "api",
+    req,
+    corsHeaders,
+  });
+  if (limited) return limited;
+
   try {
     const { type, ...params } = await req.json();
     
@@ -183,12 +193,6 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('❌ Amadeus proxy error:', error);
-    return new Response(JSON.stringify({ 
-      error: error instanceof Error ? error.message : 'Unknown error' 
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return buildSafeErrorResponse("amadeus-proxy", error, corsHeaders);
   }
 });

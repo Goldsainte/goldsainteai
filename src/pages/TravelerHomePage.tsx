@@ -54,14 +54,17 @@ export default function TravelerHomePage() {
           .order("created_at", { ascending: false })
           .limit(6),
         supabase
-          .from("moodboard_collection_saves")
-          .select("id, brand_collections(id, title, description, cover_image_url, tags)")
-          .eq("user_id", user.id)
+          .from("brand_collections")
+          .select("id, title, description, cover_image_url, tags")
+          .eq("is_published", true)
           .order("created_at", { ascending: false })
           .limit(6),
       ]);
 
-      setCollections((recs as CollectionRow[]) ?? []);
+      setCollections((recs ?? []).map(c => ({
+        ...c,
+        collection_stats: null
+      })) as CollectionRow[]);
 
       const mappedTrips: TripRow[] = (trips ?? []).map((row: any) => {
         const creator = row.assignments?.find((a: any) => a.role === "creator");
