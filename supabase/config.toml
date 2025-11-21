@@ -369,3 +369,6 @@ verify_jwt = true
 [functions.madison-chat]
 verify_jwt = false
 
+[functions.seed-creators]
+verify_jwt = false
+

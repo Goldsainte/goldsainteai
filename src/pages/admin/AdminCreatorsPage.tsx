@@ -27,7 +27,7 @@ export default function AdminCreatorsPage() {
         const { data, error: profileError } = await supabase
           .from("profiles")
           .select("id, full_name, username")
-          .eq("role", "creator")
+          .eq("account_type", "creator")
           .order("created_at", { ascending: false });
 
         if (profileError) throw profileError;
