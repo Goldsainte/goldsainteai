@@ -18,7 +18,7 @@ export const MusicIndicator = ({ isPlaying, onToggle, className }: MusicIndicato
           size="sm"
           onClick={onToggle}
           className={cn(
-            "gap-1.5 h-7 px-2 text-xs",
+            "gap-1 h-7 px-2 text-xs",
             isPlaying && "text-primary",
             className
           )}
@@ -26,12 +26,12 @@ export const MusicIndicator = ({ isPlaying, onToggle, className }: MusicIndicato
           {isPlaying ? (
             <>
               <Music className={cn("w-3.5 h-3.5", isPlaying && "animate-pulse")} />
-              <span className="hidden sm:inline">Music</span>
+              <span className="hidden md:inline text-[10px]">Music</span>
             </>
           ) : (
             <>
               <VolumeX className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Music Off</span>
+              <span className="hidden md:inline text-[10px]">Music Off</span>
             </>
           )}
         </Button>

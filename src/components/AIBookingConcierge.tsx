@@ -1344,7 +1344,7 @@ export const AIBookingConcierge = () => {
     >
       {/* Header */}
       <div className="bg-gradient-to-r from-primary to-accent p-3 sm:p-4 rounded-t-lg flex items-center justify-between">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 max-w-[140px] sm:max-w-none">
           <div className="relative flex-shrink-0">
             <img src={logomark} alt="Goldsainte" className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 object-contain" />
           </div>
@@ -1353,7 +1353,7 @@ export const AIBookingConcierge = () => {
             <p className="text-[10px] sm:text-xs text-primary-foreground/80 truncate">Powered by Goldsainte</p>
           </div>
         </div>
-        <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
+        <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
           <MusicIndicator
             isPlaying={isMusicPlaying}
             onToggle={handleMusicToggle}
@@ -1366,7 +1366,7 @@ export const AIBookingConcierge = () => {
               'muted'
             }
             onClick={enableWakeWordPipeline}
-            className="text-primary-foreground border-primary-foreground/20 text-[10px] sm:text-xs"
+            className="text-primary-foreground border-primary-foreground/20"
           />
           <Tooltip>
             <TooltipTrigger asChild>
