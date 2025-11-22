@@ -656,21 +656,14 @@ export const Header = () => {
                         </div>
                         <div className="py-2">
                           <DropdownMenuItem
-                            onClick={() => navigate('/trip-requests')}
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                          >
-                            <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">Trip Requests</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => navigate('/my-trip-requests')}
+                            onClick={() => navigate('/my-trips?tab=requests')}
                             className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                           >
                             <Calendar className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">My Trip Requests</span>
+                            <span className="text-sm font-medium">My Trips</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => navigate('/my-bookings')}
+                            onClick={() => navigate('/my-trips?tab=booked')}
                             className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                           >
                             <HandCoins className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
