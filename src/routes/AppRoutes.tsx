@@ -360,7 +360,14 @@ export const AppRoutes = () => (
       <Route path="/tiktok-lab/storyboards/:id/edit" element={<TikTokLabStoryboardEditorPage />} />
       <Route path="/notifications" element={<NotificationsPage />} />
       <Route path="/marketplace-guidelines" element={<MarketplaceGuidelinesPage />} />
-      <Route path="/concierge" element={<ConciergePage />} />
+      <Route 
+        path="/concierge" 
+        element={
+          <RequireAuth>
+            <ConciergePage />
+          </RequireAuth>
+        } 
+      />
       <Route path="/my-bookings" element={<MyBookingsPage />} />
       <Route path="/partner-bookings" element={<PartnerBookingsPage />} />
       <Route path="/bookings/:bookingId" element={<BookingDetailPage />} />
