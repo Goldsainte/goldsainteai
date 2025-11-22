@@ -271,20 +271,11 @@ export const CompactFlightCard = ({
               </Button>
               <Button
                 size="sm"
-                variant="outline"
+                variant="ghost"
                 className="h-8 px-2 text-xs"
                 onClick={() => setExpanded(!expanded)}
               >
                 {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-8 px-2 text-xs"
-                onClick={() => setPriceAlertModalOpen(true)}
-                title="Set price alert"
-              >
-                <Bell className="h-3 w-3" />
               </Button>
               <Button
                 size="sm"
