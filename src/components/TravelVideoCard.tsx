@@ -349,28 +349,8 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
     }
   };
   const fetchCollaborators = async () => {
-    try {
-      const { data } = await supabase
-        .from('post_collaborators')
-        .select('collaborator_id')
-        .eq('post_id', post.id)
-        .eq('status', 'accepted');
-      
-      if (!data || data.length === 0) {
-        setCollaborators([]);
-        return;
-      }
-      
-      const collaboratorIds = data.map(c => c.collaborator_id);
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, username, avatar_url')
-        .in('id', collaboratorIds);
-      
-      setCollaborators(profiles || []);
-    } catch (error) {
-      console.error('Error fetching collaborators:', error);
-    }
+    // Collaborator feature removed
+    setCollaborators([]);
   };
 
   const fetchPartnership = async () => {

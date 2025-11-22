@@ -1068,12 +1068,6 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         initialTab={uploadInitialTab}
       />
 
-      {/* Create Moment Modal */}
-      <CreateMomentModal
-        open={createMomentOpen}
-        onOpenChange={setCreateMomentOpen}
-      />
-
       {/* Buy Coins Modal */}
       <BuyCoinsModal
         open={buyCoinsOpen}
