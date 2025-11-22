@@ -140,7 +140,7 @@ function TripRequestCard({ req }: { req: TripRequest }) {
 
   return (
     <Link
-      to={`/trip-request/${req.id}`}
+      to={`/marketplace/request/${req.id}`}
       className="flex flex-col rounded-3xl bg-[#f6f3ea]/95 p-4 shadow-sm ring-1 ring-[#E5DFC6] hover:ring-[#BFAD72] transition-all"
     >
       <div className="flex items-center justify-between gap-2 text-[10px] text-[#8D8D8D]">

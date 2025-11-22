@@ -52,6 +52,7 @@ export default function TripRequestDetail() {
   const { user } = useAuth();
   const [request, setRequest] = useState<TripRequest | null>(null);
   const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [proposalsCount, setProposalsCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -73,16 +74,10 @@ export default function TripRequestDetail() {
     setError(null);
 
     try {
-      // Fetch trip request
+      // Fetch trip request (without invalid join)
       const { data: tripData, error: tripError } = await supabase
         .from("trip_requests")
-        .select(`
-          *,
-          profiles:user_id (
-            full_name,
-            avatar_url
-          )
-        `)
+        .select("*")
         .eq("id", id)
         .single();
 
@@ -91,6 +86,17 @@ export default function TripRequestDetail() {
       if (!tripData) {
         setError("Trip request not found.");
         return;
+      }
+
+      // Fetch profile separately if user_id exists
+      let travelerProfile = null;
+      if (tripData.user_id) {
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("full_name, avatar_url")
+          .eq("id", tripData.user_id)
+          .single();
+        travelerProfile = profileData;
       }
 
       const tripStyle = typeof tripData.trip_style === 'string' 
@@ -121,47 +127,62 @@ export default function TripRequestDetail() {
 
       setRequest(mappedRequest);
 
-      // Fetch proposals
-      const { data: proposalsData, error: proposalsError } = await supabase
-        .from("trip_proposals")
-        .select(`
-          *,
-          profiles:proposer_id (
-            id,
-            full_name,
-            avatar_url
-          )
-        `)
-        .eq("trip_request_id", id)
-        .order("created_at", { ascending: false });
+      // Check if current user is the request owner
+      const isRequestOwner = user?.id === tripData.user_id;
 
-      if (proposalsError) throw proposalsError;
+      // Fetch proposals based on ownership
+      if (isRequestOwner) {
+        // Owner sees full proposal details
+        const { data: proposalsData, error: proposalsError } = await supabase
+          .from("trip_proposals")
+          .select(`
+            *,
+            profiles!proposer_id (
+              id,
+              full_name,
+              avatar_url
+            )
+          `)
+          .eq("trip_request_id", id)
+          .order("created_at", { ascending: false });
 
-      const mappedProposals: Proposal[] = (proposalsData || []).map((proposal: any) => {
-        const proposer = proposal.profiles || {};
-        const nights = proposal.nights || 7;
-        return {
-          id: proposal.id,
-          authorType: proposal.proposer_role === "agent" ? "agent" : "creator",
-          authorName: proposer.full_name || "Unknown",
-          handle: `@${proposer.full_name?.toLowerCase().replace(/\s+/g, "") || "unknown"}`,
-          avatarInitials: proposer.full_name?.substring(0, 2).toUpperCase() || "??",
-          rating: 0, // TODO: calculate from reviews
-          reviewsCount: 0, // TODO: calculate from reviews
-          priceFrom: proposal.price_from || 0,
-          priceTo: proposal.price_from || 0,
-          currency: proposal.currency || "USD",
-          timelineLabel: `${nights} nights`,
-          highlights: proposal.inclusions ? [proposal.inclusions] : [],
-          createdAt: proposal.created_at,
-          status: proposal.status as ProposalStatus,
-          message: proposal.message || proposal.headline || "",
-          agentId: proposal.proposer_id,
-          validUntil: proposal.valid_until || null,
-        };
-      });
+        if (proposalsError) throw proposalsError;
 
-      setProposals(mappedProposals);
+        const mappedProposals: Proposal[] = (proposalsData || []).map((proposal: any) => {
+          const proposer = proposal.profiles || {};
+          const nights = proposal.nights || 7;
+          return {
+            id: proposal.id,
+            authorType: proposal.proposer_role === "agent" ? "agent" : "creator",
+            authorName: proposer.full_name || "Unknown",
+            handle: `@${proposer.full_name?.toLowerCase().replace(/\s+/g, "") || "unknown"}`,
+            avatarInitials: proposer.full_name?.substring(0, 2).toUpperCase() || "??",
+            rating: 0, // TODO: calculate from reviews
+            reviewsCount: 0, // TODO: calculate from reviews
+            priceFrom: proposal.price_from || 0,
+            priceTo: proposal.price_from || 0,
+            currency: proposal.currency || "USD",
+            timelineLabel: `${nights} nights`,
+            highlights: proposal.inclusions ? [proposal.inclusions] : [],
+            createdAt: proposal.created_at,
+            status: proposal.status as ProposalStatus,
+            message: proposal.message || proposal.headline || "",
+            agentId: proposal.proposer_id,
+            validUntil: proposal.valid_until || null,
+          };
+        });
+
+        setProposals(mappedProposals);
+      } else {
+        // Non-owners only see proposal count
+        const { count } = await supabase
+          .from("trip_proposals")
+          .select("*", { count: "exact", head: true })
+          .eq("trip_request_id", id);
+
+        setProposals([]);
+        setProposalsCount(count || 0);
+      }
     } catch (err: any) {
       console.error(err);
       setError("We couldn't load this trip request. Please refresh or try again later.");
@@ -419,31 +440,43 @@ export default function TripRequestDetail() {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-semibold text-foreground">
-                  Proposals ({proposals.length})
+                  Proposals ({isRequestOwner ? proposals.length : proposalsCount})
                 </h2>
-                <p className="text-[11px] text-muted-foreground">
-                  Compare pricing, approach, and reviews before accepting one proposal.
-                </p>
+                {isRequestOwner && (
+                  <p className="text-[11px] text-muted-foreground">
+                    Compare pricing, approach, and reviews before accepting one proposal.
+                  </p>
+                )}
               </div>
 
-              {proposals.length === 0 ? (
-                <div className="rounded-2xl bg-card px-4 py-3 text-xs text-muted-foreground shadow-sm ring-1 ring-border">
-                  No proposals yet. As agents and creators respond, they'll appear here.
-                </div>
+              {isRequestOwner ? (
+                // Owner sees full proposals
+                proposals.length === 0 ? (
+                  <div className="rounded-2xl bg-card px-4 py-3 text-xs text-muted-foreground shadow-sm ring-1 ring-border">
+                    No proposals yet. As agents and creators respond, they'll appear here.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {proposals.map((proposal) => (
+                      <ProposalCard
+                        key={proposal.id}
+                        proposal={proposal}
+                        onAccept={() => handleAcceptProposal(proposal.id)}
+                        onOpenChat={() => {
+                          toast.info("Chat feature coming soon");
+                        }}
+                        formattedBudgetRange={`${formatCurrency(proposal.priceFrom, proposal.currency)}${proposal.priceTo !== proposal.priceFrom ? ` – ${formatCurrency(proposal.priceTo, proposal.currency)}` : ""}`}
+                        isRequestOwner={isRequestOwner}
+                      />
+                    ))}
+                  </div>
+                )
               ) : (
-                <div className="space-y-3">
-                  {proposals.map((proposal) => (
-                    <ProposalCard
-                      key={proposal.id}
-                      proposal={proposal}
-                      onAccept={() => handleAcceptProposal(proposal.id)}
-                      onOpenChat={() => {
-                        toast.info("Chat feature coming soon");
-                      }}
-                      formattedBudgetRange={`${formatCurrency(proposal.priceFrom, proposal.currency)}${proposal.priceTo !== proposal.priceFrom ? ` – ${formatCurrency(proposal.priceTo, proposal.currency)}` : ""}`}
-                      isRequestOwner={isRequestOwner}
-                    />
-                  ))}
+                // Non-owners only see count
+                <div className="rounded-2xl bg-card px-4 py-3 text-xs text-muted-foreground shadow-sm ring-1 ring-border">
+                  {proposalsCount > 0 
+                    ? `${proposalsCount} ${proposalsCount === 1 ? 'proposal' : 'proposals'} submitted so far. Your proposal will only be visible to the trip owner.`
+                    : "No proposals yet. Be the first to submit a proposal!"}
                 </div>
               )}
             </div>

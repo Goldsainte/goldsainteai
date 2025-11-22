@@ -34,6 +34,7 @@ const OpsEscrowDashboardPage = lazy(() => import('@/pages/OpsEscrowDashboardPage
 const AgentPublicProfilePage = lazy(() => import('@/pages/agents/AgentPublicProfilePage'));
 const CreatorPublicProfilePage = lazy(() => import('@/pages/creators/CreatorPublicProfilePage'));
 const TravelProfileRedirect = lazy(() => import('@/pages/redirects/TravelProfileRedirectPage'));
+const TripRequestRedirect = lazy(() => import('@/pages/redirects/TripRequestRedirect'));
 const ExplorePage = lazy(() => import('@/pages/ExplorePage'));
 const Marketplace = lazy(() => import('@/pages/Marketplace'));
 const TripRequestDetail = lazy(() => import('@/pages/marketplace/TripRequestDetail'));
@@ -261,11 +262,7 @@ export const AppRoutes = () => (
       />
       <Route
         path="/trip-request/:id"
-        element={(
-          <RequireAuth>
-            <TripRequestDetailPage />
-          </RequireAuth>
-        )}
+        element={<TripRequestRedirect />}
       />
       <Route
         path="/trip-request/:id/chat"
