@@ -164,15 +164,8 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
   };
 
   const fetchCollabCount = async () => {
-    if (!user) return;
-    
-    const { count } = await supabase
-      .from('post_collaborators')
-      .select('*', { count: 'exact', head: true })
-      .eq('collaborator_id', user.id)
-      .eq('status', 'pending');
-    
-    setUnreadCollabCount(count || 0);
+    // Collaboration invites feature removed
+    setUnreadCollabCount(0);
   };
 
   const fetchProfile = async () => {
@@ -377,25 +370,14 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
   };
 
   const handleCreateContent = (type: string) => {
-    if (type === 'reel') {
-      setUploadInitialTab("video");
-      setUploadModalOpen(true);
-      setCreateSheetOpen(false);
-    } else if (type === 'post') {
-      setUploadInitialTab("photo");
-      setUploadModalOpen(true);
-      setCreateSheetOpen(false);
-    } else if (type === 'moment') {
-      setCreateSheetOpen(false);
+    if (type === 'moment') {
       setCreateMomentOpen(true);
     } else if (type === 'moments-vault') {
       toast.info('Tap the + button in the Moments Vaults section below to create a new vault');
-      setCreateSheetOpen(false);
     }
   };
 
   const handleUploadSuccess = () => {
-    setUploadModalOpen(false);
     fetchUserPosts();
     fetchVideoPosts();
   };
