@@ -354,6 +354,6 @@ export const CompactFlightCard = ({
         flight={flight}
         dictionaries={dictionaries}
       />
-    </Card>
+    </>
   );
 };
