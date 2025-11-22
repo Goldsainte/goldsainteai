@@ -128,7 +128,7 @@ export default function Marketplace() {
     queryKey: ["marketplace-trip-requests"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("marketplace_jobs")
+        .from("trip_requests")
         .select("*")
         .eq("status", "open")
         .order("created_at", { ascending: false });
