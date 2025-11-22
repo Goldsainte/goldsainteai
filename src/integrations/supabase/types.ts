@@ -9776,6 +9776,11 @@ export type Database = {
       trip_proposals: {
         Row: {
           accepted_at: string | null
+          admin_complexity_score: number | null
+          admin_cost_basis: number | null
+          admin_margin_amount: number | null
+          admin_margin_percent: number | null
+          admin_supplier_notes: string | null
           created_at: string
           currency: string | null
           declined_at: string | null
@@ -9797,6 +9802,11 @@ export type Database = {
         }
         Insert: {
           accepted_at?: string | null
+          admin_complexity_score?: number | null
+          admin_cost_basis?: number | null
+          admin_margin_amount?: number | null
+          admin_margin_percent?: number | null
+          admin_supplier_notes?: string | null
           created_at?: string
           currency?: string | null
           declined_at?: string | null
@@ -9818,6 +9828,11 @@ export type Database = {
         }
         Update: {
           accepted_at?: string | null
+          admin_complexity_score?: number | null
+          admin_cost_basis?: number | null
+          admin_margin_amount?: number | null
+          admin_margin_percent?: number | null
+          admin_supplier_notes?: string | null
           created_at?: string
           currency?: string | null
           declined_at?: string | null
