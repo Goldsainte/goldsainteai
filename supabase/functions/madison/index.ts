@@ -257,7 +257,7 @@ serve(async (req) => {
 
           response = {
             message: response.message || `Perfect! Your ${destination} storyboard is ready. Let me show you what I've envisioned.`,
-            action: "create_trip",
+            action: "trip_created",
             trip,
             storyboard,
             metadata: {
