@@ -438,14 +438,7 @@ export const Header = () => {
                             <CreditCard className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                             <span className="text-sm font-medium">Billing</span>
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={handleCreateClick} 
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                          >
-                            <Plus className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                            <span className="text-sm font-medium">Create Content</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={() => navigate('/creator-dashboard')} 
                             className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                           >
@@ -797,27 +790,13 @@ export const Header = () => {
                           </DropdownMenuItem>
                           
                           <DropdownMenuItem 
-                            onClick={() => navigate('/price-alerts')} 
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                          >
-                            <Bell className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">Price Alerts</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
                             onClick={() => navigate('/billing-dashboard')} 
                             className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                           >
                             <CreditCard className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                             <span className="text-sm font-medium">Billing</span>
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={handleCreateClick} 
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                          >
-                            <Plus className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">Create Content</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={() => navigate('/creator-dashboard')} 
                             className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                             data-tour="creator-dashboard"
@@ -830,7 +809,6 @@ export const Header = () => {
                         <DropdownMenuSeparator className="bg-border/50" />
                         
                         <div className="px-2 py-2">
-                          <CollaborationInvites />
                           <PartnershipApprovals />
                         </div>
                         
@@ -1007,25 +985,12 @@ export const Header = () => {
         </Sheet>
       )}
 
-      {/* Create Content Sheet */}
-      <CreateContentSheet
-        open={createSheetOpen}
-        onOpenChange={setCreateSheetOpen}
-        onSelectType={handleCreateContent}
-      />
-
       {/* Upload Modal */}
       <ContentUploadModal
         open={uploadModalOpen}
         onOpenChange={setUploadModalOpen}
         onSuccess={handleUploadSuccess}
         initialTab={uploadInitialTab}
-      />
-
-      {/* Create Moment Modal */}
-      <CreateMomentModal
-        open={createMomentOpen}
-        onOpenChange={setCreateMomentOpen}
       />
 
       {/* Buy Coins Modal */}

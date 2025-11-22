@@ -796,7 +796,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               {isOwnProfile && (
                 <Button
                   className="mt-4"
-                  onClick={() => setCreateSheetOpen(true)}
+                  onClick={() => setUploadModalOpen(true)}
                 >
                   Create your first journey
                 </Button>
@@ -1026,25 +1026,6 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
           profile={profile}
           onProfileUpdated={fetchProfile}
         />
-      )}
-
-      {/* Collaboration Invites Sheet */}
-      {collaborationSheetOpen && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
-          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-4">
-            <div className="bg-card rounded-lg p-4 relative">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute top-2 right-2 h-8 w-8"
-                onClick={() => setCollaborationSheetOpen(false)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-              <CollaborationInvites />
-            </div>
-          </div>
-        </div>
       )}
 
       {/* Close Friends Manager */}

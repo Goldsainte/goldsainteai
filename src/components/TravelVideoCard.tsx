@@ -1687,11 +1687,6 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         open={collectionSelectorOpen}
         onOpenChange={setCollectionSelectorOpen}
       />
-      <CollaboratorSelector
-        postId={post.id}
-        open={collaboratorSelectorOpen}
-        onOpenChange={setCollaboratorSelectorOpen}
-      />
       <SendGiftModal
         open={giftModalOpen}
         onOpenChange={setGiftModalOpen}
