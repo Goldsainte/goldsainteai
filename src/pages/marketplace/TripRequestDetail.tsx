@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ProposalCard } from "@/components/marketplace/ProposalCard";
+import ProposalCard from "@/components/marketplace/ProposalCard";
 import { Loader2 } from "lucide-react";
 
 type ProposalStatus = "pending" | "accepted" | "declined";
@@ -26,6 +26,17 @@ export type Proposal = {
   message: string;
   agentId: string;
   validUntil?: string | null;
+  // NEW FIELDS for enriched proposals
+  inclusions?: string | null;
+  exclusions?: string | null;
+  headline?: string | null;
+  nights?: number | null;
+  proposer?: {
+    id: string;
+    full_name: string;
+    avatar_url?: string | null;
+  } | null;
+  proposer_role?: "agent" | "creator";
 };
 
 type TripRequest = {
@@ -152,29 +163,40 @@ export default function TripRequestDetail() {
 
         if (proposalsError) throw proposalsError;
 
-        const mappedProposals: Proposal[] = (proposalsData || []).map((proposal: any) => {
-          const proposer = proposal.profiles || {};
-          const nights = proposal.nights || 7;
-          return {
-            id: proposal.id,
-            authorType: proposal.proposer_role === "agent" ? "agent" : "creator",
-            authorName: proposer.full_name || "Unknown",
-            handle: `@${proposer.full_name?.toLowerCase().replace(/\s+/g, "") || "unknown"}`,
-            avatarInitials: proposer.full_name?.substring(0, 2).toUpperCase() || "??",
-            rating: 0, // TODO: calculate from reviews
-            reviewsCount: 0, // TODO: calculate from reviews
-            priceFrom: proposal.price_from || 0,
-            priceTo: proposal.price_from || 0,
-            currency: proposal.currency || "USD",
-            timelineLabel: `${nights} nights`,
-            highlights: proposal.inclusions ? [proposal.inclusions] : [],
-            createdAt: proposal.created_at,
-            status: proposal.status as ProposalStatus,
-            message: proposal.message || proposal.headline || "",
-            agentId: proposal.proposer_id,
-            validUntil: proposal.valid_until || null,
-          };
-        });
+    const mappedProposals: Proposal[] = (proposalsData || []).map((proposal: any) => {
+      const proposer = proposal.profiles || {};
+      const nights = proposal.nights || 7;
+      return {
+        id: proposal.id,
+        authorType: proposal.proposer_role === "agent" ? "agent" : "creator",
+        authorName: proposer.full_name || "Unknown",
+        handle: `@${proposer.full_name?.toLowerCase().replace(/\s+/g, "") || "unknown"}`,
+        avatarInitials: proposer.full_name?.substring(0, 2).toUpperCase() || "??",
+        rating: 0, // TODO: calculate from reviews
+        reviewsCount: 0, // TODO: calculate from reviews
+        priceFrom: proposal.price_from || 0,
+        priceTo: proposal.price_from || 0,
+        currency: proposal.currency || "USD",
+        timelineLabel: `${nights} nights`,
+        highlights: [], // Deprecated - using inclusions/exclusions instead
+        createdAt: proposal.created_at,
+        status: proposal.status as ProposalStatus,
+        message: proposal.message || "", // Itinerary overview
+        agentId: proposal.proposer_id,
+        validUntil: proposal.valid_until || null,
+        // NEW: Preserve enriched fields
+        inclusions: proposal.inclusions,
+        exclusions: proposal.exclusions,
+        headline: proposal.headline, // "Why I'm a great fit"
+        nights: proposal.nights,
+        proposer: {
+          id: proposer.id,
+          full_name: proposer.full_name,
+          avatar_url: proposer.avatar_url,
+        },
+        proposer_role: proposal.proposer_role,
+      };
+    });
 
         setProposals(mappedProposals);
       } else {
@@ -548,16 +570,55 @@ export default function TripRequestDetail() {
                 ) : (
                   <div className="space-y-3">
                     {proposals.map((proposal) => (
-                      <ProposalCard
-                        key={proposal.id}
-                        proposal={proposal}
-                        onAccept={() => handleAcceptProposal(proposal.id)}
-                        onOpenChat={() => {
-                          toast.info("Chat feature coming soon");
-                        }}
-                        formattedBudgetRange={`${formatCurrency(proposal.priceFrom, proposal.currency)}${proposal.priceTo !== proposal.priceFrom ? ` – ${formatCurrency(proposal.priceTo, proposal.currency)}` : ""}`}
-                        isRequestOwner={isRequestOwner}
-                      />
+                      <div key={proposal.id} className="space-y-3">
+                        <ProposalCard proposal={proposal} />
+                        
+                        {/* Actions */}
+                        {isRequestOwner && (
+                          <div className="flex items-center justify-between gap-2 px-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                toast.info("Chat feature coming soon");
+                              }}
+                              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:border-muted-foreground hover:text-foreground"
+                            >
+                              Message
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleAcceptProposal(proposal.id)}
+                              disabled={proposal.status === "accepted" || proposal.status === "declined"}
+                              className={[
+                                "inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm transition-colors",
+                                proposal.status === "accepted" || proposal.status === "declined"
+                                  ? "cursor-not-allowed bg-muted text-muted-foreground"
+                                  : "bg-primary text-primary-foreground hover:bg-primary/90",
+                              ].join(" ")}
+                            >
+                              {proposal.status === "accepted" ? "Accepted" : "Accept proposal"}
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Policy notice for travelers */}
+                        {isRequestOwner && proposal.status !== "accepted" && proposal.status !== "declined" && (
+                          <div className="mx-2 rounded-2xl bg-muted border border-border p-2.5 text-[10px] text-foreground">
+                            <p>
+                              <span className="font-semibold">
+                                By accepting this proposal
+                              </span>
+                              , your trip and payments stay protected by Goldsainte.
+                            </p>
+                            <p className="mt-1">
+                              For your safety, please do not send direct bank transfers or share
+                              phone numbers to finalize payment. All payments and changes should
+                              go through this platform.
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 )
