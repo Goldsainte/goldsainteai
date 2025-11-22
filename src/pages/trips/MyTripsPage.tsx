@@ -109,6 +109,9 @@ export default function MyTripsPage() {
         // @ts-ignore - Type inference depth issue with nested select
         console.log("🔍 [MyTripsPage] Fetching trip requests for user:", authUser.id);
         
+        // FIXED: Removed broken nested select `trip_proposals ( status )` that was causing query to fail
+        // TODO: Add proper foreign key constraint between trip_proposals and trip_requests
+        // or implement separate query for proposal counts
         const result = await supabase
           .from("trip_requests")
           .select(
@@ -123,8 +126,7 @@ export default function MyTripsPage() {
             budget_max,
             travelers_adults,
             travelers_children,
-            created_at,
-            trip_proposals ( status )
+            created_at
           `
           )
           .eq("user_id", authUser.id)
@@ -372,7 +374,9 @@ function TripRow({ trip, muted }: TripRowProps) {
 }
 
 function TripRequestRow({ req }: { req: TripRequestWithProposals }) {
-  const proposals = req.trip_proposals ?? [];
+  // TEMPORARY FIX: Set proposals to empty array since nested select was removed
+  // Proposal counts will show as 0 until we fix the database relationship or add separate query
+  const proposals: { status: string }[] = [];
   const proposalCount = proposals.length;
   const acceptedCount = proposals.filter(
     (p) => p.status === "accepted"
