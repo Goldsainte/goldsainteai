@@ -8,7 +8,12 @@ type SessionPayload = {
 };
 
 const DEFAULT_ENDPOINT = '/api/auth/session';
-const sessionEndpoint = import.meta.env.VITE_AUTH_SESSION_ENDPOINT || DEFAULT_ENDPOINT;
+
+// Session sync is only enabled when an explicit endpoint is configured.
+// In Lovable/preview (and other static deployments), this will be disabled.
+const configuredEndpoint = import.meta.env.VITE_AUTH_SESSION_ENDPOINT;
+const SESSION_SYNC_ENABLED = Boolean(configuredEndpoint);
+const sessionEndpoint = configuredEndpoint || DEFAULT_ENDPOINT;
 
 const RETRY_OPTIONS = {
   attempts: 3,
@@ -53,6 +58,11 @@ function sanitizeSession(session: Session | null): Session | null {
 }
 
 export async function pushSessionToServer(event: AuthChangeEvent, session: Session | null) {
+  // No-op if we don't have a real backend endpoint configured
+  if (!SESSION_SYNC_ENABLED) {
+    return;
+  }
+
   const payload = sanitizeSession(session);
 
   try {
@@ -85,6 +95,12 @@ export async function pushSessionToServer(event: AuthChangeEvent, session: Sessi
 }
 
 export async function loadSessionFromServer(): Promise<Session | null> {
+  // In environments without a backend session endpoint,
+  // just skip server sync and let Supabase client manage the session.
+  if (!SESSION_SYNC_ENABLED) {
+    return null;
+  }
+
   try {
     const data = await httpJson<SessionPayload>(
       sessionEndpoint,
