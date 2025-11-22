@@ -103,7 +103,9 @@ export default function MyTripsPage() {
         const bookingsData = await getMyTrips();
         if (!cancelled) setTrips(bookingsData);
 
-        // Load trip requests
+        // MY TRIPS → REQUESTS VIEW: Query the same trip_requests table as Marketplace
+        // This is the traveler's personal dashboard view filtered to their own user_id
+        // The same records appear in the Marketplace when status='open' for creators/agents to bid on
         const { data: requestsData, error: requestsError } = await supabase
           .from("trip_requests")
           .select(

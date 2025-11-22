@@ -31,6 +31,9 @@ export default function TripRequestsBoardPage() {
       if (!user) return;
       setLoading(true);
 
+      // MARKETPLACE VIEW: Query the same trip_requests table that travelers create
+      // This is the public/external view filtered to show only 'open' requests
+      // The same records appear in "My Trips → Requests" for the traveler who created them
       const { data, error } = await supabase
         .from("trip_requests")
         .select(
