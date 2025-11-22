@@ -121,7 +121,8 @@ export default function MyTripsPage() {
             budget_max,
             travelers_adults,
             travelers_children,
-            created_at
+            created_at,
+            trip_proposals ( status )
           `
           )
           .eq("user_id", authUser.id)
@@ -362,9 +363,11 @@ function TripRow({ trip, muted }: TripRowProps) {
 }
 
 function TripRequestRow({ req }: { req: TripRequestWithProposals }) {
-  // Note: proposal counts temporarily disabled until FK constraint is added
-  const proposalCount = 0;
-  const acceptedCount = 0;
+  const proposals = req.trip_proposals ?? [];
+  const proposalCount = proposals.length;
+  const acceptedCount = proposals.filter(
+    (p) => p.status === "accepted"
+  ).length;
 
   const travelers =
     (req.travelers_adults || 0) + (req.travelers_children || 0);
