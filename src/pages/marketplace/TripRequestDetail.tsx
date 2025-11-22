@@ -302,7 +302,7 @@ export default function TripRequestDetail() {
       const proposerRole = profile?.account_type === "agent" ? "agent" : "creator";
 
       // Create proposal
-      const { error: proposalError } = await supabase
+      const { data: proposalData, error: proposalError } = await supabase
         .from("trip_proposals")
         .insert({
           trip_request_id: id,
@@ -320,9 +320,29 @@ export default function TripRequestDetail() {
           headline:
             newProposal.fitReason ||
             `${proposerRole === "agent" ? "Agent" : "Creator"} proposal`,
-        });
+        })
+        .select()
+        .single();
 
       if (proposalError) throw proposalError;
+
+      // Trigger admin insights computation (fire-and-forget, non-blocking)
+      if (proposalData?.id) {
+        supabase.functions
+          .invoke("compute-proposal-insights", {
+            body: { proposalId: proposalData.id },
+          })
+          .then(({ data, error }) => {
+            if (error) {
+              console.error("❌ Failed to compute admin insights:", error);
+            } else {
+              console.log("✅ Admin insights computed:", data);
+            }
+          })
+          .catch((err) => {
+            console.error("❌ Admin insights computation error:", err);
+          });
+      }
 
       toast.success("Proposal submitted successfully!");
       setNewProposal({

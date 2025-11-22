@@ -372,3 +372,6 @@ verify_jwt = false
 [functions.seed-creators]
 verify_jwt = false
 
+[functions.compute-proposal-insights]
+verify_jwt = false
+
