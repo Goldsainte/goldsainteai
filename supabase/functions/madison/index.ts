@@ -98,13 +98,13 @@ serve(async (req) => {
     const message: string = body.message;
     const userId: string = body.userId;
     const inputType: string = body.inputType || "text";
-    const conversationId: string | null = body.conversationId ?? null;
+    const incomingConversationId: string | null = body.conversationId ?? null;
 
     console.log("[Madison] Input:", {
       message,
       userId,
       inputType,
-      conversationId,
+      conversationId: incomingConversationId,
     });
 
     const supabase = createClient(
@@ -119,19 +119,62 @@ serve(async (req) => {
     }
 
     // 1) Ensure conversation row exists
-    if (conversationId) {
-      await supabase
-        .from("conversations")
-        .upsert(
-          {
+    let conversationId = incomingConversationId || crypto.randomUUID();
+    try {
+      const { data: existingConversation, error: conversationLookupError } =
+        await supabase
+          .from("conversations")
+          .select("id, user_id")
+          .eq("id", conversationId)
+          .maybeSingle();
+
+      if (conversationLookupError) {
+        console.error("[Madison] Conversation lookup error:", conversationLookupError);
+      }
+
+      if (existingConversation && existingConversation.user_id !== userId) {
+        console.warn("[Madison] Conversation user mismatch. Generating new ID.");
+        conversationId = crypto.randomUUID();
+      }
+
+      if (!existingConversation || existingConversation.user_id !== userId) {
+        const { error: conversationInsertError } = await supabase
+          .from("conversations")
+          .insert({
             id: conversationId,
             user_id: userId,
-          },
-          { onConflict: "id" },
-        );
+            title: "Madison conversation",
+          });
+
+        if (conversationInsertError) {
+          console.error("[Madison] Conversation insert error:", conversationInsertError);
+        } else {
+          console.log("[Madison] Conversation ensured:", conversationId);
+        }
+      }
+    } catch (e) {
+      console.error("[Madison] Error ensuring conversation:", e);
     }
 
-    // 2) Save incoming user message
+    // 2) Load conversation history BEFORE adding the new turn, so we don't duplicate the latest user message.
+    let conversationHistory: any[] = [];
+    if (conversationId) {
+      const { data: history, error: historyError } = await supabase
+        .from("chat_messages")
+        .select("role, content, created_at")
+        .eq("conversation_id", conversationId)
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (historyError) {
+        console.error("[Madison] History load error:", historyError);
+      }
+
+      conversationHistory = (history || []).reverse();
+    }
+
+    // 3) Persist incoming user message AFTER loading history
     try {
       await supabase.from("chat_messages").insert({
         conversation_id: conversationId,
@@ -144,28 +187,109 @@ serve(async (req) => {
       console.error("[Madison] Error inserting user message:", e);
     }
 
-    // 3) Load conversation history (last 10 messages for context)
-    let conversationHistory: any[] = [];
-    if (conversationId) {
-      const { data: history } = await supabase
-        .from("chat_messages")
-        .select("role, content")
-        .eq("conversation_id", conversationId)
-        .order("created_at", { ascending: true })
-        .limit(10);
-
-      conversationHistory = history || [];
-    }
+    console.log("[Madison] Loaded history", {
+      conversationId,
+      userId,
+      historyCount: conversationHistory.length,
+      historyPreview: conversationHistory,
+    });
 
     // 4) Build OpenAI messages
+    // Determine what we already know so we can instruct the model not to re-ask.
+    const historyForExtraction = [
+      ...conversationHistory,
+      { role: "user", content: message },
+    ]
+      .map((msg) => `${msg.role.toUpperCase()}: ${msg.content}`)
+      .join("\n\n");
+
+    const extractionMessages = [
+      {
+        role: "system",
+        content:
+          "Extract destination, travelers, timeframe, and vibe from this Madison conversation. Return JSON with keys destination, travelers, timeframe, vibe. If unknown, set to null. Only use the traveler-provided information.",
+      },
+      {
+        role: "user",
+        content: `Conversation so far:\n${historyForExtraction}`,
+      },
+    ];
+
+    let extractedSlots = {
+      destination: null as string | null,
+      travelers: null as string | null,
+      timeframe: null as string | null,
+      vibe: null as string | null,
+    };
+
+    try {
+      const extractionResponse = await fetch(
+        "https://api.openai.com/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${OPENAI_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",
+            messages: extractionMessages,
+            temperature: 0,
+            response_format: { type: "json_object" },
+          }),
+        },
+      );
+
+      if (extractionResponse.ok) {
+        const extractionData = await extractionResponse.json();
+        const rawContent =
+          extractionData.choices?.[0]?.message?.content?.trim() ?? "";
+
+        try {
+          const parsed = JSON.parse(rawContent);
+          extractedSlots = {
+            destination: parsed.destination ?? null,
+            travelers: parsed.travelers ?? null,
+            timeframe: parsed.timeframe ?? null,
+            vibe: parsed.vibe ?? null,
+          };
+        } catch (_e) {
+          console.warn("[Madison] Slot extraction parse issue", rawContent);
+        }
+      } else {
+        console.warn(
+          "[Madison] Slot extraction failed",
+          extractionResponse.status,
+          await extractionResponse.text(),
+        );
+      }
+    } catch (slotError) {
+      console.error("[Madison] Slot extraction error", slotError);
+    }
+
+    const knownState = `Known so far:\n- Destination: ${
+      extractedSlots.destination ?? "(unknown)"
+    }\n- Travelers: ${
+      extractedSlots.travelers ?? "(unknown)"
+    }\n- Timeframe: ${
+      extractedSlots.timeframe ?? "(unknown)"
+    }\n- Vibe: ${extractedSlots.vibe ?? "(unknown)"}\nYou MUST NOT ask again about any field that is already known. Only ask about unknown fields.`;
+
     const openaiMessages = [
       { role: "system", content: MADISON_SYSTEM_PROMPT },
+      { role: "system", content: knownState },
       ...conversationHistory.map((msg: any) => ({
         role: msg.role,
         content: msg.content,
       })),
       { role: "user", content: message },
     ];
+
+    console.log("[Madison] Slot extraction result", {
+      conversationId,
+      extractedSlots,
+    });
+    console.log("[Madison] OpenAI messages:", openaiMessages);
 
     // 5) Call OpenAI
     console.log("[Madison] Calling OpenAI with", openaiMessages.length - 1, "history messages");
@@ -201,6 +325,7 @@ serve(async (req) => {
     let response: any = {
       message: assistantMessage.replace(/\*\*CREATE_STORYBOARD:[^*]+\*\*/gi, "").trim(),
       action: "chat",
+      conversationId,
     };
 
     if (storyboardMatch) {
@@ -265,6 +390,7 @@ serve(async (req) => {
               storyboardId: storyboard.id,
               destination,
             },
+            conversationId,
           };
         }
       }

@@ -7,7 +7,7 @@ const CONVERSATION_KEY = "madison_conversation_id";
  * Ensures both modalities use the same conversation thread.
  */
 export function useMadisonConversation() {
-  const [conversationId, setConversationId] = useState<string | null>(() => {
+  const [conversationId, setConversationIdState] = useState<string | null>(() => {
     if (typeof window === "undefined") return null;
 
     const existing = window.localStorage.getItem(CONVERSATION_KEY);
@@ -18,12 +18,18 @@ export function useMadisonConversation() {
     return id;
   });
 
+  const setConversationId = (id: string | null) => {
+    if (typeof window === "undefined" || !id) return;
+    window.localStorage.setItem(CONVERSATION_KEY, id);
+    setConversationIdState(id);
+  };
+
   const resetConversation = () => {
     if (typeof window === "undefined") return;
     const id = crypto.randomUUID();
     window.localStorage.setItem(CONVERSATION_KEY, id);
-    setConversationId(id);
+    setConversationIdState(id);
   };
 
-  return { conversationId, resetConversation };
+  return { conversationId, setConversationId, resetConversation };
 }
