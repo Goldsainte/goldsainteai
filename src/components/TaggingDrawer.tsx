@@ -3,7 +3,6 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PartnershipTagging } from "./PartnershipTagging";
-import { PackageTagSelector } from "./PackageTagSelector";
 import { PeopleTagSelector } from "./PeopleTagSelector";
 import { Users, Package, UserPlus } from "lucide-react";
 
@@ -76,16 +75,6 @@ export const TaggingDrawer = ({
             <PartnershipTagging
               onPartnershipChange={setTempBrandId}
               currentBrandId={tempBrandId}
-            />
-          </TabsContent>
-          <TabsContent value="packages" className="flex-1 overflow-y-auto px-4 mt-4">
-            <PackageTagSelector
-              selectedPackageIds={tempPackageIds}
-              onPackageTagged={(packageId) => {
-                if (!tempPackageIds.includes(packageId)) {
-                  setTempPackageIds([...tempPackageIds, packageId]);
-                }
-              }}
             />
           </TabsContent>
         </Tabs>

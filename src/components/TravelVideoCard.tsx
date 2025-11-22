@@ -12,7 +12,6 @@ import { useNavigate } from "react-router-dom";
 import { CommentsSheet } from "./CommentsSheet";
 import VideoEditModal from "./VideoEditModal";
 import { CollectionSelector } from "./CollectionSelector";
-import { CollaboratorSelector } from "./CollaboratorSelector";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,7 +24,6 @@ import { useCollections } from "@/hooks/useCollections";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { SendGiftModal } from "@/components/SendGiftModal";
 import { Coins } from "lucide-react";
-import { BrandPartnershipProposal } from "./BrandPartnershipProposal";
 import { PromotePostModal } from "./PromotePostModal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
@@ -90,12 +88,8 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const [localCommentCount, setLocalCommentCount] = useState(post.comment_count);
   const [editOpen, setEditOpen] = useState(false);
   const [collectionSelectorOpen, setCollectionSelectorOpen] = useState(false);
-  const [collaboratorSelectorOpen, setCollaboratorSelectorOpen] = useState(false);
-  const [collaborators, setCollaborators] = useState<Array<{id: string, username: string | null, avatar_url: string | null}>>([]);
-  const [partnership, setPartnership] = useState<any>(null);
   const { collections, createCollection, addPostToCollection } = useCollections();
   const [giftModalOpen, setGiftModalOpen] = useState(false);
-  const [partnershipProposalOpen, setPartnershipProposalOpen] = useState(false);
   const [promoteModalOpen, setPromoteModalOpen] = useState(false);
   const [photoGalleryOpen, setPhotoGalleryOpen] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
@@ -676,9 +670,9 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                 >
                   <span className="truncate">{post.location}</span>
                 </button>
-              )}
-            </div>
+            )}
           </div>
+        </div>
           {isOwnPost ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -690,20 +684,6 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                 <DropdownMenuItem onClick={() => setEditOpen(true)}>
                   <Edit className="h-4 w-4 mr-2" />
                   Edit Sainte
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <MoreVertical className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setPartnershipProposalOpen(true)}>
-                  <Users className="h-4 w-4 mr-2" />
-                  Propose Partnership
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -1276,21 +1256,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110">
-                    <MoreVertical className="h-6 w-6 text-white" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-background/95 backdrop-blur-sm">
-                  <DropdownMenuItem onClick={() => setPartnershipProposalOpen(true)}>
-                    <Users className="h-4 w-4 mr-2" />
-                    Propose Partnership
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+            ) : null}
           </div>
 
           {/* Mute Button */}
@@ -1330,21 +1296,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110">
-                    <MoreVertical className="h-6 w-6 text-white" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-background/95 backdrop-blur-sm">
-                  <DropdownMenuItem onClick={() => setPartnershipProposalOpen(true)}>
-                    <Users className="h-4 w-4 mr-2" />
-                    Propose Partnership
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+            ) : null}
           </div>
         </>
       ) : (post.image_urls?.length > 0 || post.thumbnail_url) ? (
@@ -1464,21 +1416,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110">
-                    <MoreVertical className="h-6 w-6 text-white" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-background/95 backdrop-blur-sm">
-                  <DropdownMenuItem onClick={() => setPartnershipProposalOpen(true)}>
-                    <Users className="h-4 w-4 mr-2" />
-                    Propose Partnership
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+            ) : null}
           </div>
         </>
       ) : null}
@@ -1689,27 +1627,12 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         open={collectionSelectorOpen}
         onOpenChange={setCollectionSelectorOpen}
       />
-      <CollaboratorSelector
-        postId={post.id}
-        open={collaboratorSelectorOpen}
-        onOpenChange={setCollaboratorSelectorOpen}
-      />
       <SendGiftModal
         open={giftModalOpen}
         onOpenChange={setGiftModalOpen}
         recipientId={post.user_id}
         postId={post.id}
       />
-
-      {/* Brand Partnership Proposal Modal */}
-      {!isOwnPost && (
-        <BrandPartnershipProposal
-          open={partnershipProposalOpen}
-          onOpenChange={setPartnershipProposalOpen}
-          creatorId={post.user_id}
-          postId={post.id}
-        />
-      )}
 
       {/* Promote Post Modal */}
       <PromotePostModal

@@ -11,16 +11,11 @@ import { InstagramVerifiedBadge } from "@/components/badges/InstagramVerifiedBad
 import { BusinessVerifiedBadge } from "@/components/badges/BusinessVerifiedBadge";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
-import CreateContentSheet from "@/components/CreateContentSheet";
-import ContentUploadModal from "@/components/ContentUploadModal";
-import { BrandPartnershipProposal } from "@/components/BrandPartnershipProposal";
-import { CreatorPartnershipRequest } from "@/components/CreatorPartnershipRequest";
 import { CreateMomentModal } from "@/components/CreateMomentModal";
 
 import FollowButton from "@/components/FollowButton";
 import StoryHighlights from "@/components/StoryHighlights";
 import VideoEditModal from "@/components/VideoEditModal";
-import { CollaborationInvites } from "@/components/CollaborationInvites";
 import { EditProfileDialog } from "@/components/EditProfileDialog";
 import { ActivityStatus } from "@/components/ActivityStatus";
 import { CloseFriendsManager } from "@/components/CloseFriendsManager";
@@ -104,8 +99,6 @@ const TravelProfile = () => {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadInitialTab, setUploadInitialTab] = useState<"photo" | "video">("photo");
   const [buyCoinsOpen, setBuyCoinsOpen] = useState(false);
-  const [partnershipProposalOpen, setPartnershipProposalOpen] = useState(false);
-  const [partnershipRequestOpen, setPartnershipRequestOpen] = useState(false);
   const [createMomentOpen, setCreateMomentOpen] = useState(false);
   const { isCloseFriend } = useCloseFriends();
 const { balance, refetch: refetchCoins } = useCoinBalance();
@@ -1093,13 +1086,6 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         onOpenChange={setCloseFriendsOpen}
       />
 
-      {/* Create Content Sheet */}
-      <CreateContentSheet
-        open={createSheetOpen}
-        onOpenChange={setCreateSheetOpen}
-        onSelectType={handleCreateContent}
-      />
-
       {/* Photo Carousel Modal */}
       <PhotoCarouselModal
         open={photoModalOpen}
@@ -1155,21 +1141,6 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         onSuccess={fetchProfile}
       />
 
-      {/* Brand Partnership Proposal Modal */}
-      {!isOwnProfile && profileUserId && (
-        <>
-          <BrandPartnershipProposal
-            open={partnershipProposalOpen}
-            onOpenChange={setPartnershipProposalOpen}
-            creatorId={profileUserId}
-          />
-          <CreatorPartnershipRequest
-            open={partnershipRequestOpen}
-            onOpenChange={setPartnershipRequestOpen}
-            brandId={profileUserId}
-          />
-        </>
-      )}
 
       {/* Spacer for mobile nav to prevent overlap */}
       <div className="h-16 md:hidden" aria-hidden />
