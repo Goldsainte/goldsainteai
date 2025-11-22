@@ -31,27 +31,137 @@
 -- ============================================================================
 
 -- Traveler Profile
-INSERT INTO profiles (id, email, full_name, avatar_url, created_at)
+INSERT INTO public.profiles (
+  id,
+  email,
+  full_name,
+  avatar_url,
+  account_type,
+  onboarding_completed,
+  welcome_shown,
+  created_at
+)
 VALUES 
-  ('00000000-0000-0000-0000-000000000001', 'traveler@test.com', 'Test Traveler', 'https://api.dicebear.com/7.x/avataaars/svg?seed=traveler', NOW());
+  (
+    '00000000-0000-0000-0000-000000000001',
+    'traveler@test.com',
+    'Test Traveler',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=traveler',
+    'traveler',
+    true,
+    true,
+    NOW()
+  );
 
 -- Creator Profiles (Bronze, Gold, Platinum)
-INSERT INTO profiles (id, email, full_name, avatar_url, bio, created_at)
+INSERT INTO public.profiles (
+  id,
+  email,
+  full_name,
+  avatar_url,
+  bio,
+  account_type,
+  onboarding_completed,
+  welcome_shown,
+  created_at
+)
 VALUES 
-  ('00000000-0000-0000-0000-000000000002', 'creator-bronze@test.com', 'Bronze Creator', 'https://api.dicebear.com/7.x/avataaars/svg?seed=bronze', 'Travel content creator - Bronze tier', NOW()),
-  ('00000000-0000-0000-0000-000000000003', 'creator-gold@test.com', 'Gold Creator', 'https://api.dicebear.com/7.x/avataaars/svg?seed=gold', 'Experienced travel creator - Gold tier', NOW()),
-  ('00000000-0000-0000-0000-000000000004', 'creator-platinum@test.com', 'Platinum Creator', 'https://api.dicebear.com/7.x/avataaars/svg?seed=platinum', 'Elite travel curator - Platinum tier', NOW());
+  (
+    '00000000-0000-0000-0000-000000000002',
+    'creator-bronze@test.com',
+    'Bronze Creator',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=bronze',
+    'Travel content creator - Bronze tier',
+    'creator',
+    true,
+    true,
+    NOW()
+  ),
+  (
+    '00000000-0000-0000-0000-000000000003',
+    'creator-gold@test.com',
+    'Gold Creator',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=gold',
+    'Experienced travel creator - Gold tier',
+    'creator',
+    true,
+    true,
+    NOW()
+  ),
+  (
+    '00000000-0000-0000-0000-000000000004',
+    'creator-platinum@test.com',
+    'Platinum Creator',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=platinum',
+    'Elite travel curator - Platinum tier',
+    'creator',
+    true,
+    true,
+    NOW()
+  );
 
 -- Agent Profiles
-INSERT INTO profiles (id, email, full_name, avatar_url, bio, created_at)
+INSERT INTO public.profiles (
+  id,
+  email,
+  full_name,
+  avatar_url,
+  bio,
+  account_type,
+  onboarding_completed,
+  welcome_shown,
+  created_at
+)
 VALUES 
-  ('00000000-0000-0000-0000-000000000005', 'agent1@test.com', 'Sarah Thompson', 'https://api.dicebear.com/7.x/avataaars/svg?seed=agent1', 'Certified Goldsainte Travel Agent - Europe specialist', NOW()),
-  ('00000000-0000-0000-0000-000000000006', 'agent2@test.com', 'Michael Chen', 'https://api.dicebear.com/7.x/avataaars/svg?seed=agent2', 'Certified Goldsainte Travel Agent - Asia specialist', NOW());
+  (
+    '00000000-0000-0000-0000-000000000005',
+    'agent1@test.com',
+    'Sophie Laurent',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=agent1',
+    'Certified Goldsainte Travel Agent - Europe specialist',
+    'agent',
+    true,
+    true,
+    NOW()
+  ),
+  (
+    '00000000-0000-0000-0000-000000000006',
+    'agent2@test.com',
+    'Marcus Chen',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=agent2',
+    'Certified Goldsainte Travel Agent - Asia specialist',
+    'agent',
+    true,
+    true,
+    NOW()
+  );
 
 -- Admin Profile
-INSERT INTO profiles (id, email, full_name, avatar_url, created_at)
+INSERT INTO public.profiles (
+  id,
+  email,
+  full_name,
+  avatar_url,
+  account_type,
+  onboarding_completed,
+  welcome_shown,
+  created_at
+)
 VALUES 
-  ('00000000-0000-0000-0000-000000000007', 'admin@test.com', 'Admin User', 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin', NOW());
+  (
+    '00000000-0000-0000-0000-000000000007',
+    'admin@test.com',
+    'Platform Admin',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
+    -- Note: admin privileges come from user_roles; account_type
+    -- is still one of the allowed values.
+    'traveler',
+    true,
+    true,
+    NOW()
+  );
+
+-- ============================================================================
 
 -- ============================================================================
 -- STEP 3: Assign User Roles
