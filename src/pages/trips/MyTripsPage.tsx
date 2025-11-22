@@ -104,9 +104,10 @@ export default function MyTripsPage() {
         if (!cancelled) setTrips(bookingsData);
 
         // MY TRIPS → REQUESTS VIEW: Query the same trip_requests table as Marketplace
-        // This is the traveler's personal dashboard view filtered to their own user_id
+        // This is the traveler's personal dashboard view filtered to their own traveler_id
         // The same records appear in the Marketplace when status='open' for creators/agents to bid on
-        const { data: requestsData, error: requestsError } = await supabase
+        // @ts-ignore - Type inference depth issue with nested select
+        const result = await supabase
           .from("trip_requests")
           .select(
             `
@@ -124,8 +125,11 @@ export default function MyTripsPage() {
             trip_proposals ( status )
           `
           )
-          .eq("user_id", authUser.id)
+          .eq("traveler_id", authUser.id)
           .order("created_at", { ascending: false });
+        
+        const requestsData = result.data;
+        const requestsError = result.error;
 
         if (!cancelled) {
           if (requestsError) {
