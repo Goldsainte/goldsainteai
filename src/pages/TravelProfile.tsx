@@ -165,15 +165,8 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
   };
 
   const fetchCollabCount = async () => {
-    if (!user) return;
-    
-    const { count } = await supabase
-      .from('post_collaborators')
-      .select('*', { count: 'exact', head: true })
-      .eq('collaborator_id', user.id)
-      .eq('status', 'pending');
-    
-    setUnreadCollabCount(count || 0);
+    // Collaboration feature removed
+    setUnreadCollabCount(0);
   };
 
   const fetchProfile = async () => {
@@ -1074,7 +1067,10 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               >
                 <X className="h-4 w-4" />
               </Button>
-              <CollaborationInvites />
+              {/* CollaborationInvites component removed */}
+              <div className="p-4 text-sm text-muted-foreground">
+                Collaboration feature has been removed.
+              </div>
             </div>
           </div>
         </div>
@@ -1105,13 +1101,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         musicService={selectedPost?.music_service}
       />
 
-      {/* Upload Modal */}
-      <ContentUploadModal
-        open={uploadModalOpen}
-        onOpenChange={setUploadModalOpen}
-        onSuccess={handleUploadSuccess}
-        initialTab={uploadInitialTab}
-      />
+      {/* ContentUploadModal removed - feature consolidated into moment creation */}
 
       {/* Create Moment Modal */}
       <CreateMomentModal

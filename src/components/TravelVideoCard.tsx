@@ -344,30 +344,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       toast.error('Failed to update save status');
     }
   };
-  const fetchCollaborators = async () => {
-    try {
-      const { data } = await supabase
-        .from('post_collaborators')
-        .select('collaborator_id')
-        .eq('post_id', post.id)
-        .eq('status', 'accepted');
-      
-      if (!data || data.length === 0) {
-        setCollaborators([]);
-        return;
-      }
-      
-      const collaboratorIds = data.map(c => c.collaborator_id);
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, username, avatar_url')
-        .in('id', collaboratorIds);
-      
-      setCollaborators(profiles || []);
-    } catch (error) {
-      console.error('Error fetching collaborators:', error);
-    }
-  };
+  // Collaborators feature removed
 
   const fetchPartnership = async () => {
     try {
@@ -382,13 +359,9 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         .eq("status", "approved")
         .maybeSingle();
 
-      if (error) {
-        console.error("Error fetching partnership:", error);
-        return;
-      }
-      setPartnership(data);
+    // Partnership feature removed
     } catch (error) {
-      console.error("Error fetching partnership:", error);
+      console.error("Error in fetchPartnership:", error);
     }
   };
 
@@ -927,29 +900,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             </div>
           )}
 
-          {/* Collaborators */}
-          {collaborators.length > 0 && (
-            <div className="flex items-center gap-2 text-xs">
-              <span className="text-muted-foreground">with</span>
-              <div className="flex -space-x-2">
-                {collaborators.slice(0, 3).map(collab => (
-                  <Avatar
-                    key={collab.id}
-                    className="h-6 w-6 border-2 border-card cursor-pointer"
-                    onClick={() => navigate(`/creator/${collab.id}`)}
-                  >
-                    <AvatarImage src={collab.avatar_url || undefined} />
-                    <AvatarFallback className="text-xs">
-                      {collab.username?.[0]?.toUpperCase() || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                ))}
-              </div>
-              <span className="text-muted-foreground font-medium">
-                {collaborators.map(c => c.username).join(', ')}
-              </span>
-            </div>
-          )}
+          {/* Collaborators feature removed */}
 
           {/* Music Player */}
           {post.music_track_name && (
@@ -1199,12 +1150,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         </div>
       )}
       
-      {/* Partnership Label */}
-      {partnership && (
-        <div className="absolute top-4 left-4 right-4 z-10 px-3 py-1.5 bg-background/95 backdrop-blur-sm rounded-lg text-xs font-medium border shadow-sm">
-          Paid Partnership with @{partnership.brand.username}
-        </div>
-      )}
+      {/* Partnership feature removed */}
 
       {/* Video, Embed, or Photos */}
       {post.video_url ? (

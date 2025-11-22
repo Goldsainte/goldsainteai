@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plane, Heart, ChevronDown, ChevronUp, Clock } from "lucide-react";
+import { Plane, Heart, ChevronDown, ChevronUp, Clock, Bell } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
 import { FlightBookingModal } from "./FlightBookingModal";
 import { formatCurrency } from "@/lib/currencyHelpers";
@@ -206,15 +206,7 @@ export const CompactFlightCard = ({
               >
                 {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
               </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-8 px-2"
-                onClick={() => setPriceAlertModalOpen(true)}
-                title="Set price alert"
-              >
-                <Bell className="h-3 w-3" />
-              </Button>
+              {/* Price alert button removed - feature deleted */}
               <Button
                 size="sm"
                 className="h-8 px-4"
@@ -287,15 +279,7 @@ export const CompactFlightCard = ({
               >
                 {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
               </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-8 px-2 text-xs"
-                onClick={() => setPriceAlertModalOpen(true)}
-                title="Set price alert"
-              >
-                <Bell className="h-3 w-3" />
-              </Button>
+              {/* Price alert button removed - feature deleted */}
               <Button
                 size="sm"
                 className="h-8 px-3 text-xs"
@@ -374,20 +358,7 @@ export const CompactFlightCard = ({
         dictionaries={dictionaries}
       />
 
-      {origin && destination && departureDate && (
-        <FlightPriceAlertModal
-          open={priceAlertModalOpen}
-          onOpenChange={setPriceAlertModalOpen}
-          origin={origin}
-          destination={destination}
-          departureDate={departureDate}
-          returnDate={returnDate}
-          adults={adults}
-          cabinClass={cabinClass}
-          currentPrice={hasPriceData ? markedUpPrice : undefined}
-          currency={currency}
-        />
-      )}
+      {/* FlightPriceAlertModal removed - feature deleted */}
     </>
   );
 };

@@ -101,7 +101,6 @@ const CreatorTripPage = lazy(() => import('@/pages/CreatorTripPage'));
 const CreatorProfilePage = lazy(() => import('@/pages/CreatorProfilePage'));
 const NewCollabRequestPage = lazy(() => import('@/pages/NewCollabRequestPage'));
 const Messages = lazy(() => import('@/pages/Messages'));
-const PriceAlerts = lazy(() => import('@/pages/PriceAlerts'));
 const TravelerDashboardPage = lazy(() => import('@/pages/traveler/TravelerDashboardPage'));
 const PartnerConsolePage = lazy(() => import('@/pages/partner/PartnerConsolePage'));
 const PartnerEscrowPage = lazy(() => import('@/pages/partners/EscrowMilestonesPage'));
@@ -127,9 +126,7 @@ const EscrowTimelineDashboard = lazy(() => import('@/components/EscrowTimelineDa
 const ActivityLogs = lazy(() => import('@/pages/ActivityLogs'));
 const CustomerVerification = lazy(() => import('@/pages/CustomerVerification'));
 const EmergencyContacts = lazy(() => import('@/pages/EmergencyContacts'));
-const CoCuratedDashboard = lazy(() => import('@/pages/CoCuratedDashboard'));
 const CoCuratedCreate = lazy(() => import('@/pages/CoCuratedCreate'));
-const CoCuratedMarketplace = lazy(() => import('@/pages/CoCuratedMarketplace'));
 const CoCuratedBookingSuccess = lazy(() => import('@/pages/CoCuratedBookingSuccess'));
 const TourActivityDetail = lazy(() => import('@/pages/TourActivityDetail'));
 const RestaurantDetail = lazy(() => import('@/pages/RestaurantDetail'));
