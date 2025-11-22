@@ -10,9 +10,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
-import CreateContentSheet from "@/components/CreateContentSheet";
-import ContentUploadModal from "@/components/ContentUploadModal";
-import { CreateMomentModal } from "@/components/CreateMomentModal";
 import logoHorizontal from "@/assets/primary-horizontal-logo-gold-2.png";
 
 const navItems = [
@@ -33,10 +30,6 @@ export function TravelSidebar() {
   const [username, setUsername] = useState<string>("");
   const [open, setOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [createSheetOpen, setCreateSheetOpen] = useState(false);
-  const [uploadModalOpen, setUploadModalOpen] = useState(false);
-  const [uploadInitialTab, setUploadInitialTab] = useState<"photo" | "video">("photo");
-  const [createMomentOpen, setCreateMomentOpen] = useState(false);
 
   useEffect(() => {
     if (user?.id) {
@@ -75,37 +68,6 @@ export function TravelSidebar() {
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
-  };
-
-  const handleCreateClick = () => {
-    if (!user) {
-      navigate('/auth');
-      toast.error('Please sign in to create content');
-      return;
-    }
-    setCreateSheetOpen(true);
-  };
-
-  const handleCreateContent = (type: string) => {
-    if (type === "reel") {
-      setCreateSheetOpen(false);
-      setUploadInitialTab("video");
-      setUploadModalOpen(true);
-    } else if (type === "post") {
-      setCreateSheetOpen(false);
-      setUploadInitialTab("photo");
-      setUploadModalOpen(true);
-    } else if (type === "moment") {
-      setCreateSheetOpen(false);
-      setCreateMomentOpen(true);
-    } else if (type === "moments-vault") {
-      toast.info("Go to your profile to create moments vaults");
-      setCreateSheetOpen(false);
-    }
-  };
-
-  const handleUploadSuccess = () => {
-    setUploadModalOpen(false);
   };
 
   return (
@@ -153,14 +115,6 @@ export function TravelSidebar() {
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <div className="ml-11 mt-1 space-y-1">
-                  <Button
-                    variant="ghost"
-                    onClick={handleCreateClick}
-                    className="w-full justify-start gap-3 px-3 py-2 h-auto hover:bg-muted/50 rounded-lg"
-                  >
-                    <PlusSquare className="h-5 w-5" />
-                    <span className="text-sm">Create Content</span>
-                  </Button>
                   <Button
                     variant="ghost"
                     onClick={() => {
@@ -247,23 +201,6 @@ export function TravelSidebar() {
           </PopoverContent>
         </Popover>
       </div>
-
-      {/* Create Content Modals */}
-      <CreateContentSheet 
-        open={createSheetOpen} 
-        onOpenChange={setCreateSheetOpen}
-        onSelectType={handleCreateContent}
-      />
-      <ContentUploadModal
-        open={uploadModalOpen}
-        onOpenChange={setUploadModalOpen}
-        initialTab={uploadInitialTab}
-        onSuccess={handleUploadSuccess}
-      />
-      <CreateMomentModal
-        open={createMomentOpen}
-        onOpenChange={setCreateMomentOpen}
-      />
     </div>
   );
 }

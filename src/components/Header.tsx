@@ -21,7 +21,6 @@ import { useTranslation } from "react-i18next";
 import logoWordmark from "@/assets/primary-horizontal-logo-gold-2.png";
 import logomark from "@/assets/logomark-gold.png";
 import { useExpediaModal } from "@/contexts/ExpediaModalContext";
-import { CollaborationInvites } from "@/components/CollaborationInvites";
 import { PartnershipApprovals } from "@/components/PartnershipApprovals";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { SearchBar } from "@/components/SearchBar";
@@ -42,11 +41,9 @@ export const Header = () => {
   const { t } = useTranslation();
   const [usePreferences, setUsePreferences] = useState(true);
   const [searchSheetOpen, setSearchSheetOpen] = useState(false);
-  const [createSheetOpen, setCreateSheetOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadInitialTab, setUploadInitialTab] = useState<"photo" | "video">("photo");
   const [buyCoinsOpen, setBuyCoinsOpen] = useState(false);
-  const [createMomentOpen, setCreateMomentOpen] = useState(false);
   const [profileAvatarUrl, setProfileAvatarUrl] = useState<string | null>(null);
   const { balance } = useCoinBalance();
   const { openModal: openExpediaModal } = useExpediaModal();
@@ -127,46 +124,6 @@ export const Header = () => {
     };
   }, [user]);
 
-  const handleCreateContent = (type: string) => {
-    if (!user) {
-      navigate('/auth');
-      toast({
-        title: "Sign in required",
-        description: "Please sign in to create content",
-      });
-      return;
-    }
-    if (type === "reel") {
-      setCreateSheetOpen(false);
-      setUploadInitialTab("video");
-      setUploadModalOpen(true);
-    } else if (type === "post") {
-      setCreateSheetOpen(false);
-      setUploadInitialTab("photo");
-      setUploadModalOpen(true);
-    } else if (type === "moment") {
-      setCreateSheetOpen(false);
-      setCreateMomentOpen(true);
-    } else if (type === "moments-vault") {
-      toast({
-        title: "Moments Vault",
-        description: "Go to your profile to create moments vaults",
-      });
-      setCreateSheetOpen(false);
-    }
-  };
-
-  const handleCreateClick = () => {
-    if (!user) {
-      navigate('/auth');
-      toast({
-        title: "Sign in required",
-        description: "Please sign in to create content",
-      });
-      return;
-    }
-    setCreateSheetOpen(true);
-  };
 
   const handleUploadSuccess = () => {
     setUploadModalOpen(false);

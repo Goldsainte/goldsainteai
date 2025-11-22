@@ -12,8 +12,6 @@ import { Sparkles, Plus, DollarSign, TrendingUp, Package, Users } from "lucide-r
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { PartnershipApprovals } from "@/components/PartnershipApprovals";
-import { InfluencerPromoCodeManager } from "@/components/InfluencerPromoCodeManager";
-import { InfluencerPromotionRequests } from "@/components/InfluencerPromotionRequests";
 
 export default function CoCuratedDashboard() {
   const { user } = useAuth();
@@ -280,10 +278,11 @@ export default function CoCuratedDashboard() {
           ) : (
             <>
               <TabsContent value="promotions" className="mt-6">
-                <div className="space-y-8">
-                  <InfluencerPromotionRequests />
-                  <InfluencerPromoCodeManager />
-                </div>
+                <Card>
+                  <CardContent className="py-12 text-center">
+                    <p className="text-muted-foreground">Promotion features have been removed</p>
+                  </CardContent>
+                </Card>
               </TabsContent>
 
               <TabsContent value="marketplace" className="mt-6">

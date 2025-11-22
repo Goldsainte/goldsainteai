@@ -12,7 +12,6 @@ import { useNavigate } from "react-router-dom";
 import { CommentsSheet } from "./CommentsSheet";
 import VideoEditModal from "./VideoEditModal";
 import { CollectionSelector } from "./CollectionSelector";
-import { CollaboratorSelector } from "./CollaboratorSelector";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -90,7 +89,6 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const [localCommentCount, setLocalCommentCount] = useState(post.comment_count);
   const [editOpen, setEditOpen] = useState(false);
   const [collectionSelectorOpen, setCollectionSelectorOpen] = useState(false);
-  const [collaboratorSelectorOpen, setCollaboratorSelectorOpen] = useState(false);
   const [collaborators, setCollaborators] = useState<Array<{id: string, username: string | null, avatar_url: string | null}>>([]);
   const [partnership, setPartnership] = useState<any>(null);
   const { collections, createCollection, addPostToCollection } = useCollections();

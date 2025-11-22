@@ -11,7 +11,6 @@ import { InstagramVerifiedBadge } from "@/components/badges/InstagramVerifiedBad
 import { BusinessVerifiedBadge } from "@/components/badges/BusinessVerifiedBadge";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
-import CreateContentSheet from "@/components/CreateContentSheet";
 import ContentUploadModal from "@/components/ContentUploadModal";
 import { BrandPartnershipProposal } from "@/components/BrandPartnershipProposal";
 import { CreatorPartnershipRequest } from "@/components/CreatorPartnershipRequest";
@@ -20,7 +19,6 @@ import { CreateMomentModal } from "@/components/CreateMomentModal";
 import FollowButton from "@/components/FollowButton";
 import StoryHighlights from "@/components/StoryHighlights";
 import VideoEditModal from "@/components/VideoEditModal";
-import { CollaborationInvites } from "@/components/CollaborationInvites";
 import { EditProfileDialog } from "@/components/EditProfileDialog";
 import { ActivityStatus } from "@/components/ActivityStatus";
 import { CloseFriendsManager } from "@/components/CloseFriendsManager";
@@ -97,16 +95,12 @@ const TravelProfile = () => {
   const [editProfileOpen, setEditProfileOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
-  const [collaborationSheetOpen, setCollaborationSheetOpen] = useState(false);
   const [closeFriendsOpen, setCloseFriendsOpen] = useState(false);
-  const [unreadCollabCount, setUnreadCollabCount] = useState(0);
-  const [createSheetOpen, setCreateSheetOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadInitialTab, setUploadInitialTab] = useState<"photo" | "video">("photo");
   const [buyCoinsOpen, setBuyCoinsOpen] = useState(false);
   const [partnershipProposalOpen, setPartnershipProposalOpen] = useState(false);
   const [partnershipRequestOpen, setPartnershipRequestOpen] = useState(false);
-  const [createMomentOpen, setCreateMomentOpen] = useState(false);
   const { isCloseFriend } = useCloseFriends();
 const { balance, refetch: refetchCoins } = useCoinBalance();
   const [hasActiveMoments, setHasActiveMoments] = useState(false);
@@ -130,11 +124,6 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
       fetchLikedPosts();
       fetchStats();
       checkActiveMoments();
-      
-      // Fetch collaboration invites count only for own profile
-      if (isOwnProfile && user) {
-        fetchCollabCount();
-      }
     }
   }, [profileUserId, isOwnProfile, user]);
 
@@ -169,18 +158,6 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         setSearchParams(searchParams);
       }
     }
-  };
-
-  const fetchCollabCount = async () => {
-    if (!user) return;
-    
-    const { count } = await supabase
-      .from('post_collaborators')
-      .select('*', { count: 'exact', head: true })
-      .eq('collaborator_id', user.id)
-      .eq('status', 'pending');
-    
-    setUnreadCollabCount(count || 0);
   };
 
   const fetchProfile = async () => {
@@ -384,23 +361,6 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
     return num.toString();
   };
 
-  const handleCreateContent = (type: string) => {
-    if (type === 'reel') {
-      setUploadInitialTab("video");
-      setUploadModalOpen(true);
-      setCreateSheetOpen(false);
-    } else if (type === 'post') {
-      setUploadInitialTab("photo");
-      setUploadModalOpen(true);
-      setCreateSheetOpen(false);
-    } else if (type === 'moment') {
-      setCreateSheetOpen(false);
-      setCreateMomentOpen(true);
-    } else if (type === 'moments-vault') {
-      toast.info('Tap the + button in the Moments Vaults section below to create a new vault');
-      setCreateSheetOpen(false);
-    }
-  };
 
   const handleUploadSuccess = () => {
     setUploadModalOpen(false);

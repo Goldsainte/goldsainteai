@@ -2,10 +2,9 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plane, Heart, ChevronDown, ChevronUp, Clock, Bell } from "lucide-react";
+import { Plane, Heart, ChevronDown, ChevronUp, Clock } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
 import { FlightBookingModal } from "./FlightBookingModal";
-import { FlightPriceAlertModal } from "./FlightPriceAlertModal";
 import { formatCurrency } from "@/lib/currencyHelpers";
 
 const AirlineLogo = ({ carrierCode, className }: { carrierCode: string; className?: string }) => {
@@ -55,7 +54,6 @@ export const CompactFlightCard = ({
 }: CompactFlightCardProps) => {
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
-  const [priceAlertModalOpen, setPriceAlertModalOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   
   // Add null checks to prevent crashes
@@ -290,15 +288,6 @@ export const CompactFlightCard = ({
               </Button>
               <Button
                 size="sm"
-                variant="outline"
-                className="h-8 px-2 text-xs"
-                onClick={() => setPriceAlertModalOpen(true)}
-                title="Set price alert"
-              >
-                <Bell className="h-3 w-3" />
-              </Button>
-              <Button
-                size="sm"
                 className="h-8 px-3 text-xs"
                 onClick={() => setBookingModalOpen(true)}
               >
@@ -374,21 +363,6 @@ export const CompactFlightCard = ({
         flight={flight}
         dictionaries={dictionaries}
       />
-
-      {origin && destination && departureDate && (
-        <FlightPriceAlertModal
-          open={priceAlertModalOpen}
-          onOpenChange={setPriceAlertModalOpen}
-          origin={origin}
-          destination={destination}
-          departureDate={departureDate}
-          returnDate={returnDate}
-          adults={adults}
-          cabinClass={cabinClass}
-          currentPrice={hasPriceData ? markedUpPrice : undefined}
-          currency={currency}
-        />
-      )}
     </>
   );
 };

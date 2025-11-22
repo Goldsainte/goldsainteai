@@ -101,7 +101,6 @@ const CreatorTripPage = lazy(() => import('@/pages/CreatorTripPage'));
 const CreatorProfilePage = lazy(() => import('@/pages/CreatorProfilePage'));
 const NewCollabRequestPage = lazy(() => import('@/pages/NewCollabRequestPage'));
 const Messages = lazy(() => import('@/pages/Messages'));
-const PriceAlerts = lazy(() => import('@/pages/PriceAlerts'));
 const TravelerDashboardPage = lazy(() => import('@/pages/traveler/TravelerDashboardPage'));
 const PartnerConsolePage = lazy(() => import('@/pages/partner/PartnerConsolePage'));
 const PartnerEscrowPage = lazy(() => import('@/pages/partners/EscrowMilestonesPage'));
