@@ -462,9 +462,7 @@ export const AppRoutes = () => (
       <Route path="/activity-logs" element={<ActivityLogs />} />
       <Route path="/customer-verification" element={<CustomerVerification />} />
       <Route path="/emergency-contacts" element={<EmergencyContacts />} />
-      <Route path="/cocurated-dashboard" element={<CoCuratedDashboard />} />
       <Route path="/cocurated-create" element={<CoCuratedCreate />} />
-      <Route path="/cocurated-marketplace" element={<CoCuratedMarketplace />} />
       <Route path="/tour/:tourId" element={<TourActivityDetail />} />
       <Route path="/restaurant/:restaurantId" element={<RestaurantDetail />} />
       <Route path="/cocurated-booking-success" element={<CoCuratedBookingSuccess />} />

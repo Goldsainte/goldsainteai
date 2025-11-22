@@ -21,7 +21,7 @@ export default function StoryboardEditorPage() {
   const fromConcierge = searchParams.get("from") === "concierge";
   const [storyboard, setStoryboard] = useState<Storyboard | null>(null);
   const [items, setItems] = useState<StoryboardItem[]>([]);
-  const [tripDestination, setTripDestination] = useState<string | null>(null);
+  const [trip, setTrip] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
@@ -33,15 +33,15 @@ export default function StoryboardEditorPage() {
     async function load() {
       setLoading(true);
       try {
-        // Fetch trip destination
+        // Fetch trip data
         const { data: tripData } = await supabase
           .from("trips")
-          .select("destination")
+          .select("destination, trip_type, related_concierge_session_id")
           .eq("id", tripId)
           .single();
         
-        if (!cancelled && tripData?.destination) {
-          setTripDestination(tripData.destination);
+        if (!cancelled && tripData) {
+          setTrip(tripData);
         }
 
         const sb = await getOrCreateTripStoryboard(tripId);
@@ -162,7 +162,7 @@ export default function StoryboardEditorPage() {
         </p>
         {trip?.related_concierge_session_id && (
           <Link
-            to={`/concierge?fromTripId=${id}`}
+            to={`/concierge?fromTripId=${tripId}`}
             className="inline-flex items-center gap-1 text-[11px] text-[#BFAD72] hover:text-[#0a2225] mt-3 group"
           >
             <Sparkles className="h-3 w-3 group-hover:animate-pulse" />

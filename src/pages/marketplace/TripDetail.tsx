@@ -461,13 +461,6 @@ export default function TripDetail() {
           </aside>
         </section>
       </div>
-
-      {/* Trip Request Modal */}
-      <Dialog open={showTripRequestModal} onOpenChange={setShowTripRequestModal}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-...
-        </DialogContent>
-      </Dialog>
     </main>
   );
 }

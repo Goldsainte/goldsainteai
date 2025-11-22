@@ -160,7 +160,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   useEffect(() => {
     checkIfLiked();
     checkIfSaved();
-    fetchCollaborators();
+    // fetchCollaborators removed - feature deleted
     fetchPartnership();
     checkIfFollowing();
   }, [post.id]);
