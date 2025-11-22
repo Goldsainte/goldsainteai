@@ -21,6 +21,7 @@ export default function StoryboardEditorPage() {
   const fromConcierge = searchParams.get("from") === "concierge";
   const [storyboard, setStoryboard] = useState<Storyboard | null>(null);
   const [items, setItems] = useState<StoryboardItem[]>([]);
+  const [tripDestination, setTripDestination] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
@@ -32,6 +33,17 @@ export default function StoryboardEditorPage() {
     async function load() {
       setLoading(true);
       try {
+        // Fetch trip destination
+        const { data: tripData } = await supabase
+          .from("trips")
+          .select("destination")
+          .eq("id", tripId)
+          .single();
+        
+        if (!cancelled && tripData?.destination) {
+          setTripDestination(tripData.destination);
+        }
+
         const sb = await getOrCreateTripStoryboard(tripId);
         if (cancelled) return;
         setStoryboard(sb);
