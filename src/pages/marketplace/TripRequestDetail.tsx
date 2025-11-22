@@ -60,7 +60,11 @@ export default function TripRequestDetail() {
     priceFrom: "",
     priceTo: "",
     timelineLabel: "",
-    message: "",
+    message: "", // kept for backward-compatibility
+    included: "",
+    notIncluded: "",
+    itineraryOverview: "",
+    fitReason: "",
   });
   const [submittingProposal, setSubmittingProposal] = useState(false);
 
@@ -244,8 +248,8 @@ export default function TripRequestDetail() {
       return;
     }
 
-    if (!newProposal.priceFrom || !newProposal.message) {
-      toast.error("Please fill in price and proposal message");
+    if (!newProposal.priceFrom || !newProposal.itineraryOverview || !newProposal.fitReason) {
+      toast.error("Please fill in price, itinerary overview, and why you're a great fit");
       return;
     }
 
@@ -272,8 +276,14 @@ export default function TripRequestDetail() {
           currency: "USD",
           nights: parseInt(newProposal.timelineLabel) || 7,
           status: "sent",
-          message: newProposal.message,
-          headline: `${proposerRole === "agent" ? "Agent" : "Creator"} proposal`,
+          // New, structured fields mapped to existing columns
+          inclusions: newProposal.included || null,
+          exclusions: newProposal.notIncluded || null,
+          // Use itinerary as main body, fitReason as the headline
+          message: newProposal.itineraryOverview,
+          headline:
+            newProposal.fitReason ||
+            `${proposerRole === "agent" ? "Agent" : "Creator"} proposal`,
         });
 
       if (proposalError) throw proposalError;
@@ -284,6 +294,10 @@ export default function TripRequestDetail() {
         priceTo: "",
         timelineLabel: "",
         message: "",
+        included: "",
+        notIncluded: "",
+        itineraryOverview: "",
+        fitReason: "",
       });
       fetchData(); // Refresh proposals
     } catch (err: any) {
@@ -370,6 +384,7 @@ export default function TripRequestDetail() {
                 </p>
 
                 <form onSubmit={handleSubmitProposal} className="mt-3 space-y-3 text-xs">
+                  {/* Price + timeline */}
                   <div className="grid gap-3 md:grid-cols-3">
                     <div className="space-y-1">
                       <label className="font-medium text-foreground">Price (USD)</label>
@@ -377,7 +392,7 @@ export default function TripRequestDetail() {
                         type="number"
                         min={0}
                         required
-                        className="w-full rounded-xl border border-border bg-muted px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-background focus:outline-none focus:ring-1 focus:ring-primary"
+                        className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                         placeholder="e.g. 6500"
                         value={newProposal.priceFrom}
                         onChange={(e) =>
@@ -387,14 +402,17 @@ export default function TripRequestDetail() {
                           }))
                         }
                       />
+                      <p className="text-[10px] text-muted-foreground">
+                        Total estimated trip price per request details.
+                      </p>
                     </div>
 
                     <div className="space-y-1">
                       <label className="font-medium text-foreground">Timeline (days)</label>
                       <input
                         type="text"
-                        className="w-full rounded-xl border border-border bg-muted px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-background focus:outline-none focus:ring-1 focus:ring-primary"
-                        placeholder="e.g. 3-5"
+                        className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                        placeholder="e.g. 3–5"
                         value={newProposal.timelineLabel}
                         onChange={(e) =>
                           setNewProposal((prev) => ({
@@ -403,31 +421,103 @@ export default function TripRequestDetail() {
                           }))
                         }
                       />
+                      <p className="text-[10px] text-muted-foreground">
+                        Approximate trip length based on your proposed itinerary.
+                      </p>
                     </div>
                   </div>
 
+                  {/* Included / not included */}
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <div className="space-y-1">
+                      <label className="font-medium text-foreground">Included in this proposal</label>
+                      <textarea
+                        rows={3}
+                        className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                        placeholder="Hotels, private transfers, daily breakfast, guided experiences, concierge support…"
+                        value={newProposal.included}
+                        onChange={(e) =>
+                          setNewProposal((prev) => ({
+                            ...prev,
+                            included: e.target.value,
+                          }))
+                        }
+                      />
+                      <p className="text-[10px] text-muted-foreground">
+                        Be specific about flights, hotels, ground transport, activities, and support.
+                      </p>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="font-medium text-foreground">
+                        Not included / optional add-ons
+                      </label>
+                      <textarea
+                        rows={3}
+                        className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                        placeholder="International flights, travel insurance, most dinners, spa treatments, optional excursions…"
+                        value={newProposal.notIncluded}
+                        onChange={(e) =>
+                          setNewProposal((prev) => ({
+                            ...prev,
+                            notIncluded: e.target.value,
+                          }))
+                        }
+                      />
+                      <p className="text-[10px] text-muted-foreground">
+                        Help the traveler understand what&apos;s extra or upgradable.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Itinerary overview */}
                   <div className="space-y-1">
-                    <label className="font-medium text-foreground">Proposal message</label>
+                    <label className="font-medium text-foreground">Sample itinerary overview</label>
                     <textarea
-                      rows={3}
+                      rows={4}
                       required
-                      className="w-full rounded-xl border border-border bg-muted px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-background focus:outline-none focus:ring-1 focus:ring-primary"
-                      placeholder="Explain your approach, what's included (flights, hotels, transfers, activities), and why you're a great fit for this trip."
-                      value={newProposal.message}
+                      className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                      placeholder={`Day 1: Arrival & check-in · Day 2: Private yacht & coastal exploring · Day 3: Wine country · Day 4: Departure…`}
+                      value={newProposal.itineraryOverview}
                       onChange={(e) =>
                         setNewProposal((prev) => ({
                           ...prev,
-                          message: e.target.value,
+                          itineraryOverview: e.target.value,
                         }))
                       }
                     />
+                    <p className="text-[10px] text-muted-foreground">
+                      A concise day-by-day outline so the traveler can instantly feel the trip.
+                    </p>
                   </div>
 
+                  {/* Why you're a great fit */}
+                  <div className="space-y-1">
+                    <label className="font-medium text-foreground">Why you&apos;re a great fit</label>
+                    <textarea
+                      rows={3}
+                      required
+                      className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                      placeholder="Your expertise with this destination, hotel partners, on-the-ground connections, and similar trips you've designed."
+                      value={newProposal.fitReason}
+                      onChange={(e) =>
+                        setNewProposal((prev) => ({
+                          ...prev,
+                          fitReason: e.target.value,
+                        }))
+                      }
+                    />
+                    <p className="text-[10px] text-muted-foreground">
+                      Think of this as your editorial intro – why this trip is perfectly matched to you.
+                    </p>
+                  </div>
+
+                  {/* Submit */}
                   <div className="flex items-center justify-end gap-2 pt-1">
                     <button
                       type="submit"
                       disabled={submittingProposal}
-                      className="inline-flex items-center rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-70"
+                      className="inline-flex items-center rounded-full bg-primary px-4 py-2 text-xs font-medium text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-70"
                     >
                       {submittingProposal ? "Submitting..." : "Submit proposal"}
                     </button>
