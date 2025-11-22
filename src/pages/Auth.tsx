@@ -686,7 +686,12 @@ const Auth = () => {
                 </ul>
               </div>
             </div>
-            <Button 
+            
+            <p className="mt-3 text-xs text-muted-foreground">
+              You'll choose your account type (traveler, creator, agent, or brand) in the next step after creating your account.
+            </p>
+
+            <Button
               type="submit" 
               className="w-full h-12 bg-foreground text-background hover:bg-foreground/90" 
               disabled={isLoading}
