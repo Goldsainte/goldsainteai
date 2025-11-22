@@ -878,30 +878,6 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             </div>
           )}
 
-          {/* Collaborators */}
-          {collaborators.length > 0 && (
-            <div className="flex items-center gap-2 text-xs">
-              <span className="text-muted-foreground">with</span>
-              <div className="flex -space-x-2">
-                {collaborators.slice(0, 3).map(collab => (
-                  <Avatar
-                    key={collab.id}
-                    className="h-6 w-6 border-2 border-card cursor-pointer"
-                    onClick={() => navigate(`/creator/${collab.id}`)}
-                  >
-                    <AvatarImage src={collab.avatar_url || undefined} />
-                    <AvatarFallback className="text-xs">
-                      {collab.username?.[0]?.toUpperCase() || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                ))}
-              </div>
-              <span className="text-muted-foreground font-medium">
-                {collaborators.map(c => c.username).join(', ')}
-              </span>
-            </div>
-          )}
-
           {/* Music Player */}
           {post.music_track_name && (
             <div className="flex items-center gap-2 text-sm bg-background/80 backdrop-blur-sm rounded-lg p-2">
@@ -1150,13 +1126,6 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         </div>
       )}
       
-      {/* Partnership Label */}
-      {partnership && (
-        <div className="absolute top-4 left-4 right-4 z-10 px-3 py-1.5 bg-background/95 backdrop-blur-sm rounded-lg text-xs font-medium border shadow-sm">
-          Paid Partnership with @{partnership.brand.username}
-        </div>
-      )}
-
       {/* Video, Embed, or Photos */}
       {post.video_url ? (
         <>

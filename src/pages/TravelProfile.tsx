@@ -810,7 +810,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               {isOwnProfile && (
                 <Button
                   className="mt-4"
-                  onClick={() => setCreateSheetOpen(true)}
+                  onClick={() => setCreateMomentOpen(true)}
                 >
                   Create your first journey
                 </Button>
@@ -1143,7 +1143,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setCreateSheetOpen(true)}
+            onClick={() => setCreateMomentOpen(true)}
             className="hover:bg-accent h-12 w-12 rounded-lg [&>svg]:text-[#BFAD72]"
             aria-label="Create"
           >
