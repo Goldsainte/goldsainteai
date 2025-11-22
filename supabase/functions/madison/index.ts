@@ -195,14 +195,101 @@ serve(async (req) => {
     });
 
     // 4) Build OpenAI messages
+    // Determine what we already know so we can instruct the model not to re-ask.
+    const historyForExtraction = [
+      ...conversationHistory,
+      { role: "user", content: message },
+    ]
+      .map((msg) => `${msg.role.toUpperCase()}: ${msg.content}`)
+      .join("\n\n");
+
+    const extractionMessages = [
+      {
+        role: "system",
+        content:
+          "Extract destination, travelers, timeframe, and vibe from this Madison conversation. Return JSON with keys destination, travelers, timeframe, vibe. If unknown, set to null. Only use the traveler-provided information.",
+      },
+      {
+        role: "user",
+        content: `Conversation so far:\n${historyForExtraction}`,
+      },
+    ];
+
+    let extractedSlots = {
+      destination: null as string | null,
+      travelers: null as string | null,
+      timeframe: null as string | null,
+      vibe: null as string | null,
+    };
+
+    try {
+      const extractionResponse = await fetch(
+        "https://api.openai.com/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${OPENAI_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",
+            messages: extractionMessages,
+            temperature: 0,
+            response_format: { type: "json_object" },
+          }),
+        },
+      );
+
+      if (extractionResponse.ok) {
+        const extractionData = await extractionResponse.json();
+        const rawContent =
+          extractionData.choices?.[0]?.message?.content?.trim() ?? "";
+
+        try {
+          const parsed = JSON.parse(rawContent);
+          extractedSlots = {
+            destination: parsed.destination ?? null,
+            travelers: parsed.travelers ?? null,
+            timeframe: parsed.timeframe ?? null,
+            vibe: parsed.vibe ?? null,
+          };
+        } catch (_e) {
+          console.warn("[Madison] Slot extraction parse issue", rawContent);
+        }
+      } else {
+        console.warn(
+          "[Madison] Slot extraction failed",
+          extractionResponse.status,
+          await extractionResponse.text(),
+        );
+      }
+    } catch (slotError) {
+      console.error("[Madison] Slot extraction error", slotError);
+    }
+
+    const knownState = `Known so far:\n- Destination: ${
+      extractedSlots.destination ?? "(unknown)"
+    }\n- Travelers: ${
+      extractedSlots.travelers ?? "(unknown)"
+    }\n- Timeframe: ${
+      extractedSlots.timeframe ?? "(unknown)"
+    }\n- Vibe: ${extractedSlots.vibe ?? "(unknown)"}\nYou MUST NOT ask again about any field that is already known. Only ask about unknown fields.`;
+
     const openaiMessages = [
       { role: "system", content: MADISON_SYSTEM_PROMPT },
+      { role: "system", content: knownState },
       ...conversationHistory.map((msg: any) => ({
         role: msg.role,
         content: msg.content,
       })),
       { role: "user", content: message },
     ];
+
+    console.log("[Madison] Slot extraction result", {
+      conversationId,
+      extractedSlots,
+    });
+    console.log("[Madison] OpenAI messages:", openaiMessages);
 
     // 5) Call OpenAI
     console.log("[Madison] Calling OpenAI with", openaiMessages.length - 1, "history messages");
