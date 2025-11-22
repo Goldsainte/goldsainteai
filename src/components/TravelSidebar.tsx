@@ -10,8 +10,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
-import CreateContentSheet from "@/components/CreateContentSheet";
-import ContentUploadModal from "@/components/ContentUploadModal";
 import { CreateMomentModal } from "@/components/CreateMomentModal";
 import logoHorizontal from "@/assets/primary-horizontal-logo-gold-2.png";
 
@@ -33,9 +31,6 @@ export function TravelSidebar() {
   const [username, setUsername] = useState<string>("");
   const [open, setOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [createSheetOpen, setCreateSheetOpen] = useState(false);
-  const [uploadModalOpen, setUploadModalOpen] = useState(false);
-  const [uploadInitialTab, setUploadInitialTab] = useState<"photo" | "video">("photo");
   const [createMomentOpen, setCreateMomentOpen] = useState(false);
 
   useEffect(() => {
@@ -248,18 +243,7 @@ export function TravelSidebar() {
         </Popover>
       </div>
 
-      {/* Create Content Modals */}
-      <CreateContentSheet 
-        open={createSheetOpen} 
-        onOpenChange={setCreateSheetOpen}
-        onSelectType={handleCreateContent}
-      />
-      <ContentUploadModal
-        open={uploadModalOpen}
-        onOpenChange={setUploadModalOpen}
-        initialTab={uploadInitialTab}
-        onSuccess={handleUploadSuccess}
-      />
+      {/* Create Moment Modal */}
       <CreateMomentModal
         open={createMomentOpen}
         onOpenChange={setCreateMomentOpen}

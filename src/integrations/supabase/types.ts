@@ -2028,56 +2028,6 @@ export type Database = {
           },
         ]
       }
-      brand_partnerships: {
-        Row: {
-          brand_id: string
-          campaign_details: string
-          campaign_name: string
-          created_at: string
-          creator_id: string
-          deliverables: string
-          id: string
-          payment_amount: number
-          post_id: string | null
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          brand_id: string
-          campaign_details: string
-          campaign_name: string
-          created_at?: string
-          creator_id: string
-          deliverables: string
-          id?: string
-          payment_amount?: number
-          post_id?: string | null
-          status?: string
-          updated_at?: string
-        }
-        Update: {
-          brand_id?: string
-          campaign_details?: string
-          campaign_name?: string
-          created_at?: string
-          creator_id?: string
-          deliverables?: string
-          id?: string
-          payment_amount?: number
-          post_id?: string | null
-          status?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "brand_partnerships_post_id_fkey"
-            columns: ["post_id"]
-            isOneToOne: false
-            referencedRelation: "travel_posts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       brand_profiles: {
         Row: {
           bio: string | null
@@ -3800,66 +3750,6 @@ export type Database = {
           },
         ]
       }
-      flight_price_alerts: {
-        Row: {
-          adults: number
-          cabin_class: string
-          created_at: string
-          currency: string
-          current_price: number | null
-          departure_date: string
-          destination_code: string
-          id: string
-          is_active: boolean
-          last_checked_at: string | null
-          last_notified_at: string | null
-          notification_frequency: string
-          origin_code: string
-          return_date: string | null
-          target_price: number
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          adults?: number
-          cabin_class?: string
-          created_at?: string
-          currency?: string
-          current_price?: number | null
-          departure_date: string
-          destination_code: string
-          id?: string
-          is_active?: boolean
-          last_checked_at?: string | null
-          last_notified_at?: string | null
-          notification_frequency?: string
-          origin_code: string
-          return_date?: string | null
-          target_price: number
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          adults?: number
-          cabin_class?: string
-          created_at?: string
-          currency?: string
-          current_price?: number | null
-          departure_date?: string
-          destination_code?: string
-          id?: string
-          is_active?: boolean
-          last_checked_at?: string | null
-          last_notified_at?: string | null
-          notification_frequency?: string
-          origin_code?: string
-          return_date?: string | null
-          target_price?: number
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       gift_transactions: {
         Row: {
           coin_amount: number
@@ -4083,100 +3973,6 @@ export type Database = {
           use_count?: number | null
         }
         Relationships: []
-      }
-      influencer_promotions: {
-        Row: {
-          approved_by_agent: boolean | null
-          clicks: number | null
-          conversions: number | null
-          created_at: string
-          custom_influencer_commission_percentage: number | null
-          id: string
-          influencer_id: string
-          initiated_by: string
-          package_id: string
-          promo_code: string
-          status: string
-          total_commission_earned: number | null
-          total_revenue: number | null
-          updated_at: string
-        }
-        Insert: {
-          approved_by_agent?: boolean | null
-          clicks?: number | null
-          conversions?: number | null
-          created_at?: string
-          custom_influencer_commission_percentage?: number | null
-          id?: string
-          influencer_id: string
-          initiated_by?: string
-          package_id: string
-          promo_code: string
-          status?: string
-          total_commission_earned?: number | null
-          total_revenue?: number | null
-          updated_at?: string
-        }
-        Update: {
-          approved_by_agent?: boolean | null
-          clicks?: number | null
-          conversions?: number | null
-          created_at?: string
-          custom_influencer_commission_percentage?: number | null
-          id?: string
-          influencer_id?: string
-          initiated_by?: string
-          package_id?: string
-          promo_code?: string
-          status?: string
-          total_commission_earned?: number | null
-          total_revenue?: number | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "influencer_promotions_influencer_id_fkey"
-            columns: ["influencer_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "influencer_promotions_influencer_id_fkey"
-            columns: ["influencer_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "influencer_promotions_influencer_id_fkey"
-            columns: ["influencer_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "influencer_promotions_influencer_id_fkey"
-            columns: ["influencer_id"]
-            isOneToOne: false
-            referencedRelation: "public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "influencer_promotions_influencer_id_fkey"
-            columns: ["influencer_id"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
-          },
-          {
-            foreignKeyName: "influencer_promotions_package_id_fkey"
-            columns: ["package_id"]
-            isOneToOne: false
-            referencedRelation: "agent_packages"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       instagram_tokens: {
         Row: {
@@ -6841,47 +6637,6 @@ export type Database = {
         }
         Relationships: []
       }
-      post_collaborators: {
-        Row: {
-          collaborator_id: string
-          created_at: string
-          id: string
-          invited_at: string
-          invited_by: string
-          post_id: string
-          responded_at: string | null
-          status: string
-        }
-        Insert: {
-          collaborator_id: string
-          created_at?: string
-          id?: string
-          invited_at?: string
-          invited_by: string
-          post_id: string
-          responded_at?: string | null
-          status?: string
-        }
-        Update: {
-          collaborator_id?: string
-          created_at?: string
-          id?: string
-          invited_at?: string
-          invited_by?: string
-          post_id?: string
-          responded_at?: string | null
-          status?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "post_collaborators_post_id_fkey"
-            columns: ["post_id"]
-            isOneToOne: false
-            referencedRelation: "travel_posts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       post_collections: {
         Row: {
           cover_image_url: string | null
@@ -8067,13 +7822,6 @@ export type Database = {
             columns: ["package_id"]
             isOneToOne: false
             referencedRelation: "agent_packages"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "shared_commission_bookings_promotion_id_fkey"
-            columns: ["promotion_id"]
-            isOneToOne: false
-            referencedRelation: "influencer_promotions"
             referencedColumns: ["id"]
           },
         ]

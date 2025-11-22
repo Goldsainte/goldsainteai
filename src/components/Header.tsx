@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { User, Menu, Hotel, Plane, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info, Sparkles, CreditCard, PlaneTakeoff, HandCoins, ShieldCheck } from "lucide-react";
 import { NotificationBell } from '@/components/notifications/NotificationBell';
-import CreateContentSheet from "@/components/CreateContentSheet";
-import ContentUploadModal from "@/components/ContentUploadModal";
 import { CreateMomentModal } from "@/components/CreateMomentModal";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -21,8 +19,6 @@ import { useTranslation } from "react-i18next";
 import logoWordmark from "@/assets/primary-horizontal-logo-gold-2.png";
 import logomark from "@/assets/logomark-gold.png";
 import { useExpediaModal } from "@/contexts/ExpediaModalContext";
-import { CollaborationInvites } from "@/components/CollaborationInvites";
-import { PartnershipApprovals } from "@/components/PartnershipApprovals";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { SearchBar } from "@/components/SearchBar";
 import { useCoinBalance } from "@/hooks/useCoinBalance";
@@ -872,10 +868,6 @@ export const Header = () => {
                         
                         <DropdownMenuSeparator className="bg-border/50" />
                         
-                        <div className="px-2 py-2">
-                          <CollaborationInvites />
-                          <PartnershipApprovals />
-                        </div>
                         
                         {isAdmin && (
                           <>
@@ -1049,21 +1041,6 @@ export const Header = () => {
           </SheetContent>
         </Sheet>
       )}
-
-      {/* Create Content Sheet */}
-      <CreateContentSheet
-        open={createSheetOpen}
-        onOpenChange={setCreateSheetOpen}
-        onSelectType={handleCreateContent}
-      />
-
-      {/* Upload Modal */}
-      <ContentUploadModal
-        open={uploadModalOpen}
-        onOpenChange={setUploadModalOpen}
-        onSuccess={handleUploadSuccess}
-        initialTab={uploadInitialTab}
-      />
 
       {/* Create Moment Modal */}
       <CreateMomentModal
