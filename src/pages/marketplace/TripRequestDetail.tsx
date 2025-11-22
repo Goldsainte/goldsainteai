@@ -74,83 +74,90 @@ export default function TripRequestDetail() {
 
     try {
       // Fetch trip request
-      const { data: jobData, error: jobError } = await supabase
-        .from("marketplace_jobs")
-        .select("*")
+      const { data: tripData, error: tripError } = await supabase
+        .from("trip_requests")
+        .select(`
+          *,
+          profiles:user_id (
+            full_name,
+            avatar_url
+          )
+        `)
         .eq("id", id)
         .single();
 
-      if (jobError) throw jobError;
+      if (tripError) throw tripError;
 
-      if (!jobData) {
+      if (!tripData) {
         setError("Trip request not found.");
         return;
       }
 
-      // Parse travel_dates and requirements from JSON
-      const travelDates = jobData.travel_dates as any || {};
-      const requirements = jobData.requirements as any || {};
+      const tripStyle = typeof tripData.trip_style === 'string' 
+        ? tripData.trip_style 
+        : Array.isArray(tripData.travel_styles) && tripData.travel_styles.length > 0 
+          ? tripData.travel_styles[0] 
+          : "Not specified";
 
       const mappedRequest: TripRequest = {
-        id: jobData.id,
-        tripTitle: jobData.title,
-        status: jobData.status as any,
-        destination: jobData.destination,
-        departingFrom: requirements.departingFrom || "Not specified",
-        dateRangeLabel: travelDates.startDate && travelDates.endDate
-          ? `${new Date(travelDates.startDate).toLocaleDateString()} – ${new Date(travelDates.endDate).toLocaleDateString()}${travelDates.flexibleDates ? " (flexible)" : ""}`
+        id: tripData.id,
+        tripTitle: tripData.title || "Untitled Trip",
+        status: tripData.status as any,
+        destination: tripData.destination || "Not specified",
+        departingFrom: tripData.departure_city || "Not specified",
+        dateRangeLabel: tripData.start_date && tripData.end_date
+          ? `${new Date(tripData.start_date).toLocaleDateString()} – ${new Date(tripData.end_date).toLocaleDateString()}${tripData.flexible_dates ? " (flexible)" : ""}`
           : "Dates TBD",
-        travelers: jobData.number_of_travelers || 1,
-        tripType: requirements.tripType || "Not specified",
-        travelStyle: requirements.travelStyle || "Not specified",
-        budgetMin: jobData.budget_min || 0,
-        budgetMax: jobData.budget_max || 0,
-        description: jobData.description,
-        specialRequests: requirements.specialRequests,
-        createdAt: jobData.created_at,
-        userId: jobData.user_id,
+        travelers: (tripData.travelers_adults || 1) + (tripData.travelers_children || 0),
+        tripType: tripStyle,
+        travelStyle: tripData.accommodation_style || tripData.pace || "Not specified",
+        budgetMin: tripData.budget_min || 0,
+        budgetMax: tripData.budget_max || 0,
+        description: tripData.description || "",
+        specialRequests: tripData.special_notes,
+        createdAt: tripData.created_at,
+        userId: tripData.user_id,
       };
 
       setRequest(mappedRequest);
 
-      // Fetch proposals (agent_bids)
-      const { data: bidsData, error: bidsError } = await supabase
-        .from("agent_bids")
+      // Fetch proposals
+      const { data: proposalsData, error: proposalsError } = await supabase
+        .from("trip_proposals")
         .select(`
           *,
-          travel_agents (
+          profiles:proposer_id (
             id,
-            agency_name,
-            rating,
-            total_reviews,
-            user_id
+            full_name,
+            avatar_url
           )
         `)
-        .eq("job_id", id)
+        .eq("trip_request_id", id)
         .order("created_at", { ascending: false });
 
-      if (bidsError) throw bidsError;
+      if (proposalsError) throw proposalsError;
 
-      const mappedProposals: Proposal[] = (bidsData || []).map((bid: any) => {
-        const agent = bid.travel_agents || {};
+      const mappedProposals: Proposal[] = (proposalsData || []).map((proposal: any) => {
+        const proposer = proposal.profiles || {};
+        const nights = proposal.nights || 7;
         return {
-          id: bid.id,
-          authorType: "agent",
-          authorName: agent.agency_name || "Unknown Agent",
-          handle: `@${agent.agency_name?.toLowerCase().replace(/\s+/g, "")}`,
-          avatarInitials: agent.agency_name?.substring(0, 2).toUpperCase() || "AG",
-          rating: agent.rating || 0,
-          reviewsCount: agent.total_reviews || 0,
-          priceFrom: bid.proposed_price || 0,
-          priceTo: bid.proposed_price || 0,
-          currency: bid.currency || "USD",
-          timelineLabel: bid.delivery_time ? `${bid.delivery_time} days` : "Timeline TBD",
-          highlights: bid.proposal_details?.highlights || [],
-          createdAt: bid.created_at,
-          status: bid.status as ProposalStatus,
-          message: bid.message || "",
-          agentId: bid.agent_id,
-          validUntil: bid.valid_until || null,
+          id: proposal.id,
+          authorType: proposal.proposer_role === "agent" ? "agent" : "creator",
+          authorName: proposer.full_name || "Unknown",
+          handle: `@${proposer.full_name?.toLowerCase().replace(/\s+/g, "") || "unknown"}`,
+          avatarInitials: proposer.full_name?.substring(0, 2).toUpperCase() || "??",
+          rating: 0, // TODO: calculate from reviews
+          reviewsCount: 0, // TODO: calculate from reviews
+          priceFrom: proposal.price_from || 0,
+          priceTo: proposal.price_from || 0,
+          currency: proposal.currency || "USD",
+          timelineLabel: `${nights} nights`,
+          highlights: proposal.inclusions ? [proposal.inclusions] : [],
+          createdAt: proposal.created_at,
+          status: proposal.status as ProposalStatus,
+          message: proposal.message || proposal.headline || "",
+          agentId: proposal.proposer_id,
+          validUntil: proposal.valid_until || null,
         };
       });
 
@@ -224,37 +231,31 @@ export default function TripRequestDetail() {
     setSubmittingProposal(true);
 
     try {
-      // Get or create agent profile for current user
-      const { data: agentData } = await supabase
-        .from("travel_agents")
-        .select("id")
-        .eq("user_id", user.id)
+      // Determine user role (agent or creator)
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("account_type")
+        .eq("id", user.id)
         .single();
 
-      if (!agentData) {
-        toast.error("You must have an agent profile to submit proposals");
-        setSubmittingProposal(false);
-        return;
-      }
+      const proposerRole = profile?.account_type === "agent" ? "agent" : "creator";
 
-      // Create bid
-      const { error: bidError } = await supabase
-        .from("agent_bids")
+      // Create proposal
+      const { error: proposalError } = await supabase
+        .from("trip_proposals")
         .insert({
-          job_id: id,
-          agent_id: agentData.id,
-          proposed_price: parseFloat(newProposal.priceFrom),
+          trip_request_id: id,
+          proposer_id: user.id,
+          proposer_role: proposerRole,
+          price_from: parseFloat(newProposal.priceFrom),
           currency: "USD",
-          estimated_completion_days: parseInt(newProposal.timelineLabel) || null,
-          status: "pending",
-          proposal_details: JSON.stringify({
-            message: newProposal.message,
-            highlights: [],
-            timeline: newProposal.timelineLabel,
-          }),
-        } as any);
+          nights: parseInt(newProposal.timelineLabel) || 7,
+          status: "sent",
+          message: newProposal.message,
+          headline: `${proposerRole === "agent" ? "Agent" : "Creator"} proposal`,
+        });
 
-      if (bidError) throw bidError;
+      if (proposalError) throw proposalError;
 
       toast.success("Proposal submitted successfully!");
       setNewProposal({
