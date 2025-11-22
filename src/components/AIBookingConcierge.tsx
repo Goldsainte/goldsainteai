@@ -210,16 +210,7 @@ export const AIBookingConcierge = () => {
 
   console.log('[AIBookingConcierge] Component rendered, isOpen:', isOpen);
 
-  // Handle Shift+D to open diagnostics panel
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.shiftKey && e.key === 'D') {
-        setShowDiagnostics(prev => !prev);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  // Diagnostics panel disabled for production
 
   // Handle hold music unmute events
   useEffect(() => {
