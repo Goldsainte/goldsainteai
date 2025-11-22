@@ -98,13 +98,13 @@ serve(async (req) => {
     const message: string = body.message;
     const userId: string = body.userId;
     const inputType: string = body.inputType || "text";
-    const conversationId: string | null = body.conversationId ?? null;
+    const incomingConversationId: string | null = body.conversationId ?? null;
 
     console.log("[Madison] Input:", {
       message,
       userId,
       inputType,
-      conversationId,
+      conversationId: incomingConversationId,
     });
 
     const supabase = createClient(
@@ -119,19 +119,62 @@ serve(async (req) => {
     }
 
     // 1) Ensure conversation row exists
-    if (conversationId) {
-      await supabase
-        .from("conversations")
-        .upsert(
-          {
+    let conversationId = incomingConversationId || crypto.randomUUID();
+    try {
+      const { data: existingConversation, error: conversationLookupError } =
+        await supabase
+          .from("conversations")
+          .select("id, user_id")
+          .eq("id", conversationId)
+          .maybeSingle();
+
+      if (conversationLookupError) {
+        console.error("[Madison] Conversation lookup error:", conversationLookupError);
+      }
+
+      if (existingConversation && existingConversation.user_id !== userId) {
+        console.warn("[Madison] Conversation user mismatch. Generating new ID.");
+        conversationId = crypto.randomUUID();
+      }
+
+      if (!existingConversation || existingConversation.user_id !== userId) {
+        const { error: conversationInsertError } = await supabase
+          .from("conversations")
+          .insert({
             id: conversationId,
             user_id: userId,
-          },
-          { onConflict: "id" },
-        );
+            title: "Madison conversation",
+          });
+
+        if (conversationInsertError) {
+          console.error("[Madison] Conversation insert error:", conversationInsertError);
+        } else {
+          console.log("[Madison] Conversation ensured:", conversationId);
+        }
+      }
+    } catch (e) {
+      console.error("[Madison] Error ensuring conversation:", e);
     }
 
-    // 2) Save incoming user message
+    // 2) Load conversation history BEFORE adding the new turn, so we don't duplicate the latest user message.
+    let conversationHistory: any[] = [];
+    if (conversationId) {
+      const { data: history, error: historyError } = await supabase
+        .from("chat_messages")
+        .select("role, content, created_at")
+        .eq("conversation_id", conversationId)
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (historyError) {
+        console.error("[Madison] History load error:", historyError);
+      }
+
+      conversationHistory = (history || []).reverse();
+    }
+
+    // 3) Persist incoming user message AFTER loading history
     try {
       await supabase.from("chat_messages").insert({
         conversation_id: conversationId,
@@ -144,18 +187,12 @@ serve(async (req) => {
       console.error("[Madison] Error inserting user message:", e);
     }
 
-    // 3) Load conversation history (last 10 messages for context)
-    let conversationHistory: any[] = [];
-    if (conversationId) {
-      const { data: history } = await supabase
-        .from("chat_messages")
-        .select("role, content")
-        .eq("conversation_id", conversationId)
-        .order("created_at", { ascending: true })
-        .limit(10);
-
-      conversationHistory = history || [];
-    }
+    console.log("[Madison] Loaded history", {
+      conversationId,
+      userId,
+      historyCount: conversationHistory.length,
+      historyPreview: conversationHistory,
+    });
 
     // 4) Build OpenAI messages
     const openaiMessages = [
@@ -201,6 +238,7 @@ serve(async (req) => {
     let response: any = {
       message: assistantMessage.replace(/\*\*CREATE_STORYBOARD:[^*]+\*\*/gi, "").trim(),
       action: "chat",
+      conversationId,
     };
 
     if (storyboardMatch) {
@@ -265,6 +303,7 @@ serve(async (req) => {
               storyboardId: storyboard.id,
               destination,
             },
+            conversationId,
           };
         }
       }

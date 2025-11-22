@@ -19,7 +19,7 @@ export function MadisonChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { conversationId } = useMadisonConversation();
+  const { conversationId, setConversationId } = useMadisonConversation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -61,6 +61,10 @@ export function MadisonChat() {
       if (error) throw error;
 
       const response: any = data;
+
+      if (response?.conversationId && response.conversationId !== conversationId) {
+        setConversationId(response.conversationId);
+      }
 
       // Build message content with storyboard link if available
       let messageContent = response?.message ?? "I'm having trouble responding right now. Can you try again?";
