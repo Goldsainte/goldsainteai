@@ -682,7 +682,7 @@ export default function TripRequestDetail() {
                 </div>
               </div>
 
-              <div className="rounded-2xl bg-emerald-600 p-4 text-xs text-emerald-50 shadow-sm">
+              <div className="rounded-2xl bg-[#0c4d47] p-4 text-xs text-emerald-50 shadow-sm">
                 <h3 className="text-sm font-semibold text-white">Tips for choosing a proposal</h3>
                 <ul className="mt-2 list-disc space-y-1 pl-4 text-emerald-50/90">
                   <li>Compare what's included: flights, hotels, transfers, tours.</li>
