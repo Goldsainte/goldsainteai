@@ -125,7 +125,7 @@ export default function MyTripsPage() {
             trip_proposals ( status )
           `
           )
-          .eq("traveler_id", authUser.id)
+          .eq("user_id", authUser.id)
           .order("created_at", { ascending: false });
         
         const requestsData = result.data;
