@@ -85,19 +85,19 @@ export default function MyTripRequestsPage() {
         />
       </Helmet>
 
-      <main className="min-h-screen bg-gradient-to-b from-[#0a2225] via-[#0a2225] to-[#E5DFC6]">
+      <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
         <div className="mx-auto max-w-5xl px-4 py-10 md:py-12">
           {/* Header */}
           <header className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47]/15 px-3 py-1 text-sm font-medium text-[#E5DFC6] ring-1 ring-[#BFAD72]/60">
+              <div className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47]/10 px-3 py-1 text-sm font-medium text-[#0c4d47] ring-1 ring-[#E5DFC6]">
                 <Sparkles className="h-3 w-3 text-[#BFAD72]" />
                 <span>Your Goldsainte trips</span>
               </div>
-              <h1 className="text-lg font-semibold tracking-tight text-[#E5DFC6] md:text-xl">
+              <h1 className="text-lg font-semibold tracking-tight text-[#0a2225] md:text-xl">
                 My Trip Requests
               </h1>
-              <p className="max-w-xl text-xs text-[#E5DFC6]/80 md:text-sm">
+              <p className="max-w-xl text-xs text-[#4a4a4a] md:text-sm">
                 These are the trips you've posted to the Goldsainte
                 marketplace. As creators and agents send proposals, you'll see
                 them here and can choose your favorite.
@@ -123,12 +123,12 @@ export default function MyTripRequestsPage() {
                 ))}
               </div>
             ) : requests.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-[#E5DFC6]/40 bg-[#0a2225]/50 px-4 py-8 text-center text-xs text-[#E5DFC6]/85">
+              <div className="rounded-3xl border border-dashed border-[#E5DFC6] bg-white/70 px-4 py-8 text-center text-xs text-[#4a4a4a]">
                 You haven't posted any trips yet.
                 <br />
                 <Link
                   to="/post-trip"
-                  className="mt-2 inline-block text-[#BFAD72] underline"
+                  className="mt-2 inline-block text-[#0c4d47] underline"
                 >
                   Post your first trip to the marketplace
                 </Link>
@@ -188,7 +188,7 @@ function TripRequestRow({ req }: { req: TripRequestWithProposals }) {
   return (
     <Link
       to={`/trip-request/${req.id}`}
-      className="flex flex-col gap-3 rounded-3xl bg-[#f6f3ea]/95 p-4 text-xs text-[#0a2225] shadow-sm ring-1 ring-[#E5DFC6] hover:ring-[#BFAD72]"
+      className="flex flex-col gap-3 rounded-3xl bg-white/95 p-4 text-xs text-[#0a2225] shadow-sm ring-1 ring-[#E5DFC6] hover:ring-[#BFAD72]"
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>

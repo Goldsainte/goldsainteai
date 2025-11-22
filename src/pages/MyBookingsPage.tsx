@@ -97,13 +97,13 @@ export default function MyBookingsPage() {
         <title>My Booked Trips · Goldsainte</title>
       </Helmet>
 
-      <main className="min-h-screen bg-gradient-to-b from-[#0a2225] via-[#0a2225] to-[#E5DFC6]">
+      <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
         <div className="mx-auto max-w-5xl px-4 py-10">
           <header className="space-y-2">
-            <h1 className="text-lg font-semibold tracking-tight text-[#E5DFC6] md:text-xl">
+            <h1 className="text-lg font-semibold tracking-tight text-[#0a2225] md:text-xl">
               My Booked Trips
             </h1>
-            <p className="text-xs text-[#E5DFC6]/80 md:text-sm max-w-2xl">
+            <p className="text-xs text-[#4a4a4a] md:text-sm max-w-2xl">
               These are trips you've confirmed through Goldsainte with creators and travel agents.
             </p>
           </header>
@@ -119,7 +119,7 @@ export default function MyBookingsPage() {
                 ))}
               </div>
             ) : bookings.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-[#E5DFC6]/40 bg-[#0a2225]/50 px-4 py-8 text-center text-xs text-[#E5DFC6]/85">
+              <div className="rounded-3xl border border-dashed border-[#E5DFC6] bg-white/70 px-4 py-8 text-center text-xs text-[#4a4a4a]">
                 You don't have any booked trips yet.
               </div>
             ) : (
@@ -169,7 +169,7 @@ function BookingRowCard({
     booking.status === "completed" && (!!booking.agent_id || !!booking.creator_id);
 
   return (
-    <div className="flex flex-col gap-2 rounded-3xl bg-[#f6f3ea]/95 p-4 text-xs text-[#0a2225] shadow-sm ring-1 ring-[#E5DFC6]">
+    <div className="flex flex-col gap-2 rounded-3xl bg-white/95 p-4 text-xs text-[#0a2225] shadow-sm ring-1 ring-[#E5DFC6]">
       <div className="flex items-center justify-between gap-2">
         <div>
           <p className="text-[10px] text-[#8D8D8D]">

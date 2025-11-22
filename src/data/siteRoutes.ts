@@ -23,7 +23,7 @@ export const siteRoutes: RouteInfo[] = [
   { path: '/search-results', label: 'Search Results', description: 'Browse search results', category: 'booking' },
   { path: '/post-trip', label: 'Post Trip', description: 'Share your dream trip with the marketplace', category: 'booking', requiresAuth: true },
   { path: '/booking-confirmation', label: 'Booking Confirmation', description: 'Confirm your booking', category: 'booking', requiresAuth: true },
-  { path: '/my-trips', label: 'My Trips', description: 'View your trips', category: 'booking', requiresAuth: true },
+  { path: '/my-trips', label: 'My Trips', description: 'View all your trip requests and bookings in one place', category: 'booking', requiresAuth: true },
   
   // Creator & TikTok Ecosystem (formerly Social / Journeys)
   // Legacy internal social feed routes - DISABLED
