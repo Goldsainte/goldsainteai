@@ -10,46 +10,44 @@ type AdminGuardProps = {
 export function AdminGuard({ children }: AdminGuardProps) {
   const { user, isLoading } = useAuth();
   const location = useLocation();
-  const [profileType, setProfileType] = useState<string | null>(null);
-  const [profileLoading, setProfileLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function loadProfile() {
+    async function checkAdminRole() {
       if (!user) {
-        if (!cancelled) setProfileLoading(false);
+        if (!cancelled) {
+          setIsAdmin(false);
+          setChecking(false);
+        }
         return;
       }
 
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("account_type")
-        .eq("id", user.id)
-        .maybeSingle();
+      // SECURITY: Check user_roles table, NOT profiles.account_type
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id);
 
       if (!cancelled) {
-        if (error) {
-          console.error("Failed to load profile for admin guard", error);
-          setProfileType(null);
-        } else {
-          setProfileType(data?.account_type ?? null);
-        }
-        setProfileLoading(false);
+        setIsAdmin(roles?.some(r => r.role === "admin") || false);
+        setChecking(false);
       }
     }
 
-    loadProfile();
+    checkAdminRole();
     return () => {
       cancelled = true;
     };
   }, [user]);
 
-  if (isLoading || profileLoading) {
+  if (isLoading || checking) {
     return null;
   }
 
-  if (!user || profileType !== "admin") {
+  if (!user || !isAdmin) {
     const redirect = encodeURIComponent(location.pathname + location.search);
     return <Navigate to={`/login?redirect=${redirect}`} replace />;
   }
