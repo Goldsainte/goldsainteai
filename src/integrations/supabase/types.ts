@@ -10313,6 +10313,41 @@ export type Database = {
             referencedRelation: "brand_collections"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "trip_requests_user_id_profiles_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "trip_requests_user_id_profiles_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "trip_requests_user_id_profiles_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_requests_user_id_profiles_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_requests_user_id_profiles_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
+          },
         ]
       }
       trip_stories: {
