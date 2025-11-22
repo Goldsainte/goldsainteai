@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ProposalCard from "@/components/marketplace/ProposalCard";
@@ -37,6 +38,12 @@ export type Proposal = {
     avatar_url?: string | null;
   } | null;
   proposer_role?: "agent" | "creator";
+  // Admin-only fields
+  admin_margin_amount?: number;
+  admin_margin_percent?: number;
+  admin_cost_basis?: number;
+  admin_complexity_score?: number;
+  admin_supplier_notes?: string;
 };
 
 type TripRequest = {
@@ -61,6 +68,7 @@ export default function TripRequestDetail() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const { isAdmin } = useUserRole();
   const [request, setRequest] = useState<TripRequest | null>(null);
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [proposalsCount, setProposalsCount] = useState(0);
@@ -195,6 +203,12 @@ export default function TripRequestDetail() {
           avatar_url: proposer.avatar_url,
         },
         proposer_role: proposal.proposer_role,
+        // NEW: Preserve admin-only fields
+        admin_margin_amount: proposal.admin_margin_amount,
+        admin_margin_percent: proposal.admin_margin_percent,
+        admin_cost_basis: proposal.admin_cost_basis,
+        admin_complexity_score: proposal.admin_complexity_score,
+        admin_supplier_notes: proposal.admin_supplier_notes,
       };
     });
 
@@ -571,7 +585,7 @@ export default function TripRequestDetail() {
                   <div className="space-y-3">
                     {proposals.map((proposal) => (
                       <div key={proposal.id} className="space-y-3">
-                        <ProposalCard proposal={proposal} />
+                        <ProposalCard proposal={proposal} showAdminInsights={isAdmin} />
                         
                         {/* Actions */}
                         {isRequestOwner && (
