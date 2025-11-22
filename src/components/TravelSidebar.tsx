@@ -78,7 +78,7 @@ export function TravelSidebar() {
       toast.error('Please sign in to create content');
       return;
     }
-    setCreateSheetOpen(true);
+    setCreateMomentOpen(true);
   };
 
   const handleCreateContent = (type: string) => {
