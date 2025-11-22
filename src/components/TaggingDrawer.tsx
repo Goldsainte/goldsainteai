@@ -3,7 +3,6 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PartnershipTagging } from "./PartnershipTagging";
-import { PackageTagSelector } from "./PackageTagSelector";
 import { PeopleTagSelector } from "./PeopleTagSelector";
 import { Users, Package, UserPlus } from "lucide-react";
 

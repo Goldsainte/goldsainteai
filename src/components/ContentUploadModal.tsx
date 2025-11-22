@@ -8,7 +8,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { PartnershipTagging } from "./PartnershipTagging";
-import { PackageTagSelector } from "./PackageTagSelector";
 import { PhotoEditor } from "./PhotoEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

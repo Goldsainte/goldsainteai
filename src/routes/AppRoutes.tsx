@@ -126,9 +126,7 @@ const EscrowTimelineDashboard = lazy(() => import('@/components/EscrowTimelineDa
 const ActivityLogs = lazy(() => import('@/pages/ActivityLogs'));
 const CustomerVerification = lazy(() => import('@/pages/CustomerVerification'));
 const EmergencyContacts = lazy(() => import('@/pages/EmergencyContacts'));
-const CoCuratedDashboard = lazy(() => import('@/pages/CoCuratedDashboard'));
 const CoCuratedCreate = lazy(() => import('@/pages/CoCuratedCreate'));
-const CoCuratedMarketplace = lazy(() => import('@/pages/CoCuratedMarketplace'));
 const CoCuratedBookingSuccess = lazy(() => import('@/pages/CoCuratedBookingSuccess'));
 const TourActivityDetail = lazy(() => import('@/pages/TourActivityDetail'));
 const RestaurantDetail = lazy(() => import('@/pages/RestaurantDetail'));

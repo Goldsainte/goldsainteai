@@ -20,7 +20,6 @@ import { useTranslation } from "react-i18next";
 import logoWordmark from "@/assets/primary-horizontal-logo-gold-2.png";
 import logomark from "@/assets/logomark-gold.png";
 import { useExpediaModal } from "@/contexts/ExpediaModalContext";
-import { PartnershipApprovals } from "@/components/PartnershipApprovals";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { SearchBar } from "@/components/SearchBar";
 import { useCoinBalance } from "@/hooks/useCoinBalance";
@@ -806,12 +805,6 @@ export const Header = () => {
                         </div>
                         
                         <DropdownMenuSeparator className="bg-border/50" />
-                        
-                        <div className="px-2 py-2">
-                          <PartnershipApprovals />
-                        </div>
-                        
-                        {isAdmin && (
                           <>
                             <DropdownMenuSeparator className="bg-border/50" />
                             <div className="py-2 flex flex-col gap-1">

@@ -24,7 +24,6 @@ import { useCollections } from "@/hooks/useCollections";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { SendGiftModal } from "@/components/SendGiftModal";
 import { Coins } from "lucide-react";
-import { BrandPartnershipProposal } from "./BrandPartnershipProposal";
 import { PromotePostModal } from "./PromotePostModal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";

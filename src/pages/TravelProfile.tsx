@@ -12,8 +12,6 @@ import { BusinessVerifiedBadge } from "@/components/badges/BusinessVerifiedBadge
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import ContentUploadModal from "@/components/ContentUploadModal";
-import { BrandPartnershipProposal } from "@/components/BrandPartnershipProposal";
-import { CreatorPartnershipRequest } from "@/components/CreatorPartnershipRequest";
 import { CreateMomentModal } from "@/components/CreateMomentModal";
 
 import FollowButton from "@/components/FollowButton";
