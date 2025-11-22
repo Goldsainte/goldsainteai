@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { LayoutTemplate, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 type Props = {
   sessionId: string;
@@ -22,24 +23,35 @@ export function StartStoryboardFromChat({ sessionId, ownerRole = "traveler" }: P
         return;
       }
 
-      const { data, error } = await supabase
-        .from("storyboards")
-        .insert({
-          owner_id: user.id,
-          owner_role: ownerRole,
-          title: "Trip from Madison chat",
-          subtitle: "Storyboard created from concierge conversation",
-          related_concierge_session_id: sessionId,
-          visibility: "private",
-        })
-        .select("id")
-        .single();
+      // Call AI storyboard itinerary function
+      const { data, error } = await supabase.functions.invoke(
+        "ai-storyboard-itinerary",
+        {
+          body: {
+            conversationId: sessionId,
+            userId: user.id,
+            ownerRole,
+            maxPhotos: 20,
+          },
+        }
+      );
 
-      if (error || !data?.id) throw error;
+      if (error) {
+        console.error("AI storyboard generation failed:", error);
+        toast.error("Failed to create storyboard. Please try again.");
+        return;
+      }
 
-      navigate(`/tiktok-lab/storyboards/${data.id}?from=concierge`);
+      const storyboardId = data?.storyboardId;
+      if (!storyboardId) {
+        throw new Error("No storyboardId returned");
+      }
+
+      toast.success("✨ Your storyboard is ready!");
+      navigate(`/storyboards/${storyboardId}`);
     } catch (err) {
-      console.error("Error starting storyboard from chat", err);
+      console.error("Storyboard from chat error:", err);
+      toast.error("Something went wrong creating your storyboard.");
     } finally {
       setLoading(false);
     }

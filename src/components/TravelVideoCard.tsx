@@ -673,7 +673,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             )}
           </div>
         </div>
-          {isOwnPost ? (
+          {isOwnPost && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">

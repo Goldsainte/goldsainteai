@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { ExperienceCard } from "./ExperienceCard";
 
 type StoryboardImage = {
   id: string;
@@ -11,7 +12,19 @@ type StoryboardImage = {
   mood_tags?: string[] | null;
 };
 
+type StoryboardItem = {
+  id: string;
+  media_url?: string | null;
+  caption?: string | null;
+  media_attribution?: string | null;
+  location_label?: string | null;
+  day_number?: number | null;
+  time_of_day?: string | null;
+  category_tag?: string | null;
+};
+
 interface TravelStoryboardProps {
+  storyboardId?: string; // NEW: if provided, load items from storyboard_items
   title?: string;
   subtitle?: string;
   maxItems?: number;
@@ -20,6 +33,7 @@ interface TravelStoryboardProps {
 }
 
 export function TravelStoryboard({
+  storyboardId,
   title = "Travel storyboard",
   subtitle = "Use these visuals to imagine and design your next trip.",
   maxItems = 24,
@@ -27,43 +41,65 @@ export function TravelStoryboard({
   onImageClick,
 }: TravelStoryboardProps) {
   const [images, setImages] = useState<StoryboardImage[]>([]);
+  const [items, setItems] = useState<StoryboardItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
 
-    async function loadImages() {
+    async function loadData() {
       setLoading(true);
       try {
-        const query = supabase
-          .from("storyboard_media_library")
-          .select("id, url, thumbnail_url, label, destination_tags, mood_tags")
-          .order("created_at", { ascending: false })
-          .limit(maxItems);
+        // If storyboardId provided, load from storyboard_items
+        if (storyboardId) {
+          const { data, error } = await supabase
+            .from("storyboard_items")
+            .select("id, media_url, caption, media_attribution, location_label, day_number, time_of_day, category_tag")
+            .eq("storyboard_id", storyboardId)
+            .order("order_index", { ascending: true });
 
-        const { data, error } = await query;
+          if (error) {
+            console.error("Error loading storyboard items:", error);
+            if (!isMounted) return;
+            setItems([]);
+          } else if (isMounted) {
+            setItems((data ?? []) as StoryboardItem[]);
+          }
+        } else {
+          // Fallback: load from media library
+          const query = supabase
+            .from("storyboard_media_library")
+            .select("id, url, thumbnail_url, label, destination_tags, mood_tags")
+            .order("created_at", { ascending: false })
+            .limit(maxItems);
 
-        if (error) {
-          console.error("Error loading storyboard media:", error);
-          if (!isMounted) return;
-          setImages([]);
-        } else if (isMounted) {
-          setImages((data ?? []) as StoryboardImage[]);
+          const { data, error } = await query;
+
+          if (error) {
+            console.error("Error loading storyboard media:", error);
+            if (!isMounted) return;
+            setImages([]);
+          } else if (isMounted) {
+            setImages((data ?? []) as StoryboardImage[]);
+          }
         }
       } catch (err) {
         console.error("Unexpected error loading storyboard:", err);
-        if (isMounted) setImages([]);
+        if (isMounted) {
+          setImages([]);
+          setItems([]);
+        }
       } finally {
         if (isMounted) setLoading(false);
       }
     }
 
-    loadImages();
+    loadData();
 
     return () => {
       isMounted = false;
     };
-  }, [maxItems]);
+  }, [storyboardId, maxItems]);
 
   return (
     <section className="space-y-3">
@@ -78,12 +114,42 @@ export function TravelStoryboard({
 
       {loading ? (
         <div className="h-40 rounded-2xl bg-muted/60 animate-pulse" />
-      ) : images.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-muted-foreground/30 px-4 py-8 text-center text-[11px] text-muted-foreground">
-          No storyboard images yet. We'll soon fill this with a curated library
-          of travel visuals.
+      ) : items.length > 0 ? (
+        <div
+          className={cn(
+            "columns-2 gap-2 sm:columns-3 md:columns-4",
+            "space-y-2"
+          )}
+        >
+          {items.map((item) => (
+            item.media_url ? (
+              // Photo item
+              <div key={item.id} className="break-inside-avoid">
+                <img
+                  src={item.media_url}
+                  alt={item.caption || "Trip photo"}
+                  loading="lazy"
+                  className="w-full rounded-xl object-cover"
+                />
+                {item.media_attribution && (
+                  <p className="mt-1 text-xs text-muted-foreground">{item.media_attribution}</p>
+                )}
+              </div>
+            ) : (
+              // Experience item
+              <div key={item.id} className="break-inside-avoid">
+                <ExperienceCard
+                  dayNumber={item.day_number ?? undefined}
+                  timeOfDay={item.time_of_day ?? undefined}
+                  caption={item.caption || "Experience"}
+                  locationLabel={item.location_label ?? undefined}
+                  categoryTag={item.category_tag ?? undefined}
+                />
+              </div>
+            )
+          ))}
         </div>
-      ) : (
+      ) : images.length > 0 ? (
         <div
           className={cn(
             "columns-2 gap-2 sm:columns-3 md:columns-4",
@@ -112,6 +178,10 @@ export function TravelStoryboard({
               )}
             </figure>
           ))}
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-dashed border-muted-foreground/30 px-4 py-8 text-center text-[11px] text-muted-foreground">
+          No storyboard content yet.
         </div>
       )}
     </section>

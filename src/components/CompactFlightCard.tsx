@@ -2,10 +2,9 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plane, Heart, ChevronDown, ChevronUp, Clock, Bell } from "lucide-react";
+import { Plane, Heart, ChevronDown, ChevronUp, Clock } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
 import { FlightBookingModal } from "./FlightBookingModal";
-import { FlightPriceAlertModal } from "./FlightPriceAlertModal";
 import { formatCurrency } from "@/lib/currencyHelpers";
 
 const AirlineLogo = ({ carrierCode, className }: { carrierCode: string; className?: string }) => {
