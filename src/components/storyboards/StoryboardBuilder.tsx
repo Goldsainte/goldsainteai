@@ -6,6 +6,7 @@ type StoryboardBuilderProps = {
   storyboardId?: string;
   initialTitle?: string;
   mode: "traveler" | "creator" | "agent";
+  destination?: string | null;
   onSaved?: (storyboardId: string) => void;
 };
 
@@ -40,6 +41,7 @@ export function StoryboardBuilder({
   storyboardId,
   initialTitle,
   mode,
+  destination,
   onSaved,
 }: StoryboardBuilderProps) {
   const [title, setTitle] = useState(initialTitle || "");
@@ -76,7 +78,10 @@ export function StoryboardBuilder({
         setPhotoResults(data?.results || []);
       } else if (activeTab === "experiences") {
         const { data, error } = await supabase.functions.invoke("viator-search", {
-          body: { q: search },
+          body: { 
+            q: search,
+            location: destination || undefined
+          },
         });
         
         if (error) throw error;

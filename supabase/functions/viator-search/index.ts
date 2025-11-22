@@ -36,15 +36,24 @@ serve(async (req) => {
       currency: "USD"
     };
 
-    // Only include search parameters that have values
+    // Include search term if provided
     if (q) body.searchTerm = q;
-    if (location) body.destId = location;
+    
+    // Include location as searchTerm if no query provided (destination-based search)
+    // Or combine both if both provided
+    if (location) {
+      if (!body.searchTerm) {
+        body.searchTerm = location;
+      } else {
+        body.searchTerm = `${body.searchTerm} ${location}`;
+      }
+    }
 
-    // Validate at least one search parameter exists
-    if (!body.searchTerm && !body.destId) {
+    // Validate we have something to search for
+    if (!body.searchTerm) {
       return new Response(
         JSON.stringify({ 
-          error: "At least one search parameter required: query (q) or location (destId)" 
+          error: "At least one search parameter required: query (q) or location" 
         }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
