@@ -49,14 +49,14 @@ export function MadisonChat() {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke("madison", {
-        body: {
-          message: userMessage,
-          userId: user?.id || null,
-          inputType: "text",
-          conversationId: conversationId || crypto.randomUUID(),
-        },
-      });
+    const { data, error } = await supabase.functions.invoke("madison", {
+      body: {
+        message: userMessage,
+        userId: user?.id || null,
+        inputType: "text",
+        conversationId,
+      },
+    });
 
       if (error) throw error;
 
