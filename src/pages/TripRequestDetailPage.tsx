@@ -474,11 +474,11 @@ export default function TripRequestDetailPage() {
         <title>Trip Request · Goldsainte</title>
       </Helmet>
 
-      <main className="min-h-screen bg-gradient-to-b from-[#0a2225] via-[#0a2225] to-[#E5DFC6]">
+      <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
         <div className="mx-auto max-w-5xl px-4 py-10 md:py-12">
           <div className="grid gap-6 md:grid-cols-[1.5fr,1.1fr] md:items-start">
             {/* LEFT: Trip brief (same for traveler & responders) */}
-            <section className="rounded-3xl border border-[#BFAD72]/40 bg-[#f6f3ea]/95 p-5 shadow-xl md:p-6">
+            <section className="rounded-3xl border border-[#E5DFC6] bg-white/95 p-5 shadow-sm md:p-6">
               <div className="flex items-center justify-between gap-2">
                 <div className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47]/10 px-3 py-1 text-[11px] font-medium text-[#0c4d47]">
                   <Sparkles className="h-3 w-3 text-[#BFAD72]" />
