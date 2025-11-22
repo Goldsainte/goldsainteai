@@ -107,6 +107,8 @@ export default function MyTripsPage() {
         // This is the traveler's personal dashboard view filtered to their own traveler_id
         // The same records appear in the Marketplace when status='open' for creators/agents to bid on
         // @ts-ignore - Type inference depth issue with nested select
+        console.log("🔍 [MyTripsPage] Fetching trip requests for user:", authUser.id);
+        
         const result = await supabase
           .from("trip_requests")
           .select(
@@ -128,14 +130,21 @@ export default function MyTripsPage() {
           .eq("user_id", authUser.id)
           .order("created_at", { ascending: false });
         
+        console.log("📦 [MyTripsPage] Query result:", {
+          data: result.data,
+          error: result.error,
+          count: result.data?.length ?? 0
+        });
+        
         const requestsData = result.data;
         const requestsError = result.error;
 
         if (!cancelled) {
           if (requestsError) {
-            console.error("Error loading trip_requests:", requestsError);
+            console.error("❌ [MyTripsPage] Error loading trip_requests:", requestsError);
             setRequests([]);
           } else {
+            console.log(`✅ [MyTripsPage] Loaded ${requestsData?.length ?? 0} trip requests`);
             setRequests((requestsData ?? []) as any);
           }
         }
