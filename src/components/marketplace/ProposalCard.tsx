@@ -13,6 +13,18 @@ export default function ProposalCard({ proposal, showAdminInsights = false }: Pr
   const adminComplexityScore = proposal.admin_complexity_score as number | undefined;
   const adminSupplierNotes = proposal.admin_supplier_notes as string | undefined;
 
+  // Compute visual bands for inline pills
+  let marginBandLabel: string | null = null;
+  if (adminMarginPercent != null) {
+    if (adminMarginPercent < 10) marginBandLabel = "Low margin";
+    else if (adminMarginPercent <= 20) marginBandLabel = "Balanced";
+    else marginBandLabel = "High margin";
+  }
+
+  const complexityLabel = adminComplexityScore != null 
+    ? `Complexity ${adminComplexityScore}/10` 
+    : null;
+
   return (
     <div className="rounded-2xl border border-border bg-background p-5 shadow-sm">
       {/* Header */}
@@ -35,6 +47,22 @@ export default function ProposalCard({ proposal, showAdminInsights = false }: Pr
             <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
               {proposal?.proposer_role === "agent" ? "Travel Agent" : "Creator"}
             </p>
+            
+            {/* Admin-only triage pills */}
+            {showAdminInsights && (marginBandLabel || complexityLabel) && (
+              <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                {marginBandLabel && (
+                  <span className="inline-flex items-center rounded-full bg-neutral-900 px-2 py-0.5 text-[10px] font-medium text-neutral-50">
+                    {marginBandLabel}
+                  </span>
+                )}
+                {complexityLabel && (
+                  <span className="inline-flex items-center rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-medium text-neutral-700">
+                    {complexityLabel}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
