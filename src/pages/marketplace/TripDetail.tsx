@@ -176,7 +176,7 @@ export default function TripDetail() {
 
   if (error || !trip) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="flex min-h-screen items-center justify-center bg-[#f7f3ea] text-[#0a2225]">
         <Card className="p-4">
           <p className="text-sm text-destructive">
             {error?.message || "Trip not found."}
@@ -193,7 +193,7 @@ export default function TripDetail() {
   const isVerified = trip.travel_agents?.is_verified || false;
 
   return (
-    <div className="min-h-screen bg-background">
+    <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
       <div className="mx-auto max-w-6xl px-4 py-6 md:py-8">
         {/* Breadcrumb */}
         <button
@@ -461,6 +461,13 @@ export default function TripDetail() {
           </aside>
         </section>
       </div>
-    </div>
+
+      {/* Trip Request Modal */}
+      <Dialog open={showTripRequestModal} onOpenChange={setShowTripRequestModal}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+...
+        </DialogContent>
+      </Dialog>
+    </main>
   );
 }

@@ -129,42 +129,46 @@ export default function StoryboardEditorPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0a2225] text-[#E5DFC6] px-4 py-6">
+    <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225] px-4 py-6">
       <div className="mx-auto max-w-6xl space-y-4">
         <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div>
-            <p className="text-[11px] text-[#BFAD72] font-semibold flex items-center gap-2">
-              <Sparkles className="h-3 w-3" />
-              Goldsainte storyboard
-            </p>
-
-            {fromConcierge && (
-              <div className="mt-1 flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center rounded-full bg-[#12363a] px-2 py-0.5 text-[10px] font-medium text-[#E5DFC6] border border-[#1f4a50]">
-                  Created from Madison concierge
-                </span>
-                <Link
-                  to="/concierge"
-                  className="text-[10px] text-[#BFAD72] underline hover:text-[#e3d59a]"
-                >
-                  Open this trip in Madison
-                </Link>
-              </div>
-            )}
-
-            <h1 className="mt-2 text-lg font-semibold">
-              Design the trip like a TikTok storyboard
-            </h1>
-            <p className="text-[11px] text-[#E5DFC6]/80 max-w-md">
-              Drop scenes, hotels, shots, and experiences onto this board. The
-              traveler sees this as the visual "mood" for their booked journey.
-            </p>
+        <p className="text-xs text-[#0a2225] uppercase tracking-widest mb-1">
+          Storyboard Editor
+        </p>
+        <h1 className="text-2xl md:text-3xl font-serif font-light text-[#0a2225] mb-1">
+          {trip?.destination || "Loading..."}
+        </h1>
+        <div className="flex flex-wrap items-center gap-2 text-[11px]">
+          <span className="bg-white/80 px-2 py-0.5 text-[10px] font-medium text-[#0a2225] border border-[#E5DFC6] rounded">
+            {items.length} scenes
+          </span>
+          {trip?.trip_type && (
+            <span className="text-[#0a2225]/70">{trip.trip_type}</span>
+          )}
+          {trip?.related_concierge_session_id && (
             <Link
-              to={`/trip/${tripId}`}
-              className="text-[11px] text-[#BFAD72] underline mt-1 inline-block"
+              to={`/concierge?sessionId=${trip.related_concierge_session_id}`}
+              className="text-[10px] text-[#BFAD72] hover:text-[#0a2225] underline underline-offset-2"
             >
-              Back to trip detail
+              View concierge thread →
             </Link>
+          )}
+        </div>
+        <p className="text-[13px] text-[#0a2225]/70 leading-relaxed mt-3 max-w-2xl">
+          Build your travel story with visuals and experiences. Add images,
+          Viator activities, or notes. Each tile you add becomes part of your
+          trip's blueprint.
+        </p>
+        {trip?.related_concierge_session_id && (
+          <Link
+            to={`/concierge?fromTripId=${id}`}
+            className="inline-flex items-center gap-1 text-[11px] text-[#BFAD72] hover:text-[#0a2225] mt-3 group"
+          >
+            <Sparkles className="h-3 w-3 group-hover:animate-pulse" />
+            Refine with Madison
+          </Link>
+        )}
           </div>
 
           <div className="flex flex-col items-end gap-2">
@@ -177,7 +181,7 @@ export default function StoryboardEditorPage() {
             >
               {aiLoading ? "Shaping storyboard…" : "Let Goldsainte AI suggest scenes"}
             </Button>
-            <p className="text-[10px] text-[#E5DFC6]/70 max-w-xs text-right">
+            <p className="text-[10px] text-[#0a2225]/60 max-w-xs text-right">
               We'll create a first pass of arrival, hotel, golden hour, and
               hero moments based on the trip brief.
             </p>
@@ -186,13 +190,13 @@ export default function StoryboardEditorPage() {
 
         <section className="grid gap-4 md:grid-cols-[3fr,1.5fr]">
           <div className="space-y-4">
-            <div className="rounded-3xl bg-black/30 border border-[#BFAD72]/30 p-3 md:p-4">
+            <div className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-3 md:p-4">
               {loading ? (
-                <p className="text-[11px] text-[#E5DFC6]/80">
+                <p className="text-[11px] text-[#0a2225]/70">
                   Loading storyboard…
                 </p>
               ) : items.length === 0 ? (
-                <p className="text-[11px] text-[#E5DFC6]/80">
+                <p className="text-[11px] text-[#0a2225]/70">
                   No tiles yet. Pick images from the library to start sketching
                   the journey, or use Goldsainte AI for a first draft.
                 </p>
@@ -201,7 +205,7 @@ export default function StoryboardEditorPage() {
                   {items.map((item) => (
                     <article
                       key={item.id}
-                      className="relative rounded-2xl overflow-hidden border border-white/10 bg-gradient-to-br from-[#0c4d47] via-[#0a2225] to-[#BFAD72]"
+                      className="relative rounded-2xl overflow-hidden bg-[#faf7f0] border border-[#E5DFC6]"
                     >
                       {item.media_url && (
                         <div

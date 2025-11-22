@@ -78,29 +78,20 @@ export function TravelSidebar() {
       toast.error('Please sign in to create content');
       return;
     }
-    setCreateSheetOpen(true);
+    // Open moment creation directly
+    setCreateMomentOpen(true);
   };
 
   const handleCreateContent = (type: string) => {
-    if (type === "reel") {
-      setCreateSheetOpen(false);
-      setUploadInitialTab("video");
-      setUploadModalOpen(true);
-    } else if (type === "post") {
-      setCreateSheetOpen(false);
-      setUploadInitialTab("photo");
-      setUploadModalOpen(true);
-    } else if (type === "moment") {
-      setCreateSheetOpen(false);
+    if (type === "moment") {
       setCreateMomentOpen(true);
     } else if (type === "moments-vault") {
       toast.info("Go to your profile to create moments vaults");
-      setCreateSheetOpen(false);
     }
   };
 
   const handleUploadSuccess = () => {
-    setUploadModalOpen(false);
+    // Legacy handler - no longer used
   };
 
   return (

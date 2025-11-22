@@ -274,7 +274,7 @@ export default function TripRequestDetail() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="flex min-h-screen items-center justify-center bg-[#f7f3ea] text-[#0a2225]">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -293,7 +293,7 @@ export default function TripRequestDetail() {
   const isRequestOwner = user?.id === request.userId;
 
   return (
-    <div className="min-h-screen bg-background">
+    <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 md:py-10">
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
@@ -510,6 +510,6 @@ export default function TripRequestDetail() {
           </aside>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
