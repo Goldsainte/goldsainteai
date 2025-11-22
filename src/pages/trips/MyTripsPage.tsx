@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { Calendar, MapPin, ArrowRight, ArrowLeft, Users, HandCoins, Sparkles } from "lucide-react";
+import { Calendar, MapPin, ArrowRight, ArrowLeft, Users, HandCoins, Sparkles, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyTrips, type TravelerTrip } from "@/services/tripsService";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
 
 function formatMoney(amount: number | null | undefined, currency?: string | null) {
   if (!amount) return "—";
@@ -238,7 +239,13 @@ export default function MyTripsPage() {
                 ) : (
                   <div className="space-y-3">
                     {requests.map((req) => (
-                      <TripRequestRow key={req.id} req={req} />
+                      <TripRequestRow 
+                        key={req.id} 
+                        req={req}
+                        onDelete={(id) => {
+                          setRequests(prev => prev.filter(r => r.id !== id));
+                        }}
+                      />
                     ))}
                   </div>
                 )}
@@ -373,7 +380,9 @@ function TripRow({ trip, muted }: TripRowProps) {
   );
 }
 
-function TripRequestRow({ req }: { req: TripRequestWithProposals }) {
+function TripRequestRow({ req, onDelete }: { req: TripRequestWithProposals; onDelete: (id: string) => void }) {
+  const [isDeleting, setIsDeleting] = useState(false);
+  
   // TEMPORARY FIX: Set proposals to empty array since nested select was removed
   // Proposal counts will show as 0 until we fix the database relationship or add separate query
   const proposals: { status: string }[] = [];
@@ -381,6 +390,33 @@ function TripRequestRow({ req }: { req: TripRequestWithProposals }) {
   const acceptedCount = proposals.filter(
     (p) => p.status === "accepted"
   ).length;
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!confirm("Are you sure you want to delete this trip request? This action cannot be undone.")) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase
+        .from("trip_requests")
+        .delete()
+        .eq("id", req.id);
+
+      if (error) throw error;
+
+      toast.success("Trip request deleted");
+      onDelete(req.id);
+    } catch (error: any) {
+      console.error("Error deleting trip request:", error);
+      toast.error("Failed to delete trip request");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const travelers =
     (req.travelers_adults || 0) + (req.travelers_children || 0);
@@ -469,8 +505,16 @@ function TripRequestRow({ req }: { req: TripRequestWithProposals }) {
         </div>
       </div>
 
-      <div className="flex items-center justify-between text-sm text-[#0c4d47]">
-        <span>View full brief & proposals →</span>
+      <div className="flex items-center justify-between text-sm">
+        <span className="text-[#0c4d47]">View full brief & proposals →</span>
+        <button
+          onClick={handleDelete}
+          disabled={isDeleting}
+          className="inline-flex items-center gap-1 text-xs text-red-600 hover:text-red-700 disabled:opacity-50"
+        >
+          <Trash2 className="h-3 w-3" />
+          {isDeleting ? "Deleting..." : "Delete"}
+        </button>
       </div>
     </Link>
   );
