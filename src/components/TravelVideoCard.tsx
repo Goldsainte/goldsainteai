@@ -160,8 +160,6 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   useEffect(() => {
     checkIfLiked();
     checkIfSaved();
-    fetchCollaborators();
-    fetchPartnership();
     checkIfFollowing();
   }, [post.id]);
 
@@ -342,53 +340,6 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
     } catch (e) {
       console.error('Save/unsave failed', e);
       toast.error('Failed to update save status');
-    }
-  };
-  const fetchCollaborators = async () => {
-    try {
-      const { data } = await supabase
-        .from('post_collaborators')
-        .select('collaborator_id')
-        .eq('post_id', post.id)
-        .eq('status', 'accepted');
-      
-      if (!data || data.length === 0) {
-        setCollaborators([]);
-        return;
-      }
-      
-      const collaboratorIds = data.map(c => c.collaborator_id);
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, username, avatar_url')
-        .in('id', collaboratorIds);
-      
-      setCollaborators(profiles || []);
-    } catch (error) {
-      console.error('Error fetching collaborators:', error);
-    }
-  };
-
-  const fetchPartnership = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("paid_partnerships")
-        .select(`
-          id,
-          status,
-          brand:profiles!paid_partnerships_brand_id_fkey(id, username, avatar_url, is_verified)
-        `)
-        .eq("post_id", post.id)
-        .eq("status", "approved")
-        .maybeSingle();
-
-      if (error) {
-        console.error("Error fetching partnership:", error);
-        return;
-      }
-      setPartnership(data);
-    } catch (error) {
-      console.error("Error fetching partnership:", error);
     }
   };
 
