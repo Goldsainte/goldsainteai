@@ -125,7 +125,7 @@ export default function Marketplace() {
   });
 
   const { data: tripRequests, isLoading: isLoadingRequests } = useQuery({
-    queryKey: ["marketplace-trip-requests"],
+    queryKey: ["trip-requests-unified"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("trip_requests")
