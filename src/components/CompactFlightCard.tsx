@@ -54,7 +54,6 @@ export const CompactFlightCard = ({
 }: CompactFlightCardProps) => {
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
-  const [priceAlertModalOpen, setPriceAlertModalOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   
   // Add null checks to prevent crashes
@@ -200,20 +199,11 @@ export const CompactFlightCard = ({
             <div className="flex gap-2">
               <Button
                 size="sm"
-                variant="outline"
+                variant="ghost"
                 className="h-8 px-2"
                 onClick={() => setExpanded(!expanded)}
               >
                 {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-8 px-2"
-                onClick={() => setPriceAlertModalOpen(true)}
-                title="Set price alert"
-              >
-                <Bell className="h-3 w-3" />
               </Button>
               <Button
                 size="sm"
@@ -373,21 +363,6 @@ export const CompactFlightCard = ({
         flight={flight}
         dictionaries={dictionaries}
       />
-
-      {origin && destination && departureDate && (
-        <FlightPriceAlertModal
-          open={priceAlertModalOpen}
-          onOpenChange={setPriceAlertModalOpen}
-          origin={origin}
-          destination={destination}
-          departureDate={departureDate}
-          returnDate={returnDate}
-          adults={adults}
-          cabinClass={cabinClass}
-          currentPrice={hasPriceData ? markedUpPrice : undefined}
-          currency={currency}
-        />
-      )}
-    </>
+    </Card>
   );
 };
