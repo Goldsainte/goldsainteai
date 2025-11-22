@@ -95,7 +95,6 @@ const TravelProfile = () => {
   const [collaborationSheetOpen, setCollaborationSheetOpen] = useState(false);
   const [closeFriendsOpen, setCloseFriendsOpen] = useState(false);
   const [unreadCollabCount, setUnreadCollabCount] = useState(0);
-  const [createSheetOpen, setCreateSheetOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadInitialTab, setUploadInitialTab] = useState<"photo" | "video">("photo");
   const [buyCoinsOpen, setBuyCoinsOpen] = useState(false);
@@ -1074,7 +1073,6 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               >
                 <X className="h-4 w-4" />
               </Button>
-              <CollaborationInvites />
             </div>
           </div>
         </div>
@@ -1103,14 +1101,6 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         musicPreviewUrl={selectedPost?.music_preview_url}
         musicAlbumArt={selectedPost?.music_album_art}
         musicService={selectedPost?.music_service}
-      />
-
-      {/* Upload Modal */}
-      <ContentUploadModal
-        open={uploadModalOpen}
-        onOpenChange={setUploadModalOpen}
-        onSuccess={handleUploadSuccess}
-        initialTab={uploadInitialTab}
       />
 
       {/* Create Moment Modal */}

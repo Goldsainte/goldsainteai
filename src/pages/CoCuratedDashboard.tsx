@@ -11,9 +11,6 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles, Plus, DollarSign, TrendingUp, Package, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { PartnershipApprovals } from "@/components/PartnershipApprovals";
-import { InfluencerPromoCodeManager } from "@/components/InfluencerPromoCodeManager";
-import { InfluencerPromotionRequests } from "@/components/InfluencerPromotionRequests";
 
 export default function CoCuratedDashboard() {
   const { user } = useAuth();
