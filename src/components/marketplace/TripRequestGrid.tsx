@@ -21,16 +21,13 @@ interface TripRequestGridProps {
 }
 
 const getTripRequestImageUrl = (destination?: string) => {
-  // Basic guard
   if (!destination) {
-    // Fallback: a generic luxury travel image
-    return "https://source.unsplash.com/featured/800x600/?luxury,travel,hotel";
+    return "https://picsum.photos/800/600?random&luxury";
   }
-
-  const query = encodeURIComponent(`${destination} luxury travel`);
-  // NOTE: This uses Unsplash's source endpoint for simplicity.
-  // For production, you may want to switch to the official API with an access key.
-  return `https://source.unsplash.com/featured/800x600/?${query}`;
+  
+  // Use destination name as seed for consistent images per city
+  const seed = destination.toLowerCase().replace(/\s+/g, '-');
+  return `https://picsum.photos/seed/${seed}/800/600`;
 };
 
 export function TripRequestGrid({ requests }: TripRequestGridProps) {

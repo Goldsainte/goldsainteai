@@ -436,10 +436,10 @@ export default function TripRequestDetail() {
           <div>
             <button
               type="button"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/marketplace?tab=trip-requests')}
               className="mb-3 text-xs font-medium text-muted-foreground hover:text-foreground"
             >
-              ← Back to marketplace
+              ← Back to trip requests
             </button>
             <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
               {request.tripTitle}
