@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -276,8 +275,6 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#F7F4EC] via-[#FDFBF7] to-[#F4EFE4] text-slate-900">
-      <Header />
-
       <main className="flex justify-center px-4 py-10 md:py-16">
         <div className="w-full max-w-3xl rounded-[32px] border border-[#E5DFC6] bg-white/90 px-6 py-8 shadow-[0_24px_60px_rgba(15,23,42,0.12)] md:px-10 md:py-10">
           {/* Badge */}
