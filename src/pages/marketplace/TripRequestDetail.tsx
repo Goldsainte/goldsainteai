@@ -8,6 +8,7 @@ import ProposalCard from "@/components/marketplace/ProposalCard";
 import { Loader2 } from "lucide-react";
 import { CancellationPolicySelector } from "@/components/CancellationPolicySelector";
 import { Checkbox } from "@/components/ui/checkbox";
+import { MarketplaceDisclaimer } from "@/components/policies/MarketplaceDisclaimer";
 
 type ProposalStatus = "pending" | "accepted" | "declined";
 
@@ -743,13 +744,7 @@ export default function TripRequestDetail() {
                     </label>
                   </div>
 
-                  {/* Inline legal helper */}
-                  <p className="text-[10px] leading-relaxed text-muted-foreground mt-1">
-                    Goldsainte is a curated marketplace. By submitting this proposal, you acknowledge that 
-                    you are the travel professional responsible for trip delivery, supplier coordination, 
-                    cancellations, refunds, and all service obligations. Cancellation and refund rules 
-                    published in this proposal must be honored exactly as stated if the traveler accepts.
-                  </p>
+                  <MarketplaceDisclaimer size="sm" />
 
                   {/* Submit */}
                   <div className="flex items-center justify-end gap-2 pt-1">
@@ -848,12 +843,7 @@ export default function TripRequestDetail() {
                 </div>
               )}
 
-              {/* Marketplace disclaimer - shown to all users */}
-              <p className="text-[10px] text-muted-foreground mt-4 text-center">
-                All proposals are created and managed by independent travel professionals. Goldsainte 
-                does not operate flights, hotels, transfers, or tours. Always review proposal-specific 
-                cancellation, refund, and deposit terms before accepting a trip.
-              </p>
+              <MarketplaceDisclaimer size="sm" align="center" />
             </div>
           </div>
 
