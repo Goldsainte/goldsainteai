@@ -8034,6 +8034,7 @@ export type Database = {
           location_label: string | null
           media_attribution: string | null
           media_url: string | null
+          metadata: Json | null
           order_index: number
           sort_index: number | null
           source: string | null
@@ -8052,6 +8053,7 @@ export type Database = {
           location_label?: string | null
           media_attribution?: string | null
           media_url?: string | null
+          metadata?: Json | null
           order_index?: number
           sort_index?: number | null
           source?: string | null
@@ -8070,6 +8072,7 @@ export type Database = {
           location_label?: string | null
           media_attribution?: string | null
           media_url?: string | null
+          metadata?: Json | null
           order_index?: number
           sort_index?: number | null
           source?: string | null

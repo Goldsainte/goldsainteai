@@ -24,6 +24,9 @@ export type StoryboardItem = {
   day_number: number | null;
   time_of_day: string | null;
   category_tag: string | null;
+  kind: string | null;
+  source: string | null;
+  metadata: Record<string, any> | null;
 };
 
 export async function getOrCreateTripStoryboard(tripId: string): Promise<Storyboard> {
