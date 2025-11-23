@@ -232,16 +232,14 @@ export const AppRoutes = () => (
         path="/marketplace/request-trip"
         element={<Navigate to="/post-trip" replace />}
       />
-      <Route
-        path="/marketplace/request/:id"
-        element={(
-          <RouteSectionBoundary section="marketplace">
-            <RequireAgentTerms>
-              <TripRequestDetail />
-            </RequireAgentTerms>
-          </RouteSectionBoundary>
-        )}
-      />
+            <Route
+              path="/marketplace/request/:id"
+              element={(
+                <RouteSectionBoundary section="marketplace">
+                  <TripRequestDetail />
+                </RouteSectionBoundary>
+              )}
+            />
       <Route
         path="/marketplace/trip/:id"
         element={(

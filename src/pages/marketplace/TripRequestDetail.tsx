@@ -294,6 +294,18 @@ export default function TripRequestDetail() {
       return;
     }
 
+    // Check agent terms acceptance before allowing proposal submission
+    const { data: agent } = await supabase
+      .from('travel_agents')
+      .select('terms_accepted')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (!agent?.terms_accepted) {
+      toast.error("Please accept agent terms before submitting proposals");
+      return;
+    }
+
     if (!newProposal.ackGoldsaintePolicies || !newProposal.ackAgentCancellation) {
       toast.error("Please confirm all required policy acknowledgements before submitting.");
       return;
