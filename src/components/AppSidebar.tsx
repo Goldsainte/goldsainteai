@@ -1,4 +1,4 @@
-import { Home, Search, User, LogIn, LogOut, LayoutDashboard, Briefcase, ShieldCheck, Package, TrendingUp, Info, DollarSign, Users } from "lucide-react";
+import { Home, Search, User, LogIn, LogOut, LayoutDashboard, Briefcase, ShieldCheck, TrendingUp, Info, DollarSign, Users } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import logomark from "@/assets/logomark-gold.png";
@@ -24,7 +24,6 @@ const items = [
   { title: "Explore", url: "/explore", icon: Search },
   { title: "Traveler Console", url: "/traveler", icon: LayoutDashboard, authRequired: true },
   { title: "Marketplace", url: "/marketplace", icon: Briefcase, authRequired: true },
-  { title: "CoCurate™", url: "/cocurated-marketplace", icon: Package, tourId: "cocurated" },
   { title: "My Jobs", url: "/my-jobs", icon: Briefcase, authRequired: true },
   { title: "Browse Agents", url: "/browse-agents", icon: Users },
   { title: "Creator Earnings", url: "/tiktok-lab/earnings", icon: DollarSign, authRequired: true },

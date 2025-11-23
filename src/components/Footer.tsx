@@ -47,7 +47,6 @@ export const Footer = () => {
                 <li><Link to="/tiktok-lab" className="hover:text-primary transition-colors">TikTok Travel Lab</Link></li>
                 <li><Link to="/tiktok-lab/storyboards" className="hover:text-primary transition-colors">{t('footer.storyboards')}</Link></li>
                 <li><Link to="/browse-agents" className="hover:text-primary transition-colors">{t('footer.travelAgentServices')}</Link></li>
-                <li><Link to="/cocurated-marketplace" className="hover:text-primary transition-colors">{t('footer.cocuratedPackages')}</Link></li>
                 <li><Link to="/marketplace" className="hover:text-primary transition-colors">{t('footer.marketplace')}</Link></li>
               </ul>
             </AccordionContent>
@@ -121,7 +120,6 @@ export const Footer = () => {
               <li><Link to="/tiktok-lab" className="hover:text-primary transition-colors">TikTok Travel Lab</Link></li>
               <li><Link to="/tiktok-lab/storyboards" className="hover:text-primary transition-colors">{t('footer.storyboards')}</Link></li>
               <li><Link to="/browse-agents" className="hover:text-primary transition-colors">{t('footer.travelAgentServices')}</Link></li>
-              <li><Link to="/cocurated-marketplace" className="hover:text-primary transition-colors">{t('footer.cocuratedPackages')}</Link></li>
               <li><Link to="/marketplace" className="hover:text-primary transition-colors">{t('footer.marketplace')}</Link></li>
             </ul>
           </div>
