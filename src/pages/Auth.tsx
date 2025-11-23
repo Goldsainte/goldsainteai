@@ -53,6 +53,8 @@ const Auth = () => {
         : null;
       const destination = redirectTarget ?? storedRedirect;
 
+      // If we have an explicit redirect (e.g., user tried to access /marketplace),
+      // respect that first
       if (destination) {
         if (typeof window !== 'undefined') {
           sessionStorage.removeItem(AUTH_REDIRECT_STORAGE_KEY);
@@ -61,25 +63,37 @@ const Auth = () => {
         return;
       }
 
-      const checkAIAgent = async () => {
+      // Otherwise, determine destination based on profile + onboarding status
+      const routeAfterAuth = async () => {
         try {
-          const { data } = await supabase
-            .from('ai_agent_profiles')
-            .select('id')
-            .eq('user_id', user.id)
+          const { data: profile, error } = await supabase
+            .from("profiles")
+            .select("account_type, onboarding_completed")
+            .eq("id", user.id)
             .maybeSingle();
 
-          if (data) {
-            navigate('/', { replace: true });
-          } else {
-            navigate('/ai-agent-setup', { replace: true });
+          if (error) {
+            console.error("Error fetching profile:", error);
+            // Safe fallback: new users go to onboarding
+            navigate("/onboarding", { replace: true });
+            return;
           }
+
+          // Use centralized routing logic
+          const path = getPostAuthDestination(
+            profile?.account_type ?? null,
+            profile?.onboarding_completed ?? false
+          );
+
+          navigate(path, { replace: true });
         } catch (error) {
-          console.error('Error checking AI agent profile:', error);
-          navigate('/', { replace: true });
+          console.error("Error determining post-auth destination:", error);
+          // Safe fallback for any unexpected errors
+          navigate("/onboarding", { replace: true });
         }
       };
-      checkAIAgent();
+
+      routeAfterAuth();
     }
   }, [user, authLoading, navigate, redirectTarget]);
 
