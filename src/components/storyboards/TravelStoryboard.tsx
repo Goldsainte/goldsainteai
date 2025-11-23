@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { ExperienceCard } from "./ExperienceCard";
+import { SaveToStoryboardButton } from "./SaveToStoryboardButton";
 
 type StoryboardImage = {
   id: string;
@@ -30,6 +31,7 @@ interface TravelStoryboardProps {
   maxItems?: number;
   highlightTags?: string[];
   onImageClick?: (image: StoryboardImage) => void;
+  showSaveButtons?: boolean; // NEW: show save to storyboard buttons
 }
 
 export function TravelStoryboard({
@@ -39,6 +41,7 @@ export function TravelStoryboard({
   maxItems = 24,
   highlightTags = [],
   onImageClick,
+  showSaveButtons = false,
 }: TravelStoryboardProps) {
   const [images, setImages] = useState<StoryboardImage[]>([]);
   const [items, setItems] = useState<StoryboardItem[]>([]);
@@ -163,18 +166,35 @@ export function TravelStoryboard({
                 "group relative overflow-hidden rounded-xl bg-muted",
                 onImageClick && "cursor-pointer"
               )}
-              onClick={() => onImageClick?.(img)}
             >
-              <img
-                src={img.thumbnail_url || img.url}
-                alt={img.label || "Storyboard"}
-                loading="lazy"
-                className="h-full w-full transform object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-              />
-              {(img.label || (img.destination_tags && img.destination_tags[0])) && (
-                <figcaption className="pointer-events-none absolute inset-x-2 bottom-2 rounded-full bg-black/45 px-2 py-1 text-[10px] font-medium text-white shadow-sm backdrop-blur">
-                  {img.label || img.destination_tags?.[0]}
-                </figcaption>
+              <div onClick={() => onImageClick?.(img)}>
+                <img
+                  src={img.thumbnail_url || img.url}
+                  alt={img.label || "Storyboard"}
+                  loading="lazy"
+                  className="h-full w-full transform object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                />
+                {(img.label || (img.destination_tags && img.destination_tags[0])) && (
+                  <figcaption className="pointer-events-none absolute inset-x-2 bottom-2 rounded-full bg-black/45 px-2 py-1 text-[10px] font-medium text-white shadow-sm backdrop-blur">
+                    {img.label || img.destination_tags?.[0]}
+                  </figcaption>
+                )}
+              </div>
+              {showSaveButtons && (
+                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <SaveToStoryboardButton
+                    assetType="brand_collection"
+                    assetData={{
+                      id: img.id,
+                      title: img.label || undefined,
+                      cover_image_url: img.url,
+                      tags: [...(img.destination_tags || []), ...(img.mood_tags || [])],
+                    }}
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full bg-white/90 hover:bg-white shadow-md"
+                  />
+                </div>
               )}
             </figure>
           ))}

@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TravelStoryboard } from "@/components/storyboards/TravelStoryboard";
 
 type Storyboard = {
   id: string;
@@ -144,6 +145,24 @@ export default function TikTokLabStoryboardsPage() {
               ))}
             </div>
           )}
+
+          {/* Inspiration gallery with save buttons */}
+          <div className="mt-10 pt-8 border-t border-[#E5DFC6]">
+            <div className="mb-4">
+              <h2 className="text-sm font-semibold tracking-tight md:text-base">
+                Browse Inspiration
+              </h2>
+              <p className="text-xs text-[#4a4a4a] md:text-sm">
+                Save visual ideas to your storyboards for future trips.
+              </p>
+            </div>
+            <TravelStoryboard
+              title=""
+              subtitle=""
+              maxItems={20}
+              showSaveButtons={true}
+            />
+          </div>
         </div>
       </main>
     </>

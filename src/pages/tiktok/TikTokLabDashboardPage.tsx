@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Sparkles, ArrowRight, Film, Wallet, Layout } from "lucide-react";
 
 import { AccountHealthCard } from "@/components/account/AccountHealthCard";
+import { TravelStoryboard } from "@/components/storyboards/TravelStoryboard";
 import {
   computeCreatorMatchScore,
   type TripRequest,
@@ -169,6 +170,7 @@ export default function TikTokLabDashboardPage() {
               role={role}
             />
             <StoryboardsPanel />
+            <InspirationPanel />
           </div>
 
           {/* Right column */}
@@ -297,6 +299,41 @@ function StoryboardsPanel() {
         >
           See public wall
         </Link>
+      </div>
+    </section>
+  );
+}
+
+function InspirationPanel() {
+  return (
+    <section className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 text-[11px] space-y-3">
+      <div className="flex items-center justify-between gap-2">
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
+            Quick save
+          </p>
+          <p className="text-[12px] font-semibold">Browse & save inspiration</p>
+        </div>
+        <Link
+          to="/tiktok-lab/storyboards"
+          className="inline-flex items-center gap-1 text-[10px] text-[#0c4d47]"
+        >
+          See more
+          <ArrowRight className="h-3 w-3" />
+        </Link>
+      </div>
+
+      <p className="text-[10px] text-[#4a4a4a]">
+        Hover over any image to save it directly to your storyboards for trip planning.
+      </p>
+
+      <div className="pt-2">
+        <TravelStoryboard
+          title=""
+          subtitle=""
+          maxItems={8}
+          showSaveButtons={true}
+        />
       </div>
     </section>
   );
