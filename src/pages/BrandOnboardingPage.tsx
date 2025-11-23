@@ -117,7 +117,8 @@ export default function BrandOnboardingPage() {
         .map((r) => r.trim())
         .filter(Boolean);
 
-      const { error: upsertError } = await supabase
+      // Upsert brand profile
+      const { data: brandProfile, error: upsertError } = await supabase
         .from("brand_profiles")
         .upsert({
           owner_user_id: user.id,
@@ -129,20 +130,62 @@ export default function BrandOnboardingPage() {
           tagline: tagline.trim() || null,
           bio: bio.trim() || null,
           updated_at: new Date().toISOString(),
-        });
+        })
+        .select()
+        .single();
 
       if (upsertError) {
         console.error("Error saving brand profile", upsertError);
         setError("We couldn't save your brand profile. Please try again.");
-      } else {
-        // Mark onboarding as completed
-        await supabase
-          .from("profiles")
-          .update({ onboarding_completed: true })
-          .eq("id", user.id);
-
-        navigate("/console/brand", { replace: true });
+        return;
       }
+
+      // Create application record
+      const { data: application, error: appError } = await supabase
+        .from('brand_applications')
+        .insert({
+          brand_profile_id: brandProfile.id,
+          brand_name: brandName.trim(),
+          brand_type: brandType,
+          primary_contact_email: user.email!,
+          primary_contact_name: user.user_metadata?.full_name || brandName.trim(),
+          website: website.trim() || null,
+          regions: regionsArray,
+          style_tags: styleTags,
+        })
+        .select()
+        .single();
+
+      if (appError) {
+        console.error("Error creating application:", appError);
+        setError("We couldn't create your application. Please try again.");
+        return;
+      }
+
+      // Initiate Stripe Identity verification
+      const { data: session } = await supabase.auth.getSession();
+      const { data: verificationData, error: verificationError } = 
+        await supabase.functions.invoke('create-stripe-identity-session', {
+          headers: {
+            Authorization: `Bearer ${session?.session?.access_token}`,
+          },
+          body: {
+            email: user.email,
+            firstName: brandName.trim().split(' ')[0],
+            lastName: 'Brand',
+            applicationType: 'brand',
+            applicationId: application.id,
+          },
+        });
+
+      if (verificationError) {
+        console.error("Verification error:", verificationError);
+        setError("We couldn't start identity verification. Please contact support.");
+        return;
+      }
+
+      // Redirect to Stripe Identity
+      window.location.href = verificationData.url;
     } finally {
       setSaving(false);
     }
