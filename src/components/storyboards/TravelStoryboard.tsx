@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 import { ExperienceCard } from "./ExperienceCard";
 import { SaveToStoryboardButton } from "./SaveToStoryboardButton";
+
+type StoryboardItemRow = Database["public"]["Tables"]["storyboard_items"]["Row"];
 
 type StoryboardImage = {
   id: string;
@@ -13,25 +16,14 @@ type StoryboardImage = {
   mood_tags?: string[] | null;
 };
 
-type StoryboardItem = {
-  id: string;
-  media_url?: string | null;
-  caption?: string | null;
-  media_attribution?: string | null;
-  location_label?: string | null;
-  day_number?: number | null;
-  time_of_day?: string | null;
-  category_tag?: string | null;
-};
-
 interface TravelStoryboardProps {
-  storyboardId?: string; // NEW: if provided, load items from storyboard_items
+  storyboardId?: string;
   title?: string;
   subtitle?: string;
   maxItems?: number;
   highlightTags?: string[];
   onImageClick?: (image: StoryboardImage) => void;
-  showSaveButtons?: boolean; // NEW: show save to storyboard buttons
+  showSaveButtons?: boolean;
 }
 
 export function TravelStoryboard({
@@ -44,7 +36,7 @@ export function TravelStoryboard({
   showSaveButtons = false,
 }: TravelStoryboardProps) {
   const [images, setImages] = useState<StoryboardImage[]>([]);
-  const [items, setItems] = useState<StoryboardItem[]>([]);
+  const [items, setItems] = useState<StoryboardItemRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -53,23 +45,21 @@ export function TravelStoryboard({
     async function loadData() {
       setLoading(true);
       try {
-        // If storyboardId provided, load from storyboard_items
         if (storyboardId) {
           const { data, error } = await supabase
             .from("storyboard_items")
-            .select("id, media_url, caption, media_attribution, location_label, day_number, time_of_day, category_tag")
+            .select("*")
             .eq("storyboard_id", storyboardId)
-            .order("order_index", { ascending: true });
+            .order("position", { ascending: true });
 
           if (error) {
             console.error("Error loading storyboard items:", error);
             if (!isMounted) return;
             setItems([]);
           } else if (isMounted) {
-            setItems((data ?? []) as StoryboardItem[]);
+            setItems(data ?? []);
           }
         } else {
-          // Fallback: load from media library
           const query = supabase
             .from("storyboard_media_library")
             .select("id, url, thumbnail_url, label, destination_tags, mood_tags")
@@ -125,31 +115,24 @@ export function TravelStoryboard({
           )}
         >
           {items.map((item) => (
-            item.media_url ? (
-              // Photo item
-              <div key={item.id} className="break-inside-avoid">
+            <div key={item.id} className="break-inside-avoid">
+              {item.image_url ? (
                 <img
-                  src={item.media_url}
-                  alt={item.caption || "Trip photo"}
+                  src={item.image_url}
+                  alt={item.title || "Trip photo"}
                   loading="lazy"
                   className="w-full rounded-xl object-cover"
                 />
-                {item.media_attribution && (
-                  <p className="mt-1 text-xs text-muted-foreground">{item.media_attribution}</p>
-                )}
-              </div>
-            ) : (
-              // Experience item
-              <div key={item.id} className="break-inside-avoid">
+              ) : (
                 <ExperienceCard
-                  dayNumber={item.day_number ?? undefined}
-                  timeOfDay={item.time_of_day ?? undefined}
-                  caption={item.caption || "Experience"}
-                  locationLabel={item.location_label ?? undefined}
-                  categoryTag={item.category_tag ?? undefined}
+                  dayNumber={undefined}
+                  timeOfDay={undefined}
+                  caption={item.subtitle || "Experience"}
+                  locationLabel={item.title ?? undefined}
+                  categoryTag={undefined}
                 />
-              </div>
-            )
+              )}
+            </div>
           ))}
         </div>
       ) : images.length > 0 ? (

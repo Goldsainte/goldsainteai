@@ -1,10 +1,11 @@
-// src/components/TripStoryboardViewer.tsx
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { StoryboardItem } from "@/services/storyboardService";
+import type { Database } from "@/integrations/supabase/types";
+
+type StoryboardItemRow = Database["public"]["Tables"]["storyboard_items"]["Row"];
 
 export function TripStoryboardViewer({ tripId }: { tripId: string }) {
-  const [items, setItems] = useState<StoryboardItem[]>([]);
+  const [items, setItems] = useState<StoryboardItemRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -12,12 +13,12 @@ export function TripStoryboardViewer({ tripId }: { tripId: string }) {
 
     async function load() {
       setLoading(true);
-      // Find any storyboard for this trip with visibility "trip"
+      
+      // Find storyboard with this trip_request_id
       const { data: storyboard, error: sbError } = await supabase
         .from("storyboards")
         .select("id")
-        .eq("trip_id", tripId)
-        .eq("visibility", "trip")
+        .eq("trip_request_id", tripId)
         .maybeSingle();
 
       if (sbError || !storyboard) {
@@ -30,7 +31,7 @@ export function TripStoryboardViewer({ tripId }: { tripId: string }) {
         .from("storyboard_items")
         .select("*")
         .eq("storyboard_id", storyboard.id)
-        .order("order_index", { ascending: true });
+        .order("position", { ascending: true });
 
       if (cancelled) return;
 
@@ -38,7 +39,7 @@ export function TripStoryboardViewer({ tripId }: { tripId: string }) {
         console.error(itemsError);
         setItems([]);
       } else {
-        setItems((items ?? []) as StoryboardItem[]);
+        setItems(items ?? []);
       }
 
       setLoading(false);
@@ -82,24 +83,22 @@ export function TripStoryboardViewer({ tripId }: { tripId: string }) {
             key={item.id}
             className="relative rounded-2xl overflow-hidden border border-white/10 bg-gradient-to-br from-[#0c4d47] via-[#0a2225] to-[#BFAD72]"
           >
-            {item.media_url && (
+            {item.image_url && (
               <div
                 className="absolute inset-0 bg-cover bg-center"
-                style={{ backgroundImage: `url(${item.media_url})` }}
+                style={{ backgroundImage: `url(${item.image_url})` }}
               />
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
             <div className="relative h-full flex flex-col justify-end p-2">
-              {item.caption && (
+              {item.subtitle && (
                 <p className="text-[10px] text-[#E5DFC6] line-clamp-2">
-                  {item.caption}
+                  {item.subtitle}
                 </p>
               )}
-              {(item.location_label || item.category_tag) && (
+              {item.title && (
                 <p className="text-[9px] text-[#BFAD72] mt-0.5">
-                  {item.location_label}
-                  {item.location_label && item.category_tag ? " · " : ""}
-                  {item.category_tag}
+                  {item.title}
                 </p>
               )}
             </div>

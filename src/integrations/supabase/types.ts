@@ -2729,13 +2729,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "concierge_sessions_linked_storyboard_id_fkey"
-            columns: ["linked_storyboard_id"]
-            isOneToOne: false
-            referencedRelation: "storyboards"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "concierge_sessions_linked_trip_request_id_fkey"
             columns: ["linked_trip_request_id"]
             isOneToOne: false
@@ -8023,61 +8016,49 @@ export type Database = {
       }
       storyboard_items: {
         Row: {
-          caption: string | null
-          category_tag: string | null
           created_at: string
-          data: Json | null
-          day_number: number | null
+          description: string | null
           id: string
-          kind: string | null
-          layout_type: string
-          location_label: string | null
-          media_attribution: string | null
-          media_url: string | null
+          image_url: string | null
+          item_type: string
           metadata: Json | null
-          order_index: number
-          sort_index: number | null
-          source: string | null
+          position: number
+          source_id: string | null
+          source_type: string | null
           storyboard_id: string
-          time_of_day: string | null
+          subtitle: string | null
+          title: string | null
+          video_url: string | null
         }
         Insert: {
-          caption?: string | null
-          category_tag?: string | null
           created_at?: string
-          data?: Json | null
-          day_number?: number | null
+          description?: string | null
           id?: string
-          kind?: string | null
-          layout_type?: string
-          location_label?: string | null
-          media_attribution?: string | null
-          media_url?: string | null
+          image_url?: string | null
+          item_type: string
           metadata?: Json | null
-          order_index?: number
-          sort_index?: number | null
-          source?: string | null
+          position?: number
+          source_id?: string | null
+          source_type?: string | null
           storyboard_id: string
-          time_of_day?: string | null
+          subtitle?: string | null
+          title?: string | null
+          video_url?: string | null
         }
         Update: {
-          caption?: string | null
-          category_tag?: string | null
           created_at?: string
-          data?: Json | null
-          day_number?: number | null
+          description?: string | null
           id?: string
-          kind?: string | null
-          layout_type?: string
-          location_label?: string | null
-          media_attribution?: string | null
-          media_url?: string | null
+          image_url?: string | null
+          item_type?: string
           metadata?: Json | null
-          order_index?: number
-          sort_index?: number | null
-          source?: string | null
+          position?: number
+          source_id?: string | null
+          source_type?: string | null
           storyboard_id?: string
-          time_of_day?: string | null
+          subtitle?: string | null
+          title?: string | null
+          video_url?: string | null
         }
         Relationships: [
           {
@@ -8130,110 +8111,66 @@ export type Database = {
       }
       storyboards: {
         Row: {
+          cover_image_url: string | null
           created_at: string
-          default_budget_level: string | null
-          default_budget_max: number | null
-          default_budget_min: number | null
-          default_ends_on: string | null
-          default_interests: string[] | null
-          default_pace: string | null
-          default_starts_on: string | null
           description: string | null
-          destination: string | null
-          hero_image_url: string | null
           id: string
+          is_public: boolean
+          original_storyboard_id: string | null
           owner_id: string
-          owner_role: string | null
-          related_concierge_session_id: string | null
-          related_trip_proposal_id: string | null
-          related_trip_request_id: string | null
-          slug: string | null
-          subtitle: string | null
-          theme_tags: string[] | null
-          title: string | null
-          trip_id: string | null
+          role: string
+          source_creator_id: string | null
+          tags: string[] | null
+          title: string
+          trip_request_id: string | null
           updated_at: string
-          visibility: string
+          view_count: number
         }
         Insert: {
+          cover_image_url?: string | null
           created_at?: string
-          default_budget_level?: string | null
-          default_budget_max?: number | null
-          default_budget_min?: number | null
-          default_ends_on?: string | null
-          default_interests?: string[] | null
-          default_pace?: string | null
-          default_starts_on?: string | null
           description?: string | null
-          destination?: string | null
-          hero_image_url?: string | null
           id?: string
+          is_public?: boolean
+          original_storyboard_id?: string | null
           owner_id: string
-          owner_role?: string | null
-          related_concierge_session_id?: string | null
-          related_trip_proposal_id?: string | null
-          related_trip_request_id?: string | null
-          slug?: string | null
-          subtitle?: string | null
-          theme_tags?: string[] | null
-          title?: string | null
-          trip_id?: string | null
+          role: string
+          source_creator_id?: string | null
+          tags?: string[] | null
+          title: string
+          trip_request_id?: string | null
           updated_at?: string
-          visibility?: string
+          view_count?: number
         }
         Update: {
+          cover_image_url?: string | null
           created_at?: string
-          default_budget_level?: string | null
-          default_budget_max?: number | null
-          default_budget_min?: number | null
-          default_ends_on?: string | null
-          default_interests?: string[] | null
-          default_pace?: string | null
-          default_starts_on?: string | null
           description?: string | null
-          destination?: string | null
-          hero_image_url?: string | null
           id?: string
+          is_public?: boolean
+          original_storyboard_id?: string | null
           owner_id?: string
-          owner_role?: string | null
-          related_concierge_session_id?: string | null
-          related_trip_proposal_id?: string | null
-          related_trip_request_id?: string | null
-          slug?: string | null
-          subtitle?: string | null
-          theme_tags?: string[] | null
-          title?: string | null
-          trip_id?: string | null
+          role?: string
+          source_creator_id?: string | null
+          tags?: string[] | null
+          title?: string
+          trip_request_id?: string | null
           updated_at?: string
-          visibility?: string
+          view_count?: number
         }
         Relationships: [
           {
-            foreignKeyName: "storyboards_related_concierge_session_id_fkey"
-            columns: ["related_concierge_session_id"]
+            foreignKeyName: "storyboards_original_storyboard_id_fkey"
+            columns: ["original_storyboard_id"]
             isOneToOne: false
-            referencedRelation: "concierge_sessions"
+            referencedRelation: "storyboards"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "storyboards_related_trip_proposal_id_fkey"
-            columns: ["related_trip_proposal_id"]
-            isOneToOne: false
-            referencedRelation: "trip_proposals"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "storyboards_related_trip_request_id_fkey"
-            columns: ["related_trip_request_id"]
+            foreignKeyName: "storyboards_trip_request_id_fkey"
+            columns: ["trip_request_id"]
             isOneToOne: false
             referencedRelation: "trip_requests"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "storyboards_trip_id_fkey"
-            columns: ["trip_id"]
-            isOneToOne: false
-            referencedRelation: "trips"
             referencedColumns: ["id"]
           },
         ]
