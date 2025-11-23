@@ -2,6 +2,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { SaveToStoryboardButton } from "@/components/storyboards/SaveToStoryboardButton";
 import {
   CheckCircle2,
   ArrowRight,
@@ -265,6 +266,18 @@ export default function CreatorPublicProfilePage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
+            <SaveToStoryboardButton
+              assetType="creator_profile"
+              assetData={{
+                id: creator.id,
+                name: creator.full_name || "Creator",
+                avatar_url: creator.avatar_url,
+                tags: creator.creator_niches,
+              }}
+              variant="outline"
+              size="sm"
+              className="rounded-full"
+            />
             <Link
               to={`/tiktok-lab/matches?creatorId=${creator.id}`}
               className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-5 py-2 text-[11px] font-semibold hover:bg-[#073331]"
