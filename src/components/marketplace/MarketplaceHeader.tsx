@@ -27,32 +27,27 @@ export function MarketplaceHeader() {
               Post a Trip Request
             </Link>
 
-            {/* Secondary CTAs */}
-            <Link
-              to="/marketplace?tab=creators"
-              className="rounded-full border border-[#BFAD72] bg-white px-4 py-2 text-sm font-medium text-[#0a2225] transition hover:bg-[#BFAD72] hover:text-white"
-            >
-              Browse Creators
-            </Link>
+          {/* Secondary CTAs */}
+          <Link
+            to="/creators"
+            className="rounded-full border border-[#BFAD72] bg-white px-4 py-2 text-sm font-medium text-[#0a2225] transition hover:bg-[#BFAD72] hover:text-white"
+          >
+            Browse Creators
+          </Link>
 
-            <Link
-              to="/marketplace?tab=agents"
-              className="rounded-full border border-[#E5DFC6] bg-white px-4 py-2 text-sm font-medium text-[#0a2225] transition hover:bg-[#BFAD72] hover:text-white"
-            >
-              Browse Agents
-            </Link>
+          <Link
+            to="/agents"
+            className="rounded-full border border-[#E5DFC6] bg-white px-4 py-2 text-sm font-medium text-[#0a2225] transition hover:bg-[#BFAD72] hover:text-white"
+          >
+            Browse Agents
+          </Link>
 
-            <Link
-              to="/marketplace?tab=brands"
-              className="rounded-full border border-[#E5DFC6]/60 bg-white px-4 py-2 text-sm font-medium text-[#0a2225] transition hover:bg-[#BFAD72] hover:text-white"
-            >
-              Browse Brands
-            </Link>
-
-            {/* Marketplace Pill */}
-            <div className="rounded-full border border-[#E5DFC6] bg-white px-4 py-2 text-sm font-semibold text-[#0a2225]">
-              Marketplace
-            </div>
+          <Link
+            to="/marketplace?tab=brands"
+            className="rounded-full border border-[#E5DFC6]/60 bg-white px-4 py-2 text-sm font-medium text-[#0a2225] transition hover:bg-[#BFAD72] hover:text-white"
+          >
+            Browse Brands
+          </Link>
           </div>
 
           {/* Marketplace Legal Disclaimer */}
