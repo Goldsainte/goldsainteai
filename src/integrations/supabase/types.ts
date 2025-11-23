@@ -7104,11 +7104,13 @@ export type Database = {
           last_warning_at: string | null
           location: string | null
           onboarding_completed: boolean
+          onboarding_completed_at: string | null
           payout_schedule: string | null
           phone: string | null
           preferences: Json | null
           preferred_currency: string | null
           preferred_language: string | null
+          primary_platform: string | null
           restriction_expires_at: string | null
           role: string | null
           show_account_type: boolean | null
@@ -7181,11 +7183,13 @@ export type Database = {
           last_warning_at?: string | null
           location?: string | null
           onboarding_completed?: boolean
+          onboarding_completed_at?: string | null
           payout_schedule?: string | null
           phone?: string | null
           preferences?: Json | null
           preferred_currency?: string | null
           preferred_language?: string | null
+          primary_platform?: string | null
           restriction_expires_at?: string | null
           role?: string | null
           show_account_type?: boolean | null
@@ -7258,11 +7262,13 @@ export type Database = {
           last_warning_at?: string | null
           location?: string | null
           onboarding_completed?: boolean
+          onboarding_completed_at?: string | null
           payout_schedule?: string | null
           phone?: string | null
           preferences?: Json | null
           preferred_currency?: string | null
           preferred_language?: string | null
+          primary_platform?: string | null
           restriction_expires_at?: string | null
           role?: string | null
           show_account_type?: boolean | null

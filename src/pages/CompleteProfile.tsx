@@ -15,8 +15,8 @@ export default function CompleteProfile() {
   }, [user, isLoading, navigate]);
 
   const handleComplete = () => {
-    // Navigate to home, the auth flow will handle dashboard redirect
-    navigate('/', { replace: true });
+    // Navigate to onboarding to complete profile setup
+    navigate('/onboarding', { replace: true });
   };
 
   if (isLoading) {

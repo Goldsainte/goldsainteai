@@ -163,7 +163,7 @@ const TrustSafetyPage = lazy(() => import('@/pages/TrustSafetyPage'));
 const CancellationRefundPolicy = lazy(() => import('@/pages/CancellationRefundPolicy'));
 const CorporateContact = lazy(() => import('@/pages/CorporateContact'));
 const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
-const Onboarding = lazy(() => import('@/pages/Onboarding'));
+const OnboardingPage = lazy(() => import('@/pages/onboarding/OnboardingPage'));
 const AIAgentOnboarding = lazy(() => import('@/pages/AIAgentOnboarding'));
 const AppleCallback = lazy(() => import('@/pages/AppleCallback'));
 const EarningsDashboard = lazy(() => import('@/pages/EarningsDashboard'));
@@ -202,7 +202,7 @@ export const AppRoutes = () => (
       <Route path="/auth/complete-profile" element={<CompleteProfile />} />
       <Route path="/auth/email-confirmed" element={<EmailConfirmedPage />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/onboarding" element={<Onboarding />} />
+      <Route path="/onboarding" element={<OnboardingPage />} />
       <Route path="/onboarding/creator" element={<CreatorOnboardingPage />} />
       <Route path="/brand/onboarding" element={<BrandOnboardingPage />} />
       <Route path="/onboarding/profile" element={<OnboardingProfilePage />} />

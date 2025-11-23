@@ -22,7 +22,7 @@ const AuthCallback = () => {
         // Check if profile exists and if it's complete
         const { data: profile } = await supabase
           .from('profiles')
-          .select('id, is_profile_complete, account_type, first_name, last_name, phone')
+          .select('id, is_profile_complete, account_type, onboarding_completed, role, first_name, last_name, phone')
           .eq('id', session.user.id)
           .maybeSingle();
 
@@ -33,7 +33,8 @@ const AuthCallback = () => {
             username: session.user.user_metadata?.username || session.user.email?.split('@')[0],
             avatar_url: session.user.user_metadata?.avatar_url,
             is_profile_complete: false,
-            account_type: null
+            account_type: null,
+            onboarding_completed: false
           });
           
           // Redirect to complete profile since this is a new user
@@ -54,12 +55,29 @@ const AuthCallback = () => {
           return;
         }
 
-        // Profile is complete, proceed with normal redirect
+        // Check if onboarding is completed
+        if (!profile.onboarding_completed) {
+          navigate('/onboarding', { replace: true });
+          return;
+        }
+
+        // Profile and onboarding complete, proceed with redirect
         const redirectFromQuery = getRedirectPathFromSearch(location.search);
         const storedRedirect = typeof window !== 'undefined'
           ? sanitizeRedirectPath(sessionStorage.getItem(AUTH_REDIRECT_STORAGE_KEY))
           : null;
-        const destination = redirectFromQuery ?? storedRedirect ?? '/';
+        
+        // Role-based default destinations
+        const roleDefaults: Record<string, string> = {
+          creator: '/creator-lab',
+          agent: '/marketplace?tab=trip-requests',
+          traveler: '/marketplace'
+        };
+        const roleDefault = (profile.role || profile.account_type) ? 
+          roleDefaults[profile.role || profile.account_type] || '/marketplace' : 
+          '/marketplace';
+        
+        const destination = redirectFromQuery ?? storedRedirect ?? roleDefault;
 
         if (typeof window !== 'undefined') {
           sessionStorage.removeItem(AUTH_REDIRECT_STORAGE_KEY);
