@@ -73,7 +73,7 @@ const AuthCallback = () => {
         // Check if profile needs completion
         const needsCompletion = !profile.is_profile_complete || 
                                 !profile.account_type ||
-                                !['traveler', 'creator', 'agent'].includes(profile.account_type) ||
+                                !['traveler', 'creator', 'agent', 'brand'].includes(profile.account_type) ||
                                 !profile.first_name ||
                                 !profile.last_name ||
                                 !profile.phone;
