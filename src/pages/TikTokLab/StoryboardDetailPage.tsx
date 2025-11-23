@@ -1,23 +1,15 @@
 // src/pages/StoryboardDetailPage.tsx
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Sparkles, ArrowLeft, ArrowRight, MapPin } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { Sparkles, ArrowLeft, ArrowRight } from "lucide-react";
+import { getStoryboardPublicBySlugOrId, StoryboardPublic } from "@/services/storyboardsService";
 
 const BG = "bg-[#f7f3ea]";
-
-type StoryboardDetail = {
-  id: string;
-  trip_id: string | null;
-  title: string | null;
-  description: string | null;
-  theme_tags: string[] | null;
-};
 
 export default function StoryboardDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [storyboard, setStoryboard] = useState<StoryboardDetail | null>(null);
+  const [storyboard, setStoryboard] = useState<StoryboardPublic | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,18 +25,12 @@ export default function StoryboardDetailPage() {
       setLoading(true);
       setError(null);
       try {
-        const { data, error: fetchError } = await supabase
-          .from("storyboards")
-          .select("*")
-          .eq("id", id)
-          .single();
-
+        const data = await getStoryboardPublicBySlugOrId(id);
         if (!cancelled) {
-          if (fetchError) throw fetchError;
           if (!data) {
             setError("This storyboard could not be found.");
           } else {
-            setStoryboard(data as StoryboardDetail);
+            setStoryboard(data);
           }
         }
       } catch (err: any) {
@@ -103,12 +89,16 @@ export default function StoryboardDetailPage() {
           </button>
 
           <div className="grid gap-6 md:grid-cols-[3fr,2fr] items-start">
-            <div className="space-y-3">
-              <div className="overflow-hidden rounded-3xl bg-[#f6f3ea] border border-[#E5DFC6] h-56 md:h-64">
-                <div className="h-full flex items-center justify-center">
-                  <Sparkles className="h-8 w-8 text-[#BFAD72]" />
+            <div className="space-y-4">
+              {storyboard.hero_image_url && (
+                <div className="overflow-hidden rounded-3xl bg-[#f6f3ea] border border-[#E5DFC6] h-56 md:h-64">
+                  <img 
+                    src={storyboard.hero_image_url} 
+                    alt={storyboard.title || "Storyboard"} 
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-              </div>
+              )}
 
               <div className="space-y-1">
                 <div className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-[10px] border border-[#BFAD72]/40">
@@ -120,9 +110,9 @@ export default function StoryboardDetailPage() {
                 <h1 className="font-display text-[22px] md:text-[24px] leading-snug">
                   {storyboard.title || "Untitled journey"}
                 </h1>
-                {storyboard.description && (
+                {storyboard.destination && (
                   <p className="text-[11px] text-[#4a4a4a]">
-                    {storyboard.description}
+                    {storyboard.destination}
                   </p>
                 )}
               </div>
@@ -137,6 +127,41 @@ export default function StoryboardDetailPage() {
                       {tag}
                     </span>
                   ))}
+                </div>
+              )}
+
+              {storyboard.scenes && storyboard.scenes.length > 0 && (
+                <div className="space-y-2">
+                  <h2 className="text-[11px] font-semibold text-[#4a4a4a] tracking-wide uppercase">
+                    Scenes
+                  </h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {storyboard.scenes.map((scene) => (
+                      <div
+                        key={scene.id}
+                        className="group relative overflow-hidden rounded-2xl bg-[#f6f3ea] border border-[#E5DFC6] aspect-[3/4]"
+                      >
+                        {scene.media_url ? (
+                          <img
+                            src={scene.media_url}
+                            alt={scene.caption || "Scene"}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Sparkles className="h-6 w-6 text-[#BFAD72]" />
+                          </div>
+                        )}
+                        {scene.caption && (
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
+                            <p className="text-[10px] text-white line-clamp-2">
+                              {scene.caption}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
