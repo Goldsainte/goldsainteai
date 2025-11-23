@@ -127,8 +127,6 @@ const EscrowTimelineDashboard = lazy(() => import('@/components/EscrowTimelineDa
 const ActivityLogs = lazy(() => import('@/pages/ActivityLogs'));
 const CustomerVerification = lazy(() => import('@/pages/CustomerVerification'));
 const EmergencyContacts = lazy(() => import('@/pages/EmergencyContacts'));
-const CoCuratedCreate = lazy(() => import('@/pages/CoCuratedCreate'));
-const CoCuratedBookingSuccess = lazy(() => import('@/pages/CoCuratedBookingSuccess'));
 const TourActivityDetail = lazy(() => import('@/pages/TourActivityDetail'));
 const RestaurantDetail = lazy(() => import('@/pages/RestaurantDetail'));
 const YourActivity = lazy(() => import('@/pages/YourActivity'));
@@ -459,10 +457,8 @@ export const AppRoutes = () => (
       <Route path="/activity-logs" element={<ActivityLogs />} />
       <Route path="/customer-verification" element={<CustomerVerification />} />
       <Route path="/emergency-contacts" element={<EmergencyContacts />} />
-      <Route path="/cocurated-create" element={<CoCuratedCreate />} />
       <Route path="/tour/:tourId" element={<TourActivityDetail />} />
       <Route path="/restaurant/:restaurantId" element={<RestaurantDetail />} />
-      <Route path="/cocurated-booking-success" element={<CoCuratedBookingSuccess />} />
       <Route path="/your-activity" element={<YourActivity />} />
       <Route path="/earnings" element={<EarningsDashboard />} />
     </Route>

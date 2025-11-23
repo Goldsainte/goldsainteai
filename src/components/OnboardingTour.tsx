@@ -58,12 +58,6 @@ export const OnboardingTour = () => {
       disableBeacon: true,
     },
     {
-      target: '[data-tour="cocurated"]',
-      content: "CoCurated™ Packages - Where Experts Meet Adventure! Browse exclusive travel packages crafted by top creators and agents. From Bali retreats to Paris getaways, book curated experiences with transparent pricing.",
-      placement: "bottom",
-      disableBeacon: true,
-    },
-    {
       target: '[data-tour="send-gift-post"]',
       content: "Support Creators with Gifts! Send virtual gifts using coins to your favorite travel creators. They earn real money, encouraging amazing content.",
       placement: "top",

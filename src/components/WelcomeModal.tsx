@@ -92,20 +92,7 @@ export const WelcomeModal = ({ open, onClose, isFirstVisit = false }: WelcomeMod
               </div>
             </div>
 
-            {/* Feature 5 - CoCurated Packages */}
-            <div className="flex gap-2.5 sm:gap-3 items-start">
-              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                <Users className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-              </div>
-              <div className="space-y-0.5">
-                <h3 className="font-semibold text-sm sm:text-base">{t('welcomeModal.cocurated.title')}</h3>
-                <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
-                  {t('welcomeModal.cocurated.description')}
-                </p>
-              </div>
-            </div>
-
-            {/* Feature 6 - Creator Dashboard */}
+            {/* Feature 5 - Creator Dashboard */}
             <div className="flex gap-2.5 sm:gap-3 items-start">
               <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
                 <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
