@@ -52,8 +52,23 @@ export function HomeHero() {
               >
                 Browse agents
               </Link>
+
+              {/* NEW: Marketplace pill */}
+              <Link
+                to="/marketplace"
+                className="inline-flex items-center gap-1 rounded-full border border-[#0C4D47]/25 bg-white/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#0C4D47] hover:bg-white"
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-[#0C4D47]" />
+                <span>Marketplace</span>
+              </Link>
             </div>
           </div>
+
+          {/* Marketplace positioning statement */}
+          <p className="pt-1 text-[11px] text-[#8D8D8D]">
+            All actions happen inside the Goldsainte marketplace — we connect travelers, creators and agents, 
+            but do not operate the trips ourselves.
+          </p>
 
           {/* AI concierge mention (not a second widget, just an entry point link) */}
           <p className="pt-2 text-sm text-[#8D8D8D]">
