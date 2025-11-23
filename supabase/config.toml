@@ -375,3 +375,5 @@ verify_jwt = false
 [functions.compute-proposal-insights]
 verify_jwt = false
 
+[functions.save-to-storyboard]
+verify_jwt = true
