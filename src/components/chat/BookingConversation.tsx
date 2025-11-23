@@ -98,6 +98,15 @@ export function BookingConversation({ bookingId }: { bookingId: string }) {
     <div className="flex flex-col h-[400px]">
       <ChatSafetyBanner />
       
+      {/* Inline legal helper for messaging */}
+      <div className="rounded-lg border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 mb-2">
+        <p className="text-[10px] leading-relaxed text-muted-foreground">
+          Goldsainte messaging is provided for coordination only. All travel-related agreements, 
+          cancellations, and refunds are between you and the travel professional or supplier. 
+          Goldsainte is not a party to your travel contract.
+        </p>
+      </div>
+      
       <div className="flex-1 overflow-y-auto space-y-2 mb-3">
         {loading && (
           <p className="text-[10px] text-[#8D8D8D]">Loading messages...</p>

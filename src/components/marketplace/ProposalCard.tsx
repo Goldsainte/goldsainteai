@@ -129,6 +129,13 @@ export default function ProposalCard({ proposal, showAdminInsights = false }: Pr
         </div>
       )}
 
+      {/* Inline legal helper */}
+      <p className="text-[10px] text-muted-foreground mt-3">
+        Cancellation and refund terms included in this proposal are set by the travel 
+        professional. Goldsainte is not responsible for the fulfillment or modification of 
+        supplier services.
+      </p>
+
       {/* Timeline */}
       {proposal.nights && (
         <div className="mt-4 space-y-1">

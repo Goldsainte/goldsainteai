@@ -195,6 +195,14 @@ export const BookingModal = ({
           </label>
         </div>
 
+        {/* Inline helper for travelers */}
+        <p className="text-[11px] leading-snug text-muted-foreground mt-2">
+          Goldsainte connects you with independent travel professionals. Your cancellation and 
+          refund rights are determined by the travel professional's terms and the underlying 
+          supplier rules (airlines, hotels, tour operators). Goldsainte is not the travel provider 
+          and does not control these policies.
+        </p>
+
         {/* Booking Options */}
         <div className="space-y-4">
           {/* Room/Booking Details */}
