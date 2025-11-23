@@ -5,10 +5,11 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ProposalCard from "@/components/marketplace/ProposalCard";
-import { Loader2 } from "lucide-react";
+import { Loader2, MapPin, Calendar, Users } from "lucide-react";
 import { CancellationPolicySelector } from "@/components/CancellationPolicySelector";
 import { Checkbox } from "@/components/ui/checkbox";
 import { MarketplaceDisclaimer } from "@/components/policies/MarketplaceDisclaimer";
+import { getTripRequestImageUrl } from "@/utils/tripImages";
 
 type ProposalStatus = "pending" | "accepted" | "declined";
 
@@ -430,45 +431,69 @@ export default function TripRequestDetail() {
 
   return (
     <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 md:py-10">
-        {/* Header */}
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <button
-              type="button"
-              onClick={() => navigate('/marketplace?tab=trip-requests')}
-              className="mb-3 text-xs font-medium text-muted-foreground hover:text-foreground"
-            >
-              ← Back to trip requests
-            </button>
-            <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
+      {/* Hero Header */}
+      <div className="relative h-64 w-full overflow-hidden md:h-80">
+        <img
+          src={getTripRequestImageUrl(request.destination)}
+          alt={request.destination || request.tripTitle}
+          className="h-full w-full object-cover"
+          loading="eager"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+
+        <div className="absolute bottom-6 left-1/2 w-full max-w-6xl -translate-x-1/2 px-4">
+          <div className="flex flex-col gap-2 text-white">
+            <div className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em]">
+              <span
+                className={[
+                  "inline-flex h-1.5 w-1.5 rounded-full",
+                  request.status === "open"
+                    ? "bg-emerald-300"
+                    : request.status === "in_progress"
+                    ? "bg-amber-300"
+                    : "bg-gray-400",
+                ].join(" ")}
+              />
+              Trip Request
+            </div>
+            <h1 className="font-display text-2xl md:text-3xl">
               {request.tripTitle}
             </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Trip request · <span className="capitalize">{request.travelStyle}</span> · {request.tripType}
-            </p>
-          </div>
-
-          <div className="flex flex-col items-end gap-2 text-xs">
-            <span
-              className={[
-                "inline-flex items-center rounded-full px-3 py-1 font-medium",
-                request.status === "open"
-                  ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
-                  : request.status === "in_progress"
-                  ? "bg-amber-50 text-amber-700 ring-1 ring-amber-200"
-                  : "bg-muted text-muted-foreground ring-1 ring-border",
-              ].join(" ")}
-            >
-              {request.status === "open" && "Open to proposals"}
-              {request.status === "in_progress" && "In progress"}
-              {request.status === "closed" && "Closed"}
-            </span>
-            <p className="text-[11px] text-muted-foreground">
-              Posted on {new Date(request.createdAt).toLocaleDateString()}
-            </p>
+            <div className="flex flex-wrap items-center gap-3 text-[12px] text-white/85">
+              {request.destination && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-black/40 px-3 py-1 backdrop-blur-sm">
+                  <MapPin className="h-3.5 w-3.5" />
+                  <span className="max-w-[200px] truncate md:max-w-xs">
+                    {request.destination}
+                  </span>
+                </span>
+              )}
+              {request.dateRangeLabel && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-black/30 px-3 py-1 backdrop-blur-sm">
+                  <Calendar className="h-3.5 w-3.5" />
+                  {request.dateRangeLabel}
+                </span>
+              )}
+              {request.travelers > 0 && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-black/30 px-3 py-1 backdrop-blur-sm">
+                  <Users className="h-3.5 w-3.5" />
+                  {request.travelers} {request.travelers === 1 ? "traveler" : "travelers"}
+                </span>
+              )}
+            </div>
           </div>
         </div>
+      </div>
+
+      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 md:py-10">
+        {/* Back button below hero */}
+        <button
+          type="button"
+          onClick={() => navigate('/marketplace?tab=trip-requests')}
+          className="self-start text-xs font-medium text-muted-foreground hover:text-foreground"
+        >
+          ← Back to trip requests
+        </button>
 
         <div className="flex flex-col gap-6 md:flex-row">
           {/* LEFT: Proposals list + submit form */}
