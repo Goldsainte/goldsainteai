@@ -12,6 +12,7 @@ import {
 import { getBookingDetail, type BookingDetail } from "@/services/bookingsService";
 import { BookingConversation } from "@/components/chat/BookingConversation";
 import { TrustSafetyInline } from "@/components/trust/TrustSafetyInline";
+import { TripPoliciesPanel } from "@/components/trips/TripPoliciesPanel";
 
 const CONFIRMED_STATUSES = new Set([
   "proposal_accepted",
@@ -405,6 +406,17 @@ export default function BookingDetailPage() {
                   partners if we ever need to review something.
                 </p>
               </div>
+
+              {/* Policies - NEW */}
+              <TripPoliciesPanel
+                bookingStatus={booking.status}
+                proposalPolicies={booking.proposal_policies ? {
+                  cancellationPolicyName: booking.proposal_policies.cancellation_policy_name,
+                  customCancellationTerms: booking.proposal_policies.custom_cancellation_terms,
+                  depositPercentage: booking.proposal_policies.deposit_percentage,
+                  depositDueDays: booking.proposal_policies.deposit_due_days,
+                } : null}
+              />
             </div>
           </div>
         </section>
