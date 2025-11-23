@@ -56,10 +56,9 @@ export function HomeHero() {
               {/* NEW: Marketplace pill */}
               <Link
                 to="/marketplace"
-                className="inline-flex items-center gap-1 rounded-full border border-[#0C4D47]/25 bg-white/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#0C4D47] hover:bg-white"
+                className="rounded-full border border-[#E5DFC6] bg-white px-4 py-2 font-semibold text-[#0a2225] transition-all hover:bg-[#BFAD72] hover:text-white"
               >
-                <span className="h-1.5 w-1.5 rounded-full bg-[#0C4D47]" />
-                <span>Marketplace</span>
+                Marketplace
               </Link>
             </div>
           </div>
