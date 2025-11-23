@@ -10,34 +10,61 @@ const AuthCallback = () => {
 
   useEffect(() => {
     const handleAuthCallback = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      
-      if (error) {
-        console.error('Auth callback error:', error);
-        navigate('/auth');
-        return;
-      }
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Auth callback error:', error);
+          navigate('/auth');
+          return;
+        }
 
-      if (session) {
-        // Check if profile exists and if it's complete
-        const { data: profile } = await supabase
+        if (!session) {
+          console.log('No session found, redirecting to auth');
+          navigate('/auth');
+          return;
+        }
+
+        // Check if profile exists
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('id, is_profile_complete, account_type, onboarding_completed, role, first_name, last_name, phone')
           .eq('id', session.user.id)
           .maybeSingle();
 
+        if (profileError && profileError.code !== 'PGRST116') {
+          console.error('Profile query error:', profileError);
+          navigate('/auth');
+          return;
+        }
+
         if (!profile) {
-          // Create minimal profile for new OAuth users
-          await supabase.from('profiles').insert({
+          // Create minimal profile for new users (email signup or OAuth)
+          const { error: insertError } = await supabase.from('profiles').insert({
             id: session.user.id,
-            username: session.user.user_metadata?.username || session.user.email?.split('@')[0],
-            avatar_url: session.user.user_metadata?.avatar_url,
+            username: session.user.user_metadata?.username || session.user.email?.split('@')[0] || `user_${session.user.id.slice(0, 8)}`,
+            avatar_url: session.user.user_metadata?.avatar_url || null,
             is_profile_complete: false,
             account_type: null,
             onboarding_completed: false
           });
           
-          // Redirect to complete profile since this is a new user
+          if (insertError) {
+            console.error('Profile creation error:', insertError);
+            // If profile already exists (race condition), try to fetch again
+            const { data: retryProfile } = await supabase
+              .from('profiles')
+              .select('id, is_profile_complete, account_type, onboarding_completed, role')
+              .eq('id', session.user.id)
+              .maybeSingle();
+            
+            if (!retryProfile) {
+              navigate('/auth');
+              return;
+            }
+          }
+          
+          // New user needs to complete profile
           navigate('/auth/complete-profile', { replace: true });
           return;
         }
@@ -84,7 +111,8 @@ const AuthCallback = () => {
         }
 
         navigate(destination, { replace: true });
-      } else {
+      } catch (err) {
+        console.error('Unexpected error in auth callback:', err);
         navigate('/auth');
       }
     };
