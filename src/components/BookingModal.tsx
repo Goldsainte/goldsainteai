@@ -18,6 +18,7 @@ import { BookingPolicyBanner } from "./BookingPolicyBanner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
 import { Checkbox } from "@/components/ui/checkbox";
+import { MarketplaceDisclaimer } from "@/components/policies/MarketplaceDisclaimer";
 
 const bookingFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -195,13 +196,7 @@ export const BookingModal = ({
           </label>
         </div>
 
-        {/* Inline helper for travelers */}
-        <p className="text-[11px] leading-snug text-muted-foreground mt-2">
-          Goldsainte connects you with independent travel professionals. Your cancellation and 
-          refund rights are determined by the travel professional's terms and the underlying 
-          supplier rules (airlines, hotels, tour operators). Goldsainte is not the travel provider 
-          and does not control these policies.
-        </p>
+        <MarketplaceDisclaimer size="sm" />
 
         {/* Booking Options */}
         <div className="space-y-4">

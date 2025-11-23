@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { CreditCard, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { MarketplaceDisclaimer } from "@/components/policies/MarketplaceDisclaimer";
 
 interface PaymentModalProps {
   jobId: string;
@@ -102,12 +103,17 @@ export const PaymentModal = ({
                 <li>• <strong>Escrow protection:</strong> Funds held securely until delivery</li>
                 <li>• Agent receives payment after you approve their work</li>
               </ul>
-              
-              {/* Inline legal helper */}
-              <p className="text-[10px] text-muted-foreground mt-2 px-1">
-                Deposits, fees, and non-refundable amounts are governed by supplier policies and the 
-                travel professional's terms. Goldsainte does not process or control supplier contracts.
-              </p>
+            </AlertDescription>
+          </Alert>
+
+          <MarketplaceDisclaimer size="sm" />
+
+          <Alert className="border-blue-200 bg-blue-50">
+            <AlertDescription className="text-xs">
+              <strong className="block mb-1">Total Payment:</strong>
+              <div className="text-lg font-semibold">
+                {currency} {amount.toFixed(2)}
+              </div>
             </AlertDescription>
           </Alert>
 
