@@ -38,6 +38,13 @@ export type BookingDetail = {
     id: string;
     display_name: string | null;
   } | null;
+
+  proposal_policies?: {
+    cancellation_policy_name?: string | null;
+    custom_cancellation_terms?: string | null;
+    deposit_percentage?: number | null;
+    deposit_due_days?: number | null;
+  } | null;
 };
 
 export async function getBookingDetail(
@@ -61,6 +68,7 @@ export async function getBookingDetail(
       traveler_id,
       creator_id,
       agent_id,
+      proposal_id,
       trips!inner (
         id,
         title,
@@ -88,6 +96,34 @@ export async function getBookingDetail(
     .in("id", userIds);
 
   const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+
+  // Fetch proposal policies if proposal_id exists
+  let proposalPolicies = null;
+  if (data.proposal_id) {
+    const { data: proposal } = await supabase
+      .from("trip_proposals")
+      .select(`
+        custom_cancellation_terms,
+        deposit_percentage,
+        deposit_due_days,
+        cancellation_policy_id,
+        cancellation_policies (
+          name
+        )
+      `)
+      .eq("id", data.proposal_id)
+      .eq("status", "accepted")
+      .maybeSingle();
+
+    if (proposal) {
+      proposalPolicies = {
+        cancellation_policy_name: proposal.cancellation_policies?.name || null,
+        custom_cancellation_terms: proposal.custom_cancellation_terms,
+        deposit_percentage: proposal.deposit_percentage,
+        deposit_due_days: proposal.deposit_due_days,
+      };
+    }
+  }
 
   return {
     id: data.id,
@@ -119,5 +155,6 @@ export async function getBookingDetail(
       id: data.agent_id,
       display_name: profileMap.get(data.agent_id)?.display_name || null,
     } : null,
+    proposal_policies: proposalPolicies,
   };
 }
