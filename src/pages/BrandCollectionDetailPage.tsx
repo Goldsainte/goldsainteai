@@ -8,6 +8,7 @@ import { TripRequestModal } from "@/components/trips/TripRequestModal";
 import { CollectionHeroCollage } from "@/components/brand/CollectionHeroCollage";
 import { TripSummaryChips } from "@/components/brand/TripSummaryChips";
 import { CollectionSidebar } from "@/components/brand/CollectionSidebar";
+import { SaveToStoryboardButton } from "@/components/storyboards/SaveToStoryboardButton";
 import { ArrowLeft, MapPin } from "lucide-react";
 
 interface BrandProfile {
@@ -237,13 +238,24 @@ export default function BrandCollectionDetailPage() {
             </div>
 
             {/* Mobile CTA */}
-            <div className="md:hidden">
+            <div className="md:hidden space-y-2">
               <Button
                 onClick={handleTripInquiry}
                 className="w-full rounded-full bg-[#0a2225] px-4 py-2.5 text-[13px] font-medium text-[#FDFBF5] hover:bg-[#123338]"
               >
                 Request a trip like this
               </Button>
+              <SaveToStoryboardButton
+                assetType="brand_collection"
+                assetData={{
+                  id: collection.id,
+                  title: collection.title,
+                  cover_image_url: collection.cover_image_url,
+                  tags: collection.tags,
+                }}
+                variant="outline"
+                className="w-full rounded-full"
+              />
             </div>
           </div>
         </div>
@@ -281,12 +293,23 @@ export default function BrandCollectionDetailPage() {
           </div>
 
           {/* Right sidebar (desktop only) */}
-          <div className="hidden lg:block">
+          <div className="hidden lg:block space-y-3">
             <CollectionSidebar
               brandName={brand.name}
               startingPriceLabel="From $4,200 pp"
               onRequestTrip={handleTripInquiry}
               className="sticky top-8"
+            />
+            <SaveToStoryboardButton
+              assetType="brand_collection"
+              assetData={{
+                id: collection.id,
+                title: collection.title,
+                cover_image_url: collection.cover_image_url,
+                tags: collection.tags,
+              }}
+              variant="outline"
+              className="w-full rounded-full"
             />
           </div>
         </div>
