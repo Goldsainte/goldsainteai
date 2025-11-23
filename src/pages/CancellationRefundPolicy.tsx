@@ -1,14 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Header } from "@/components/Header";
 import { ShieldCheck, Clock, AlertCircle, CheckCircle, Info } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 export default function CancellationRefundPolicy() {
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
-
       <main className="flex-1 container mx-auto px-4 py-8 max-w-4xl">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Cancellation &amp; Refund Policy</h1>
