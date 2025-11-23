@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ProposalCard from "@/components/marketplace/ProposalCard";
 import { Loader2 } from "lucide-react";
+import { CancellationPolicySelector } from "@/components/CancellationPolicySelector";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type ProposalStatus = "pending" | "accepted" | "declined";
 
@@ -84,6 +86,14 @@ export default function TripRequestDetail() {
     notIncluded: "",
     itineraryOverview: "",
     fitReason: "",
+    // NEW: Legal/commercial fields
+    cancellationPolicyId: "" as string | "",
+    customCancellationTerms: "",
+    depositPercentage: "",
+    depositDueDays: "",
+    // NEW: Policy acknowledgements
+    ackGoldsaintePolicies: false,
+    ackAgentCancellation: false,
   });
   const [submittingProposal, setSubmittingProposal] = useState(false);
 
@@ -284,6 +294,11 @@ export default function TripRequestDetail() {
       return;
     }
 
+    if (!newProposal.ackGoldsaintePolicies || !newProposal.ackAgentCancellation) {
+      toast.error("Please confirm all required policy acknowledgements before submitting.");
+      return;
+    }
+
     if (!newProposal.priceFrom || !newProposal.itineraryOverview || !newProposal.fitReason) {
       toast.error("Please fill in price, itinerary overview, and why you're a great fit");
       return;
@@ -320,6 +335,16 @@ export default function TripRequestDetail() {
           headline:
             newProposal.fitReason ||
             `${proposerRole === "agent" ? "Agent" : "Creator"} proposal`,
+          // NEW: Legal/commercial fields
+          cancellation_policy_id: newProposal.cancellationPolicyId || null,
+          custom_cancellation_terms: newProposal.customCancellationTerms || null,
+          deposit_percentage: newProposal.depositPercentage
+            ? parseFloat(newProposal.depositPercentage)
+            : null,
+          deposit_due_days: newProposal.depositDueDays
+            ? parseInt(newProposal.depositDueDays)
+            : null,
+          acknowledged_goldsainte_policies: true,
         })
         .select()
         .single();
@@ -354,6 +379,12 @@ export default function TripRequestDetail() {
         notIncluded: "",
         itineraryOverview: "",
         fitReason: "",
+        cancellationPolicyId: "",
+        customCancellationTerms: "",
+        depositPercentage: "",
+        depositDueDays: "",
+        ackGoldsaintePolicies: false,
+        ackAgentCancellation: false,
       });
       fetchData(); // Refresh proposals
     } catch (err: any) {
@@ -566,6 +597,138 @@ export default function TripRequestDetail() {
                     <p className="text-[10px] text-muted-foreground">
                       Think of this as your editorial intro – why this trip is perfectly matched to you.
                     </p>
+                  </div>
+
+                  {/* Cancellation policy selection */}
+                  <div className="space-y-2">
+                    <CancellationPolicySelector
+                      selectedPolicyId={newProposal.cancellationPolicyId || undefined}
+                      onPolicySelect={(policyId) =>
+                        setNewProposal((prev) => ({ ...prev, cancellationPolicyId: policyId }))
+                      }
+                    />
+                    <div className="space-y-1">
+                      <label className="font-medium text-foreground text-xs">
+                        Additional cancellation / refund terms (optional)
+                      </label>
+                      <textarea
+                        rows={3}
+                        className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                        placeholder="Add any agency-specific nuances, blackout dates, or non-refundable elements."
+                        value={newProposal.customCancellationTerms}
+                        onChange={(e) =>
+                          setNewProposal((prev) => ({
+                            ...prev,
+                            customCancellationTerms: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  {/* Deposit / payment structure */}
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <div className="space-y-1">
+                      <label className="font-medium text-foreground text-xs">
+                        Required deposit (%)
+                      </label>
+                      <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                        placeholder="e.g. 30"
+                        value={newProposal.depositPercentage}
+                        onChange={(e) =>
+                          setNewProposal((prev) => ({
+                            ...prev,
+                            depositPercentage: e.target.value,
+                          }))
+                        }
+                      />
+                      <p className="text-[10px] text-muted-foreground">
+                        If left blank, we'll treat this as due in full at confirmation.
+                      </p>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="font-medium text-foreground text-xs">
+                        Deposit due (days after acceptance)
+                      </label>
+                      <input
+                        type="number"
+                        min={0}
+                        className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                        placeholder="e.g. 3"
+                        value={newProposal.depositDueDays}
+                        onChange={(e) =>
+                          setNewProposal((prev) => ({
+                            ...prev,
+                            depositDueDays: e.target.value,
+                          }))
+                        }
+                      />
+                      <p className="text-[10px] text-muted-foreground">
+                        When the traveler must pay the deposit to keep this proposal valid.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Legal acknowledgements */}
+                  <div className="space-y-2 rounded-xl border border-border bg-muted/40 px-3 py-3">
+                    <p className="text-[11px] font-semibold text-foreground">
+                      Legal & policy acknowledgements
+                    </p>
+
+                    <label className="flex items-start gap-2 text-[11px] text-muted-foreground">
+                      <Checkbox
+                        checked={newProposal.ackGoldsaintePolicies}
+                        onCheckedChange={(checked) =>
+                          setNewProposal((prev) => ({
+                            ...prev,
+                            ackGoldsaintePolicies: Boolean(checked),
+                          }))
+                        }
+                      />
+                      <span>
+                        I understand that Goldsainte operates as a marketplace and that I, as the
+                        travel professional, am solely responsible for trip delivery, supplier
+                        contracts, and compliance. I've reviewed the{" "}
+                        <Link
+                          to="/cancellation-refund-policy"
+                          className="underline underline-offset-2"
+                          target="_blank"
+                        >
+                          Cancellation & Refund Policy
+                        </Link>{" "}
+                        and{" "}
+                        <Link
+                          to="/terms"
+                          className="underline underline-offset-2"
+                          target="_blank"
+                        >
+                          Terms & Conditions
+                        </Link>
+                        .
+                      </span>
+                    </label>
+
+                    <label className="flex items-start gap-2 text-[11px] text-muted-foreground">
+                      <Checkbox
+                        checked={newProposal.ackAgentCancellation}
+                        onCheckedChange={(checked) =>
+                          setNewProposal((prev) => ({
+                            ...prev,
+                            ackAgentCancellation: Boolean(checked),
+                          }))
+                        }
+                      />
+                      <span>
+                        I confirm that the cancellation, refund, and deposit terms in this
+                        proposal are accurate, clearly communicated, and will be honored exactly
+                        as stated if the traveler accepts.
+                      </span>
+                    </label>
                   </div>
 
                   {/* Submit */}

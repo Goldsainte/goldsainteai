@@ -13,10 +13,11 @@ import { ExternalLink, Users } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
 import { getCurrencySymbol } from "@/lib/currencyHelpers";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { BookingPolicyBanner } from "./BookingPolicyBanner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const bookingFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -49,6 +50,8 @@ export const BookingModal = ({
   const [userProfile, setUserProfile] = useState<any>(null);
   const navigate = useNavigate();
   const [safetyModalOpen, setSafetyModalOpen] = useState(false);
+  const [ackGoldsaintePolicies, setAckGoldsaintePolicies] = useState(false);
+  const [ackAgentTerms, setAckAgentTerms] = useState(false);
 
   const form = useForm<z.infer<typeof bookingFormSchema>>({
     resolver: zodResolver(bookingFormSchema),
@@ -98,6 +101,15 @@ export const BookingModal = ({
   const currencySymbol = getCurrencySymbol(currency);
 
   const handleDirectBooking = () => {
+    if (!ackGoldsaintePolicies || !ackAgentTerms) {
+      toast({
+        title: "Please review policies",
+        description: "You must acknowledge the trip and platform policies before completing your booking.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     toast({
       title: "Direct booking unavailable",
       description: "Please use our Agent Marketplace to complete your booking",
@@ -107,6 +119,15 @@ export const BookingModal = ({
   };
 
   const handleAgentContact = () => {
+    if (!ackGoldsaintePolicies || !ackAgentTerms) {
+      toast({
+        title: "Please review policies",
+        description: "You must acknowledge the trip and platform policies before proceeding.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     navigate('/marketplace');
     onClose();
     toast({
@@ -139,6 +160,40 @@ export const BookingModal = ({
         </div>
 
         <BookingPolicyBanner bookingType={bookingType} />
+
+        {/* Traveler Policy Acknowledgements */}
+        <div className="space-y-2 rounded-lg border border-border bg-muted/40 px-3 py-3 text-xs">
+          <label className="flex items-start gap-2 text-[11px] text-muted-foreground">
+            <Checkbox
+              checked={ackGoldsaintePolicies}
+              onCheckedChange={(checked) => setAckGoldsaintePolicies(Boolean(checked))}
+            />
+            <span>
+              I understand that Goldsainte is a marketplace and that my trip is fulfilled by
+              the travel professional or supplier named in this booking. I have reviewed the{" "}
+              <Link
+                to="/cancellation-refund-policy"
+                className="underline underline-offset-2"
+                target="_blank"
+              >
+                Cancellation & Refund Policy
+              </Link>{" "}
+              and agree to these terms for this booking.
+            </span>
+          </label>
+
+          <label className="flex items-start gap-2 text-[11px] text-muted-foreground">
+            <Checkbox
+              checked={ackAgentTerms}
+              onCheckedChange={(checked) => setAckAgentTerms(Boolean(checked))}
+            />
+            <span>
+              I understand that the travel professional's own cancellation, refund, and
+              deposit terms apply in addition to Goldsainte's marketplace policies, and I
+              have reviewed them before proceeding.
+            </span>
+          </label>
+        </div>
 
         {/* Booking Options */}
         <div className="space-y-4">
