@@ -105,14 +105,57 @@ export default function AgentOnboarding() {
         whatsapp_notifications_enabled: whatsappNotifications
       };
 
-      const { error } = await supabase
+      // Insert into travel_agents
+      const { data: agentProfile, error } = await supabase
         .from('travel_agents')
-        .insert(agentData as any);
+        .insert(agentData as any)
+        .select()
+        .single();
 
       if (error) throw error;
 
-      toast.success('Agent application submitted! Pending verification.');
-      navigate('/agent-dashboard');
+      // Create application record
+      const { data: application, error: appError } = await supabase
+        .from('agent_applications')
+        .insert({
+          agent_id: user.id,
+          first_name: formData.get('primary_contact_name')?.toString().split(' ')[0] || '',
+          last_name: formData.get('primary_contact_name')?.toString().split(' ').slice(1).join(' ') || '',
+          email: formData.get('email') as string,
+          phone: formData.get('phone') as string,
+          agency_name: formData.get('agency_name') as string,
+          license_number: formData.get('license_number') as string,
+          years_experience: parseInt(formData.get('experience_years') as string),
+          specialties: specializations,
+          website: formData.get('website') as string,
+        })
+        .select()
+        .single();
+
+      if (appError) throw appError;
+
+      // Initiate Stripe Identity verification
+      const { data: session } = await supabase.auth.getSession();
+      const { data: verificationData, error: verificationError } = 
+        await supabase.functions.invoke('create-stripe-identity-session', {
+          headers: {
+            Authorization: `Bearer ${session?.session?.access_token}`,
+          },
+          body: {
+            email: formData.get('email') as string,
+            firstName: formData.get('primary_contact_name')?.toString().split(' ')[0] || '',
+            lastName: formData.get('primary_contact_name')?.toString().split(' ').slice(1).join(' ') || 'Agent',
+            applicationType: 'agent',
+            applicationId: application.id,
+          },
+        });
+
+      if (verificationError) throw verificationError;
+
+      toast.success('Application submitted! Redirecting to identity verification...');
+      
+      // Redirect to Stripe Identity
+      window.location.href = verificationData.url;
     } catch (error: any) {
       console.error('Error creating agent profile:', error);
       toast.error(error.message || 'Failed to create agent profile');

@@ -89,6 +89,87 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_users: {
+        Row: {
+          admin_role: string | null
+          can_approve_agents: boolean | null
+          can_approve_brands: boolean | null
+          can_manage_disputes: boolean | null
+          can_view_analytics: boolean | null
+          created_at: string | null
+          department: string | null
+          id: string
+          is_super_admin: boolean | null
+          notes: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          admin_role?: string | null
+          can_approve_agents?: boolean | null
+          can_approve_brands?: boolean | null
+          can_manage_disputes?: boolean | null
+          can_view_analytics?: boolean | null
+          created_at?: string | null
+          department?: string | null
+          id?: string
+          is_super_admin?: boolean | null
+          notes?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          admin_role?: string | null
+          can_approve_agents?: boolean | null
+          can_approve_brands?: boolean | null
+          can_manage_disputes?: boolean | null
+          can_view_analytics?: boolean | null
+          created_at?: string | null
+          department?: string | null
+          id?: string
+          is_super_admin?: boolean | null
+          notes?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_users_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "admin_users_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "admin_users_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_users_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_users_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
+          },
+        ]
+      }
       affiliate_clicks: {
         Row: {
           affiliate_link_id: string
@@ -240,10 +321,13 @@ export type Database = {
       }
       agent_applications: {
         Row: {
+          account_created_at: string | null
           admin_notes: string | null
+          admin_status: string | null
           agency_name: string | null
           agent_id: string
           created_at: string | null
+          created_user_id: string | null
           id: string
           instagram_handle: string | null
           kyc_provider: string | null
@@ -255,16 +339,23 @@ export type Database = {
           reviewed_at: string | null
           reviewed_by: string | null
           specialties: string[] | null
+          stripe_verification_session_id: string | null
+          stripe_verification_status: string | null
+          stripe_verified_at: string | null
           tiktok_handle: string | null
+          user_account_created: boolean | null
           verification_status: string | null
           website: string | null
           years_experience: number | null
         }
         Insert: {
+          account_created_at?: string | null
           admin_notes?: string | null
+          admin_status?: string | null
           agency_name?: string | null
           agent_id: string
           created_at?: string | null
+          created_user_id?: string | null
           id?: string
           instagram_handle?: string | null
           kyc_provider?: string | null
@@ -276,16 +367,23 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           specialties?: string[] | null
+          stripe_verification_session_id?: string | null
+          stripe_verification_status?: string | null
+          stripe_verified_at?: string | null
           tiktok_handle?: string | null
+          user_account_created?: boolean | null
           verification_status?: string | null
           website?: string | null
           years_experience?: number | null
         }
         Update: {
+          account_created_at?: string | null
           admin_notes?: string | null
+          admin_status?: string | null
           agency_name?: string | null
           agent_id?: string
           created_at?: string | null
+          created_user_id?: string | null
           id?: string
           instagram_handle?: string | null
           kyc_provider?: string | null
@@ -297,7 +395,11 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           specialties?: string[] | null
+          stripe_verification_session_id?: string | null
+          stripe_verification_status?: string | null
+          stripe_verified_at?: string | null
           tiktok_handle?: string | null
+          user_account_created?: boolean | null
           verification_status?: string | null
           website?: string | null
           years_experience?: number | null
@@ -1818,6 +1920,143 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "trips"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_applications: {
+        Row: {
+          account_created_at: string | null
+          admin_notes: string | null
+          admin_status: string | null
+          brand_name: string
+          brand_profile_created: boolean | null
+          brand_profile_id: string | null
+          brand_type: string
+          created_at: string | null
+          created_brand_profile_id: string | null
+          created_user_id: string | null
+          id: string
+          primary_contact_email: string
+          primary_contact_name: string
+          primary_contact_phone: string | null
+          primary_contact_title: string | null
+          regions: string[] | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          stripe_verification_session_id: string | null
+          stripe_verification_status: string | null
+          stripe_verified_at: string | null
+          style_tags: string[] | null
+          updated_at: string | null
+          user_account_created: boolean | null
+          website: string | null
+        }
+        Insert: {
+          account_created_at?: string | null
+          admin_notes?: string | null
+          admin_status?: string | null
+          brand_name: string
+          brand_profile_created?: boolean | null
+          brand_profile_id?: string | null
+          brand_type: string
+          created_at?: string | null
+          created_brand_profile_id?: string | null
+          created_user_id?: string | null
+          id?: string
+          primary_contact_email: string
+          primary_contact_name: string
+          primary_contact_phone?: string | null
+          primary_contact_title?: string | null
+          regions?: string[] | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          stripe_verification_session_id?: string | null
+          stripe_verification_status?: string | null
+          stripe_verified_at?: string | null
+          style_tags?: string[] | null
+          updated_at?: string | null
+          user_account_created?: boolean | null
+          website?: string | null
+        }
+        Update: {
+          account_created_at?: string | null
+          admin_notes?: string | null
+          admin_status?: string | null
+          brand_name?: string
+          brand_profile_created?: boolean | null
+          brand_profile_id?: string | null
+          brand_type?: string
+          created_at?: string | null
+          created_brand_profile_id?: string | null
+          created_user_id?: string | null
+          id?: string
+          primary_contact_email?: string
+          primary_contact_name?: string
+          primary_contact_phone?: string | null
+          primary_contact_title?: string | null
+          regions?: string[] | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          stripe_verification_session_id?: string | null
+          stripe_verification_status?: string | null
+          stripe_verified_at?: string | null
+          style_tags?: string[] | null
+          updated_at?: string | null
+          user_account_created?: boolean | null
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_applications_brand_profile_id_fkey"
+            columns: ["brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_applications_created_brand_profile_id_fkey"
+            columns: ["created_brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_applications_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "brand_applications_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "brand_applications_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_applications_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_applications_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
           },
         ]
       }
@@ -7075,6 +7314,7 @@ export type Database = {
           avatar_url: string | null
           billing_address: Json | null
           bio: string | null
+          brand_verification_status: string | null
           content_style_tags: string[] | null
           country: string | null
           created_at: string
@@ -7154,6 +7394,7 @@ export type Database = {
           avatar_url?: string | null
           billing_address?: Json | null
           bio?: string | null
+          brand_verification_status?: string | null
           content_style_tags?: string[] | null
           country?: string | null
           created_at?: string
@@ -7233,6 +7474,7 @@ export type Database = {
           avatar_url?: string | null
           billing_address?: Json | null
           bio?: string | null
+          brand_verification_status?: string | null
           content_style_tags?: string[] | null
           country?: string | null
           created_at?: string

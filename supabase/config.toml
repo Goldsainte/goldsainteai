@@ -1,5 +1,23 @@
 project_id = "iwdevxltjuedijrcdejs"
 
+[functions.create-stripe-identity-session]
+verify_jwt = true
+
+[functions.stripe-identity-webhook]
+verify_jwt = false
+
+[functions.notify-admin-new-application]
+verify_jwt = false
+
+[functions.notify-applicant-status-change]
+verify_jwt = false
+
+[functions.create-approved-account]
+verify_jwt = true
+
+[functions.notify-admin-verification-complete]
+verify_jwt = false
+
 [functions.amadeus-proxy]
 verify_jwt = true
 
@@ -48,56 +66,32 @@ verify_jwt = true
 [functions.notify-agents-new-job]
 verify_jwt = false
 
-[functions.unified-search-flights]
+[functions.claim-job]
 verify_jwt = true
 
-[functions.unified-search-hotels]
+[functions.update-job-status]
 verify_jwt = true
 
-[functions.booking-com-rapid-search]
+[functions.process-job-payment]
 verify_jwt = true
 
-[functions.create-checkout]
-verify_jwt = false
-
-[functions.get-hotel-details]
-verify_jwt = false
-
-[functions.fetch-restaurants]
-verify_jwt = false
-
-[functions.check-visa-requirements]
-verify_jwt = false
-
-[functions.submit-visa-request]
-verify_jwt = false
-
-[functions.search-events]
-verify_jwt = false
-
-[functions.customer-portal]
-verify_jwt = false
-
-[functions.ai-booking-assistant]
-verify_jwt = false
-
-[functions.ai-booking-concierge]
-verify_jwt = false
-
-[functions.ai-preferences-assistant]
+[functions.release-escrow]
 verify_jwt = true
 
 [functions.realtime-voice-session]
-verify_jwt = false
-
-[functions.send-confirmation-email]
-verify_jwt = false
-
-[functions.stripe-connect-onboarding]
 verify_jwt = true
 
-[functions.check-stripe-connect-status]
+[functions.madison]
 verify_jwt = true
+
+[functions.ai-storyboard-itinerary]
+verify_jwt = true
+
+[functions.unsplash-search]
+verify_jwt = false
+
+[functions.viator-search-experiences]
+verify_jwt = false
 
 [functions.submit-job-completion]
 verify_jwt = true
@@ -198,32 +192,26 @@ verify_jwt = true
 [functions.submit-transportation-vendor-application]
 verify_jwt = true
 
-[functions.approve-transportation-vendor]
+[functions.update-visa-request-status]
+verify_jwt = false
+
+[functions.create-commission-payout]
 verify_jwt = true
 
-[functions.search-transportation-vendors]
-verify_jwt = false
-
-[functions.check-vendor-availability]
-verify_jwt = false
-
-[functions.create-vendor-promotion]
+[functions.get-stripe-payout-schedule]
 verify_jwt = true
-
-[functions.log-activity]
-verify_jwt = true
-
-[functions.ai-agent-matching]
-verify_jwt = false
-
-[functions.ai-trip-matching]
-verify_jwt = false
 
 [functions.stripe-webhook]
 verify_jwt = false
 
-[functions.send-verification-email]
-verify_jwt = false
+[functions.create-checkout]
+verify_jwt = true
+
+[functions.customer-portal]
+verify_jwt = true
+
+[functions.check-subscription]
+verify_jwt = true
 
 [functions.create-verification-checkout]
 verify_jwt = true
@@ -231,152 +219,77 @@ verify_jwt = true
 [functions.check-verification]
 verify_jwt = true
 
-[functions.start-transport-vendor-onboarding]
+[functions.create-trip-booking]
 verify_jwt = true
 
-[functions.help-center-ai]
-verify_jwt = false
-
-[functions.apple-signin-init]
-verify_jwt = false
-
-[functions.apple-signin-callback]
-verify_jwt = false
-
-[functions.facebook-signin-init]
-verify_jwt = false
-
-[functions.facebook-signin-callback]
-verify_jwt = false
-
-[functions.tiktok-oauth-start]
-verify_jwt = false
-
-[functions.tiktok-oauth-callback]
-verify_jwt = false
-
-[functions.publish-trip-story]
+[functions.create-hotel-booking]
 verify_jwt = true
 
-[functions.create-agent-inquiry]
-verify_jwt = false
-
-[functions.convert-inquiry-to-marketplace-job]
-verify_jwt = false
-
-[functions.send-traveler-confirmation-email]
-verify_jwt = false
-
-[functions.notify-creators-new-opportunity]
-verify_jwt = false
-
-[functions.verify-transportation-payment]
+[functions.check-connection-status]
 verify_jwt = true
 
-[functions.verify-promotion-payment]
+[functions.start-connection]
 verify_jwt = true
 
-[functions.verify-cocurated-payment]
+[functions.accept-proposal]
 verify_jwt = true
 
-[functions.hotelbeds-search-hotels]
-verify_jwt = false
-
-[functions.hotelbeds-search-activities]
-verify_jwt = false
-
-[functions.hotelbeds-search-transfers]
-verify_jwt = false
-
-[functions.get-personalized-recommendations]
+[functions.process-proposal-payment]
 verify_jwt = true
 
-[functions.generate-trip-itinerary]
+[functions.track-affiliate-commission]
+verify_jwt = false
+
+[functions.process-escrow-payment]
 verify_jwt = true
 
-[functions.send-trip-reminders]
+[functions.process-creator-share]
 verify_jwt = false
 
-[functions.get-weather-forecast]
+[functions.process-agent-payout]
+verify_jwt = false
+
+[functions.process-platform-fee]
+verify_jwt = false
+
+[functions.generate-itinerary-pdf]
 verify_jwt = true
 
-[functions.get-exchange-rates]
+[functions.send-itinerary-email]
 verify_jwt = true
 
-[functions.check-ai-usage]
+[functions.stripe-connect-status]
 verify_jwt = true
 
-[functions.create-ai-subscription-checkout]
+[functions.save-to-storyboard]
 verify_jwt = true
 
-[functions.check-api-health]
+[functions.check-stripe-connect-status]
 verify_jwt = true
 
-[functions.compare-date-flexibility]
-verify_jwt = false
-
-[functions.search-multi-city-flights]
-verify_jwt = false
-
-[functions.get-travel-advisories]
-verify_jwt = false
-
-[functions.lookup-baggage-policy]
-verify_jwt = false
-
-[functions.check-flight-price-alerts]
-verify_jwt = false
-
-[functions.realtime-sdp-relay]
-verify_jwt = false
-
-[functions.amadeus-proxy]
-verify_jwt = false
-
-[functions.stripe-connect-link]
-verify_jwt = false
-
-[functions.seed-storyboard-media]
-verify_jwt = false
-
-[functions.match-trip-request]
-verify_jwt = false
-
-[functions.match-agent-creators]
-verify_jwt = false
-
-[functions.madison]
-verify_jwt = false
-
-[functions.ai-storyboard-suggestions]
+[functions.update-trip-match-status]
 verify_jwt = true
 
-[functions.agent-start-verification]
-verify_jwt = true
-
-[functions.agent-verification-webhook]
-verify_jwt = false
-
-[functions.unsplash-search]
-verify_jwt = false
-
-[functions.viator-search]
+[functions.ai-trip-matching]
 verify_jwt = false
 
 [functions.update-trip-match-status]
 verify_jwt = true
 
-[functions.madison-chat]
-verify_jwt = false
+[functions.trip-checkout-create]
+verify_jwt = true
 
-[functions.seed-creators]
-verify_jwt = false
-
-[functions.compute-proposal-insights]
-verify_jwt = false
-
-[functions.save-to-storyboard]
+[functions.generate-signed-contract]
 verify_jwt = true
 
 [functions.send-contract-notification]
 verify_jwt = true
+
+[functions.validate-contract-signature]
+verify_jwt = true
+
+[functions.compute-proposal-insights]
+verify_jwt = false
+
+[functions.ai-booking-concierge]
+verify_jwt = false
