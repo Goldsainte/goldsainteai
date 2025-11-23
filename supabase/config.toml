@@ -377,3 +377,6 @@ verify_jwt = false
 
 [functions.save-to-storyboard]
 verify_jwt = true
+
+[functions.send-contract-notification]
+verify_jwt = true

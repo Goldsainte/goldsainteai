@@ -9405,6 +9405,182 @@ export type Database = {
           },
         ]
       }
+      trip_contracts: {
+        Row: {
+          agent_id: string
+          agent_signature: string | null
+          agent_signed_at: string | null
+          contract_sections: Json
+          created_at: string
+          creator_id: string | null
+          creator_signature: string | null
+          creator_signed_at: string | null
+          field_values: Json
+          id: string
+          status: string
+          traveler_id: string
+          traveler_info: Json
+          traveler_signature: string | null
+          traveler_signed_at: string | null
+          trip_id: string
+          trip_info: Json
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          agent_signature?: string | null
+          agent_signed_at?: string | null
+          contract_sections?: Json
+          created_at?: string
+          creator_id?: string | null
+          creator_signature?: string | null
+          creator_signed_at?: string | null
+          field_values?: Json
+          id?: string
+          status?: string
+          traveler_id: string
+          traveler_info?: Json
+          traveler_signature?: string | null
+          traveler_signed_at?: string | null
+          trip_id: string
+          trip_info?: Json
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          agent_signature?: string | null
+          agent_signed_at?: string | null
+          contract_sections?: Json
+          created_at?: string
+          creator_id?: string | null
+          creator_signature?: string | null
+          creator_signed_at?: string | null
+          field_values?: Json
+          id?: string
+          status?: string
+          traveler_id?: string
+          traveler_info?: Json
+          traveler_signature?: string | null
+          traveler_signed_at?: string | null
+          trip_id?: string
+          trip_info?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_contracts_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "trip_contracts_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "trip_contracts_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_contracts_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_contracts_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
+          },
+          {
+            foreignKeyName: "trip_contracts_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "trip_contracts_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "trip_contracts_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_contracts_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_contracts_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
+          },
+          {
+            foreignKeyName: "trip_contracts_traveler_id_fkey"
+            columns: ["traveler_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "trip_contracts_traveler_id_fkey"
+            columns: ["traveler_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "trip_contracts_traveler_id_fkey"
+            columns: ["traveler_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_contracts_traveler_id_fkey"
+            columns: ["traveler_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_contracts_traveler_id_fkey"
+            columns: ["traveler_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["brand_profile_id"]
+          },
+          {
+            foreignKeyName: "trip_contracts_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: true
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trip_files: {
         Row: {
           created_at: string
