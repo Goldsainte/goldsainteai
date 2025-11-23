@@ -89,12 +89,17 @@ export const PaymentModal = ({
         </DialogHeader>
 
         <div className="space-y-4">
-          <Alert>
-            <AlertDescription className="text-sm">
-              <strong>Payment Breakdown:</strong>
-              <ul className="mt-2 space-y-1 text-xs">
-                <li>• Service Fee: Included in total</li>
-                <li>• <strong>Escrow Protection:</strong> Funds held securely until job completion</li>
+          <Alert className="bg-muted/50 border-border">
+            <AlertDescription className="text-xs">
+              <p className="font-semibold mb-2">About this payment</p>
+              <p className="mb-2">
+                Goldsainte operates as a marketplace platform. Your trip is fulfilled by the 
+                travel professional named in this booking. Payment is processed securely and 
+                held in escrow until job completion.
+              </p>
+              <ul className="space-y-1">
+                <li>• Platform service fee: Included in total</li>
+                <li>• <strong>Escrow protection:</strong> Funds held securely until delivery</li>
                 <li>• Agent receives payment after you approve their work</li>
               </ul>
             </AlertDescription>

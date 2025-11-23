@@ -10,8 +10,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { MapPin, Tag, AlertCircle } from "lucide-react";
+import { MapPin, Tag, AlertCircle, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface BrandProfile {
   profile_id: string;
@@ -271,6 +272,16 @@ export function TripRequestModal({
 
           {/* RIGHT: Form */}
           <form onSubmit={handleSubmit} className="px-6 py-4 space-y-3">
+            {/* Marketplace disclaimer */}
+            <Alert className="mb-3 bg-[#f7f3ea] border-[#E5DFC6]">
+              <Info className="h-4 w-4 text-[#7A7151]" />
+              <AlertDescription className="text-[11px] text-[#4a4a4a]">
+                Goldsainte is a curated marketplace connecting travelers with certified travel 
+                professionals. Your trip will be fulfilled by the travel agent or creator who 
+                accepts your request, not by Goldsainte directly.
+              </AlertDescription>
+            </Alert>
+
             <div>
               <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-[#7A7151]">
                 Destination (optional)
