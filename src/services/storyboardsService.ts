@@ -1,170 +1,325 @@
-// src/services/storyboardsService.ts
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 
-export type StoryboardForPrefill = {
-  id: string;
-  title: string | null;
-  destination: string | null;
-  default_starts_on: string | null;
-  default_ends_on: string | null;
-  default_budget_min: number | null;
-  default_budget_max: number | null;
-  default_budget_level: string | null;
-  default_pace: string | null;
-  default_interests: string[] | null;
+// Type exports
+export type StoryboardRow = Database["public"]["Tables"]["storyboards"]["Row"];
+export type StoryboardInsert = Database["public"]["Tables"]["storyboards"]["Insert"];
+export type StoryboardUpdate = Database["public"]["Tables"]["storyboards"]["Update"];
+export type StoryboardItemRow = Database["public"]["Tables"]["storyboard_items"]["Row"];
+export type StoryboardItemInsert = Database["public"]["Tables"]["storyboard_items"]["Insert"];
+
+export type Storyboard = StoryboardRow & {
+  items?: StoryboardItemRow[];
+  items_count?: number;
 };
 
-export async function getStoryboardForPrefill(
-  id: string
-): Promise<StoryboardForPrefill | null> {
+// Get all storyboards for a user
+export async function getMyStoryboards(userId: string): Promise<Storyboard[]> {
   const { data, error } = await supabase
     .from("storyboards")
-    .select(
-      `
-      id,
-      title,
-      destination,
-      default_starts_on,
-      default_ends_on,
-      default_budget_min,
-      default_budget_max,
-      default_budget_level,
-      default_pace,
-      default_interests
-    `
-    )
-    .eq("id", id)
-    .maybeSingle();
+    .select(`
+      *,
+      items:storyboard_items(count)
+    `)
+    .eq("owner_id", userId)
+    .order("updated_at", { ascending: false });
 
-  if (error) {
-    console.error("Error loading storyboard for prefill", error);
-    throw new Error("Could not load storyboard.");
-  }
-
-  if (!data) return null;
-
-  return {
-    id: data.id,
-    title: data.title,
-    destination: data.destination,
-    default_starts_on: data.default_starts_on,
-    default_ends_on: data.default_ends_on,
-    default_budget_min: data.default_budget_min,
-    default_budget_max: data.default_budget_max,
-    default_budget_level: data.default_budget_level,
-    default_pace: data.default_pace,
-    default_interests: data.default_interests,
-  };
+  if (error) throw error;
+  
+  // Transform the count response
+  return (data || []).map(board => ({
+    ...board,
+    items_count: board.items?.[0]?.count || 0,
+    items: undefined
+  })) as Storyboard[];
 }
 
-export type StoryboardScene = {
-  id: string;
-  media_url: string | null;
-  caption: string | null;
-  order_index: number | null;
-};
-
-export type StoryboardPublic = {
-  id: string;
-  slug: string | null;
-  title: string | null;
-  destination: string | null;
-  hero_image_url: string | null;
-  theme_tags: string[] | null;
-  owner: {
-    id: string;
-    display_name: string | null;
-    avatar_url?: string | null;
-  } | null;
-  scenes: StoryboardScene[];
-};
-
-export async function getStoryboardPublicBySlugOrId(
-  slugOrId: string
-): Promise<StoryboardPublic | null> {
-  // Try slug first
-  const { data: slugData, error } = await supabase
+// Get public storyboards (for discovery)
+export async function getPublicStoryboards(): Promise<Storyboard[]> {
+  const { data, error } = await supabase
     .from("storyboards")
-    .select(
-      `
-      id,
-      slug,
-      title,
-      destination,
-      hero_image_url,
-      theme_tags,
-      owner_id
-    `
-    )
-    .eq("slug", slugOrId)
-    .maybeSingle();
+    .select(`
+      *,
+      items:storyboard_items(count)
+    `)
+    .eq("is_public", true)
+    .order("view_count", { ascending: false })
+    .limit(20);
 
-  let data = slugData;
+  if (error) throw error;
+  
+  return (data || []).map(board => ({
+    ...board,
+    items_count: board.items?.[0]?.count || 0,
+    items: undefined
+  })) as Storyboard[];
+}
+
+// Get a single storyboard by ID with all items
+export async function getStoryboardById(id: string): Promise<Storyboard | null> {
+  const { data, error } = await supabase
+    .from("storyboards")
+    .select(`
+      *,
+      storyboard_items(*)
+    `)
+    .eq("id", id)
+    .single();
 
   if (error) {
-    console.error("Error loading storyboard by slug", error);
+    if (error.code === "PGRST116") return null;
+    throw error;
+  }
+  
+  // Sort items by position
+  if (data?.storyboard_items) {
+    data.storyboard_items.sort((a, b) => a.position - b.position);
+  }
+  
+  return {
+    ...data,
+    items: data.storyboard_items
+  } as Storyboard;
+}
+
+// Create a new storyboard
+export async function createStoryboard(params: {
+  ownerId: string;
+  role: "creator" | "traveler";
+  title: string;
+  description?: string;
+  originalStoryboardId?: string | null;
+  sourceCreatorId?: string | null;
+  isPublic?: boolean;
+}): Promise<StoryboardRow> {
+  const { data, error } = await supabase
+    .from("storyboards")
+    .insert({
+      owner_id: params.ownerId,
+      role: params.role,
+      title: params.title,
+      description: params.description || null,
+      original_storyboard_id: params.originalStoryboardId || null,
+      source_creator_id: params.sourceCreatorId || null,
+      is_public: params.isPublic || false,
+    })
+    .select("*")
+    .single();
+
+  if (error) throw error;
+  return data as StoryboardRow;
+}
+
+// Update a storyboard
+export async function updateStoryboard(
+  id: string,
+  updates: Partial<StoryboardUpdate>
+): Promise<StoryboardRow> {
+  const { data, error } = await supabase
+    .from("storyboards")
+    .update(updates)
+    .eq("id", id)
+    .select("*")
+    .single();
+
+  if (error) throw error;
+  return data as StoryboardRow;
+}
+
+// Delete a storyboard
+export async function deleteStoryboard(id: string): Promise<void> {
+  const { error } = await supabase
+    .from("storyboards")
+    .delete()
+    .eq("id", id);
+
+  if (error) throw error;
+}
+
+// Add an item to a storyboard
+export async function addStoryboardItem(params: {
+  storyboardId: string;
+  itemType: "image" | "creator" | "agent" | "brand" | "note" | "video";
+  title?: string;
+  subtitle?: string;
+  description?: string;
+  imageUrl?: string;
+  videoUrl?: string;
+  sourceType?: string;
+  sourceId?: string;
+  metadata?: Record<string, any>;
+  position?: number;
+}): Promise<StoryboardItemRow> {
+  // Get the current max position if not provided
+  let position = params.position;
+  if (position === undefined) {
+    const { data: items } = await supabase
+      .from("storyboard_items")
+      .select("position")
+      .eq("storyboard_id", params.storyboardId)
+      .order("position", { ascending: false })
+      .limit(1);
+    
+    position = items?.[0]?.position ? items[0].position + 1 : 0;
   }
 
-  // If not found by slug, try by id
-  if (!data) {
-    const { data: byId, error: byIdError } = await supabase
-      .from("storyboards")
-      .select(
-        `
-        id,
-        slug,
-        title,
-        destination,
-        hero_image_url,
-        theme_tags,
-        owner_id
-      `
-      )
-      .eq("id", slugOrId)
-      .maybeSingle();
-
-    if (byIdError) {
-      console.error("Error loading storyboard by id", byIdError);
-      throw new Error("Could not load storyboard.");
-    }
-    data = byId;
-  }
-
-  if (!data) return null;
-
-  // Fetch owner profile
-  let owner = null;
-  if (data.owner_id) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("id, display_name, avatar_url")
-      .eq("id", data.owner_id)
-      .maybeSingle();
-    owner = profile;
-  }
-
-  // Fetch storyboard scenes
-  const { data: items } = await supabase
+  const { data, error } = await supabase
     .from("storyboard_items")
-    .select("id, media_url, caption, order_index")
-    .eq("storyboard_id", data.id)
-    .order("order_index", { ascending: true });
+    .insert({
+      storyboard_id: params.storyboardId,
+      item_type: params.itemType,
+      title: params.title || null,
+      subtitle: params.subtitle || null,
+      description: params.description || null,
+      image_url: params.imageUrl || null,
+      video_url: params.videoUrl || null,
+      source_type: params.sourceType || null,
+      source_id: params.sourceId || null,
+      metadata: params.metadata || {},
+      position,
+    })
+    .select("*")
+    .single();
 
-  const scenes: StoryboardScene[] = (items || []).map((item) => ({
-    id: item.id,
-    media_url: item.media_url,
-    caption: item.caption,
-    order_index: item.order_index,
+  if (error) throw error;
+  
+  // Update the storyboard's updated_at timestamp
+  await supabase
+    .from("storyboards")
+    .update({ updated_at: new Date().toISOString() })
+    .eq("id", params.storyboardId);
+
+  return data as StoryboardItemRow;
+}
+
+// Remove an item from a storyboard
+export async function removeStoryboardItem(itemId: string): Promise<void> {
+  const { error } = await supabase
+    .from("storyboard_items")
+    .delete()
+    .eq("id", itemId);
+
+  if (error) throw error;
+}
+
+// Reorder items in a storyboard
+export async function reorderStoryboardItems(
+  storyboardId: string,
+  itemIds: string[]
+): Promise<void> {
+  const updates = itemIds.map((id, index) => ({
+    id,
+    position: index,
   }));
 
-  return {
-    id: data.id,
-    slug: data.slug,
-    title: data.title,
-    destination: data.destination,
-    hero_image_url: data.hero_image_url,
-    theme_tags: data.theme_tags,
-    owner,
-    scenes,
-  };
+  for (const update of updates) {
+    const { error } = await supabase
+      .from("storyboard_items")
+      .update({ position: update.position })
+      .eq("id", update.id)
+      .eq("storyboard_id", storyboardId);
+
+    if (error) throw error;
+  }
+}
+
+// Fork a storyboard (copy from creator to traveler)
+export async function forkStoryboard(params: {
+  originalStoryboardId: string;
+  userId: string;
+  title?: string;
+}): Promise<StoryboardRow> {
+  // Get the original storyboard with items
+  const original = await getStoryboardById(params.originalStoryboardId);
+  if (!original) throw new Error("Original storyboard not found");
+
+  // Create the new storyboard
+  const newBoard = await createStoryboard({
+    ownerId: params.userId,
+    role: "traveler",
+    title: params.title || `${original.title} (Copy)`,
+    description: original.description,
+    originalStoryboardId: original.id,
+    sourceCreatorId: original.owner_id,
+  });
+
+  // Copy all items
+  if (original.items && original.items.length > 0) {
+    for (const item of original.items) {
+      await addStoryboardItem({
+        storyboardId: newBoard.id,
+        itemType: item.item_type as any,
+        title: item.title,
+        subtitle: item.subtitle,
+        description: item.description,
+        imageUrl: item.image_url,
+        videoUrl: item.video_url,
+        sourceType: item.source_type,
+        sourceId: item.source_id,
+        metadata: item.metadata,
+        position: item.position,
+      });
+    }
+  }
+
+  return newBoard;
+}
+
+// Convert storyboard to trip request
+export async function convertStoryboardToTripRequest(params: {
+  storyboardId: string;
+  userId: string;
+  destination?: string;
+  budget?: number;
+  startDate?: string;
+  endDate?: string;
+  travelersCount?: number;
+}): Promise<{ tripRequestId: string }> {
+  const storyboard = await getStoryboardById(params.storyboardId);
+  if (!storyboard) throw new Error("Storyboard not found");
+
+  // Create trip request with storyboard data
+  const { data: trip, error: tripError } = await supabase
+    .from("trip_requests")
+    .insert({
+      user_id: params.userId,
+      title: storyboard.title,
+      description: storyboard.description || "Trip inspired by my Goldsainte storyboard",
+      destination: params.destination || null,
+      budget_min: params.budget ? params.budget * 0.8 : null,
+      budget_max: params.budget || null,
+      start_date: params.startDate || null,
+      end_date: params.endDate || null,
+      travelers_adults: params.travelersCount || 2,
+      status: "open",
+      source: "storyboard",
+    })
+    .select("id")
+    .single();
+
+  if (tripError) throw tripError;
+
+  // Link storyboard to trip request
+  await updateStoryboard(storyboard.id, {
+    trip_request_id: trip.id
+  });
+
+  return { tripRequestId: trip.id };
+}
+
+// Get or create default storyboard for a user
+export async function getOrCreateDefaultStoryboard(userId: string): Promise<StoryboardRow> {
+  const boards = await getMyStoryboards(userId);
+  let defaultBoard = boards.find(b => b.role === "traveler");
+
+  if (!defaultBoard) {
+    defaultBoard = await createStoryboard({
+      ownerId: userId,
+      role: "traveler",
+      title: "My Goldsainte Collection",
+      description: "Inspiration for my next luxury adventure"
+    });
+  }
+
+  return defaultBoard;
 }

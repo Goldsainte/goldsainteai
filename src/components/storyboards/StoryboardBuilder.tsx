@@ -182,7 +182,7 @@ export function StoryboardBuilder({
           .from("storyboards")
           .insert({
             owner_id: user.id,
-            owner_role: mode,
+            role: mode,
             title,
           })
           .select("id")
@@ -195,10 +195,12 @@ export function StoryboardBuilder({
       // Insert items
       const rows = items.map((item, index) => ({
         storyboard_id: sbId,
-        kind: item.kind,
-        source: item.source,
-        sort_index: index,
-        data: item.data,
+        item_type: item.kind === "photo" ? "image" : item.kind,
+        source_type: item.source,
+        position: index,
+        image_url: item.kind === "photo" ? item.data.full_url : null,
+        title: item.data.title || item.data.alt || null,
+        metadata: item.data,
       }));
 
       const { error: itemsError } = await supabase

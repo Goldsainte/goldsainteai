@@ -1,70 +1,41 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import type { Database } from "@/integrations/supabase/types";
 
-type Storyboard = {
-  id: string;
-  trip_id: string | null;
-  owner_id: string;
-  owner_role: "creator" | "agent" | "traveler";
-  title: string | null;
-  description: string | null;
-  theme_tags: string[] | null;
-  visibility: "private" | "trip" | "public_template";
-  created_at: string;
-  updated_at: string;
-};
+type StoryboardRow = Database["public"]["Tables"]["storyboards"]["Row"];
+type StoryboardItemRow = Database["public"]["Tables"]["storyboard_items"]["Row"];
 
-type StoryboardItem = {
-  id: string;
-  storyboard_id: string;
-  order_index: number;
-  layout_type: "masonry" | "full" | "half" | "third";
-  media_url: string | null;
-  media_attribution: string | null;
-  caption: string | null;
-  location_label: string | null;
-  day_number: number | null;
-  time_of_day: string | null;
-  category_tag: string | null;
-  kind: string | null;
-  source: string | null;
-  metadata: Record<string, any> | null;
-  created_at: string;
-};
+export type Storyboard = StoryboardRow;
+export type StoryboardItem = StoryboardItemRow;
 
-export function useStoryboards(tripId?: string, ownerId?: string) {
+export function useStoryboards(ownerId?: string) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: storyboards, isLoading } = useQuery({
-    queryKey: ["storyboards", tripId, ownerId],
+    queryKey: ["storyboards", ownerId],
     queryFn: async () => {
       let query = supabase.from("storyboards").select("*");
       
-      if (tripId) {
-        query = query.eq("trip_id", tripId);
-      }
       if (ownerId) {
         query = query.eq("owner_id", ownerId);
       }
       
-      const { data, error } = await query.order("created_at", { ascending: false });
+      const { data, error } = await query.order("updated_at", { ascending: false });
       
       if (error) throw error;
       return data as Storyboard[];
     },
-    enabled: !!(tripId || ownerId),
+    enabled: !!ownerId,
   });
 
   const createStoryboard = useMutation({
     mutationFn: async (input: {
-      trip_id?: string;
-      owner_role: "creator" | "agent" | "traveler";
+      role: "creator" | "traveler";
       title: string;
       description?: string;
-      theme_tags?: string[];
-      visibility?: "private" | "trip" | "public_template";
+      is_public?: boolean;
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
@@ -115,7 +86,7 @@ export function useStoryboardItems(storyboardId?: string) {
         .from("storyboard_items")
         .select("*")
         .eq("storyboard_id", storyboardId!)
-        .order("order_index", { ascending: true });
+        .order("position", { ascending: true });
 
       if (error) throw error;
       return data as StoryboardItem[];
@@ -126,13 +97,12 @@ export function useStoryboardItems(storyboardId?: string) {
   const addItem = useMutation({
     mutationFn: async (input: {
       storyboard_id: string;
-      media_url: string;
-      caption?: string;
-      location_label?: string;
-      day_number?: number;
-      time_of_day?: string;
-      category_tag?: string;
-      layout_type?: "masonry" | "full" | "half" | "third";
+      item_type: "image" | "creator" | "agent" | "brand" | "note" | "video";
+      title?: string;
+      subtitle?: string;
+      image_url?: string;
+      source_type?: string;
+      source_id?: string;
     }) => {
       const { data, error } = await supabase
         .from("storyboard_items")
