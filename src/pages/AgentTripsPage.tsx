@@ -1,10 +1,12 @@
 // src/pages/AgentTripsPage.tsx
 import { useEffect, useState } from "react";
 import { getOpenTrips, Trip } from "@/services/tripService";
-import { Link } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Loader2, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function AgentTripsPage() {
+  const navigate = useNavigate();
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -53,29 +55,44 @@ export default function AgentTripsPage() {
 
         <div className="space-y-3">
           {trips.map((trip) => (
-            <Link
+            <div
               key={trip.id}
-              to={`/trip/${trip.id}`}
-              className="block rounded-3xl border border-border bg-card p-4 hover:border-primary transition-colors"
+              className="rounded-3xl border border-border bg-card p-4 hover:border-primary transition-colors"
             >
-              <h2 className="text-sm font-semibold">
-                {trip.title || "Untitled trip"}
-              </h2>
-              <p className="text-[11px] text-muted-foreground">
-                {trip.destination || "Destination TBD"}
-              </p>
-              <p className="mt-1 text-[11px] text-muted-foreground">
-                Budget: {trip.budget_range || "Not specified"}
-              </p>
-              <p className="mt-1 text-[10px] text-muted-foreground">
-                {trip.travelers_count ? `${trip.travelers_count} travelers` : "Travelers count not specified"}
-              </p>
-              {trip.start_date && trip.end_date && (
-                <p className="mt-1 text-[10px] text-muted-foreground">
-                  {new Date(trip.start_date).toLocaleDateString()} - {new Date(trip.end_date).toLocaleDateString()}
-                </p>
-              )}
-            </Link>
+              <div className="flex items-start justify-between gap-4">
+                <Link
+                  to={`/trip/${trip.id}`}
+                  className="flex-1"
+                >
+                  <h2 className="text-sm font-semibold">
+                    {trip.title || "Untitled trip"}
+                  </h2>
+                  <p className="text-[11px] text-muted-foreground">
+                    {trip.destination || "Destination TBD"}
+                  </p>
+                  <p className="mt-1 text-[11px] text-muted-foreground">
+                    Budget: {trip.budget_range || "Not specified"}
+                  </p>
+                  <p className="mt-1 text-[10px] text-muted-foreground">
+                    {trip.travelers_count ? `${trip.travelers_count} travelers` : "Travelers count not specified"}
+                  </p>
+                  {trip.start_date && trip.end_date && (
+                    <p className="mt-1 text-[10px] text-muted-foreground">
+                      {new Date(trip.start_date).toLocaleDateString()} - {new Date(trip.end_date).toLocaleDateString()}
+                    </p>
+                  )}
+                </Link>
+                <Button
+                  onClick={() => navigate(`/agent/trips/${trip.id}/contract`)}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 shrink-0"
+                >
+                  <FileText className="h-4 w-4" />
+                  Create Contract
+                </Button>
+              </div>
+            </div>
           ))}
         </div>
       </div>

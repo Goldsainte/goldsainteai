@@ -54,6 +54,7 @@ const AgentDashboard = lazy(() => import('@/pages/AgentDashboard'));
 const AgentEarningsPage = lazy(() => import('@/pages/agent/AgentEarningsPage'));
 const AgentTripRequests = lazy(() => import('@/pages/AgentTripRequests'));
 const AgentStoryboardBuilderPage = lazy(() => import('@/pages/agents/AgentStoryboardBuilderPage'));
+const AgentContractBuilder = lazy(() => import('@/pages/agent/AgentContractBuilder'));
 const AgentPerformanceDashboard = lazy(() => import('@/pages/AgentPerformanceDashboard'));
 const AgentDealsDashboardPage = lazy(() => import('@/pages/AgentDealsDashboardPage'));
 const TripRequestsBoardPage = lazy(() => import('@/pages/TripRequestsBoardPage'));
@@ -392,6 +393,16 @@ export const AppRoutes = () => (
       <Route path="/agent-trip-requests" element={<RequireAgentTerms><AgentTripRequests /></RequireAgentTerms>} />
       <Route path="/agent-performance" element={<RequireAgentTerms><AgentPerformanceDashboard /></RequireAgentTerms>} />
       <Route path="/agent-deals" element={<RequireAgentTerms><AgentDealsDashboardPage /></RequireAgentTerms>} />
+      <Route 
+        path="/agent/trips/:tripId/contract" 
+        element={
+          <RequireAuth>
+            <RequireAgentTerms>
+              <AgentContractBuilder />
+            </RequireAgentTerms>
+          </RequireAuth>
+        } 
+      />
       <Route path="/email-preview" element={<EmailPreview />} />
       <Route path="/billing-dashboard" element={<BillingDashboard />} />
       <Route path="/travel-settings" element={<CreatorSettingsPage />} />
