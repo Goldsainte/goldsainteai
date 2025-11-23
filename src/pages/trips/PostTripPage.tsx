@@ -68,10 +68,10 @@ export default function PostTripPage() {
       if (prefill.destination) setDestination(prefill.destination);
       if (prefill.title) setTitle(prefill.title);
       
-      // Extract aesthetic tags from storyboard summary/description
+      // Extract aesthetic tags from storyboard description
       if (sourceStoryboard) {
         const tags = extractAestheticTags(
-          [prefill.summary, prefill.notesForPartners, sourceStoryboard.description].filter(Boolean).join(" ")
+          [prefill.description, sourceStoryboard.description].filter(Boolean).join(" ")
         );
         setAestheticTags(tags);
       }
