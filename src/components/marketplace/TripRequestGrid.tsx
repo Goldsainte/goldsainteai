@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { MapPin, Calendar, DollarSign } from "lucide-react";
+import { getTripRequestImageUrl } from "@/utils/tripImages";
 
 interface TripRequest {
   id: string;
@@ -19,16 +20,6 @@ interface TripRequest {
 interface TripRequestGridProps {
   requests: TripRequest[];
 }
-
-const getTripRequestImageUrl = (destination?: string) => {
-  if (!destination) {
-    return "https://picsum.photos/800/600?random&luxury";
-  }
-  
-  // Use destination name as seed for consistent images per city
-  const seed = destination.toLowerCase().replace(/\s+/g, '-');
-  return `https://picsum.photos/seed/${seed}/800/600`;
-};
 
 export function TripRequestGrid({ requests }: TripRequestGridProps) {
   const navigate = useNavigate();
