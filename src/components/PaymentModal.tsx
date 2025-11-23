@@ -102,6 +102,12 @@ export const PaymentModal = ({
                 <li>• <strong>Escrow protection:</strong> Funds held securely until delivery</li>
                 <li>• Agent receives payment after you approve their work</li>
               </ul>
+              
+              {/* Inline legal helper */}
+              <p className="text-[10px] text-muted-foreground mt-2 px-1">
+                Deposits, fees, and non-refundable amounts are governed by supplier policies and the 
+                travel professional's terms. Goldsainte does not process or control supplier contracts.
+              </p>
             </AlertDescription>
           </Alert>
 

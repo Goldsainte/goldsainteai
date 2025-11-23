@@ -743,6 +743,14 @@ export default function TripRequestDetail() {
                     </label>
                   </div>
 
+                  {/* Inline legal helper */}
+                  <p className="text-[10px] leading-relaxed text-muted-foreground mt-1">
+                    Goldsainte is a curated marketplace. By submitting this proposal, you acknowledge that 
+                    you are the travel professional responsible for trip delivery, supplier coordination, 
+                    cancellations, refunds, and all service obligations. Cancellation and refund rules 
+                    published in this proposal must be honored exactly as stated if the traveler accepts.
+                  </p>
+
                   {/* Submit */}
                   <div className="flex items-center justify-end gap-2 pt-1">
                     <button
@@ -839,6 +847,13 @@ export default function TripRequestDetail() {
                     : "No proposals yet. Be the first to submit a proposal!"}
                 </div>
               )}
+
+              {/* Marketplace disclaimer - shown to all users */}
+              <p className="text-[10px] text-muted-foreground mt-4 text-center">
+                All proposals are created and managed by independent travel professionals. Goldsainte 
+                does not operate flights, hotels, transfers, or tours. Always review proposal-specific 
+                cancellation, refund, and deposit terms before accepting a trip.
+              </p>
             </div>
           </div>
 
