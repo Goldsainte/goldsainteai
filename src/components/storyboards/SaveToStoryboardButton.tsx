@@ -53,9 +53,9 @@ export function SaveToStoryboardButton({
     // Load user's storyboards
     const { data, error } = await supabase
       .from("storyboards")
-      .select("id, title, hero_image_url")
+      .select("id, title, cover_image_url")
       .eq("owner_id", session.user.id)
-      .eq("owner_role", "traveler")
+      .eq("role", "traveler")
       .order("created_at", { ascending: false })
       .limit(10);
 
@@ -146,9 +146,9 @@ export function SaveToStoryboardButton({
                     disabled={loading}
                     className="w-full flex items-center gap-3 p-3 rounded-xl border border-[#E5DFC6] hover:bg-[#f7f3ea] transition-colors text-left disabled:opacity-50"
                   >
-                    {board.hero_image_url ? (
+                    {board.cover_image_url ? (
                       <img
-                        src={board.hero_image_url}
+                        src={board.cover_image_url}
                         alt={board.title || "Storyboard"}
                         className="w-12 h-12 rounded-lg object-cover"
                       />

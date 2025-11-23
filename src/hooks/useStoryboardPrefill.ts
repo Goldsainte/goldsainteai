@@ -1,23 +1,21 @@
-// src/hooks/useStoryboardPrefill.ts
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getStoryboardById, type StoryboardGalleryItem } from "@/services/storyboardService";
+import { getStoryboardById, type Storyboard } from "@/services/storyboardsService";
 
 export type TripPrefill = {
   title: string;
   destination: string;
-  summary: string;
-  notesForPartners: string;
+  description: string;
+  tags: string[];
 };
 
 export function useStoryboardPrefill() {
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [prefill, setPrefill] = useState<TripPrefill | null>(null);
-  const [sourceStoryboard, setSourceStoryboard] = useState<StoryboardGalleryItem | null>(null);
+  const [sourceStoryboard, setSourceStoryboard] = useState<Storyboard | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Support both ?fromStoryboard=X and ?from=storyboard&storyboardId=X patterns
   const storyboardId = 
     searchParams.get("fromStoryboard") || 
     (searchParams.get("from") === "storyboard" ? searchParams.get("storyboardId") : null);
@@ -41,42 +39,24 @@ export function useStoryboardPrefill() {
           return;
         }
 
-        const destination = sb.destination || "";
-        const title =
-          sb.title ||
-          (destination ? `${destination} – curated by Goldsainte` : "Goldsainte journey");
-
-        const summaryLines: string[] = [];
-        if (destination) summaryLines.push(`Destination: ${destination}`);
-        if (sb.duration_label) summaryLines.push(`Duration: ${sb.duration_label}`);
-        if (sb.ideal_traveler) summaryLines.push(`Ideal traveler: ${sb.ideal_traveler}`);
-        if (sb.description) summaryLines.push(`\n${sb.description}`);
-
-        const summary = summaryLines.join("\n");
-
-        const notesParts: string[] = [];
-        if (sb.vibe_tags && sb.vibe_tags.length) {
-          notesParts.push(`Vibes to keep: ${sb.vibe_tags.join(", ")}.`);
-        }
-        if (sb.theme_tags && sb.theme_tags.length) {
-          notesParts.push(`Themes: ${sb.theme_tags.join(", ")}.`);
-        }
-
-        const notesForPartners = notesParts.join(" ");
+        const title = sb.title || "Trip inspired by storyboard";
+        const description = sb.description 
+          ? `Inspired by "${sb.title}". ${sb.description}`
+          : `Trip inspired by my Goldsainte storyboard.`;
+        
+        const tags = sb.tags || [];
 
         setSourceStoryboard(sb);
         setPrefill({
           title,
-          destination,
-          summary,
-          notesForPartners,
+          destination: "",
+          description,
+          tags,
         });
       } catch (err: any) {
         console.error(err);
         if (!cancelled) {
-          setError(
-            err?.message || "We had trouble loading the storyboard details."
-          );
+          setError(err?.message || "We had trouble loading the storyboard details.");
           setPrefill(null);
           setSourceStoryboard(null);
         }

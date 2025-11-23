@@ -45,7 +45,7 @@ export const Footer = () => {
               <ul className="space-y-3 text-sm text-muted-foreground">
                 <li><Link to="/creators" className="hover:text-primary transition-colors">Creator Marketplace</Link></li>
                 <li><Link to="/tiktok-lab" className="hover:text-primary transition-colors">TikTok Travel Lab</Link></li>
-                <li><Link to="/tiktok-lab/storyboards" className="hover:text-primary transition-colors">{t('footer.storyboards')}</Link></li>
+                <li><Link to="/storyboards" className="hover:text-primary transition-colors">{t('footer.storyboards')}</Link></li>
                 <li><Link to="/browse-agents" className="hover:text-primary transition-colors">{t('footer.travelAgentServices')}</Link></li>
                 <li><Link to="/marketplace" className="hover:text-primary transition-colors">{t('footer.marketplace')}</Link></li>
               </ul>
@@ -118,7 +118,7 @@ export const Footer = () => {
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li><Link to="/creators" className="hover:text-primary transition-colors">Creator Marketplace</Link></li>
               <li><Link to="/tiktok-lab" className="hover:text-primary transition-colors">TikTok Travel Lab</Link></li>
-              <li><Link to="/tiktok-lab/storyboards" className="hover:text-primary transition-colors">{t('footer.storyboards')}</Link></li>
+              <li><Link to="/storyboards" className="hover:text-primary transition-colors">{t('footer.storyboards')}</Link></li>
               <li><Link to="/browse-agents" className="hover:text-primary transition-colors">{t('footer.travelAgentServices')}</Link></li>
               <li><Link to="/marketplace" className="hover:text-primary transition-colors">{t('footer.marketplace')}</Link></li>
             </ul>

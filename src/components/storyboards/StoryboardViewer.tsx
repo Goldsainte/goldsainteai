@@ -37,10 +37,10 @@ export function StoryboardViewer({
           key={item.id}
           className="group relative overflow-hidden rounded-xl bg-muted break-inside-avoid"
         >
-          {item.media_url && (
+          {item.image_url && (
             <img
-              src={item.media_url}
-              alt={item.caption || "Storyboard item"}
+              src={item.image_url}
+              alt={item.subtitle || item.title || "Storyboard item"}
               loading="lazy"
               className="h-full w-full object-cover"
             />
@@ -57,23 +57,10 @@ export function StoryboardViewer({
             )}
           </div>
 
-          {(item.caption || item.location_label || item.time_of_day) && (
+          {(item.title || item.subtitle) && (
             <div className="absolute inset-x-2 bottom-2 rounded-full bg-black/45 px-2 py-1 text-[10px] font-medium text-white shadow-sm backdrop-blur space-y-0.5">
-              {item.caption && <p>{item.caption}</p>}
-              <div className="flex items-center gap-2 text-[9px] text-white/80">
-                {item.location_label && (
-                  <span className="flex items-center gap-0.5">
-                    <MapPin className="h-2.5 w-2.5" />
-                    {item.location_label}
-                  </span>
-                )}
-                {item.time_of_day && (
-                  <span className="flex items-center gap-0.5">
-                    <Clock className="h-2.5 w-2.5" />
-                    {item.time_of_day}
-                  </span>
-                )}
-              </div>
+              {item.title && <p className="font-medium">{item.title}</p>}
+              {item.subtitle && <p className="text-[9px] text-white/80">{item.subtitle}</p>}
             </div>
           )}
         </div>

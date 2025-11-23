@@ -10,7 +10,7 @@ type Storyboard = {
   id: string;
   title: string | null;
   description: string | null;
-  theme_tags: string[] | null;
+  tags: string[] | null;
   created_at: string;
 };
 
@@ -30,7 +30,7 @@ export default function TikTokLabStoryboardsPage() {
       // Fetch storyboards owned by this user
       const { data, error} = await supabase
         .from("storyboards")
-        .select("id, title, description, theme_tags, created_at")
+        .select("id, title, description, tags, created_at")
         .eq("owner_id", user.id)
         .order("created_at", { ascending: false });
 
@@ -129,9 +129,9 @@ export default function TikTokLabStoryboardsPage() {
                       {storyboard.description}
                     </p>
                   )}
-                  {storyboard.theme_tags && storyboard.theme_tags.length > 0 && (
+                  {storyboard.tags && storyboard.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1">
-                      {storyboard.theme_tags.slice(0, 3).map((tag) => (
+                      {storyboard.tags.slice(0, 3).map((tag) => (
                         <span
                           key={tag}
                           className="inline-flex rounded-full bg-[#f7f3ea] px-2 py-0.5 text-[9px] text-[#4a4a4a]"

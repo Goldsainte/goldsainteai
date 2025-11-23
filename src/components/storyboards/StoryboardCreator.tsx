@@ -35,12 +35,14 @@ export function StoryboardCreator({ tripId, ownerRole }: StoryboardCreatorProps)
   const { addItem, deleteItem } = useStoryboardItems(selectedStoryboardId || undefined);
 
   const handleCreateStoryboard = () => {
+    // Map agent role to creator for storyboard system
+    const mappedRole = ownerRole === "agent" ? "creator" : ownerRole === "creator" ? "creator" : "traveler";
+    
     createStoryboard({
-      trip_id: tripId,
-      owner_role: ownerRole,
+      role: mappedRole,
       title,
       description,
-      visibility: "trip",
+      is_public: false,
     });
     setOpen(false);
     setTitle("");
@@ -57,8 +59,9 @@ export function StoryboardCreator({ tripId, ownerRole }: StoryboardCreatorProps)
     
     addItem({
       storyboard_id: selectedStoryboardId,
-      media_url: selectedMediaUrl,
-      caption: itemCaption,
+      item_type: "image",
+      title: itemCaption || "Untitled",
+      image_url: selectedMediaUrl,
     });
     
     setAddItemOpen(false);

@@ -249,14 +249,14 @@ export async function forkStoryboard(params: {
       await addStoryboardItem({
         storyboardId: newBoard.id,
         itemType: item.item_type as any,
-        title: item.title,
-        subtitle: item.subtitle,
-        description: item.description,
-        imageUrl: item.image_url,
-        videoUrl: item.video_url,
-        sourceType: item.source_type,
-        sourceId: item.source_id,
-        metadata: item.metadata,
+        title: item.title || undefined,
+        subtitle: item.subtitle || undefined,
+        description: item.description || undefined,
+        imageUrl: item.image_url || undefined,
+        videoUrl: item.video_url || undefined,
+        sourceType: item.source_type || undefined,
+        sourceId: item.source_id || undefined,
+        metadata: (item.metadata as Record<string, any>) || {},
         position: item.position,
       });
     }
@@ -286,13 +286,17 @@ export async function convertStoryboardToTripRequest(params: {
       title: storyboard.title,
       description: storyboard.description || "Trip inspired by my Goldsainte storyboard",
       destination: params.destination || null,
-      budget_min: params.budget ? params.budget * 0.8 : null,
+      budget_min: params.budget ? Math.round(params.budget * 0.8) : null,
       budget_max: params.budget || null,
       start_date: params.startDate || null,
       end_date: params.endDate || null,
       travelers_adults: params.travelersCount || 2,
       status: "open",
       source: "storyboard",
+      source_metadata: {
+        storyboard_id: storyboard.id,
+        items_count: storyboard.items?.length || 0,
+      },
     })
     .select("id")
     .single();
@@ -306,6 +310,13 @@ export async function convertStoryboardToTripRequest(params: {
 
   return { tripRequestId: trip.id };
 }
+
+// Get public storyboard by ID (for sharing)
+export async function getStoryboardPublicBySlugOrId(id: string): Promise<Storyboard | null> {
+  return getStoryboardById(id);
+}
+
+export type StoryboardPublic = Storyboard;
 
 // Get or create default storyboard for a user
 export async function getOrCreateDefaultStoryboard(userId: string): Promise<StoryboardRow> {
