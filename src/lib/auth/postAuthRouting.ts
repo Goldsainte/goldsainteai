@@ -9,16 +9,27 @@ export function getPostAuthDestination(
   accountType: string | null | undefined,
   onboardingCompleted?: boolean
 ): string {
+  // No account type yet → send to role picker onboarding
+  if (!accountType) {
+    return "/onboarding";
+  }
+
+  // Has account type but onboarding not completed → send to onboarding flow
+  if (!onboardingCompleted) {
+    return "/onboarding";
+  }
+
+  // Onboarding complete → send to role-based home
   if (accountType === "creator" || accountType === "agent") {
     return "/partner";
   }
-  
+
   if (accountType === "brand") {
-    return onboardingCompleted ? "/console/brand" : "/brand/onboarding";
+    return "/console/brand";
   }
-  
-  // Default: traveler goes to onboarding to set preferences
-  return "/onboarding";
+
+  // Default: traveler with completed onboarding → marketplace
+  return "/marketplace";
 }
 
 /**

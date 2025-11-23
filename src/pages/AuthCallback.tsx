@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { AUTH_REDIRECT_STORAGE_KEY, getRedirectPathFromSearch, sanitizeRedirectPath } from '@/lib/auth/redirect';
+import { getPostAuthDestination } from '@/lib/auth/postAuthRouting';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -82,35 +83,33 @@ const AuthCallback = () => {
           return;
         }
 
-        // Check if onboarding is completed
-        if (!profile.onboarding_completed) {
-          navigate('/onboarding', { replace: true });
-          return;
-        }
-
         // Profile and onboarding complete, proceed with redirect
         const redirectFromQuery = getRedirectPathFromSearch(location.search);
         const storedRedirect = typeof window !== 'undefined'
           ? sanitizeRedirectPath(sessionStorage.getItem(AUTH_REDIRECT_STORAGE_KEY))
           : null;
-        
-        // Role-based default destinations
-        const roleDefaults: Record<string, string> = {
-          creator: '/creator-lab',
-          agent: '/marketplace?tab=trip-requests',
-          traveler: '/marketplace'
-        };
-        const roleDefault = (profile.role || profile.account_type) ? 
-          roleDefaults[profile.role || profile.account_type] || '/marketplace' : 
-          '/marketplace';
-        
-        const destination = redirectFromQuery ?? storedRedirect ?? roleDefault;
+
+        // If we have an explicit redirect, respect that
+        if (redirectFromQuery || storedRedirect) {
+          const destination = redirectFromQuery ?? storedRedirect ?? '/marketplace';
+          if (typeof window !== 'undefined') {
+            sessionStorage.removeItem(AUTH_REDIRECT_STORAGE_KEY);
+          }
+          navigate(destination, { replace: true });
+          return;
+        }
+
+        // Use centralized routing logic for default destinations
+        const path = getPostAuthDestination(
+          profile.account_type,
+          profile.onboarding_completed
+        );
 
         if (typeof window !== 'undefined') {
           sessionStorage.removeItem(AUTH_REDIRECT_STORAGE_KEY);
         }
 
-        navigate(destination, { replace: true });
+        navigate(path, { replace: true });
       } catch (err) {
         console.error('Unexpected error in auth callback:', err);
         navigate('/auth');
