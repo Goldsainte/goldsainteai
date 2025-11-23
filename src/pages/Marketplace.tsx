@@ -18,7 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 
-type Tab = "trips" | "creators" | "agents" | "brands" | "trip-requests";
+type Tab = "creators" | "agents" | "brands" | "trip-requests";
 
 export interface SearchFilters {
   destination?: string;
@@ -33,9 +33,13 @@ export default function Marketplace() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   
-  const [activeTab, setActiveTab] = useState<Tab>(
-    (searchParams.get("tab") as Tab) || "trips"
-  );
+  const rawTab = (searchParams.get("tab") as string) || "trip-requests";
+  const validTabs: Tab[] = ["creators", "agents", "brands", "trip-requests"];
+  const initialTab: Tab = validTabs.includes(rawTab as Tab)
+    ? (rawTab as Tab)
+    : "trip-requests";
+
+  const [activeTab, setActiveTab] = useState<Tab>(initialTab);
   const [filters, setFilters] = useState<SearchFilters>({
     destination: searchParams.get("destination") || "",
     travelers: parseInt(searchParams.get("travelers") || "1"),
@@ -51,49 +55,6 @@ export default function Marketplace() {
     setSearchParams(params, { replace: true });
   }, [activeTab, filters, setSearchParams]);
 
-  const { data: trips, isLoading: isLoadingTrips } = useQuery({
-    queryKey: ["marketplace-trips", filters],
-    queryFn: async () => {
-      let query = supabase
-        .from("packaged_trips")
-        .select(`
-          *,
-          profiles:creator_id(full_name,username),
-          travel_agents:agent_id(agency_name)
-        `)
-        .eq("status", "published");
-
-      if (filters.destination) {
-        query = query.or(
-          `destination.ilike.%${filters.destination}%,title.ilike.%${filters.destination}%`
-        );
-      }
-
-      const { data, error } = await query.order("created_at", { ascending: false });
-      if (error) throw error;
-
-      return data?.map((trip: any) => ({
-        id: trip.id,
-        title: trip.title,
-        slug: trip.slug,
-        destination: trip.destination,
-        cover_image_url: trip.cover_image_url,
-        price_per_person: trip.price_per_person,
-        currency: trip.currency,
-        duration_days: trip.duration_days,
-        rating: trip.rating,
-        review_count: trip.review_count,
-        tags: trip.tags || [],
-        creator_name:
-          trip.travel_agents?.agency_name ||
-          trip.profiles?.full_name ||
-          trip.profiles?.username,
-        is_verified: trip.is_verified,
-        max_participants: trip.max_participants,
-      })) || [];
-    },
-    enabled: activeTab === "trips",
-  });
 
   const { data: creators, isLoading: isLoadingCreators } = useQuery({
     queryKey: ["marketplace-creators"],
@@ -175,22 +136,6 @@ export default function Marketplace() {
   };
 
   const renderContent = () => {
-    if (activeTab === "trips") {
-      if (isLoadingTrips) {
-        return (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[...Array(6)].map((_, i) => (
-              <Skeleton key={i} className="h-96 rounded-2xl" />
-            ))}
-          </div>
-        );
-      }
-      if (!trips?.length) {
-        return <EmptyState type="trips" onAction={() => navigate("/post-trip")} />;
-      }
-      return <TripGrid trips={trips} />;
-    }
-
     if (activeTab === "creators") {
       if (isLoadingCreators) {
         return (
