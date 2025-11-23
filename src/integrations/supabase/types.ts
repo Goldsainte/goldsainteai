@@ -2197,6 +2197,45 @@ export type Database = {
           },
         ]
       }
+      cancellation_policies: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          full_refund_hours: number
+          id: string
+          is_default: boolean | null
+          name: string
+          no_refund_hours: number
+          partial_refund_hours: number | null
+          partial_refund_percentage: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          full_refund_hours: number
+          id?: string
+          is_default?: boolean | null
+          name: string
+          no_refund_hours: number
+          partial_refund_hours?: number | null
+          partial_refund_percentage?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          full_refund_hours?: number
+          id?: string
+          is_default?: boolean | null
+          name?: string
+          no_refund_hours?: number
+          partial_refund_hours?: number | null
+          partial_refund_percentage?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           content: string
@@ -9776,14 +9815,19 @@ export type Database = {
       trip_proposals: {
         Row: {
           accepted_at: string | null
+          acknowledged_goldsainte_policies: boolean | null
           admin_complexity_score: number | null
           admin_cost_basis: number | null
           admin_margin_amount: number | null
           admin_margin_percent: number | null
           admin_supplier_notes: string | null
+          cancellation_policy_id: string | null
           created_at: string
           currency: string | null
+          custom_cancellation_terms: string | null
           declined_at: string | null
+          deposit_due_days: number | null
+          deposit_percentage: number | null
           exclusions: string | null
           headline: string | null
           id: string
@@ -9802,14 +9846,19 @@ export type Database = {
         }
         Insert: {
           accepted_at?: string | null
+          acknowledged_goldsainte_policies?: boolean | null
           admin_complexity_score?: number | null
           admin_cost_basis?: number | null
           admin_margin_amount?: number | null
           admin_margin_percent?: number | null
           admin_supplier_notes?: string | null
+          cancellation_policy_id?: string | null
           created_at?: string
           currency?: string | null
+          custom_cancellation_terms?: string | null
           declined_at?: string | null
+          deposit_due_days?: number | null
+          deposit_percentage?: number | null
           exclusions?: string | null
           headline?: string | null
           id?: string
@@ -9828,14 +9877,19 @@ export type Database = {
         }
         Update: {
           accepted_at?: string | null
+          acknowledged_goldsainte_policies?: boolean | null
           admin_complexity_score?: number | null
           admin_cost_basis?: number | null
           admin_margin_amount?: number | null
           admin_margin_percent?: number | null
           admin_supplier_notes?: string | null
+          cancellation_policy_id?: string | null
           created_at?: string
           currency?: string | null
+          custom_cancellation_terms?: string | null
           declined_at?: string | null
+          deposit_due_days?: number | null
+          deposit_percentage?: number | null
           exclusions?: string | null
           headline?: string | null
           id?: string
@@ -9853,6 +9907,13 @@ export type Database = {
           withdrawn_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "trip_proposals_cancellation_policy_id_fkey"
+            columns: ["cancellation_policy_id"]
+            isOneToOne: false
+            referencedRelation: "cancellation_policies"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "trip_proposals_trip_request_id_fkey"
             columns: ["trip_request_id"]

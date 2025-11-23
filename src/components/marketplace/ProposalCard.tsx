@@ -13,6 +13,12 @@ export default function ProposalCard({ proposal, showAdminInsights = false }: Pr
   const adminComplexityScore = proposal.admin_complexity_score as number | undefined;
   const adminSupplierNotes = proposal.admin_supplier_notes as string | undefined;
 
+  // Legal/commercial fields
+  const cancellationPolicyId = (proposal as any).cancellation_policy_id as string | undefined;
+  const customCancellationTerms = (proposal as any).custom_cancellation_terms as string | undefined;
+  const depositPercentage = (proposal as any).deposit_percentage as number | undefined;
+  const depositDueDays = (proposal as any).deposit_due_days as number | undefined;
+
   // Compute visual bands for inline pills
   let marginBandLabel: string | null = null;
   if (adminMarginPercent != null) {
@@ -130,6 +136,28 @@ export default function ProposalCard({ proposal, showAdminInsights = false }: Pr
             Timeline
           </p>
           <p className="text-xs text-foreground">{proposal.nights} nights</p>
+        </div>
+      )}
+
+      {/* Cancellation & Deposit Terms */}
+      {(cancellationPolicyId || depositPercentage != null || customCancellationTerms) && (
+        <div className="mt-4 rounded-lg border border-border bg-muted/30 px-3 py-2">
+          <p className="text-xs font-medium text-foreground">Cancellation & Payment Terms</p>
+          {cancellationPolicyId && (
+            <p className="text-[11px] text-muted-foreground mt-1">
+              Standard cancellation policy applied
+            </p>
+          )}
+          {depositPercentage != null && depositDueDays != null && (
+            <p className="text-[11px] text-muted-foreground mt-1">
+              {depositPercentage}% deposit due within {depositDueDays} days of acceptance
+            </p>
+          )}
+          {customCancellationTerms && (
+            <p className="text-[11px] text-muted-foreground mt-2 italic leading-relaxed">
+              {customCancellationTerms}
+            </p>
+          )}
         </div>
       )}
 

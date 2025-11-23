@@ -236,7 +236,9 @@ export const AppRoutes = () => (
         path="/marketplace/request/:id"
         element={(
           <RouteSectionBoundary section="marketplace">
-            <TripRequestDetail />
+            <RequireAgentTerms>
+              <TripRequestDetail />
+            </RequireAgentTerms>
           </RouteSectionBoundary>
         )}
       />
