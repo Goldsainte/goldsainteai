@@ -17,7 +17,10 @@ export function useStoryboardPrefill() {
   const [sourceStoryboard, setSourceStoryboard] = useState<StoryboardGalleryItem | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const storyboardId = searchParams.get("fromStoryboard");
+  // Support both ?fromStoryboard=X and ?from=storyboard&storyboardId=X patterns
+  const storyboardId = 
+    searchParams.get("fromStoryboard") || 
+    (searchParams.get("from") === "storyboard" ? searchParams.get("storyboardId") : null);
 
   useEffect(() => {
     if (!storyboardId) return;

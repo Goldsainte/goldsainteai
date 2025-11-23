@@ -1,13 +1,13 @@
 // src/pages/trips/PostTripPage.tsx
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { getStoryboardForPrefill } from "@/services/storyboardsService";
 import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
 import { toast } from "sonner";
 import { StoryboardBuilder } from "@/components/storyboards/StoryboardBuilder";
 import { useAuth } from "@/contexts/AuthContext";
+import { useStoryboardPrefill } from "@/hooks/useStoryboardPrefill";
 
 type BudgetLevel = "accessible" | "elevated" | "ultra_luxury";
 type Pace = "slow" | "balanced" | "packed";
@@ -16,8 +16,16 @@ type WantsRole = "creator" | "agent" | "both";
 export default function PostTripPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const fromStoryboard = searchParams.get("fromStoryboard");
   const { user } = useAuth();
+
+  // Support both ?fromStoryboard=X and ?from=storyboard&storyboardId=X patterns
+  const storyboardIdFromQuery = 
+    searchParams.get("fromStoryboard") || 
+    (searchParams.get("from") === "storyboard" ? searchParams.get("storyboardId") : null);
+
+  // Use storyboard prefill hook
+  const { loading: loadingPrefill, prefill, sourceStoryboard, error: prefillError } = 
+    useStoryboardPrefill();
 
   const [destination, setDestination] = useState("");
   const [title, setTitle] = useState("");
@@ -32,12 +40,10 @@ export default function PostTripPage() {
   const [accommodationStyle, setAccommodationStyle] = useState("");
   const [pace, setPace] = useState<Pace>("balanced");
   const [interests, setInterests] = useState<string[]>([]);
+  const [aestheticTags, setAestheticTags] = useState<string[]>([]);
   const [flexibility, setFlexibility] = useState("");
   const [specialNotes, setSpecialNotes] = useState("");
   const [wantsRole, setWantsRole] = useState<WantsRole>("both");
-
-  const [preFilledFrom, setPreFilledFrom] = useState<string | null>(null);
-  const [preFillError, setPreFillError] = useState<string | null>(null);
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,54 +61,45 @@ export default function PostTripPage() {
     "Honeymoon / romance",
   ];
 
-  // Prefill from storyboard if present
-  useEffect(() => {
-    let cancelled = false;
-
-    async function prefillFromStoryboard(id: string) {
-      try {
-        const data = await getStoryboardForPrefill(id);
-        if (cancelled || !data) return;
-
-        setPreFilledFrom(data.title || "Storyboard");
-        if (data.destination) setDestination((prev) => prev || data.destination!);
-        if (data.title) setTitle((prev) => prev || data.title!);
-        if (data.default_starts_on)
-          setStartsOn((prev) => prev || data.default_starts_on!);
-        if (data.default_ends_on)
-          setEndsOn((prev) => prev || data.default_ends_on!);
-        if (data.default_budget_min != null)
-          setBudgetMin((prev) =>
-            prev || String(Math.round(data.default_budget_min!))
-          );
-        if (data.default_budget_max != null)
-          setBudgetMax((prev) =>
-            prev || String(Math.round(data.default_budget_max!))
-          );
-        if (data.default_budget_level)
-          setBudgetLevel(
-            (data.default_budget_level as BudgetLevel) || "elevated"
-          );
-        if (data.default_pace)
-          setPace((data.default_pace as Pace) || "balanced");
-        if (data.default_interests && data.default_interests.length > 0)
-          setInterests((prev) => (prev.length ? prev : data.default_interests!));
-      } catch (err: any) {
-        if (!cancelled)
-          setPreFillError(
-            err.message || "We couldn't prefill from this storyboard."
-          );
+  // Auto-populate form when prefill data loads
+  useState(() => {
+    if (prefill && !destination && !title) {
+      // Populate basic fields
+      if (prefill.destination) setDestination(prefill.destination);
+      if (prefill.title) setTitle(prefill.title);
+      
+      // Extract aesthetic tags from storyboard summary/description
+      if (sourceStoryboard) {
+        const tags = extractAestheticTags(
+          [prefill.summary, prefill.notesForPartners, sourceStoryboard.description].filter(Boolean).join(" ")
+        );
+        setAestheticTags(tags);
       }
     }
+  });
 
-    if (fromStoryboard) {
-      prefillFromStoryboard(fromStoryboard);
-    }
+  // Extract aesthetic keywords from text
+  function extractAestheticTags(text: string): string[] {
+    if (!text) return [];
+    
+    const aestheticKeywords = [
+      "luxury", "boutique", "design", "romantic", "minimalist", "rustic",
+      "modern", "vintage", "coastal", "urban", "bohemian", "elegant",
+      "contemporary", "traditional", "chic", "intimate", "vibrant",
+      "serene", "artistic", "authentic", "curated", "exclusive"
+    ];
+    
+    const lowercaseText = text.toLowerCase();
+    const found = aestheticKeywords.filter(keyword => 
+      lowercaseText.includes(keyword)
+    );
+    
+    return [...new Set(found)].slice(0, 5); // Max 5 unique tags
+  }
 
-    return () => {
-      cancelled = true;
-    };
-  }, [fromStoryboard]);
+  function removeAestheticTag(tag: string) {
+    setAestheticTags(prev => prev.filter(t => t !== tag));
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -192,16 +189,21 @@ export default function PostTripPage() {
       </section>
 
       <section className="mx-auto max-w-3xl px-4 pb-16 md:pb-20">
-        {preFilledFrom && (
+        {storyboardIdFromQuery && loadingPrefill && (
           <div className="mb-3 rounded-2xl bg-[#f7f3ea] border border-[#E5DFC6] px-3 py-2 text-xs text-[#4a4a4a]">
-            This form is pre-filled from the storyboard{" "}
-            <span className="font-semibold">{preFilledFrom}</span>. You can
-            adjust any detail before posting your trip.
+            Loading storyboard details...
           </div>
         )}
-        {preFillError && (
-          <p className="mb-2 text-xs text-red-600">
-            {preFillError}
+        {prefill && sourceStoryboard && (
+          <div className="mb-3 rounded-2xl bg-[#f7f3ea] border border-[#E5DFC6] px-3 py-2 text-xs text-[#4a4a4a]">
+            Pre-filled from storyboard{" "}
+            <span className="font-semibold">{sourceStoryboard.title || "Untitled"}</span>. 
+            You can adjust any details before posting.
+          </div>
+        )}
+        {prefillError && (
+          <p className="mb-3 rounded-2xl bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">
+            {prefillError}
           </p>
         )}
 
@@ -428,6 +430,34 @@ export default function PostTripPage() {
                 ))}
               </div>
             </div>
+
+            {aestheticTags.length > 0 && (
+              <div>
+                <label className="block mb-1 text-xs text-[#4a4a4a]">
+                  Aesthetic tags (from storyboard)
+                </label>
+                <div className="flex flex-wrap gap-1">
+                  {aestheticTags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center gap-1 px-3 py-1 rounded-full border border-[#BFAD72] bg-[#FDFBF5] text-xs text-[#0a2225]"
+                    >
+                      {tag}
+                      <button
+                        type="button"
+                        onClick={() => removeAestheticTag(tag)}
+                        className="hover:text-red-600"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+                <p className="mt-1 text-[10px] text-[#8C8470]">
+                  These keywords were extracted from your storyboard
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Section 4: Flexibility & notes */}
