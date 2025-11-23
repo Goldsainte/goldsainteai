@@ -5,6 +5,7 @@ import Auth from '@/pages/Auth';
 import AuthCallback from '@/pages/AuthCallback';
 import CompleteProfile from '@/pages/CompleteProfile';
 import ApplicationVerificationComplete from '@/pages/ApplicationVerificationComplete';
+import ApplicationReviewDashboard from '@/pages/admin/ApplicationReviewDashboard';
 // Legacy social feed - disabled
 // import TravelFeed from '@/pages/TravelFeed';
 import NotFound from '@/pages/NotFound';
@@ -488,6 +489,7 @@ export const AppRoutes = () => (
       )}
     >
       <Route path="/admin" element={<AdminHomePage />} />
+      <Route path="/admin/applications" element={<ApplicationReviewDashboard />} />
       <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
       <Route path="/admin/safety" element={<AdminSafetyDashboardPage />} />
       <Route path="/admin/agents" element={<AdminAgentsPage />} />
