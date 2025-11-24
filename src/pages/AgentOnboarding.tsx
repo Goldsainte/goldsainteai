@@ -177,13 +177,13 @@ export default function AgentOnboarding() {
           Back
         </Button>
         
-        <Card>
+        <Card className="border border-border bg-card/90 rounded-[32px] shadow-[0_24px_60px_rgba(15,23,42,0.12)]">
           <CardHeader className="px-4 sm:px-6">
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
               <Briefcase className="h-7 w-7 sm:h-8 sm:w-8 text-primary shrink-0" />
-              <CardTitle className="text-xl sm:text-2xl lg:text-3xl font-secondary leading-tight">Travel Agent Application</CardTitle>
+              <CardTitle className="text-xl sm:text-2xl lg:text-3xl font-semibold font-secondary leading-tight">Travel Agent Application</CardTitle>
             </div>
-            <CardDescription className="text-sm md:text-base">
+            <CardDescription className="mt-1 text-sm md:text-base text-muted-foreground">
               Complete this comprehensive application to join our marketplace
             </CardDescription>
           </CardHeader>

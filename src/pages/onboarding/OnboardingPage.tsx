@@ -262,33 +262,33 @@ export default function OnboardingPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#F7F4EC] via-[#FDFBF7] to-[#F4EFE4] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-3">
           <div className="animate-pulse">
-            <Sparkles className="h-8 w-8 mx-auto text-[#0C4D47]" />
+            <Sparkles className="h-8 w-8 mx-auto text-foreground" />
           </div>
-          <p className="text-sm text-slate-600">Loading onboarding...</p>
+          <p className="text-sm text-muted-foreground">Loading onboarding...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F7F4EC] via-[#FDFBF7] to-[#F4EFE4] text-slate-900">
+    <div className="min-h-screen bg-background text-foreground">
       <main className="flex justify-center px-4 py-10 md:py-16">
-        <div className="w-full max-w-3xl rounded-[32px] border border-[#E5DFC6] bg-white/90 px-6 py-8 shadow-[0_24px_60px_rgba(15,23,42,0.12)] md:px-10 md:py-10">
+        <div className="w-full max-w-3xl rounded-[32px] border border-border bg-card/90 backdrop-blur-sm px-6 py-8 shadow-[0_24px_60px_rgba(15,23,42,0.12)] md:px-10 md:py-10">
           {/* Badge */}
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-[#F7F4EC] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-[#0C4D47]">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/60 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             <Sparkles className="h-3.5 w-3.5" />
             <span>Goldsainte onboarding</span>
           </div>
 
           {/* Heading */}
           <div className="space-y-2 md:space-y-3">
-            <h1 className="text-2xl font-semibold tracking-tight text-[#0A2225] md:text-3xl">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
               Tell us how you travel with Goldsainte
             </h1>
-            <p className="max-w-xl text-xs leading-relaxed text-slate-600 md:text-sm">
+            <p className="max-w-xl text-xs leading-relaxed text-muted-foreground md:text-sm">
               Choose your role and set up a short profile. This helps us match the
               right travelers, creators and agents — and keeps the marketplace safe
               and curated.
@@ -313,7 +313,7 @@ export default function OnboardingPage() {
           <form onSubmit={handleSubmit} className="mt-8 space-y-8">
             {/* Roles */}
             <section className="space-y-3">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-700">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                 How are you using Goldsainte? <span className="text-rose-500">*</span>
               </p>
               <div className="grid gap-3 md:grid-cols-3">
@@ -324,32 +324,32 @@ export default function OnboardingPage() {
                     onClick={() => setRole(card.id)}
                     className={cn(
                       "flex h-full flex-col rounded-2xl border px-3.5 py-3 text-left transition",
-                      "border-[#E5DFC6] bg-white hover:border-[#BFAD72] hover:bg-[#FBF8F0]",
+                      "border-border bg-card/80 hover:border-foreground hover:bg-foreground hover:text-background",
                       role === card.id &&
-                        "border-[#0C4D47] bg-[#F3F0E6] ring-1 ring-[#0C4D47]/40"
+                        "border-foreground bg-foreground text-background ring-1 ring-foreground/40"
                     )}
                   >
-                    <span className="text-xs font-semibold text-[#0A2225]">
+                    <span className="text-xs font-semibold">
                       {card.label}
                     </span>
-                    <p className="mt-1 text-[11px] font-medium leading-snug text-slate-800">
+                    <p className="mt-1 text-[11px] font-medium leading-snug">
                       {card.title}
                     </p>
-                    <p className="mt-2 text-[11px] leading-relaxed text-slate-600">
+                    <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
                       {card.body}
                     </p>
                   </button>
                 ))}
               </div>
-              <p className="text-[11px] text-slate-600">{roleHelperText}</p>
+              <p className="text-[11px] text-muted-foreground">{roleHelperText}</p>
             </section>
 
             {/* Name fields */}
             <section className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-1.5">
-                  <label className="flex items-center gap-1 text-xs font-medium text-slate-800">
-                    <User className="h-3.5 w-3.5 text-slate-500" />
+                  <label className="flex items-center gap-1 text-xs font-medium text-foreground">
+                    <User className="h-3.5 w-3.5 text-muted-foreground" />
                     Full name <span className="text-rose-500">*</span>
                   </label>
                   <Input
@@ -357,15 +357,15 @@ export default function OnboardingPage() {
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Your legal name"
                     required
-                    className="h-11 rounded-2xl border-[#E2DDCC] bg-white text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#0C4D47] focus:ring-0"
+                    className="h-11 rounded-2xl border-border bg-card text-xs text-foreground placeholder:text-muted-foreground focus:border-foreground focus:ring-0"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="flex items-center gap-1 text-xs font-medium text-slate-800">
-                    <PenSquare className="h-3.5 w-3.5 text-slate-500" />
+                  <label className="flex items-center gap-1 text-xs font-medium text-foreground">
+                    <PenSquare className="h-3.5 w-3.5 text-muted-foreground" />
                     Display name <span className="text-rose-500">*</span>
                     {checkingName && (
-                      <span className="text-[10px] text-slate-500">Checking...</span>
+                      <span className="text-[10px] text-muted-foreground">Checking...</span>
                     )}
                     {!checkingName && nameAvailable === true && displayName.length >= 3 && (
                       <span className="flex items-center gap-0.5 text-[10px] text-emerald-600">
@@ -386,8 +386,8 @@ export default function OnboardingPage() {
                     minLength={3}
                     maxLength={30}
                     className={cn(
-                      "h-11 rounded-2xl border-[#E2DDCC] bg-white text-xs text-slate-900 placeholder:text-slate-400 focus:ring-0",
-                      nameAvailable === false ? "border-red-500/50 focus:border-red-500" : "focus:border-[#0C4D47]",
+                      "h-11 rounded-2xl border-border bg-card text-xs text-foreground placeholder:text-muted-foreground focus:ring-0",
+                      nameAvailable === false ? "border-red-500/50 focus:border-red-500" : "focus:border-foreground",
                       nameAvailable === true && displayName.length >= 3 ? "border-emerald-500/50" : ""
                     )}
                   />
@@ -398,20 +398,20 @@ export default function OnboardingPage() {
               {role === "agent" && (
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-1.5">
-                    <label className="flex items-center gap-1 text-xs font-medium text-slate-800">
-                      <Building2 className="h-3.5 w-3.5 text-slate-500" />
+                    <label className="flex items-center gap-1 text-xs font-medium text-foreground">
+                      <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
                       Agency/Company
                     </label>
                     <Input
                       value={agencyName}
                       onChange={(e) => setAgencyName(e.target.value)}
                       placeholder="Your travel agency (optional)"
-                      className="h-11 rounded-2xl border-[#E2DDCC] bg-white text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#0C4D47] focus:ring-0"
+                      className="h-11 rounded-2xl border-border bg-card text-xs text-foreground placeholder:text-muted-foreground focus:border-foreground focus:ring-0"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="flex items-center gap-1 text-xs font-medium text-slate-800">
-                      <Globe className="h-3.5 w-3.5 text-slate-500" />
+                    <label className="flex items-center gap-1 text-xs font-medium text-foreground">
+                      <Globe className="h-3.5 w-3.5 text-muted-foreground" />
                       Website
                     </label>
                     <Input
@@ -419,7 +419,7 @@ export default function OnboardingPage() {
                       onChange={(e) => setWebsite(e.target.value)}
                       placeholder="https://your-agency.com (optional)"
                       type="url"
-                      className="h-11 rounded-2xl border-[#E2DDCC] bg-white text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#0C4D47] focus:ring-0"
+                      className="h-11 rounded-2xl border-border bg-card text-xs text-foreground placeholder:text-muted-foreground focus:border-foreground focus:ring-0"
                     />
                   </div>
                 </div>
@@ -428,11 +428,11 @@ export default function OnboardingPage() {
               {role === "creator" && (
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-slate-800">
+                    <label className="text-xs font-medium text-foreground">
                       Primary Platform
                     </label>
                     <Select value={primaryPlatform} onValueChange={setPrimaryPlatform}>
-                      <SelectTrigger className="h-11 rounded-2xl border-[#E2DDCC] bg-white text-xs text-slate-900">
+                      <SelectTrigger className="h-11 rounded-2xl border-border bg-card text-xs text-foreground">
                         <SelectValue placeholder="Select your main platform" />
                       </SelectTrigger>
                       <SelectContent>
@@ -445,8 +445,8 @@ export default function OnboardingPage() {
                     </Select>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="flex items-center gap-1 text-xs font-medium text-slate-800">
-                      <Globe className="h-3.5 w-3.5 text-slate-500" />
+                    <label className="flex items-center gap-1 text-xs font-medium text-foreground">
+                      <Globe className="h-3.5 w-3.5 text-muted-foreground" />
                       Website
                     </label>
                     <Input
@@ -454,14 +454,14 @@ export default function OnboardingPage() {
                       onChange={(e) => setWebsite(e.target.value)}
                       placeholder="https://your-site.com (optional)"
                       type="url"
-                      className="h-11 rounded-2xl border-[#E2DDCC] bg-white text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#0C4D47] focus:ring-0"
+                      className="h-11 rounded-2xl border-border bg-card text-xs text-foreground placeholder:text-muted-foreground focus:border-foreground focus:ring-0"
                     />
                   </div>
                 </div>
               )}
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-800">
+                <label className="text-xs font-medium text-foreground">
                   Short bio
                 </label>
                 <Textarea
@@ -475,9 +475,9 @@ export default function OnboardingPage() {
                       ? "Share your specialties: regions, supplier partners, client profile, non-negotiables..."
                       : "How do you like to travel? Styles, favorite destinations, non-negotiables..."
                   }
-                  className="rounded-2xl border-[#E2DDCC] bg-white text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#0C4D47] focus:ring-0"
+                  className="rounded-2xl border-border bg-card text-xs text-foreground placeholder:text-muted-foreground focus:border-foreground focus:ring-0"
                 />
-                <p className="text-[10px] text-slate-500">
+                <p className="text-[10px] text-muted-foreground">
                   This helps other travelers, creators and agents understand your style
                   at a glance.
                 </p>
@@ -489,32 +489,32 @@ export default function OnboardingPage() {
               <Button
                 type="submit"
                 disabled={submitting || !role || !fullName.trim() || !displayName.trim()}
-                className="flex w-full items-center justify-center rounded-full bg-[#BFAD72] px-6 py-2.5 text-sm font-semibold text-[#111210] shadow-sm transition hover:bg-[#D0C183] disabled:cursor-not-allowed disabled:opacity-70"
+                className="flex w-full items-center justify-center rounded-full bg-foreground px-6 py-2.5 text-sm font-semibold text-background shadow-sm transition hover:bg-foreground/90 disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {submitting ? "Completing onboarding..." : "Complete onboarding"}
               </Button>
 
               <button
                 type="button"
-                className="mx-auto block text-[11px] text-slate-500 underline underline-offset-2 hover:text-slate-700"
+                className="mx-auto block text-[11px] text-muted-foreground underline underline-offset-2 hover:text-foreground"
                 onClick={handleSkip}
               >
                 Skip for now (you can complete this later)
               </button>
 
-              <p className="text-[10px] text-center text-slate-500">
+              <p className="text-[10px] text-center text-muted-foreground">
                 By continuing, you agree to keep conversations and bookings on Goldsainte
                 so we can protect travelers and partners on both sides. Learn more in our{" "}
                 <a
                   href="/terms"
-                  className="underline underline-offset-2 hover:text-slate-800"
+                  className="underline underline-offset-2 hover:text-foreground"
                 >
                   Terms &amp; Conditions
                 </a>{" "}
                 and{" "}
                 <a
                   href="/cancellation-refund-policy"
-                  className="underline underline-offset-2 hover:text-slate-800"
+                  className="underline underline-offset-2 hover:text-foreground"
                 >
                   Cancellation &amp; Refund Policy
                 </a>

@@ -73,15 +73,15 @@ export default function CreatorOnboardingPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225] flex items-center justify-center px-4">
-      <div className="w-full max-w-xl rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-6 space-y-4">
+    <main className="min-h-screen bg-background text-foreground flex items-center justify-center px-4">
+      <div className="w-full max-w-xl rounded-[32px] bg-card/90 border border-border p-6 md:p-8 space-y-6 shadow-[0_24px_60px_rgba(15,23,42,0.12)]">
         <header className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <div className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#0c4d47]">
-              <Sparkles className="h-3 w-3 text-[#E5DFC6]" />
+            <div className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-border/60 bg-background/60">
+              <Sparkles className="h-3 w-3" />
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
+              <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
                 Creator onboarding
               </p>
               <p className="text-[12px] font-semibold">
@@ -92,7 +92,7 @@ export default function CreatorOnboardingPage() {
               </p>
             </div>
           </div>
-          <p className="text-[10px] text-[#8D8D8D]">
+          <p className="text-[10px] text-muted-foreground">
             Step {step} of 4
           </p>
         </header>
@@ -103,7 +103,7 @@ export default function CreatorOnboardingPage() {
           </p>
         )}
 
-        <div className="border-t border-[#E5DFC6] pt-4">
+        <div className="border-t border-border pt-4">
           {step === 1 && (
             <Step1Basics
               displayName={displayName}
@@ -138,7 +138,7 @@ export default function CreatorOnboardingPage() {
             type="button"
             onClick={goPrev}
             disabled={step === 1}
-            className="inline-flex items-center gap-1 text-[10px] text-[#8D8D8D] disabled:opacity-40"
+            className="inline-flex items-center gap-1 text-[10px] text-muted-foreground disabled:opacity-40"
           >
             <ArrowLeft className="h-3 w-3" />
             Back
@@ -147,7 +147,7 @@ export default function CreatorOnboardingPage() {
             <button
               type="button"
               onClick={goNext}
-              className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-4 py-2 text-[11px] font-semibold hover:bg-[#073331]"
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-foreground text-background px-4 py-2 text-[11px] font-semibold hover:bg-foreground/90"
             >
               Continue
               <ArrowRight className="h-3 w-3" />
@@ -157,7 +157,7 @@ export default function CreatorOnboardingPage() {
               type="button"
               onClick={handleFinish}
               disabled={saving}
-              className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-4 py-2 text-[11px] font-semibold hover:bg-[#073331] disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-foreground text-background px-4 py-2 text-[11px] font-semibold hover:bg-foreground/90 disabled:opacity-50"
             >
               {saving ? "Finishing…" : "Go to Goldsainte Creator Lab"}
               <ArrowRight className="h-3 w-3" />
@@ -190,7 +190,7 @@ function Step1Basics({
 }: Step1Props) {
   return (
     <div className="space-y-3 text-[11px]">
-      <p className="text-[#4a4a4a]">
+      <p className="text-muted-foreground">
         Let's set the stage for your travel universe. We'll use this to
         personalize requests and show agents who they're partnering with.
       </p>
@@ -201,14 +201,14 @@ function Step1Basics({
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none"
+            className="w-full rounded-2xl border border-border bg-muted px-3 py-2 text-[11px] outline-none"
             placeholder="e.g. JetLag & Champagne"
           />
         </label>
         <label className="block space-y-1">
           <span className="font-semibold">TikTok handle</span>
-          <div className="flex items-center rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2">
-            <span className="text-[#8D8D8D] text-[11px] mr-1">@</span>
+          <div className="flex items-center rounded-2xl border border-border bg-muted px-3 py-2">
+            <span className="text-muted-foreground text-[11px] mr-1">@</span>
             <input
               type="text"
               value={tiktokHandle}
@@ -224,7 +224,7 @@ function Step1Basics({
             type="text"
             value={homeBase}
             onChange={(e) => setHomeBase(e.target.value)}
-            className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none"
+            className="w-full rounded-2xl border border-border bg-muted px-3 py-2 text-[11px] outline-none"
             placeholder="e.g. New York, London, Dubai"
           />
         </label>
@@ -260,7 +260,7 @@ function Step2Niche({
     );
   return (
     <div className="space-y-3 text-[11px]">
-      <p className="text-[#4a4a4a]">
+      <p className="text-muted-foreground">
         Tell us what kind of trips feel the most "you". This helps Goldsainte
         match you with the right travelers and agents.
       </p>
@@ -311,7 +311,7 @@ function Step2Niche({
             rows={3}
             value={pov}
             onChange={(e) => setPov(e.target.value)}
-            className="w-full rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-[11px] outline-none"
+            className="w-full rounded-2xl border border-border bg-muted px-3 py-2 text-[11px] outline-none"
             placeholder="Describe your travel POV in a few lines. What makes your recommendations unique?"
           />
         </label>
@@ -328,12 +328,12 @@ type Step3Props = {
 function Step3Earnings({ policyAccepted, setPolicyAccepted }: Step3Props) {
   return (
     <div className="space-y-3 text-[11px]">
-      <p className="text-[#4a4a4a]">
+      <p className="text-muted-foreground">
         When a traveler books a trip inspired by your storyboard, you earn a
         share of the booking value. Travel agents handle pricing and logistics;
         Goldsainte manages payments and payouts.
       </p>
-      <ul className="list-disc list-inside text-[#4a4a4a] space-y-1">
+      <ul className="list-disc list-inside text-muted-foreground space-y-1">
         <li>Secure payments and escrow for travelers.</li>
         <li>Automatic payouts for you and the travel agent.</li>
         <li>No invoices, no chasing DMs, no off-platform payment links.</li>
@@ -358,11 +358,11 @@ function Step3Earnings({ policyAccepted, setPolicyAccepted }: Step3Props) {
 function Step4Storyboard() {
   return (
     <div className="space-y-3 text-[11px]">
-      <p className="text-[#4a4a4a]">
+      <p className="text-muted-foreground">
         Your trips are ready to become storyboards — the bookable version of
         your content.
       </p>
-      <p className="text-[#4a4a4a]">
+      <p className="text-muted-foreground">
         Start with one great trip you've filmed recently. We'll help you
         outline the destination, key moments and starting budget so agents can
         plug in rates.
@@ -371,19 +371,19 @@ function Step4Storyboard() {
       <div className="flex flex-col gap-2 pt-2">
         <button
           type="button"
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-4 py-2 text-[11px] font-semibold hover:bg-[#073331]"
+          className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-foreground text-background px-4 py-2 text-[11px] font-semibold hover:bg-foreground/90"
         >
           Create a storyboard manually
         </button>
         <button
           type="button"
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#f7f3ea] text-[#0a2225] px-4 py-2 text-[11px] font-semibold border border-[#E5DFC6]"
+          className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-transparent text-foreground px-4 py-2 text-[11px] font-semibold hover:bg-muted"
         >
           (Coming soon) Paste a TikTok link
         </button>
       </div>
 
-      <p className="text-[10px] text-[#8D8D8D]">
+      <p className="text-[10px] text-muted-foreground">
         After onboarding, you'll land in Goldsainte Creator Lab where you can manage
         storyboards, see requests and track earnings.
       </p>
