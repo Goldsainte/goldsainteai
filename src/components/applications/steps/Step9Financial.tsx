@@ -2,6 +2,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Shield, CheckCircle2 } from "lucide-react";
 
 interface Step9Props {
   formData: any;
@@ -90,75 +91,56 @@ export const Step9Financial = ({ formData, setFormData }: Step9Props) => {
       </div>
 
       <div className="border-t pt-4">
-        <h3 className="mb-4 text-lg font-semibold">Banking Information</h3>
-        <p className="mb-4 text-sm text-muted-foreground">
-          For commission payments. Your information is encrypted and secure.
+        <h3 className="mb-2 text-lg font-semibold text-[#0a2225]">
+          Commission Payment Setup
+        </h3>
+        <p className="mb-4 text-sm text-[#8D8D8D]">
+          You'll connect your bank account securely through Stripe after approval
         </p>
         
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <Label htmlFor="bankName">Bank Name *</Label>
-            <Input
-              id="bankName"
-              value={formData.bankName || ""}
-              onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
-              required
-            />
+        <div className="rounded-lg bg-[#f7f3ea] p-6 space-y-4">
+          <div className="flex items-start gap-3">
+            <Shield className="h-6 w-6 text-[#0c4d47] flex-shrink-0" />
+            <div>
+              <h4 className="font-semibold text-[#0a2225] mb-2">
+                Secure Payment via Stripe Connect
+              </h4>
+              <p className="text-sm text-[#4a4a4a] mb-3">
+                After your application is approved, you'll securely connect your bank account
+                through Stripe. This ensures:
+              </p>
+              <ul className="space-y-1.5 text-sm text-[#4a4a4a]">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-[#0c4d47] flex-shrink-0" />
+                  Your banking details are never stored by Goldsainte
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-[#0c4d47] flex-shrink-0" />
+                  Bank-level security & PCI compliance
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-[#0c4d47] flex-shrink-0" />
+                  Fast, automatic commission deposits
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-[#0c4d47] flex-shrink-0" />
+                  Transparent payout tracking
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-[#0c4d47] flex-shrink-0" />
+                  Automatic tax form generation (1099-K)
+                </li>
+              </ul>
+            </div>
           </div>
+        </div>
 
-          <div>
-            <Label htmlFor="accountHolderName">Account Holder Name *</Label>
-            <Input
-              id="accountHolderName"
-              placeholder="Full name on account"
-              value={formData.accountHolderName || ""}
-              onChange={(e) => setFormData({ ...formData, accountHolderName: e.target.value })}
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="accountType">Account Type *</Label>
-            <Select
-              value={formData.accountType || ""}
-              onValueChange={(value) => setFormData({ ...formData, accountType: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="checking">Checking</SelectItem>
-                <SelectItem value="savings">Savings</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="routingNumber">Routing Number *</Label>
-            <Input
-              id="routingNumber"
-              placeholder="9 digits"
-              value={formData.routingNumber || ""}
-              onChange={(e) => setFormData({ ...formData, routingNumber: e.target.value })}
-              maxLength={9}
-              required
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <Label htmlFor="accountNumber">Account Number *</Label>
-            <Input
-              id="accountNumber"
-              type="password"
-              placeholder="Will be encrypted"
-              value={formData.accountNumber || ""}
-              onChange={(e) => setFormData({ ...formData, accountNumber: e.target.value })}
-              required
-            />
-            <p className="mt-1 text-xs text-muted-foreground">
-              Only the last 4 digits will be stored for verification
-            </p>
-          </div>
+        <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
+          <p className="text-xs text-blue-900">
+            <strong>Note:</strong> You don't need to provide banking information now.
+            Once approved, you'll receive an email with a secure link to connect your
+            bank account through Stripe in 2-3 minutes.
+          </p>
         </div>
       </div>
     </div>

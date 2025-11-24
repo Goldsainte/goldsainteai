@@ -1,5 +1,8 @@
 project_id = "iwdevxltjuedijrcdejs"
 
+[functions.create-agent-application-stripe-account]
+verify_jwt = true
+
 [functions.create-stripe-identity-session]
 verify_jwt = false
 
