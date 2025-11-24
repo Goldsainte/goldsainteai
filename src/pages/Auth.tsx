@@ -22,10 +22,12 @@ const passwordSchema = z.string()
   .regex(/[0-9]/, "Password must contain at least one number")
   .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character");
 
-type AuthStep = 'email' | 'signin' | 'signup' | 'forgot-password' | 'verify-email' | 'profile';
+type AuthStep = 'account-type' | 'email' | 'signin' | 'signup' | 'forgot-password' | 'verify-email' | 'profile';
+type AccountType = 'traveler' | 'creator' | 'agent' | 'brand' | null;
 
 const Auth = () => {
-  const [step, setStep] = useState<AuthStep>('email');
+  const [step, setStep] = useState<AuthStep>('account-type');
+  const [selectedAccountType, setSelectedAccountType] = useState<AccountType>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -217,7 +219,61 @@ const Auth = () => {
       setIsLoading(false);
       return;
     }
+
+    // ===================================================================
+    // CRITICAL: Redirect agents/brands to application (NO AUTH CREATION)
+    // ===================================================================
     
+    if (selectedAccountType === 'agent') {
+      toast({
+        title: "Complete Your Application",
+        description: "You'll be redirected to the agent application form.",
+      });
+      
+      navigate('/apply/agent', {
+        state: {
+          email,
+          firstName,
+          lastName,
+          phone,
+        }
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    if (selectedAccountType === 'brand') {
+      toast({
+        title: "Complete Your Application",
+        description: "You'll be redirected to the brand application form.",
+      });
+      
+      navigate('/brand/onboarding', {
+        state: {
+          email,
+          firstName,
+          lastName,
+          phone,
+        }
+      });
+      setIsLoading(false);
+      return;
+    }
+    
+    // ===================================================================
+    // ONLY create auth for travelers and creators
+    // ===================================================================
+    
+    if (selectedAccountType !== 'traveler' && selectedAccountType !== 'creator') {
+      toast({
+        title: "Invalid account type",
+        description: "Please select a valid account type.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+
     const passwordValidation = passwordSchema.safeParse(password);
     if (!passwordValidation.success) {
       const errorMessage = passwordValidation.error.errors[0].message;
@@ -241,7 +297,7 @@ const Auth = () => {
             first_name: firstName,
             last_name: lastName,
             phone: phone || null,
-            // account_type will be set during profile completion via AccountTypeStep
+            account_type: selectedAccountType,
           },
         },
       });
@@ -425,18 +481,85 @@ const Auth = () => {
           <img src={logomark} alt="Goldsainte Logo" className="h-12 w-12" />
         </div>
 
-        {/* Heading */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl sm:text-3xl font-semibold mb-2">
-            {isMobile ? 'Log in or sign up' : 'Welcome back'}
-          </h1>
-          <p className="text-xs sm:text-sm text-muted-foreground">
-            Sign in to plan fast, save big, and travel smarter — powered by AI, agents, and creators.
-          </p>
-        </div>
+        {/* Account Type Step - SHOWN FIRST */}
+        {step === 'account-type' && (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <h1 className="text-2xl sm:text-3xl font-semibold mb-2">
+                Welcome to Goldsainte
+              </h1>
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                Choose your account type to get started
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3">
+              <button
+                onClick={() => {
+                  setSelectedAccountType('traveler');
+                  setStep('email');
+                }}
+                className="p-4 rounded-lg border-2 border-border hover:border-primary hover:bg-accent/5 transition-all text-left"
+              >
+                <div className="font-semibold mb-1">Traveler</div>
+                <div className="text-xs text-muted-foreground">
+                  Book and plan luxury travel experiences
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  setSelectedAccountType('creator');
+                  setStep('email');
+                }}
+                className="p-4 rounded-lg border-2 border-border hover:border-primary hover:bg-accent/5 transition-all text-left"
+              >
+                <div className="font-semibold mb-1">Creator</div>
+                <div className="text-xs text-muted-foreground">
+                  Share travel content and inspire others
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  setSelectedAccountType('agent');
+                  setStep('email');
+                }}
+                className="p-4 rounded-lg border-2 border-border hover:border-primary hover:bg-accent/5 transition-all text-left"
+              >
+                <div className="font-semibold mb-1">Travel Agent</div>
+                <div className="text-xs text-muted-foreground">
+                  Professional agents • Application required
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  setSelectedAccountType('brand');
+                  setStep('email');
+                }}
+                className="p-4 rounded-lg border-2 border-border hover:border-primary hover:bg-accent/5 transition-all text-left"
+              >
+                <div className="font-semibold mb-1">Brand/Hotel</div>
+                <div className="text-xs text-muted-foreground">
+                  Hotels & lifestyle brands • Application required
+                </div>
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Email Step */}
         {step === 'email' && (
+          <>
+            <div className="text-center mb-8">
+              <h1 className="text-2xl sm:text-3xl font-semibold mb-2">
+                {isMobile ? 'Log in or sign up' : 'Welcome back'}
+              </h1>
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                Sign in to plan fast, save big, and travel smarter — powered by AI, agents, and creators.
+              </p>
+            </div>
           <div className="space-y-4">
             {/* Social Buttons */}
             <div className="space-y-3">
@@ -561,6 +684,7 @@ const Auth = () => {
               </button>
             </div>
           </div>
+          </>
         )}
 
         {/* Sign In Step */}
@@ -635,6 +759,21 @@ const Auth = () => {
         {/* Sign Up Step */}
         {step === 'signup' && (
           <form onSubmit={handleSignUp} className="space-y-4">
+            <div className="text-center mb-6">
+              <h1 className="text-2xl sm:text-3xl font-semibold mb-2">
+                {selectedAccountType === 'agent' && "Apply as Travel Agent"}
+                {selectedAccountType === 'brand' && "Apply as Brand"}
+                {selectedAccountType === 'traveler' && "Create Traveler Account"}
+                {selectedAccountType === 'creator' && "Create Creator Account"}
+              </h1>
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                {(selectedAccountType === 'agent' || selectedAccountType === 'brand') 
+                  ? "We'll redirect you to complete your application"
+                  : "Enter your details to get started"
+                }
+              </p>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="firstName">First Name</Label>
@@ -676,57 +815,62 @@ const Auth = () => {
                 className="h-12"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Create a password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={isLoading}
-                className="h-12"
-                minLength={8}
-              />
-              <div className="text-xs text-muted-foreground space-y-1">
-                <p>Password must contain:</p>
-                <ul className="list-disc list-inside pl-2 space-y-0.5">
-                  <li>At least 8 characters</li>
-                  <li>One uppercase letter</li>
+
+            {/* Only show password for traveler/creator */}
+            {(selectedAccountType === 'traveler' || selectedAccountType === 'creator') && (
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Create a password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={isLoading}
+                  className="h-12"
+                  minLength={8}
+                />
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <p>Password must contain:</p>
+                  <ul className="list-disc list-inside pl-2 space-y-0.5">
+                    <li>At least 8 characters</li>
+                    <li>One uppercase letter</li>
                   <li>One lowercase letter</li>
                   <li>One number</li>
                   <li>One special character</li>
                 </ul>
               </div>
             </div>
-            
-            <p className="mt-3 text-xs text-muted-foreground">
-              You'll choose your account type (traveler, creator, agent, or brand) in the next step after creating your account.
-            </p>
+            )}
 
-            <Button
-              type="submit" 
-              className="w-full h-12 bg-foreground text-background hover:bg-foreground/90" 
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating account...
-                </>
-              ) : (
-                'Create Account'
-              )}
-            </Button>
-            <div className="text-center">
-              <button
+            <div className="flex gap-2">
+              <Button
                 type="button"
-                onClick={() => setStep('email')}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                variant="outline"
+                onClick={() => setStep('account-type')}
+                className="flex-1"
+                disabled={isLoading}
               >
-                ← Back
-              </button>
+                Back
+              </Button>
+              
+              <Button
+                type="submit" 
+                className="flex-1 h-12" 
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (selectedAccountType === 'agent' || selectedAccountType === 'brand') ? (
+                  'Continue to Application'
+                ) : (
+                  'Create Account'
+                )}
+              </Button>
             </div>
           </form>
         )}
