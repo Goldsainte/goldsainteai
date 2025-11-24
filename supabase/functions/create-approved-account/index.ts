@@ -74,6 +74,33 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Create Stripe Connect account for agents
+    let stripeOnboardingUrl = null;
+    if (applicationType === 'agent') {
+      try {
+        const stripeResponse = await fetch(
+          `${SUPABASE_URL}/functions/v1/create-agent-application-stripe-account`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+            },
+            body: JSON.stringify({ applicationId }),
+          }
+        );
+        
+        if (stripeResponse.ok) {
+          const stripeData = await stripeResponse.json();
+          stripeOnboardingUrl = stripeData.onboardingUrl;
+        } else {
+          console.error('Failed to create Stripe Connect account');
+        }
+      } catch (stripeError) {
+        console.error('Error calling Stripe Connect function:', stripeError);
+      }
+    }
+
     // Update application
     await supabaseAdmin
       .from(tableName)
@@ -122,6 +149,7 @@ Deno.serve(async (req) => {
         success: true, 
         userId: authData.user.id,
         temporaryPassword,
+        stripeOnboardingUrl,
         message: "Account created successfully"
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }

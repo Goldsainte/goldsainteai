@@ -47,12 +47,63 @@ Deno.serve(async (req) => {
 
     if (newStatus === 'approved') {
       subject = "🎉 Your Goldsainte Application Has Been Approved!";
+      
+      // Get Stripe onboarding URL if available (for agents)
+      let stripeSection = '';
+      if (applicationType === 'agent' && application.stripe_connect_onboarding_url) {
+        stripeSection = `
+          <div style="margin: 24px 0; padding: 20px; background: #f7f3ea; border-left: 4px solid #0c4d47; border-radius: 8px;">
+            <h3 style="margin: 0 0 12px 0; color: #0a2225; font-size: 18px;">Step 2: Connect Your Bank Account</h3>
+            <p style="margin: 0 0 12px 0; color: #4a4a4a; font-size: 14px;">
+              Required to receive commission payments (takes 2-3 minutes):
+            </p>
+            <a href="${application.stripe_connect_onboarding_url}" 
+               style="display: inline-block; padding: 12px 24px; background: #635BFF; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;">
+              Complete Stripe Connect Setup →
+            </a>
+            <p style="margin: 16px 0 0 0; color: #8D8D8D; font-size: 12px;">
+              <strong>Why Stripe?</strong> We use Stripe Connect for secure, PCI-compliant commission payments. 
+              Your banking details are encrypted by Stripe and never stored by Goldsainte.
+            </p>
+          </div>
+        `;
+      }
+      
       htmlContent = `
-        <h2>Congratulations ${recipientName}!</h2>
-        <p>Your ${applicationType} application has been approved.</p>
-        <p>You can now access your dashboard and start using Goldsainte.</p>
-        <p><a href="${APP_URL}/login">Login to Your Dashboard →</a></p>
-        ${adminNotes ? `<p><em>Note from admin: ${adminNotes}</em></p>` : ''}
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #0a2225; font-size: 24px; margin-bottom: 16px;">Congratulations ${recipientName}! 🎉</h2>
+          <p style="color: #4a4a4a; font-size: 16px; line-height: 1.6;">
+            Your ${applicationType} application has been approved. Welcome to the Goldsainte network!
+          </p>
+          
+          <div style="margin: 24px 0; padding: 20px; background: #ffffff; border: 1px solid #E5DFC6; border-radius: 8px;">
+            <h3 style="margin: 0 0 12px 0; color: #0a2225; font-size: 18px;">Step 1: Access Your Dashboard</h3>
+            <p style="margin: 0 0 12px 0; color: #4a4a4a; font-size: 14px;">
+              Log in to your Goldsainte dashboard:
+            </p>
+            <a href="${APP_URL}/login" 
+               style="display: inline-block; padding: 12px 24px; background: #0c4d47; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;">
+              Login to Dashboard →
+            </a>
+            <p style="margin: 12px 0 0 0; color: #8D8D8D; font-size: 12px;">
+              You'll be prompted to set your permanent password on first login.
+            </p>
+          </div>
+          
+          ${stripeSection}
+          
+          ${adminNotes ? `
+            <div style="margin: 24px 0; padding: 16px; background: #f0f9ff; border-radius: 8px;">
+              <p style="margin: 0; color: #0369a1; font-size: 14px;">
+                <strong>Note from admin:</strong> ${adminNotes}
+              </p>
+            </div>
+          ` : ''}
+          
+          <p style="margin: 24px 0 0 0; color: #8D8D8D; font-size: 13px;">
+            Once you've completed both steps, you're ready to start receiving trip requests and earning commissions!
+          </p>
+        </div>
       `;
     } else if (newStatus === 'rejected') {
       subject = "Update on Your Goldsainte Application";

@@ -281,7 +281,43 @@ async function handlePayoutPaid(payout: any) {
 async function handleAccountUpdated(account: any) {
   console.log("Processing account.updated", account.id);
   
-  // Update Stripe Connect status
+  const metadata = account.metadata || {};
+  const applicationId = metadata.goldsainte_application_id;
+  const accountType = metadata.goldsainte_type;
+
+  // Handle agent application Stripe Connect updates
+  if (applicationId && accountType === 'agent') {
+    await supabaseClient
+      .from('agent_applications')
+      .update({
+        stripe_connect_onboarding_complete: account.details_submitted || false,
+        stripe_connect_charges_enabled: account.charges_enabled || false,
+        stripe_connect_payouts_enabled: account.payouts_enabled || false,
+        stripe_connect_last_updated: new Date().toISOString(),
+      })
+      .eq('stripe_connect_account_id', account.id);
+
+    // If onboarding complete, also update profiles table
+    if (account.details_submitted && account.payouts_enabled) {
+      const { data: application } = await supabaseClient
+        .from('agent_applications')
+        .select('created_user_id')
+        .eq('stripe_connect_account_id', account.id)
+        .single();
+
+      if (application?.created_user_id) {
+        await supabaseClient
+          .from('profiles')
+          .update({
+            stripe_connect_account_id: account.id,
+            stripe_connect_payouts_enabled: true,
+          })
+          .eq('id', application.created_user_id);
+      }
+    }
+  }
+  
+  // Handle existing Stripe Connect status updates (for authenticated users)
   await supabaseClient
     .from('profiles')
     .update({ 

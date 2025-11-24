@@ -59,11 +59,6 @@ type AgentApplicationData = {
   reference2Company: string;
   reference2Email: string;
   reference2Phone: string;
-  bankName: string;
-  accountHolderName: string;
-  accountType: "checking" | "savings" | "";
-  routingNumber: string;
-  accountNumber: string;
   primaryFocus: string[];
   averageTripValue: string;
   monthlyBookings: string;
@@ -212,11 +207,6 @@ export default function AgentApplicationForm() {
     reference2Company: "",
     reference2Email: "",
     reference2Phone: "",
-    bankName: "",
-    accountHolderName: "",
-    accountType: "",
-    routingNumber: "",
-    accountNumber: "",
     primaryFocus: [],
     averageTripValue: "",
     monthlyBookings: "",
@@ -441,17 +431,12 @@ export default function AgentApplicationForm() {
           previous_legal_issues: formData.previousLegalIssues || null,
           regulatory_violations: formData.regulatoryViolations || null,
 
-          // Insurance & Banking
+          // Insurance
           annual_revenue: formData.annualRevenue || null,
           has_eo_insurance: formData.errorsOmissionsInsurance,
           insurance_provider: formData.insuranceProvider || null,
           insurance_policy_number: formData.insurancePolicyNumber || null,
           insurance_coverage: formData.insuranceCoverage || null,
-          bank_name: formData.bankName || null,
-          account_holder_name: formData.accountHolderName || null,
-          account_type: formData.accountType || null,
-          routing_number: formData.routingNumber || null,
-          account_number_last4: formData.accountNumber ? formData.accountNumber.slice(-4) : null,
 
           // References
           reference1_name: formData.reference1Name || null,

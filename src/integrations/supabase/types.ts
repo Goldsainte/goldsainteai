@@ -323,9 +323,6 @@ export type Database = {
         Row: {
           accessibility_travel_experience: boolean | null
           account_created_at: string | null
-          account_holder_name: string | null
-          account_number_last4: string | null
-          account_type: string | null
           accounting_software: string | null
           admin_notes: string | null
           admin_status: string | null
@@ -348,7 +345,6 @@ export type Database = {
           background_check_completed: boolean | null
           background_check_consent: boolean | null
           background_check_date: string | null
-          bank_name: string | null
           blog_url: string | null
           booking_platform: string | null
           booking_volume_last_12_months: number | null
@@ -449,13 +445,19 @@ export type Database = {
           rejection_reason: string | null
           reviewed_at: string | null
           reviewed_by: string | null
-          routing_number: string | null
           seller_of_travel_license: string | null
           seller_of_travel_state: string | null
           seller_of_travel_states: string[] | null
           social_media_followers_total: number | null
           solo_travel_booking_experience: boolean | null
           specialties: string[] | null
+          stripe_connect_account_id: string | null
+          stripe_connect_charges_enabled: boolean | null
+          stripe_connect_created_at: string | null
+          stripe_connect_last_updated: string | null
+          stripe_connect_onboarding_complete: boolean | null
+          stripe_connect_onboarding_url: string | null
+          stripe_connect_payouts_enabled: boolean | null
           stripe_verification_session_id: string | null
           stripe_verification_status: string | null
           stripe_verified_at: string | null
@@ -488,9 +490,6 @@ export type Database = {
         Insert: {
           accessibility_travel_experience?: boolean | null
           account_created_at?: string | null
-          account_holder_name?: string | null
-          account_number_last4?: string | null
-          account_type?: string | null
           accounting_software?: string | null
           admin_notes?: string | null
           admin_status?: string | null
@@ -513,7 +512,6 @@ export type Database = {
           background_check_completed?: boolean | null
           background_check_consent?: boolean | null
           background_check_date?: string | null
-          bank_name?: string | null
           blog_url?: string | null
           booking_platform?: string | null
           booking_volume_last_12_months?: number | null
@@ -614,13 +612,19 @@ export type Database = {
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
-          routing_number?: string | null
           seller_of_travel_license?: string | null
           seller_of_travel_state?: string | null
           seller_of_travel_states?: string[] | null
           social_media_followers_total?: number | null
           solo_travel_booking_experience?: boolean | null
           specialties?: string[] | null
+          stripe_connect_account_id?: string | null
+          stripe_connect_charges_enabled?: boolean | null
+          stripe_connect_created_at?: string | null
+          stripe_connect_last_updated?: string | null
+          stripe_connect_onboarding_complete?: boolean | null
+          stripe_connect_onboarding_url?: string | null
+          stripe_connect_payouts_enabled?: boolean | null
           stripe_verification_session_id?: string | null
           stripe_verification_status?: string | null
           stripe_verified_at?: string | null
@@ -653,9 +657,6 @@ export type Database = {
         Update: {
           accessibility_travel_experience?: boolean | null
           account_created_at?: string | null
-          account_holder_name?: string | null
-          account_number_last4?: string | null
-          account_type?: string | null
           accounting_software?: string | null
           admin_notes?: string | null
           admin_status?: string | null
@@ -678,7 +679,6 @@ export type Database = {
           background_check_completed?: boolean | null
           background_check_consent?: boolean | null
           background_check_date?: string | null
-          bank_name?: string | null
           blog_url?: string | null
           booking_platform?: string | null
           booking_volume_last_12_months?: number | null
@@ -779,13 +779,19 @@ export type Database = {
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
-          routing_number?: string | null
           seller_of_travel_license?: string | null
           seller_of_travel_state?: string | null
           seller_of_travel_states?: string[] | null
           social_media_followers_total?: number | null
           solo_travel_booking_experience?: boolean | null
           specialties?: string[] | null
+          stripe_connect_account_id?: string | null
+          stripe_connect_charges_enabled?: boolean | null
+          stripe_connect_created_at?: string | null
+          stripe_connect_last_updated?: string | null
+          stripe_connect_onboarding_complete?: boolean | null
+          stripe_connect_onboarding_url?: string | null
+          stripe_connect_payouts_enabled?: boolean | null
           stripe_verification_session_id?: string | null
           stripe_verification_status?: string | null
           stripe_verified_at?: string | null
@@ -7772,6 +7778,8 @@ export type Database = {
           stripe_account_id: string | null
           stripe_account_status: string | null
           stripe_charges_enabled: boolean | null
+          stripe_connect_account_id: string | null
+          stripe_connect_payouts_enabled: boolean | null
           stripe_customer_id: string | null
           stripe_onboarding_completed: boolean | null
           stripe_payouts_enabled: boolean | null
@@ -7852,6 +7860,8 @@ export type Database = {
           stripe_account_id?: string | null
           stripe_account_status?: string | null
           stripe_charges_enabled?: boolean | null
+          stripe_connect_account_id?: string | null
+          stripe_connect_payouts_enabled?: boolean | null
           stripe_customer_id?: string | null
           stripe_onboarding_completed?: boolean | null
           stripe_payouts_enabled?: boolean | null
@@ -7932,6 +7942,8 @@ export type Database = {
           stripe_account_id?: string | null
           stripe_account_status?: string | null
           stripe_charges_enabled?: boolean | null
+          stripe_connect_account_id?: string | null
+          stripe_connect_payouts_enabled?: boolean | null
           stripe_customer_id?: string | null
           stripe_onboarding_completed?: boolean | null
           stripe_payouts_enabled?: boolean | null
