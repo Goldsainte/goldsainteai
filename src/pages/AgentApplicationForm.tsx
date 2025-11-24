@@ -17,6 +17,8 @@ import { Step5ClientSales } from "@/components/applications/steps/Step5ClientSal
 import { Step6OnlinePresence } from "@/components/applications/steps/Step6OnlinePresence";
 import { Step7Technology } from "@/components/applications/steps/Step7Technology";
 import { Step8EmergencyLegal } from "@/components/applications/steps/Step8EmergencyLegal";
+import { Step9Financial } from "@/components/applications/steps/Step9Financial";
+import { Step10Documents } from "@/components/applications/steps/Step10Documents";
 
 type AgentApplicationData = {
   // Existing fields
@@ -706,282 +708,6 @@ export default function AgentApplicationForm() {
     </div>
   );
 
-  const renderStep2 = () => (
-    <div className="space-y-6">
-      <div>
-        <h3 className="mb-4 text-lg font-semibold">Professional Credentials</h3>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <Label htmlFor="iataNumber">IATA Number</Label>
-            <Input
-              id="iataNumber"
-              value={formData.iataNumber}
-              onChange={(e) => setFormData({ ...formData, iataNumber: e.target.value })}
-            />
-          </div>
-          <div>
-            <Label htmlFor="arcNumber">ARC Number</Label>
-            <Input
-              id="arcNumber"
-              value={formData.arcNumber}
-              onChange={(e) => setFormData({ ...formData, arcNumber: e.target.value })}
-            />
-          </div>
-          <div>
-            <Label htmlFor="cliaNumber">CLIA Number</Label>
-            <Input
-              id="cliaNumber"
-              value={formData.cliaNumber}
-              onChange={(e) => setFormData({ ...formData, cliaNumber: e.target.value })}
-            />
-          </div>
-        </div>
-        
-        <div className="mt-4">
-          <Label>Specializations</Label>
-          <div className="mt-2 grid grid-cols-2 gap-2 md:grid-cols-3">
-            {specializationOptions.map((spec) => (
-              <div key={spec} className="flex items-center space-x-2">
-                <Checkbox
-                  id={spec}
-                  checked={formData.specializations.includes(spec)}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setFormData({ ...formData, specializations: [...formData.specializations, spec] });
-                    } else {
-                      setFormData({ ...formData, specializations: formData.specializations.filter((s) => s !== spec) });
-                    }
-                  }}
-                />
-                <label htmlFor={spec} className="text-sm">{spec}</label>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <h3 className="mb-4 text-lg font-semibold">Goldsainte Focus</h3>
-        <div className="space-y-4">
-          <div>
-            <Label>Primary Focus</Label>
-            <div className="mt-2 space-y-2">
-              {primaryFocusOptions.map((focus) => (
-                <div key={focus} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={focus}
-                    checked={formData.primaryFocus.includes(focus)}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setFormData({ ...formData, primaryFocus: [...formData.primaryFocus, focus] });
-                      } else {
-                        setFormData({ ...formData, primaryFocus: formData.primaryFocus.filter((f) => f !== focus) });
-                      }
-                    }}
-                  />
-                  <label htmlFor={focus} className="text-sm">{focus}</label>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <Label htmlFor="whyGoldsainte">Why do you want to join Goldsainte?</Label>
-            <Textarea
-              id="whyGoldsainte"
-              value={formData.whyGoldsainte}
-              onChange={(e) => setFormData({ ...formData, whyGoldsainte: e.target.value })}
-              rows={4}
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={() => setStep(8)}>
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back
-        </Button>
-        <Button onClick={() => setStep(10)}>
-          Next
-          <ArrowRight className="ml-2 h-4 w-4" />
-        </Button>
-      </div>
-    </div>
-  );
-
-  const renderStep3 = () => (
-    <div className="space-y-6">
-      <div>
-        <h3 className="mb-4 text-lg font-semibold">Document Uploads</h3>
-        <p className="mb-4 text-sm text-muted-foreground">
-          Please upload the required documents. All documents must be clear and legible.
-        </p>
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="businessLicenseFile">Business License *</Label>
-            <Input
-              id="businessLicenseFile"
-              type="file"
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  setFormData({ ...formData, businessLicenseFile: file });
-                }
-              }}
-            />
-          </div>
-          <div>
-            <Label htmlFor="insuranceCertificateFile">E&O Insurance Certificate</Label>
-            <Input
-              id="insuranceCertificateFile"
-              type="file"
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  setFormData({ ...formData, insuranceCertificateFile: file });
-                }
-              }}
-            />
-          </div>
-          <div>
-            <Label htmlFor="governmentIdFile">Government-Issued ID</Label>
-            <Input
-              id="governmentIdFile"
-              type="file"
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  setFormData({ ...formData, governmentIdFile: file });
-                }
-              }}
-            />
-          </div>
-          <div>
-            <Label htmlFor="professionalHeadshotFile">Professional Headshot</Label>
-            <Input
-              id="professionalHeadshotFile"
-              type="file"
-              accept=".jpg,.jpeg,.png"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  setFormData({ ...formData, professionalHeadshotFile: file });
-                }
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <h3 className="mb-4 text-lg font-semibold">Professional References</h3>
-        <div className="space-y-4">
-          <div className="rounded-lg border p-4">
-            <h4 className="mb-3 text-sm font-semibold">Reference 1</h4>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <Label htmlFor="reference1Name">Name</Label>
-                <Input
-                  id="reference1Name"
-                  value={formData.reference1Name}
-                  onChange={(e) => setFormData({ ...formData, reference1Name: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="reference1Company">Company</Label>
-                <Input
-                  id="reference1Company"
-                  value={formData.reference1Company}
-                  onChange={(e) => setFormData({ ...formData, reference1Company: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="reference1Email">Email</Label>
-                <Input
-                  id="reference1Email"
-                  type="email"
-                  value={formData.reference1Email}
-                  onChange={(e) => setFormData({ ...formData, reference1Email: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="reference1Phone">Phone</Label>
-                <Input
-                  id="reference1Phone"
-                  type="tel"
-                  value={formData.reference1Phone}
-                  onChange={(e) => setFormData({ ...formData, reference1Phone: e.target.value })}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-lg border p-4">
-            <h4 className="mb-3 text-sm font-semibold">Reference 2</h4>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <Label htmlFor="reference2Name">Name</Label>
-                <Input
-                  id="reference2Name"
-                  value={formData.reference2Name}
-                  onChange={(e) => setFormData({ ...formData, reference2Name: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="reference2Company">Company</Label>
-                <Input
-                  id="reference2Company"
-                  value={formData.reference2Company}
-                  onChange={(e) => setFormData({ ...formData, reference2Company: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="reference2Email">Email</Label>
-                <Input
-                  id="reference2Email"
-                  type="email"
-                  value={formData.reference2Email}
-                  onChange={(e) => setFormData({ ...formData, reference2Email: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="reference2Phone">Phone</Label>
-                <Input
-                  id="reference2Phone"
-                  type="tel"
-                  value={formData.reference2Phone}
-                  onChange={(e) => setFormData({ ...formData, reference2Phone: e.target.value })}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={() => setStep(9)}>
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back
-        </Button>
-        <Button onClick={saveDraftApplication} disabled={isLoading}>
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Saving...
-            </>
-          ) : (
-            <>
-              Continue to Verification
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </>
-          )}
-        </Button>
-      </div>
-    </div>
-  );
-
   const renderStep11 = () => (
     <div className="space-y-6">
       <div className="text-center">
@@ -1112,8 +838,36 @@ export default function AgentApplicationForm() {
                 </div>
               </>
             )}
-            {step === 9 && renderStep2()}
-            {step === 10 && renderStep3()}
+            {step === 9 && (
+              <>
+                <Step9Financial formData={formData} setFormData={setFormData} />
+                <div className="flex justify-between mt-6">
+                  <Button variant="outline" onClick={() => setStep(8)}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={() => setStep(10)}>Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                </div>
+              </>
+            )}
+            {step === 10 && (
+              <>
+                <Step10Documents formData={formData} setFormData={setFormData} />
+                <div className="flex justify-between mt-6">
+                  <Button variant="outline" onClick={() => setStep(9)}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={saveDraftApplication} disabled={isLoading}>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        Continue to Verification
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </>
+            )}
             {step === 11 && renderStep11()}
           </CardContent>
         </Card>
