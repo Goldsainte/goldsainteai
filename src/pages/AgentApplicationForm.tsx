@@ -67,6 +67,8 @@ type AgentApplicationData = {
 
 export default function AgentApplicationForm() {
   const [step, setStep] = useState(1);
+  const [stripeVerificationComplete, setStripeVerificationComplete] = useState(false);
+  const [draftApplicationId, setDraftApplicationId] = useState<string | null>(null);
   const [formData, setFormData] = useState<AgentApplicationData>({
     firstName: "",
     lastName: "",
@@ -174,7 +176,7 @@ export default function AgentApplicationForm() {
     }
   };
 
-  const handleSubmit = async () => {
+  const saveDraftApplication = async () => {
     setIsLoading(true);
 
     try {
@@ -261,7 +263,7 @@ export default function AgentApplicationForm() {
           insurance_certificate_document: insuranceCertPath,
           government_id_document: govIdPath,
           headshot_photo: headshotPath,
-          application_status: 'pending_review',
+          application_status: 'draft',
           submitted_at: new Date().toISOString(),
           stripe_verification_status: 'pending',
         })
@@ -270,29 +272,22 @@ export default function AgentApplicationForm() {
 
       if (applicationError) {
         console.error('Application error:', applicationError);
-        throw new Error(applicationError.message || 'Failed to submit application');
+        throw new Error(applicationError.message || 'Failed to save application');
       }
 
+      setDraftApplicationId(applicationData.id);
       setApplicationId(applicationData.id);
-
-      try {
-        await supabase.functions.invoke('notify-admin-new-application', {
-          body: {
-            applicationType: 'agent',
-            applicationId: applicationData.id,
-            applicantName: `${formData.firstName} ${formData.lastName}`,
-            applicantEmail: formData.email,
-          },
-        });
-      } catch (notifyErr) {
-        console.error('Could not send admin notification:', notifyErr);
-      }
-
-      setSubmitted(true);
+      
+      // Store email in localStorage for verification return flow
+      localStorage.setItem('agent_application_email', formData.email);
+      localStorage.setItem('agent_application_id', applicationData.id);
+      
+      // Move to step 11 (Identity Verification)
+      setStep(11);
       
       toast({
-        title: "Application submitted successfully!",
-        description: "We'll review your application and contact you within 3-5 business days.",
+        title: "Application saved",
+        description: "Now complete identity verification to submit your application.",
       });
     } catch (error: any) {
       console.error('Submission error:', error);
@@ -307,15 +302,16 @@ export default function AgentApplicationForm() {
   };
 
   const startStripeVerification = async () => {
-    if (!applicationId) {
+    if (!draftApplicationId) {
       toast({
         title: "Error",
-        description: "Please submit your application first",
+        description: "Please complete all previous steps first",
         variant: "destructive",
       });
       return;
     }
 
+    setIsLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('create-stripe-identity-session', {
         body: {
@@ -323,94 +319,28 @@ export default function AgentApplicationForm() {
           firstName: formData.firstName,
           lastName: formData.lastName,
           applicationType: 'agent',
-          applicationId: applicationId,
+          applicationId: draftApplicationId,
         },
       });
 
       if (error) throw error;
 
       if (data.url) {
+        // Redirect to Stripe Identity
         window.location.href = data.url;
       }
     } catch (error: any) {
       console.error('Stripe verification error:', error);
       toast({
         title: "Verification setup failed",
-        description: "You can complete identity verification later.",
+        description: error.message || "Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  if (submitted) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
-        <div className="w-full max-w-2xl">
-          <Card className="border-2">
-            <CardContent className="p-8 text-center">
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                <CheckCircle2 className="h-8 w-8 text-primary" />
-              </div>
-              
-              <h1 className="mb-2 font-serif text-2xl font-semibold">
-                Application Submitted Successfully!
-              </h1>
-              
-              <p className="mb-6 text-sm text-muted-foreground">
-                Thank you for applying to become a Goldsainte travel agent.
-              </p>
-              
-              <div className="mb-6 rounded-lg bg-muted p-4 text-left">
-                <p className="mb-2 text-xs font-semibold">What happens next:</p>
-                <ol className="space-y-2 text-xs text-muted-foreground">
-                  <li>1. Our team will review your application (3-5 business days)</li>
-                  <li>2. We may contact your professional references</li>
-                  <li>3. You'll receive an email with our decision</li>
-                  <li>4. If approved, you'll get login credentials to access your dashboard</li>
-                </ol>
-              </div>
-
-              {applicationId && (
-                <div className="mb-6 rounded-lg border border-primary/20 bg-primary/5 p-4">
-                  <p className="mb-2 text-xs font-semibold">
-                    <Shield className="inline h-4 w-4 mr-1" />
-                    Optional: Complete Identity Verification Now
-                  </p>
-                  <p className="mb-3 text-xs text-muted-foreground">
-                    Speed up your approval by verifying your identity with Stripe. This takes 2-3 minutes.
-                  </p>
-                  <Button
-                    onClick={startStripeVerification}
-                    variant="outline"
-                    className="w-full"
-                  >
-                    Verify Identity Now (Optional)
-                  </Button>
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <Button
-                  onClick={() => navigate("/")}
-                  className="w-full"
-                >
-                  Return to Home
-                </Button>
-                
-                <Button
-                  onClick={() => navigate("/application/status")}
-                  variant="outline"
-                  className="w-full"
-                >
-                  Check Application Status
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
 
   const renderStep1 = () => (
     <div className="space-y-6">
@@ -662,17 +592,233 @@ export default function AgentApplicationForm() {
         <Button variant="outline" onClick={() => setStep(1)}>
           <ArrowLeft className="mr-2 h-4 w-4" /> Back
         </Button>
-        <Button onClick={handleSubmit} disabled={isLoading}>
+        <Button onClick={() => setStep(3)}>
+          Next
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+
+  const renderStep3 = () => (
+    <div className="space-y-6">
+      <div>
+        <h3 className="mb-4 text-lg font-semibold">Document Uploads</h3>
+        <p className="mb-4 text-sm text-muted-foreground">
+          Please upload the required documents. All documents must be clear and legible.
+        </p>
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="businessLicenseFile">Business License *</Label>
+            <Input
+              id="businessLicenseFile"
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  setFormData({ ...formData, businessLicenseFile: file });
+                }
+              }}
+            />
+          </div>
+          <div>
+            <Label htmlFor="insuranceCertificateFile">E&O Insurance Certificate</Label>
+            <Input
+              id="insuranceCertificateFile"
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  setFormData({ ...formData, insuranceCertificateFile: file });
+                }
+              }}
+            />
+          </div>
+          <div>
+            <Label htmlFor="governmentIdFile">Government-Issued ID</Label>
+            <Input
+              id="governmentIdFile"
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  setFormData({ ...formData, governmentIdFile: file });
+                }
+              }}
+            />
+          </div>
+          <div>
+            <Label htmlFor="professionalHeadshotFile">Professional Headshot</Label>
+            <Input
+              id="professionalHeadshotFile"
+              type="file"
+              accept=".jpg,.jpeg,.png"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  setFormData({ ...formData, professionalHeadshotFile: file });
+                }
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="mb-4 text-lg font-semibold">Professional References</h3>
+        <div className="space-y-4">
+          <div className="rounded-lg border p-4">
+            <h4 className="mb-3 text-sm font-semibold">Reference 1</h4>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <Label htmlFor="reference1Name">Name</Label>
+                <Input
+                  id="reference1Name"
+                  value={formData.reference1Name}
+                  onChange={(e) => setFormData({ ...formData, reference1Name: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="reference1Company">Company</Label>
+                <Input
+                  id="reference1Company"
+                  value={formData.reference1Company}
+                  onChange={(e) => setFormData({ ...formData, reference1Company: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="reference1Email">Email</Label>
+                <Input
+                  id="reference1Email"
+                  type="email"
+                  value={formData.reference1Email}
+                  onChange={(e) => setFormData({ ...formData, reference1Email: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="reference1Phone">Phone</Label>
+                <Input
+                  id="reference1Phone"
+                  type="tel"
+                  value={formData.reference1Phone}
+                  onChange={(e) => setFormData({ ...formData, reference1Phone: e.target.value })}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-lg border p-4">
+            <h4 className="mb-3 text-sm font-semibold">Reference 2</h4>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <Label htmlFor="reference2Name">Name</Label>
+                <Input
+                  id="reference2Name"
+                  value={formData.reference2Name}
+                  onChange={(e) => setFormData({ ...formData, reference2Name: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="reference2Company">Company</Label>
+                <Input
+                  id="reference2Company"
+                  value={formData.reference2Company}
+                  onChange={(e) => setFormData({ ...formData, reference2Company: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="reference2Email">Email</Label>
+                <Input
+                  id="reference2Email"
+                  type="email"
+                  value={formData.reference2Email}
+                  onChange={(e) => setFormData({ ...formData, reference2Email: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="reference2Phone">Phone</Label>
+                <Input
+                  id="reference2Phone"
+                  type="tel"
+                  value={formData.reference2Phone}
+                  onChange={(e) => setFormData({ ...formData, reference2Phone: e.target.value })}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-between">
+        <Button variant="outline" onClick={() => setStep(2)}>
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back
+        </Button>
+        <Button onClick={saveDraftApplication} disabled={isLoading}>
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Submitting...
+              Saving...
             </>
           ) : (
-            "Submit Application"
+            <>
+              Continue to Verification
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </>
           )}
         </Button>
       </div>
+    </div>
+  );
+
+  const renderStep11 = () => (
+    <div className="space-y-6">
+      <div className="text-center">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+          <Shield className="h-8 w-8 text-primary" />
+        </div>
+        <h3 className="mb-2 text-lg font-semibold">Identity Verification Required</h3>
+        <p className="text-sm text-muted-foreground mb-6">
+          All travel agents must complete identity verification through Stripe Identity.
+          This is required under Goldsainte's trust & safety policy and typically takes 2-3 minutes.
+        </p>
+      </div>
+
+      <div className="rounded-lg border bg-muted/50 p-4">
+        <h4 className="mb-2 text-sm font-semibold">What you'll need:</h4>
+        <ul className="space-y-1 text-xs text-muted-foreground">
+          <li>• Government-issued photo ID (passport, driver's license, or ID card)</li>
+          <li>• Device with camera for selfie verification</li>
+          <li>• 2-3 minutes to complete the process</li>
+        </ul>
+      </div>
+
+      <Button
+        type="button"
+        onClick={startStripeVerification}
+        disabled={isLoading}
+        className="w-full"
+        size="lg"
+      >
+        {isLoading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Setting up verification...
+          </>
+        ) : (
+          <>
+            <Shield className="mr-2 h-4 w-4" />
+            Start Identity Verification
+          </>
+        )}
+      </Button>
+
+      <p className="text-center text-xs text-muted-foreground">
+        Your information is secure and encrypted. Goldsainte uses Stripe Identity
+        for verification and does not store your government ID.
+      </p>
     </div>
   );
 
@@ -686,12 +832,18 @@ export default function AgentApplicationForm() {
           <p className="text-sm text-muted-foreground">
             Join Goldsainte's exclusive network of luxury travel professionals
           </p>
-          <div className="mx-auto mt-4 flex max-w-xs justify-between">
+          <div className="mx-auto mt-4 flex max-w-2xl justify-between text-center">
             <div className={`text-xs ${step >= 1 ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>
-              Step 1: Personal & Business
+              Step 1<br/>Personal & Business
             </div>
             <div className={`text-xs ${step >= 2 ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>
-              Step 2: Credentials
+              Step 2<br/>Credentials
+            </div>
+            <div className={`text-xs ${step >= 3 ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>
+              Step 3<br/>Documents
+            </div>
+            <div className={`text-xs ${step >= 11 ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>
+              Step 4<br/>Verification
             </div>
           </div>
         </div>
@@ -700,6 +852,8 @@ export default function AgentApplicationForm() {
           <CardContent className="p-8">
             {step === 1 && renderStep1()}
             {step === 2 && renderStep2()}
+            {step === 3 && renderStep3()}
+            {step === 11 && renderStep11()}
           </CardContent>
         </Card>
       </div>

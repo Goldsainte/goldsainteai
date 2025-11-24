@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import logomark from "@/assets/logomark-gold.png";
 
 export default function ApplicationVerificationComplete() {
@@ -13,13 +14,77 @@ export default function ApplicationVerificationComplete() {
   const applicationType = searchParams.get('type') as 'agent' | 'brand' || 'agent';
 
   useEffect(() => {
-    // Simulate checking verification status
-    const timer = setTimeout(() => {
-      setStatus('success');
-    }, 1000);
+    const checkVerificationAndUpdateApplication = async () => {
+      try {
+        // Get application ID from localStorage
+        const applicationId = localStorage.getItem('agent_application_id');
+        const email = localStorage.getItem('agent_application_email');
+        
+        if (!applicationId) {
+          setStatus('error');
+          return;
+        }
 
-    return () => clearTimeout(timer);
-  }, []);
+        // Wait a bit for webhook to process
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // Check verification status in database
+        const tableName = applicationType === 'agent' ? 'agent_applications' : 'brand_applications';
+        const { data: application, error } = await supabase
+          .from(tableName)
+          .select('stripe_verification_status, admin_status')
+          .eq('id', applicationId)
+          .single();
+
+        if (error || !application) {
+          console.error('Error checking verification:', error);
+          setStatus('error');
+          return;
+        }
+
+        if (application.stripe_verification_status === 'verified') {
+          // Update application status to pending_review
+          const { error: updateError } = await supabase
+            .from(tableName)
+            .update({ admin_status: 'pending_review' })
+            .eq('id', applicationId);
+
+          if (updateError) {
+            console.error('Error updating application:', updateError);
+          }
+
+          // Notify admin
+          try {
+            await supabase.functions.invoke('notify-admin-new-application', {
+              body: {
+                applicationType,
+                applicationId,
+                applicantEmail: email,
+              },
+            });
+          } catch (notifyErr) {
+            console.error('Could not send admin notification:', notifyErr);
+          }
+
+          // Clear localStorage
+          localStorage.removeItem('agent_application_id');
+          localStorage.removeItem('agent_application_email');
+
+          setStatus('success');
+        } else if (application.stripe_verification_status === 'requires_input') {
+          setStatus('error');
+        } else {
+          // Still pending, show success anyway
+          setStatus('success');
+        }
+      } catch (err) {
+        console.error('Verification check error:', err);
+        setStatus('error');
+      }
+    };
+
+    checkVerificationAndUpdateApplication();
+  }, [applicationType]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/20 p-4">
