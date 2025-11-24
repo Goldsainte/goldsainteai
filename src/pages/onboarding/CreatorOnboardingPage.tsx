@@ -73,8 +73,8 @@ export default function CreatorOnboardingPage() {
   };
 
   return (
-    <main className="min-h-screen bg-background text-foreground flex items-center justify-center px-4">
-      <div className="w-full max-w-xl rounded-[32px] bg-card/90 border border-border p-6 md:p-8 space-y-6 shadow-[0_24px_60px_rgba(15,23,42,0.12)]">
+    <main className="min-h-screen !bg-white !text-black flex items-center justify-center px-4">
+      <div className="w-full max-w-xl rounded-[32px] !bg-white border !border-gray-300 p-6 md:p-8 space-y-6 shadow-[0_24px_60px_rgba(15,23,42,0.12)]">
         <header className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <div className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-border/60 bg-background/60">

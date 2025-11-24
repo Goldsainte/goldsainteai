@@ -165,7 +165,7 @@ export default function AgentOnboarding() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen !bg-white !text-black flex flex-col">
       <main className="flex-1 container mx-auto px-4 sm:px-6 py-6 md:py-8 max-w-4xl">
         <Button
           variant="ghost"
@@ -177,7 +177,7 @@ export default function AgentOnboarding() {
           Back
         </Button>
         
-        <Card className="border border-border bg-card/90 rounded-[32px] shadow-[0_24px_60px_rgba(15,23,42,0.12)]">
+        <Card className="border !border-gray-300 !bg-white rounded-[32px] shadow-[0_24px_60px_rgba(15,23,42,0.12)]">
           <CardHeader className="px-4 sm:px-6">
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
               <Briefcase className="h-7 w-7 sm:h-8 sm:w-8 text-primary shrink-0" />

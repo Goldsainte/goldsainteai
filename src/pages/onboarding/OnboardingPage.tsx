@@ -274,9 +274,9 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen !bg-white !text-black">
       <main className="flex justify-center px-4 py-10 md:py-16">
-        <div className="w-full max-w-3xl rounded-[32px] border border-border bg-card/90 backdrop-blur-sm px-6 py-8 shadow-[0_24px_60px_rgba(15,23,42,0.12)] md:px-10 md:py-10">
+        <div className="w-full max-w-3xl rounded-[32px] border !border-gray-300 !bg-white backdrop-blur-sm px-6 py-8 shadow-[0_24px_60px_rgba(15,23,42,0.12)] md:px-10 md:py-10">
           {/* Badge */}
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/60 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             <Sparkles className="h-3.5 w-3.5" />
