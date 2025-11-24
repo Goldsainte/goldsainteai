@@ -14,17 +14,16 @@ type ApplicationType = "agent" | "brand";
 
 interface AgentApplication {
   id: string;
-  agent_id: string;
+  email: string | null;
+  first_name: string | null;
+  last_name: string | null;
   agency_name: string | null;
   years_experience: number | null;
-  specialties: string[] | null;
+  specializations: string[] | null;
   stripe_verification_status: string | null;
   stripe_verified_at: string | null;
   admin_status: string | null;
   created_at: string | null;
-  profiles?: {
-    full_name: string | null;
-  };
 }
 
 interface BrandApplication {
@@ -55,10 +54,10 @@ export default function ApplicationReviewDashboard() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("agent_applications")
-        .select("*, profiles!agent_applications_agent_id_fkey(full_name)")
+        .select("id, email, first_name, last_name, agency_name, years_experience, specializations, stripe_verification_status, stripe_verified_at, admin_status, created_at")
         .eq("stripe_verification_status", "verified")
         .eq("admin_status", "pending_review")
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false }) as any;
 
       if (error) throw error;
       return data as AgentApplication[];
@@ -196,8 +195,11 @@ export default function ApplicationReviewDashboard() {
         <div className="flex items-start justify-between">
           <div>
             <CardTitle className="text-lg">
-              {app.profiles?.full_name || "Unknown"}
+              {app.first_name} {app.last_name}
             </CardTitle>
+            <CardDescription className="mt-1">
+              {app.email}
+            </CardDescription>
             <CardDescription className="mt-1">
               {app.agency_name || "No agency"} • {app.years_experience || 0} years experience
             </CardDescription>
@@ -210,7 +212,7 @@ export default function ApplicationReviewDashboard() {
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div className="col-span-2">
-            <span className="font-medium">Agent ID:</span> {app.agent_id}
+            <span className="font-medium">Application ID:</span> {app.id}
           </div>
           <div>
             <span className="font-medium">Applied:</span>{" "}
@@ -221,8 +223,8 @@ export default function ApplicationReviewDashboard() {
             {app.stripe_verified_at ? new Date(app.stripe_verified_at).toLocaleDateString() : "N/A"}
           </div>
           <div className="col-span-2">
-            <span className="font-medium">Specialties:</span>{" "}
-            {app.specialties?.join(", ") || "None specified"}
+            <span className="font-medium">Specializations:</span>{" "}
+            {app.specializations?.join(", ") || "None specified"}
           </div>
         </div>
 

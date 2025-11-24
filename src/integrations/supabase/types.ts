@@ -325,16 +325,20 @@ export type Database = {
           admin_notes: string | null
           admin_status: string | null
           agency_name: string | null
-          agent_id: string
+          agent_id: string | null
           created_at: string | null
           created_user_id: string | null
+          email: string | null
+          first_name: string | null
           id: string
           instagram_handle: string | null
           kyc_provider: string | null
           kyc_session_id: string | null
+          last_name: string | null
           license_authority: string | null
           license_number: string | null
           notes: string | null
+          phone: string | null
           rejection_reason: string | null
           reviewed_at: string | null
           reviewed_by: string | null
@@ -353,16 +357,20 @@ export type Database = {
           admin_notes?: string | null
           admin_status?: string | null
           agency_name?: string | null
-          agent_id: string
+          agent_id?: string | null
           created_at?: string | null
           created_user_id?: string | null
+          email?: string | null
+          first_name?: string | null
           id?: string
           instagram_handle?: string | null
           kyc_provider?: string | null
           kyc_session_id?: string | null
+          last_name?: string | null
           license_authority?: string | null
           license_number?: string | null
           notes?: string | null
+          phone?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -381,16 +389,20 @@ export type Database = {
           admin_notes?: string | null
           admin_status?: string | null
           agency_name?: string | null
-          agent_id?: string
+          agent_id?: string | null
           created_at?: string | null
           created_user_id?: string | null
+          email?: string | null
+          first_name?: string | null
           id?: string
           instagram_handle?: string | null
           kyc_provider?: string | null
           kyc_session_id?: string | null
+          last_name?: string | null
           license_authority?: string | null
           license_number?: string | null
           notes?: string | null
+          phone?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -1936,6 +1948,7 @@ export type Database = {
           created_brand_profile_id: string | null
           created_user_id: string | null
           id: string
+          phone: string | null
           primary_contact_email: string
           primary_contact_name: string
           primary_contact_phone: string | null
@@ -1964,6 +1977,7 @@ export type Database = {
           created_brand_profile_id?: string | null
           created_user_id?: string | null
           id?: string
+          phone?: string | null
           primary_contact_email: string
           primary_contact_name: string
           primary_contact_phone?: string | null
@@ -1992,6 +2006,7 @@ export type Database = {
           created_brand_profile_id?: string | null
           created_user_id?: string | null
           id?: string
+          phone?: string | null
           primary_contact_email?: string
           primary_contact_name?: string
           primary_contact_phone?: string | null

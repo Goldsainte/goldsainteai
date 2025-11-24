@@ -39,16 +39,16 @@ Deno.serve(async (req) => {
       event.type === "identity.verification_session.requires_input" ||
       event.type === "identity.verification_session.canceled"
     ) {
-      const session = event.data.object as Stripe.Identity.VerificationSession;
-      const sessionId = session.id;
-      const userId = session.metadata?.user_id;
-      const applicationType = session.metadata?.application_type as 'agent' | 'brand';
-      const applicationId = session.metadata?.application_id;
+    const session = event.data.object as Stripe.Identity.VerificationSession;
+    const sessionId = session.id;
+    const email = session.metadata?.email;
+    const applicationType = session.metadata?.application_type as 'agent' | 'brand';
+    const applicationId = session.metadata?.application_id;
 
-      if (!sessionId || !userId || !applicationType) {
-        console.error("Missing required metadata in Stripe Identity session");
-        return new Response("OK", { status: 200 });
-      }
+    if (!sessionId || !email || !applicationType) {
+      console.error("Missing required metadata in Stripe Identity session");
+      return new Response("OK", { status: 200 });
+    }
 
       // Determine new status based on event type
       let newStatus: string;
@@ -56,15 +56,15 @@ Deno.serve(async (req) => {
 
       if (event.type === "identity.verification_session.verified") {
         newStatus = "verified";
-        console.log(`✅ Verification successful for ${applicationType}:`, userId);
+        console.log(`✅ Verification successful for ${applicationType}:`, email);
       } else if (event.type === "identity.verification_session.requires_input") {
         newStatus = "failed";
         rejectionReason = session.last_error?.reason || session.last_error?.code || "Document could not be verified";
-        console.log(`⚠️ Verification requires input for ${applicationType}:`, userId, rejectionReason);
+        console.log(`⚠️ Verification requires input for ${applicationType}:`, email, rejectionReason);
       } else {
         newStatus = "failed";
         rejectionReason = "Verification was canceled";
-        console.log(`❌ Verification canceled for ${applicationType}:`, userId);
+        console.log(`❌ Verification canceled for ${applicationType}:`, email);
       }
 
       // Update application table if applicationId provided
@@ -85,24 +85,14 @@ Deno.serve(async (req) => {
         }
       }
 
-      // Update profile verification status
-      const { error: profileError } = await supabaseAdmin
-        .from("profiles")
-        .update({
-          [`${applicationType}_verification_status`]: newStatus,
-        })
-        .eq("id", userId);
-
-      if (profileError) {
-        console.error("Error updating profile verification status:", profileError);
-      }
+      // Don't update profile - it doesn't exist yet for anonymous applicants
 
       // If verified, send notification to admins
       if (newStatus === "verified") {
         try {
           await supabaseAdmin.functions.invoke('notify-admin-verification-complete', {
             body: {
-              userId,
+              email,
               applicationType,
               applicationId,
               sessionId,
