@@ -94,6 +94,7 @@ const BillingDashboard = lazy(() => import('@/pages/BillingDashboard'));
 const TikTokLabStoryboardsPage = lazy(() => import('@/pages/TikTokLab/StoryboardsPage'));
 const TravelSettings = lazy(() => import('@/pages/TravelSettings'));
 const ApplicationStatusCheck = lazy(() => import('@/pages/ApplicationStatusCheck'));
+const AgentApplicationForm = lazy(() => import('@/pages/AgentApplicationForm'));
 const TravelSettings2 = lazy(() => import('@/pages/TravelSettings2'));
 const CreatorSettingsPage = lazy(() => import('@/pages/CreatorSettingsPage'));
 const MusicVolumeSettings = lazy(() => import('@/pages/MusicVolumeSettings'));
@@ -304,7 +305,8 @@ export const AppRoutes = () => (
           </RequireAuth>
         )}
       />
-      <Route path="/application/status" element={<ApplicationStatusCheck />} />
+          <Route path="/application/status" element={<ApplicationStatusCheck />} />
+          <Route path="/apply/agent" element={<AgentApplicationForm />} />
       <Route
         path="/trips"
         element={(

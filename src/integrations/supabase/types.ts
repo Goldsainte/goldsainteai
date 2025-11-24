@@ -322,98 +322,233 @@ export type Database = {
       agent_applications: {
         Row: {
           account_created_at: string | null
+          account_holder_name: string | null
+          account_number_last4: string | null
+          account_type: string | null
           admin_notes: string | null
           admin_status: string | null
           agency_name: string | null
           agent_id: string | null
+          annual_revenue: string | null
+          application_status: string | null
+          arc_number: string | null
+          average_trip_value: string | null
+          bank_name: string | null
+          business_address: string | null
+          business_city: string | null
+          business_country: string | null
+          business_license_document: string | null
+          business_license_number: string | null
+          business_state: string | null
+          business_type: string | null
+          business_zip: string | null
+          clia_number: string | null
           created_at: string | null
           created_user_id: string | null
+          date_of_birth: string | null
           email: string | null
           first_name: string | null
+          government_id_document: string | null
+          has_eo_insurance: boolean | null
+          headshot_photo: string | null
+          iata_number: string | null
           id: string
           instagram_handle: string | null
+          insurance_certificate_document: string | null
+          insurance_coverage: string | null
+          insurance_policy_number: string | null
+          insurance_provider: string | null
           kyc_provider: string | null
           kyc_session_id: string | null
           last_name: string | null
           license_authority: string | null
           license_number: string | null
+          monthly_bookings: string | null
           notes: string | null
+          other_certifications: string | null
           phone: string | null
+          preferred_destinations: string | null
+          primary_focus: string[] | null
+          reference1_company: string | null
+          reference1_email: string | null
+          reference1_name: string | null
+          reference1_phone: string | null
+          reference2_company: string | null
+          reference2_email: string | null
+          reference2_name: string | null
+          reference2_phone: string | null
           rejection_reason: string | null
           reviewed_at: string | null
           reviewed_by: string | null
+          routing_number: string | null
+          seller_of_travel_license: string | null
+          seller_of_travel_state: string | null
           specialties: string[] | null
           stripe_verification_session_id: string | null
           stripe_verification_status: string | null
           stripe_verified_at: string | null
+          submitted_at: string | null
+          tax_id_ein: string | null
           tiktok_handle: string | null
           user_account_created: boolean | null
           verification_status: string | null
           website: string | null
+          why_goldsainte: string | null
+          year_established: number | null
           years_experience: number | null
         }
         Insert: {
           account_created_at?: string | null
+          account_holder_name?: string | null
+          account_number_last4?: string | null
+          account_type?: string | null
           admin_notes?: string | null
           admin_status?: string | null
           agency_name?: string | null
           agent_id?: string | null
+          annual_revenue?: string | null
+          application_status?: string | null
+          arc_number?: string | null
+          average_trip_value?: string | null
+          bank_name?: string | null
+          business_address?: string | null
+          business_city?: string | null
+          business_country?: string | null
+          business_license_document?: string | null
+          business_license_number?: string | null
+          business_state?: string | null
+          business_type?: string | null
+          business_zip?: string | null
+          clia_number?: string | null
           created_at?: string | null
           created_user_id?: string | null
+          date_of_birth?: string | null
           email?: string | null
           first_name?: string | null
+          government_id_document?: string | null
+          has_eo_insurance?: boolean | null
+          headshot_photo?: string | null
+          iata_number?: string | null
           id?: string
           instagram_handle?: string | null
+          insurance_certificate_document?: string | null
+          insurance_coverage?: string | null
+          insurance_policy_number?: string | null
+          insurance_provider?: string | null
           kyc_provider?: string | null
           kyc_session_id?: string | null
           last_name?: string | null
           license_authority?: string | null
           license_number?: string | null
+          monthly_bookings?: string | null
           notes?: string | null
+          other_certifications?: string | null
           phone?: string | null
+          preferred_destinations?: string | null
+          primary_focus?: string[] | null
+          reference1_company?: string | null
+          reference1_email?: string | null
+          reference1_name?: string | null
+          reference1_phone?: string | null
+          reference2_company?: string | null
+          reference2_email?: string | null
+          reference2_name?: string | null
+          reference2_phone?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          routing_number?: string | null
+          seller_of_travel_license?: string | null
+          seller_of_travel_state?: string | null
           specialties?: string[] | null
           stripe_verification_session_id?: string | null
           stripe_verification_status?: string | null
           stripe_verified_at?: string | null
+          submitted_at?: string | null
+          tax_id_ein?: string | null
           tiktok_handle?: string | null
           user_account_created?: boolean | null
           verification_status?: string | null
           website?: string | null
+          why_goldsainte?: string | null
+          year_established?: number | null
           years_experience?: number | null
         }
         Update: {
           account_created_at?: string | null
+          account_holder_name?: string | null
+          account_number_last4?: string | null
+          account_type?: string | null
           admin_notes?: string | null
           admin_status?: string | null
           agency_name?: string | null
           agent_id?: string | null
+          annual_revenue?: string | null
+          application_status?: string | null
+          arc_number?: string | null
+          average_trip_value?: string | null
+          bank_name?: string | null
+          business_address?: string | null
+          business_city?: string | null
+          business_country?: string | null
+          business_license_document?: string | null
+          business_license_number?: string | null
+          business_state?: string | null
+          business_type?: string | null
+          business_zip?: string | null
+          clia_number?: string | null
           created_at?: string | null
           created_user_id?: string | null
+          date_of_birth?: string | null
           email?: string | null
           first_name?: string | null
+          government_id_document?: string | null
+          has_eo_insurance?: boolean | null
+          headshot_photo?: string | null
+          iata_number?: string | null
           id?: string
           instagram_handle?: string | null
+          insurance_certificate_document?: string | null
+          insurance_coverage?: string | null
+          insurance_policy_number?: string | null
+          insurance_provider?: string | null
           kyc_provider?: string | null
           kyc_session_id?: string | null
           last_name?: string | null
           license_authority?: string | null
           license_number?: string | null
+          monthly_bookings?: string | null
           notes?: string | null
+          other_certifications?: string | null
           phone?: string | null
+          preferred_destinations?: string | null
+          primary_focus?: string[] | null
+          reference1_company?: string | null
+          reference1_email?: string | null
+          reference1_name?: string | null
+          reference1_phone?: string | null
+          reference2_company?: string | null
+          reference2_email?: string | null
+          reference2_name?: string | null
+          reference2_phone?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          routing_number?: string | null
+          seller_of_travel_license?: string | null
+          seller_of_travel_state?: string | null
           specialties?: string[] | null
           stripe_verification_session_id?: string | null
           stripe_verification_status?: string | null
           stripe_verified_at?: string | null
+          submitted_at?: string | null
+          tax_id_ein?: string | null
           tiktok_handle?: string | null
           user_account_created?: boolean | null
           verification_status?: string | null
           website?: string | null
+          why_goldsainte?: string | null
+          year_established?: number | null
           years_experience?: number | null
         }
         Relationships: [
