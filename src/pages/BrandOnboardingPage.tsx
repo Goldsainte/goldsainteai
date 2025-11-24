@@ -193,14 +193,14 @@ export default function BrandOnboardingPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <p className="text-xs text-muted-foreground">Preparing your studio…</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 py-10 px-4">
+    <div className="min-h-screen bg-background py-10 px-4">
       <div className="mx-auto flex max-w-5xl flex-col gap-8 md:flex-row md:items-start">
         {/* Left: hero copy */}
         <div className="md:w-2/5 space-y-4">
@@ -233,9 +233,9 @@ export default function BrandOnboardingPage() {
 
         {/* Right: brand form */}
         <div className="md:w-3/5">
-          <Card className="border-[#E5DFC6] bg-white/80 backdrop-blur-sm">
+          <Card className="border border-border bg-card/90 backdrop-blur-sm rounded-[32px] shadow-[0_24px_60px_rgba(15,23,42,0.12)]">
             <CardHeader>
-              <CardTitle className="text-sm font-semibold text-[#0a2225]">
+              <CardTitle className="text-sm font-semibold text-card-foreground">
                 Brand profile basics
               </CardTitle>
             </CardHeader>
@@ -269,8 +269,8 @@ export default function BrandOnboardingPage() {
                       type="button"
                       className={`rounded-2xl border px-3 py-2 text-left transition-all ${
                         brandType === type
-                          ? "border-[#0a2225] bg-[#0a2225] text-[#E5DFC6]"
-                          : "border-[#E5DFC6] bg-white text-[#0a2225]"
+                          ? "border-foreground bg-foreground text-background"
+                          : "border-border bg-card text-card-foreground"
                       }`}
                       onClick={() => setBrandType(type)}
                     >
@@ -326,8 +326,8 @@ export default function BrandOnboardingPage() {
                       type="button"
                       className={`rounded-full border px-3 py-1 text-[11px] ${
                         styleTags.includes(tag)
-                          ? "border-[#0a2225] bg-[#0a2225] text-[#E5DFC6]"
-                          : "border-[#E5DFC6] bg-white text-[#0a2225]"
+                          ? "border-foreground bg-foreground text-background"
+                          : "border-border bg-card text-card-foreground"
                       }`}
                       onClick={() => toggleTag(tag)}
                     >
@@ -341,7 +341,7 @@ export default function BrandOnboardingPage() {
                       <Badge
                         key={tag}
                         variant="outline"
-                        className="border-[#E5DFC6] bg-[#FDFBF5] text-[10px]"
+                        className="border-border bg-muted/50 text-[10px]"
                       >
                         {tag}
                       </Badge>
