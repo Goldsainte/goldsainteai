@@ -321,38 +321,89 @@ export type Database = {
       }
       agent_applications: {
         Row: {
+          accessibility_travel_experience: boolean | null
           account_created_at: string | null
           account_holder_name: string | null
           account_number_last4: string | null
           account_type: string | null
+          accounting_software: string | null
           admin_notes: string | null
           admin_status: string | null
+          advertising_channels: string[] | null
+          after_hours_availability: string | null
           agency_name: string | null
           agent_id: string | null
+          ai_tools_experience: string[] | null
+          all_inclusive_experience: string | null
           annual_revenue: string | null
+          annual_sales_volume: string | null
           application_status: string | null
           arc_number: string | null
+          asta_membership_number: string | null
+          asta_verified_travel_advisor: boolean | null
+          average_client_age_range: string | null
+          average_commission_percentage: number | null
+          average_review_rating: number | null
           average_trip_value: string | null
+          background_check_completed: boolean | null
+          background_check_consent: boolean | null
+          background_check_date: string | null
           bank_name: string | null
+          blog_url: string | null
+          booking_platform: string | null
+          booking_volume_last_12_months: number | null
           business_address: string | null
           business_city: string | null
           business_country: string | null
+          business_ein_verified: boolean | null
           business_license_document: string | null
           business_license_number: string | null
           business_state: string | null
           business_type: string | null
           business_zip: string | null
+          california_registration_number: string | null
+          ccpa_compliant: boolean | null
+          clia_certification_level: string | null
           clia_number: string | null
+          client_data_protection_measures: string | null
+          client_demographics: string[] | null
+          comfortable_with_technology: number | null
+          consortium_memberships: string[] | null
+          content_creation_experience: boolean | null
+          continents_visited: string[] | null
+          contracts_with_clients: boolean | null
+          countries_visited_count: number | null
           created_at: string | null
           created_user_id: string | null
+          criminal_history_disclosure: string | null
+          crisis_response_examples: string | null
+          crm_software: string | null
+          cruise_experience_level: string | null
           date_of_birth: string | null
+          dba_names: string | null
+          destination_expert_certifications: string[] | null
           email: string | null
+          email_list_size: number | null
+          email_marketing_platform: string | null
+          emergency_contact_phone: string | null
+          facebook_page_url: string | null
+          fam_trips_taken_last_year: number | null
           first_name: string | null
+          florida_registration_number: string | null
+          gdpr_compliant: boolean | null
+          gds_access: string[] | null
+          google_business_profile: string | null
           government_id_document: string | null
           has_eo_insurance: boolean | null
+          has_own_booking_engine: boolean | null
+          hawaii_registration_number: string | null
           headshot_photo: string | null
+          host_agency_affiliation: string | null
+          host_agency_name: string | null
           iata_number: string | null
+          iatan_id_number: string | null
           id: string
+          influencer_partnerships: boolean | null
           instagram_handle: string | null
           insurance_certificate_document: string | null
           insurance_coverage: string | null
@@ -360,15 +411,32 @@ export type Database = {
           insurance_provider: string | null
           kyc_provider: string | null
           kyc_session_id: string | null
+          language_proficiency_levels: Json | null
+          languages_spoken: string[] | null
           last_name: string | null
+          lead_sources: string[] | null
+          legal_counsel_on_retainer: boolean | null
           license_authority: string | null
           license_number: string | null
+          linkedin_profile_url: string | null
+          marketing_budget_annual: string | null
           monthly_bookings: string | null
+          monthly_content_output: string | null
+          multigenerational_travel_experience: boolean | null
           notes: string | null
+          number_of_active_clients: number | null
+          online_reviews_count: number | null
+          operating_states: string[] | null
           other_certifications: string | null
+          percentage_referral_business: number | null
+          percentage_repeat_clients: number | null
           phone: string | null
+          preferred_booking_platforms: string[] | null
           preferred_destinations: string | null
+          preferred_suppliers: string[] | null
+          previous_legal_issues: string | null
           primary_focus: string[] | null
+          privacy_policy_url: string | null
           reference1_company: string | null
           reference1_email: string | null
           reference1_name: string | null
@@ -377,59 +445,130 @@ export type Database = {
           reference2_email: string | null
           reference2_name: string | null
           reference2_phone: string | null
+          regulatory_violations: string | null
           rejection_reason: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           routing_number: string | null
           seller_of_travel_license: string | null
           seller_of_travel_state: string | null
+          seller_of_travel_states: string[] | null
+          social_media_followers_total: number | null
+          solo_travel_booking_experience: boolean | null
           specialties: string[] | null
           stripe_verification_session_id: string | null
           stripe_verification_status: string | null
           stripe_verified_at: string | null
           submitted_at: string | null
+          support_24_7: boolean | null
+          surety_bond_amount: number | null
+          surety_bond_expiration: string | null
+          surety_bond_provider: string | null
           tax_id_ein: string | null
+          terms_and_conditions_url: string | null
           tiktok_handle: string | null
+          tour_operator_experience: string | null
+          travel_crisis_management_training: boolean | null
+          travel_institute_cta: boolean | null
+          travel_institute_ctc: boolean | null
+          travel_insurance_licensed: boolean | null
           user_account_created: boolean | null
           verification_status: string | null
+          video_conferencing_tools: string[] | null
+          video_content_creation: boolean | null
+          washington_registration_number: string | null
           website: string | null
+          website_platform: string | null
           why_goldsainte: string | null
           year_established: number | null
           years_experience: number | null
+          years_with_host_agency: number | null
+          youtube_channel_url: string | null
         }
         Insert: {
+          accessibility_travel_experience?: boolean | null
           account_created_at?: string | null
           account_holder_name?: string | null
           account_number_last4?: string | null
           account_type?: string | null
+          accounting_software?: string | null
           admin_notes?: string | null
           admin_status?: string | null
+          advertising_channels?: string[] | null
+          after_hours_availability?: string | null
           agency_name?: string | null
           agent_id?: string | null
+          ai_tools_experience?: string[] | null
+          all_inclusive_experience?: string | null
           annual_revenue?: string | null
+          annual_sales_volume?: string | null
           application_status?: string | null
           arc_number?: string | null
+          asta_membership_number?: string | null
+          asta_verified_travel_advisor?: boolean | null
+          average_client_age_range?: string | null
+          average_commission_percentage?: number | null
+          average_review_rating?: number | null
           average_trip_value?: string | null
+          background_check_completed?: boolean | null
+          background_check_consent?: boolean | null
+          background_check_date?: string | null
           bank_name?: string | null
+          blog_url?: string | null
+          booking_platform?: string | null
+          booking_volume_last_12_months?: number | null
           business_address?: string | null
           business_city?: string | null
           business_country?: string | null
+          business_ein_verified?: boolean | null
           business_license_document?: string | null
           business_license_number?: string | null
           business_state?: string | null
           business_type?: string | null
           business_zip?: string | null
+          california_registration_number?: string | null
+          ccpa_compliant?: boolean | null
+          clia_certification_level?: string | null
           clia_number?: string | null
+          client_data_protection_measures?: string | null
+          client_demographics?: string[] | null
+          comfortable_with_technology?: number | null
+          consortium_memberships?: string[] | null
+          content_creation_experience?: boolean | null
+          continents_visited?: string[] | null
+          contracts_with_clients?: boolean | null
+          countries_visited_count?: number | null
           created_at?: string | null
           created_user_id?: string | null
+          criminal_history_disclosure?: string | null
+          crisis_response_examples?: string | null
+          crm_software?: string | null
+          cruise_experience_level?: string | null
           date_of_birth?: string | null
+          dba_names?: string | null
+          destination_expert_certifications?: string[] | null
           email?: string | null
+          email_list_size?: number | null
+          email_marketing_platform?: string | null
+          emergency_contact_phone?: string | null
+          facebook_page_url?: string | null
+          fam_trips_taken_last_year?: number | null
           first_name?: string | null
+          florida_registration_number?: string | null
+          gdpr_compliant?: boolean | null
+          gds_access?: string[] | null
+          google_business_profile?: string | null
           government_id_document?: string | null
           has_eo_insurance?: boolean | null
+          has_own_booking_engine?: boolean | null
+          hawaii_registration_number?: string | null
           headshot_photo?: string | null
+          host_agency_affiliation?: string | null
+          host_agency_name?: string | null
           iata_number?: string | null
+          iatan_id_number?: string | null
           id?: string
+          influencer_partnerships?: boolean | null
           instagram_handle?: string | null
           insurance_certificate_document?: string | null
           insurance_coverage?: string | null
@@ -437,15 +576,32 @@ export type Database = {
           insurance_provider?: string | null
           kyc_provider?: string | null
           kyc_session_id?: string | null
+          language_proficiency_levels?: Json | null
+          languages_spoken?: string[] | null
           last_name?: string | null
+          lead_sources?: string[] | null
+          legal_counsel_on_retainer?: boolean | null
           license_authority?: string | null
           license_number?: string | null
+          linkedin_profile_url?: string | null
+          marketing_budget_annual?: string | null
           monthly_bookings?: string | null
+          monthly_content_output?: string | null
+          multigenerational_travel_experience?: boolean | null
           notes?: string | null
+          number_of_active_clients?: number | null
+          online_reviews_count?: number | null
+          operating_states?: string[] | null
           other_certifications?: string | null
+          percentage_referral_business?: number | null
+          percentage_repeat_clients?: number | null
           phone?: string | null
+          preferred_booking_platforms?: string[] | null
           preferred_destinations?: string | null
+          preferred_suppliers?: string[] | null
+          previous_legal_issues?: string | null
           primary_focus?: string[] | null
+          privacy_policy_url?: string | null
           reference1_company?: string | null
           reference1_email?: string | null
           reference1_name?: string | null
@@ -454,59 +610,130 @@ export type Database = {
           reference2_email?: string | null
           reference2_name?: string | null
           reference2_phone?: string | null
+          regulatory_violations?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           routing_number?: string | null
           seller_of_travel_license?: string | null
           seller_of_travel_state?: string | null
+          seller_of_travel_states?: string[] | null
+          social_media_followers_total?: number | null
+          solo_travel_booking_experience?: boolean | null
           specialties?: string[] | null
           stripe_verification_session_id?: string | null
           stripe_verification_status?: string | null
           stripe_verified_at?: string | null
           submitted_at?: string | null
+          support_24_7?: boolean | null
+          surety_bond_amount?: number | null
+          surety_bond_expiration?: string | null
+          surety_bond_provider?: string | null
           tax_id_ein?: string | null
+          terms_and_conditions_url?: string | null
           tiktok_handle?: string | null
+          tour_operator_experience?: string | null
+          travel_crisis_management_training?: boolean | null
+          travel_institute_cta?: boolean | null
+          travel_institute_ctc?: boolean | null
+          travel_insurance_licensed?: boolean | null
           user_account_created?: boolean | null
           verification_status?: string | null
+          video_conferencing_tools?: string[] | null
+          video_content_creation?: boolean | null
+          washington_registration_number?: string | null
           website?: string | null
+          website_platform?: string | null
           why_goldsainte?: string | null
           year_established?: number | null
           years_experience?: number | null
+          years_with_host_agency?: number | null
+          youtube_channel_url?: string | null
         }
         Update: {
+          accessibility_travel_experience?: boolean | null
           account_created_at?: string | null
           account_holder_name?: string | null
           account_number_last4?: string | null
           account_type?: string | null
+          accounting_software?: string | null
           admin_notes?: string | null
           admin_status?: string | null
+          advertising_channels?: string[] | null
+          after_hours_availability?: string | null
           agency_name?: string | null
           agent_id?: string | null
+          ai_tools_experience?: string[] | null
+          all_inclusive_experience?: string | null
           annual_revenue?: string | null
+          annual_sales_volume?: string | null
           application_status?: string | null
           arc_number?: string | null
+          asta_membership_number?: string | null
+          asta_verified_travel_advisor?: boolean | null
+          average_client_age_range?: string | null
+          average_commission_percentage?: number | null
+          average_review_rating?: number | null
           average_trip_value?: string | null
+          background_check_completed?: boolean | null
+          background_check_consent?: boolean | null
+          background_check_date?: string | null
           bank_name?: string | null
+          blog_url?: string | null
+          booking_platform?: string | null
+          booking_volume_last_12_months?: number | null
           business_address?: string | null
           business_city?: string | null
           business_country?: string | null
+          business_ein_verified?: boolean | null
           business_license_document?: string | null
           business_license_number?: string | null
           business_state?: string | null
           business_type?: string | null
           business_zip?: string | null
+          california_registration_number?: string | null
+          ccpa_compliant?: boolean | null
+          clia_certification_level?: string | null
           clia_number?: string | null
+          client_data_protection_measures?: string | null
+          client_demographics?: string[] | null
+          comfortable_with_technology?: number | null
+          consortium_memberships?: string[] | null
+          content_creation_experience?: boolean | null
+          continents_visited?: string[] | null
+          contracts_with_clients?: boolean | null
+          countries_visited_count?: number | null
           created_at?: string | null
           created_user_id?: string | null
+          criminal_history_disclosure?: string | null
+          crisis_response_examples?: string | null
+          crm_software?: string | null
+          cruise_experience_level?: string | null
           date_of_birth?: string | null
+          dba_names?: string | null
+          destination_expert_certifications?: string[] | null
           email?: string | null
+          email_list_size?: number | null
+          email_marketing_platform?: string | null
+          emergency_contact_phone?: string | null
+          facebook_page_url?: string | null
+          fam_trips_taken_last_year?: number | null
           first_name?: string | null
+          florida_registration_number?: string | null
+          gdpr_compliant?: boolean | null
+          gds_access?: string[] | null
+          google_business_profile?: string | null
           government_id_document?: string | null
           has_eo_insurance?: boolean | null
+          has_own_booking_engine?: boolean | null
+          hawaii_registration_number?: string | null
           headshot_photo?: string | null
+          host_agency_affiliation?: string | null
+          host_agency_name?: string | null
           iata_number?: string | null
+          iatan_id_number?: string | null
           id?: string
+          influencer_partnerships?: boolean | null
           instagram_handle?: string | null
           insurance_certificate_document?: string | null
           insurance_coverage?: string | null
@@ -514,15 +741,32 @@ export type Database = {
           insurance_provider?: string | null
           kyc_provider?: string | null
           kyc_session_id?: string | null
+          language_proficiency_levels?: Json | null
+          languages_spoken?: string[] | null
           last_name?: string | null
+          lead_sources?: string[] | null
+          legal_counsel_on_retainer?: boolean | null
           license_authority?: string | null
           license_number?: string | null
+          linkedin_profile_url?: string | null
+          marketing_budget_annual?: string | null
           monthly_bookings?: string | null
+          monthly_content_output?: string | null
+          multigenerational_travel_experience?: boolean | null
           notes?: string | null
+          number_of_active_clients?: number | null
+          online_reviews_count?: number | null
+          operating_states?: string[] | null
           other_certifications?: string | null
+          percentage_referral_business?: number | null
+          percentage_repeat_clients?: number | null
           phone?: string | null
+          preferred_booking_platforms?: string[] | null
           preferred_destinations?: string | null
+          preferred_suppliers?: string[] | null
+          previous_legal_issues?: string | null
           primary_focus?: string[] | null
+          privacy_policy_url?: string | null
           reference1_company?: string | null
           reference1_email?: string | null
           reference1_name?: string | null
@@ -531,25 +775,45 @@ export type Database = {
           reference2_email?: string | null
           reference2_name?: string | null
           reference2_phone?: string | null
+          regulatory_violations?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           routing_number?: string | null
           seller_of_travel_license?: string | null
           seller_of_travel_state?: string | null
+          seller_of_travel_states?: string[] | null
+          social_media_followers_total?: number | null
+          solo_travel_booking_experience?: boolean | null
           specialties?: string[] | null
           stripe_verification_session_id?: string | null
           stripe_verification_status?: string | null
           stripe_verified_at?: string | null
           submitted_at?: string | null
+          support_24_7?: boolean | null
+          surety_bond_amount?: number | null
+          surety_bond_expiration?: string | null
+          surety_bond_provider?: string | null
           tax_id_ein?: string | null
+          terms_and_conditions_url?: string | null
           tiktok_handle?: string | null
+          tour_operator_experience?: string | null
+          travel_crisis_management_training?: boolean | null
+          travel_institute_cta?: boolean | null
+          travel_institute_ctc?: boolean | null
+          travel_insurance_licensed?: boolean | null
           user_account_created?: boolean | null
           verification_status?: string | null
+          video_conferencing_tools?: string[] | null
+          video_content_creation?: boolean | null
+          washington_registration_number?: string | null
           website?: string | null
+          website_platform?: string | null
           why_goldsainte?: string | null
           year_established?: number | null
           years_experience?: number | null
+          years_with_host_agency?: number | null
+          youtube_channel_url?: string | null
         }
         Relationships: [
           {

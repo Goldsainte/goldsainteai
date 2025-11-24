@@ -10,8 +10,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, CheckCircle2, Shield, ArrowRight, ArrowLeft } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Step2BusinessCompliance } from "@/components/applications/steps/Step2BusinessCompliance";
+import { Step3ProfessionalCredentials } from "@/components/applications/steps/Step3ProfessionalCredentials";
+import { Step4ExperienceExpertise } from "@/components/applications/steps/Step4ExperienceExpertise";
+import { Step5ClientSales } from "@/components/applications/steps/Step5ClientSales";
+import { Step6OnlinePresence } from "@/components/applications/steps/Step6OnlinePresence";
+import { Step7Technology } from "@/components/applications/steps/Step7Technology";
+import { Step8EmergencyLegal } from "@/components/applications/steps/Step8EmergencyLegal";
 
 type AgentApplicationData = {
+  // Existing fields
   firstName: string;
   lastName: string;
   email: string;
@@ -63,6 +71,101 @@ type AgentApplicationData = {
   insuranceCertificateFile: File | null;
   governmentIdFile: File | null;
   professionalHeadshotFile: File | null;
+
+  // Section 2: Business Compliance (NEW)
+  dbaNames?: string;
+  operatingStates?: string[];
+  sellerOfTravelStates?: string[];
+  floridaRegistrationNumber?: string;
+  californiaRegistrationNumber?: string;
+  hawaiiRegistrationNumber?: string;
+  washingtonRegistrationNumber?: string;
+  suretyBondAmount?: string;
+  suretyBondProvider?: string;
+  suretyBondExpiration?: string;
+  backgroundCheckConsent?: boolean;
+  criminalHistoryDisclosure?: string;
+
+  // Section 3: Professional Credentials (NEW)
+  iatanIdNumber?: string;
+  astaVerifiedTravelAdvisor?: boolean;
+  astaMembershipNumber?: string;
+  travelInstituteCta?: boolean;
+  travelInstituteCtc?: boolean;
+  cliaCertificationLevel?: string;
+  hostAgencyName?: string;
+  hostAgencyAffiliation?: string;
+  yearsWithHostAgency?: string;
+
+  // Section 4: Experience & Expertise (NEW)
+  countriesVisitedCount?: string;
+  famTripsTakenLastYear?: string;
+  continentsVisited?: string[];
+  destinationExpertCertifications?: string[];
+  cruiseExperienceLevel?: string;
+  allInclusiveExperience?: string;
+  accessibilityTravelExperience?: boolean;
+  multigenerationalTravelExperience?: boolean;
+  soloTravelBookingExperience?: boolean;
+  languagesSpoken?: string[];
+
+  // Section 5: Client Sales (NEW)
+  annualSalesVolume?: string;
+  numberOfActiveClients?: string;
+  percentageRepeatClients?: string;
+  percentageReferralBusiness?: string;
+  bookingVolumeLast12Months?: string;
+  averageCommissionPercentage?: string;
+  clientDemographics?: string[];
+  averageClientAgeRange?: string;
+  gdsAccess?: string[];
+  preferredBookingPlatforms?: string[];
+  preferredSuppliers?: string[];
+  consortiumMemberships?: string[];
+
+  // Section 6: Online Presence (NEW)
+  instagramHandle?: string;
+  tiktokHandle?: string;
+  facebookPageUrl?: string;
+  linkedinProfileUrl?: string;
+  youtubeChannelUrl?: string;
+  blogUrl?: string;
+  googleBusinessProfile?: string;
+  socialMediaFollowersTotal?: string;
+  onlineReviewsCount?: string;
+  averageReviewRating?: string;
+  contentCreationExperience?: boolean;
+  videoContentCreation?: boolean;
+  influencerPartnerships?: boolean;
+  emailMarketingPlatform?: string;
+  emailListSize?: string;
+
+  // Section 7: Technology (NEW)
+  crmSoftware?: string;
+  bookingPlatform?: string;
+  accountingSoftware?: string;
+  websitePlatform?: string;
+  hasOwnBookingEngine?: boolean;
+  comfortableWithTechnology?: number;
+  videoConferencingTools?: string[];
+  aiToolsExperience?: string[];
+
+  // Section 8: Emergency & Legal (NEW)
+  support24_7?: boolean;
+  travelCrisisManagementTraining?: boolean;
+  travelInsuranceLicensed?: boolean;
+  emergencyContactPhone?: string;
+  afterHoursAvailability?: string;
+  crisisResponseExamples?: string;
+  privacyPolicyUrl?: string;
+  termsAndConditionsUrl?: string;
+  gdprCompliant?: boolean;
+  ccpaCompliant?: boolean;
+  clientDataProtectionMeasures?: string;
+  contractsWithClients?: boolean;
+  legalCounselOnRetainer?: boolean;
+  previousLegalIssues?: string;
+  regulatoryViolations?: string;
 };
 
 export default function AgentApplicationForm() {
@@ -212,6 +315,7 @@ export default function AgentApplicationForm() {
       const { data: applicationData, error: applicationError } = await supabase
         .from('agent_applications')
         .insert({
+          // Personal & Business Info
           first_name: formData.firstName,
           last_name: formData.lastName,
           email: formData.email,
@@ -226,21 +330,128 @@ export default function AgentApplicationForm() {
           business_country: formData.businessCountry,
           year_established: formData.yearEstablished ? parseInt(formData.yearEstablished) : null,
           website: formData.website || null,
+          business_license_number: formData.businessLicenseNumber,
+          tax_id_ein: formData.taxIdEIN || null,
+          years_experience: formData.yearsExperience ? parseInt(formData.yearsExperience) : 0,
+          specialties: formData.specializations,
+          primary_focus: formData.primaryFocus,
+          average_trip_value: formData.averageTripValue || null,
+          monthly_bookings: formData.monthlyBookings || null,
+          preferred_destinations: formData.preferredDestinations || null,
+          why_goldsainte: formData.whyGoldsainte || null,
+
+          // Business Compliance
+          dba_names: formData.dbaNames || null,
+          operating_states: formData.operatingStates || [],
+          seller_of_travel_states: formData.sellerOfTravelStates || [],
+          florida_registration_number: formData.floridaRegistrationNumber || null,
+          california_registration_number: formData.californiaRegistrationNumber || null,
+          hawaii_registration_number: formData.hawaiiRegistrationNumber || null,
+          washington_registration_number: formData.washingtonRegistrationNumber || null,
+          surety_bond_amount: formData.suretyBondAmount ? parseFloat(formData.suretyBondAmount) : null,
+          surety_bond_provider: formData.suretyBondProvider || null,
+          surety_bond_expiration: formData.suretyBondExpiration || null,
+          background_check_consent: formData.backgroundCheckConsent || false,
+          criminal_history_disclosure: formData.criminalHistoryDisclosure || null,
+
+          // Professional Credentials
           iata_number: formData.iataNumber || null,
           arc_number: formData.arcNumber || null,
           clia_number: formData.cliaNumber || null,
+          iatan_id_number: formData.iatanIdNumber || null,
+          asta_verified_travel_advisor: formData.astaVerifiedTravelAdvisor || false,
+          asta_membership_number: formData.astaMembershipNumber || null,
+          travel_institute_cta: formData.travelInstituteCta || false,
+          travel_institute_ctc: formData.travelInstituteCtc || false,
+          clia_certification_level: formData.cliaCertificationLevel || null,
+          host_agency_name: formData.hostAgencyName || null,
+          host_agency_affiliation: formData.hostAgencyAffiliation || null,
+          years_with_host_agency: formData.yearsWithHostAgency ? parseInt(formData.yearsWithHostAgency) : null,
           other_certifications: formData.otherCertifications || null,
-          years_experience: formData.yearsExperience ? parseInt(formData.yearsExperience) : 0,
-          specialties: formData.specializations,
-          seller_of_travel_license: formData.sellerOfTravelLicense || null,
-          seller_of_travel_state: formData.sellerOfTravelState || null,
-          business_license_number: formData.businessLicenseNumber,
-          tax_id_ein: formData.taxIdEIN || null,
+
+          // Travel Experience
+          countries_visited_count: formData.countriesVisitedCount ? parseInt(formData.countriesVisitedCount) : null,
+          fam_trips_taken_last_year: formData.famTripsTakenLastYear ? parseInt(formData.famTripsTakenLastYear) : null,
+          continents_visited: formData.continentsVisited || [],
+          destination_expert_certifications: formData.destinationExpertCertifications || [],
+          cruise_experience_level: formData.cruiseExperienceLevel || null,
+          all_inclusive_experience: formData.allInclusiveExperience || null,
+          accessibility_travel_experience: formData.accessibilityTravelExperience || false,
+          multigenerational_travel_experience: formData.multigenerationalTravelExperience || false,
+          solo_travel_booking_experience: formData.soloTravelBookingExperience || false,
+          languages_spoken: formData.languagesSpoken || [],
+
+          // Client & Sales
+          annual_sales_volume: formData.annualSalesVolume || null,
+          number_of_active_clients: formData.numberOfActiveClients ? parseInt(formData.numberOfActiveClients) : null,
+          percentage_repeat_clients: formData.percentageRepeatClients ? parseInt(formData.percentageRepeatClients) : null,
+          percentage_referral_business: formData.percentageReferralBusiness ? parseInt(formData.percentageReferralBusiness) : null,
+          booking_volume_last_12_months: formData.bookingVolumeLast12Months ? parseInt(formData.bookingVolumeLast12Months) : null,
+          average_commission_percentage: formData.averageCommissionPercentage ? parseFloat(formData.averageCommissionPercentage) : null,
+          client_demographics: formData.clientDemographics || [],
+          average_client_age_range: formData.averageClientAgeRange || null,
+          gds_access: formData.gdsAccess || [],
+          preferred_booking_platforms: formData.preferredBookingPlatforms || [],
+          preferred_suppliers: formData.preferredSuppliers || [],
+          consortium_memberships: formData.consortiumMemberships || [],
+
+          // Online Presence
+          instagram_handle: formData.instagramHandle || null,
+          tiktok_handle: formData.tiktokHandle || null,
+          facebook_page_url: formData.facebookPageUrl || null,
+          linkedin_profile_url: formData.linkedinProfileUrl || null,
+          youtube_channel_url: formData.youtubeChannelUrl || null,
+          blog_url: formData.blogUrl || null,
+          google_business_profile: formData.googleBusinessProfile || null,
+          social_media_followers_total: formData.socialMediaFollowersTotal ? parseInt(formData.socialMediaFollowersTotal) : null,
+          online_reviews_count: formData.onlineReviewsCount ? parseInt(formData.onlineReviewsCount) : null,
+          average_review_rating: formData.averageReviewRating ? parseFloat(formData.averageReviewRating) : null,
+          content_creation_experience: formData.contentCreationExperience || false,
+          video_content_creation: formData.videoContentCreation || false,
+          influencer_partnerships: formData.influencerPartnerships || false,
+          email_marketing_platform: formData.emailMarketingPlatform || null,
+          email_list_size: formData.emailListSize ? parseInt(formData.emailListSize) : null,
+
+          // Technology
+          crm_software: formData.crmSoftware || null,
+          booking_platform: formData.bookingPlatform || null,
+          accounting_software: formData.accountingSoftware || null,
+          website_platform: formData.websitePlatform || null,
+          has_own_booking_engine: formData.hasOwnBookingEngine || false,
+          comfortable_with_technology: formData.comfortableWithTechnology || null,
+          video_conferencing_tools: formData.videoConferencingTools || [],
+          ai_tools_experience: formData.aiToolsExperience || [],
+
+          // Emergency & Legal
+          support_24_7: formData.support24_7 || false,
+          travel_crisis_management_training: formData.travelCrisisManagementTraining || false,
+          travel_insurance_licensed: formData.travelInsuranceLicensed || false,
+          emergency_contact_phone: formData.emergencyContactPhone || null,
+          after_hours_availability: formData.afterHoursAvailability || null,
+          crisis_response_examples: formData.crisisResponseExamples || null,
+          privacy_policy_url: formData.privacyPolicyUrl || null,
+          terms_and_conditions_url: formData.termsAndConditionsUrl || null,
+          gdpr_compliant: formData.gdprCompliant || false,
+          ccpa_compliant: formData.ccpaCompliant || false,
+          client_data_protection_measures: formData.clientDataProtectionMeasures || null,
+          contracts_with_clients: formData.contractsWithClients || false,
+          legal_counsel_on_retainer: formData.legalCounselOnRetainer || false,
+          previous_legal_issues: formData.previousLegalIssues || null,
+          regulatory_violations: formData.regulatoryViolations || null,
+
+          // Insurance & Banking
           annual_revenue: formData.annualRevenue || null,
           has_eo_insurance: formData.errorsOmissionsInsurance,
           insurance_provider: formData.insuranceProvider || null,
           insurance_policy_number: formData.insurancePolicyNumber || null,
           insurance_coverage: formData.insuranceCoverage || null,
+          bank_name: formData.bankName || null,
+          account_holder_name: formData.accountHolderName || null,
+          account_type: formData.accountType || null,
+          routing_number: formData.routingNumber || null,
+          account_number_last4: formData.accountNumber ? formData.accountNumber.slice(-4) : null,
+
+          // References
           reference1_name: formData.reference1Name || null,
           reference1_company: formData.reference1Company || null,
           reference1_email: formData.reference1Email || null,
@@ -249,20 +460,18 @@ export default function AgentApplicationForm() {
           reference2_company: formData.reference2Company || null,
           reference2_email: formData.reference2Email || null,
           reference2_phone: formData.reference2Phone || null,
-          bank_name: formData.bankName || null,
-          account_holder_name: formData.accountHolderName || null,
-          account_type: formData.accountType || null,
-          routing_number: formData.routingNumber || null,
-          account_number_last4: formData.accountNumber ? formData.accountNumber.slice(-4) : null,
-          primary_focus: formData.primaryFocus,
-          average_trip_value: formData.averageTripValue || null,
-          monthly_bookings: formData.monthlyBookings || null,
-          preferred_destinations: formData.preferredDestinations || null,
-          why_goldsainte: formData.whyGoldsainte || null,
+
+          // Legacy fields
+          seller_of_travel_license: formData.sellerOfTravelLicense || null,
+          seller_of_travel_state: formData.sellerOfTravelState || null,
+
+          // Documents
           business_license_document: businessLicensePath,
           insurance_certificate_document: insuranceCertPath,
           government_id_document: govIdPath,
           headshot_photo: headshotPath,
+
+          // Status
           application_status: 'draft',
           submitted_at: new Date().toISOString(),
           stripe_verification_status: 'pending',
@@ -589,10 +798,10 @@ export default function AgentApplicationForm() {
       </div>
 
       <div className="flex justify-between">
-        <Button variant="outline" onClick={() => setStep(1)}>
+        <Button variant="outline" onClick={() => setStep(8)}>
           <ArrowLeft className="mr-2 h-4 w-4" /> Back
         </Button>
-        <Button onClick={() => setStep(3)}>
+        <Button onClick={() => setStep(10)}>
           Next
           <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
@@ -753,7 +962,7 @@ export default function AgentApplicationForm() {
       </div>
 
       <div className="flex justify-between">
-        <Button variant="outline" onClick={() => setStep(2)}>
+        <Button variant="outline" onClick={() => setStep(9)}>
           <ArrowLeft className="mr-2 h-4 w-4" /> Back
         </Button>
         <Button onClick={saveDraftApplication} disabled={isLoading}>
@@ -832,27 +1041,79 @@ export default function AgentApplicationForm() {
           <p className="text-sm text-muted-foreground">
             Join Goldsainte's exclusive network of luxury travel professionals
           </p>
-          <div className="mx-auto mt-4 flex max-w-2xl justify-between text-center">
-            <div className={`text-xs ${step >= 1 ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>
-              Step 1<br/>Personal & Business
-            </div>
-            <div className={`text-xs ${step >= 2 ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>
-              Step 2<br/>Credentials
-            </div>
-            <div className={`text-xs ${step >= 3 ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>
-              Step 3<br/>Documents
-            </div>
-            <div className={`text-xs ${step >= 11 ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>
-              Step 4<br/>Verification
-            </div>
+          <div className="mx-auto mt-4 text-center">
+            <p className="text-xs text-muted-foreground">Step {step} of 11</p>
           </div>
         </div>
 
         <Card>
           <CardContent className="p-8">
             {step === 1 && renderStep1()}
-            {step === 2 && renderStep2()}
-            {step === 3 && renderStep3()}
+            {step === 2 && (
+              <>
+                <Step2BusinessCompliance formData={formData} setFormData={setFormData} />
+                <div className="flex justify-between mt-6">
+                  <Button variant="outline" onClick={() => setStep(1)}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={() => setStep(3)}>Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                </div>
+              </>
+            )}
+            {step === 3 && (
+              <>
+                <Step3ProfessionalCredentials formData={formData} setFormData={setFormData} />
+                <div className="flex justify-between mt-6">
+                  <Button variant="outline" onClick={() => setStep(2)}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={() => setStep(4)}>Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                </div>
+              </>
+            )}
+            {step === 4 && (
+              <>
+                <Step4ExperienceExpertise formData={formData} setFormData={setFormData} />
+                <div className="flex justify-between mt-6">
+                  <Button variant="outline" onClick={() => setStep(3)}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={() => setStep(5)}>Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                </div>
+              </>
+            )}
+            {step === 5 && (
+              <>
+                <Step5ClientSales formData={formData} setFormData={setFormData} />
+                <div className="flex justify-between mt-6">
+                  <Button variant="outline" onClick={() => setStep(4)}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={() => setStep(6)}>Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                </div>
+              </>
+            )}
+            {step === 6 && (
+              <>
+                <Step6OnlinePresence formData={formData} setFormData={setFormData} />
+                <div className="flex justify-between mt-6">
+                  <Button variant="outline" onClick={() => setStep(5)}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={() => setStep(7)}>Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                </div>
+              </>
+            )}
+            {step === 7 && (
+              <>
+                <Step7Technology formData={formData} setFormData={setFormData} />
+                <div className="flex justify-between mt-6">
+                  <Button variant="outline" onClick={() => setStep(6)}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={() => setStep(8)}>Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                </div>
+              </>
+            )}
+            {step === 8 && (
+              <>
+                <Step8EmergencyLegal formData={formData} setFormData={setFormData} />
+                <div className="flex justify-between mt-6">
+                  <Button variant="outline" onClick={() => setStep(7)}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={() => setStep(9)}>Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                </div>
+              </>
+            )}
+            {step === 9 && renderStep2()}
+            {step === 10 && renderStep3()}
             {step === 11 && renderStep11()}
           </CardContent>
         </Card>
