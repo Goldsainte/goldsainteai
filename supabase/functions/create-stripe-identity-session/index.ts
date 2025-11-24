@@ -25,24 +25,16 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Optional auth check - allow anonymous applications
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Missing Authorization header" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+    let userId: string | null = null;
+    
+    if (authHeader) {
+      const supabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+        global: { headers: { Authorization: authHeader } },
       });
-    }
-
-    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-      global: { headers: { Authorization: authHeader } },
-    });
-
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-    if (userError || !user) {
-      return new Response(JSON.stringify({ error: "Not authenticated" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      userId = user?.id || null;
     }
 
     const { email, firstName, lastName, applicationType, applicationId } = await req.json();
@@ -84,13 +76,16 @@ Deno.serve(async (req) => {
     formData.append("options[document][require_matching_selfie]", "true");
     formData.append("options[document][require_live_capture]", "true");
     
-    // Metadata for tracking
-    formData.append("metadata[user_id]", user.id);
+    // Metadata - use email as primary identifier
     formData.append("metadata[email]", email);
     formData.append("metadata[name]", `${firstName} ${lastName}`);
     formData.append("metadata[application_type]", applicationType);
     if (applicationId) {
       formData.append("metadata[application_id]", applicationId);
+    }
+    // Only add user_id if authenticated
+    if (userId) {
+      formData.append("metadata[user_id]", userId);
     }
     
     // Return URL after verification completes
@@ -135,14 +130,8 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Update profile status
-    await supabaseAdmin
-      .from("profiles")
-      .update({
-        account_type: applicationType,
-        [`${applicationType}_verification_status`]: "pending",
-      })
-      .eq("id", user.id);
+    // Don't update profile - it doesn't exist yet for anonymous applicants
+    // Profile will be created after admin approval
 
     return new Response(
       JSON.stringify({
