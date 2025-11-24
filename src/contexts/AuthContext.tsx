@@ -215,8 +215,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const signUp = async (email: string, password: string, username?: string, firstName?: string, lastName?: string, phone?: string) => {
+  const signUp = async (
+    email: string,
+    password: string,
+    username?: string,
+    firstName?: string,
+    lastName?: string,
+    phone?: string,
+    accountType?: string
+  ) => {
     try {
+      // ===================================================================
+      // CRITICAL: Block agent/brand from using this function
+      // ===================================================================
+      if (accountType === 'agent' || accountType === 'brand') {
+        throw new Error(
+          `${accountType} accounts require application approval. Please use the application form at /apply/agent or /brand/onboarding`
+        );
+      }
+
       const redirectUrl = `${window.location.origin}/auth/callback`;
       
       const { data, error } = await supabase.auth.signUp({
@@ -229,6 +246,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             first_name: firstName,
             last_name: lastName,
             phone: phone,
+            account_type: accountType || 'traveler',
           }
         }
       });
@@ -241,7 +259,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           action: 'user_signup',
           entity_type: 'auth',
           entity_id: data.user.id,
-          details: { email, username: username || email.split('@')[0], timestamp: new Date().toISOString() }
+          details: { 
+            email, 
+            username: username || email.split('@')[0],
+            account_type: accountType || 'traveler',
+            timestamp: new Date().toISOString() 
+          }
         });
         
         setUser(data.user);

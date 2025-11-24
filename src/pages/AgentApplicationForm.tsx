@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -166,14 +166,22 @@ type AgentApplicationData = {
 };
 
 export default function AgentApplicationForm() {
+  const location = useLocation();
+  const prefillData = location.state as {
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+  } | null;
+
   const [step, setStep] = useState(1);
   const [stripeVerificationComplete, setStripeVerificationComplete] = useState(false);
   const [draftApplicationId, setDraftApplicationId] = useState<string | null>(null);
   const [formData, setFormData] = useState<AgentApplicationData>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
+    firstName: prefillData?.firstName || "",
+    lastName: prefillData?.lastName || "",
+    email: prefillData?.email || "",
+    phone: prefillData?.phone || "",
     dateOfBirth: "",
     agencyName: "",
     businessType: "",
