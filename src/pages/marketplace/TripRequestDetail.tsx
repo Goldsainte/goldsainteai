@@ -334,8 +334,8 @@ export default function TripRequestDetail() {
       const { data: proposalData, error: proposalError } = await supabase
         .from("trip_proposals")
         .insert({
-          proposer_id: user.id,
-          proposer_role: proposerRole,
+          trip_request_id: id,
+          ...(proposerRole === 'agent' ? { agent_id: user.id } : { creator_id: user.id }),
           price_from: parseFloat(newProposal.priceFrom),
           currency: "USD",
           nights: parseInt(newProposal.timelineLabel) || 7,
@@ -358,7 +358,7 @@ export default function TripRequestDetail() {
             ? parseInt(newProposal.depositDueDays)
             : null,
           acknowledged_goldsainte_policies: true,
-        })
+        } as any)
         .select()
         .single();
 
