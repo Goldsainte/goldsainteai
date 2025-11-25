@@ -18,6 +18,9 @@ verify_jwt = false
 [functions.create-approved-account]
 verify_jwt = true
 
+[functions.approve-application]
+verify_jwt = true
+
 [functions.notify-admin-verification-complete]
 verify_jwt = false
 
