@@ -67,7 +67,7 @@ INSERT INTO public.profiles (
 )
 VALUES 
   (
-    '00000000-0000-0000-0000-000000000002',
+    '00000000-0000-0000-0000-000000000002', -- account_type='creator'
     'creator-bronze@test.com',
     'Bronze Creator',
     'https://api.dicebear.com/7.x/avataaars/svg?seed=bronze',
@@ -78,7 +78,7 @@ VALUES
     NOW()
   ),
   (
-    '00000000-0000-0000-0000-000000000003',
+    '00000000-0000-0000-0000-000000000003', -- account_type='creator'
     'creator-gold@test.com',
     'Gold Creator',
     'https://api.dicebear.com/7.x/avataaars/svg?seed=gold',
@@ -89,7 +89,7 @@ VALUES
     NOW()
   ),
   (
-    '00000000-0000-0000-0000-000000000004',
+    '00000000-0000-0000-0000-000000000004', -- account_type='creator'
     'creator-platinum@test.com',
     'Platinum Creator',
     'https://api.dicebear.com/7.x/avataaars/svg?seed=platinum',
