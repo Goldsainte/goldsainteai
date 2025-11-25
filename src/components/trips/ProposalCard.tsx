@@ -15,8 +15,8 @@ interface Proposal {
   price_from: number | null;
   currency: string | null;
   nights: number | null;
-  inclusions: string | null;
-  exclusions: string | null;
+  inclusions: string[] | null;
+  exclusions: string[] | null;
   created_at: string;
   proposer_id: string;
   proposer_role: string;
@@ -206,22 +206,22 @@ export function ProposalCard({
         )}
       </div>
 
-      {(proposal.inclusions || proposal.exclusions) && (
+      {((proposal.inclusions && proposal.inclusions.length > 0) || (proposal.exclusions && proposal.exclusions.length > 0)) && (
         <div className="space-y-2 border-t border-[#E5DFC6] pt-3 text-[11px]">
-          {proposal.inclusions && (
+          {proposal.inclusions && proposal.inclusions.length > 0 && (
             <div>
               <p className="mb-1 font-semibold text-[#7A7151] uppercase tracking-wide">
                 Included
               </p>
-              <p className="text-[#4a4a4a] whitespace-pre-line">{proposal.inclusions}</p>
+              <p className="text-[#4a4a4a] whitespace-pre-line">{proposal.inclusions.join(', ')}</p>
             </div>
           )}
-          {proposal.exclusions && (
+          {proposal.exclusions && proposal.exclusions.length > 0 && (
             <div>
               <p className="mb-1 font-semibold text-[#7A7151] uppercase tracking-wide">
                 Not included
               </p>
-              <p className="text-[#4a4a4a] whitespace-pre-line">{proposal.exclusions}</p>
+              <p className="text-[#4a4a4a] whitespace-pre-line">{proposal.exclusions.join(', ')}</p>
             </div>
           )}
         </div>

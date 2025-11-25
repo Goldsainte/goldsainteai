@@ -924,7 +924,22 @@ export type Database = {
           wholesale_cost?: number
           why_this_trip?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "agent_packages_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agent_leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "agent_packages_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       agent_performance_metrics: {
         Row: {
@@ -1908,9 +1923,11 @@ export type Database = {
       bookings: {
         Row: {
           agent_commission_pct: number | null
+          agent_earnings: number | null
           agent_id: string | null
           agent_payout_cents: number | null
           agent_reviewed: boolean | null
+          agent_share: number | null
           booking_number: string
           brand_commission_pct: number | null
           brand_id: string | null
@@ -1921,9 +1938,11 @@ export type Database = {
           completed_at: string | null
           created_at: string | null
           creator_commission_pct: number | null
+          creator_earnings: number | null
           creator_id: string | null
           creator_payout_cents: number | null
           creator_reviewed: boolean | null
+          creator_share: number | null
           currency: string
           destination: string
           dispute_opened_at: string | null
@@ -1941,28 +1960,36 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["payment_status"] | null
           payout_completed_at: string | null
           payout_eligible_at: string | null
+          payout_expected_at: string | null
+          payout_paid_at: string | null
           payout_scheduled_at: string | null
           payout_status: Database["public"]["Enums"]["payout_status"] | null
           platform_commission_pct: number | null
+          platform_fee: number | null
           platform_fee_cents: number | null
+          proposal_id: string | null
           refund_amount_cents: number | null
           refunded_at: string | null
           start_date: string
           status: Database["public"]["Enums"]["booking_status"] | null
           stripe_payment_intent_id: string | null
+          total_amount: number | null
           total_price_cents: number
           traveler_id: string
           traveler_reviewed: boolean | null
           travelers_count: number
+          trip_id: string | null
           trip_proposal_id: string | null
           trip_request_id: string | null
           updated_at: string | null
         }
         Insert: {
           agent_commission_pct?: number | null
+          agent_earnings?: number | null
           agent_id?: string | null
           agent_payout_cents?: number | null
           agent_reviewed?: boolean | null
+          agent_share?: number | null
           booking_number: string
           brand_commission_pct?: number | null
           brand_id?: string | null
@@ -1973,9 +2000,11 @@ export type Database = {
           completed_at?: string | null
           created_at?: string | null
           creator_commission_pct?: number | null
+          creator_earnings?: number | null
           creator_id?: string | null
           creator_payout_cents?: number | null
           creator_reviewed?: boolean | null
+          creator_share?: number | null
           currency?: string
           destination: string
           dispute_opened_at?: string | null
@@ -1993,28 +2022,36 @@ export type Database = {
           payment_status?: Database["public"]["Enums"]["payment_status"] | null
           payout_completed_at?: string | null
           payout_eligible_at?: string | null
+          payout_expected_at?: string | null
+          payout_paid_at?: string | null
           payout_scheduled_at?: string | null
           payout_status?: Database["public"]["Enums"]["payout_status"] | null
           platform_commission_pct?: number | null
+          platform_fee?: number | null
           platform_fee_cents?: number | null
+          proposal_id?: string | null
           refund_amount_cents?: number | null
           refunded_at?: string | null
           start_date: string
           status?: Database["public"]["Enums"]["booking_status"] | null
           stripe_payment_intent_id?: string | null
+          total_amount?: number | null
           total_price_cents: number
           traveler_id: string
           traveler_reviewed?: boolean | null
           travelers_count: number
+          trip_id?: string | null
           trip_proposal_id?: string | null
           trip_request_id?: string | null
           updated_at?: string | null
         }
         Update: {
           agent_commission_pct?: number | null
+          agent_earnings?: number | null
           agent_id?: string | null
           agent_payout_cents?: number | null
           agent_reviewed?: boolean | null
+          agent_share?: number | null
           booking_number?: string
           brand_commission_pct?: number | null
           brand_id?: string | null
@@ -2025,9 +2062,11 @@ export type Database = {
           completed_at?: string | null
           created_at?: string | null
           creator_commission_pct?: number | null
+          creator_earnings?: number | null
           creator_id?: string | null
           creator_payout_cents?: number | null
           creator_reviewed?: boolean | null
+          creator_share?: number | null
           currency?: string
           destination?: string
           dispute_opened_at?: string | null
@@ -2045,24 +2084,37 @@ export type Database = {
           payment_status?: Database["public"]["Enums"]["payment_status"] | null
           payout_completed_at?: string | null
           payout_eligible_at?: string | null
+          payout_expected_at?: string | null
+          payout_paid_at?: string | null
           payout_scheduled_at?: string | null
           payout_status?: Database["public"]["Enums"]["payout_status"] | null
           platform_commission_pct?: number | null
+          platform_fee?: number | null
           platform_fee_cents?: number | null
+          proposal_id?: string | null
           refund_amount_cents?: number | null
           refunded_at?: string | null
           start_date?: string
           status?: Database["public"]["Enums"]["booking_status"] | null
           stripe_payment_intent_id?: string | null
+          total_amount?: number | null
           total_price_cents?: number
           traveler_id?: string
           traveler_reviewed?: boolean | null
           travelers_count?: number
+          trip_id?: string | null
           trip_proposal_id?: string | null
           trip_request_id?: string | null
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "bookings_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "bookings_trip_proposal_id_fkey"
             columns: ["trip_proposal_id"]
@@ -2633,39 +2685,39 @@ export type Database = {
       }
       cancellation_policies: {
         Row: {
+          booking_type: string
           created_at: string | null
           description: string | null
-          full_refund_hours: number
+          hours_before_checkin: number
           id: string
-          is_default: boolean | null
+          is_active: boolean | null
           name: string
-          no_refund_hours: number
-          partial_refund_hours: number | null
-          partial_refund_percentage: number | null
+          policy_name: string
+          refund_percentage: number
           updated_at: string | null
         }
         Insert: {
+          booking_type: string
           created_at?: string | null
           description?: string | null
-          full_refund_hours: number
+          hours_before_checkin: number
           id?: string
-          is_default?: boolean | null
+          is_active?: boolean | null
           name: string
-          no_refund_hours: number
-          partial_refund_hours?: number | null
-          partial_refund_percentage?: number | null
+          policy_name: string
+          refund_percentage: number
           updated_at?: string | null
         }
         Update: {
+          booking_type?: string
           created_at?: string | null
           description?: string | null
-          full_refund_hours?: number
+          hours_before_checkin?: number
           id?: string
-          is_default?: boolean | null
+          is_active?: boolean | null
           name?: string
-          no_refund_hours?: number
-          partial_refund_hours?: number | null
-          partial_refund_percentage?: number | null
+          policy_name?: string
+          refund_percentage?: number
           updated_at?: string | null
         }
         Relationships: []
@@ -7555,6 +7607,7 @@ export type Database = {
           creator_pov: string | null
           destinations_focus_tags: string[] | null
           display_name: string | null
+          email: string | null
           email_notifications: boolean | null
           email_verified: boolean | null
           featured_photos: string[] | null
@@ -7645,6 +7698,7 @@ export type Database = {
           creator_pov?: string | null
           destinations_focus_tags?: string[] | null
           display_name?: string | null
+          email?: string | null
           email_notifications?: boolean | null
           email_verified?: boolean | null
           featured_photos?: string[] | null
@@ -7735,6 +7789,7 @@ export type Database = {
           creator_pov?: string | null
           destinations_focus_tags?: string[] | null
           display_name?: string | null
+          email?: string | null
           email_notifications?: boolean | null
           email_verified?: boolean | null
           featured_photos?: string[] | null
@@ -9401,29 +9456,52 @@ export type Database = {
           acceptance_rate: number | null
           agency_name: string
           average_rating: number | null
+          background_check_status: string | null
           bio: string | null
+          business_address: string | null
           business_type: string
           cancelled_bookings: number | null
           completed_bookings: number | null
           completion_rate: number | null
           created_at: string | null
           current_booking_count: number | null
+          destinations: string[] | null
           disputed_bookings: number | null
+          email: string | null
+          experience_years: number | null
           id: string
+          identity_verified: boolean | null
+          insurance_verified: boolean | null
           is_accepting_requests: boolean | null
+          is_active: boolean | null
+          is_verified: boolean | null
+          languages: string[] | null
           last_active_at: string | null
+          max_budget: number | null
           max_concurrent_bookings: number | null
+          min_budget: number | null
           onboarded_at: string | null
+          phone: string | null
+          primary_contact_name: string | null
+          professional_license_verified: boolean | null
+          profile_image_url: string | null
+          rating: number | null
+          regions: string[] | null
           response_time_avg_minutes: number | null
           review_count: number | null
+          service_types: string[] | null
+          specializations: string[] | null
           status: string | null
           stripe_connect_account_id: string | null
           stripe_onboarding_complete: boolean | null
           stripe_payouts_enabled: boolean | null
           suspended_at: string | null
           suspension_reason: string | null
+          terms_accepted: boolean | null
           total_bookings: number | null
           total_revenue_cents: number | null
+          total_reviews: number | null
+          trust_score: number | null
           updated_at: string | null
           user_id: string
           website: string | null
@@ -9432,29 +9510,52 @@ export type Database = {
           acceptance_rate?: number | null
           agency_name: string
           average_rating?: number | null
+          background_check_status?: string | null
           bio?: string | null
+          business_address?: string | null
           business_type: string
           cancelled_bookings?: number | null
           completed_bookings?: number | null
           completion_rate?: number | null
           created_at?: string | null
           current_booking_count?: number | null
+          destinations?: string[] | null
           disputed_bookings?: number | null
+          email?: string | null
+          experience_years?: number | null
           id?: string
+          identity_verified?: boolean | null
+          insurance_verified?: boolean | null
           is_accepting_requests?: boolean | null
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          languages?: string[] | null
           last_active_at?: string | null
+          max_budget?: number | null
           max_concurrent_bookings?: number | null
+          min_budget?: number | null
           onboarded_at?: string | null
+          phone?: string | null
+          primary_contact_name?: string | null
+          professional_license_verified?: boolean | null
+          profile_image_url?: string | null
+          rating?: number | null
+          regions?: string[] | null
           response_time_avg_minutes?: number | null
           review_count?: number | null
+          service_types?: string[] | null
+          specializations?: string[] | null
           status?: string | null
           stripe_connect_account_id?: string | null
           stripe_onboarding_complete?: boolean | null
           stripe_payouts_enabled?: boolean | null
           suspended_at?: string | null
           suspension_reason?: string | null
+          terms_accepted?: boolean | null
           total_bookings?: number | null
           total_revenue_cents?: number | null
+          total_reviews?: number | null
+          trust_score?: number | null
           updated_at?: string | null
           user_id: string
           website?: string | null
@@ -9463,29 +9564,52 @@ export type Database = {
           acceptance_rate?: number | null
           agency_name?: string
           average_rating?: number | null
+          background_check_status?: string | null
           bio?: string | null
+          business_address?: string | null
           business_type?: string
           cancelled_bookings?: number | null
           completed_bookings?: number | null
           completion_rate?: number | null
           created_at?: string | null
           current_booking_count?: number | null
+          destinations?: string[] | null
           disputed_bookings?: number | null
+          email?: string | null
+          experience_years?: number | null
           id?: string
+          identity_verified?: boolean | null
+          insurance_verified?: boolean | null
           is_accepting_requests?: boolean | null
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          languages?: string[] | null
           last_active_at?: string | null
+          max_budget?: number | null
           max_concurrent_bookings?: number | null
+          min_budget?: number | null
           onboarded_at?: string | null
+          phone?: string | null
+          primary_contact_name?: string | null
+          professional_license_verified?: boolean | null
+          profile_image_url?: string | null
+          rating?: number | null
+          regions?: string[] | null
           response_time_avg_minutes?: number | null
           review_count?: number | null
+          service_types?: string[] | null
+          specializations?: string[] | null
           status?: string | null
           stripe_connect_account_id?: string | null
           stripe_onboarding_complete?: boolean | null
           stripe_payouts_enabled?: boolean | null
           suspended_at?: string | null
           suspension_reason?: string | null
+          terms_accepted?: boolean | null
           total_bookings?: number | null
           total_revenue_cents?: number | null
+          total_reviews?: number | null
+          trust_score?: number | null
           updated_at?: string | null
           user_id?: string
           website?: string | null
@@ -9804,7 +9928,15 @@ export type Database = {
           trip_request_id?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "trip_bookings_trip_request_id_fkey"
+            columns: ["trip_request_id"]
+            isOneToOne: false
+            referencedRelation: "trip_requests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       trip_contracts: {
         Row: {
@@ -10294,73 +10426,116 @@ export type Database = {
         Row: {
           agent_commission_pct: number | null
           agent_id: string | null
+          cancellation_policy_id: string | null
           created_at: string | null
           creator_commission_pct: number | null
           creator_id: string | null
+          currency: string | null
+          custom_cancellation_terms: string | null
+          deposit_due_days: number | null
+          deposit_percentage: number | null
+          end_date: string | null
+          exclusions: string[] | null
           expires_at: string | null
           headline: string | null
           id: string
+          inclusions: string[] | null
           is_collaborative: boolean | null
           itinerary_summary: string | null
           message: string
+          nights: number | null
+          payment_schedule: Json | null
           price_breakdown: Json | null
           price_currency: string | null
           price_from: number | null
           proposer_id: string
           proposer_role: string
           responded_at: string | null
+          start_date: string | null
           status: string | null
           trip_request_id: string
           updated_at: string | null
+          valid_until: string | null
           viewed_at: string | null
         }
         Insert: {
           agent_commission_pct?: number | null
           agent_id?: string | null
+          cancellation_policy_id?: string | null
           created_at?: string | null
           creator_commission_pct?: number | null
           creator_id?: string | null
+          currency?: string | null
+          custom_cancellation_terms?: string | null
+          deposit_due_days?: number | null
+          deposit_percentage?: number | null
+          end_date?: string | null
+          exclusions?: string[] | null
           expires_at?: string | null
           headline?: string | null
           id?: string
+          inclusions?: string[] | null
           is_collaborative?: boolean | null
           itinerary_summary?: string | null
           message: string
+          nights?: number | null
+          payment_schedule?: Json | null
           price_breakdown?: Json | null
           price_currency?: string | null
           price_from?: number | null
           proposer_id: string
           proposer_role: string
           responded_at?: string | null
+          start_date?: string | null
           status?: string | null
           trip_request_id: string
           updated_at?: string | null
+          valid_until?: string | null
           viewed_at?: string | null
         }
         Update: {
           agent_commission_pct?: number | null
           agent_id?: string | null
+          cancellation_policy_id?: string | null
           created_at?: string | null
           creator_commission_pct?: number | null
           creator_id?: string | null
+          currency?: string | null
+          custom_cancellation_terms?: string | null
+          deposit_due_days?: number | null
+          deposit_percentage?: number | null
+          end_date?: string | null
+          exclusions?: string[] | null
           expires_at?: string | null
           headline?: string | null
           id?: string
+          inclusions?: string[] | null
           is_collaborative?: boolean | null
           itinerary_summary?: string | null
           message?: string
+          nights?: number | null
+          payment_schedule?: Json | null
           price_breakdown?: Json | null
           price_currency?: string | null
           price_from?: number | null
           proposer_id?: string
           proposer_role?: string
           responded_at?: string | null
+          start_date?: string | null
           status?: string | null
           trip_request_id?: string
           updated_at?: string | null
+          valid_until?: string | null
           viewed_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "trip_proposals_cancellation_policy_id_fkey"
+            columns: ["cancellation_policy_id"]
+            isOneToOne: false
+            referencedRelation: "cancellation_policies"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "trip_proposals_trip_request_id_fkey"
             columns: ["trip_request_id"]
@@ -10537,6 +10712,13 @@ export type Database = {
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "trip_request_matches_trip_request_id_fkey"
+            columns: ["trip_request_id"]
+            isOneToOne: false
+            referencedRelation: "trip_requests"
+            referencedColumns: ["id"]
+          },
         ]
       }
       trip_request_messages: {
@@ -10611,94 +10793,138 @@ export type Database = {
         Row: {
           accessibility_needs: string[] | null
           accommodation_preferences: string[] | null
+          accommodation_style: string | null
           booked_at: string | null
           budget_currency: string | null
+          budget_level: string | null
           budget_max: number | null
           budget_min: number | null
           budget_per_person: boolean | null
           created_at: string | null
           date_flexibility_days: number | null
+          departure_city: string | null
           description: string | null
           destination: string | null
           dietary_restrictions: string[] | null
           end_date: string | null
+          flexibility: string | null
           flexible_dates: boolean | null
           id: string
           inspiration_links: string[] | null
           interests: string[] | null
+          occasion: string | null
+          pace: string | null
           selected_proposal_id: string | null
+          source_brand_profile_id: string | null
+          source_collection_id: string | null
+          source_metadata: Json | null
+          special_notes: string | null
           start_date: string | null
           status: string | null
           tiktok_link: string | null
           title: string | null
+          travel_styles: string[] | null
           travelers_adults: number | null
           travelers_children: number | null
           travelers_infants: number | null
           trip_style: string[] | null
           updated_at: string | null
           user_id: string
+          wants_role: string | null
         }
         Insert: {
           accessibility_needs?: string[] | null
           accommodation_preferences?: string[] | null
+          accommodation_style?: string | null
           booked_at?: string | null
           budget_currency?: string | null
+          budget_level?: string | null
           budget_max?: number | null
           budget_min?: number | null
           budget_per_person?: boolean | null
           created_at?: string | null
           date_flexibility_days?: number | null
+          departure_city?: string | null
           description?: string | null
           destination?: string | null
           dietary_restrictions?: string[] | null
           end_date?: string | null
+          flexibility?: string | null
           flexible_dates?: boolean | null
           id?: string
           inspiration_links?: string[] | null
           interests?: string[] | null
+          occasion?: string | null
+          pace?: string | null
           selected_proposal_id?: string | null
+          source_brand_profile_id?: string | null
+          source_collection_id?: string | null
+          source_metadata?: Json | null
+          special_notes?: string | null
           start_date?: string | null
           status?: string | null
           tiktok_link?: string | null
           title?: string | null
+          travel_styles?: string[] | null
           travelers_adults?: number | null
           travelers_children?: number | null
           travelers_infants?: number | null
           trip_style?: string[] | null
           updated_at?: string | null
           user_id: string
+          wants_role?: string | null
         }
         Update: {
           accessibility_needs?: string[] | null
           accommodation_preferences?: string[] | null
+          accommodation_style?: string | null
           booked_at?: string | null
           budget_currency?: string | null
+          budget_level?: string | null
           budget_max?: number | null
           budget_min?: number | null
           budget_per_person?: boolean | null
           created_at?: string | null
           date_flexibility_days?: number | null
+          departure_city?: string | null
           description?: string | null
           destination?: string | null
           dietary_restrictions?: string[] | null
           end_date?: string | null
+          flexibility?: string | null
           flexible_dates?: boolean | null
           id?: string
           inspiration_links?: string[] | null
           interests?: string[] | null
+          occasion?: string | null
+          pace?: string | null
           selected_proposal_id?: string | null
+          source_brand_profile_id?: string | null
+          source_collection_id?: string | null
+          source_metadata?: Json | null
+          special_notes?: string | null
           start_date?: string | null
           status?: string | null
           tiktok_link?: string | null
           title?: string | null
+          travel_styles?: string[] | null
           travelers_adults?: number | null
           travelers_children?: number | null
           travelers_infants?: number | null
           trip_style?: string[] | null
           updated_at?: string | null
           user_id?: string
+          wants_role?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "trip_requests_source_brand_profile_id_fkey"
+            columns: ["source_brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       trip_stories: {
         Row: {

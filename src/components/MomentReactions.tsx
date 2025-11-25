@@ -117,11 +117,10 @@ export const MomentReactions = ({ momentId, className = '' }: MomentReactionsPro
             .from('notifications')
             .insert({
               user_id: moment.user_id,
-              notification_type: 'moment_reaction',
+              type: 'message_received',
               title: 'New Reaction',
               message: `Someone reacted ${reaction} to your moment`,
-              link: `/creator/${moment.user_id}?momentId=${momentId}`,
-              metadata: { moment_id: momentId, reaction, from_user_id: user.id }
+              action_url: `/creator/${moment.user_id}?momentId=${momentId}`
             });
         }
         
