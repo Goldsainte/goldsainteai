@@ -334,7 +334,6 @@ export default function TripRequestDetail() {
       const { data: proposalData, error: proposalError } = await supabase
         .from("trip_proposals")
         .insert({
-          trip_request_id: id,
           proposer_id: user.id,
           proposer_role: proposerRole,
           price_from: parseFloat(newProposal.priceFrom),

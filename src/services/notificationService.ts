@@ -31,7 +31,19 @@ export async function fetchNotifications(limit = 20): Promise<Notification[]> {
     throw new Error("Could not load notifications.");
   }
 
-  return (data || []) as Notification[];
+  return (data || []).map(n => ({
+    id: n.id,
+    notification_type: n.type || '',
+    title: n.title || '',
+    message: n.message,
+    link: n.action_url || null,
+    metadata: n.entity_type ? { entity_type: n.entity_type, entity_id: n.entity_id } : null,
+    is_read: n.is_read,
+    read_at: n.read_at,
+    created_at: n.created_at,
+    updated_at: n.created_at,
+    user_id: n.user_id
+  }));
 }
 
 export async function fetchUnreadCount(): Promise<number> {

@@ -76,7 +76,7 @@ export default function OpsEscrowDashboardPage() {
         .order("booking_created_at", { ascending: false });
 
       if (!error && data) {
-        setRows(data as OpsBookingRow[]);
+        setRows(data as any as OpsBookingRow[]);
       }
       setLoading(false);
     };

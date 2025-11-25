@@ -75,7 +75,7 @@ export default function PlatformAnalytics() {
         .single();
 
       if (error) throw error;
-      setStats(data as PlatformStats);
+      setStats(data as any as PlatformStats);
     } catch (error) {
       console.error("Error loading analytics:", error);
       toast.error("Failed to load platform analytics");
