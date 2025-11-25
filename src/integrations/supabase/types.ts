@@ -1169,7 +1169,22 @@ export type Database = {
           updated_at?: string
           verification_type?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "agent_verification_requests_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agent_leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "agent_verification_requests_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       ai_agent_profiles: {
         Row: {
@@ -1680,6 +1695,13 @@ export type Database = {
             referencedRelation: "trip_bookings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "booking_cancellations_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
+            referencedColumns: ["id"]
+          },
         ]
       }
       booking_messages: {
@@ -1916,6 +1938,13 @@ export type Database = {
             columns: ["booking_id"]
             isOneToOne: false
             referencedRelation: "trip_bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_status_history_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "trip_bookings_ops_view"
             referencedColumns: ["id"]
           },
         ]
@@ -12731,6 +12760,18 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_analytics: {
+        Row: {
+          total_agents: number | null
+          total_booking_value: number | null
+          total_bookings: number | null
+          total_creators: number | null
+          total_proposals: number | null
+          total_travelers: number | null
+          total_trip_requests: number | null
+        }
+        Relationships: []
+      }
       public_profiles: {
         Row: {
           avatar_url: string | null
@@ -12757,6 +12798,42 @@ export type Database = {
           username?: string | null
         }
         Relationships: []
+      }
+      trip_bookings_ops_view: {
+        Row: {
+          created_at: string | null
+          currency: string | null
+          destination: string | null
+          id: string | null
+          metadata: Json | null
+          partner_email: string | null
+          partner_id: string | null
+          partner_payout: number | null
+          partner_role: string | null
+          payment_client_secret: string | null
+          payment_url: string | null
+          platform_commission: number | null
+          proposal_id: string | null
+          status: string | null
+          stripe_payment_intent_id: string | null
+          stripe_payment_status: string | null
+          stripe_transfer_group: string | null
+          total_price: number | null
+          traveler_email: string | null
+          traveler_id: string | null
+          trip_request_id: string | null
+          trip_title: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_bookings_trip_request_id_fkey"
+            columns: ["trip_request_id"]
+            isOneToOne: false
+            referencedRelation: "trip_requests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
@@ -13059,6 +13136,8 @@ export type Database = {
         | "paid"
         | "failed"
         | "reversed"
+        | "released"
+        | "on_hold"
       subscription_tier: "free" | "premium" | "enterprise"
       supplier_type:
         | "hotel"
@@ -13226,6 +13305,8 @@ export const Constants = {
         "paid",
         "failed",
         "reversed",
+        "released",
+        "on_hold",
       ],
       subscription_tier: ["free", "premium", "enterprise"],
       supplier_type: [
