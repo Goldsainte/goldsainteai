@@ -59,21 +59,6 @@ export function AccountTypeStep({ onComplete }: Props) {
         console.error("Error updating profile", upsertError);
         setError("Could not save your profile. Please try again.");
       } else {
-        // For brands, create placeholder brand_profiles entry
-        if (accountType === "brand") {
-          const { error: brandError } = await supabase
-            .from("brand_profiles")
-            .insert({
-              owner_user_id: user.id,
-              brand_name: `${firstName.trim()} ${lastName.trim()}`,
-            });
-          
-          if (brandError && brandError.code !== '23505') {
-            console.error("Error creating brand profile:", brandError);
-            // Continue anyway - they can complete brand onboarding later
-          }
-        }
-        
         onComplete();
       }
     } finally {
