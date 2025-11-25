@@ -8,6 +8,8 @@ const originalInfo = console.info.bind(console);
 
 export function installConsoleRedaction() {
   console.error = (...args: ConsoleArg[]) => {
+    // Always call original console.error first
+    originalError(...args);
     const [message, ...rest] = args;
     const error = rest.find((arg) => arg instanceof Error) as Error | undefined;
     const context = rest.length ? { args: rest.map((arg) => scrubPII(arg)) } : undefined;
@@ -19,6 +21,8 @@ export function installConsoleRedaction() {
   };
 
   console.warn = (...args: ConsoleArg[]) => {
+    // Always call original console.warn first
+    originalWarn(...args);
     const [message, ...rest] = args;
     const context = rest.length ? { args: rest.map((arg) => scrubPII(arg)) } : undefined;
     if (typeof message === "string") {
@@ -29,6 +33,8 @@ export function installConsoleRedaction() {
   };
 
   console.info = (...args: ConsoleArg[]) => {
+    // Always call original console.info first
+    originalInfo(...args);
     const [message, ...rest] = args;
     const context = rest.length ? { args: rest.map((arg) => scrubPII(arg)) } : undefined;
     if (typeof message === "string") {
