@@ -56,34 +56,43 @@ export type Database = {
       activity_logs: {
         Row: {
           action: string
-          created_at: string
+          created_at: string | null
           details: Json | null
-          entity_id: string
-          entity_type: string
+          entity_id: string | null
+          entity_type: string | null
           id: string
-          ip_address: string | null
+          ip_address: unknown
+          new_values: Json | null
+          old_values: Json | null
+          request_id: string | null
           user_agent: string | null
           user_id: string | null
         }
         Insert: {
           action: string
-          created_at?: string
+          created_at?: string | null
           details?: Json | null
-          entity_id: string
-          entity_type: string
+          entity_id?: string | null
+          entity_type?: string | null
           id?: string
-          ip_address?: string | null
+          ip_address?: unknown
+          new_values?: Json | null
+          old_values?: Json | null
+          request_id?: string | null
           user_agent?: string | null
           user_id?: string | null
         }
         Update: {
           action?: string
-          created_at?: string
+          created_at?: string | null
           details?: Json | null
-          entity_id?: string
-          entity_type?: string
+          entity_id?: string | null
+          entity_type?: string | null
           id?: string
-          ip_address?: string | null
+          ip_address?: unknown
+          new_values?: Json | null
+          old_values?: Json | null
+          request_id?: string | null
           user_agent?: string | null
           user_id?: string | null
         }
@@ -160,13 +169,6 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "admin_users_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
           },
         ]
       }
@@ -587,15 +589,7 @@ export type Database = {
           notes?: string | null
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "agent_availability_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       agent_badges: {
         Row: {
@@ -625,15 +619,7 @@ export type Database = {
           id?: string
           valid_until?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "agent_badges_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       agent_bids: {
         Row: {
@@ -694,13 +680,6 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "agent_bids_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "agent_bids_job_id_fkey"
             columns: ["job_id"]
@@ -781,13 +760,6 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "agent_inquiries_assigned_agent_id_fkey"
-            columns: ["assigned_agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "agent_inquiries_converted_to_job_id_fkey"
             columns: ["converted_to_job_id"]
@@ -952,15 +924,7 @@ export type Database = {
           wholesale_cost?: number
           why_this_trip?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "agent_packages_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       agent_performance_metrics: {
         Row: {
@@ -1023,15 +987,7 @@ export type Database = {
           total_bids_sent?: number | null
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "agent_performance_metrics_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       agent_response_tracking: {
         Row: {
@@ -1065,13 +1021,6 @@ export type Database = {
           response_time_minutes?: number | null
         }
         Relationships: [
-          {
-            foreignKeyName: "agent_response_tracking_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "agent_response_tracking_job_id_fkey"
             columns: ["job_id"]
@@ -1118,13 +1067,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "agent_reviews_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "agent_reviews_job_id_fkey"
             columns: ["job_id"]
             isOneToOne: false
@@ -1164,15 +1106,7 @@ export type Database = {
           user_agent?: string | null
           vendor_version?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "agent_terms_acceptance_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       agent_verification_requests: {
         Row: {
@@ -1220,15 +1154,7 @@ export type Database = {
           updated_at?: string
           verification_type?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "agent_verification_requests_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       ai_agent_profiles: {
         Row: {
@@ -1358,13 +1284,6 @@ export type Database = {
           matching_factors?: Json | null
         }
         Relationships: [
-          {
-            foreignKeyName: "ai_matching_scores_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "ai_matching_scores_job_id_fkey"
             columns: ["job_id"]
@@ -1621,15 +1540,7 @@ export type Database = {
           specializations?: string[] | null
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "auto_assignment_rules_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       blocked_keywords: {
         Row: {
@@ -1754,13 +1665,6 @@ export type Database = {
             referencedRelation: "trip_bookings"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "booking_cancellations_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["booking_id"]
-          },
         ]
       }
       booking_messages: {
@@ -1788,9 +1692,63 @@ export type Database = {
           sender_id?: string
           updated_at?: string
         }
+        Relationships: []
+      }
+      booking_milestones: {
+        Row: {
+          amount_cents: number
+          booking_id: string
+          created_at: string | null
+          currency: string
+          description: string | null
+          due_condition: string | null
+          due_date: string | null
+          funded_at: string | null
+          id: string
+          released_at: string | null
+          released_to: string | null
+          status: string | null
+          stripe_payment_intent_id: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          amount_cents: number
+          booking_id: string
+          created_at?: string | null
+          currency?: string
+          description?: string | null
+          due_condition?: string | null
+          due_date?: string | null
+          funded_at?: string | null
+          id?: string
+          released_at?: string | null
+          released_to?: string | null
+          status?: string | null
+          stripe_payment_intent_id?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          booking_id?: string
+          created_at?: string | null
+          currency?: string
+          description?: string | null
+          due_condition?: string | null
+          due_date?: string | null
+          funded_at?: string | null
+          id?: string
+          released_at?: string | null
+          released_to?: string | null
+          status?: string | null
+          stripe_payment_intent_id?: string | null
+          title?: string
+          updated_at?: string | null
+        }
         Relationships: [
           {
-            foreignKeyName: "booking_messages_booking_id_fkey"
+            foreignKeyName: "booking_milestones_booking_id_fkey"
             columns: ["booking_id"]
             isOneToOne: false
             referencedRelation: "bookings"
@@ -1945,101 +1903,178 @@ export type Database = {
             referencedRelation: "trip_bookings"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "booking_status_history_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["booking_id"]
-          },
         ]
       }
       bookings: {
         Row: {
-          agent_earnings: number | null
+          agent_commission_pct: number | null
           agent_id: string | null
-          agent_share: number | null
+          agent_payout_cents: number | null
+          agent_reviewed: boolean | null
+          booking_number: string
+          brand_commission_pct: number | null
+          brand_id: string | null
+          brand_payout_cents: number | null
+          cancellation_reason: string | null
           cancelled_at: string | null
-          created_at: string
-          creator_earnings: number | null
+          cancelled_by: string | null
+          completed_at: string | null
+          created_at: string | null
+          creator_commission_pct: number | null
           creator_id: string | null
-          creator_share: number | null
-          currency: string | null
-          disputed_at: string | null
-          escrow_released_at: string | null
+          creator_payout_cents: number | null
+          creator_reviewed: boolean | null
+          currency: string
+          destination: string
+          dispute_opened_at: string | null
+          dispute_reason: string | null
+          dispute_resolution: string | null
+          dispute_resolved_at: string | null
+          end_date: string
+          escrow_held_cents: number | null
+          escrow_released_cents: number | null
           id: string
-          payout_expected_at: string | null
-          payout_paid_at: string | null
-          payout_status: string
-          platform_fee: number | null
-          proposal_id: string | null
-          status: string
-          total_amount: number | null
+          is_disputed: boolean | null
+          milestone_payment_enabled: boolean | null
+          milestones: Json | null
+          paid_at: string | null
+          payment_status: Database["public"]["Enums"]["payment_status"] | null
+          payout_completed_at: string | null
+          payout_eligible_at: string | null
+          payout_scheduled_at: string | null
+          payout_status: Database["public"]["Enums"]["payout_status"] | null
+          platform_commission_pct: number | null
+          platform_fee_cents: number | null
+          refund_amount_cents: number | null
+          refunded_at: string | null
+          start_date: string
+          status: Database["public"]["Enums"]["booking_status"] | null
+          stripe_payment_intent_id: string | null
+          total_price_cents: number
           traveler_id: string
-          trip_id: string
-          updated_at: string
+          traveler_reviewed: boolean | null
+          travelers_count: number
+          trip_proposal_id: string | null
+          trip_request_id: string | null
+          updated_at: string | null
         }
         Insert: {
-          agent_earnings?: number | null
+          agent_commission_pct?: number | null
           agent_id?: string | null
-          agent_share?: number | null
+          agent_payout_cents?: number | null
+          agent_reviewed?: boolean | null
+          booking_number: string
+          brand_commission_pct?: number | null
+          brand_id?: string | null
+          brand_payout_cents?: number | null
+          cancellation_reason?: string | null
           cancelled_at?: string | null
-          created_at?: string
-          creator_earnings?: number | null
+          cancelled_by?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          creator_commission_pct?: number | null
           creator_id?: string | null
-          creator_share?: number | null
-          currency?: string | null
-          disputed_at?: string | null
-          escrow_released_at?: string | null
+          creator_payout_cents?: number | null
+          creator_reviewed?: boolean | null
+          currency?: string
+          destination: string
+          dispute_opened_at?: string | null
+          dispute_reason?: string | null
+          dispute_resolution?: string | null
+          dispute_resolved_at?: string | null
+          end_date: string
+          escrow_held_cents?: number | null
+          escrow_released_cents?: number | null
           id?: string
-          payout_expected_at?: string | null
-          payout_paid_at?: string | null
-          payout_status?: string
-          platform_fee?: number | null
-          proposal_id?: string | null
-          status?: string
-          total_amount?: number | null
+          is_disputed?: boolean | null
+          milestone_payment_enabled?: boolean | null
+          milestones?: Json | null
+          paid_at?: string | null
+          payment_status?: Database["public"]["Enums"]["payment_status"] | null
+          payout_completed_at?: string | null
+          payout_eligible_at?: string | null
+          payout_scheduled_at?: string | null
+          payout_status?: Database["public"]["Enums"]["payout_status"] | null
+          platform_commission_pct?: number | null
+          platform_fee_cents?: number | null
+          refund_amount_cents?: number | null
+          refunded_at?: string | null
+          start_date: string
+          status?: Database["public"]["Enums"]["booking_status"] | null
+          stripe_payment_intent_id?: string | null
+          total_price_cents: number
           traveler_id: string
-          trip_id: string
-          updated_at?: string
+          traveler_reviewed?: boolean | null
+          travelers_count: number
+          trip_proposal_id?: string | null
+          trip_request_id?: string | null
+          updated_at?: string | null
         }
         Update: {
-          agent_earnings?: number | null
+          agent_commission_pct?: number | null
           agent_id?: string | null
-          agent_share?: number | null
+          agent_payout_cents?: number | null
+          agent_reviewed?: boolean | null
+          booking_number?: string
+          brand_commission_pct?: number | null
+          brand_id?: string | null
+          brand_payout_cents?: number | null
+          cancellation_reason?: string | null
           cancelled_at?: string | null
-          created_at?: string
-          creator_earnings?: number | null
+          cancelled_by?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          creator_commission_pct?: number | null
           creator_id?: string | null
-          creator_share?: number | null
-          currency?: string | null
-          disputed_at?: string | null
-          escrow_released_at?: string | null
+          creator_payout_cents?: number | null
+          creator_reviewed?: boolean | null
+          currency?: string
+          destination?: string
+          dispute_opened_at?: string | null
+          dispute_reason?: string | null
+          dispute_resolution?: string | null
+          dispute_resolved_at?: string | null
+          end_date?: string
+          escrow_held_cents?: number | null
+          escrow_released_cents?: number | null
           id?: string
-          payout_expected_at?: string | null
-          payout_paid_at?: string | null
-          payout_status?: string
-          platform_fee?: number | null
-          proposal_id?: string | null
-          status?: string
-          total_amount?: number | null
+          is_disputed?: boolean | null
+          milestone_payment_enabled?: boolean | null
+          milestones?: Json | null
+          paid_at?: string | null
+          payment_status?: Database["public"]["Enums"]["payment_status"] | null
+          payout_completed_at?: string | null
+          payout_eligible_at?: string | null
+          payout_scheduled_at?: string | null
+          payout_status?: Database["public"]["Enums"]["payout_status"] | null
+          platform_commission_pct?: number | null
+          platform_fee_cents?: number | null
+          refund_amount_cents?: number | null
+          refunded_at?: string | null
+          start_date?: string
+          status?: Database["public"]["Enums"]["booking_status"] | null
+          stripe_payment_intent_id?: string | null
+          total_price_cents?: number
           traveler_id?: string
-          trip_id?: string
-          updated_at?: string
+          traveler_reviewed?: boolean | null
+          travelers_count?: number
+          trip_proposal_id?: string | null
+          trip_request_id?: string | null
+          updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "bookings_proposal_id_fkey1"
-            columns: ["proposal_id"]
+            foreignKeyName: "bookings_trip_proposal_id_fkey"
+            columns: ["trip_proposal_id"]
             isOneToOne: false
             referencedRelation: "trip_proposals"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "bookings_trip_id_fkey"
-            columns: ["trip_id"]
+            foreignKeyName: "bookings_trip_request_id_fkey"
+            columns: ["trip_request_id"]
             isOneToOne: false
-            referencedRelation: "trips"
+            referencedRelation: "trip_requests"
             referencedColumns: ["id"]
           },
         ]
@@ -2219,15 +2254,7 @@ export type Database = {
           video_urls?: string[] | null
           website?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "brand_applications_brand_profile_id_fkey"
-            columns: ["brand_profile_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       brand_collections: {
         Row: {
@@ -2295,13 +2322,6 @@ export type Database = {
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "brand_collections_brand_profile_id_fkey"
-            columns: ["brand_profile_id"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
-          },
         ]
       }
       brand_engagement_daily_stats: {
@@ -2357,13 +2377,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "brand_engagement_daily_stats_brand_profile_id_fkey"
-            columns: ["brand_profile_id"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
           },
         ]
       }
@@ -2427,56 +2440,76 @@ export type Database = {
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "brand_engagement_events_brand_profile_id_fkey"
-            columns: ["brand_profile_id"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
-          },
         ]
       }
       brand_profiles: {
         Row: {
+          average_rating: number | null
           bio: string | null
           brand_name: string
-          brand_type: string | null
+          brand_type: string
+          cities: string[] | null
+          cover_image_url: string | null
           created_at: string | null
+          gallery_urls: string[] | null
           id: string
+          is_featured: boolean | null
+          logo_url: string | null
           owner_user_id: string
           regions: string[] | null
+          review_count: number | null
+          status: string | null
+          stripe_connect_account_id: string | null
           style_tags: string[] | null
           tagline: string | null
+          total_bookings: number | null
           updated_at: string | null
-          verification_status: string | null
           website: string | null
         }
         Insert: {
+          average_rating?: number | null
           bio?: string | null
           brand_name: string
-          brand_type?: string | null
+          brand_type: string
+          cities?: string[] | null
+          cover_image_url?: string | null
           created_at?: string | null
+          gallery_urls?: string[] | null
           id?: string
+          is_featured?: boolean | null
+          logo_url?: string | null
           owner_user_id: string
           regions?: string[] | null
+          review_count?: number | null
+          status?: string | null
+          stripe_connect_account_id?: string | null
           style_tags?: string[] | null
           tagline?: string | null
+          total_bookings?: number | null
           updated_at?: string | null
-          verification_status?: string | null
           website?: string | null
         }
         Update: {
+          average_rating?: number | null
           bio?: string | null
           brand_name?: string
-          brand_type?: string | null
+          brand_type?: string
+          cities?: string[] | null
+          cover_image_url?: string | null
           created_at?: string | null
+          gallery_urls?: string[] | null
           id?: string
+          is_featured?: boolean | null
+          logo_url?: string | null
           owner_user_id?: string
           regions?: string[] | null
+          review_count?: number | null
+          status?: string | null
+          stripe_connect_account_id?: string | null
           style_tags?: string[] | null
           tagline?: string | null
+          total_bookings?: number | null
           updated_at?: string | null
-          verification_status?: string | null
           website?: string | null
         }
         Relationships: []
@@ -2582,13 +2615,6 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "calendar_events_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "calendar_events_related_itinerary_id_fkey"
             columns: ["related_itinerary_id"]
@@ -2832,15 +2858,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "cocurated_trip_requests_assigned_agent_id_fkey"
-            columns: ["assigned_agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       coin_purchases: {
         Row: {
@@ -2990,13 +3008,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "commission_payout_requests_processed_by_fkey"
-            columns: ["processed_by"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
-          },
-          {
             foreignKeyName: "commission_payout_requests_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -3023,13 +3034,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "commission_payout_requests_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
           },
         ]
       }
@@ -3137,13 +3141,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "concierge_sessions_linked_trip_request_id_fkey"
-            columns: ["linked_trip_request_id"]
-            isOneToOne: false
-            referencedRelation: "trip_requests"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "concierge_sessions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -3170,13 +3167,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "concierge_sessions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
           },
         ]
       }
@@ -3916,15 +3906,7 @@ export type Database = {
           status?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "disputes_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       earnings_ledger: {
         Row: {
@@ -3964,13 +3946,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "earnings_ledger_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "earnings_ledger_payout_id_fkey"
             columns: ["payout_id"]
@@ -4180,13 +4155,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "favorites_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
           },
         ]
       }
@@ -5176,13 +5144,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "marketplace_invoices_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "marketplace_invoices_job_id_fkey"
             columns: ["job_id"]
             isOneToOne: false
@@ -5403,13 +5364,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "marketplace_jobs_assigned_agent_id_fkey"
-            columns: ["assigned_agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "marketplace_jobs_installment_plan_id_fkey"
             columns: ["installment_plan_id"]
             isOneToOne: false
@@ -5495,6 +5449,72 @@ export type Database = {
           url?: string
         }
         Relationships: []
+      }
+      messages: {
+        Row: {
+          attachments: Json | null
+          body: string
+          booking_id: string | null
+          contains_sensitive_info: boolean | null
+          created_at: string | null
+          flagged_for_review: boolean | null
+          flagged_reason: string | null
+          id: string
+          is_read: boolean | null
+          read_at: string | null
+          receiver_id: string | null
+          sender_id: string
+          trip_request_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          attachments?: Json | null
+          body: string
+          booking_id?: string | null
+          contains_sensitive_info?: boolean | null
+          created_at?: string | null
+          flagged_for_review?: boolean | null
+          flagged_reason?: string | null
+          id?: string
+          is_read?: boolean | null
+          read_at?: string | null
+          receiver_id?: string | null
+          sender_id: string
+          trip_request_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          attachments?: Json | null
+          body?: string
+          booking_id?: string | null
+          contains_sensitive_info?: boolean | null
+          created_at?: string | null
+          flagged_for_review?: boolean | null
+          flagged_reason?: string | null
+          id?: string
+          is_read?: boolean | null
+          read_at?: string | null
+          receiver_id?: string | null
+          sender_id?: string
+          trip_request_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_trip_request_id_fkey"
+            columns: ["trip_request_id"]
+            isOneToOne: false
+            referencedRelation: "trip_requests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       moderation_actions: {
         Row: {
@@ -5807,53 +5827,64 @@ export type Database = {
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "moments_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
-          },
         ]
       }
       notifications: {
         Row: {
+          action_label: string | null
+          action_url: string | null
           created_at: string | null
+          entity_id: string | null
+          entity_type: string | null
+          expires_at: string | null
           id: string
           is_read: boolean | null
-          link: string | null
           message: string
-          metadata: Json | null
-          notification_type: string
+          priority: string | null
           read_at: string | null
+          sent_via_email: boolean | null
+          sent_via_push: boolean | null
+          sent_via_sms: boolean | null
           title: string
-          updated_at: string | null
+          type: string
           user_id: string
         }
         Insert: {
+          action_label?: string | null
+          action_url?: string | null
           created_at?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          expires_at?: string | null
           id?: string
           is_read?: boolean | null
-          link?: string | null
           message: string
-          metadata?: Json | null
-          notification_type: string
+          priority?: string | null
           read_at?: string | null
+          sent_via_email?: boolean | null
+          sent_via_push?: boolean | null
+          sent_via_sms?: boolean | null
           title: string
-          updated_at?: string | null
+          type: string
           user_id: string
         }
         Update: {
+          action_label?: string | null
+          action_url?: string | null
           created_at?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          expires_at?: string | null
           id?: string
           is_read?: boolean | null
-          link?: string | null
           message?: string
-          metadata?: Json | null
-          notification_type?: string
+          priority?: string | null
           read_at?: string | null
+          sent_via_email?: boolean | null
+          sent_via_push?: boolean | null
+          sent_via_sms?: boolean | null
           title?: string
-          updated_at?: string | null
+          type?: string
           user_id?: string
         }
         Relationships: []
@@ -6537,13 +6568,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "packaged_trips_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "packaged_trips_creator_id_fkey"
             columns: ["creator_id"]
             isOneToOne: false
@@ -6570,13 +6594,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "packaged_trips_creator_id_fkey"
-            columns: ["creator_id"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
           },
         ]
       }
@@ -6647,13 +6664,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "paid_partnerships_brand_id_fkey"
-            columns: ["brand_id"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
-          },
-          {
             foreignKeyName: "paid_partnerships_creator_id_fkey"
             columns: ["creator_id"]
             isOneToOne: false
@@ -6680,13 +6690,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "paid_partnerships_creator_id_fkey"
-            columns: ["creator_id"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
           },
           {
             foreignKeyName: "paid_partnerships_post_id_fkey"
@@ -6781,15 +6784,7 @@ export type Database = {
           status?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "payment_intents_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       payment_milestones: {
         Row: {
@@ -7041,6 +7036,72 @@ export type Database = {
           status?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      platform_metrics: {
+        Row: {
+          active_users_today: number | null
+          approved_applications_today: number | null
+          cancelled_bookings_today: number | null
+          completed_bookings_today: number | null
+          created_at: string | null
+          id: string
+          messages_sent_today: number | null
+          metric_date: string
+          new_bookings_today: number | null
+          new_users_today: number | null
+          payouts_today_cents: number | null
+          pending_agent_applications: number | null
+          pending_brand_applications: number | null
+          platform_fees_cents: number | null
+          proposals_sent_today: number | null
+          revenue_today_cents: number | null
+          total_bookings: number | null
+          total_revenue_cents: number | null
+          total_users: number | null
+        }
+        Insert: {
+          active_users_today?: number | null
+          approved_applications_today?: number | null
+          cancelled_bookings_today?: number | null
+          completed_bookings_today?: number | null
+          created_at?: string | null
+          id?: string
+          messages_sent_today?: number | null
+          metric_date: string
+          new_bookings_today?: number | null
+          new_users_today?: number | null
+          payouts_today_cents?: number | null
+          pending_agent_applications?: number | null
+          pending_brand_applications?: number | null
+          platform_fees_cents?: number | null
+          proposals_sent_today?: number | null
+          revenue_today_cents?: number | null
+          total_bookings?: number | null
+          total_revenue_cents?: number | null
+          total_users?: number | null
+        }
+        Update: {
+          active_users_today?: number | null
+          approved_applications_today?: number | null
+          cancelled_bookings_today?: number | null
+          completed_bookings_today?: number | null
+          created_at?: string | null
+          id?: string
+          messages_sent_today?: number | null
+          metric_date?: string
+          new_bookings_today?: number | null
+          new_users_today?: number | null
+          payouts_today_cents?: number | null
+          pending_agent_applications?: number | null
+          pending_brand_applications?: number | null
+          platform_fees_cents?: number | null
+          proposals_sent_today?: number | null
+          revenue_today_cents?: number | null
+          total_bookings?: number | null
+          total_revenue_cents?: number | null
+          total_users?: number | null
         }
         Relationships: []
       }
@@ -7920,15 +7981,7 @@ export type Database = {
           updated_at?: string | null
           usage_count?: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "quick_reply_templates_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       rate_limits: {
         Row: {
@@ -8109,6 +8162,86 @@ export type Database = {
         }
         Relationships: []
       }
+      reviews: {
+        Row: {
+          booking_id: string
+          comment: string | null
+          communication_rating: number | null
+          created_at: string | null
+          experience_rating: number | null
+          flagged_reason: string | null
+          id: string
+          is_featured: boolean | null
+          is_public: boolean | null
+          photos: string[] | null
+          professionalism_rating: number | null
+          rating: number
+          responded_at: string | null
+          response: string | null
+          reviewee_id: string
+          reviewee_type: string
+          reviewer_id: string
+          status: string | null
+          title: string | null
+          updated_at: string | null
+          value_rating: number | null
+        }
+        Insert: {
+          booking_id: string
+          comment?: string | null
+          communication_rating?: number | null
+          created_at?: string | null
+          experience_rating?: number | null
+          flagged_reason?: string | null
+          id?: string
+          is_featured?: boolean | null
+          is_public?: boolean | null
+          photos?: string[] | null
+          professionalism_rating?: number | null
+          rating: number
+          responded_at?: string | null
+          response?: string | null
+          reviewee_id: string
+          reviewee_type: string
+          reviewer_id: string
+          status?: string | null
+          title?: string | null
+          updated_at?: string | null
+          value_rating?: number | null
+        }
+        Update: {
+          booking_id?: string
+          comment?: string | null
+          communication_rating?: number | null
+          created_at?: string | null
+          experience_rating?: number | null
+          flagged_reason?: string | null
+          id?: string
+          is_featured?: boolean | null
+          is_public?: boolean | null
+          photos?: string[] | null
+          professionalism_rating?: number | null
+          rating?: number
+          responded_at?: string | null
+          response?: string | null
+          reviewee_id?: string
+          reviewee_type?: string
+          reviewer_id?: string
+          status?: string | null
+          title?: string | null
+          updated_at?: string | null
+          value_rating?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       search_cache: {
         Row: {
           cache_key: string
@@ -8288,13 +8421,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "shared_commission_bookings_customer_id_fkey"
-            columns: ["customer_id"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
           },
           {
             foreignKeyName: "shared_commission_bookings_package_id_fkey"
@@ -8611,13 +8737,6 @@ export type Database = {
             columns: ["original_storyboard_id"]
             isOneToOne: false
             referencedRelation: "storyboards"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "storyboards_trip_request_id_fkey"
-            columns: ["trip_request_id"]
-            isOneToOne: false
-            referencedRelation: "trip_requests"
             referencedColumns: ["id"]
           },
         ]
@@ -9279,241 +9398,97 @@ export type Database = {
       }
       travel_agents: {
         Row: {
-          accepted_gdpr: boolean | null
-          accepted_privacy: boolean | null
-          accepted_terms: boolean | null
-          accepted_vendor: boolean | null
-          accreditations: string | null
+          acceptance_rate: number | null
           agency_name: string
-          background_check_date: string | null
-          background_check_provider: string | null
-          background_check_status: string | null
-          beneficiary_name: string | null
+          average_rating: number | null
           bio: string | null
-          business_address: string | null
-          business_registration_number: string | null
-          business_type: string | null
-          cancellation_fee_percentage: number | null
-          cancellation_hours_before: number | null
-          cancellation_policy: string | null
-          commission_rate: number | null
-          created_at: string
-          destinations: string[] | null
-          email: string | null
-          email_notifications_enabled: boolean | null
-          experience_years: number | null
+          business_type: string
+          cancelled_bookings: number | null
+          completed_bookings: number | null
+          completion_rate: number | null
+          created_at: string | null
+          current_booking_count: number | null
+          disputed_bookings: number | null
           id: string
-          identity_document_url: string | null
-          identity_verification_date: string | null
-          identity_verified: boolean | null
-          insurance_document_url: string | null
-          insurance_expiry: string | null
-          insurance_policy_number: string | null
-          insurance_provider: string | null
-          insurance_verified: boolean | null
-          inventory_management: string | null
-          is_active: boolean | null
-          is_verified: boolean | null
-          languages: string[] | null
+          is_accepting_requests: boolean | null
           last_active_at: string | null
-          license_number: string | null
-          max_budget: number | null
-          max_group_size: number | null
-          min_budget: number | null
-          payment_processor: string | null
-          payout_schedule: string | null
-          phone: string | null
-          preferred_currency: string | null
-          primary_contact_name: string | null
-          primary_contact_title: string | null
-          professional_license_document_url: string | null
-          professional_license_expiry: string | null
-          professional_license_number: string | null
-          professional_license_verified: boolean | null
-          profile_image_url: string | null
-          rating: number | null
-          regions: string[] | null
-          selfie_verification_url: string | null
-          service_types: string[] | null
-          sms_notifications_enabled: boolean | null
-          social_media: string | null
-          specializations: string[] | null
-          stripe_account_id: string | null
-          stripe_account_status: string | null
-          stripe_charges_enabled: boolean | null
-          stripe_onboarding_completed: boolean | null
+          max_concurrent_bookings: number | null
+          onboarded_at: string | null
+          response_time_avg_minutes: number | null
+          review_count: number | null
+          status: string | null
+          stripe_connect_account_id: string | null
+          stripe_onboarding_complete: boolean | null
           stripe_payouts_enabled: boolean | null
-          target_audience: string[] | null
-          tax_id: string | null
-          terms_accepted: boolean | null
-          terms_accepted_at: string | null
-          terms_version: string | null
-          time_zone: string | null
-          total_reviews: number | null
-          trust_score: number | null
-          updated_at: string
+          suspended_at: string | null
+          suspension_reason: string | null
+          total_bookings: number | null
+          total_revenue_cents: number | null
+          updated_at: string | null
           user_id: string
           website: string | null
-          whatsapp_notifications_enabled: boolean | null
-          whatsapp_number: string | null
         }
         Insert: {
-          accepted_gdpr?: boolean | null
-          accepted_privacy?: boolean | null
-          accepted_terms?: boolean | null
-          accepted_vendor?: boolean | null
-          accreditations?: string | null
+          acceptance_rate?: number | null
           agency_name: string
-          background_check_date?: string | null
-          background_check_provider?: string | null
-          background_check_status?: string | null
-          beneficiary_name?: string | null
+          average_rating?: number | null
           bio?: string | null
-          business_address?: string | null
-          business_registration_number?: string | null
-          business_type?: string | null
-          cancellation_fee_percentage?: number | null
-          cancellation_hours_before?: number | null
-          cancellation_policy?: string | null
-          commission_rate?: number | null
-          created_at?: string
-          destinations?: string[] | null
-          email?: string | null
-          email_notifications_enabled?: boolean | null
-          experience_years?: number | null
+          business_type: string
+          cancelled_bookings?: number | null
+          completed_bookings?: number | null
+          completion_rate?: number | null
+          created_at?: string | null
+          current_booking_count?: number | null
+          disputed_bookings?: number | null
           id?: string
-          identity_document_url?: string | null
-          identity_verification_date?: string | null
-          identity_verified?: boolean | null
-          insurance_document_url?: string | null
-          insurance_expiry?: string | null
-          insurance_policy_number?: string | null
-          insurance_provider?: string | null
-          insurance_verified?: boolean | null
-          inventory_management?: string | null
-          is_active?: boolean | null
-          is_verified?: boolean | null
-          languages?: string[] | null
+          is_accepting_requests?: boolean | null
           last_active_at?: string | null
-          license_number?: string | null
-          max_budget?: number | null
-          max_group_size?: number | null
-          min_budget?: number | null
-          payment_processor?: string | null
-          payout_schedule?: string | null
-          phone?: string | null
-          preferred_currency?: string | null
-          primary_contact_name?: string | null
-          primary_contact_title?: string | null
-          professional_license_document_url?: string | null
-          professional_license_expiry?: string | null
-          professional_license_number?: string | null
-          professional_license_verified?: boolean | null
-          profile_image_url?: string | null
-          rating?: number | null
-          regions?: string[] | null
-          selfie_verification_url?: string | null
-          service_types?: string[] | null
-          sms_notifications_enabled?: boolean | null
-          social_media?: string | null
-          specializations?: string[] | null
-          stripe_account_id?: string | null
-          stripe_account_status?: string | null
-          stripe_charges_enabled?: boolean | null
-          stripe_onboarding_completed?: boolean | null
+          max_concurrent_bookings?: number | null
+          onboarded_at?: string | null
+          response_time_avg_minutes?: number | null
+          review_count?: number | null
+          status?: string | null
+          stripe_connect_account_id?: string | null
+          stripe_onboarding_complete?: boolean | null
           stripe_payouts_enabled?: boolean | null
-          target_audience?: string[] | null
-          tax_id?: string | null
-          terms_accepted?: boolean | null
-          terms_accepted_at?: string | null
-          terms_version?: string | null
-          time_zone?: string | null
-          total_reviews?: number | null
-          trust_score?: number | null
-          updated_at?: string
+          suspended_at?: string | null
+          suspension_reason?: string | null
+          total_bookings?: number | null
+          total_revenue_cents?: number | null
+          updated_at?: string | null
           user_id: string
           website?: string | null
-          whatsapp_notifications_enabled?: boolean | null
-          whatsapp_number?: string | null
         }
         Update: {
-          accepted_gdpr?: boolean | null
-          accepted_privacy?: boolean | null
-          accepted_terms?: boolean | null
-          accepted_vendor?: boolean | null
-          accreditations?: string | null
+          acceptance_rate?: number | null
           agency_name?: string
-          background_check_date?: string | null
-          background_check_provider?: string | null
-          background_check_status?: string | null
-          beneficiary_name?: string | null
+          average_rating?: number | null
           bio?: string | null
-          business_address?: string | null
-          business_registration_number?: string | null
-          business_type?: string | null
-          cancellation_fee_percentage?: number | null
-          cancellation_hours_before?: number | null
-          cancellation_policy?: string | null
-          commission_rate?: number | null
-          created_at?: string
-          destinations?: string[] | null
-          email?: string | null
-          email_notifications_enabled?: boolean | null
-          experience_years?: number | null
+          business_type?: string
+          cancelled_bookings?: number | null
+          completed_bookings?: number | null
+          completion_rate?: number | null
+          created_at?: string | null
+          current_booking_count?: number | null
+          disputed_bookings?: number | null
           id?: string
-          identity_document_url?: string | null
-          identity_verification_date?: string | null
-          identity_verified?: boolean | null
-          insurance_document_url?: string | null
-          insurance_expiry?: string | null
-          insurance_policy_number?: string | null
-          insurance_provider?: string | null
-          insurance_verified?: boolean | null
-          inventory_management?: string | null
-          is_active?: boolean | null
-          is_verified?: boolean | null
-          languages?: string[] | null
+          is_accepting_requests?: boolean | null
           last_active_at?: string | null
-          license_number?: string | null
-          max_budget?: number | null
-          max_group_size?: number | null
-          min_budget?: number | null
-          payment_processor?: string | null
-          payout_schedule?: string | null
-          phone?: string | null
-          preferred_currency?: string | null
-          primary_contact_name?: string | null
-          primary_contact_title?: string | null
-          professional_license_document_url?: string | null
-          professional_license_expiry?: string | null
-          professional_license_number?: string | null
-          professional_license_verified?: boolean | null
-          profile_image_url?: string | null
-          rating?: number | null
-          regions?: string[] | null
-          selfie_verification_url?: string | null
-          service_types?: string[] | null
-          sms_notifications_enabled?: boolean | null
-          social_media?: string | null
-          specializations?: string[] | null
-          stripe_account_id?: string | null
-          stripe_account_status?: string | null
-          stripe_charges_enabled?: boolean | null
-          stripe_onboarding_completed?: boolean | null
+          max_concurrent_bookings?: number | null
+          onboarded_at?: string | null
+          response_time_avg_minutes?: number | null
+          review_count?: number | null
+          status?: string | null
+          stripe_connect_account_id?: string | null
+          stripe_onboarding_complete?: boolean | null
           stripe_payouts_enabled?: boolean | null
-          target_audience?: string[] | null
-          tax_id?: string | null
-          terms_accepted?: boolean | null
-          terms_accepted_at?: string | null
-          terms_version?: string | null
-          time_zone?: string | null
-          total_reviews?: number | null
-          trust_score?: number | null
-          updated_at?: string
+          suspended_at?: string | null
+          suspension_reason?: string | null
+          total_bookings?: number | null
+          total_revenue_cents?: number | null
+          updated_at?: string | null
           user_id?: string
           website?: string | null
-          whatsapp_notifications_enabled?: boolean | null
-          whatsapp_number?: string | null
         }
         Relationships: []
       }
@@ -9829,22 +9804,7 @@ export type Database = {
           trip_request_id?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "bookings_proposal_id_fkey"
-            columns: ["proposal_id"]
-            isOneToOne: false
-            referencedRelation: "trip_proposals"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "bookings_trip_request_id_fkey"
-            columns: ["trip_request_id"]
-            isOneToOne: false
-            referencedRelation: "trip_requests"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       trip_contracts: {
         Row: {
@@ -9937,13 +9897,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "trip_contracts_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
-          },
-          {
             foreignKeyName: "trip_contracts_creator_id_fkey"
             columns: ["creator_id"]
             isOneToOne: false
@@ -9972,13 +9925,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "trip_contracts_creator_id_fkey"
-            columns: ["creator_id"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
-          },
-          {
             foreignKeyName: "trip_contracts_traveler_id_fkey"
             columns: ["traveler_id"]
             isOneToOne: false
@@ -10005,13 +9951,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trip_contracts_traveler_id_fkey"
-            columns: ["traveler_id"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
           },
           {
             foreignKeyName: "trip_contracts_trip_id_fkey"
@@ -10053,15 +9992,7 @@ export type Database = {
           trip_request_id?: string
           uploader_user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "trip_files_trip_request_id_fkey"
-            columns: ["trip_request_id"]
-            isOneToOne: false
-            referencedRelation: "trip_requests"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       trip_internal_notes: {
         Row: {
@@ -10085,15 +10016,7 @@ export type Database = {
           note?: string
           trip_request_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "trip_internal_notes_trip_request_id_fkey"
-            columns: ["trip_request_id"]
-            isOneToOne: false
-            referencedRelation: "trip_requests"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       trip_itineraries: {
         Row: {
@@ -10365,118 +10288,79 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "trip_photos_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       trip_proposals: {
         Row: {
-          accepted_at: string | null
-          acknowledged_goldsainte_policies: boolean | null
-          admin_complexity_score: number | null
-          admin_cost_basis: number | null
-          admin_margin_amount: number | null
-          admin_margin_percent: number | null
-          admin_supplier_notes: string | null
-          cancellation_policy_id: string | null
-          created_at: string
-          currency: string | null
-          custom_cancellation_terms: string | null
-          declined_at: string | null
-          deposit_due_days: number | null
-          deposit_percentage: number | null
-          exclusions: string | null
+          agent_commission_pct: number | null
+          agent_id: string | null
+          created_at: string | null
+          creator_commission_pct: number | null
+          creator_id: string | null
+          expires_at: string | null
           headline: string | null
           id: string
-          inclusions: string | null
-          message: string | null
-          nights: number | null
-          payment_schedule: Json | null
+          is_collaborative: boolean | null
+          itinerary_summary: string | null
+          message: string
+          price_breakdown: Json | null
+          price_currency: string | null
           price_from: number | null
           proposer_id: string
           proposer_role: string
-          status: string
+          responded_at: string | null
+          status: string | null
           trip_request_id: string
-          updated_at: string
-          valid_until: string | null
-          withdrawn_at: string | null
+          updated_at: string | null
+          viewed_at: string | null
         }
         Insert: {
-          accepted_at?: string | null
-          acknowledged_goldsainte_policies?: boolean | null
-          admin_complexity_score?: number | null
-          admin_cost_basis?: number | null
-          admin_margin_amount?: number | null
-          admin_margin_percent?: number | null
-          admin_supplier_notes?: string | null
-          cancellation_policy_id?: string | null
-          created_at?: string
-          currency?: string | null
-          custom_cancellation_terms?: string | null
-          declined_at?: string | null
-          deposit_due_days?: number | null
-          deposit_percentage?: number | null
-          exclusions?: string | null
+          agent_commission_pct?: number | null
+          agent_id?: string | null
+          created_at?: string | null
+          creator_commission_pct?: number | null
+          creator_id?: string | null
+          expires_at?: string | null
           headline?: string | null
           id?: string
-          inclusions?: string | null
-          message?: string | null
-          nights?: number | null
-          payment_schedule?: Json | null
+          is_collaborative?: boolean | null
+          itinerary_summary?: string | null
+          message: string
+          price_breakdown?: Json | null
+          price_currency?: string | null
           price_from?: number | null
           proposer_id: string
           proposer_role: string
-          status?: string
+          responded_at?: string | null
+          status?: string | null
           trip_request_id: string
-          updated_at?: string
-          valid_until?: string | null
-          withdrawn_at?: string | null
+          updated_at?: string | null
+          viewed_at?: string | null
         }
         Update: {
-          accepted_at?: string | null
-          acknowledged_goldsainte_policies?: boolean | null
-          admin_complexity_score?: number | null
-          admin_cost_basis?: number | null
-          admin_margin_amount?: number | null
-          admin_margin_percent?: number | null
-          admin_supplier_notes?: string | null
-          cancellation_policy_id?: string | null
-          created_at?: string
-          currency?: string | null
-          custom_cancellation_terms?: string | null
-          declined_at?: string | null
-          deposit_due_days?: number | null
-          deposit_percentage?: number | null
-          exclusions?: string | null
+          agent_commission_pct?: number | null
+          agent_id?: string | null
+          created_at?: string | null
+          creator_commission_pct?: number | null
+          creator_id?: string | null
+          expires_at?: string | null
           headline?: string | null
           id?: string
-          inclusions?: string | null
-          message?: string | null
-          nights?: number | null
-          payment_schedule?: Json | null
+          is_collaborative?: boolean | null
+          itinerary_summary?: string | null
+          message?: string
+          price_breakdown?: Json | null
+          price_currency?: string | null
           price_from?: number | null
           proposer_id?: string
           proposer_role?: string
-          status?: string
+          responded_at?: string | null
+          status?: string | null
           trip_request_id?: string
-          updated_at?: string
-          valid_until?: string | null
-          withdrawn_at?: string | null
+          updated_at?: string | null
+          viewed_at?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "trip_proposals_cancellation_policy_id_fkey"
-            columns: ["cancellation_policy_id"]
-            isOneToOne: false
-            referencedRelation: "cancellation_policies"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "trip_proposals_trip_request_id_fkey"
             columns: ["trip_request_id"]
@@ -10532,15 +10416,7 @@ export type Database = {
           user_id?: string
           would_recommend?: boolean | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "trip_reports_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       trip_request_assignments: {
         Row: {
@@ -10594,20 +10470,6 @@ export type Database = {
             columns: ["assignee_profile_id"]
             isOneToOne: false
             referencedRelation: "public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trip_request_assignments_assignee_profile_id_fkey"
-            columns: ["assignee_profile_id"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
-          },
-          {
-            foreignKeyName: "trip_request_assignments_trip_request_id_fkey"
-            columns: ["trip_request_id"]
-            isOneToOne: false
-            referencedRelation: "trip_requests"
             referencedColumns: ["id"]
           },
         ]
@@ -10675,20 +10537,6 @@ export type Database = {
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "trip_request_matches_candidate_profile_id_fkey"
-            columns: ["candidate_profile_id"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
-          },
-          {
-            foreignKeyName: "trip_request_matches_trip_request_id_fkey"
-            columns: ["trip_request_id"]
-            isOneToOne: false
-            referencedRelation: "trip_requests"
-            referencedColumns: ["id"]
-          },
         ]
       }
       trip_request_messages: {
@@ -10719,22 +10567,7 @@ export type Database = {
           sender_id?: string
           trip_request_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "trip_request_messages_proposal_id_fkey"
-            columns: ["proposal_id"]
-            isOneToOne: false
-            referencedRelation: "trip_proposals"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trip_request_messages_trip_request_id_fkey"
-            columns: ["trip_request_id"]
-            isOneToOne: false
-            referencedRelation: "trip_requests"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       trip_request_modifications: {
         Row: {
@@ -10776,218 +10609,96 @@ export type Database = {
       }
       trip_requests: {
         Row: {
-          accepted_at: string | null
-          accepted_proposal_id: string | null
-          accommodation_style: string | null
+          accessibility_needs: string[] | null
+          accommodation_preferences: string[] | null
           booked_at: string | null
-          budget_level: string | null
+          budget_currency: string | null
           budget_max: number | null
           budget_min: number | null
-          created_at: string
-          departure_city: string | null
+          budget_per_person: boolean | null
+          created_at: string | null
+          date_flexibility_days: number | null
           description: string | null
           destination: string | null
+          dietary_restrictions: string[] | null
           end_date: string | null
-          flexibility: string | null
           flexible_dates: boolean | null
           id: string
+          inspiration_links: string[] | null
           interests: string[] | null
-          occasion: string | null
-          pace: string | null
           selected_proposal_id: string | null
-          source_brand_profile_id: string | null
-          source_collection_id: string | null
-          source_metadata: Json | null
-          source_type: string | null
-          special_notes: string | null
           start_date: string | null
-          status: string
+          status: string | null
           tiktok_link: string | null
-          tiktok_links: string[] | null
           title: string | null
-          travel_styles: string[] | null
-          traveler_count: number | null
-          traveler_type: string | null
           travelers_adults: number | null
           travelers_children: number | null
+          travelers_infants: number | null
           trip_style: string[] | null
-          updated_at: string
-          user_id: string | null
-          wants_role: string | null
+          updated_at: string | null
+          user_id: string
         }
         Insert: {
-          accepted_at?: string | null
-          accepted_proposal_id?: string | null
-          accommodation_style?: string | null
+          accessibility_needs?: string[] | null
+          accommodation_preferences?: string[] | null
           booked_at?: string | null
-          budget_level?: string | null
+          budget_currency?: string | null
           budget_max?: number | null
           budget_min?: number | null
-          created_at?: string
-          departure_city?: string | null
+          budget_per_person?: boolean | null
+          created_at?: string | null
+          date_flexibility_days?: number | null
           description?: string | null
           destination?: string | null
+          dietary_restrictions?: string[] | null
           end_date?: string | null
-          flexibility?: string | null
           flexible_dates?: boolean | null
           id?: string
+          inspiration_links?: string[] | null
           interests?: string[] | null
-          occasion?: string | null
-          pace?: string | null
           selected_proposal_id?: string | null
-          source_brand_profile_id?: string | null
-          source_collection_id?: string | null
-          source_metadata?: Json | null
-          source_type?: string | null
-          special_notes?: string | null
           start_date?: string | null
-          status?: string
+          status?: string | null
           tiktok_link?: string | null
-          tiktok_links?: string[] | null
           title?: string | null
-          travel_styles?: string[] | null
-          traveler_count?: number | null
-          traveler_type?: string | null
           travelers_adults?: number | null
           travelers_children?: number | null
+          travelers_infants?: number | null
           trip_style?: string[] | null
-          updated_at?: string
-          user_id?: string | null
-          wants_role?: string | null
+          updated_at?: string | null
+          user_id: string
         }
         Update: {
-          accepted_at?: string | null
-          accepted_proposal_id?: string | null
-          accommodation_style?: string | null
+          accessibility_needs?: string[] | null
+          accommodation_preferences?: string[] | null
           booked_at?: string | null
-          budget_level?: string | null
+          budget_currency?: string | null
           budget_max?: number | null
           budget_min?: number | null
-          created_at?: string
-          departure_city?: string | null
+          budget_per_person?: boolean | null
+          created_at?: string | null
+          date_flexibility_days?: number | null
           description?: string | null
           destination?: string | null
+          dietary_restrictions?: string[] | null
           end_date?: string | null
-          flexibility?: string | null
           flexible_dates?: boolean | null
           id?: string
+          inspiration_links?: string[] | null
           interests?: string[] | null
-          occasion?: string | null
-          pace?: string | null
           selected_proposal_id?: string | null
-          source_brand_profile_id?: string | null
-          source_collection_id?: string | null
-          source_metadata?: Json | null
-          source_type?: string | null
-          special_notes?: string | null
           start_date?: string | null
-          status?: string
+          status?: string | null
           tiktok_link?: string | null
-          tiktok_links?: string[] | null
           title?: string | null
-          travel_styles?: string[] | null
-          traveler_count?: number | null
-          traveler_type?: string | null
           travelers_adults?: number | null
           travelers_children?: number | null
+          travelers_infants?: number | null
           trip_style?: string[] | null
-          updated_at?: string
-          user_id?: string | null
-          wants_role?: string | null
+          updated_at?: string | null
+          user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "trip_requests_accepted_proposal_id_fkey"
-            columns: ["accepted_proposal_id"]
-            isOneToOne: false
-            referencedRelation: "trip_proposals"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trip_requests_selected_proposal_id_fkey"
-            columns: ["selected_proposal_id"]
-            isOneToOne: false
-            referencedRelation: "trip_proposals"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trip_requests_source_brand_profile_id_fkey"
-            columns: ["source_brand_profile_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "trip_requests_source_brand_profile_id_fkey"
-            columns: ["source_brand_profile_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "trip_requests_source_brand_profile_id_fkey"
-            columns: ["source_brand_profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trip_requests_source_brand_profile_id_fkey"
-            columns: ["source_brand_profile_id"]
-            isOneToOne: false
-            referencedRelation: "public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trip_requests_source_brand_profile_id_fkey"
-            columns: ["source_brand_profile_id"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
-          },
-          {
-            foreignKeyName: "trip_requests_source_collection_id_fkey"
-            columns: ["source_collection_id"]
-            isOneToOne: false
-            referencedRelation: "brand_collections"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trip_requests_user_id_profiles_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "trip_requests_user_id_profiles_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "trip_requests_user_id_profiles_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trip_requests_user_id_profiles_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trip_requests_user_id_profiles_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
-          },
-        ]
+        Relationships: []
       }
       trip_stories: {
         Row: {
@@ -11150,15 +10861,7 @@ export type Database = {
           user_id?: string
           video_url?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "trip_videos_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       trip_votes: {
         Row: {
@@ -11675,13 +11378,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "user_conversations_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "user_conversations_job_id_fkey"
             columns: ["job_id"]
             isOneToOne: false
@@ -11847,15 +11543,7 @@ export type Database = {
           status?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_reports_reported_agent_id_fkey"
-            columns: ["reported_agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_roles: {
         Row: {
@@ -12779,6 +12467,23 @@ export type Database = {
       }
     }
     Views: {
+      agent_leaderboard: {
+        Row: {
+          agency_name: string | null
+          avatar_url: string | null
+          average_rating: number | null
+          completion_rate: number | null
+          full_name: string | null
+          id: string | null
+          rating_rank: number | null
+          revenue_rank: number | null
+          review_count: number | null
+          total_bookings: number | null
+          total_revenue_cents: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
       brand_profiles_discovery: {
         Row: {
           account_type: string | null
@@ -12797,25 +12502,6 @@ export type Database = {
           supplier_verified: boolean | null
           tags: string[] | null
           user_id: string | null
-        }
-        Relationships: []
-      }
-      platform_analytics: {
-        Row: {
-          active_agents: number | null
-          average_rating: number | null
-          completed_jobs: number | null
-          in_progress_jobs: number | null
-          open_disputes: number | null
-          open_jobs: number | null
-          pending_reports: number | null
-          total_agent_payouts: number | null
-          total_jobs: number | null
-          total_reviews: number | null
-          total_service_fees: number | null
-          total_success_fees: number | null
-          total_users: number | null
-          verified_agents: number | null
         }
         Relationships: []
       }
@@ -12845,53 +12531,6 @@ export type Database = {
           username?: string | null
         }
         Relationships: []
-      }
-      trip_bookings_ops_view: {
-        Row: {
-          accepted_at: string | null
-          amount_total_cents: number | null
-          booking_created_at: string | null
-          booking_id: string | null
-          booking_status: string | null
-          booking_updated_at: string | null
-          brand_avatar_url: string | null
-          brand_name: string | null
-          brand_profile_id: string | null
-          budget_max: number | null
-          budget_min: number | null
-          collection_tags: string[] | null
-          collection_title: string | null
-          currency: string | null
-          destination: string | null
-          end_date: string | null
-          partner_payout: number | null
-          payment_provider: string | null
-          payment_reference: string | null
-          payment_url: string | null
-          platform_commission: number | null
-          proposal_id: string | null
-          start_date: string | null
-          travelers_adults: number | null
-          travelers_children: number | null
-          trip_request_id: string | null
-          trip_status: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "bookings_proposal_id_fkey"
-            columns: ["proposal_id"]
-            isOneToOne: false
-            referencedRelation: "trip_proposals"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "bookings_trip_request_id_fkey"
-            columns: ["trip_request_id"]
-            isOneToOne: false
-            referencedRelation: "trip_requests"
-            referencedColumns: ["id"]
-          },
-        ]
       }
     }
     Functions: {
@@ -12938,16 +12577,27 @@ export type Database = {
         }
         Returns: Json
       }
-      calculate_commission_split: {
-        Args: {
-          p_agent_percentage: number
-          p_influencer_percentage: number
-          p_platform_percentage: number
-          p_retail_price: number
-          p_wholesale_cost: number
-        }
-        Returns: Json
-      }
+      calculate_commission_split:
+        | {
+            Args: {
+              p_agent_percentage: number
+              p_influencer_percentage: number
+              p_platform_percentage: number
+              p_retail_price: number
+              p_wholesale_cost: number
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              _agent_commission_pct: number
+              _brand_commission_pct: number
+              _creator_commission_pct: number
+              _platform_commission_pct: number
+              _total_price_cents: number
+            }
+            Returns: Json
+          }
       calculate_creator_earnings: {
         Args: { post_uuid: string }
         Returns: number
@@ -13007,6 +12657,7 @@ export type Database = {
           rating: number
         }[]
       }
+      generate_booking_number: { Args: never; Returns: string }
       generate_invoice_number: { Args: never; Returns: string }
       get_api_error_rate: {
         Args: { p_minutes_ago?: number; p_service_name: string }
@@ -13155,11 +12806,33 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user" | "agent" | "brand"
+      booking_status:
+        | "pending"
+        | "confirmed"
+        | "in_progress"
+        | "completed"
+        | "cancelled"
+        | "disputed"
+        | "refunded"
       brand_engagement_type:
         | "discovered"
         | "profile_view"
         | "moodboard_save"
         | "trip_inquiry"
+      payment_status:
+        | "pending"
+        | "authorized"
+        | "captured"
+        | "failed"
+        | "refunded"
+        | "partially_refunded"
+      payout_status:
+        | "not_eligible"
+        | "pending"
+        | "in_transit"
+        | "paid"
+        | "failed"
+        | "reversed"
       subscription_tier: "free" | "premium" | "enterprise"
       supplier_type:
         | "hotel"
@@ -13297,11 +12970,36 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user", "agent", "brand"],
+      booking_status: [
+        "pending",
+        "confirmed",
+        "in_progress",
+        "completed",
+        "cancelled",
+        "disputed",
+        "refunded",
+      ],
       brand_engagement_type: [
         "discovered",
         "profile_view",
         "moodboard_save",
         "trip_inquiry",
+      ],
+      payment_status: [
+        "pending",
+        "authorized",
+        "captured",
+        "failed",
+        "refunded",
+        "partially_refunded",
+      ],
+      payout_status: [
+        "not_eligible",
+        "pending",
+        "in_transit",
+        "paid",
+        "failed",
+        "reversed",
       ],
       subscription_tier: ["free", "premium", "enterprise"],
       supplier_type: [
