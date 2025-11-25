@@ -1,202 +1,724 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import Stripe from "https://esm.sh/stripe@18.5.0";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import Stripe from "https://esm.sh/stripe@13.11.0?target=deno";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 
+// ============================================================================
+// ENVIRONMENT VARIABLES
+// ============================================================================
+
+const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY")!;
+const STRIPE_WEBHOOK_SECRET = Deno.env.get("STRIPE_IDENTITY_WEBHOOK_SECRET")!;
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY")!;
-const STRIPE_WEBHOOK_SECRET_IDENTITY = Deno.env.get("STRIPE_WEBHOOK_SECRET_IDENTITY")!;
 
 const stripe = new Stripe(STRIPE_SECRET_KEY, {
-  apiVersion: "2024-06-20",
+  apiVersion: "2023-10-16",
+  httpClient: Stripe.createFetchHttpClient(),
 });
 
-const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-Deno.serve(async (req) => {
-  if (req.method !== "POST") {
-    return new Response("Method not allowed", { status: 405 });
-  }
+// ============================================================================
+// TYPES
+// ============================================================================
 
-  const sig = req.headers.get("Stripe-Signature");
-  if (!sig) {
-    return new Response("Missing Stripe-Signature", { status: 400 });
-  }
+interface VerificationSession {
+  id: string;
+  status: string;
+  type: string;
+  livemode: boolean;
+  metadata: {
+    email?: string;
+    applicationType?: string;
+    applicationId?: string;
+  };
+  verified_outputs?: {
+    first_name?: string;
+    last_name?: string;
+    dob?: {
+      day: number;
+      month: number;
+      year: number;
+    };
+    address?: {
+      city?: string;
+      country?: string;
+      line1?: string;
+      line2?: string;
+      postal_code?: string;
+      state?: string;
+    };
+    id_number?: string;
+  };
+  last_error?: {
+    code?: string;
+    reason?: string;
+  };
+  client_secret?: string;
+  url?: string;
+}
 
-  const rawBody = await req.text();
-  const startTime = Date.now();
+interface Logger {
+  info: (message: string, data?: any) => void;
+  warn: (message: string, data?: any) => void;
+  error: (message: string, data?: any) => void;
+}
 
-  let event: Stripe.Event;
-  try {
-    event = stripe.webhooks.constructEvent(rawBody, sig, STRIPE_WEBHOOK_SECRET_IDENTITY);
-  } catch (err) {
-    console.error("Stripe webhook signature verification failed", err);
-    return new Response("Bad signature", { status: 400 });
-  }
+// ============================================================================
+// STRUCTURED LOGGING
+// ============================================================================
 
-  // ============================================================================
-  // IDEMPOTENCY CHECK
-  // ============================================================================
-  
-  const { error: insertError } = await supabaseAdmin
+const createLogger = (requestId: string): Logger => {
+  const log = (level: string, message: string, data?: any) => {
+    const logEntry = {
+      timestamp: new Date().toISOString(),
+      level,
+      requestId,
+      message,
+      ...(data && { data }),
+    };
+    console.log(JSON.stringify(logEntry));
+  };
+
+  return {
+    info: (message: string, data?: any) => log("INFO", message, data),
+    warn: (message: string, data?: any) => log("WARN", message, data),
+    error: (message: string, data?: any) => log("ERROR", message, data),
+  };
+};
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+/**
+ * Check if webhook event has already been processed (idempotency)
+ */
+async function isEventProcessed(eventId: string): Promise<boolean> {
+  const { data, error } = await supabaseClient
     .from("webhook_events")
-    .insert({
-      event_id: event.id,
-      event_type: event.type,
-      event_source: "stripe_identity",
-      payload: event.data.object,
-      processing_duration_ms: null, // Will update at end
+    .select("id")
+    .eq("event_id", eventId)
+    .single();
+
+  if (error && error.code !== "PGRST116") {
+    // PGRST116 = not found, which is expected for new events
+    throw error;
+  }
+
+  return !!data;
+}
+
+/**
+ * Record webhook event for idempotency tracking
+ */
+async function recordWebhookEvent(
+  eventId: string,
+  eventType: string,
+  payload: any,
+  processingDuration: number,
+  errorMessage?: string
+): Promise<void> {
+  const { error } = await supabaseClient.from("webhook_events").insert({
+    event_id: eventId,
+    event_type: eventType,
+    event_source: "stripe_identity",
+    payload,
+    processing_duration_ms: processingDuration,
+    error_message: errorMessage || null,
+    processed_at: new Date().toISOString(),
+  });
+
+  if (error) {
+    // If duplicate key error (event already processed by another instance), silently ignore
+    if (error.code === "23505") {
+      return;
+    }
+    throw error;
+  }
+}
+
+/**
+ * Log audit event
+ */
+async function logAuditEvent(
+  applicationId: string,
+  applicationType: "agent" | "brand",
+  action: string,
+  details: any
+): Promise<void> {
+  await supabaseClient.from("application_audit_log").insert({
+    application_id: applicationId,
+    application_type: applicationType,
+    action,
+    actor_type: "webhook",
+    details,
+    created_at: new Date().toISOString(),
+  });
+}
+
+/**
+ * Send notification to applicant
+ */
+async function sendApplicantNotification(
+  email: string,
+  status: "verified" | "failed",
+  applicationType: "agent" | "brand"
+): Promise<void> {
+  // This will be implemented with your email service (SendGrid, Resend, etc.)
+  // For now, we'll just log it
+  const subject =
+    status === "verified"
+      ? `✅ Identity Verified - ${applicationType === "agent" ? "Agent" : "Brand"} Application`
+      : `❌ Identity Verification Failed - ${applicationType === "agent" ? "Agent" : "Brand"} Application`;
+
+  const message =
+    status === "verified"
+      ? "Your identity has been successfully verified. Our team will review your application within 2-3 business days."
+      : "Identity verification failed. Please check your email for instructions on how to retry verification.";
+
+  console.log(
+    JSON.stringify({
+      action: "send_email",
+      to: email,
+      subject,
+      message,
+      status,
+      applicationType,
+    })
+  );
+
+  // TODO: Implement actual email sending
+  // await sendEmail({ to: email, subject, body: message });
+}
+
+/**
+ * Send notification to admin team
+ */
+async function sendAdminNotification(
+  applicationId: string,
+  applicationType: "agent" | "brand",
+  applicantName: string,
+  email: string
+): Promise<void> {
+  // Get all admin users
+  const { data: admins, error } = await supabaseClient
+    .from("profiles")
+    .select("id, email, full_name")
+    .eq("role", "admin");
+
+  if (error) {
+    console.error("Failed to fetch admin users:", error);
+    return;
+  }
+
+  const adminEmails = admins?.map((admin) => admin.email).filter(Boolean) || [];
+
+  if (adminEmails.length === 0) {
+    console.warn("No admin users found to notify");
+    return;
+  }
+
+  const subject = `🔔 New ${applicationType === "agent" ? "Agent" : "Brand"} Application Ready for Review`;
+  const message = `
+    A new ${applicationType} application has been verified and is ready for review.
+    
+    Applicant: ${applicantName}
+    Email: ${email}
+    Application ID: ${applicationId}
+    
+    Please review the application in the admin dashboard.
+  `;
+
+  console.log(
+    JSON.stringify({
+      action: "send_admin_notification",
+      to: adminEmails,
+      subject,
+      message,
+      applicationId,
+      applicationType,
+    })
+  );
+
+  // TODO: Implement actual email sending
+  // await sendEmail({ to: adminEmails, subject, body: message });
+
+  // Also create in-app notifications
+  const notifications = admins.map((admin) => ({
+    user_id: admin.id,
+    type: "application_update",
+    title: `New ${applicationType === "agent" ? "Agent" : "Brand"} Application`,
+    message: `${applicantName} has completed identity verification. Review pending.`,
+    entity_type: `${applicationType}_application`,
+    entity_id: applicationId,
+    action_url: `/admin/applications/${applicationType}s/${applicationId}`,
+    action_label: "Review Application",
+    priority: "high",
+    created_at: new Date().toISOString(),
+  }));
+
+  await supabaseClient.from("notifications").insert(notifications);
+}
+
+/**
+ * Update agent application status after verification
+ */
+async function updateAgentApplication(
+  sessionId: string,
+  verificationSession: VerificationSession,
+  logger: Logger
+): Promise<void> {
+  const { status, verified_outputs, last_error, metadata } =
+    verificationSession;
+
+  // Find application by Stripe session ID
+  const { data: application, error: fetchError } = await supabaseClient
+    .from("agent_applications")
+    .select("*")
+    .eq("stripe_session_id", sessionId)
+    .single();
+
+  if (fetchError || !application) {
+    logger.error("Agent application not found", {
+      sessionId,
+      error: fetchError,
+    });
+    throw new Error(`Agent application not found for session ${sessionId}`);
+  }
+
+  logger.info("Found agent application", { applicationId: application.id });
+
+  // Determine new status
+  let newStatus: string;
+  let verificationReport: any = {
+    stripe_session_id: sessionId,
+    verified_at: new Date().toISOString(),
+    verification_status: status,
+    verified_outputs,
+    last_error,
+  };
+
+  if (status === "verified") {
+    newStatus = "verified";
+    logger.info("Verification successful", {
+      applicationId: application.id,
     });
 
-  if (insertError?.code === "23505") {
-    // Duplicate event
-    console.log(`✅ Duplicate webhook ignored: ${event.id}`);
-    return new Response(JSON.stringify({ received: true, duplicate: true }), {
-      status: 200,
+    // Update application
+    const { error: updateError } = await supabaseClient
+      .from("agent_applications")
+      .update({
+        status: newStatus,
+        stripe_verification_status: status,
+        stripe_verified_at: new Date().toISOString(),
+        stripe_verification_report: verificationReport,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", application.id);
+
+    if (updateError) {
+      logger.error("Failed to update agent application", {
+        error: updateError,
+      });
+      throw updateError;
+    }
+
+    // Log audit event
+    await logAuditEvent(
+      application.id,
+      "agent",
+      "identity_verified",
+      verificationReport
+    );
+
+    // Send notifications
+    await sendApplicantNotification(application.email, "verified", "agent");
+    await sendAdminNotification(
+      application.id,
+      "agent",
+      `${application.first_name} ${application.last_name}`,
+      application.email
+    );
+
+    logger.info("Agent application updated to verified", {
+      applicationId: application.id,
+    });
+  } else if (
+    status === "requires_input" ||
+    status === "processing" ||
+    status === "canceled"
+  ) {
+    newStatus = "failed";
+    logger.warn("Verification failed or requires input", {
+      applicationId: application.id,
+      status,
+      lastError: last_error,
+    });
+
+    // Update application
+    const { error: updateError } = await supabaseClient
+      .from("agent_applications")
+      .update({
+        status: newStatus,
+        stripe_verification_status: status,
+        stripe_verification_report: verificationReport,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", application.id);
+
+    if (updateError) {
+      logger.error("Failed to update agent application", {
+        error: updateError,
+      });
+      throw updateError;
+    }
+
+    // Log audit event
+    await logAuditEvent(application.id, "agent", "identity_failed", {
+      reason: last_error?.reason || "Unknown",
+      code: last_error?.code || "Unknown",
+      status,
+    });
+
+    // Send failure notification
+    await sendApplicantNotification(application.email, "failed", "agent");
+
+    logger.info("Agent application updated to failed", {
+      applicationId: application.id,
+      reason: last_error?.reason,
+    });
+  }
+}
+
+/**
+ * Update brand application status after verification
+ */
+async function updateBrandApplication(
+  sessionId: string,
+  verificationSession: VerificationSession,
+  logger: Logger
+): Promise<void> {
+  const { status, verified_outputs, last_error, metadata } =
+    verificationSession;
+
+  // Find application by Stripe session ID
+  const { data: application, error: fetchError } = await supabaseClient
+    .from("brand_applications")
+    .select("*")
+    .eq("stripe_session_id", sessionId)
+    .single();
+
+  if (fetchError || !application) {
+    logger.error("Brand application not found", {
+      sessionId,
+      error: fetchError,
+    });
+    throw new Error(`Brand application not found for session ${sessionId}`);
+  }
+
+  logger.info("Found brand application", { applicationId: application.id });
+
+  // Determine new status
+  let newStatus: string;
+  let verificationReport: any = {
+    stripe_session_id: sessionId,
+    verified_at: new Date().toISOString(),
+    verification_status: status,
+    verified_outputs,
+    last_error,
+  };
+
+  if (status === "verified") {
+    newStatus = "verified";
+    logger.info("Verification successful", {
+      applicationId: application.id,
+    });
+
+    // Update application
+    const { error: updateError } = await supabaseClient
+      .from("brand_applications")
+      .update({
+        status: newStatus,
+        stripe_verification_status: status,
+        stripe_verified_at: new Date().toISOString(),
+        stripe_verification_report: verificationReport,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", application.id);
+
+    if (updateError) {
+      logger.error("Failed to update brand application", {
+        error: updateError,
+      });
+      throw updateError;
+    }
+
+    // Log audit event
+    await logAuditEvent(
+      application.id,
+      "brand",
+      "identity_verified",
+      verificationReport
+    );
+
+    // Send notifications
+    await sendApplicantNotification(
+      application.primary_contact_email,
+      "verified",
+      "brand"
+    );
+    await sendAdminNotification(
+      application.id,
+      "brand",
+      application.brand_name,
+      application.primary_contact_email
+    );
+
+    logger.info("Brand application updated to verified", {
+      applicationId: application.id,
+    });
+  } else if (
+    status === "requires_input" ||
+    status === "processing" ||
+    status === "canceled"
+  ) {
+    newStatus = "failed";
+    logger.warn("Verification failed or requires input", {
+      applicationId: application.id,
+      status,
+      lastError: last_error,
+    });
+
+    // Update application
+    const { error: updateError } = await supabaseClient
+      .from("brand_applications")
+      .update({
+        status: newStatus,
+        stripe_verification_status: status,
+        stripe_verification_report: verificationReport,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", application.id);
+
+    if (updateError) {
+      logger.error("Failed to update brand application", {
+        error: updateError,
+      });
+      throw updateError;
+    }
+
+    // Log audit event
+    await logAuditEvent(application.id, "brand", "identity_failed", {
+      reason: last_error?.reason || "Unknown",
+      code: last_error?.code || "Unknown",
+      status,
+    });
+
+    // Send failure notification
+    await sendApplicantNotification(
+      application.primary_contact_email,
+      "failed",
+      "brand"
+    );
+
+    logger.info("Brand application updated to failed", {
+      applicationId: application.id,
+      reason: last_error?.reason,
+    });
+  }
+}
+
+/**
+ * Process verification session completed event
+ */
+async function processVerificationCompleted(
+  verificationSession: VerificationSession,
+  logger: Logger
+): Promise<void> {
+  const sessionId = verificationSession.id;
+
+  logger.info("Processing verification session", {
+    sessionId,
+    status: verificationSession.status,
+  });
+
+  // Check if this is an agent or brand application by trying both tables
+  const { data: agentApp } = await supabaseClient
+    .from("agent_applications")
+    .select("id, email, first_name, last_name")
+    .eq("stripe_session_id", sessionId)
+    .single();
+
+  const { data: brandApp } = await supabaseClient
+    .from("brand_applications")
+    .select("id, primary_contact_email, brand_name")
+    .eq("stripe_session_id", sessionId)
+    .single();
+
+  if (agentApp) {
+    logger.info("Identified as agent application", {
+      applicationId: agentApp.id,
+    });
+    await updateAgentApplication(sessionId, verificationSession, logger);
+  } else if (brandApp) {
+    logger.info("Identified as brand application", {
+      applicationId: brandApp.id,
+    });
+    await updateBrandApplication(sessionId, verificationSession, logger);
+  } else {
+    logger.error("No application found for verification session", {
+      sessionId,
+    });
+    throw new Error(
+      `No application found for verification session ${sessionId}`
+    );
+  }
+}
+
+// ============================================================================
+// MAIN HANDLER
+// ============================================================================
+
+serve(async (req: Request) => {
+  const requestId = crypto.randomUUID();
+  const logger = createLogger(requestId);
+  const startTime = Date.now();
+
+  logger.info("Webhook request received", {
+    method: req.method,
+    url: req.url,
+  });
+
+  // Only accept POST requests
+  if (req.method !== "POST") {
+    logger.warn("Invalid method", { method: req.method });
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
       headers: { "Content-Type": "application/json" },
     });
   }
 
-  if (insertError) {
-    console.error("Error logging webhook event:", insertError);
-    // Continue processing anyway
-  }
-
   try {
-    // ============================================================================
-    // HANDLE IDENTITY VERIFICATION EVENTS
-    // ============================================================================
-
-    if (
-      event.type === "identity.verification_session.verified" ||
-      event.type === "identity.verification_session.requires_input" ||
-      event.type === "identity.verification_session.canceled"
-    ) {
-      const session = event.data.object as Stripe.Identity.VerificationSession;
-      const sessionId = session.id;
-      const email = session.metadata?.email;
-      const applicationType = session.metadata?.application_type as "agent" | "brand";
-      const applicationId = session.metadata?.application_id;
-
-      if (!sessionId || !email || !applicationType || !applicationId) {
-        console.error("Missing required metadata in Stripe Identity session");
-        return new Response("OK", { status: 200 });
-      }
-
-      console.log(`📨 Processing ${event.type} for ${applicationType}: ${email}`);
-
-      // Determine new status
-      let newStatus: string;
-      let rejectionReason: string | null = null;
-
-      if (event.type === "identity.verification_session.verified") {
-        newStatus = "verified";
-        console.log(`✅ Identity verified: ${email}`);
-      } else if (event.type === "identity.verification_session.requires_input") {
-        newStatus = "failed";
-        rejectionReason =
-          session.last_error?.reason ||
-          session.last_error?.code ||
-          "Document could not be verified";
-        console.log(`⚠️ Identity verification failed: ${email} - ${rejectionReason}`);
-      } else {
-        newStatus = "failed";
-        rejectionReason = "Verification was canceled by applicant";
-        console.log(`❌ Identity verification canceled: ${email}`);
-      }
-
-      // Update application table
-      const tableName =
-        applicationType === "agent" ? "agent_applications" : "brand_applications";
-
-      const { error: appUpdateError } = await supabaseAdmin
-        .from(tableName)
-        .update({
-          status: newStatus,
-          stripe_session_id: sessionId,
-          stripe_verification_status: newStatus,
-          stripe_verified_at:
-            newStatus === "verified" ? new Date().toISOString() : null,
-          stripe_verification_report:
-            newStatus === "verified" ? session.last_verification_report : null,
-          rejection_reason: rejectionReason,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", applicationId);
-
-      if (appUpdateError) {
-        console.error(`Error updating ${tableName}:`, appUpdateError);
-        throw appUpdateError;
-      }
-
-      // Log audit event
-      await supabaseAdmin.from("application_audit_log").insert({
-        application_id: applicationId,
-        application_type: applicationType,
-        action: newStatus === "verified" ? "identity_verified" : "identity_failed",
-        actor_type: "webhook",
-        details: {
-          email,
-          session_id: sessionId,
-          event_type: event.type,
-          rejection_reason: rejectionReason,
-        },
-      });
-
-      // If verified, notify admins to review application
-      if (newStatus === "verified") {
-        try {
-          await supabaseAdmin.functions.invoke("notify-admin-new-application", {
-            body: {
-              email,
-              applicationType,
-              applicationId,
-            },
-          });
-        } catch (notifyError) {
-          console.error("Error sending admin notification:", notifyError);
-          // Don't fail webhook if notification fails
-        }
-      }
-
-      // If failed, notify applicant
-      if (newStatus === "failed") {
-        try {
-          await supabaseAdmin.functions.invoke("notify-applicant-verification-failed", {
-            body: {
-              email,
-              applicationType,
-              rejectionReason,
-            },
-          });
-        } catch (notifyError) {
-          console.error("Error sending applicant notification:", notifyError);
-        }
-      }
+    // Get the signature from headers
+    const signature = req.headers.get("stripe-signature");
+    if (!signature) {
+      logger.error("Missing stripe-signature header");
+      return new Response(
+        JSON.stringify({ error: "Missing stripe-signature header" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
     }
 
-    // Update webhook event with processing duration
+    // Get raw body for signature verification
+    const body = await req.text();
+
+    // Verify webhook signature
+    let event: Stripe.Event;
+    try {
+      event = stripe.webhooks.constructEvent(
+        body,
+        signature,
+        STRIPE_WEBHOOK_SECRET
+      );
+      logger.info("Webhook signature verified", { eventType: event.type });
+    } catch (err: any) {
+      logger.error("Webhook signature verification failed", {
+        error: err.message,
+      });
+      return new Response(
+        JSON.stringify({ error: "Invalid signature", details: err.message }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Check for duplicate events (idempotency)
+    const isProcessed = await isEventProcessed(event.id);
+    if (isProcessed) {
+      logger.info("Event already processed (duplicate)", { eventId: event.id });
+      return new Response(
+        JSON.stringify({ received: true, duplicate: true, requestId }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Handle the event
+    let errorMessage: string | undefined;
+
+    try {
+      switch (event.type) {
+        case "identity.verification_session.verified":
+        case "identity.verification_session.requires_input":
+        case "identity.verification_session.processing":
+        case "identity.verification_session.canceled":
+          logger.info("Processing verification session event", {
+            eventType: event.type,
+            sessionId: event.data.object.id,
+          });
+
+          const verificationSession =
+            event.data.object as VerificationSession;
+          await processVerificationCompleted(verificationSession, logger);
+          break;
+
+        default:
+          logger.warn("Unhandled event type", { eventType: event.type });
+      }
+    } catch (processingError: any) {
+      errorMessage = processingError.message;
+      logger.error("Error processing webhook event", {
+        error: processingError.message,
+        stack: processingError.stack,
+      });
+      throw processingError;
+    } finally {
+      // Record webhook event for idempotency (even if processing failed)
+      const processingDuration = Date.now() - startTime;
+      await recordWebhookEvent(
+        event.id,
+        event.type,
+        event.data.object,
+        processingDuration,
+        errorMessage
+      );
+    }
+
     const processingDuration = Date.now() - startTime;
-    await supabaseAdmin
-      .from("webhook_events")
-      .update({
-        processing_duration_ms: processingDuration,
-      })
-      .eq("event_id", event.id);
+    logger.info("Webhook processed successfully", {
+      processingDuration,
+      eventType: event.type,
+    });
 
-    return new Response("OK", { status: 200 });
-  } catch (err) {
-    console.error("Error handling Stripe Identity webhook:", err);
+    return new Response(
+      JSON.stringify({
+        received: true,
+        requestId,
+        processingDuration,
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  } catch (error: any) {
+    const processingDuration = Date.now() - startTime;
+    logger.error("Fatal error processing webhook", {
+      error: error.message,
+      stack: error.stack,
+      processingDuration,
+    });
 
-    // Log error in webhook_events
-    await supabaseAdmin
-      .from("webhook_events")
-      .update({
-        error_message: err instanceof Error ? err.message : String(err),
-        processing_duration_ms: Date.now() - startTime,
-      })
-      .eq("event_id", event.id);
-
-    // Return 200 to prevent Stripe retries (we logged the error)
-    return new Response("OK", { status: 200 });
+    return new Response(
+      JSON.stringify({
+        error: "Internal server error",
+        message: error.message,
+        requestId,
+        processingDuration,
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
 });
