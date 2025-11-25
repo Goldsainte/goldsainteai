@@ -49,66 +49,7 @@ export default function AgentOnboarding() {
       const serviceTypes = (formData.get('service_types') as string).split(',').map(s => s.trim());
       const destinations = (formData.get('destinations') as string).split(',').map(d => d.trim());
 
-      const agentData = {
-        // Business & Contact Information
-        agency_name: formData.get('agency_name') as string,
-        bio: formData.get('bio') as string,
-        business_registration_number: formData.get('business_registration_number') as string,
-        business_type: formData.get('business_type') as string,
-        primary_contact_name: formData.get('primary_contact_name') as string,
-        primary_contact_title: formData.get('primary_contact_title') as string,
-        email: formData.get('email') as string,
-        phone: formData.get('phone') as string,
-        whatsapp_number: formData.get('whatsapp_number') as string,
-        business_address: formData.get('business_address') as string,
-        website: formData.get('website') as string,
-        social_media: formData.get('social_media') as string,
-        
-        // Licensing & Certifications
-        license_number: formData.get('license_number') as string,
-        accreditations: formData.get('accreditations') as string,
-        
-        // Financial & Payment
-        preferred_currency: formData.get('preferred_currency') as string,
-        payment_processor: formData.get('payment_processor') as string,
-        tax_id: formData.get('tax_id') as string,
-        beneficiary_name: formData.get('beneficiary_name') as string,
-        
-        // Services
-        service_types: serviceTypes,
-        destinations: destinations,
-        specializations,
-        inventory_management: formData.get('inventory_management') as string,
-        cancellation_policy: formData.get('cancellation_policy') as string,
-        commission_rate: parseFloat(formData.get('commission_rate') as string),
-        
-        // Platform Access
-        languages,
-        time_zone: formData.get('time_zone') as string,
-        experience_years: parseInt(formData.get('experience_years') as string),
-        
-        // Legal compliance flags
-        accepted_terms: acceptedTerms,
-        accepted_privacy: acceptedPrivacy,
-        accepted_vendor: acceptedVendor,
-        accepted_gdpr: acceptedGDPR,
-        
-        // Communication preferences
-        email_notifications_enabled: emailNotifications,
-        sms_notifications_enabled: smsNotifications,
-        whatsapp_notifications_enabled: whatsappNotifications
-      };
-
-      // Insert into travel_agents
-      const { data: agentProfile, error } = await supabase
-        .from('travel_agents')
-        .insert(agentData as any)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // Create application record (no agent_id - anonymous application)
+      // ONLY save to agent_applications (NO travel_agents record yet)
       const { data: application, error: appError } = await supabase
         .from('agent_applications')
         .insert({
@@ -117,10 +58,21 @@ export default function AgentOnboarding() {
           email: formData.get('email') as string,
           phone: formData.get('phone') as string,
           agency_name: formData.get('agency_name') as string,
+          business_type: formData.get('business_type') as string,
           license_number: formData.get('license_number') as string,
           years_experience: parseInt(formData.get('experience_years') as string),
           specialties: specializations,
+          languages,
           website: formData.get('website') as string,
+          status: 'pending_verification',
+          // Additional fields
+          business_registration_number: formData.get('business_registration_number') as string,
+          primary_contact_name: formData.get('primary_contact_name') as string,
+          primary_contact_title: formData.get('primary_contact_title') as string,
+          whatsapp_number: formData.get('whatsapp_number') as string,
+          business_address: formData.get('business_address') as string,
+          social_media: formData.get('social_media') as string,
+          accreditations: formData.get('accreditations') as string,
         })
         .select()
         .single();
@@ -146,8 +98,8 @@ export default function AgentOnboarding() {
       // Redirect to Stripe Identity
       window.location.href = verificationData.url;
     } catch (error: any) {
-      console.error('Error creating agent profile:', error);
-      toast.error(error.message || 'Failed to create agent profile');
+      console.error('Error creating agent application:', error);
+      toast.error(error.message || 'Failed to submit application');
     } finally {
       setLoading(false);
     }
