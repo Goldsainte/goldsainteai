@@ -278,7 +278,7 @@ async function updateAgentApplication(
 
   // Determine new status
   let newStatus: string;
-  const verificationReport: any = {
+  const verificationReport = {
     stripe_session_id: sessionId,
     verified_at: new Date().toISOString(),
     verification_status: status,
