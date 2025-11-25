@@ -96,11 +96,16 @@ export default function BrandOnboardingPage() {
         .insert({
           brand_name: brandName.trim(),
           brand_type: brandType,
-          primary_contact_email: '', // Will be collected in form
-          primary_contact_name: '', // Will be collected in form
+          primary_contact_email: 'placeholder@temp.com', // Must collect actual email in full form
+          primary_contact_name: brandName.trim(), // Temporary - should collect actual name
+          primary_contact_phone: '+10000000000', // Temporary - must collect actual phone
           website: website.trim() || null,
           regions: regionsArray,
           style_tags: styleTags,
+          tagline: tagline.trim() || null,
+          bio: bio.trim() || null,
+          status: 'pending_verification',
+          submitted_at: new Date().toISOString(),
         })
         .select()
         .single();
@@ -115,7 +120,7 @@ export default function BrandOnboardingPage() {
       const { data: verificationData, error: verificationError } = 
         await supabase.functions.invoke('create-stripe-identity-session', {
           body: {
-            email: '', // Will be collected in form
+            email: 'placeholder@temp.com', // Must collect actual email in full form
             firstName: brandName.trim().split(' ')[0],
             lastName: 'Brand',
             applicationType: 'brand',

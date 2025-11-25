@@ -32,7 +32,7 @@ export default function ApplicationVerificationComplete() {
         const tableName = applicationType === 'agent' ? 'agent_applications' : 'brand_applications';
         const { data: application, error } = await supabase
           .from(tableName)
-          .select('stripe_verification_status, admin_status')
+          .select('status, stripe_verification_status')
           .eq('id', applicationId)
           .single();
 
@@ -42,36 +42,14 @@ export default function ApplicationVerificationComplete() {
           return;
         }
 
-        if (application.stripe_verification_status === 'verified') {
-          // Update application status to pending_review
-          const { error: updateError } = await supabase
-            .from(tableName)
-            .update({ admin_status: 'pending_review' })
-            .eq('id', applicationId);
-
-          if (updateError) {
-            console.error('Error updating application:', updateError);
-          }
-
-          // Notify admin
-          try {
-            await supabase.functions.invoke('notify-admin-new-application', {
-              body: {
-                applicationType,
-                applicationId,
-                applicantEmail: email,
-              },
-            });
-          } catch (notifyErr) {
-            console.error('Could not send admin notification:', notifyErr);
-          }
-
+        if (application.status === 'verified' || application.stripe_verification_status === 'verified') {
+          // Application is already verified - no need to update
           // Clear localStorage
           localStorage.removeItem('agent_application_id');
           localStorage.removeItem('agent_application_email');
 
           setStatus('success');
-        } else if (application.stripe_verification_status === 'requires_input') {
+        } else if (application.status === 'failed') {
           setStatus('error');
         } else {
           // Still pending, show success anyway

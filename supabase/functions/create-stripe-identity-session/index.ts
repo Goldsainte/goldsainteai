@@ -121,12 +121,28 @@ Deno.serve(async (req) => {
         .from(tableName)
         .update({
           stripe_verification_session_id: session.id,
+          status: 'pending_verification', // Explicit status
           stripe_verification_status: "pending",
         })
         .eq("id", applicationId);
 
       if (updateError) {
         console.error("Error updating application with verification session", updateError);
+      } else {
+        // Log to audit trail
+        await supabaseAdmin
+          .from('application_audit_log')
+          .insert({
+            application_id: applicationId,
+            application_type: applicationType,
+            action: 'submitted',
+            actor_type: 'system',
+            details: {
+              session_id: session.id,
+              email,
+              name: `${firstName} ${lastName}`,
+            },
+          });
       }
     }
 

@@ -19,10 +19,10 @@ interface AgentApplication {
   last_name: string | null;
   agency_name: string | null;
   years_experience: number | null;
-  specializations: string[] | null;
+  specialties: string[] | null;
   stripe_verification_status: string | null;
   stripe_verified_at: string | null;
-  admin_status: string | null;
+  status: string | null; // Changed from admin_status
   created_at: string | null;
 }
 
@@ -38,7 +38,7 @@ interface BrandApplication {
   style_tags: string[];
   stripe_verification_status: string;
   stripe_verified_at: string;
-  admin_status: string;
+  status: string; // Changed from admin_status
   created_at: string;
 }
 
@@ -54,10 +54,9 @@ export default function ApplicationReviewDashboard() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("agent_applications")
-        .select("id, email, first_name, last_name, agency_name, years_experience, specializations, stripe_verification_status, stripe_verified_at, admin_status, created_at")
-        .eq("stripe_verification_status", "verified")
-        .eq("admin_status", "pending_review")
-        .order("created_at", { ascending: false }) as any;
+        .select("id, email, first_name, last_name, agency_name, years_experience, specialties, stripe_verification_status, stripe_verified_at, status, created_at")
+        .eq("status", "verified")
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       return data as AgentApplication[];
@@ -71,8 +70,7 @@ export default function ApplicationReviewDashboard() {
       const { data, error } = await supabase
         .from("brand_applications")
         .select("*")
-        .eq("stripe_verification_status", "verified")
-        .eq("admin_status", "pending_review")
+        .eq("status", "verified")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -122,7 +120,7 @@ export default function ApplicationReviewDashboard() {
       const { error: updateError } = await supabase
         .from(tableName)
         .update({
-          admin_status: "rejected",
+          status: "rejected",
           rejection_reason: reason,
           reviewed_at: new Date().toISOString(),
         })
@@ -224,7 +222,7 @@ export default function ApplicationReviewDashboard() {
           </div>
           <div className="col-span-2">
             <span className="font-medium">Specializations:</span>{" "}
-            {app.specializations?.join(", ") || "None specified"}
+            {app.specialties?.join(", ") || "None specified"}
           </div>
         </div>
 

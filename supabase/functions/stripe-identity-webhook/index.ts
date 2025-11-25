@@ -74,14 +74,31 @@ Deno.serve(async (req) => {
         const { error: appUpdateError } = await supabaseAdmin
           .from(tableName)
           .update({
+            status: newStatus, // Use single status field
             stripe_verification_status: newStatus,
             stripe_verified_at: newStatus === 'verified' ? new Date().toISOString() : null,
+            stripe_verification_report: newStatus === 'verified' ? session.last_verification_report : null,
             rejection_reason: rejectionReason,
           })
           .eq("id", applicationId);
 
         if (appUpdateError) {
           console.error(`Error updating ${tableName}:`, appUpdateError);
+        } else {
+          // Log to audit trail
+          await supabaseAdmin
+            .from('application_audit_log')
+            .insert({
+              application_id: applicationId,
+              application_type: applicationType,
+              action: newStatus === 'verified' ? 'identity_verified' : 'identity_failed',
+              actor_type: 'webhook',
+              details: {
+                session_id: sessionId,
+                verification_status: newStatus,
+                rejection_reason: rejectionReason,
+              },
+            });
         }
       }
 

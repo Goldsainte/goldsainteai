@@ -82,21 +82,22 @@ export default function AgentApplyPage() {
 
       const { error: upsertError } = await supabase
         .from("agent_applications")
-        .upsert(
+        .insert(
           {
-            agent_id: user.id,
-            agency_name: agencyName || null,
+            first_name: user.user_metadata?.first_name || user.email?.split('@')[0] || 'Unknown',
+            last_name: user.user_metadata?.last_name || '',
+            email: user.email || '',
+            phone: '+10000000000', // Temporary placeholder
+            agency_name: agencyName || 'Unknown Agency',
+            business_type: 'independent',
+            business_address: 'Not provided',
             license_number: licenseNumber || null,
-            license_authority: licenseAuthority || null,
+            accreditations: licenseAuthority || null,
             website: website || null,
-            instagram_handle: instagram || null,
-            tiktok_handle: tiktok || null,
-            years_experience: yearsExperience ? Number(yearsExperience) : null,
+            years_experience: yearsExperience ? Number(yearsExperience) : 0,
             specialties: specialties,
-            notes: notes || null,
-            verification_status: "pending",
-          },
-          { onConflict: "agent_id" }
+            status: "pending_verification",
+          }
         );
 
       if (upsertError) throw upsertError;
