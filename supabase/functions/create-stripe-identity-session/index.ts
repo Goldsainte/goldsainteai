@@ -56,7 +56,7 @@ Deno.serve(async (req) => {
       const tableName = applicationType === 'agent' ? 'agent_applications' : 'brand_applications';
       const { data: application, error: appError } = await supabaseAdmin
         .from(tableName)
-        .select("id, stripe_verification_session_id")
+        .select("id, stripe_session_id")
         .eq("id", applicationId)
         .maybeSingle();
 
@@ -120,7 +120,7 @@ Deno.serve(async (req) => {
       const { error: updateError } = await supabaseAdmin
         .from(tableName)
         .update({
-          stripe_verification_session_id: session.id,
+          stripe_session_id: session.id,
           status: 'pending_verification', // Explicit status
           stripe_verification_status: "pending",
         })
