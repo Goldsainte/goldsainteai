@@ -329,36 +329,72 @@ export type Database = {
           admin_notes: string | null
           admin_reviewer_id: string | null
           agency_name: string
+          approval_notes: string | null
           approved_at: string | null
+          background_check_completed_at: string | null
+          background_check_provider: string | null
+          background_check_report_id: string | null
+          background_check_status: string | null
+          bank_account_encrypted: string | null
           business_address: string
+          business_city: string | null
+          business_country: string | null
+          business_postal_code: string | null
           business_registration_number: string | null
+          business_state: string | null
           business_type: string
+          cancellation_policy: string | null
+          certifications: Json | null
+          client_testimonials: Json | null
+          commission_rate: number | null
           created_at: string | null
           destinations: string[] | null
+          documents: Json | null
           email: string
           email_notifications_enabled: boolean | null
           first_name: string
+          iban: string | null
           id: string
+          insurance_coverage_amount: number | null
+          insurance_policy_number: string | null
+          insurance_provider: string | null
           languages: string[] | null
           last_name: string
+          license_expiry: string | null
           license_number: string | null
+          license_state: string | null
+          minimum_booking_value: number | null
           payment_processor: string | null
           phone: string
+          preferred_contact_method: string | null
           preferred_currency: string | null
+          previous_platforms: string[] | null
+          rejected_at: string | null
           rejection_reason: string | null
           reviewed_at: string | null
+          risk_factors: Json | null
+          risk_score: number | null
+          routing_number_encrypted: string | null
           service_types: string[] | null
           sms_notifications_enabled: boolean | null
+          social_media: Json | null
           specialties: string[] | null
           status: string | null
+          stripe_verification_document_back: string | null
+          stripe_verification_document_front: string | null
           stripe_verification_report: Json | null
           stripe_verification_session_id: string | null
           stripe_verification_status: string | null
           stripe_verified_at: string | null
           submitted_at: string | null
+          swift_code: string | null
+          tax_country: string | null
           tax_id: string | null
+          terms_accepted_at: string | null
+          terms_version: string | null
           updated_at: string | null
           user_id: string | null
+          vat_number: string | null
           website: string | null
           whatsapp_notifications_enabled: boolean | null
           years_experience: number
@@ -372,36 +408,72 @@ export type Database = {
           admin_notes?: string | null
           admin_reviewer_id?: string | null
           agency_name: string
+          approval_notes?: string | null
           approved_at?: string | null
+          background_check_completed_at?: string | null
+          background_check_provider?: string | null
+          background_check_report_id?: string | null
+          background_check_status?: string | null
+          bank_account_encrypted?: string | null
           business_address: string
+          business_city?: string | null
+          business_country?: string | null
+          business_postal_code?: string | null
           business_registration_number?: string | null
+          business_state?: string | null
           business_type: string
+          cancellation_policy?: string | null
+          certifications?: Json | null
+          client_testimonials?: Json | null
+          commission_rate?: number | null
           created_at?: string | null
           destinations?: string[] | null
+          documents?: Json | null
           email: string
           email_notifications_enabled?: boolean | null
           first_name: string
+          iban?: string | null
           id?: string
+          insurance_coverage_amount?: number | null
+          insurance_policy_number?: string | null
+          insurance_provider?: string | null
           languages?: string[] | null
           last_name: string
+          license_expiry?: string | null
           license_number?: string | null
+          license_state?: string | null
+          minimum_booking_value?: number | null
           payment_processor?: string | null
           phone: string
+          preferred_contact_method?: string | null
           preferred_currency?: string | null
+          previous_platforms?: string[] | null
+          rejected_at?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
+          risk_factors?: Json | null
+          risk_score?: number | null
+          routing_number_encrypted?: string | null
           service_types?: string[] | null
           sms_notifications_enabled?: boolean | null
+          social_media?: Json | null
           specialties?: string[] | null
           status?: string | null
+          stripe_verification_document_back?: string | null
+          stripe_verification_document_front?: string | null
           stripe_verification_report?: Json | null
           stripe_verification_session_id?: string | null
           stripe_verification_status?: string | null
           stripe_verified_at?: string | null
           submitted_at?: string | null
+          swift_code?: string | null
+          tax_country?: string | null
           tax_id?: string | null
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           updated_at?: string | null
           user_id?: string | null
+          vat_number?: string | null
           website?: string | null
           whatsapp_notifications_enabled?: boolean | null
           years_experience: number
@@ -415,36 +487,72 @@ export type Database = {
           admin_notes?: string | null
           admin_reviewer_id?: string | null
           agency_name?: string
+          approval_notes?: string | null
           approved_at?: string | null
+          background_check_completed_at?: string | null
+          background_check_provider?: string | null
+          background_check_report_id?: string | null
+          background_check_status?: string | null
+          bank_account_encrypted?: string | null
           business_address?: string
+          business_city?: string | null
+          business_country?: string | null
+          business_postal_code?: string | null
           business_registration_number?: string | null
+          business_state?: string | null
           business_type?: string
+          cancellation_policy?: string | null
+          certifications?: Json | null
+          client_testimonials?: Json | null
+          commission_rate?: number | null
           created_at?: string | null
           destinations?: string[] | null
+          documents?: Json | null
           email?: string
           email_notifications_enabled?: boolean | null
           first_name?: string
+          iban?: string | null
           id?: string
+          insurance_coverage_amount?: number | null
+          insurance_policy_number?: string | null
+          insurance_provider?: string | null
           languages?: string[] | null
           last_name?: string
+          license_expiry?: string | null
           license_number?: string | null
+          license_state?: string | null
+          minimum_booking_value?: number | null
           payment_processor?: string | null
           phone?: string
+          preferred_contact_method?: string | null
           preferred_currency?: string | null
+          previous_platforms?: string[] | null
+          rejected_at?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
+          risk_factors?: Json | null
+          risk_score?: number | null
+          routing_number_encrypted?: string | null
           service_types?: string[] | null
           sms_notifications_enabled?: boolean | null
+          social_media?: Json | null
           specialties?: string[] | null
           status?: string | null
+          stripe_verification_document_back?: string | null
+          stripe_verification_document_front?: string | null
           stripe_verification_report?: Json | null
           stripe_verification_session_id?: string | null
           stripe_verification_status?: string | null
           stripe_verified_at?: string | null
           submitted_at?: string | null
+          swift_code?: string | null
+          tax_country?: string | null
           tax_id?: string | null
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           updated_at?: string | null
           user_id?: string | null
+          vat_number?: string | null
           website?: string | null
           whatsapp_notifications_enabled?: boolean | null
           years_experience?: number
@@ -1940,19 +2048,44 @@ export type Database = {
         Row: {
           admin_notes: string | null
           admin_reviewer_id: string | null
+          amenities: string[] | null
+          approval_notes: string | null
           approved_at: string | null
           bio: string | null
+          brand_category: string | null
           brand_name: string
           brand_profile_id: string | null
+          brand_story: string | null
           brand_type: string
+          business_address: string | null
+          business_city: string | null
+          business_country: string | null
+          business_postal_code: string | null
+          business_registration_number: string | null
+          business_state: string | null
+          capacity_max: number | null
+          capacity_min: number | null
+          cities: string[] | null
+          cover_image_url: string | null
           created_at: string | null
+          documents: Json | null
+          facebook_url: string | null
+          gallery_urls: string[] | null
           id: string
+          instagram_handle: string | null
+          linkedin_url: string | null
+          logo_url: string | null
+          price_range: string | null
           primary_contact_email: string
           primary_contact_name: string
           primary_contact_phone: string
+          primary_contact_title: string | null
+          quality_certifications: string[] | null
           regions: string[] | null
+          rejected_at: string | null
           rejection_reason: string | null
           reviewed_at: string | null
+          room_types: Json | null
           status: string | null
           stripe_verification_report: Json | null
           stripe_verification_session_id: string | null
@@ -1960,27 +2093,57 @@ export type Database = {
           stripe_verified_at: string | null
           style_tags: string[] | null
           submitted_at: string | null
+          sustainability_certifications: string[] | null
           tagline: string | null
+          tax_id: string | null
+          tiktok_handle: string | null
           updated_at: string | null
           user_id: string | null
+          vat_number: string | null
+          video_urls: string[] | null
           website: string | null
         }
         Insert: {
           admin_notes?: string | null
           admin_reviewer_id?: string | null
+          amenities?: string[] | null
+          approval_notes?: string | null
           approved_at?: string | null
           bio?: string | null
+          brand_category?: string | null
           brand_name: string
           brand_profile_id?: string | null
+          brand_story?: string | null
           brand_type: string
+          business_address?: string | null
+          business_city?: string | null
+          business_country?: string | null
+          business_postal_code?: string | null
+          business_registration_number?: string | null
+          business_state?: string | null
+          capacity_max?: number | null
+          capacity_min?: number | null
+          cities?: string[] | null
+          cover_image_url?: string | null
           created_at?: string | null
+          documents?: Json | null
+          facebook_url?: string | null
+          gallery_urls?: string[] | null
           id?: string
+          instagram_handle?: string | null
+          linkedin_url?: string | null
+          logo_url?: string | null
+          price_range?: string | null
           primary_contact_email: string
           primary_contact_name: string
           primary_contact_phone: string
+          primary_contact_title?: string | null
+          quality_certifications?: string[] | null
           regions?: string[] | null
+          rejected_at?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
+          room_types?: Json | null
           status?: string | null
           stripe_verification_report?: Json | null
           stripe_verification_session_id?: string | null
@@ -1988,27 +2151,57 @@ export type Database = {
           stripe_verified_at?: string | null
           style_tags?: string[] | null
           submitted_at?: string | null
+          sustainability_certifications?: string[] | null
           tagline?: string | null
+          tax_id?: string | null
+          tiktok_handle?: string | null
           updated_at?: string | null
           user_id?: string | null
+          vat_number?: string | null
+          video_urls?: string[] | null
           website?: string | null
         }
         Update: {
           admin_notes?: string | null
           admin_reviewer_id?: string | null
+          amenities?: string[] | null
+          approval_notes?: string | null
           approved_at?: string | null
           bio?: string | null
+          brand_category?: string | null
           brand_name?: string
           brand_profile_id?: string | null
+          brand_story?: string | null
           brand_type?: string
+          business_address?: string | null
+          business_city?: string | null
+          business_country?: string | null
+          business_postal_code?: string | null
+          business_registration_number?: string | null
+          business_state?: string | null
+          capacity_max?: number | null
+          capacity_min?: number | null
+          cities?: string[] | null
+          cover_image_url?: string | null
           created_at?: string | null
+          documents?: Json | null
+          facebook_url?: string | null
+          gallery_urls?: string[] | null
           id?: string
+          instagram_handle?: string | null
+          linkedin_url?: string | null
+          logo_url?: string | null
+          price_range?: string | null
           primary_contact_email?: string
           primary_contact_name?: string
           primary_contact_phone?: string
+          primary_contact_title?: string | null
+          quality_certifications?: string[] | null
           regions?: string[] | null
+          rejected_at?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
+          room_types?: Json | null
           status?: string | null
           stripe_verification_report?: Json | null
           stripe_verification_session_id?: string | null
@@ -2016,9 +2209,14 @@ export type Database = {
           stripe_verified_at?: string | null
           style_tags?: string[] | null
           submitted_at?: string | null
+          sustainability_certifications?: string[] | null
           tagline?: string | null
+          tax_id?: string | null
+          tiktok_handle?: string | null
           updated_at?: string | null
           user_id?: string | null
+          vat_number?: string | null
+          video_urls?: string[] | null
           website?: string | null
         }
         Relationships: [
@@ -7297,6 +7495,7 @@ export type Database = {
           destinations_focus_tags: string[] | null
           display_name: string | null
           email_notifications: boolean | null
+          email_verified: boolean | null
           featured_photos: string[] | null
           first_name: string | null
           followers_count: number | null
@@ -7305,6 +7504,7 @@ export type Database = {
           has_completed_creator_onboarding: boolean | null
           home_base: string | null
           id: string
+          identity_verified: boolean | null
           instagram_handle: string | null
           instagram_username: string | null
           is_business_verified: boolean | null
@@ -7312,16 +7512,21 @@ export type Database = {
           is_shadowbanned: boolean | null
           is_verified: boolean | null
           last_name: string | null
+          last_seen_at: string | null
           last_warning_at: string | null
           location: string | null
+          metadata: Json | null
+          notification_preferences: Json | null
           onboarding_completed: boolean
           onboarding_completed_at: string | null
           payout_schedule: string | null
           phone: string | null
+          phone_verified: boolean | null
           preferences: Json | null
           preferred_currency: string | null
           preferred_language: string | null
           primary_platform: string | null
+          profile_visibility: string | null
           restriction_expires_at: string | null
           role: string | null
           show_account_type: boolean | null
@@ -7343,6 +7548,7 @@ export type Database = {
           tiktok_refresh_token: string | null
           tiktok_token_expires_at: string | null
           tiktok_username: string | null
+          time_zone: string | null
           updated_at: string
           username: string | null
           warning_count: number | null
@@ -7379,6 +7585,7 @@ export type Database = {
           destinations_focus_tags?: string[] | null
           display_name?: string | null
           email_notifications?: boolean | null
+          email_verified?: boolean | null
           featured_photos?: string[] | null
           first_name?: string | null
           followers_count?: number | null
@@ -7387,6 +7594,7 @@ export type Database = {
           has_completed_creator_onboarding?: boolean | null
           home_base?: string | null
           id: string
+          identity_verified?: boolean | null
           instagram_handle?: string | null
           instagram_username?: string | null
           is_business_verified?: boolean | null
@@ -7394,16 +7602,21 @@ export type Database = {
           is_shadowbanned?: boolean | null
           is_verified?: boolean | null
           last_name?: string | null
+          last_seen_at?: string | null
           last_warning_at?: string | null
           location?: string | null
+          metadata?: Json | null
+          notification_preferences?: Json | null
           onboarding_completed?: boolean
           onboarding_completed_at?: string | null
           payout_schedule?: string | null
           phone?: string | null
+          phone_verified?: boolean | null
           preferences?: Json | null
           preferred_currency?: string | null
           preferred_language?: string | null
           primary_platform?: string | null
+          profile_visibility?: string | null
           restriction_expires_at?: string | null
           role?: string | null
           show_account_type?: boolean | null
@@ -7425,6 +7638,7 @@ export type Database = {
           tiktok_refresh_token?: string | null
           tiktok_token_expires_at?: string | null
           tiktok_username?: string | null
+          time_zone?: string | null
           updated_at?: string
           username?: string | null
           warning_count?: number | null
@@ -7461,6 +7675,7 @@ export type Database = {
           destinations_focus_tags?: string[] | null
           display_name?: string | null
           email_notifications?: boolean | null
+          email_verified?: boolean | null
           featured_photos?: string[] | null
           first_name?: string | null
           followers_count?: number | null
@@ -7469,6 +7684,7 @@ export type Database = {
           has_completed_creator_onboarding?: boolean | null
           home_base?: string | null
           id?: string
+          identity_verified?: boolean | null
           instagram_handle?: string | null
           instagram_username?: string | null
           is_business_verified?: boolean | null
@@ -7476,16 +7692,21 @@ export type Database = {
           is_shadowbanned?: boolean | null
           is_verified?: boolean | null
           last_name?: string | null
+          last_seen_at?: string | null
           last_warning_at?: string | null
           location?: string | null
+          metadata?: Json | null
+          notification_preferences?: Json | null
           onboarding_completed?: boolean
           onboarding_completed_at?: string | null
           payout_schedule?: string | null
           phone?: string | null
+          phone_verified?: boolean | null
           preferences?: Json | null
           preferred_currency?: string | null
           preferred_language?: string | null
           primary_platform?: string | null
+          profile_visibility?: string | null
           restriction_expires_at?: string | null
           role?: string | null
           show_account_type?: boolean | null
@@ -7507,6 +7728,7 @@ export type Database = {
           tiktok_refresh_token?: string | null
           tiktok_token_expires_at?: string | null
           tiktok_username?: string | null
+          time_zone?: string | null
           updated_at?: string
           username?: string | null
           warning_count?: number | null
@@ -12924,6 +13146,8 @@ export type Database = {
         }
         Returns: Json
       }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
       update_agent_performance_metrics: {
         Args: { target_agent_id: string }
         Returns: boolean
