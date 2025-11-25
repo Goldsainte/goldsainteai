@@ -173,11 +173,14 @@ try {
   const rootElement = document.getElementById("root");
   
   if (!rootElement) {
+    console.error("❌ [Main] Root element #root not found in DOM!");
     throw new Error("Root element not found");
   }
 
+  console.log("✅ [Main] Root element found, creating React root...");
   const root = createRoot(rootElement);
   
+  console.log("🎨 [Main] Rendering App component...");
   // Wrap in ErrorBoundary only if Sentry is initialized
   if (sentryDsn) {
     root.render(

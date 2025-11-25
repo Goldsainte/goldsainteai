@@ -57,16 +57,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
+    console.log("🔐 [AuthContext] Initializing auth state...");
     let isMounted = true;
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log("🔄 [AuthContext] Auth state changed:", event, session ? `User: ${session.user.email}` : "No session");
         if (!isMounted) return;
         setSession(session);
         setUser(session?.user ?? null);
         setIsLoading(false);
         resetSessionFailureCount();
         void pushSessionToServer(event, session).catch((error: unknown) => {
+          console.warn("⚠️ [AuthContext] Failed to push session to server:", error);
           Sentry.captureException(error, {
             level: 'warning',
             tags: { scope: 'session_sync', phase: 'push', event },
@@ -77,20 +80,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const bootstrapSession = async () => {
       try {
+        console.log("🔍 [AuthContext] Loading session from server...");
         const serverSession = await loadSessionFromServer();
         if (!isMounted) return;
 
         if (serverSession) {
+          console.log("✅ [AuthContext] Server session found, hydrating...");
           const { data: hydrated, error: setSessionError } = await supabase.auth.setSession({
             access_token: serverSession.access_token,
             refresh_token: serverSession.refresh_token,
           });
 
           if (setSessionError) {
-            console.error('Failed to hydrate Supabase session from server', setSessionError);
+            console.error('❌ [AuthContext] Failed to hydrate Supabase session from server', setSessionError);
             setSession(null);
             setUser(null);
           } else {
+            console.log("✅ [AuthContext] Session hydrated successfully");
             setSession(hydrated.session);
             setUser(hydrated.session?.user ?? null);
           }
@@ -99,20 +105,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           return;
         }
 
+        console.log("🔍 [AuthContext] No server session, checking local session...");
         const { data, error } = await supabase.auth.getSession();
         if (!isMounted) return;
 
         if (error) {
-          console.error('Auth session error:', error);
+          console.error('❌ [AuthContext] Auth session error:', error);
           setSession(null);
           setUser(null);
         } else {
+          console.log("✅ [AuthContext] Local session loaded:", data.session ? `User: ${data.session.user.email}` : "No session");
           setSession(data.session);
           setUser(data.session?.user ?? null);
         }
         resetSessionFailureCount();
         setIsLoading(false);
       } catch (error) {
+        console.error("❌ [AuthContext] Bootstrap session exception:", error);
         if (!isMounted) return;
         if (error instanceof SessionSyncError) {
           await handleSessionSyncFailure(error);
