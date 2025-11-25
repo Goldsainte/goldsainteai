@@ -66,6 +66,33 @@ serve(async (req) => {
       });
     }
 
+    // IDEMPOTENCY CHECK
+    const { error: insertError } = await supabaseClient
+      .from('webhook_events')
+      .insert({
+        event_id: event.id,
+        event_type: event.type,
+        payload: event.data.object,
+        processed_at: new Date().toISOString()
+      });
+
+    if (insertError?.code === '23505') {
+      // Duplicate event (unique constraint violation)
+      logger.info("Duplicate webhook ignored", { eventId: event.id });
+      return new Response(JSON.stringify({ 
+        received: true, 
+        duplicate: true,
+        requestId 
+      }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
+    if (insertError) {
+      throw insertError; // Other database errors
+    }
+
     switch (event.type) {
       case "checkout.session.completed":
         await handleCheckoutSessionCompleted(event.data.object);
