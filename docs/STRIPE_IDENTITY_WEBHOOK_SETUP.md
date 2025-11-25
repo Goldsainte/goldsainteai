@@ -4,7 +4,7 @@ Both edge functions are deployed and production-ready with comprehensive securit
 
 ## ✅ Edge Functions Ready
 
-### 1. `create-stripe-identity-session` (Deployed)
+### 1. `create-identity-verification` (Deployed)
 Creates verification sessions with:
 - Rate limiting (5 requests/hour per email)
 - Duplicate detection (30-minute window)
@@ -62,9 +62,10 @@ The secret `STRIPE_WEBHOOK_SECRET_IDENTITY` is already configured in your Supaba
 
 ### 3. Configure Webhook Endpoint in Stripe
 
-**Production Endpoint:**
+**Production Endpoints:**
 ```
-https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/stripe-identity-webhook
+Session creation: https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/create-identity-verification
+Webhook: https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/stripe-identity-webhook
 ```
 
 **Events to Subscribe:**
