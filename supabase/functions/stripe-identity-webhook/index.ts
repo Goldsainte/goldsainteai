@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@13.11.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
+import { sendVerificationFailedEmail } from "../_shared/email-service.ts";
 
 // ============================================================================
 // ENVIRONMENT VARIABLES
@@ -162,34 +163,20 @@ async function logAuditEvent(
  */
 async function sendApplicantNotification(
   email: string,
+  name: string,
   status: "verified" | "failed",
-  applicationType: "agent" | "brand"
+  applicationType: "agent" | "brand",
+  reason?: string
 ): Promise<void> {
-  // This will be implemented with your email service (SendGrid, Resend, etc.)
-  // For now, we'll just log it
-  const subject =
-    status === "verified"
-      ? `✅ Identity Verified - ${applicationType === "agent" ? "Agent" : "Brand"} Application`
-      : `❌ Identity Verification Failed - ${applicationType === "agent" ? "Agent" : "Brand"} Application`;
-
-  const message =
-    status === "verified"
-      ? "Your identity has been successfully verified. Our team will review your application within 2-3 business days."
-      : "Identity verification failed. Please check your email for instructions on how to retry verification.";
-
-  console.log(
-    JSON.stringify({
-      action: "send_email",
-      to: email,
-      subject,
-      message,
-      status,
-      applicationType,
-    })
-  );
-
-  // TODO: Implement actual email sending
-  // await sendEmail({ to: email, subject, body: message });
+  try {
+    if (status === "failed") {
+      await sendVerificationFailedEmail(email, name, applicationType, reason);
+    }
+    // For verified status, admin will send welcome email after approval
+  } catch (error: any) {
+    console.error("Failed to send notification email:", error);
+    // Don't throw - notification failure shouldn't block webhook processing
+  }
 }
 
 /**
@@ -333,7 +320,12 @@ async function updateAgentApplication(
     );
 
     // Send notifications
-    await sendApplicantNotification(application.email, "verified", "agent");
+    await sendApplicantNotification(
+      application.email,
+      `${application.first_name} ${application.last_name}`,
+      "verified",
+      "agent"
+    );
     await sendAdminNotification(
       application.id,
       "agent",
@@ -382,7 +374,13 @@ async function updateAgentApplication(
     });
 
     // Send failure notification
-    await sendApplicantNotification(application.email, "failed", "agent");
+    await sendApplicantNotification(
+      application.email,
+      `${application.first_name} ${application.last_name}`,
+      "failed",
+      "agent",
+      last_error?.reason
+    );
 
     logger.info("Agent application updated to failed", {
       applicationId: application.id,
@@ -465,6 +463,7 @@ async function updateBrandApplication(
     // Send notifications
     await sendApplicantNotification(
       application.primary_contact_email,
+      application.brand_name,
       "verified",
       "brand"
     );
@@ -518,8 +517,10 @@ async function updateBrandApplication(
     // Send failure notification
     await sendApplicantNotification(
       application.primary_contact_email,
+      application.brand_name,
       "failed",
-      "brand"
+      "brand",
+      last_error?.reason
     );
 
     logger.info("Brand application updated to failed", {

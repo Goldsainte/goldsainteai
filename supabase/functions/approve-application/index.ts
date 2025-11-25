@@ -1,5 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
+import {
+  sendAgentWelcomeEmail,
+  sendBrandWelcomeEmail,
+  sendAgentRejectionEmail,
+  sendBrandRejectionEmail,
+} from "../_shared/email-service.ts";
 
 // ============================================================================
 // ENVIRONMENT VARIABLES
@@ -219,215 +225,20 @@ async function sendWelcomeEmail(
   firstName: string,
   temporaryPassword: string,
   applicationType: "agent" | "brand",
-  logger: Logger
+  brandName?: string,
+  logger?: Logger
 ): Promise<void> {
-  const loginUrl = `${FRONTEND_URL}/login`;
-  const accountType = applicationType === "agent" ? "Travel Agent" : "Brand Partner";
-
-  const emailContent = {
-    to: email,
-    subject: `🎉 Welcome to Goldsainte - Your ${accountType} Account is Ready!`,
-    html: `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <style>
-            body {
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-              line-height: 1.6;
-              color: #333;
-              max-width: 600px;
-              margin: 0 auto;
-              padding: 20px;
-            }
-            .header {
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              color: white;
-              padding: 30px;
-              text-align: center;
-              border-radius: 8px 8px 0 0;
-            }
-            .content {
-              background: #f9fafb;
-              padding: 30px;
-              border: 1px solid #e5e7eb;
-              border-top: none;
-              border-radius: 0 0 8px 8px;
-            }
-            .credentials-box {
-              background: white;
-              border: 2px solid #667eea;
-              padding: 20px;
-              margin: 20px 0;
-              border-radius: 8px;
-            }
-            .credential-item {
-              margin: 10px 0;
-              padding: 10px;
-              background: #f3f4f6;
-              border-radius: 4px;
-            }
-            .credential-label {
-              font-weight: 600;
-              color: #4b5563;
-              font-size: 12px;
-              text-transform: uppercase;
-              letter-spacing: 0.5px;
-            }
-            .credential-value {
-              font-size: 16px;
-              color: #111827;
-              font-family: 'Courier New', monospace;
-              margin-top: 5px;
-            }
-            .button {
-              display: inline-block;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              color: white;
-              padding: 14px 28px;
-              text-decoration: none;
-              border-radius: 6px;
-              margin: 20px 0;
-              font-weight: 600;
-            }
-            .warning {
-              background: #fef3c7;
-              border-left: 4px solid #f59e0b;
-              padding: 15px;
-              margin: 20px 0;
-              border-radius: 4px;
-            }
-            .footer {
-              text-align: center;
-              margin-top: 30px;
-              padding-top: 20px;
-              border-top: 1px solid #e5e7eb;
-              font-size: 14px;
-              color: #6b7280;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h1 style="margin: 0; font-size: 28px;">Welcome to Goldsainte! 🎉</h1>
-            <p style="margin: 10px 0 0 0; opacity: 0.9;">Your ${accountType} account has been approved</p>
-          </div>
-          
-          <div class="content">
-            <p>Hi ${firstName},</p>
-            
-            <p>Congratulations! Your application has been reviewed and approved. Welcome to the Goldsainte community of elite ${applicationType === "agent" ? "travel agents" : "brand partners"}!</p>
-            
-            <p>Your account is now active, and you can start using the platform right away.</p>
-            
-            <div class="credentials-box">
-              <h3 style="margin-top: 0; color: #667eea;">Your Login Credentials</h3>
-              
-              <div class="credential-item">
-                <div class="credential-label">Email</div>
-                <div class="credential-value">${email}</div>
-              </div>
-              
-              <div class="credential-item">
-                <div class="credential-label">Temporary Password</div>
-                <div class="credential-value">${temporaryPassword}</div>
-              </div>
-            </div>
-            
-            <div class="warning">
-              <strong>⚠️ Important Security Notice:</strong><br>
-              Please change your password immediately after your first login. This temporary password will expire in 7 days.
-            </div>
-            
-            <div style="text-align: center;">
-              <a href="${loginUrl}" class="button">Log In to Your Account</a>
-            </div>
-            
-            <h3 style="color: #667eea; margin-top: 30px;">Next Steps:</h3>
-            <ol style="line-height: 1.8;">
-              <li><strong>Log in</strong> using the credentials above</li>
-              <li><strong>Complete your profile</strong> with additional details</li>
-              ${
-                applicationType === "agent"
-                  ? "<li><strong>Connect your Stripe account</strong> to receive payouts</li>"
-                  : "<li><strong>Set up your brand profile</strong> and upload more content</li>"
-              }
-              <li><strong>Explore the platform</strong> and start ${
-                applicationType === "agent" ? "accepting trip requests" : "connecting with travelers"
-              }</li>
-            </ol>
-            
-            ${
-              applicationType === "agent"
-                ? `
-              <h3 style="color: #667eea;">Agent Resources:</h3>
-              <ul style="line-height: 1.8;">
-                <li><a href="${FRONTEND_URL}/agent/guide">Agent Success Guide</a></li>
-                <li><a href="${FRONTEND_URL}/agent/commission-structure">Commission Structure</a></li>
-                <li><a href="${FRONTEND_URL}/support">Support Center</a></li>
-              </ul>
-            `
-                : `
-              <h3 style="color: #667eea;">Brand Resources:</h3>
-              <ul style="line-height: 1.8;">
-                <li><a href="${FRONTEND_URL}/brand/guide">Brand Partner Guide</a></li>
-                <li><a href="${FRONTEND_URL}/brand/best-practices">Marketing Best Practices</a></li>
-                <li><a href="${FRONTEND_URL}/support">Support Center</a></li>
-              </ul>
-            `
-            }
-            
-            <p style="margin-top: 30px;">If you have any questions or need assistance, our support team is here to help.</p>
-            
-            <p>Welcome aboard!</p>
-            <p><strong>The Goldsainte Team</strong></p>
-          </div>
-          
-          <div class="footer">
-            <p>© ${new Date().getFullYear()} Goldsainte. All rights reserved.</p>
-            <p>
-              <a href="${FRONTEND_URL}/terms" style="color: #667eea; text-decoration: none;">Terms</a> · 
-              <a href="${FRONTEND_URL}/privacy" style="color: #667eea; text-decoration: none;">Privacy</a> · 
-              <a href="${FRONTEND_URL}/support" style="color: #667eea; text-decoration: none;">Support</a>
-            </p>
-          </div>
-        </body>
-      </html>
-    `,
-    text: `
-Welcome to Goldsainte, ${firstName}!
-
-Your ${accountType} account has been approved and is now active.
-
-LOGIN CREDENTIALS:
-Email: ${email}
-Temporary Password: ${temporaryPassword}
-
-⚠️ IMPORTANT: Please change your password immediately after your first login.
-
-Log in at: ${loginUrl}
-
-Next Steps:
-1. Log in using the credentials above
-2. Complete your profile with additional details
-${applicationType === "agent" ? "3. Connect your Stripe account to receive payouts" : "3. Set up your brand profile and upload more content"}
-4. Start ${applicationType === "agent" ? "accepting trip requests" : "connecting with travelers"}
-
-If you need help, visit ${FRONTEND_URL}/support
-
-Welcome aboard!
-The Goldsainte Team
-    `,
-  };
-
-  logger.info("Sending welcome email", { to: email, type: applicationType });
-  
-  // TODO: Integrate with your email service (SendGrid, Resend, etc.)
-  console.log(JSON.stringify({ action: "send_email", ...emailContent }));
-  
-  // Placeholder for actual email sending
-  // await sendEmail(emailContent);
+  try {
+    if (applicationType === "agent") {
+      await sendAgentWelcomeEmail(email, firstName, temporaryPassword);
+    } else {
+      await sendBrandWelcomeEmail(email, firstName, brandName!, temporaryPassword);
+    }
+    logger?.info("Welcome email sent successfully", { email });
+  } catch (error: any) {
+    logger?.error("Failed to send welcome email", { error: error.message });
+    // Don't throw - email failure shouldn't block approval
+  }
 }
 
 /**
@@ -439,137 +250,26 @@ async function sendRejectionEmail(
   rejectionReason: string,
   applicationType: "agent" | "brand",
   allowResubmission: boolean,
-  logger: Logger
+  brandName?: string,
+  logger?: Logger
 ): Promise<void> {
-  const accountType = applicationType === "agent" ? "Travel Agent" : "Brand Partner";
-  const reapplyUrl = `${FRONTEND_URL}/apply/${applicationType}`;
-
-  const emailContent = {
-    to: email,
-    subject: `Update on Your ${accountType} Application`,
-    html: `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <style>
-            body {
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-              line-height: 1.6;
-              color: #333;
-              max-width: 600px;
-              margin: 0 auto;
-              padding: 20px;
-            }
-            .header {
-              background: #f3f4f6;
-              padding: 30px;
-              text-align: center;
-              border-radius: 8px 8px 0 0;
-            }
-            .content {
-              background: white;
-              padding: 30px;
-              border: 1px solid #e5e7eb;
-              border-top: none;
-              border-radius: 0 0 8px 8px;
-            }
-            .reason-box {
-              background: #fef3c7;
-              border-left: 4px solid #f59e0b;
-              padding: 15px;
-              margin: 20px 0;
-              border-radius: 4px;
-            }
-            .button {
-              display: inline-block;
-              background: #667eea;
-              color: white;
-              padding: 14px 28px;
-              text-decoration: none;
-              border-radius: 6px;
-              margin: 20px 0;
-              font-weight: 600;
-            }
-            .footer {
-              text-align: center;
-              margin-top: 30px;
-              padding-top: 20px;
-              border-top: 1px solid #e5e7eb;
-              font-size: 14px;
-              color: #6b7280;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h1 style="margin: 0; font-size: 28px; color: #374151;">Application Status Update</h1>
-          </div>
-          
-          <div class="content">
-            <p>Hi ${firstName},</p>
-            
-            <p>Thank you for your interest in joining Goldsainte as a ${accountType}. After careful review of your application, we regret to inform you that we are unable to approve your application at this time.</p>
-            
-            <div class="reason-box">
-              <strong>Reason:</strong><br>
-              ${rejectionReason}
-            </div>
-            
-            ${
-              allowResubmission
-                ? `
-              <p>We encourage you to address the items mentioned above and resubmit your application when ready.</p>
-              
-              <div style="text-align: center;">
-                <a href="${reapplyUrl}" class="button">Reapply Now</a>
-              </div>
-            `
-                : `
-              <p>Please note that based on our review, we are not accepting resubmissions at this time. We appreciate your understanding.</p>
-            `
-            }
-            
-            <p>If you have questions about this decision or would like more information, please don't hesitate to contact our support team at <a href="mailto:support@goldsainte.com">support@goldsainte.com</a>.</p>
-            
-            <p>We appreciate your interest in Goldsainte and wish you the best in your endeavors.</p>
-            
-            <p><strong>The Goldsainte Team</strong></p>
-          </div>
-          
-          <div class="footer">
-            <p>© ${new Date().getFullYear()} Goldsainte. All rights reserved.</p>
-          </div>
-        </body>
-      </html>
-    `,
-    text: `
-Hi ${firstName},
-
-Thank you for your interest in joining Goldsainte as a ${accountType}. After careful review, we are unable to approve your application at this time.
-
-Reason:
-${rejectionReason}
-
-${
-  allowResubmission
-    ? `We encourage you to address the items above and resubmit when ready: ${reapplyUrl}`
-    : "Based on our review, we are not accepting resubmissions at this time."
-}
-
-Questions? Contact support@goldsainte.com
-
-Best regards,
-The Goldsainte Team
-    `,
-  };
-
-  logger.info("Sending rejection email", { to: email, type: applicationType });
-  
-  console.log(JSON.stringify({ action: "send_email", ...emailContent }));
-  
-  // TODO: Integrate with email service
-  // await sendEmail(emailContent);
+  try {
+    if (applicationType === "agent") {
+      await sendAgentRejectionEmail(email, firstName, rejectionReason, allowResubmission);
+    } else {
+      await sendBrandRejectionEmail(
+        email,
+        firstName,
+        brandName!,
+        rejectionReason,
+        allowResubmission
+      );
+    }
+    logger?.info("Rejection email sent successfully", { email });
+  } catch (error: any) {
+    logger?.error("Failed to send rejection email", { error: error.message });
+    // Don't throw - email failure shouldn't block rejection
+  }
 }
 
 // ============================================================================
@@ -767,6 +467,7 @@ async function approveAgentApplication(
         app.first_name,
         temporaryPassword,
         "agent",
+        undefined,
         logger
       );
     }
@@ -1007,6 +708,7 @@ async function approveBrandApplication(
         firstName,
         temporaryPassword,
         "brand",
+        app.brand_name,
         logger
       );
     }
@@ -1119,6 +821,8 @@ async function rejectApplication(
     applicationType === "agent"
       ? application.first_name
       : application.primary_contact_name.split(" ")[0];
+  const brandName =
+    applicationType === "brand" ? application.brand_name : undefined;
 
   await sendRejectionEmail(
     email,
@@ -1126,6 +830,7 @@ async function rejectApplication(
     rejectionReason,
     applicationType,
     allowResubmission,
+    brandName,
     logger
   );
 
