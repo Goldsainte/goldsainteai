@@ -57,39 +57,12 @@ export default function BrandOnboardingPage() {
   const [bio, setBio] = useState("");
   const [styleTags, setStyleTags] = useState<string[]>([]);
 
+  // Brand applications are ANONYMOUS - no auth required
   useEffect(() => {
-    if (authLoading) return;
-    if (!user) {
-      navigate("/auth", { replace: true });
-      return;
-    }
+    // No need to load existing profile for anonymous applications
+    setLoading(false);
 
-    const load = async () => {
-      setLoading(true);
-      // Try to load any existing brand profile
-      const { data, error: brandError } = await supabase
-        .from("brand_profiles")
-        .select(
-          "id, brand_name, website, brand_type, regions, style_tags, tagline, bio"
-        )
-        .eq("owner_user_id", user.id)
-        .maybeSingle();
-
-      if (!brandError && data) {
-        setBrandName(data.brand_name ?? "");
-        setWebsite(data.website ?? "");
-        setBrandType(data.brand_type ?? "");
-        setPrimaryRegions((data.regions ?? []).join(", "));
-        setStyleTags(data.style_tags ?? []);
-        setTagline(data.tagline ?? "");
-        setBio(data.bio ?? "");
-      }
-
-      setLoading(false);
-    };
-
-    void load();
-  }, [authLoading, user, navigate]);
+  }, []);
 
   const toggleTag = (tag: string) => {
     setStyleTags((prev) =>
@@ -98,7 +71,7 @@ export default function BrandOnboardingPage() {
   };
 
   const handleSave = async () => {
-    if (!user) return;
+    // Anonymous submission - no auth required
     setError(null);
 
     if (!brandName.trim()) {
@@ -117,38 +90,14 @@ export default function BrandOnboardingPage() {
         .map((r) => r.trim())
         .filter(Boolean);
 
-      // Upsert brand profile
-      const { data: brandProfile, error: upsertError } = await supabase
-        .from("brand_profiles")
-        .upsert({
-          owner_user_id: user.id,
-          brand_name: brandName.trim(),
-          website: website.trim() || null,
-          brand_type: brandType,
-          regions: regionsArray,
-          style_tags: styleTags,
-          tagline: tagline.trim() || null,
-          bio: bio.trim() || null,
-          updated_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
-
-      if (upsertError) {
-        console.error("Error saving brand profile", upsertError);
-        setError("We couldn't save your brand profile. Please try again.");
-        return;
-      }
-
-      // Create application record
+      // Create anonymous application record (no brand_profile_id yet)
       const { data: application, error: appError } = await supabase
         .from('brand_applications')
         .insert({
-          brand_profile_id: brandProfile.id,
           brand_name: brandName.trim(),
           brand_type: brandType,
-          primary_contact_email: user.email!,
-          primary_contact_name: user.user_metadata?.full_name || brandName.trim(),
+          primary_contact_email: '', // Will be collected in form
+          primary_contact_name: '', // Will be collected in form
           website: website.trim() || null,
           regions: regionsArray,
           style_tags: styleTags,
@@ -162,15 +111,11 @@ export default function BrandOnboardingPage() {
         return;
       }
 
-      // Initiate Stripe Identity verification
-      const { data: session } = await supabase.auth.getSession();
+      // Initiate Stripe Identity verification (anonymous)
       const { data: verificationData, error: verificationError } = 
         await supabase.functions.invoke('create-stripe-identity-session', {
-          headers: {
-            Authorization: `Bearer ${session?.session?.access_token}`,
-          },
           body: {
-            email: user.email,
+            email: '', // Will be collected in form
             firstName: brandName.trim().split(' ')[0],
             lastName: 'Brand',
             applicationType: 'brand',
@@ -191,7 +136,7 @@ export default function BrandOnboardingPage() {
     }
   };
 
-  if (authLoading || loading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <p className="text-xs text-muted-foreground">Preparing your studio…</p>
