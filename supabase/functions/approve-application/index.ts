@@ -45,12 +45,12 @@ serve(async (req) => {
     }
 
     // Check verification status
-    if (app.stripe_verification_status !== 'verified') {
+    if (app.status !== 'verified') {
       throw new Error('Application must pass Stripe Identity verification first');
     }
 
     // Check if already approved
-    if (app.admin_status === 'approved') {
+    if (app.status === 'approved') {
       throw new Error('Application has already been approved');
     }
 
@@ -82,11 +82,11 @@ serve(async (req) => {
     const { error: updateError } = await supabase
       .from(tableName)
       .update({
-        admin_status: 'approved',
+        status: 'approved', // Use single status field
+        approved_at: new Date().toISOString(),
         reviewed_at: new Date().toISOString(),
-        reviewed_by: adminUserId,
-        user_account_created: true,
-        created_user_id: userId,
+        admin_reviewer_id: adminUserId,
+        user_id: userId, // Link to created auth account
       })
       .eq('id', applicationId);
 
@@ -94,6 +94,21 @@ serve(async (req) => {
       console.error('Application update error:', updateError);
       throw new Error(`Failed to update application: ${updateError.message}`);
     }
+
+    // Log to audit trail
+    await supabase
+      .from('application_audit_log')
+      .insert({
+        application_id: applicationId,
+        application_type: applicationType,
+        action: 'approved',
+        actor_id: adminUserId,
+        actor_type: 'admin',
+        details: {
+          created_user_id: userId,
+          email: app.email,
+        },
+      });
 
     // Create profile record
     const { error: profileError } = await supabase

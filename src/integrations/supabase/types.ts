@@ -321,578 +321,135 @@ export type Database = {
       }
       agent_applications: {
         Row: {
-          accessibility_travel_experience: boolean | null
-          account_created_at: string | null
-          accounting_software: string | null
+          accepted_gdpr: boolean | null
+          accepted_privacy: boolean | null
+          accepted_terms: boolean | null
+          accepted_vendor: boolean | null
+          accreditations: string | null
           admin_notes: string | null
-          admin_status: string | null
-          advertising_channels: string[] | null
-          after_hours_availability: string | null
-          agency_name: string | null
-          agent_id: string | null
-          ai_tools_experience: string[] | null
-          all_inclusive_experience: string | null
-          annual_revenue: string | null
-          annual_sales_volume: string | null
-          application_status: string | null
-          arc_number: string | null
-          asta_membership_number: string | null
-          asta_verified_travel_advisor: boolean | null
-          average_client_age_range: string | null
-          average_commission_percentage: number | null
-          average_review_rating: number | null
-          average_trip_value: string | null
-          background_check_completed: boolean | null
-          background_check_consent: boolean | null
-          background_check_date: string | null
-          blog_url: string | null
-          booking_platform: string | null
-          booking_volume_last_12_months: number | null
-          business_address: string | null
-          business_city: string | null
-          business_country: string | null
-          business_ein_verified: boolean | null
-          business_license_document: string | null
-          business_license_number: string | null
-          business_state: string | null
-          business_type: string | null
-          business_zip: string | null
-          california_registration_number: string | null
-          ccpa_compliant: boolean | null
-          clia_certification_level: string | null
-          clia_number: string | null
-          client_data_protection_measures: string | null
-          client_demographics: string[] | null
-          comfortable_with_technology: number | null
-          consortium_memberships: string[] | null
-          content_creation_experience: boolean | null
-          continents_visited: string[] | null
-          contracts_with_clients: boolean | null
-          countries_visited_count: number | null
+          admin_reviewer_id: string | null
+          agency_name: string
+          approved_at: string | null
+          business_address: string
+          business_registration_number: string | null
+          business_type: string
           created_at: string | null
-          created_user_id: string | null
-          criminal_history_disclosure: string | null
-          crisis_response_examples: string | null
-          crm_software: string | null
-          cruise_experience_level: string | null
-          date_of_birth: string | null
-          dba_names: string | null
-          destination_expert_certifications: string[] | null
-          email: string | null
-          email_list_size: number | null
-          email_marketing_platform: string | null
-          emergency_contact_phone: string | null
-          facebook_page_url: string | null
-          fam_trips_taken_last_year: number | null
-          first_name: string | null
-          florida_registration_number: string | null
-          gdpr_compliant: boolean | null
-          gds_access: string[] | null
-          google_business_profile: string | null
-          government_id_document: string | null
-          has_eo_insurance: boolean | null
-          has_own_booking_engine: boolean | null
-          hawaii_registration_number: string | null
-          headshot_photo: string | null
-          host_agency_affiliation: string | null
-          host_agency_name: string | null
-          iata_number: string | null
-          iatan_id_number: string | null
+          destinations: string[] | null
+          email: string
+          email_notifications_enabled: boolean | null
+          first_name: string
           id: string
-          influencer_partnerships: boolean | null
-          instagram_handle: string | null
-          insurance_certificate_document: string | null
-          insurance_coverage: string | null
-          insurance_policy_number: string | null
-          insurance_provider: string | null
-          kyc_provider: string | null
-          kyc_session_id: string | null
-          language_proficiency_levels: Json | null
-          languages_spoken: string[] | null
-          last_name: string | null
-          lead_sources: string[] | null
-          legal_counsel_on_retainer: boolean | null
-          license_authority: string | null
+          languages: string[] | null
+          last_name: string
           license_number: string | null
-          linkedin_profile_url: string | null
-          marketing_budget_annual: string | null
-          monthly_bookings: string | null
-          monthly_content_output: string | null
-          multigenerational_travel_experience: boolean | null
-          notes: string | null
-          number_of_active_clients: number | null
-          online_reviews_count: number | null
-          operating_states: string[] | null
-          other_certifications: string | null
-          percentage_referral_business: number | null
-          percentage_repeat_clients: number | null
-          phone: string | null
-          preferred_booking_platforms: string[] | null
-          preferred_destinations: string | null
-          preferred_suppliers: string[] | null
-          previous_legal_issues: string | null
-          primary_focus: string[] | null
-          privacy_policy_url: string | null
-          reference1_company: string | null
-          reference1_email: string | null
-          reference1_name: string | null
-          reference1_phone: string | null
-          reference2_company: string | null
-          reference2_email: string | null
-          reference2_name: string | null
-          reference2_phone: string | null
-          regulatory_violations: string | null
+          payment_processor: string | null
+          phone: string
+          preferred_currency: string | null
           rejection_reason: string | null
           reviewed_at: string | null
-          reviewed_by: string | null
-          seller_of_travel_license: string | null
-          seller_of_travel_state: string | null
-          seller_of_travel_states: string[] | null
-          social_media_followers_total: number | null
-          solo_travel_booking_experience: boolean | null
+          service_types: string[] | null
+          sms_notifications_enabled: boolean | null
           specialties: string[] | null
-          stripe_connect_account_id: string | null
-          stripe_connect_charges_enabled: boolean | null
-          stripe_connect_created_at: string | null
-          stripe_connect_last_updated: string | null
-          stripe_connect_onboarding_complete: boolean | null
-          stripe_connect_onboarding_url: string | null
-          stripe_connect_payouts_enabled: boolean | null
+          status: string | null
+          stripe_verification_report: Json | null
           stripe_verification_session_id: string | null
           stripe_verification_status: string | null
           stripe_verified_at: string | null
           submitted_at: string | null
-          support_24_7: boolean | null
-          surety_bond_amount: number | null
-          surety_bond_expiration: string | null
-          surety_bond_provider: string | null
-          tax_id_ein: string | null
-          terms_and_conditions_url: string | null
-          tiktok_handle: string | null
-          tour_operator_experience: string | null
-          travel_crisis_management_training: boolean | null
-          travel_institute_cta: boolean | null
-          travel_institute_ctc: boolean | null
-          travel_insurance_licensed: boolean | null
-          user_account_created: boolean | null
-          verification_status: string | null
-          video_conferencing_tools: string[] | null
-          video_content_creation: boolean | null
-          washington_registration_number: string | null
+          tax_id: string | null
+          updated_at: string | null
+          user_id: string | null
           website: string | null
-          website_platform: string | null
-          why_goldsainte: string | null
-          year_established: number | null
-          years_experience: number | null
-          years_with_host_agency: number | null
-          youtube_channel_url: string | null
+          whatsapp_notifications_enabled: boolean | null
+          years_experience: number
         }
         Insert: {
-          accessibility_travel_experience?: boolean | null
-          account_created_at?: string | null
-          accounting_software?: string | null
+          accepted_gdpr?: boolean | null
+          accepted_privacy?: boolean | null
+          accepted_terms?: boolean | null
+          accepted_vendor?: boolean | null
+          accreditations?: string | null
           admin_notes?: string | null
-          admin_status?: string | null
-          advertising_channels?: string[] | null
-          after_hours_availability?: string | null
-          agency_name?: string | null
-          agent_id?: string | null
-          ai_tools_experience?: string[] | null
-          all_inclusive_experience?: string | null
-          annual_revenue?: string | null
-          annual_sales_volume?: string | null
-          application_status?: string | null
-          arc_number?: string | null
-          asta_membership_number?: string | null
-          asta_verified_travel_advisor?: boolean | null
-          average_client_age_range?: string | null
-          average_commission_percentage?: number | null
-          average_review_rating?: number | null
-          average_trip_value?: string | null
-          background_check_completed?: boolean | null
-          background_check_consent?: boolean | null
-          background_check_date?: string | null
-          blog_url?: string | null
-          booking_platform?: string | null
-          booking_volume_last_12_months?: number | null
-          business_address?: string | null
-          business_city?: string | null
-          business_country?: string | null
-          business_ein_verified?: boolean | null
-          business_license_document?: string | null
-          business_license_number?: string | null
-          business_state?: string | null
-          business_type?: string | null
-          business_zip?: string | null
-          california_registration_number?: string | null
-          ccpa_compliant?: boolean | null
-          clia_certification_level?: string | null
-          clia_number?: string | null
-          client_data_protection_measures?: string | null
-          client_demographics?: string[] | null
-          comfortable_with_technology?: number | null
-          consortium_memberships?: string[] | null
-          content_creation_experience?: boolean | null
-          continents_visited?: string[] | null
-          contracts_with_clients?: boolean | null
-          countries_visited_count?: number | null
+          admin_reviewer_id?: string | null
+          agency_name: string
+          approved_at?: string | null
+          business_address: string
+          business_registration_number?: string | null
+          business_type: string
           created_at?: string | null
-          created_user_id?: string | null
-          criminal_history_disclosure?: string | null
-          crisis_response_examples?: string | null
-          crm_software?: string | null
-          cruise_experience_level?: string | null
-          date_of_birth?: string | null
-          dba_names?: string | null
-          destination_expert_certifications?: string[] | null
-          email?: string | null
-          email_list_size?: number | null
-          email_marketing_platform?: string | null
-          emergency_contact_phone?: string | null
-          facebook_page_url?: string | null
-          fam_trips_taken_last_year?: number | null
-          first_name?: string | null
-          florida_registration_number?: string | null
-          gdpr_compliant?: boolean | null
-          gds_access?: string[] | null
-          google_business_profile?: string | null
-          government_id_document?: string | null
-          has_eo_insurance?: boolean | null
-          has_own_booking_engine?: boolean | null
-          hawaii_registration_number?: string | null
-          headshot_photo?: string | null
-          host_agency_affiliation?: string | null
-          host_agency_name?: string | null
-          iata_number?: string | null
-          iatan_id_number?: string | null
+          destinations?: string[] | null
+          email: string
+          email_notifications_enabled?: boolean | null
+          first_name: string
           id?: string
-          influencer_partnerships?: boolean | null
-          instagram_handle?: string | null
-          insurance_certificate_document?: string | null
-          insurance_coverage?: string | null
-          insurance_policy_number?: string | null
-          insurance_provider?: string | null
-          kyc_provider?: string | null
-          kyc_session_id?: string | null
-          language_proficiency_levels?: Json | null
-          languages_spoken?: string[] | null
-          last_name?: string | null
-          lead_sources?: string[] | null
-          legal_counsel_on_retainer?: boolean | null
-          license_authority?: string | null
+          languages?: string[] | null
+          last_name: string
           license_number?: string | null
-          linkedin_profile_url?: string | null
-          marketing_budget_annual?: string | null
-          monthly_bookings?: string | null
-          monthly_content_output?: string | null
-          multigenerational_travel_experience?: boolean | null
-          notes?: string | null
-          number_of_active_clients?: number | null
-          online_reviews_count?: number | null
-          operating_states?: string[] | null
-          other_certifications?: string | null
-          percentage_referral_business?: number | null
-          percentage_repeat_clients?: number | null
-          phone?: string | null
-          preferred_booking_platforms?: string[] | null
-          preferred_destinations?: string | null
-          preferred_suppliers?: string[] | null
-          previous_legal_issues?: string | null
-          primary_focus?: string[] | null
-          privacy_policy_url?: string | null
-          reference1_company?: string | null
-          reference1_email?: string | null
-          reference1_name?: string | null
-          reference1_phone?: string | null
-          reference2_company?: string | null
-          reference2_email?: string | null
-          reference2_name?: string | null
-          reference2_phone?: string | null
-          regulatory_violations?: string | null
+          payment_processor?: string | null
+          phone: string
+          preferred_currency?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
-          reviewed_by?: string | null
-          seller_of_travel_license?: string | null
-          seller_of_travel_state?: string | null
-          seller_of_travel_states?: string[] | null
-          social_media_followers_total?: number | null
-          solo_travel_booking_experience?: boolean | null
+          service_types?: string[] | null
+          sms_notifications_enabled?: boolean | null
           specialties?: string[] | null
-          stripe_connect_account_id?: string | null
-          stripe_connect_charges_enabled?: boolean | null
-          stripe_connect_created_at?: string | null
-          stripe_connect_last_updated?: string | null
-          stripe_connect_onboarding_complete?: boolean | null
-          stripe_connect_onboarding_url?: string | null
-          stripe_connect_payouts_enabled?: boolean | null
+          status?: string | null
+          stripe_verification_report?: Json | null
           stripe_verification_session_id?: string | null
           stripe_verification_status?: string | null
           stripe_verified_at?: string | null
           submitted_at?: string | null
-          support_24_7?: boolean | null
-          surety_bond_amount?: number | null
-          surety_bond_expiration?: string | null
-          surety_bond_provider?: string | null
-          tax_id_ein?: string | null
-          terms_and_conditions_url?: string | null
-          tiktok_handle?: string | null
-          tour_operator_experience?: string | null
-          travel_crisis_management_training?: boolean | null
-          travel_institute_cta?: boolean | null
-          travel_institute_ctc?: boolean | null
-          travel_insurance_licensed?: boolean | null
-          user_account_created?: boolean | null
-          verification_status?: string | null
-          video_conferencing_tools?: string[] | null
-          video_content_creation?: boolean | null
-          washington_registration_number?: string | null
+          tax_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
           website?: string | null
-          website_platform?: string | null
-          why_goldsainte?: string | null
-          year_established?: number | null
-          years_experience?: number | null
-          years_with_host_agency?: number | null
-          youtube_channel_url?: string | null
+          whatsapp_notifications_enabled?: boolean | null
+          years_experience: number
         }
         Update: {
-          accessibility_travel_experience?: boolean | null
-          account_created_at?: string | null
-          accounting_software?: string | null
+          accepted_gdpr?: boolean | null
+          accepted_privacy?: boolean | null
+          accepted_terms?: boolean | null
+          accepted_vendor?: boolean | null
+          accreditations?: string | null
           admin_notes?: string | null
-          admin_status?: string | null
-          advertising_channels?: string[] | null
-          after_hours_availability?: string | null
-          agency_name?: string | null
-          agent_id?: string | null
-          ai_tools_experience?: string[] | null
-          all_inclusive_experience?: string | null
-          annual_revenue?: string | null
-          annual_sales_volume?: string | null
-          application_status?: string | null
-          arc_number?: string | null
-          asta_membership_number?: string | null
-          asta_verified_travel_advisor?: boolean | null
-          average_client_age_range?: string | null
-          average_commission_percentage?: number | null
-          average_review_rating?: number | null
-          average_trip_value?: string | null
-          background_check_completed?: boolean | null
-          background_check_consent?: boolean | null
-          background_check_date?: string | null
-          blog_url?: string | null
-          booking_platform?: string | null
-          booking_volume_last_12_months?: number | null
-          business_address?: string | null
-          business_city?: string | null
-          business_country?: string | null
-          business_ein_verified?: boolean | null
-          business_license_document?: string | null
-          business_license_number?: string | null
-          business_state?: string | null
-          business_type?: string | null
-          business_zip?: string | null
-          california_registration_number?: string | null
-          ccpa_compliant?: boolean | null
-          clia_certification_level?: string | null
-          clia_number?: string | null
-          client_data_protection_measures?: string | null
-          client_demographics?: string[] | null
-          comfortable_with_technology?: number | null
-          consortium_memberships?: string[] | null
-          content_creation_experience?: boolean | null
-          continents_visited?: string[] | null
-          contracts_with_clients?: boolean | null
-          countries_visited_count?: number | null
+          admin_reviewer_id?: string | null
+          agency_name?: string
+          approved_at?: string | null
+          business_address?: string
+          business_registration_number?: string | null
+          business_type?: string
           created_at?: string | null
-          created_user_id?: string | null
-          criminal_history_disclosure?: string | null
-          crisis_response_examples?: string | null
-          crm_software?: string | null
-          cruise_experience_level?: string | null
-          date_of_birth?: string | null
-          dba_names?: string | null
-          destination_expert_certifications?: string[] | null
-          email?: string | null
-          email_list_size?: number | null
-          email_marketing_platform?: string | null
-          emergency_contact_phone?: string | null
-          facebook_page_url?: string | null
-          fam_trips_taken_last_year?: number | null
-          first_name?: string | null
-          florida_registration_number?: string | null
-          gdpr_compliant?: boolean | null
-          gds_access?: string[] | null
-          google_business_profile?: string | null
-          government_id_document?: string | null
-          has_eo_insurance?: boolean | null
-          has_own_booking_engine?: boolean | null
-          hawaii_registration_number?: string | null
-          headshot_photo?: string | null
-          host_agency_affiliation?: string | null
-          host_agency_name?: string | null
-          iata_number?: string | null
-          iatan_id_number?: string | null
+          destinations?: string[] | null
+          email?: string
+          email_notifications_enabled?: boolean | null
+          first_name?: string
           id?: string
-          influencer_partnerships?: boolean | null
-          instagram_handle?: string | null
-          insurance_certificate_document?: string | null
-          insurance_coverage?: string | null
-          insurance_policy_number?: string | null
-          insurance_provider?: string | null
-          kyc_provider?: string | null
-          kyc_session_id?: string | null
-          language_proficiency_levels?: Json | null
-          languages_spoken?: string[] | null
-          last_name?: string | null
-          lead_sources?: string[] | null
-          legal_counsel_on_retainer?: boolean | null
-          license_authority?: string | null
+          languages?: string[] | null
+          last_name?: string
           license_number?: string | null
-          linkedin_profile_url?: string | null
-          marketing_budget_annual?: string | null
-          monthly_bookings?: string | null
-          monthly_content_output?: string | null
-          multigenerational_travel_experience?: boolean | null
-          notes?: string | null
-          number_of_active_clients?: number | null
-          online_reviews_count?: number | null
-          operating_states?: string[] | null
-          other_certifications?: string | null
-          percentage_referral_business?: number | null
-          percentage_repeat_clients?: number | null
-          phone?: string | null
-          preferred_booking_platforms?: string[] | null
-          preferred_destinations?: string | null
-          preferred_suppliers?: string[] | null
-          previous_legal_issues?: string | null
-          primary_focus?: string[] | null
-          privacy_policy_url?: string | null
-          reference1_company?: string | null
-          reference1_email?: string | null
-          reference1_name?: string | null
-          reference1_phone?: string | null
-          reference2_company?: string | null
-          reference2_email?: string | null
-          reference2_name?: string | null
-          reference2_phone?: string | null
-          regulatory_violations?: string | null
+          payment_processor?: string | null
+          phone?: string
+          preferred_currency?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
-          reviewed_by?: string | null
-          seller_of_travel_license?: string | null
-          seller_of_travel_state?: string | null
-          seller_of_travel_states?: string[] | null
-          social_media_followers_total?: number | null
-          solo_travel_booking_experience?: boolean | null
+          service_types?: string[] | null
+          sms_notifications_enabled?: boolean | null
           specialties?: string[] | null
-          stripe_connect_account_id?: string | null
-          stripe_connect_charges_enabled?: boolean | null
-          stripe_connect_created_at?: string | null
-          stripe_connect_last_updated?: string | null
-          stripe_connect_onboarding_complete?: boolean | null
-          stripe_connect_onboarding_url?: string | null
-          stripe_connect_payouts_enabled?: boolean | null
+          status?: string | null
+          stripe_verification_report?: Json | null
           stripe_verification_session_id?: string | null
           stripe_verification_status?: string | null
           stripe_verified_at?: string | null
           submitted_at?: string | null
-          support_24_7?: boolean | null
-          surety_bond_amount?: number | null
-          surety_bond_expiration?: string | null
-          surety_bond_provider?: string | null
-          tax_id_ein?: string | null
-          terms_and_conditions_url?: string | null
-          tiktok_handle?: string | null
-          tour_operator_experience?: string | null
-          travel_crisis_management_training?: boolean | null
-          travel_institute_cta?: boolean | null
-          travel_institute_ctc?: boolean | null
-          travel_insurance_licensed?: boolean | null
-          user_account_created?: boolean | null
-          verification_status?: string | null
-          video_conferencing_tools?: string[] | null
-          video_content_creation?: boolean | null
-          washington_registration_number?: string | null
+          tax_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
           website?: string | null
-          website_platform?: string | null
-          why_goldsainte?: string | null
-          year_established?: number | null
-          years_experience?: number | null
-          years_with_host_agency?: number | null
-          youtube_channel_url?: string | null
+          whatsapp_notifications_enabled?: boolean | null
+          years_experience?: number
         }
-        Relationships: [
-          {
-            foreignKeyName: "agent_applications_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: true
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "agent_applications_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: true
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "agent_applications_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "agent_applications_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: true
-            referencedRelation: "public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "agent_applications_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: true
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
-          },
-          {
-            foreignKeyName: "agent_applications_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "agent_applications_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "agent_applications_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "agent_applications_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "agent_applications_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
-          },
-        ]
+        Relationships: []
       }
       agent_availability: {
         Row: {
@@ -1874,6 +1431,45 @@ export type Database = {
         }
         Relationships: []
       }
+      application_audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_type: string | null
+          application_id: string
+          application_type: string
+          created_at: string | null
+          details: Json | null
+          id: string
+          ip_address: unknown
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_type?: string | null
+          application_id: string
+          application_type: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_type?: string | null
+          application_id?: string
+          application_type?: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       auto_assignment_rules: {
         Row: {
           agent_id: string
@@ -2342,90 +1938,87 @@ export type Database = {
       }
       brand_applications: {
         Row: {
-          account_created_at: string | null
           admin_notes: string | null
-          admin_status: string | null
+          admin_reviewer_id: string | null
+          approved_at: string | null
+          bio: string | null
           brand_name: string
-          brand_profile_created: boolean | null
           brand_profile_id: string | null
           brand_type: string
           created_at: string | null
-          created_brand_profile_id: string | null
-          created_user_id: string | null
           id: string
-          phone: string | null
           primary_contact_email: string
           primary_contact_name: string
-          primary_contact_phone: string | null
-          primary_contact_title: string | null
+          primary_contact_phone: string
           regions: string[] | null
           rejection_reason: string | null
           reviewed_at: string | null
-          reviewed_by: string | null
+          status: string | null
+          stripe_verification_report: Json | null
           stripe_verification_session_id: string | null
           stripe_verification_status: string | null
           stripe_verified_at: string | null
           style_tags: string[] | null
+          submitted_at: string | null
+          tagline: string | null
           updated_at: string | null
-          user_account_created: boolean | null
+          user_id: string | null
           website: string | null
         }
         Insert: {
-          account_created_at?: string | null
           admin_notes?: string | null
-          admin_status?: string | null
+          admin_reviewer_id?: string | null
+          approved_at?: string | null
+          bio?: string | null
           brand_name: string
-          brand_profile_created?: boolean | null
           brand_profile_id?: string | null
           brand_type: string
           created_at?: string | null
-          created_brand_profile_id?: string | null
-          created_user_id?: string | null
           id?: string
-          phone?: string | null
           primary_contact_email: string
           primary_contact_name: string
-          primary_contact_phone?: string | null
-          primary_contact_title?: string | null
+          primary_contact_phone: string
           regions?: string[] | null
           rejection_reason?: string | null
           reviewed_at?: string | null
-          reviewed_by?: string | null
+          status?: string | null
+          stripe_verification_report?: Json | null
           stripe_verification_session_id?: string | null
           stripe_verification_status?: string | null
           stripe_verified_at?: string | null
           style_tags?: string[] | null
+          submitted_at?: string | null
+          tagline?: string | null
           updated_at?: string | null
-          user_account_created?: boolean | null
+          user_id?: string | null
           website?: string | null
         }
         Update: {
-          account_created_at?: string | null
           admin_notes?: string | null
-          admin_status?: string | null
+          admin_reviewer_id?: string | null
+          approved_at?: string | null
+          bio?: string | null
           brand_name?: string
-          brand_profile_created?: boolean | null
           brand_profile_id?: string | null
           brand_type?: string
           created_at?: string | null
-          created_brand_profile_id?: string | null
-          created_user_id?: string | null
           id?: string
-          phone?: string | null
           primary_contact_email?: string
           primary_contact_name?: string
-          primary_contact_phone?: string | null
-          primary_contact_title?: string | null
+          primary_contact_phone?: string
           regions?: string[] | null
           rejection_reason?: string | null
           reviewed_at?: string | null
-          reviewed_by?: string | null
+          status?: string | null
+          stripe_verification_report?: Json | null
           stripe_verification_session_id?: string | null
           stripe_verification_status?: string | null
           stripe_verified_at?: string | null
           style_tags?: string[] | null
+          submitted_at?: string | null
+          tagline?: string | null
           updated_at?: string | null
-          user_account_created?: boolean | null
+          user_id?: string | null
           website?: string | null
         }
         Relationships: [
@@ -2435,48 +2028,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "brand_profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "brand_applications_created_brand_profile_id_fkey"
-            columns: ["created_brand_profile_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "brand_applications_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "brand_applications_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "brand_applications_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "brand_applications_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "brand_applications_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "trip_bookings_ops_view"
-            referencedColumns: ["brand_profile_id"]
           },
         ]
       }
@@ -12967,10 +12518,12 @@ export type Database = {
           created_at: string
           error_message: string | null
           event_id: string
+          event_source: string | null
           event_type: string
           id: string
           payload: Json
           processed_at: string
+          processing_duration_ms: number | null
           processing_status: string
           provider: string
         }
@@ -12978,10 +12531,12 @@ export type Database = {
           created_at?: string
           error_message?: string | null
           event_id: string
+          event_source?: string | null
           event_type: string
           id?: string
           payload: Json
           processed_at?: string
+          processing_duration_ms?: number | null
           processing_status?: string
           provider?: string
         }
@@ -12989,10 +12544,12 @@ export type Database = {
           created_at?: string
           error_message?: string | null
           event_id?: string
+          event_source?: string | null
           event_type?: string
           id?: string
           payload?: Json
           processed_at?: string
+          processing_duration_ms?: number | null
           processing_status?: string
           provider?: string
         }
