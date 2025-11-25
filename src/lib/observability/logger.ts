@@ -4,10 +4,6 @@ type LogLevel = "info" | "warn" | "error";
 
 type LogContext = Record<string, unknown> | undefined;
 
-const originalError = console.error.bind(console);
-const originalWarn = console.warn.bind(console);
-const originalInfo = console.info.bind(console);
-
 const REDACT_KEYS = new Set([
   "access_token",
   "refresh_token",
@@ -58,7 +54,8 @@ function emit(level: LogLevel, message: string, context?: LogContext, error?: un
       stack: import.meta.env.DEV ? error.stack : undefined,
     };
   }
-  const method = level === "error" ? originalError : level === "warn" ? originalWarn : originalInfo;
+  // Use console directly - console-patch.ts already handles redirection
+  const method = level === "error" ? console.error : level === "warn" ? console.warn : console.info;
   method(`[${level.toUpperCase()}] ${message}`, payload);
 }
 
