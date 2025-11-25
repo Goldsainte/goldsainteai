@@ -20,13 +20,8 @@ export default function AgentOnboarding() {
   const { isAdmin } = useUserRole();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user) {
-      navigate('/auth');
-      return;
-    }
-  }, [user, authLoading, navigate]);
+  // Agent applications are ANONYMOUS - no auth required
+  // Form will save to agent_applications table without user_id
   const [loading, setLoading] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
@@ -38,7 +33,7 @@ export default function AgentOnboarding() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!user) return;
+    // Anonymous submission - no auth required
 
     if (!acceptedTerms || !acceptedPrivacy || !acceptedVendor || !acceptedGDPR) {
       toast.error("Please accept all legal agreements to continue");
@@ -55,7 +50,6 @@ export default function AgentOnboarding() {
       const destinations = (formData.get('destinations') as string).split(',').map(d => d.trim());
 
       const agentData = {
-        user_id: user.id,
         // Business & Contact Information
         agency_name: formData.get('agency_name') as string,
         bio: formData.get('bio') as string,
@@ -114,11 +108,10 @@ export default function AgentOnboarding() {
 
       if (error) throw error;
 
-      // Create application record
+      // Create application record (no agent_id - anonymous application)
       const { data: application, error: appError } = await supabase
         .from('agent_applications')
         .insert({
-          agent_id: user.id,
           first_name: formData.get('primary_contact_name')?.toString().split(' ')[0] || '',
           last_name: formData.get('primary_contact_name')?.toString().split(' ').slice(1).join(' ') || '',
           email: formData.get('email') as string,
@@ -134,13 +127,9 @@ export default function AgentOnboarding() {
 
       if (appError) throw appError;
 
-      // Initiate Stripe Identity verification
-      const { data: session } = await supabase.auth.getSession();
+      // Initiate Stripe Identity verification (anonymous)
       const { data: verificationData, error: verificationError } = 
         await supabase.functions.invoke('create-stripe-identity-session', {
-          headers: {
-            Authorization: `Bearer ${session?.session?.access_token}`,
-          },
           body: {
             email: formData.get('email') as string,
             firstName: formData.get('primary_contact_name')?.toString().split(' ')[0] || '',
