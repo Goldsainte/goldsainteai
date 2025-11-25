@@ -1,487 +1,1137 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@18.5.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { verifyStripeWebhook, validateWebhookEvent, checkWebhookRateLimit } from "../_shared/webhookSecurity.ts";
-import { logger, generateTraceId } from "../_shared/structuredLogger.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import Stripe from "https://esm.sh/stripe@13.11.0?target=deno";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 
-// Map your paid product IDs to tiers used in app:
-const PRODUCT_TIER_MAP: Record<string, string> = { 
-  'prod_TNOppvdXPriM3E': 'premium', 
-  'prod_TNOpkzmfNXljRz': 'enterprise' 
-};
+// ============================================================================
+// ENVIRONMENT VARIABLES
+// ============================================================================
 
-const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-  apiVersion: "2024-06-20",
+const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY")!;
+const STRIPE_WEBHOOK_SECRET = Deno.env.get("STRIPE_WEBHOOK_SECRET")!;
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+const stripe = new Stripe(STRIPE_SECRET_KEY, {
+  apiVersion: "2023-10-16",
+  httpClient: Stripe.createFetchHttpClient(),
 });
 
-const supabaseClient = createClient(
-  Deno.env.get("SUPABASE_URL") ?? "",
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-  { auth: { persistSession: false } }
-);
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-serve(async (req) => {
-  const requestId = generateTraceId();
-  logger.setContext({ functionName: 'stripe-webhook', requestId });
+// ============================================================================
+// TYPES
+// ============================================================================
 
-  const signature = req.headers.get("stripe-signature");
-  const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
+interface Logger {
+  info: (message: string, data?: any) => void;
+  warn: (message: string, data?: any) => void;
+  error: (message: string, data?: any) => void;
+}
 
-  if (!signature || !webhookSecret) {
-    logger.error("Missing stripe-signature header or webhook secret");
-    return new Response("Webhook signature or secret missing", { status: 400 });
+// Type aliases for better type safety with metadata
+type PaymentIntentWithMetadata = Stripe.PaymentIntent & {
+  metadata: {
+    booking_id?: string;
+    milestone_id?: string;
+    user_id?: string;
+    booking_type?: string;
+  };
+};
+
+type SubscriptionWithMetadata = Stripe.Subscription & {
+  metadata: {
+    user_id?: string;
+    tier?: string;
+  };
+};
+
+// ============================================================================
+// STRUCTURED LOGGING
+// ============================================================================
+
+const createLogger = (requestId: string): Logger => {
+  const log = (level: string, message: string, data?: any) => {
+    const logEntry = {
+      timestamp: new Date().toISOString(),
+      level,
+      requestId,
+      message,
+      ...(data && { data }),
+    };
+    console.log(JSON.stringify(logEntry));
+  };
+
+  return {
+    info: (message: string, data?: any) => log("INFO", message, data),
+    warn: (message: string, data?: any) => log("WARN", message, data),
+    error: (message: string, data?: any) => log("ERROR", message, data),
+  };
+};
+
+// ============================================================================
+// IDEMPOTENCY CHECK
+// ============================================================================
+
+/**
+ * Check if webhook event has already been processed
+ */
+async function checkIdempotency(
+  eventId: string,
+  logger: Logger
+): Promise<boolean> {
+  const { data, error } = await supabaseClient
+    .from("webhook_events")
+    .select("id")
+    .eq("event_id", eventId)
+    .maybeSingle();
+
+  if (error && error.code !== "PGRST116") {
+    // PGRST116 = not found (expected for new events)
+    logger.error("Error checking idempotency", { error });
+    throw error;
+  }
+
+  const isDuplicate = !!data;
+  if (isDuplicate) {
+    logger.info("Duplicate event detected", { eventId });
+  }
+
+  return isDuplicate;
+}
+
+/**
+ * Record webhook event for idempotency tracking
+ */
+async function recordWebhookEvent(
+  eventId: string,
+  eventType: string,
+  payload: any,
+  processingDuration: number,
+  errorMessage?: string
+): Promise<void> {
+  const { error } = await supabaseClient.from("webhook_events").insert({
+    event_id: eventId,
+    event_type: eventType,
+    event_source: "stripe",
+    payload,
+    processing_duration_ms: processingDuration,
+    error_message: errorMessage || null,
+    processed_at: new Date().toISOString(),
+  });
+
+  // Silently ignore duplicate key errors (23505)
+  if (error && error.code !== "23505") {
+    throw error;
+  }
+}
+
+// ============================================================================
+// RATE LIMITING
+// ============================================================================
+
+interface RateLimitEntry {
+  count: number;
+  resetAt: number;
+}
+
+const rateLimitStore = new Map<string, RateLimitEntry>();
+
+/**
+ * Simple rate limiter: 100 requests per minute per IP
+ */
+function checkRateLimit(ip: string): {
+  allowed: boolean;
+  remaining: number;
+  resetAt: number;
+} {
+  const now = Date.now();
+  const key = `webhook:${ip}`;
+  const limit = 100;
+  const windowMs = 60 * 1000; // 1 minute
+
+  const entry = rateLimitStore.get(key);
+
+  // Clean up expired entries
+  if (entry && now > entry.resetAt) {
+    rateLimitStore.delete(key);
+  }
+
+  if (!entry || now > entry.resetAt) {
+    const resetAt = now + windowMs;
+    rateLimitStore.set(key, { count: 1, resetAt });
+    return { allowed: true, remaining: limit - 1, resetAt };
+  }
+
+  if (entry.count >= limit) {
+    return { allowed: false, remaining: 0, resetAt: entry.resetAt };
+  }
+
+  entry.count++;
+  rateLimitStore.set(key, entry);
+  return { allowed: true, remaining: limit - entry.count, resetAt: entry.resetAt };
+}
+
+// ============================================================================
+// PAYMENT INTENT HANDLERS
+// ============================================================================
+
+/**
+ * Handle successful payment
+ */
+async function handlePaymentSucceeded(
+  paymentIntent: PaymentIntentWithMetadata,
+  logger: Logger
+): Promise<void> {
+  const { metadata, amount, currency, id: paymentIntentId } = paymentIntent;
+  const { booking_id, milestone_id, booking_type } = metadata;
+
+  logger.info("Processing payment success", {
+    paymentIntentId,
+    bookingId: booking_id,
+    milestoneId: milestone_id,
+    amount,
+    currency,
+  });
+
+  if (!booking_id) {
+    logger.warn("No booking_id in payment metadata", { paymentIntentId });
+    return;
   }
 
   try {
-    const body = await req.text();
-    
-    // Verify webhook signature with enhanced security
-    const verification = await verifyStripeWebhook(body, signature, webhookSecret);
-    
-    if (!verification.valid) {
-      logger.error("Webhook verification failed", new Error(verification.error || "Unknown error"));
-      return new Response(`Webhook Error: ${verification.error}`, { status: 400 });
-    }
-    
-    const event = verification.event!;
-    logger.info("Webhook received", { eventType: event.type, eventId: event.id });
-    
-    // Additional security validation
-    const validation = validateWebhookEvent(event);
-    if (!validation.valid) {
-      logger.warn("Webhook event validation failed", { error: validation.error });
-      return new Response(`Validation Error: ${validation.error}`, { status: 400 });
-    }
-    
-    // Rate limit check per event type
-    const rateLimit = checkWebhookRateLimit(event.type, 100); // 100 events per minute per type
-    if (!rateLimit.allowed) {
-      logger.warn("Webhook rate limit exceeded", { 
-        eventType: event.type,
-        retryAfter: rateLimit.retryAfter 
-      });
-      return new Response("Rate limit exceeded", { 
-        status: 429,
-        headers: { "Retry-After": String(rateLimit.retryAfter || 60) }
-      });
+    // If milestone payment
+    if (milestone_id) {
+      await handleMilestonePayment(
+        booking_id,
+        milestone_id,
+        paymentIntentId,
+        amount,
+        currency,
+        logger
+      );
+    } else {
+      // Full payment for booking
+      await handleFullBookingPayment(
+        booking_id,
+        paymentIntentId,
+        amount,
+        currency,
+        logger
+      );
     }
 
-    // IDEMPOTENCY CHECK
-    const { error: insertError } = await supabaseClient
-      .from('webhook_events')
-      .insert({
-        event_id: event.id,
-        event_type: event.type,
-        payload: event.data.object,
-        processed_at: new Date().toISOString()
-      });
-
-    if (insertError?.code === '23505') {
-      // Duplicate event (unique constraint violation)
-      logger.info("Duplicate webhook ignored", { eventId: event.id });
-      return new Response(JSON.stringify({ 
-        received: true, 
-        duplicate: true,
-        requestId 
-      }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" }
-      });
-    }
-
-    if (insertError) {
-      throw insertError; // Other database errors
-    }
-
-    switch (event.type) {
-      case "checkout.session.completed":
-        await handleCheckoutSessionCompleted(event.data.object);
-        await handleStandardCheckout(event.data.object);
-        break;
-
-      case "customer.subscription.updated":
-        await handleSubscriptionUpdated(event.data.object);
-        break;
-
-      case "customer.subscription.created":
-        await upsertStandardSubscription(event.data.object);
-        break;
-
-      case "customer.subscription.deleted":
-        await handleSubscriptionDeleted(event.data.object);
-        await handleStandardSubscriptionDeleted(event.data.object);
-        break;
-      
-      case "invoice.payment_failed":
-        await handlePaymentFailed(event.data.object);
-        break;
-      
-      default:
-        logger.info("Unhandled webhook event type", { eventType: event.type });
-    }
-
-    logger.info("Webhook processed successfully", { 
-      eventType: event.type,
-      eventId: event.id 
-    });
-
-    return new Response(JSON.stringify({ received: true, requestId }), {
-      headers: { "Content-Type": "application/json" },
-      status: 200,
+    logger.info("Payment processed successfully", {
+      bookingId: booking_id,
+      paymentIntentId,
     });
   } catch (error: any) {
-    logger.error("Webhook processing failed", error, { 
-      eventType: (error as any)?.event?.type 
+    logger.error("Error processing payment", {
+      error: error.message,
+      bookingId: booking_id,
     });
-    
+    throw error;
+  }
+}
+
+/**
+ * Handle milestone payment
+ */
+async function handleMilestonePayment(
+  bookingId: string,
+  milestoneId: string,
+  paymentIntentId: string,
+  amount: number,
+  currency: string,
+  logger: Logger
+): Promise<void> {
+  logger.info("Processing milestone payment", { bookingId, milestoneId });
+
+  // Update milestone status
+  const { error: milestoneError } = await supabaseClient
+    .from("booking_milestones")
+    .update({
+      status: "funded",
+      stripe_payment_intent_id: paymentIntentId,
+      funded_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", milestoneId);
+
+  if (milestoneError) {
+    logger.error("Failed to update milestone", { error: milestoneError });
+    throw milestoneError;
+  }
+
+  // Update booking escrow amount
+  const { data: booking, error: fetchError } = await supabaseClient
+    .from("bookings")
+    .select("escrow_held_cents")
+    .eq("id", bookingId)
+    .maybeSingle();
+
+  if (fetchError || !booking) {
+    logger.error("Failed to fetch booking", { error: fetchError });
+    throw fetchError;
+  }
+
+  const newEscrowAmount = (booking.escrow_held_cents || 0) + amount;
+
+  const { error: bookingError } = await supabaseClient
+    .from("bookings")
+    .update({
+      escrow_held_cents: newEscrowAmount,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", bookingId);
+
+  if (bookingError) {
+    logger.error("Failed to update booking escrow", { error: bookingError });
+    throw bookingError;
+  }
+
+  // Create notification for agent/creator
+  await createPaymentNotification(bookingId, milestoneId, amount, currency, logger);
+
+  logger.info("Milestone payment processed", { milestoneId, amount });
+}
+
+/**
+ * Handle full booking payment
+ */
+async function handleFullBookingPayment(
+  bookingId: string,
+  paymentIntentId: string,
+  amount: number,
+  currency: string,
+  logger: Logger
+): Promise<void> {
+  logger.info("Processing full booking payment", { bookingId });
+
+  const { error: updateError } = await supabaseClient
+    .from("bookings")
+    .update({
+      payment_status: "captured",
+      stripe_payment_intent_id: paymentIntentId,
+      paid_at: new Date().toISOString(),
+      status: "confirmed",
+      payout_status: "pending",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", bookingId);
+
+  if (updateError) {
+    logger.error("Failed to update booking", { error: updateError });
+    throw updateError;
+  }
+
+  // Fetch booking details for notifications
+  const { data: booking, error: fetchError } = await supabaseClient
+    .from("bookings")
+    .select(
+      `
+      id,
+      booking_number,
+      traveler_id,
+      agent_id,
+      creator_id,
+      brand_id,
+      total_price_cents,
+      currency,
+      destination,
+      start_date,
+      end_date
+    `
+    )
+    .eq("id", bookingId)
+    .maybeSingle();
+
+  if (fetchError || !booking) {
+    logger.error("Failed to fetch booking details", { error: fetchError });
+    throw fetchError;
+  }
+
+  // Create notifications for all parties
+  const notifications = [];
+
+  // Notify traveler
+  if (booking.traveler_id) {
+    notifications.push({
+      user_id: booking.traveler_id,
+      type: "payment_received",
+      title: "Payment Confirmed",
+      message: `Your payment for ${booking.destination} has been confirmed.`,
+      entity_type: "booking",
+      entity_id: bookingId,
+      action_url: `/bookings/${bookingId}`,
+      action_label: "View Booking",
+      priority: "high",
+      created_at: new Date().toISOString(),
+    });
+  }
+
+  // Notify agent
+  if (booking.agent_id) {
+    notifications.push({
+      user_id: booking.agent_id,
+      type: "payment_received",
+      title: "Payment Received",
+      message: `Payment confirmed for booking ${booking.booking_number}`,
+      entity_type: "booking",
+      entity_id: bookingId,
+      action_url: `/agent/bookings/${bookingId}`,
+      action_label: "View Booking",
+      priority: "high",
+      created_at: new Date().toISOString(),
+    });
+  }
+
+  // Notify creator
+  if (booking.creator_id) {
+    notifications.push({
+      user_id: booking.creator_id,
+      type: "payment_received",
+      title: "Payment Received",
+      message: `Payment confirmed for booking ${booking.booking_number}`,
+      entity_type: "booking",
+      entity_id: bookingId,
+      action_url: `/creator/bookings/${bookingId}`,
+      action_label: "View Booking",
+      priority: "high",
+      created_at: new Date().toISOString(),
+    });
+  }
+
+  if (notifications.length > 0) {
+    await supabaseClient.from("notifications").insert(notifications);
+  }
+
+  logger.info("Full booking payment processed", { bookingId });
+}
+
+/**
+ * Handle payment failure
+ */
+async function handlePaymentFailed(
+  paymentIntent: PaymentIntentWithMetadata,
+  logger: Logger
+): Promise<void> {
+  const { metadata, id: paymentIntentId, last_payment_error } = paymentIntent;
+  const { booking_id, milestone_id } = metadata;
+
+  logger.warn("Payment failed", {
+    paymentIntentId,
+    bookingId: booking_id,
+    error: last_payment_error?.message,
+  });
+
+  if (!booking_id) {
+    logger.warn("No booking_id in failed payment metadata", { paymentIntentId });
+    return;
+  }
+
+  // Update booking status
+  const { error: updateError } = await supabaseClient
+    .from("bookings")
+    .update({
+      payment_status: "failed",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", booking_id);
+
+  if (updateError) {
+    logger.error("Failed to update booking after payment failure", {
+      error: updateError,
+    });
+  }
+
+  // Notify traveler of failed payment
+  const { data: booking } = await supabaseClient
+    .from("bookings")
+    .select("traveler_id, booking_number")
+    .eq("id", booking_id)
+    .maybeSingle();
+
+  if (booking?.traveler_id) {
+    await supabaseClient.from("notifications").insert({
+      user_id: booking.traveler_id,
+      type: "payment_received",
+      title: "Payment Failed",
+      message: `Payment for booking ${booking.booking_number} failed. Please update your payment method.`,
+      entity_type: "booking",
+      entity_id: booking_id,
+      action_url: `/bookings/${booking_id}/payment`,
+      action_label: "Retry Payment",
+      priority: "urgent",
+      created_at: new Date().toISOString(),
+    });
+  }
+
+  logger.info("Payment failure processed", { bookingId: booking_id });
+}
+
+/**
+ * Create payment notification
+ */
+async function createPaymentNotification(
+  bookingId: string,
+  milestoneId: string,
+  amount: number,
+  currency: string,
+  logger: Logger
+): Promise<void> {
+  // Fetch booking and milestone details
+  const { data: booking } = await supabaseClient
+    .from("bookings")
+    .select("agent_id, creator_id")
+    .eq("id", bookingId)
+    .maybeSingle();
+
+  const { data: milestone } = await supabaseClient
+    .from("booking_milestones")
+    .select("title")
+    .eq("id", milestoneId)
+    .maybeSingle();
+
+  if (!booking) return;
+
+  const notifications = [];
+  const amountFormatted = (amount / 100).toFixed(2);
+  const message = `Milestone payment received: ${milestone?.title || "Payment"} - ${currency.toUpperCase()} ${amountFormatted}`;
+
+  if (booking.agent_id) {
+    notifications.push({
+      user_id: booking.agent_id,
+      type: "milestone_funded",
+      title: "Milestone Funded",
+      message,
+      entity_type: "milestone",
+      entity_id: milestoneId,
+      priority: "high",
+      created_at: new Date().toISOString(),
+    });
+  }
+
+  if (booking.creator_id) {
+    notifications.push({
+      user_id: booking.creator_id,
+      type: "milestone_funded",
+      title: "Milestone Funded",
+      message,
+      entity_type: "milestone",
+      entity_id: milestoneId,
+      priority: "high",
+      created_at: new Date().toISOString(),
+    });
+  }
+
+  if (notifications.length > 0) {
+    await supabaseClient.from("notifications").insert(notifications);
+  }
+}
+
+// ============================================================================
+// SUBSCRIPTION HANDLERS
+// ============================================================================
+
+/**
+ * Handle subscription created/updated
+ */
+async function handleSubscriptionUpdated(
+  subscription: SubscriptionWithMetadata,
+  logger: Logger
+): Promise<void> {
+  const { metadata, id, customer, status, current_period_start, current_period_end, cancel_at_period_end, items } = subscription;
+  const { user_id, tier } = metadata;
+
+  logger.info("Processing subscription update", {
+    subscriptionId: id,
+    userId: user_id,
+    status,
+  });
+
+  if (!user_id) {
+    logger.warn("No user_id in subscription metadata", { subscriptionId: id });
+    return;
+  }
+
+  // Get price and product info
+  const subscriptionItem = items.data[0];
+  const priceId = subscriptionItem?.price.id;
+  const productId = subscriptionItem?.price.product as string;
+
+  // Upsert subscription record
+  const { error: upsertError } = await supabaseClient
+    .from("user_subscriptions")
+    .upsert(
+      {
+        user_id,
+        tier: tier || "premium",
+        stripe_customer_id: customer as string,
+        stripe_subscription_id: id,
+        stripe_price_id: priceId,
+        stripe_product_id: productId,
+        status,
+        cancel_at_period_end,
+        current_period_start: new Date(current_period_start * 1000).toISOString(),
+        current_period_end: new Date(current_period_end * 1000).toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      {
+        onConflict: "user_id",
+      }
+    );
+
+  if (upsertError) {
+    logger.error("Failed to upsert subscription", { error: upsertError });
+    throw upsertError;
+  }
+
+  // Send notification
+  let notificationTitle = "Subscription Updated";
+  let notificationMessage = "Your subscription has been updated.";
+
+  if (status === "active") {
+    notificationTitle = "Subscription Active";
+    notificationMessage = `Your ${tier || "premium"} subscription is now active!`;
+  } else if (status === "canceled") {
+    notificationTitle = "Subscription Canceled";
+    notificationMessage = "Your subscription has been canceled.";
+  } else if (status === "past_due") {
+    notificationTitle = "Payment Past Due";
+    notificationMessage = "Your subscription payment is past due. Please update your payment method.";
+  }
+
+  await supabaseClient.from("notifications").insert({
+    user_id,
+    type: "system_announcement",
+    title: notificationTitle,
+    message: notificationMessage,
+    priority: status === "past_due" ? "urgent" : "normal",
+    created_at: new Date().toISOString(),
+  });
+
+  logger.info("Subscription updated successfully", { subscriptionId: id, userId: user_id });
+}
+
+/**
+ * Handle subscription deleted
+ */
+async function handleSubscriptionDeleted(
+  subscription: SubscriptionWithMetadata,
+  logger: Logger
+): Promise<void> {
+  const { metadata, id } = subscription;
+  const { user_id } = metadata;
+
+  logger.info("Processing subscription deletion", {
+    subscriptionId: id,
+    userId: user_id,
+  });
+
+  if (!user_id) {
+    logger.warn("No user_id in subscription metadata", { subscriptionId: id });
+    return;
+  }
+
+  const { error: updateError } = await supabaseClient
+    .from("user_subscriptions")
+    .update({
+      status: "canceled",
+      ended_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", user_id);
+
+  if (updateError) {
+    logger.error("Failed to update subscription status", { error: updateError });
+    throw updateError;
+  }
+
+  // Downgrade user to free tier
+  const { error: tierError } = await supabaseClient
+    .from("user_subscriptions")
+    .update({
+      tier: "free",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", user_id);
+
+  if (tierError) {
+    logger.error("Failed to downgrade user tier", { error: tierError });
+  }
+
+  // Send notification
+  await supabaseClient.from("notifications").insert({
+    user_id,
+    type: "system_announcement",
+    title: "Subscription Ended",
+    message: "Your subscription has ended. You've been moved to the free tier.",
+    priority: "normal",
+    created_at: new Date().toISOString(),
+  });
+
+  logger.info("Subscription deletion processed", { subscriptionId: id, userId: user_id });
+}
+
+// ============================================================================
+// STRIPE CONNECT PAYOUT HANDLERS
+// ============================================================================
+
+/**
+ * Handle payout paid (Stripe Connect)
+ */
+async function handlePayoutPaid(payout: Stripe.Payout, logger: Logger): Promise<void> {
+  const { id, amount, currency, destination, arrival_date } = payout;
+
+  logger.info("Processing payout paid", {
+    payoutId: id,
+    amount,
+    currency,
+    destination,
+  });
+
+  // Find bookings associated with this payout
+  // This would require tracking payout IDs in your bookings table
+  // For now, we'll log the event
+  
+  logger.info("Payout processed successfully", { payoutId: id, amount });
+
+  // TODO: Implement payout tracking logic
+  // Update booking payout status to "paid"
+  // Create notifications for agents/creators
+}
+
+/**
+ * Handle payout failed (Stripe Connect)
+ */
+async function handlePayoutFailed(payout: Stripe.Payout, logger: Logger): Promise<void> {
+  const { id, amount, currency, failure_message } = payout;
+
+  logger.error("Payout failed", {
+    payoutId: id,
+    amount,
+    currency,
+    failureMessage: failure_message,
+  });
+
+  // TODO: Implement failure handling
+  // Update booking payout status to "failed"
+  // Notify admin team
+  // Create alert for agent/creator
+}
+
+// ============================================================================
+// CHARGE DISPUTE HANDLERS
+// ============================================================================
+
+/**
+ * Handle charge dispute created
+ */
+async function handleDisputeCreated(dispute: Stripe.Dispute, logger: Logger): Promise<void> {
+  const { id, charge, amount, currency, reason, status } = dispute;
+
+  logger.warn("Dispute created", {
+    disputeId: id,
+    chargeId: charge,
+    amount,
+    reason,
+    status,
+  });
+
+  // Find booking associated with charge
+  const { data: booking } = await supabaseClient
+    .from("bookings")
+    .select("id, booking_number, traveler_id, agent_id, creator_id")
+    .eq("stripe_payment_intent_id", charge)
+    .maybeSingle();
+
+  if (!booking) {
+    logger.warn("No booking found for disputed charge", { chargeId: charge });
+    return;
+  }
+
+  // Update booking status
+  await supabaseClient
+    .from("bookings")
+    .update({
+      is_disputed: true,
+      dispute_reason: reason,
+      dispute_opened_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", booking.id);
+
+  // Notify all parties
+  const notifications = [];
+
+  if (booking.agent_id) {
+    notifications.push({
+      user_id: booking.agent_id,
+      type: "system_announcement",
+      title: "⚠️ Payment Dispute",
+      message: `A payment dispute has been opened for booking ${booking.booking_number}. Please provide evidence.`,
+      entity_type: "booking",
+      entity_id: booking.id,
+      priority: "urgent",
+      created_at: new Date().toISOString(),
+    });
+  }
+
+  if (booking.creator_id) {
+    notifications.push({
+      user_id: booking.creator_id,
+      type: "system_announcement",
+      title: "⚠️ Payment Dispute",
+      message: `A payment dispute has been opened for booking ${booking.booking_number}.`,
+      entity_type: "booking",
+      entity_id: booking.id,
+      priority: "urgent",
+      created_at: new Date().toISOString(),
+    });
+  }
+
+  if (notifications.length > 0) {
+    await supabaseClient.from("notifications").insert(notifications);
+  }
+
+  logger.info("Dispute created and processed", { disputeId: id, bookingId: booking.id });
+}
+
+/**
+ * Handle charge dispute closed
+ */
+async function handleDisputeClosed(dispute: Stripe.Dispute, logger: Logger): Promise<void> {
+  const { id, charge, status } = dispute;
+
+  logger.info("Dispute closed", {
+    disputeId: id,
+    chargeId: charge,
+    status,
+  });
+
+  // Find booking
+  const { data: booking } = await supabaseClient
+    .from("bookings")
+    .select("id, booking_number, agent_id, creator_id")
+    .eq("stripe_payment_intent_id", charge)
+    .maybeSingle();
+
+  if (!booking) {
+    logger.warn("No booking found for closed dispute", { chargeId: charge });
+    return;
+  }
+
+  // Update booking
+  await supabaseClient
+    .from("bookings")
+    .update({
+      dispute_resolved_at: new Date().toISOString(),
+      dispute_resolution: status === "won" ? "merchant_won" : "customer_won",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", booking.id);
+
+  // Notify parties
+  const resultMessage =
+    status === "won"
+      ? "The dispute was resolved in your favor."
+      : "The dispute was resolved in the customer's favor.";
+
+  const notifications = [];
+
+  if (booking.agent_id) {
+    notifications.push({
+      user_id: booking.agent_id,
+      type: "system_announcement",
+      title: "Dispute Resolved",
+      message: `Dispute for booking ${booking.booking_number} has been resolved. ${resultMessage}`,
+      entity_type: "booking",
+      entity_id: booking.id,
+      priority: "high",
+      created_at: new Date().toISOString(),
+    });
+  }
+
+  if (booking.creator_id) {
+    notifications.push({
+      user_id: booking.creator_id,
+      type: "system_announcement",
+      title: "Dispute Resolved",
+      message: `Dispute for booking ${booking.booking_number} has been resolved. ${resultMessage}`,
+      entity_type: "booking",
+      entity_id: booking.id,
+      priority: "high",
+      created_at: new Date().toISOString(),
+    });
+  }
+
+  if (notifications.length > 0) {
+    await supabaseClient.from("notifications").insert(notifications);
+  }
+
+  logger.info("Dispute closed and processed", { disputeId: id, bookingId: booking.id });
+}
+
+// ============================================================================
+// REFUND HANDLERS
+// ============================================================================
+
+/**
+ * Handle refund created
+ */
+async function handleRefundCreated(refund: Stripe.Refund, logger: Logger): Promise<void> {
+  const { id, charge, amount, currency, status, reason } = refund;
+
+  logger.info("Processing refund", {
+    refundId: id,
+    chargeId: charge,
+    amount,
+    status,
+    reason,
+  });
+
+  // Find booking
+  const { data: booking } = await supabaseClient
+    .from("bookings")
+    .select("id, booking_number, traveler_id, agent_id, total_price_cents, status")
+    .eq("stripe_payment_intent_id", charge)
+    .maybeSingle();
+
+  if (!booking) {
+    logger.warn("No booking found for refund", { chargeId: charge });
+    return;
+  }
+
+  // Update booking refund status
+  const isFullRefund = amount >= booking.total_price_cents;
+  
+  await supabaseClient
+    .from("bookings")
+    .update({
+      refund_amount_cents: amount,
+      refunded_at: new Date().toISOString(),
+      payment_status: isFullRefund ? "refunded" : "partially_refunded",
+      status: isFullRefund ? "cancelled" : booking.status,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", booking.id);
+
+  // Notify traveler
+  if (booking.traveler_id) {
+    await supabaseClient.from("notifications").insert({
+      user_id: booking.traveler_id,
+      type: "payment_received",
+      title: isFullRefund ? "Refund Processed" : "Partial Refund Processed",
+      message: `A ${isFullRefund ? "full" : "partial"} refund of ${currency.toUpperCase()} ${(amount / 100).toFixed(2)} has been processed for booking ${booking.booking_number}.`,
+      entity_type: "booking",
+      entity_id: booking.id,
+      priority: "high",
+      created_at: new Date().toISOString(),
+    });
+  }
+
+  logger.info("Refund processed", { refundId: id, bookingId: booking.id });
+}
+
+// ============================================================================
+// MAIN HANDLER
+// ============================================================================
+
+serve(async (req: Request) => {
+  const requestId = crypto.randomUUID();
+  const logger = createLogger(requestId);
+  const startTime = Date.now();
+
+  logger.info("Webhook request received", {
+    method: req.method,
+    url: req.url,
+  });
+
+  // Only accept POST requests
+  if (req.method !== "POST") {
+    logger.warn("Invalid method", { method: req.method });
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  try {
+    // Rate limiting
+    const clientIp = req.headers.get("x-forwarded-for") || "unknown";
+    const rateLimit = checkRateLimit(clientIp);
+
+    if (!rateLimit.allowed) {
+      logger.warn("Rate limit exceeded", { ip: clientIp });
+      return new Response(
+        JSON.stringify({
+          error: "Rate limit exceeded",
+          retry_after: Math.ceil((rateLimit.resetAt - Date.now()) / 1000),
+          requestId,
+        }),
+        {
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+            "Retry-After": String(
+              Math.ceil((rateLimit.resetAt - Date.now()) / 1000)
+            ),
+          },
+        }
+      );
+    }
+
+    // Get signature
+    const signature = req.headers.get("stripe-signature");
+    if (!signature) {
+      logger.error("Missing stripe-signature header");
+      return new Response(
+        JSON.stringify({ error: "Missing stripe-signature header", requestId }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Get raw body for signature verification
+    const body = await req.text();
+
+    // Verify webhook signature
+    let event: Stripe.Event;
+    try {
+      event = stripe.webhooks.constructEvent(
+        body,
+        signature,
+        STRIPE_WEBHOOK_SECRET
+      );
+      logger.info("Webhook signature verified", { eventType: event.type });
+    } catch (err: any) {
+      logger.error("Webhook signature verification failed", {
+        error: err.message,
+      });
+      return new Response(
+        JSON.stringify({
+          error: "Invalid signature",
+          details: err.message,
+          requestId,
+        }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Check for duplicate events (idempotency)
+    const isDuplicate = await checkIdempotency(event.id, logger);
+    if (isDuplicate) {
+      logger.info("Duplicate event, skipping processing", { eventId: event.id });
+      return new Response(
+        JSON.stringify({ received: true, duplicate: true, requestId }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Process the event
+    let errorMessage: string | undefined;
+
+    try {
+      switch (event.type) {
+        // Payment Intents
+        case "payment_intent.succeeded":
+          await handlePaymentSucceeded(event.data.object as PaymentIntentWithMetadata, logger);
+          break;
+
+        case "payment_intent.payment_failed":
+          await handlePaymentFailed(event.data.object as PaymentIntentWithMetadata, logger);
+          break;
+
+        // Subscriptions
+        case "customer.subscription.created":
+        case "customer.subscription.updated":
+          await handleSubscriptionUpdated(event.data.object as SubscriptionWithMetadata, logger);
+          break;
+
+        case "customer.subscription.deleted":
+          await handleSubscriptionDeleted(event.data.object as SubscriptionWithMetadata, logger);
+          break;
+
+        // Payouts (Stripe Connect)
+        case "payout.paid":
+          await handlePayoutPaid(event.data.object as Stripe.Payout, logger);
+          break;
+
+        case "payout.failed":
+          await handlePayoutFailed(event.data.object as Stripe.Payout, logger);
+          break;
+
+        // Disputes
+        case "charge.dispute.created":
+          await handleDisputeCreated(event.data.object as Stripe.Dispute, logger);
+          break;
+
+        case "charge.dispute.closed":
+          await handleDisputeClosed(event.data.object as Stripe.Dispute, logger);
+          break;
+
+        // Refunds
+        case "charge.refund.updated":
+          await handleRefundCreated(event.data.object as Stripe.Refund, logger);
+          break;
+
+        default:
+          logger.info("Unhandled event type", { eventType: event.type });
+      }
+    } catch (processingError: any) {
+      errorMessage = processingError.message;
+      logger.error("Error processing webhook event", {
+        error: processingError.message,
+        stack: processingError.stack,
+      });
+      throw processingError;
+    } finally {
+      // Record webhook event for idempotency
+      const processingDuration = Date.now() - startTime;
+      await recordWebhookEvent(
+        event.id,
+        event.type,
+        event.data.object,
+        processingDuration,
+        errorMessage
+      );
+    }
+
+    const processingDuration = Date.now() - startTime;
+    logger.info("Webhook processed successfully", {
+      processingDuration,
+      eventType: event.type,
+    });
+
     return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        requestId 
-      }), 
-      { 
-        status: 400,
-        headers: { "Content-Type": "application/json" }
+      JSON.stringify({
+        received: true,
+        requestId,
+        processingDuration,
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  } catch (error: any) {
+    const processingDuration = Date.now() - startTime;
+    logger.error("Fatal error processing webhook", {
+      error: error.message,
+      stack: error.stack,
+      processingDuration,
+    });
+
+    return new Response(
+      JSON.stringify({
+        error: "Internal server error",
+        message: error.message,
+        requestId,
+        processingDuration,
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
       }
     );
   }
 });
-
-async function handleCheckoutSessionCompleted(session: any) {
-  logger.info("Processing checkout.session.completed", { sessionId: session.id });
-  
-  const userId = session.metadata?.user_id;
-  const subscriptionType = session.metadata?.subscription_type;
-  
-  if (!userId || subscriptionType !== 'verification') {
-    logger.info("Not a verification subscription, skipping");
-    return;
-  }
-
-  try {
-    // Grant verified badge
-    const { error: profileError } = await supabaseClient
-      .from('profiles')
-      .update({ is_verified: true })
-      .eq('id', userId);
-
-    if (profileError) {
-      logger.error("Error updating profile", profileError);
-      throw profileError;
-    }
-
-    // Store subscription details
-    const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
-    
-    const { error: subError } = await supabaseClient
-      .from('verification_subscriptions')
-      .upsert({
-        user_id: userId,
-        stripe_customer_id: session.customer as string,
-        stripe_subscription_id: session.subscription as string,
-        status: subscription.status,
-        current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-        cancel_at_period_end: subscription.cancel_at_period_end,
-      }, {
-        onConflict: 'user_id'
-      });
-
-    if (subError) {
-      logger.error("Error storing subscription", subError);
-      throw subError;
-    }
-
-    logger.info("Granted verification badge", { userId });
-    
-    // Log activity
-    await supabaseClient
-      .from('activity_logs')
-      .insert({
-        user_id: userId,
-        action: 'verification_badge_granted',
-        entity_type: 'subscription',
-        entity_id: userId,
-        details: {
-          stripe_subscription_id: session.subscription,
-          stripe_customer_id: session.customer,
-        }
-      });
-  } catch (error) {
-    logger.error("Error in handleCheckoutSessionCompleted", error as Error);
-    throw error;
-  }
-}
-
-async function handleSubscriptionUpdated(subscription: any) {
-  logger.info("Processing customer.subscription.updated", { subscriptionId: subscription.id });
-  
-  // Only process verification subscriptions
-  if (subscription.metadata?.subscription_type !== 'verification') {
-    logger.info("Not a verification subscription, skipping");
-    return;
-  }
-
-  try {
-    // Find user by subscription ID
-    const { data: subData, error: findError } = await supabaseClient
-      .from('verification_subscriptions')
-      .select('user_id')
-      .eq('stripe_subscription_id', subscription.id)
-      .single();
-
-    if (findError || !subData) {
-      logger.warn("Subscription not found in database", { subscriptionId: subscription.id });
-      return;
-    }
-
-    const userId = subData.user_id;
-
-    // Update subscription status
-    const { error: updateError } = await supabaseClient
-      .from('verification_subscriptions')
-      .update({
-        status: subscription.status,
-        current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-        cancel_at_period_end: subscription.cancel_at_period_end,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('stripe_subscription_id', subscription.id);
-
-    if (updateError) {
-      logger.error("Error updating subscription", updateError);
-      throw updateError;
-    }
-
-    // Update verification badge based on status
-    const isActive = subscription.status === 'active';
-    
-    const { error: profileError } = await supabaseClient
-      .from('profiles')
-      .update({ is_verified: isActive })
-      .eq('id', userId);
-
-    if (profileError) {
-      logger.error("Error updating profile", profileError);
-      throw profileError;
-    }
-
-    logger.info("Updated verification status", { userId, isActive });
-    
-    // Log activity
-    await supabaseClient
-      .from('activity_logs')
-      .insert({
-        user_id: userId,
-        action: isActive ? 'verification_badge_renewed' : 'verification_badge_suspended',
-        entity_type: 'subscription',
-        entity_id: userId,
-        details: {
-          stripe_subscription_id: subscription.id,
-          subscription_status: subscription.status,
-        }
-      });
-  } catch (error) {
-    logger.error("Error in handleSubscriptionUpdated", error as Error);
-    throw error;
-  }
-}
-
-async function handleSubscriptionDeleted(subscription: any) {
-  logger.info("Processing customer.subscription.deleted", { subscriptionId: subscription.id });
-  
-  if (subscription.metadata?.subscription_type !== 'verification') {
-    logger.info("Not a verification subscription, skipping");
-    return;
-  }
-
-  try {
-    // Find user by subscription ID
-    const { data: subData, error: findError } = await supabaseClient
-      .from('verification_subscriptions')
-      .select('user_id')
-      .eq('stripe_subscription_id', subscription.id)
-      .single();
-
-    if (findError || !subData) {
-      logger.warn("Subscription not found in database", { subscriptionId: subscription.id });
-      return;
-    }
-
-    const userId = subData.user_id;
-
-    // Revoke verification badge
-    const { error: profileError } = await supabaseClient
-      .from('profiles')
-      .update({ is_verified: false })
-      .eq('id', userId);
-
-    if (profileError) {
-      logger.error("Error updating profile", profileError);
-      throw profileError;
-    }
-
-    // Update subscription status to canceled
-    const { error: updateError } = await supabaseClient
-      .from('verification_subscriptions')
-      .update({
-        status: 'canceled',
-        updated_at: new Date().toISOString(),
-      })
-      .eq('stripe_subscription_id', subscription.id);
-
-    if (updateError) {
-      logger.error("Error updating subscription", updateError);
-      throw updateError;
-    }
-
-    logger.info("Revoked verification badge", { userId });
-    
-    // Log activity
-    await supabaseClient
-      .from('activity_logs')
-      .insert({
-        user_id: userId,
-        action: 'verification_badge_revoked',
-        entity_type: 'subscription',
-        entity_id: userId,
-        details: {
-          stripe_subscription_id: subscription.id,
-          reason: 'subscription_deleted',
-        }
-      });
-  } catch (error) {
-    logger.error("Error in handleSubscriptionDeleted", error as Error);
-    throw error;
-  }
-}
-
-// Persist standard (non-verification) subscriptions to user_subscriptions
-async function handleStandardCheckout(session: any) {
-  try {
-    // verification flow already handled above
-    if (session.metadata?.subscription_type === 'verification') return;
-    if (session.mode !== 'subscription') return;
-    const subscriptionId = session.subscription;
-    const customerId = session.customer as string;
-    const subscription = await stripe.subscriptions.retrieve(subscriptionId as string);
-    const productId = subscription.items.data[0]?.price?.product as string | undefined;
-    if (!productId) return;
-    const tier = PRODUCT_TIER_MAP[productId] || 'free';
-    const userId = session.metadata?.user_id;
-    let resolvedUserId = userId;
-    if (!resolvedUserId) {
-      const customer = typeof customerId === 'string' ? await stripe.customers.retrieve(customerId) : null;
-      const email = (customer as any)?.email;
-      if (email) {
-        const { data } = await supabaseClient.from('profiles').select('id').eq('email', email).single();
-        resolvedUserId = data?.id;
-      }
-    }
-    if (!resolvedUserId) return;
-    await supabaseClient.from('user_subscriptions').upsert({ user_id: resolvedUserId, tier });
-  } catch (e) {
-    logger.error('handleStandardCheckout failed', e as Error);
-  }
-}
-
-async function upsertStandardSubscription(subscription: any) {
-  try {
-    if (subscription.metadata?.subscription_type === 'verification') return;
-    const customerId = subscription.customer as string;
-    const productId = subscription.items?.data?.[0]?.price?.product as string | undefined;
-    if (!productId) return;
-    const tier = PRODUCT_TIER_MAP[productId] || 'free';
-    const customer = await stripe.customers.retrieve(customerId);
-    const email = (customer as any)?.email;
-    if (!email) return;
-    const { data } = await supabaseClient.from('profiles').select('id').eq('email', email).single();
-    const userId = data?.id;
-    if (!userId) return;
-    await supabaseClient.from('user_subscriptions').upsert({ user_id: userId, tier });
-  } catch (e) {
-    logger.error('upsertStandardSubscription failed', e as Error);
-  }
-}
-
-async function handleStandardSubscriptionDeleted(subscription: any) {
-  try {
-    if (subscription.metadata?.subscription_type === 'verification') return;
-    const customerId = subscription.customer as string;
-    const customer = await stripe.customers.retrieve(customerId);
-    const email = (customer as any)?.email;
-    if (!email) return;
-    const { data } = await supabaseClient.from('profiles').select('id').eq('email', email).single();
-    const userId = data?.id;
-    if (!userId) return;
-    await supabaseClient.from('user_subscriptions').upsert({ user_id: userId, tier: 'free' });
-  } catch (e) {
-    logger.error('handleStandardSubscriptionDeleted failed', e as Error);
-  }
-}
-
-async function handlePaymentFailed(invoice: any) {
-  logger.info("Processing invoice.payment_failed", { invoiceId: invoice.id });
-  
-  try {
-    const subscriptionId = invoice.subscription;
-    if (!subscriptionId) return;
-
-    const subscription = await stripe.subscriptions.retrieve(subscriptionId as string);
-    
-    if (subscription.metadata?.subscription_type !== 'verification') {
-      logger.info("Not a verification subscription, skipping");
-      return;
-    }
-
-    // Find user by subscription ID
-    const { data: subData, error: findError } = await supabaseClient
-      .from('verification_subscriptions')
-      .select('user_id')
-      .eq('stripe_subscription_id', subscriptionId)
-      .single();
-
-    if (findError || !subData) {
-      logger.warn("Subscription not found in database", { subscriptionId });
-      return;
-    }
-
-    const userId = subData.user_id;
-
-    // Update subscription status to past_due
-    const { error: updateError } = await supabaseClient
-      .from('verification_subscriptions')
-      .update({
-        status: 'past_due',
-        updated_at: new Date().toISOString(),
-      })
-      .eq('stripe_subscription_id', subscriptionId);
-
-    if (updateError) {
-      logger.error("Error updating subscription", updateError);
-      throw updateError;
-    }
-
-    logger.warn("Payment failed, subscription past_due", { userId });
-    
-    // Log activity
-    await supabaseClient
-      .from('activity_logs')
-      .insert({
-        user_id: userId,
-        action: 'verification_payment_failed',
-        entity_type: 'subscription',
-        entity_id: userId,
-        details: {
-          stripe_subscription_id: subscriptionId,
-          invoice_id: invoice.id,
-          amount_due: invoice.amount_due,
-        }
-      });
-
-    // Note: Badge remains active during grace period (Stripe handles retry logic)
-    // Badge will be revoked when subscription.deleted event fires if payment never succeeds
-  } catch (error) {
-    logger.error("Error in handlePaymentFailed", error as Error);
-    throw error;
-  }
-}
