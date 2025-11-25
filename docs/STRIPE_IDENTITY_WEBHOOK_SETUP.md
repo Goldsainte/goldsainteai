@@ -1,12 +1,29 @@
-# Stripe Identity Webhook Setup Guide
+# Stripe Identity Setup - Complete ✅
 
-This guide covers the complete setup process for the Stripe Identity verification webhook.
+Both edge functions are deployed and production-ready with comprehensive security features.
+
+## ✅ Edge Functions Ready
+
+### 1. `create-stripe-identity-session` (Deployed)
+Creates verification sessions with:
+- Rate limiting (5 requests/hour per email)
+- Duplicate detection (30-minute window)
+- Disposable email blocking
+- Request validation & structured logging
+
+### 2. `stripe-identity-webhook` (Deployed)
+Processes Stripe events with:
+- Webhook signature verification
+- Idempotency via `webhook_events` table
+- Audit logging to `application_audit_log`
+- Email notifications (ready for Resend)
+- Admin in-app notifications
 
 ## Prerequisites
 
-- Stripe account with Identity feature enabled
-- Supabase project deployed
-- Edge functions deployed
+- ✅ Stripe account with Identity feature enabled
+- ✅ Supabase project deployed
+- ✅ Edge functions deployed
 
 ## Setup Steps
 
