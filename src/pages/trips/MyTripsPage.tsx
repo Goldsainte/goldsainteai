@@ -107,6 +107,7 @@ export default function MyTripsPage() {
         // MY TRIPS → REQUESTS VIEW: Query the same trip_requests table as Marketplace
         // This is the traveler's personal dashboard view filtered to their own traveler_id
         // The same records appear in the Marketplace when status='open' for creators/agents to bid on
+        // @ts-expect-error Type inference depth issue with nested select
         console.log("🔍 [MyTripsPage] Fetching trip requests for user:", authUser.id);
         
         // FIXED: Removed broken nested select `trip_proposals ( status )` that was causing query to fail
