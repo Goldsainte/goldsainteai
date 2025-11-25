@@ -1,218 +1,1357 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+// ============================================================================
+// ENVIRONMENT VARIABLES
+// ============================================================================
+
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const FRONTEND_URL = Deno.env.get("FRONTEND_URL") || "https://goldsainte.com";
+
+const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false,
+  },
+});
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+interface ApproveApplicationRequest {
+  applicationId: string;
+  applicationType: "agent" | "brand";
+  approvalNotes?: string;
+  sendWelcomeEmail?: boolean;
+}
+
+interface RejectApplicationRequest {
+  applicationId: string;
+  applicationType: "agent" | "brand";
+  rejectionReason: string;
+  allowResubmission?: boolean;
+}
+
+interface Logger {
+  info: (message: string, data?: any) => void;
+  warn: (message: string, data?: any) => void;
+  error: (message: string, data?: any) => void;
+}
+
+interface AgentApplication {
+  id: string;
+  status: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  agency_name: string;
+  business_type: string;
+  years_experience: number;
+  service_types: string[];
+  specialties: string[];
+  languages: string[];
+  commission_rate: number;
+  stripe_session_id: string;
+  stripe_verification_status: string;
+  stripe_verified_at: string;
+  website?: string;
+}
+
+interface BrandApplication {
+  id: string;
+  status: string;
+  primary_contact_name: string;
+  primary_contact_email: string;
+  primary_contact_phone: string;
+  brand_name: string;
+  brand_type: string;
+  bio: string;
+  regions: string[];
+  cities: string[];
+  style_tags: string[];
+  logo_url: string;
+  cover_image_url: string;
+  gallery_urls: string[];
+  stripe_session_id: string;
+  stripe_verification_status: string;
+  stripe_verified_at: string;
+  website?: string;
+}
+
+// ============================================================================
+// STRUCTURED LOGGING
+// ============================================================================
+
+const createLogger = (requestId: string): Logger => {
+  const log = (level: string, message: string, data?: any) => {
+    const logEntry = {
+      timestamp: new Date().toISOString(),
+      level,
+      requestId,
+      message,
+      ...(data && { data }),
+    };
+    console.log(JSON.stringify(logEntry));
+  };
+
+  return {
+    info: (message: string, data?: any) => log("INFO", message, data),
+    warn: (message: string, data?: any) => log("WARN", message, data),
+    error: (message: string, data?: any) => log("ERROR", message, data),
+  };
 };
 
-serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+// ============================================================================
+// CORS HEADERS
+// ============================================================================
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+};
+
+// ============================================================================
+// AUTHENTICATION & AUTHORIZATION
+// ============================================================================
+
+/**
+ * Verify that the requesting user is an admin
+ */
+async function verifyAdminUser(
+  authHeader: string | null,
+  logger: Logger
+): Promise<{ authorized: boolean; userId?: string; error?: string }> {
+  if (!authHeader) {
+    logger.warn("Missing authorization header");
+    return { authorized: false, error: "Missing authorization header" };
   }
 
-  const supabase = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-    { auth: { persistSession: false } }
-  );
-
   try {
-    const { applicationId, applicationType, adminUserId } = await req.json();
-    
-    if (!applicationId || !applicationType) {
-      throw new Error('Missing required fields: applicationId, applicationType');
+    // Extract JWT from Bearer token
+    const token = authHeader.replace("Bearer ", "");
+
+    // Verify the JWT and get user
+    const {
+      data: { user },
+      error: authError,
+    } = await supabaseAdmin.auth.getUser(token);
+
+    if (authError || !user) {
+      logger.warn("Invalid or expired token", { error: authError });
+      return { authorized: false, error: "Invalid or expired token" };
     }
 
-    if (!['agent', 'brand'].includes(applicationType)) {
-      throw new Error('Invalid applicationType. Must be "agent" or "brand"');
-    }
+    logger.info("User authenticated", { userId: user.id });
 
-    console.log(`Processing ${applicationType} application approval:`, applicationId);
-
-    // Get application details
-    const tableName = applicationType === 'agent' ? 'agent_applications' : 'brand_applications';
-    const { data: app, error: appError } = await supabase
-      .from(tableName)
-      .select('*')
-      .eq('id', applicationId)
+    // Check if user has admin role
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
       .single();
 
-    if (appError || !app) {
-      console.error('Application fetch error:', appError);
-      throw new Error('Application not found');
+    if (profileError || !profile) {
+      logger.error("Failed to fetch user profile", { error: profileError });
+      return { authorized: false, error: "User profile not found" };
     }
 
-    // Check verification status
-    if (app.status !== 'verified') {
-      throw new Error('Application must pass Stripe Identity verification first');
+    if (profile.role !== "admin") {
+      logger.warn("User is not an admin", { userId: user.id, role: profile.role });
+      return {
+        authorized: false,
+        error: "Insufficient permissions. Admin role required.",
+      };
     }
 
-    // Check if already approved
-    if (app.status === 'approved') {
-      throw new Error('Application has already been approved');
-    }
+    logger.info("Admin user verified", { userId: user.id });
+    return { authorized: true, userId: user.id };
+  } catch (error: any) {
+    logger.error("Error verifying admin user", { error: error.message });
+    return { authorized: false, error: "Authentication failed" };
+  }
+}
 
-    // Generate temporary password
-    const tempPassword = crypto.randomUUID().substring(0, 12);
+// ============================================================================
+// PASSWORD GENERATION
+// ============================================================================
 
-    console.log(`Creating auth account for ${app.email}...`);
+/**
+ * Generate a secure temporary password
+ */
+function generateTemporaryPassword(): string {
+  const length = 16;
+  const charset =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+  let password = "";
 
-    // Create auth account
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+  // Ensure at least one of each required character type
+  password += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random() * 26)]; // Uppercase
+  password += "abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 26)]; // Lowercase
+  password += "0123456789"[Math.floor(Math.random() * 10)]; // Number
+  password += "!@#$%^&*"[Math.floor(Math.random() * 8)]; // Special char
+
+  // Fill the rest randomly
+  for (let i = password.length; i < length; i++) {
+    password += charset[Math.floor(Math.random() * charset.length)];
+  }
+
+  // Shuffle the password
+  return password
+    .split("")
+    .sort(() => Math.random() - 0.5)
+    .join("");
+}
+
+// ============================================================================
+// EMAIL NOTIFICATIONS
+// ============================================================================
+
+/**
+ * Send welcome email to approved applicant with login credentials
+ */
+async function sendWelcomeEmail(
+  email: string,
+  firstName: string,
+  temporaryPassword: string,
+  applicationType: "agent" | "brand",
+  logger: Logger
+): Promise<void> {
+  const loginUrl = `${FRONTEND_URL}/login`;
+  const accountType = applicationType === "agent" ? "Travel Agent" : "Brand Partner";
+
+  const emailContent = {
+    to: email,
+    subject: `🎉 Welcome to Goldsainte - Your ${accountType} Account is Ready!`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+              line-height: 1.6;
+              color: #333;
+              max-width: 600px;
+              margin: 0 auto;
+              padding: 20px;
+            }
+            .header {
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              padding: 30px;
+              text-align: center;
+              border-radius: 8px 8px 0 0;
+            }
+            .content {
+              background: #f9fafb;
+              padding: 30px;
+              border: 1px solid #e5e7eb;
+              border-top: none;
+              border-radius: 0 0 8px 8px;
+            }
+            .credentials-box {
+              background: white;
+              border: 2px solid #667eea;
+              padding: 20px;
+              margin: 20px 0;
+              border-radius: 8px;
+            }
+            .credential-item {
+              margin: 10px 0;
+              padding: 10px;
+              background: #f3f4f6;
+              border-radius: 4px;
+            }
+            .credential-label {
+              font-weight: 600;
+              color: #4b5563;
+              font-size: 12px;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+            .credential-value {
+              font-size: 16px;
+              color: #111827;
+              font-family: 'Courier New', monospace;
+              margin-top: 5px;
+            }
+            .button {
+              display: inline-block;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              padding: 14px 28px;
+              text-decoration: none;
+              border-radius: 6px;
+              margin: 20px 0;
+              font-weight: 600;
+            }
+            .warning {
+              background: #fef3c7;
+              border-left: 4px solid #f59e0b;
+              padding: 15px;
+              margin: 20px 0;
+              border-radius: 4px;
+            }
+            .footer {
+              text-align: center;
+              margin-top: 30px;
+              padding-top: 20px;
+              border-top: 1px solid #e5e7eb;
+              font-size: 14px;
+              color: #6b7280;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1 style="margin: 0; font-size: 28px;">Welcome to Goldsainte! 🎉</h1>
+            <p style="margin: 10px 0 0 0; opacity: 0.9;">Your ${accountType} account has been approved</p>
+          </div>
+          
+          <div class="content">
+            <p>Hi ${firstName},</p>
+            
+            <p>Congratulations! Your application has been reviewed and approved. Welcome to the Goldsainte community of elite ${applicationType === "agent" ? "travel agents" : "brand partners"}!</p>
+            
+            <p>Your account is now active, and you can start using the platform right away.</p>
+            
+            <div class="credentials-box">
+              <h3 style="margin-top: 0; color: #667eea;">Your Login Credentials</h3>
+              
+              <div class="credential-item">
+                <div class="credential-label">Email</div>
+                <div class="credential-value">${email}</div>
+              </div>
+              
+              <div class="credential-item">
+                <div class="credential-label">Temporary Password</div>
+                <div class="credential-value">${temporaryPassword}</div>
+              </div>
+            </div>
+            
+            <div class="warning">
+              <strong>⚠️ Important Security Notice:</strong><br>
+              Please change your password immediately after your first login. This temporary password will expire in 7 days.
+            </div>
+            
+            <div style="text-align: center;">
+              <a href="${loginUrl}" class="button">Log In to Your Account</a>
+            </div>
+            
+            <h3 style="color: #667eea; margin-top: 30px;">Next Steps:</h3>
+            <ol style="line-height: 1.8;">
+              <li><strong>Log in</strong> using the credentials above</li>
+              <li><strong>Complete your profile</strong> with additional details</li>
+              ${
+                applicationType === "agent"
+                  ? "<li><strong>Connect your Stripe account</strong> to receive payouts</li>"
+                  : "<li><strong>Set up your brand profile</strong> and upload more content</li>"
+              }
+              <li><strong>Explore the platform</strong> and start ${
+                applicationType === "agent" ? "accepting trip requests" : "connecting with travelers"
+              }</li>
+            </ol>
+            
+            ${
+              applicationType === "agent"
+                ? `
+              <h3 style="color: #667eea;">Agent Resources:</h3>
+              <ul style="line-height: 1.8;">
+                <li><a href="${FRONTEND_URL}/agent/guide">Agent Success Guide</a></li>
+                <li><a href="${FRONTEND_URL}/agent/commission-structure">Commission Structure</a></li>
+                <li><a href="${FRONTEND_URL}/support">Support Center</a></li>
+              </ul>
+            `
+                : `
+              <h3 style="color: #667eea;">Brand Resources:</h3>
+              <ul style="line-height: 1.8;">
+                <li><a href="${FRONTEND_URL}/brand/guide">Brand Partner Guide</a></li>
+                <li><a href="${FRONTEND_URL}/brand/best-practices">Marketing Best Practices</a></li>
+                <li><a href="${FRONTEND_URL}/support">Support Center</a></li>
+              </ul>
+            `
+            }
+            
+            <p style="margin-top: 30px;">If you have any questions or need assistance, our support team is here to help.</p>
+            
+            <p>Welcome aboard!</p>
+            <p><strong>The Goldsainte Team</strong></p>
+          </div>
+          
+          <div class="footer">
+            <p>© ${new Date().getFullYear()} Goldsainte. All rights reserved.</p>
+            <p>
+              <a href="${FRONTEND_URL}/terms" style="color: #667eea; text-decoration: none;">Terms</a> · 
+              <a href="${FRONTEND_URL}/privacy" style="color: #667eea; text-decoration: none;">Privacy</a> · 
+              <a href="${FRONTEND_URL}/support" style="color: #667eea; text-decoration: none;">Support</a>
+            </p>
+          </div>
+        </body>
+      </html>
+    `,
+    text: `
+Welcome to Goldsainte, ${firstName}!
+
+Your ${accountType} account has been approved and is now active.
+
+LOGIN CREDENTIALS:
+Email: ${email}
+Temporary Password: ${temporaryPassword}
+
+⚠️ IMPORTANT: Please change your password immediately after your first login.
+
+Log in at: ${loginUrl}
+
+Next Steps:
+1. Log in using the credentials above
+2. Complete your profile with additional details
+${applicationType === "agent" ? "3. Connect your Stripe account to receive payouts" : "3. Set up your brand profile and upload more content"}
+4. Start ${applicationType === "agent" ? "accepting trip requests" : "connecting with travelers"}
+
+If you need help, visit ${FRONTEND_URL}/support
+
+Welcome aboard!
+The Goldsainte Team
+    `,
+  };
+
+  logger.info("Sending welcome email", { to: email, type: applicationType });
+  
+  // TODO: Integrate with your email service (SendGrid, Resend, etc.)
+  console.log(JSON.stringify({ action: "send_email", ...emailContent }));
+  
+  // Placeholder for actual email sending
+  // await sendEmail(emailContent);
+}
+
+/**
+ * Send rejection email to applicant
+ */
+async function sendRejectionEmail(
+  email: string,
+  firstName: string,
+  rejectionReason: string,
+  applicationType: "agent" | "brand",
+  allowResubmission: boolean,
+  logger: Logger
+): Promise<void> {
+  const accountType = applicationType === "agent" ? "Travel Agent" : "Brand Partner";
+  const reapplyUrl = `${FRONTEND_URL}/apply/${applicationType}`;
+
+  const emailContent = {
+    to: email,
+    subject: `Update on Your ${accountType} Application`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+              line-height: 1.6;
+              color: #333;
+              max-width: 600px;
+              margin: 0 auto;
+              padding: 20px;
+            }
+            .header {
+              background: #f3f4f6;
+              padding: 30px;
+              text-align: center;
+              border-radius: 8px 8px 0 0;
+            }
+            .content {
+              background: white;
+              padding: 30px;
+              border: 1px solid #e5e7eb;
+              border-top: none;
+              border-radius: 0 0 8px 8px;
+            }
+            .reason-box {
+              background: #fef3c7;
+              border-left: 4px solid #f59e0b;
+              padding: 15px;
+              margin: 20px 0;
+              border-radius: 4px;
+            }
+            .button {
+              display: inline-block;
+              background: #667eea;
+              color: white;
+              padding: 14px 28px;
+              text-decoration: none;
+              border-radius: 6px;
+              margin: 20px 0;
+              font-weight: 600;
+            }
+            .footer {
+              text-align: center;
+              margin-top: 30px;
+              padding-top: 20px;
+              border-top: 1px solid #e5e7eb;
+              font-size: 14px;
+              color: #6b7280;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1 style="margin: 0; font-size: 28px; color: #374151;">Application Status Update</h1>
+          </div>
+          
+          <div class="content">
+            <p>Hi ${firstName},</p>
+            
+            <p>Thank you for your interest in joining Goldsainte as a ${accountType}. After careful review of your application, we regret to inform you that we are unable to approve your application at this time.</p>
+            
+            <div class="reason-box">
+              <strong>Reason:</strong><br>
+              ${rejectionReason}
+            </div>
+            
+            ${
+              allowResubmission
+                ? `
+              <p>We encourage you to address the items mentioned above and resubmit your application when ready.</p>
+              
+              <div style="text-align: center;">
+                <a href="${reapplyUrl}" class="button">Reapply Now</a>
+              </div>
+            `
+                : `
+              <p>Please note that based on our review, we are not accepting resubmissions at this time. We appreciate your understanding.</p>
+            `
+            }
+            
+            <p>If you have questions about this decision or would like more information, please don't hesitate to contact our support team at <a href="mailto:support@goldsainte.com">support@goldsainte.com</a>.</p>
+            
+            <p>We appreciate your interest in Goldsainte and wish you the best in your endeavors.</p>
+            
+            <p><strong>The Goldsainte Team</strong></p>
+          </div>
+          
+          <div class="footer">
+            <p>© ${new Date().getFullYear()} Goldsainte. All rights reserved.</p>
+          </div>
+        </body>
+      </html>
+    `,
+    text: `
+Hi ${firstName},
+
+Thank you for your interest in joining Goldsainte as a ${accountType}. After careful review, we are unable to approve your application at this time.
+
+Reason:
+${rejectionReason}
+
+${
+  allowResubmission
+    ? `We encourage you to address the items above and resubmit when ready: ${reapplyUrl}`
+    : "Based on our review, we are not accepting resubmissions at this time."
+}
+
+Questions? Contact support@goldsainte.com
+
+Best regards,
+The Goldsainte Team
+    `,
+  };
+
+  logger.info("Sending rejection email", { to: email, type: applicationType });
+  
+  console.log(JSON.stringify({ action: "send_email", ...emailContent }));
+  
+  // TODO: Integrate with email service
+  // await sendEmail(emailContent);
+}
+
+// ============================================================================
+// AGENT APPROVAL
+// ============================================================================
+
+/**
+ * Approve agent application and create auth account
+ */
+async function approveAgentApplication(
+  applicationId: string,
+  adminUserId: string,
+  approvalNotes: string | undefined,
+  sendWelcome: boolean,
+  logger: Logger
+): Promise<{ success: boolean; userId?: string; error?: string }> {
+  logger.info("Starting agent approval process", { applicationId });
+
+  // 1. Fetch application
+  const { data: application, error: fetchError } = await supabaseAdmin
+    .from("agent_applications")
+    .select("*")
+    .eq("id", applicationId)
+    .single();
+
+  if (fetchError || !application) {
+    logger.error("Failed to fetch application", { error: fetchError });
+    return { success: false, error: "Application not found" };
+  }
+
+  const app = application as AgentApplication;
+
+  // 2. Validate application status
+  if (app.status === "approved") {
+    logger.warn("Application already approved", { applicationId });
+    return { success: false, error: "Application already approved" };
+  }
+
+  if (app.status !== "verified") {
+    logger.warn("Application not in verified status", {
+      applicationId,
+      currentStatus: app.status,
+    });
+    return {
+      success: false,
+      error: `Application must be verified before approval. Current status: ${app.status}`,
+    };
+  }
+
+  // 3. Generate temporary password
+  const temporaryPassword = generateTemporaryPassword();
+  logger.info("Generated temporary password");
+
+  // 4. Create auth account
+  logger.info("Creating auth account", { email: app.email });
+  
+  const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser(
+    {
       email: app.email,
-      password: tempPassword,
-      email_confirm: true,
+      password: temporaryPassword,
+      email_confirm: true, // Auto-confirm email since we verified via Stripe Identity
       user_metadata: {
-        full_name: `${app.first_name} ${app.last_name}`,
-        account_type: applicationType,
-      }
+        first_name: app.first_name,
+        last_name: app.last_name,
+        account_type: "agent",
+        application_id: applicationId,
+      },
+    }
+  );
+
+  if (authError || !authData.user) {
+    logger.error("Failed to create auth account", { error: authError });
+    return {
+      success: false,
+      error: `Failed to create auth account: ${authError?.message}`,
+    };
+  }
+
+  const userId = authData.user.id;
+  logger.info("Auth account created", { userId });
+
+  try {
+    // 5. Create profile
+    logger.info("Creating profile", { userId });
+    
+    const { error: profileError } = await supabaseAdmin.from("profiles").insert({
+      id: userId,
+      email: app.email,
+      username: app.email.split("@")[0],
+      first_name: app.first_name,
+      last_name: app.last_name,
+      phone: app.phone,
+      account_type: "agent",
+      role: "agent",
+      is_verified: true,
+      email_verified: true,
+      identity_verified: true,
+      is_profile_complete: false,
+      onboarding_completed: false,
+      created_at: new Date().toISOString(),
     });
 
-    if (authError) {
-      console.error('Auth user creation error:', authError);
-      throw new Error(`Failed to create auth account: ${authError.message}`);
+    if (profileError) {
+      logger.error("Failed to create profile", { error: profileError });
+      throw new Error(`Failed to create profile: ${profileError.message}`);
     }
 
-    const userId = authData.user.id;
-    console.log(`Auth account created: ${userId}`);
+    // 6. Create travel_agents record
+    logger.info("Creating travel agent profile", { userId });
+    
+    const { error: agentError } = await supabaseAdmin
+      .from("travel_agents")
+      .insert({
+        user_id: userId,
+        agency_name: app.agency_name,
+        business_type: app.business_type,
+        bio: `${app.years_experience} years of experience specializing in ${app.specialties.slice(0, 3).join(", ")}`,
+        website: app.website,
+        status: "active",
+        is_accepting_requests: true,
+        onboarded_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+      });
 
-    // Update application status
-    const { error: updateError } = await supabase
-      .from(tableName)
+    if (agentError) {
+      logger.error("Failed to create agent profile", { error: agentError });
+      throw new Error(`Failed to create agent profile: ${agentError.message}`);
+    }
+
+    // 7. Assign role
+    logger.info("Assigning agent role", { userId });
+    
+    const { error: roleError } = await supabaseAdmin.from("user_roles").insert({
+      user_id: userId,
+      role: "agent",
+      granted_by: adminUserId,
+      granted_at: new Date().toISOString(),
+    });
+
+    if (roleError) {
+      logger.error("Failed to assign role", { error: roleError });
+      // Non-fatal, continue
+    }
+
+    // 8. Update application status
+    logger.info("Updating application status", { applicationId });
+    
+    const { error: updateError } = await supabaseAdmin
+      .from("agent_applications")
       .update({
-        status: 'approved', // Use single status field
-        approved_at: new Date().toISOString(),
-        reviewed_at: new Date().toISOString(),
+        status: "approved",
+        user_id: userId,
         admin_reviewer_id: adminUserId,
-        user_id: userId, // Link to created auth account
+        reviewed_at: new Date().toISOString(),
+        approved_at: new Date().toISOString(),
+        approval_notes: approvalNotes,
+        updated_at: new Date().toISOString(),
       })
-      .eq('id', applicationId);
+      .eq("id", applicationId);
 
     if (updateError) {
-      console.error('Application update error:', updateError);
+      logger.error("Failed to update application", { error: updateError });
       throw new Error(`Failed to update application: ${updateError.message}`);
     }
 
-    // Log to audit trail
-    await supabase
-      .from('application_audit_log')
-      .insert({
-        application_id: applicationId,
-        application_type: applicationType,
-        action: 'approved',
-        actor_id: adminUserId,
-        actor_type: 'admin',
-        details: {
-          created_user_id: userId,
-          email: app.email,
-        },
-      });
+    // 9. Log audit event
+    await supabaseAdmin.from("application_audit_log").insert({
+      application_id: applicationId,
+      application_type: "agent",
+      action: "approved",
+      actor_id: adminUserId,
+      actor_type: "admin",
+      details: {
+        user_id: userId,
+        approval_notes: approvalNotes,
+        approved_at: new Date().toISOString(),
+      },
+      created_at: new Date().toISOString(),
+    });
 
-    // Create profile record
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .insert({
-        id: userId,
-        email: app.email,
-        first_name: app.first_name,
-        last_name: app.last_name,
-        display_name: `${app.first_name} ${app.last_name}`,
-        account_type: applicationType,
-        is_profile_complete: true,
-        onboarding_completed: true,
-        onboarding_completed_at: new Date().toISOString(),
+    // 10. Create success notification for applicant
+    await supabaseAdmin.from("notifications").insert({
+      user_id: userId,
+      type: "application_update",
+      title: "🎉 Application Approved!",
+      message: "Your travel agent application has been approved. Welcome to Goldsainte!",
+      priority: "high",
+      created_at: new Date().toISOString(),
+    });
+
+    // 11. Send welcome email
+    if (sendWelcome) {
+      await sendWelcomeEmail(
+        app.email,
+        app.first_name,
+        temporaryPassword,
+        "agent",
+        logger
+      );
+    }
+
+    logger.info("Agent approval completed successfully", {
+      applicationId,
+      userId,
+    });
+
+    return { success: true, userId };
+  } catch (error: any) {
+    // Rollback: Delete auth account if profile creation failed
+    logger.error("Error during approval, attempting rollback", {
+      error: error.message,
+    });
+
+    try {
+      await supabaseAdmin.auth.admin.deleteUser(userId);
+      logger.info("Auth account deleted (rollback)", { userId });
+    } catch (rollbackError: any) {
+      logger.error("Failed to rollback auth account", {
+        error: rollbackError.message,
       });
+    }
+
+    return { success: false, error: error.message };
+  }
+}
+
+// ============================================================================
+// BRAND APPROVAL
+// ============================================================================
+
+/**
+ * Approve brand application and create auth account
+ */
+async function approveBrandApplication(
+  applicationId: string,
+  adminUserId: string,
+  approvalNotes: string | undefined,
+  sendWelcome: boolean,
+  logger: Logger
+): Promise<{ success: boolean; userId?: string; brandId?: string; error?: string }> {
+  logger.info("Starting brand approval process", { applicationId });
+
+  // 1. Fetch application
+  const { data: application, error: fetchError } = await supabaseAdmin
+    .from("brand_applications")
+    .select("*")
+    .eq("id", applicationId)
+    .single();
+
+  if (fetchError || !application) {
+    logger.error("Failed to fetch application", { error: fetchError });
+    return { success: false, error: "Application not found" };
+  }
+
+  const app = application as BrandApplication;
+
+  // 2. Validate application status
+  if (app.status === "approved") {
+    logger.warn("Application already approved", { applicationId });
+    return { success: false, error: "Application already approved" };
+  }
+
+  if (app.status !== "verified") {
+    logger.warn("Application not in verified status", {
+      applicationId,
+      currentStatus: app.status,
+    });
+    return {
+      success: false,
+      error: `Application must be verified before approval. Current status: ${app.status}`,
+    };
+  }
+
+  // 3. Generate temporary password
+  const temporaryPassword = generateTemporaryPassword();
+  logger.info("Generated temporary password");
+
+  // 4. Create auth account
+  logger.info("Creating auth account", { email: app.primary_contact_email });
+  
+  const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser(
+    {
+      email: app.primary_contact_email,
+      password: temporaryPassword,
+      email_confirm: true,
+      user_metadata: {
+        full_name: app.primary_contact_name,
+        account_type: "brand",
+        brand_name: app.brand_name,
+        application_id: applicationId,
+      },
+    }
+  );
+
+  if (authError || !authData.user) {
+    logger.error("Failed to create auth account", { error: authError });
+    return {
+      success: false,
+      error: `Failed to create auth account: ${authError?.message}`,
+    };
+  }
+
+  const userId = authData.user.id;
+  logger.info("Auth account created", { userId });
+
+  try {
+    // 5. Create profile
+    logger.info("Creating profile", { userId });
+    
+    const nameParts = app.primary_contact_name.split(" ");
+    const firstName = nameParts[0] || app.primary_contact_name;
+    const lastName = nameParts.slice(1).join(" ") || "";
+
+    const { error: profileError } = await supabaseAdmin.from("profiles").insert({
+      id: userId,
+      email: app.primary_contact_email,
+      username: app.brand_name.toLowerCase().replace(/\s+/g, "-"),
+      first_name: firstName,
+      last_name: lastName,
+      phone: app.primary_contact_phone,
+      account_type: "brand",
+      role: "brand",
+      is_verified: true,
+      email_verified: true,
+      identity_verified: true,
+      is_profile_complete: false,
+      onboarding_completed: false,
+      created_at: new Date().toISOString(),
+    });
 
     if (profileError) {
-      console.error('Profile creation error:', profileError);
-      // Don't throw - profile might exist from trigger
+      logger.error("Failed to create profile", { error: profileError });
+      throw new Error(`Failed to create profile: ${profileError.message}`);
     }
 
-    // Create role-specific records
-    if (applicationType === 'agent') {
-      const { error: agentError } = await supabase
-        .from('travel_agents')
-        .insert({
-          user_id: userId,
-          agency_name: app.agency_name,
-          email: app.email,
-          phone: app.phone || '',
-          business_type: app.business_type || '',
-          license_number: app.license_number || '',
-          years_experience: app.years_experience || 0,
-          specialties: app.specialties || [],
-          languages: app.languages || [],
-          website: app.website || '',
-          is_verified: true,
-          identity_verified: true,
-        });
+    // 6. Create brand_profiles record
+    logger.info("Creating brand profile", { userId });
+    
+    const { data: brandProfile, error: brandError } = await supabaseAdmin
+      .from("brand_profiles")
+      .insert({
+        owner_user_id: userId,
+        brand_name: app.brand_name,
+        brand_type: app.brand_type,
+        bio: app.bio,
+        website: app.website,
+        regions: app.regions,
+        cities: app.cities,
+        style_tags: app.style_tags,
+        logo_url: app.logo_url,
+        cover_image_url: app.cover_image_url,
+        gallery_urls: app.gallery_urls,
+        status: "active",
+        is_featured: false,
+        created_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
 
-      if (agentError) {
-        console.error('Travel agent record creation error:', agentError);
-        throw new Error(`Failed to create agent record: ${agentError.message}`);
-      }
-
-      console.log('Travel agent record created successfully');
+    if (brandError || !brandProfile) {
+      logger.error("Failed to create brand profile", { error: brandError });
+      throw new Error(`Failed to create brand profile: ${brandError?.message}`);
     }
 
-    if (applicationType === 'brand') {
-      const { error: brandError } = await supabase
-        .from('brand_profiles')
-        .insert({
-          owner_user_id: userId,
-          brand_name: app.brand_name,
-          brand_type: app.brand_type,
-          contact_name: app.primary_contact_name,
-          contact_email: app.primary_contact_email,
-          contact_phone: app.primary_contact_phone,
-          website: app.website || '',
-          is_verified: true,
-        });
+    const brandId = brandProfile.id;
+    logger.info("Brand profile created", { brandId });
 
-      if (brandError) {
-        console.error('Brand profile creation error:', brandError);
-        throw new Error(`Failed to create brand profile: ${brandError.message}`);
-      }
+    // 7. Assign role
+    logger.info("Assigning brand role", { userId });
+    
+    const { error: roleError } = await supabaseAdmin.from("user_roles").insert({
+      user_id: userId,
+      role: "brand",
+      granted_by: adminUserId,
+      granted_at: new Date().toISOString(),
+    });
 
-      console.log('Brand profile created successfully');
+    if (roleError) {
+      logger.error("Failed to assign role", { error: roleError });
+      // Non-fatal, continue
     }
 
-    // Send welcome email with credentials (fire-and-forget)
-    supabase.functions.invoke('notify-applicant-status-change', {
-      body: {
-        email: app.email,
-        firstName: app.first_name,
-        applicationType,
-        status: 'approved',
-        tempPassword,
-      }
-    }).catch(err => console.error('Email notification error:', err));
+    // 8. Update application status
+    logger.info("Updating application status", { applicationId });
+    
+    const { error: updateError } = await supabaseAdmin
+      .from("brand_applications")
+      .update({
+        status: "approved",
+        user_id: userId,
+        brand_profile_id: brandId,
+        admin_reviewer_id: adminUserId,
+        reviewed_at: new Date().toISOString(),
+        approved_at: new Date().toISOString(),
+        approval_notes: approvalNotes,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", applicationId);
 
-    console.log(`✅ Application ${applicationId} approved successfully`);
+    if (updateError) {
+      logger.error("Failed to update application", { error: updateError });
+      throw new Error(`Failed to update application: ${updateError.message}`);
+    }
 
+    // 9. Log audit event
+    await supabaseAdmin.from("application_audit_log").insert({
+      application_id: applicationId,
+      application_type: "brand",
+      action: "approved",
+      actor_id: adminUserId,
+      actor_type: "admin",
+      details: {
+        user_id: userId,
+        brand_id: brandId,
+        approval_notes: approvalNotes,
+        approved_at: new Date().toISOString(),
+      },
+      created_at: new Date().toISOString(),
+    });
+
+    // 10. Create success notification
+    await supabaseAdmin.from("notifications").insert({
+      user_id: userId,
+      type: "application_update",
+      title: "🎉 Brand Application Approved!",
+      message: `${app.brand_name} has been approved. Welcome to Goldsainte!`,
+      priority: "high",
+      created_at: new Date().toISOString(),
+    });
+
+    // 11. Send welcome email
+    if (sendWelcome) {
+      await sendWelcomeEmail(
+        app.primary_contact_email,
+        firstName,
+        temporaryPassword,
+        "brand",
+        logger
+      );
+    }
+
+    logger.info("Brand approval completed successfully", {
+      applicationId,
+      userId,
+      brandId,
+    });
+
+    return { success: true, userId, brandId };
+  } catch (error: any) {
+    // Rollback: Delete auth account
+    logger.error("Error during approval, attempting rollback", {
+      error: error.message,
+    });
+
+    try {
+      await supabaseAdmin.auth.admin.deleteUser(userId);
+      logger.info("Auth account deleted (rollback)", { userId });
+    } catch (rollbackError: any) {
+      logger.error("Failed to rollback auth account", {
+        error: rollbackError.message,
+      });
+    }
+
+    return { success: false, error: error.message };
+  }
+}
+
+// ============================================================================
+// REJECT APPLICATION
+// ============================================================================
+
+/**
+ * Reject an application
+ */
+async function rejectApplication(
+  applicationId: string,
+  applicationType: "agent" | "brand",
+  adminUserId: string,
+  rejectionReason: string,
+  allowResubmission: boolean,
+  logger: Logger
+): Promise<{ success: boolean; error?: string }> {
+  logger.info("Starting rejection process", { applicationId, applicationType });
+
+  const tableName =
+    applicationType === "agent" ? "agent_applications" : "brand_applications";
+
+  // 1. Fetch application
+  const { data: application, error: fetchError } = await supabaseAdmin
+    .from(tableName)
+    .select("*")
+    .eq("id", applicationId)
+    .single();
+
+  if (fetchError || !application) {
+    logger.error("Failed to fetch application", { error: fetchError });
+    return { success: false, error: "Application not found" };
+  }
+
+  if (application.status === "rejected") {
+    logger.warn("Application already rejected", { applicationId });
+    return { success: false, error: "Application already rejected" };
+  }
+
+  // 2. Update application status
+  const { error: updateError } = await supabaseAdmin
+    .from(tableName)
+    .update({
+      status: "rejected",
+      admin_reviewer_id: adminUserId,
+      reviewed_at: new Date().toISOString(),
+      rejected_at: new Date().toISOString(),
+      rejection_reason: rejectionReason,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", applicationId);
+
+  if (updateError) {
+    logger.error("Failed to update application", { error: updateError });
+    return {
+      success: false,
+      error: `Failed to reject application: ${updateError.message}`,
+    };
+  }
+
+  // 3. Log audit event
+  await supabaseAdmin.from("application_audit_log").insert({
+    application_id: applicationId,
+    application_type: applicationType,
+    action: "rejected",
+    actor_id: adminUserId,
+    actor_type: "admin",
+    details: {
+      rejection_reason: rejectionReason,
+      allow_resubmission: allowResubmission,
+      rejected_at: new Date().toISOString(),
+    },
+    created_at: new Date().toISOString(),
+  });
+
+  // 4. Send rejection email
+  const email =
+    applicationType === "agent"
+      ? application.email
+      : application.primary_contact_email;
+  const firstName =
+    applicationType === "agent"
+      ? application.first_name
+      : application.primary_contact_name.split(" ")[0];
+
+  await sendRejectionEmail(
+    email,
+    firstName,
+    rejectionReason,
+    applicationType,
+    allowResubmission,
+    logger
+  );
+
+  logger.info("Application rejected successfully", { applicationId });
+  return { success: true };
+}
+
+// ============================================================================
+// MAIN HANDLER
+// ============================================================================
+
+serve(async (req: Request) => {
+  const requestId = crypto.randomUUID();
+  const logger = createLogger(requestId);
+
+  logger.info("Request received", {
+    method: req.method,
+    url: req.url,
+  });
+
+  // Handle CORS preflight
+  if (req.method === "OPTIONS") {
+    return new Response(null, {
+      status: 204,
+      headers: corsHeaders,
+    });
+  }
+
+  // Only accept POST requests
+  if (req.method !== "POST") {
     return new Response(
-      JSON.stringify({
-        success: true,
-        userId,
-        message: 'Application approved and account created successfully',
-      }),
+      JSON.stringify({ error: "Method not allowed", requestId }),
       {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
+        status: 405,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       }
     );
+  }
+
+  try {
+    // Verify admin authorization
+    const authHeader = req.headers.get("authorization");
+    const authCheck = await verifyAdminUser(authHeader, logger);
+
+    if (!authCheck.authorized) {
+      return new Response(
+        JSON.stringify({
+          error: "Unauthorized",
+          message: authCheck.error,
+          requestId,
+        }),
+        {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const adminUserId = authCheck.userId!;
+
+    // Parse request body
+    const body = await req.json();
+    const action = body.action as "approve" | "reject";
+
+    if (!action || !["approve", "reject"].includes(action)) {
+      return new Response(
+        JSON.stringify({
+          error: "Invalid action",
+          message: 'Action must be "approve" or "reject"',
+          requestId,
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    logger.info("Processing action", { action, adminUserId });
+
+    if (action === "approve") {
+      const approveRequest: ApproveApplicationRequest = {
+        applicationId: body.applicationId,
+        applicationType: body.applicationType,
+        approvalNotes: body.approvalNotes,
+        sendWelcomeEmail: body.sendWelcomeEmail !== false, // Default true
+      };
+
+      if (!approveRequest.applicationId || !approveRequest.applicationType) {
+        return new Response(
+          JSON.stringify({
+            error: "Missing required fields",
+            message: "applicationId and applicationType are required",
+            requestId,
+          }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+
+      let result;
+      if (approveRequest.applicationType === "agent") {
+        result = await approveAgentApplication(
+          approveRequest.applicationId,
+          adminUserId,
+          approveRequest.approvalNotes,
+          approveRequest.sendWelcomeEmail ?? true,
+          logger
+        );
+      } else {
+        result = await approveBrandApplication(
+          approveRequest.applicationId,
+          adminUserId,
+          approveRequest.approvalNotes,
+          approveRequest.sendWelcomeEmail ?? true,
+          logger
+        );
+      }
+
+      if (!result.success) {
+        return new Response(
+          JSON.stringify({
+            error: "Approval failed",
+            message: result.error,
+            requestId,
+          }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          userId: result.userId,
+          brandId: (result as any).brandId,
+          message: "Application approved successfully",
+          requestId,
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    } else {
+      // Reject
+      const rejectRequest: RejectApplicationRequest = {
+        applicationId: body.applicationId,
+        applicationType: body.applicationType,
+        rejectionReason: body.rejectionReason,
+        allowResubmission: body.allowResubmission !== false, // Default true
+      };
+
+      if (
+        !rejectRequest.applicationId ||
+        !rejectRequest.applicationType ||
+        !rejectRequest.rejectionReason
+      ) {
+        return new Response(
+          JSON.stringify({
+            error: "Missing required fields",
+            message:
+              "applicationId, applicationType, and rejectionReason are required",
+            requestId,
+          }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+
+      const result = await rejectApplication(
+        rejectRequest.applicationId,
+        rejectRequest.applicationType,
+        adminUserId,
+        rejectRequest.rejectionReason,
+        rejectRequest.allowResubmission ?? true,
+        logger
+      );
+
+      if (!result.success) {
+        return new Response(
+          JSON.stringify({
+            error: "Rejection failed",
+            message: result.error,
+            requestId,
+          }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: "Application rejected successfully",
+          requestId,
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
   } catch (error: any) {
-    console.error('Approval function error:', error);
+    logger.error("Fatal error", {
+      error: error.message,
+      stack: error.stack,
+    });
+
     return new Response(
       JSON.stringify({
-        success: false,
-        error: error.message || 'Failed to approve application'
+        error: "Internal server error",
+        message: error.message,
+        requestId,
       }),
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       }
     );
   }
