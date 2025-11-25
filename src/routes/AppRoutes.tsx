@@ -171,6 +171,7 @@ const OnboardingPage = lazy(() => import('@/pages/onboarding/OnboardingPage'));
 const AIAgentOnboarding = lazy(() => import('@/pages/AIAgentOnboarding'));
 const AppleCallback = lazy(() => import('@/pages/AppleCallback'));
 const EarningsDashboard = lazy(() => import('@/pages/EarningsDashboard'));
+const HealthCheck = lazy(() => import('@/pages/HealthCheck'));
 
 export const AppRoutes = () => (
   <Routes>
@@ -189,6 +190,7 @@ export const AppRoutes = () => (
       <Route path="/community-guidelines" element={<CommunityGuidelines />} />
       <Route path="/trust-safety" element={<TrustSafety />} />
       <Route path="/trust-and-safety" element={<TrustSafetyPage />} />
+      <Route path="/health" element={<HealthCheck />} />
       <Route path="/legal/terms" element={<LegalTermsPage />} />
       <Route path="/legal/privacy" element={<LegalPrivacyPage />} />
       <Route path="/cancellation-refund-policy" element={<CancellationRefundPolicy />} />
