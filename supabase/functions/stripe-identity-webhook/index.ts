@@ -278,7 +278,7 @@ async function updateAgentApplication(
 
   // Determine new status
   let newStatus: string;
-  let verificationReport: any = {
+  const verificationReport: any = {
     stripe_session_id: sessionId,
     verified_at: new Date().toISOString(),
     verification_status: status,
@@ -419,7 +419,7 @@ async function updateBrandApplication(
 
   // Determine new status
   let newStatus: string;
-  let verificationReport: any = {
+  const verificationReport: any = {
     stripe_session_id: sessionId,
     verified_at: new Date().toISOString(),
     verification_status: status,
@@ -651,7 +651,7 @@ serve(async (req: Request) => {
         case "identity.verification_session.verified":
         case "identity.verification_session.requires_input":
         case "identity.verification_session.processing":
-        case "identity.verification_session.canceled":
+        case "identity.verification_session.canceled": {
           logger.info("Processing verification session event", {
             eventType: event.type,
             sessionId: event.data.object.id,
@@ -661,6 +661,7 @@ serve(async (req: Request) => {
             event.data.object as VerificationSession;
           await processVerificationCompleted(verificationSession, logger);
           break;
+        }
 
         default:
           logger.warn("Unhandled event type", { eventType: event.type });
