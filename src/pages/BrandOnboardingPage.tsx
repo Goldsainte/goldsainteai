@@ -118,7 +118,7 @@ export default function BrandOnboardingPage() {
 
       // Initiate Stripe Identity verification (anonymous)
       const { data: verificationData, error: verificationError } = 
-        await supabase.functions.invoke('create-stripe-identity-session', {
+        await supabase.functions.invoke('create-identity-verification', {
           body: {
             email: 'placeholder@temp.com', // Must collect actual email in full form
             firstName: brandName.trim().split(' ')[0],

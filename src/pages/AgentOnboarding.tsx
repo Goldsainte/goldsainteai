@@ -92,7 +92,7 @@ export default function AgentOnboarding() {
 
       // Initiate Stripe Identity verification (anonymous)
       const { data: verificationData, error: verificationError } = 
-        await supabase.functions.invoke('create-stripe-identity-session', {
+        await supabase.functions.invoke('create-identity-verification', {
           body: {
             email: formData.get('email') as string,
             firstName: formData.get('primary_contact_name')?.toString().split(' ')[0] || '',
