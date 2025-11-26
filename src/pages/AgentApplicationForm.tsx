@@ -280,9 +280,20 @@ export default function AgentApplicationForm() {
   };
 
   const saveDraftApplication = async () => {
+    console.log('=== 🚀 Starting saveDraftApplication ===');
+    
+    // Initial diagnostics
+    console.log('🔧 Supabase client check:', {
+      clientExists: !!supabase,
+      hasFrom: typeof supabase?.from === 'function',
+      hasStorage: typeof supabase?.storage === 'object',
+    });
+    
     setIsLoading(true);
 
     try {
+      // STEP 1: Validation
+      console.log('Step 1: 🔍 Validating required fields...');
       if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone) {
         throw new Error("Please fill in all required personal information fields");
       }
@@ -290,29 +301,42 @@ export default function AgentApplicationForm() {
       if (!formData.agencyName || !formData.businessType || !formData.businessLicenseNumber) {
         throw new Error("Please fill in all required business information fields");
       }
+      console.log('Step 1: ✅ Validation passed');
 
+      // STEP 2: File uploads
+      console.log('Step 2: 📤 Starting file uploads...');
       let businessLicensePath = null;
       let insuranceCertPath = null;
       let govIdPath = null;
       let headshotPath = null;
 
       if (formData.businessLicenseFile) {
+        console.log('  📄 Uploading business license...');
         businessLicensePath = await handleFileUpload(formData.businessLicenseFile, 'business_license');
+        console.log('  ✅ Business license uploaded:', businessLicensePath);
       }
       
       if (formData.insuranceCertificateFile) {
+        console.log('  📄 Uploading insurance certificate...');
         insuranceCertPath = await handleFileUpload(formData.insuranceCertificateFile, 'insurance_certificate');
+        console.log('  ✅ Insurance cert uploaded:', insuranceCertPath);
       }
       
       if (formData.governmentIdFile) {
+        console.log('  📄 Uploading government ID...');
         govIdPath = await handleFileUpload(formData.governmentIdFile, 'government_id');
+        console.log('  ✅ Government ID uploaded:', govIdPath);
       }
       
       if (formData.professionalHeadshotFile) {
+        console.log('  📄 Uploading headshot...');
         headshotPath = await handleFileUpload(formData.professionalHeadshotFile, 'headshot');
+        console.log('  ✅ Headshot uploaded:', headshotPath);
       }
+      console.log('Step 2: ✅ All files uploaded successfully');
 
-      // Build extended_data object for fields that don't have dedicated columns
+      // STEP 3: Build extended_data object
+      console.log('Step 3: 🔨 Building extended_data object...');
       const extendedData = {
         // Business Compliance extras
         dbaNames: formData.dbaNames,
@@ -413,7 +437,21 @@ export default function AgentApplicationForm() {
         reference2Email: formData.reference2Email,
         reference2Phone: formData.reference2Phone,
       };
+      console.log('Step 3: ✅ Extended data built successfully');
 
+      // STEP 4: Database insert
+      console.log('Step 4: 💾 Inserting application into database...');
+      console.log('  📊 Insert payload summary:', {
+        email: formData.email,
+        agency_name: formData.agencyName,
+        business_type: formData.businessType,
+        hasBusinessLicense: !!businessLicensePath,
+        hasInsuranceCert: !!insuranceCertPath,
+        hasGovId: !!govIdPath,
+        hasHeadshot: !!headshotPath,
+        extendedDataKeys: Object.keys(extendedData).length,
+      });
+      
       const { data: applicationData, error: applicationError } = await supabase
         .from('agent_applications')
         .insert({
@@ -482,33 +520,66 @@ export default function AgentApplicationForm() {
         .single();
 
       if (applicationError) {
-        console.error('Application error:', applicationError);
+        console.error('Step 4: ❌ Database insert failed:', {
+          message: applicationError.message,
+          code: applicationError.code,
+          details: applicationError.details,
+          hint: applicationError.hint,
+        });
         throw new Error(applicationError.message || 'Failed to save application');
       }
+
+      console.log('Step 4: ✅ Application inserted successfully:', {
+        id: applicationData.id,
+        email: applicationData.email,
+        status: applicationData.status,
+      });
 
       setDraftApplicationId(applicationData.id);
       setApplicationId(applicationData.id);
       
       // Store email in localStorage for verification return flow
+      console.log('Step 5: 💾 Storing application data in localStorage...');
       localStorage.setItem('agent_application_email', formData.email);
       localStorage.setItem('agent_application_id', applicationData.id);
+      console.log('Step 5: ✅ LocalStorage updated');
       
       // Move to step 11 (Identity Verification)
+      console.log('Step 6: 🎯 Moving to step 11 (Identity Verification)');
       setStep(11);
+      
+      console.log('=== ✅ saveDraftApplication completed successfully ===');
       
       toast({
         title: "Application saved",
         description: "Now complete identity verification to submit your application.",
       });
     } catch (error: any) {
-      console.error('Full submission error:', {
+      console.error('=== ❌ ERROR in saveDraftApplication ===');
+      console.error('Error type:', error.constructor.name);
+      console.error('Error message:', error.message);
+      
+      // Detailed error information
+      const errorDetails = {
         message: error.message,
         code: error.code,
         details: error.details,
         hint: error.hint,
         status: error.status,
         stack: error.stack,
-      });
+      };
+      console.error('Full error details:', errorDetails);
+      
+      // Check if it's a network error
+      if (error.message?.includes('fetch') || error.message?.includes('Failed to fetch')) {
+        console.error('🚨 NETWORK ERROR DETECTED - this is likely a connectivity issue');
+        console.error('Possible causes:');
+        console.error('  1. Supabase client not initialized');
+        console.error('  2. Network connection lost');
+        console.error('  3. Supabase project URL incorrect');
+        console.error('  4. CORS issue (check Network tab)');
+      }
+      
       toast({
         title: "Submission failed",
         description: error.message || "Please check all required fields and try again.",
