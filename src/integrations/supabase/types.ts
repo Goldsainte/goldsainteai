@@ -328,11 +328,14 @@ export type Database = {
           accepted_terms: boolean | null
           accepted_vendor: boolean | null
           accreditations: string | null
+          active_clients_count: number | null
           admin_notes: string | null
           admin_reviewer_id: string | null
           agency_name: string
+          annual_sales_volume: string | null
           approval_notes: string | null
           approved_at: string | null
+          average_trip_value: string | null
           background_check_completed_at: string | null
           background_check_provider: string | null
           background_check_report_id: string | null
@@ -349,12 +352,20 @@ export type Database = {
           certifications: Json | null
           client_testimonials: Json | null
           commission_rate: number | null
+          content_creation_experience: boolean | null
           created_at: string | null
+          date_of_birth: string | null
           destinations: string[] | null
+          document_business_license: string | null
+          document_government_id: string | null
+          document_headshot: string | null
+          document_insurance_cert: string | null
           documents: Json | null
           email: string
           email_notifications_enabled: boolean | null
+          extended_data: Json | null
           first_name: string
+          host_agency_name: string | null
           iban: string | null
           id: string
           insurance_coverage_amount: number | null
@@ -366,13 +377,16 @@ export type Database = {
           license_number: string | null
           license_state: string | null
           minimum_booking_value: number | null
+          monthly_bookings: string | null
           payment_processor: string | null
           phone: string
           preferred_contact_method: string | null
           preferred_currency: string | null
           previous_platforms: string[] | null
+          primary_focus: string[] | null
           rejected_at: string | null
           rejection_reason: string | null
+          repeat_clients_percentage: number | null
           reviewed_at: string | null
           risk_factors: Json | null
           risk_score: number | null
@@ -380,6 +394,7 @@ export type Database = {
           service_types: string[] | null
           sms_notifications_enabled: boolean | null
           social_media: Json | null
+          social_media_followers_total: number | null
           specialties: string[] | null
           status: string | null
           stripe_verification_document_back: string | null
@@ -397,8 +412,11 @@ export type Database = {
           updated_at: string | null
           user_id: string | null
           vat_number: string | null
+          video_content_creation: boolean | null
           website: string | null
           whatsapp_notifications_enabled: boolean | null
+          why_goldsainte: string | null
+          year_established: number | null
           years_experience: number
         }
         Insert: {
@@ -407,11 +425,14 @@ export type Database = {
           accepted_terms?: boolean | null
           accepted_vendor?: boolean | null
           accreditations?: string | null
+          active_clients_count?: number | null
           admin_notes?: string | null
           admin_reviewer_id?: string | null
           agency_name: string
+          annual_sales_volume?: string | null
           approval_notes?: string | null
           approved_at?: string | null
+          average_trip_value?: string | null
           background_check_completed_at?: string | null
           background_check_provider?: string | null
           background_check_report_id?: string | null
@@ -428,12 +449,20 @@ export type Database = {
           certifications?: Json | null
           client_testimonials?: Json | null
           commission_rate?: number | null
+          content_creation_experience?: boolean | null
           created_at?: string | null
+          date_of_birth?: string | null
           destinations?: string[] | null
+          document_business_license?: string | null
+          document_government_id?: string | null
+          document_headshot?: string | null
+          document_insurance_cert?: string | null
           documents?: Json | null
           email: string
           email_notifications_enabled?: boolean | null
+          extended_data?: Json | null
           first_name: string
+          host_agency_name?: string | null
           iban?: string | null
           id?: string
           insurance_coverage_amount?: number | null
@@ -445,13 +474,16 @@ export type Database = {
           license_number?: string | null
           license_state?: string | null
           minimum_booking_value?: number | null
+          monthly_bookings?: string | null
           payment_processor?: string | null
           phone: string
           preferred_contact_method?: string | null
           preferred_currency?: string | null
           previous_platforms?: string[] | null
+          primary_focus?: string[] | null
           rejected_at?: string | null
           rejection_reason?: string | null
+          repeat_clients_percentage?: number | null
           reviewed_at?: string | null
           risk_factors?: Json | null
           risk_score?: number | null
@@ -459,6 +491,7 @@ export type Database = {
           service_types?: string[] | null
           sms_notifications_enabled?: boolean | null
           social_media?: Json | null
+          social_media_followers_total?: number | null
           specialties?: string[] | null
           status?: string | null
           stripe_verification_document_back?: string | null
@@ -476,8 +509,11 @@ export type Database = {
           updated_at?: string | null
           user_id?: string | null
           vat_number?: string | null
+          video_content_creation?: boolean | null
           website?: string | null
           whatsapp_notifications_enabled?: boolean | null
+          why_goldsainte?: string | null
+          year_established?: number | null
           years_experience: number
         }
         Update: {
@@ -486,11 +522,14 @@ export type Database = {
           accepted_terms?: boolean | null
           accepted_vendor?: boolean | null
           accreditations?: string | null
+          active_clients_count?: number | null
           admin_notes?: string | null
           admin_reviewer_id?: string | null
           agency_name?: string
+          annual_sales_volume?: string | null
           approval_notes?: string | null
           approved_at?: string | null
+          average_trip_value?: string | null
           background_check_completed_at?: string | null
           background_check_provider?: string | null
           background_check_report_id?: string | null
@@ -507,12 +546,20 @@ export type Database = {
           certifications?: Json | null
           client_testimonials?: Json | null
           commission_rate?: number | null
+          content_creation_experience?: boolean | null
           created_at?: string | null
+          date_of_birth?: string | null
           destinations?: string[] | null
+          document_business_license?: string | null
+          document_government_id?: string | null
+          document_headshot?: string | null
+          document_insurance_cert?: string | null
           documents?: Json | null
           email?: string
           email_notifications_enabled?: boolean | null
+          extended_data?: Json | null
           first_name?: string
+          host_agency_name?: string | null
           iban?: string | null
           id?: string
           insurance_coverage_amount?: number | null
@@ -524,13 +571,16 @@ export type Database = {
           license_number?: string | null
           license_state?: string | null
           minimum_booking_value?: number | null
+          monthly_bookings?: string | null
           payment_processor?: string | null
           phone?: string
           preferred_contact_method?: string | null
           preferred_currency?: string | null
           previous_platforms?: string[] | null
+          primary_focus?: string[] | null
           rejected_at?: string | null
           rejection_reason?: string | null
+          repeat_clients_percentage?: number | null
           reviewed_at?: string | null
           risk_factors?: Json | null
           risk_score?: number | null
@@ -538,6 +588,7 @@ export type Database = {
           service_types?: string[] | null
           sms_notifications_enabled?: boolean | null
           social_media?: Json | null
+          social_media_followers_total?: number | null
           specialties?: string[] | null
           status?: string | null
           stripe_verification_document_back?: string | null
@@ -555,8 +606,11 @@ export type Database = {
           updated_at?: string | null
           user_id?: string | null
           vat_number?: string | null
+          video_content_creation?: boolean | null
           website?: string | null
           whatsapp_notifications_enabled?: boolean | null
+          why_goldsainte?: string | null
+          year_established?: number | null
           years_experience?: number
         }
         Relationships: []
