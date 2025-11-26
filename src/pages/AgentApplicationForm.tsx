@@ -312,10 +312,102 @@ export default function AgentApplicationForm() {
         headshotPath = await handleFileUpload(formData.professionalHeadshotFile, 'headshot');
       }
 
+      // Build extended_data object for fields that don't have dedicated columns
+      const extendedData = {
+        // Business Compliance extras
+        dbaNames: formData.dbaNames,
+        operatingStates: formData.operatingStates,
+        sellerOfTravelStates: formData.sellerOfTravelStates,
+        floridaRegistrationNumber: formData.floridaRegistrationNumber,
+        californiaRegistrationNumber: formData.californiaRegistrationNumber,
+        hawaiiRegistrationNumber: formData.hawaiiRegistrationNumber,
+        washingtonRegistrationNumber: formData.washingtonRegistrationNumber,
+        suretyBondAmount: formData.suretyBondAmount,
+        suretyBondProvider: formData.suretyBondProvider,
+        suretyBondExpiration: formData.suretyBondExpiration,
+        backgroundCheckConsent: formData.backgroundCheckConsent,
+        criminalHistoryDisclosure: formData.criminalHistoryDisclosure,
+        
+        // Professional Credentials
+        iatanIdNumber: formData.iatanIdNumber,
+        astaVerifiedTravelAdvisor: formData.astaVerifiedTravelAdvisor,
+        astaMembershipNumber: formData.astaMembershipNumber,
+        travelInstituteCta: formData.travelInstituteCta,
+        travelInstituteCtc: formData.travelInstituteCtc,
+        cliaCertificationLevel: formData.cliaCertificationLevel,
+        hostAgencyAffiliation: formData.hostAgencyAffiliation,
+        yearsWithHostAgency: formData.yearsWithHostAgency,
+        
+        // Travel Experience
+        countriesVisitedCount: formData.countriesVisitedCount,
+        famTripsTakenLastYear: formData.famTripsTakenLastYear,
+        continentsVisited: formData.continentsVisited,
+        destinationExpertCertifications: formData.destinationExpertCertifications,
+        cruiseExperienceLevel: formData.cruiseExperienceLevel,
+        allInclusiveExperience: formData.allInclusiveExperience,
+        accessibilityTravelExperience: formData.accessibilityTravelExperience,
+        multigenerationalTravelExperience: formData.multigenerationalTravelExperience,
+        soloTravelBookingExperience: formData.soloTravelBookingExperience,
+        languagesSpoken: formData.languagesSpoken,
+        
+        // Client & Sales metrics
+        numberOfActiveClients: formData.numberOfActiveClients,
+        percentageReferralBusiness: formData.percentageReferralBusiness,
+        bookingVolumeLast12Months: formData.bookingVolumeLast12Months,
+        averageCommissionPercentage: formData.averageCommissionPercentage,
+        clientDemographics: formData.clientDemographics,
+        averageClientAgeRange: formData.averageClientAgeRange,
+        gdsAccess: formData.gdsAccess,
+        preferredBookingPlatforms: formData.preferredBookingPlatforms,
+        preferredSuppliers: formData.preferredSuppliers,
+        consortiumMemberships: formData.consortiumMemberships,
+        
+        // Online Presence
+        instagramHandle: formData.instagramHandle,
+        tiktokHandle: formData.tiktokHandle,
+        facebookPageUrl: formData.facebookPageUrl,
+        linkedinProfileUrl: formData.linkedinProfileUrl,
+        youtubeChannelUrl: formData.youtubeChannelUrl,
+        blogUrl: formData.blogUrl,
+        googleBusinessProfile: formData.googleBusinessProfile,
+        onlineReviewsCount: formData.onlineReviewsCount,
+        averageReviewRating: formData.averageReviewRating,
+        influencerPartnerships: formData.influencerPartnerships,
+        emailMarketingPlatform: formData.emailMarketingPlatform,
+        emailListSize: formData.emailListSize,
+        
+        // Technology
+        crmSoftware: formData.crmSoftware,
+        bookingPlatform: formData.bookingPlatform,
+        accountingSoftware: formData.accountingSoftware,
+        websitePlatform: formData.websitePlatform,
+        hasOwnBookingEngine: formData.hasOwnBookingEngine,
+        comfortableWithTechnology: formData.comfortableWithTechnology,
+        videoConferencingTools: formData.videoConferencingTools,
+        aiToolsExperience: formData.aiToolsExperience,
+        
+        // Emergency & Legal
+        support24_7: formData.support24_7,
+        travelCrisisManagementTraining: formData.travelCrisisManagementTraining,
+        travelInsuranceLicensed: formData.travelInsuranceLicensed,
+        emergencyContactPhone: formData.emergencyContactPhone,
+        afterHoursAvailability: formData.afterHoursAvailability,
+        crisisResponseExamples: formData.crisisResponseExamples,
+        privacyPolicyUrl: formData.privacyPolicyUrl,
+        termsAndConditionsUrl: formData.termsAndConditionsUrl,
+        gdprCompliant: formData.gdprCompliant,
+        ccpaCompliant: formData.ccpaCompliant,
+        clientDataProtectionMeasures: formData.clientDataProtectionMeasures,
+        contractsWithClients: formData.contractsWithClients,
+        legalCounselOnRetainer: formData.legalCounselOnRetainer,
+        previousLegalIssues: formData.previousLegalIssues,
+        regulatoryViolations: formData.regulatoryViolations,
+      };
+
       const { data: applicationData, error: applicationError } = await supabase
         .from('agent_applications')
         .insert({
-          // Personal & Business Info
+          // Core fields - mapped to dedicated columns
           first_name: formData.firstName,
           last_name: formData.lastName,
           email: formData.email,
@@ -326,150 +418,55 @@ export default function AgentApplicationForm() {
           business_address: formData.businessAddress,
           business_city: formData.businessCity,
           business_state: formData.businessState,
-          business_zip: formData.businessZip,
+          business_postal_code: formData.businessZip,
           business_country: formData.businessCountry,
           year_established: formData.yearEstablished ? parseInt(formData.yearEstablished) : null,
           website: formData.website || null,
-          business_license_number: formData.businessLicenseNumber,
-          tax_id_ein: formData.taxIdEIN || null,
+          business_registration_number: formData.businessLicenseNumber,
+          tax_id: formData.taxIdEIN || null,
           years_experience: formData.yearsExperience ? parseInt(formData.yearsExperience) : 0,
           specialties: formData.specializations,
           primary_focus: formData.primaryFocus,
           average_trip_value: formData.averageTripValue || null,
           monthly_bookings: formData.monthlyBookings || null,
-          preferred_destinations: formData.preferredDestinations || null,
+          destinations: formData.preferredDestinations ? [formData.preferredDestinations] : [],
           why_goldsainte: formData.whyGoldsainte || null,
-
-          // Business Compliance
-          dba_names: formData.dbaNames || null,
-          operating_states: formData.operatingStates || [],
-          seller_of_travel_states: formData.sellerOfTravelStates || [],
-          florida_registration_number: formData.floridaRegistrationNumber || null,
-          california_registration_number: formData.californiaRegistrationNumber || null,
-          hawaii_registration_number: formData.hawaiiRegistrationNumber || null,
-          washington_registration_number: formData.washingtonRegistrationNumber || null,
-          surety_bond_amount: formData.suretyBondAmount ? parseFloat(formData.suretyBondAmount) : null,
-          surety_bond_provider: formData.suretyBondProvider || null,
-          surety_bond_expiration: formData.suretyBondExpiration || null,
-          background_check_consent: formData.backgroundCheckConsent || false,
-          criminal_history_disclosure: formData.criminalHistoryDisclosure || null,
-
-          // Professional Credentials
-          iata_number: formData.iataNumber || null,
-          arc_number: formData.arcNumber || null,
-          clia_number: formData.cliaNumber || null,
-          iatan_id_number: formData.iatanIdNumber || null,
-          asta_verified_travel_advisor: formData.astaVerifiedTravelAdvisor || false,
-          asta_membership_number: formData.astaMembershipNumber || null,
-          travel_institute_cta: formData.travelInstituteCta || false,
-          travel_institute_ctc: formData.travelInstituteCtc || false,
-          clia_certification_level: formData.cliaCertificationLevel || null,
-          host_agency_name: formData.hostAgencyName || null,
-          host_agency_affiliation: formData.hostAgencyAffiliation || null,
-          years_with_host_agency: formData.yearsWithHostAgency ? parseInt(formData.yearsWithHostAgency) : null,
-          other_certifications: formData.otherCertifications || null,
-
-          // Travel Experience
-          countries_visited_count: formData.countriesVisitedCount ? parseInt(formData.countriesVisitedCount) : null,
-          fam_trips_taken_last_year: formData.famTripsTakenLastYear ? parseInt(formData.famTripsTakenLastYear) : null,
-          continents_visited: formData.continentsVisited || [],
-          destination_expert_certifications: formData.destinationExpertCertifications || [],
-          cruise_experience_level: formData.cruiseExperienceLevel || null,
-          all_inclusive_experience: formData.allInclusiveExperience || null,
-          accessibility_travel_experience: formData.accessibilityTravelExperience || false,
-          multigenerational_travel_experience: formData.multigenerationalTravelExperience || false,
-          solo_travel_booking_experience: formData.soloTravelBookingExperience || false,
-          languages_spoken: formData.languagesSpoken || [],
-
-          // Client & Sales
+          
+          // Professional credentials
+          license_number: formData.iataNumber || null,
+          
+          // Sales metrics - mapped to new dedicated columns
           annual_sales_volume: formData.annualSalesVolume || null,
-          number_of_active_clients: formData.numberOfActiveClients ? parseInt(formData.numberOfActiveClients) : null,
-          percentage_repeat_clients: formData.percentageRepeatClients ? parseInt(formData.percentageRepeatClients) : null,
-          percentage_referral_business: formData.percentageReferralBusiness ? parseInt(formData.percentageReferralBusiness) : null,
-          booking_volume_last_12_months: formData.bookingVolumeLast12Months ? parseInt(formData.bookingVolumeLast12Months) : null,
-          average_commission_percentage: formData.averageCommissionPercentage ? parseFloat(formData.averageCommissionPercentage) : null,
-          client_demographics: formData.clientDemographics || [],
-          average_client_age_range: formData.averageClientAgeRange || null,
-          gds_access: formData.gdsAccess || [],
-          preferred_booking_platforms: formData.preferredBookingPlatforms || [],
-          preferred_suppliers: formData.preferredSuppliers || [],
-          consortium_memberships: formData.consortiumMemberships || [],
-
-          // Online Presence
-          instagram_handle: formData.instagramHandle || null,
-          tiktok_handle: formData.tiktokHandle || null,
-          facebook_page_url: formData.facebookPageUrl || null,
-          linkedin_profile_url: formData.linkedinProfileUrl || null,
-          youtube_channel_url: formData.youtubeChannelUrl || null,
-          blog_url: formData.blogUrl || null,
-          google_business_profile: formData.googleBusinessProfile || null,
-          social_media_followers_total: formData.socialMediaFollowersTotal ? parseInt(formData.socialMediaFollowersTotal) : null,
-          online_reviews_count: formData.onlineReviewsCount ? parseInt(formData.onlineReviewsCount) : null,
-          average_review_rating: formData.averageReviewRating ? parseFloat(formData.averageReviewRating) : null,
+          active_clients_count: formData.numberOfActiveClients ? parseInt(formData.numberOfActiveClients) : null,
+          repeat_clients_percentage: formData.percentageRepeatClients ? parseInt(formData.percentageRepeatClients) : null,
+          
+          // Host agency - mapped to new dedicated column
+          host_agency_name: formData.hostAgencyName || null,
+          
+          // Content creation - mapped to new dedicated columns
           content_creation_experience: formData.contentCreationExperience || false,
           video_content_creation: formData.videoContentCreation || false,
-          influencer_partnerships: formData.influencerPartnerships || false,
-          email_marketing_platform: formData.emailMarketingPlatform || null,
-          email_list_size: formData.emailListSize ? parseInt(formData.emailListSize) : null,
-
-          // Technology
-          crm_software: formData.crmSoftware || null,
-          booking_platform: formData.bookingPlatform || null,
-          accounting_software: formData.accountingSoftware || null,
-          website_platform: formData.websitePlatform || null,
-          has_own_booking_engine: formData.hasOwnBookingEngine || false,
-          comfortable_with_technology: formData.comfortableWithTechnology || null,
-          video_conferencing_tools: formData.videoConferencingTools || [],
-          ai_tools_experience: formData.aiToolsExperience || [],
-
-          // Emergency & Legal
-          support_24_7: formData.support24_7 || false,
-          travel_crisis_management_training: formData.travelCrisisManagementTraining || false,
-          travel_insurance_licensed: formData.travelInsuranceLicensed || false,
-          emergency_contact_phone: formData.emergencyContactPhone || null,
-          after_hours_availability: formData.afterHoursAvailability || null,
-          crisis_response_examples: formData.crisisResponseExamples || null,
-          privacy_policy_url: formData.privacyPolicyUrl || null,
-          terms_and_conditions_url: formData.termsAndConditionsUrl || null,
-          gdpr_compliant: formData.gdprCompliant || false,
-          ccpa_compliant: formData.ccpaCompliant || false,
-          client_data_protection_measures: formData.clientDataProtectionMeasures || null,
-          contracts_with_clients: formData.contractsWithClients || false,
-          legal_counsel_on_retainer: formData.legalCounselOnRetainer || false,
-          previous_legal_issues: formData.previousLegalIssues || null,
-          regulatory_violations: formData.regulatoryViolations || null,
-
-          // Insurance
-          annual_revenue: formData.annualRevenue || null,
-          has_eo_insurance: formData.errorsOmissionsInsurance,
+          social_media_followers_total: formData.socialMediaFollowersTotal ? parseInt(formData.socialMediaFollowersTotal) : null,
+          
+          // Languages (existing column)
+          languages: formData.languagesSpoken || [],
+          
+          // Insurance (existing columns)
           insurance_provider: formData.insuranceProvider || null,
           insurance_policy_number: formData.insurancePolicyNumber || null,
-          insurance_coverage: formData.insuranceCoverage || null,
-
-          // References
-          reference1_name: formData.reference1Name || null,
-          reference1_company: formData.reference1Company || null,
-          reference1_email: formData.reference1Email || null,
-          reference1_phone: formData.reference1Phone || null,
-          reference2_name: formData.reference2Name || null,
-          reference2_company: formData.reference2Company || null,
-          reference2_email: formData.reference2Email || null,
-          reference2_phone: formData.reference2Phone || null,
-
-          // Legacy fields
-          seller_of_travel_license: formData.sellerOfTravelLicense || null,
-          seller_of_travel_state: formData.sellerOfTravelState || null,
-
-          // Documents
-          business_license_document: businessLicensePath,
-          insurance_certificate_document: insuranceCertPath,
-          government_id_document: govIdPath,
-          headshot_photo: headshotPath,
-
-          // Status
-          application_status: 'draft',
-          submitted_at: new Date().toISOString(),
-          stripe_verification_status: 'pending',
+          insurance_coverage_amount: formData.insuranceCoverage ? parseFloat(formData.insuranceCoverage) : null,
+          
+          // Documents - mapped to new dedicated columns
+          document_business_license: businessLicensePath,
+          document_insurance_cert: insuranceCertPath,
+          document_government_id: govIdPath,
+          document_headshot: headshotPath,
+          
+          // All other fields stored in extended_data JSONB
+          extended_data: extendedData,
+          
+          // Status fields
+          status: 'pending_verification',
         })
         .select()
         .single();
@@ -517,13 +514,15 @@ export default function AgentApplicationForm() {
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('create-stripe-identity-session', {
+      const { data, error } = await supabase.functions.invoke('create-identity-verification', {
         body: {
           email: formData.email,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
           applicationType: 'agent',
-          applicationId: draftApplicationId,
+          metadata: {
+            applicationId: draftApplicationId,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+          },
         },
       });
 
