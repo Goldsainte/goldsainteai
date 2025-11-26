@@ -402,6 +402,16 @@ export default function AgentApplicationForm() {
         legalCounselOnRetainer: formData.legalCounselOnRetainer,
         previousLegalIssues: formData.previousLegalIssues,
         regulatoryViolations: formData.regulatoryViolations,
+        
+        // Professional References
+        reference1Name: formData.reference1Name,
+        reference1Company: formData.reference1Company,
+        reference1Email: formData.reference1Email,
+        reference1Phone: formData.reference1Phone,
+        reference2Name: formData.reference2Name,
+        reference2Company: formData.reference2Company,
+        reference2Email: formData.reference2Email,
+        reference2Phone: formData.reference2Phone,
       };
 
       const { data: applicationData, error: applicationError } = await supabase
@@ -491,7 +501,14 @@ export default function AgentApplicationForm() {
         description: "Now complete identity verification to submit your application.",
       });
     } catch (error: any) {
-      console.error('Submission error:', error);
+      console.error('Full submission error:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+        status: error.status,
+        stack: error.stack,
+      });
       toast({
         title: "Submission failed",
         description: error.message || "Please check all required fields and try again.",
