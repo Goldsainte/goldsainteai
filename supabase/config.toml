@@ -3,7 +3,7 @@ project_id = "iwdevxltjuedijrcdejs"
 [functions.create-agent-application-stripe-account]
 verify_jwt = true
 
-[functions.create-stripe-identity-session]
+[functions.create-identity-verification]
 verify_jwt = false
 
 [functions.stripe-identity-webhook]
