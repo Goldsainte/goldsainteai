@@ -292,6 +292,20 @@ export default function AgentApplicationForm() {
     setIsLoading(true);
 
     try {
+      // STEP 0: Pre-flight storage check
+      console.log('Step 0: 🏥 Testing storage connectivity...');
+      try {
+        const { data: buckets, error: bucketError } = await supabase.storage.listBuckets();
+        if (bucketError) {
+          console.error('❌ Storage bucket list error:', bucketError);
+          throw new Error(`Storage not accessible: ${bucketError.message}`);
+        }
+        console.log('Step 0: ✅ Storage accessible, buckets:', buckets?.map(b => b.name));
+      } catch (storageCheckError: any) {
+        console.error('Step 0: ❌ STORAGE CONNECTIVITY FAILED:', storageCheckError);
+        throw new Error(`Cannot connect to storage: ${storageCheckError.message}`);
+      }
+
       // STEP 1: Validation
       console.log('Step 1: 🔍 Validating required fields...');
       if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone) {
@@ -303,37 +317,68 @@ export default function AgentApplicationForm() {
       }
       console.log('Step 1: ✅ Validation passed');
 
-      // STEP 2: File uploads
+      // STEP 2: File uploads (with individual try-catch for isolation)
       console.log('Step 2: 📤 Starting file uploads...');
       let businessLicensePath = null;
       let insuranceCertPath = null;
       let govIdPath = null;
       let headshotPath = null;
 
-      if (formData.businessLicenseFile) {
-        console.log('  📄 Uploading business license...');
-        businessLicensePath = await handleFileUpload(formData.businessLicenseFile, 'business_license');
-        console.log('  ✅ Business license uploaded:', businessLicensePath);
+      // OPTIONAL: Set to true to skip file uploads as test
+      const SKIP_FILE_UPLOADS = false;
+
+      if (!SKIP_FILE_UPLOADS) {
+        // Upload business license
+        if (formData.businessLicenseFile) {
+          try {
+            console.log('  📄 Uploading business license...');
+            businessLicensePath = await handleFileUpload(formData.businessLicenseFile, 'business_license');
+            console.log('  ✅ Business license uploaded:', businessLicensePath);
+          } catch (fileError: any) {
+            console.error('  ❌ Business license upload FAILED:', fileError);
+            throw new Error(`Business license upload failed: ${fileError.message}`);
+          }
+        }
+        
+        // Upload insurance certificate
+        if (formData.insuranceCertificateFile) {
+          try {
+            console.log('  📄 Uploading insurance certificate...');
+            insuranceCertPath = await handleFileUpload(formData.insuranceCertificateFile, 'insurance_certificate');
+            console.log('  ✅ Insurance cert uploaded:', insuranceCertPath);
+          } catch (fileError: any) {
+            console.error('  ❌ Insurance cert upload FAILED:', fileError);
+            throw new Error(`Insurance certificate upload failed: ${fileError.message}`);
+          }
+        }
+        
+        // Upload government ID
+        if (formData.governmentIdFile) {
+          try {
+            console.log('  📄 Uploading government ID...');
+            govIdPath = await handleFileUpload(formData.governmentIdFile, 'government_id');
+            console.log('  ✅ Government ID uploaded:', govIdPath);
+          } catch (fileError: any) {
+            console.error('  ❌ Government ID upload FAILED:', fileError);
+            throw new Error(`Government ID upload failed: ${fileError.message}`);
+          }
+        }
+        
+        // Upload headshot
+        if (formData.professionalHeadshotFile) {
+          try {
+            console.log('  📄 Uploading headshot...');
+            headshotPath = await handleFileUpload(formData.professionalHeadshotFile, 'headshot');
+            console.log('  ✅ Headshot uploaded:', headshotPath);
+          } catch (fileError: any) {
+            console.error('  ❌ Headshot upload FAILED:', fileError);
+            throw new Error(`Headshot upload failed: ${fileError.message}`);
+          }
+        }
+        console.log('Step 2: ✅ All files uploaded successfully');
+      } else {
+        console.log('Step 2: ⏭️ SKIPPING file uploads (testing mode)');
       }
-      
-      if (formData.insuranceCertificateFile) {
-        console.log('  📄 Uploading insurance certificate...');
-        insuranceCertPath = await handleFileUpload(formData.insuranceCertificateFile, 'insurance_certificate');
-        console.log('  ✅ Insurance cert uploaded:', insuranceCertPath);
-      }
-      
-      if (formData.governmentIdFile) {
-        console.log('  📄 Uploading government ID...');
-        govIdPath = await handleFileUpload(formData.governmentIdFile, 'government_id');
-        console.log('  ✅ Government ID uploaded:', govIdPath);
-      }
-      
-      if (formData.professionalHeadshotFile) {
-        console.log('  📄 Uploading headshot...');
-        headshotPath = await handleFileUpload(formData.professionalHeadshotFile, 'headshot');
-        console.log('  ✅ Headshot uploaded:', headshotPath);
-      }
-      console.log('Step 2: ✅ All files uploaded successfully');
 
       // STEP 3: Build extended_data object
       console.log('Step 3: 🔨 Building extended_data object...');
@@ -439,7 +484,7 @@ export default function AgentApplicationForm() {
       };
       console.log('Step 3: ✅ Extended data built successfully');
 
-      // STEP 4: Database insert
+      // STEP 4: Database insert (with try-catch for isolation)
       console.log('Step 4: 💾 Inserting application into database...');
       console.log('  📊 Insert payload summary:', {
         email: formData.email,
@@ -452,7 +497,9 @@ export default function AgentApplicationForm() {
         extendedDataKeys: Object.keys(extendedData).length,
       });
       
-      const { data: applicationData, error: applicationError } = await supabase
+      let applicationData;
+      try {
+        const { data, error: applicationError } = await supabase
         .from('agent_applications')
         .insert({
           // Core fields - mapped to dedicated columns
@@ -519,21 +566,26 @@ export default function AgentApplicationForm() {
         .select()
         .single();
 
-      if (applicationError) {
-        console.error('Step 4: ❌ Database insert failed:', {
-          message: applicationError.message,
-          code: applicationError.code,
-          details: applicationError.details,
-          hint: applicationError.hint,
-        });
-        throw new Error(applicationError.message || 'Failed to save application');
-      }
+        if (applicationError) {
+          console.error('Step 4: ❌ Database insert failed:', {
+            message: applicationError.message,
+            code: applicationError.code,
+            details: applicationError.details,
+            hint: applicationError.hint,
+          });
+          throw new Error(applicationError.message || 'Failed to save application');
+        }
 
-      console.log('Step 4: ✅ Application inserted successfully:', {
-        id: applicationData.id,
-        email: applicationData.email,
-        status: applicationData.status,
-      });
+        applicationData = data;
+        console.log('Step 4: ✅ Application inserted successfully:', {
+          id: applicationData.id,
+          email: applicationData.email,
+          status: applicationData.status,
+        });
+      } catch (dbError: any) {
+        console.error('Step 4: ❌ DATABASE INSERT OPERATION FAILED:', dbError);
+        throw new Error(`Database operation failed: ${dbError.message}`);
+      }
 
       setDraftApplicationId(applicationData.id);
       setApplicationId(applicationData.id);
