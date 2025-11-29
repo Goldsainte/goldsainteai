@@ -12955,6 +12955,15 @@ export type Database = {
             }
             Returns: Json
           }
+        | {
+            Args: {
+              agent_pct?: number
+              creator_pct?: number
+              platform_pct?: number
+              total_amount: number
+            }
+            Returns: Json
+          }
       calculate_creator_earnings: {
         Args: { post_uuid: string }
         Returns: number
@@ -13034,7 +13043,10 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: number
       }
-      get_user_ai_usage_count: { Args: { p_user_id: string }; Returns: number }
+      get_user_ai_usage_count: {
+        Args: { target_user_id: string }
+        Returns: number
+      }
       get_user_tier: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["subscription_tier"]
