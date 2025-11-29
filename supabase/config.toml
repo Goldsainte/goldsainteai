@@ -299,3 +299,9 @@ verify_jwt = false
 
 [functions.ai-booking-concierge]
 verify_jwt = false
+
+[functions.send-phone-verification]
+verify_jwt = true
+
+[functions.check-phone-verification]
+verify_jwt = true
