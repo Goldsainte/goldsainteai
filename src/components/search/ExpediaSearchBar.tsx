@@ -153,7 +153,7 @@ export default function ExpediaSearchBar() {
           {/* WHERE pill */}
           <div
             ref={whereRefs.setReference}
-            className="h-[54px] px-4 rounded-[21px] bg-white/40 hover:bg-white/60 transition flex items-center gap-3 cursor-text"
+            className="h-[54px] px-4 rounded-[21px] bg-white/40 hover:bg-white/60 transition flex flex-col justify-center cursor-text"
             style={{ width: 238 }}
             onClick={() => {
               whereInputRef.current?.focus();
@@ -169,11 +169,7 @@ export default function ExpediaSearchBar() {
               ref={whereInputRef}
               type="text"
               className="w-full bg-transparent outline-none font-display expedia-search-input"
-              style={{
-                padding: 0,
-                margin: 0,
-                height: 'auto'
-              }}
+              style={{ fontSize: '16px', lineHeight: 1.2, color: '#1F3D36' }}
               placeholder="Search destinations"
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
