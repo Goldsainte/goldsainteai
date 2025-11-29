@@ -6,6 +6,10 @@ import type { Database } from "./types";
 const FALLBACK_SUPABASE_URL = "https://placeholder.supabase.co";
 const FALLBACK_SUPABASE_KEY = "public-anon-key";
 
+// Debug logging - remove after verification
+console.log("[Supabase DEBUG] Raw VITE_SUPABASE_URL:", import.meta.env.VITE_SUPABASE_URL);
+console.log("[Supabase DEBUG] Raw VITE_SUPABASE_PUBLISHABLE_KEY:", import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ? "SET (hidden)" : "NOT SET");
+
 // Use real env vars if present, otherwise fall back to placeholders.
 // This keeps the UI working even if Supabase is not fully configured.
 const SUPABASE_URL =
@@ -21,6 +25,10 @@ const isPlaceholderConfig =
   SUPABASE_URL.includes("placeholder.supabase.co") ||
   SUPABASE_PUBLISHABLE_KEY.includes("your-supabase-anon-key") ||
   SUPABASE_PUBLISHABLE_KEY === "public-anon-key";
+
+// Debug logging - remove after verification
+console.log("[Supabase DEBUG] Final URL:", SUPABASE_URL);
+console.log("[Supabase DEBUG] Using placeholder config:", isPlaceholderConfig);
 
 // In production (including Lovable preview), DO NOT crash the app.
 // Just log an error so we know Supabase is not really configured.
