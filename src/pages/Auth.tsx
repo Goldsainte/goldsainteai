@@ -291,25 +291,6 @@ const Auth = () => {
     }
     
     try {
-      // ====== DEBUG: Pre-request logging ======
-      console.log('=== SIGNUP DEBUG START ===');
-      console.log('Timestamp:', new Date().toISOString());
-      console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
-      console.log('Has Anon Key:', !!import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY);
-      console.log('Email:', email);
-      console.log('Account Type:', selectedAccountType);
-      console.log('Redirect URL:', `${window.location.origin}/auth/callback`);
-      console.log('User metadata:', {
-        first_name: firstName,
-        last_name: lastName,
-        phone: phone || null,
-        account_type: selectedAccountType,
-        sms_notifications: smsOptIn,
-      });
-      console.log('Window origin:', window.location.origin);
-      console.log('Navigator online:', navigator.onLine);
-      
-      // Use direct supabase.auth.signUp with emailRedirectTo
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -318,72 +299,32 @@ const Auth = () => {
           data: {
             first_name: firstName,
             last_name: lastName,
-            phone: phone || null,
+            full_name: `${firstName} ${lastName}`.trim(),
+            phone_number: phone || null,
             account_type: selectedAccountType,
             sms_notifications: smsOptIn,
           },
         },
       });
 
-      // ====== DEBUG: Response logging ======
-      console.log('=== SIGNUP RESPONSE ===');
-      console.log('Data:', data);
-      console.log('User:', data?.user);
-      console.log('Session:', data?.session);
-      console.log('Error:', error);
-      console.log('=== END SIGNUP RESPONSE ===');
-
       if (error) {
-        console.error('=== SIGNUP ERROR DETAILS ===');
-        console.error('Error object:', error);
-        console.error('Error name:', error.name);
-        console.error('Error message:', error.message);
-        console.error('Error status:', (error as any).status);
-        console.error('Error code:', (error as any).code);
-        console.error('Error cause:', (error as any).cause);
-        console.error('Error __isAuthError:', (error as any).__isAuthError);
-        try {
-          console.error('Full error JSON:', JSON.stringify(error, null, 2));
-        } catch (e) {
-          console.error('Could not stringify error');
-        }
-        console.error('=== END SIGNUP ERROR ===');
-        
+        console.error("Sign up error:", error);
         toast({
           title: "Could not create your account",
-          description: `${error.message || 'Unknown error'}. Check console for details.`,
+          description: error.message,
           variant: "destructive",
         });
         setIsLoading(false);
         return;
       }
 
-      // Supabase has sent a verification email
-      // Move to verify-email step
-      console.log('=== SIGNUP SUCCESS - Moving to verify-email step ===');
       setStep("verify-email");
       setIsLoading(false);
     } catch (error: any) {
-      console.error('=== UNEXPECTED SIGNUP ERROR ===');
-      console.error('Error type:', typeof error);
-      console.error('Error instanceof Error:', error instanceof Error);
-      console.error('Error constructor:', error?.constructor?.name);
-      console.error('Error object:', error);
-      console.error('Error message:', error?.message);
-      console.error('Error stack:', error?.stack);
-      console.error('Is TypeError:', error instanceof TypeError);
-      console.error('Is network error:', error?.message?.toLowerCase()?.includes('fetch'));
-      console.error('Navigator online:', navigator.onLine);
-      try {
-        console.error('Full error JSON:', JSON.stringify(error, Object.getOwnPropertyNames(error || {}), 2));
-      } catch (e) {
-        console.error('Could not stringify error');
-      }
-      console.error('=== END UNEXPECTED ERROR ===');
-      
+      console.error("Unexpected signup error:", error);
       toast({
         title: "Sign up failed",
-        description: `${error?.message || "An unexpected error occurred"}. Check browser console for details.`,
+        description: error?.message || "An unexpected error occurred.",
         variant: "destructive",
       });
       setIsLoading(false);
