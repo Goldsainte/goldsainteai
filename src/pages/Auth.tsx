@@ -202,6 +202,20 @@ const Auth = () => {
     e.preventDefault();
     setIsLoading(true);
     
+    // 🔐 CRITICAL: Never call Supabase without a valid email
+    if (!email.trim()) {
+      toast({
+        title: "Email required",
+        description: "Please enter your email address before creating your account.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      setStep("email"); // Send user back to email step
+      return;
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    
     if (!firstName.trim() || !lastName.trim()) {
       toast({
         title: "Missing information",
@@ -291,8 +305,10 @@ const Auth = () => {
     }
     
     try {
+      console.log("[Auth] Signing up with email:", normalizedEmail);
+      
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: normalizedEmail,
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
