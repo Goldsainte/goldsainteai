@@ -202,19 +202,29 @@ const Auth = () => {
     e.preventDefault();
     setIsLoading(true);
     
-    // 🔐 CRITICAL: Never call Supabase without a valid email
-    if (!email.trim()) {
+    // 🔐 CRITICAL: Validate email before any Supabase calls
+    const normalizedEmail = email.trim().toLowerCase();
+    
+    if (!normalizedEmail) {
       toast({
         title: "Email required",
         description: "Please enter your email address before creating your account.",
         variant: "destructive",
       });
       setIsLoading(false);
-      setStep("email"); // Send user back to email step
       return;
     }
 
-    const normalizedEmail = email.trim().toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(normalizedEmail)) {
+      toast({
+        title: "Invalid email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
     
     if (!firstName.trim() || !lastName.trim()) {
       toast({
@@ -248,7 +258,7 @@ const Auth = () => {
       
       navigate('/apply/agent', {
         state: {
-          email,
+          email: normalizedEmail,
           firstName,
           lastName,
           phone,
@@ -267,7 +277,7 @@ const Auth = () => {
       
       navigate('/brand/onboarding', {
         state: {
-          email,
+          email: normalizedEmail,
           firstName,
           lastName,
           phone,
@@ -797,6 +807,21 @@ const Auth = () => {
                   : "Enter your details to get started"
                 }
               </p>
+            </div>
+
+            {/* Email field for all account types */}
+            <div className="space-y-2">
+              <Label htmlFor="signupEmail">Email address</Label>
+              <Input
+                id="signupEmail"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={isLoading}
+                className="h-12"
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
