@@ -40,12 +40,14 @@ export default defineConfig(({ mode }) => {
       // Ensure a single React instance to prevent ReactCurrentDispatcher errors
       dedupe: ["react", "react-dom"],
     },
-    define: {
-      'import.meta.env.VITE_SENTRY_DSN': JSON.stringify(process.env.VITE_SENTRY_DSN ?? env.VITE_SENTRY_DSN ?? ''),
-      'import.meta.env.VITE_RELEASE_VERSION': JSON.stringify(
-        env.VITE_RELEASE_VERSION || `goldsainte@${env.npm_package_version || '1.0.0'}`
-      ),
-    },
+  define: {
+    'import.meta.env.VITE_SENTRY_DSN': JSON.stringify(process.env.VITE_SENTRY_DSN ?? env.VITE_SENTRY_DSN ?? ''),
+    'import.meta.env.VITE_RELEASE_VERSION': JSON.stringify(
+      env.VITE_RELEASE_VERSION || `goldsainte@${env.npm_package_version || '1.0.0'}`
+    ),
+    'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(process.env.VITE_SUPABASE_URL ?? env.VITE_SUPABASE_URL ?? ''),
+    'import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY': JSON.stringify(process.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? env.VITE_SUPABASE_PUBLISHABLE_KEY ?? ''),
+  },
     build: {
       sourcemap: true, // Enable source maps for Sentry
     },
