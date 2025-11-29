@@ -13016,6 +13016,7 @@ export type Database = {
       }
       generate_booking_number: { Args: never; Returns: string }
       generate_invoice_number: { Args: never; Returns: string }
+      get_agent_user_id: { Args: { _agent_id: string }; Returns: string }
       get_api_error_rate: {
         Args: { p_minutes_ago?: number; p_service_name: string }
         Returns: {
