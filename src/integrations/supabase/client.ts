@@ -3,11 +3,11 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 
-// Read Supabase config from environment - NO FALLBACKS
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+// Read Supabase config from environment
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "";
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
 
-// Validate configuration - fail fast if misconfigured
+// Validate configuration
 const isInvalidConfig =
   !SUPABASE_URL ||
   !SUPABASE_PUBLISHABLE_KEY ||
@@ -16,26 +16,24 @@ const isInvalidConfig =
   SUPABASE_PUBLISHABLE_KEY.includes("your-supabase-anon-key") ||
   SUPABASE_PUBLISHABLE_KEY === "public-anon-key";
 
+// Log warning but don't crash the app - auth will fail gracefully
 if (isInvalidConfig) {
-  const errorMessage =
-    "Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY environment variables.";
-
-  console.error(errorMessage, {
-    hasUrl: !!SUPABASE_URL,
-    hasKey: !!SUPABASE_PUBLISHABLE_KEY,
-    url: SUPABASE_URL || "(not set)",
-  });
-
-  // ALWAYS throw - don't silently use bad config in any environment
-  throw new Error(errorMessage);
+  console.error(
+    "Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY environment variables.",
+    {
+      hasUrl: !!SUPABASE_URL,
+      hasKey: !!SUPABASE_PUBLISHABLE_KEY,
+      url: SUPABASE_URL || "(not set)",
+    }
+  );
 }
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
 export const supabase = createClient<Database>(
-  SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY,
+  SUPABASE_URL || "https://placeholder.supabase.co",
+  SUPABASE_PUBLISHABLE_KEY || "placeholder-key",
   {
     auth: {
       persistSession: true,
@@ -44,3 +42,6 @@ export const supabase = createClient<Database>(
     },
   }
 );
+
+// Export config status for components to check
+export const isSupabaseConfigured = !isInvalidConfig;
