@@ -309,9 +309,15 @@ const Auth = () => {
 
       if (error) {
         console.error("Sign up error:", error);
+
+        let description = error.message || "An unexpected error occurred.";
+        if (error.message === "Failed to fetch" || error.message?.includes("fetch")) {
+          description = "Unable to connect to authentication server. Please check your internet connection or contact support.";
+        }
+
         toast({
           title: "Could not create your account",
-          description: error.message,
+          description,
           variant: "destructive",
         });
         setIsLoading(false);
