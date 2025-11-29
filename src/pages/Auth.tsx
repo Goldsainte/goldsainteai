@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -33,6 +34,7 @@ const Auth = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
+  const [smsOptIn, setSmsOptIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp, user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -236,6 +238,7 @@ const Auth = () => {
           firstName,
           lastName,
           phone,
+          smsOptIn,
         }
       });
       setIsLoading(false);
@@ -254,6 +257,7 @@ const Auth = () => {
           firstName,
           lastName,
           phone,
+          smsOptIn,
         }
       });
       setIsLoading(false);
@@ -298,6 +302,7 @@ const Auth = () => {
             last_name: lastName,
             phone: phone || null,
             account_type: selectedAccountType,
+            sms_notifications: smsOptIn,
           },
         },
       });
@@ -814,6 +819,29 @@ const Auth = () => {
                 disabled={isLoading}
                 className="h-12"
               />
+            </div>
+
+            {/* SMS Opt-in Checkbox */}
+            <div className="flex items-start space-x-3 pt-1">
+              <Checkbox
+                id="smsOptIn"
+                checked={smsOptIn}
+                onCheckedChange={(checked) => setSmsOptIn(checked === true)}
+                disabled={isLoading}
+                className="mt-0.5 h-4 w-4"
+              />
+              <div className="space-y-1">
+                <Label 
+                  htmlFor="smsOptIn" 
+                  className="text-sm font-medium leading-none cursor-pointer"
+                >
+                  Text message notifications
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  Receive trip updates, booking confirmations, and travel alerts via SMS. 
+                  Message and data rates may apply.
+                </p>
+              </div>
             </div>
 
             {/* Only show password for traveler/creator */}
