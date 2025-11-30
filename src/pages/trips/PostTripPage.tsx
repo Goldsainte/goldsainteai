@@ -1,5 +1,5 @@
 // src/pages/trips/PostTripPage.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -62,21 +62,29 @@ export default function PostTripPage() {
   ];
 
   // Auto-populate form when prefill data loads
-  useState(() => {
-    if (prefill && !destination && !title) {
-      // Populate basic fields
-      if (prefill.destination) setDestination(prefill.destination);
-      if (prefill.title) setTitle(prefill.title);
+  useEffect(() => {
+    if (prefill) {
+      // Populate title from storyboard
+      if (prefill.title && !title) {
+        setTitle(prefill.title);
+      }
+      
+      // Populate special notes with storyboard description
+      if (prefill.description && !specialNotes) {
+        setSpecialNotes(prefill.description);
+      }
       
       // Extract aesthetic tags from storyboard description
       if (sourceStoryboard) {
         const tags = extractAestheticTags(
           [prefill.description, sourceStoryboard.description].filter(Boolean).join(" ")
         );
-        setAestheticTags(tags);
+        if (tags.length > 0) {
+          setAestheticTags(tags);
+        }
       }
     }
-  });
+  }, [prefill, sourceStoryboard]);
 
   // Extract aesthetic keywords from text
   function extractAestheticTags(text: string): string[] {
