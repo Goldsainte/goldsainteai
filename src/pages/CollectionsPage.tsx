@@ -210,8 +210,8 @@ export default function CollectionsPage() {
                       className="rounded-full px-4 text-xs bg-[#0a2225] hover:bg-[#0a2225]/90"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <Link to={`/storyboards/new?destination=${encodeURIComponent(trip.primaryDestination)}`}>
-                        Create storyboard
+                      <Link to={`/post-trip?from=collection&destination=${encodeURIComponent(trip.primaryDestination)}&title=${encodeURIComponent(trip.title)}&nights=${trip.durationNights}&vibes=${encodeURIComponent(trip.vibeTags.join(','))}&headline=${encodeURIComponent(trip.headline)}`}>
+                        Post to Marketplace
                       </Link>
                     </Button>
                     <Button 

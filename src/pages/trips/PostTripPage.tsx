@@ -1,17 +1,26 @@
 // src/pages/trips/PostTripPage.tsx
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import { ArrowLeft, ArrowRight, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, X, Sparkles, Image, Link2, StickyNote, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
 import { toast } from "sonner";
 import { StoryboardBuilder } from "@/components/storyboards/StoryboardBuilder";
 import { useAuth } from "@/contexts/AuthContext";
 import { useStoryboardPrefill } from "@/hooks/useStoryboardPrefill";
+import { useItineraryPrefill } from "@/hooks/useItineraryPrefill";
+import { Badge } from "@/components/ui/badge";
 
 type BudgetLevel = "accessible" | "elevated" | "ultra_luxury";
 type Pace = "slow" | "balanced" | "packed";
 type WantsRole = "creator" | "agent" | "both";
+
+interface InspirationItem {
+  type: "image" | "tiktok" | "note";
+  url?: string;
+  content?: string;
+  caption?: string;
+}
 
 export default function PostTripPage() {
   const navigate = useNavigate();
@@ -26,6 +35,9 @@ export default function PostTripPage() {
   // Use storyboard prefill hook
   const { loading: loadingPrefill, prefill, sourceStoryboard, error: prefillError } = 
     useStoryboardPrefill();
+  
+  // Use itinerary prefill hook for AI collections
+  const { hasItineraryPrefill, prefillData: itineraryPrefill } = useItineraryPrefill();
 
   const [destination, setDestination] = useState("");
   const [title, setTitle] = useState("");
@@ -45,6 +57,13 @@ export default function PostTripPage() {
   const [specialNotes, setSpecialNotes] = useState("");
   const [wantsRole, setWantsRole] = useState<WantsRole>("both");
 
+  // Inspiration items (photos, TikTok links, notes)
+  const [inspirationItems, setInspirationItems] = useState<InspirationItem[]>([]);
+  const [newImageUrl, setNewImageUrl] = useState("");
+  const [newTikTokUrl, setNewTikTokUrl] = useState("");
+  const [newNote, setNewNote] = useState("");
+  const [showItineraryPreview, setShowItineraryPreview] = useState(true);
+
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSafetyModal, setShowSafetyModal] = useState(false);
@@ -61,9 +80,25 @@ export default function PostTripPage() {
     "Honeymoon / romance",
   ];
 
-  // Auto-populate form when prefill data loads
+  // Auto-populate from AI Collection prefill
   useEffect(() => {
-    if (prefill) {
+    if (hasItineraryPrefill && itineraryPrefill) {
+      setDestination(itineraryPrefill.destination);
+      setTitle(itineraryPrefill.title);
+      setStartsOn(itineraryPrefill.startsOn);
+      setEndsOn(itineraryPrefill.endsOn);
+      if (itineraryPrefill.budgetMin) setBudgetMin(String(itineraryPrefill.budgetMin));
+      if (itineraryPrefill.budgetMax) setBudgetMax(String(itineraryPrefill.budgetMax));
+      setBudgetLevel(itineraryPrefill.budgetLevel);
+      if (itineraryPrefill.interests.length > 0) setInterests(itineraryPrefill.interests);
+      if (itineraryPrefill.specialNotes) setSpecialNotes(itineraryPrefill.specialNotes);
+      if (itineraryPrefill.vibes.length > 0) setAestheticTags(itineraryPrefill.vibes);
+    }
+  }, [hasItineraryPrefill, itineraryPrefill]);
+
+  // Auto-populate form when storyboard prefill data loads
+  useEffect(() => {
+    if (prefill && !hasItineraryPrefill) {
       // Populate title from storyboard
       if (prefill.title && !title) {
         setTitle(prefill.title);
@@ -84,7 +119,7 @@ export default function PostTripPage() {
         }
       }
     }
-  }, [prefill, sourceStoryboard]);
+  }, [prefill, sourceStoryboard, hasItineraryPrefill]);
 
   // Extract aesthetic keywords from text
   function extractAestheticTags(text: string): string[] {
@@ -109,6 +144,34 @@ export default function PostTripPage() {
     setAestheticTags(prev => prev.filter(t => t !== tag));
   }
 
+  // Inspiration item handlers
+  function addImageUrl() {
+    if (!newImageUrl.trim()) return;
+    setInspirationItems(prev => [...prev, { type: "image", url: newImageUrl.trim() }]);
+    setNewImageUrl("");
+  }
+
+  function addTikTokUrl() {
+    if (!newTikTokUrl.trim()) return;
+    // Validate TikTok URL
+    if (!newTikTokUrl.includes("tiktok.com")) {
+      toast.error("Please enter a valid TikTok URL");
+      return;
+    }
+    setInspirationItems(prev => [...prev, { type: "tiktok", url: newTikTokUrl.trim() }]);
+    setNewTikTokUrl("");
+  }
+
+  function addNote() {
+    if (!newNote.trim()) return;
+    setInspirationItems(prev => [...prev, { type: "note", content: newNote.trim() }]);
+    setNewNote("");
+  }
+
+  function removeInspirationItem(index: number) {
+    setInspirationItems(prev => prev.filter((_, i) => i !== index));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
@@ -124,6 +187,14 @@ export default function PostTripPage() {
       if (!user) {
         throw new Error("Please sign in before posting a trip.");
       }
+
+      // Build source metadata if from AI collection
+      const sourceMetadata = hasItineraryPrefill && itineraryPrefill ? {
+        source_type: "ai_collection",
+        collection_title: itineraryPrefill.title,
+        collection_vibes: itineraryPrefill.vibes,
+        ai_itinerary: itineraryPrefill.itinerary,
+      } : undefined;
 
       const { error: insertError } = await supabase
         .from("trip_requests")
@@ -146,7 +217,9 @@ export default function PostTripPage() {
           special_notes: specialNotes || null,
           wants_role: wantsRole,
           status: "open",
-        })
+          source_metadata: sourceMetadata,
+          source_media: inspirationItems.length > 0 ? inspirationItems : null,
+        } as any)
         .select("id")
         .single();
 
@@ -197,12 +270,32 @@ export default function PostTripPage() {
       </section>
 
       <section className="mx-auto max-w-3xl px-4 pb-16 md:pb-20">
+        {/* AI Collection Prefill Banner */}
+        {hasItineraryPrefill && itineraryPrefill && (
+          <div className="mb-4 rounded-2xl bg-gradient-to-r from-[#FDFBF5] to-[#F6F0E4] border border-[#C7A962]/30 px-4 py-3">
+            <div className="flex items-start gap-3">
+              <Sparkles className="h-5 w-5 text-[#C7A962] flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-[#0a2225]">
+                  Pre-filled from AI Collection
+                </p>
+                <p className="text-xs text-[#4a4a4a] mt-0.5">
+                  <span className="font-semibold">{itineraryPrefill.title}</span> — {itineraryPrefill.nights} nights in {itineraryPrefill.destination}
+                </p>
+                <p className="text-[10px] text-[#8C8470] mt-1">
+                  Review and adjust any details before posting to the marketplace.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {storyboardIdFromQuery && loadingPrefill && (
           <div className="mb-3 rounded-2xl bg-[#f7f3ea] border border-[#E5DFC6] px-3 py-2 text-xs text-[#4a4a4a]">
             Loading storyboard details...
           </div>
         )}
-        {prefill && sourceStoryboard && (
+        {prefill && sourceStoryboard && !hasItineraryPrefill && (
           <div className="mb-3 rounded-2xl bg-[#f7f3ea] border border-[#E5DFC6] px-3 py-2 text-xs text-[#4a4a4a]">
             Pre-filled from storyboard{" "}
             <span className="font-semibold">{sourceStoryboard.title || "Untitled"}</span>. 
@@ -497,7 +590,149 @@ export default function PostTripPage() {
             </div>
           </div>
 
-          {/* Section 4.5: Visual Storyboard */}
+          {/* AI Itinerary Preview (if from collection) */}
+          {hasItineraryPrefill && itineraryPrefill && itineraryPrefill.itinerary.length > 0 && (
+            <div className="space-y-3">
+              <button
+                type="button"
+                onClick={() => setShowItineraryPreview(!showItineraryPreview)}
+                className="flex items-center justify-between w-full text-left"
+              >
+                <h2 className="text-base font-semibold flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-[#C7A962]" />
+                  AI-Generated Itinerary Preview
+                </h2>
+                {showItineraryPreview ? (
+                  <ChevronUp className="h-4 w-4 text-[#8D8D8D]" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 text-[#8D8D8D]" />
+                )}
+              </button>
+              {showItineraryPreview && (
+                <div className="space-y-2 rounded-2xl border border-[#E5DFC6] bg-[#FDFBF5] p-3">
+                  <p className="text-[10px] text-[#8C8470] mb-2">
+                    This itinerary will be shared with agents as a reference for your trip
+                  </p>
+                  {itineraryPrefill.itinerary.map((day) => (
+                    <div key={day.dayNumber} className="flex gap-3 py-2 border-b border-[#E5DFC6] last:border-b-0">
+                      <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#0a2225] text-white text-[10px] font-medium flex-shrink-0">
+                        {day.dayNumber}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-[#0a2225]">{day.title}</p>
+                        <p className="text-[10px] text-[#4a4a4a] line-clamp-2">{day.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Section 4.5: Add Inspiration */}
+          <div className="space-y-3">
+            <h2 className="text-base font-semibold flex items-center gap-2">
+              Add Inspiration
+              <Badge variant="outline" className="text-[9px] font-normal">Optional</Badge>
+            </h2>
+            <p className="text-xs text-[#4a4a4a]">
+              Add photos, TikTok links, or notes to help agents understand your vision.
+            </p>
+
+            {/* Existing inspiration items */}
+            {inspirationItems.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {inspirationItems.map((item, index) => (
+                  <div
+                    key={index}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#E5DFC6] bg-white text-xs"
+                  >
+                    {item.type === "image" && <Image className="h-3 w-3 text-[#C7A962]" />}
+                    {item.type === "tiktok" && <Link2 className="h-3 w-3 text-[#C7A962]" />}
+                    {item.type === "note" && <StickyNote className="h-3 w-3 text-[#C7A962]" />}
+                    <span className="max-w-[150px] truncate">
+                      {item.url || item.content}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeInspirationItem(index)}
+                      className="hover:text-red-600"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Add image URL */}
+            <div className="flex gap-2">
+              <div className="flex-1 flex items-center gap-2 rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2">
+                <Image className="h-4 w-4 text-[#8D8D8D]" />
+                <input
+                  type="url"
+                  value={newImageUrl}
+                  onChange={(e) => setNewImageUrl(e.target.value)}
+                  className="flex-1 bg-transparent text-sm outline-none"
+                  placeholder="Paste image URL (Pinterest, Unsplash...)"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={addImageUrl}
+                disabled={!newImageUrl.trim()}
+                className="px-3 py-2 rounded-full bg-[#f7f3ea] border border-[#E5DFC6] text-xs font-medium hover:border-[#BFAD72] disabled:opacity-50"
+              >
+                Add
+              </button>
+            </div>
+
+            {/* Add TikTok URL */}
+            <div className="flex gap-2">
+              <div className="flex-1 flex items-center gap-2 rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2">
+                <Link2 className="h-4 w-4 text-[#8D8D8D]" />
+                <input
+                  type="url"
+                  value={newTikTokUrl}
+                  onChange={(e) => setNewTikTokUrl(e.target.value)}
+                  className="flex-1 bg-transparent text-sm outline-none"
+                  placeholder="Paste TikTok link"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={addTikTokUrl}
+                disabled={!newTikTokUrl.trim()}
+                className="px-3 py-2 rounded-full bg-[#f7f3ea] border border-[#E5DFC6] text-xs font-medium hover:border-[#BFAD72] disabled:opacity-50"
+              >
+                Add
+              </button>
+            </div>
+
+            {/* Add note */}
+            <div className="flex gap-2">
+              <div className="flex-1 flex items-center gap-2 rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2">
+                <StickyNote className="h-4 w-4 text-[#8D8D8D]" />
+                <input
+                  type="text"
+                  value={newNote}
+                  onChange={(e) => setNewNote(e.target.value)}
+                  className="flex-1 bg-transparent text-sm outline-none"
+                  placeholder="Add a note or revision"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={addNote}
+                disabled={!newNote.trim()}
+                className="px-3 py-2 rounded-full bg-[#f7f3ea] border border-[#E5DFC6] text-xs font-medium hover:border-[#BFAD72] disabled:opacity-50"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+
+          {/* Section 4.6: Visual Storyboard */}
           <div className="space-y-3">
             <h2 className="text-base font-semibold">Build your visual storyboard</h2>
             <p className="text-xs text-[#4a4a4a]">

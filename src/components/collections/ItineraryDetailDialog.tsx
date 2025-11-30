@@ -1,9 +1,10 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { MapPin, Calendar, Sparkles, Utensils, Home, Sun } from "lucide-react";
+import { MapPin, Calendar, Sparkles, Utensils, Home, Sun, Send, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { encodeData } from "@/lib/utils";
 
 interface ItineraryDay {
   dayNumber: number;
@@ -36,6 +37,28 @@ export function ItineraryDetailDialog({ itinerary, open, onOpenChange }: Itinera
   if (!itinerary) return null;
 
   const hasItinerary = itinerary.itinerary && itinerary.itinerary.length > 0;
+
+  // Build URL params for Post to Marketplace
+  const buildPostTripUrl = () => {
+    const params = new URLSearchParams({
+      from: "collection",
+      destination: itinerary.primaryDestination,
+      title: itinerary.title,
+      nights: String(itinerary.durationNights),
+      vibes: itinerary.vibeTags.join(","),
+      headline: itinerary.headline,
+    });
+    
+    if (itinerary.budgetRange) {
+      params.set("budget", itinerary.budgetRange);
+    }
+    
+    if (hasItinerary) {
+      params.set("itinerary", encodeData(itinerary.itinerary));
+    }
+    
+    return `/post-trip?${params.toString()}`;
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -157,19 +180,20 @@ export function ItineraryDetailDialog({ itinerary, open, onOpenChange }: Itinera
                 <Sparkles className="h-5 w-5 text-[#C7A962] flex-shrink-0 mt-0.5" />
                 <div className="text-sm text-[#6E6650]">
                   <p className="font-medium text-[#0a2225] mb-1">AI-Curated Inspiration</p>
-                  <p>This itinerary was generated based on your travel preferences. Create a storyboard to save and customize it, or ask Madison for a detailed day-by-day plan.</p>
+                  <p>This itinerary was generated based on your travel preferences. Post to the marketplace to let agents bid on making it real.</p>
                 </div>
               </div>
             )}
 
-            {/* CTAs */}
+            {/* CTAs - Post to Marketplace is primary */}
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <Button 
                 asChild
                 className="flex-1 rounded-full bg-[#0a2225] hover:bg-[#0a2225]/90"
               >
-                <Link to={`/storyboards/new?destination=${encodeURIComponent(itinerary.primaryDestination)}&title=${encodeURIComponent(itinerary.title)}`}>
-                  Create storyboard
+                <Link to={buildPostTripUrl()}>
+                  <Send className="h-4 w-4 mr-2" />
+                  Post to Marketplace
                 </Link>
               </Button>
               <Button 
@@ -178,6 +202,7 @@ export function ItineraryDetailDialog({ itinerary, open, onOpenChange }: Itinera
                 className="flex-1 rounded-full border-[#E5DFC6] hover:bg-[#F6F0E4]"
               >
                 <Link to={`/concierge?destination=${encodeURIComponent(itinerary.primaryDestination)}&context=${encodeURIComponent(itinerary.title)}&nights=${itinerary.durationNights}&vibes=${encodeURIComponent(itinerary.vibeTags.join(','))}`}>
+                  <MessageCircle className="h-4 w-4 mr-2" />
                   Ask Madison
                 </Link>
               </Button>

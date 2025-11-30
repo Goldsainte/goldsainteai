@@ -10912,6 +10912,7 @@ export type Database = {
           selected_proposal_id: string | null
           source_brand_profile_id: string | null
           source_collection_id: string | null
+          source_media: Json | null
           source_metadata: Json | null
           special_notes: string | null
           start_date: string | null
@@ -10954,6 +10955,7 @@ export type Database = {
           selected_proposal_id?: string | null
           source_brand_profile_id?: string | null
           source_collection_id?: string | null
+          source_media?: Json | null
           source_metadata?: Json | null
           special_notes?: string | null
           start_date?: string | null
@@ -10996,6 +10998,7 @@ export type Database = {
           selected_proposal_id?: string | null
           source_brand_profile_id?: string | null
           source_collection_id?: string | null
+          source_media?: Json | null
           source_metadata?: Json | null
           special_notes?: string | null
           start_date?: string | null
