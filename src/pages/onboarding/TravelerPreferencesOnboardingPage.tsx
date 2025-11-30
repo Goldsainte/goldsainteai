@@ -167,80 +167,96 @@ export default function TravelerPreferencesOnboardingPage() {
 
   return (
     <div className="min-h-screen bg-[#FDF9F0]">
-      <div className="container max-w-4xl py-10 px-4">
+      {/* Decorative background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#C7B892]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#C7B892]/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+      </div>
+
+      <div className="relative container max-w-4xl py-8 sm:py-12 px-4">
         {/* Header */}
-        <div className="text-center mb-10">
-          <div className="w-16 h-0.5 bg-[#C7A962] mx-auto mb-6" />
-          <p className="uppercase tracking-[0.25em] text-[10px] text-muted-foreground mb-4">
+        <div className="text-center mb-8 sm:mb-12">
+          <div className="w-16 h-0.5 bg-[#C7B892] mx-auto mb-6" />
+          <p className="uppercase tracking-[0.25em] text-[10px] sm:text-[11px] text-[#7A7151] mb-4 font-medium">
             Goldsainte Onboarding
           </p>
           <h1 className="font-secondary text-3xl sm:text-4xl md:text-5xl text-[#0a2225] mb-4">
             Let's learn your travel signature
           </h1>
-          <p className="max-w-2xl mx-auto text-sm sm:text-base text-muted-foreground leading-relaxed">
+          <p className="max-w-xl mx-auto text-sm sm:text-base text-[#6E6650] leading-relaxed">
             Answer a few quick questions so we can curate storyboards, collections,
             and itineraries that feel like they were designed just for you.
           </p>
         </div>
 
-        <Card className="border-none shadow-lg bg-white/90 backdrop-blur-sm rounded-3xl">
-          <CardContent className="p-6 md:p-8">
-            <TravelPreferencesWizard
-              preferences={preferences}
-              onPreferencesChange={setPreferences}
-            />
+        {/* Main Card with stacked card effect */}
+        <div className="relative">
+          {/* Decorative stacked cards behind */}
+          <div className="absolute inset-x-2 top-3 bottom-0 rounded-[28px] bg-[#E5DFC6]/30 -z-10" />
+          <div className="absolute inset-x-1 top-1.5 bottom-0 rounded-[28px] bg-[#E5DFC6]/50 -z-10" />
+          
+          <div className="rounded-[28px] border border-[#E5DFC6] bg-white/95 backdrop-blur-sm shadow-[0_24px_60px_rgba(10,34,37,0.12)]">
+            <div className="p-5 sm:p-8 md:p-10">
+              <TravelPreferencesWizard
+                preferences={preferences}
+                onPreferencesChange={setPreferences}
+              />
 
-            {/* Discovery Opt-in */}
-            <div className="border-t border-border/50 pt-6 mt-8">
-              <div className="flex items-start gap-4 p-4 rounded-2xl bg-secondary/30">
-                <Switch 
-                  checked={isDiscoverable}
-                  onCheckedChange={setIsDiscoverable}
-                  className="mt-0.5"
-                />
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Users className="w-4 h-4 text-primary" />
-                    <p className="font-medium text-sm text-foreground">Let travel experts find me</p>
+              {/* Discovery Opt-in */}
+              <div className="border-t border-[#E5DFC6]/60 pt-6 mt-8">
+                <div className="flex items-start gap-4 p-4 sm:p-5 rounded-[20px] bg-[#F5EFE1]">
+                  <Switch 
+                    checked={isDiscoverable}
+                    onCheckedChange={setIsDiscoverable}
+                    className="mt-0.5 data-[state=checked]:bg-[#C7B892]"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="w-5 h-5 rounded-full bg-[#C7B892]/20 flex items-center justify-center">
+                        <Users className="w-3 h-3 text-[#7A7151]" />
+                      </div>
+                      <p className="font-medium text-sm text-[#0a2225]">Let travel experts find me</p>
+                    </div>
+                    <p className="text-xs text-[#6E6650] leading-relaxed">
+                      Verified agents and creators can see your travel preferences and proactively 
+                      curate trips tailored to you. Your contact info stays private.
+                    </p>
                   </div>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Verified agents and creators can see your travel preferences and proactively 
-                    curate trips tailored to you. Your contact info stays private.
-                  </p>
                 </div>
               </div>
-            </div>
 
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-8 border-t border-border/40 mt-8">
-              <Button
-                variant="ghost"
-                onClick={handleSkip}
-                className="text-muted-foreground hover:text-foreground text-sm"
-              >
-                Skip for now
-              </Button>
-              
-              <Button
-                size="lg"
-                className="rounded-full px-8 bg-[#0a2225] hover:bg-[#0a2225]/90 text-white gap-2"
-                onClick={handleSave}
-                disabled={isSaving}
-              >
-                {isSaving ? (
-                  <>
-                    <Sparkles className="h-4 w-4 animate-pulse" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    Finish & see my collections
-                    <ArrowRight className="h-4 w-4" />
-                  </>
-                )}
-              </Button>
+              {/* CTAs */}
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-8 border-t border-[#E5DFC6]/40 mt-8">
+                <Button
+                  variant="ghost"
+                  onClick={handleSkip}
+                  className="text-[#6E6650] hover:text-[#0a2225] hover:bg-[#F5EFE1] text-sm rounded-full px-6"
+                >
+                  Skip for now
+                </Button>
+                
+                <Button
+                  size="lg"
+                  className="rounded-full px-8 bg-[#0a2225] hover:bg-[#0a2225]/90 text-white gap-2 shadow-lg shadow-[#0a2225]/20"
+                  onClick={handleSave}
+                  disabled={isSaving}
+                >
+                  {isSaving ? (
+                    <>
+                      <Sparkles className="h-4 w-4 animate-pulse" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      Finish & see my collections
+                      <ArrowRight className="h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
