@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, MapPin, Calendar, ArrowRight, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { ItineraryDetailDialog } from "@/components/collections/ItineraryDetailDialog";
 
 interface CuratedItinerary {
   id: string;
@@ -25,6 +26,8 @@ export default function CollectionsPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [preferences, setPreferences] = useState<any>(null);
+  const [selectedItinerary, setSelectedItinerary] = useState<CuratedItinerary | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const loadCollections = async (isRefresh = false) => {
     if (!user) return;
@@ -148,6 +151,10 @@ export default function CollectionsPage() {
             {itineraries.map((trip) => (
               <Card
                 key={trip.id}
+                onClick={() => {
+                  setSelectedItinerary(trip);
+                  setDialogOpen(true);
+                }}
                 className="overflow-hidden group cursor-pointer bg-white border-none shadow-sm hover:shadow-xl transition-all duration-300 rounded-2xl"
               >
                 {/* Image */}
@@ -201,6 +208,7 @@ export default function CollectionsPage() {
                       asChild
                       size="sm" 
                       className="rounded-full px-4 text-xs bg-[#0a2225] hover:bg-[#0a2225]/90"
+                      onClick={(e) => e.stopPropagation()}
                     >
                       <Link to={`/storyboards/new?destination=${encodeURIComponent(trip.primaryDestination)}`}>
                         Create storyboard
@@ -211,6 +219,7 @@ export default function CollectionsPage() {
                       size="sm" 
                       variant="ghost" 
                       className="rounded-full px-3 text-xs text-muted-foreground hover:text-[#0a2225]"
+                      onClick={(e) => e.stopPropagation()}
                     >
                       <Link to={`/concierge?destination=${encodeURIComponent(trip.primaryDestination)}`}>
                         Ask Madison
@@ -265,6 +274,13 @@ export default function CollectionsPage() {
           </div>
         )}
       </div>
+
+      {/* Itinerary Detail Dialog */}
+      <ItineraryDetailDialog 
+        itinerary={selectedItinerary}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
     </div>
   );
 }
