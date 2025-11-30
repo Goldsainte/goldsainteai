@@ -152,7 +152,7 @@ export default function TravelerDashboardPage() {
               <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225]">
                 Where are we taking you next?
               </h1>
-              <p className="text-base text-[#6B7280] max-w-xl leading-relaxed">
+              <p className="text-base text-[#6B7280] leading-relaxed">
                 Start with a collection that feels like you, then let Madison and our creators turn it into a real trip.
               </p>
             </div>
@@ -381,7 +381,7 @@ export default function TravelerDashboardPage() {
                       <MapPin className="h-6 w-6 text-[#C7A962]" />
                     </div>
                     <p className="font-secondary text-lg text-[#0a2225] mb-2">No trips yet</p>
-                    <p className="text-sm text-[#6B7280] mb-6 max-w-xs mx-auto">
+                    <p className="text-sm text-[#6B7280] mb-6 max-w-sm mx-auto">
                       Start by posting your first trip request and let our curators craft your perfect journey.
                     </p>
                     <button
@@ -444,7 +444,7 @@ export default function TravelerDashboardPage() {
                       <Plane className="h-6 w-6 text-[#C7A962]" />
                     </div>
                     <p className="font-secondary text-lg text-[#0a2225] mb-2">No bookings yet</p>
-                    <p className="text-sm text-[#6B7280] max-w-xs mx-auto">
+                    <p className="text-sm text-[#6B7280] max-w-sm mx-auto">
                       Once you accept a proposal and complete payment, your confirmed bookings will appear here.
                     </p>
                   </div>
