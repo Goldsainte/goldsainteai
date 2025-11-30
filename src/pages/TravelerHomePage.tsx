@@ -90,7 +90,7 @@ export default function TravelerHomePage() {
     void load();
   }, [user]);
 
-  const heroCTA = user ? "/madison" : "/auth?returnTo=/madison";
+  const heroCTA = user ? "/concierge" : "/auth?returnTo=/concierge";
 
   const continuePlanning = useMemo(() => {
     return activeTrips.filter(
@@ -123,7 +123,7 @@ export default function TravelerHomePage() {
             <h2 className="font-secondary text-xl text-[#0a2225]">Collections we’d start with</h2>
           </div>
           <Button asChild variant="ghost" className="rounded-full text-xs">
-            <Link to="/collections">Browse all</Link>
+            <Link to="/marketplace">Browse all</Link>
           </Button>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
@@ -194,7 +194,7 @@ export default function TravelerHomePage() {
               <p className="text-sm text-[#4a4a4a]">No active trips yet. Start with a collection you love.</p>
               <div className="flex gap-2">
                 <Button asChild className="rounded-full text-xs">
-                  <Link to="/collections">Explore collections</Link>
+                  <Link to="/marketplace">Explore collections</Link>
                 </Button>
                 <Button asChild variant="outline" className="rounded-full text-xs">
                   <Link to={heroCTA}>Ask Madison</Link>
