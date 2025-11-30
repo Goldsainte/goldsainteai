@@ -1,3 +1,4 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -35,7 +36,7 @@ serve(async (req) => {
   }
 
   try {
-    const { userId, count = 12 } = await req.json();
+    const { userId, count = 10 } = await req.json();
 
     if (!userId) {
       return new Response(
@@ -63,10 +64,10 @@ serve(async (req) => {
     // Build prompt based on preferences
     const prefsContext = buildPreferencesContext(preferences);
 
-    // Call Lovable AI to generate itineraries
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY not configured");
+    // Get OpenAI API key
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+    if (!OPENAI_API_KEY) {
+      console.error("OPENAI_API_KEY not configured");
       // Return fallback itineraries
       return new Response(
         JSON.stringify({ itineraries: getFallbackItineraries() }),
@@ -93,14 +94,16 @@ ${prefsContext}
 
 Respond with a JSON array of itinerary objects.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    console.log("Calling OpenAI to generate curated itineraries for user:", userId);
+
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "gpt-4o",
         messages: [
           { role: "system", content: systemPrompt },
           { 
@@ -115,7 +118,7 @@ Respond with a JSON array of itinerary objects.`;
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
+      console.error("OpenAI API error:", response.status, errorText);
       
       // Return fallback itineraries on error
       return new Response(
@@ -131,7 +134,17 @@ Respond with a JSON array of itinerary objects.`;
     let itineraries: CuratedItinerary[] = [];
     try {
       // Extract JSON from the response (handle markdown code blocks)
-      const jsonMatch = content.match(/\[[\s\S]*\]/);
+      let jsonText = content.trim();
+      if (jsonText.startsWith("```json")) {
+        jsonText = jsonText.slice(7);
+      } else if (jsonText.startsWith("```")) {
+        jsonText = jsonText.slice(3);
+      }
+      if (jsonText.endsWith("```")) {
+        jsonText = jsonText.slice(0, -3);
+      }
+      
+      const jsonMatch = jsonText.match(/\[[\s\S]*\]/);
       if (jsonMatch) {
         const rawItineraries = JSON.parse(jsonMatch[0]);
         
@@ -148,9 +161,11 @@ Respond with a JSON array of itinerary objects.`;
         }));
       }
     } catch (parseError) {
-      console.error("Error parsing AI response:", parseError);
+      console.error("Error parsing OpenAI response:", parseError);
       itineraries = getFallbackItineraries();
     }
+
+    console.log(`Generated ${itineraries.length} curated itineraries for user:`, userId);
 
     return new Response(
       JSON.stringify({ itineraries }),
