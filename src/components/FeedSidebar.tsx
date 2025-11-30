@@ -13,6 +13,14 @@ export function FeedSidebar() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
 
+  // Gate sidebar for creators only
+  const accountType = 
+    ((user as any)?.user_metadata?.account_type as string | undefined)?.toLowerCase() ?? null;
+  const isCreator = accountType === "creator";
+
+  // Don't render sidebar for non-creators
+  if (!isCreator) return null;
+
   useEffect(() => {
     if (user) {
       fetchProfile();
