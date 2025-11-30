@@ -12,6 +12,7 @@ interface CollectionRow {
   description: string | null;
   cover_image_url: string | null;
   tags: string[] | null;
+  brand_profile_id: string | null;
   collection_stats?: {
     views_count: number;
     saves_count: number;
@@ -42,7 +43,7 @@ export default function TravelerHomePage() {
       const [{ data: recs }, { data: trips }, { data: saves }] = await Promise.all([
         supabase
           .from("brand_collections")
-          .select("id, title, description, cover_image_url, tags, collection_stats(views_count, saves_count, trip_inquiries_count)")
+          .select("id, title, description, cover_image_url, tags, brand_profile_id, collection_stats(views_count, saves_count, trip_inquiries_count)")
           .order("created_at", { ascending: false })
           .limit(6),
         supabase
@@ -55,7 +56,7 @@ export default function TravelerHomePage() {
           .limit(6),
         supabase
           .from("brand_collections")
-          .select("id, title, description, cover_image_url, tags")
+          .select("id, title, description, cover_image_url, tags, brand_profile_id")
           .eq("is_published", true)
           .order("created_at", { ascending: false })
           .limit(6),
@@ -166,7 +167,9 @@ export default function TravelerHomePage() {
                     {collection.collection_stats?.trip_inquiries_count ?? 0} inquiries
                   </span>
                   <Link
-                    to={`/collection/${collection.id}`}
+                    to={collection.brand_profile_id 
+                      ? `/brands/${collection.brand_profile_id}/collections/${collection.id}`
+                      : `/marketplace`}
                     className="text-[#0a2225] underline-offset-4 hover:underline"
                   >
                     Open
@@ -261,7 +264,9 @@ export default function TravelerHomePage() {
                     {collection.description ?? "Saved to your moodboard."}
                   </p>
                   <Button asChild variant="ghost" className="rounded-full text-xs">
-                    <Link to={`/collection/${collection.id}`}>Open collection</Link>
+                    <Link to={collection.brand_profile_id 
+                      ? `/brands/${collection.brand_profile_id}/collections/${collection.id}`
+                      : `/marketplace`}>Open collection</Link>
                   </Button>
                 </CardContent>
               </Card>
