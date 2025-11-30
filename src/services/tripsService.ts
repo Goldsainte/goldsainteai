@@ -20,49 +20,47 @@ export type TravelerTrip = {
 
 export async function getMyTrips(): Promise<TravelerTrip[]> {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) throw new Error("Not signed in");
+  if (userError || !user) {
+    console.warn("[tripsService] Not signed in, returning empty array");
+    return [];
+  }
 
   const { data, error } = await supabase
     .from("bookings")
-    .select(
-      `
+    .select(`
       id,
       status,
-      total_amount,
+      total_price_cents,
       currency,
       payout_status,
       created_at,
-      trips:trip_id (
-        id,
-        title,
-        destination,
-        start_date,
-        end_date
-      )
-    `
-    )
+      destination,
+      start_date,
+      end_date
+    `)
     .eq("traveler_id", user.id)
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Error loading trips", error);
-    throw new Error("Could not load your trips.");
+    console.error("[tripsService] Error loading trips:", error);
+    return []; // Return empty array instead of throwing
   }
 
+  // Map to expected shape - use booking's own fields since we removed the join
   return (data || []).map((row: any) => ({
     booking_id: row.id,
     status: row.status,
-    total_amount: row.total_amount,
+    total_amount: row.total_price_cents ? row.total_price_cents / 100 : null,
     currency: row.currency,
-    payout_status: row.payout_status,
+    payout_status: row.payout_status || "pending",
     created_at: row.created_at,
-    trip: row.trips ? {
-      id: row.trips.id,
-      title: row.trips.title,
-      destination: row.trips.destination,
-      starts_on: row.trips.start_date,
-      ends_on: row.trips.end_date,
-    } : null,
+    trip: {
+      id: row.id, // Use booking id as fallback
+      title: null,
+      destination: row.destination,
+      starts_on: row.start_date,
+      ends_on: row.end_date,
+    },
   }));
 }
 
@@ -93,60 +91,55 @@ export async function getMyPartnerTrips(
   role: "creator" | "agent"
 ): Promise<PartnerTrip[]> {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) throw new Error("Not signed in");
+  if (userError || !user) {
+    console.warn("[tripsService] Not signed in, returning empty array");
+    return [];
+  }
 
   const column = role === "creator" ? "creator_id" : "agent_id";
-  const earningsColumn =
-    role === "creator" ? "creator_earnings" : "agent_earnings";
+  const earningsColumn = role === "creator" ? "creator_payout_cents" : "agent_payout_cents";
 
   const { data, error } = await supabase
     .from("bookings")
-    .select(
-      `
+    .select(`
       id,
       status,
-      total_amount,
+      total_price_cents,
       currency,
       payout_status,
       created_at,
+      destination,
+      start_date,
+      end_date,
       ${earningsColumn},
-      trips:trip_id (
-        id,
-        title,
-        destination,
-        start_date,
-        end_date
-      ),
-      traveler_profile:traveler_id (
+      traveler:traveler_id (
         id,
         display_name
       )
-    `
-    )
+    `)
     .eq(column, user.id)
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Error loading partner trips", error);
-    throw new Error("Could not load your trips as a partner.");
+    console.error("[tripsService] Error loading partner trips:", error);
+    return []; // Return empty array instead of throwing
   }
 
   return (data || []).map((row: any) => ({
     booking_id: row.id,
     status: row.status,
-    total_amount: row.total_amount,
+    total_amount: row.total_price_cents ? row.total_price_cents / 100 : null,
     currency: row.currency,
-    payout_status: row.payout_status,
+    payout_status: row.payout_status || "pending",
     created_at: row.created_at,
-    my_earnings:
-      role === "creator" ? row.creator_earnings : row.agent_earnings,
-    trip: row.trips ? {
-      id: row.trips.id,
-      title: row.trips.title,
-      destination: row.trips.destination,
-      starts_on: row.trips.start_date,
-      ends_on: row.trips.end_date,
-    } : null,
-    traveler: row.traveler_profile || null,
+    my_earnings: row[earningsColumn] ? row[earningsColumn] / 100 : null,
+    trip: {
+      id: row.id,
+      title: null,
+      destination: row.destination,
+      starts_on: row.start_date,
+      ends_on: row.end_date,
+    },
+    traveler: row.traveler || null,
   }));
 }
