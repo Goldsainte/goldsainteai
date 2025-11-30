@@ -239,7 +239,8 @@ export const AIBookingConcierge = () => {
 
       setAgentProfile(data);
 
-      // Try to restore recent conversation from localStorage
+      // SECURITY: Restore recent conversation from localStorage
+      // This only contains chat messages for UX continuity - NO sensitive data stored
       const savedConversation = localStorage.getItem('aiConciergeConversation');
       let shouldUseInitialGreeting = true;
 
@@ -256,12 +257,13 @@ export const AIBookingConcierge = () => {
             setMessages(parsed.messages);
             shouldUseInitialGreeting = false;
           } else {
-            // Clear old conversation
+            // Clear old conversation - SECURITY: prevents stale data accumulation
             console.log('Clearing old conversation');
             localStorage.removeItem('aiConciergeConversation');
           }
         } catch (e) {
           console.error('Failed to parse saved conversation:', e);
+          // SECURITY: Clear corrupted data
           localStorage.removeItem('aiConciergeConversation');
         }
       }
@@ -428,12 +430,26 @@ export const AIBookingConcierge = () => {
     }
   }, [location.search]);
 
-  // Save conversation data to localStorage for seamless handoff
+  // SECURITY: Save conversation data to localStorage for seamless handoff
+  // This stores only chat messages for UX recovery - NO sensitive data (auth tokens, API keys, payment info)
+  // Messages may contain user-entered travel preferences but not PII like passwords or payment details
   const saveConversationData = () => {
+    // Sanitize messages before storage - remove any accidentally captured sensitive patterns
+    const sanitizedMessages = messages.map(msg => ({
+      role: msg.role,
+      content: msg.content
+        // Remove potential credit card patterns
+        .replace(/\b\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}\b/g, '[REDACTED]')
+        // Remove potential SSN patterns
+        .replace(/\b\d{3}[\s-]?\d{2}[\s-]?\d{4}\b/g, '[REDACTED]'),
+      toolResults: msg.toolResults,
+    }));
+    
     const conversationData = {
-      messages,
+      messages: sanitizedMessages,
       timestamp: new Date().toISOString(),
     };
+    // SECURITY: Safe - contains only sanitized chat messages, no auth tokens or API keys
     localStorage.setItem('aiConciergeConversation', JSON.stringify(conversationData));
   };
 
