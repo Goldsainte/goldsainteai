@@ -47,9 +47,11 @@ export const Header = () => {
   const { balance } = useCoinBalance();
   const { openModal: openExpediaModal } = useExpediaModal();
   const accountType = ((user as any)?.user_metadata?.account_type as string | undefined)?.toLowerCase() ?? null;
+  const isTraveler = !accountType || accountType === "traveler";
   const isCreator = accountType === "creator";
-  const isAgent = accountType === "agent";
-  const showPartnerBookings = isCreator || isAgent;
+  const isAgentAccount = accountType === "agent";
+  const isBrand = accountType === "brand";
+  const showPartnerBookings = isCreator || isAgentAccount;
   const primaryBookingsPath = showPartnerBookings ? "/partner-bookings" : "/my-bookings";
 
   const handleLanguageChange = (language: string) => {
@@ -454,43 +456,58 @@ export const Header = () => {
                             </DropdownMenuItem>
                           )}
                           
-                          {/* Goldsainte Creator Lab - Available to all users */}
-                          <DropdownMenuItem 
-                            onClick={() => navigate('/tiktok-lab')} 
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                          >
-                            <Video className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                            <span className="text-sm font-medium">Goldsainte Creator Lab</span>
-                          </DropdownMenuItem>
+                          {/* Goldsainte Creator Lab - Creators, Agents, Brands only */}
+                          {(isCreator || isAgentAccount || isBrand) && (
+                            <DropdownMenuItem 
+                              onClick={() => navigate('/tiktok-lab')} 
+                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <Video className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm font-medium">Goldsainte Creator Lab</span>
+                            </DropdownMenuItem>
+                          )}
                           
-                          <DropdownMenuItem 
-                            onClick={() => navigate('/price-alerts')} 
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                          >
-                            <Bell className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                            <span className="text-sm font-medium">Price Alerts</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => navigate('/billing-dashboard')} 
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                          >
-                            <CreditCard className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                            <span className="text-sm font-medium">Billing</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={handleCreateClick} 
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                          >
-                            <Plus className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                            <span className="text-sm font-medium">Create Content</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => navigate('/creator-dashboard')} 
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                          >
-                            <TrendingUp className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                            <span className="text-sm font-medium">Creator Dashboard</span>
-                          </DropdownMenuItem>
+                          {/* Billing - Creators, Agents, Brands only */}
+                          {(isCreator || isAgentAccount || isBrand) && (
+                            <DropdownMenuItem 
+                              onClick={() => navigate('/billing-dashboard')} 
+                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <CreditCard className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm font-medium">Billing</span>
+                            </DropdownMenuItem>
+                          )}
+                          
+                          {/* Create Content - Creators only */}
+                          {isCreator && (
+                            <DropdownMenuItem 
+                              onClick={handleCreateClick} 
+                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <Plus className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm font-medium">Create Content</span>
+                            </DropdownMenuItem>
+                          )}
+                          
+                          {/* Creator Dashboard + Earnings - Creators only */}
+                          {isCreator && (
+                            <>
+                              <DropdownMenuItem 
+                                onClick={() => navigate('/creator-dashboard')} 
+                                className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                              >
+                                <TrendingUp className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                <span className="text-sm font-medium">Creator Dashboard</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => navigate('/tiktok-lab/earnings')} 
+                                className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                              >
+                                <HandCoins className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                <span className="text-sm font-medium">Earnings</span>
+                              </DropdownMenuItem>
+                            </>
+                          )}
                           
                           <DropdownMenuSeparator className="bg-border/50" />
                           
@@ -676,7 +693,7 @@ export const Header = () => {
                               <span className="text-sm font-medium">Escrow & Milestones</span>
                             </DropdownMenuItem>
                           )}
-                          {isAgent && (
+                          {isAgentAccount && (
                             <DropdownMenuItem
                               onClick={() => navigate('/agent/earnings')}
                               className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
@@ -826,44 +843,59 @@ export const Header = () => {
                             </DropdownMenuItem>
                           )}
                           
-                          {/* Goldsainte Creator Lab - Available to all users */}
-                          <DropdownMenuItem 
-                            onClick={() => navigate('/tiktok-lab')} 
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                          >
-                            <Video className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">Goldsainte Creator Lab</span>
-                          </DropdownMenuItem>
+                          {/* Goldsainte Creator Lab - Creators, Agents, Brands only */}
+                          {(isCreator || isAgentAccount || isBrand) && (
+                            <DropdownMenuItem 
+                              onClick={() => navigate('/tiktok-lab')} 
+                              className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                            >
+                              <Video className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                              <span className="text-sm font-medium">Goldsainte Creator Lab</span>
+                            </DropdownMenuItem>
+                          )}
                           
-                          <DropdownMenuItem 
-                            onClick={() => navigate('/price-alerts')} 
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                          >
-                            <Bell className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">Price Alerts</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => navigate('/billing-dashboard')} 
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                          >
-                            <CreditCard className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">Billing</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={handleCreateClick} 
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                          >
-                            <Plus className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">Create Content</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => navigate('/creator-dashboard')} 
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                            data-tour="creator-dashboard"
-                          >
-                            <TrendingUp className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">Creator Dashboard</span>
-                          </DropdownMenuItem>
+                          {/* Billing - Creators, Agents, Brands only */}
+                          {(isCreator || isAgentAccount || isBrand) && (
+                            <DropdownMenuItem 
+                              onClick={() => navigate('/billing-dashboard')} 
+                              className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                            >
+                              <CreditCard className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                              <span className="text-sm font-medium">Billing</span>
+                            </DropdownMenuItem>
+                          )}
+                          
+                          {/* Create Content - Creators only */}
+                          {isCreator && (
+                            <DropdownMenuItem 
+                              onClick={handleCreateClick} 
+                              className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                            >
+                              <Plus className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                              <span className="text-sm font-medium">Create Content</span>
+                            </DropdownMenuItem>
+                          )}
+                          
+                          {/* Creator Dashboard + Earnings - Creators only */}
+                          {isCreator && (
+                            <>
+                              <DropdownMenuItem 
+                                onClick={() => navigate('/creator-dashboard')} 
+                                className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                                data-tour="creator-dashboard"
+                              >
+                                <TrendingUp className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                                <span className="text-sm font-medium">Creator Dashboard</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => navigate('/tiktok-lab/earnings')} 
+                                className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                              >
+                                <HandCoins className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                                <span className="text-sm font-medium">Earnings</span>
+                              </DropdownMenuItem>
+                            </>
+                          )}
                         </div>
                         
                         <DropdownMenuSeparator className="bg-border/50" />
