@@ -4,9 +4,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import TravelPreferencesWizard from "@/components/TravelPreferencesWizard";
 import { toast } from "sonner";
-import { Sparkles, ArrowRight } from "lucide-react";
+import { Sparkles, ArrowRight, Users } from "lucide-react";
 
 export default function TravelerPreferencesOnboardingPage() {
   const { user, isLoading: authLoading } = useAuth();
@@ -14,6 +15,7 @@ export default function TravelerPreferencesOnboardingPage() {
   const [preferences, setPreferences] = useState<any>({});
   const [isSaving, setIsSaving] = useState(false);
   const [existingPrefs, setExistingPrefs] = useState<any>(null);
+  const [isDiscoverable, setIsDiscoverable] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -38,6 +40,7 @@ export default function TravelerPreferencesOnboardingPage() {
 
       if (data) {
         setExistingPrefs(data);
+        setIsDiscoverable(data.is_discoverable || false);
         // Map existing data into wizard format
         setPreferences({
           general: {
@@ -47,7 +50,7 @@ export default function TravelerPreferencesOnboardingPage() {
               : data.travel_companions ? [data.travel_companions] : [],
           },
           destination: {
-            preferredRegions: data.preferred_destinations?.join(", ") || "",
+            preferredDestinations: data.preferred_destinations || [],
           },
           accommodation: {
             types: data.preferred_accommodation_types || [],
@@ -75,9 +78,7 @@ export default function TravelerPreferencesOnboardingPage() {
         user_id: user.id,
         travel_style: preferences.general?.tripTypes || [],
         budget_preference: preferences.budget?.range || null,
-        preferred_destinations: preferences.destination?.preferredRegions
-          ? preferences.destination.preferredRegions.split(",").map((s: string) => s.trim()).filter(Boolean)
-          : [],
+        preferred_destinations: preferences.destination?.preferredDestinations || [],
         preferred_accommodation_types: preferences.accommodation?.types || [],
         preferred_airlines: preferences.transportation?.loyaltyPrograms
           ? preferences.transportation.loyaltyPrograms.split(",").map((s: string) => s.trim()).filter(Boolean)
@@ -94,6 +95,7 @@ export default function TravelerPreferencesOnboardingPage() {
           vibe: preferences.vibe || {},
           planning: preferences.planning || {},
         },
+        is_discoverable: isDiscoverable,
         last_updated_at: new Date().toISOString(),
       };
 
@@ -187,6 +189,27 @@ export default function TravelerPreferencesOnboardingPage() {
               preferences={preferences}
               onPreferencesChange={setPreferences}
             />
+
+            {/* Discovery Opt-in */}
+            <div className="border-t border-border/50 pt-6 mt-8">
+              <div className="flex items-start gap-4 p-4 rounded-2xl bg-secondary/30">
+                <Switch 
+                  checked={isDiscoverable}
+                  onCheckedChange={setIsDiscoverable}
+                  className="mt-0.5"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Users className="w-4 h-4 text-primary" />
+                    <p className="font-medium text-sm text-foreground">Let travel experts find me</p>
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Verified agents and creators can see your travel preferences and proactively 
+                    curate trips tailored to you. Your contact info stays private.
+                  </p>
+                </div>
+              </div>
+            </div>
 
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-8 border-t border-border/40 mt-8">
               <Button

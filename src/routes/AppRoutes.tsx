@@ -171,6 +171,7 @@ const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
 const OnboardingPage = lazy(() => import('@/pages/onboarding/OnboardingPage'));
 const TravelerPreferencesOnboardingPage = lazy(() => import('@/pages/onboarding/TravelerPreferencesOnboardingPage'));
 const CollectionsPage = lazy(() => import('@/pages/CollectionsPage'));
+const TravelerDemandPage = lazy(() => import('@/pages/TravelerDemandPage'));
 const AIAgentOnboarding = lazy(() => import('@/pages/AIAgentOnboarding'));
 const AppleCallback = lazy(() => import('@/pages/AppleCallback'));
 const EarningsDashboard = lazy(() => import('@/pages/EarningsDashboard'));
@@ -256,6 +257,14 @@ export const AppRoutes = () => (
         element={(
           <RequireAuth>
             <CollectionsPage />
+          </RequireAuth>
+        )}
+      />
+      <Route
+        path="/traveler-demand"
+        element={(
+          <RequireAuth>
+            <TravelerDemandPage />
           </RequireAuth>
         )}
       />

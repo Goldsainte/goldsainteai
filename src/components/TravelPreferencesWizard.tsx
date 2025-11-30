@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
 import { ChevronLeft, ChevronRight, Sparkles, Plane, Globe, Train, Hotel, UtensilsCrossed, Wallet, Target, ClipboardList } from "lucide-react";
+import { DestinationAutocomplete } from "@/components/preferences/DestinationAutocomplete";
 
 interface TravelPreferencesWizardProps {
   preferences: any;
@@ -116,12 +117,13 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
           </div>
 
           <div>
-            <Label className="text-base mb-3 block">Any favorite countries or regions? (Optional)</Label>
-            <Textarea
-              placeholder="e.g., Japan, Mediterranean, Southeast Asia..."
-              value={preferences.destination?.preferredRegions || ''}
-              onChange={(e) => updatePreference('destination', 'preferredRegions', e.target.value)}
-              className="min-h-[80px] text-sm sm:text-base"
+            <DestinationAutocomplete
+              label="Where do you dream of traveling?"
+              helperText="We'll prioritize collections and storyboards featuring these places."
+              placeholder="Start typing a city..."
+              value={preferences.destination?.preferredDestinations || []}
+              onChange={(destinations) => updatePreference('destination', 'preferredDestinations', destinations)}
+              maxSelections={12}
             />
           </div>
 

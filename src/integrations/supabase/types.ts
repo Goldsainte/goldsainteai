@@ -11920,6 +11920,7 @@ export type Database = {
           created_at: string
           dietary_restrictions: string[] | null
           id: string
+          is_discoverable: boolean | null
           last_updated_at: string
           preferred_accommodation_types: string[] | null
           preferred_airlines: string[] | null
@@ -11937,6 +11938,7 @@ export type Database = {
           created_at?: string
           dietary_restrictions?: string[] | null
           id?: string
+          is_discoverable?: boolean | null
           last_updated_at?: string
           preferred_accommodation_types?: string[] | null
           preferred_airlines?: string[] | null
@@ -11954,6 +11956,7 @@ export type Database = {
           created_at?: string
           dietary_restrictions?: string[] | null
           id?: string
+          is_discoverable?: boolean | null
           last_updated_at?: string
           preferred_accommodation_types?: string[] | null
           preferred_airlines?: string[] | null
