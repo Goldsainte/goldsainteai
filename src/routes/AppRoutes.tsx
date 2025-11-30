@@ -65,7 +65,7 @@ const TripChatPage = lazy(() => import('@/pages/TripChatPage'));
 const MyTripRequestsPage = lazy(() => import('@/pages/MyTripRequestsPage'));
 const MyTripMatchesPage = lazy(() => import('@/pages/MyTripMatchesPage'));
 const TripInboxPage = lazy(() => import('@/pages/TripInboxPage'));
-const TravelerHomePage = lazy(() => import('@/pages/TravelerHomePage'));
+const TravelerDashboardPage = lazy(() => import('@/pages/traveler/TravelerDashboardPage'));
 const MyTripsPage = lazy(() => import('@/pages/trips/MyTripsPage'));
 const PostTripPage = lazy(() => import('@/pages/trips/PostTripPage'));
 const TripRequestDetailPageNew = lazy(() => import('@/pages/trips/TripRequestDetailPage'));
@@ -110,7 +110,7 @@ const TripDetailPageNew = lazy(() => import('@/pages/trips/TripDetailPage'));
 const CreatorProfilePage = lazy(() => import('@/pages/CreatorProfilePage'));
 const NewCollabRequestPage = lazy(() => import('@/pages/NewCollabRequestPage'));
 const Messages = lazy(() => import('@/pages/Messages'));
-const TravelerDashboardPage = lazy(() => import('@/pages/traveler/TravelerDashboardPage'));
+// TravelerDashboardPage import moved to line 68
 const PartnerConsolePage = lazy(() => import('@/pages/partner/PartnerConsolePage'));
 const PartnerEscrowPage = lazy(() => import('@/pages/partners/EscrowMilestonesPage'));
 const MyJobs = lazy(() => import('@/pages/MyJobs'));
@@ -332,7 +332,7 @@ export const AppRoutes = () => (
         path="/traveler"
         element={(
           <RequireAuth>
-            <TravelerHomePage />
+            <TravelerDashboardPage />
           </RequireAuth>
         )}
       />
@@ -407,7 +407,7 @@ export const AppRoutes = () => (
       <Route path="/my-bookings" element={<MyBookingsPage />} />
       <Route path="/partner-bookings" element={<PartnerBookingsPage />} />
       <Route path="/bookings/:bookingId" element={<BookingDetailPage />} />
-      <Route path="/traveler" element={<TravelerDashboardPage />} />
+      {/* Duplicate /traveler route removed - consolidated to line 331 */}
       <Route path="/partner" element={<PartnerConsolePage />} />
       <Route
         path="/partner/escrow"
