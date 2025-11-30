@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ChevronLeft, ChevronRight, Plane, Globe, Train, Hotel, UtensilsCrossed, Wallet, Target, ClipboardList, Sparkles } from "lucide-react";
-import { DestinationAutocomplete } from "@/components/preferences/DestinationAutocomplete";
+import { DestinationAutocompleteNominatim } from "@/components/preferences/DestinationAutocompleteNominatim";
 import { LuxuryStepIndicator } from "@/components/onboarding/LuxuryStepIndicator";
 import { LuxurySelectionCard } from "@/components/onboarding/LuxurySelectionCard";
 import { LuxuryFormSection } from "@/components/onboarding/LuxuryFormSection";
@@ -111,7 +111,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
           </LuxuryFormSection>
 
           <LuxuryFormSection title="Where do you dream of traveling?" helperText="We'll prioritize collections and storyboards featuring these places.">
-            <DestinationAutocomplete
+            <DestinationAutocompleteNominatim
               placeholder="Start typing a city..."
               value={preferences.destination?.preferredDestinations || []}
               onChange={(destinations) => updatePreference('destination', 'preferredDestinations', destinations)}
