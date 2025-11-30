@@ -35,7 +35,7 @@ export function useRequireOnboarding() {
       }
 
       if (!profile || !profile.onboarding_completed) {
-        navigate("/onboarding/profile", { replace: true });
+        navigate("/onboarding", { replace: true });
         return;
       }
 
