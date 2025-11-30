@@ -106,6 +106,7 @@ const TikTokCallback = lazy(() => import('@/pages/TikTokCallback'));
 const CreatorDashboard = lazy(() => import('@/pages/CreatorDashboard'));
 // New TikTok creator ecosystem pages
 const CreatorTripPage = lazy(() => import('@/pages/CreatorTripPage'));
+const TripDetailPageNew = lazy(() => import('@/pages/trips/TripDetailPage'));
 const CreatorProfilePage = lazy(() => import('@/pages/CreatorProfilePage'));
 const NewCollabRequestPage = lazy(() => import('@/pages/NewCollabRequestPage'));
 const Messages = lazy(() => import('@/pages/Messages'));
@@ -263,6 +264,14 @@ export const AppRoutes = () => (
         element={(
           <RouteSectionBoundary section="marketplace">
             <TripDetail />
+          </RouteSectionBoundary>
+        )}
+      />
+      <Route
+        path="/trip/:slug"
+        element={(
+          <RouteSectionBoundary section="marketplace">
+            <TripDetailPageNew />
           </RouteSectionBoundary>
         )}
       />
