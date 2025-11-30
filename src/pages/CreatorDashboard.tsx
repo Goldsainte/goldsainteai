@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { Sparkles, TrendingUp, Video, DollarSign, ExternalLink, Plus } from "lucide-react";
 
 type CreatorStats = {
   tiktokConnected: boolean;
@@ -80,164 +81,186 @@ export default function CreatorDashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-6xl px-4 py-8 md:py-10">
-        {/* HEADER */}
-        <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
-              Creator Dashboard
-            </h1>
-            <p className="mt-1 max-w-xl text-sm text-muted-foreground">
-              See how your TikTok travel content is performing and how many
-              trips you're selling through Goldsainte.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
+    <div className="min-h-screen bg-[#FDF9F0]">
+      <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
+        {/* Gold accent line */}
+        <div className="w-16 h-0.5 bg-[#C7A962] mb-6" />
+        
+        {/* Header */}
+        <header className="mb-12">
+          <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225] tracking-tight">
+            Creator Dashboard
+          </h1>
+          <p className="mt-3 text-[#6B7280] text-base max-w-xl leading-relaxed">
+            Track your content performance and see how your travel stories are inspiring journeys through Goldsainte.
+          </p>
+          
+          <div className="flex flex-wrap gap-3 mt-6">
             <Link
               to="/tiktok-lab"
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
+              className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-[#0a2225]/90 transition-colors"
             >
-              Open Goldsainte Creator Lab
+              <Sparkles className="w-4 h-4" />
+              Open Creator Lab
             </Link>
             <Link
-              to="/browse-creators"
-              className="inline-flex items-center gap-2 rounded-full bg-secondary px-4 py-2 text-sm font-semibold text-secondary-foreground shadow-sm hover:bg-secondary/80"
+              to="/marketplace"
+              className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-white px-6 py-3 text-sm font-medium text-[#0a2225] shadow-sm hover:bg-[#F6F0E4] transition-colors"
             >
-              View Creator Marketplace
+              View Marketplace
             </Link>
           </div>
         </header>
 
-        {/* TIKTOK CONNECT STATUS + METRICS */}
-        <section className="mt-6 grid gap-4 md:grid-cols-[2fr,3fr]">
-          {/* TikTok connection card */}
-          <div className="rounded-2xl bg-card p-4 shadow-sm border">
-            <h2 className="text-sm font-semibold text-card-foreground">
-              TikTok connection
-            </h2>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Connect your TikTok account so we can post on your behalf and
-              track performance.
-            </p>
-            <div className="mt-3 flex items-center justify-between rounded-xl bg-muted px-3 py-2">
-              <div className="flex flex-col text-xs">
-                <span className="font-medium text-foreground">
-                  {stats.tiktokConnected
-                    ? "TikTok account connected"
-                    : "TikTok not connected"}
-                </span>
-                <span className="text-[11px] text-muted-foreground">
-                  {stats.tiktokConnected
-                    ? "You're ready to publish from Goldsainte Creator Lab."
-                    : "Connect TikTok to start publishing stories."}
-                </span>
-              </div>
-              <Link
-                to="/tiktok-lab"
-                className="rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
-              >
-                {stats.tiktokConnected ? "Manage connection" : "Connect TikTok"}
-              </Link>
-            </div>
-          </div>
+        {/* Stats Grid */}
+        <section className="grid gap-6 md:grid-cols-3 mb-12">
+          <LuxuryStatCard
+            icon={<Video className="w-5 h-5 text-[#C7A962]" />}
+            label="Trip Stories"
+            value={loading ? "—" : stats.totalTripStories.toString()}
+            helper="Stories created in Creator Lab"
+          />
+          <LuxuryStatCard
+            icon={<TrendingUp className="w-5 h-5 text-[#C7A962]" />}
+            label="TikTok Linked"
+            value={loading ? "—" : stats.totalTripsLinked.toString()}
+            helper="Trips with content attached"
+          />
+          <LuxuryStatCard
+            icon={<DollarSign className="w-5 h-5 text-[#C7A962]" />}
+            label="Estimated Earnings"
+            value={
+              loading
+                ? "—"
+                : `$${stats.totalEstimatedEarnings.toLocaleString("en-US", {
+                    maximumFractionDigits: 0,
+                  })}`
+            }
+            helper="Based on trips sold"
+          />
+        </section>
 
-          {/* Summary metrics */}
-          <div className="grid gap-3 md:grid-cols-3">
-            <SummaryStat
-              label="Trip stories created"
-              value={loading ? "…" : stats.totalTripStories.toString()}
-              helper="Stories built in Goldsainte Creator Lab"
-            />
-            <SummaryStat
-              label="Trips linked to TikTok"
-              value={loading ? "…" : stats.totalTripsLinked.toString()}
-              helper="Trips that have a TikTok story attached"
-            />
-            <SummaryStat
-              label="Estimated earnings"
-              value={
-                loading
-                  ? "…"
-                  : `$${stats.totalEstimatedEarnings.toLocaleString("en-US", {
-                      maximumFractionDigits: 0,
-                    })}`
-              }
-              helper="Based on trips sold through your content"
-            />
+        {/* TikTok Connection Card */}
+        <section className="mb-12">
+          <div className="rounded-2xl bg-white border border-[#E5DFC6] p-8 shadow-sm">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-full bg-[#F6F0E4] flex items-center justify-center flex-shrink-0">
+                  <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="font-secondary text-xl text-[#0a2225]">
+                    TikTok Connection
+                  </h2>
+                  <p className="mt-1 text-sm text-[#6B7280] max-w-md">
+                    {stats.tiktokConnected
+                      ? "Your TikTok account is connected. You're ready to publish stories directly from Creator Lab."
+                      : "Connect your TikTok account to publish stories and track performance across platforms."}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <div className={`px-4 py-1.5 rounded-full text-sm font-medium ${
+                  stats.tiktokConnected 
+                    ? "bg-emerald-50 text-emerald-700" 
+                    : "bg-amber-50 text-amber-700"
+                }`}>
+                  {stats.tiktokConnected ? "Connected" : "Not Connected"}
+                </div>
+                <Link
+                  to="/tiktok-lab"
+                  className="rounded-full bg-[#0a2225] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0a2225]/90 transition-colors"
+                >
+                  {stats.tiktokConnected ? "Manage" : "Connect"}
+                </Link>
+              </div>
+            </div>
           </div>
         </section>
 
-        {/* ERROR */}
+        {/* Error State */}
         {error && (
-          <div className="mt-4 rounded-xl border border-destructive/50 bg-destructive/10 px-3 py-2 text-[11px] text-destructive">
+          <div className="mb-8 rounded-2xl border border-red-200 bg-red-50 px-6 py-4 text-sm text-red-700">
             {error}
           </div>
         )}
 
-        {/* RECENT STORIES */}
-        <section className="mt-6 rounded-2xl bg-card p-4 shadow-sm border">
-          <div className="flex items-center justify-between">
+        {/* Recent Stories */}
+        <section>
+          <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-sm font-semibold text-card-foreground">
-                Recent TikTok trip stories
+              <h2 className="font-secondary text-2xl text-[#0a2225]">
+                Recent Stories
               </h2>
-              <p className="mt-1 text-[11px] text-muted-foreground">
-                These are stories you've created in Goldsainte Creator Lab and linked
-                to trips.
+              <p className="mt-1 text-sm text-[#6B7280]">
+                Your latest trip stories from Creator Lab
               </p>
             </div>
             <Link
               to="/tiktok-lab"
-              className="rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+              className="inline-flex items-center gap-2 rounded-full border border-[#C7A962] bg-[#C7A962]/10 px-5 py-2.5 text-sm font-medium text-[#0a2225] hover:bg-[#C7A962]/20 transition-colors"
             >
-              Create new story
+              <Plus className="w-4 h-4" />
+              Create Story
             </Link>
           </div>
 
-          <div className="mt-3 space-y-2">
+          <div className="space-y-4">
             {loading ? (
-              <div className="rounded-xl bg-muted px-3 py-2 text-[11px] text-muted-foreground">
-                Loading your stories…
-              </div>
+              <LuxuryEmptyState message="Loading your stories..." />
             ) : stats.recentStories.length === 0 ? (
-              <div className="rounded-xl bg-muted px-3 py-2 text-[11px] text-muted-foreground">
-                You haven't created any trip stories yet. Start in TikTok Travel
-                Lab.
-              </div>
+              <LuxuryEmptyState 
+                message="No stories yet"
+                subtext="Start creating travel stories in Creator Lab to see them here."
+                action={
+                  <Link
+                    to="/tiktok-lab"
+                    className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0a2225]/90 transition-colors mt-4"
+                  >
+                    Create Your First Story
+                  </Link>
+                }
+              />
             ) : (
               stats.recentStories.map((story) => (
                 <div
                   key={story.id}
-                  className="flex items-center justify-between gap-2 rounded-xl bg-muted px-3 py-2 text-xs"
+                  className="flex items-center justify-between gap-4 rounded-2xl bg-white border border-[#E5DFC6] p-5 hover:shadow-md transition-shadow"
                 >
-                  <div className="flex flex-col">
-                    <span className="font-medium text-foreground">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-[#0a2225] truncate">
                       {story.title}
-                    </span>
-                    <span className="text-[11px] text-muted-foreground">
-                      {new Date(story.createdAt).toLocaleString()}
-                    </span>
+                    </h3>
+                    <p className="text-sm text-[#6B7280] mt-0.5">
+                      {new Date(story.createdAt).toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
+                    </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  
+                  <div className="flex items-center gap-3">
                     <span
-                      className={[
-                        "rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                      className={`rounded-full px-3 py-1 text-xs font-medium ${
                         story.postedToTikTok
-                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                          : "bg-muted-foreground/10 text-muted-foreground",
-                      ].join(" ")}
+                          ? "bg-emerald-50 text-emerald-700"
+                          : "bg-[#F6F0E4] text-[#6B7280]"
+                      }`}
                     >
-                      {story.postedToTikTok ? "Sent to TikTok" : "Draft only"}
+                      {story.postedToTikTok ? "Published" : "Draft"}
                     </span>
                     {story.tiktokVideoId && (
                       <a
                         href={`https://www.tiktok.com/@goldsainte/video/${story.tiktokVideoId}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[11px] font-medium text-primary hover:underline"
+                        className="inline-flex items-center gap-1 text-sm font-medium text-[#C7A962] hover:text-[#B39952] transition-colors"
                       >
-                        View on TikTok
+                        View <ExternalLink className="w-3.5 h-3.5" />
                       </a>
                     )}
                   </div>
@@ -251,22 +274,54 @@ export default function CreatorDashboard() {
   );
 }
 
-function SummaryStat({
+function LuxuryStatCard({
+  icon,
   label,
   value,
   helper,
 }: {
+  icon: React.ReactNode;
   label: string;
   value: string;
   helper: string;
 }) {
   return (
-    <div className="rounded-2xl bg-card p-4 shadow-sm border">
-      <div className="text-[11px] font-medium text-muted-foreground">{label}</div>
-      <div className="mt-1 text-lg font-semibold text-foreground">
+    <div className="rounded-2xl bg-white border border-[#E5DFC6] p-6 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-full bg-[#F6F0E4] flex items-center justify-center">
+          {icon}
+        </div>
+        <span className="text-sm font-medium text-[#6B7280] uppercase tracking-wide">
+          {label}
+        </span>
+      </div>
+      <div className="font-secondary text-3xl text-[#0a2225]">
         {value}
       </div>
-      <div className="mt-1 text-[11px] text-muted-foreground">{helper}</div>
+      <p className="text-sm text-[#6B7280] mt-2">{helper}</p>
+    </div>
+  );
+}
+
+function LuxuryEmptyState({ 
+  message, 
+  subtext, 
+  action 
+}: { 
+  message: string; 
+  subtext?: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-2xl bg-white border border-[#E5DFC6] p-12 text-center">
+      <div className="w-16 h-16 rounded-full bg-[#F6F0E4] flex items-center justify-center mx-auto mb-4">
+        <Video className="w-7 h-7 text-[#C7A962]" />
+      </div>
+      <h3 className="font-secondary text-xl text-[#0a2225]">{message}</h3>
+      {subtext && (
+        <p className="text-sm text-[#6B7280] mt-2 max-w-sm mx-auto">{subtext}</p>
+      )}
+      {action}
     </div>
   );
 }
