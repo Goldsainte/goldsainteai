@@ -154,7 +154,7 @@ const SystemHealth = lazy(() => import('@/pages/SystemHealth'));
 const Redirect = lazy(() => import('@/pages/Redirect'));
 const About = lazy(() => import('@/pages/About'));
 const BrandProfilePage = lazy(() => import('@/pages/BrandProfilePage'));
-const OnboardingProfilePage = lazy(() => import('@/pages/OnboardingProfilePage'));
+
 const TermsPage = lazy(() => import('@/pages/Terms'));
 const WhatWeDo = lazy(() => import('@/pages/WhatWeDo'));
 const DisputeResolution = lazy(() => import('@/pages/DisputeResolution'));
@@ -216,7 +216,7 @@ export const AppRoutes = () => (
       <Route path="/onboarding/traveler/preferences" element={<TravelerPreferencesOnboardingPage />} />
       <Route path="/onboarding/creator" element={<CreatorOnboardingPage />} />
       <Route path="/brand/onboarding" element={<BrandOnboardingPage />} />
-      <Route path="/onboarding/profile" element={<OnboardingProfilePage />} />
+      
       <Route path="/ai-agent-setup" element={<AIAgentOnboarding />} />
     </Route>
 
