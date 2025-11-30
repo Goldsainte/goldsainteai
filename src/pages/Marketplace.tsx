@@ -11,6 +11,7 @@ import { CreatorGrid } from "@/components/marketplace/CreatorGrid";
 import { AgentGrid } from "@/components/marketplace/AgentGrid";
 import { TripRequestGrid } from "@/components/marketplace/TripRequestGrid";
 import { BrandGrid } from "@/components/marketplace/BrandGrid";
+import { LiveTripGrid } from "@/components/marketplace/LiveTripGrid";
 import type { BrandSummary } from "@/components/marketplace/BrandCard";
 import { EmptyState } from "@/components/marketplace/EmptyState";
 import { BrandEmptyState } from "@/components/brand/BrandEmptyState";
@@ -18,7 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 
-type Tab = "creators" | "agents" | "brands" | "trip-requests";
+type Tab = "trips" | "creators" | "agents" | "brands" | "trip-requests";
 
 export interface SearchFilters {
   destination?: string;
@@ -40,15 +41,15 @@ export default function Marketplace() {
 
   // Travelers cannot see trip-requests tab
   const validTabs: Tab[] = isTraveler 
-    ? ["creators", "agents", "brands"]
-    : ["creators", "agents", "brands", "trip-requests"];
+    ? ["trips", "creators", "agents", "brands"]
+    : ["trips", "creators", "agents", "brands", "trip-requests"];
   
-  const rawTab = (searchParams.get("tab") as string) || (isTraveler ? "creators" : "trip-requests");
+  const rawTab = (searchParams.get("tab") as string) || "trips";
   
   // Redirect travelers away from trip-requests tab
   const initialTab: Tab = validTabs.includes(rawTab as Tab)
     ? (rawTab as Tab)
-    : (isTraveler ? "creators" : "trip-requests");
+    : "trips";
 
   const [activeTab, setActiveTab] = useState<Tab>(initialTab);
   const [filters, setFilters] = useState<SearchFilters>({
@@ -66,6 +67,27 @@ export default function Marketplace() {
     setSearchParams(params, { replace: true });
   }, [activeTab, filters, setSearchParams]);
 
+
+  // Live Trips query
+  const { data: liveTrips, isLoading: isLoadingTrips } = useQuery({
+    queryKey: ["marketplace-live-trips"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("packaged_trips")
+        .select(`
+          id, slug, title, destination, cover_image_url, price_per_person, currency,
+          duration_days, max_participants, current_bookings, difficulty_level,
+          rating, review_count, available_from, available_until, tags,
+          creator:profiles!packaged_trips_creator_id_fkey(id, full_name, avatar_url)
+        `)
+        .eq("status", "published")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: activeTab === "trips",
+  });
 
   const { data: creators, isLoading: isLoadingCreators } = useQuery({
     queryKey: ["marketplace-creators"],
@@ -147,6 +169,28 @@ export default function Marketplace() {
   };
 
   const renderContent = () => {
+    // Live Trips tab
+    if (activeTab === "trips") {
+      if (isLoadingTrips) {
+        return (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[...Array(6)].map((_, i) => (
+              <Skeleton key={i} className="h-[420px] rounded-2xl" />
+            ))}
+          </div>
+        );
+      }
+      if (!liveTrips?.length) {
+        return (
+          <EmptyState
+            type="trips"
+            onAction={() => navigate("/post-trip")}
+          />
+        );
+      }
+      return <LiveTripGrid trips={liveTrips as any} />;
+    }
+
     if (activeTab === "creators") {
       if (isLoadingCreators) {
         return (

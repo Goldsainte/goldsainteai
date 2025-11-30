@@ -6571,14 +6571,18 @@ export type Database = {
           creator_id: string | null
           creator_type: string
           currency: string
+          current_bookings: number | null
           departure_dates: Json | null
+          deposit_percentage: number | null
           description: string | null
           destination: string
           difficulty_level: string | null
           duration_days: number
           duration_nights: number | null
+          faqs: Json | null
           fitness_level_required: string | null
           highlights: Json | null
+          host_tagline: string | null
           id: string
           image_gallery: Json | null
           included: Json | null
@@ -6618,14 +6622,18 @@ export type Database = {
           creator_id?: string | null
           creator_type?: string
           currency?: string
+          current_bookings?: number | null
           departure_dates?: Json | null
+          deposit_percentage?: number | null
           description?: string | null
           destination: string
           difficulty_level?: string | null
           duration_days: number
           duration_nights?: number | null
+          faqs?: Json | null
           fitness_level_required?: string | null
           highlights?: Json | null
+          host_tagline?: string | null
           id?: string
           image_gallery?: Json | null
           included?: Json | null
@@ -6665,14 +6673,18 @@ export type Database = {
           creator_id?: string | null
           creator_type?: string
           currency?: string
+          current_bookings?: number | null
           departure_dates?: Json | null
+          deposit_percentage?: number | null
           description?: string | null
           destination?: string
           difficulty_level?: string | null
           duration_days?: number
           duration_nights?: number | null
+          faqs?: Json | null
           fitness_level_required?: string | null
           highlights?: Json | null
+          host_tagline?: string | null
           id?: string
           image_gallery?: Json | null
           included?: Json | null
