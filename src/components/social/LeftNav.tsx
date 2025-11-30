@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { usePanelStore } from "@/stores/panelStore";
-import { Home, Users, Video, Search, MessageCircle, Bell, BarChart3, User2, Store, Building, PlaneTakeoff } from "lucide-react";
+import { Home, Users, Video, Search, MessageCircle, Bell, BarChart3, User2, Store, Building, PlaneTakeoff, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -48,7 +48,10 @@ export default function LeftNav() {
         
         <NavItemLink to="/post-trip"><PlaneTakeoff className="w-6 h-6" /> Post a Trip</NavItemLink>
         
-        {/* My Trips removed - now only in Profile menu */}
+        {/* My Collections - Authenticated users only */}
+        {user && (
+          <NavItemLink to="/collections"><Sparkles className="w-6 h-6" /> My Collections</NavItemLink>
+        )}
         
         <NavItemBtn onClick={() => openType("search")}><Search className="w-6 h-6" /> Search</NavItemBtn>
         <NavItemBtn onClick={() => openType("messages")}><MessageCircle className="w-6 h-6" /> Messages</NavItemBtn>
