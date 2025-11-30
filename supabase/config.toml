@@ -305,3 +305,6 @@ verify_jwt = true
 
 [functions.check-phone-verification]
 verify_jwt = true
+
+[functions.curated-itineraries]
+verify_jwt = true

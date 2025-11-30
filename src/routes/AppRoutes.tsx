@@ -168,6 +168,8 @@ const CancellationRefundPolicy = lazy(() => import('@/pages/CancellationRefundPo
 const CorporateContact = lazy(() => import('@/pages/CorporateContact'));
 const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
 const OnboardingPage = lazy(() => import('@/pages/onboarding/OnboardingPage'));
+const TravelerPreferencesOnboardingPage = lazy(() => import('@/pages/onboarding/TravelerPreferencesOnboardingPage'));
+const CollectionsPage = lazy(() => import('@/pages/CollectionsPage'));
 const AIAgentOnboarding = lazy(() => import('@/pages/AIAgentOnboarding'));
 const AppleCallback = lazy(() => import('@/pages/AppleCallback'));
 const EarningsDashboard = lazy(() => import('@/pages/EarningsDashboard'));
@@ -209,6 +211,7 @@ export const AppRoutes = () => (
       <Route path="/application/verification-complete" element={<ApplicationVerificationComplete />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/onboarding" element={<OnboardingPage />} />
+      <Route path="/onboarding/traveler/preferences" element={<TravelerPreferencesOnboardingPage />} />
       <Route path="/onboarding/creator" element={<CreatorOnboardingPage />} />
       <Route path="/brand/onboarding" element={<BrandOnboardingPage />} />
       <Route path="/onboarding/profile" element={<OnboardingProfilePage />} />
@@ -247,6 +250,14 @@ export const AppRoutes = () => (
                 </RouteSectionBoundary>
               )}
             />
+      <Route
+        path="/collections"
+        element={(
+          <RequireAuth>
+            <CollectionsPage />
+          </RequireAuth>
+        )}
+      />
       <Route
         path="/marketplace/trip/:id"
         element={(
