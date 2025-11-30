@@ -6,13 +6,127 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// ⚠️ SECURITY: Input validation for content moderation
+const ALLOWED_CONTENT_TYPES = ['post', 'comment', 'moment', 'message', 'profile'] as const;
+type AllowedContentType = typeof ALLOWED_CONTENT_TYPES[number];
+
+const isValidUUID = (str: string): boolean => {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+};
+
+const isValidUrl = (str: string): boolean => {
+  try {
+    const url = new URL(str);
+    return url.protocol === 'https:' || url.protocol === 'http:';
+  } catch {
+    return false;
+  }
+};
+
+const sanitizeText = (text: string, maxLength: number = 50000): string => {
+  if (typeof text !== 'string') return '';
+  return text
+    .slice(0, maxLength)
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, ''); // Remove control characters
+};
+
+interface ModerationInput {
+  content_type: string;
+  content_id: string;
+  text_content?: string;
+  image_urls?: string[];
+}
+
+const validateModerationInput = (data: unknown): { success: true; data: ModerationInput } | { success: false; error: string } => {
+  if (!data || typeof data !== 'object') {
+    return { success: false, error: 'Request body must be an object' };
+  }
+
+  const input = data as Record<string, unknown>;
+
+  // Validate content_type
+  if (!input.content_type || typeof input.content_type !== 'string') {
+    return { success: false, error: 'content_type is required and must be a string' };
+  }
+  if (!ALLOWED_CONTENT_TYPES.includes(input.content_type as AllowedContentType)) {
+    return { success: false, error: `content_type must be one of: ${ALLOWED_CONTENT_TYPES.join(', ')}` };
+  }
+
+  // Validate content_id
+  if (!input.content_id || typeof input.content_id !== 'string') {
+    return { success: false, error: 'content_id is required and must be a string' };
+  }
+  if (!isValidUUID(input.content_id)) {
+    return { success: false, error: 'content_id must be a valid UUID' };
+  }
+
+  // Validate text_content (optional)
+  let sanitizedText: string | undefined;
+  if (input.text_content !== undefined) {
+    if (typeof input.text_content !== 'string') {
+      return { success: false, error: 'text_content must be a string' };
+    }
+    sanitizedText = sanitizeText(input.text_content);
+  }
+
+  // Validate image_urls (optional)
+  let validatedImageUrls: string[] | undefined;
+  if (input.image_urls !== undefined) {
+    if (!Array.isArray(input.image_urls)) {
+      return { success: false, error: 'image_urls must be an array' };
+    }
+    if (input.image_urls.length > 20) {
+      return { success: false, error: 'Maximum 20 image URLs allowed' };
+    }
+    for (const url of input.image_urls) {
+      if (typeof url !== 'string' || !isValidUrl(url)) {
+        return { success: false, error: 'Each image_url must be a valid HTTP/HTTPS URL' };
+      }
+    }
+    validatedImageUrls = input.image_urls;
+  }
+
+  return {
+    success: true,
+    data: {
+      content_type: input.content_type as string,
+      content_id: input.content_id as string,
+      text_content: sanitizedText,
+      image_urls: validatedImageUrls,
+    }
+  };
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { content_type, content_id, text_content, image_urls } = await req.json();
+    // ⚠️ SECURITY: Parse and validate input
+    let rawBody: unknown;
+    try {
+      rawBody = await req.json();
+    } catch {
+      return new Response(
+        JSON.stringify({ error: 'Invalid JSON in request body' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('🔒 [VALIDATION] Validating moderation input');
+    const validation = validateModerationInput(rawBody);
+    if (!validation.success) {
+      console.error('❌ [VALIDATION] Invalid input:', validation.error);
+      return new Response(
+        JSON.stringify({ error: validation.error }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    console.log('✅ [VALIDATION] Input validated');
+
+    const { content_type, content_id, text_content, image_urls } = validation.data;
     
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
