@@ -59,10 +59,19 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
 
     const loadGoogleMaps = async () => {
       try {
+        const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+        
+        // Validate API key exists
+        if (!apiKey) {
+          console.error("VITE_GOOGLE_MAPS_API_KEY is not configured");
+          setError("Destination search is not configured. Please add VITE_GOOGLE_MAPS_API_KEY.");
+          return;
+        }
+        
         // Set options only once
         if (!optionsSet) {
           setOptions({
-            key: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "",
+            key: apiKey,
             v: "weekly",
           });
           optionsSet = true;

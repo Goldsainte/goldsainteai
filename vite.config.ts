@@ -51,6 +51,9 @@ export default defineConfig(({ mode }) => {
     'import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY': JSON.stringify(
       process.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? env.VITE_SUPABASE_PUBLISHABLE_KEY ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3ZGV2eGx0anVlZGlqcmNkZWpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxNjQ4MDEsImV4cCI6MjA3NDc0MDgwMX0.syDQQrSgkyB1MEuE-OeMpxVt6wfoH17lDjMGGEzOiBc'
     ),
+    'import.meta.env.VITE_GOOGLE_MAPS_API_KEY': JSON.stringify(
+      process.env.VITE_GOOGLE_MAPS_API_KEY ?? env.VITE_GOOGLE_MAPS_API_KEY ?? ''
+    ),
   },
     build: {
       sourcemap: true, // Enable source maps for Sentry
