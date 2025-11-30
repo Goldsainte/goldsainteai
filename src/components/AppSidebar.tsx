@@ -19,14 +19,22 @@ import {
 
 import { format } from "date-fns";
 
-const items = [
+interface NavItem {
+  title: string;
+  url: string;
+  icon: React.ComponentType<{ className?: string }>;
+  authRequired?: boolean;
+  showFor?: 'creator' | 'agent' | 'brand';
+}
+
+const items: NavItem[] = [
   { title: "Home", url: "/", icon: Home },
   { title: "Explore", url: "/explore", icon: Search },
   { title: "Traveler Console", url: "/traveler", icon: LayoutDashboard, authRequired: true },
   { title: "Marketplace", url: "/marketplace", icon: Briefcase, authRequired: true },
   { title: "My Jobs", url: "/my-jobs", icon: Briefcase, authRequired: true },
   { title: "Browse Agents", url: "/browse-agents", icon: Users },
-  { title: "Creator Earnings", url: "/tiktok-lab/earnings", icon: DollarSign, authRequired: true },
+  { title: "Creator Earnings", url: "/tiktok-lab/earnings", icon: DollarSign, authRequired: true, showFor: "creator" },
   { title: "About", url: "/about", icon: Info },
 ];
 
@@ -39,6 +47,22 @@ export function AppSidebar() {
   const { user, signOut } = useAuth();
   const { isAdmin, isAgent } = useUserRole();
   const navigate = useNavigate();
+
+  // Account type helpers
+  const accountType = ((user as any)?.user_metadata?.account_type as string | undefined)?.toLowerCase() ?? null;
+  const isCreator = accountType === "creator";
+  const isAgentAccount = accountType === "agent";
+  const isBrand = accountType === "brand";
+
+  const shouldShowItem = (item: NavItem): boolean => {
+    if (item.authRequired && !user) return false;
+    if (item.showFor) {
+      if (item.showFor === 'creator' && !isCreator) return false;
+      if (item.showFor === 'agent' && !isAgentAccount) return false;
+      if (item.showFor === 'brand' && !isBrand) return false;
+    }
+    return true;
+  };
 
   return (
     <Sidebar className="border-r border-border">
@@ -56,7 +80,7 @@ export function AppSidebar() {
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.filter(item => !item.authRequired || user).map((item) => (
+              {items.filter(shouldShowItem).map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink
