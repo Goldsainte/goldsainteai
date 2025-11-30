@@ -33,11 +33,22 @@ export default function Marketplace() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   
-  const rawTab = (searchParams.get("tab") as string) || "trip-requests";
-  const validTabs: Tab[] = ["creators", "agents", "brands", "trip-requests"];
+  // Extract account type to gate Trip Requests tab
+  const accountType = 
+    ((user as any)?.user_metadata?.account_type as string | undefined)?.toLowerCase() ?? null;
+  const isTraveler = !accountType || accountType === "traveler";
+
+  // Travelers cannot see trip-requests tab
+  const validTabs: Tab[] = isTraveler 
+    ? ["creators", "agents", "brands"]
+    : ["creators", "agents", "brands", "trip-requests"];
+  
+  const rawTab = (searchParams.get("tab") as string) || (isTraveler ? "creators" : "trip-requests");
+  
+  // Redirect travelers away from trip-requests tab
   const initialTab: Tab = validTabs.includes(rawTab as Tab)
     ? (rawTab as Tab)
-    : "trip-requests";
+    : (isTraveler ? "creators" : "trip-requests");
 
   const [activeTab, setActiveTab] = useState<Tab>(initialTab);
   const [filters, setFilters] = useState<SearchFilters>({
@@ -223,7 +234,7 @@ export default function Marketplace() {
 
         <div className="mx-auto max-w-6xl px-4 py-8">
           <div className="mb-8 flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-            <MarketplaceTabs activeTab={activeTab} onTabChange={handleTabChange} />
+            <MarketplaceTabs activeTab={activeTab} onTabChange={handleTabChange} accountType={accountType} />
             <MarketplaceFilters filters={filters} onFilterChange={setFilters} />
           </div>
 

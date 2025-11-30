@@ -1,14 +1,18 @@
 interface MarketplaceTabsProps {
   activeTab: string;
   onTabChange: (tab: "creators" | "agents" | "brands" | "trip-requests") => void;
+  accountType?: string | null;
 }
 
-export function MarketplaceTabs({ activeTab, onTabChange }: MarketplaceTabsProps) {
+export function MarketplaceTabs({ activeTab, onTabChange, accountType }: MarketplaceTabsProps) {
+  const isTraveler = !accountType || accountType === "traveler";
+
+  // Trip Requests tab only visible to creators, agents, and brands
   const tabs = [
     { id: "creators", label: "Creators" },
     { id: "agents", label: "Agents" },
     { id: "brands", label: "Brands" },
-    { id: "trip-requests", label: "Trip Requests" },
+    ...(!isTraveler ? [{ id: "trip-requests", label: "Trip Requests" }] : []),
   ] as const;
 
   return (
@@ -16,7 +20,7 @@ export function MarketplaceTabs({ activeTab, onTabChange }: MarketplaceTabsProps
       {tabs.map((tab) => (
         <button
           key={tab.id}
-          onClick={() => onTabChange(tab.id)}
+          onClick={() => onTabChange(tab.id as "creators" | "agents" | "brands" | "trip-requests")}
           className={`
             rounded-full px-5 py-2.5 text-sm font-semibold transition-all
             ${
