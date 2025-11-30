@@ -251,7 +251,7 @@ export const Header = () => {
                     >
                       {/* Discover Section */}
                       <div className="px-4 py-3 border-b border-border/50">
-                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">{t('navigation.discover')}</p>
+                        <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">{t('navigation.discover')}</p>
                       </div>
                       <div className="py-2">
                         <DropdownMenuItem
@@ -304,7 +304,7 @@ export const Header = () => {
                       
                       {/* Professional Section */}
                       <div className="px-4 py-3 border-b border-border/50">
-                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">{t('navigation.professional')}</p>
+                        <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">{t('navigation.professional')}</p>
                       </div>
                       <div className="py-2">
                         <DropdownMenuItem 
@@ -327,7 +327,7 @@ export const Header = () => {
                       
                       {/* Shop & Commerce Section */}
                       <div className="px-4 py-3 border-b border-border/50">
-                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">{t('navigation.shopAndEarn')}</p>
+                        <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">{t('navigation.shopAndEarn')}</p>
                       </div>
                       <div className="py-2">
                         <DropdownMenuItem
@@ -350,7 +350,7 @@ export const Header = () => {
 
                       {/* Company Section */}
                       <div className="px-4 py-3 border-b border-border/50">
-                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">{t('navigation.company')}</p>
+                        <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">{t('navigation.company')}</p>
                       </div>
                       <div className="py-2">
                         <DropdownMenuItem
@@ -613,7 +613,7 @@ export const Header = () => {
                     
                     {/* Discover Section */}
                     <div className="px-4 py-3 border-b border-border/50">
-                      <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Discover</p>
+                      <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Discover</p>
                     </div>
                     <div className="py-2">
                       <DropdownMenuItem
@@ -669,7 +669,7 @@ export const Header = () => {
                     {user && (
                       <>
                         <div className="px-4 py-3 border-b border-border/50">
-                          <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">
+                          <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">
                             Trips & Bookings
                           </p>
                         </div>
@@ -725,7 +725,7 @@ export const Header = () => {
 
                     {/* Professional Section */}
                     <div className="px-4 py-3 border-b border-border/50">
-                      <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Professional</p>
+                      <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Professional</p>
                     </div>
                     <div className="py-2 pb-3">
                       <DropdownMenuItem 
@@ -742,7 +742,7 @@ export const Header = () => {
                     
                     {/* Company Section */}
                     <div className="px-4 py-3 border-b border-border/50">
-                      <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Company</p>
+                      <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Company</p>
                     </div>
                     <div className="py-2 pb-3">
                       <DropdownMenuItem
