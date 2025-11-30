@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles, MapPin, Calendar, ArrowRight, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { ItineraryDetailDialog } from "@/components/collections/ItineraryDetailDialog";
+import { BackButton } from "@/components/ui/BackButton";
 
 interface CuratedItinerary {
   id: string;
@@ -81,7 +82,12 @@ export default function CollectionsPage() {
 
   return (
     <div className="min-h-screen bg-[#FDF9F0]">
-      <div className="container px-4 py-10 max-w-7xl mx-auto">
+      <div className="container px-4 py-6 sm:py-10 max-w-7xl mx-auto">
+        {/* Back Button */}
+        <div className="mb-4">
+          <BackButton label="Back" />
+        </div>
+        
         {/* Header */}
         <div className="text-center mb-12">
           <div className="w-20 h-0.5 bg-[#C7A962] mx-auto mb-6" />

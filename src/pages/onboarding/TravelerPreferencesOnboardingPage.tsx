@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import TravelPreferencesWizard from "@/components/TravelPreferencesWizard";
 import { toast } from "sonner";
 import { Sparkles, ArrowRight, Users } from "lucide-react";
+import { BackButton } from "@/components/ui/BackButton";
 
 export default function TravelerPreferencesOnboardingPage() {
   const { user, isLoading: authLoading } = useAuth();
@@ -173,7 +174,11 @@ export default function TravelerPreferencesOnboardingPage() {
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#C7B892]/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
       </div>
 
-      <div className="relative container max-w-4xl py-8 sm:py-12 px-4">
+      <div className="relative container max-w-4xl py-6 sm:py-12 px-4">
+        {/* Back Button */}
+        <div className="mb-4">
+          <BackButton label="Back" to="/onboarding" />
+        </div>
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12">
           <div className="w-16 h-0.5 bg-[#C7B892] mx-auto mb-6" />

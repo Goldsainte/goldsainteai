@@ -3,6 +3,7 @@ import { MarketplaceShell } from "@/components/marketplace/MarketplaceShell";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { useNavigate } from "react-router-dom";
+import { BackButton } from "@/components/ui/BackButton";
 
 type AgentRow = Database["public"]["Tables"]["travel_agents"]["Row"];
 
@@ -334,14 +335,18 @@ export default function BrowseAgents() {
   );
 
   return (
-    <MarketplaceShell
-      title="Browse verified travel agents"
-      subtitle="Find agents whose destinations, budgets, and style fit the trips you want to run through Goldsainte."
-      filters={filtersPanel}
-      headerRight={headerRight}
-      resultCount={filteredAgents.length}
-      sortControl={sortControl}
-    >
+    <div className="bg-background min-h-screen">
+      <div className="container max-w-6xl px-4 pt-4">
+        <BackButton label="Back" />
+      </div>
+      <MarketplaceShell
+        title="Browse verified travel agents"
+        subtitle="Find agents whose destinations, budgets, and style fit the trips you want to run through Goldsainte."
+        filters={filtersPanel}
+        headerRight={headerRight}
+        resultCount={filteredAgents.length}
+        sortControl={sortControl}
+      >
       {loading ? (
         <div className="py-10 text-sm text-slate-500">Loading travel agents…</div>
       ) : filteredAgents.length === 0 ? (
@@ -427,6 +432,7 @@ export default function BrowseAgents() {
           ))}
         </div>
       )}
-    </MarketplaceShell>
+      </MarketplaceShell>
+    </div>
   );
 }

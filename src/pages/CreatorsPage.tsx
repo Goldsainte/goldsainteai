@@ -3,6 +3,7 @@ import { MarketplaceShell } from "@/components/marketplace/MarketplaceShell";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { useNavigate } from "react-router-dom";
+import { BackButton } from "@/components/ui/BackButton";
 
 type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 
@@ -372,14 +373,18 @@ export default function CreatorsPage() {
   );
 
   return (
-    <MarketplaceShell
-      title="Creator Marketplace"
-      subtitle="Discover TikTok travel creators and partner with them to sell trips through Goldsainte."
-      filters={filtersPanel}
-      headerRight={headerRight}
-      resultCount={filteredCreators.length}
-      sortControl={sortControl}
-    >
+    <div className="bg-background min-h-screen">
+      <div className="container max-w-6xl px-4 pt-4">
+        <BackButton label="Back" />
+      </div>
+      <MarketplaceShell
+        title="Creator Marketplace"
+        subtitle="Discover TikTok travel creators and partner with them to sell trips through Goldsainte."
+        filters={filtersPanel}
+        headerRight={headerRight}
+        resultCount={filteredCreators.length}
+        sortControl={sortControl}
+      >
       {loading ? (
         <div className="py-10 text-sm text-slate-500">Loading creators…</div>
       ) : filteredCreators.length === 0 ? (
@@ -456,6 +461,7 @@ export default function CreatorsPage() {
           })}
         </div>
       )}
-    </MarketplaceShell>
+      </MarketplaceShell>
+    </div>
   );
 }
