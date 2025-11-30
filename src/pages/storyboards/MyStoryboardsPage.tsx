@@ -126,7 +126,7 @@ export default function MyStoryboardsPage() {
                   size="sm"
                   variant="outline"
                   className="rounded-full"
-                  onClick={() => navigate("/creator-lab")}
+                  onClick={() => navigate("/tiktok-lab")}
                 >
                   Open Creator Lab
                 </Button>

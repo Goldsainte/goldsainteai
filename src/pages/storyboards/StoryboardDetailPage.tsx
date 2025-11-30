@@ -10,7 +10,6 @@ import {
   addStoryboardItem,
   removeStoryboardItem,
   updateStoryboard,
-  convertStoryboardToTripRequest,
   type Storyboard,
 } from "@/services/storyboardsService";
 import { Button } from "@/components/ui/button";
@@ -30,7 +29,6 @@ export default function StoryboardDetailPage() {
   const [user, setUser] = useState<any>(null);
   const [storyboard, setStoryboard] = useState<Storyboard | null>(null);
   const [loading, setLoading] = useState(true);
-  const [converting, setConverting] = useState(false);
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -154,22 +152,9 @@ export default function StoryboardDetailPage() {
     }
   };
 
-  const handleConvertToTrip = async () => {
-    if (!id || !user) return;
-    setConverting(true);
-    try {
-      const { tripRequestId } = await convertStoryboardToTripRequest({
-        storyboardId: id,
-        userId: user.id,
-      });
-      toast.success("Storyboard converted to Trip Request!");
-      navigate(`/post-trip?fromStoryboard=${id}`);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to convert storyboard");
-    } finally {
-      setConverting(false);
-    }
+  const handleConvertToTrip = () => {
+    if (!id) return;
+    navigate(`/post-trip?fromStoryboard=${id}`);
   };
 
   const handleDeleteItem = async (itemId: string) => {
@@ -191,8 +176,28 @@ export default function StoryboardDetailPage() {
     }
   };
 
-  const handleShareLink = () => {
+  const handleShareLink = async () => {
     const url = window.location.href;
+    const shareData = {
+      title: storyboard?.title || "My Goldsainte Storyboard",
+      text: storyboard?.description || "Check out my travel storyboard on Goldsainte!",
+      url,
+    };
+
+    // Try native share first (works on mobile and modern browsers)
+    if (navigator.share && navigator.canShare?.(shareData)) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch (err) {
+        // User cancelled or error - fall back to clipboard
+        if ((err as Error).name !== "AbortError") {
+          console.error("Share failed:", err);
+        }
+      }
+    }
+
+    // Fallback to clipboard copy
     navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -336,7 +341,7 @@ export default function StoryboardDetailPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => navigate("/creator-lab")}
+                      onClick={() => navigate("/tiktok-lab")}
                     >
                       <Plus className="mr-1 h-3.5 w-3.5" />
                       Add from Lab
@@ -344,10 +349,9 @@ export default function StoryboardDetailPage() {
                     {!storyboard.trip_request_id && (
                       <Button
                         size="sm"
-                        disabled={converting}
                         onClick={handleConvertToTrip}
                       >
-                        {converting ? "Converting..." : "Convert to Trip Request"}
+                        Convert to Trip Request
                       </Button>
                     )}
                   </div>
@@ -369,7 +373,7 @@ export default function StoryboardDetailPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => navigate("/creator-lab")}
+                      onClick={() => navigate("/tiktok-lab")}
                     >
                       Open Creator Lab
                     </Button>
