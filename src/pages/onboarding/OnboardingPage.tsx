@@ -164,14 +164,15 @@ export default function OnboardingPage() {
         return;
       }
 
-      // Prepare update data
+      // Prepare update data - travelers complete onboarding after preferences
+      const isTraveler = role === "traveler";
       const updateData: any = {
         full_name: fullName.trim(),
         display_name: displayName.trim(),
         bio: bio.trim() || null,
         role: role,
-        onboarding_completed: true,
-        onboarding_completed_at: new Date().toISOString(),
+        onboarding_completed: !isTraveler, // Travelers complete after preferences step
+        onboarding_completed_at: !isTraveler ? new Date().toISOString() : null,
         updated_at: new Date().toISOString()
       };
 
@@ -194,23 +195,36 @@ export default function OnboardingPage() {
 
       if (error) throw error;
 
-      // Success! Welcome the user
-      toast.success(
-        <div className="flex flex-col gap-1">
-          <span className="font-semibold">Welcome to Goldsainte, {displayName}!</span>
-          <span className="text-xs">Taking you to your personalized dashboard...</span>
-        </div>
-      );
-      
-      // Role-based redirect
-      setTimeout(() => {
-        const redirectMap = {
-          creator: "/creator-lab",
-          agent: "/marketplace?tab=trip-requests", 
-          traveler: "/marketplace"
-        };
-        navigate(redirectMap[role!]);
-      }, 1500);
+      // Travelers go to preferences wizard, others complete here
+      if (isTraveler) {
+        toast.success(
+          <div className="flex flex-col gap-1">
+            <span className="font-semibold">Great, {displayName}!</span>
+            <span className="text-xs">Let's learn how you like to travel...</span>
+          </div>
+        );
+        setTimeout(() => {
+          navigate("/onboarding/traveler/preferences");
+        }, 1000);
+      } else {
+        // Success! Welcome the user
+        toast.success(
+          <div className="flex flex-col gap-1">
+            <span className="font-semibold">Welcome to Goldsainte, {displayName}!</span>
+            <span className="text-xs">Taking you to your personalized dashboard...</span>
+          </div>
+        );
+        
+        // Role-based redirect for creators/agents
+        setTimeout(() => {
+          const redirectMap = {
+            creator: "/creator-lab",
+            agent: "/marketplace?tab=trip-requests", 
+            traveler: "/marketplace"
+          };
+          navigate(redirectMap[role!]);
+        }, 1500);
+      }
       
     } catch (err: any) {
       console.error("Onboarding error:", err);
