@@ -152,7 +152,7 @@ Respond with a JSON array of itinerary objects.`;
         itineraries = rawItineraries.map((item: any, index: number) => ({
           id: `curated-${Date.now()}-${index}`,
           title: item.title || "Untitled Journey",
-          heroImageUrl: getUnsplashImage(item.heroImageKeyword || item.primaryDestination),
+          heroImageUrl: getUnsplashImage(item.heroImageKeyword || item.primaryDestination, index),
           primaryDestination: item.primaryDestination || "Unknown",
           vibeTags: item.vibeTags || [],
           durationNights: item.durationNights || 7,
@@ -223,9 +223,29 @@ function buildPreferencesContext(prefs: TravelPreferences | null): string {
   return `Traveler preferences:\n${parts.join("\n")}\n\nTailor suggestions to match these preferences while still offering diverse options.`;
 }
 
-function getUnsplashImage(keyword: string): string {
-  const encodedKeyword = encodeURIComponent(keyword || "luxury travel");
-  return `https://source.unsplash.com/800x600/?${encodedKeyword}`;
+// Curated Unsplash photo IDs for reliable, high-quality travel images
+const TRAVEL_IMAGE_POOL = [
+  "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop", // Mountains
+  "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&fit=crop", // Beach
+  "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&h=600&fit=crop", // Lake mountains
+  "https://images.unsplash.com/photo-1530789253388-582c481c54b0?w=800&h=600&fit=crop", // Santorini
+  "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=800&h=600&fit=crop", // Paris
+  "https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=800&h=600&fit=crop", // Venice
+  "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&h=600&fit=crop", // Dubai
+  "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&h=600&fit=crop", // Kyoto
+  "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=800&h=600&fit=crop", // Morocco
+  "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=800&h=600&fit=crop", // Bali
+  "https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=800&h=600&fit=crop", // Coast
+  "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=800&h=600&fit=crop", // Tokyo
+  "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop", // Safari
+  "https://images.unsplash.com/photo-1500259571355-332da5cb07aa?w=800&h=600&fit=crop", // Maldives
+  "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800&h=600&fit=crop", // Amalfi
+  "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=800&h=600&fit=crop", // Italy coast
+];
+
+function getUnsplashImage(keyword: string, index: number = 0): string {
+  // Use index to ensure variety, cycling through the pool
+  return TRAVEL_IMAGE_POOL[index % TRAVEL_IMAGE_POOL.length];
 }
 
 function getFallbackItineraries(): CuratedItinerary[] {
@@ -233,7 +253,7 @@ function getFallbackItineraries(): CuratedItinerary[] {
     {
       id: "fallback-1",
       title: "Amalfi Coast Slow Living",
-      heroImageUrl: "https://source.unsplash.com/800x600/?amalfi-coast-italy",
+      heroImageUrl: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800&h=600&fit=crop",
       primaryDestination: "Positano, Italy",
       vibeTags: ["coastal", "romantic", "culinary"],
       durationNights: 7,
@@ -242,7 +262,7 @@ function getFallbackItineraries(): CuratedItinerary[] {
     {
       id: "fallback-2",
       title: "Kyoto Temple Trail",
-      heroImageUrl: "https://source.unsplash.com/800x600/?kyoto-temple",
+      heroImageUrl: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&h=600&fit=crop",
       primaryDestination: "Kyoto, Japan",
       vibeTags: ["cultural", "zen", "historic"],
       durationNights: 5,
@@ -251,7 +271,7 @@ function getFallbackItineraries(): CuratedItinerary[] {
     {
       id: "fallback-3",
       title: "Patagonian Wilderness",
-      heroImageUrl: "https://source.unsplash.com/800x600/?patagonia-mountains",
+      heroImageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop",
       primaryDestination: "Torres del Paine, Chile",
       vibeTags: ["adventure", "nature", "remote"],
       durationNights: 10,
@@ -260,7 +280,7 @@ function getFallbackItineraries(): CuratedItinerary[] {
     {
       id: "fallback-4",
       title: "Marrakech Medina Magic",
-      heroImageUrl: "https://source.unsplash.com/800x600/?marrakech-morocco",
+      heroImageUrl: "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=800&h=600&fit=crop",
       primaryDestination: "Marrakech, Morocco",
       vibeTags: ["exotic", "design", "culinary"],
       durationNights: 4,
@@ -269,7 +289,7 @@ function getFallbackItineraries(): CuratedItinerary[] {
     {
       id: "fallback-5",
       title: "Santorini Blue Hour",
-      heroImageUrl: "https://source.unsplash.com/800x600/?santorini-greece",
+      heroImageUrl: "https://images.unsplash.com/photo-1530789253388-582c481c54b0?w=800&h=600&fit=crop",
       primaryDestination: "Santorini, Greece",
       vibeTags: ["romantic", "coastal", "luxury"],
       durationNights: 5,
@@ -278,7 +298,7 @@ function getFallbackItineraries(): CuratedItinerary[] {
     {
       id: "fallback-6",
       title: "Bali Wellness Retreat",
-      heroImageUrl: "https://source.unsplash.com/800x600/?bali-rice-terrace",
+      heroImageUrl: "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=800&h=600&fit=crop",
       primaryDestination: "Ubud, Bali",
       vibeTags: ["wellness", "spiritual", "nature"],
       durationNights: 8,
@@ -287,7 +307,7 @@ function getFallbackItineraries(): CuratedItinerary[] {
     {
       id: "fallback-7",
       title: "Swiss Alps Adventure",
-      heroImageUrl: "https://source.unsplash.com/800x600/?swiss-alps",
+      heroImageUrl: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&h=600&fit=crop",
       primaryDestination: "Zermatt, Switzerland",
       vibeTags: ["adventure", "scenic", "luxury"],
       durationNights: 6,
@@ -296,7 +316,7 @@ function getFallbackItineraries(): CuratedItinerary[] {
     {
       id: "fallback-8",
       title: "Cape Town Coastal Escape",
-      heroImageUrl: "https://source.unsplash.com/800x600/?cape-town-beach",
+      heroImageUrl: "https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=800&h=600&fit=crop",
       primaryDestination: "Cape Town, South Africa",
       vibeTags: ["adventure", "wine", "scenic"],
       durationNights: 7,
