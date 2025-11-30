@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { User, Menu, Hotel, Plane, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info, Sparkles, CreditCard, PlaneTakeoff, HandCoins, ShieldCheck } from "lucide-react";
+import { User, Menu, Hotel, Plane, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info, Sparkles, CreditCard, PlaneTakeoff, HandCoins, ShieldCheck } from "lucide-react";
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { CreateMomentModal } from "@/components/CreateMomentModal";
 import { Button } from "@/components/ui/button";
@@ -21,9 +21,7 @@ import logomark from "@/assets/logomark-gold.png";
 import { useExpediaModal } from "@/contexts/ExpediaModalContext";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { SearchBar } from "@/components/SearchBar";
-import { useCoinBalance } from "@/hooks/useCoinBalance";
 import ExpediaSearchBar from "@/components/search/ExpediaSearchBar";
-import { BuyCoinsModal } from "@/components/BuyCoinsModal";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { NotificationInbox } from "@/components/NotificationInbox";
 
@@ -41,10 +39,8 @@ export const Header = () => {
   const [createSheetOpen, setCreateSheetOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadInitialTab, setUploadInitialTab] = useState<"photo" | "video">("photo");
-  const [buyCoinsOpen, setBuyCoinsOpen] = useState(false);
   const [createMomentOpen, setCreateMomentOpen] = useState(false);
   const [profileAvatarUrl, setProfileAvatarUrl] = useState<string | null>(null);
-  const { balance } = useCoinBalance();
   const { openModal: openExpediaModal } = useExpediaModal();
   const accountType = ((user as any)?.user_metadata?.account_type as string | undefined)?.toLowerCase() ?? null;
   const isTraveler = !accountType || accountType === "traveler";
@@ -389,21 +385,7 @@ export const Header = () => {
                     >
                       {user ? (
                         <>
-                          {/* Coin Balance Section */}
-                          <div className="px-4 py-3 border-b border-border/50">
-                            <div 
-                              className="flex items-center justify-between cursor-pointer hover:bg-secondary/10 -mx-2 px-2 py-1 rounded-lg transition-colors"
-                              onClick={() => setBuyCoinsOpen(true)}
-                            >
-                              <div className="flex items-center gap-2">
-                                <Coins className="h-5 w-5 text-secondary" />
-                                <span className="text-sm font-medium">Coin Balance</span>
-                              </div>
-                              <span className="text-lg font-bold text-secondary">{balance}</span>
-                            </div>
-                          </div>
-
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={() => navigate('/profile')} 
                             className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                           >
@@ -704,7 +686,7 @@ export const Header = () => {
                               onClick={() => navigate('/agent/earnings')}
                               className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                             >
-                              <Coins className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                              <HandCoins className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                               <span className="text-sm font-medium">Agent Earnings</span>
                             </DropdownMenuItem>
                           )}
@@ -781,25 +763,6 @@ export const Header = () => {
                   >
                     {user ? (
                       <>
-                        {/* Coin Balance Section */}
-                        <div className="px-4 py-3 border-b border-border/50" data-tour="coin-balance">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <Coins className="h-4 w-4 text-yellow-500" />
-                              <span className="text-sm font-medium">{balance} Coins</span>
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setBuyCoinsOpen(true)}
-                              className="h-7 text-xs hover:bg-secondary/10"
-                              data-tour="buy-coins"
-                            >
-                              Buy
-                            </Button>
-                          </div>
-                        </div>
-
                         <div className="py-2">
                           <DropdownMenuItem
                             onClick={() => navigate('/traveler')}
@@ -1084,12 +1047,6 @@ export const Header = () => {
       <CreateMomentModal
         open={createMomentOpen}
         onOpenChange={setCreateMomentOpen}
-      />
-
-      {/* Buy Coins Modal */}
-      <BuyCoinsModal
-        open={buyCoinsOpen}
-        onOpenChange={setBuyCoinsOpen}
       />
 
     </>
