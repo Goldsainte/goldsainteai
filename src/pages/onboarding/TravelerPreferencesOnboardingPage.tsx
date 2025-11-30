@@ -188,7 +188,7 @@ export default function TravelerPreferencesOnboardingPage() {
           <h1 className="font-secondary text-3xl sm:text-4xl md:text-5xl text-[#0a2225] mb-4">
             Let's learn your travel signature
           </h1>
-          <p className="max-w-xl mx-auto text-sm sm:text-base text-[#6E6650] leading-relaxed">
+          <p className="max-w-2xl mx-auto text-sm sm:text-base text-[#6E6650] leading-relaxed">
             Answer a few quick questions so we can curate storyboards, collections,
             and itineraries that feel like they were designed just for you.
           </p>

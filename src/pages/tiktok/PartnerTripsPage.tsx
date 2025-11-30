@@ -139,7 +139,7 @@ export default function PartnerTripsPage() {
           <h1 className="font-display text-[22px] md:text-[24px] leading-tight">
             Trips you&apos;re helping bring to life
           </h1>
-          <p className="text-[11px] md:text-[12px] text-[#4a4a4a] max-w-md">
+          <p className="text-[11px] md:text-[12px] text-[#4a4a4a]">
             Every booking where you&apos;re a {roleLabel} lives here. Follow
             status, stay close to travelers, and see what each trip means for
             your earnings.

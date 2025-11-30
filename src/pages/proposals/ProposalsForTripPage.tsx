@@ -137,7 +137,7 @@ export default function ProposalsForTripPage() {
             <h1 className="font-display text-[22px] md:text-[24px] leading-tight">
               Options for "{title}"
             </h1>
-            <p className="text-[11px] md:text-[12px] text-muted-foreground max-w-lg">
+            <p className="text-[11px] md:text-[12px] text-muted-foreground">
               Compare proposals from creators and travel agents side by side.
               When you&apos;re ready, you can open one to see details and move
               into Goldsainte&apos;s protected booking flow.

@@ -191,7 +191,7 @@ export default function MyTripsPage() {
             <h1 className="font-secondary text-2xl md:text-3xl leading-tight text-[#0a2225]">
               Your Goldsainte Journey
             </h1>
-            <p className="text-sm text-[#6E6650] max-w-lg leading-relaxed">
+            <p className="text-sm text-[#6E6650] leading-relaxed">
               Track your trip requests, upcoming adventures, and past escapes — all in one beautifully curated space.
             </p>
           </div>
