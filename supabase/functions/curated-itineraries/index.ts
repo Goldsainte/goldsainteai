@@ -18,6 +18,15 @@ interface TravelPreferences {
   booking_preferences: Record<string, any>;
 }
 
+interface ItineraryDay {
+  dayNumber: number;
+  title: string;
+  description: string;
+  activities: string[];
+  meals: string;
+  accommodation: string;
+}
+
 interface CuratedItinerary {
   id: string;
   title: string;
@@ -27,6 +36,7 @@ interface CuratedItinerary {
   durationNights: number;
   headline: string;
   budgetRange?: string;
+  itinerary?: ItineraryDay[];
 }
 
 serve(async (req) => {
@@ -87,6 +97,13 @@ For each itinerary, provide:
 - durationNights: Suggested trip length (4-14 nights)
 - headline: 1-2 sentence description capturing the essence
 - heroImageKeyword: A search term for finding a beautiful image (e.g., "amalfi coast sunset")
+- itinerary: An array of day-by-day activities with this structure for EACH day:
+  - dayNumber: The day number (1, 2, 3, etc.)
+  - title: A catchy title for the day (e.g., "Arrival & Sunset Aperitivo")
+  - description: 2-3 sentences describing the day's vibe and highlights
+  - activities: Array of 3-4 specific activities (e.g., "Morning yoga at cliffside terrace", "Private cooking class with local chef")
+  - meals: Where/what to eat (e.g., "Breakfast at hotel, Lunch at seaside trattoria, Dinner at Michelin-starred Da Adolfo")
+  - accommodation: Where to stay that night (e.g., "Le Sirenuse, Positano")
 
 Make itineraries globally diverse - include destinations from Europe, Asia, Americas, Middle East, Africa, and Oceania.
 
@@ -108,11 +125,11 @@ Respond with a JSON array of itinerary objects.`;
           { role: "system", content: systemPrompt },
           { 
             role: "user", 
-            content: `Generate ${count} personalized travel itineraries. Return only valid JSON array.` 
+            content: `Generate ${count} personalized travel itineraries with complete day-by-day details. Return only valid JSON array.` 
           },
         ],
         temperature: 0.8,
-        max_tokens: 3000,
+        max_tokens: 8000,
       }),
     });
 
@@ -158,6 +175,7 @@ Respond with a JSON array of itinerary objects.`;
           durationNights: item.durationNights || 7,
           headline: item.headline || "",
           budgetRange: item.budgetRange,
+          itinerary: item.itinerary || [],
         }));
       }
     } catch (parseError) {
@@ -258,6 +276,15 @@ function getFallbackItineraries(): CuratedItinerary[] {
       vibeTags: ["coastal", "romantic", "culinary"],
       durationNights: 7,
       headline: "Winding coastal roads, lemon groves, and seaside dinners at sunset.",
+      itinerary: [
+        { dayNumber: 1, title: "Arrival & Sunset Aperitivo", description: "Settle into your cliffside hotel and watch the sun dip below the horizon with a spritz in hand.", activities: ["Airport transfer via scenic coastal route", "Check-in at Le Sirenuse", "Evening passeggiata through town", "Sunset aperitivo at Franco's Bar"], meals: "Dinner at La Sponda", accommodation: "Le Sirenuse, Positano" },
+        { dayNumber: 2, title: "Ravello Gardens & Culture", description: "Explore the hilltop gardens of Ravello with panoramic sea views.", activities: ["Morning yoga on terrace", "Visit Villa Rufolo gardens", "Lunch in Ravello piazza", "Afternoon at Villa Cimbrone"], meals: "Lunch at Rossellinis, Dinner at hotel", accommodation: "Le Sirenuse, Positano" },
+        { dayNumber: 3, title: "Cooking with Nonna", description: "Learn the secrets of Amalfi cuisine with a local family.", activities: ["Market visit in Amalfi", "Private cooking class", "Long Italian lunch", "Afternoon beach time"], meals: "Cooking class lunch, Light dinner", accommodation: "Le Sirenuse, Positano" },
+        { dayNumber: 4, title: "Capri Day Trip", description: "Take the ferry to glamorous Capri for a day of exploration.", activities: ["Morning ferry to Capri", "Blue Grotto visit", "Lunch at Da Paolino", "Shopping in Capri town"], meals: "Lunch at Da Paolino, Dinner in Positano", accommodation: "Le Sirenuse, Positano" },
+        { dayNumber: 5, title: "Path of the Gods Hike", description: "Walk the legendary coastal trail with breathtaking views.", activities: ["Early morning hike start", "Path of the Gods trek", "Lunch in Nocelle", "Afternoon spa treatment"], meals: "Picnic lunch, Dinner at Il San Pietro", accommodation: "Le Sirenuse, Positano" },
+        { dayNumber: 6, title: "Beach & Wine", description: "A relaxed day between sea and vineyard.", activities: ["Morning at Spiaggia Grande", "Private boat to hidden beach", "Evening wine tasting", "Farewell dinner"], meals: "Beach lunch, Wine tasting dinner", accommodation: "Le Sirenuse, Positano" },
+        { dayNumber: 7, title: "Departure", description: "Final morning in paradise before heading home.", activities: ["Leisurely breakfast", "Last stroll through Positano", "Airport transfer"], meals: "Breakfast at hotel", accommodation: "Departure" },
+      ],
     },
     {
       id: "fallback-2",
@@ -267,6 +294,13 @@ function getFallbackItineraries(): CuratedItinerary[] {
       vibeTags: ["cultural", "zen", "historic"],
       durationNights: 5,
       headline: "Ancient temples, bamboo forests, and the art of slow travel.",
+      itinerary: [
+        { dayNumber: 1, title: "Arrival in Ancient Kyoto", description: "Arrive and settle into a traditional ryokan experience.", activities: ["Shinkansen from Tokyo", "Check-in at Tawaraya Ryokan", "Evening stroll in Gion", "Kaiseki dinner"], meals: "Kaiseki dinner at ryokan", accommodation: "Tawaraya Ryokan" },
+        { dayNumber: 2, title: "Golden Pavilion & Zen Gardens", description: "Explore Kyoto's most iconic temples and gardens.", activities: ["Kinkaku-ji (Golden Pavilion)", "Ryoan-ji Zen garden", "Lunch in Arashiyama", "Bamboo Grove walk"], meals: "Lunch at Shoraian, Dinner at Kikunoi", accommodation: "Tawaraya Ryokan" },
+        { dayNumber: 3, title: "Tea Ceremony & Crafts", description: "Immerse yourself in traditional Japanese arts.", activities: ["Morning meditation at temple", "Private tea ceremony", "Visit to sake brewery", "Afternoon at kimono workshop"], meals: "Bento lunch, Dinner at Gion Nanba", accommodation: "Tawaraya Ryokan" },
+        { dayNumber: 4, title: "Fushimi Inari & Nara", description: "Walk through thousands of vermillion torii gates.", activities: ["Early morning at Fushimi Inari", "Day trip to Nara", "Feed the sacred deer", "Visit Todai-ji temple"], meals: "Local lunch in Nara, Dinner at ryokan", accommodation: "Tawaraya Ryokan" },
+        { dayNumber: 5, title: "Departure", description: "Final moments of tranquility before heading home.", activities: ["Morning onsen bath", "Last temple visit", "Departure"], meals: "Traditional breakfast", accommodation: "Departure" },
+      ],
     },
     {
       id: "fallback-3",
@@ -276,6 +310,11 @@ function getFallbackItineraries(): CuratedItinerary[] {
       vibeTags: ["adventure", "nature", "remote"],
       durationNights: 10,
       headline: "Dramatic peaks, glacial lakes, and untouched wilderness at the edge of the world.",
+      itinerary: [
+        { dayNumber: 1, title: "Arrival in Punta Arenas", description: "Gateway to the end of the world.", activities: ["Arrive Punta Arenas", "City walking tour", "Visit penguin colony", "Welcome dinner"], meals: "Dinner at La Marmita", accommodation: "Hotel Dreams del Estrecho" },
+        { dayNumber: 2, title: "Journey to Torres del Paine", description: "Drive through vast Patagonian steppes to the park.", activities: ["Scenic drive to park", "Check-in at Explora Patagonia", "Afternoon orientation hike", "Sunset views"], meals: "All meals at lodge", accommodation: "Explora Patagonia" },
+        { dayNumber: 3, title: "Base Torres Trek", description: "The iconic hike to the towers.", activities: ["Early start for Base Torres", "10-hour round trip hike", "Glacier views", "Recovery at spa"], meals: "Packed lunch, Dinner at lodge", accommodation: "Explora Patagonia" },
+      ],
     },
     {
       id: "fallback-4",
@@ -285,6 +324,12 @@ function getFallbackItineraries(): CuratedItinerary[] {
       vibeTags: ["exotic", "design", "culinary"],
       durationNights: 4,
       headline: "Spice markets, hidden riads, and rooftop sunsets over the medina.",
+      itinerary: [
+        { dayNumber: 1, title: "Enter the Medina", description: "Step into a world of color, scent, and sound.", activities: ["Private airport transfer", "Check-in at La Mamounia", "Guided medina walk", "Rooftop dinner"], meals: "Dinner at Nomad", accommodation: "La Mamounia" },
+        { dayNumber: 2, title: "Souks & Secrets", description: "Navigate the labyrinthine markets with a local guide.", activities: ["Spice market tour", "Artisan workshops visit", "Traditional hammam", "Cooking class"], meals: "Lunch at Café des Épices, Dinner at Le Jardin", accommodation: "La Mamounia" },
+        { dayNumber: 3, title: "Atlas Mountains", description: "Escape to the mountains for a day.", activities: ["Drive to Atlas Mountains", "Berber village visit", "Mountain lunch", "Return for sunset"], meals: "Berber lunch, Dinner at hotel", accommodation: "La Mamounia" },
+        { dayNumber: 4, title: "Departure", description: "Final moments in the rose city.", activities: ["Majorelle Garden visit", "Last souk shopping", "Departure"], meals: "Breakfast at hotel", accommodation: "Departure" },
+      ],
     },
     {
       id: "fallback-5",
@@ -294,33 +339,10 @@ function getFallbackItineraries(): CuratedItinerary[] {
       vibeTags: ["romantic", "coastal", "luxury"],
       durationNights: 5,
       headline: "White-washed villages, volcanic beaches, and legendary sunsets.",
-    },
-    {
-      id: "fallback-6",
-      title: "Bali Wellness Retreat",
-      heroImageUrl: "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=800&h=600&fit=crop",
-      primaryDestination: "Ubud, Bali",
-      vibeTags: ["wellness", "spiritual", "nature"],
-      durationNights: 8,
-      headline: "Rice terraces, yoga retreats, and sacred water temples.",
-    },
-    {
-      id: "fallback-7",
-      title: "Swiss Alps Adventure",
-      heroImageUrl: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&h=600&fit=crop",
-      primaryDestination: "Zermatt, Switzerland",
-      vibeTags: ["adventure", "scenic", "luxury"],
-      durationNights: 6,
-      headline: "Panoramic train journeys, alpine villages, and Matterhorn views.",
-    },
-    {
-      id: "fallback-8",
-      title: "Cape Town Coastal Escape",
-      heroImageUrl: "https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=800&h=600&fit=crop",
-      primaryDestination: "Cape Town, South Africa",
-      vibeTags: ["adventure", "wine", "scenic"],
-      durationNights: 7,
-      headline: "Table Mountain, penguin colonies, and world-class wine country.",
+      itinerary: [
+        { dayNumber: 1, title: "Arrival in Paradise", description: "Land on the volcanic island and settle into your cave suite.", activities: ["Ferry or flight arrival", "Check-in at Canaves Oia", "Pool time with caldera views", "Sunset dinner in Oia"], meals: "Dinner at Floga", accommodation: "Canaves Oia" },
+        { dayNumber: 2, title: "Wine & Volcano", description: "Explore the island's volcanic heritage and wine culture.", activities: ["Morning at Red Beach", "Volcano boat tour", "Hot springs swim", "Sunset wine tasting"], meals: "Lunch at Metaxy Mas, Dinner at Selene", accommodation: "Canaves Oia" },
+      ],
     },
   ];
 }

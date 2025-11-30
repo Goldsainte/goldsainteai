@@ -1,9 +1,28 @@
+import { useSearchParams } from "react-router-dom";
 import { MadisonChat } from "@/components/MadisonChat";
 
 export default function ConciergePage() {
+  const [searchParams] = useSearchParams();
+  
+  // Read URL params passed from collections
+  const destination = searchParams.get("destination");
+  const context = searchParams.get("context");
+  const nights = searchParams.get("nights");
+  const vibes = searchParams.get("vibes");
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Context Banner */}
+        {context && (
+          <div className="mb-4 p-4 rounded-xl bg-[#F6F0E4] border border-[#E5DFC6]">
+            <p className="text-sm text-[#6E6650]">
+              <span className="font-medium text-[#0a2225]">Continuing from: </span>
+              {context} {destination && `in ${destination}`}
+            </p>
+          </div>
+        )}
+
         {/* Intro Section */}
         <div className="mb-8 text-center">
           <h1 className="text-3xl md:text-4xl font-secondary text-foreground mb-3">
@@ -23,7 +42,12 @@ export default function ConciergePage() {
         </div>
 
         {/* Chat Interface */}
-        <MadisonChat />
+        <MadisonChat 
+          initialDestination={destination}
+          initialContext={context}
+          initialNights={nights}
+          initialVibes={vibes}
+        />
       </div>
     </div>
   );

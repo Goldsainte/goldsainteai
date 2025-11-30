@@ -15,10 +15,23 @@ interface Message {
   timestamp: Date;
 }
 
-export function MadisonChat() {
+interface MadisonChatProps {
+  initialDestination?: string | null;
+  initialContext?: string | null;
+  initialNights?: string | null;
+  initialVibes?: string | null;
+}
+
+export function MadisonChat({ 
+  initialDestination, 
+  initialContext, 
+  initialNights,
+  initialVibes 
+}: MadisonChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [hasAutoSent, setHasAutoSent] = useState(false);
   const { conversationId, setConversationId } = useMadisonConversation();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -32,10 +45,28 @@ export function MadisonChat() {
     }
   }, [messages]);
 
-  const sendMessage = async () => {
-    if (!input.trim()) return;
+  // Auto-send initial message if context is provided
+  useEffect(() => {
+    if (initialContext && initialDestination && !hasAutoSent && messages.length === 0) {
+      const vibesText = initialVibes ? ` The vibe I'm looking for is ${initialVibes.split(',').join(', ')}.` : '';
+      const nightsText = initialNights ? ` for ${initialNights} nights` : '';
+      
+      const autoMessage = `I'm interested in the "${initialContext}" trip to ${initialDestination}${nightsText}.${vibesText} Can you tell me more about this itinerary and help me customize it?`;
+      
+      setHasAutoSent(true);
+      setInput(autoMessage);
+      
+      // Auto-send after a brief delay so user can see the message
+      setTimeout(() => {
+        sendMessageDirect(autoMessage);
+      }, 500);
+    }
+  }, [initialContext, initialDestination, hasAutoSent, messages.length]);
 
-    const userMessage = input.trim();
+  const sendMessageDirect = async (messageText: string) => {
+    if (!messageText.trim()) return;
+
+    const userMessage = messageText.trim();
     setInput("");
 
     const now = new Date();
@@ -123,6 +154,10 @@ export function MadisonChat() {
     }
   };
 
+  const sendMessage = async () => {
+    await sendMessageDirect(input);
+  };
+
   const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -143,7 +178,7 @@ export function MadisonChat() {
       {/* Messages */}
       <ScrollArea className="flex-1 px-4 py-3">
         <div ref={scrollRef} className="space-y-4">
-          {messages.length === 0 && (
+          {messages.length === 0 && !initialContext && (
             <div className="py-8 text-center text-muted-foreground">
               <p className="mb-2 text-sm">👋 Hi, I'm Madison.</p>
               <p className="text-xs">
