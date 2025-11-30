@@ -178,20 +178,20 @@ export default function MyTripsPage() {
         <title>My Trips · Goldsainte</title>
       </Helmet>
 
-      <main className="min-h-screen bg-background text-foreground">
+      <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
         <section className="mx-auto max-w-5xl px-4 pt-14 pb-6 md:pt-16 md:pb-8">
           <div className="flex items-center justify-between mb-6">
             <BackButton label="Back" />
           </div>
 
           <div className="space-y-3">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-[#A4987C] font-medium">
               My trips
             </p>
-            <h1 className="font-serif text-2xl md:text-3xl leading-tight text-foreground">
+            <h1 className="font-serif text-2xl md:text-3xl leading-tight text-[#0a2225]">
               Your Goldsainte Journey
             </h1>
-            <p className="text-sm text-muted-foreground max-w-lg leading-relaxed">
+            <p className="text-sm text-[#6E6650] max-w-lg leading-relaxed">
               Track your trip requests, upcoming adventures, and past escapes — all in one beautifully curated space.
             </p>
           </div>
@@ -201,35 +201,53 @@ export default function MyTripsPage() {
           {loading && (
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
-                <div className="animate-pulse mx-auto w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-4">
-                  <Plane className="h-6 w-6 text-primary" />
+                <div className="animate-pulse mx-auto w-12 h-12 rounded-full bg-[#BFAD72]/20 flex items-center justify-center mb-4">
+                  <Plane className="h-6 w-6 text-[#BFAD72]" />
                 </div>
-                <p className="text-sm text-muted-foreground">Loading your trips…</p>
+                <p className="text-sm text-[#6E6650]">Loading your trips…</p>
               </div>
             </div>
           )}
 
           {!loading && !error && (
             <Tabs defaultValue={defaultTab} className="w-full">
-              <TabsList className="mb-6">
-                <TabsTrigger value="requests">Requests</TabsTrigger>
-                <TabsTrigger value="in-progress">In Progress</TabsTrigger>
-                <TabsTrigger value="booked">Booked &amp; Past</TabsTrigger>
-              </TabsList>
+              {/* Custom pill-style tabs matching MarketplaceTabs */}
+              <div className="inline-flex items-center gap-1 rounded-full border border-[#E5DFC6] bg-white p-1 mb-6">
+                <TabsList className="bg-transparent p-0 h-auto gap-1">
+                  <TabsTrigger 
+                    value="requests"
+                    className="rounded-full px-4 py-2.5 text-sm font-semibold transition-all data-[state=active]:bg-[#BFAD72] data-[state=active]:text-white data-[state=inactive]:text-[#4a4a4a] data-[state=inactive]:hover:text-[#0a2225] data-[state=inactive]:bg-transparent"
+                  >
+                    Requests
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="in-progress"
+                    className="rounded-full px-4 py-2.5 text-sm font-semibold transition-all data-[state=active]:bg-[#BFAD72] data-[state=active]:text-white data-[state=inactive]:text-[#4a4a4a] data-[state=inactive]:hover:text-[#0a2225] data-[state=inactive]:bg-transparent"
+                  >
+                    In Progress
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="booked"
+                    className="rounded-full px-4 py-2.5 text-sm font-semibold transition-all data-[state=active]:bg-[#BFAD72] data-[state=active]:text-white data-[state=inactive]:text-[#4a4a4a] data-[state=inactive]:hover:text-[#0a2225] data-[state=inactive]:bg-transparent"
+                  >
+                    Booked &amp; Past
+                  </TabsTrigger>
+                </TabsList>
+              </div>
 
               <TabsContent value="requests" className="space-y-5">
                 {requests.length === 0 ? (
-                  <div className="rounded-3xl bg-card border border-border p-8 md:p-12 text-center">
-                    <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-                      <Globe className="h-8 w-8 text-primary" />
+                  <div className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-8 md:p-12 text-center">
+                    <div className="mx-auto w-16 h-16 rounded-full bg-[#BFAD72]/15 flex items-center justify-center mb-6">
+                      <Globe className="h-8 w-8 text-[#BFAD72]" />
                     </div>
-                    <h3 className="font-serif text-xl md:text-2xl mb-3 text-foreground">
+                    <h3 className="font-serif text-xl md:text-2xl mb-3 text-[#0a2225]">
                       Where will your next adventure take you?
                     </h3>
-                    <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto leading-relaxed">
+                    <p className="text-sm text-[#6E6650] mb-6 max-w-md mx-auto leading-relaxed">
                       Share your dream destination with the Goldsainte marketplace. Our curated network of creators and agents will craft personalized proposals just for you.
                     </p>
-                    <Button asChild size="lg" className="rounded-full">
+                    <Button asChild size="lg" className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d3a] text-white">
                       <Link to="/post-trip" className="inline-flex items-center gap-2">
                         <Sparkles className="h-4 w-4" />
                         Post Your Dream Trip
@@ -253,14 +271,14 @@ export default function MyTripsPage() {
 
               <TabsContent value="in-progress" className="space-y-5">
                 {inProgress.length === 0 ? (
-                  <div className="rounded-3xl bg-card border border-border p-8 md:p-12 text-center">
-                    <div className="mx-auto w-16 h-16 rounded-full bg-accent/50 flex items-center justify-center mb-6">
-                      <Plane className="h-8 w-8 text-muted-foreground" />
+                  <div className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-8 md:p-12 text-center">
+                    <div className="mx-auto w-16 h-16 rounded-full bg-[#BFAD72]/15 flex items-center justify-center mb-6">
+                      <Plane className="h-8 w-8 text-[#BFAD72]" />
                     </div>
-                    <h3 className="font-serif text-xl md:text-2xl mb-3 text-foreground">
+                    <h3 className="font-serif text-xl md:text-2xl mb-3 text-[#0a2225]">
                       No trips in progress
                     </h3>
-                    <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+                    <p className="text-sm text-[#6E6650] max-w-md mx-auto leading-relaxed">
                       When you're on an adventure, your active trips will appear here with all the details you need.
                     </p>
                   </div>
@@ -271,17 +289,17 @@ export default function MyTripsPage() {
 
               <TabsContent value="booked" className="space-y-5">
                 {trips.length === 0 ? (
-                  <div className="rounded-3xl bg-card border border-border p-8 md:p-12 text-center">
-                    <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-                      <Calendar className="h-8 w-8 text-primary" />
+                  <div className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-8 md:p-12 text-center">
+                    <div className="mx-auto w-16 h-16 rounded-full bg-[#BFAD72]/15 flex items-center justify-center mb-6">
+                      <Calendar className="h-8 w-8 text-[#BFAD72]" />
                     </div>
-                    <h3 className="font-serif text-xl md:text-2xl mb-3 text-foreground">
+                    <h3 className="font-serif text-xl md:text-2xl mb-3 text-[#0a2225]">
                       Your travel story starts here
                     </h3>
-                    <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto leading-relaxed">
+                    <p className="text-sm text-[#6E6650] mb-6 max-w-md mx-auto leading-relaxed">
                       Book through Goldsainte or accept a curated proposal from our creators and agents. Every journey becomes part of your story.
                     </p>
-                    <Button asChild size="lg" className="rounded-full">
+                    <Button asChild size="lg" className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d3a] text-white">
                       <Link to="/marketplace" className="inline-flex items-center gap-2">
                         Explore the Marketplace
                         <ArrowRight className="h-4 w-4" />
