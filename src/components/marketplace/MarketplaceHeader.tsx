@@ -1,11 +1,18 @@
 import { Link } from "react-router-dom";
-import { Sparkles } from "lucide-react";
+import { Sparkles, ArrowLeft } from "lucide-react";
 
 export function MarketplaceHeader() {
   return (
     <section className="border-b border-[#E5DFC6]/30 bg-white">
       <div className="mx-auto max-w-6xl px-4 py-8 md:py-12">
         <div className="flex flex-col gap-6">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 text-xs text-[#8D8D8D] transition hover:text-[#0a2225] -mb-2"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            <span>Back to Home</span>
+          </Link>
           <div className="max-w-3xl space-y-3">
             <h1 className="font-display text-3xl text-[#0a2225] md:text-4xl">
               Where your dream trip meets the perfect team.
