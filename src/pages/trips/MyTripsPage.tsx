@@ -188,7 +188,7 @@ export default function MyTripsPage() {
             <p className="text-[10px] uppercase tracking-[0.2em] text-[#A4987C] font-medium">
               My trips
             </p>
-            <h1 className="font-serif text-2xl md:text-3xl leading-tight text-[#0a2225]">
+            <h1 className="font-secondary text-2xl md:text-3xl leading-tight text-[#0a2225]">
               Your Goldsainte Journey
             </h1>
             <p className="text-sm text-[#6E6650] max-w-lg leading-relaxed">
@@ -241,7 +241,7 @@ export default function MyTripsPage() {
                     <div className="mx-auto w-16 h-16 rounded-full bg-[#BFAD72]/15 flex items-center justify-center mb-6">
                       <Globe className="h-8 w-8 text-[#BFAD72]" />
                     </div>
-                    <h3 className="font-serif text-xl md:text-2xl mb-3 text-[#0a2225]">
+                    <h3 className="font-secondary text-xl md:text-2xl mb-3 text-[#0a2225]">
                       Where will your next adventure take you?
                     </h3>
                     <p className="text-sm text-[#6E6650] mb-6 max-w-md mx-auto leading-relaxed">
@@ -275,7 +275,7 @@ export default function MyTripsPage() {
                     <div className="mx-auto w-16 h-16 rounded-full bg-[#BFAD72]/15 flex items-center justify-center mb-6">
                       <Plane className="h-8 w-8 text-[#BFAD72]" />
                     </div>
-                    <h3 className="font-serif text-xl md:text-2xl mb-3 text-[#0a2225]">
+                    <h3 className="font-secondary text-xl md:text-2xl mb-3 text-[#0a2225]">
                       No trips in progress
                     </h3>
                     <p className="text-sm text-[#6E6650] max-w-md mx-auto leading-relaxed">
@@ -293,7 +293,7 @@ export default function MyTripsPage() {
                     <div className="mx-auto w-16 h-16 rounded-full bg-[#BFAD72]/15 flex items-center justify-center mb-6">
                       <Calendar className="h-8 w-8 text-[#BFAD72]" />
                     </div>
-                    <h3 className="font-serif text-xl md:text-2xl mb-3 text-[#0a2225]">
+                    <h3 className="font-secondary text-xl md:text-2xl mb-3 text-[#0a2225]">
                       Your travel story starts here
                     </h3>
                     <p className="text-sm text-[#6E6650] mb-6 max-w-md mx-auto leading-relaxed">
