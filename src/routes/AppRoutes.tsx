@@ -168,7 +168,7 @@ const TrustSafetyPage = lazy(() => import('@/pages/TrustSafetyPage'));
 const CancellationRefundPolicy = lazy(() => import('@/pages/CancellationRefundPolicy'));
 const CorporateContact = lazy(() => import('@/pages/CorporateContact'));
 const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
-const OnboardingPage = lazy(() => import('@/pages/onboarding/OnboardingPage'));
+
 const TravelerPreferencesOnboardingPage = lazy(() => import('@/pages/onboarding/TravelerPreferencesOnboardingPage'));
 const CollectionsPage = lazy(() => import('@/pages/CollectionsPage'));
 const TravelerDemandPage = lazy(() => import('@/pages/TravelerDemandPage'));
@@ -212,7 +212,8 @@ export const AppRoutes = () => (
       <Route path="/auth/complete-profile" element={<CompleteProfile />} />
       <Route path="/application/verification-complete" element={<ApplicationVerificationComplete />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/onboarding" element={<OnboardingPage />} />
+      {/* Redirect /onboarding to traveler preferences */}
+      <Route path="/onboarding" element={<Navigate to="/onboarding/traveler/preferences" replace />} />
       <Route path="/onboarding/traveler/preferences" element={<TravelerPreferencesOnboardingPage />} />
       <Route path="/onboarding/creator" element={<CreatorOnboardingPage />} />
       <Route path="/brand/onboarding" element={<BrandOnboardingPage />} />
