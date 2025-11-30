@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { Calendar, MapPin, ArrowRight, ArrowLeft, Users, HandCoins, Sparkles, Trash2 } from "lucide-react";
+import { Calendar, MapPin, ArrowRight, Users, HandCoins, Sparkles, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyTrips, type TravelerTrip } from "@/services/tripsService";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { BackButton } from "@/components/ui/BackButton";
 
 function formatMoney(amount: number | null | undefined, currency?: string | null) {
   if (!amount) return "—";
@@ -177,13 +178,7 @@ export default function MyTripsPage() {
       <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
         <section className="mx-auto max-w-5xl px-4 pt-14 pb-6 md:pt-16 md:pb-8">
           <div className="flex items-center justify-between mb-4">
-            <Link
-              to="/"
-              className="inline-flex items-center gap-1 text-[10px] text-[#8D8D8D]"
-            >
-              <ArrowLeft className="h-3 w-3" />
-              Back to home
-            </Link>
+            <BackButton label="Back" />
           </div>
 
           <div className="space-y-2">

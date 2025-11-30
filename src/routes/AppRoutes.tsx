@@ -114,7 +114,7 @@ const Messages = lazy(() => import('@/pages/Messages'));
 const PartnerConsolePage = lazy(() => import('@/pages/partner/PartnerConsolePage'));
 const PartnerEscrowPage = lazy(() => import('@/pages/partners/EscrowMilestonesPage'));
 const MyJobs = lazy(() => import('@/pages/MyJobs'));
-const MyTrips = lazy(() => import('@/pages/MyTrips'));
+// MyTrips removed - using MyTripsPage instead
 const GroupTrips = lazy(() => import('@/pages/GroupTrips'));
 const JournalListing = lazy(() => import('@/pages/JournalListing'));
 const JournalArticle = lazy(() => import('@/pages/JournalArticle'));
@@ -489,7 +489,7 @@ export const AppRoutes = () => (
         )}
       />
       <Route path="/my-jobs" element={<MyJobs />} />
-      <Route path="/my-trips" element={<MyTrips />} />
+      {/* Duplicate /my-trips route removed - using MyTripsPage at line 351 */}
       <Route path="/group-trips" element={<GroupTrips />} />
       <Route path="/group-trips/:tripId" element={<GroupTrips />} />
       <Route path="/journal" element={<JournalListing />} />
