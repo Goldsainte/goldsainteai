@@ -35,7 +35,16 @@ export function useRequireOnboarding() {
       }
 
       if (!profile || !profile.onboarding_completed) {
-        navigate("/onboarding", { replace: true });
+        // Role-based redirect for incomplete onboarding
+        const accountType = profile?.account_type;
+        if (accountType === 'creator') {
+          navigate("/creator-lab", { replace: true });
+        } else if (accountType === 'agent') {
+          navigate("/marketplace?tab=trip-requests", { replace: true });
+        } else {
+          // Travelers and unknown roles go to preferences
+          navigate("/onboarding/traveler/preferences", { replace: true });
+        }
         return;
       }
 
