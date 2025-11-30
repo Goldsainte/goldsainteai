@@ -65,10 +65,10 @@ export default function TripInboxPage() {
             <p>Start with a moodboard or collection that feels like you.</p>
             <div className="flex gap-2">
               <Button asChild size="sm" className="rounded-full text-xs">
-                <Link to="/collections">Browse collections</Link>
+                <Link to="/marketplace">Browse collections</Link>
               </Button>
               <Button asChild size="sm" variant="outline" className="rounded-full text-xs">
-                <Link to="/madison">Ask Madison</Link>
+                <Link to="/concierge">Ask Madison</Link>
               </Button>
             </div>
           </CardContent>
