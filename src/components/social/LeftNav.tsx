@@ -1,7 +1,8 @@
 import { NavLink } from "react-router-dom";
 import { usePanelStore } from "@/stores/panelStore";
-import { Home, Users, Video, Search, MessageCircle, Bell, BarChart3, User2, Store, Building, PlaneTakeoff, FileText } from "lucide-react";
+import { Home, Users, Video, Search, MessageCircle, Bell, BarChart3, User2, Store, Building, PlaneTakeoff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const itemCls = "flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-muted/60 text-base";
 
@@ -23,6 +24,13 @@ function NavItemBtn({ onClick, children }: { onClick: () => void; children: Reac
 
 export default function LeftNav() {
   const { openType } = usePanelStore();
+  const { user } = useAuth();
+  
+  const accountType = 
+    ((user as any)?.user_metadata?.account_type as string | undefined)?.toLowerCase() ?? null;
+  const isCreator = accountType === "creator";
+  const isAgentAccount = accountType === "agent";
+  const isBrand = accountType === "brand";
 
   return (
     <div className="h-screen flex flex-col py-4">
@@ -32,13 +40,25 @@ export default function LeftNav() {
         <NavItemLink to="/marketplace"><Store className="w-6 h-6" /> Marketplace</NavItemLink>
         <NavItemLink to="/browse-creators"><Users className="w-6 h-6" /> Browse Creators</NavItemLink>
         <NavItemLink to="/browse-agents"><Building className="w-6 h-6" /> Browse Agents</NavItemLink>
-        <NavItemLink to="/tiktok-lab"><Video className="w-6 h-6" /> TikTok Lab</NavItemLink>
+        
+        {/* TikTok Lab - Creators, Agents, Brands only */}
+        {(isCreator || isAgentAccount || isBrand) && (
+          <NavItemLink to="/tiktok-lab"><Video className="w-6 h-6" /> TikTok Lab</NavItemLink>
+        )}
+        
         <NavItemLink to="/post-trip"><PlaneTakeoff className="w-6 h-6" /> Post a Trip</NavItemLink>
-        <NavItemLink to="/my-trip-requests"><FileText className="w-6 h-6" /> My Trips</NavItemLink>
+        
+        {/* My Trips removed - now only in Profile menu */}
+        
         <NavItemBtn onClick={() => openType("search")}><Search className="w-6 h-6" /> Search</NavItemBtn>
         <NavItemBtn onClick={() => openType("messages")}><MessageCircle className="w-6 h-6" /> Messages</NavItemBtn>
         <NavItemBtn onClick={() => openType("notifications")}><Bell className="w-6 h-6" /> Notifications</NavItemBtn>
-        <NavItemLink to="/creator-dashboard"><BarChart3 className="w-6 h-6" /> Dashboard</NavItemLink>
+        
+        {/* Dashboard - Creators only */}
+        {isCreator && (
+          <NavItemLink to="/creator-dashboard"><BarChart3 className="w-6 h-6" /> Dashboard</NavItemLink>
+        )}
+        
         <NavItemBtn onClick={() => {
           supabase.auth.getUser().then(({ data: { user } }) => {
             if (user) window.location.href = `/creator/${user.id}`;

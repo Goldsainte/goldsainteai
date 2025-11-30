@@ -282,13 +282,15 @@ export const Header = () => {
                           <ShoppingCart className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                           <span className="text-sm font-medium">{t('navigation.marketplace')}</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => navigate('/tiktok-lab')} 
-                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                        >
-                          <Video className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">Goldsainte Creator Lab</span>
-                        </DropdownMenuItem>
+                        {(isCreator || isAgentAccount || isBrand) && (
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/tiktok-lab')} 
+                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                          >
+                            <Video className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                            <span className="text-sm font-medium">Goldsainte Creator Lab</span>
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem
                           onClick={() => navigate('/post-trip')}
                           className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
@@ -635,20 +637,24 @@ export const Header = () => {
                         <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Browse Agents</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => navigate('/trip-requests')}
-                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                      >
-                        <ShoppingCart className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">Trip Requests Marketplace</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => navigate('/tiktok-lab')} 
-                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                      >
-                        <Video className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">Goldsainte Creator Lab</span>
-                      </DropdownMenuItem>
+                      {(isCreator || isAgentAccount || isBrand) && (
+                        <>
+                          <DropdownMenuItem
+                            onClick={() => navigate('/trip-requests')}
+                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <ShoppingCart className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">Trip Requests Marketplace</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/tiktok-lab')} 
+                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <Video className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">Goldsainte Creator Lab</span>
+                          </DropdownMenuItem>
+                        </>
+                      )}
                       <DropdownMenuItem
                         onClick={() => navigate('/post-trip')}
                         className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
