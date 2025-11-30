@@ -964,39 +964,48 @@ export const Header = () => {
       {/* Mobile Bottom Navigation */}
       {isMobile && (
         <nav className="fixed bottom-0 left-0 right-0 z-[100] bg-background border-t border-border shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
-          <div className="grid grid-cols-4 h-16">
+          <div className="grid grid-cols-5 h-16">
             <button
               onClick={() => setSearchSheetOpen(true)}
-              className="flex flex-col items-center justify-center gap-1 hover:bg-muted transition-colors min-h-[44px]"
+              className="flex flex-col items-center justify-center gap-0.5 hover:bg-muted transition-colors min-h-[44px]"
               aria-label="Search"
             >
               <Search className="h-5 w-5" />
-              <span className="text-xs">Search</span>
+              <span className="text-[10px]">Search</span>
             </button>
 
             <button
               onClick={() => navigate('/marketplace')}
-              className="flex flex-col items-center justify-center gap-1 hover:bg-muted transition-colors min-h-[44px]"
+              className="flex flex-col items-center justify-center gap-0.5 hover:bg-muted transition-colors min-h-[44px]"
               aria-label="Marketplace"
               data-tour="marketplace"
             >
               <Briefcase className="h-5 w-5" />
-              <span className="text-xs">Marketplace</span>
+              <span className="text-[10px]">Marketplace</span>
+            </button>
+
+            <button
+              onClick={() => (user ? navigate('/collections') : navigate('/auth'))}
+              className="flex flex-col items-center justify-center gap-0.5 hover:bg-muted transition-colors min-h-[44px]"
+              aria-label="Collections"
+            >
+              <Sparkles className="h-5 w-5" />
+              <span className="text-[10px]">Collections</span>
             </button>
 
             <button
               onClick={() => (user ? navigate(primaryBookingsPath) : navigate('/auth'))}
-              className="flex flex-col items-center justify-center gap-1 hover:bg-muted transition-colors min-h-[44px]"
+              className="flex flex-col items-center justify-center gap-0.5 hover:bg-muted transition-colors min-h-[44px]"
               aria-label="Bookings"
               data-tour="bookings"
             >
               <Calendar className="h-5 w-5" />
-              <span className="text-xs">Bookings</span>
+              <span className="text-[10px]">Bookings</span>
             </button>
 
             <button
               onClick={() => user ? navigate(`/creator/${user.id}`) : navigate('/auth')}
-              className="flex flex-col items-center justify-center gap-1 hover:bg-muted transition-colors min-h-[44px]"
+              className="flex flex-col items-center justify-center gap-0.5 hover:bg-muted transition-colors min-h-[44px]"
               aria-label="Profile"
               data-tour="profile"
             >
@@ -1010,7 +1019,7 @@ export const Header = () => {
               ) : (
                 <User className="h-5 w-5" />
               )}
-              <span className="text-xs">Profile</span>
+              <span className="text-[10px]">Profile</span>
             </button>
           </div>
         </nav>
