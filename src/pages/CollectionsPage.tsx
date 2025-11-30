@@ -256,6 +256,49 @@ export default function CollectionsPage() {
           </div>
         )}
 
+        {/* Luxury Fallback CTA - "Dreaming of something else?" */}
+        {!loading && itineraries.length > 0 && (
+          <Card className="mt-16 bg-gradient-to-br from-[#FDF9F0] to-[#F6F0E4] border border-[#E5DFC6] rounded-2xl overflow-hidden">
+            <div className="p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
+              {/* Left: Editorial image */}
+              <div className="w-full md:w-1/3 aspect-[4/3] rounded-xl overflow-hidden flex-shrink-0">
+                <img 
+                  src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80" 
+                  alt="Create your own journey"
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+              
+              {/* Right: Content */}
+              <div className="flex-1 text-center md:text-left space-y-4">
+                <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] leading-tight">
+                  Dreaming of something the AI didn't imagine?
+                </h2>
+                <p className="text-sm text-muted-foreground max-w-lg leading-relaxed">
+                  Start with a blank canvas. Build your own visual storyboard with photos, 
+                  TikTok inspiration, and notes — then share it with our curated network 
+                  of travel professionals, or simply keep dreaming.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-3 pt-4 justify-center md:justify-start">
+                  <Button asChild className="rounded-full px-6 bg-[#0a2225] hover:bg-[#0a2225]/90">
+                    <Link to="/storyboards/new">
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Begin Your Storyboard
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" className="rounded-full px-6 border-[#E5DFC6] hover:bg-white/60">
+                    <Link to="/creators">
+                      Browse Creators for Inspiration
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
+
         {/* Bottom CTA */}
         {!loading && itineraries.length > 0 && (
           <div className="text-center mt-16 pt-10 border-t border-[#E5DFC6]">
