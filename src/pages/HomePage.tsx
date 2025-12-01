@@ -7,9 +7,9 @@ export default function HomePage() {
   return (
     <main className="bg-[#f7f3ea] text-[#0a2225] min-h-screen">
       <HomeHero />
+      <StoryboardsHighlight />
       <BuiltForEverySideSection />
       <HowGoldsainteWorksSection />
-      <StoryboardsHighlight />
       <TrustSafetyPaymentsSection />
       <RoleSpecificCTAs />
     </main>
