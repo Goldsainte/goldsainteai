@@ -1,6 +1,7 @@
 import { useWelcomeModal } from "@/hooks/useWelcomeModal";
 import { Sparkles, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import welcomeHeroImage from "@/assets/welcome-modal-hero.jpg";
 
 export function OnboardingWelcomeModal() {
   const { open, dismiss, accountType, displayName, loading } = useWelcomeModal();
@@ -46,60 +47,74 @@ export function OnboardingWelcomeModal() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-      <div className="w-full max-w-lg rounded-3xl bg-[#FDF9F0] border border-[#E5DFC6] p-6 md:p-8 space-y-5 shadow-[0_24px_60px_rgba(10,34,37,0.18)] text-[#0a2225]">
-        {/* Header */}
-        <div className="flex items-center justify-between gap-3">
-          <div className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-[#7A7151] bg-[#C7B892]/30 px-3 py-1.5 rounded-full font-medium">
-            <Sparkles className="h-3 w-3" />
-            Goldsainte
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+      <div className="w-full max-w-3xl rounded-3xl bg-[#FDF9F0] border border-[#E5DFC6] overflow-hidden shadow-[0_24px_60px_rgba(10,34,37,0.25)] text-[#0a2225]">
+        <div className="flex flex-col md:flex-row">
+          {/* Left: Hero Image */}
+          <div className="md:w-[40%] relative">
+            <img
+              src={welcomeHeroImage}
+              alt="Luxury travel destination"
+              className="w-full h-48 md:h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent md:bg-gradient-to-r" />
           </div>
-          <button
-            type="button"
-            onClick={dismiss}
-            className="text-xs text-[#7A7151] hover:text-[#0a2225] underline-offset-2 hover:underline transition-colors"
-          >
-            Skip for now
-          </button>
-        </div>
 
-        {/* Title & Greeting */}
-        <div className="space-y-2">
-          <p className="text-sm text-[#4A4A4A]">
-            Hi {name}, welcome in.
-          </p>
-          <h2 className="font-secondary text-2xl md:text-3xl font-semibold text-[#0a2225] leading-tight">
-            {title}
-          </h2>
-        </div>
+          {/* Right: Content */}
+          <div className="md:w-[60%] p-6 md:p-8 space-y-5">
+            {/* Header */}
+            <div className="flex items-center justify-between gap-3">
+              <div className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-[#7A7151] bg-[#C7B892]/30 px-3 py-1.5 rounded-full font-medium">
+                <Sparkles className="h-3 w-3" />
+                Goldsainte
+              </div>
+              <button
+                type="button"
+                onClick={dismiss}
+                className="text-xs text-[#7A7151] hover:text-[#0a2225] underline-offset-2 hover:underline transition-colors"
+              >
+                Skip for now
+              </button>
+            </div>
 
-        {/* Bullet Cards */}
-        <ul className="space-y-2.5">
-          {bullets.map((b, idx) => (
-            <li
-              key={idx}
-              className="flex gap-3 rounded-xl border border-[#E5DFC6] bg-white/80 px-4 py-3"
-            >
-              <span className="mt-1 h-2 w-2 rounded-full bg-[#C7B892] flex-shrink-0" />
-              <span className="text-[13px] text-[#3F3A33] leading-relaxed">{b}</span>
-            </li>
-          ))}
-        </ul>
+            {/* Title & Greeting */}
+            <div className="space-y-2">
+              <p className="text-sm text-[#4A4A4A]">
+                Hi {name}, welcome in.
+              </p>
+              <h2 className="font-secondary text-xl md:text-2xl font-semibold text-[#0a2225] leading-tight">
+                {title}
+              </h2>
+            </div>
 
-        {/* Footer CTA */}
-        <div className="flex flex-col gap-4 pt-2 md:flex-row md:items-center md:justify-between">
-          <Link
-            to={primaryCta.href}
-            onClick={dismiss}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0a2225] text-[#E5DFC6] px-5 py-2.5 text-sm font-semibold hover:bg-[#0a2225]/90 transition-colors"
-          >
-            {primaryCta.label}
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-          <p className="text-xs text-[#7A7151] max-w-sm leading-relaxed">
-            You can always find this view again from your dashboard — we just
-            wanted your first step to feel clear, not chaotic.
-          </p>
+            {/* Bullet Cards */}
+            <ul className="space-y-2">
+              {bullets.map((b, idx) => (
+                <li
+                  key={idx}
+                  className="flex gap-3 rounded-xl border border-[#E5DFC6] bg-white/80 px-3 py-2.5"
+                >
+                  <span className="mt-1 h-2 w-2 rounded-full bg-[#C7B892] flex-shrink-0" />
+                  <span className="text-[12px] text-[#3F3A33] leading-relaxed">{b}</span>
+                </li>
+              ))}
+            </ul>
+
+            {/* Footer CTA */}
+            <div className="flex flex-col gap-3 pt-1">
+              <Link
+                to={primaryCta.href}
+                onClick={dismiss}
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0a2225] text-[#E5DFC6] px-5 py-2.5 text-sm font-semibold hover:bg-[#0a2225]/90 transition-colors whitespace-nowrap"
+              >
+                {primaryCta.label}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <p className="text-[11px] text-[#7A7151] leading-relaxed">
+                You can always find this view again from your dashboard.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { User, Menu, Hotel, Plane, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info, Sparkles, CreditCard, PlaneTakeoff, HandCoins, ShieldCheck } from "lucide-react";
+import { User, Hotel, Plane, Ticket, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info, Sparkles, CreditCard, PlaneTakeoff, HandCoins, ShieldCheck, Car } from "lucide-react";
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { CreateMomentModal } from "@/components/CreateMomentModal";
 import { Button } from "@/components/ui/button";
@@ -220,7 +220,7 @@ export const Header = () => {
           {/* Mobile Layout */}
           {isMobile ? (
             <div className="flex flex-col gap-2 py-2">
-              {/* Top row: Logo + Navigation + User Menu */}
+              {/* Top row: Logo + Notifications + Profile Menu */}
               <div className="flex items-center justify-between">
                 <a href="/" className="flex items-center hover:opacity-90 transition-opacity">
                   <img src={logomark} alt="Goldsainte Logo" className="h-8 w-8" />
@@ -229,180 +229,91 @@ export const Header = () => {
                 <div className="flex items-center gap-2">
                   {user && <NotificationBell />}
                   
-                  {/* Mobile Navigation Menu */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          className="h-12 w-12 min-h-[48px] min-w-[48px] hover:bg-[#BFAD72] transition-all duration-300 group touch-manipulation"
-                          aria-label="Main menu"
-                        >
-                          <Menu className="h-6 w-6 text-[#BFAD72] group-hover:text-white transition-colors" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent 
-                      align="end" 
-                      className="w-80 max-h-[75vh] overflow-y-auto bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100]"
-                    >
-                      {/* Discover Section */}
-                      <div className="px-4 py-3 border-b border-border/50">
-                        <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">{t('navigation.discover')}</p>
-                      </div>
-                      <div className="py-2">
-                        <DropdownMenuItem
-                          onClick={() => navigate('/storyboards')}
-                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                        >
-                          <Plane className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">{t('navigation.storyboards')}</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => navigate('/browse-creators')} 
-                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                        >
-                          <User className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">{t('navigation.browseCreators')}</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => navigate('/browse-agents')} 
-                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                        >
-                          <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">{t('navigation.browseAgents')}</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => navigate('/marketplace')} 
-                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                        >
-                          <ShoppingCart className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">{t('navigation.marketplace')}</span>
-                        </DropdownMenuItem>
-                        {(isCreator || isAgentAccount || isBrand) && (
-                          <DropdownMenuItem 
-                            onClick={() => navigate('/tiktok-lab')} 
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                          >
-                            <Video className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                            <span className="text-sm font-medium">Goldsainte Creator Lab</span>
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem
-                          onClick={() => navigate('/post-trip')}
-                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                        >
-                          <PlaneTakeoff className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">Post a Trip</span>
-                        </DropdownMenuItem>
-                      </div>
-                      
-                      <DropdownMenuSeparator className="bg-border/50" />
-                      
-                      {/* Professional Section */}
-                      <div className="px-4 py-3 border-b border-border/50">
-                        <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">{t('navigation.professional')}</p>
-                      </div>
-                      <div className="py-2">
-                        <DropdownMenuItem 
-                          onClick={() => navigate('/agent-onboarding')} 
-                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                        >
-                          <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">{t('navigation.becomeAgent')}</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => navigate('/transportation-vendor-partners')} 
-                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                        >
-                          <Car className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">{t('navigation.becomeTransportVendor')}</span>
-                        </DropdownMenuItem>
-                      </div>
-                      
-                      <DropdownMenuSeparator className="bg-border/50" />
-                      
-                      {/* Shop & Commerce Section */}
-                      <div className="px-4 py-3 border-b border-border/50">
-                        <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">{t('navigation.shopAndEarn')}</p>
-                      </div>
-                      <div className="py-2">
-                        <DropdownMenuItem
-                          onClick={() => navigate('/shop')}
-                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                        >
-                          <ShoppingCart className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">{t('navigation.shop')}</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => navigate('/affiliate-manager')}
-                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                        >
-                          <Link2 className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">{t('navigation.affiliateLinks')}</span>
-                        </DropdownMenuItem>
-                      </div>
-
-                      <DropdownMenuSeparator className="bg-border/50" />
-
-                      {/* Company Section */}
-                      <div className="px-4 py-3 border-b border-border/50">
-                        <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">{t('navigation.company')}</p>
-                      </div>
-                      <div className="py-2">
-                        <DropdownMenuItem
-                          onClick={() => navigate('/concierge')}
-                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                        >
-                          <Sparkles className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">{t('navigation.concierge')}</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => navigate('/about')}
-                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                        >
-                          <Info className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">{t('navigation.about')}</span>
-                        </DropdownMenuItem>
-                      </div>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  
-                  {/* Mobile User Menu */}
+                  {/* Unified Profile Menu - Mobile */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button 
                           variant="ghost" 
                           size="icon"
                           className="h-12 w-12 min-h-[48px] min-w-[48px] hover:bg-[#BFAD72] rounded-full border border-border shadow-sm transition-all duration-300 group touch-manipulation"
-                          aria-label="User menu"
+                          aria-label="Menu"
                         >
                           <User className="h-6 w-6 text-[#BFAD72] group-hover:text-white transition-colors" />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent 
                       align="end" 
-                      className="w-72 max-h-[75vh] overflow-y-auto bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100]"
+                      className="w-80 max-h-[80vh] overflow-y-auto bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100]"
                     >
                       {user ? (
                         <>
-                          <DropdownMenuItem
-                            onClick={() => navigate('/profile')} 
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                          >
-                            <User className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                            <span className="text-sm font-medium">Profile</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => navigate('/traveler')}
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                          >
-                            <LayoutDashboard className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                            <span className="text-sm font-medium">Dashboard</span>
-                          </DropdownMenuItem>
+                          {/* DISCOVER Section */}
+                          <div className="px-4 py-3 border-b border-border/50">
+                            <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Discover</p>
+                          </div>
+                          <div className="py-2">
+                            <DropdownMenuItem
+                              onClick={() => navigate('/storyboards')}
+                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <Plane className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm font-medium">Storyboards</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => navigate('/creators')} 
+                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <User className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm font-medium">Browse Creators</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => navigate('/browse-agents')} 
+                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm font-medium">Browse Agents</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => navigate('/marketplace')} 
+                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <ShoppingCart className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm font-medium">Marketplace</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => navigate('/post-trip')}
+                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <PlaneTakeoff className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm font-medium">Post a Trip</span>
+                            </DropdownMenuItem>
+                            {(isCreator || isAgentAccount || isBrand) && (
+                              <DropdownMenuItem 
+                                onClick={() => navigate('/tiktok-lab')} 
+                                className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                              >
+                                <Video className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                <span className="text-sm font-medium">Goldsainte Creator Lab</span>
+                              </DropdownMenuItem>
+                            )}
+                          </div>
                           
-                          {/* Trip-related navigation based on account type */}
-                          {accountType === 'traveler' && (
-                            <>
+                          <DropdownMenuSeparator className="bg-border/50" />
+                          
+                          {/* MY ACCOUNT Section */}
+                          <div className="px-4 py-3 border-b border-border/50">
+                            <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">My Account</p>
+                          </div>
+                          <div className="py-2">
+                            <DropdownMenuItem
+                              onClick={() => navigate('/traveler')}
+                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <LayoutDashboard className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm font-medium">Dashboard</span>
+                            </DropdownMenuItem>
+                            
+                            {isTraveler && (
                               <DropdownMenuItem 
                                 onClick={() => navigate('/my-trips')} 
                                 className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
@@ -410,93 +321,173 @@ export const Header = () => {
                                 <Plane className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                                 <span className="text-sm font-medium">My Trips</span>
                               </DropdownMenuItem>
+                            )}
+                            
+                            <DropdownMenuItem 
+                              onClick={() => navigate('/collections')} 
+                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <Sparkles className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm font-medium">My Collections</span>
+                            </DropdownMenuItem>
+                            
+                            {isAgentAccount && (
                               <DropdownMenuItem 
-                                onClick={() => navigate('/post-trip')} 
+                                onClick={() => navigate('/agent-trips')} 
                                 className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                               >
-                                <PlaneTakeoff className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                <span className="text-sm font-medium">Post a Trip</span>
+                                <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                <span className="text-sm font-medium">Available Trips</span>
                               </DropdownMenuItem>
-                            </>
-                          )}
+                            )}
+                            
+                            {isCreator && (
+                              <DropdownMenuItem 
+                                onClick={() => navigate('/creator-trips')} 
+                                className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                              >
+                                <Video className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                <span className="text-sm font-medium">Collab Opportunities</span>
+                              </DropdownMenuItem>
+                            )}
+                            
+                            {showPartnerBookings && (
+                              <DropdownMenuItem 
+                                onClick={() => navigate('/partner-bookings')} 
+                                className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                              >
+                                <Calendar className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                <span className="text-sm font-medium">Partner Bookings</span>
+                              </DropdownMenuItem>
+                            )}
+                          </div>
                           
-                          {accountType === 'agent' && (
-                            <DropdownMenuItem 
-                              onClick={() => navigate('/agent-trips')} 
-                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                            >
-                              <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                              <span className="text-sm font-medium">Available Trips</span>
-                            </DropdownMenuItem>
-                          )}
-                          
-                          {accountType === 'creator' && (
-                            <DropdownMenuItem 
-                              onClick={() => navigate('/creator-trips')} 
-                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                            >
-                              <Video className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                              <span className="text-sm font-medium">Collab Opportunities</span>
-                            </DropdownMenuItem>
-                          )}
-                          
-                          {/* Goldsainte Creator Lab - Creators, Agents, Brands only */}
+                          {/* EARNINGS & BILLING Section - Creators/Agents/Brands only */}
                           {(isCreator || isAgentAccount || isBrand) && (
-                            <DropdownMenuItem 
-                              onClick={() => navigate('/tiktok-lab')} 
-                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                            >
-                              <Video className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                              <span className="text-sm font-medium">Goldsainte Creator Lab</span>
-                            </DropdownMenuItem>
-                          )}
-                          
-                          {/* Billing - Creators, Agents, Brands only */}
-                          {(isCreator || isAgentAccount || isBrand) && (
-                            <DropdownMenuItem 
-                              onClick={() => navigate('/billing-dashboard')} 
-                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                            >
-                              <CreditCard className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                              <span className="text-sm font-medium">Billing</span>
-                            </DropdownMenuItem>
-                          )}
-                          
-                          {/* Create Content - Creators only */}
-                          {isCreator && (
-                            <DropdownMenuItem 
-                              onClick={handleCreateClick} 
-                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                            >
-                              <Plus className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                              <span className="text-sm font-medium">Create Content</span>
-                            </DropdownMenuItem>
-                          )}
-                          
-                          {/* Creator Dashboard + Earnings - Creators only */}
-                          {isCreator && (
                             <>
-                              <DropdownMenuItem 
-                                onClick={() => navigate('/creator-dashboard')} 
-                                className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                              >
-                                <TrendingUp className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                <span className="text-sm font-medium">Creator Dashboard</span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                onClick={() => navigate('/tiktok-lab/earnings')} 
-                                className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                              >
-                                <HandCoins className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                <span className="text-sm font-medium">Earnings</span>
-                              </DropdownMenuItem>
+                              <DropdownMenuSeparator className="bg-border/50" />
+                              <div className="px-4 py-3 border-b border-border/50">
+                                <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Earnings & Billing</p>
+                              </div>
+                              <div className="py-2">
+                                {isCreator && (
+                                  <DropdownMenuItem 
+                                    onClick={() => navigate('/tiktok-lab/earnings')} 
+                                    className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                                  >
+                                    <HandCoins className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                    <span className="text-sm font-medium">Earnings</span>
+                                  </DropdownMenuItem>
+                                )}
+                                <DropdownMenuItem 
+                                  onClick={() => navigate('/partner/escrow')} 
+                                  className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                                >
+                                  <ShieldCheck className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                  <span className="text-sm font-medium">Escrow & Milestones</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  onClick={() => navigate('/billing-dashboard')} 
+                                  className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                                >
+                                  <CreditCard className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                  <span className="text-sm font-medium">Billing</span>
+                                </DropdownMenuItem>
+                              </div>
                             </>
                           )}
                           
                           <DropdownMenuSeparator className="bg-border/50" />
                           
+                          {/* PROFESSIONAL Section */}
+                          <div className="px-4 py-3 border-b border-border/50">
+                            <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Professional</p>
+                          </div>
+                          <div className="py-2">
+                            <DropdownMenuItem 
+                              onClick={() => navigate('/apply/agent')} 
+                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm font-medium">Become an Agent</span>
+                            </DropdownMenuItem>
+                          </div>
+                          
+                          <DropdownMenuSeparator className="bg-border/50" />
+                          
+                          {/* COMPANY Section */}
+                          <div className="px-4 py-3 border-b border-border/50">
+                            <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Company</p>
+                          </div>
+                          <div className="py-2">
+                            <DropdownMenuItem
+                              onClick={() => navigate('/concierge')}
+                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <Sparkles className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm font-medium">Concierge</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => navigate('/about')}
+                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <Info className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm font-medium">About</span>
+                            </DropdownMenuItem>
+                          </div>
+                          
+                          {/* ADMIN Section - Admin only */}
+                          {isAdmin && (
+                            <>
+                              <DropdownMenuSeparator className="bg-border/50" />
+                              <div className="px-4 py-3 border-b border-border/50">
+                                <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Admin</p>
+                              </div>
+                              <div className="py-2">
+                                {[
+                                  { label: 'Admin overview', path: '/admin' },
+                                  { label: 'Agents dashboard', path: '/admin/agents' },
+                                  { label: 'Creators dashboard', path: '/admin/creators' },
+                                  { label: 'Bookings & revenue', path: '/admin/bookings' },
+                                  { label: 'Disputes', path: '/admin/disputes' },
+                                ].map((item) => (
+                                  <DropdownMenuItem
+                                    key={item.path}
+                                    onClick={() => navigate(item.path)}
+                                    className="mx-2 px-4 py-3 min-h-[44px] cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                                  >
+                                    <span className="text-sm font-semibold text-secondary">{item.label}</span>
+                                  </DropdownMenuItem>
+                                ))}
+                              </div>
+                            </>
+                          )}
+                          
+                          <DropdownMenuSeparator className="bg-border/50" />
+                          
+                          {/* SETTINGS Section */}
+                          <div className="px-4 py-4">
+                            <div className="flex items-center justify-between gap-3">
+                              <Label htmlFor="preferences-toggle-mobile" className="text-sm font-medium cursor-pointer flex-1 leading-tight">
+                                Use My Preferences
+                              </Label>
+                              <Switch
+                                id="preferences-toggle-mobile"
+                                checked={usePreferences}
+                                onCheckedChange={togglePreferences}
+                                className="flex-shrink-0 h-6 w-11"
+                                aria-label="Toggle search preferences"
+                              />
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
+                              Apply saved preferences to searches
+                            </p>
+                          </div>
+                          
+                          <DropdownMenuSeparator className="bg-border/50" />
+                          
                           {/* Language Selector */}
-                          <div className="mx-2 px-4 py-3">
+                          <div className="px-4 py-4">
                             <p className="text-xs font-medium text-muted-foreground mb-2">Language</p>
                             <LanguageSelector
                               variant="outline" 
@@ -508,31 +499,31 @@ export const Header = () => {
                           
                           <DropdownMenuSeparator className="bg-border/50" />
                           
-                          <DropdownMenuItem 
-                            onClick={signOut} 
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 text-destructive touch-manipulation"
-                          >
-                            <User className="h-5 w-5 flex-shrink-0" />
-                            <span className="text-sm font-medium">Sign Out</span>
-                          </DropdownMenuItem>
+                          <div className="py-2 pb-3">
+                            <DropdownMenuItem 
+                              onClick={signOut} 
+                              className="mx-2 px-4 py-4 min-h-[48px] cursor-pointer rounded-lg hover:bg-destructive/10 hover:text-destructive touch-manipulation"
+                            >
+                              <span className="text-sm font-medium">Sign Out</span>
+                            </DropdownMenuItem>
+                          </div>
                         </>
                       ) : (
-                        <>
+                        /* Logged Out - Simple Sign In / Sign Up */
+                        <div className="py-2">
                           <DropdownMenuItem 
                             onClick={() => navigate('/auth')} 
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            className="mx-2 px-4 py-4 min-h-[48px] cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                           >
-                            <User className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                            <span className="text-sm font-medium">Sign In</span>
+                            <span className="text-sm font-semibold">Sign In</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem 
                             onClick={() => navigate('/auth?mode=signup')} 
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 bg-secondary/20 touch-manipulation"
+                            className="mx-2 px-4 py-4 min-h-[48px] cursor-pointer rounded-lg hover:bg-secondary/10 bg-secondary/5 touch-manipulation"
                           >
-                            <User className="h-5 w-5 text-secondary flex-shrink-0" />
-                            <span className="text-sm font-medium text-secondary">Sign Up</span>
+                            <span className="text-sm font-medium">Sign Up</span>
                           </DropdownMenuItem>
-                        </>
+                        </div>
                       )}
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -571,309 +562,236 @@ export const Header = () => {
                 <ExpediaSearchBar />
               </div>
 
-              {/* Right side actions */}
+              {/* Right side actions - Single Profile Menu */}
               <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
                 {user && <NotificationBell />}
                 
-                {/* Main Navigation - Desktop */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      className="h-12 w-12 min-h-[48px] min-w-[48px] sm:h-12 sm:w-12 hover:bg-[#BFAD72] transition-all duration-300 group touch-manipulation"
-                      aria-label="Main menu"
-                      data-tour="navigation"
-                    >
-                      <Menu className="h-6 w-6 text-[#BFAD72] group-hover:text-white transition-colors" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent 
-                    align="end" 
-                    className="w-80 max-h-[75vh] overflow-y-auto bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100] animate-in fade-in-0 zoom-in-95 duration-200"
-                  >
-                    
-                    {/* Discover Section */}
-                    <div className="px-4 py-3 border-b border-border/50">
-                      <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Discover</p>
-                    </div>
-                    <div className="py-2">
-                      <DropdownMenuItem
-                        onClick={() => navigate('/storyboards')}
-                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                      >
-                        <Plane className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">{t('navigation.storyboards')}</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => navigate('/browse-creators')} 
-                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                      >
-                        <User className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">Browse Creators</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => navigate('/browse-agents')} 
-                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                      >
-                        <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">Browse Agents</span>
-                      </DropdownMenuItem>
-                      {(isCreator || isAgentAccount || isBrand) && (
-                        <>
-                          <DropdownMenuItem
-                            onClick={() => navigate('/trip-requests')}
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                          >
-                            <ShoppingCart className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">Trip Requests Marketplace</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => navigate('/tiktok-lab')} 
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                          >
-                            <Video className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">Goldsainte Creator Lab</span>
-                          </DropdownMenuItem>
-                        </>
-                      )}
-                      <DropdownMenuItem
-                        onClick={() => navigate('/post-trip')}
-                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                      >
-                        <PlaneTakeoff className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">Post a Trip</span>
-                      </DropdownMenuItem>
-                    </div>
-
-                    <DropdownMenuSeparator className="bg-border/50" />
-
-                    {user && (
-                      <>
-                        <div className="px-4 py-3 border-b border-border/50">
-                          <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">
-                            Trips & Bookings
-                          </p>
-                        </div>
-                        <div className="py-2">
-                          <DropdownMenuItem
-                            onClick={() => navigate('/my-trips')}
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                          >
-                            <Calendar className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">My Trips</span>
-                          </DropdownMenuItem>
-                          {showPartnerBookings && (
-                            <DropdownMenuItem
-                              onClick={() => navigate('/partner-bookings')}
-                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                            >
-                              <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                              <span className="text-sm font-medium">Partner Bookings</span>
-                            </DropdownMenuItem>
-                          )}
-                          {showPartnerBookings && (
-                            <DropdownMenuItem
-                              onClick={() => navigate('/partner/escrow')}
-                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                            >
-                              <ShieldCheck className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                              <span className="text-sm font-medium">Escrow & Milestones</span>
-                            </DropdownMenuItem>
-                          )}
-                          {isAgentAccount && (
-                            <DropdownMenuItem
-                              onClick={() => navigate('/agent/earnings')}
-                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                            >
-                              <HandCoins className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                              <span className="text-sm font-medium">Agent Earnings</span>
-                            </DropdownMenuItem>
-                          )}
-                          {isCreator && (
-                            <DropdownMenuItem
-                              onClick={() => navigate('/tiktok-lab/earnings')}
-                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                            >
-                              <Sparkles className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                              <span className="text-sm font-medium">Creator Earnings</span>
-                            </DropdownMenuItem>
-                          )}
-                        </div>
-
-                        <DropdownMenuSeparator className="bg-border/50" />
-                      </>
-                    )}
-
-                    {/* Professional Section */}
-                    <div className="px-4 py-3 border-b border-border/50">
-                      <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Professional</p>
-                    </div>
-                    <div className="py-2 pb-3">
-                      <DropdownMenuItem 
-                        onClick={() => navigate('/agent-onboarding')} 
-                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                      >
-                        <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">Become an Agent</span>
-                      </DropdownMenuItem>
-                    </div>
-                    
-                    <DropdownMenuSeparator className="bg-border/50" />
-                    
-                    
-                    {/* Company Section */}
-                    <div className="px-4 py-3 border-b border-border/50">
-                      <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Company</p>
-                    </div>
-                    <div className="py-2 pb-3">
-                      <DropdownMenuItem
-                        onClick={() => navigate('/concierge')}
-                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                      >
-                        <Sparkles className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">Concierge</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => navigate('/about')} 
-                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                      >
-                        <Info className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">About</span>
-                      </DropdownMenuItem>
-                    </div>
-                  </DropdownMenuContent>
-                 </DropdownMenu>
-
-                {/* User Menu */}
+                {/* Unified Profile Menu - Desktop */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button 
                       variant="ghost" 
                       size="icon"
                       className="h-12 w-12 min-h-[48px] min-w-[48px] sm:h-12 sm:w-12 hover:bg-[#BFAD72] rounded-full border border-border shadow-sm transition-all duration-300 group touch-manipulation"
-                      aria-label="User menu"
+                      aria-label="Menu"
+                      data-tour="navigation"
                     >
                       <User className="h-6 w-6 text-[#BFAD72] group-hover:text-white transition-colors" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent 
                     align="end" 
-                    className="w-72 max-h-[75vh] overflow-y-auto bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100] animate-in fade-in-0 zoom-in-95 duration-200"
+                    className="w-80 max-h-[80vh] overflow-y-auto bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100] animate-in fade-in-0 zoom-in-95 duration-200"
                   >
                     {user ? (
                       <>
+                        {/* DISCOVER Section */}
+                        <div className="px-4 py-3 border-b border-border/50">
+                          <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Discover</p>
+                        </div>
+                        <div className="py-2">
+                          <DropdownMenuItem
+                            onClick={() => navigate('/storyboards')}
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <Plane className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">Storyboards</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/creators')} 
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <User className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">Browse Creators</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/browse-agents')} 
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">Browse Agents</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/marketplace')} 
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <ShoppingCart className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">Marketplace</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => navigate('/post-trip')}
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <PlaneTakeoff className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">Post a Trip</span>
+                          </DropdownMenuItem>
+                          {(isCreator || isAgentAccount || isBrand) && (
+                            <DropdownMenuItem 
+                              onClick={() => navigate('/tiktok-lab')} 
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                            >
+                              <Video className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                              <span className="text-sm font-medium">Goldsainte Creator Lab</span>
+                            </DropdownMenuItem>
+                          )}
+                        </div>
+
+                        <DropdownMenuSeparator className="bg-border/50" />
+
+                        {/* MY ACCOUNT Section */}
+                        <div className="px-4 py-3 border-b border-border/50">
+                          <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">My Account</p>
+                        </div>
                         <div className="py-2">
                           <DropdownMenuItem
                             onClick={() => navigate('/traveler')}
-                            className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                           >
-                            <LayoutDashboard className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <LayoutDashboard className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                             <span className="text-sm font-medium">Dashboard</span>
                           </DropdownMenuItem>
                           
-                          {/* Trip-related navigation based on account type */}
-                          {accountType === 'traveler' && (
-                            <>
-                              <DropdownMenuItem 
-                                onClick={() => navigate('/my-trips')} 
-                                className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                              >
-                                <Plane className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                                <span className="text-sm font-medium">My Trips</span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                onClick={() => navigate('/post-trip')} 
-                                className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                              >
-                                <PlaneTakeoff className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                                <span className="text-sm font-medium">Post a Trip</span>
-                              </DropdownMenuItem>
-                            </>
+                          {isTraveler && (
+                            <DropdownMenuItem 
+                              onClick={() => navigate('/my-trips')} 
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                            >
+                              <Plane className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                              <span className="text-sm font-medium">My Trips</span>
+                            </DropdownMenuItem>
                           )}
                           
-                          {accountType === 'agent' && (
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/collections')} 
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <Sparkles className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">My Collections</span>
+                          </DropdownMenuItem>
+                          
+                          {isAgentAccount && (
                             <DropdownMenuItem 
                               onClick={() => navigate('/agent-trips')} 
-                              className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                             >
-                              <Briefcase className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                              <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                               <span className="text-sm font-medium">Available Trips</span>
                             </DropdownMenuItem>
                           )}
                           
-                          {accountType === 'creator' && (
-                            <DropdownMenuItem 
-                              onClick={() => navigate('/creator-trips')} 
-                              className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                            >
-                              <Video className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                              <span className="text-sm font-medium">Collab Opportunities</span>
-                            </DropdownMenuItem>
-                          )}
-                          
-                          {/* Goldsainte Creator Lab - Creators, Agents, Brands only */}
-                          {(isCreator || isAgentAccount || isBrand) && (
-                            <DropdownMenuItem 
-                              onClick={() => navigate('/tiktok-lab')} 
-                              className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                            >
-                              <Video className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                              <span className="text-sm font-medium">Goldsainte Creator Lab</span>
-                            </DropdownMenuItem>
-                          )}
-                          
-                          {/* Billing - Creators, Agents, Brands only */}
-                          {(isCreator || isAgentAccount || isBrand) && (
-                            <DropdownMenuItem 
-                              onClick={() => navigate('/billing-dashboard')} 
-                              className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                            >
-                              <CreditCard className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                              <span className="text-sm font-medium">Billing</span>
-                            </DropdownMenuItem>
-                          )}
-                          
-                          {/* Create Content - Creators only */}
-                          {isCreator && (
-                            <DropdownMenuItem 
-                              onClick={handleCreateClick} 
-                              className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                            >
-                              <Plus className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                              <span className="text-sm font-medium">Create Content</span>
-                            </DropdownMenuItem>
-                          )}
-                          
-                          {/* Creator Dashboard + Earnings - Creators only */}
                           {isCreator && (
                             <>
                               <DropdownMenuItem 
-                                onClick={() => navigate('/creator-dashboard')} 
-                                className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                                data-tour="creator-dashboard"
+                                onClick={() => navigate('/creator-trips')} 
+                                className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                               >
-                                <TrendingUp className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                                <span className="text-sm font-medium">Creator Dashboard</span>
+                                <Video className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                                <span className="text-sm font-medium">Collab Opportunities</span>
                               </DropdownMenuItem>
                               <DropdownMenuItem 
-                                onClick={() => navigate('/tiktok-lab/earnings')} 
-                                className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                                onClick={() => navigate('/creator-dashboard')} 
+                                className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                                data-tour="creator-dashboard"
                               >
-                                <HandCoins className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                                <span className="text-sm font-medium">Earnings</span>
+                                <TrendingUp className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                                <span className="text-sm font-medium">Creator Dashboard</span>
                               </DropdownMenuItem>
                             </>
                           )}
+                          
+                          {showPartnerBookings && (
+                            <DropdownMenuItem 
+                              onClick={() => navigate('/partner-bookings')} 
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                            >
+                              <Calendar className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                              <span className="text-sm font-medium">Partner Bookings</span>
+                            </DropdownMenuItem>
+                          )}
+                        </div>
+
+                        {/* EARNINGS & BILLING Section - Creators/Agents/Brands only */}
+                        {(isCreator || isAgentAccount || isBrand) && (
+                          <>
+                            <DropdownMenuSeparator className="bg-border/50" />
+                            <div className="px-4 py-3 border-b border-border/50">
+                              <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Earnings & Billing</p>
+                            </div>
+                            <div className="py-2">
+                              {isCreator && (
+                                <DropdownMenuItem 
+                                  onClick={() => navigate('/tiktok-lab/earnings')} 
+                                  className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                                >
+                                  <HandCoins className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                                  <span className="text-sm font-medium">Earnings</span>
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem 
+                                onClick={() => navigate('/partner/escrow')} 
+                                className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                              >
+                                <ShieldCheck className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                                <span className="text-sm font-medium">Escrow & Milestones</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => navigate('/billing-dashboard')} 
+                                className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                              >
+                                <CreditCard className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                                <span className="text-sm font-medium">Billing</span>
+                              </DropdownMenuItem>
+                            </div>
+                          </>
+                        )}
+
+                        <DropdownMenuSeparator className="bg-border/50" />
+
+                        {/* PROFESSIONAL Section */}
+                        <div className="px-4 py-3 border-b border-border/50">
+                          <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Professional</p>
+                        </div>
+                        <div className="py-2">
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/apply/agent')} 
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">Become an Agent</span>
+                          </DropdownMenuItem>
                         </div>
                         
                         <DropdownMenuSeparator className="bg-border/50" />
                         
-                        
+                        {/* COMPANY Section */}
+                        <div className="px-4 py-3 border-b border-border/50">
+                          <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Company</p>
+                        </div>
+                        <div className="py-2">
+                          <DropdownMenuItem
+                            onClick={() => navigate('/concierge')}
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <Sparkles className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">Concierge</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/about')} 
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <Info className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">About</span>
+                          </DropdownMenuItem>
+                        </div>
+
+                        {/* ADMIN Section - Admin only */}
                         {isAdmin && (
                           <>
                             <DropdownMenuSeparator className="bg-border/50" />
-                            <div className="py-2 flex flex-col gap-1">
+                            <div className="px-4 py-3 border-b border-border/50">
+                              <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Admin</p>
+                            </div>
+                            <div className="py-2">
                               {[
                                 { label: 'Admin overview', path: '/admin' },
                                 { label: 'Agents dashboard', path: '/admin/agents' },
@@ -895,6 +813,7 @@ export const Header = () => {
                         
                         <DropdownMenuSeparator className="bg-border/50" />
                         
+                        {/* SETTINGS Section */}
                         <div className="px-4 py-4">
                           <div className="flex items-center justify-between gap-3">
                             <Label htmlFor="preferences-toggle" className="text-sm font-medium cursor-pointer flex-1 leading-tight">
@@ -904,7 +823,7 @@ export const Header = () => {
                               id="preferences-toggle"
                               checked={usePreferences}
                               onCheckedChange={togglePreferences}
-                              className="flex-shrink-0"
+                              className="flex-shrink-0 h-6 w-11"
                               aria-label="Toggle search preferences"
                             />
                           </div>
@@ -938,6 +857,7 @@ export const Header = () => {
                         </div>
                       </>
                     ) : (
+                      /* Logged Out - Simple Sign In / Sign Up */
                       <div className="py-2">
                         <DropdownMenuItem 
                           onClick={() => navigate('/auth')} 
@@ -946,7 +866,7 @@ export const Header = () => {
                           <span className="text-sm font-semibold">Sign In</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                          onClick={() => navigate('/auth')} 
+                          onClick={() => navigate('/auth?mode=signup')} 
                           className="mx-2 px-4 py-4 min-h-[48px] cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 touch-manipulation"
                         >
                           <span className="text-sm font-medium">Sign Up</span>
@@ -994,70 +914,43 @@ export const Header = () => {
             </button>
 
             <button
-              onClick={() => (user ? navigate(primaryBookingsPath) : navigate('/auth'))}
+              onClick={() => navigate('/concierge')}
               className="flex flex-col items-center justify-center gap-0.5 hover:bg-muted transition-colors min-h-[44px]"
-              aria-label="Bookings"
-              data-tour="bookings"
+              aria-label="Concierge"
             >
-              <Calendar className="h-5 w-5" />
-              <span className="text-[10px]">Bookings</span>
+              <Sparkles className="h-5 w-5" />
+              <span className="text-[10px]">Concierge</span>
             </button>
 
             <button
-              onClick={() => user ? navigate(`/creator/${user.id}`) : navigate('/auth')}
+              onClick={() => (user ? navigate('/profile') : navigate('/auth'))}
               className="flex flex-col items-center justify-center gap-0.5 hover:bg-muted transition-colors min-h-[44px]"
               aria-label="Profile"
-              data-tour="profile"
             >
-              {user ? (
-                <Avatar className="h-6 w-6 ring-2 ring-primary/20">
-                  <AvatarImage src={profileAvatarUrl || user.user_metadata?.avatar_url} />
-                  <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                    {user.user_metadata?.username?.[0]?.toUpperCase() || 'U'}
-                  </AvatarFallback>
-                </Avatar>
-              ) : (
-                <User className="h-5 w-5" />
-              )}
+              <User className="h-5 w-5" />
               <span className="text-[10px]">Profile</span>
             </button>
           </div>
         </nav>
       )}
 
-      {/* Mobile Search Sheet */}
-      {isMobile && (
-        <Sheet open={searchSheetOpen} onOpenChange={setSearchSheetOpen}>
-          <SheetContent side="bottom" className="h-full max-h-[100dvh] p-0 rounded-t-3xl">
-            <div className="flex flex-col h-full">
-              <SheetHeader className="px-6 py-4 border-b border-border flex-shrink-0">
-                <div className="flex items-center justify-between">
-                  <button 
-                    onClick={() => setSearchSheetOpen(false)}
-                    className="flex items-center gap-2 text-foreground hover:opacity-70 transition-opacity"
-                    aria-label="Close search"
-                  >
-                    <ArrowLeft className="h-5 w-5" />
-                    <span className="text-sm font-medium">Back to Search</span>
-                  </button>
-                </div>
-              </SheetHeader>
-              <div className="flex-1 overflow-y-auto pb-20">
-                <div className="p-6">
-                  <SearchBar />
-                </div>
-              </div>
-            </div>
-          </SheetContent>
-        </Sheet>
-      )}
+      {/* Search Sheet - Mobile */}
+      <Sheet open={searchSheetOpen} onOpenChange={setSearchSheetOpen}>
+        <SheetContent side="bottom" className="h-[85vh] overflow-y-auto">
+          <SheetHeader className="text-left">
+            <SheetTitle>Search</SheetTitle>
+            <SheetDescription>
+              Find hotels, flights, and events
+            </SheetDescription>
+          </SheetHeader>
+          <div className="mt-4 space-y-4">
+            <ExpediaSearchBar />
+          </div>
+        </SheetContent>
+      </Sheet>
 
-      {/* Create Moment Modal */}
-      <CreateMomentModal
-        open={createMomentOpen}
-        onOpenChange={setCreateMomentOpen}
-      />
-
+      {/* Create Content Modal */}
+      <CreateMomentModal open={createMomentOpen} onOpenChange={setCreateMomentOpen} />
     </>
   );
 };

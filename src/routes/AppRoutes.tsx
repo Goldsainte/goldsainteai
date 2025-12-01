@@ -348,7 +348,14 @@ export const AppRoutes = () => (
           </RequireAuth>
         )}
       />
-      <Route path="/my-trips" element={<MyTripsPage />} />
+      <Route 
+        path="/my-trips" 
+        element={(
+          <RequireAuth>
+            <MyTripsPage />
+          </RequireAuth>
+        )} 
+      />
       <Route
         path="/post-trip"
         element={(
