@@ -117,6 +117,7 @@ export default function TravelerPreferencesOnboardingPage() {
         .update({ 
           onboarding_completed: true,
           onboarding_completed_at: new Date().toISOString(),
+          is_profile_complete: true,
         })
         .eq("id", user.id);
 
@@ -147,6 +148,7 @@ export default function TravelerPreferencesOnboardingPage() {
       .update({ 
         onboarding_completed: true,
         onboarding_completed_at: new Date().toISOString(),
+        is_profile_complete: true,
       })
       .eq("id", user.id);
 
