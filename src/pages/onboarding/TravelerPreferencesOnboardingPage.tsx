@@ -118,6 +118,7 @@ export default function TravelerPreferencesOnboardingPage() {
           onboarding_completed: true,
           onboarding_completed_at: new Date().toISOString(),
           is_profile_complete: true,
+          welcome_shown: true,
         })
         .eq("id", user.id);
 
@@ -149,6 +150,7 @@ export default function TravelerPreferencesOnboardingPage() {
         onboarding_completed: true,
         onboarding_completed_at: new Date().toISOString(),
         is_profile_complete: true,
+        welcome_shown: true,
       })
       .eq("id", user.id);
 

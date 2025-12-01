@@ -100,11 +100,7 @@ function AppContent() {
     void ensureCSRFToken();
   }, []);
 
-  useEffect(() => {
-    const handler = () => navigate("/");
-    window.addEventListener("welcomeDismissed", handler);
-    return () => window.removeEventListener("welcomeDismissed", handler);
-  }, [navigate]);
+  // Removed: welcomeDismissed navigation handler was causing unexpected redirects to home
 
   // Disabled auto-show of WelcomeModal on homepage to show new content immediately
   // useEffect(() => {
