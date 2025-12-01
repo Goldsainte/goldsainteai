@@ -122,13 +122,13 @@ export default function TravelerDashboardPage() {
     <main className="min-h-screen bg-[#FDF9F0] pb-24 lg:pb-0">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 md:py-12">
         {/* Sticky Header */}
-        <header className="mb-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <header className="mb-6 md:mb-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6">
             {/* Profile Summary */}
-            <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16 border-2 border-[#E5DFC6]">
+            <div className="flex items-center gap-3 md:gap-4">
+              <Avatar className="h-12 w-12 md:h-16 md:w-16 border-2 border-[#E5DFC6]">
                 <AvatarImage src={profile?.avatar_url || undefined} alt={displayName} />
-                <AvatarFallback className="bg-[#F6F0E4] text-[#0a2225] text-lg font-secondary">
+                <AvatarFallback className="bg-[#F6F0E4] text-[#0a2225] text-base md:text-lg font-secondary">
                   {getInitials(displayName)}
                 </AvatarFallback>
               </Avatar>
@@ -137,24 +137,24 @@ export default function TravelerDashboardPage() {
                   <Sparkles className="h-3 w-3" />
                   Traveler Hub
                 </p>
-                <h1 className="font-secondary text-2xl md:text-3xl text-[#0a2225]">
+                <h1 className="font-secondary text-xl md:text-2xl lg:text-3xl text-[#0a2225]">
                   Welcome back, {displayName.split(" ")[0]}
                 </h1>
               </div>
             </div>
 
             {/* Quick Actions */}
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-3">
               <button
                 onClick={() => navigate("/post-trip")}
-                className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] text-white px-5 py-2.5 text-sm font-medium hover:bg-[#0a2225]/90 transition-colors"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-[#0a2225] text-white px-5 py-2.5 text-sm font-medium hover:bg-[#0a2225]/90 transition-colors"
               >
                 <Plus className="h-4 w-4" />
                 Post Trip
               </button>
               <button
                 onClick={() => navigate("/concierge")}
-                className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-white text-[#0a2225] px-5 py-2.5 text-sm font-medium hover:bg-[#F6F0E4] transition-colors"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full border border-[#E5DFC6] bg-white text-[#0a2225] px-5 py-2.5 text-sm font-medium hover:bg-[#F6F0E4] transition-colors"
               >
                 <MessageCircle className="h-4 w-4 text-[#C7A962]" />
                 Ask Madison
