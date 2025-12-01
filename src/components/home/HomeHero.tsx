@@ -10,7 +10,7 @@ export function HomeHero() {
 
   return (
     <section className="bg-[#f7f3ea] text-[#0a2225]">
-      <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 pb-12 pt-16 md:flex-row md:items-center md:pt-20">
+      <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 pb-8 pt-16 md:flex-row md:items-center md:pt-20 md:pb-12">
         {/* LEFT: Copy & CTAs */}
         <div className="w-full md:w-[52%] space-y-5">
           <div className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#0C4D47]">
@@ -30,59 +30,40 @@ export function HomeHero() {
             {t('home.hero.mainDescription')}
           </p>
 
-          {/* Primary CTAs */}
-          <div className="flex flex-wrap items-center gap-3 pt-1">
+          {/* Primary CTAs - Mobile optimized layout */}
+          <div className="flex flex-col gap-3 pt-1 md:flex-row md:flex-wrap md:items-center">
+            {/* Primary CTA - Full width on mobile */}
             <Link
               to="/post-trip"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-6 py-2.5 text-sm font-semibold text-[#E5DFC6] shadow-sm hover:bg-[#073331]"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-6 py-3 text-sm font-semibold text-[#E5DFC6] shadow-sm hover:bg-[#073331] w-full md:w-auto"
             >
               {t('home.hero.postDreamTrip')}
             </Link>
 
-            <div className="inline-flex flex-wrap gap-2 text-sm">
+            {/* Secondary CTAs - Row of 2 on mobile */}
+            <div className="flex gap-2 w-full md:w-auto">
               <Link
                 to="/creators"
-                className="rounded-full border border-[#BFAD72] bg-white px-4 py-2 font-semibold text-[#0a2225] transition-all hover:bg-[#BFAD72] hover:text-white"
+                className="flex-1 md:flex-none text-center rounded-full border border-[#BFAD72] bg-white px-4 py-2.5 text-sm font-semibold text-[#0a2225] transition-all hover:bg-[#BFAD72] hover:text-white"
               >
                 {t('home.hero.browseCreators')}
               </Link>
               <Link
                 to="/agents"
-                className="rounded-full border border-[#E5DFC6] bg-white px-4 py-2 font-semibold text-[#0a2225] transition-all hover:bg-[#BFAD72] hover:text-white"
+                className="flex-1 md:flex-none text-center rounded-full border border-[#E5DFC6] bg-white px-4 py-2.5 text-sm font-semibold text-[#0a2225] transition-all hover:bg-[#BFAD72] hover:text-white"
               >
                 {t('home.hero.browseAgents')}
               </Link>
-
-              {/* NEW: Marketplace pill */}
-              <Link
-                to="/marketplace"
-                className="rounded-full border border-[#E5DFC6] bg-white px-4 py-2 font-semibold text-[#0a2225] transition-all hover:bg-[#BFAD72] hover:text-white"
-              >
-                {t('home.hero.marketplace')}
-              </Link>
             </div>
-          </div>
 
-          {/* Marketplace positioning statement */}
-          <p className="pt-1 text-[11px] text-[#8D8D8D]">
-            {t('home.hero.marketplaceDisclaimer')}
-          </p>
-
-          {/* AI concierge mention (not a second widget, just an entry point link) */}
-          <p className="pt-2 text-sm text-[#8D8D8D]">
-            {t('home.hero.gentleAssist')}{" "}
+            {/* Marketplace - Full width on mobile */}
             <Link
-              to="/concierge"
-              className="underline underline-offset-2 text-[#0c4d47]"
+              to="/marketplace"
+              className="text-center rounded-full border border-[#E5DFC6] bg-white px-4 py-2.5 text-sm font-semibold text-[#0a2225] transition-all hover:bg-[#BFAD72] hover:text-white w-full md:w-auto"
             >
-              {t('home.hero.askAI')}
+              {t('home.hero.marketplace')}
             </Link>
-          </p>
-
-          {/* Trust / promise line */}
-          <p className="pt-1 text-xs text-[#8D8D8D] max-w-sm">
-            {t('home.hero.trustPromise')}
-          </p>
+          </div>
         </div>
 
         {/* RIGHT: Luxury visual stack */}
@@ -130,6 +111,25 @@ export function HomeHero() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Disclaimer section - BELOW photo collage */}
+      <div className="max-w-6xl mx-auto px-4 pb-12 text-center space-y-3">
+        <p className="text-[11px] text-[#8D8D8D] max-w-2xl mx-auto">
+          {t('home.hero.marketplaceDisclaimer')}
+        </p>
+        <p className="text-sm text-[#8D8D8D]">
+          {t('home.hero.gentleAssist')}{" "}
+          <Link
+            to="/concierge"
+            className="underline underline-offset-2 text-[#0c4d47]"
+          >
+            {t('home.hero.askAI')}
+          </Link>
+        </p>
+        <p className="text-xs text-[#8D8D8D] max-w-md mx-auto">
+          {t('home.hero.trustPromise')}
+        </p>
       </div>
     </section>
   );
