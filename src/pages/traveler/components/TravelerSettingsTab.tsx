@@ -103,15 +103,22 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
         return;
       }
 
-      const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
-        redirectTo: `${window.location.origin}/auth/callback`,
+      toast.loading("Sending password reset email...");
+
+      const { data, error } = await supabase.functions.invoke('request-password-reset', {
+        body: {
+          email: user.email,
+          redirectTo: `${window.location.origin}/reset-password`,
+        },
       });
 
       if (error) throw error;
       
-      toast.success("Password reset email sent! Check your inbox.");
+      toast.dismiss();
+      toast.success("Password reset email sent! Check your inbox for the branded Goldsainte email.");
     } catch (error) {
       console.error('Error sending password reset:', error);
+      toast.dismiss();
       toast.error("Failed to send reset email. Please try again.");
     }
   };
