@@ -335,7 +335,7 @@ export default function BrowseAgents() {
   );
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="bg-background flex-1">
       <div className="container max-w-6xl px-4 pt-4">
         <BackButton label="Back" />
       </div>

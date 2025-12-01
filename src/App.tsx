@@ -131,7 +131,7 @@ function AppContent() {
       <WelcomeModal open={showWelcomeModal} onClose={() => setShowWelcomeModal(false)} isFirstVisit />
       <OnboardingTour />
       {hideHeader ? null : <Header />}
-      <main id="main-content" className="flex-1" tabIndex={-1}>
+      <main id="main-content" className="flex-1 flex flex-col" tabIndex={-1}>
         <AppRoutes />
         <SentryStatusChip />
         <SentryTestButton />

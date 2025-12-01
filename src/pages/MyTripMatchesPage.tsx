@@ -308,7 +308,7 @@ export default function MyTripMatchesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDF9F0] pb-16">
+    <div className="flex-1 bg-[#FDF9F0] pb-16">
       <div className="mx-auto max-w-6xl px-4 pt-10">
         <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
