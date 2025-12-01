@@ -26,6 +26,49 @@ interface TravelStoryboardProps {
   showSaveButtons?: boolean;
 }
 
+// Fallback image for broken URLs
+const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&q=80";
+
+// Diversify images by mood to ensure variety
+function diversifyImages(images: StoryboardImage[], limit: number): StoryboardImage[] {
+  if (images.length <= limit) {
+    return images.sort(() => Math.random() - 0.5);
+  }
+
+  // Group by primary mood tag
+  const byMood: Record<string, StoryboardImage[]> = {};
+  images.forEach(img => {
+    const mood = img.mood_tags?.[0] || 'general';
+    if (!byMood[mood]) byMood[mood] = [];
+    byMood[mood].push(img);
+  });
+
+  // Shuffle within each mood group
+  Object.keys(byMood).forEach(mood => {
+    byMood[mood] = byMood[mood].sort(() => Math.random() - 0.5);
+  });
+
+  // Round-robin select from each mood category for variety
+  const result: StoryboardImage[] = [];
+  const moods = Object.keys(byMood);
+  let index = 0;
+
+  while (result.length < limit && moods.length > 0) {
+    const moodIndex = index % moods.length;
+    const mood = moods[moodIndex];
+    
+    if (byMood[mood] && byMood[mood].length > 0) {
+      result.push(byMood[mood].shift()!);
+    } else {
+      moods.splice(moodIndex, 1);
+    }
+    index++;
+  }
+
+  // Final shuffle to mix moods together
+  return result.sort(() => Math.random() - 0.5);
+}
+
 export function TravelStoryboard({
   storyboardId,
   title = "Travel storyboard",
@@ -60,11 +103,11 @@ export function TravelStoryboard({
             setItems(data ?? []);
           }
         } else {
+          // Fetch larger pool for diversification (no ordering - we'll diversify client-side)
           const query = supabase
             .from("storyboard_media_library")
             .select("id, url, thumbnail_url, label, destination_tags, mood_tags")
-            .order("created_at", { ascending: false })
-            .limit(maxItems);
+            .limit(200); // Fetch more to ensure good variety
 
           const { data, error } = await query;
 
@@ -73,7 +116,9 @@ export function TravelStoryboard({
             if (!isMounted) return;
             setImages([]);
           } else if (isMounted) {
-            setImages((data ?? []) as StoryboardImage[]);
+            // Apply diversification to get a good mix of moods
+            const diversified = diversifyImages((data ?? []) as StoryboardImage[], maxItems);
+            setImages(diversified);
           }
         }
       } catch (err) {
@@ -121,6 +166,9 @@ export function TravelStoryboard({
                   src={item.image_url}
                   alt={item.title || "Trip photo"}
                   loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.src = FALLBACK_IMAGE;
+                  }}
                   className="w-full rounded-xl object-cover"
                 />
               ) : (
@@ -155,6 +203,9 @@ export function TravelStoryboard({
                   src={img.thumbnail_url || img.url}
                   alt={img.label || "Storyboard"}
                   loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.src = FALLBACK_IMAGE;
+                  }}
                   className="h-full w-full transform object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                 />
                 {(img.label || (img.destination_tags && img.destination_tags[0])) && (
