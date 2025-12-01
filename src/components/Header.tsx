@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info, Sparkles, CreditCard, PlaneTakeoff, HandCoins, ShieldCheck, Car } from "lucide-react";
+import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info, Sparkles, CreditCard, PlaneTakeoff, HandCoins, ShieldCheck, Car, MessageCircle } from "lucide-react";
 import { NotificationBell } from '@/components/notifications/NotificationBell';
+import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
 import { CreateMomentModal } from "@/components/CreateMomentModal";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -42,6 +43,7 @@ export const Header = () => {
   const [createMomentOpen, setCreateMomentOpen] = useState(false);
   const [profileAvatarUrl, setProfileAvatarUrl] = useState<string | null>(null);
   const { openModal: openExpediaModal } = useExpediaModal();
+  const { unreadCount: unreadMessageCount } = useUnreadMessageCount();
   const accountType = ((user as any)?.user_metadata?.account_type as string | undefined)?.toLowerCase() ?? null;
   const isTraveler = !accountType || accountType === "traveler";
   const isCreator = accountType === "creator";
@@ -329,6 +331,21 @@ export const Header = () => {
                             >
                               <Sparkles className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                               <span className="text-sm font-medium">My Collections</span>
+                            </DropdownMenuItem>
+                            
+                            <DropdownMenuItem 
+                              onClick={() => navigate('/messages')} 
+                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <div className="relative flex-shrink-0">
+                                <MessageCircle className="h-5 w-5 text-muted-foreground" />
+                                {unreadMessageCount > 0 && (
+                                  <span className="absolute -top-1 -right-1 h-4 min-w-[16px] rounded-full bg-primary text-[9px] font-bold text-primary-foreground flex items-center justify-center px-1">
+                                    {unreadMessageCount > 99 ? "99+" : unreadMessageCount}
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-sm font-medium">Messages</span>
                             </DropdownMenuItem>
                             
                             {isAgentAccount && (
@@ -662,6 +679,21 @@ export const Header = () => {
                           >
                             <Sparkles className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                             <span className="text-sm font-medium">My Collections</span>
+                          </DropdownMenuItem>
+                          
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/messages')} 
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <div className="relative flex-shrink-0">
+                              <MessageCircle className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300" />
+                              {unreadMessageCount > 0 && (
+                                <span className="absolute -top-1 -right-1 h-4 min-w-[16px] rounded-full bg-primary text-[9px] font-bold text-primary-foreground flex items-center justify-center px-1">
+                                  {unreadMessageCount > 99 ? "99+" : unreadMessageCount}
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-sm font-medium">Messages</span>
                           </DropdownMenuItem>
                           
                           {isAgentAccount && (

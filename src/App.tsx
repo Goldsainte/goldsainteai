@@ -8,6 +8,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { MobileBottomNav } from "@/components/navigation/MobileBottomNav";
 import { SkipNavigation } from "@/components/SkipNavigation";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { WelcomeModal } from "@/components/WelcomeModal";
@@ -125,7 +126,7 @@ function AppContent() {
   const hideConciergeWidget = shouldHideForPath(location.pathname, HIDE_CONCIERGE_WIDGET_PAGES);
 
   return (
-    <div className="min-h-screen w-full max-w-full flex flex-col overflow-x-hidden box-border viewport-guard">
+    <div className="min-h-screen w-full max-w-full flex flex-col overflow-x-hidden box-border viewport-guard pb-16 lg:pb-0">
       <SkipNavigation />
       <OnboardingWelcomeModal />
       <WelcomeModal open={showWelcomeModal} onClose={() => setShowWelcomeModal(false)} isFirstVisit />
@@ -142,6 +143,7 @@ function AppContent() {
           <AIBookingConcierge />
         </Suspense>
       )}
+      <MobileBottomNav />
     </div>
   );
 }

@@ -1,8 +1,9 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { usePanelStore } from "@/stores/panelStore";
 import { Home, Users, Video, Search, MessageCircle, Bell, BarChart3, User2, Store, Building, PlaneTakeoff, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
 
 const itemCls = "flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-muted/60 text-base";
 
@@ -25,6 +26,8 @@ function NavItemBtn({ onClick, children }: { onClick: () => void; children: Reac
 export default function LeftNav() {
   const { openType } = usePanelStore();
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { unreadCount } = useUnreadMessageCount();
   
   const accountType = 
     ((user as any)?.user_metadata?.account_type as string | undefined)?.toLowerCase() ?? null;
@@ -54,7 +57,20 @@ export default function LeftNav() {
         )}
         
         <NavItemBtn onClick={() => openType("search")}><Search className="w-6 h-6" /> Search</NavItemBtn>
-        <NavItemBtn onClick={() => openType("messages")}><MessageCircle className="w-6 h-6" /> Messages</NavItemBtn>
+        
+        {/* Messages - Navigate to full page instead of panel */}
+        <NavItemLink to="/messages">
+          <div className="relative">
+            <MessageCircle className="w-6 h-6" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 h-4 min-w-[16px] rounded-full bg-primary text-[10px] font-bold text-primary-foreground flex items-center justify-center px-1">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
+          </div>
+          Messages
+        </NavItemLink>
+        
         <NavItemBtn onClick={() => openType("notifications")}><Bell className="w-6 h-6" /> Notifications</NavItemBtn>
         
         {/* Dashboard - Creators only */}
