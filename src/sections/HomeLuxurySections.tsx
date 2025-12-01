@@ -1,5 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
+import { OptimizedImage } from "@/components/OptimizedImage";
 import { useTranslation } from "react-i18next";
 
 // Real images from assets
@@ -210,10 +211,12 @@ export const HowGoldsainteWorksSection: React.FC = () => {
               {/* Image - Small on mobile, side by side */}
               <div className="w-[35%] flex-shrink-0 md:w-1/2">
                 <div className="overflow-hidden rounded-xl md:rounded-[26px] bg-[#D8CFBD]/40 shadow-[0_8px_20px_rgba(10,34,37,0.12)] md:shadow-[0_18px_40px_rgba(10,34,37,0.18)]">
-                  <img
+                  <OptimizedImage
                     src={step.image}
                     alt={step.alt}
                     className="h-24 w-full object-cover md:h-64"
+                    priority={index === 0}
+                    sizes="(max-width: 768px) 35vw, 50vw"
                   />
                 </div>
               </div>
