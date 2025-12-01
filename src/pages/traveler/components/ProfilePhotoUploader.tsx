@@ -43,6 +43,13 @@ export function ProfilePhotoUploader({
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Validate userId is present
+    if (!userId) {
+      console.error("Cannot upload photo: userId is empty");
+      toast.error("Profile not loaded yet. Please wait and try again.");
+      return;
+    }
+
     // Validate file type
     if (!file.type.startsWith("image/")) {
       toast.error("Please select an image file");

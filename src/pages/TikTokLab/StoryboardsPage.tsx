@@ -77,7 +77,7 @@ export default function TikTokLabStoryboardsPage() {
               asChild
               className="rounded-full bg-[#0c4d47] text-[#E5DFC6] text-xs font-semibold hover:bg-[#073331]"
             >
-              <Link to="/tiktok-lab/storyboards/new">
+              <Link to="/storyboards/new">
                 <Plus className="h-3 w-3 mr-1" />
                 New storyboard
               </Link>
@@ -105,7 +105,7 @@ export default function TikTokLabStoryboardsPage() {
                 asChild
                 className="rounded-full bg-[#0c4d47] text-[#E5DFC6] text-xs font-semibold hover:bg-[#073331]"
               >
-                <Link to="/tiktok-lab/storyboards/new">
+                <Link to="/storyboards/new">
                   Create your first storyboard
                 </Link>
               </Button>
@@ -115,7 +115,7 @@ export default function TikTokLabStoryboardsPage() {
               {storyboards.map((storyboard) => (
                 <Link
                   key={storyboard.id}
-                  to={`/tiktok-lab/storyboards/${storyboard.id}`}
+                  to={`/storyboards/${storyboard.id}`}
                   className="group rounded-2xl bg-white/90 border border-[#E5DFC6] p-4 space-y-2 hover:border-[#BFAD72] transition-colors"
                 >
                   <div className="h-32 rounded-xl bg-gradient-to-br from-[#0a2225] to-[#0c4d47] flex items-center justify-center">

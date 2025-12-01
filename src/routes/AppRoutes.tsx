@@ -20,7 +20,6 @@ import { AdminGuard } from '@/hooks/useAdminGuard';
 const SearchResults = lazy(() => import('@/pages/SearchResults'));
 const MyStoryboardsPage = lazy(() => import('@/pages/storyboards/MyStoryboardsPage'));
 const StoryboardDetailPage = lazy(() => import('@/pages/storyboards/StoryboardDetailPage'));
-const NewStoryboardPage = lazy(() => import('@/pages/storyboards/NewStoryboardPage'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const BrandOnboardingPage = lazy(() => import('@/pages/BrandOnboardingPage'));
 const BrandConsolePage = lazy(() => import('@/pages/BrandConsolePage'));
@@ -395,9 +394,10 @@ export const AppRoutes = () => (
       <Route path="/tiktok-lab/trips" element={<PartnerTripsPage />} />
       <Route path="/apply/agent" element={<AgentApplyPage />} />
       <Route path="/tiktok-lab/earnings" element={<TikTokEarningsPage />} />
-      <Route path="/storyboards" element={<RequireAuth><MyStoryboardsPage /></RequireAuth>} />
-      <Route path="/storyboards/new" element={<RequireAuth><NewStoryboardPage /></RequireAuth>} />
-      <Route path="/storyboards/:id" element={<RequireAuth><StoryboardDetailPage /></RequireAuth>} />
+      <Route path="/storyboards" element={<RequireAuth><TikTokLabStoryboardsPage /></RequireAuth>} />
+      <Route path="/storyboards/new" element={<RequireAuth><TikTokLabStoryboardEditorPage /></RequireAuth>} />
+      <Route path="/storyboards/:id" element={<RequireAuth><TikTokLabStoryboardEditorPage /></RequireAuth>} />
+      <Route path="/storyboards/:id/edit" element={<RequireAuth><TikTokLabStoryboardEditorPage /></RequireAuth>} />
       {/* Legacy TikTok Lab storyboard routes - redirect to new storyboard system */}
       <Route path="/tiktok-lab/storyboards" element={<Navigate to="/storyboards" replace />} />
       <Route path="/tiktok-lab/storyboards/new" element={<Navigate to="/storyboards/new" replace />} />
