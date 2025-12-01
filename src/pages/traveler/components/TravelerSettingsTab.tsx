@@ -18,10 +18,9 @@ interface TravelPreferences {
 
 interface TravelerSettingsTabProps {
   userId: string;
-  email: string | null;
 }
 
-export function TravelerSettingsTab({ userId, email }: TravelerSettingsTabProps) {
+export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
   const [loadingPortal, setLoadingPortal] = useState(false);
   const [savingNotifications, setSavingNotifications] = useState(false);
   const [preferences, setPreferences] = useState<TravelPreferences | null>(null);
