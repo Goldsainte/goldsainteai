@@ -85,19 +85,18 @@ export default function MyTripRequestsPage() {
         />
       </Helmet>
 
-      <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
-        <div className="mx-auto max-w-5xl px-4 py-10 md:py-12">
+      <main className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
+        <div className="mx-auto max-w-6xl px-4 md:px-6 py-10 md:py-12">
           {/* Header */}
           <header className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47]/10 px-3 py-1 text-sm font-medium text-[#0c4d47] ring-1 ring-[#E5DFC6]">
-                <Sparkles className="h-3 w-3 text-[#BFAD72]" />
-                <span>Your Goldsainte trips</span>
-              </div>
-              <h1 className="text-lg font-semibold tracking-tight text-[#0a2225] md:text-xl">
+              <p className="text-xs uppercase tracking-[0.18em] text-[#C7A962]">
+                Your trips
+              </p>
+              <h1 className="font-secondary text-2xl md:text-3xl text-[#0a2225]">
                 My Trip Requests
               </h1>
-              <p className="max-w-xl text-xs text-[#4a4a4a] md:text-sm">
+              <p className="text-sm text-[#6B7280]">
                 These are the trips you've posted to the Goldsainte
                 marketplace. As creators and agents send proposals, you'll see
                 them here and can choose your favorite.
