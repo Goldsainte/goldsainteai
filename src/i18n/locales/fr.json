@@ -25,6 +25,13 @@
     "changed": "Langue Modifiée",
     "setTo": "Langue de l'interface définie sur {{language}}"
   },
+  "nav": {
+    "home": "Accueil",
+    "discover": "Découvrir",
+    "messages": "Messages",
+    "alerts": "Alertes",
+    "profile": "Profil"
+  },
   "home": {
     "hero": {
       "title": "Découvrez. Réservez. Créez. Gagnez — Le voyage réinventé avec l'IA, les enchères d'agents et les collaborations de créateurs",

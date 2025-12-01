@@ -25,6 +25,13 @@
     "changed": "Idioma Alterado",
     "setTo": "Idioma da interface definido para {{language}}"
   },
+  "nav": {
+    "home": "Início",
+    "discover": "Descobrir",
+    "messages": "Mensagens",
+    "alerts": "Alertas",
+    "profile": "Perfil"
+  },
   "home": {
     "hero": {
       "title": "Descubra. Reserve. Crie. Ganhe — Viagens Reinventadas com IA, Lances de Agentes e Colaborações de Criadores",

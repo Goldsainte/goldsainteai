@@ -115,8 +115,8 @@ export default function TravelerDashboardPage() {
   const displayName = profile?.display_name || profile?.full_name || "Traveler";
 
   return (
-    <main className="min-h-screen bg-[#FDF9F0]">
-      <div className="mx-auto max-w-6xl px-6 py-8 md:py-12">
+    <main className="min-h-screen bg-[#FDF9F0] pb-24 lg:pb-0">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 md:py-12">
         {/* Sticky Header */}
         <header className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
@@ -168,45 +168,45 @@ export default function TravelerDashboardPage() {
         ) : (
           /* Tabbed Navigation */
           <Tabs defaultValue="overview" className="space-y-8">
-            <TabsList className="bg-white border border-[#E5DFC6] rounded-full p-1.5 h-auto flex-wrap justify-start gap-1">
+            <TabsList className="bg-white border border-[#E5DFC6] rounded-full p-1.5 h-auto overflow-x-auto scrollbar-hide flex flex-nowrap justify-start gap-1 max-w-full">
               <TabsTrigger 
                 value="overview" 
-                className="rounded-full px-4 py-2 text-sm font-medium data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                className="rounded-full px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
               >
                 <Sparkles className="h-3.5 w-3.5 mr-1.5" />
                 Overview
               </TabsTrigger>
               <TabsTrigger 
                 value="profile"
-                className="rounded-full px-4 py-2 text-sm font-medium data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                className="rounded-full px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
               >
                 <User className="h-3.5 w-3.5 mr-1.5" />
-                My Profile
+                Profile
               </TabsTrigger>
               <TabsTrigger 
                 value="trips"
-                className="rounded-full px-4 py-2 text-sm font-medium data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                className="rounded-full px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
               >
                 <Calendar className="h-3.5 w-3.5 mr-1.5" />
                 Trips
               </TabsTrigger>
               <TabsTrigger 
                 value="bookings"
-                className="rounded-full px-4 py-2 text-sm font-medium data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                className="rounded-full px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
               >
                 <Plane className="h-3.5 w-3.5 mr-1.5" />
                 Bookings
               </TabsTrigger>
               <TabsTrigger 
                 value="storyboards"
-                className="rounded-full px-4 py-2 text-sm font-medium data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                className="rounded-full px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
               >
                 <Bookmark className="h-3.5 w-3.5 mr-1.5" />
                 Storyboards
               </TabsTrigger>
               <TabsTrigger 
                 value="settings"
-                className="rounded-full px-4 py-2 text-sm font-medium data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                className="rounded-full px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
               >
                 <Settings className="h-3.5 w-3.5 mr-1.5" />
                 Settings

@@ -25,6 +25,13 @@
     "changed": "언어가 변경되었습니다",
     "setTo": "인터페이스 언어가 {{language}}로 설정되었습니다"
   },
+  "nav": {
+    "home": "홈",
+    "discover": "발견",
+    "messages": "메시지",
+    "alerts": "알림",
+    "profile": "프로필"
+  },
   "home": {
     "hero": {
       "title": "발견. 예약. 창작. 수익 — AI, 에이전트 입찰 및 크리에이터 협업으로 재창조된 여행",
