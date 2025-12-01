@@ -279,9 +279,6 @@ verify_jwt = true
 [functions.ai-trip-matching]
 verify_jwt = false
 
-[functions.update-trip-match-status]
-verify_jwt = true
-
 [functions.trip-checkout-create]
 verify_jwt = true
 
@@ -307,4 +304,13 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.curated-itineraries]
+verify_jwt = true
+
+[functions.send-direct-message]
+verify_jwt = true
+
+[functions.get-conversations]
+verify_jwt = true
+
+[functions.manage-conversation]
 verify_jwt = true

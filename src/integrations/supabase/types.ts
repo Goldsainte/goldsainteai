@@ -3995,6 +3995,87 @@ export type Database = {
         }
         Relationships: []
       }
+      direct_messages: {
+        Row: {
+          attachments: Json | null
+          body: string
+          conversation_id: string
+          created_at: string | null
+          filtered_content: string | null
+          flagged_for_review: boolean | null
+          flagged_reason: string | null
+          id: string
+          is_deleted: boolean | null
+          is_read: boolean | null
+          read_at: string | null
+          sender_id: string
+        }
+        Insert: {
+          attachments?: Json | null
+          body: string
+          conversation_id: string
+          created_at?: string | null
+          filtered_content?: string | null
+          flagged_for_review?: boolean | null
+          flagged_reason?: string | null
+          id?: string
+          is_deleted?: boolean | null
+          is_read?: boolean | null
+          read_at?: string | null
+          sender_id: string
+        }
+        Update: {
+          attachments?: Json | null
+          body?: string
+          conversation_id?: string
+          created_at?: string | null
+          filtered_content?: string | null
+          flagged_for_review?: boolean | null
+          flagged_reason?: string | null
+          id?: string
+          is_deleted?: boolean | null
+          is_read?: boolean | null
+          read_at?: string | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "direct_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "dm_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "direct_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "direct_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "direct_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "direct_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dispute_submissions: {
         Row: {
           booking_reference: string | null
@@ -4072,6 +4153,133 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      dm_conversations: {
+        Row: {
+          created_at: string | null
+          id: string
+          initiated_by: string
+          last_message_at: string | null
+          last_message_preview: string | null
+          participant_1: string
+          participant_2: string
+          status: string
+          unread_count_p1: number | null
+          unread_count_p2: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          initiated_by: string
+          last_message_at?: string | null
+          last_message_preview?: string | null
+          participant_1: string
+          participant_2: string
+          status?: string
+          unread_count_p1?: number | null
+          unread_count_p2?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          initiated_by?: string
+          last_message_at?: string | null
+          last_message_preview?: string | null
+          participant_1?: string
+          participant_2?: string
+          status?: string
+          unread_count_p1?: number | null
+          unread_count_p2?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dm_conversations_initiated_by_fkey"
+            columns: ["initiated_by"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "dm_conversations_initiated_by_fkey"
+            columns: ["initiated_by"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "dm_conversations_initiated_by_fkey"
+            columns: ["initiated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dm_conversations_initiated_by_fkey"
+            columns: ["initiated_by"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dm_conversations_participant_1_fkey"
+            columns: ["participant_1"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "dm_conversations_participant_1_fkey"
+            columns: ["participant_1"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "dm_conversations_participant_1_fkey"
+            columns: ["participant_1"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dm_conversations_participant_1_fkey"
+            columns: ["participant_1"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dm_conversations_participant_2_fkey"
+            columns: ["participant_2"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "dm_conversations_participant_2_fkey"
+            columns: ["participant_2"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "dm_conversations_participant_2_fkey"
+            columns: ["participant_2"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dm_conversations_participant_2_fkey"
+            columns: ["participant_2"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       earnings_ledger: {
         Row: {
@@ -5614,6 +5822,68 @@ export type Database = {
           url?: string
         }
         Relationships: []
+      }
+      message_settings: {
+        Row: {
+          allow_message_requests: boolean | null
+          blocked_users: string[] | null
+          created_at: string | null
+          filter_requests: boolean | null
+          show_read_receipts: boolean | null
+          updated_at: string | null
+          user_id: string
+          who_can_message: string | null
+        }
+        Insert: {
+          allow_message_requests?: boolean | null
+          blocked_users?: string[] | null
+          created_at?: string | null
+          filter_requests?: boolean | null
+          show_read_receipts?: boolean | null
+          updated_at?: string | null
+          user_id: string
+          who_can_message?: string | null
+        }
+        Update: {
+          allow_message_requests?: boolean | null
+          blocked_users?: string[] | null
+          created_at?: string | null
+          filter_requests?: boolean | null
+          show_read_receipts?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+          who_can_message?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_settings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "message_settings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "message_settings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "message_settings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       messages: {
         Row: {
