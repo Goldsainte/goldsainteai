@@ -14,9 +14,12 @@ type Storyboard = {
   created_at: string;
 };
 
+type AccountType = "traveler" | "creator" | "agent" | "brand" | null;
+
 export default function TikTokLabStoryboardsPage() {
   const [storyboards, setStoryboards] = useState<Storyboard[]>([]);
   const [loading, setLoading] = useState(true);
+  const [accountType, setAccountType] = useState<AccountType>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -27,8 +30,19 @@ export default function TikTokLabStoryboardsPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user || cancelled) return;
 
+      // Fetch user profile to get account type
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("account_type")
+        .eq("id", user.id)
+        .single();
+
+      if (!cancelled && profile) {
+        setAccountType(profile.account_type as AccountType);
+      }
+
       // Fetch storyboards owned by this user
-      const { data, error} = await supabase
+      const { data, error } = await supabase
         .from("storyboards")
         .select("id, title, description, tags, created_at")
         .eq("owner_id", user.id)
@@ -51,14 +65,33 @@ export default function TikTokLabStoryboardsPage() {
     };
   }, []);
 
+  const isCreatorOrAgent = accountType === "creator" || accountType === "agent";
+
+  // Role-specific copy
+  const copy = {
+    pageTitle: isCreatorOrAgent 
+      ? "My Storyboards · Goldsainte Creator Lab" 
+      : "My Storyboards · Goldsainte",
+    metaDescription: isCreatorOrAgent
+      ? "Manage your storyboards and turn your travel content into bookable trips."
+      : "Collect and organize travel inspiration for your dream trips.",
+    headerSubtitle: isCreatorOrAgent
+      ? "These are your trip templates. Share them in your TikTok bio, and earn commission when your audience books through Goldsainte."
+      : "Collect and organize travel inspiration. Save your favorite destinations, experiences, and aesthetic ideas to shape your perfect trip.",
+    emptyTitle: "No storyboards yet",
+    emptyDescription: isCreatorOrAgent
+      ? "Create your first storyboard from your existing travel content. Each storyboard becomes a bookable trip template your audience can request."
+      : "Start collecting travel inspiration! Save photos, destinations, and experiences you love — then turn your favorite storyboard into a trip request.",
+    emptyCta: isCreatorOrAgent
+      ? "Create your first storyboard"
+      : "Start collecting inspiration",
+  };
+
   return (
     <>
       <Helmet>
-        <title>My Storyboards · Goldsainte Creator Lab</title>
-        <meta
-          name="description"
-          content="Manage your storyboards and turn your travel content into bookable trips."
-        />
+        <title>{copy.pageTitle}</title>
+        <meta name="description" content={copy.metaDescription} />
       </Helmet>
 
       <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
@@ -68,9 +101,8 @@ export default function TikTokLabStoryboardsPage() {
               <h1 className="text-lg font-semibold tracking-tight md:text-xl">
                 My Storyboards
               </h1>
-              <p className="max-w-xl text-xs text-[#4a4a4a] md:text-sm">
-                These are your trip templates. Share them in your TikTok bio, and earn
-                commission when your audience books through Goldsainte.
+              <p className="max-w-2xl text-xs text-[#4a4a4a] md:text-sm">
+                {copy.headerSubtitle}
               </p>
             </div>
             <Button
@@ -96,17 +128,16 @@ export default function TikTokLabStoryboardsPage() {
           ) : storyboards.length === 0 ? (
             <div className="rounded-3xl bg-white/90 border border-[#E5DFC6] p-8 text-center space-y-3">
               <ImageIcon className="h-10 w-10 mx-auto text-[#BFAD72]" />
-              <h2 className="text-lg font-semibold">No storyboards yet</h2>
+              <h2 className="text-lg font-semibold">{copy.emptyTitle}</h2>
               <p className="text-sm text-[#4a4a4a] max-w-md mx-auto">
-                Create your first storyboard from your existing travel content. Each storyboard
-                becomes a bookable trip template your audience can request.
+                {copy.emptyDescription}
               </p>
               <Button
                 asChild
                 className="rounded-full bg-[#0c4d47] text-[#E5DFC6] text-xs font-semibold hover:bg-[#073331]"
               >
                 <Link to="/storyboards/new">
-                  Create your first storyboard
+                  {copy.emptyCta}
                 </Link>
               </Button>
             </div>
