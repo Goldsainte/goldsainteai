@@ -81,7 +81,7 @@ export default function CreatorDashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#FDF9F0]">
+    <div className="flex-1 bg-[#FDF9F0]">
       <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
         {/* Gold accent line */}
         <div className="w-16 h-0.5 bg-[#C7A962] mb-6" />
