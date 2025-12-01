@@ -70,13 +70,19 @@ const AuthCallback = () => {
           return;
         }
 
-        // Check if profile needs completion
-        const needsCompletion = !profile.is_profile_complete || 
-                                !profile.account_type ||
-                                !['traveler', 'creator', 'agent', 'brand'].includes(profile.account_type) ||
-                                !profile.first_name ||
-                                !profile.last_name ||
-                                !profile.phone;
+        // Travelers with completed onboarding don't need strict profile completion
+        const isTravelerWithCompletedOnboarding = 
+          profile.account_type === 'traveler' && profile.onboarding_completed === true;
+
+        // Check if profile needs completion (bypass for travelers with completed onboarding)
+        const needsCompletion = !isTravelerWithCompletedOnboarding && (
+          !profile.is_profile_complete || 
+          !profile.account_type ||
+          !['traveler', 'creator', 'agent', 'brand'].includes(profile.account_type) ||
+          !profile.first_name ||
+          !profile.last_name ||
+          !profile.phone
+        );
 
         if (needsCompletion) {
           navigate('/auth/complete-profile', { replace: true });
