@@ -272,12 +272,13 @@ export default function Marketplace() {
         />
       </Helmet>
 
-      <div className="min-h-screen bg-[#f7f3ea] pb-24 lg:pb-0">
+      <div className="min-h-screen bg-[#FDF9F0] pb-24 lg:pb-0">
         <MarketplaceHeader />
         <MarketplaceSearch onSearch={handleSearch} filters={filters} />
 
-        <div className="mx-auto max-w-6xl px-4 py-6 md:py-8">
-          <div className="mb-8 flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+        <div className="mx-auto max-w-6xl px-4 py-4 md:py-8">
+          {/* Mobile: Stack tabs and filters vertically */}
+          <div className="mb-6 md:mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <MarketplaceTabs activeTab={activeTab} onTabChange={handleTabChange} accountType={accountType} />
             <MarketplaceFilters filters={filters} onFilterChange={setFilters} />
           </div>
