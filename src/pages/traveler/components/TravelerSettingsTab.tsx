@@ -118,10 +118,18 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
       
       toast.dismiss();
       toast.success("Password reset email sent! Check your inbox for the branded Goldsainte email.");
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending password reset:', error);
       toast.dismiss();
-      toast.error("Failed to send reset email. Please try again.");
+      
+      // Extract the actual error message from edge function response
+      const errorMessage = 
+        error?.context?.body?.error ||
+        error?.message ||
+        error?.error ||
+        "Failed to send reset email. Please try again.";
+      
+      toast.error(errorMessage);
     }
   };
 

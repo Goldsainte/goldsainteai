@@ -314,3 +314,6 @@ verify_jwt = true
 
 [functions.manage-conversation]
 verify_jwt = true
+
+[functions.test-resend]
+verify_jwt = false

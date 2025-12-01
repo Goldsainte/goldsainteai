@@ -455,9 +455,16 @@ const Auth = () => {
       });
       setStep('email');
     } catch (error: any) {
+      // Extract the actual error message from edge function response
+      const errorMessage = 
+        error?.context?.body?.error ||
+        error?.message ||
+        error?.error ||
+        "Failed to send reset email.";
+      
       toast({
         title: "Error",
-        description: error.message || "Failed to send reset email.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
