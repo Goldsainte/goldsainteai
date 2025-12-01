@@ -46,48 +46,57 @@ export function OnboardingWelcomeModal() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-      <div className="w-full max-w-lg rounded-3xl bg-[#0a2225] border border-[#BFAD72]/50 p-5 space-y-4 shadow-2xl text-[#E5DFC6]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+      <div className="w-full max-w-lg rounded-3xl bg-[#FDF9F0] border border-[#E5DFC6] p-6 md:p-8 space-y-5 shadow-[0_24px_60px_rgba(10,34,37,0.18)] text-[#0a2225]">
+        {/* Header */}
         <div className="flex items-center justify-between gap-3">
-          <div className="inline-flex items-center gap-2 text-[11px] text-[#BFAD72] font-semibold">
+          <div className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-[#7A7151] bg-[#C7B892]/30 px-3 py-1.5 rounded-full font-medium">
             <Sparkles className="h-3 w-3" />
             Goldsainte
           </div>
           <button
             type="button"
             onClick={dismiss}
-            className="text-[10px] text-[#E5DFC6]/70 hover:text-[#E5DFC6]"
+            className="text-xs text-[#7A7151] hover:text-[#0a2225] underline-offset-2 hover:underline transition-colors"
           >
             Skip for now
           </button>
         </div>
 
-        <div className="space-y-1">
-          <p className="text-[11px] text-[#E5DFC6]/80">
+        {/* Title & Greeting */}
+        <div className="space-y-2">
+          <p className="text-sm text-[#4A4A4A]">
             Hi {name}, welcome in.
           </p>
-          <h2 className="text-lg font-semibold">{title}</h2>
+          <h2 className="font-secondary text-2xl md:text-3xl font-semibold text-[#0a2225] leading-tight">
+            {title}
+          </h2>
         </div>
 
-        <ul className="space-y-1 text-[11px] text-[#E5DFC6]/80">
-          {bullets.map((b) => (
-            <li key={b} className="flex gap-2">
-              <span className="mt-[3px] h-1.5 w-1.5 rounded-full bg-[#BFAD72]" />
-              <span>{b}</span>
+        {/* Bullet Cards */}
+        <ul className="space-y-2.5">
+          {bullets.map((b, idx) => (
+            <li
+              key={idx}
+              className="flex gap-3 rounded-xl border border-[#E5DFC6] bg-white/80 px-4 py-3"
+            >
+              <span className="mt-1 h-2 w-2 rounded-full bg-[#C7B892] flex-shrink-0" />
+              <span className="text-[13px] text-[#3F3A33] leading-relaxed">{b}</span>
             </li>
           ))}
         </ul>
 
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-[11px]">
+        {/* Footer CTA */}
+        <div className="flex flex-col gap-4 pt-2 md:flex-row md:items-center md:justify-between">
           <Link
             to={primaryCta.href}
             onClick={dismiss}
-            className="inline-flex items-center justify-center gap-1 rounded-full bg-[#BFAD72] text-[#0a2225] px-3 py-1.5 font-semibold hover:bg-[#d4c58d]"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0a2225] text-[#E5DFC6] px-5 py-2.5 text-sm font-semibold hover:bg-[#0a2225]/90 transition-colors"
           >
             {primaryCta.label}
-            <ArrowRight className="h-3 w-3" />
+            <ArrowRight className="h-4 w-4" />
           </Link>
-          <p className="text-[10px] text-[#E5DFC6]/70 max-w-xs">
+          <p className="text-xs text-[#7A7151] max-w-sm leading-relaxed">
             You can always find this view again from your dashboard — we just
             wanted your first step to feel clear, not chaotic.
           </p>
