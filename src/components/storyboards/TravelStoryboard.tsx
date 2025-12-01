@@ -30,7 +30,7 @@ export function TravelStoryboard({
   storyboardId,
   title = "Travel storyboard",
   subtitle = "Use these visuals to imagine and design your next trip.",
-  maxItems = 24,
+  maxItems = 100,
   highlightTags = [],
   onImageClick,
   showSaveButtons = false,

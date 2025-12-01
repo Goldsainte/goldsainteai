@@ -644,7 +644,7 @@ export default function PostTripPage() {
 
           <div className="flex flex-col gap-3 pt-2 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-xs text-[#8D8D8D] max-w-xs">
+              <p className="text-xs text-[#8D8D8D] max-w-2xl">
                 After you post your trip, Goldsainte AI and our partners will use
                 these details to send proposals. You&apos;ll see everything in
                 your &quot;My Trips&quot; and notifications.
