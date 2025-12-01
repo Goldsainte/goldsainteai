@@ -30,6 +30,8 @@ export default function CollectionsPage() {
   const [selectedItinerary, setSelectedItinerary] = useState<CuratedItinerary | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
+  const [wasCached, setWasCached] = useState(false);
+
   const loadCollections = async (isRefresh = false) => {
     if (!user) return;
     
@@ -50,8 +52,9 @@ export default function CollectionsPage() {
       setPreferences(prefsData);
 
       // Call the edge function to get AI-curated itineraries
+      // Pass forceRefresh: true when user manually refreshes
       const { data, error } = await supabase.functions.invoke("curated-itineraries", {
-        body: { userId: user.id, count: 12 },
+        body: { userId: user.id, count: 12, forceRefresh: isRefresh },
       });
 
       if (error) {
@@ -61,6 +64,11 @@ export default function CollectionsPage() {
       }
 
       setItineraries(data?.itineraries || []);
+      setWasCached(data?.cached || false);
+      
+      if (isRefresh && !data?.cached) {
+        toast.success("Collections refreshed with your latest activity");
+      }
     } catch (err) {
       console.error("Error in loadCollections:", err);
       toast.error("Something went wrong loading collections");
@@ -135,9 +143,16 @@ export default function CollectionsPage() {
           </div>
         )}
 
-        {/* Refresh button */}
+        {/* Refresh button & cache indicator */}
         {!loading && itineraries.length > 0 && (
-          <div className="flex justify-end mb-6">
+          <div className="flex justify-between items-center mb-6">
+            {wasCached && (
+              <p className="text-xs text-muted-foreground">
+                <Sparkles className="h-3 w-3 inline mr-1" />
+                Loaded instantly from your personalized cache
+              </p>
+            )}
+            {!wasCached && <div />}
             <Button
               variant="outline"
               size="sm"
@@ -146,7 +161,7 @@ export default function CollectionsPage() {
               className="rounded-full text-xs gap-2"
             >
               <RefreshCw className={`h-3 w-3 ${refreshing ? 'animate-spin' : ''}`} />
-              {refreshing ? 'Refreshing...' : 'Refresh collections'}
+              {refreshing ? 'Generating fresh recommendations...' : 'Refresh with latest activity'}
             </Button>
           </div>
         )}

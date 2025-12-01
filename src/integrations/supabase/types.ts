@@ -3842,6 +3842,36 @@ export type Database = {
         }
         Relationships: []
       }
+      curated_itineraries_cache: {
+        Row: {
+          behavioral_hash: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          itineraries: Json
+          preferences_hash: string
+          user_id: string
+        }
+        Insert: {
+          behavioral_hash?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          itineraries: Json
+          preferences_hash: string
+          user_id: string
+        }
+        Update: {
+          behavioral_hash?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          itineraries?: Json
+          preferences_hash?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       currency_exchange_rates: {
         Row: {
           created_at: string
@@ -13011,6 +13041,7 @@ export type Database = {
         Returns: boolean
       }
       cleanup_expired_cache: { Args: never; Returns: undefined }
+      cleanup_expired_itinerary_cache: { Args: never; Returns: undefined }
       cleanup_expired_oauth_states: { Args: never; Returns: undefined }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
       convert_currency: {
