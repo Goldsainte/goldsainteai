@@ -81,8 +81,8 @@ export default function CreatorTripPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-neutral-50">
-        <div className="mx-auto max-w-4xl px-4 py-8 text-sm text-neutral-600">
+      <div className="flex-1 bg-[#f7f3ea]">
+        <div className="mx-auto max-w-6xl px-4 md:px-6 py-8 text-sm text-[#6B7280]">
           Loading trip…
         </div>
       </div>
@@ -91,8 +91,8 @@ export default function CreatorTripPage() {
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-neutral-50">
-        <div className="mx-auto max-w-4xl px-4 py-8 text-sm text-red-700">
+      <div className="flex-1 bg-[#f7f3ea]">
+        <div className="mx-auto max-w-6xl px-4 md:px-6 py-8 text-sm text-red-700">
           {error ?? "Trip not found."}
         </div>
       </div>
@@ -104,8 +104,8 @@ export default function CreatorTripPage() {
   const tags = journey?.tags ?? [];
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      <div className="mx-auto max-w-4xl px-4 py-8 md:py-10">
+    <div className="flex-1 bg-[#f7f3ea]">
+      <div className="mx-auto max-w-6xl px-4 md:px-6 py-8 md:py-10">
         {/* HERO */}
         <div className="overflow-hidden rounded-2xl bg-neutral-200 shadow-sm">
           {heroImage && (
@@ -119,7 +119,7 @@ export default function CreatorTripPage() {
 
         <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
+            <h1 className="font-secondary text-2xl md:text-3xl text-[#0a2225]">
               {journey?.title ?? tripStory.title}
             </h1>
             <p className="mt-1 text-sm text-neutral-600">

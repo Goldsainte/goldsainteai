@@ -203,12 +203,12 @@ export default function PostTripPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
-      <section className="mx-auto max-w-5xl px-4 pt-14 pb-6 md:pt-16 md:pb-8">
+    <main className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
+      <section className="mx-auto max-w-6xl px-4 md:px-6 pt-14 pb-6 md:pt-16 md:pb-8">
         <div className="flex items-center justify-between mb-4">
           <Link
             to="/"
-            className="inline-flex items-center gap-1 text-xs text-[#8D8D8D]"
+            className="inline-flex items-center gap-1 text-xs text-[#6B7280]"
           >
             <ArrowLeft className="h-3 w-3" />
             Back to home
@@ -216,13 +216,13 @@ export default function PostTripPage() {
         </div>
 
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-[0.16em] text-[#8D8D8D]">
+          <p className="text-xs uppercase tracking-[0.18em] text-[#C7A962]">
             Post a trip
           </p>
-          <h1 className="font-display text-[22px] md:text-[24px] leading-tight">
+          <h1 className="font-secondary text-2xl md:text-3xl text-[#0a2225] leading-tight">
             Tell us about the trip you&apos;re dreaming of
           </h1>
-          <p className="text-sm md:text-base text-[#4a4a4a] max-w-2xl">
+          <p className="text-sm text-[#6B7280]">
             A few details now help Goldsainte AI and our partners send
             thoughtful proposals later. It&apos;s okay if not everything is
             decided — just share what you know.
@@ -230,7 +230,7 @@ export default function PostTripPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-4 pb-16 md:pb-20">
+      <section className="mx-auto max-w-6xl px-4 md:px-6 pb-16 md:pb-20">
         {/* AI Collection Prefill Banner */}
         {hasItineraryPrefill && itineraryPrefill && (
           <div className="mb-4 rounded-2xl bg-gradient-to-r from-[#FDFBF5] to-[#F6F0E4] border border-[#C7A962]/30 px-4 py-3">
@@ -243,7 +243,7 @@ export default function PostTripPage() {
                 <p className="text-xs text-[#4a4a4a] mt-0.5">
                   <span className="font-semibold">{itineraryPrefill.title}</span> — {itineraryPrefill.nights} nights in {itineraryPrefill.destination}
                 </p>
-                <p className="text-[10px] text-[#8C8470] mt-1">
+                <p className="text-xs text-[#8C8470] mt-1">
                   Review and adjust any details before posting to the marketplace.
                 </p>
               </div>
@@ -270,9 +270,9 @@ export default function PostTripPage() {
         )}
 
         <form
-          className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 space-y-5 text-sm max-w-3xl mx-auto"
-            onSubmit={handleSubmit}
-          >
+          className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-6 space-y-5 text-sm"
+          onSubmit={handleSubmit}
+        >
           {/* Section 1: Where & when */}
           <div className="space-y-3">
             <h2 className="text-base font-semibold">Where and when</h2>

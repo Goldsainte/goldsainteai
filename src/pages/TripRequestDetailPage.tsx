@@ -443,8 +443,8 @@ export default function TripRequestDetailPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#0a2225] text-[#E5DFC6]">
-        <div className="mx-auto max-w-3xl px-4 py-10 text-sm">
+      <main className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
+        <div className="mx-auto max-w-6xl px-4 md:px-6 py-10 text-sm">
           Loading trip request…
         </div>
       </main>
@@ -453,8 +453,8 @@ export default function TripRequestDetailPage() {
 
   if (!trip) {
     return (
-      <main className="min-h-screen bg-[#0a2225] text-[#E5DFC6]">
-        <div className="mx-auto max-w-3xl px-4 py-10 text-sm">
+      <main className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
+        <div className="mx-auto max-w-6xl px-4 md:px-6 py-10 text-sm">
           Trip request not found or no longer available.
         </div>
       </main>
@@ -474,8 +474,8 @@ export default function TripRequestDetailPage() {
         <title>Trip Request · Goldsainte</title>
       </Helmet>
 
-      <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
-        <div className="mx-auto max-w-5xl px-4 py-10 md:py-12">
+      <main className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
+        <div className="mx-auto max-w-6xl px-4 md:px-6 py-10 md:py-12">
           <div className="grid gap-6 md:grid-cols-[1.5fr,1.1fr] md:items-start">
             {/* LEFT: Trip brief (same for traveler & responders) */}
             <section className="rounded-3xl border border-[#E5DFC6] bg-white/95 p-5 shadow-sm md:p-6">
@@ -484,7 +484,7 @@ export default function TripRequestDetailPage() {
                   <Sparkles className="h-3 w-3 text-[#BFAD72]" />
                   <span>Trip request from Goldsainte traveler</span>
                 </div>
-                <span className="text-[10px] text-[#8D8D8D]">
+                <span className="text-xs text-[#6B7280]">
                   Posted {new Date(trip.created_at).toLocaleDateString()}
                 </span>
               </div>

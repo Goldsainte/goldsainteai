@@ -85,13 +85,16 @@ export default function PartnerBookingsPage() {
         <title>My Bookings · Goldsainte</title>
       </Helmet>
 
-      <main className="min-h-screen bg-gradient-to-b from-[#0a2225] via-[#0a2225] to-[#E5DFC6]">
-        <div className="mx-auto max-w-5xl px-4 py-10">
+      <main className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
+        <div className="mx-auto max-w-6xl px-4 md:px-6 py-10 md:py-12">
           <header className="space-y-2">
-            <h1 className="text-lg font-semibold tracking-tight text-[#E5DFC6] md:text-xl">
+            <p className="text-xs uppercase tracking-[0.18em] text-[#C7A962]">
+              Partner dashboard
+            </p>
+            <h1 className="font-secondary text-2xl md:text-3xl text-[#0a2225]">
               My Goldsainte Bookings
             </h1>
-            <p className="text-xs text-[#E5DFC6]/80 md:text-sm max-w-2xl">
+            <p className="text-sm text-[#6B7280]">
               These are trips travelers have booked with you as a TikTok creator or travel agent.
             </p>
           </header>
@@ -107,7 +110,7 @@ export default function PartnerBookingsPage() {
                 ))}
               </div>
             ) : bookings.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-[#E5DFC6]/40 bg-[#0a2225]/50 px-4 py-8 text-center text-xs text-[#E5DFC6]/85">
+              <div className="rounded-3xl border border-dashed border-[#E5DFC6] bg-white/70 px-4 py-8 text-center text-sm text-[#6B7280]">
                 You don't have any active bookings yet.
               </div>
             ) : (
@@ -146,7 +149,7 @@ function PartnerBookingRowCard({ booking }: { booking: BookingRow }) {
     >
       <div className="flex items-center justify-between gap-2">
         <div>
-          <p className="text-[10px] text-[#8D8D8D]">
+          <p className="text-xs text-[#6B7280]">
             Booked {new Date(booking.created_at).toLocaleDateString()}
           </p>
           <h2 className="mt-1 text-sm font-semibold">
