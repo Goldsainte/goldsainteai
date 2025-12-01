@@ -1,56 +1,85 @@
 // src/components/home/StoryboardsHighlight.tsx
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Sparkles } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Sparkles, MapPin, Calendar } from "lucide-react";
 import { useTranslation, Trans } from "react-i18next";
+
+interface StoryboardItem {
+  id: string;
+  title: string;
+  destination: string;
+  durationNights: number;
+  vibeTags: string[];
+  image: string;
+  curator: string;
+}
 
 export function StoryboardsHighlight() {
   const { t } = useTranslation();
 
-  const sampleStoryboards = [
+  const sampleStoryboards: StoryboardItem[] = [
     {
-      id: 1,
+      id: "amalfi-coast",
       title: "Amalfi Coast Long Weekend",
-      subtitle: t('home.storyboards.creatorAgentCollab'),
+      destination: "Amalfi Coast, Italy",
+      durationNights: 4,
+      vibeTags: ["Romantic", "Coastal", "Foodie"],
       image: "/home/jack-ward-rknrvCrfS1k-unsplash.jpg",
+      curator: t('home.storyboards.creatorAgentCollab'),
     },
     {
-      id: 2,
+      id: "cape-town",
       title: "Cape Town & Winelands",
-      subtitle: t('home.storyboards.agentCurated'),
+      destination: "Cape Town, South Africa",
+      durationNights: 6,
+      vibeTags: ["Adventure", "Wine", "Safari"],
       image: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=800&auto=format&fit=crop",
+      curator: t('home.storyboards.agentCurated'),
     },
     {
-      id: 3,
+      id: "tokyo",
       title: "Tokyo for Food Lovers",
-      subtitle: t('home.storyboards.creatorAgentCollab'),
+      destination: "Tokyo, Japan",
+      durationNights: 5,
+      vibeTags: ["Foodie", "Culture", "Urban"],
       image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&auto=format&fit=crop",
+      curator: t('home.storyboards.creatorAgentCollab'),
     },
     {
-      id: 4,
+      id: "swiss-alps",
       title: "Swiss Alps Ski Escape",
-      subtitle: t('home.storyboards.agentCurated'),
+      destination: "Zermatt, Switzerland",
+      durationNights: 5,
+      vibeTags: ["Skiing", "Luxury", "Mountains"],
       image: "https://images.unsplash.com/photo-1551524164-687a55dd1126?w=800&auto=format&fit=crop",
+      curator: t('home.storyboards.agentCurated'),
     },
     {
-      id: 5,
+      id: "morocco",
       title: "Moroccan Desert Adventure",
-      subtitle: t('home.storyboards.creatorAgentCollab'),
+      destination: "Marrakech, Morocco",
+      durationNights: 6,
+      vibeTags: ["Adventure", "Desert", "Culture"],
       image: "https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=800&auto=format&fit=crop",
+      curator: t('home.storyboards.creatorAgentCollab'),
     },
     {
-      id: 6,
+      id: "bali",
       title: "Bali Wellness Retreat",
-      subtitle: t('home.storyboards.agentCurated'),
+      destination: "Ubud, Bali",
+      durationNights: 4,
+      vibeTags: ["Wellness", "Yoga", "Nature"],
       image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&auto=format&fit=crop",
+      curator: t('home.storyboards.agentCurated'),
     },
   ];
 
   return (
     <section className="bg-white border-y border-[#E5DFC6]/30 py-16 md:py-20">
       <div className="mx-auto max-w-6xl px-4">
-        <div className="text-center mb-12">
-          <h2 className="font-display text-[26px] leading-snug text-[#0a2225] md:text-[31px] lg:text-[36px] mb-4">
+        <div className="text-center mb-10 md:mb-12">
+          <h2 className="font-secondary text-[26px] leading-snug text-[#0a2225] md:text-[31px] lg:text-[36px] mb-4">
             <Trans 
               i18nKey="home.storyboards.title" 
               components={{ em: <em className="font-secondary italic" /> }} 
@@ -62,36 +91,69 @@ export function StoryboardsHighlight() {
         </div>
 
         {/* Storyboard tiles grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 mb-10">
           {sampleStoryboards.map((storyboard) => (
-            <div
+            <Link
               key={storyboard.id}
-              className="group overflow-hidden rounded-2xl bg-white shadow-sm border border-[#E5DFC6] transition-all hover:-translate-y-1 hover:shadow-lg"
+              to={`/concierge?destination=${encodeURIComponent(storyboard.destination)}&context=${encodeURIComponent(storyboard.title)}&nights=${storyboard.durationNights}&vibes=${encodeURIComponent(storyboard.vibeTags.join(','))}`}
+              className="group overflow-hidden rounded-xl md:rounded-2xl bg-white shadow-sm border border-[#E5DFC6] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer"
             >
-              <div className="aspect-[4/5] overflow-hidden">
+              {/* Image with gradient and badge */}
+              <div className="relative aspect-[4/5] md:aspect-[3/4] overflow-hidden">
                 <img
                   src={storyboard.image}
                   alt={storyboard.title}
-                  className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+                
+                {/* Duration badge */}
+                <Badge className="absolute top-2 right-2 md:top-3 md:right-3 rounded-full text-[9px] md:text-[10px] bg-white/95 text-[#0a2225] border-0 shadow-sm px-2 py-0.5">
+                  <Calendar className="h-2.5 w-2.5 md:h-3 md:w-3 mr-1" />
+                  {storyboard.durationNights} nights
+                </Badge>
+
+                {/* Bottom overlay content */}
+                <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4">
+                  <h3 className="font-secondary text-sm md:text-base text-white font-medium leading-tight mb-1">
+                    {storyboard.title}
+                  </h3>
+                  <p className="flex items-center gap-1 text-[10px] md:text-xs text-white/90">
+                    <MapPin className="h-2.5 w-2.5 md:h-3 md:w-3 flex-shrink-0" />
+                    <span className="truncate">{storyboard.destination}</span>
+                  </p>
+                </div>
               </div>
-              <div className="p-4">
-                <h3 className="font-display text-base text-[#0a2225] mb-1">
-                  {storyboard.title}
-                </h3>
-                <p className="text-xs text-[#8D8D8D]">{storyboard.subtitle}</p>
+              
+              {/* Content below image */}
+              <div className="p-2.5 md:p-4 space-y-2">
+                {/* Vibe tags */}
+                <div className="flex flex-wrap gap-1">
+                  {storyboard.vibeTags.slice(0, 3).map((tag) => (
+                    <Badge 
+                      key={tag} 
+                      variant="outline" 
+                      className="rounded-full text-[8px] md:text-[9px] px-1.5 md:px-2 py-0 border-[#E5DFC6] text-[#6B7280] bg-[#FDF9F0]/50"
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+                
+                {/* Curator credit */}
+                <p className="text-[9px] md:text-[10px] text-[#8D8D8D]">{storyboard.curator}</p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 
         {/* CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4">
           <Button
             asChild
             size="lg"
-            className="bg-[#0c4d47] text-[#E5DFC6] hover:bg-[#073331] shadow-sm"
+            className="w-full sm:w-auto bg-[#0c4d47] text-[#E5DFC6] hover:bg-[#073331] shadow-sm"
           >
             <Link to="/concierge">
               <Sparkles className="mr-2 h-4 w-4" />
@@ -102,7 +164,7 @@ export function StoryboardsHighlight() {
             asChild
             variant="outline"
             size="lg"
-            className="border-[#0c4d47] text-[#0c4d47] hover:bg-[#0c4d47]/5"
+            className="w-full sm:w-auto border-[#0c4d47] text-[#0c4d47] hover:bg-[#0c4d47]/5"
           >
             <Link to="/marketplace">
               {t('home.storyboards.exploreStoryboards')}
