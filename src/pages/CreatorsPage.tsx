@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { useNavigate } from "react-router-dom";
 import { BackButton } from "@/components/ui/BackButton";
+import { useAuth } from "@/contexts/AuthContext";
 
 type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 
@@ -115,6 +116,9 @@ export default function CreatorsPage() {
     "followers"
   );
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const accountType = ((user as any)?.user_metadata?.account_type as string | undefined)?.toLowerCase() ?? null;
+  const showCreatorLabButton = accountType === "creator" || accountType === "agent" || accountType === "brand";
 
   useEffect(() => {
     async function loadCreators() {
@@ -361,13 +365,15 @@ export default function CreatorsPage() {
         >
           Post a trip brief
         </button>
-        <button
-          type="button"
-          className="rounded-full bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-black"
-          onClick={() => navigate("/tiktok-lab")}
-        >
-          Go to Goldsainte Creator Lab
-        </button>
+        {showCreatorLabButton && (
+          <button
+            type="button"
+            className="rounded-full bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-black"
+            onClick={() => navigate("/tiktok-lab")}
+          >
+            Go to Goldsainte Creator Lab
+          </button>
+        )}
       </div>
     </div>
   );
