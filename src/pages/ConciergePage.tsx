@@ -1,8 +1,10 @@
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import { MadisonChat } from "@/components/MadisonChat";
 
 export default function ConciergePage() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   
   // Read URL params passed from collections
   const destination = searchParams.get("destination");
@@ -13,6 +15,15 @@ export default function ConciergePage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition mb-6"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </button>
+
         {/* Context Banner */}
         {context && (
           <div className="mb-4 p-4 rounded-xl bg-[#F6F0E4] border border-[#E5DFC6]">
