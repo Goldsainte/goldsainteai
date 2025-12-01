@@ -7,6 +7,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { SearchFilters } from "@/pages/Marketplace";
 
 interface MarketplaceFiltersProps {
@@ -50,20 +51,23 @@ export function MarketplaceFilters({ filters, onFilterChange }: MarketplaceFilte
       {/* Desktop: Horizontal scroll pills */}
       <div className="hidden md:block">
         <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-          {quickFilters.map((filter) => (
-            <Badge
-              key={filter}
-              variant="outline"
-              className={`cursor-pointer whitespace-nowrap rounded-full border-[#E5DFC6] px-4 py-1.5 font-secondary text-xs font-medium transition-all ${
-                selectedFilter === filter
-                  ? "border-[#BFAD72] bg-[#BFAD72] text-white shadow-sm"
-                  : "bg-[#FBF9F0] text-[#0a2225] hover:border-[#BFAD72] hover:bg-[#BFAD72] hover:text-white hover:shadow-sm"
-              }`}
-              onClick={() => handleQuickFilter(filter)}
-            >
-              {filter}
-            </Badge>
-          ))}
+          <ToggleGroup
+            type="single"
+            value={selectedFilter || ""}
+            onValueChange={(value) => handleQuickFilter(value)}
+            className="flex flex-wrap gap-2"
+          >
+            {quickFilters.map((filter) => (
+              <ToggleGroupItem
+                key={filter}
+                value={filter}
+                variant="standard"
+                className="whitespace-nowrap"
+              >
+                {filter}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
         </div>
       </div>
 
@@ -88,20 +92,24 @@ export function MarketplaceFilters({ filters, onFilterChange }: MarketplaceFilte
                   Trip Type
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {quickFilters.map((filter) => (
-                    <Badge
-                      key={filter}
-                      variant="outline"
-                      className={`cursor-pointer rounded-full border-[#E5DFC6] px-3 py-1.5 text-xs font-medium transition-all active:scale-95 ${
-                        selectedFilter === filter
-                          ? "border-[#BFAD72] bg-[#BFAD72] text-white"
-                          : "bg-[#FBF9F0] text-[#0a2225] hover:border-[#BFAD72]"
-                      }`}
-                      onClick={() => handleQuickFilter(filter)}
-                    >
-                      {filter}
-                    </Badge>
-                  ))}
+                  <ToggleGroup
+                    type="single"
+                    value={selectedFilter || ""}
+                    onValueChange={(value) => handleQuickFilter(value)}
+                    className="flex flex-wrap gap-2"
+                  >
+                    {quickFilters.map((filter) => (
+                      <ToggleGroupItem
+                        key={filter}
+                        value={filter}
+                        variant="standard"
+                        size="mobile"
+                        className="whitespace-nowrap"
+                      >
+                        {filter}
+                      </ToggleGroupItem>
+                    ))}
+                  </ToggleGroup>
                 </div>
                 {selectedFilter && (
                   <button
