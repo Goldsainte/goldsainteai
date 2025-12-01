@@ -1,4 +1,4 @@
-import { Facebook, Instagram, Twitter, Linkedin, Youtube, Globe } from "lucide-react";
+import { Instagram, Linkedin, Globe } from "lucide-react";
 import { Link } from "react-router-dom";
 import verticalLogo from "@/assets/primary-vertical-logo-gold.png";
 import { useState } from "react";
@@ -187,20 +187,23 @@ export const Footer = () => {
           {/* Social Media Links */}
           <div className="flex items-center gap-3 sm:gap-4 flex-wrap justify-center">
             <span className="text-xs sm:text-sm font-secondary uppercase tracking-[0.12em] text-[#0a2225] w-full sm:w-auto text-center sm:text-left">{t('footer.followUs')}</span>
-            <a href="#" className="text-[#4A4A4A] hover:text-[#C7B892] transition-colors" aria-label="Facebook">
-              <Facebook className="h-5 w-5" />
-            </a>
-            <a href="https://www.instagram.com/goldsainte/?hl=en" target="_blank" rel="noopener noreferrer" className="text-[#4A4A4A] hover:text-[#C7B892] transition-colors" aria-label="Instagram">
-              <Instagram className="h-5 w-5" />
-            </a>
-            <a href="#" className="text-[#4A4A4A] hover:text-[#C7B892] transition-colors" aria-label="Twitter">
-              <Twitter className="h-5 w-5" />
-            </a>
-            <a href="#" className="text-[#4A4A4A] hover:text-[#C7B892] transition-colors" aria-label="LinkedIn">
+            <a 
+              href="https://www.linkedin.com/company/goldsainte/" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-[#4A4A4A] hover:text-[#C7B892] transition-colors" 
+              aria-label="LinkedIn"
+            >
               <Linkedin className="h-5 w-5" />
             </a>
-            <a href="#" className="text-[#4A4A4A] hover:text-[#C7B892] transition-colors" aria-label="YouTube">
-              <Youtube className="h-5 w-5" />
+            <a 
+              href="https://www.instagram.com/goldsainteai/" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-[#4A4A4A] hover:text-[#C7B892] transition-colors" 
+              aria-label="Instagram"
+            >
+              <Instagram className="h-5 w-5" />
             </a>
           </div>
         </div>
