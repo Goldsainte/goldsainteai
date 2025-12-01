@@ -1,6 +1,7 @@
 // src/components/home/HomeHero.tsx
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Shield, Sparkles, Lock, ArrowRight } from "lucide-react";
 import heroMainImg from "@/assets/maximilien-t-scharner-FD0Ga_KJTwM-unsplash.jpeg"; // infinity pool
 import heroSecondaryImg from "@/assets/austin-distel-riQNJpiaGgE-unsplash.jpeg"; // treehouse / hammock
 import heroTertiaryImg from "@/assets/felix-rostig-UmV2wr-Vbq8-unsplash.jpeg"; // friends hiking
@@ -113,23 +114,52 @@ export function HomeHero() {
         </div>
       </div>
 
-      {/* Disclaimer section - BELOW photo collage */}
-      <div className="max-w-6xl mx-auto px-4 pb-12 text-center space-y-3">
-        <p className="text-[11px] text-[#8D8D8D] max-w-2xl mx-auto">
-          {t('home.hero.marketplaceDisclaimer')}
-        </p>
-        <p className="text-sm text-[#8D8D8D]">
-          {t('home.hero.gentleAssist')}{" "}
-          <Link
-            to="/concierge"
-            className="underline underline-offset-2 text-[#0c4d47]"
-          >
-            {t('home.hero.askAI')}
-          </Link>
-        </p>
-        <p className="text-xs text-[#8D8D8D] max-w-md mx-auto">
-          {t('home.hero.trustPromise')}
-        </p>
+      {/* Trust & Safety Card - BELOW photo collage */}
+      <div className="max-w-2xl mx-auto px-4 pb-12">
+        <div className="bg-white/60 border border-[#E5DFC6] rounded-2xl p-5 space-y-4">
+          
+          {/* Marketplace Statement */}
+          <div className="flex items-start gap-3">
+            <Shield className="h-5 w-5 text-[#0c4d47] flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-[#0a2225]">All actions stay on-platform</p>
+              <p className="text-xs text-[#6B7280] mt-0.5">
+                We connect travelers, creators & agents — we don't operate trips ourselves.
+              </p>
+            </div>
+          </div>
+          
+          <div className="border-t border-[#E5DFC6]" />
+          
+          {/* AI Assist CTA */}
+          <div className="flex items-start gap-3">
+            <Sparkles className="h-5 w-5 text-[#BFAD72] flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-[#0a2225]">Need a gentle assist?</p>
+              <Link 
+                to="/concierge"
+                className="inline-flex items-center gap-1 text-sm text-[#0c4d47] font-semibold mt-1 hover:underline"
+              >
+                Ask Madison to shape your brief
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+          
+          <div className="border-t border-[#E5DFC6]" />
+          
+          {/* Trust Promise */}
+          <div className="flex items-start gap-3">
+            <Lock className="h-5 w-5 text-[#0c4d47] flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-[#0a2225]">Protected bookings</p>
+              <p className="text-xs text-[#6B7280] mt-0.5">
+                No phone numbers, no side deals — just beautifully organized, secure transactions.
+              </p>
+            </div>
+          </div>
+          
+        </div>
       </div>
     </section>
   );
