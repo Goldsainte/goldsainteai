@@ -269,9 +269,8 @@ export default function PostTripPage() {
           </p>
         )}
 
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)]">
-          <form
-            className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 space-y-5 text-sm"
+        <form
+          className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 space-y-5 text-sm max-w-3xl mx-auto"
             onSubmit={handleSubmit}
           >
           {/* Section 1: Where & when */}
@@ -636,6 +635,23 @@ export default function PostTripPage() {
             </div>
           </div>
 
+          {/* Trust & Safety */}
+          <div className="rounded-2xl border border-[#E5DFC6] bg-[#FDFBF5] p-4 space-y-2">
+            <p className="text-xs uppercase tracking-[0.16em] text-[#8D8D8D]">Trust &amp; safety</p>
+            <h3 className="text-sm font-semibold text-[#0a2225]">How Goldsainte keeps this safe</h3>
+            <p className="text-xs text-[#4a4a4a]">
+              Your trip brief is shared only with vetted creators and verified travel professionals. We keep all proposals, messages,
+              and payments on-platform so there's a clear record of what was agreed and what was delivered.
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowSafetyModal(true)}
+              className="text-xs font-semibold text-[#0c4d47] underline-offset-4 hover:underline"
+            >
+              View safety guidelines
+            </button>
+          </div>
+
           {error && (
             <p className="text-xs text-red-600">
               {error}
@@ -663,22 +679,6 @@ export default function PostTripPage() {
             </button>
           </div>
         </form>
-        <aside className="rounded-3xl border border-[#E5DFC6] bg-white/90 p-4 md:p-5 text-sm space-y-3 self-start lg:sticky lg:top-24">
-          <p className="text-xs uppercase tracking-[0.16em] text-[#8D8D8D]">Trust &amp; safety</p>
-          <h2 className="text-base font-semibold text-[#0a2225]">How Goldsainte keeps this safe</h2>
-          <p className="text-sm text-[#4a4a4a]">
-            Your trip brief is shared only with vetted creators and verified travel professionals. We keep all proposals, messages,
-            and payments on-platform so there’s a clear record of what was agreed and what was delivered.
-          </p>
-          <button
-            type="button"
-            onClick={() => setShowSafetyModal(true)}
-            className="text-sm font-semibold text-[#0c4d47] underline-offset-4 hover:underline"
-          >
-            View safety guidelines
-          </button>
-        </aside>
-        </div>
       </section>
 
       <TrustSafetyModal
