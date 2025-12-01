@@ -4,6 +4,7 @@ import { useNavigate, useLocation, useParams, Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useRequireOnboarding } from "@/hooks/useRequireOnboarding";
 import { StoryboardBuilder } from "@/components/storyboards/StoryboardBuilder";
+import { TravelStoryboard } from "@/components/storyboards/TravelStoryboard";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function StoryboardEditorPage() {
@@ -117,6 +118,18 @@ export default function StoryboardEditorPage() {
           mode="creator"
           onSaved={handleStoryboardSaved}
         />
+
+        {/* Browse Inspiration section */}
+        {effectiveMode === "create" && (
+          <div className="mt-10 pt-8 border-t border-[#E5DFC6]">
+            <TravelStoryboard
+              title="Browse Inspiration"
+              subtitle="Save visual ideas to your storyboard. Click the save button on any image to add it."
+              showSaveButtons={true}
+              maxItems={20}
+            />
+          </div>
+        )}
       </div>
     </main>
   );
