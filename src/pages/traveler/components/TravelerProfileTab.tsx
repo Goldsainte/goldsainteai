@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Save, Loader2 } from "lucide-react";
 import { ProfilePhotoUploader } from "./ProfilePhotoUploader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,33 +17,62 @@ interface ProfileData {
   username?: string | null;
   bio?: string | null;
   email?: string | null;
-  phone_number?: string | null;
+  phone?: string | null;
   home_base?: string | null;
   avatar_url?: string | null;
   instagram_handle?: string | null;
   tiktok_handle?: string | null;
-  website_url?: string | null;
+  website?: string | null;
 }
 
-interface TravelerProfileTabProps {
-  profile: ProfileData | null;
-  onProfileUpdate: (updates: Partial<ProfileData>) => void;
-}
-
-export function TravelerProfileTab({ profile, onProfileUpdate }: TravelerProfileTabProps) {
+export function TravelerProfileTab() {
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
-    first_name: profile?.first_name || "",
-    last_name: profile?.last_name || "",
-    display_name: profile?.display_name || "",
-    username: profile?.username || "",
-    bio: profile?.bio || "",
-    phone_number: profile?.phone_number || "",
-    home_base: profile?.home_base || "",
-    instagram_handle: profile?.instagram_handle || "",
-    tiktok_handle: profile?.tiktok_handle || "",
-    website_url: profile?.website_url || "",
+    first_name: "",
+    last_name: "",
+    display_name: "",
+    username: "",
+    bio: "",
+    phone: "",
+    home_base: "",
+    instagram_handle: "",
+    tiktok_handle: "",
+    website: "",
   });
+
+  useEffect(() => {
+    async function fetchProfile() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, first_name, last_name, display_name, username, bio, email, phone, home_base, avatar_url, instagram_handle, tiktok_handle, website")
+        .eq("id", user.id)
+        .single();
+
+      if (data && !error) {
+        setProfile(data);
+        setFormData({
+          first_name: data.first_name || "",
+          last_name: data.last_name || "",
+          display_name: data.display_name || "",
+          username: data.username || "",
+          bio: data.bio || "",
+          phone: data.phone || "",
+          home_base: data.home_base || "",
+          instagram_handle: data.instagram_handle || "",
+          tiktok_handle: data.tiktok_handle || "",
+          website: data.website || "",
+        });
+      }
+      setLoading(false);
+    }
+
+    fetchProfile();
+  }, []);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -62,17 +91,17 @@ export function TravelerProfileTab({ profile, onProfileUpdate }: TravelerProfile
           display_name: formData.display_name || null,
           username: formData.username || null,
           bio: formData.bio || null,
-          phone_number: formData.phone_number || null,
+          phone: formData.phone || null,
           home_base: formData.home_base || null,
           instagram_handle: formData.instagram_handle || null,
           tiktok_handle: formData.tiktok_handle || null,
-          website_url: formData.website_url || null,
+          website: formData.website || null,
         })
         .eq("id", profile.id);
 
       if (error) throw error;
 
-      onProfileUpdate(formData);
+      setProfile({ ...profile, ...formData });
       toast.success("Profile updated successfully");
     } catch (error) {
       console.error("Save error:", error);
@@ -81,6 +110,14 @@ export function TravelerProfileTab({ profile, onProfileUpdate }: TravelerProfile
       setSaving(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="w-8 h-8 border-2 border-[#C7A962] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -94,7 +131,7 @@ export function TravelerProfileTab({ profile, onProfileUpdate }: TravelerProfile
             userId={profile?.id || ""}
             currentAvatarUrl={profile?.avatar_url}
             displayName={profile?.display_name || "Traveler"}
-            onUploadComplete={(url) => onProfileUpdate({ avatar_url: url })}
+            onUploadComplete={(url) => setProfile(prev => prev ? { ...prev, avatar_url: url } : null)}
             size="lg"
           />
           <p className="text-sm text-[#6B7280] mt-4 text-center max-w-sm">
@@ -188,12 +225,12 @@ export function TravelerProfileTab({ profile, onProfileUpdate }: TravelerProfile
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="phone_number" className="text-[#0a2225]">Phone Number</Label>
+              <Label htmlFor="phone" className="text-[#0a2225]">Phone Number</Label>
               <Input
-                id="phone_number"
+                id="phone"
                 type="tel"
-                value={formData.phone_number}
-                onChange={(e) => handleInputChange("phone_number", e.target.value)}
+                value={formData.phone}
+                onChange={(e) => handleInputChange("phone", e.target.value)}
                 className="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]"
                 placeholder="+1 (555) 000-0000"
               />
@@ -242,12 +279,12 @@ export function TravelerProfileTab({ profile, onProfileUpdate }: TravelerProfile
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="website_url" className="text-[#0a2225]">Website</Label>
+            <Label htmlFor="website" className="text-[#0a2225]">Website</Label>
             <Input
-              id="website_url"
+              id="website"
               type="url"
-              value={formData.website_url}
-              onChange={(e) => handleInputChange("website_url", e.target.value)}
+              value={formData.website}
+              onChange={(e) => handleInputChange("website", e.target.value)}
               className="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]"
               placeholder="https://yourwebsite.com"
             />
