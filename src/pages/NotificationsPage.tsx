@@ -74,9 +74,8 @@ export default function NotificationsPage() {
             </h1>
           </div>
         </div>
-        <p className="text-[11px] text-[#4a4a4a] max-w-md">
-          New trip invites, proposal updates and booking changes appear here —
-          so you can stay on top of opportunities without leaving the platform.
+        <p className="text-sm text-[#4a4a4a]">
+          New trip invites, proposal updates and booking changes appear here — so you can stay on top of opportunities without leaving the platform.
         </p>
       </section>
 
@@ -89,9 +88,8 @@ export default function NotificationsPage() {
             </p>
           )}
           {!loading && !error && notifications.length === 0 && (
-            <p className="text-[10px] text-[#8D8D8D]">
-              You don't have any notifications yet. As travelers post briefs
-              and respond to your proposals, updates will appear here.
+            <p className="text-sm text-[#8D8D8D] py-4">
+              You don't have any notifications yet. As travelers post briefs and respond to your proposals, updates will appear here.
             </p>
           )}
 
