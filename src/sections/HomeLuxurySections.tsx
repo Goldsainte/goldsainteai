@@ -181,59 +181,72 @@ export const HowGoldsainteWorksSection: React.FC = () => {
   ];
 
   return (
-    <section className="bg-[#F6F0E4] px-4 py-16 md:py-24">
-      <div className="mx-auto flex max-w-6xl flex-col gap-10 md:flex-row md:items-start">
-        <div className="md:w-2/5 space-y-3">
-          <p className="text-[11px] uppercase tracking-[0.22em] text-[#7A7151]">
+    <section className="bg-[#F6F0E4] px-5 py-12 md:px-4 md:py-24">
+      <div className="mx-auto flex max-w-6xl flex-col gap-6 md:gap-10 md:flex-row md:items-start">
+        {/* Header - Compact on mobile */}
+        <div className="md:w-2/5 space-y-2 md:space-y-3">
+          <p className="text-xs uppercase tracking-[0.22em] text-[#7A7151]">
             {t('home.howItWorks.sectionTitle')}
           </p>
-          <h2 className="font-secondary text-3xl leading-tight text-[#0a2225] md:text-4xl">
+          <h2 className="font-secondary text-2xl leading-tight text-[#0a2225] md:text-4xl">
             {t('home.howItWorks.headline')}
           </h2>
-          <p className="max-w-sm text-sm text-[#4A4A4A]">
+          <p className="max-w-sm text-sm text-[#4A4A4A] hidden md:block">
             {t('home.howItWorks.description')}
           </p>
         </div>
 
-        <div className="md:w-3/5 space-y-8">
+        {/* Steps */}
+        <div className="md:w-3/5 space-y-4 md:space-y-8">
           {steps.map((step, index) => (
             <div
               key={step.id}
               className={cn(
-                "flex flex-col gap-6 md:items-center",
+                "flex gap-3 md:gap-6 md:items-center rounded-2xl bg-white/60 p-3 md:p-0 md:bg-transparent md:rounded-none",
+                "md:flex-col",
                 index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
               )}
             >
-              {/* Text */}
-              <div className="md:w-1/2 space-y-2">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#C7B892] text-[11px] font-semibold text-[#7A7151]">
-                    {step.id}
-                  </div>
-                  <span className="text-[11px] uppercase tracking-[0.22em] text-[#A4987C]">
-                    {t('common.step')} {step.id}
-                  </span>
-                </div>
-                <h3 className="text-lg font-semibold text-[#0a2225]">
-                  {step.title}
-                </h3>
-                <p className="text-[13px] leading-relaxed text-[#4A4A4A]">
-                  {step.body}
-                </p>
-              </div>
-
-              {/* Image */}
-              <div className="md:w-1/2">
-                <div className="overflow-hidden rounded-[26px] bg-[#D8CFBD]/40 shadow-[0_18px_40px_rgba(10,34,37,0.18)]">
+              {/* Image - Small on mobile, side by side */}
+              <div className="w-[35%] flex-shrink-0 md:w-1/2">
+                <div className="overflow-hidden rounded-xl md:rounded-[26px] bg-[#D8CFBD]/40 shadow-[0_8px_20px_rgba(10,34,37,0.12)] md:shadow-[0_18px_40px_rgba(10,34,37,0.18)]">
                   <img
                     src={step.image}
                     alt={step.alt}
-                    className="h-52 w-full object-cover md:h-64"
+                    className="h-24 w-full object-cover md:h-64"
                   />
                 </div>
               </div>
+
+              {/* Text - Compact on mobile */}
+              <div className="flex-1 md:w-1/2 space-y-1 md:space-y-2">
+                <div className="flex items-center gap-2 md:gap-3">
+                  <div className="flex h-6 w-6 md:h-8 md:w-8 items-center justify-center rounded-full border border-[#C7B892] text-[10px] md:text-[11px] font-semibold text-[#7A7151]">
+                    {step.id}
+                  </div>
+                  <span className="text-[10px] md:text-[11px] uppercase tracking-[0.18em] md:tracking-[0.22em] text-[#A4987C]">
+                    {t('common.step')} {step.id}
+                  </span>
+                </div>
+                <h3 className="text-sm md:text-lg font-semibold text-[#0a2225] leading-snug">
+                  {step.title}
+                </h3>
+                <p className="text-xs md:text-sm leading-relaxed text-[#4A4A4A]">
+                  {step.body}
+                </p>
+              </div>
             </div>
           ))}
+
+          {/* Progress dots - Mobile only */}
+          <div className="flex justify-center gap-2 pt-2 md:hidden">
+            {steps.map((step) => (
+              <div
+                key={step.id}
+                className="h-1.5 w-1.5 rounded-full bg-[#C7B892]"
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>
