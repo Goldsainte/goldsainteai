@@ -160,7 +160,7 @@ export function StoryboardCreator({ tripId, ownerRole }: StoryboardCreatorProps)
             </p>
           </div>
           <TravelStoryboard
-            maxItems={12}
+            maxItems={100}
             onImageClick={(img) => handleSelectMedia(img.url)}
           />
         </div>

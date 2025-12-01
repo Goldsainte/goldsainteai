@@ -82,7 +82,7 @@ export function TrustSafetyModal({ open, onClose, context = "general", onAcknowl
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Button onClick={handleConfirm} className="flex-1">I understand</Button>
           <Link
-            to="/trust-safety"
+            to="/trust-and-safety"
             onClick={() => onClose()}
             className={cn(
               "text-sm font-medium text-primary hover:text-primary/80 text-center",
