@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Sparkles, User, Plane, Calendar, Bookmark, Settings, Plus, MessageCircle } from "lucide-react";
 import { useRequireOnboarding } from "@/hooks/useRequireOnboarding";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TravelerOverviewTab } from "./components/TravelerOverviewTab";
 import { TravelerProfileTab } from "./components/TravelerProfileTab";
 import { TravelerTripsTab } from "./components/TravelerTripsTab";
@@ -12,6 +13,7 @@ import { TravelerBookingsTab } from "./components/TravelerBookingsTab";
 import { TravelerStoryboardsTab } from "./components/TravelerStoryboardsTab";
 import { TravelerSettingsTab } from "./components/TravelerSettingsTab";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Profile {
   id: string;
@@ -31,9 +33,11 @@ export default function TravelerDashboardPage() {
   const { checking, allowed } = useRequireOnboarding();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [stats, setStats] = useState<DashboardStats>({ tripRequests: 0, bookings: 0, storyboards: 0 });
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
     async function loadDashboardData() {
@@ -167,51 +171,90 @@ export default function TravelerDashboardPage() {
           </div>
         ) : (
           /* Tabbed Navigation */
-          <Tabs defaultValue="overview" className="space-y-8">
-            <TabsList className="bg-white border border-[#E5DFC6] rounded-full p-1.5 h-auto overflow-x-auto scrollbar-hide flex flex-nowrap justify-start gap-1 max-w-full">
-              <TabsTrigger 
-                value="overview" 
-                className="rounded-full px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
-              >
-                <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-                Overview
-              </TabsTrigger>
-              <TabsTrigger 
-                value="profile"
-                className="rounded-full px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
-              >
-                <User className="h-3.5 w-3.5 mr-1.5" />
-                Profile
-              </TabsTrigger>
-              <TabsTrigger 
-                value="trips"
-                className="rounded-full px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
-              >
-                <Calendar className="h-3.5 w-3.5 mr-1.5" />
-                Trips
-              </TabsTrigger>
-              <TabsTrigger 
-                value="bookings"
-                className="rounded-full px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
-              >
-                <Plane className="h-3.5 w-3.5 mr-1.5" />
-                Bookings
-              </TabsTrigger>
-              <TabsTrigger 
-                value="storyboards"
-                className="rounded-full px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
-              >
-                <Bookmark className="h-3.5 w-3.5 mr-1.5" />
-                Storyboards
-              </TabsTrigger>
-              <TabsTrigger 
-                value="settings"
-                className="rounded-full px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
-              >
-                <Settings className="h-3.5 w-3.5 mr-1.5" />
-                Settings
-              </TabsTrigger>
-            </TabsList>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+            {/* Mobile: Dropdown Select */}
+            {isMobile ? (
+              <Select value={activeTab} onValueChange={setActiveTab}>
+                <SelectTrigger className="w-full bg-white border-[#E5DFC6] rounded-full h-12 px-4 text-sm font-medium text-[#0a2225]">
+                  <SelectValue>
+                    <span className="flex items-center gap-2">
+                      {activeTab === "overview" && <><Sparkles className="h-4 w-4 text-[#C7A962]" /> Overview</>}
+                      {activeTab === "profile" && <><User className="h-4 w-4 text-[#C7A962]" /> Profile</>}
+                      {activeTab === "trips" && <><Calendar className="h-4 w-4 text-[#C7A962]" /> Trips</>}
+                      {activeTab === "bookings" && <><Plane className="h-4 w-4 text-[#C7A962]" /> Bookings</>}
+                      {activeTab === "storyboards" && <><Bookmark className="h-4 w-4 text-[#C7A962]" /> Storyboards</>}
+                      {activeTab === "settings" && <><Settings className="h-4 w-4 text-[#C7A962]" /> Settings</>}
+                    </span>
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent className="bg-white border-[#E5DFC6] rounded-xl">
+                  <SelectItem value="overview" className="py-3">
+                    <span className="flex items-center gap-2"><Sparkles className="h-4 w-4" /> Overview</span>
+                  </SelectItem>
+                  <SelectItem value="profile" className="py-3">
+                    <span className="flex items-center gap-2"><User className="h-4 w-4" /> Profile</span>
+                  </SelectItem>
+                  <SelectItem value="trips" className="py-3">
+                    <span className="flex items-center gap-2"><Calendar className="h-4 w-4" /> Trips</span>
+                  </SelectItem>
+                  <SelectItem value="bookings" className="py-3">
+                    <span className="flex items-center gap-2"><Plane className="h-4 w-4" /> Bookings</span>
+                  </SelectItem>
+                  <SelectItem value="storyboards" className="py-3">
+                    <span className="flex items-center gap-2"><Bookmark className="h-4 w-4" /> Storyboards</span>
+                  </SelectItem>
+                  <SelectItem value="settings" className="py-3">
+                    <span className="flex items-center gap-2"><Settings className="h-4 w-4" /> Settings</span>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            ) : (
+              /* Desktop: Horizontal TabsList */
+              <TabsList className="bg-white border border-[#E5DFC6] rounded-full p-1.5 h-auto flex flex-nowrap justify-start gap-1">
+                <TabsTrigger 
+                  value="overview" 
+                  className="rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                >
+                  <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="profile"
+                  className="rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                >
+                  <User className="h-3.5 w-3.5 mr-1.5" />
+                  Profile
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="trips"
+                  className="rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                >
+                  <Calendar className="h-3.5 w-3.5 mr-1.5" />
+                  Trips
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="bookings"
+                  className="rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                >
+                  <Plane className="h-3.5 w-3.5 mr-1.5" />
+                  Bookings
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="storyboards"
+                  className="rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                >
+                  <Bookmark className="h-3.5 w-3.5 mr-1.5" />
+                  Storyboards
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="settings"
+                  className="rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                >
+                  <Settings className="h-3.5 w-3.5 mr-1.5" />
+                  Settings
+                </TabsTrigger>
+              </TabsList>
+            )}
 
             <TabsContent value="overview" className="mt-0">
               {profile && (
