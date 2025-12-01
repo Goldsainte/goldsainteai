@@ -19,8 +19,8 @@ export function MarketplaceTabs({ activeTab, onTabChange, accountType }: Marketp
   ] as const;
 
   return (
-    <div className="overflow-x-auto scrollbar-hide max-w-full -mx-4 px-4 md:mx-0 md:px-0">
-      <div className="inline-flex items-center gap-1 rounded-full border border-[#E5DFC6] bg-white p-1">
+    <div className="flex justify-center w-full overflow-x-auto scrollbar-hide">
+      <div className="inline-flex items-center gap-0.5 sm:gap-1 rounded-full border border-[#E5DFC6] bg-white p-0.5 sm:p-1">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -29,7 +29,7 @@ export function MarketplaceTabs({ activeTab, onTabChange, accountType }: Marketp
               key={tab.id}
               onClick={() => onTabChange(tab.id as "trips" | "creators" | "agents" | "brands" | "trip-requests")}
               className={`
-                flex flex-col items-center gap-0.5 rounded-full px-3 py-2 sm:flex-row sm:gap-1.5 sm:px-4 sm:py-2.5 
+                flex flex-col items-center gap-0.5 rounded-full px-2.5 py-1.5 sm:flex-row sm:gap-1.5 sm:px-4 sm:py-2.5 
                 text-[10px] sm:text-sm font-semibold transition-all whitespace-nowrap touch-manipulation min-h-[44px] min-w-[44px]
                 ${
                   isActive
@@ -39,7 +39,6 @@ export function MarketplaceTabs({ activeTab, onTabChange, accountType }: Marketp
               `}
             >
               <Icon className="h-4 w-4 flex-shrink-0" />
-              {/* Show short label on mobile, full on desktop */}
               <span className="sm:hidden">{tab.shortLabel}</span>
               <span className="hidden sm:inline">{tab.label}</span>
             </button>
