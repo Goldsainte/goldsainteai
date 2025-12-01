@@ -171,42 +171,42 @@ export default function TravelerDashboardPage() {
             <TabsList className="bg-white border border-[#E5DFC6] rounded-full p-1.5 h-auto flex-wrap justify-start gap-1">
               <TabsTrigger 
                 value="overview" 
-                className="rounded-full px-4 py-2 text-sm font-medium data-[state=active]:bg-[#0a2225] data-[state=active]:text-white data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                className="rounded-full px-4 py-2 text-sm font-medium data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
               >
                 <Sparkles className="h-3.5 w-3.5 mr-1.5" />
                 Overview
               </TabsTrigger>
               <TabsTrigger 
                 value="profile"
-                className="rounded-full px-4 py-2 text-sm font-medium data-[state=active]:bg-[#0a2225] data-[state=active]:text-white data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                className="rounded-full px-4 py-2 text-sm font-medium data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
               >
                 <User className="h-3.5 w-3.5 mr-1.5" />
                 My Profile
               </TabsTrigger>
               <TabsTrigger 
                 value="trips"
-                className="rounded-full px-4 py-2 text-sm font-medium data-[state=active]:bg-[#0a2225] data-[state=active]:text-white data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                className="rounded-full px-4 py-2 text-sm font-medium data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
               >
                 <Calendar className="h-3.5 w-3.5 mr-1.5" />
                 Trips
               </TabsTrigger>
               <TabsTrigger 
                 value="bookings"
-                className="rounded-full px-4 py-2 text-sm font-medium data-[state=active]:bg-[#0a2225] data-[state=active]:text-white data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                className="rounded-full px-4 py-2 text-sm font-medium data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
               >
                 <Plane className="h-3.5 w-3.5 mr-1.5" />
                 Bookings
               </TabsTrigger>
               <TabsTrigger 
                 value="storyboards"
-                className="rounded-full px-4 py-2 text-sm font-medium data-[state=active]:bg-[#0a2225] data-[state=active]:text-white data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                className="rounded-full px-4 py-2 text-sm font-medium data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
               >
                 <Bookmark className="h-3.5 w-3.5 mr-1.5" />
                 Storyboards
               </TabsTrigger>
               <TabsTrigger 
                 value="settings"
-                className="rounded-full px-4 py-2 text-sm font-medium data-[state=active]:bg-[#0a2225] data-[state=active]:text-white data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                className="rounded-full px-4 py-2 text-sm font-medium data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
               >
                 <Settings className="h-3.5 w-3.5 mr-1.5" />
                 Settings

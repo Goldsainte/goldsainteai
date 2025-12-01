@@ -111,7 +111,7 @@ serve(async (req) => {
 
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: customerId,
-      return_url: `${origin}/subscription`,
+      return_url: `${origin}/traveler`,
     });
     logStep("Customer portal session created", { sessionId: portalSession.id });
 
