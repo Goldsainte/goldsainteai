@@ -247,8 +247,8 @@ export default function MyTripsPage() {
                     <p className="text-sm text-[#6E6650] mb-6 max-w-md mx-auto leading-relaxed">
                       Share your dream destination with the Goldsainte marketplace. Our curated network of creators and agents will craft personalized proposals just for you.
                     </p>
-                    <Button asChild size="lg" className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d3a] text-white">
-                      <Link to="/post-trip" className="inline-flex items-center gap-2">
+                    <Button asChild className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d3a] text-white px-5 py-2.5 h-auto">
+                      <Link to="/post-trip" className="inline-flex items-center gap-2 whitespace-nowrap">
                         <Sparkles className="h-4 w-4" />
                         Post Your Dream Trip
                       </Link>
@@ -299,8 +299,8 @@ export default function MyTripsPage() {
                     <p className="text-sm text-[#6E6650] mb-6 max-w-md mx-auto leading-relaxed">
                       Book through Goldsainte or accept a curated proposal from our creators and agents. Every journey becomes part of your story.
                     </p>
-                    <Button asChild size="lg" className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d3a] text-white">
-                      <Link to="/marketplace" className="inline-flex items-center gap-2">
+                    <Button asChild className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d3a] text-white px-5 py-2.5 h-auto">
+                      <Link to="/marketplace" className="inline-flex items-center gap-2 whitespace-nowrap">
                         Explore the Marketplace
                         <ArrowRight className="h-4 w-4" />
                       </Link>
