@@ -2,7 +2,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sparkles } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useTranslation, Trans } from "react-i18next";
 
 export function StoryboardsHighlight() {
   const { t } = useTranslation();
@@ -51,7 +51,10 @@ export function StoryboardsHighlight() {
       <div className="mx-auto max-w-6xl px-4">
         <div className="text-center mb-12">
           <h2 className="font-display text-[26px] leading-snug text-[#0a2225] md:text-[31px] lg:text-[36px] mb-4">
-            {t('home.storyboards.title')}
+            <Trans 
+              i18nKey="home.storyboards.title" 
+              components={{ em: <em className="font-secondary italic" /> }} 
+            />
           </h2>
           <p className="mx-auto max-w-3xl text-sm leading-relaxed text-[#4a4a4a] md:text-base">
             {t('home.storyboards.description')}
