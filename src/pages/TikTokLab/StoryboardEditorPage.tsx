@@ -65,14 +65,14 @@ export default function StoryboardEditorPage() {
   }
 
   function handleStoryboardSaved(id: string) {
-    navigate("/tiktok-lab/storyboards");
+    navigate("/storyboards");
   }
 
   return (
     <main className="min-h-screen bg-[#f7f3ea] px-4 py-8">
       <div className="mx-auto max-w-5xl">
         <Link
-          to="/tiktok-lab/storyboards"
+          to="/storyboards"
           className="mb-6 inline-flex items-center gap-2 text-[11px] text-[#4a4a4a] hover:text-[#0a2225]"
         >
           <ArrowLeft className="h-3 w-3" />

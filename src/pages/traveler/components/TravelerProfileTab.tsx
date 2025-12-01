@@ -44,31 +44,48 @@ export function TravelerProfileTab() {
 
   useEffect(() => {
     async function fetchProfile() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          console.error("No authenticated user found");
+          setLoading(false);
+          return;
+        }
 
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, first_name, last_name, display_name, username, bio, email, phone, home_base, avatar_url, instagram_handle, tiktok_handle, website")
-        .eq("id", user.id)
-        .single();
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("id, first_name, last_name, display_name, username, bio, email, phone, home_base, avatar_url, instagram_handle, tiktok_handle, website")
+          .eq("id", user.id)
+          .single();
 
-      if (data && !error) {
-        setProfile(data);
-        setFormData({
-          first_name: data.first_name || "",
-          last_name: data.last_name || "",
-          display_name: data.display_name || "",
-          username: data.username || "",
-          bio: data.bio || "",
-          phone: data.phone || "",
-          home_base: data.home_base || "",
-          instagram_handle: data.instagram_handle || "",
-          tiktok_handle: data.tiktok_handle || "",
-          website: data.website || "",
-        });
+        if (error) {
+          console.error("Error fetching profile:", error);
+          toast.error("Failed to load profile");
+          setLoading(false);
+          return;
+        }
+
+        if (data) {
+          setProfile(data);
+          setFormData({
+            first_name: data.first_name || "",
+            last_name: data.last_name || "",
+            display_name: data.display_name || "",
+            username: data.username || "",
+            bio: data.bio || "",
+            phone: data.phone || "",
+            home_base: data.home_base || "",
+            instagram_handle: data.instagram_handle || "",
+            tiktok_handle: data.tiktok_handle || "",
+            website: data.website || "",
+          });
+        }
+      } catch (err) {
+        console.error("Unexpected error fetching profile:", err);
+        toast.error("Something went wrong loading your profile");
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
 
     fetchProfile();

@@ -143,7 +143,7 @@ export default function TikTokLabDashboardPage() {
 
           <div className="flex flex-wrap gap-2 text-[11px]">
             <Link
-              to="/tiktok-lab/storyboards/new"
+              to="/storyboards/new"
               className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-4 py-2 font-semibold hover:bg-[#073331]"
             >
               <Film className="h-3 w-3" />
@@ -275,7 +275,7 @@ function StoryboardsPanel() {
           <p className="text-[12px] font-semibold">Storyboards</p>
         </div>
         <Link
-          to="/tiktok-lab/storyboards"
+          to="/storyboards"
           className="inline-flex items-center gap-1 text-[10px] text-[#0c4d47]"
         >
           Manage all
@@ -291,13 +291,13 @@ function StoryboardsPanel() {
 
       <div className="mt-2 flex flex-wrap gap-2">
         <Link
-          to="/tiktok-lab/storyboards/new"
+          to="/storyboards/new"
           className="inline-flex items-center gap-2 rounded-2xl bg-[#0c4d47] text-[#E5DFC6] px-3 py-1.5 text-[10px] font-semibold hover:bg-[#073331]"
         >
           Create a storyboard
         </Link>
         <Link
-          to="/tiktok-lab/storyboards"
+          to="/storyboards"
           className="inline-flex items-center gap-2 rounded-2xl bg-[#f7f3ea] border border-[#E5DFC6] text-[10px] px-3 py-1.5"
         >
           See public wall
@@ -318,7 +318,7 @@ function InspirationPanel() {
           <p className="text-[12px] font-semibold">Browse & save inspiration</p>
         </div>
         <Link
-          to="/tiktok-lab/storyboards"
+          to="/storyboards"
           className="inline-flex items-center gap-1 text-[10px] text-[#0c4d47]"
         >
           See more
