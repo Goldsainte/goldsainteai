@@ -126,7 +126,7 @@ export default function StoryboardEditorPage() {
               title="Browse Inspiration"
               subtitle="Save visual ideas to your storyboard. Click the save button on any image to add it."
               showSaveButtons={true}
-              maxItems={20}
+              maxItems={50}
             />
           </div>
         )}
