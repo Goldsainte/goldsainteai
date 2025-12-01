@@ -1,7 +1,7 @@
 // src/pages/trips/PostTripPage.tsx
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import { ArrowLeft, ArrowRight, X, Sparkles, Image, Link2, StickyNote, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, ArrowRight, X, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
 import { toast } from "sonner";
@@ -15,12 +15,6 @@ type BudgetLevel = "accessible" | "elevated" | "ultra_luxury";
 type Pace = "slow" | "balanced" | "packed";
 type WantsRole = "creator" | "agent" | "both";
 
-interface InspirationItem {
-  type: "image" | "tiktok" | "note";
-  url?: string;
-  content?: string;
-  caption?: string;
-}
 
 export default function PostTripPage() {
   const navigate = useNavigate();
@@ -57,11 +51,6 @@ export default function PostTripPage() {
   const [specialNotes, setSpecialNotes] = useState("");
   const [wantsRole, setWantsRole] = useState<WantsRole>("both");
 
-  // Inspiration items (photos, TikTok links, notes)
-  const [inspirationItems, setInspirationItems] = useState<InspirationItem[]>([]);
-  const [newImageUrl, setNewImageUrl] = useState("");
-  const [newTikTokUrl, setNewTikTokUrl] = useState("");
-  const [newNote, setNewNote] = useState("");
   const [showItineraryPreview, setShowItineraryPreview] = useState(true);
 
   const [submitting, setSubmitting] = useState(false);
@@ -144,33 +133,6 @@ export default function PostTripPage() {
     setAestheticTags(prev => prev.filter(t => t !== tag));
   }
 
-  // Inspiration item handlers
-  function addImageUrl() {
-    if (!newImageUrl.trim()) return;
-    setInspirationItems(prev => [...prev, { type: "image", url: newImageUrl.trim() }]);
-    setNewImageUrl("");
-  }
-
-  function addTikTokUrl() {
-    if (!newTikTokUrl.trim()) return;
-    // Validate TikTok URL
-    if (!newTikTokUrl.includes("tiktok.com")) {
-      toast.error("Please enter a valid TikTok URL");
-      return;
-    }
-    setInspirationItems(prev => [...prev, { type: "tiktok", url: newTikTokUrl.trim() }]);
-    setNewTikTokUrl("");
-  }
-
-  function addNote() {
-    if (!newNote.trim()) return;
-    setInspirationItems(prev => [...prev, { type: "note", content: newNote.trim() }]);
-    setNewNote("");
-  }
-
-  function removeInspirationItem(index: number) {
-    setInspirationItems(prev => prev.filter((_, i) => i !== index));
-  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -218,7 +180,6 @@ export default function PostTripPage() {
           wants_role: wantsRole,
           status: "open",
           source_metadata: sourceMetadata,
-          source_media: inspirationItems.length > 0 ? inspirationItems : null,
         } as any)
         .select("id")
         .single();
@@ -261,7 +222,7 @@ export default function PostTripPage() {
           <h1 className="font-display text-[22px] md:text-[24px] leading-tight">
             Tell us about the trip you&apos;re dreaming of
           </h1>
-          <p className="text-sm md:text-base text-[#4a4a4a] max-w-lg">
+          <p className="text-sm md:text-base text-[#4a4a4a] max-w-2xl">
             A few details now help Goldsainte AI and our partners send
             thoughtful proposals later. It&apos;s okay if not everything is
             decided — just share what you know.
@@ -628,109 +589,6 @@ export default function PostTripPage() {
               )}
             </div>
           )}
-
-          {/* Section 4.5: Add Inspiration */}
-          <div className="space-y-3">
-            <h2 className="text-base font-semibold flex items-center gap-2">
-              Add Inspiration
-              <Badge variant="outline" className="text-[9px] font-normal">Optional</Badge>
-            </h2>
-            <p className="text-xs text-[#4a4a4a]">
-              Add photos, TikTok links, or notes to help agents understand your vision.
-            </p>
-
-            {/* Existing inspiration items */}
-            {inspirationItems.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {inspirationItems.map((item, index) => (
-                  <div
-                    key={index}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#E5DFC6] bg-white text-xs"
-                  >
-                    {item.type === "image" && <Image className="h-3 w-3 text-[#C7A962]" />}
-                    {item.type === "tiktok" && <Link2 className="h-3 w-3 text-[#C7A962]" />}
-                    {item.type === "note" && <StickyNote className="h-3 w-3 text-[#C7A962]" />}
-                    <span className="max-w-[150px] truncate">
-                      {item.url || item.content}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => removeInspirationItem(index)}
-                      className="hover:text-red-600"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Add image URL */}
-            <div className="flex gap-2">
-              <div className="flex-1 flex items-center gap-2 rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2">
-                <Image className="h-4 w-4 text-[#8D8D8D]" />
-                <input
-                  type="url"
-                  value={newImageUrl}
-                  onChange={(e) => setNewImageUrl(e.target.value)}
-                  className="flex-1 bg-transparent text-sm outline-none"
-                  placeholder="Paste image URL (Pinterest, Unsplash...)"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={addImageUrl}
-                disabled={!newImageUrl.trim()}
-                className="px-3 py-2 rounded-full bg-[#f7f3ea] border border-[#E5DFC6] text-xs font-medium hover:border-[#BFAD72] disabled:opacity-50"
-              >
-                Add
-              </button>
-            </div>
-
-            {/* Add TikTok URL */}
-            <div className="flex gap-2">
-              <div className="flex-1 flex items-center gap-2 rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2">
-                <Link2 className="h-4 w-4 text-[#8D8D8D]" />
-                <input
-                  type="url"
-                  value={newTikTokUrl}
-                  onChange={(e) => setNewTikTokUrl(e.target.value)}
-                  className="flex-1 bg-transparent text-sm outline-none"
-                  placeholder="Paste TikTok link"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={addTikTokUrl}
-                disabled={!newTikTokUrl.trim()}
-                className="px-3 py-2 rounded-full bg-[#f7f3ea] border border-[#E5DFC6] text-xs font-medium hover:border-[#BFAD72] disabled:opacity-50"
-              >
-                Add
-              </button>
-            </div>
-
-            {/* Add note */}
-            <div className="flex gap-2">
-              <div className="flex-1 flex items-center gap-2 rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2">
-                <StickyNote className="h-4 w-4 text-[#8D8D8D]" />
-                <input
-                  type="text"
-                  value={newNote}
-                  onChange={(e) => setNewNote(e.target.value)}
-                  className="flex-1 bg-transparent text-sm outline-none"
-                  placeholder="Add a note or revision"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={addNote}
-                disabled={!newNote.trim()}
-                className="px-3 py-2 rounded-full bg-[#f7f3ea] border border-[#E5DFC6] text-xs font-medium hover:border-[#BFAD72] disabled:opacity-50"
-              >
-                Add
-              </button>
-            </div>
-          </div>
 
           {/* Section 4.6: Visual Storyboard */}
           <div className="space-y-3">

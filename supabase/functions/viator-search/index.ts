@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { enforceRateLimit } from "../_utils/rate-limit.ts";
 import { buildSafeErrorResponse } from "../_shared/httpError.ts";
 
 const corsHeaders = {
@@ -12,14 +11,6 @@ serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
-
-  // 🔒 Rate limiting
-  const limited = await enforceRateLimit({
-    keyType: "api",
-    req,
-    corsHeaders,
-  });
-  if (limited) return limited;
 
   try {
     const VIATOR_API_KEY = Deno.env.get("VIATOR_API_KEY");
