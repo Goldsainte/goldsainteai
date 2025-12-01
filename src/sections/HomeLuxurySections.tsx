@@ -1,5 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 // Real images from assets
 import heroMain from "@/assets/sections/built-for-every-side-main.jpg";
@@ -18,6 +19,8 @@ import trustBg from "@/assets/luxury-destinations.jpg";
 /* -------------------------------------------------------------------------- */
 
 export const BuiltForEverySideSection: React.FC = () => {
+  const { t } = useTranslation();
+
   return (
     <section className="bg-[#FDF9F0] px-4 py-16 md:py-24">
       <div className="mx-auto flex max-w-6xl flex-col gap-10 md:flex-row md:items-center">
@@ -25,50 +28,47 @@ export const BuiltForEverySideSection: React.FC = () => {
         <div className="space-y-8 md:w-3/5">
           <div className="space-y-3">
             <p className="inline-flex rounded-full bg-[#C7B892]/30 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-[#7A7151]">
-              Travelers — Creators — Agents — Brands
+              {t('home.builtForEverySide.badge')}
             </p>
             <h2 className="font-secondary text-3xl leading-tight text-[#0a2225] md:text-4xl">
-              Built for every side of luxury travel
+              {t('home.builtForEverySide.title')}
             </h2>
             <p className="max-w-md text-sm text-[#4A4A4A]">
-              Each role brings something essential — travelers bring the vision,
-              creators bring the aesthetic, agents refine the details, brands
-              shape the experience. Goldsainte brings them together in one
-              cinematic journey.
+              {t('home.builtForEverySide.description')}
             </p>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
             <PersonaCard
-              label="Travelers"
+              label={t('home.builtForEverySide.travelers.label')}
               items={[
-                "Save ideas the way you savor moments — moodboards from TikToks, Reels and images you love.",
-                "Get matched with creators and travel designers who understand your pace, taste and budget.",
-                "Book inside a protected marketplace with escrow, support and a single trip story to return to.",
+                t('home.builtForEverySide.travelers.item1'),
+                t('home.builtForEverySide.travelers.item2'),
+                t('home.builtForEverySide.travelers.item3'),
               ]}
             />
             <PersonaCard
-              label="Creators"
+              label={t('home.builtForEverySide.creators.label')}
               items={[
-                "Turn your signature aesthetic into storyboards that become real trips.",
-                "Collaborate with certified agents who handle rates, contracts and logistics.",
-                "Earn on every trip booked, without becoming a full-time travel agent.",
+                t('home.builtForEverySide.creators.item1'),
+                t('home.builtForEverySide.creators.item2'),
+                t('home.builtForEverySide.creators.item3'),
               ]}
             />
             <PersonaCard
-              label="Travel agents"
+              label={t('home.builtForEverySide.agents.label')}
               items={[
-                "Receive high-intent briefs from travelers who already know how they want the trip to feel.",
-                "Co-design itineraries with creators on storyboards that pre-sell your itineraries.",
-                "Manage payments and status in one calm, luxury-focused workspace.",
+                t('home.builtForEverySide.agents.item1'),
+                t('home.builtForEverySide.agents.item2'),
+                t('home.builtForEverySide.agents.item3'),
               ]}
             />
             <PersonaCard
-              label="Brands"
+              label={t('home.builtForEverySide.brands.label')}
               items={[
-                "Present your world as curated collections, not generic listings.",
-                "Reach travelers at the exact moment of inspiration and trip planning.",
-                "Let AI surface guests whose aesthetic and expectations align with your brand.",
+                t('home.builtForEverySide.brands.item1'),
+                t('home.builtForEverySide.brands.item2'),
+                t('home.builtForEverySide.brands.item3'),
               ]}
             />
           </div>
@@ -109,9 +109,7 @@ export const BuiltForEverySideSection: React.FC = () => {
               </div>
 
               <p className="rounded-[18px] bg-[#F5EFE1] px-4 py-3 text-[11px] leading-relaxed text-[#6E6650]">
-                Each role brings something essential — travelers frame the
-                story, creators refine the aesthetic, agents engineer the
-                journey, brands set the tone.
+                {t('home.builtForEverySide.collageCaption')}
               </p>
             </div>
           </div>
@@ -149,32 +147,34 @@ const PersonaCard: React.FC<PersonaCardProps> = ({ label, items }) => {
 /* -------------------------------------------------------------------------- */
 
 export const HowGoldsainteWorksSection: React.FC = () => {
+  const { t } = useTranslation();
+
   const steps = [
     {
       id: "1",
-      title: "Share your inspiration",
-      body: "Paste TikToks, Reels, mood images or notes. Tell us who's traveling, when, and the feeling you want the trip to hold.",
+      title: t('home.howItWorks.step1.title'),
+      body: t('home.howItWorks.step1.body'),
       image: aiStep1,
       alt: "City street with warm cinematic tones",
     },
     {
       id: "2",
-      title: "Madison drafts your storyboard",
-      body: "Our AI concierge translates your inspiration into a visual storyboard with destinations, hotel vibes and curated experiences that match your aesthetic.",
+      title: t('home.howItWorks.step2.title'),
+      body: t('home.howItWorks.step2.body'),
       image: aiStep2,
       alt: "Architectural city scene in soft light",
     },
     {
       id: "3",
-      title: "Creators and agents collaborate",
-      body: "Matched creators refine the look and feel; certified travel agents layer in flights, stays and experiences — all inside the same evolving storyboard.",
+      title: t('home.howItWorks.step3.title'),
+      body: t('home.howItWorks.step3.body'),
       image: aiStep3,
       alt: "Friends on a rooftop vehicle in open landscape",
     },
     {
       id: "4",
-      title: "You review, chat and book on Goldsainte",
-      body: "Compare proposals, refine details in chat, and confirm the one that feels right. Payments go through Goldsainte's escrow for added protection.",
+      title: t('home.howItWorks.step4.title'),
+      body: t('home.howItWorks.step4.body'),
       image: aiStep4,
       alt: "Traveler with camera capturing the moment",
     },
@@ -185,15 +185,13 @@ export const HowGoldsainteWorksSection: React.FC = () => {
       <div className="mx-auto flex max-w-6xl flex-col gap-10 md:flex-row md:items-start">
         <div className="md:w-2/5 space-y-3">
           <p className="text-[11px] uppercase tracking-[0.22em] text-[#7A7151]">
-            How Goldsainte AI works
+            {t('home.howItWorks.sectionTitle')}
           </p>
           <h2 className="font-secondary text-3xl leading-tight text-[#0a2225] md:text-4xl">
-            A concierge in the loop, not just an algorithm.
+            {t('home.howItWorks.headline')}
           </h2>
           <p className="max-w-sm text-sm text-[#4A4A4A]">
-            Goldsainte AI listens to your style, curates the right partners and
-            quietly orchestrates the journey in the background — while you stay
-            in the experience.
+            {t('home.howItWorks.description')}
           </p>
         </div>
 
@@ -213,7 +211,7 @@ export const HowGoldsainteWorksSection: React.FC = () => {
                     {step.id}
                   </div>
                   <span className="text-[11px] uppercase tracking-[0.22em] text-[#A4987C]">
-                    Step {step.id}
+                    {t('common.step')} {step.id}
                   </span>
                 </div>
                 <h3 className="text-lg font-semibold text-[#0a2225]">
@@ -247,22 +245,24 @@ export const HowGoldsainteWorksSection: React.FC = () => {
 /* -------------------------------------------------------------------------- */
 
 export const TrustSafetyPaymentsSection: React.FC = () => {
+  const { t } = useTranslation();
+
   const items = [
     {
-      title: "Identity verification, done quietly",
-      body: "Agents complete Stripe Identity and license checks before taking bookings, so you're working with real, vetted professionals.",
+      title: t('home.trustSafety.item1.title'),
+      body: t('home.trustSafety.item1.body'),
     },
     {
-      title: "Escrowed payments for peace of mind",
-      body: "Your funds sit safely in escrow and are released in clear stages, with a post-trip protection window built in.",
+      title: t('home.trustSafety.item2.title'),
+      body: t('home.trustSafety.item2.body'),
     },
     {
-      title: "A safe place to plan",
-      body: "All messaging, proposals and approvals stay inside Goldsainte, keeping your details where they belong.",
+      title: t('home.trustSafety.item3.title'),
+      body: t('home.trustSafety.item3.body'),
     },
     {
-      title: "Structured dispute resolution",
-      body: "If something doesn't feel right, our team steps in. Every trip includes a clear, well-documented path for review and resolution.",
+      title: t('home.trustSafety.item4.title'),
+      body: t('home.trustSafety.item4.body'),
     },
   ];
 
@@ -281,15 +281,13 @@ export const TrustSafetyPaymentsSection: React.FC = () => {
       <div className="relative mx-auto flex max-w-6xl flex-col gap-8">
         <div className="space-y-3">
           <p className="text-[11px] uppercase tracking-[0.22em] text-[#C9B786]">
-            Trust, safety & payments
+            {t('home.trustSafety.badge')}
           </p>
           <h2 className="font-secondary text-3xl leading-tight text-[#FDFBF5] md:text-4xl">
-            Built for trips where the details matter.
+            {t('home.trustSafety.title')}
           </h2>
           <p className="max-w-lg text-sm text-[#D9D1C0]">
-            For trips that carry meaning, trust isn't a feature — it's the
-            foundation. Goldsainte is designed with discreet identity checks,
-            secure payments and human oversight at every step.
+            {t('home.trustSafety.description')}
           </p>
         </div>
 

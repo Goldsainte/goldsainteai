@@ -45,8 +45,8 @@ export const Footer = () => {
             <AccordionTrigger className={headingClasses}>{t('footer.discover')}</AccordionTrigger>
             <AccordionContent>
               <ul className="space-y-3 text-sm">
-                <li><Link to="/creators" className={linkClasses}>Creator Marketplace</Link></li>
-                <li><Link to="/tiktok-lab" className={linkClasses}>TikTok Travel Lab</Link></li>
+                <li><Link to="/creators" className={linkClasses}>{t('footer.creatorMarketplace')}</Link></li>
+                <li><Link to="/tiktok-lab" className={linkClasses}>{t('footer.tiktokTravelLab')}</Link></li>
                 <li><Link to="/storyboards" className={linkClasses}>{t('footer.storyboards')}</Link></li>
                 <li><Link to="/browse-agents" className={linkClasses}>{t('footer.travelAgentServices')}</Link></li>
                 <li><Link to="/marketplace" className={linkClasses}>{t('footer.marketplace')}</Link></li>
@@ -77,7 +77,7 @@ export const Footer = () => {
             <AccordionContent>
               <ul className="space-y-3 text-sm">
                 <li><Link to="/agent-onboarding" className={linkClasses}>{t('footer.becomeAgent')}</Link></li>
-                <li><Link to="/browse-creators" className={linkClasses}>{t('footer.influencerProgram')}</Link></li>
+                <li><Link to="/creators" className={linkClasses}>{t('footer.influencerProgram')}</Link></li>
                 <li><Link to="/shop" className={linkClasses}>{t('footer.affiliateProgram')}</Link></li>
                 <li><Link to="/transportation-vendor-partners" className={linkClasses}>{t('footer.listYourCompany')}</Link></li>
               </ul>
@@ -118,8 +118,8 @@ export const Footer = () => {
           <div>
             <h4 className={headingClasses}>{t('footer.discover')}</h4>
             <ul className="space-y-3 text-sm">
-              <li><Link to="/creators" className={linkClasses}>Creator Marketplace</Link></li>
-              <li><Link to="/tiktok-lab" className={linkClasses}>TikTok Travel Lab</Link></li>
+              <li><Link to="/creators" className={linkClasses}>{t('footer.creatorMarketplace')}</Link></li>
+              <li><Link to="/tiktok-lab" className={linkClasses}>{t('footer.tiktokTravelLab')}</Link></li>
               <li><Link to="/storyboards" className={linkClasses}>{t('footer.storyboards')}</Link></li>
               <li><Link to="/browse-agents" className={linkClasses}>{t('footer.travelAgentServices')}</Link></li>
               <li><Link to="/marketplace" className={linkClasses}>{t('footer.marketplace')}</Link></li>
