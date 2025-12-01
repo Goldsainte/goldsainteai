@@ -1,9 +1,11 @@
 import { Home, Store, MessageCircle, Bell, User } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTranslation } from "react-i18next";
 
 export function MobileBottomNav() {
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   // Determine profile route based on user's account type
   const getProfileRoute = () => {
@@ -20,11 +22,11 @@ export function MobileBottomNav() {
   };
 
   const navItems = [
-    { to: "/", icon: Home, label: "Home" },
-    { to: "/marketplace", icon: Store, label: "Discover" },
-    { to: "/messages", icon: MessageCircle, label: "Messages", requireAuth: true },
-    { to: "/notifications", icon: Bell, label: "Alerts", requireAuth: true },
-    { to: getProfileRoute(), icon: User, label: "Profile" },
+    { to: "/", icon: Home, labelKey: "nav.home" },
+    { to: "/marketplace", icon: Store, labelKey: "nav.discover" },
+    { to: "/messages", icon: MessageCircle, labelKey: "nav.messages", requireAuth: true },
+    { to: "/notifications", icon: Bell, labelKey: "nav.alerts", requireAuth: true },
+    { to: getProfileRoute(), icon: User, labelKey: "nav.profile" },
   ];
 
   return (
@@ -35,22 +37,22 @@ export function MobileBottomNav() {
           if (item.requireAuth && !user) {
             return (
               <NavLink
-                key={item.label}
+                key={item.labelKey}
                 to="/auth"
-                className="flex flex-col items-center justify-center gap-1 text-[#0c4d47] transition-colors"
+                className="flex flex-col items-center justify-center gap-1 text-[#0c4d47] transition-colors touch-manipulation min-h-[48px]"
               >
                 <item.icon className="h-5 w-5" />
-                <span className="text-[10px] font-medium">{item.label}</span>
+                <span className="text-[10px] font-medium">{t(item.labelKey)}</span>
               </NavLink>
             );
           }
 
           return (
             <NavLink
-              key={item.label}
+              key={item.labelKey}
               to={item.to}
               className={({ isActive }) =>
-                `flex flex-col items-center justify-center gap-1 transition-colors ${
+                `flex flex-col items-center justify-center gap-1 transition-colors touch-manipulation min-h-[48px] ${
                   isActive 
                     ? "text-[#0c4d47] font-semibold" 
                     : "text-[#0c4d47]/70"
@@ -58,7 +60,7 @@ export function MobileBottomNav() {
               }
             >
               <item.icon className="h-5 w-5" />
-              <span className="text-[10px] font-medium">{item.label}</span>
+              <span className="text-[10px] font-medium">{t(item.labelKey)}</span>
             </NavLink>
           );
         })}

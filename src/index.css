@@ -415,6 +415,7 @@ html, body, #root, #main-content {
     /* Prevent text selection on buttons */
     button, a[role="button"] {
       user-select: none;
+      touch-action: manipulation;
       -webkit-user-select: none;
     }
   }
@@ -428,6 +429,22 @@ html, body, #root, #main-content {
   .scrollbar-hide {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
+  }
+
+  /* Mobile bottom navigation safe padding */
+  .pb-mobile-nav {
+    padding-bottom: 5rem; /* 80px for bottom nav + safe area */
+  }
+  
+  @media (min-width: 1024px) {
+    .pb-mobile-nav {
+      padding-bottom: 0;
+    }
+  }
+
+  /* Safe area bottom padding utility */
+  .safe-area-pb {
+    padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);
   }
 
   /* Heading defaults - improved mobile sizing */

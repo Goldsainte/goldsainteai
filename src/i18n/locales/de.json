@@ -25,6 +25,13 @@
     "changed": "Sprache Geändert",
     "setTo": "Sprache der Benutzeroberfläche auf {{language}} gesetzt"
   },
+  "nav": {
+    "home": "Startseite",
+    "discover": "Entdecken",
+    "messages": "Nachrichten",
+    "alerts": "Benachrichtigungen",
+    "profile": "Profil"
+  },
   "home": {
     "hero": {
       "title": "Entdecken. Buchen. Erstellen. Verdienen — Reisen neu erfunden mit KI, Agenten-Geboten und Creator-Kooperationen",

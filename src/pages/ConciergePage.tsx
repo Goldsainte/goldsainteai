@@ -13,8 +13,8 @@ export default function ConciergePage() {
   const vibes = searchParams.get("vibes");
 
   return (
-    <div className="min-h-screen bg-[#FDF9F0]">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="min-h-screen bg-[#FDF9F0] pb-24 lg:pb-0">
+      <div className="container mx-auto px-4 py-6 md:py-8 max-w-4xl">
         {/* Back Button */}
         <BackButton className="mb-6" />
 

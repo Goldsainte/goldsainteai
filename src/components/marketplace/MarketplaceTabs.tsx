@@ -19,27 +19,29 @@ export function MarketplaceTabs({ activeTab, onTabChange, accountType }: Marketp
   ] as const;
 
   return (
-    <div className="inline-flex items-center gap-1 rounded-full border border-[#E5DFC6] bg-white p-1">
-      {tabs.map((tab) => {
-        const Icon = tab.icon;
-        return (
-          <button
-            key={tab.id}
-            onClick={() => onTabChange(tab.id as "trips" | "creators" | "agents" | "brands" | "trip-requests")}
-            className={`
-              flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-semibold transition-all
-              ${
-                activeTab === tab.id
-                  ? "bg-[#BFAD72] text-white shadow-sm"
-                  : "text-[#4a4a4a] hover:text-[#0a2225]"
-              }
-            `}
-          >
-            <Icon className="h-4 w-4" />
-            <span className="hidden sm:inline">{tab.label}</span>
-          </button>
-        );
-      })}
+    <div className="overflow-x-auto scrollbar-hide max-w-full">
+      <div className="inline-flex items-center gap-1 rounded-full border border-[#E5DFC6] bg-white p-1">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => onTabChange(tab.id as "trips" | "creators" | "agents" | "brands" | "trip-requests")}
+              className={`
+                flex items-center gap-1.5 rounded-full px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-semibold transition-all whitespace-nowrap touch-manipulation min-h-[40px]
+                ${
+                  activeTab === tab.id
+                    ? "bg-[#BFAD72] text-white shadow-sm"
+                    : "text-[#4a4a4a] hover:text-[#0a2225]"
+                }
+              `}
+            >
+              <Icon className="h-4 w-4 flex-shrink-0" />
+              <span className="hidden sm:inline">{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

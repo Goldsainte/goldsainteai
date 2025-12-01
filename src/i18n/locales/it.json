@@ -25,6 +25,13 @@
     "changed": "Lingua Cambiata",
     "setTo": "Lingua dell'interfaccia impostata su {{language}}"
   },
+  "nav": {
+    "home": "Home",
+    "discover": "Scopri",
+    "messages": "Messaggi",
+    "alerts": "Avvisi",
+    "profile": "Profilo"
+  },
   "home": {
     "hero": {
       "title": "Scopri. Prenota. Crea. Guadagna — Viaggi Reinventati con IA, Offerte di Agenti e Collaborazioni con Creator",
