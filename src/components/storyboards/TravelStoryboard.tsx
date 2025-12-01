@@ -29,10 +29,45 @@ interface TravelStoryboardProps {
 // Fallback image for broken URLs
 const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&q=80";
 
-// Diversify images by mood to ensure variety
+// Luxury travel aesthetic mood tags - only show aspirational content
+const LUXURY_MOOD_TAGS = [
+  'luxury', 'beach', 'resort', 'honeymoon', 'yacht', 'pool',
+  'adventure', 'safari', 'hiking', 'mountain', 'winter', 'skiing',
+  'food', 'dining', 'cafe', 'wine', 'culinary',
+  'scenic', 'sunset', 'romantic', 'tropical', 'mediterranean',
+  'iconic', 'bucket-list', 'relaxation', 'nature', 'wildlife',
+  'aerial', 'panoramic', 'island', 'waterfront', 'snorkeling',
+  'underwater', 'desert', 'garden', 'historic', 'architecture',
+  'spa', 'wellness', 'boutique', 'villa', 'chateau', 'castle'
+];
+
+// Premium tags to prioritize in sorting
+const PREMIUM_TAGS = ['luxury', 'honeymoon', 'resort', 'yacht', 'safari', 'bucket-list', 'villa', 'chateau'];
+
+// Remove duplicates by URL
+function deduplicateByUrl(images: StoryboardImage[]): StoryboardImage[] {
+  return Array.from(new Map(images.map(img => [img.url, img])).values());
+}
+
+// Filter for luxury travel aesthetic
+function filterLuxuryAesthetic(images: StoryboardImage[]): StoryboardImage[] {
+  return images.filter(img => {
+    const tags = img.mood_tags || [];
+    return tags.some(tag => LUXURY_MOOD_TAGS.includes(tag.toLowerCase()));
+  });
+}
+
+// Score image by premium tags for prioritization
+function getPremiumScore(img: StoryboardImage): number {
+  const tags = img.mood_tags || [];
+  return tags.filter(tag => PREMIUM_TAGS.includes(tag.toLowerCase())).length;
+}
+
+// Diversify images by mood to ensure variety, with premium prioritization
 function diversifyImages(images: StoryboardImage[], limit: number): StoryboardImage[] {
   if (images.length <= limit) {
-    return images.sort(() => Math.random() - 0.5);
+    // Sort by premium score, then shuffle within same score
+    return images.sort((a, b) => getPremiumScore(b) - getPremiumScore(a));
   }
 
   // Group by primary mood tag
@@ -43,9 +78,11 @@ function diversifyImages(images: StoryboardImage[], limit: number): StoryboardIm
     byMood[mood].push(img);
   });
 
-  // Shuffle within each mood group
+  // Sort within each mood group by premium score, then shuffle
   Object.keys(byMood).forEach(mood => {
-    byMood[mood] = byMood[mood].sort(() => Math.random() - 0.5);
+    byMood[mood] = byMood[mood]
+      .sort((a, b) => getPremiumScore(b) - getPremiumScore(a))
+      .sort(() => Math.random() - 0.5);
   });
 
   // Round-robin select from each mood category for variety
@@ -103,11 +140,11 @@ export function TravelStoryboard({
             setItems(data ?? []);
           }
         } else {
-          // Fetch larger pool for diversification (no ordering - we'll diversify client-side)
+          // Fetch larger pool for filtering and diversification
           const query = supabase
             .from("storyboard_media_library")
             .select("id, url, thumbnail_url, label, destination_tags, mood_tags")
-            .limit(200); // Fetch more to ensure good variety
+            .limit(300); // Fetch more to ensure good variety after filtering
 
           const { data, error } = await query;
 
@@ -116,8 +153,17 @@ export function TravelStoryboard({
             if (!isMounted) return;
             setImages([]);
           } else if (isMounted) {
-            // Apply diversification to get a good mix of moods
-            const diversified = diversifyImages((data ?? []) as StoryboardImage[], maxItems);
+            const rawImages = (data ?? []) as StoryboardImage[];
+            
+            // Step 1: Remove duplicates by URL
+            const unique = deduplicateByUrl(rawImages);
+            
+            // Step 2: Filter for luxury travel aesthetic only
+            const luxuryOnly = filterLuxuryAesthetic(unique);
+            
+            // Step 3: Diversify and prioritize premium content
+            const diversified = diversifyImages(luxuryOnly, maxItems);
+            
             setImages(diversified);
           }
         }
