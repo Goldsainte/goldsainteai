@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Send } from "lucide-react";
+import { Loader2, Send, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMadisonConversation } from "@/hooks/useMadisonConversation";
 
@@ -166,22 +166,28 @@ export function MadisonChat({
   };
 
   return (
-    <div className="flex h-full flex-col bg-background">
+    <div className="flex flex-col bg-white border border-[#E5DFC6] rounded-2xl shadow-sm overflow-hidden h-[500px]">
       {/* Header */}
-      <div className="border-b border-border px-4 py-3">
-        <h2 className="text-base font-semibold text-foreground">Madison</h2>
-        <p className="text-xs text-muted-foreground">
-          Your AI travel concierge (text & voice)
-        </p>
+      <div className="border-b border-[#E5DFC6] px-5 py-4 bg-[#FDFBF7]">
+        <div className="flex items-center gap-2 mb-1">
+          <Sparkles className="h-4 w-4 text-[#C7A962]" />
+          <span className="text-xs font-medium tracking-[0.1em] uppercase text-[#C7A962]">
+            AI Concierge
+          </span>
+        </div>
+        <h2 className="text-lg font-secondary text-[#0a2225]">Madison</h2>
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 px-4 py-3">
+      <ScrollArea className="flex-1 px-5 py-4">
         <div ref={scrollRef} className="space-y-4">
           {messages.length === 0 && !initialContext && (
-            <div className="py-8 text-center text-muted-foreground">
-              <p className="mb-2 text-sm">👋 Hi, I'm Madison.</p>
-              <p className="text-xs">
+            <div className="py-12 text-center">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#F6F0E4] mb-4">
+                <Sparkles className="h-5 w-5 text-[#C7A962]" />
+              </div>
+              <p className="font-secondary text-lg text-[#0a2225] mb-2">Hi, I'm Madison</p>
+              <p className="text-sm text-[#6B7280]">
                 Try: "I want to go to Morocco in May for 7 days."
               </p>
             </div>
@@ -195,13 +201,13 @@ export function MadisonChat({
               }`}
             >
               <div
-                className={`max-w-[80%] rounded-lg px-3 py-2 text-xs ${
+                className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm ${
                   msg.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-foreground"
+                    ? "bg-[#0a2225] text-white"
+                    : "bg-[#F6F0E4] text-[#0a2225] border border-[#E5DFC6]"
                 }`}
               >
-                <p className="whitespace-pre-wrap">
+                <p className="whitespace-pre-wrap leading-relaxed">
                   {msg.content.split(/(\[.*?\]\(.*?\))/).map((part, i) => {
                     const linkMatch = part.match(/\[(.*?)\]\((.*?)\)/);
                     if (linkMatch) {
@@ -209,7 +215,9 @@ export function MadisonChat({
                         <a
                           key={i}
                           href={linkMatch[2]}
-                          className="underline font-semibold hover:opacity-80 transition-opacity"
+                          className={`underline font-semibold hover:opacity-80 transition-opacity ${
+                            msg.role === "user" ? "text-white" : "text-[#C7A962]"
+                          }`}
                           onClick={(e) => {
                             e.preventDefault();
                             navigate(linkMatch[2]);
@@ -222,7 +230,9 @@ export function MadisonChat({
                     return <span key={i}>{part}</span>;
                   })}
                 </p>
-                <p className="mt-1 text-[10px] opacity-70">
+                <p className={`mt-2 text-[10px] ${
+                  msg.role === "user" ? "text-white/60" : "text-[#6B7280]"
+                }`}>
                   {msg.timestamp.toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
@@ -234,8 +244,8 @@ export function MadisonChat({
 
           {isLoading && (
             <div className="flex justify-start">
-              <div className="rounded-lg bg-muted px-3 py-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
+              <div className="rounded-2xl bg-[#F6F0E4] border border-[#E5DFC6] px-4 py-3">
+                <Loader2 className="h-4 w-4 animate-spin text-[#C7A962]" />
               </div>
             </div>
           )}
@@ -243,20 +253,21 @@ export function MadisonChat({
       </ScrollArea>
 
       {/* Input */}
-      <div className="border-t border-border px-4 py-3">
-        <div className="flex gap-2">
+      <div className="border-t border-[#E5DFC6] px-5 py-4 bg-[#FDFBF7]">
+        <div className="flex gap-3">
           <Input
             placeholder='Type a message... (e.g., "I want to go to Morocco")'
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={isLoading}
-            className="bg-background"
+            className="bg-white border-[#E5DFC6] rounded-full px-4 text-sm placeholder:text-[#9CA3AF] focus-visible:ring-[#C7A962] focus-visible:border-[#C7A962]"
           />
           <Button
             onClick={sendMessage}
             disabled={isLoading || !input.trim()}
             size="icon"
+            className="bg-[#0a2225] hover:bg-[#0a2225]/90 rounded-full h-10 w-10 shrink-0"
           >
             <Send className="h-4 w-4" />
           </Button>

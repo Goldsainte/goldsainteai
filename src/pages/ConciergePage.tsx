@@ -1,10 +1,10 @@
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
+import { Sparkles } from "lucide-react";
 import { MadisonChat } from "@/components/MadisonChat";
+import { BackButton } from "@/components/ui/BackButton";
 
 export default function ConciergePage() {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   
   // Read URL params passed from collections
   const destination = searchParams.get("destination");
@@ -13,21 +13,15 @@ export default function ConciergePage() {
   const vibes = searchParams.get("vibes");
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#FDF9F0]">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Back Button */}
-        <button
-          onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition mb-6"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </button>
+        <BackButton className="mb-6" />
 
         {/* Context Banner */}
         {context && (
-          <div className="mb-4 p-4 rounded-xl bg-[#F6F0E4] border border-[#E5DFC6]">
-            <p className="text-sm text-[#6E6650]">
+          <div className="mb-6 p-4 rounded-2xl bg-white border border-[#E5DFC6] shadow-sm">
+            <p className="text-sm text-[#6B7280]">
               <span className="font-medium text-[#0a2225]">Continuing from: </span>
               {context} {destination && `in ${destination}`}
             </p>
@@ -36,19 +30,21 @@ export default function ConciergePage() {
 
         {/* Intro Section */}
         <div className="mb-8 text-center">
-          <h1 className="text-3xl md:text-4xl font-secondary text-foreground mb-3">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Sparkles className="h-5 w-5 text-[#C7A962]" />
+            <span className="text-xs font-medium tracking-[0.15em] uppercase text-[#C7A962]">
+              AI Concierge
+            </span>
+          </div>
+          <h1 className="text-3xl md:text-4xl font-secondary text-[#0a2225] mb-3">
             Your Goldsainte Concierge
           </h1>
-          <h2 className="text-lg md:text-xl text-muted-foreground mb-4">
+          <p className="text-base text-[#6B7280] mb-2">
             A calm, human-feeling assistant for every part of your trip.
-          </h2>
-          <p className="text-sm md:text-base text-foreground/80 leading-relaxed max-w-2xl mx-auto mb-6">
-            I can help you sketch your first itinerary, refine a trip brief, create a visual storyboard, 
-            or match you with creators and certified agents whose style fits your vision. Think of me as 
-            the person who makes travel feel beautifully simple.
           </p>
-          <p className="text-sm text-muted-foreground italic">
-            Tell me what you're dreaming of, and I'll take it from here.
+          <p className="text-sm text-[#0a2225]/70 leading-relaxed max-w-2xl mx-auto">
+            I can help you sketch your first itinerary, refine a trip brief, create a visual storyboard, 
+            or match you with creators and certified agents whose style fits your vision.
           </p>
         </div>
 
