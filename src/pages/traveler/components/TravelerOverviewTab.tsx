@@ -154,7 +154,7 @@ export function TravelerOverviewTab({ profile, stats, onAvatarUpdate }: Traveler
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Button asChild className="bg-[#0a2225] hover:bg-[#0a2225]/90 text-white rounded-full px-6">
+              <Button asChild className="bg-[#0c4d47] hover:bg-[#073331] text-[#bfad72] rounded-full px-6">
                 <Link to="/post-trip">
                   Post Trip Request
                 </Link>

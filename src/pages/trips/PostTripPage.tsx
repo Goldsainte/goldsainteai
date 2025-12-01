@@ -215,17 +215,15 @@ export default function PostTripPage() {
           </button>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 max-w-3xl">
           <p className="text-xs uppercase tracking-[0.18em] text-[#C7A962]">
             Post a trip
           </p>
           <h1 className="font-secondary text-2xl md:text-3xl text-[#0a2225] leading-tight">
             Tell us about the trip you&apos;re dreaming of
           </h1>
-          <p className="text-sm text-[#6B7280]">
-            A few details now help Goldsainte AI and our partners send
-            thoughtful proposals later. It&apos;s okay if not everything is
-            decided — just share what you know.
+          <p className="text-sm text-[#6B7280] leading-relaxed">
+            A few details now help Goldsainte AI and our partners send thoughtful proposals later. It&apos;s okay if not everything is decided — just share what you know.
           </p>
         </div>
       </section>
