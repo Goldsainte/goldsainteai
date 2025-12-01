@@ -261,23 +261,13 @@ export function DirectMessageInbox() {
                       ? "No archived conversations"
                       : "No conversations yet"}
                   </p>
-                  <p className="text-xs text-[#5a6c6e] mt-1 mb-3">
+                  <p className="text-xs text-[#5a6c6e] mt-1">
                     {activeTab === "primary" 
-                      ? "Start a conversation with a creator or agent"
+                      ? "Click 'New' above to start a conversation"
                       : activeTab === "requests"
                       ? "Message requests will appear here"
                       : "Archived messages will appear here"}
                   </p>
-                  {activeTab === "primary" && (
-                    <Button 
-                      size="sm"
-                      onClick={() => setShowRecipientSearch(true)}
-                      className="bg-[#0a2225] hover:bg-[#0a2225]/90 text-white rounded-full"
-                    >
-                      <PenSquare className="h-3.5 w-3.5 mr-1.5" />
-                      New Message
-                    </Button>
-                  )}
                 </div>
               ) : (
                 getConversationList().map((conv) => (
@@ -439,14 +429,7 @@ export function DirectMessageInbox() {
             <div className="text-center">
               <MessageCircle className="h-12 w-12 mx-auto mb-4 text-[#C7A962] opacity-50" />
               <p className="font-secondary text-[#0a2225]">Select a conversation</p>
-              <p className="text-sm text-[#5a6c6e] mt-1 mb-4">Choose from your messages on the left</p>
-              <Button 
-                onClick={() => setShowRecipientSearch(true)}
-                className="bg-[#0a2225] hover:bg-[#0a2225]/90 text-white rounded-full"
-              >
-                <PenSquare className="h-4 w-4 mr-2" />
-                Start New Message
-              </Button>
+              <p className="text-sm text-[#5a6c6e] mt-1">Choose from your messages on the left, or start a new one</p>
             </div>
           </div>
         )}
