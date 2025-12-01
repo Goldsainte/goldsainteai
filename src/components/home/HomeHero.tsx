@@ -1,7 +1,8 @@
 // src/components/home/HomeHero.tsx
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Shield, Sparkles, Lock, ArrowRight } from "lucide-react";
+import { Shield, Sparkles, Lock, ArrowRight, Mic, MessageCircle } from "lucide-react";
+import logomark from "@/assets/logomark-gold.png";
 import heroMainImg from "@/assets/maximilien-t-scharner-FD0Ga_KJTwM-unsplash.jpeg"; // infinity pool
 import heroSecondaryImg from "@/assets/austin-distel-riQNJpiaGgE-unsplash.jpeg"; // treehouse / hammock
 import heroTertiaryImg from "@/assets/felix-rostig-UmV2wr-Vbq8-unsplash.jpeg"; // friends hiking
@@ -134,18 +135,31 @@ export function HomeHero() {
           {/* AI Assist CTA - Always visible, emphasized on mobile */}
           <div className="flex items-start gap-3">
             <Sparkles className="h-6 w-6 md:h-5 md:w-5 text-[#BFAD72] flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm md:text-sm font-semibold md:font-medium text-[#0a2225]">
+            <div className="space-y-2.5">
+              <p className="text-sm font-semibold md:font-medium text-[#0a2225]">
                 <span className="md:hidden">Goldsainte AI Concierge</span>
                 <span className="hidden md:inline">Need a gentle assist?</span>
               </p>
+              
+              {/* Text Chat Option */}
               <Link 
                 to="/concierge"
-                className="inline-flex items-center gap-1 text-sm text-[#0c4d47] font-semibold mt-1 hover:underline"
+                className="flex items-center gap-1.5 text-sm text-[#0c4d47] font-semibold hover:underline"
               >
+                <MessageCircle className="h-4 w-4" />
                 Ask Madison to shape your brief
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-3.5 w-3.5" />
               </Link>
+              
+              {/* Voice Option */}
+              <p className="flex items-center gap-1.5 text-sm text-[#6B7280]">
+                <Mic className="h-4 w-4 text-[#BFAD72]" />
+                <span>Or tap the</span>
+                <span className="inline-flex items-center justify-center h-5 w-5 rounded-full bg-white border border-[#E5DFC6] shadow-sm">
+                  <img src={logomark} alt="" className="h-3.5 w-3.5 object-contain" />
+                </span>
+                <span>widget for voice</span>
+              </p>
             </div>
           </div>
           
