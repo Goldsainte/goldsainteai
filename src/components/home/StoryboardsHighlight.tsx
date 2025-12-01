@@ -75,9 +75,8 @@ export function StoryboardsHighlight() {
     },
   ];
 
-return (
+  return (
     <section className="bg-white border-y border-[#E5DFC6]/30 py-16 md:py-20">
-      <div className="bg-red-500 text-white text-center py-2 font-bold">DEBUG: STORYBOARDS SECTION - SHOULD BE AFTER HERO</div>
       <div className="mx-auto max-w-6xl px-4">
         <div className="text-center mb-10 md:mb-12">
           <h2 className="font-secondary text-[26px] leading-snug text-[#0a2225] md:text-[31px] lg:text-[36px] mb-4">
