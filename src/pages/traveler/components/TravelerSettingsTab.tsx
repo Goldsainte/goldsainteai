@@ -238,6 +238,8 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
               <p className="text-sm text-[#6B7280]">Receive updates about your trips and proposals</p>
             </div>
             <Switch
+              size="lg"
+              className="md:h-6 md:w-11"
               checked={notifications.email_notifications}
               onCheckedChange={(checked) => setNotifications((prev) => ({ ...prev, email_notifications: checked }))}
             />
@@ -249,6 +251,8 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
               <p className="text-sm text-[#6B7280]">Get text alerts for urgent updates</p>
             </div>
             <Switch
+              size="lg"
+              className="md:h-6 md:w-11"
               checked={notifications.sms_notifications}
               onCheckedChange={(checked) => setNotifications((prev) => ({ ...prev, sms_notifications: checked }))}
             />
@@ -260,6 +264,8 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
               <p className="text-sm text-[#6B7280]">Receive travel inspiration and offers</p>
             </div>
             <Switch
+              size="lg"
+              className="md:h-6 md:w-11"
               checked={notifications.marketing_emails}
               onCheckedChange={(checked) => setNotifications((prev) => ({ ...prev, marketing_emails: checked }))}
             />
