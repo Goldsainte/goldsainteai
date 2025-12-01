@@ -923,7 +923,23 @@ export const Header = () => {
             </button>
 
             <button
-              onClick={() => (user ? navigate('/profile') : navigate('/auth'))}
+              onClick={() => {
+                if (!user) {
+                  navigate('/auth');
+                  return;
+                }
+                // Role-based profile routing (same logic as MobileBottomNav)
+                switch (accountType) {
+                  case "creator":
+                    navigate(`/creator/${user.id}`);
+                    break;
+                  case "agent":
+                    navigate("/agent-dashboard");
+                    break;
+                  default:
+                    navigate("/traveler"); // Travelers and default
+                }
+              }}
               className="flex flex-col items-center justify-center gap-0.5 hover:bg-muted transition-colors min-h-[44px]"
               aria-label="Profile"
             >

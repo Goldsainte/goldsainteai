@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CreditCard, Bell, Shield, Globe, Loader2, ExternalLink, Save } from "lucide-react";
+import { CreditCard, Bell, Shield, Globe, Loader2, ExternalLink, Save, ShieldCheck, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { CustomerVerificationUpload } from "@/components/CustomerVerificationUpload";
+import { EmergencyContactsManager } from "@/components/EmergencyContactsManager";
 
 interface TravelPreferences {
   travel_style?: string[] | null;
@@ -374,6 +376,42 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
               Download
             </Button>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Identity Verification */}
+      <Card className="bg-white border-[#E5DFC6] rounded-2xl">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-[#F6F0E4] rounded-xl">
+              <ShieldCheck className="h-5 w-5 text-[#C7A962]" />
+            </div>
+            <div>
+              <CardTitle className="font-secondary text-xl text-[#0a2225]">Identity Verification</CardTitle>
+              <CardDescription>Verify your identity to unlock premium features</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <CustomerVerificationUpload />
+        </CardContent>
+      </Card>
+
+      {/* Emergency Contacts */}
+      <Card className="bg-white border-[#E5DFC6] rounded-2xl">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-[#F6F0E4] rounded-xl">
+              <AlertCircle className="h-5 w-5 text-[#C7A962]" />
+            </div>
+            <div>
+              <CardTitle className="font-secondary text-xl text-[#0a2225]">Emergency Contacts</CardTitle>
+              <CardDescription>Required for high-value bookings over $5,000</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <EmergencyContactsManager />
         </CardContent>
       </Card>
     </div>
