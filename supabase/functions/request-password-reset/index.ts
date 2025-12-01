@@ -14,6 +14,23 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // === Environment sanity checks ===
+  if (!RESEND_API_KEY) {
+    console.error("❌ RESEND_API_KEY is not set in the Edge Function environment");
+    return new Response(
+      JSON.stringify({ error: "Email service is not configured (RESEND_API_KEY missing)." }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+    console.error("❌ SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY missing in Edge Function env");
+    return new Response(
+      JSON.stringify({ error: "Auth service is not configured correctly." }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
   try {
     const { email, redirectTo } = await req.json();
     
@@ -21,7 +38,7 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Email is required");
     }
 
-    console.log("Generating password reset link for:", email);
+    console.log("✅ Environment OK. Generating password reset link for:", email);
 
     // Generate recovery link using Supabase Admin API
     const generateLinkResponse = await fetch(
@@ -44,9 +61,11 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
     if (!generateLinkResponse.ok) {
-      const errorData = await generateLinkResponse.json();
-      console.error("Failed to generate recovery link:", errorData);
-      throw new Error(`Failed to generate recovery link: ${errorData.message || "Unknown error"}`);
+      const errorData = await generateLinkResponse.json().catch(() => null);
+      console.error("❌ Failed to generate recovery link:", errorData || generateLinkResponse.statusText);
+      throw new Error(
+        errorData?.message || `Failed to generate recovery link (status ${generateLinkResponse.status})`
+      );
     }
 
     const { action_link } = await generateLinkResponse.json();
@@ -241,9 +260,11 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     if (!emailResponse.ok) {
-      const errorData = await emailResponse.json();
-      console.error("Failed to send email:", errorData);
-      throw new Error(`Failed to send email: ${errorData.message || "Unknown error"}`);
+      const errorData = await emailResponse.json().catch(() => null);
+      console.error("❌ Failed to send email via Resend:", errorData || emailResponse.statusText);
+      throw new Error(
+        errorData?.message || `Failed to send email (Resend status ${emailResponse.status})`
+      );
     }
 
     const emailResult = await emailResponse.json();
