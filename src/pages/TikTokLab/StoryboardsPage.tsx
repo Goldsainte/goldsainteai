@@ -190,7 +190,7 @@ export default function TikTokLabStoryboardsPage() {
             <TravelStoryboard
               title=""
               subtitle=""
-              maxItems={20}
+              maxItems={50}
               showSaveButtons={true}
             />
           </div>
