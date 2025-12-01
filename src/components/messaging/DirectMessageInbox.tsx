@@ -12,6 +12,7 @@ import {
   Shield,
   MoreVertical,
   Ban,
+  PenSquare,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,8 @@ import {
 } from "@/hooks/useDirectMessages";
 import { useAuth } from "@/contexts/AuthContext";
 import { MessageSettingsModal } from "./MessageSettingsModal";
+import { RecipientSearchModal } from "./RecipientSearchModal";
+import { NewMessageModal } from "./NewMessageModal";
 
 export function DirectMessageInbox() {
   const { user } = useAuth();
@@ -42,6 +45,8 @@ export function DirectMessageInbox() {
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showRecipientSearch, setShowRecipientSearch] = useState(false);
+  const [selectedRecipient, setSelectedRecipient] = useState<{ id: string; name: string } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -188,14 +193,25 @@ export function DirectMessageInbox() {
       <div className="w-80 border-r border-[#E5DFC6] flex flex-col bg-[#FDFBF7]">
         <div className="p-4 border-b border-[#E5DFC6] flex items-center justify-between">
           <h2 className="font-secondary text-lg font-semibold text-[#0a2225]">Inbox</h2>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => setShowSettings(true)}
-            className="text-[#5a6c6e] hover:text-[#0a2225] hover:bg-[#F6F0E4]"
-          >
-            <Settings className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => setShowRecipientSearch(true)}
+              className="text-[#C7A962] hover:text-[#0a2225] hover:bg-[#F6F0E4] gap-1.5"
+            >
+              <PenSquare className="h-4 w-4" />
+              <span className="text-xs">New</span>
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setShowSettings(true)}
+              className="text-[#5a6c6e] hover:text-[#0a2225] hover:bg-[#F6F0E4]"
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
@@ -245,9 +261,23 @@ export function DirectMessageInbox() {
                       ? "No archived conversations"
                       : "No conversations yet"}
                   </p>
-                  <p className="text-xs text-[#5a6c6e] mt-1">
-                    Start a conversation from a creator or agent profile
+                  <p className="text-xs text-[#5a6c6e] mt-1 mb-3">
+                    {activeTab === "primary" 
+                      ? "Start a conversation with a creator or agent"
+                      : activeTab === "requests"
+                      ? "Message requests will appear here"
+                      : "Archived messages will appear here"}
                   </p>
+                  {activeTab === "primary" && (
+                    <Button 
+                      size="sm"
+                      onClick={() => setShowRecipientSearch(true)}
+                      className="bg-[#0a2225] hover:bg-[#0a2225]/90 text-white rounded-full"
+                    >
+                      <PenSquare className="h-3.5 w-3.5 mr-1.5" />
+                      New Message
+                    </Button>
+                  )}
                 </div>
               ) : (
                 getConversationList().map((conv) => (
@@ -409,13 +439,40 @@ export function DirectMessageInbox() {
             <div className="text-center">
               <MessageCircle className="h-12 w-12 mx-auto mb-4 text-[#C7A962] opacity-50" />
               <p className="font-secondary text-[#0a2225]">Select a conversation</p>
-              <p className="text-sm text-[#5a6c6e] mt-1">Choose from your messages on the left</p>
+              <p className="text-sm text-[#5a6c6e] mt-1 mb-4">Choose from your messages on the left</p>
+              <Button 
+                onClick={() => setShowRecipientSearch(true)}
+                className="bg-[#0a2225] hover:bg-[#0a2225]/90 text-white rounded-full"
+              >
+                <PenSquare className="h-4 w-4 mr-2" />
+                Start New Message
+              </Button>
             </div>
           </div>
         )}
       </div>
 
       <MessageSettingsModal open={showSettings} onOpenChange={setShowSettings} />
+      
+      <RecipientSearchModal
+        open={showRecipientSearch}
+        onOpenChange={setShowRecipientSearch}
+        onSelectRecipient={(recipient) => {
+          setSelectedRecipient(recipient);
+          setShowRecipientSearch(false);
+        }}
+      />
+
+      {selectedRecipient && (
+        <NewMessageModal
+          open={!!selectedRecipient}
+          onOpenChange={(open) => {
+            if (!open) setSelectedRecipient(null);
+          }}
+          recipientId={selectedRecipient.id}
+          recipientName={selectedRecipient.name}
+        />
+      )}
     </div>
   );
 }
