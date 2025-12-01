@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { User, Hotel, Plane, Ticket, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info, Sparkles, CreditCard, PlaneTakeoff, HandCoins, ShieldCheck, Car } from "lucide-react";
+import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info, Sparkles, CreditCard, PlaneTakeoff, HandCoins, ShieldCheck, Car } from "lucide-react";
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { CreateMomentModal } from "@/components/CreateMomentModal";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,7 @@ import logomark from "@/assets/logomark-gold.png";
 import { useExpediaModal } from "@/contexts/ExpediaModalContext";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { SearchBar } from "@/components/SearchBar";
-import ExpediaSearchBar from "@/components/search/ExpediaSearchBar";
+
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { NotificationInbox } from "@/components/NotificationInbox";
 
@@ -35,7 +35,7 @@ export const Header = () => {
   const { language: currentLanguage, setLanguage: setCurrentLanguage } = useLanguage();
   const { t } = useTranslation();
   const [usePreferences, setUsePreferences] = useState(true);
-  const [searchSheetOpen, setSearchSheetOpen] = useState(false);
+  
   const [createSheetOpen, setCreateSheetOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadInitialTab, setUploadInitialTab] = useState<"photo" | "video">("photo");
@@ -551,16 +551,11 @@ export const Header = () => {
             </div>
           ) : (
             /* Desktop Layout */
-            <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-3 md:gap-4 h-14 sm:h-16 md:h-20 min-w-0">
+            <div className="flex items-center justify-between gap-2 sm:gap-3 md:gap-4 h-14 sm:h-16 md:h-20">
               {/* Logo - Left */}
               <a href="/" className="flex items-center hover:opacity-90 transition-opacity flex-shrink-0 min-h-[44px]">
                 <img src={logoWordmark} alt="Goldsainte Logo" className="h-6 sm:h-7 md:h-8 w-auto" />
               </a>
-
-              {/* Compact Search Bar - Center */}
-              <div className="flex justify-center min-w-0" data-tour="traditional-search">
-                <ExpediaSearchBar />
-              </div>
 
               {/* Right side actions - Single Profile Menu */}
               <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
@@ -884,16 +879,7 @@ export const Header = () => {
       {/* Mobile Bottom Navigation */}
       {isMobile && (
         <nav className="fixed bottom-0 left-0 right-0 z-[100] bg-background border-t border-border shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
-          <div className="grid grid-cols-5 h-16">
-            <button
-              onClick={() => setSearchSheetOpen(true)}
-              className="flex flex-col items-center justify-center gap-0.5 hover:bg-muted transition-colors min-h-[44px]"
-              aria-label="Search"
-            >
-              <Search className="h-5 w-5" />
-              <span className="text-[10px]">Search</span>
-            </button>
-
+          <div className="grid grid-cols-4 h-16">
             <button
               onClick={() => navigate('/marketplace')}
               className="flex flex-col items-center justify-center gap-0.5 hover:bg-muted transition-colors min-h-[44px]"
@@ -933,21 +919,6 @@ export const Header = () => {
           </div>
         </nav>
       )}
-
-      {/* Search Sheet - Mobile */}
-      <Sheet open={searchSheetOpen} onOpenChange={setSearchSheetOpen}>
-        <SheetContent side="bottom" className="h-[85vh] overflow-y-auto">
-          <SheetHeader className="text-left">
-            <SheetTitle>Search</SheetTitle>
-            <SheetDescription>
-              Find hotels, flights, and events
-            </SheetDescription>
-          </SheetHeader>
-          <div className="mt-4 space-y-4">
-            <ExpediaSearchBar />
-          </div>
-        </SheetContent>
-      </Sheet>
 
       {/* Create Content Modal */}
       <CreateMomentModal open={createMomentOpen} onOpenChange={setCreateMomentOpen} />
