@@ -36,16 +36,14 @@ export default function ConciergePage() {
               AI Concierge
             </span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-secondary text-[#0a2225] mb-3">
-            Your Goldsainte Concierge
-          </h1>
-          <p className="text-base text-[#6B7280] mb-2">
-            A calm, human-feeling assistant for every part of your trip.
-          </p>
-          <p className="text-sm text-[#0a2225]/70 leading-relaxed max-w-2xl mx-auto">
-            I can help you sketch your first itinerary, refine a trip brief, create a visual storyboard, 
-            or match you with creators and certified agents whose style fits your vision.
-          </p>
+        <h1 className="text-3xl md:text-4xl font-secondary text-[#0a2225] mb-4">
+          Madison by Goldsainte AI
+        </h1>
+        <p className="text-base text-[#0a2225]/80 leading-relaxed max-w-2xl mx-auto">
+          Bring me your ideas—I'll help you shape your first itinerary, refine your trip brief, 
+          craft a visual storyboard, and connect you with creators and certified agents whose 
+          style complements your vision.
+        </p>
         </div>
 
         {/* Chat Interface */}
