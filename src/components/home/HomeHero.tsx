@@ -1,21 +1,24 @@
 // src/components/home/HomeHero.tsx
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import heroMainImg from "@/assets/maximilien-t-scharner-FD0Ga_KJTwM-unsplash.jpeg"; // infinity pool
 import heroSecondaryImg from "@/assets/austin-distel-riQNJpiaGgE-unsplash.jpeg"; // treehouse / hammock
 import heroTertiaryImg from "@/assets/felix-rostig-UmV2wr-Vbq8-unsplash.jpeg"; // friends hiking
 
 export function HomeHero() {
+  const { t } = useTranslation();
+
   return (
     <section className="bg-[#f7f3ea] text-[#0a2225]">
       <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 pb-12 pt-16 md:flex-row md:items-center md:pt-20">
         {/* LEFT: Copy & CTAs */}
         <div className="w-full md:w-[52%] space-y-5">
           <div className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#0C4D47]">
-            <span>Travelers</span>
+            <span>{t('common.travelers')}</span>
             <span className="h-[1px] w-4 bg-[#0C4D47]/30" />
-            <span>Creators</span>
+            <span>{t('common.creators')}</span>
             <span className="h-[1px] w-4 bg-[#0C4D47]/30" />
-            <span>Agents</span>
+            <span>{t('common.agents')}</span>
           </div>
 
           <h1 className="font-display text-3xl leading-snug md:text-4xl lg:text-[42px]">
@@ -24,10 +27,7 @@ export function HomeHero() {
           </h1>
 
           <p className="max-w-xl text-sm md:text-base leading-relaxed text-[#4a4a4a]">
-            Goldsainte turns inspiration into itinerary. Post your dream trip, match
-            instantly with creators and certified agents whose style fits yours,
-            co-design the journey through a shared storyboard, and book the entire
-            experience inside a trusted luxury marketplace.
+            {t('home.hero.mainDescription')}
           </p>
 
           {/* Primary CTAs */}
@@ -36,7 +36,7 @@ export function HomeHero() {
               to="/post-trip"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-6 py-2.5 text-sm font-semibold text-[#E5DFC6] shadow-sm hover:bg-[#073331]"
             >
-              Post a dream trip
+              {t('home.hero.postDreamTrip')}
             </Link>
 
             <div className="inline-flex flex-wrap gap-2 text-sm">
@@ -44,13 +44,13 @@ export function HomeHero() {
                 to="/creators"
                 className="rounded-full border border-[#BFAD72] bg-white px-4 py-2 font-semibold text-[#0a2225] transition-all hover:bg-[#BFAD72] hover:text-white"
               >
-                Browse creators
+                {t('home.hero.browseCreators')}
               </Link>
               <Link
                 to="/agents"
                 className="rounded-full border border-[#E5DFC6] bg-white px-4 py-2 font-semibold text-[#0a2225] transition-all hover:bg-[#BFAD72] hover:text-white"
               >
-                Browse agents
+                {t('home.hero.browseAgents')}
               </Link>
 
               {/* NEW: Marketplace pill */}
@@ -58,32 +58,30 @@ export function HomeHero() {
                 to="/marketplace"
                 className="rounded-full border border-[#E5DFC6] bg-white px-4 py-2 font-semibold text-[#0a2225] transition-all hover:bg-[#BFAD72] hover:text-white"
               >
-                Marketplace
+                {t('home.hero.marketplace')}
               </Link>
             </div>
           </div>
 
           {/* Marketplace positioning statement */}
           <p className="pt-1 text-[11px] text-[#8D8D8D]">
-            All actions happen inside the Goldsainte marketplace — we connect travelers, creators and agents, 
-            but do not operate the trips ourselves.
+            {t('home.hero.marketplaceDisclaimer')}
           </p>
 
           {/* AI concierge mention (not a second widget, just an entry point link) */}
           <p className="pt-2 text-sm text-[#8D8D8D]">
-            Prefer a gentle assist?{" "}
+            {t('home.hero.gentleAssist')}{" "}
             <Link
               to="/concierge"
               className="underline underline-offset-2 text-[#0c4d47]"
             >
-              Ask Goldsainte AI to shape your brief.
+              {t('home.hero.askAI')}
             </Link>
           </p>
 
           {/* Trust / promise line */}
           <p className="pt-1 text-xs text-[#8D8D8D] max-w-sm">
-            All messaging and payments stay on-platform. No phone numbers, no side
-            deals — just beautifully organized, protected bookings.
+            {t('home.hero.trustPromise')}
           </p>
         </div>
 
@@ -98,7 +96,7 @@ export function HomeHero() {
                 <div className="col-span-2 row-span-2 overflow-hidden rounded-3xl">
                   <img
                     src={heroMainImg}
-                    alt="Infinity pool and skyline"
+                    alt={t('home.hero.infinityPool')}
                     className="h-full w-full object-cover"
                   />
                 </div>
@@ -107,14 +105,14 @@ export function HomeHero() {
                 <div className="overflow-hidden rounded-3xl">
                   <img
                     src={heroSecondaryImg}
-                    alt="Treehouse hammock"
+                    alt={t('home.hero.treehouseHammock')}
                     className="h-full w-full object-cover"
                   />
                 </div>
                 <div className="overflow-hidden rounded-3xl">
                   <img
                     src={heroTertiaryImg}
-                    alt="Friends hiking"
+                    alt={t('home.hero.friendsHiking')}
                     className="h-full w-full object-cover"
                   />
                 </div>
@@ -123,12 +121,10 @@ export function HomeHero() {
               {/* Caption card */}
               <div className="mt-3 rounded-2xl bg-[#0c4d47] px-4 py-3 text-sm text-[#E5DFC6]">
                 <p className="font-semibold mb-1">
-                  Every trip begins with a storyboard.
+                  {t('home.hero.storyboardCaption')}
                 </p>
                 <p className="text-xs text-[#E5DFC6]/90">
-                  Drop in TikToks, Reels, YouTube videos, Unsplash photos and Viator
-                  experiences. Creators refine the mood; agents engineer the itinerary.
-                  You see the journey before you ever click "Book".
+                  {t('home.hero.storyboardDescription')}
                 </p>
               </div>
             </div>

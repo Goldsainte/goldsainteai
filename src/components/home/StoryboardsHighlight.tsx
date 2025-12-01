@@ -2,43 +2,46 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export function StoryboardsHighlight() {
+  const { t } = useTranslation();
+
   const sampleStoryboards = [
     {
       id: 1,
       title: "Amalfi Coast Long Weekend",
-      subtitle: "Creator + Agent collab",
+      subtitle: t('home.storyboards.creatorAgentCollab'),
       image: "/home/jack-ward-rknrvCrfS1k-unsplash.jpg",
     },
     {
       id: 2,
       title: "Cape Town & Winelands",
-      subtitle: "Agent-curated journey",
+      subtitle: t('home.storyboards.agentCurated'),
       image: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=800&auto=format&fit=crop",
     },
     {
       id: 3,
       title: "Tokyo for Food Lovers",
-      subtitle: "Creator + Agent collab",
+      subtitle: t('home.storyboards.creatorAgentCollab'),
       image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&auto=format&fit=crop",
     },
     {
       id: 4,
       title: "Swiss Alps Ski Escape",
-      subtitle: "Agent-curated journey",
+      subtitle: t('home.storyboards.agentCurated'),
       image: "https://images.unsplash.com/photo-1551524164-687a55dd1126?w=800&auto=format&fit=crop",
     },
     {
       id: 5,
       title: "Moroccan Desert Adventure",
-      subtitle: "Creator + Agent collab",
+      subtitle: t('home.storyboards.creatorAgentCollab'),
       image: "https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=800&auto=format&fit=crop",
     },
     {
       id: 6,
       title: "Bali Wellness Retreat",
-      subtitle: "Agent-curated journey",
+      subtitle: t('home.storyboards.agentCurated'),
       image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&auto=format&fit=crop",
     },
   ];
@@ -48,12 +51,10 @@ export function StoryboardsHighlight() {
       <div className="mx-auto max-w-6xl px-4">
         <div className="text-center mb-12">
           <h2 className="font-display text-[26px] leading-snug text-[#0a2225] md:text-[31px] lg:text-[36px] mb-4">
-            Storyboards: The Blueprint for Every <span className="italic">Goldsainte AI</span> Journey
+            {t('home.storyboards.title')}
           </h2>
           <p className="mx-auto max-w-3xl text-sm leading-relaxed text-[#4a4a4a] md:text-base">
-            Every trip on Goldsainte starts as a storyboard—a visual brief that blends your saved TikToks, 
-            creator content, mood images and curated experiences. It's how travelers express what they want 
-            to feel, and how creators and agents collaborate without chaos.
+            {t('home.storyboards.description')}
           </p>
         </div>
 
@@ -91,7 +92,7 @@ export function StoryboardsHighlight() {
           >
             <Link to="/concierge">
               <Sparkles className="mr-2 h-4 w-4" />
-              Start a storyboard with Madison
+              {t('home.storyboards.startWithMadison')}
             </Link>
           </Button>
           <Button
@@ -101,7 +102,7 @@ export function StoryboardsHighlight() {
             className="border-[#0c4d47] text-[#0c4d47] hover:bg-[#0c4d47]/5"
           >
             <Link to="/marketplace">
-              Explore creator and agent storyboards
+              {t('home.storyboards.exploreStoryboards')}
             </Link>
           </Button>
         </div>

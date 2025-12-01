@@ -2,30 +2,33 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Video, Briefcase } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export function RoleSpecificCTAs() {
+  const { t } = useTranslation();
+
   const roles = [
     {
       icon: Sparkles,
-      title: "Plan my trip",
-      body: "Tell Madison what you're dreaming about and let creators and agents do the heavy lifting.",
-      buttonText: "Start my trip brief",
+      title: t('home.rolesCTA.planMyTrip.title'),
+      body: t('home.rolesCTA.planMyTrip.body'),
+      buttonText: t('home.rolesCTA.planMyTrip.button'),
       link: "/post-trip",
       backgroundImage: "/home/christian-lambert-vmIWr0NnpCQ-unsplash.jpeg",
     },
     {
       icon: Video,
-      title: "Join as a creator",
-      body: "Set up your creator profile, connect TikTok, and start turning your audience into curated journeys.",
-      buttonText: "Creator sign up",
+      title: t('home.rolesCTA.joinAsCreator.title'),
+      body: t('home.rolesCTA.joinAsCreator.body'),
+      buttonText: t('home.rolesCTA.joinAsCreator.button'),
       link: "/auth?mode=signup&role=creator",
       backgroundImage: "/home/justin-clark-JkT5-MulyiE-unsplash.jpg",
     },
     {
       icon: Briefcase,
-      title: "Apply as a travel agent",
-      body: "Share your credentials, specialties and preferred markets. Once verified, you'll receive curated briefs from qualified travelers.",
-      buttonText: "Agent application",
+      title: t('home.rolesCTA.applyAsAgent.title'),
+      body: t('home.rolesCTA.applyAsAgent.body'),
+      buttonText: t('home.rolesCTA.applyAsAgent.button'),
       link: "/apply/agent",
       backgroundImage: "/home/nicolas-meunier-WKGmcxLdXC4-unsplash.jpeg",
     },
@@ -35,7 +38,7 @@ export function RoleSpecificCTAs() {
     <section className="bg-white border-t border-[#E5DFC6]/30 py-20 md:py-24">
       <div className="mx-auto max-w-6xl px-4">
         <h2 className="text-center font-display text-3xl leading-snug text-[#0a2225] md:text-4xl lg:text-[42px] mb-12">
-          Choose how you join Goldsainte
+          {t('home.rolesCTA.title')}
         </h2>
 
         <div className="grid gap-8 md:grid-cols-3">
