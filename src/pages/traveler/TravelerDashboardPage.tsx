@@ -495,21 +495,21 @@ export default function TravelerDashboardPage() {
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 <div className="space-y-3 max-w-xl">
                   <p className="text-xs text-[#C7A962] font-medium tracking-wider uppercase">
-                    What's Next
+                    Start Planning
                   </p>
                   <h3 className="font-secondary text-2xl text-[#0a2225]">
                     Ready to turn your next inspiration into a real journey?
                   </h3>
                   <p className="text-base text-[#6B7280] leading-relaxed">
-                    Use the Creator Lab to pair your favorite travel content with Goldsainte 
-                    agents — then see everything land back here in your dashboard.
+                    Create visual storyboards of your dream trips — save inspiration, organize ideas, 
+                    and share them with creators and agents who can make them real.
                   </p>
                 </div>
                 <Link
-                  to="/tiktok-lab"
+                  to="/storyboards"
                   className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] text-white px-6 py-3 text-sm font-medium hover:bg-[#0a2225]/90 transition-colors whitespace-nowrap"
                 >
-                  Open Creator Lab
+                  Open My Storyboards
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>

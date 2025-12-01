@@ -13,10 +13,10 @@ import {
 } from "@/services/matchingService";
 import { supabase } from "@/integrations/supabase/client";
 
-type Role = "creator" | "agent";
+type Role = "creator" | "agent" | "traveler";
 
 export default function TikTokLabDashboardPage() {
-  const [role, setRole] = useState<Role>("creator");
+  const [role, setRole] = useState<Role>("traveler");
   const [matches, setMatches] = useState<CreatorMatch[]>([]);
   const [loadingMatches, setLoadingMatches] = useState(true);
 
@@ -41,9 +41,10 @@ export default function TikTokLabDashboardPage() {
 
         if (!profile || cancelled) return;
 
-        const acctType = profile.account_type as Role | null;
+        const acctType = profile.account_type as string | null;
         if (acctType === "agent") setRole("agent");
-        else setRole("creator");
+        else if (acctType === "creator") setRole("creator");
+        else setRole("traveler");
 
         // 2) load a small set of open trip requests
         const { data: trips } = await supabase
@@ -173,11 +174,13 @@ export default function TikTokLabDashboardPage() {
             <InspirationPanel />
           </div>
 
-          {/* Right column */}
-          <div className="space-y-5">
-            <EarningsSnapshot />
-            <AccountHealthCard role={role === "agent" ? "agent" : "creator"} />
-          </div>
+          {/* Right column - only show for creators/agents */}
+          {(role === "creator" || role === "agent") && (
+            <div className="space-y-5">
+              <EarningsSnapshot />
+              <AccountHealthCard role={role === "agent" ? "agent" : "creator"} />
+            </div>
+          )}
         </div>
       </section>
     </main>
