@@ -204,7 +204,7 @@ export default function PostTripPage() {
 
   return (
     <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
-      <section className="mx-auto max-w-3xl px-4 pt-14 pb-6 md:pt-16 md:pb-8">
+      <section className="mx-auto max-w-5xl px-4 pt-14 pb-6 md:pt-16 md:pb-8">
         <div className="flex items-center justify-between mb-4">
           <Link
             to="/"
@@ -230,7 +230,7 @@ export default function PostTripPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-3xl px-4 pb-16 md:pb-20">
+      <section className="mx-auto max-w-5xl px-4 pb-16 md:pb-20">
         {/* AI Collection Prefill Banner */}
         {hasItineraryPrefill && itineraryPrefill && (
           <div className="mb-4 rounded-2xl bg-gradient-to-r from-[#FDFBF5] to-[#F6F0E4] border border-[#C7A962]/30 px-4 py-3">
@@ -269,7 +269,7 @@ export default function PostTripPage() {
           </p>
         )}
 
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)]">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)]">
           <form
             className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 space-y-5 text-sm"
             onSubmit={handleSubmit}
@@ -656,14 +656,14 @@ export default function PostTripPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-5 py-2 text-sm font-semibold hover:bg-[#073331] disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-6 py-2.5 text-sm font-semibold hover:bg-[#073331] disabled:opacity-60 whitespace-nowrap flex-shrink-0"
             >
               {submitting ? "Posting..." : "Post this trip"}
-              <ArrowRight className="h-3 w-3" />
+              <ArrowRight className="h-4 w-4" />
             </button>
           </div>
         </form>
-        <aside className="rounded-3xl border border-[#E5DFC6] bg-white/90 p-4 md:p-5 text-sm space-y-3 self-start">
+        <aside className="rounded-3xl border border-[#E5DFC6] bg-white/90 p-4 md:p-5 text-sm space-y-3 self-start lg:sticky lg:top-24">
           <p className="text-xs uppercase tracking-[0.16em] text-[#8D8D8D]">Trust &amp; safety</p>
           <h2 className="text-base font-semibold text-[#0a2225]">How Goldsainte keeps this safe</h2>
           <p className="text-sm text-[#4a4a4a]">
