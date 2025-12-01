@@ -109,6 +109,7 @@ const TripDetailPageNew = lazy(() => import('@/pages/trips/TripDetailPage'));
 const CreatorProfilePage = lazy(() => import('@/pages/CreatorProfilePage'));
 const NewCollabRequestPage = lazy(() => import('@/pages/NewCollabRequestPage'));
 const Messages = lazy(() => import('@/pages/Messages'));
+const MessagesPage = lazy(() => import('@/pages/MessagesPage'));
 // TravelerDashboardPage import moved to line 68
 const PartnerConsolePage = lazy(() => import('@/pages/partner/PartnerConsolePage'));
 const PartnerEscrowPage = lazy(() => import('@/pages/partners/EscrowMilestonesPage'));
@@ -404,6 +405,7 @@ export const AppRoutes = () => (
       <Route path="/tiktok-lab/storyboards/:id" element={<Navigate to="/storyboards/:id" replace />} />
       <Route path="/tiktok-lab/storyboards/:id/edit" element={<Navigate to="/storyboards/:id" replace />} />
       <Route path="/notifications" element={<NotificationsPage />} />
+      <Route path="/messages" element={<RequireAuth><MessagesPage /></RequireAuth>} />
       <Route path="/marketplace-guidelines" element={<MarketplaceGuidelinesPage />} />
       <Route 
         path="/concierge" 
