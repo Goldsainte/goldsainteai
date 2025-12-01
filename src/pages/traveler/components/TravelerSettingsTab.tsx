@@ -95,6 +95,37 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
     }
   };
 
+  const handleChangePassword = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.email) {
+        toast.error("Email not found. Unable to send password reset email.");
+        return;
+      }
+
+      const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      });
+
+      if (error) throw error;
+      
+      toast.success("Password reset email sent! Check your inbox.");
+    } catch (error) {
+      console.error('Error sending password reset:', error);
+      toast.error("Failed to send reset email. Please try again.");
+    }
+  };
+
+  const handleDownloadData = async () => {
+    try {
+      toast("Coming soon", {
+        description: "Data export functionality will be available soon",
+      });
+    } catch (error) {
+      console.error('Error downloading data:', error);
+    }
+  };
+
   const travelStyleOptions = [
     "Adventure", "Relaxation", "Cultural", "Luxury", "Budget", "Eco-friendly", "Family", "Solo", "Romantic"
   ];
@@ -238,8 +269,6 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
               <p className="text-sm text-[#6B7280]">Receive updates about your trips and proposals</p>
             </div>
             <Switch
-              size="lg"
-              className="md:h-6 md:w-11"
               checked={notifications.email_notifications}
               onCheckedChange={(checked) => setNotifications((prev) => ({ ...prev, email_notifications: checked }))}
             />
@@ -251,8 +280,6 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
               <p className="text-sm text-[#6B7280]">Get text alerts for urgent updates</p>
             </div>
             <Switch
-              size="lg"
-              className="md:h-6 md:w-11"
               checked={notifications.sms_notifications}
               onCheckedChange={(checked) => setNotifications((prev) => ({ ...prev, sms_notifications: checked }))}
             />
@@ -264,8 +291,6 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
               <p className="text-sm text-[#6B7280]">Receive travel inspiration and offers</p>
             </div>
             <Switch
-              size="lg"
-              className="md:h-6 md:w-11"
               checked={notifications.marketing_emails}
               onCheckedChange={(checked) => setNotifications((prev) => ({ ...prev, marketing_emails: checked }))}
             />
@@ -310,7 +335,12 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
               <p className="text-[#0a2225] font-medium">Change Password</p>
               <p className="text-sm text-[#6B7280]">Update your account password</p>
             </div>
-            <Button variant="outline" size="sm" className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#F6F0E4] rounded-full">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#F6F0E4] rounded-full"
+              onClick={handleChangePassword}
+            >
               Update
             </Button>
           </div>
@@ -328,7 +358,12 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
               <p className="text-[#0a2225] font-medium">Download My Data</p>
               <p className="text-sm text-[#6B7280]">Export a copy of your account data</p>
             </div>
-            <Button variant="outline" size="sm" className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#F6F0E4] rounded-full">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#F6F0E4] rounded-full"
+              onClick={handleDownloadData}
+            >
               Download
             </Button>
           </div>
