@@ -118,8 +118,8 @@ export function HomeHero() {
       <div className="max-w-2xl mx-auto px-4 pb-12">
         <div className="bg-white/60 border border-[#E5DFC6] rounded-2xl p-5 space-y-4">
           
-          {/* Marketplace Statement */}
-          <div className="flex items-start gap-3">
+          {/* Marketplace Statement - Hidden on mobile */}
+          <div className="hidden md:flex items-start gap-3">
             <Shield className="h-5 w-5 text-[#0c4d47] flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-medium text-[#0a2225]">All actions stay on-platform</p>
@@ -129,13 +129,16 @@ export function HomeHero() {
             </div>
           </div>
           
-          <div className="border-t border-[#E5DFC6]" />
+          <div className="hidden md:block border-t border-[#E5DFC6]" />
           
-          {/* AI Assist CTA */}
+          {/* AI Assist CTA - Always visible, emphasized on mobile */}
           <div className="flex items-start gap-3">
-            <Sparkles className="h-5 w-5 text-[#BFAD72] flex-shrink-0 mt-0.5" />
+            <Sparkles className="h-6 w-6 md:h-5 md:w-5 text-[#BFAD72] flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-[#0a2225]">Need a gentle assist?</p>
+              <p className="text-sm md:text-sm font-semibold md:font-medium text-[#0a2225]">
+                <span className="md:hidden">Goldsainte AI Concierge</span>
+                <span className="hidden md:inline">Need a gentle assist?</span>
+              </p>
               <Link 
                 to="/concierge"
                 className="inline-flex items-center gap-1 text-sm text-[#0c4d47] font-semibold mt-1 hover:underline"
@@ -146,10 +149,10 @@ export function HomeHero() {
             </div>
           </div>
           
-          <div className="border-t border-[#E5DFC6]" />
+          <div className="hidden md:block border-t border-[#E5DFC6]" />
           
-          {/* Trust Promise */}
-          <div className="flex items-start gap-3">
+          {/* Trust Promise - Hidden on mobile */}
+          <div className="hidden md:flex items-start gap-3">
             <Lock className="h-5 w-5 text-[#0c4d47] flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-medium text-[#0a2225]">Protected bookings</p>

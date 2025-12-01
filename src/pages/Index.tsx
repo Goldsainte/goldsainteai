@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { HomeHero } from "@/components/home/HomeHero";
 import { StoryboardsHighlight } from "@/components/home/StoryboardsHighlight";
 import { RoleSpecificCTAs } from "@/components/home/RoleSpecificCTAs";
+import { TrustFooterMobile } from "@/components/home/TrustFooterMobile";
 import {
   BuiltForEverySideSection,
   HowGoldsainteWorksSection,
@@ -38,6 +39,9 @@ export default function Index() {
 
         {/* Role-specific CTAs - three-way sign up */}
         <RoleSpecificCTAs />
+
+        {/* Trust messaging - mobile only, after role CTAs */}
+        <TrustFooterMobile />
       </main>
     </>
   );
