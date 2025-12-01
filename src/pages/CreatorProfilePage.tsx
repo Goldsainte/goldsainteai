@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { TravelStoryboard } from "@/components/storyboards/TravelStoryboard";
+import { MessageButton } from "@/components/messaging/MessageButton";
 
 type CreatorProfileResponse = {
   creator: {
@@ -190,6 +191,11 @@ export default function CreatorProfilePage() {
                 </div>
               </div>
             </div>
+            <MessageButton
+              recipientId={creator.id}
+              recipientName={creator.name}
+              className="w-full rounded-full"
+            />
             <Link
               to={`/collabs/new?creatorId=${creator.id}`}
               className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"

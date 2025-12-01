@@ -15,6 +15,7 @@ import { AgentAvailabilityCalendar } from "@/components/AgentAvailabilityCalenda
 import { TrustBadges } from "@/components/TrustBadges";
 import { ReportUserModal } from "@/components/ReportUserModal";
 import { TravelStoryboard } from "@/components/storyboards/TravelStoryboard";
+import { MessageButton } from "@/components/messaging/MessageButton";
 
 export default function AgentProfile() {
   const { agentId } = useParams();
@@ -185,6 +186,11 @@ export default function AgentProfile() {
                   </p>
 
                   <div className="space-y-2 w-full">
+                    <MessageButton
+                      recipientId={agent.user_id}
+                      recipientName={agent.agency_name}
+                      className="w-full"
+                    />
                     <Button className="w-full" onClick={() => navigate('/marketplace')}>
                       Request Service
                     </Button>
