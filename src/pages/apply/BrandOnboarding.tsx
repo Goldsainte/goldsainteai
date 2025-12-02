@@ -7,9 +7,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, CheckCircle, XCircle, Upload, FileText, X } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, Upload, FileText, X, ArrowLeft, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface BrandFormData {
@@ -153,6 +153,10 @@ const QUALITY_CERTS = [
   'Small Luxury Hotels',
   'Design Hotels'
 ];
+
+// Luxury styling classes
+const luxuryInputClasses = "min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg";
+const luxurySelectTriggerClasses = "min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg";
 
 export default function BrandOnboarding() {
   const navigate = useNavigate();
@@ -580,25 +584,34 @@ export default function BrandOnboarding() {
     }
   };
 
+  // Step section header component
+  const SectionHeader = ({ title }: { title: string }) => (
+    <div className="flex items-center gap-3 mb-6">
+      <div className="w-1 h-6 bg-[#C7A962] rounded-full" />
+      <h3 className="font-secondary text-xl text-[#0a2225]">{title}</h3>
+    </div>
+  );
+
   // Render form steps
   const renderStep = () => {
     switch (currentStep) {
       case 1:
         return (
           <div className="space-y-6">
-            <Alert>
-              <AlertDescription>
+            <SectionHeader title="Contact Information" />
+            <Alert className="bg-[#F5EFE1] border-[#E5DFC6]">
+              <AlertDescription className="text-[#0a2225]">
                 Tell us about the primary contact person for your brand on Goldsainte.
               </AlertDescription>
             </Alert>
 
             <div>
-              <Label htmlFor="primaryContactName">Full Name *</Label>
+              <Label htmlFor="primaryContactName" className="font-medium text-[#0a2225]">Full Name *</Label>
               <Input
                 id="primaryContactName"
                 value={formData.primaryContactName}
                 onChange={(e) => setFormData({ ...formData, primaryContactName: e.target.value })}
-                className={errors.primaryContactName ? 'border-red-500' : ''}
+                className={`${luxuryInputClasses} ${errors.primaryContactName ? 'border-red-500' : ''}`}
                 placeholder="John Smith"
               />
               {errors.primaryContactName && (
@@ -607,13 +620,13 @@ export default function BrandOnboarding() {
             </div>
 
             <div>
-              <Label htmlFor="primaryContactEmail">Email Address *</Label>
+              <Label htmlFor="primaryContactEmail" className="font-medium text-[#0a2225]">Email Address *</Label>
               <Input
                 id="primaryContactEmail"
                 type="email"
                 value={formData.primaryContactEmail}
                 onChange={(e) => setFormData({ ...formData, primaryContactEmail: e.target.value })}
-                className={errors.primaryContactEmail ? 'border-red-500' : ''}
+                className={`${luxuryInputClasses} ${errors.primaryContactEmail ? 'border-red-500' : ''}`}
                 placeholder="john@yourbrand.com"
               />
               {errors.primaryContactEmail && (
@@ -622,27 +635,28 @@ export default function BrandOnboarding() {
             </div>
 
             <div>
-              <Label htmlFor="primaryContactPhone">Phone Number *</Label>
+              <Label htmlFor="primaryContactPhone" className="font-medium text-[#0a2225]">Phone Number *</Label>
               <Input
                 id="primaryContactPhone"
                 type="tel"
                 value={formData.primaryContactPhone}
                 onChange={(e) => setFormData({ ...formData, primaryContactPhone: e.target.value })}
-                className={errors.primaryContactPhone ? 'border-red-500' : ''}
+                className={`${luxuryInputClasses} ${errors.primaryContactPhone ? 'border-red-500' : ''}`}
                 placeholder="+1234567890"
               />
-              <p className="text-sm text-gray-500 mt-1">Use international format (e.g., +1234567890)</p>
+              <p className="text-sm text-[#6B7280] mt-1">Use international format (e.g., +1234567890)</p>
               {errors.primaryContactPhone && (
                 <p className="text-sm text-red-500 mt-1">{errors.primaryContactPhone}</p>
               )}
             </div>
 
             <div>
-              <Label htmlFor="primaryContactTitle">Title / Position</Label>
+              <Label htmlFor="primaryContactTitle" className="font-medium text-[#0a2225]">Title / Position</Label>
               <Input
                 id="primaryContactTitle"
                 value={formData.primaryContactTitle}
                 onChange={(e) => setFormData({ ...formData, primaryContactTitle: e.target.value })}
+                className={luxuryInputClasses}
                 placeholder="General Manager, Marketing Director, etc."
               />
             </div>
@@ -652,25 +666,26 @@ export default function BrandOnboarding() {
       case 2:
         return (
           <div className="space-y-6">
+            <SectionHeader title="Brand Information" />
             <div>
-              <Label htmlFor="brandName">Brand Name *</Label>
+              <Label htmlFor="brandName" className="font-medium text-[#0a2225]">Brand Name *</Label>
               <Input
                 id="brandName"
                 value={formData.brandName}
                 onChange={(e) => setFormData({ ...formData, brandName: e.target.value })}
-                className={errors.brandName ? 'border-red-500' : ''}
+                className={`${luxuryInputClasses} ${errors.brandName ? 'border-red-500' : ''}`}
                 placeholder="Your Brand Name"
               />
               {errors.brandName && <p className="text-sm text-red-500 mt-1">{errors.brandName}</p>}
             </div>
 
             <div>
-              <Label htmlFor="brandType">Brand Type *</Label>
+              <Label htmlFor="brandType" className="font-medium text-[#0a2225]">Brand Type *</Label>
               <Select
                 value={formData.brandType}
                 onValueChange={(value) => setFormData({ ...formData, brandType: value })}
               >
-                <SelectTrigger className={errors.brandType ? 'border-red-500' : ''}>
+                <SelectTrigger className={`${luxurySelectTriggerClasses} ${errors.brandType ? 'border-red-500' : ''}`}>
                   <SelectValue placeholder="Select brand type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -685,50 +700,52 @@ export default function BrandOnboarding() {
             </div>
 
             <div>
-              <Label htmlFor="tagline">Tagline</Label>
+              <Label htmlFor="tagline" className="font-medium text-[#0a2225]">Tagline</Label>
               <Input
                 id="tagline"
                 value={formData.tagline}
                 onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
+                className={luxuryInputClasses}
                 placeholder="A short, memorable phrase describing your brand"
                 maxLength={100}
               />
-              <p className="text-sm text-gray-500 mt-1">{formData.tagline.length}/100 characters</p>
+              <p className="text-sm text-[#6B7280] mt-1">{formData.tagline.length}/100 characters</p>
             </div>
 
             <div>
-              <Label htmlFor="bio">Brand Bio * (Minimum 100 characters)</Label>
+              <Label htmlFor="bio" className="font-medium text-[#0a2225]">Brand Bio * (Minimum 100 characters)</Label>
               <Textarea
                 id="bio"
                 value={formData.bio}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                className={errors.bio ? 'border-red-500' : ''}
+                className={`${luxuryInputClasses} min-h-[120px] ${errors.bio ? 'border-red-500' : ''}`}
                 rows={4}
                 placeholder="Describe your brand, what makes it unique, and what guests can expect..."
               />
-              <p className="text-sm text-gray-500 mt-1">{formData.bio.length} characters</p>
+              <p className="text-sm text-[#6B7280] mt-1">{formData.bio.length} characters</p>
               {errors.bio && <p className="text-sm text-red-500 mt-1">{errors.bio}</p>}
             </div>
 
             <div>
-              <Label htmlFor="brandStory">Brand Story (Optional)</Label>
+              <Label htmlFor="brandStory" className="font-medium text-[#0a2225]">Brand Story (Optional)</Label>
               <Textarea
                 id="brandStory"
                 value={formData.brandStory}
                 onChange={(e) => setFormData({ ...formData, brandStory: e.target.value })}
+                className={`${luxuryInputClasses} min-h-[150px]`}
                 rows={6}
                 placeholder="Tell the story behind your brand - your inspiration, journey, and vision..."
               />
             </div>
 
             <div>
-              <Label htmlFor="website">Website</Label>
+              <Label htmlFor="website" className="font-medium text-[#0a2225]">Website</Label>
               <Input
                 id="website"
                 type="url"
                 value={formData.website}
                 onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                className={errors.website ? 'border-red-500' : ''}
+                className={`${luxuryInputClasses} ${errors.website ? 'border-red-500' : ''}`}
                 placeholder="https://www.yourbrand.com"
               />
               {errors.website && <p className="text-sm text-red-500 mt-1">{errors.website}</p>}
@@ -739,23 +756,25 @@ export default function BrandOnboarding() {
       case 3:
         return (
           <div className="space-y-6">
+            <SectionHeader title="Business Details" />
             <div>
-              <Label htmlFor="businessRegistrationNumber">Business Registration Number</Label>
+              <Label htmlFor="businessRegistrationNumber" className="font-medium text-[#0a2225]">Business Registration Number</Label>
               <Input
                 id="businessRegistrationNumber"
                 value={formData.businessRegistrationNumber}
                 onChange={(e) => setFormData({ ...formData, businessRegistrationNumber: e.target.value })}
+                className={luxuryInputClasses}
                 placeholder="Optional"
               />
             </div>
 
             <div>
-              <Label htmlFor="businessAddress">Business Address *</Label>
+              <Label htmlFor="businessAddress" className="font-medium text-[#0a2225]">Business Address *</Label>
               <Input
                 id="businessAddress"
                 value={formData.businessAddress}
                 onChange={(e) => setFormData({ ...formData, businessAddress: e.target.value })}
-                className={errors.businessAddress ? 'border-red-500' : ''}
+                className={`${luxuryInputClasses} ${errors.businessAddress ? 'border-red-500' : ''}`}
                 placeholder="123 Main Street"
               />
               {errors.businessAddress && (
@@ -765,40 +784,43 @@ export default function BrandOnboarding() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="businessCity">City</Label>
+                <Label htmlFor="businessCity" className="font-medium text-[#0a2225]">City</Label>
                 <Input
                   id="businessCity"
                   value={formData.businessCity}
                   onChange={(e) => setFormData({ ...formData, businessCity: e.target.value })}
+                  className={luxuryInputClasses}
                 />
               </div>
 
               <div>
-                <Label htmlFor="businessState">State/Province</Label>
+                <Label htmlFor="businessState" className="font-medium text-[#0a2225]">State/Province</Label>
                 <Input
                   id="businessState"
                   value={formData.businessState}
                   onChange={(e) => setFormData({ ...formData, businessState: e.target.value })}
+                  className={luxuryInputClasses}
                 />
               </div>
 
               <div>
-                <Label htmlFor="businessPostalCode">Postal Code</Label>
+                <Label htmlFor="businessPostalCode" className="font-medium text-[#0a2225]">Postal Code</Label>
                 <Input
                   id="businessPostalCode"
                   value={formData.businessPostalCode}
                   onChange={(e) => setFormData({ ...formData, businessPostalCode: e.target.value })}
+                  className={luxuryInputClasses}
                 />
               </div>
             </div>
 
             <div>
-              <Label htmlFor="businessCountry">Country *</Label>
+              <Label htmlFor="businessCountry" className="font-medium text-[#0a2225]">Country *</Label>
               <Input
                 id="businessCountry"
                 value={formData.businessCountry}
                 onChange={(e) => setFormData({ ...formData, businessCountry: e.target.value })}
-                className={errors.businessCountry ? 'border-red-500' : ''}
+                className={`${luxuryInputClasses} ${errors.businessCountry ? 'border-red-500' : ''}`}
                 placeholder="United States"
               />
               {errors.businessCountry && (
@@ -808,21 +830,23 @@ export default function BrandOnboarding() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="taxId">Tax ID / VAT Number</Label>
+                <Label htmlFor="taxId" className="font-medium text-[#0a2225]">Tax ID / VAT Number</Label>
                 <Input
                   id="taxId"
                   value={formData.taxId}
                   onChange={(e) => setFormData({ ...formData, taxId: e.target.value })}
+                  className={luxuryInputClasses}
                   placeholder="XX-XXXXXXX"
                 />
               </div>
 
               <div>
-                <Label htmlFor="vatNumber">VAT Registration Number (EU)</Label>
+                <Label htmlFor="vatNumber" className="font-medium text-[#0a2225]">VAT Registration Number (EU)</Label>
                 <Input
                   id="vatNumber"
                   value={formData.vatNumber}
                   onChange={(e) => setFormData({ ...formData, vatNumber: e.target.value })}
+                  className={luxuryInputClasses}
                   placeholder="Optional"
                 />
               </div>
@@ -833,8 +857,9 @@ export default function BrandOnboarding() {
       case 4:
         return (
           <div className="space-y-6">
+            <SectionHeader title="Geographic & Style" />
             <div>
-              <Label>Regions * (Select all that apply)</Label>
+              <Label className="font-medium text-[#0a2225]">Regions * (Select all that apply)</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
                 {REGIONS.map((region) => (
                   <div key={region} className="flex items-center space-x-2">
@@ -851,8 +876,9 @@ export default function BrandOnboarding() {
                           });
                         }
                       }}
+                      className="data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47]"
                     />
-                    <label htmlFor={`region-${region}`} className="text-sm cursor-pointer">
+                    <label htmlFor={`region-${region}`} className="text-sm cursor-pointer text-[#0a2225]">
                       {region}
                     </label>
                   </div>
@@ -862,15 +888,21 @@ export default function BrandOnboarding() {
             </div>
 
             <div>
-              <Label>Cities/Locations * (Where your brand operates)</Label>
+              <Label className="font-medium text-[#0a2225]">Cities/Locations * (Where your brand operates)</Label>
               <div className="flex gap-2 mt-2">
                 <Input
                   value={cityInput}
                   onChange={(e) => setCityInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCity())}
+                  className={luxuryInputClasses}
                   placeholder="Enter a city and press Enter"
                 />
-                <Button type="button" onClick={addCity} variant="outline">
+                <Button 
+                  type="button" 
+                  onClick={addCity} 
+                  variant="outline"
+                  className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20"
+                >
                   Add
                 </Button>
               </div>
@@ -880,13 +912,13 @@ export default function BrandOnboarding() {
                   {formData.cities.map((city) => (
                     <div
                       key={city}
-                      className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm"
+                      className="flex items-center gap-1 px-3 py-1 bg-[#F5EFE1] text-[#7A7151] rounded-full text-sm border border-[#E5DFC6]"
                     >
                       {city}
                       <button
                         type="button"
                         onClick={() => removeCity(city)}
-                        className="ml-1 hover:text-blue-900"
+                        className="ml-1 hover:text-[#0a2225]"
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -898,7 +930,7 @@ export default function BrandOnboarding() {
             </div>
 
             <div>
-              <Label>Style Tags * (Select all that apply)</Label>
+              <Label className="font-medium text-[#0a2225]">Style Tags * (Select all that apply)</Label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
                 {STYLE_TAGS.map((tag) => (
                   <div key={tag} className="flex items-center space-x-2">
@@ -915,8 +947,9 @@ export default function BrandOnboarding() {
                           });
                         }
                       }}
+                      className="data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47]"
                     />
-                    <label htmlFor={`style-${tag}`} className="text-sm cursor-pointer">
+                    <label htmlFor={`style-${tag}`} className="text-sm cursor-pointer text-[#0a2225]">
                       {tag}
                     </label>
                   </div>
@@ -926,12 +959,12 @@ export default function BrandOnboarding() {
             </div>
 
             <div>
-              <Label htmlFor="priceRange">Price Range *</Label>
+              <Label htmlFor="priceRange" className="font-medium text-[#0a2225]">Price Range *</Label>
               <Select
                 value={formData.priceRange}
                 onValueChange={(value) => setFormData({ ...formData, priceRange: value })}
               >
-                <SelectTrigger className={errors.priceRange ? 'border-red-500' : ''}>
+                <SelectTrigger className={`${luxurySelectTriggerClasses} ${errors.priceRange ? 'border-red-500' : ''}`}>
                   <SelectValue placeholder="Select price range" />
                 </SelectTrigger>
                 <SelectContent>
@@ -945,52 +978,46 @@ export default function BrandOnboarding() {
               {errors.priceRange && <p className="text-sm text-red-500 mt-1">{errors.priceRange}</p>}
             </div>
 
-            {['Hotel', 'Resort', 'Villa / Home', 'Boutique Stay'].includes(formData.brandType) && (
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="capacityMin">Minimum Capacity (guests)</Label>
-                  <Input
-                    id="capacityMin"
-                    type="number"
-                    min="1"
-                    value={formData.capacityMin}
-                    onChange={(e) => setFormData({ ...formData, capacityMin: e.target.value })}
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="capacityMax">Maximum Capacity (guests)</Label>
-                  <Input
-                    id="capacityMax"
-                    type="number"
-                    min="1"
-                    value={formData.capacityMax}
-                    onChange={(e) => setFormData({ ...formData, capacityMax: e.target.value })}
-                  />
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="capacityMin" className="font-medium text-[#0a2225]">Minimum Capacity</Label>
+                <Input
+                  id="capacityMin"
+                  type="number"
+                  value={formData.capacityMin}
+                  onChange={(e) => setFormData({ ...formData, capacityMin: e.target.value })}
+                  className={luxuryInputClasses}
+                  placeholder="e.g., 1"
+                />
               </div>
-            )}
+              <div>
+                <Label htmlFor="capacityMax" className="font-medium text-[#0a2225]">Maximum Capacity</Label>
+                <Input
+                  id="capacityMax"
+                  type="number"
+                  value={formData.capacityMax}
+                  onChange={(e) => setFormData({ ...formData, capacityMax: e.target.value })}
+                  className={luxuryInputClasses}
+                  placeholder="e.g., 100"
+                />
+              </div>
+            </div>
           </div>
         );
 
       case 5:
         return (
           <div className="space-y-6">
-            <Alert>
-              <AlertDescription>
-                High-quality images are essential. Upload your logo, a cover image, and at least 3 gallery images showcasing your brand.
-              </AlertDescription>
-            </Alert>
-
+            <SectionHeader title="Media Assets" />
             <div>
-              <Label>Brand Logo * (Square format recommended)</Label>
+              <Label className="font-medium text-[#0a2225]">Brand Logo * (Square format recommended)</Label>
               <div className="mt-2">
                 {formData.logoUrl ? (
-                  <div className="relative w-48 h-48 border rounded-lg overflow-hidden">
+                  <div className="relative w-32 h-32 border border-[#E5DFC6] rounded-xl overflow-hidden">
                     <img
                       src={formData.logoUrl}
-                      alt="Brand Logo"
-                      className="w-full h-full object-cover"
+                      alt="Logo"
+                      className="w-full h-full object-contain"
                     />
                     <button
                       type="button"
@@ -1001,10 +1028,10 @@ export default function BrandOnboarding() {
                     </button>
                   </div>
                 ) : (
-                  <label className="flex items-center justify-center w-full px-4 py-12 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
+                  <label className="flex items-center justify-center w-full px-4 py-12 border-2 border-dashed border-[#E5DFC6] rounded-xl cursor-pointer hover:bg-[#F5EFE1]/50 transition-colors">
                     <div className="text-center">
-                      <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                      <p className="mt-2 text-sm text-gray-600">Click to upload logo</p>
+                      <Upload className="mx-auto h-12 w-12 text-[#C7A962]" />
+                      <p className="mt-2 text-sm text-[#6B7280]">Click to upload logo</p>
                     </div>
                     <input
                       type="file"
@@ -1019,10 +1046,10 @@ export default function BrandOnboarding() {
             </div>
 
             <div>
-              <Label>Cover Image * (Wide format recommended, 16:9)</Label>
+              <Label className="font-medium text-[#0a2225]">Cover Image * (Wide format recommended, 16:9)</Label>
               <div className="mt-2">
                 {formData.coverImageUrl ? (
-                  <div className="relative w-full h-64 border rounded-lg overflow-hidden">
+                  <div className="relative w-full h-64 border border-[#E5DFC6] rounded-xl overflow-hidden">
                     <img
                       src={formData.coverImageUrl}
                       alt="Cover"
@@ -1037,10 +1064,10 @@ export default function BrandOnboarding() {
                     </button>
                   </div>
                 ) : (
-                  <label className="flex items-center justify-center w-full px-4 py-12 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
+                  <label className="flex items-center justify-center w-full px-4 py-12 border-2 border-dashed border-[#E5DFC6] rounded-xl cursor-pointer hover:bg-[#F5EFE1]/50 transition-colors">
                     <div className="text-center">
-                      <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                      <p className="mt-2 text-sm text-gray-600">Click to upload cover image</p>
+                      <Upload className="mx-auto h-12 w-12 text-[#C7A962]" />
+                      <p className="mt-2 text-sm text-[#6B7280]">Click to upload cover image</p>
                     </div>
                     <input
                       type="file"
@@ -1055,10 +1082,10 @@ export default function BrandOnboarding() {
             </div>
 
             <div>
-              <Label>Gallery Images * (At least 3, maximum 12)</Label>
+              <Label className="font-medium text-[#0a2225]">Gallery Images * (At least 3, maximum 12)</Label>
               <div className="mt-2 grid grid-cols-3 gap-4">
                 {formData.galleryUrls.map((url, index) => (
-                  <div key={index} className="relative aspect-square border rounded-lg overflow-hidden">
+                  <div key={index} className="relative aspect-square border border-[#E5DFC6] rounded-xl overflow-hidden">
                     <img src={url} alt={`Gallery ${index + 1}`} className="w-full h-full object-cover" />
                     <button
                       type="button"
@@ -1071,10 +1098,10 @@ export default function BrandOnboarding() {
                 ))}
 
                 {formData.galleryUrls.length < 12 && (
-                  <label className="flex items-center justify-center aspect-square border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
+                  <label className="flex items-center justify-center aspect-square border-2 border-dashed border-[#E5DFC6] rounded-xl cursor-pointer hover:bg-[#F5EFE1]/50 transition-colors">
                     <div className="text-center">
-                      <Upload className="mx-auto h-8 w-8 text-gray-400" />
-                      <p className="mt-1 text-xs text-gray-600">Add Image</p>
+                      <Upload className="mx-auto h-8 w-8 text-[#C7A962]" />
+                      <p className="mt-1 text-xs text-[#6B7280]">Add Image</p>
                     </div>
                     <input
                       type="file"
@@ -1085,51 +1112,55 @@ export default function BrandOnboarding() {
                   </label>
                 )}
               </div>
-              <p className="text-sm text-gray-500 mt-2">
+              <p className="text-sm text-[#6B7280] mt-2">
                 {formData.galleryUrls.length}/12 images uploaded
               </p>
               {errors.galleryUrls && <p className="text-sm text-red-500 mt-1">{errors.galleryUrls}</p>}
             </div>
 
             <div>
-              <Label>Social Media</Label>
+              <Label className="font-medium text-[#0a2225]">Social Media</Label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
                 <div>
-                  <Label htmlFor="instagramHandle" className="text-sm">Instagram</Label>
+                  <Label htmlFor="instagramHandle" className="text-sm text-[#6B7280]">Instagram</Label>
                   <Input
                     id="instagramHandle"
                     value={formData.instagramHandle}
                     onChange={(e) => setFormData({ ...formData, instagramHandle: e.target.value })}
+                    className={luxuryInputClasses}
                     placeholder="@yourbrand"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="tiktokHandle" className="text-sm">TikTok</Label>
+                  <Label htmlFor="tiktokHandle" className="text-sm text-[#6B7280]">TikTok</Label>
                   <Input
                     id="tiktokHandle"
                     value={formData.tiktokHandle}
                     onChange={(e) => setFormData({ ...formData, tiktokHandle: e.target.value })}
+                    className={luxuryInputClasses}
                     placeholder="@yourbrand"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="facebookUrl" className="text-sm">Facebook</Label>
+                  <Label htmlFor="facebookUrl" className="text-sm text-[#6B7280]">Facebook</Label>
                   <Input
                     id="facebookUrl"
                     value={formData.facebookUrl}
                     onChange={(e) => setFormData({ ...formData, facebookUrl: e.target.value })}
+                    className={luxuryInputClasses}
                     placeholder="https://facebook.com/yourbrand"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="linkedinUrl" className="text-sm">LinkedIn</Label>
+                  <Label htmlFor="linkedinUrl" className="text-sm text-[#6B7280]">LinkedIn</Label>
                   <Input
                     id="linkedinUrl"
                     value={formData.linkedinUrl}
                     onChange={(e) => setFormData({ ...formData, linkedinUrl: e.target.value })}
+                    className={luxuryInputClasses}
                     placeholder="https://linkedin.com/company/yourbrand"
                   />
                 </div>
@@ -1141,16 +1172,17 @@ export default function BrandOnboarding() {
       case 6:
         return (
           <div className="space-y-6">
+            <SectionHeader title="Amenities & Certifications" />
             {['Hotel', 'Resort', 'Villa / Home', 'Boutique Stay'].includes(formData.brandType) ? (
               <>
-                <Alert>
-                  <AlertDescription>
+                <Alert className="bg-[#F5EFE1] border-[#E5DFC6]">
+                  <AlertDescription className="text-[#0a2225]">
                     Select amenities and features that your property offers.
                   </AlertDescription>
                 </Alert>
 
                 <div>
-                  <Label>Amenities * (Select all that apply)</Label>
+                  <Label className="font-medium text-[#0a2225]">Amenities * (Select all that apply)</Label>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
                     {AMENITIES.map((amenity) => (
                       <div key={amenity} className="flex items-center space-x-2">
@@ -1167,8 +1199,9 @@ export default function BrandOnboarding() {
                               });
                             }
                           }}
+                          className="data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47]"
                         />
-                        <label htmlFor={`amenity-${amenity}`} className="text-sm cursor-pointer">
+                        <label htmlFor={`amenity-${amenity}`} className="text-sm cursor-pointer text-[#0a2225]">
                           {amenity}
                         </label>
                       </div>
@@ -1178,18 +1211,18 @@ export default function BrandOnboarding() {
                 </div>
               </>
             ) : (
-              <Alert>
-                <AlertDescription>
+              <Alert className="bg-[#F5EFE1] border-[#E5DFC6]">
+                <AlertDescription className="text-[#0a2225]">
                   Amenity selection is primarily for accommodations. Skip this step or select certifications below.
                 </AlertDescription>
               </Alert>
             )}
 
-            <div className="border-t pt-6">
-              <h3 className="font-semibold mb-4">Certifications & Awards</h3>
+            <div className="border-t border-[#E5DFC6] pt-6">
+              <h3 className="font-secondary text-lg text-[#0a2225] mb-4">Certifications & Awards</h3>
               
               <div>
-                <Label>Sustainability Certifications</Label>
+                <Label className="font-medium text-[#0a2225]">Sustainability Certifications</Label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
                   {SUSTAINABILITY_CERTS.map((cert) => (
                     <div key={cert} className="flex items-center space-x-2">
@@ -1209,8 +1242,9 @@ export default function BrandOnboarding() {
                             });
                           }
                         }}
+                        className="data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47]"
                       />
-                      <label htmlFor={`sustain-${cert}`} className="text-sm cursor-pointer">
+                      <label htmlFor={`sustain-${cert}`} className="text-sm cursor-pointer text-[#0a2225]">
                         {cert}
                       </label>
                     </div>
@@ -1219,7 +1253,7 @@ export default function BrandOnboarding() {
               </div>
 
               <div className="mt-6">
-                <Label>Quality Certifications & Memberships</Label>
+                <Label className="font-medium text-[#0a2225]">Quality Certifications & Memberships</Label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
                   {QUALITY_CERTS.map((cert) => (
                     <div key={cert} className="flex items-center space-x-2">
@@ -1239,8 +1273,9 @@ export default function BrandOnboarding() {
                             });
                           }
                         }}
+                        className="data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47]"
                       />
-                      <label htmlFor={`quality-${cert}`} className="text-sm cursor-pointer">
+                      <label htmlFor={`quality-${cert}`} className="text-sm cursor-pointer text-[#0a2225]">
                         {cert}
                       </label>
                     </div>
@@ -1254,8 +1289,9 @@ export default function BrandOnboarding() {
       case 7:
         return (
           <div className="space-y-6">
-            <Alert>
-              <AlertDescription>
+            <SectionHeader title="Documents" />
+            <Alert className="bg-[#F5EFE1] border-[#E5DFC6]">
+              <AlertDescription className="text-[#0a2225]">
                 Upload required documents: Business License/Registration, Tax Documents, or any certifications mentioned.
                 Accepted formats: PDF, JPEG, PNG. Max size: 10MB per file.
               </AlertDescription>
@@ -1263,12 +1299,12 @@ export default function BrandOnboarding() {
 
             <div className="space-y-4">
               <div>
-                <Label>Business License / Registration *</Label>
+                <Label className="font-medium text-[#0a2225]">Business License / Registration *</Label>
                 <div className="mt-2">
-                  <label className="flex items-center justify-center w-full px-4 py-6 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
+                  <label className="flex items-center justify-center w-full px-4 py-6 border-2 border-dashed border-[#E5DFC6] rounded-xl cursor-pointer hover:bg-[#F5EFE1]/50 transition-colors">
                     <div className="text-center">
-                      <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                      <p className="mt-2 text-sm text-gray-600">Click to upload business documents</p>
+                      <Upload className="mx-auto h-12 w-12 text-[#C7A962]" />
+                      <p className="mt-2 text-sm text-[#6B7280]">Click to upload business documents</p>
                     </div>
                     <input
                       type="file"
@@ -1281,12 +1317,12 @@ export default function BrandOnboarding() {
               </div>
 
               <div>
-                <Label>Tax Documents (Optional)</Label>
+                <Label className="font-medium text-[#0a2225]">Tax Documents (Optional)</Label>
                 <div className="mt-2">
-                  <label className="flex items-center justify-center w-full px-4 py-6 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
+                  <label className="flex items-center justify-center w-full px-4 py-6 border-2 border-dashed border-[#E5DFC6] rounded-xl cursor-pointer hover:bg-[#F5EFE1]/50 transition-colors">
                     <div className="text-center">
-                      <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                      <p className="mt-2 text-sm text-gray-600">Click to upload tax documents</p>
+                      <Upload className="mx-auto h-12 w-12 text-[#C7A962]" />
+                      <p className="mt-2 text-sm text-[#6B7280]">Click to upload tax documents</p>
                     </div>
                     <input
                       type="file"
@@ -1299,12 +1335,12 @@ export default function BrandOnboarding() {
               </div>
 
               <div>
-                <Label>Certifications (Optional)</Label>
+                <Label className="font-medium text-[#0a2225]">Certifications (Optional)</Label>
                 <div className="mt-2">
-                  <label className="flex items-center justify-center w-full px-4 py-6 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
+                  <label className="flex items-center justify-center w-full px-4 py-6 border-2 border-dashed border-[#E5DFC6] rounded-xl cursor-pointer hover:bg-[#F5EFE1]/50 transition-colors">
                     <div className="text-center">
-                      <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                      <p className="mt-2 text-sm text-gray-600">Click to upload certifications</p>
+                      <Upload className="mx-auto h-12 w-12 text-[#C7A962]" />
+                      <p className="mt-2 text-sm text-[#6B7280]">Click to upload certifications</p>
                     </div>
                     <input
                       type="file"
@@ -1318,16 +1354,16 @@ export default function BrandOnboarding() {
             </div>
 
             {uploadedDocuments.length > 0 && (
-              <div className="border rounded-lg p-4">
-                <h4 className="font-semibold mb-3">Uploaded Documents</h4>
+              <div className="border border-[#E5DFC6] rounded-xl p-4">
+                <h4 className="font-secondary text-lg text-[#0a2225] mb-3">Uploaded Documents</h4>
                 <div className="space-y-2">
                   {uploadedDocuments.map((doc, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <div key={index} className="flex items-center justify-between p-3 bg-[#F5EFE1] rounded-lg">
                       <div className="flex items-center space-x-3">
-                        <FileText className="h-5 w-5 text-gray-500" />
+                        <FileText className="h-5 w-5 text-[#C7A962]" />
                         <div>
-                          <p className="text-sm font-medium">{doc.type}</p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-sm font-medium text-[#0a2225]">{doc.type}</p>
+                          <p className="text-xs text-[#6B7280]">
                             {doc.fileName} • {(doc.fileSize / 1024 / 1024).toFixed(2)} MB
                           </p>
                         </div>
@@ -1336,6 +1372,7 @@ export default function BrandOnboarding() {
                         variant="ghost"
                         size="sm"
                         onClick={() => removeDocument(index)}
+                        className="text-[#0a2225] hover:bg-[#E5DFC6]/50"
                       >
                         Remove
                       </Button>
@@ -1352,8 +1389,9 @@ export default function BrandOnboarding() {
       case 8:
         return (
           <div className="space-y-6">
-            <Alert>
-              <AlertDescription>
+            <SectionHeader title="Legal Terms" />
+            <Alert className="bg-[#F5EFE1] border-[#E5DFC6]">
+              <AlertDescription className="text-[#0a2225]">
                 Please review and accept our terms to complete your application.
               </AlertDescription>
             </Alert>
@@ -1364,11 +1402,11 @@ export default function BrandOnboarding() {
                   id="acceptedTerms"
                   checked={formData.acceptedTerms}
                   onCheckedChange={(checked) => setFormData({ ...formData, acceptedTerms: checked as boolean })}
-                  className={errors.acceptedTerms ? 'border-red-500' : ''}
+                  className={`data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47] ${errors.acceptedTerms ? 'border-red-500' : ''}`}
                 />
                 <div className="flex-1">
-                  <label htmlFor="acceptedTerms" className="text-sm font-medium cursor-pointer">
-                    I accept the <a href="/terms" target="_blank" className="text-blue-600 hover:underline">Terms of Service</a> *
+                  <label htmlFor="acceptedTerms" className="text-sm font-medium cursor-pointer text-[#0a2225]">
+                    I accept the <a href="/terms" target="_blank" className="text-[#C7A962] hover:underline">Terms of Service</a> *
                   </label>
                   {errors.acceptedTerms && <p className="text-sm text-red-500 mt-1">{errors.acceptedTerms}</p>}
                 </div>
@@ -1379,11 +1417,11 @@ export default function BrandOnboarding() {
                   id="acceptedPrivacy"
                   checked={formData.acceptedPrivacy}
                   onCheckedChange={(checked) => setFormData({ ...formData, acceptedPrivacy: checked as boolean })}
-                  className={errors.acceptedPrivacy ? 'border-red-500' : ''}
+                  className={`data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47] ${errors.acceptedPrivacy ? 'border-red-500' : ''}`}
                 />
                 <div className="flex-1">
-                  <label htmlFor="acceptedPrivacy" className="text-sm font-medium cursor-pointer">
-                    I accept the <a href="/privacy" target="_blank" className="text-blue-600 hover:underline">Privacy Policy</a> *
+                  <label htmlFor="acceptedPrivacy" className="text-sm font-medium cursor-pointer text-[#0a2225]">
+                    I accept the <a href="/privacy" target="_blank" className="text-[#C7A962] hover:underline">Privacy Policy</a> *
                   </label>
                   {errors.acceptedPrivacy && <p className="text-sm text-red-500 mt-1">{errors.acceptedPrivacy}</p>}
                 </div>
@@ -1394,49 +1432,49 @@ export default function BrandOnboarding() {
                   id="acceptedVendor"
                   checked={formData.acceptedVendor}
                   onCheckedChange={(checked) => setFormData({ ...formData, acceptedVendor: checked as boolean })}
-                  className={errors.acceptedVendor ? 'border-red-500' : ''}
+                  className={`data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47] ${errors.acceptedVendor ? 'border-red-500' : ''}`}
                 />
                 <div className="flex-1">
-                  <label htmlFor="acceptedVendor" className="text-sm font-medium cursor-pointer">
-                    I accept the <a href="/vendor-agreement" target="_blank" className="text-blue-600 hover:underline">Brand Partnership Agreement</a> *
+                  <label htmlFor="acceptedVendor" className="text-sm font-medium cursor-pointer text-[#0a2225]">
+                    I accept the <a href="/vendor-agreement" target="_blank" className="text-[#C7A962] hover:underline">Brand Partnership Agreement</a> *
                   </label>
                   {errors.acceptedVendor && <p className="text-sm text-red-500 mt-1">{errors.acceptedVendor}</p>}
                 </div>
               </div>
             </div>
 
-            <div className="border-t pt-6">
-              <h3 className="font-semibold mb-3">Application Summary</h3>
-              <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
+            <div className="border-t border-[#E5DFC6] pt-6">
+              <h3 className="font-secondary text-lg text-[#0a2225] mb-3">Application Summary</h3>
+              <div className="bg-[#F5EFE1] border border-[#E5DFC6] rounded-xl p-4 space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Brand Name:</span>
-                  <span className="font-medium">{formData.brandName}</span>
+                  <span className="text-[#6B7280]">Brand Name:</span>
+                  <span className="font-medium text-[#0a2225]">{formData.brandName}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Brand Type:</span>
-                  <span className="font-medium">{formData.brandType}</span>
+                  <span className="text-[#6B7280]">Brand Type:</span>
+                  <span className="font-medium text-[#0a2225]">{formData.brandType}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Contact Email:</span>
-                  <span className="font-medium">{formData.primaryContactEmail}</span>
+                  <span className="text-[#6B7280]">Contact Email:</span>
+                  <span className="font-medium text-[#0a2225]">{formData.primaryContactEmail}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Regions:</span>
-                  <span className="font-medium">{formData.regions.length}</span>
+                  <span className="text-[#6B7280]">Regions:</span>
+                  <span className="font-medium text-[#0a2225]">{formData.regions.length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Documents Uploaded:</span>
-                  <span className="font-medium">{uploadedDocuments.length}</span>
+                  <span className="text-[#6B7280]">Documents Uploaded:</span>
+                  <span className="font-medium text-[#0a2225]">{uploadedDocuments.length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Gallery Images:</span>
-                  <span className="font-medium">{formData.galleryUrls.length}</span>
+                  <span className="text-[#6B7280]">Gallery Images:</span>
+                  <span className="font-medium text-[#0a2225]">{formData.galleryUrls.length}</span>
                 </div>
               </div>
             </div>
 
-            <Alert>
-              <AlertDescription>
+            <Alert className="bg-[#F5EFE1] border-[#E5DFC6]">
+              <AlertDescription className="text-[#0a2225]">
                 After submitting, you'll be redirected to verify your identity via Stripe Identity. This is a quick 2-3 minute process. Once verified, our team will review your application within 2-3 business days.
               </AlertDescription>
             </Alert>
@@ -1449,83 +1487,84 @@ export default function BrandOnboarding() {
   };
 
   const totalSteps = 8;
-  const progress = (currentStep / totalSteps) * 100;
+  const stepLabels = ['Contact', 'Brand', 'Business', 'Location', 'Media', 'Amenities', 'Documents', 'Terms'];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-4xl mx-auto px-4">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-3xl">Brand Partnership Application</CardTitle>
-            <CardDescription>
-              Join Goldsainte's curated collection of exceptional travel brands
-            </CardDescription>
-            
-            {/* Progress Bar */}
-            <div className="mt-6">
-              <div className="flex justify-between text-sm text-gray-600 mb-2">
-                <span>Step {currentStep} of {totalSteps}</span>
-                <span>{Math.round(progress)}% Complete</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            </div>
+    <div className="min-h-screen bg-[#FDF9F0] px-4 py-12 md:py-16">
+      <div className="mx-auto max-w-4xl">
+        {/* Luxury Header */}
+        <div className="mb-10 text-center">
+          <h1 className="mb-4 font-secondary text-[26px] md:text-[31px] lg:text-[36px] text-[#0a2225]">
+            List Your Brand on <em>Goldsainte</em>
+          </h1>
+          <p className="text-base text-[#6B7280] max-w-2xl mx-auto leading-relaxed">
+            Join an exclusive collection of design-led hotels, residences, and experience brands. Connect with discerning travelers and collaborate with top creators.
+          </p>
 
-            {/* Step Labels */}
-            <div className="mt-4 grid grid-cols-4 md:grid-cols-8 gap-2 text-xs text-center">
-              {[
-                'Contact',
-                'Brand',
-                'Business',
-                'Location',
-                'Media',
-                'Amenities',
-                'Documents',
-                'Terms'
-              ].map((label, index) => (
-                <div
-                  key={label}
-                  className={`p-2 rounded ${
-                    index + 1 < currentStep
-                      ? 'bg-green-100 text-green-700'
-                      : index + 1 === currentStep
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'bg-gray-100 text-gray-500'
+          {/* Gold Progress Segments */}
+          <div className="flex items-center justify-center gap-2 mt-8">
+            <div className="flex gap-1.5">
+              {[...Array(8)].map((_, i) => (
+                <div 
+                  key={i}
+                  className={`h-1.5 w-6 rounded-full transition-colors ${
+                    i + 1 <= currentStep ? 'bg-[#C7A962]' : 'bg-[#E5DFC6]'
                   }`}
-                >
-                  {index + 1 < currentStep && <CheckCircle className="h-4 w-4 mx-auto mb-1" />}
-                  {label}
-                </div>
+                />
               ))}
             </div>
-          </CardHeader>
+            <span className="text-xs text-[#6B7280] ml-3">Step {currentStep} of 8</span>
+          </div>
 
-          <CardContent>
+          {/* Step Labels */}
+          <div className="mt-6 flex flex-wrap justify-center gap-2">
+            {stepLabels.map((label, index) => (
+              <div
+                key={label}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  index + 1 < currentStep
+                    ? 'bg-[#0c4d47] text-[#E5DFC6]'
+                    : index + 1 === currentStep
+                    ? 'bg-[#C7A962] text-white'
+                    : 'bg-[#E5DFC6] text-[#6B7280]'
+                }`}
+              >
+                {index + 1 < currentStep && <CheckCircle className="h-3 w-3 inline mr-1" />}
+                {label}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Form Card */}
+        <Card className="bg-white border border-[#E5DFC6] rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
+          <CardContent className="p-6 md:p-8">
             {renderStep()}
 
             {/* Navigation Buttons */}
-            <div className="flex justify-between mt-8 pt-6 border-t">
+            <div className="flex justify-between mt-8 pt-6 border-t border-[#E5DFC6]">
               <Button
                 variant="outline"
                 onClick={handleBack}
                 disabled={currentStep === 1 || isSubmitting}
+                className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full px-6"
               >
-                Back
+                <ArrowLeft className="mr-2 h-4 w-4" /> Back
               </Button>
 
               {currentStep < totalSteps ? (
-                <Button onClick={handleNext} disabled={isSubmitting}>
-                  Next
+                <Button 
+                  onClick={handleNext} 
+                  disabled={isSubmitting}
+                  className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8"
+                >
+                  Next <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               ) : (
                 <Button
                   onClick={handleSubmit}
                   disabled={isSubmitting || verificationStatus === 'success'}
-                  className="min-w-[150px]"
+                  className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8 min-w-[150px]"
                 >
                   {isSubmitting ? (
                     <>
