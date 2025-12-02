@@ -199,7 +199,7 @@ export const HowGoldsainteWorksSection: React.FC = () => {
     <section className="bg-[#FDF9F0] px-4 py-16 md:py-24">
       <div className="mx-auto max-w-6xl">
         {/* Section Header */}
-        <div className="mb-10 md:mb-14">
+        <div className="mb-10 md:mb-14 text-center md:text-left">
           <p className="text-xs font-medium uppercase tracking-[0.15em] text-[#8B7D5D] mb-3">
             {t('home.howItWorks.sectionTitle')}
           </p>
@@ -307,14 +307,14 @@ export const TrustSafetyPaymentsSection: React.FC = () => {
   return (
     <section className="bg-[#FDF9F0] px-4 py-16 md:py-24">
       <div className="mx-auto flex max-w-6xl flex-col gap-8">
-        <div className="space-y-3">
+        <div className="space-y-3 text-center md:text-left">
           <p className="text-[11px] uppercase tracking-[0.22em] text-[#7A7151]">
             {t('home.trustSafety.badge')}
           </p>
           <h2 className="font-secondary text-[26px] leading-tight text-[#0a2225] md:text-4xl">
             {t('home.trustSafety.title')}
           </h2>
-          <p className="max-w-lg text-sm text-[#4A4A4A]">
+          <p className="max-w-lg mx-auto md:mx-0 text-sm text-[#4A4A4A]">
             {t('home.trustSafety.description')}
           </p>
         </div>
