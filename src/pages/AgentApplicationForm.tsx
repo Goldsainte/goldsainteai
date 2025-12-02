@@ -930,7 +930,7 @@ export default function AgentApplicationForm() {
       <div className="mx-auto max-w-4xl">
         {/* Luxury Header */}
         <div className="mb-10 text-center">
-          <h1 className="mb-4 font-secondary text-3xl md:text-4xl text-[#0a2225]">
+          <h1 className="mb-4 font-secondary text-[26px] md:text-[31px] lg:text-[36px] text-[#0a2225]">
             Grow Your Luxury Travel Business With <em>Goldsainte</em>
           </h1>
           <p className="text-base text-[#6B7280] max-w-2xl mx-auto leading-relaxed">
