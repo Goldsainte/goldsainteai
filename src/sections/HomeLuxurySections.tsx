@@ -196,7 +196,7 @@ export const HowGoldsainteWorksSection: React.FC = () => {
   const activeAlt = steps.find(s => s.id === activeStep)?.alt || "Mountain bridge adventure";
 
   return (
-    <section className="bg-[#FDF9F0] px-4 py-16 md:py-24">
+    <section className="bg-white px-4 py-16 md:py-24">
       <div className="mx-auto max-w-6xl">
         {/* Section Header */}
         <div className="mb-10 md:mb-14 text-center md:text-left">
