@@ -179,10 +179,10 @@
     },
     "rolesCTA": {
       "title": "Choose how you join Goldsainte",
-      "planMyTrip": {
-        "title": "Plan my trip",
-        "body": "Tell Madison what you're dreaming about and let creators and agents do the heavy lifting.",
-        "button": "Start my trip brief"
+      "traveler": {
+        "title": "Sign up as a traveler",
+        "body": "Create your profile, save inspiration, and let Madison help plan your dream trips.",
+        "button": "Get started"
       },
       "joinAsCreator": {
         "title": "Join as a creator",
@@ -191,8 +191,13 @@
       },
       "applyAsAgent": {
         "title": "Apply as a travel agent",
-        "body": "Share your credentials, specialties and preferred markets. Once verified, you'll receive curated briefs from qualified travelers.",
+        "body": "Share your credentials, specialties and preferred markets. Once verified, you'll receive curated briefs.",
         "button": "Agent application"
+      },
+      "applyAsBrand": {
+        "title": "Partner as a brand",
+        "body": "Hotels, resorts and lifestyle brands — showcase your property to discerning travelers.",
+        "button": "Brand application"
       }
     },
     "rotatingPlaceholders": {

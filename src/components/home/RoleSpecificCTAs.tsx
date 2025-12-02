@@ -1,7 +1,7 @@
 // src/components/home/RoleSpecificCTAs.tsx
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Video, Briefcase } from "lucide-react";
+import { User, Video, Briefcase, Building2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export function RoleSpecificCTAs() {
@@ -9,11 +9,11 @@ export function RoleSpecificCTAs() {
 
   const roles = [
     {
-      icon: Sparkles,
-      title: t('home.rolesCTA.planMyTrip.title'),
-      body: t('home.rolesCTA.planMyTrip.body'),
-      buttonText: t('home.rolesCTA.planMyTrip.button'),
-      link: "/post-trip",
+      icon: User,
+      title: t('home.rolesCTA.traveler.title'),
+      body: t('home.rolesCTA.traveler.body'),
+      buttonText: t('home.rolesCTA.traveler.button'),
+      link: "/auth?mode=signup&role=traveler",
       backgroundImage: "/home/christian-lambert-vmIWr0NnpCQ-unsplash.jpeg",
     },
     {
@@ -32,16 +32,24 @@ export function RoleSpecificCTAs() {
       link: "/apply/agent",
       backgroundImage: "/home/nicolas-meunier-WKGmcxLdXC4-unsplash.jpeg",
     },
+    {
+      icon: Building2,
+      title: t('home.rolesCTA.applyAsBrand.title'),
+      body: t('home.rolesCTA.applyAsBrand.body'),
+      buttonText: t('home.rolesCTA.applyAsBrand.button'),
+      link: "/apply/brand",
+      backgroundImage: "/home/amanoi-vietnam-702398-unsplash.jpeg",
+    },
   ];
 
   return (
-    <section className="bg-white border-t border-[#E5DFC6]/30 py-20 md:py-24">
+    <section className="bg-[#FDF9F0] py-20 md:py-24">
       <div className="mx-auto max-w-6xl px-4">
-        <h2 className="text-center font-display text-[26px] leading-snug text-[#0a2225] md:text-4xl lg:text-[42px] mb-12">
-          {t('home.rolesCTA.title')}
+        <h2 className="text-center font-secondary text-[26px] leading-snug text-[#0a2225] md:text-4xl lg:text-[42px] mb-14">
+          Choose how you join <em>Goldsainte</em>
         </h2>
 
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {roles.map((role, index) => {
             const Icon = role.icon;
             return (
@@ -50,35 +58,35 @@ export function RoleSpecificCTAs() {
                 className="group flex flex-col rounded-2xl border border-[#E5DFC6] bg-white shadow-sm overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
               >
                 {/* Background image banner */}
-                <div className="relative h-32 overflow-hidden">
+                <div className="relative h-44 overflow-hidden">
                   <img
                     src={role.backgroundImage}
                     alt=""
                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                   
                   {/* Icon overlay */}
-                  <div className="absolute bottom-4 left-6">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm shadow-sm">
-                      <Icon className="h-6 w-6 text-[#0c4d47]" />
+                  <div className="absolute bottom-4 left-5">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white border border-[#C7B892]/40 backdrop-blur-sm shadow-sm">
+                      <Icon className="h-5 w-5 text-[#0c4d47]" />
                     </div>
                   </div>
                 </div>
 
                 {/* Content */}
-                <div className="flex flex-col flex-1 p-8">
-                  <h3 className="font-display text-xl text-[#0a2225] mb-3">
+                <div className="flex flex-col flex-1 p-6">
+                  <h3 className="font-secondary text-lg text-[#0a2225] mb-2">
                     {role.title}
                   </h3>
                   
-                  <p className="text-sm leading-[1.7] text-[#4a4a4a] mb-6 flex-1">
+                  <p className="text-sm leading-relaxed text-[#4a4a4a] mb-5 flex-1">
                     {role.body}
                   </p>
 
                   <Button
                     asChild
-                    className="w-full bg-[#0c4d47] text-[#E5DFC6] hover:bg-[#073331] transition-colors duration-300"
+                    className="w-full rounded-full bg-[#0c4d47] text-[#E5DFC6] hover:bg-[#073331] transition-colors duration-300"
                   >
                     <Link to={role.link}>
                       {role.buttonText}
