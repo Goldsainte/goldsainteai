@@ -203,7 +203,7 @@ export const HowGoldsainteWorksSection: React.FC = () => {
           <p className="text-xs font-medium uppercase tracking-[0.15em] text-[#8B7D5D] mb-3">
             {t('home.howItWorks.sectionTitle')}
           </p>
-          <h2 className="font-secondary text-3xl leading-[1.15] text-[#0a2225] md:text-[40px] max-w-xl">
+          <h2 className="font-secondary text-[26px] leading-[1.15] text-[#0a2225] md:text-[40px] max-w-xl">
             {t('home.howItWorks.headline')}
           </h2>
         </div>
@@ -311,7 +311,7 @@ export const TrustSafetyPaymentsSection: React.FC = () => {
           <p className="text-[11px] uppercase tracking-[0.22em] text-[#7A7151]">
             {t('home.trustSafety.badge')}
           </p>
-          <h2 className="font-secondary text-3xl leading-tight text-[#0a2225] md:text-4xl">
+          <h2 className="font-secondary text-[26px] leading-tight text-[#0a2225] md:text-4xl">
             {t('home.trustSafety.title')}
           </h2>
           <p className="max-w-lg text-sm text-[#4A4A4A]">
