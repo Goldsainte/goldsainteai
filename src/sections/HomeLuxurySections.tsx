@@ -28,7 +28,7 @@ export const BuiltForEverySideSection: React.FC = () => {
         {/* LEFT SIDE: COPY + PERSONAS */}
         <div className="space-y-8 md:w-3/5">
           <div className="space-y-3">
-            <p className="inline-flex rounded-full bg-[#0c4d47] px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-[#BFAD72]">
+            <p className="inline-flex rounded-full bg-[#0c4d47] px-3 py-1 text-xs font-medium uppercase tracking-[0.12em] text-[#D4C07A]">
               {t('home.builtForEverySide.badge')}
             </p>
             <h2 className="font-secondary text-3xl leading-tight text-[#0a2225] md:text-4xl">
@@ -128,7 +128,7 @@ type PersonaCardProps = {
 const PersonaCard: React.FC<PersonaCardProps> = ({ label, items }) => {
   return (
     <div className="flex h-full flex-col rounded-[24px] border border-[#E5DFC6] bg-white/80 px-5 py-5">
-      <span className="mb-3 inline-flex w-fit rounded-full bg-[#0c4d47] px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-[#BFAD72]">
+      <span className="mb-3 inline-flex w-fit rounded-full bg-[#0c4d47] px-3 py-1 text-xs font-medium uppercase tracking-[0.12em] text-[#D4C07A]">
         {label}
       </span>
       <ul className="space-y-2 text-[13px] text-[#3F3A33]">
