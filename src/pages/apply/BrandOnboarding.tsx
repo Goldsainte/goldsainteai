@@ -555,18 +555,7 @@ export default function BrandOnboarding() {
 
       if (dbError) throw dbError;
 
-      // Step 3: Log audit event
-      await supabase.from('application_audit_log').insert({
-        application_id: applicationRecord.id,
-        application_type: 'brand',
-        action: 'submitted',
-        actor_type: 'applicant',
-        details: {
-          email: formData.primaryContactEmail,
-          brand_name: formData.brandName,
-          brand_type: formData.brandType
-        }
-      });
+      // Audit logging is now handled in the edge function with service_role permissions
 
       // Step 4: Redirect to Stripe Identity Verification
       setVerificationStatus('success');
