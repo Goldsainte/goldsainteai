@@ -99,6 +99,7 @@ export default function AgentOnboarding() {
             lastName: formData.get('primary_contact_name')?.toString().split(' ').slice(1).join(' ') || 'Agent',
             applicationType: 'agent',
             applicationId: application.id,
+            returnUrl: `${window.location.origin}/application/verification-complete?type=agent`
           },
         });
 
