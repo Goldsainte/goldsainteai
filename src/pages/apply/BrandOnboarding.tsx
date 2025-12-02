@@ -493,7 +493,8 @@ export default function BrandOnboarding() {
             email: formData.primaryContactEmail,
             firstName: formData.primaryContactName.split(' ')[0],
             lastName: formData.primaryContactName.split(' ').slice(1).join(' ') || formData.primaryContactName,
-            applicationType: 'brand'
+            applicationType: 'brand',
+            returnUrl: `${window.location.origin}/application/verification-complete?type=brand`
           }
         }
       );
