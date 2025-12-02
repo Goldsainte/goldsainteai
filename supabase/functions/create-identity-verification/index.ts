@@ -220,7 +220,7 @@ async function checkForDuplicateSession(
 
   const { data, error } = await supabaseClient
     .from(tableName)
-    .select("stripe_session_id, status, submitted_at")
+    .select("stripe_verification_session_id, status, submitted_at")
     .eq(emailField, email)
     .in("status", ["pending_verification", "verified"])
     .gte("submitted_at", thirtyMinutesAgo)
@@ -236,12 +236,12 @@ async function checkForDuplicateSession(
     logger.warn("Found recent verification session", {
       email,
       applicationType,
-      existingSessionId: data[0].stripe_session_id,
+      existingSessionId: data[0].stripe_verification_session_id,
       status: data[0].status,
     });
     return {
       hasDuplicate: true,
-      sessionId: data[0].stripe_session_id,
+      sessionId: data[0].stripe_verification_session_id,
     };
   }
 
