@@ -8,6 +8,8 @@ interface Step7Props {
   setFormData: (data: any) => void;
 }
 
+const luxuryInputClasses = "mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg";
+
 export const Step7Technology = ({ formData, setFormData }: Step7Props) => {
   const videoToolsOptions = ["Zoom", "Microsoft Teams", "Google Meet", "Skype"];
   const aiToolsOptions = ["ChatGPT", "Claude", "Midjourney", "Other AI Tools"];
@@ -43,73 +45,81 @@ export const Step7Technology = ({ formData, setFormData }: Step7Props) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h3 className="mb-4 text-lg font-semibold">Technology & Tools</h3>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="h-8 w-1 bg-[#C7A962] rounded-full" />
+          <h3 className="font-secondary text-xl md:text-2xl text-[#0a2225]">Technology & Tools</h3>
+        </div>
         
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-5 md:grid-cols-2">
           <div>
-            <Label htmlFor="crm">CRM Software</Label>
+            <Label htmlFor="crm" className="text-sm font-medium text-[#0a2225]">CRM Software</Label>
             <Input
               id="crm"
               placeholder="e.g., ClientBase, TravelWorks, Zoho"
               value={formData.crmSoftware || ""}
               onChange={(e) => setFormData({ ...formData, crmSoftware: e.target.value })}
+              className={luxuryInputClasses}
             />
           </div>
 
           <div>
-            <Label htmlFor="bookingPlatform">Primary Booking Platform</Label>
+            <Label htmlFor="bookingPlatform" className="text-sm font-medium text-[#0a2225]">Primary Booking Platform</Label>
             <Input
               id="bookingPlatform"
               placeholder="e.g., Travefy, Axus, Sabre"
               value={formData.bookingPlatform || ""}
               onChange={(e) => setFormData({ ...formData, bookingPlatform: e.target.value })}
+              className={luxuryInputClasses}
             />
           </div>
 
           <div>
-            <Label htmlFor="accounting">Accounting Software</Label>
+            <Label htmlFor="accounting" className="text-sm font-medium text-[#0a2225]">Accounting Software</Label>
             <Input
               id="accounting"
               placeholder="e.g., QuickBooks, Xero, FreshBooks"
               value={formData.accountingSoftware || ""}
               onChange={(e) => setFormData({ ...formData, accountingSoftware: e.target.value })}
+              className={luxuryInputClasses}
             />
           </div>
 
           <div>
-            <Label htmlFor="websitePlatform">Website Platform</Label>
+            <Label htmlFor="websitePlatform" className="text-sm font-medium text-[#0a2225]">Website Platform</Label>
             <Input
               id="websitePlatform"
               placeholder="e.g., WordPress, Wix, Custom"
               value={formData.websitePlatform || ""}
               onChange={(e) => setFormData({ ...formData, websitePlatform: e.target.value })}
+              className={luxuryInputClasses}
             />
           </div>
 
-          <div className="flex items-center space-x-2 mt-6">
+          <div className="flex items-center space-x-3 mt-6">
             <Checkbox
               id="ownBookingEngine"
               checked={formData.hasOwnBookingEngine || false}
               onCheckedChange={(checked) => 
                 setFormData({ ...formData, hasOwnBookingEngine: checked })
               }
+              className="border-[#E5DFC6] data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47]"
             />
-            <Label htmlFor="ownBookingEngine" className="text-sm cursor-pointer">
+            <Label htmlFor="ownBookingEngine" className="text-sm cursor-pointer text-[#0a2225]">
               I have my own online booking engine on my website
             </Label>
           </div>
 
           <div>
-            <Label htmlFor="techComfort">Tech Comfort Level (1-5)</Label>
+            <Label htmlFor="techComfort" className="text-sm font-medium text-[#0a2225]">Tech Comfort Level (1-5)</Label>
             <Select
               value={formData.comfortableWithTechnology?.toString() || ""}
               onValueChange={(value) => 
                 setFormData({ ...formData, comfortableWithTechnology: parseInt(value) })
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className={luxuryInputClasses}>
                 <SelectValue placeholder="Rate your tech comfort" />
               </SelectTrigger>
               <SelectContent>
@@ -122,17 +132,21 @@ export const Step7Technology = ({ formData, setFormData }: Step7Props) => {
             </Select>
           </div>
 
-          <div className="md:col-span-2 border-t pt-4">
-            <h4 className="mb-3 text-base font-semibold">Video Conferencing Tools</h4>
-            <div className="flex flex-wrap gap-3">
+          <div className="md:col-span-2 border-t border-[#E5DFC6] pt-6 mt-2">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-6 w-1 bg-[#C7A962]/60 rounded-full" />
+              <h4 className="font-secondary text-lg text-[#0a2225]">Video Conferencing Tools</h4>
+            </div>
+            <div className="flex flex-wrap gap-4">
               {videoToolsOptions.map((tool) => (
                 <div key={tool} className="flex items-center space-x-2">
                   <Checkbox
                     id={`video-${tool}`}
                     checked={(formData.videoConferencingTools || []).includes(tool)}
                     onCheckedChange={() => toggleVideoTool(tool)}
+                    className="border-[#E5DFC6] data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47]"
                   />
-                  <Label htmlFor={`video-${tool}`} className="text-sm cursor-pointer">
+                  <Label htmlFor={`video-${tool}`} className="text-sm cursor-pointer text-[#0a2225]">
                     {tool}
                   </Label>
                 </div>
@@ -140,20 +154,24 @@ export const Step7Technology = ({ formData, setFormData }: Step7Props) => {
             </div>
           </div>
 
-          <div className="md:col-span-2 border-t pt-4">
-            <h4 className="mb-3 text-base font-semibold">AI Tools Experience</h4>
-            <p className="text-sm text-muted-foreground mb-2">
+          <div className="md:col-span-2 border-t border-[#E5DFC6] pt-6">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="h-6 w-1 bg-[#C7A962]/60 rounded-full" />
+              <h4 className="font-secondary text-lg text-[#0a2225]">AI Tools Experience</h4>
+            </div>
+            <p className="text-sm text-[#6B7280] mb-4 ml-4">
               Do you use AI tools in your travel business?
             </p>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-4">
               {aiToolsOptions.map((tool) => (
                 <div key={tool} className="flex items-center space-x-2">
                   <Checkbox
                     id={`ai-${tool}`}
                     checked={(formData.aiToolsExperience || []).includes(tool)}
                     onCheckedChange={() => toggleAiTool(tool)}
+                    className="border-[#E5DFC6] data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47]"
                   />
-                  <Label htmlFor={`ai-${tool}`} className="text-sm cursor-pointer">
+                  <Label htmlFor={`ai-${tool}`} className="text-sm cursor-pointer text-[#0a2225]">
                     {tool}
                   </Label>
                 </div>

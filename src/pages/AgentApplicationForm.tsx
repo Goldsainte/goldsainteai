@@ -686,79 +686,93 @@ export default function AgentApplicationForm() {
 
 
   const renderStep1 = () => (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* Personal Information Section */}
       <div>
-        <h3 className="mb-4 text-lg font-semibold">Personal Information</h3>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="h-8 w-1 bg-[#C7A962] rounded-full" />
+          <h3 className="font-secondary text-xl md:text-2xl text-[#0a2225]">Personal Information</h3>
+        </div>
+        <div className="grid gap-5 md:grid-cols-2">
           <div>
-            <Label htmlFor="firstName">First Name *</Label>
+            <Label htmlFor="firstName" className="text-sm font-medium text-[#0a2225]">First Name *</Label>
             <Input
               id="firstName"
               value={formData.firstName}
               onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
               required
+              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
             />
           </div>
           <div>
-            <Label htmlFor="lastName">Last Name *</Label>
+            <Label htmlFor="lastName" className="text-sm font-medium text-[#0a2225]">Last Name *</Label>
             <Input
               id="lastName"
               value={formData.lastName}
               onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
               required
+              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
             />
           </div>
           <div>
-            <Label htmlFor="email">Email *</Label>
+            <Label htmlFor="email" className="text-sm font-medium text-[#0a2225]">Email *</Label>
             <Input
               id="email"
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
+              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
             />
           </div>
           <div>
-            <Label htmlFor="phone">Phone *</Label>
+            <Label htmlFor="phone" className="text-sm font-medium text-[#0a2225]">Phone *</Label>
             <Input
               id="phone"
               type="tel"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               required
+              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
             />
           </div>
           <div>
-            <Label htmlFor="dateOfBirth">Date of Birth</Label>
+            <Label htmlFor="dateOfBirth" className="text-sm font-medium text-[#0a2225]">Date of Birth</Label>
             <Input
               id="dateOfBirth"
               type="date"
               value={formData.dateOfBirth}
               onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
             />
           </div>
         </div>
       </div>
 
+      {/* Business Information Section */}
       <div>
-        <h3 className="mb-4 text-lg font-semibold">Business Information</h3>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="h-8 w-1 bg-[#C7A962] rounded-full" />
+          <h3 className="font-secondary text-xl md:text-2xl text-[#0a2225]">Business Information</h3>
+        </div>
+        <div className="grid gap-5 md:grid-cols-2">
           <div>
-            <Label htmlFor="agencyName">Agency Name *</Label>
+            <Label htmlFor="agencyName" className="text-sm font-medium text-[#0a2225]">Agency Name *</Label>
             <Input
               id="agencyName"
               value={formData.agencyName}
               onChange={(e) => setFormData({ ...formData, agencyName: e.target.value })}
               required
+              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
             />
           </div>
           <div>
-            <Label htmlFor="businessType">Business Type *</Label>
+            <Label htmlFor="businessType" className="text-sm font-medium text-[#0a2225]">Business Type *</Label>
             <Select
               value={formData.businessType}
               onValueChange={(value: any) => setFormData({ ...formData, businessType: value })}
             >
-              <SelectTrigger>
+              <SelectTrigger className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg">
                 <SelectValue placeholder="Select business type" />
               </SelectTrigger>
               <SelectContent>
@@ -770,70 +784,80 @@ export default function AgentApplicationForm() {
             </Select>
           </div>
           <div className="md:col-span-2">
-            <Label htmlFor="businessAddress">Business Address</Label>
+            <Label htmlFor="businessAddress" className="text-sm font-medium text-[#0a2225]">Business Address</Label>
             <Input
               id="businessAddress"
               value={formData.businessAddress}
               onChange={(e) => setFormData({ ...formData, businessAddress: e.target.value })}
+              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
             />
           </div>
           <div>
-            <Label htmlFor="businessCity">City</Label>
+            <Label htmlFor="businessCity" className="text-sm font-medium text-[#0a2225]">City</Label>
             <Input
               id="businessCity"
               value={formData.businessCity}
               onChange={(e) => setFormData({ ...formData, businessCity: e.target.value })}
+              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
             />
           </div>
           <div>
-            <Label htmlFor="businessState">State</Label>
+            <Label htmlFor="businessState" className="text-sm font-medium text-[#0a2225]">State</Label>
             <Input
               id="businessState"
               value={formData.businessState}
               onChange={(e) => setFormData({ ...formData, businessState: e.target.value })}
+              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
             />
           </div>
           <div>
-            <Label htmlFor="yearEstablished">Year Established</Label>
+            <Label htmlFor="yearEstablished" className="text-sm font-medium text-[#0a2225]">Year Established</Label>
             <Input
               id="yearEstablished"
               type="number"
               value={formData.yearEstablished}
               onChange={(e) => setFormData({ ...formData, yearEstablished: e.target.value })}
+              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
             />
           </div>
           <div>
-            <Label htmlFor="website">Website</Label>
+            <Label htmlFor="website" className="text-sm font-medium text-[#0a2225]">Website</Label>
             <Input
               id="website"
               type="url"
               value={formData.website}
               onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
             />
           </div>
           <div>
-            <Label htmlFor="businessLicenseNumber">Business License Number *</Label>
+            <Label htmlFor="businessLicenseNumber" className="text-sm font-medium text-[#0a2225]">Business License Number *</Label>
             <Input
               id="businessLicenseNumber"
               value={formData.businessLicenseNumber}
               onChange={(e) => setFormData({ ...formData, businessLicenseNumber: e.target.value })}
               required
+              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
             />
           </div>
           <div>
-            <Label htmlFor="yearsExperience">Years of Experience</Label>
+            <Label htmlFor="yearsExperience" className="text-sm font-medium text-[#0a2225]">Years of Experience</Label>
             <Input
               id="yearsExperience"
               type="number"
               value={formData.yearsExperience}
               onChange={(e) => setFormData({ ...formData, yearsExperience: e.target.value })}
+              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
             />
           </div>
         </div>
       </div>
 
-      <div className="flex justify-end">
-        <Button onClick={() => setStep(2)}>
+      <div className="flex justify-end pt-4">
+        <Button 
+          onClick={() => setStep(2)}
+          className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8"
+        >
           Next <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </div>
@@ -841,24 +865,33 @@ export default function AgentApplicationForm() {
   );
 
   const renderStep11 = () => (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="text-center">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-          <Shield className="h-8 w-8 text-primary" />
+        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#FDF9F0] border border-[#C7A962]/30">
+          <Shield className="h-10 w-10 text-[#C7A962]" />
         </div>
-        <h3 className="mb-2 text-lg font-semibold">Identity Verification Required</h3>
-        <p className="text-sm text-muted-foreground mb-6">
+        <h3 className="mb-3 font-secondary text-2xl text-[#0a2225]">Identity Verification Required</h3>
+        <p className="text-base text-[#6B7280] max-w-md mx-auto">
           All travel agents must complete identity verification through Stripe Identity.
-          This is required under Goldsainte's trust & safety policy and typically takes 2-3 minutes.
+          This is required under <em className="font-secondary">Goldsainte's</em> trust & safety policy and typically takes 2-3 minutes.
         </p>
       </div>
 
-      <div className="rounded-lg border bg-muted/50 p-4">
-        <h4 className="mb-2 text-sm font-semibold">What you'll need:</h4>
-        <ul className="space-y-1 text-xs text-muted-foreground">
-          <li>• Government-issued photo ID (passport, driver's license, or ID card)</li>
-          <li>• Device with camera for selfie verification</li>
-          <li>• 2-3 minutes to complete the process</li>
+      <div className="rounded-xl border border-[#E5DFC6] bg-[#FDF9F0]/50 p-6">
+        <h4 className="mb-3 text-sm font-semibold text-[#0a2225]">What you'll need:</h4>
+        <ul className="space-y-2 text-sm text-[#6B7280]">
+          <li className="flex items-center gap-2">
+            <div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />
+            Government-issued photo ID (passport, driver's license, or ID card)
+          </li>
+          <li className="flex items-center gap-2">
+            <div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />
+            Device with camera for selfie verification
+          </li>
+          <li className="flex items-center gap-2">
+            <div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />
+            2-3 minutes to complete the process
+          </li>
         </ul>
       </div>
 
@@ -866,125 +899,142 @@ export default function AgentApplicationForm() {
         type="button"
         onClick={startStripeVerification}
         disabled={isLoading}
-        className="w-full"
+        className="w-full bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full min-h-[52px] text-base"
         size="lg"
       >
         {isLoading ? (
           <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
             Setting up verification...
           </>
         ) : (
           <>
-            <Shield className="mr-2 h-4 w-4" />
+            <Shield className="mr-2 h-5 w-5" />
             Start Identity Verification
           </>
         )}
       </Button>
 
-      <p className="text-center text-xs text-muted-foreground">
-        Your information is secure and encrypted. Goldsainte uses Stripe Identity
+      <p className="text-center text-xs text-[#9A9079]">
+        Your information is secure and encrypted. <em className="font-secondary">Goldsainte</em> uses Stripe Identity
         for verification and does not store your government ID.
       </p>
     </div>
   );
 
+  // Luxury input styling
+  const luxuryInputClasses = "min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg";
+
   return (
-    <div className="min-h-screen bg-background px-4 py-12">
+    <div className="min-h-screen bg-[#FDF9F0] px-4 py-12 md:py-16">
       <div className="mx-auto max-w-4xl">
-        <div className="mb-8 text-center">
-          <h1 className="mb-2 font-serif text-3xl font-semibold">
+        {/* Luxury Header */}
+        <div className="mb-10 text-center">
+          <h1 className="mb-3 font-secondary text-3xl md:text-4xl text-[#0a2225]">
             Travel Agent Application
           </h1>
-          <p className="text-sm text-muted-foreground">
-            Join Goldsainte's exclusive network of luxury travel professionals
+          <p className="text-base text-[#6B7280]">
+            Join <em className="font-secondary">Goldsainte's</em> exclusive network of luxury travel professionals
           </p>
-          <div className="mx-auto mt-4 text-center">
-            <p className="text-xs text-muted-foreground">Step {step} of 11</p>
+          
+          {/* Gold Progress Bar */}
+          <div className="flex items-center justify-center gap-2 mt-8">
+            <div className="flex gap-1.5">
+              {[...Array(11)].map((_, i) => (
+                <div 
+                  key={i}
+                  className={`h-1.5 w-6 rounded-full transition-colors ${
+                    i + 1 <= step ? 'bg-[#C7A962]' : 'bg-[#E5DFC6]'
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="text-xs text-[#6B7280] ml-3">Step {step} of 11</span>
           </div>
         </div>
 
-        <Card>
-          <CardContent className="p-8">
+        {/* Luxury Card Container */}
+        <Card className="bg-white border border-[#E5DFC6] rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
+          <CardContent className="p-6 md:p-10">
             {step === 1 && renderStep1()}
             {step === 2 && (
               <>
                 <Step2BusinessCompliance formData={formData} setFormData={setFormData} />
-                <div className="flex justify-between mt-6">
-                  <Button variant="outline" onClick={() => setStep(1)}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={() => setStep(3)}>Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                <div className="flex justify-between mt-8 pt-4 border-t border-[#E5DFC6]">
+                  <Button variant="outline" onClick={() => setStep(1)} className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full px-6"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={() => setStep(3)} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
                 </div>
               </>
             )}
             {step === 3 && (
               <>
                 <Step3ProfessionalCredentials formData={formData} setFormData={setFormData} />
-                <div className="flex justify-between mt-6">
-                  <Button variant="outline" onClick={() => setStep(2)}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={() => setStep(4)}>Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                <div className="flex justify-between mt-8 pt-4 border-t border-[#E5DFC6]">
+                  <Button variant="outline" onClick={() => setStep(2)} className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full px-6"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={() => setStep(4)} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
                 </div>
               </>
             )}
             {step === 4 && (
               <>
                 <Step4ExperienceExpertise formData={formData} setFormData={setFormData} />
-                <div className="flex justify-between mt-6">
-                  <Button variant="outline" onClick={() => setStep(3)}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={() => setStep(5)}>Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                <div className="flex justify-between mt-8 pt-4 border-t border-[#E5DFC6]">
+                  <Button variant="outline" onClick={() => setStep(3)} className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full px-6"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={() => setStep(5)} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
                 </div>
               </>
             )}
             {step === 5 && (
               <>
                 <Step5ClientSales formData={formData} setFormData={setFormData} />
-                <div className="flex justify-between mt-6">
-                  <Button variant="outline" onClick={() => setStep(4)}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={() => setStep(6)}>Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                <div className="flex justify-between mt-8 pt-4 border-t border-[#E5DFC6]">
+                  <Button variant="outline" onClick={() => setStep(4)} className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full px-6"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={() => setStep(6)} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
                 </div>
               </>
             )}
             {step === 6 && (
               <>
                 <Step6OnlinePresence formData={formData} setFormData={setFormData} />
-                <div className="flex justify-between mt-6">
-                  <Button variant="outline" onClick={() => setStep(5)}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={() => setStep(7)}>Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                <div className="flex justify-between mt-8 pt-4 border-t border-[#E5DFC6]">
+                  <Button variant="outline" onClick={() => setStep(5)} className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full px-6"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={() => setStep(7)} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
                 </div>
               </>
             )}
             {step === 7 && (
               <>
                 <Step7Technology formData={formData} setFormData={setFormData} />
-                <div className="flex justify-between mt-6">
-                  <Button variant="outline" onClick={() => setStep(6)}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={() => setStep(8)}>Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                <div className="flex justify-between mt-8 pt-4 border-t border-[#E5DFC6]">
+                  <Button variant="outline" onClick={() => setStep(6)} className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full px-6"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={() => setStep(8)} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
                 </div>
               </>
             )}
             {step === 8 && (
               <>
                 <Step8EmergencyLegal formData={formData} setFormData={setFormData} />
-                <div className="flex justify-between mt-6">
-                  <Button variant="outline" onClick={() => setStep(7)}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={() => setStep(9)}>Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                <div className="flex justify-between mt-8 pt-4 border-t border-[#E5DFC6]">
+                  <Button variant="outline" onClick={() => setStep(7)} className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full px-6"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={() => setStep(9)} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
                 </div>
               </>
             )}
             {step === 9 && (
               <>
                 <Step9Financial formData={formData} setFormData={setFormData} />
-                <div className="flex justify-between mt-6">
-                  <Button variant="outline" onClick={() => setStep(8)}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={() => setStep(10)}>Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                <div className="flex justify-between mt-8 pt-4 border-t border-[#E5DFC6]">
+                  <Button variant="outline" onClick={() => setStep(8)} className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full px-6"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={() => setStep(10)} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
                 </div>
               </>
             )}
             {step === 10 && (
               <>
                 <Step10Documents formData={formData} setFormData={setFormData} />
-                <div className="flex justify-between mt-6">
-                  <Button variant="outline" onClick={() => setStep(9)}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={saveDraftApplication} disabled={isLoading}>
+                <div className="flex justify-between mt-8 pt-4 border-t border-[#E5DFC6]">
+                  <Button variant="outline" onClick={() => setStep(9)} className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full px-6"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={saveDraftApplication} disabled={isLoading} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8">
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
