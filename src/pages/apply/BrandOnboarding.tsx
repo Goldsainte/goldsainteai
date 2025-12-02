@@ -542,7 +542,7 @@ export default function BrandOnboarding() {
         tax_id: formData.taxId,
         vat_number: formData.vatNumber,
         documents: uploadedDocuments,
-        stripe_session_id: sessionId,
+        stripe_verification_session_id: sessionId,
         stripe_verification_status: 'pending',
         submitted_at: new Date().toISOString()
       };
