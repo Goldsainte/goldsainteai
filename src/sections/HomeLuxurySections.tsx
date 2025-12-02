@@ -37,7 +37,7 @@ export const BuiltForEverySideSection: React.FC = () => {
             <p className="inline-flex rounded-full bg-[#0c4d47] px-2 md:px-3 py-1 text-[10px] md:text-xs font-medium uppercase tracking-[0.06em] md:tracking-[0.12em] text-[#D4C07A] whitespace-nowrap">
               {t('home.builtForEverySide.badge')}
             </p>
-            <h2 className="font-secondary text-3xl leading-tight text-[#0a2225] md:text-4xl">
+            <h2 className="font-secondary text-[26px] leading-tight text-[#0a2225] md:text-4xl">
               {t('home.builtForEverySide.title')}
             </h2>
             <p className="max-w-md mx-auto md:mx-0 text-sm text-[#4A4A4A]">
