@@ -367,13 +367,13 @@ export default function BrandOnboarding() {
       const filePath = `brand-media/${imageType}/${fileName}`;
 
       const { data, error } = await supabase.storage
-        .from('brands')
+        .from('brand-collections')
         .upload(filePath, file);
 
       if (error) throw error;
 
       const { data: urlData } = supabase.storage
-        .from('brands')
+        .from('brand-collections')
         .getPublicUrl(filePath);
 
       if (imageType === 'logo') {
@@ -428,13 +428,13 @@ export default function BrandOnboarding() {
       const filePath = `brand-documents/${fileName}`;
 
       const { data, error } = await supabase.storage
-        .from('applications')
+        .from('application-documents')
         .upload(filePath, file);
 
       if (error) throw error;
 
       const { data: urlData } = supabase.storage
-        .from('applications')
+        .from('application-documents')
         .getPublicUrl(filePath);
 
       const newDocument: UploadedDocument = {
