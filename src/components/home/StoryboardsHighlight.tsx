@@ -95,7 +95,7 @@ export function StoryboardsHighlight() {
           {sampleStoryboards.map((storyboard) => (
             <Link
               key={storyboard.id}
-              to={`/concierge?destination=${encodeURIComponent(storyboard.destination)}&context=${encodeURIComponent(storyboard.title)}&nights=${storyboard.durationNights}&vibes=${encodeURIComponent(storyboard.vibeTags.join(','))}`}
+              to={`/post-trip?from=collection&destination=${encodeURIComponent(storyboard.destination)}&title=${encodeURIComponent(storyboard.title)}&nights=${storyboard.durationNights}&vibes=${encodeURIComponent(storyboard.vibeTags.join(','))}`}
               className="group overflow-hidden rounded-xl md:rounded-2xl bg-white shadow-sm border border-[#E5DFC6] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer"
             >
               {/* Image with gradient and badge */}
