@@ -146,20 +146,6 @@ export type Database = {
             foreignKeyName: "admin_users_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "admin_users_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "admin_users_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -2433,20 +2419,6 @@ export type Database = {
             foreignKeyName: "brand_collections_brand_profile_id_fkey"
             columns: ["brand_profile_id"]
             isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "brand_collections_brand_profile_id_fkey"
-            columns: ["brand_profile_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "brand_collections_brand_profile_id_fkey"
-            columns: ["brand_profile_id"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -2485,20 +2457,6 @@ export type Database = {
           trip_inquiry_count?: number
         }
         Relationships: [
-          {
-            foreignKeyName: "brand_engagement_daily_stats_brand_profile_id_fkey"
-            columns: ["brand_profile_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "brand_engagement_daily_stats_brand_profile_id_fkey"
-            columns: ["brand_profile_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
           {
             foreignKeyName: "brand_engagement_daily_stats_brand_profile_id_fkey"
             columns: ["brand_profile_id"]
@@ -2547,20 +2505,6 @@ export type Database = {
           metadata?: Json
         }
         Relationships: [
-          {
-            foreignKeyName: "brand_engagement_events_brand_profile_id_fkey"
-            columns: ["brand_profile_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "brand_engagement_events_brand_profile_id_fkey"
-            columns: ["brand_profile_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
           {
             foreignKeyName: "brand_engagement_events_brand_profile_id_fkey"
             columns: ["brand_profile_id"]
@@ -3118,20 +3062,6 @@ export type Database = {
             foreignKeyName: "commission_payout_requests_processed_by_fkey"
             columns: ["processed_by"]
             isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "commission_payout_requests_processed_by_fkey"
-            columns: ["processed_by"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "commission_payout_requests_processed_by_fkey"
-            columns: ["processed_by"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -3141,20 +3071,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "commission_payout_requests_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "commission_payout_requests_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "commission_payout_requests_user_id_fkey"
@@ -3275,20 +3191,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "concierge_sessions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "concierge_sessions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
           {
             foreignKeyName: "concierge_sessions_user_id_fkey"
             columns: ["user_id"]
@@ -4050,20 +3952,6 @@ export type Database = {
             foreignKeyName: "direct_messages_sender_id_fkey"
             columns: ["sender_id"]
             isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "direct_messages_sender_id_fkey"
-            columns: ["sender_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "direct_messages_sender_id_fkey"
-            columns: ["sender_id"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -4199,20 +4087,6 @@ export type Database = {
             foreignKeyName: "dm_conversations_initiated_by_fkey"
             columns: ["initiated_by"]
             isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "dm_conversations_initiated_by_fkey"
-            columns: ["initiated_by"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "dm_conversations_initiated_by_fkey"
-            columns: ["initiated_by"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -4227,20 +4101,6 @@ export type Database = {
             foreignKeyName: "dm_conversations_participant_1_fkey"
             columns: ["participant_1"]
             isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "dm_conversations_participant_1_fkey"
-            columns: ["participant_1"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "dm_conversations_participant_1_fkey"
-            columns: ["participant_1"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -4250,20 +4110,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dm_conversations_participant_2_fkey"
-            columns: ["participant_2"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "dm_conversations_participant_2_fkey"
-            columns: ["participant_2"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "dm_conversations_participant_2_fkey"
@@ -4501,20 +4347,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "favorites_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "favorites_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
           {
             foreignKeyName: "favorites_user_id_fkey"
             columns: ["user_id"]
@@ -5859,20 +5691,6 @@ export type Database = {
             foreignKeyName: "message_settings_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "message_settings_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "message_settings_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -6234,20 +6052,6 @@ export type Database = {
           view_count?: number | null
         }
         Relationships: [
-          {
-            foreignKeyName: "moments_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "moments_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
           {
             foreignKeyName: "moments_user_id_fkey"
             columns: ["user_id"]
@@ -7018,20 +6822,6 @@ export type Database = {
             foreignKeyName: "packaged_trips_creator_id_fkey"
             columns: ["creator_id"]
             isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "packaged_trips_creator_id_fkey"
-            columns: ["creator_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "packaged_trips_creator_id_fkey"
-            columns: ["creator_id"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -7086,20 +6876,6 @@ export type Database = {
             foreignKeyName: "paid_partnerships_brand_id_fkey"
             columns: ["brand_id"]
             isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "paid_partnerships_brand_id_fkey"
-            columns: ["brand_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "paid_partnerships_brand_id_fkey"
-            columns: ["brand_id"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -7109,20 +6885,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "paid_partnerships_creator_id_fkey"
-            columns: ["creator_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "paid_partnerships_creator_id_fkey"
-            columns: ["creator_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "paid_partnerships_creator_id_fkey"
@@ -8848,20 +8610,6 @@ export type Database = {
             foreignKeyName: "shared_commission_bookings_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "shared_commission_bookings_customer_id_fkey"
-            columns: ["customer_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "shared_commission_bookings_customer_id_fkey"
-            columns: ["customer_id"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -10399,20 +10147,6 @@ export type Database = {
             foreignKeyName: "trip_contracts_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "trip_contracts_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "trip_contracts_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -10427,20 +10161,6 @@ export type Database = {
             foreignKeyName: "trip_contracts_creator_id_fkey"
             columns: ["creator_id"]
             isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "trip_contracts_creator_id_fkey"
-            columns: ["creator_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "trip_contracts_creator_id_fkey"
-            columns: ["creator_id"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -10450,20 +10170,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trip_contracts_traveler_id_fkey"
-            columns: ["traveler_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "trip_contracts_traveler_id_fkey"
-            columns: ["traveler_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "trip_contracts_traveler_id_fkey"
@@ -11018,20 +10724,6 @@ export type Database = {
             foreignKeyName: "trip_request_assignments_assignee_profile_id_fkey"
             columns: ["assignee_profile_id"]
             isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "trip_request_assignments_assignee_profile_id_fkey"
-            columns: ["assignee_profile_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "trip_request_assignments_assignee_profile_id_fkey"
-            columns: ["assignee_profile_id"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -11079,20 +10771,6 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "trip_request_matches_candidate_profile_id_fkey"
-            columns: ["candidate_profile_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "trip_request_matches_candidate_profile_id_fkey"
-            columns: ["candidate_profile_id"]
-            isOneToOne: false
-            referencedRelation: "brand_profiles_discovery"
-            referencedColumns: ["user_id"]
-          },
           {
             foreignKeyName: "trip_request_matches_candidate_profile_id_fkey"
             columns: ["candidate_profile_id"]
@@ -11321,6 +10999,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "brand_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_requests_source_brand_profile_id_fkey"
+            columns: ["source_brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "brand_profiles_discovery"
+            referencedColumns: ["profile_id"]
           },
         ]
       }
@@ -13113,22 +12798,58 @@ export type Database = {
       }
       brand_profiles_discovery: {
         Row: {
-          account_type: string | null
           avatar_url: string | null
           bio: string | null
+          brand_type: string | null
           categories: string[] | null
-          country: string | null
+          cover_image_url: string | null
           created_at: string | null
+          is_featured: boolean | null
           name: string | null
           profile_id: string | null
           regions: string[] | null
-          supplier_name: string | null
+          status: string | null
           supplier_rating: number | null
           supplier_reviews: number | null
           supplier_type: string | null
-          supplier_verified: boolean | null
           tags: string[] | null
           user_id: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          brand_type?: string | null
+          categories?: string[] | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          is_featured?: boolean | null
+          name?: string | null
+          profile_id?: string | null
+          regions?: string[] | null
+          status?: string | null
+          supplier_rating?: number | null
+          supplier_reviews?: number | null
+          supplier_type?: string | null
+          tags?: string[] | null
+          user_id?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          brand_type?: string | null
+          categories?: string[] | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          is_featured?: boolean | null
+          name?: string | null
+          profile_id?: string | null
+          regions?: string[] | null
+          status?: string | null
+          supplier_rating?: number | null
+          supplier_reviews?: number | null
+          supplier_type?: string | null
+          tags?: string[] | null
+          user_id?: string | null
         }
         Relationships: []
       }

@@ -79,11 +79,11 @@ Deno.serve(async (req) => {
       });
     }
 
-    // 2) Load candidate brands
+    // 2) Load candidate brands with brand_type and cover_image_url
     const { data: brands, error: brandsError } = await supabase
       .from("brand_profiles_discovery")
       .select(
-        "profile_id, name, avatar_url, bio, categories, regions, tags, supplier_type, supplier_rating, supplier_reviews"
+        "profile_id, name, avatar_url, cover_image_url, bio, brand_type, categories, regions, tags, supplier_type, supplier_rating, supplier_reviews"
       )
       .limit(200);
 
