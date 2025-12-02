@@ -547,11 +547,9 @@ export default function BrandOnboarding() {
         submitted_at: new Date().toISOString()
       };
 
-      const { data: applicationRecord, error: dbError } = await supabase
+      const { error: dbError } = await supabase
         .from('brand_applications')
-        .insert(applicationData as any)
-        .select()
-        .single();
+        .insert(applicationData as any);
 
       if (dbError) throw dbError;
 
