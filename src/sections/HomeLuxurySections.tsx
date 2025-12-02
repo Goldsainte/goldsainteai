@@ -33,14 +33,14 @@ export const BuiltForEverySideSection: React.FC = () => {
       <div className="mx-auto flex max-w-6xl flex-col gap-10 md:flex-row md:items-center">
         {/* LEFT SIDE: COPY + PERSONAS */}
         <div className="space-y-8 md:w-3/5">
-          <div className="space-y-3">
+          <div className="space-y-3 text-center md:text-left">
             <p className="inline-flex rounded-full bg-[#0c4d47] px-2 md:px-3 py-1 text-[10px] md:text-xs font-medium uppercase tracking-[0.06em] md:tracking-[0.12em] text-[#D4C07A] whitespace-nowrap">
               {t('home.builtForEverySide.badge')}
             </p>
             <h2 className="font-secondary text-3xl leading-tight text-[#0a2225] md:text-4xl">
               {t('home.builtForEverySide.title')}
             </h2>
-            <p className="max-w-md text-sm text-[#4A4A4A]">
+            <p className="max-w-md mx-auto md:mx-0 text-sm text-[#4A4A4A]">
               {t('home.builtForEverySide.description')}
             </p>
           </div>
