@@ -1,18 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import { OptimizedImage } from "@/components/OptimizedImage";
 import { useTranslation } from "react-i18next";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 // Real images from assets
 import heroMain from "@/assets/sections/built-for-every-side-main.jpg";
 import heroRightTop from "@/assets/resort-pool-palms.jpg";
 import heroRightBottom from "@/assets/elephants-safari.jpg";
 
-// Luxury editorial photography for "How Goldsainte AI works"
-import aiStep1 from "@/assets/luxury-infinity-pool.jpg";
-import aiStep2 from "@/assets/luxury-venice-sunset.jpg";
-import aiStep3 from "@/assets/creator-beach-selfie.jpg";
-import aiStep4 from "@/assets/luxury-tropical-hideaway.jpg";
+// Luxury editorial photography for "How Goldsainte AI works" accordion
+import santoriniStepsImg from "@/assets/santorini-steps.jpg";
+import veniceGondolaImg from "@/assets/venice-gondola.jpg";
+import hotAirBalloonsImg from "@/assets/hot-air-balloons.jpg";
+import tropicalAerialImg from "@/assets/tropical-islands-aerial.jpg";
+import mountainBridgeImg from "@/assets/mountain-bridge-adventure.jpg";
 
 /* -------------------------------------------------------------------------- */
 /*  Built for every side of luxury travel                                     */
@@ -148,109 +155,123 @@ const PersonaCard: React.FC<PersonaCardProps> = ({ label, items }) => {
 
 export const HowGoldsainteWorksSection: React.FC = () => {
   const { t } = useTranslation();
+  const [activeStep, setActiveStep] = useState("step-1");
 
   const steps = [
     {
-      id: "1",
+      id: "step-1",
+      number: "01",
       label: "Share your inspiration",
-      title: t('home.howItWorks.step1.title'),
       body: t('home.howItWorks.step1.body'),
-      image: aiStep1,
-      alt: "Infinity pool overlooking tropical paradise",
+      image: santoriniStepsImg,
+      alt: "Santorini steps overlooking the sea",
     },
     {
-      id: "2",
+      id: "step-2",
+      number: "02",
       label: "Madison drafts your storyboard",
-      title: t('home.howItWorks.step2.title'),
       body: t('home.howItWorks.step2.body'),
-      image: aiStep2,
-      alt: "Romantic sunset over Venice canals",
+      image: veniceGondolaImg,
+      alt: "Venice gondola on serene canals",
     },
     {
-      id: "3",
+      id: "step-3",
+      number: "03",
       label: "Creators and agents collaborate",
-      title: t('home.howItWorks.step3.title'),
       body: t('home.howItWorks.step3.body'),
-      image: aiStep3,
-      alt: "Creator capturing beach moment",
+      image: hotAirBalloonsImg,
+      alt: "Hot air balloons over scenic landscape",
     },
     {
-      id: "4",
+      id: "step-4",
+      number: "04",
       label: "Review, chat & book",
-      title: t('home.howItWorks.step4.title'),
       body: t('home.howItWorks.step4.body'),
-      image: aiStep4,
-      alt: "Secluded tropical hideaway retreat",
+      image: tropicalAerialImg,
+      alt: "Tropical islands aerial view",
     },
   ];
 
+  const activeImage = steps.find(s => s.id === activeStep)?.image || mountainBridgeImg;
+  const activeAlt = steps.find(s => s.id === activeStep)?.alt || "Mountain bridge adventure";
+
   return (
-    <section className="bg-[#FDF9F0] px-4 py-20 md:py-32">
+    <section className="bg-[#FDF9F0] px-4 py-16 md:py-24">
       <div className="mx-auto max-w-6xl">
-        {/* Section Header - Editorial Style */}
-        <div className="mb-16 md:mb-24 max-w-2xl">
-          <p className="text-xs font-medium uppercase tracking-[0.15em] text-[#8B7D5D] mb-4">
+        {/* Section Header */}
+        <div className="mb-10 md:mb-14">
+          <p className="text-xs font-medium uppercase tracking-[0.15em] text-[#8B7D5D] mb-3">
             {t('home.howItWorks.sectionTitle')}
           </p>
-          <h2 className="font-secondary text-3xl leading-[1.15] text-[#0a2225] md:text-[44px] mb-5">
+          <h2 className="font-secondary text-3xl leading-[1.15] text-[#0a2225] md:text-[40px] max-w-xl">
             {t('home.howItWorks.headline')}
           </h2>
-          <p className="text-[15px] leading-relaxed text-[#5A5A5A] max-w-lg">
-            {t('home.howItWorks.description')}
-          </p>
         </div>
 
-        {/* Steps - Staggered Editorial Layout */}
-        <div className="space-y-16 md:space-y-28">
-          {steps.map((step, index) => {
-            const isEven = index % 2 === 0;
-            
-            return (
-              <div
-                key={step.id}
-                className={cn(
-                  "flex flex-col gap-8 md:gap-16 md:items-center",
-                  isEven ? "md:flex-row" : "md:flex-row-reverse"
-                )}
-              >
-                {/* Large Editorial Image */}
-                <div className="w-full md:w-[55%]">
-                  <div className="overflow-hidden rounded-3xl border border-[#E8E0D0] shadow-[0_20px_50px_rgba(10,34,37,0.12)]">
-                    <OptimizedImage
-                      src={step.image}
-                      alt={step.alt}
-                      className="aspect-[4/3] w-full object-cover"
-                      priority={index === 0}
-                      sizes="(max-width: 768px) 100vw, 55vw"
-                    />
-                  </div>
-                </div>
+        {/* Two Column Layout: Image + Accordion */}
+        <div className="flex flex-col-reverse gap-8 md:flex-row md:gap-12 lg:gap-16">
+          {/* LEFT: Dynamic Image with Crossfade */}
+          <div className="w-full md:w-[55%] lg:w-[58%]">
+            <div className="relative aspect-[4/5] md:aspect-[3/4] overflow-hidden rounded-2xl shadow-[0_12px_40px_rgba(10,34,37,0.12)]">
+              {steps.map((step) => (
+                <img
+                  key={step.id}
+                  src={step.image}
+                  alt={step.alt}
+                  className={cn(
+                    "absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-in-out",
+                    activeStep === step.id ? "opacity-100" : "opacity-0"
+                  )}
+                />
+              ))}
+            </div>
+          </div>
 
-                {/* Text Content */}
-                <div className={cn(
-                  "w-full md:w-[45%] space-y-4",
-                  isEven ? "md:pl-4" : "md:pr-4"
-                )}>
-                  {/* Elegant Step Indicator */}
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl font-light text-[#C7B892]">{step.id}</span>
-                    <span className="text-[#C7B892]">·</span>
-                    <span className="text-[11px] uppercase tracking-[0.15em] text-[#8B7D5D]">
-                      Step {step.id.toLowerCase()}
-                    </span>
-                  </div>
-                  
-                  <h3 className="font-secondary text-2xl leading-snug text-[#0a2225] md:text-[28px]">
-                    {step.title}
-                  </h3>
-                  
-                  <p className="text-[15px] leading-[1.7] text-[#5A5A5A]">
-                    {step.body}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
+          {/* RIGHT: Accordion */}
+          <div className="w-full md:w-[45%] lg:w-[42%]">
+            <Accordion
+              type="single"
+              collapsible
+              value={activeStep}
+              onValueChange={(value) => value && setActiveStep(value)}
+              className="space-y-0"
+            >
+              {steps.map((step) => (
+                <AccordionItem
+                  key={step.id}
+                  value={step.id}
+                  className="border-b border-[#E5DFC6] first:border-t-0 last:border-b-0"
+                >
+                  <AccordionTrigger className="py-5 hover:no-underline group [&[data-state=open]>svg]:text-[#C7B892]">
+                    <div className="flex items-center gap-4 text-left">
+                      <span className={cn(
+                        "text-xl font-light transition-colors duration-300",
+                        activeStep === step.id ? "text-[#0a2225]" : "text-[#C7B892]"
+                      )}>
+                        {step.number}
+                      </span>
+                      <span className={cn(
+                        "font-secondary text-lg transition-colors duration-300",
+                        activeStep === step.id ? "text-[#0a2225]" : "text-[#6B6B6B]"
+                      )}>
+                        {step.label}
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-5 pl-10 pr-4">
+                    <p className="text-[15px] leading-[1.7] text-[#5A5A5A]">
+                      {step.body}
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+
+            {/* Subtle footer note */}
+            <p className="mt-8 text-[13px] leading-relaxed text-[#8B8B8B] max-w-sm">
+              {t('home.howItWorks.description')}
+            </p>
+          </div>
         </div>
       </div>
     </section>
