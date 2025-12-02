@@ -473,7 +473,7 @@ export const Header = () => {
                                     onClick={() => navigate(item.path)}
                                     className="mx-2 px-4 py-3 min-h-[44px] cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                                   >
-                                    <span className="text-sm font-semibold text-secondary">{item.label}</span>
+                                    <span className="text-sm font-semibold text-[#0c4d47]">{item.label}</span>
                                   </DropdownMenuItem>
                                 ))}
                               </div>
@@ -813,7 +813,7 @@ export const Header = () => {
                                   onClick={() => navigate(item.path)}
                                   className="mx-2 px-4 py-3 min-h-[44px] cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 touch-manipulation"
                                 >
-                                  <span className="text-sm font-semibold text-secondary">{item.label}</span>
+                                  <span className="text-sm font-semibold text-[#0c4d47]">{item.label}</span>
                                 </DropdownMenuItem>
                               ))}
                             </div>
