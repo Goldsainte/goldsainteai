@@ -263,7 +263,7 @@ async function updateAgentApplication(
   const { data: application, error: fetchError } = await supabaseClient
     .from("agent_applications")
     .select("*")
-    .eq("stripe_session_id", sessionId)
+    .eq("stripe_verification_session_id", sessionId)
     .single();
 
   if (fetchError || !application) {
@@ -404,7 +404,7 @@ async function updateBrandApplication(
   const { data: application, error: fetchError } = await supabaseClient
     .from("brand_applications")
     .select("*")
-    .eq("stripe_session_id", sessionId)
+    .eq("stripe_verification_session_id", sessionId)
     .single();
 
   if (fetchError || !application) {
