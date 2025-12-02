@@ -212,7 +212,7 @@ export const HowGoldsainteWorksSection: React.FC = () => {
         <div className="flex flex-col-reverse gap-8 md:flex-row md:gap-12 lg:gap-16">
           {/* LEFT: Dynamic Image with Crossfade */}
           <div className="w-full md:w-[55%] lg:w-[58%]">
-            <div className="relative aspect-[4/5] md:aspect-[3/4] overflow-hidden rounded-2xl shadow-[0_12px_40px_rgba(10,34,37,0.12)]">
+            <div className="relative aspect-[4/3] max-h-[500px] overflow-hidden rounded-2xl shadow-[0_12px_40px_rgba(10,34,37,0.12)]">
               {steps.map((step) => (
                 <img
                   key={step.id}
