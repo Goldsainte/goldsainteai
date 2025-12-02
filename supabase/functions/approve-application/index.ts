@@ -405,8 +405,6 @@ async function approveAgentApplication(
     const { error: roleError } = await supabaseAdmin.from("user_roles").insert({
       user_id: userId,
       role: "agent",
-      granted_by: adminUserId,
-      granted_at: new Date().toISOString(),
     });
 
     if (roleError) {
@@ -644,8 +642,6 @@ async function approveBrandApplication(
     const { error: roleError } = await supabaseAdmin.from("user_roles").insert({
       user_id: userId,
       role: "brand",
-      granted_by: adminUserId,
-      granted_at: new Date().toISOString(),
     });
 
     if (roleError) {
