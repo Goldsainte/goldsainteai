@@ -6665,6 +6665,7 @@ export type Database = {
       }
       packaged_trips: {
         Row: {
+          activity_level: string | null
           agent_id: string | null
           available_from: string | null
           available_until: string | null
@@ -6683,8 +6684,10 @@ export type Database = {
           difficulty_level: string | null
           duration_days: number
           duration_nights: number | null
+          essential_info: Json | null
           faqs: Json | null
           fitness_level_required: string | null
+          group_size_note: string | null
           highlights: Json | null
           host_tagline: string | null
           id: string
@@ -6700,6 +6703,8 @@ export type Database = {
           price_per_person: number
           published_at: string | null
           rating: number | null
+          recommended_arrival_airport: string | null
+          recommended_departure_airport: string | null
           refund_policy: string | null
           review_count: number | null
           slug: string | null
@@ -6716,6 +6721,7 @@ export type Database = {
           wishlist_count: number | null
         }
         Insert: {
+          activity_level?: string | null
           agent_id?: string | null
           available_from?: string | null
           available_until?: string | null
@@ -6734,8 +6740,10 @@ export type Database = {
           difficulty_level?: string | null
           duration_days: number
           duration_nights?: number | null
+          essential_info?: Json | null
           faqs?: Json | null
           fitness_level_required?: string | null
+          group_size_note?: string | null
           highlights?: Json | null
           host_tagline?: string | null
           id?: string
@@ -6751,6 +6759,8 @@ export type Database = {
           price_per_person: number
           published_at?: string | null
           rating?: number | null
+          recommended_arrival_airport?: string | null
+          recommended_departure_airport?: string | null
           refund_policy?: string | null
           review_count?: number | null
           slug?: string | null
@@ -6767,6 +6777,7 @@ export type Database = {
           wishlist_count?: number | null
         }
         Update: {
+          activity_level?: string | null
           agent_id?: string | null
           available_from?: string | null
           available_until?: string | null
@@ -6785,8 +6796,10 @@ export type Database = {
           difficulty_level?: string | null
           duration_days?: number
           duration_nights?: number | null
+          essential_info?: Json | null
           faqs?: Json | null
           fitness_level_required?: string | null
+          group_size_note?: string | null
           highlights?: Json | null
           host_tagline?: string | null
           id?: string
@@ -6802,6 +6815,8 @@ export type Database = {
           price_per_person?: number
           published_at?: string | null
           rating?: number | null
+          recommended_arrival_airport?: string | null
+          recommended_departure_airport?: string | null
           refund_policy?: string | null
           review_count?: number | null
           slug?: string | null
@@ -10007,6 +10022,97 @@ export type Database = {
         }
         Relationships: []
       }
+      trip_activities: {
+        Row: {
+          activity_order: number | null
+          additional_fee: number | null
+          created_at: string | null
+          currency: string | null
+          description: string | null
+          id: string
+          is_included: boolean | null
+          name: string
+          trip_id: string
+        }
+        Insert: {
+          activity_order?: number | null
+          additional_fee?: number | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          id?: string
+          is_included?: boolean | null
+          name: string
+          trip_id: string
+        }
+        Update: {
+          activity_order?: number | null
+          additional_fee?: number | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          id?: string
+          is_included?: boolean | null
+          name?: string
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_activities_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "packaged_trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trip_addons: {
+        Row: {
+          addon_type: string
+          created_at: string | null
+          currency: string | null
+          description: string | null
+          id: string
+          is_optional: boolean | null
+          max_quantity: number | null
+          name: string
+          price: number
+          trip_id: string
+        }
+        Insert: {
+          addon_type: string
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          id?: string
+          is_optional?: boolean | null
+          max_quantity?: number | null
+          name: string
+          price: number
+          trip_id: string
+        }
+        Update: {
+          addon_type?: string
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          id?: string
+          is_optional?: boolean | null
+          max_quantity?: number | null
+          name?: string
+          price?: number
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_addons_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "packaged_trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trip_bookings: {
         Row: {
           created_at: string
@@ -10309,6 +10415,59 @@ export type Database = {
             columns: ["job_id"]
             isOneToOne: false
             referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trip_itinerary_days: {
+        Row: {
+          accommodation: string | null
+          accommodation_type: string | null
+          activities: Json | null
+          created_at: string | null
+          day_number: number
+          description: string | null
+          id: string
+          is_featured_day: boolean | null
+          meals_included: string[] | null
+          overnight_location: string | null
+          title: string
+          trip_id: string
+        }
+        Insert: {
+          accommodation?: string | null
+          accommodation_type?: string | null
+          activities?: Json | null
+          created_at?: string | null
+          day_number: number
+          description?: string | null
+          id?: string
+          is_featured_day?: boolean | null
+          meals_included?: string[] | null
+          overnight_location?: string | null
+          title: string
+          trip_id: string
+        }
+        Update: {
+          accommodation?: string | null
+          accommodation_type?: string | null
+          activities?: Json | null
+          created_at?: string | null
+          day_number?: number
+          description?: string | null
+          id?: string
+          is_featured_day?: boolean | null
+          meals_included?: string[] | null
+          overnight_location?: string | null
+          title?: string
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_itinerary_days_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "packaged_trips"
             referencedColumns: ["id"]
           },
         ]

@@ -43,6 +43,7 @@ const ExplorePage = lazy(() => import('@/pages/ExplorePage'));
 const Marketplace = lazy(() => import('@/pages/Marketplace'));
 const TripRequestDetail = lazy(() => import('@/pages/marketplace/TripRequestDetail'));
 const TripDetail = lazy(() => import('@/pages/marketplace/TripDetail'));
+const TrovaTripDetailPage = lazy(() => import('@/pages/marketplace/TrovaTripDetailPage'));
 // Legacy social feed - disabled
 // const Search = lazy(() => import('@/pages/Search'));
 // const Trending = lazy(() => import('@/pages/Trending'));
@@ -272,7 +273,7 @@ export const AppRoutes = () => (
         path="/marketplace/trip/:id"
         element={(
           <RouteSectionBoundary section="marketplace">
-            <TripDetail />
+            <TrovaTripDetailPage />
           </RouteSectionBoundary>
         )}
       />
