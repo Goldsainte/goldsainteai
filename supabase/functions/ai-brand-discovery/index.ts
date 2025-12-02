@@ -44,11 +44,14 @@ Deno.serve(async (req) => {
     // 1) Pull basic preference signals from profile
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("travel_preferences, primary_niches, primary_regions, content_style_tags")
-      .eq("user_id", userId)
+      .select("preferences, creator_niches, destinations_focus_tags, content_style_tags")
+      .eq("id", userId)
       .maybeSingle();
 
-    if (profileError) throw profileError;
+    // Don't throw on profile error - just proceed without personalization
+    if (profileError) {
+      console.warn("Profile lookup failed:", profileError);
+    }
 
     const preferenceTags = new Set<string>();
 
@@ -60,15 +63,16 @@ Deno.serve(async (req) => {
       }
     };
 
-    addTags(profile?.primary_niches);
-    addTags(profile?.primary_regions);
+    addTags(profile?.creator_niches);
+    addTags(profile?.destinations_focus_tags);
     addTags(profile?.content_style_tags);
 
+    // Handle preferences JSONB (if it exists and has travel data)
     if (
-      profile?.travel_preferences &&
-      typeof profile.travel_preferences === "object"
+      profile?.preferences &&
+      typeof profile.preferences === "object"
     ) {
-      Object.values(profile.travel_preferences).forEach((v) => {
+      Object.values(profile.preferences).forEach((v) => {
         if (Array.isArray(v)) {
           v.forEach((item) => {
             if (typeof item === "string") {
