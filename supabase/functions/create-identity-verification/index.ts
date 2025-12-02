@@ -260,7 +260,7 @@ async function createVerificationSession(
   logger: Logger
 ): Promise<{
   client_secret: string;
-  verification_session_id: string;
+  sessionId: string;
   url: string;
 }> {
   const { email, applicationType, returnUrl, metadata } = request;
@@ -299,7 +299,7 @@ async function createVerificationSession(
 
     return {
       client_secret: verificationSession.client_secret!,
-      verification_session_id: verificationSession.id,
+      sessionId: verificationSession.id,
       url: verificationSession.url!,
     };
   } catch (error: any) {
@@ -516,7 +516,7 @@ serve(async (req: Request) => {
         return new Response(
           JSON.stringify({
             client_secret: existingSession.client_secret,
-            verification_session_id: existingSession.id,
+            sessionId: existingSession.id,
             url: existingSession.url,
             is_duplicate: true,
             message: "You have a pending verification session. Redirecting to existing session.",
@@ -547,10 +547,26 @@ serve(async (req: Request) => {
     const session = await createVerificationSession(requestData, logger);
 
     logger.info("Verification session created successfully", {
-      sessionId: session.verification_session_id,
+      sessionId: session.sessionId,
       email: requestData.email,
       applicationType: requestData.applicationType,
     });
+
+    // Log audit event (runs with service_role so RLS allows it)
+    try {
+      await supabaseClient.from('application_audit_log').insert({
+        application_type: requestData.applicationType,
+        action: 'verification_started',
+        actor_type: 'applicant',
+        details: {
+          email: requestData.email,
+          stripe_session_id: session.sessionId,
+        }
+      });
+    } catch (auditError: any) {
+      logger.warn("Failed to log audit event", { error: auditError.message });
+      // Don't fail the request if audit logging fails
+    }
 
     return new Response(
       JSON.stringify({
