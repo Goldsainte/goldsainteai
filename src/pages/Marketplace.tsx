@@ -21,6 +21,22 @@ import { useQuery } from "@tanstack/react-query";
 
 type Tab = "trips" | "creators" | "agents" | "brands" | "trip-requests";
 
+// Map UI filter names to database tag variants (case-insensitive matching)
+const FILTER_TAG_MAP: Record<string, string[]> = {
+  "Top Rated": [], // Special handling - sort by rating instead of filtering
+  "Luxury": ["luxury", "high-end", "Luxury"],
+  "Budget Friendly": ["budget", "budget-friendly", "Budget Friendly"],
+  "All-Inclusive": ["all-inclusive", "All-Inclusive"],
+  "Adventure": ["adventure", "Adventure"],
+  "Family": ["family", "family-friendly", "Family"],
+  "Solo Travel": ["solo", "solo-travel", "Solo Travel"],
+  "Wellness": ["wellness", "spa", "retreat", "Wellness"],
+  "Design-led": ["design", "design-led", "boutique", "Design-led"],
+  "Eco-conscious": ["eco", "eco-conscious", "sustainable", "Eco-conscious"],
+  "Adults only": ["adults-only", "adults only", "Adults only"],
+  "City breaks": ["city", "city-break", "urban", "City breaks"],
+};
+
 export interface SearchFilters {
   destination?: string;
   startDate?: string;
@@ -70,9 +86,9 @@ export default function Marketplace() {
 
   // Live Trips query
   const { data: liveTrips, isLoading: isLoadingTrips } = useQuery({
-    queryKey: ["marketplace-live-trips"],
+    queryKey: ["marketplace-live-trips", filters.category],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("packaged_trips")
         .select(`
           id, slug, title, destination, cover_image_url, price_per_person, currency,
@@ -80,9 +96,22 @@ export default function Marketplace() {
           rating, review_count, available_from, available_until, tags,
           creator:profiles!packaged_trips_creator_id_fkey(id, full_name, avatar_url)
         `)
-        .eq("status", "published")
-        .order("created_at", { ascending: false });
+        .eq("status", "published");
 
+      // Apply category filter if selected (except "Top Rated" which is sort-only)
+      if (filters.category && filters.category !== "Top Rated") {
+        const tagVariants = FILTER_TAG_MAP[filters.category] || [filters.category.toLowerCase()];
+        query = query.overlaps("tags", tagVariants);
+      }
+
+      // Sort: "Top Rated" by rating, otherwise by created_at
+      if (filters.category === "Top Rated") {
+        query = query.order("rating", { ascending: false, nullsFirst: false });
+      } else {
+        query = query.order("created_at", { ascending: false });
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       return data || [];
     },
@@ -90,13 +119,20 @@ export default function Marketplace() {
   });
 
   const { data: creators, isLoading: isLoadingCreators } = useQuery({
-    queryKey: ["marketplace-creators"],
+    queryKey: ["marketplace-creators", filters.category],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("profiles")
-        .select("id,full_name,username,avatar_url,bio")
+        .select("id,full_name,username,avatar_url,bio,creator_niches")
         .eq("account_type", "creator");
 
+      // Apply category filter using creator_niches
+      if (filters.category && filters.category !== "Top Rated") {
+        const tagVariants = FILTER_TAG_MAP[filters.category] || [filters.category.toLowerCase()];
+        query = query.overlaps("creator_niches", tagVariants);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       return data || [];
     },
@@ -104,14 +140,23 @@ export default function Marketplace() {
   });
 
   const { data: agents, isLoading: isLoadingAgents } = useQuery({
-    queryKey: ["marketplace-agents"],
+    queryKey: ["marketplace-agents", filters.category],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("travel_agents")
         .select("*")
-        .eq("is_active", true)
-        .order("rating", { ascending: false });
+        .eq("is_active", true);
 
+      // Apply category filter using specializations
+      if (filters.category && filters.category !== "Top Rated") {
+        const tagVariants = FILTER_TAG_MAP[filters.category] || [filters.category.toLowerCase()];
+        query = query.overlaps("specializations", tagVariants);
+      }
+
+      // Sort by rating
+      query = query.order("rating", { ascending: false, nullsFirst: false });
+
+      const { data, error } = await query;
       if (error) throw error;
       return data || [];
     },
