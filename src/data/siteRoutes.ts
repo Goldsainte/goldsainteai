@@ -62,10 +62,6 @@ export const siteRoutes: RouteInfo[] = [
   { path: '/shop', label: 'Shop', description: 'Browse products', category: 'commerce' },
   { path: '/affiliate-manager', label: 'Affiliate Manager', description: 'Manage affiliate links', category: 'commerce', requiresAuth: true },
   
-  // Transportation Vendors
-  { path: '/transportation-vendor-partners', label: 'Vendor Partners', description: 'Transportation vendor info', category: 'marketplace' },
-  { path: '/transportation-vendor-application', label: 'Vendor Application', description: 'Apply as vendor', category: 'marketplace' },
-  { path: '/transportation-vendor-dashboard', label: 'Vendor Dashboard', description: 'Manage vendor services', category: 'marketplace', requiresAuth: true, requiresRole: 'vendor' },
   
   // Trust & Safety
   { path: '/customer-verification', label: 'Verification', description: 'Verify your identity', category: 'trust', requiresAuth: true },
