@@ -123,9 +123,6 @@ const CreatorArticles = lazy(() => import('@/pages/CreatorArticles'));
 const CreatorArticleEditor = lazy(() => import('@/pages/CreatorArticleEditor'));
 const AffiliateManager = lazy(() => import('@/pages/AffiliateManager'));
 const SupplierManagement = lazy(() => import('@/pages/SupplierManagement'));
-const TransportationVendorPartners = lazy(() => import('@/pages/TransportationVendorPartners'));
-const TransportationVendorApplication = lazy(() => import('@/pages/TransportationVendorApplication'));
-const TransportationVendorDashboard = lazy(() => import('@/pages/TransportationVendorDashboard'));
 const FleetManagementDashboard = lazy(() => import('@/components/FleetManagementDashboard'));
 const DriverManagementPanel = lazy(() => import('@/components/DriverManagementPanel'));
 const VendorPromotionManager = lazy(() => import('@/components/VendorPromotionManager'));
@@ -511,9 +508,6 @@ export const AppRoutes = () => (
       <Route path="/creator-articles/edit/:id" element={<CreatorArticleEditor />} />
       <Route path="/affiliate-manager" element={<AffiliateManager />} />
       <Route path="/supplier-management" element={<SupplierManagement />} />
-      <Route path="/transportation-vendor-partners" element={<TransportationVendorPartners />} />
-      <Route path="/transportation-vendor-application" element={<TransportationVendorApplication />} />
-      <Route path="/transportation-vendor-dashboard" element={<TransportationVendorDashboard />} />
       <Route path="/fleet-management" element={<FleetManagementDashboard />} />
       <Route path="/driver-management" element={<DriverManagementPanel />} />
       <Route path="/vendor-promotions" element={<VendorPromotionManager />} />

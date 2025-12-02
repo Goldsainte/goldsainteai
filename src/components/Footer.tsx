@@ -79,7 +79,7 @@ export const Footer = () => {
                 <li><Link to="/agent-onboarding" className={linkClasses}>{t('footer.becomeAgent')}</Link></li>
                 <li><Link to="/creators" className={linkClasses}>{t('footer.influencerProgram')}</Link></li>
                 <li><Link to="/shop" className={linkClasses}>{t('footer.affiliateProgram')}</Link></li>
-                <li><Link to="/transportation-vendor-partners" className={linkClasses}>{t('footer.listYourCompany')}</Link></li>
+                <li><Link to="/apply/brand" className={linkClasses}>{t('footer.listYourCompany')}</Link></li>
               </ul>
             </AccordionContent>
           </AccordionItem>
@@ -148,7 +148,7 @@ export const Footer = () => {
               <li><Link to="/agent-onboarding" className={linkClasses}>{t('footer.becomeAgent')}</Link></li>
               <li><Link to="/creators" className={linkClasses}>{t('footer.influencerProgram')}</Link></li>
               <li><Link to="/shop" className={linkClasses}>{t('footer.affiliateProgram')}</Link></li>
-              <li><Link to="/transportation-vendor-partners" className={linkClasses}>{t('footer.listYourCompany')}</Link></li>
+              <li><Link to="/apply/brand" className={linkClasses}>{t('footer.listYourCompany')}</Link></li>
             </ul>
           </div>
 
