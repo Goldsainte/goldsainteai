@@ -463,6 +463,7 @@ export const Header = () => {
                               <div className="py-2">
                                 {[
                                   { label: 'Admin overview', path: '/admin' },
+                                  { label: 'Applications', path: '/admin/applications' },
                                   { label: 'Agents dashboard', path: '/admin/agents' },
                                   { label: 'Creators dashboard', path: '/admin/creators' },
                                   { label: 'Bookings & revenue', path: '/admin/bookings' },
@@ -803,6 +804,7 @@ export const Header = () => {
                             <div className="py-2">
                               {[
                                 { label: 'Admin overview', path: '/admin' },
+                                { label: 'Applications', path: '/admin/applications' },
                                 { label: 'Agents dashboard', path: '/admin/agents' },
                                 { label: 'Creators dashboard', path: '/admin/creators' },
                                 { label: 'Bookings & revenue', path: '/admin/bookings' },
