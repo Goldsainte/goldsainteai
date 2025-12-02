@@ -548,13 +548,19 @@ export default function BrandOnboarding() {
         submitted_at: new Date().toISOString()
       };
 
-      const { error: dbError } = await supabase
+      const { data: insertedApplication, error: dbError } = await supabase
         .from('brand_applications')
-        .insert(applicationData as any);
+        .insert(applicationData as any)
+        .select('id')
+        .single();
 
       if (dbError) throw dbError;
 
-      // Audit logging is now handled in the edge function with service_role permissions
+      // Store application ID and email in localStorage for verification complete page
+      if (insertedApplication) {
+        localStorage.setItem('brand_application_id', insertedApplication.id);
+        localStorage.setItem('brand_application_email', formData.primaryContactEmail);
+      }
 
       // Step 4: Redirect to Stripe Identity Verification
       setVerificationStatus('success');

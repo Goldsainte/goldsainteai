@@ -16,9 +16,13 @@ export default function ApplicationVerificationComplete() {
   useEffect(() => {
     const checkVerificationAndUpdateApplication = async () => {
       try {
-        // Get application ID from localStorage
-        const applicationId = localStorage.getItem('agent_application_id');
-        const email = localStorage.getItem('agent_application_email');
+        // Get application ID from localStorage based on application type
+        const applicationId = applicationType === 'brand'
+          ? localStorage.getItem('brand_application_id')
+          : localStorage.getItem('agent_application_id');
+        const email = applicationType === 'brand'
+          ? localStorage.getItem('brand_application_email')
+          : localStorage.getItem('agent_application_email');
         
         if (!applicationId) {
           setStatus('error');
@@ -44,15 +48,20 @@ export default function ApplicationVerificationComplete() {
 
         if (application.status === 'verified' || application.stripe_verification_status === 'verified') {
           // Application is already verified - no need to update
-          // Clear localStorage
-          localStorage.removeItem('agent_application_id');
-          localStorage.removeItem('agent_application_email');
+          // Clear localStorage based on application type
+          if (applicationType === 'brand') {
+            localStorage.removeItem('brand_application_id');
+            localStorage.removeItem('brand_application_email');
+          } else {
+            localStorage.removeItem('agent_application_id');
+            localStorage.removeItem('agent_application_email');
+          }
 
           setStatus('success');
         } else if (application.status === 'failed') {
           setStatus('error');
         } else {
-          // Still pending, show success anyway
+          // Still pending, show success anyway (webhook may still be processing)
           setStatus('success');
         }
       } catch (err) {
