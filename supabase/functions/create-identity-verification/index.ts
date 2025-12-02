@@ -6,11 +6,11 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 // ENVIRONMENT VARIABLES
 // ============================================================================
 
-const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY")!;
+const STRIPE_IDENTITY_API_KEY = Deno.env.get("Stripe_Identity_API_Key")!;
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-const stripe = new Stripe(STRIPE_SECRET_KEY, {
+const stripe = new Stripe(STRIPE_IDENTITY_API_KEY, {
   apiVersion: "2023-10-16",
   httpClient: Stripe.createFetchHttpClient(),
 });
