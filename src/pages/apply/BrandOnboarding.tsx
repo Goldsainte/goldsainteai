@@ -487,7 +487,7 @@ export default function BrandOnboarding() {
     try {
       // Step 1: Create Stripe Identity Verification Session
       const { data: sessionData, error: sessionError } = await supabase.functions.invoke(
-        'create-stripe-identity-session',
+        'create-identity-verification',
         {
           body: {
             email: formData.primaryContactEmail,
