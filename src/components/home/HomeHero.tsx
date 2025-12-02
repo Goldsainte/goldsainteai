@@ -14,12 +14,14 @@ export function HomeHero() {
       <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 pb-8 pt-16 md:flex-row md:items-center md:pt-20 md:pb-12">
         {/* LEFT: Copy & CTAs */}
         <div className="w-full md:w-[52%] space-y-5">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#0C4D47]">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-3 py-1.5 text-sm font-medium uppercase tracking-[0.12em] text-[#073331]">
             <span>{t('common.travelers')}</span>
-            <span className="h-[1px] w-4 bg-[#0C4D47]/30" />
+            <span className="h-[1px] w-4 bg-[#073331]/30" />
             <span>{t('common.creators')}</span>
-            <span className="h-[1px] w-4 bg-[#0C4D47]/30" />
+            <span className="h-[1px] w-4 bg-[#073331]/30" />
             <span>{t('common.agents')}</span>
+            <span className="h-[1px] w-4 bg-[#073331]/30" />
+            <span>{t('common.brands')}</span>
           </div>
 
           <h1 className="font-display text-3xl leading-snug md:text-4xl lg:text-[42px]">
