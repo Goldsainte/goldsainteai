@@ -22,6 +22,7 @@ const MyStoryboardsPage = lazy(() => import('@/pages/storyboards/MyStoryboardsPa
 const StoryboardDetailPage = lazy(() => import('@/pages/storyboards/StoryboardDetailPage'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const BrandOnboardingPage = lazy(() => import('@/pages/BrandOnboardingPage'));
+const BrandApplyPage = lazy(() => import('@/pages/apply/BrandOnboarding'));
 const BrandConsolePage = lazy(() => import('@/pages/BrandConsolePage'));
 const BrandCollectionDetailPage = lazy(() => import('@/pages/BrandCollectionDetailPage'));
 const AdminDashboardPage = lazy(() => import('@/pages/admin/AdminDashboardPage'));
@@ -216,7 +217,8 @@ export const AppRoutes = () => (
       <Route path="/onboarding" element={<Navigate to="/onboarding/traveler/preferences" replace />} />
       <Route path="/onboarding/traveler/preferences" element={<TravelerPreferencesOnboardingPage />} />
       <Route path="/onboarding/creator" element={<CreatorOnboardingPage />} />
-      <Route path="/brand/onboarding" element={<BrandOnboardingPage />} />
+      <Route path="/brand/onboarding" element={<Navigate to="/apply/brand" replace />} />
+      <Route path="/apply/brand" element={<BrandApplyPage />} />
       
       <Route path="/ai-agent-setup" element={<AIAgentOnboarding />} />
     </Route>
