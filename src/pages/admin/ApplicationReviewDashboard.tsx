@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import {
   CheckCircle,
   XCircle,
@@ -35,6 +36,8 @@ import {
   Loader2,
   CheckCheck,
   ArrowLeft,
+  X,
+  ShieldAlert,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -578,12 +581,26 @@ const AgentApplicationDetail: React.FC<{
   application: AgentApplication;
   onApprove: () => void;
   onReject: () => void;
-}> = ({ application, onApprove, onReject }) => {
+  onSkipVerification?: () => void;
+  onClose?: () => void;
+  showCloseButton?: boolean;
+}> = ({ application, onApprove, onReject, onSkipVerification, onClose, showCloseButton }) => {
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
+          {showCloseButton && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="mb-2 -ml-2 text-[#6B7280] hover:text-[#0a2225]"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to list
+            </Button>
+          )}
           <h2 className="font-secondary text-2xl text-[#0a2225]">
             {application.first_name} {application.last_name}
           </h2>
@@ -592,28 +609,81 @@ const AgentApplicationDetail: React.FC<{
             <StatusBadge status={application.status} />
           </div>
         </div>
+      </div>
 
-        <div className="flex gap-2">
-          {application.status === 'verified' && (
-            <>
-              <Button
-                variant="outline"
-                onClick={onReject}
-                className="border-[#E5DFC6] text-[#5b2c2c] hover:bg-[#f0d1d1] rounded-xl"
-              >
-                <XCircle className="mr-2 h-4 w-4" />
-                Reject
-              </Button>
-              <Button
-                onClick={onApprove}
-                className="bg-[#0c4d47] hover:bg-[#0a3d3a] text-[#E5DFC6] rounded-xl"
-              >
-                <CheckCircle className="mr-2 h-4 w-4" />
-                Approve
-              </Button>
-            </>
-          )}
-        </div>
+      {/* Action Buttons - Show based on status */}
+      <div className="flex flex-wrap gap-2">
+        {application.status === 'verified' && (
+          <>
+            <Button
+              variant="outline"
+              onClick={onReject}
+              className="border-[#E5DFC6] text-[#5b2c2c] hover:bg-[#f0d1d1] rounded-xl"
+            >
+              <XCircle className="mr-2 h-4 w-4" />
+              Reject
+            </Button>
+            <Button
+              onClick={onApprove}
+              className="bg-[#0c4d47] hover:bg-[#0a3d3a] text-[#E5DFC6] rounded-xl"
+            >
+              <CheckCircle className="mr-2 h-4 w-4" />
+              Approve
+            </Button>
+          </>
+        )}
+        {application.status === 'pending_verification' && (
+          <>
+            <Alert className="w-full bg-[#fef3cd] border-[#856404]/20 rounded-xl">
+              <Clock className="h-4 w-4 text-[#856404]" />
+              <AlertDescription className="text-[#856404]">
+                Waiting for applicant to complete identity verification via Stripe Identity.
+              </AlertDescription>
+            </Alert>
+            <Button
+              variant="outline"
+              onClick={onSkipVerification}
+              className="border-[#856404]/30 text-[#856404] hover:bg-[#fef3cd] rounded-xl"
+            >
+              <ShieldAlert className="mr-2 h-4 w-4" />
+              Skip Verification (Admin Override)
+            </Button>
+          </>
+        )}
+        {application.status === 'approved' && (
+          <Alert className="w-full bg-[#cfe8d7] border-[#0c4d47]/20 rounded-xl">
+            <CheckCheck className="h-4 w-4 text-[#0c4d47]" />
+            <AlertDescription className="text-[#0c4d47]">
+              This application has been approved. The applicant has been notified and can now access the platform.
+            </AlertDescription>
+          </Alert>
+        )}
+        {application.status === 'rejected' && (
+          <Alert className="w-full bg-[#f0d1d1] border-[#5b2c2c]/20 rounded-xl">
+            <XCircle className="h-4 w-4 text-[#5b2c2c]" />
+            <AlertDescription className="text-[#5b2c2c]">
+              This application has been rejected.
+            </AlertDescription>
+          </Alert>
+        )}
+        {application.status === 'failed' && (
+          <>
+            <Alert className="w-full bg-[#f0d1d1] border-[#5b2c2c]/20 rounded-xl">
+              <AlertTriangle className="h-4 w-4 text-[#5b2c2c]" />
+              <AlertDescription className="text-[#5b2c2c]">
+                Identity verification failed. The applicant may need to retry.
+              </AlertDescription>
+            </Alert>
+            <Button
+              variant="outline"
+              onClick={onSkipVerification}
+              className="border-[#856404]/30 text-[#856404] hover:bg-[#fef3cd] rounded-xl"
+            >
+              <ShieldAlert className="mr-2 h-4 w-4" />
+              Override & Mark Verified
+            </Button>
+          </>
+        )}
       </div>
 
       <div className="border-t border-[#E5DFC6]" />
@@ -871,40 +941,107 @@ const BrandApplicationDetail: React.FC<{
   application: BrandApplication;
   onApprove: () => void;
   onReject: () => void;
-}> = ({ application, onApprove, onReject }) => {
+  onSkipVerification?: () => void;
+  onClose?: () => void;
+  showCloseButton?: boolean;
+}> = ({ application, onApprove, onReject, onSkipVerification, onClose, showCloseButton }) => {
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
+          {showCloseButton && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="mb-2 -ml-2 text-[#6B7280] hover:text-[#0a2225]"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to list
+            </Button>
+          )}
           <h2 className="font-secondary text-2xl text-[#0a2225]">{application.brand_name}</h2>
           <p className="text-[#6B7280] mt-1 capitalize">{application.brand_type}</p>
           <div className="mt-3">
             <StatusBadge status={application.status} />
           </div>
         </div>
+      </div>
 
-        <div className="flex gap-2">
-          {application.status === 'verified' && (
-            <>
-              <Button
-                variant="outline"
-                onClick={onReject}
-                className="border-[#E5DFC6] text-[#5b2c2c] hover:bg-[#f0d1d1] rounded-xl"
-              >
-                <XCircle className="mr-2 h-4 w-4" />
-                Reject
-              </Button>
-              <Button
-                onClick={onApprove}
-                className="bg-[#0c4d47] hover:bg-[#0a3d3a] text-[#E5DFC6] rounded-xl"
-              >
-                <CheckCircle className="mr-2 h-4 w-4" />
-                Approve
-              </Button>
-            </>
-          )}
-        </div>
+      {/* Action Buttons - Show based on status */}
+      <div className="flex flex-wrap gap-2">
+        {application.status === 'verified' && (
+          <>
+            <Button
+              variant="outline"
+              onClick={onReject}
+              className="border-[#E5DFC6] text-[#5b2c2c] hover:bg-[#f0d1d1] rounded-xl"
+            >
+              <XCircle className="mr-2 h-4 w-4" />
+              Reject
+            </Button>
+            <Button
+              onClick={onApprove}
+              className="bg-[#0c4d47] hover:bg-[#0a3d3a] text-[#E5DFC6] rounded-xl"
+            >
+              <CheckCircle className="mr-2 h-4 w-4" />
+              Approve
+            </Button>
+          </>
+        )}
+        {application.status === 'pending_verification' && (
+          <>
+            <Alert className="w-full bg-[#fef3cd] border-[#856404]/20 rounded-xl">
+              <Clock className="h-4 w-4 text-[#856404]" />
+              <AlertDescription className="text-[#856404]">
+                Waiting for applicant to complete identity verification via Stripe Identity.
+              </AlertDescription>
+            </Alert>
+            <Button
+              variant="outline"
+              onClick={onSkipVerification}
+              className="border-[#856404]/30 text-[#856404] hover:bg-[#fef3cd] rounded-xl"
+            >
+              <ShieldAlert className="mr-2 h-4 w-4" />
+              Skip Verification (Admin Override)
+            </Button>
+          </>
+        )}
+        {application.status === 'approved' && (
+          <Alert className="w-full bg-[#cfe8d7] border-[#0c4d47]/20 rounded-xl">
+            <CheckCheck className="h-4 w-4 text-[#0c4d47]" />
+            <AlertDescription className="text-[#0c4d47]">
+              This application has been approved. The applicant has been notified and can now access the platform.
+            </AlertDescription>
+          </Alert>
+        )}
+        {application.status === 'rejected' && (
+          <Alert className="w-full bg-[#f0d1d1] border-[#5b2c2c]/20 rounded-xl">
+            <XCircle className="h-4 w-4 text-[#5b2c2c]" />
+            <AlertDescription className="text-[#5b2c2c]">
+              This application has been rejected.
+            </AlertDescription>
+          </Alert>
+        )}
+        {application.status === 'failed' && (
+          <>
+            <Alert className="w-full bg-[#f0d1d1] border-[#5b2c2c]/20 rounded-xl">
+              <AlertTriangle className="h-4 w-4 text-[#5b2c2c]" />
+              <AlertDescription className="text-[#5b2c2c]">
+                Identity verification failed. The applicant may need to retry.
+              </AlertDescription>
+            </Alert>
+            <Button
+              variant="outline"
+              onClick={onSkipVerification}
+              className="border-[#856404]/30 text-[#856404] hover:bg-[#fef3cd] rounded-xl"
+            >
+              <ShieldAlert className="mr-2 h-4 w-4" />
+              Override & Mark Verified
+            </Button>
+          </>
+        )}
       </div>
 
       <div className="border-t border-[#E5DFC6]" />
@@ -1155,6 +1292,10 @@ export default function AdminApplicationsPage() {
   // Dialog states
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
   const [rejectionDialogOpen, setRejectionDialogOpen] = useState(false);
+  const [skipVerificationDialogOpen, setSkipVerificationDialogOpen] = useState(false);
+  
+  // Mobile sheet state
+  const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
 
   // Stats
   const [stats, setStats] = useState({
@@ -1280,10 +1421,60 @@ export default function AdminApplicationsPage() {
       // Refresh applications
       await fetchApplications();
       setSelectedApplication(null);
+      setMobileSheetOpen(false);
     } catch (error: any) {
       console.error('Rejection error:', error);
       throw new Error(error.message || 'Failed to reject application');
     }
+  };
+
+  // Handle skip verification (admin override)
+  const handleSkipVerification = async () => {
+    if (!selectedApplication) return;
+
+    try {
+      const table = activeTab === 'agents' ? 'agent_applications' : 'brand_applications';
+      
+      const { error } = await supabase
+        .from(table)
+        .update({
+          status: 'verified',
+          stripe_verification_status: 'admin_override',
+          stripe_verified_at: new Date().toISOString(),
+        })
+        .eq('id', selectedApplication.id);
+
+      if (error) throw error;
+
+      toast.success('Verification skipped - application marked as verified');
+      setSkipVerificationDialogOpen(false);
+      await fetchApplications();
+      
+      // Refresh selected application
+      const updatedApp = activeTab === 'agents' 
+        ? agentApplications.find(a => a.id === selectedApplication.id)
+        : brandApplications.find(b => b.id === selectedApplication.id);
+      if (updatedApp) {
+        setSelectedApplication({ ...updatedApp, status: 'verified' });
+      }
+    } catch (error: any) {
+      console.error('Skip verification error:', error);
+      toast.error(error.message || 'Failed to skip verification');
+    }
+  };
+
+  // Handle application selection
+  const handleSelectApplication = (app: Application) => {
+    setSelectedApplication(app);
+    // On mobile, open the sheet
+    if (window.innerWidth < 1024) {
+      setMobileSheetOpen(true);
+    }
+  };
+
+  // Close mobile sheet
+  const handleCloseMobileSheet = () => {
+    setMobileSheetOpen(false);
   };
 
   if (isLoading) {
@@ -1458,7 +1649,7 @@ export default function AdminApplicationsPage() {
                               ? 'bg-[#F5EFE1]'
                               : 'hover:bg-[#FDF9F0]'
                           }`}
-                          onClick={() => setSelectedApplication(app)}
+                          onClick={() => handleSelectApplication(app)}
                         >
                           <div className="flex items-start justify-between mb-2">
                             <div>
@@ -1496,7 +1687,7 @@ export default function AdminApplicationsPage() {
                               ? 'bg-[#F5EFE1]'
                               : 'hover:bg-[#FDF9F0]'
                           }`}
-                          onClick={() => setSelectedApplication(app)}
+                          onClick={() => handleSelectApplication(app)}
                         >
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex items-center gap-3">
@@ -1529,8 +1720,8 @@ export default function AdminApplicationsPage() {
             </LuxuryCard>
           </div>
 
-          {/* Detail Panel */}
-          <div className="col-span-12 lg:col-span-7">
+          {/* Detail Panel - Hidden on mobile (shown in sheet instead) */}
+          <div className="hidden lg:block col-span-7">
             <LuxuryCard className="p-6">
               {selectedApplication ? (
                 activeTab === 'agents' ? (
@@ -1538,12 +1729,14 @@ export default function AdminApplicationsPage() {
                     application={selectedApplication as AgentApplication}
                     onApprove={() => setApprovalDialogOpen(true)}
                     onReject={() => setRejectionDialogOpen(true)}
+                    onSkipVerification={() => setSkipVerificationDialogOpen(true)}
                   />
                 ) : (
                   <BrandApplicationDetail
                     application={selectedApplication as BrandApplication}
                     onApprove={() => setApprovalDialogOpen(true)}
                     onReject={() => setRejectionDialogOpen(true)}
+                    onSkipVerification={() => setSkipVerificationDialogOpen(true)}
                   />
                 )
               ) : (
@@ -1562,6 +1755,37 @@ export default function AdminApplicationsPage() {
         </div>
       </div>
 
+      {/* Mobile Detail Sheet */}
+      <Sheet open={mobileSheetOpen} onOpenChange={setMobileSheetOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-xl p-0 bg-[#FDF9F0]">
+          <ScrollArea className="h-full">
+            <div className="p-6">
+              {selectedApplication && (
+                activeTab === 'agents' ? (
+                  <AgentApplicationDetail
+                    application={selectedApplication as AgentApplication}
+                    onApprove={() => setApprovalDialogOpen(true)}
+                    onReject={() => setRejectionDialogOpen(true)}
+                    onSkipVerification={() => setSkipVerificationDialogOpen(true)}
+                    onClose={handleCloseMobileSheet}
+                    showCloseButton
+                  />
+                ) : (
+                  <BrandApplicationDetail
+                    application={selectedApplication as BrandApplication}
+                    onApprove={() => setApprovalDialogOpen(true)}
+                    onReject={() => setRejectionDialogOpen(true)}
+                    onSkipVerification={() => setSkipVerificationDialogOpen(true)}
+                    onClose={handleCloseMobileSheet}
+                    showCloseButton
+                  />
+                )
+              )}
+            </div>
+          </ScrollArea>
+        </SheetContent>
+      </Sheet>
+
       {/* Dialogs */}
       <ApprovalDialog
         open={approvalDialogOpen}
@@ -1578,6 +1802,45 @@ export default function AdminApplicationsPage() {
         applicationType={activeTab === 'agents' ? 'agent' : 'brand'}
         onReject={handleReject}
       />
+
+      {/* Skip Verification Confirmation Dialog */}
+      <Dialog open={skipVerificationDialogOpen} onOpenChange={setSkipVerificationDialogOpen}>
+        <DialogContent className="max-w-md bg-white border border-[#E5DFC6] rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 font-secondary text-xl text-[#0a2225]">
+              <ShieldAlert className="h-5 w-5 text-[#856404]" />
+              Skip Identity Verification
+            </DialogTitle>
+            <DialogDescription className="text-[#6B7280]">
+              Are you sure you want to skip identity verification for this application?
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="bg-[#fef3cd] border border-[#856404]/20 rounded-xl p-4 my-4">
+            <p className="text-sm text-[#856404]">
+              <strong>Warning:</strong> This will mark the application as verified without completing Stripe Identity verification. 
+              Use this only for testing or when you have manually verified the applicant's identity through other means.
+            </p>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setSkipVerificationDialogOpen(false)}
+              className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#F5EFE1] rounded-xl"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSkipVerification}
+              className="bg-[#856404] hover:bg-[#6d5203] text-white rounded-xl"
+            >
+              <ShieldAlert className="mr-2 h-4 w-4" />
+              Skip Verification
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
