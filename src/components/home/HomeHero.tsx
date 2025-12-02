@@ -1,7 +1,7 @@
 // src/components/home/HomeHero.tsx
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Shield, Lock } from "lucide-react";
+
 import heroMainImg from "@/assets/maximilien-t-scharner-FD0Ga_KJTwM-unsplash.jpeg"; // infinity pool
 import heroSecondaryImg from "@/assets/austin-distel-riQNJpiaGgE-unsplash.jpeg"; // treehouse / hammock
 import heroTertiaryImg from "@/assets/felix-rostig-UmV2wr-Vbq8-unsplash.jpeg"; // friends hiking
@@ -116,36 +116,6 @@ export function HomeHero() {
         </div>
       </div>
 
-      {/* Trust & Safety Card - BELOW photo collage, hidden on mobile */}
-      <div className="hidden md:block max-w-2xl mx-auto px-4 pb-12">
-        <div className="bg-white/60 border border-[#E5DFC6] rounded-2xl p-5 space-y-4">
-          
-          {/* Marketplace Statement */}
-          <div className="flex items-start gap-3">
-            <Shield className="h-5 w-5 text-[#0c4d47] flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm font-medium text-[#0a2225]">All actions stay on-platform</p>
-              <p className="text-xs text-[#6B7280] mt-0.5">
-                We connect travelers, creators & agents — we don't operate trips ourselves.
-              </p>
-            </div>
-          </div>
-          
-          <div className="border-t border-[#E5DFC6]" />
-          
-          {/* Trust Promise */}
-          <div className="flex items-start gap-3">
-            <Lock className="h-5 w-5 text-[#0c4d47] flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm font-medium text-[#0a2225]">Protected bookings</p>
-              <p className="text-xs text-[#6B7280] mt-0.5">
-                No phone numbers, no side deals — just beautifully organized, secure transactions.
-              </p>
-            </div>
-          </div>
-          
-        </div>
-      </div>
     </section>
   );
 }
