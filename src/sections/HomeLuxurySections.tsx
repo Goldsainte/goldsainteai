@@ -209,10 +209,10 @@ export const HowGoldsainteWorksSection: React.FC = () => {
         </div>
 
         {/* Two Column Layout: Image + Accordion */}
-        <div className="flex flex-col-reverse gap-8 md:flex-row md:gap-12 lg:gap-16">
+        <div className="flex flex-col-reverse gap-8 md:flex-row md:gap-8 lg:gap-10">
           {/* LEFT: Dynamic Image with Crossfade */}
-          <div className="w-full md:w-[42%] lg:w-[45%]">
-            <div className="relative aspect-[3/4] max-h-[420px] overflow-hidden rounded-2xl shadow-[0_12px_40px_rgba(10,34,37,0.12)]">
+          <div className="w-full md:w-[45%] lg:w-[48%]">
+            <div className="relative aspect-[3/4] max-h-[480px] overflow-hidden rounded-2xl shadow-[0_12px_40px_rgba(10,34,37,0.12)]">
               {steps.map((step) => (
                 <img
                   key={step.id}
@@ -228,7 +228,7 @@ export const HowGoldsainteWorksSection: React.FC = () => {
           </div>
 
           {/* RIGHT: Accordion */}
-          <div className="w-full md:w-[58%] lg:w-[55%]">
+          <div className="w-full md:w-[55%] lg:w-[52%]">
             <Accordion
               type="single"
               collapsible
