@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -35,9 +34,11 @@ import {
   ChevronRight,
   Loader2,
   CheckCheck,
+  ArrowLeft,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { Link } from 'react-router-dom';
 
 // ============================================================================
 // TYPES
@@ -134,39 +135,51 @@ interface RejectionDialogProps {
 }
 
 // ============================================================================
-// STATUS BADGE COMPONENT
+// LUXURY STATUS BADGE COMPONENT
 // ============================================================================
 
 const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
-  const configs: Record<string, { label: string; variant: any; icon: any }> = {
+  const configs: Record<string, { label: string; bgColor: string; textColor: string; borderColor: string; icon: any }> = {
     pending_verification: {
       label: 'Pending Verification',
-      variant: 'secondary',
+      bgColor: 'bg-[#FDF9F0]',
+      textColor: 'text-[#6B7280]',
+      borderColor: 'border-[#E5DFC6]',
       icon: Clock,
     },
     verified: {
-      label: 'Verified - Awaiting Review',
-      variant: 'default',
+      label: 'Verified · Awaiting Review',
+      bgColor: 'bg-[#d4e7dd]',
+      textColor: 'text-[#0c4d47]',
+      borderColor: 'border-[#0c4d47]/20',
       icon: CheckCircle,
     },
     pending_review: {
       label: 'Under Review',
-      variant: 'default',
+      bgColor: 'bg-[#f5e9c5]',
+      textColor: 'text-[#6d5223]',
+      borderColor: 'border-[#C7A962]/30',
       icon: Eye,
     },
     approved: {
       label: 'Approved',
-      variant: 'default',
+      bgColor: 'bg-[#cfe8d7]',
+      textColor: 'text-[#0c4d47]',
+      borderColor: 'border-[#0c4d47]/20',
       icon: CheckCheck,
     },
     rejected: {
       label: 'Rejected',
-      variant: 'destructive',
+      bgColor: 'bg-[#f0d1d1]',
+      textColor: 'text-[#5b2c2c]',
+      borderColor: 'border-[#5b2c2c]/20',
       icon: XCircle,
     },
     failed: {
       label: 'Verification Failed',
-      variant: 'destructive',
+      bgColor: 'bg-[#fef3cd]',
+      textColor: 'text-[#856404]',
+      borderColor: 'border-[#856404]/20',
       icon: AlertTriangle,
     },
   };
@@ -175,15 +188,17 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
   const Icon = config.icon;
 
   return (
-    <Badge variant={config.variant as any} className="flex items-center gap-1">
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium border ${config.bgColor} ${config.textColor} ${config.borderColor}`}
+    >
       <Icon className="h-3 w-3" />
       {config.label}
-    </Badge>
+    </span>
   );
 };
 
 // ============================================================================
-// APPROVAL DIALOG
+// LUXURY APPROVAL DIALOG
 // ============================================================================
 
 const ApprovalDialog: React.FC<ApprovalDialogProps> = ({
@@ -222,42 +237,44 @@ const ApprovalDialog: React.FC<ApprovalDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl bg-white border border-[#E5DFC6] rounded-2xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <CheckCircle className="h-5 w-5 text-green-600" />
+          <DialogTitle className="flex items-center gap-2 font-secondary text-xl text-[#0a2225]">
+            <CheckCircle className="h-5 w-5 text-[#0c4d47]" />
             Approve Application
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-[#6B7280]">
             You are about to approve {name}'s {applicationType} application.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
-          <Alert>
-            <AlertDescription>
+          <div className="bg-[#d4e7dd] border border-[#0c4d47]/20 rounded-xl p-4">
+            <p className="text-sm text-[#0c4d47]">
               <strong>What happens next:</strong>
-              <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>A Supabase Auth account will be created</li>
-                <li>Profile and {applicationType} records will be created</li>
-                <li>Temporary password will be generated</li>
-                <li>Welcome email will be sent with login credentials (if enabled)</li>
-                <li>Applicant can immediately log in and start using the platform</li>
-              </ul>
-            </AlertDescription>
-          </Alert>
+            </p>
+            <ul className="list-disc list-inside mt-2 space-y-1 text-sm text-[#0c4d47]/80">
+              <li>A Supabase Auth account will be created</li>
+              <li>Profile and {applicationType} records will be created</li>
+              <li>Temporary password will be generated</li>
+              <li>Welcome email will be sent with login credentials (if enabled)</li>
+              <li>Applicant can immediately log in and start using the platform</li>
+            </ul>
+          </div>
 
           <div>
-            <Label htmlFor="approvalNotes">Approval Notes (Optional)</Label>
+            <Label htmlFor="approvalNotes" className="text-[#0a2225] font-medium">
+              Approval Notes (Optional)
+            </Label>
             <Textarea
               id="approvalNotes"
               value={approvalNotes}
               onChange={(e) => setApprovalNotes(e.target.value)}
               placeholder="Add any internal notes about this approval..."
               rows={4}
-              className="mt-1"
+              className="mt-2 border-[#E5DFC6] rounded-xl focus:ring-[#C7A962] focus:border-[#C7A962]"
             />
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-xs text-[#6B7280] mt-1">
               These notes are for internal records only and won't be shared with the applicant.
             </p>
           </div>
@@ -268,19 +285,28 @@ const ApprovalDialog: React.FC<ApprovalDialogProps> = ({
               id="sendWelcomeEmail"
               checked={sendWelcomeEmail}
               onChange={(e) => setSendWelcomeEmail(e.target.checked)}
-              className="h-4 w-4"
+              className="h-4 w-4 rounded border-[#E5DFC6] text-[#0c4d47] focus:ring-[#C7A962]"
             />
-            <Label htmlFor="sendWelcomeEmail" className="cursor-pointer">
+            <Label htmlFor="sendWelcomeEmail" className="cursor-pointer text-[#0a2225]">
               Send welcome email with login credentials
             </Label>
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
+        <DialogFooter className="gap-2">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={isSubmitting}
+            className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#F5EFE1] rounded-xl"
+          >
             Cancel
           </Button>
-          <Button onClick={handleApprove} disabled={isSubmitting}>
+          <Button
+            onClick={handleApprove}
+            disabled={isSubmitting}
+            className="bg-[#0c4d47] hover:bg-[#0a3d3a] text-[#E5DFC6] rounded-xl"
+          >
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -300,7 +326,7 @@ const ApprovalDialog: React.FC<ApprovalDialogProps> = ({
 };
 
 // ============================================================================
-// REJECTION DIALOG
+// LUXURY REJECTION DIALOG
 // ============================================================================
 
 const RejectionDialog: React.FC<RejectionDialogProps> = ({
@@ -403,31 +429,33 @@ const RejectionDialog: React.FC<RejectionDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl bg-white border border-[#E5DFC6] rounded-2xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <XCircle className="h-5 w-5 text-red-600" />
+          <DialogTitle className="flex items-center gap-2 font-secondary text-xl text-[#0a2225]">
+            <XCircle className="h-5 w-5 text-[#5b2c2c]" />
             Reject Application
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-[#6B7280]">
             You are about to reject {name}'s {applicationType} application.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
-          <Alert variant="destructive">
-            <AlertDescription>
+          <div className="bg-[#f0d1d1] border border-[#5b2c2c]/20 rounded-xl p-4">
+            <p className="text-sm text-[#5b2c2c]">
               This action will notify the applicant via email with the rejection reason provided below.
-            </AlertDescription>
-          </Alert>
+            </p>
+          </div>
 
           <div>
-            <Label htmlFor="template">Use Template (Optional)</Label>
+            <Label htmlFor="template" className="text-[#0a2225] font-medium">
+              Use Template (Optional)
+            </Label>
             <Select value={selectedTemplate} onValueChange={handleTemplateSelect}>
-              <SelectTrigger className="mt-1">
+              <SelectTrigger className="mt-2 border-[#E5DFC6] rounded-xl focus:ring-[#C7A962]">
                 <SelectValue placeholder="Select a rejection reason template" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white border-[#E5DFC6] rounded-xl">
                 {templates.map((template) => (
                   <SelectItem key={template.value} value={template.value}>
                     {template.label}
@@ -438,8 +466,8 @@ const RejectionDialog: React.FC<RejectionDialogProps> = ({
           </div>
 
           <div>
-            <Label htmlFor="rejectionReason">
-              Rejection Reason <span className="text-red-500">*</span>
+            <Label htmlFor="rejectionReason" className="text-[#0a2225] font-medium">
+              Rejection Reason <span className="text-[#5b2c2c]">*</span>
             </Label>
             <Textarea
               id="rejectionReason"
@@ -447,10 +475,10 @@ const RejectionDialog: React.FC<RejectionDialogProps> = ({
               onChange={(e) => setRejectionReason(e.target.value)}
               placeholder="Provide a clear reason for rejection. This will be sent to the applicant."
               rows={6}
-              className="mt-1"
+              className="mt-2 border-[#E5DFC6] rounded-xl focus:ring-[#C7A962] focus:border-[#C7A962]"
               required
             />
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-xs text-[#6B7280] mt-1">
               Be professional and constructive. This reason will be included in the rejection email.
             </p>
           </div>
@@ -461,22 +489,27 @@ const RejectionDialog: React.FC<RejectionDialogProps> = ({
               id="allowResubmission"
               checked={allowResubmission}
               onChange={(e) => setAllowResubmission(e.target.checked)}
-              className="h-4 w-4"
+              className="h-4 w-4 rounded border-[#E5DFC6] text-[#0c4d47] focus:ring-[#C7A962]"
             />
-            <Label htmlFor="allowResubmission" className="cursor-pointer">
+            <Label htmlFor="allowResubmission" className="cursor-pointer text-[#0a2225]">
               Allow applicant to resubmit after addressing issues
             </Label>
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
+        <DialogFooter className="gap-2">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={isSubmitting}
+            className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#F5EFE1] rounded-xl"
+          >
             Cancel
           </Button>
           <Button
-            variant="destructive"
             onClick={handleReject}
             disabled={isSubmitting || !rejectionReason.trim()}
+            className="bg-[#5b2c2c] hover:bg-[#4a2424] text-white rounded-xl"
           >
             {isSubmitting ? (
               <>
@@ -497,6 +530,47 @@ const RejectionDialog: React.FC<RejectionDialogProps> = ({
 };
 
 // ============================================================================
+// LUXURY CARD COMPONENT
+// ============================================================================
+
+const LuxuryCard: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
+  <div className={`bg-white rounded-2xl border border-[#E5DFC6] shadow-sm ${className}`}>
+    {children}
+  </div>
+);
+
+const LuxuryCardHeader: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
+  <div className={`p-6 pb-4 ${className}`}>{children}</div>
+);
+
+const LuxuryCardTitle: React.FC<{ children: React.ReactNode; icon?: any; className?: string }> = ({ children, icon: Icon, className = '' }) => (
+  <h3 className={`font-secondary text-lg text-[#0a2225] flex items-center gap-2 ${className}`}>
+    {Icon && <Icon className="h-5 w-5 text-[#C7A962]" />}
+    {children}
+  </h3>
+);
+
+const LuxuryCardContent: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
+  <div className={`p-6 pt-0 ${className}`}>{children}</div>
+);
+
+// ============================================================================
+// LUXURY BADGE FOR TAGS
+// ============================================================================
+
+const LuxuryBadge: React.FC<{ children: React.ReactNode; variant?: 'default' | 'outline' }> = ({ children, variant = 'default' }) => (
+  <span
+    className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
+      variant === 'outline'
+        ? 'border border-[#E5DFC6] bg-white text-[#0a2225]'
+        : 'bg-[#F5EFE1] text-[#0a2225] border border-[#E5DFC6]'
+    }`}
+  >
+    {children}
+  </span>
+);
+
+// ============================================================================
 // APPLICATION DETAIL VIEW - AGENT
 // ============================================================================
 
@@ -510,11 +584,11 @@ const AgentApplicationDetail: React.FC<{
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold">
+          <h2 className="font-secondary text-2xl text-[#0a2225]">
             {application.first_name} {application.last_name}
           </h2>
-          <p className="text-muted-foreground">{application.agency_name}</p>
-          <div className="mt-2">
+          <p className="text-[#6B7280] mt-1">{application.agency_name}</p>
+          <div className="mt-3">
             <StatusBadge status={application.status} />
           </div>
         </div>
@@ -522,11 +596,18 @@ const AgentApplicationDetail: React.FC<{
         <div className="flex gap-2">
           {application.status === 'verified' && (
             <>
-              <Button variant="outline" onClick={onReject}>
+              <Button
+                variant="outline"
+                onClick={onReject}
+                className="border-[#E5DFC6] text-[#5b2c2c] hover:bg-[#f0d1d1] rounded-xl"
+              >
                 <XCircle className="mr-2 h-4 w-4" />
                 Reject
               </Button>
-              <Button onClick={onApprove}>
+              <Button
+                onClick={onApprove}
+                className="bg-[#0c4d47] hover:bg-[#0a3d3a] text-[#E5DFC6] rounded-xl"
+              >
                 <CheckCircle className="mr-2 h-4 w-4" />
                 Approve
               </Button>
@@ -535,29 +616,27 @@ const AgentApplicationDetail: React.FC<{
         </div>
       </div>
 
-      <Separator />
+      <div className="border-t border-[#E5DFC6]" />
 
       {/* Contact Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Contact Information</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Mail className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm">
-              <a href={`mailto:${application.email}`} className="text-primary hover:underline">
-                {application.email}
-              </a>
-            </span>
+      <LuxuryCard>
+        <LuxuryCardHeader>
+          <LuxuryCardTitle icon={Mail}>Contact Information</LuxuryCardTitle>
+        </LuxuryCardHeader>
+        <LuxuryCardContent className="space-y-3">
+          <div className="flex items-center gap-3">
+            <Mail className="h-4 w-4 text-[#C7A962]" />
+            <a href={`mailto:${application.email}`} className="text-sm text-[#0c4d47] hover:underline">
+              {application.email}
+            </a>
           </div>
-          <div className="flex items-center gap-2">
-            <Phone className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm">{application.phone}</span>
+          <div className="flex items-center gap-3">
+            <Phone className="h-4 w-4 text-[#C7A962]" />
+            <span className="text-sm text-[#0a2225]">{application.phone}</span>
           </div>
-          <div className="flex items-start gap-2">
-            <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-            <span className="text-sm">
+          <div className="flex items-start gap-3">
+            <MapPin className="h-4 w-4 text-[#C7A962] mt-0.5" />
+            <span className="text-sm text-[#0a2225]">
               {application.business_address}
               {application.business_city && `, ${application.business_city}`}
               {application.business_state && `, ${application.business_state}`}
@@ -566,143 +645,132 @@ const AgentApplicationDetail: React.FC<{
             </span>
           </div>
           {application.website && (
-            <div className="flex items-center gap-2">
-              <Globe className="h-4 w-4 text-muted-foreground" />
+            <div className="flex items-center gap-3">
+              <Globe className="h-4 w-4 text-[#C7A962]" />
               <a
                 href={application.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-primary hover:underline flex items-center gap-1"
+                className="text-sm text-[#0c4d47] hover:underline flex items-center gap-1"
               >
                 {application.website}
                 <ExternalLink className="h-3 w-3" />
               </a>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </LuxuryCardContent>
+      </LuxuryCard>
 
       {/* Business Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Business Information</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+      <LuxuryCard>
+        <LuxuryCardHeader>
+          <LuxuryCardTitle icon={Building}>Business Information</LuxuryCardTitle>
+        </LuxuryCardHeader>
+        <LuxuryCardContent>
+          <div className="grid grid-cols-2 gap-6">
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Business Type</Label>
-              <p className="mt-1 capitalize">{application.business_type?.replace('_', ' ') || 'N/A'}</p>
+              <p className="text-xs text-[#6B7280] uppercase tracking-wide">Business Type</p>
+              <p className="mt-1 text-[#0a2225] capitalize">{application.business_type?.replace('_', ' ') || 'N/A'}</p>
             </div>
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Years of Experience</Label>
-              <p className="mt-1">{application.years_experience} years</p>
+              <p className="text-xs text-[#6B7280] uppercase tracking-wide">Years of Experience</p>
+              <p className="mt-1 text-[#0a2225]">{application.years_experience} years</p>
             </div>
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Commission Rate</Label>
-              <p className="mt-1">{application.commission_rate}%</p>
+              <p className="text-xs text-[#6B7280] uppercase tracking-wide">Commission Rate</p>
+              <p className="mt-1 text-[#0a2225]">{application.commission_rate}%</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </LuxuryCardContent>
+      </LuxuryCard>
 
       {/* Services & Specialties */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Services & Specializations</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <LuxuryCard>
+        <LuxuryCardHeader>
+          <LuxuryCardTitle icon={Award}>Services & Specializations</LuxuryCardTitle>
+        </LuxuryCardHeader>
+        <LuxuryCardContent className="space-y-4">
           <div>
-            <Label className="text-sm font-medium text-muted-foreground">Service Types</Label>
-            <div className="flex flex-wrap gap-2 mt-2">
+            <p className="text-xs text-[#6B7280] uppercase tracking-wide mb-2">Service Types</p>
+            <div className="flex flex-wrap gap-2">
               {(application.service_types || []).map((service) => (
-                <Badge key={service} variant="secondary">
-                  {service}
-                </Badge>
+                <LuxuryBadge key={service}>{service}</LuxuryBadge>
               ))}
             </div>
           </div>
 
           <div>
-            <Label className="text-sm font-medium text-muted-foreground">Specialties</Label>
-            <div className="flex flex-wrap gap-2 mt-2">
+            <p className="text-xs text-[#6B7280] uppercase tracking-wide mb-2">Specialties</p>
+            <div className="flex flex-wrap gap-2">
               {(application.specialties || []).map((specialty) => (
-                <Badge key={specialty} variant="outline">
-                  {specialty}
-                </Badge>
+                <LuxuryBadge key={specialty} variant="outline">{specialty}</LuxuryBadge>
               ))}
             </div>
           </div>
 
           <div>
-            <Label className="text-sm font-medium text-muted-foreground">Languages</Label>
-            <div className="flex flex-wrap gap-2 mt-2">
+            <p className="text-xs text-[#6B7280] uppercase tracking-wide mb-2">Languages</p>
+            <div className="flex flex-wrap gap-2">
               {(application.languages || []).map((language) => (
-                <Badge key={language} variant="secondary">
-                  {language}
-                </Badge>
+                <LuxuryBadge key={language}>{language}</LuxuryBadge>
               ))}
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </LuxuryCardContent>
+      </LuxuryCard>
 
       {/* Licensing & Insurance */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Licensing & Insurance
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+      <LuxuryCard>
+        <LuxuryCardHeader>
+          <LuxuryCardTitle icon={Shield}>Licensing & Insurance</LuxuryCardTitle>
+        </LuxuryCardHeader>
+        <LuxuryCardContent>
+          <div className="grid grid-cols-2 gap-6">
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">License Number</Label>
-              <p className="mt-1">{application.license_number}</p>
+              <p className="text-xs text-[#6B7280] uppercase tracking-wide">License Number</p>
+              <p className="mt-1 text-[#0a2225]">{application.license_number || 'N/A'}</p>
             </div>
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">License State</Label>
-              <p className="mt-1">{application.license_state}</p>
+              <p className="text-xs text-[#6B7280] uppercase tracking-wide">License State</p>
+              <p className="mt-1 text-[#0a2225]">{application.license_state || 'N/A'}</p>
             </div>
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Insurance Provider</Label>
-              <p className="mt-1">{application.insurance_provider}</p>
+              <p className="text-xs text-[#6B7280] uppercase tracking-wide">Insurance Provider</p>
+              <p className="mt-1 text-[#0a2225]">{application.insurance_provider || 'N/A'}</p>
             </div>
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Policy Number</Label>
-              <p className="mt-1">{application.insurance_policy_number}</p>
+              <p className="text-xs text-[#6B7280] uppercase tracking-wide">Policy Number</p>
+              <p className="mt-1 text-[#0a2225]">{application.insurance_policy_number || 'N/A'}</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </LuxuryCardContent>
+      </LuxuryCard>
 
       {/* Documents */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <FileText className="h-5 w-5" />
-            Uploaded Documents
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      <LuxuryCard>
+        <LuxuryCardHeader>
+          <LuxuryCardTitle icon={FileText}>Uploaded Documents</LuxuryCardTitle>
+        </LuxuryCardHeader>
+        <LuxuryCardContent>
           {application.documents && application.documents.length > 0 ? (
             <div className="space-y-2">
               {application.documents.map((doc: any, index: number) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50"
+                  className="flex items-center justify-between p-3 border border-[#E5DFC6] rounded-xl hover:bg-[#F5EFE1] transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <FileText className="h-5 w-5 text-muted-foreground" />
+                    <FileText className="h-5 w-5 text-[#C7A962]" />
                     <div>
-                      <p className="font-medium text-sm">{doc.type}</p>
-                      <p className="text-xs text-muted-foreground">{doc.fileName}</p>
+                      <p className="font-medium text-sm text-[#0a2225]">{doc.type}</p>
+                      <p className="text-xs text-[#6B7280]">{doc.fileName}</p>
                     </div>
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => window.open(doc.url, '_blank')}
+                    className="text-[#0c4d47] hover:bg-[#d4e7dd]"
                   >
                     <ExternalLink className="h-4 w-4" />
                   </Button>
@@ -710,39 +778,28 @@ const AgentApplicationDetail: React.FC<{
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">No documents uploaded</p>
+            <p className="text-sm text-[#6B7280]">No documents uploaded</p>
           )}
-        </CardContent>
-      </Card>
+        </LuxuryCardContent>
+      </LuxuryCard>
 
       {/* Stripe Verification */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Identity Verification
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-2 gap-4">
+      <LuxuryCard>
+        <LuxuryCardHeader>
+          <LuxuryCardTitle icon={Shield}>Identity Verification</LuxuryCardTitle>
+        </LuxuryCardHeader>
+        <LuxuryCardContent className="space-y-3">
+          <div className="grid grid-cols-2 gap-6">
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Status</Label>
-              <p className="mt-1">
-                <Badge
-                  variant={
-                    application.stripe_verification_status === 'verified'
-                      ? 'default'
-                      : 'secondary'
-                  }
-                >
-                  {application.stripe_verification_status}
-                </Badge>
-              </p>
+              <p className="text-xs text-[#6B7280] uppercase tracking-wide">Status</p>
+              <div className="mt-2">
+                <StatusBadge status={application.stripe_verification_status || 'pending_verification'} />
+              </div>
             </div>
             {application.stripe_verified_at && (
               <div>
-                <Label className="text-sm font-medium text-muted-foreground">Verified At</Label>
-                <p className="mt-1 text-sm">
+                <p className="text-xs text-[#6B7280] uppercase tracking-wide">Verified At</p>
+                <p className="mt-1 text-sm text-[#0a2225]">
                   {format(new Date(application.stripe_verified_at), 'PPp')}
                 </p>
               </div>
@@ -750,58 +807,57 @@ const AgentApplicationDetail: React.FC<{
           </div>
 
           {application.stripe_verification_report && (
-            <div className="bg-muted p-3 rounded-lg">
-              <p className="text-xs font-mono text-muted-foreground">
+            <div className="bg-[#F5EFE1] p-3 rounded-xl mt-4">
+              <p className="text-xs font-mono text-[#6B7280]">
                 Session ID: {application.stripe_verification_session_id}
               </p>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </LuxuryCardContent>
+      </LuxuryCard>
 
       {/* Timeline */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            Timeline
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
+      <LuxuryCard>
+        <LuxuryCardHeader>
+          <LuxuryCardTitle icon={Calendar}>Timeline</LuxuryCardTitle>
+        </LuxuryCardHeader>
+        <LuxuryCardContent className="space-y-2">
           <div className="flex items-center gap-2 text-sm">
-            <span className="font-medium text-muted-foreground">Submitted:</span>
-            <span>{format(new Date(application.submitted_at), 'PPp')}</span>
+            <span className="text-[#6B7280] w-24">Submitted:</span>
+            <span className="text-[#0a2225]">{format(new Date(application.submitted_at), 'PPp')}</span>
           </div>
           {application.stripe_verified_at && (
             <div className="flex items-center gap-2 text-sm">
-              <span className="font-medium text-muted-foreground">Verified:</span>
-              <span>{format(new Date(application.stripe_verified_at), 'PPp')}</span>
+              <span className="text-[#6B7280] w-24">Verified:</span>
+              <span className="text-[#0a2225]">{format(new Date(application.stripe_verified_at), 'PPp')}</span>
             </div>
           )}
           {application.approved_at && (
             <div className="flex items-center gap-2 text-sm">
-              <span className="font-medium text-muted-foreground">Approved:</span>
-              <span>{format(new Date(application.approved_at), 'PPp')}</span>
+              <span className="text-[#6B7280] w-24">Approved:</span>
+              <span className="text-[#0c4d47]">{format(new Date(application.approved_at), 'PPp')}</span>
             </div>
           )}
           {application.rejected_at && (
             <div className="flex items-center gap-2 text-sm">
-              <span className="font-medium text-muted-foreground">Rejected:</span>
-              <span>{format(new Date(application.rejected_at), 'PPp')}</span>
+              <span className="text-[#6B7280] w-24">Rejected:</span>
+              <span className="text-[#5b2c2c]">{format(new Date(application.rejected_at), 'PPp')}</span>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </LuxuryCardContent>
+      </LuxuryCard>
 
       {/* Rejection Reason (if applicable) */}
       {application.status === 'rejected' && application.rejection_reason && (
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>
-            <strong>Rejection Reason:</strong>
-            <p className="mt-2">{application.rejection_reason}</p>
-          </AlertDescription>
-        </Alert>
+        <div className="bg-[#f0d1d1] border border-[#5b2c2c]/20 rounded-2xl p-6">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-[#5b2c2c] mt-0.5" />
+            <div>
+              <p className="font-medium text-[#5b2c2c]">Rejection Reason</p>
+              <p className="mt-2 text-sm text-[#5b2c2c]/80">{application.rejection_reason}</p>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -821,9 +877,9 @@ const BrandApplicationDetail: React.FC<{
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold">{application.brand_name}</h2>
-          <p className="text-muted-foreground">{application.brand_type}</p>
-          <div className="mt-2">
+          <h2 className="font-secondary text-2xl text-[#0a2225]">{application.brand_name}</h2>
+          <p className="text-[#6B7280] mt-1 capitalize">{application.brand_type}</p>
+          <div className="mt-3">
             <StatusBadge status={application.status} />
           </div>
         </div>
@@ -831,11 +887,18 @@ const BrandApplicationDetail: React.FC<{
         <div className="flex gap-2">
           {application.status === 'verified' && (
             <>
-              <Button variant="outline" onClick={onReject}>
+              <Button
+                variant="outline"
+                onClick={onReject}
+                className="border-[#E5DFC6] text-[#5b2c2c] hover:bg-[#f0d1d1] rounded-xl"
+              >
                 <XCircle className="mr-2 h-4 w-4" />
                 Reject
               </Button>
-              <Button onClick={onApprove}>
+              <Button
+                onClick={onApprove}
+                className="bg-[#0c4d47] hover:bg-[#0a3d3a] text-[#E5DFC6] rounded-xl"
+              >
                 <CheckCircle className="mr-2 h-4 w-4" />
                 Approve
               </Button>
@@ -844,162 +907,147 @@ const BrandApplicationDetail: React.FC<{
         </div>
       </div>
 
-      <Separator />
+      <div className="border-t border-[#E5DFC6]" />
 
       {/* Cover Image */}
       {application.cover_image_url && (
-        <Card>
-          <CardContent className="p-0">
-            <img
-              src={application.cover_image_url}
-              alt={application.brand_name}
-              className="w-full h-64 object-cover rounded-lg"
-            />
-          </CardContent>
-        </Card>
+        <div className="rounded-2xl overflow-hidden border border-[#E5DFC6]">
+          <img
+            src={application.cover_image_url}
+            alt={application.brand_name}
+            className="w-full h-64 object-cover"
+          />
+        </div>
       )}
 
       {/* Contact Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Primary Contact</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
+      <LuxuryCard>
+        <LuxuryCardHeader>
+          <LuxuryCardTitle icon={Users}>Primary Contact</LuxuryCardTitle>
+        </LuxuryCardHeader>
+        <LuxuryCardContent className="space-y-3">
           <div>
-            <Label className="text-sm font-medium text-muted-foreground">Name</Label>
-            <p className="mt-1">{application.primary_contact_name}</p>
+            <p className="text-xs text-[#6B7280] uppercase tracking-wide">Name</p>
+            <p className="mt-1 text-[#0a2225]">{application.primary_contact_name}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Mail className="h-4 w-4 text-muted-foreground" />
+          <div className="flex items-center gap-3">
+            <Mail className="h-4 w-4 text-[#C7A962]" />
             <a
               href={`mailto:${application.primary_contact_email}`}
-              className="text-sm text-primary hover:underline"
+              className="text-sm text-[#0c4d47] hover:underline"
             >
               {application.primary_contact_email}
             </a>
           </div>
-          <div className="flex items-center gap-2">
-            <Phone className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm">{application.primary_contact_phone}</span>
+          <div className="flex items-center gap-3">
+            <Phone className="h-4 w-4 text-[#C7A962]" />
+            <span className="text-sm text-[#0a2225]">{application.primary_contact_phone}</span>
           </div>
-        </CardContent>
-      </Card>
+        </LuxuryCardContent>
+      </LuxuryCard>
 
       {/* Brand Description */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">About</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm leading-relaxed">{application.bio}</p>
-        </CardContent>
-      </Card>
+      <LuxuryCard>
+        <LuxuryCardHeader>
+          <LuxuryCardTitle icon={FileText}>About</LuxuryCardTitle>
+        </LuxuryCardHeader>
+        <LuxuryCardContent>
+          <p className="text-sm leading-relaxed text-[#0a2225]">{application.bio}</p>
+        </LuxuryCardContent>
+      </LuxuryCard>
 
       {/* Location & Style */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Location & Style</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <LuxuryCard>
+        <LuxuryCardHeader>
+          <LuxuryCardTitle icon={MapPin}>Location & Style</LuxuryCardTitle>
+        </LuxuryCardHeader>
+        <LuxuryCardContent className="space-y-4">
           <div>
-            <Label className="text-sm font-medium text-muted-foreground">Regions</Label>
-            <div className="flex flex-wrap gap-2 mt-2">
+            <p className="text-xs text-[#6B7280] uppercase tracking-wide mb-2">Regions</p>
+            <div className="flex flex-wrap gap-2">
               {(application.regions || []).map((region) => (
-                <Badge key={region} variant="secondary">
-                  {region}
-                </Badge>
+                <LuxuryBadge key={region}>{region}</LuxuryBadge>
               ))}
             </div>
           </div>
 
           <div>
-            <Label className="text-sm font-medium text-muted-foreground">Cities</Label>
-            <div className="flex flex-wrap gap-2 mt-2">
+            <p className="text-xs text-[#6B7280] uppercase tracking-wide mb-2">Cities</p>
+            <div className="flex flex-wrap gap-2">
               {(application.cities || []).map((city) => (
-                <Badge key={city} variant="outline">
-                  {city}
-                </Badge>
+                <LuxuryBadge key={city} variant="outline">{city}</LuxuryBadge>
               ))}
             </div>
           </div>
 
           <div>
-            <Label className="text-sm font-medium text-muted-foreground">Style Tags</Label>
-            <div className="flex flex-wrap gap-2 mt-2">
+            <p className="text-xs text-[#6B7280] uppercase tracking-wide mb-2">Style Tags</p>
+            <div className="flex flex-wrap gap-2">
               {(application.style_tags || []).map((tag) => (
-                <Badge key={tag} variant="secondary">
-                  {tag}
-                </Badge>
+                <LuxuryBadge key={tag}>{tag}</LuxuryBadge>
               ))}
             </div>
           </div>
 
           <div>
-            <Label className="text-sm font-medium text-muted-foreground">Price Range</Label>
-            <p className="mt-1 capitalize">{application.price_range?.replace('_', ' ') || 'N/A'}</p>
+            <p className="text-xs text-[#6B7280] uppercase tracking-wide">Price Range</p>
+            <p className="mt-1 capitalize text-[#0a2225]">{application.price_range?.replace('_', ' ') || 'N/A'}</p>
           </div>
-        </CardContent>
-      </Card>
+        </LuxuryCardContent>
+      </LuxuryCard>
 
       {/* Gallery */}
       {application.gallery_urls && application.gallery_urls.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Gallery</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <LuxuryCard>
+          <LuxuryCardHeader>
+            <LuxuryCardTitle>Gallery</LuxuryCardTitle>
+          </LuxuryCardHeader>
+          <LuxuryCardContent>
             <div className="grid grid-cols-3 gap-4">
               {application.gallery_urls.map((url, index) => (
                 <img
                   key={index}
                   src={url}
                   alt={`Gallery ${index + 1}`}
-                  className="w-full h-40 object-cover rounded-lg cursor-pointer hover:opacity-90"
+                  className="w-full h-40 object-cover rounded-xl cursor-pointer hover:opacity-90 transition-opacity border border-[#E5DFC6]"
                   onClick={() => window.open(url, '_blank')}
                 />
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </LuxuryCardContent>
+        </LuxuryCard>
       )}
 
       {/* Amenities */}
       {application.amenities && (application.amenities || []).length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Amenities</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <LuxuryCard>
+          <LuxuryCardHeader>
+            <LuxuryCardTitle>Amenities</LuxuryCardTitle>
+          </LuxuryCardHeader>
+          <LuxuryCardContent>
             <div className="flex flex-wrap gap-2">
               {(application.amenities || []).map((amenity) => (
-                <Badge key={amenity} variant="outline">
-                  {amenity}
-                </Badge>
+                <LuxuryBadge key={amenity} variant="outline">{amenity}</LuxuryBadge>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </LuxuryCardContent>
+        </LuxuryCard>
       )}
 
       {/* Certifications */}
       {((application.sustainability_certifications || []).length > 0 ||
         (application.quality_certifications || []).length > 0) && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Award className="h-5 w-5" />
-              Certifications
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <LuxuryCard>
+          <LuxuryCardHeader>
+            <LuxuryCardTitle icon={Award}>Certifications</LuxuryCardTitle>
+          </LuxuryCardHeader>
+          <LuxuryCardContent className="space-y-4">
             {(application.sustainability_certifications || []).length > 0 && (
               <div>
-                <Label className="text-sm font-medium text-muted-foreground">Sustainability</Label>
-                <div className="flex flex-wrap gap-2 mt-2">
+                <p className="text-xs text-[#6B7280] uppercase tracking-wide mb-2">Sustainability</p>
+                <div className="flex flex-wrap gap-2">
                   {(application.sustainability_certifications || []).map((cert) => (
-                    <Badge key={cert} variant="secondary">
-                      {cert}
-                    </Badge>
+                    <LuxuryBadge key={cert}>{cert}</LuxuryBadge>
                   ))}
                 </div>
               </div>
@@ -1007,47 +1055,43 @@ const BrandApplicationDetail: React.FC<{
 
             {(application.quality_certifications || []).length > 0 && (
               <div>
-                <Label className="text-sm font-medium text-muted-foreground">Quality</Label>
-                <div className="flex flex-wrap gap-2 mt-2">
+                <p className="text-xs text-[#6B7280] uppercase tracking-wide mb-2">Quality</p>
+                <div className="flex flex-wrap gap-2">
                   {(application.quality_certifications || []).map((cert) => (
-                    <Badge key={cert} variant="secondary">
-                      {cert}
-                    </Badge>
+                    <LuxuryBadge key={cert}>{cert}</LuxuryBadge>
                   ))}
                 </div>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </LuxuryCardContent>
+        </LuxuryCard>
       )}
 
       {/* Documents */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <FileText className="h-5 w-5" />
-            Uploaded Documents
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      <LuxuryCard>
+        <LuxuryCardHeader>
+          <LuxuryCardTitle icon={FileText}>Uploaded Documents</LuxuryCardTitle>
+        </LuxuryCardHeader>
+        <LuxuryCardContent>
           {application.documents && application.documents.length > 0 ? (
             <div className="space-y-2">
               {application.documents.map((doc: any, index: number) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50"
+                  className="flex items-center justify-between p-3 border border-[#E5DFC6] rounded-xl hover:bg-[#F5EFE1] transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <FileText className="h-5 w-5 text-muted-foreground" />
+                    <FileText className="h-5 w-5 text-[#C7A962]" />
                     <div>
-                      <p className="font-medium text-sm">{doc.type}</p>
-                      <p className="text-xs text-muted-foreground">{doc.fileName}</p>
+                      <p className="font-medium text-sm text-[#0a2225]">{doc.type}</p>
+                      <p className="text-xs text-[#6B7280]">{doc.fileName}</p>
                     </div>
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => window.open(doc.url, '_blank')}
+                    className="text-[#0c4d47] hover:bg-[#d4e7dd]"
                   >
                     <ExternalLink className="h-4 w-4" />
                   </Button>
@@ -1055,44 +1099,41 @@ const BrandApplicationDetail: React.FC<{
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">No documents uploaded</p>
+            <p className="text-sm text-[#6B7280]">No documents uploaded</p>
           )}
-        </CardContent>
-      </Card>
+        </LuxuryCardContent>
+      </LuxuryCard>
 
       {/* Timeline */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            Timeline
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
+      <LuxuryCard>
+        <LuxuryCardHeader>
+          <LuxuryCardTitle icon={Calendar}>Timeline</LuxuryCardTitle>
+        </LuxuryCardHeader>
+        <LuxuryCardContent className="space-y-2">
           <div className="flex items-center gap-2 text-sm">
-            <span className="font-medium text-muted-foreground">Submitted:</span>
-            <span>{format(new Date(application.submitted_at), 'PPp')}</span>
+            <span className="text-[#6B7280] w-24">Submitted:</span>
+            <span className="text-[#0a2225]">{format(new Date(application.submitted_at), 'PPp')}</span>
           </div>
           {application.stripe_verified_at && (
             <div className="flex items-center gap-2 text-sm">
-              <span className="font-medium text-muted-foreground">Verified:</span>
-              <span>{format(new Date(application.stripe_verified_at), 'PPp')}</span>
+              <span className="text-[#6B7280] w-24">Verified:</span>
+              <span className="text-[#0a2225]">{format(new Date(application.stripe_verified_at), 'PPp')}</span>
             </div>
           )}
           {application.approved_at && (
             <div className="flex items-center gap-2 text-sm">
-              <span className="font-medium text-muted-foreground">Approved:</span>
-              <span>{format(new Date(application.approved_at), 'PPp')}</span>
+              <span className="text-[#6B7280] w-24">Approved:</span>
+              <span className="text-[#0c4d47]">{format(new Date(application.approved_at), 'PPp')}</span>
             </div>
           )}
           {application.rejected_at && (
             <div className="flex items-center gap-2 text-sm">
-              <span className="font-medium text-muted-foreground">Rejected:</span>
-              <span>{format(new Date(application.rejected_at), 'PPp')}</span>
+              <span className="text-[#6B7280] w-24">Rejected:</span>
+              <span className="text-[#5b2c2c]">{format(new Date(application.rejected_at), 'PPp')}</span>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </LuxuryCardContent>
+      </LuxuryCard>
     </div>
   );
 };
@@ -1110,7 +1151,7 @@ export default function AdminApplicationsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  
+
   // Dialog states
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
   const [rejectionDialogOpen, setRejectionDialogOpen] = useState(false);
@@ -1156,10 +1197,8 @@ export default function AdminApplicationsPage() {
       setStats({
         totalAgents: agents?.length || 0,
         totalBrands: brands?.length || 0,
-        pendingAgents:
-          agents?.filter((a) => a.status === 'pending_verification').length || 0,
-        pendingBrands:
-          brands?.filter((b) => b.status === 'pending_verification').length || 0,
+        pendingAgents: agents?.filter((a) => a.status === 'pending_verification').length || 0,
+        pendingBrands: brands?.filter((b) => b.status === 'pending_verification').length || 0,
         verifiedAgents: agents?.filter((a) => a.status === 'verified').length || 0,
         verifiedBrands: brands?.filter((b) => b.status === 'verified').length || 0,
       });
@@ -1249,157 +1288,190 @@ export default function AdminApplicationsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="flex items-center justify-center min-h-screen bg-[#FDF9F0]">
+        <Loader2 className="h-8 w-8 animate-spin text-[#0c4d47]" />
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-7xl">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Applications Management</h1>
-        <p className="text-muted-foreground mt-2">
-          Review and manage agent and brand applications
-        </p>
-      </div>
+    <div className="min-h-screen bg-[#FDF9F0]">
+      <div className="container mx-auto py-8 px-4 max-w-7xl">
+        {/* Header */}
+        <div className="mb-8">
+          <Link
+            to="/admin"
+            className="inline-flex items-center gap-2 text-sm text-[#6B7280] hover:text-[#0a2225] mb-4 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Admin
+          </Link>
+          <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225]">Applications Management</h1>
+          <p className="text-[#6B7280] mt-2">
+            Review and manage agent and brand applications
+          </p>
+        </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Total Agents</p>
-                <p className="text-2xl font-bold">{stats.totalAgents}</p>
-              </div>
-              <Users className="h-8 w-8 text-primary" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Total Brands</p>
-                <p className="text-2xl font-bold">{stats.totalBrands}</p>
-              </div>
-              <Building className="h-8 w-8 text-primary" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Awaiting Review</p>
-                <p className="text-2xl font-bold">
-                  {stats.verifiedAgents + stats.verifiedBrands}
-                </p>
-              </div>
-              <Clock className="h-8 w-8 text-primary" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Pending Verification</p>
-                <p className="text-2xl font-bold">
-                  {stats.pendingAgents + stats.pendingBrands}
-                </p>
-              </div>
-              <AlertTriangle className="h-8 w-8 text-primary" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Filters */}
-      <Card className="mb-6">
-        <CardContent className="pt-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by name, email, or company..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <LuxuryCard>
+            <div className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-[#6B7280] uppercase tracking-wide">Total Agents</p>
+                  <p className="text-3xl font-secondary text-[#0a2225] mt-1">{stats.totalAgents}</p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-[#d4e7dd] flex items-center justify-center">
+                  <Users className="h-6 w-6 text-[#0c4d47]" />
+                </div>
               </div>
             </div>
+          </LuxuryCard>
 
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full md:w-[200px]">
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="pending_verification">Pending Verification</SelectItem>
-                <SelectItem value="verified">Verified - Awaiting Review</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
-                <SelectItem value="failed">Verification Failed</SelectItem>
-              </SelectContent>
-            </Select>
+          <LuxuryCard>
+            <div className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-[#6B7280] uppercase tracking-wide">Total Brands</p>
+                  <p className="text-3xl font-secondary text-[#0a2225] mt-1">{stats.totalBrands}</p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-[#F5EFE1] flex items-center justify-center">
+                  <Building className="h-6 w-6 text-[#C7A962]" />
+                </div>
+              </div>
+            </div>
+          </LuxuryCard>
+
+          <LuxuryCard>
+            <div className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-[#6B7280] uppercase tracking-wide">Awaiting Review</p>
+                  <p className="text-3xl font-secondary text-[#0a2225] mt-1">
+                    {stats.verifiedAgents + stats.verifiedBrands}
+                  </p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-[#f5e9c5] flex items-center justify-center">
+                  <Clock className="h-6 w-6 text-[#6d5223]" />
+                </div>
+              </div>
+            </div>
+          </LuxuryCard>
+
+          <LuxuryCard>
+            <div className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-[#6B7280] uppercase tracking-wide">Pending Verification</p>
+                  <p className="text-3xl font-secondary text-[#0a2225] mt-1">
+                    {stats.pendingAgents + stats.pendingBrands}
+                  </p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-[#fef3cd] flex items-center justify-center">
+                  <AlertTriangle className="h-6 w-6 text-[#856404]" />
+                </div>
+              </div>
+            </div>
+          </LuxuryCard>
+        </div>
+
+        {/* Filters */}
+        <LuxuryCard className="mb-6">
+          <div className="p-6">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#6B7280]" />
+                  <Input
+                    placeholder="Search by name, email, or company..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-11 border-[#E5DFC6] rounded-xl focus:ring-[#C7A962] focus:border-[#C7A962] bg-white"
+                  />
+                </div>
+              </div>
+
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full md:w-[220px] border-[#E5DFC6] rounded-xl focus:ring-[#C7A962] bg-white">
+                  <Filter className="h-4 w-4 mr-2 text-[#6B7280]" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-white border-[#E5DFC6] rounded-xl">
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="pending_verification">Pending Verification</SelectItem>
+                  <SelectItem value="verified">Verified - Awaiting Review</SelectItem>
+                  <SelectItem value="approved">Approved</SelectItem>
+                  <SelectItem value="rejected">Rejected</SelectItem>
+                  <SelectItem value="failed">Verification Failed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </LuxuryCard>
 
-      {/* Main Content */}
-      <div className="grid grid-cols-12 gap-6">
-        {/* Applications List */}
-        <div className="col-span-12 lg:col-span-5">
-          <Card>
-            <CardHeader>
-              <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="agents">
+        {/* Main Content */}
+        <div className="grid grid-cols-12 gap-6">
+          {/* Applications List */}
+          <div className="col-span-12 lg:col-span-5">
+            <LuxuryCard>
+              <div className="p-4 border-b border-[#E5DFC6]">
+                {/* Luxury Tabs */}
+                <div className="bg-[#F5EFE1] rounded-xl p-1 flex">
+                  <button
+                    onClick={() => setActiveTab('agents')}
+                    className={`flex-1 py-2.5 px-4 text-sm font-medium rounded-lg transition-all ${
+                      activeTab === 'agents'
+                        ? 'bg-[#0c4d47] text-[#E5DFC6] shadow-sm'
+                        : 'text-[#6B7280] hover:text-[#0a2225]'
+                    }`}
+                  >
                     Agents ({filteredAgentApplications.length})
-                  </TabsTrigger>
-                  <TabsTrigger value="brands">
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('brands')}
+                    className={`flex-1 py-2.5 px-4 text-sm font-medium rounded-lg transition-all ${
+                      activeTab === 'brands'
+                        ? 'bg-[#0c4d47] text-[#E5DFC6] shadow-sm'
+                        : 'text-[#6B7280] hover:text-[#0a2225]'
+                    }`}
+                  >
                     Brands ({filteredBrandApplications.length})
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </CardHeader>
-            <CardContent className="p-0">
+                  </button>
+                </div>
+              </div>
+
               <ScrollArea className="h-[600px]">
                 {activeTab === 'agents' ? (
-                  <div className="divide-y">
+                  <div className="divide-y divide-[#E5DFC6]">
                     {filteredAgentApplications.length === 0 ? (
-                      <div className="p-8 text-center text-muted-foreground">
-                        No agent applications found
+                      <div className="p-8 text-center">
+                        <Users className="h-12 w-12 mx-auto text-[#E5DFC6] mb-3" />
+                        <p className="font-secondary text-[#0a2225]">No agent applications found</p>
+                        <p className="text-sm text-[#6B7280] mt-1">Try adjusting your search or filters</p>
                       </div>
                     ) : (
                       filteredAgentApplications.map((app) => (
                         <div
                           key={app.id}
-                          className={`p-4 cursor-pointer hover:bg-muted/50 ${
-                            selectedApplication?.id === app.id ? 'bg-muted' : ''
+                          className={`p-4 cursor-pointer transition-colors ${
+                            selectedApplication?.id === app.id
+                              ? 'bg-[#F5EFE1]'
+                              : 'hover:bg-[#FDF9F0]'
                           }`}
                           onClick={() => setSelectedApplication(app)}
                         >
                           <div className="flex items-start justify-between mb-2">
                             <div>
-                              <h3 className="font-semibold">
+                              <h3 className="font-medium text-[#0a2225]">
                                 {app.first_name} {app.last_name}
                               </h3>
-                              <p className="text-sm text-muted-foreground">{app.agency_name}</p>
+                              <p className="text-sm text-[#6B7280]">{app.agency_name}</p>
                             </div>
-                            <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                            <ChevronRight className="h-5 w-5 text-[#C7A962]" />
                           </div>
                           <div className="flex items-center justify-between">
                             <StatusBadge status={app.status} />
-                            <span className="text-xs text-muted-foreground">
+                            <span className="text-xs text-[#6B7280]">
                               {format(new Date(app.submitted_at), 'MMM d')}
                             </span>
                           </div>
@@ -1408,17 +1480,21 @@ export default function AdminApplicationsPage() {
                     )}
                   </div>
                 ) : (
-                  <div className="divide-y">
+                  <div className="divide-y divide-[#E5DFC6]">
                     {filteredBrandApplications.length === 0 ? (
-                      <div className="p-8 text-center text-muted-foreground">
-                        No brand applications found
+                      <div className="p-8 text-center">
+                        <Building className="h-12 w-12 mx-auto text-[#E5DFC6] mb-3" />
+                        <p className="font-secondary text-[#0a2225]">No brand applications found</p>
+                        <p className="text-sm text-[#6B7280] mt-1">Try adjusting your search or filters</p>
                       </div>
                     ) : (
                       filteredBrandApplications.map((app) => (
                         <div
                           key={app.id}
-                          className={`p-4 cursor-pointer hover:bg-muted/50 ${
-                            selectedApplication?.id === app.id ? 'bg-muted' : ''
+                          className={`p-4 cursor-pointer transition-colors ${
+                            selectedApplication?.id === app.id
+                              ? 'bg-[#F5EFE1]'
+                              : 'hover:bg-[#FDF9F0]'
                           }`}
                           onClick={() => setSelectedApplication(app)}
                         >
@@ -1428,19 +1504,19 @@ export default function AdminApplicationsPage() {
                                 <img
                                   src={app.logo_url}
                                   alt={app.brand_name}
-                                  className="h-10 w-10 rounded object-cover"
+                                  className="h-10 w-10 rounded-xl object-cover border border-[#E5DFC6]"
                                 />
                               )}
                               <div>
-                                <h3 className="font-semibold">{app.brand_name}</h3>
-                                <p className="text-sm text-muted-foreground">{app.brand_type}</p>
+                                <h3 className="font-medium text-[#0a2225]">{app.brand_name}</h3>
+                                <p className="text-sm text-[#6B7280] capitalize">{app.brand_type}</p>
                               </div>
                             </div>
-                            <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                            <ChevronRight className="h-5 w-5 text-[#C7A962]" />
                           </div>
                           <div className="flex items-center justify-between">
                             <StatusBadge status={app.status} />
-                            <span className="text-xs text-muted-foreground">
+                            <span className="text-xs text-[#6B7280]">
                               {format(new Date(app.submitted_at), 'MMM d')}
                             </span>
                           </div>
@@ -1450,40 +1526,39 @@ export default function AdminApplicationsPage() {
                   </div>
                 )}
               </ScrollArea>
-            </CardContent>
-          </Card>
-        </div>
+            </LuxuryCard>
+          </div>
 
-        {/* Application Detail */}
-        <div className="col-span-12 lg:col-span-7">
-          <Card>
-            <CardContent className="p-6">
-              <ScrollArea className="h-[600px] pr-4">
-                {selectedApplication ? (
-                  activeTab === 'agents' ? (
-                    <AgentApplicationDetail
-                      application={selectedApplication as AgentApplication}
-                      onApprove={() => setApprovalDialogOpen(true)}
-                      onReject={() => setRejectionDialogOpen(true)}
-                    />
-                  ) : (
-                    <BrandApplicationDetail
-                      application={selectedApplication as BrandApplication}
-                      onApprove={() => setApprovalDialogOpen(true)}
-                      onReject={() => setRejectionDialogOpen(true)}
-                    />
-                  )
+          {/* Detail Panel */}
+          <div className="col-span-12 lg:col-span-7">
+            <LuxuryCard className="p-6">
+              {selectedApplication ? (
+                activeTab === 'agents' ? (
+                  <AgentApplicationDetail
+                    application={selectedApplication as AgentApplication}
+                    onApprove={() => setApprovalDialogOpen(true)}
+                    onReject={() => setRejectionDialogOpen(true)}
+                  />
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-center">
-                    <Eye className="h-12 w-12 text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">
-                      Select an application to view details
-                    </p>
+                  <BrandApplicationDetail
+                    application={selectedApplication as BrandApplication}
+                    onApprove={() => setApprovalDialogOpen(true)}
+                    onReject={() => setRejectionDialogOpen(true)}
+                  />
+                )
+              ) : (
+                <div className="flex flex-col items-center justify-center h-[600px] text-center">
+                  <div className="h-16 w-16 rounded-full bg-[#F5EFE1] flex items-center justify-center mb-4">
+                    <Eye className="h-8 w-8 text-[#C7A962]" />
                   </div>
-                )}
-              </ScrollArea>
-            </CardContent>
-          </Card>
+                  <h3 className="font-secondary text-xl text-[#0a2225]">Select an application</h3>
+                  <p className="text-sm text-[#6B7280] mt-2 max-w-sm">
+                    Choose an application from the list to view details and take action
+                  </p>
+                </div>
+              )}
+            </LuxuryCard>
+          </div>
         </div>
       </div>
 
