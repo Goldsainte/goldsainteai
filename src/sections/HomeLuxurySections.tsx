@@ -13,8 +13,6 @@ import aiStep2 from "@/assets/luxury-hotels.jpg";
 import aiStep3 from "@/assets/creator-road-trip.jpg";
 import aiStep4 from "@/assets/photographer-plane.jpg";
 
-import trustBg from "@/assets/luxury-destinations.jpg";
-
 /* -------------------------------------------------------------------------- */
 /*  Built for every side of luxury travel                                     */
 /* -------------------------------------------------------------------------- */
@@ -283,26 +281,16 @@ export const TrustSafetyPaymentsSection: React.FC = () => {
   ];
 
   return (
-    <section className="relative overflow-hidden bg-[#0a2225] px-4 py-16 md:py-24">
-      {/* Subtle background image overlay */}
-      <div className="pointer-events-none absolute inset-0 opacity-25">
-        <img
-          src={trustBg}
-          alt="Soft-focus luxury hotel lobby"
-          className="h-full w-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a2225] via-[#0a2225]/95 to-[#0a2225]" />
-      </div>
-
-      <div className="relative mx-auto flex max-w-6xl flex-col gap-8">
+    <section className="bg-[#FDF9F0] px-4 py-16 md:py-24">
+      <div className="mx-auto flex max-w-6xl flex-col gap-8">
         <div className="space-y-3">
-          <p className="text-[11px] uppercase tracking-[0.22em] text-[#C9B786]">
+          <p className="text-[11px] uppercase tracking-[0.22em] text-[#7A7151]">
             {t('home.trustSafety.badge')}
           </p>
-          <h2 className="font-secondary text-3xl leading-tight text-[#FDFBF5] md:text-4xl">
+          <h2 className="font-secondary text-3xl leading-tight text-[#0a2225] md:text-4xl">
             {t('home.trustSafety.title')}
           </h2>
-          <p className="max-w-lg text-sm text-[#D9D1C0]">
+          <p className="max-w-lg text-sm text-[#4A4A4A]">
             {t('home.trustSafety.description')}
           </p>
         </div>
@@ -311,12 +299,12 @@ export const TrustSafetyPaymentsSection: React.FC = () => {
           {items.map((item) => (
             <div
               key={item.title}
-              className="rounded-2xl border border-[#344240] bg-[#111C1D]/95 p-5 shadow-[0_18px_36px_rgba(0,0,0,0.45)]"
+              className="rounded-2xl border border-[#E5DFC6] bg-white p-5 shadow-[0_8px_20px_rgba(10,34,37,0.08)]"
             >
-              <h3 className="text-sm font-semibold text-[#F5EEE0]">
+              <h3 className="text-sm font-semibold text-[#0a2225]">
                 {item.title}
               </h3>
-              <p className="mt-2 text-[13px] leading-relaxed text-[#C8C0B0]">
+              <p className="mt-2 text-[13px] leading-relaxed text-[#4A4A4A]">
                 {item.body}
               </p>
             </div>
