@@ -352,16 +352,16 @@ async function approveAgentApplication(
   logger.info("Auth account created", { userId });
 
   try {
-    // 5. Create profile
-    logger.info("Creating profile", { userId });
+    // 5. Create or update profile (upsert to handle trigger-created profiles)
+    logger.info("Upserting profile", { userId });
     
-    const { error: profileError } = await supabaseAdmin.from("profiles").insert({
+    const { error: profileError } = await supabaseAdmin.from("profiles").upsert({
       id: userId,
       email: app.email,
       username: app.email.split("@")[0],
       first_name: app.first_name,
       last_name: app.last_name,
-      phone: app.phone,
+      phone: app.phone || null, // NULL if empty to avoid unique constraint
       account_type: "agent",
       role: "agent",
       is_verified: true,
@@ -370,11 +370,11 @@ async function approveAgentApplication(
       is_profile_complete: false,
       onboarding_completed: false,
       created_at: new Date().toISOString(),
-    });
+    }, { onConflict: 'id' });
 
     if (profileError) {
-      logger.error("Failed to create profile", { error: profileError });
-      throw new Error(`Failed to create profile: ${profileError.message}`);
+      logger.error("Failed to upsert profile", { error: profileError });
+      throw new Error(`Failed to upsert profile: ${profileError.message}`);
     }
 
     // 6. Create travel_agents record
@@ -577,20 +577,20 @@ async function approveBrandApplication(
   logger.info("Auth account created", { userId });
 
   try {
-    // 5. Create profile
-    logger.info("Creating profile", { userId });
+    // 5. Create or update profile (upsert to handle trigger-created profiles)
+    logger.info("Upserting profile", { userId });
     
     const nameParts = app.primary_contact_name.split(" ");
     const firstName = nameParts[0] || app.primary_contact_name;
     const lastName = nameParts.slice(1).join(" ") || "";
 
-    const { error: profileError } = await supabaseAdmin.from("profiles").insert({
+    const { error: profileError } = await supabaseAdmin.from("profiles").upsert({
       id: userId,
       email: app.primary_contact_email,
       username: app.brand_name.toLowerCase().replace(/\s+/g, "-"),
       first_name: firstName,
       last_name: lastName,
-      phone: app.primary_contact_phone,
+      phone: app.primary_contact_phone || null, // NULL if empty to avoid unique constraint
       account_type: "brand",
       role: "brand",
       is_verified: true,
@@ -599,11 +599,11 @@ async function approveBrandApplication(
       is_profile_complete: false,
       onboarding_completed: false,
       created_at: new Date().toISOString(),
-    });
+    }, { onConflict: 'id' });
 
     if (profileError) {
-      logger.error("Failed to create profile", { error: profileError });
-      throw new Error(`Failed to create profile: ${profileError.message}`);
+      logger.error("Failed to upsert profile", { error: profileError });
+      throw new Error(`Failed to upsert profile: ${profileError.message}`);
     }
 
     // 6. Create brand_profiles record
