@@ -9,20 +9,25 @@ interface Step9Props {
   setFormData: (data: any) => void;
 }
 
+const luxuryInputClasses = "mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg";
+
 export const Step9Financial = ({ formData, setFormData }: Step9Props) => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h3 className="mb-4 text-lg font-semibold">Financial Information</h3>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="h-8 w-1 bg-[#C7A962] rounded-full" />
+          <h3 className="font-secondary text-xl md:text-2xl text-[#0a2225]">Financial Information</h3>
+        </div>
         
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-5 md:grid-cols-2">
           <div>
-            <Label htmlFor="annualRevenue">Annual Revenue</Label>
+            <Label htmlFor="annualRevenue" className="text-sm font-medium text-[#0a2225]">Annual Revenue</Label>
             <Select
               value={formData.annualRevenue || ""}
               onValueChange={(value) => setFormData({ ...formData, annualRevenue: value })}
             >
-              <SelectTrigger>
+              <SelectTrigger className={luxuryInputClasses}>
                 <SelectValue placeholder="Select range" />
               </SelectTrigger>
               <SelectContent>
@@ -38,95 +43,105 @@ export const Step9Financial = ({ formData, setFormData }: Step9Props) => {
         </div>
       </div>
 
-      <div className="border-t pt-4">
-        <h3 className="mb-4 text-lg font-semibold">Errors & Omissions Insurance</h3>
+      <div className="border-t border-[#E5DFC6] pt-6">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="h-6 w-1 bg-[#C7A962]/60 rounded-full" />
+          <h4 className="font-secondary text-lg text-[#0a2225]">Errors & Omissions Insurance</h4>
+        </div>
         
-        <div className="mb-4 flex items-center space-x-2">
+        <div className="mb-5 flex items-center space-x-3">
           <Checkbox
             id="errorsOmissionsInsurance"
             checked={formData.errorsOmissionsInsurance || false}
             onCheckedChange={(checked) => 
               setFormData({ ...formData, errorsOmissionsInsurance: checked })
             }
+            className="border-[#E5DFC6] data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47]"
           />
-          <Label htmlFor="errorsOmissionsInsurance" className="cursor-pointer">
+          <Label htmlFor="errorsOmissionsInsurance" className="cursor-pointer text-[#0a2225]">
             I have Errors & Omissions Insurance
           </Label>
         </div>
 
         {formData.errorsOmissionsInsurance && (
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-5 md:grid-cols-2">
             <div>
-              <Label htmlFor="insuranceProvider">Insurance Provider *</Label>
+              <Label htmlFor="insuranceProvider" className="text-sm font-medium text-[#0a2225]">Insurance Provider *</Label>
               <Input
                 id="insuranceProvider"
                 value={formData.insuranceProvider || ""}
                 onChange={(e) => setFormData({ ...formData, insuranceProvider: e.target.value })}
                 required={formData.errorsOmissionsInsurance}
+                className={luxuryInputClasses}
               />
             </div>
 
             <div>
-              <Label htmlFor="insurancePolicyNumber">Policy Number *</Label>
+              <Label htmlFor="insurancePolicyNumber" className="text-sm font-medium text-[#0a2225]">Policy Number *</Label>
               <Input
                 id="insurancePolicyNumber"
                 value={formData.insurancePolicyNumber || ""}
                 onChange={(e) => setFormData({ ...formData, insurancePolicyNumber: e.target.value })}
                 required={formData.errorsOmissionsInsurance}
+                className={luxuryInputClasses}
               />
             </div>
 
             <div className="md:col-span-2">
-              <Label htmlFor="insuranceCoverage">Coverage Amount *</Label>
+              <Label htmlFor="insuranceCoverage" className="text-sm font-medium text-[#0a2225]">Coverage Amount *</Label>
               <Input
                 id="insuranceCoverage"
                 placeholder="e.g., $1,000,000"
                 value={formData.insuranceCoverage || ""}
                 onChange={(e) => setFormData({ ...formData, insuranceCoverage: e.target.value })}
                 required={formData.errorsOmissionsInsurance}
+                className={luxuryInputClasses}
               />
             </div>
           </div>
         )}
       </div>
 
-      <div className="border-t pt-4">
-        <h3 className="mb-2 text-lg font-semibold text-[#0a2225]">
-          Commission Payment Setup
-        </h3>
-        <p className="mb-4 text-sm text-[#8D8D8D]">
+      <div className="border-t border-[#E5DFC6] pt-6">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="h-6 w-1 bg-[#C7A962]/60 rounded-full" />
+          <h4 className="font-secondary text-lg text-[#0a2225]">Commission Payment Setup</h4>
+        </div>
+        <p className="mb-5 text-sm text-[#6B7280] ml-4">
           You'll connect your bank account securely through Stripe after approval
         </p>
         
-        <div className="rounded-lg bg-[#f7f3ea] p-6 space-y-4">
-          <div className="flex items-start gap-3">
-            <Shield className="h-6 w-6 text-[#0c4d47] flex-shrink-0" />
+        <div className="rounded-xl bg-[#FDF9F0] border border-[#E5DFC6] p-6 space-y-4">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0 h-12 w-12 rounded-full bg-white border border-[#C7A962]/30 flex items-center justify-center">
+              <Shield className="h-6 w-6 text-[#C7A962]" />
+            </div>
             <div>
-              <h4 className="font-semibold text-[#0a2225] mb-2">
+              <h4 className="font-secondary text-lg text-[#0a2225] mb-2">
                 Secure Payment via Stripe Connect
               </h4>
-              <p className="text-sm text-[#4a4a4a] mb-3">
+              <p className="text-sm text-[#6B7280] mb-4">
                 After your application is approved, you'll securely connect your bank account
                 through Stripe. This ensures:
               </p>
-              <ul className="space-y-1.5 text-sm text-[#4a4a4a]">
-                <li className="flex items-center gap-2">
+              <ul className="space-y-2 text-sm text-[#4a4a4a]">
+                <li className="flex items-center gap-3">
                   <CheckCircle2 className="h-4 w-4 text-[#0c4d47] flex-shrink-0" />
-                  Your banking details are never stored by Goldsainte
+                  Your banking details are never stored by <em className="font-secondary">Goldsainte</em>
                 </li>
-                <li className="flex items-center gap-2">
+                <li className="flex items-center gap-3">
                   <CheckCircle2 className="h-4 w-4 text-[#0c4d47] flex-shrink-0" />
                   Bank-level security & PCI compliance
                 </li>
-                <li className="flex items-center gap-2">
+                <li className="flex items-center gap-3">
                   <CheckCircle2 className="h-4 w-4 text-[#0c4d47] flex-shrink-0" />
                   Fast, automatic commission deposits
                 </li>
-                <li className="flex items-center gap-2">
+                <li className="flex items-center gap-3">
                   <CheckCircle2 className="h-4 w-4 text-[#0c4d47] flex-shrink-0" />
                   Transparent payout tracking
                 </li>
-                <li className="flex items-center gap-2">
+                <li className="flex items-center gap-3">
                   <CheckCircle2 className="h-4 w-4 text-[#0c4d47] flex-shrink-0" />
                   Automatic tax form generation (1099-K)
                 </li>
@@ -135,9 +150,9 @@ export const Step9Financial = ({ formData, setFormData }: Step9Props) => {
           </div>
         </div>
 
-        <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
-          <p className="text-xs text-blue-900">
-            <strong>Note:</strong> You don't need to provide banking information now.
+        <div className="mt-5 rounded-xl border border-[#C7A962]/30 bg-[#FDF9F0]/50 p-4">
+          <p className="text-xs text-[#6B7280]">
+            <strong className="text-[#0a2225]">Note:</strong> You don't need to provide banking information now.
             Once approved, you'll receive an email with a secure link to connect your
             bank account through Stripe in 2-3 minutes.
           </p>
