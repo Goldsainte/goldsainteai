@@ -126,7 +126,7 @@ function AppContent() {
   const hideConciergeWidget = shouldHideForPath(location.pathname, HIDE_CONCIERGE_WIDGET_PAGES);
 
   return (
-    <div className="min-h-screen w-full max-w-full flex flex-col overflow-x-hidden box-border viewport-guard pb-16 lg:pb-0">
+    <div className="flex-1 flex flex-col w-full max-w-full overflow-x-hidden pb-16 lg:pb-0">
       <SkipNavigation />
       <OnboardingWelcomeModal />
       <WelcomeModal open={showWelcomeModal} onClose={() => setShowWelcomeModal(false)} isFirstVisit />
@@ -159,11 +159,9 @@ export default function App() {
             <ScrollToTop />
             <AuthProvider>
               <LanguageProvider>
-                <ExpediaModalProvider>
-                  <div className="viewport-guard">
-                    <AppContent />
-                  </div>
-                </ExpediaModalProvider>
+              <ExpediaModalProvider>
+                <AppContent />
+              </ExpediaModalProvider>
               </LanguageProvider>
             </AuthProvider>
           </BrowserRouter>

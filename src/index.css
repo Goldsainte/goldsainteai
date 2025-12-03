@@ -138,13 +138,31 @@ All colors MUST be HSL.
 */
 
 @layer base {
-  /* Mobile responsiveness - prevent horizontal overflow on iPhone */
+/* Mobile responsiveness - prevent horizontal overflow on iPhone */
 /* Viewport guard - prevent horizontal overflow globally */
 html, body, #root, #main-content {
   width: 100%;
   max-width: 100svw;
   overflow-x: clip;
   box-sizing: border-box;
+}
+
+/* Height chain for footer at bottom on first paint */
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#root {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .viewport-guard {
