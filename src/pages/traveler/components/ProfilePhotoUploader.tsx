@@ -65,18 +65,34 @@ export function ProfilePhotoUploader({
     setUploading(true);
 
     try {
-      const fileExt = file.name.split(".").pop();
+      const fileExt = file.name.split(".").pop()?.toLowerCase() || 'jpg';
+      // Use simple path format that matches RLS policy: userId/filename
       const fileName = `${userId}/avatar-${Date.now()}.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from("avatars")
-        .upload(fileName, file, { upsert: true });
+      console.log("[ProfilePhotoUploader] Uploading to path:", fileName);
+      console.log("[ProfilePhotoUploader] File size:", file.size, "bytes");
+      console.log("[ProfilePhotoUploader] File type:", file.type);
 
-      if (uploadError) throw uploadError;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(fileName, file, { 
+          upsert: true,
+          cacheControl: '3600',
+          contentType: file.type 
+        });
+
+      if (uploadError) {
+        console.error("[ProfilePhotoUploader] Storage upload error:", uploadError);
+        throw uploadError;
+      }
+
+      console.log("[ProfilePhotoUploader] Upload successful:", uploadData);
 
       const { data: urlData } = supabase.storage
         .from("avatars")
         .getPublicUrl(fileName);
+
+      console.log("[ProfilePhotoUploader] Public URL:", urlData.publicUrl);
 
       // Update profile with new avatar URL
       const { error: updateError } = await supabase
@@ -84,13 +100,17 @@ export function ProfilePhotoUploader({
         .update({ avatar_url: urlData.publicUrl })
         .eq("id", userId);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error("[ProfilePhotoUploader] Profile update error:", updateError);
+        throw updateError;
+      }
 
       onUploadComplete(urlData.publicUrl);
       toast.success("Profile photo updated");
-    } catch (error) {
-      console.error("Upload error:", error);
-      toast.error("Failed to upload photo");
+    } catch (error: any) {
+      console.error("[ProfilePhotoUploader] Full error:", error);
+      const errorMessage = error?.message || error?.error_description || "Failed to upload photo";
+      toast.error(errorMessage);
     } finally {
       setUploading(false);
     }

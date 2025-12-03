@@ -18,6 +18,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 interface Profile {
   id: string;
   display_name: string | null;
+  first_name: string | null;
   full_name: string | null;
   avatar_url: string | null;
   created_at: string | null;
@@ -53,7 +54,7 @@ export default function TravelerDashboardPage() {
         const [profileResult, tripsResult, bookingsResult, storyboardsResult] = await Promise.all([
           supabase
             .from("profiles")
-            .select("id, display_name, full_name, avatar_url, created_at")
+            .select("id, display_name, first_name, full_name, avatar_url, created_at")
             .eq("id", authUser.id)
             .single(),
           supabase
@@ -116,7 +117,7 @@ export default function TravelerDashboardPage() {
     );
   }
 
-  const displayName = profile?.display_name || profile?.full_name || "Traveler";
+  const displayName = profile?.display_name || profile?.first_name || profile?.full_name || "Traveler";
 
   return (
     <main className="min-h-screen bg-[#FDF9F0] pb-24 lg:pb-0">
@@ -262,6 +263,7 @@ export default function TravelerDashboardPage() {
                   profile={{
                     id: profile.id,
                     display_name: profile.display_name,
+                    first_name: profile.first_name,
                     avatar_url: profile.avatar_url,
                     created_at: profile.created_at,
                   }}
