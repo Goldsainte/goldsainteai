@@ -108,7 +108,8 @@ const AuthCallback = () => {
         // Use centralized routing logic for default destinations
         const path = getPostAuthDestination(
           profile.account_type,
-          profile.onboarding_completed
+          profile.onboarding_completed,
+          profile.is_profile_complete
         );
 
         if (typeof window !== 'undefined') {
