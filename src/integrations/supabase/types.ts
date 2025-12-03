@@ -13263,7 +13263,7 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_trip_member: {
-        Args: { p_trip_id: string; p_user_id: string }
+        Args: { p_status?: string; p_trip_id: string; p_user_id: string }
         Returns: boolean
       }
       is_user_restricted: { Args: { target_user_id: string }; Returns: boolean }
