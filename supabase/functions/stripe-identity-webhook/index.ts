@@ -531,6 +531,115 @@ async function updateBrandApplication(
 }
 
 /**
+ * Update traveler verification status
+ */
+async function updateTravelerVerification(
+  sessionId: string,
+  verificationSession: VerificationSession,
+  logger: Logger
+): Promise<void> {
+  const { status, verified_outputs, last_error } = verificationSession;
+
+  // Find verification record by Stripe session ID
+  const { data: verification, error: fetchError } = await supabaseClient
+    .from("customer_verifications")
+    .select("*")
+    .eq("stripe_verification_session_id", sessionId)
+    .single();
+
+  if (fetchError || !verification) {
+    logger.error("Traveler verification not found", {
+      sessionId,
+      error: fetchError,
+    });
+    throw new Error(`Traveler verification not found for session ${sessionId}`);
+  }
+
+  logger.info("Found traveler verification", { verificationId: verification.id, userId: verification.user_id });
+
+  const verificationReport: any = {
+    stripe_session_id: sessionId,
+    verified_at: new Date().toISOString(),
+    verification_status: status,
+    verified_outputs,
+    last_error,
+  };
+
+  if (status === "verified") {
+    // Update customer_verifications record
+    const { error: updateError } = await supabaseClient
+      .from("customer_verifications")
+      .update({
+        status: "approved",
+        verified_at: new Date().toISOString(),
+        metadata: verificationReport,
+      })
+      .eq("id", verification.id);
+
+    if (updateError) {
+      logger.error("Failed to update traveler verification", { error: updateError });
+      throw updateError;
+    }
+
+    // Update user profile to mark as verified
+    const { error: profileError } = await supabaseClient
+      .from("profiles")
+      .update({
+        is_verified: true,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", verification.user_id);
+
+    if (profileError) {
+      logger.error("Failed to update traveler profile", { error: profileError });
+      // Don't throw - verification record is already updated
+    }
+
+    // Create notification for the user
+    await supabaseClient.from("notifications").insert({
+      user_id: verification.user_id,
+      notification_type: "verification",
+      title: "Identity Verified ✓",
+      message: "Your identity has been verified! You now have a verified badge on your profile.",
+      link: "/profile",
+      created_at: new Date().toISOString(),
+    });
+
+    logger.info("Traveler verification approved", { userId: verification.user_id });
+  } else {
+    // Verification failed
+    const { error: updateError } = await supabaseClient
+      .from("customer_verifications")
+      .update({
+        status: "rejected",
+        rejection_reason: last_error?.reason || "Verification could not be completed",
+        metadata: verificationReport,
+      })
+      .eq("id", verification.id);
+
+    if (updateError) {
+      logger.error("Failed to update failed traveler verification", { error: updateError });
+      throw updateError;
+    }
+
+    // Create notification for the user
+    await supabaseClient.from("notifications").insert({
+      user_id: verification.user_id,
+      notification_type: "verification",
+      title: "Verification Update",
+      message: `Your identity verification was not successful. ${last_error?.reason || "Please try again."}`,
+      link: "/customer-verification",
+      created_at: new Date().toISOString(),
+    });
+
+    logger.info("Traveler verification rejected", { 
+      userId: verification.user_id, 
+      reason: last_error?.reason 
+    });
+  }
+}
+
+/**
  * Process verification session completed event
  */
 async function processVerificationCompleted(
@@ -544,7 +653,7 @@ async function processVerificationCompleted(
     status: verificationSession.status,
   });
 
-  // Check if this is an agent or brand application by trying both tables
+  // Check if this is an agent, brand, or traveler verification by trying all tables
   const { data: agentApp } = await supabaseClient
     .from("agent_applications")
     .select("id, email, first_name, last_name")
@@ -557,6 +666,12 @@ async function processVerificationCompleted(
     .eq("stripe_session_id", sessionId)
     .single();
 
+  const { data: travelerVerification } = await supabaseClient
+    .from("customer_verifications")
+    .select("id, user_id")
+    .eq("stripe_verification_session_id", sessionId)
+    .single();
+
   if (agentApp) {
     logger.info("Identified as agent application", {
       applicationId: agentApp.id,
@@ -567,6 +682,12 @@ async function processVerificationCompleted(
       applicationId: brandApp.id,
     });
     await updateBrandApplication(sessionId, verificationSession, logger);
+  } else if (travelerVerification) {
+    logger.info("Identified as traveler verification", {
+      verificationId: travelerVerification.id,
+      userId: travelerVerification.user_id,
+    });
+    await updateTravelerVerification(sessionId, verificationSession, logger);
   } else {
     logger.error("No application found for verification session", {
       sessionId,

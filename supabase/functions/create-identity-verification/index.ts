@@ -23,7 +23,8 @@ const supabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 interface CreateVerificationRequest {
   email: string;
-  applicationType: "agent" | "brand";
+  applicationType: "agent" | "brand" | "traveler";
+  userId?: string; // Required for traveler verification
   returnUrl?: string;
   metadata?: Record<string, string>;
 }
@@ -85,8 +86,8 @@ function isValidEmail(email: string): boolean {
  */
 function isValidApplicationType(
   type: string
-): type is "agent" | "brand" {
-  return type === "agent" || type === "brand";
+): type is "agent" | "brand" | "traveler" {
+  return type === "agent" || type === "brand" || type === "traveler";
 }
 
 /**
@@ -125,7 +126,12 @@ function validateRequest(body: any): {
   if (!body.applicationType) {
     errors.push("Application type is required");
   } else if (!isValidApplicationType(body.applicationType)) {
-    errors.push('Application type must be "agent" or "brand"');
+    errors.push('Application type must be "agent", "brand", or "traveler"');
+  }
+
+  // Traveler verification requires userId
+  if (body.applicationType === "traveler" && !body.userId) {
+    errors.push("User ID is required for traveler verification");
   }
 
   if (body.returnUrl && !isValidUrl(body.returnUrl)) {
@@ -142,6 +148,7 @@ function validateRequest(body: any): {
     data: {
       email: body.email,
       applicationType: body.applicationType,
+      userId: body.userId,
       returnUrl: body.returnUrl,
       metadata: body.metadata || {},
     },
@@ -208,11 +215,43 @@ function checkRateLimit(email: string): {
  */
 async function checkForDuplicateSession(
   email: string,
-  applicationType: "agent" | "brand",
-  logger: Logger
+  applicationType: "agent" | "brand" | "traveler",
+  logger: Logger,
+  userId?: string
 ): Promise<{ hasDuplicate: boolean; sessionId?: string }> {
   const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
 
+  // For travelers, check by userId in customer_verifications
+  if (applicationType === "traveler" && userId) {
+    const { data, error } = await supabaseClient
+      .from("customer_verifications")
+      .select("stripe_verification_session_id, status, created_at")
+      .eq("user_id", userId)
+      .in("status", ["pending", "approved"])
+      .gte("created_at", thirtyMinutesAgo)
+      .order("created_at", { ascending: false })
+      .limit(1);
+
+    if (error) {
+      logger.error("Error checking for duplicate traveler session", { error });
+      return { hasDuplicate: false };
+    }
+
+    if (data && data.length > 0 && data[0].stripe_verification_session_id) {
+      logger.warn("Found recent traveler verification session", {
+        userId,
+        existingSessionId: data[0].stripe_verification_session_id,
+        status: data[0].status,
+      });
+      return {
+        hasDuplicate: true,
+        sessionId: data[0].stripe_verification_session_id,
+      };
+    }
+    return { hasDuplicate: false };
+  }
+
+  // For agents and brands, check by email in their respective tables
   const tableName =
     applicationType === "agent" ? "agent_applications" : "brand_applications";
   const emailField =
@@ -263,14 +302,20 @@ async function createVerificationSession(
   sessionId: string;
   url: string;
 }> {
-  const { email, applicationType, returnUrl, metadata } = request;
+  const { email, applicationType, userId, returnUrl, metadata } = request;
 
   logger.info("Creating Stripe Identity verification session", {
     email,
     applicationType,
+    userId,
   });
 
   try {
+    // Determine return URL based on application type
+    const defaultReturnUrl = applicationType === "traveler"
+      ? `${Deno.env.get("FRONTEND_URL") || "https://goldsainte.ai"}/customer-verification?status=complete`
+      : `${SUPABASE_URL}/apply/${applicationType}/verification-complete`;
+
     // Create verification session
     const verificationSession = await stripe.identity.verificationSessions.create(
       {
@@ -278,6 +323,7 @@ async function createVerificationSession(
         metadata: {
           email,
           application_type: applicationType,
+          user_id: userId || "",
           ...metadata,
         },
         options: {
@@ -288,7 +334,7 @@ async function createVerificationSession(
             allowed_types: ["driving_license", "passport", "id_card"],
           },
         },
-        return_url: returnUrl || `${SUPABASE_URL}/apply/${applicationType}/verification-complete`,
+        return_url: returnUrl || defaultReturnUrl,
       }
     );
 
@@ -296,6 +342,23 @@ async function createVerificationSession(
       sessionId: verificationSession.id,
       clientSecret: verificationSession.client_secret,
     });
+
+    // For travelers, store the session in customer_verifications
+    if (applicationType === "traveler" && userId) {
+      const { error: insertError } = await supabaseClient
+        .from("customer_verifications")
+        .insert({
+          user_id: userId,
+          verification_type: "stripe_identity",
+          status: "pending",
+          stripe_verification_session_id: verificationSession.id,
+        });
+
+      if (insertError) {
+        logger.error("Failed to store traveler verification session", { error: insertError });
+        // Don't throw - we still want to return the session to the user
+      }
+    }
 
     return {
       client_secret: verificationSession.client_secret!,
@@ -499,7 +562,8 @@ serve(async (req: Request) => {
     const duplicateCheck = await checkForDuplicateSession(
       requestData.email,
       requestData.applicationType,
-      logger
+      logger,
+      requestData.userId
     );
 
     if (duplicateCheck.hasDuplicate) {
