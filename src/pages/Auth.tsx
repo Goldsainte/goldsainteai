@@ -27,8 +27,30 @@ type AuthStep = 'account-type' | 'email' | 'signin' | 'signup' | 'forgot-passwor
 type AccountType = 'traveler' | 'creator' | 'agent' | 'brand' | null;
 
 const Auth = () => {
-  const [step, setStep] = useState<AuthStep>('account-type');
-  const [selectedAccountType, setSelectedAccountType] = useState<AccountType>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
+  const isMobile = useIsMobile();
+  
+  // Parse URL parameters to determine initial step
+  const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const mode = searchParams.get('mode'); // 'signup' | 'signin' | null
+  const roleFromUrl = searchParams.get('role') as AccountType | null;
+  
+  // Determine initial step based on URL mode
+  const getInitialStep = (): AuthStep => {
+    // Sign Up flow → show role selection first
+    if (mode === 'signup') {
+      return 'account-type';
+    }
+    // Sign In flow (default) → go directly to email/password form
+    return 'email';
+  };
+  
+  const [step, setStep] = useState<AuthStep>(getInitialStep);
+  const [selectedAccountType, setSelectedAccountType] = useState<AccountType>(
+    roleFromUrl && ['traveler', 'creator', 'agent', 'brand'].includes(roleFromUrl) ? roleFromUrl : null
+  );
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -37,11 +59,10 @@ const Auth = () => {
   const [smsOptIn, setSmsOptIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp, user, isLoading: authLoading } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { toast } = useToast();
-  const isMobile = useIsMobile();
   const redirectTarget = useMemo(() => getRedirectPathFromSearch(location.search), [location.search]);
+  
+  // Track if we're in signup mode for UI labels
+  const isSignUpMode = mode === 'signup' || step === 'account-type' || step === 'signup';
 
   const persistRedirectTargetForOAuth = () => {
     if (typeof window === 'undefined') return;
@@ -588,6 +609,20 @@ const Auth = () => {
                 </div>
               </button>
             </div>
+            
+            {/* Sign in link for existing users */}
+            <div className="mt-6 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setStep('email');
+                  navigate('/auth', { replace: true });
+                }}
+                className="text-sm text-primary hover:underline font-medium"
+              >
+                Already have an account? Sign in
+              </button>
+            </div>
           </div>
         )}
 
@@ -596,10 +631,12 @@ const Auth = () => {
           <>
             <div className="text-center mb-8">
               <h1 className="text-2xl sm:text-3xl font-semibold mb-2">
-                {isMobile ? 'Log in or sign up' : 'Welcome back'}
+                {isSignUpMode ? 'Create your account' : 'Welcome back'}
               </h1>
               <p className="text-xs sm:text-sm text-muted-foreground">
-                Sign in to plan fast, save big, and travel smarter — powered by AI, agents, and creators.
+                {isSignUpMode 
+                  ? 'Enter your email to get started with Goldsainte.'
+                  : 'Sign in to plan fast, save big, and travel smarter — powered by AI, agents, and creators.'}
               </p>
             </div>
           <div className="space-y-4">
@@ -710,13 +747,26 @@ const Auth = () => {
 
             {/* Footer Links */}
             <div className="mt-6 space-y-2 text-center">
-              <button
-                type="button"
-                onClick={() => setStep('signup')}
-                className="block w-full text-sm text-primary hover:underline font-medium"
-              >
-                New to Goldsainte? Create an account
-              </button>
+              {isSignUpMode ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStep('email');
+                    navigate('/auth', { replace: true });
+                  }}
+                  className="block w-full text-sm text-primary hover:underline font-medium"
+                >
+                  Already have an account? Sign in
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setStep('account-type')}
+                  className="block w-full text-sm text-primary hover:underline font-medium"
+                >
+                  New to Goldsainte? Create an account
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => navigate('/')}
