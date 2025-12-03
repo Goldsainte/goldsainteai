@@ -7,19 +7,33 @@ export type AccountType = "traveler" | "creator" | "agent" | "brand";
 
 export function getPostAuthDestination(
   accountType: string | null | undefined,
-  onboardingCompleted?: boolean
+  onboardingCompleted?: boolean,
+  isProfileComplete?: boolean
 ): string {
   // No account type yet → send to role picker onboarding
   if (!accountType) {
     return "/onboarding";
   }
 
-  // Has account type but onboarding not completed → send to onboarding flow
-  if (!onboardingCompleted) {
-    return "/onboarding";
+  // Role-specific onboarding checks:
+  // - Travelers check onboarding_completed (preferences wizard)
+  // - Creators/Agents/Brands check is_profile_complete (application/profile flow)
+  
+  if (accountType === "traveler") {
+    // Travelers need to complete preferences onboarding
+    if (!onboardingCompleted) {
+      return "/onboarding/traveler/preferences";
+    }
+    // Traveler with completed onboarding → marketplace
+    return "/marketplace";
   }
 
-  // Onboarding complete → send to role-based home
+  // Creators, Agents, Brands check profile completion
+  if (!isProfileComplete) {
+    return "/auth/complete-profile";
+  }
+
+  // Fully onboarded → role-based home
   if (accountType === "creator" || accountType === "agent") {
     return "/partner";
   }
@@ -28,7 +42,7 @@ export function getPostAuthDestination(
     return "/console/brand";
   }
 
-  // Default: traveler with completed onboarding → marketplace
+  // Fallback
   return "/marketplace";
 }
 
