@@ -13262,6 +13262,10 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      is_trip_member: {
+        Args: { p_trip_id: string; p_user_id: string }
+        Returns: boolean
+      }
       is_user_restricted: { Args: { target_user_id: string }; Returns: boolean }
       log_brand_engagement: {
         Args: {
