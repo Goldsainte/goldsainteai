@@ -1,175 +1,146 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Shield, CheckCircle, XCircle, Clock, Camera } from "lucide-react";
+import { Shield, CheckCircle, XCircle, Clock, ExternalLink, RefreshCw } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useSearchParams } from "react-router-dom";
 
 interface VerificationStatus {
-  verification_type: string;
+  id: string;
   status: string;
   verified_at?: string;
   rejection_reason?: string;
 }
 
 export function CustomerVerificationUpload() {
-  const [step, setStep] = useState<'list' | 'select' | 'document' | 'selfie'>('list');
-  const [selectedIdType, setSelectedIdType] = useState<string>("");
-  const [documentUploadId, setDocumentUploadId] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const [verifications, setVerifications] = useState<VerificationStatus[]>([]);
+  const [searchParams] = useSearchParams();
+  const [verificationStatus, setVerificationStatus] = useState<VerificationStatus | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const verificationTypes = [
-    { value: "government_id", label: "Government ID" },
-    { value: "passport", label: "Passport" },
-    { value: "drivers_license", label: "Driver's License" },
-  ];
+  const [starting, setStarting] = useState(false);
+  const [userEmail, setUserEmail] = useState<string>("");
+  const [userId, setUserId] = useState<string>("");
 
   useEffect(() => {
-    loadVerifications();
-  }, []);
+    loadVerificationStatus();
+    
+    // Check for return from Stripe
+    const status = searchParams.get("status");
+    if (status === "complete") {
+      toast.success("Verification submitted! We'll notify you once it's reviewed.");
+      loadVerificationStatus();
+    }
+  }, [searchParams]);
 
-  const loadVerifications = async () => {
+  const loadVerificationStatus = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      setUserEmail(user.email || "");
+      setUserId(user.id);
+
+      // Check if user is already verified in profile
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("is_verified")
+        .eq("id", user.id)
+        .single();
+
+      // Get most recent verification record
       const { data, error } = await supabase
         .from("customer_verifications")
-        .select("verification_type, status, verified_at, rejection_reason, metadata")
-        .eq("user_id", user.id);
+        .select("id, status, verified_at, rejection_reason")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
       if (error) throw error;
-      setVerifications(data || []);
+
+      // If profile shows verified but no record, create synthetic status
+      if (profile?.is_verified && !data) {
+        setVerificationStatus({
+          id: "profile",
+          status: "approved",
+          verified_at: new Date().toISOString(),
+        });
+      } else if (data) {
+        setVerificationStatus({
+          id: data.id,
+          status: data.status,
+          verified_at: data.verified_at || undefined,
+          rejection_reason: data.rejection_reason || undefined,
+        });
+      } else {
+        setVerificationStatus(null);
+      }
     } catch (error) {
-      console.error("Error loading verifications:", error);
+      console.error("Error loading verification status:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const resetWizard = () => {
-    setStep('list');
-    setSelectedIdType("");
-    setDocumentUploadId(null);
-  };
-
-  const handleDocumentUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setUploading(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      // Upload document to storage
-      const fileExt = file.name.split(".").pop();
-      const filePath = `${user.id}/${selectedIdType}-${Date.now()}.${fileExt}`;
-      
-      const { error: uploadError } = await supabase.storage
-        .from("verification-documents")
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from("verification-documents")
-        .getPublicUrl(filePath);
-
-      // Create verification record
-      const { data: insertData, error: insertError } = await supabase
-        .from("customer_verifications")
-        .insert({
-          user_id: user.id,
-          verification_type: selectedIdType,
-          document_url: publicUrl,
-          status: "pending",
-        })
-        .select()
-        .single();
-
-      if (insertError) throw insertError;
-
-      // Save record ID and move to selfie step
-      setDocumentUploadId(insertData.id);
-      toast.success("ID document uploaded successfully! Now take a selfie.");
-      setStep('selfie');
-    } catch (error) {
-      console.error("Error uploading document:", error);
-      toast.error("Failed to upload ID document");
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleSelfieUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !documentUploadId) {
-      toast.error("Document upload ID missing");
+  const startVerification = async () => {
+    if (!userEmail || !userId) {
+      toast.error("Please sign in to verify your identity");
       return;
     }
 
-    setUploading(true);
+    setStarting(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      const returnUrl = `${window.location.origin}/customer-verification?status=complete`;
 
-      // Upload selfie to storage
-      const fileExt = file.name.split(".").pop();
-      const filePath = `${user.id}/selfie-${Date.now()}.${fileExt}`;
-      
-      const { error: uploadError } = await supabase.storage
-        .from("verification-documents")
-        .upload(filePath, file);
+      const { data, error } = await supabase.functions.invoke("create-identity-verification", {
+        body: {
+          email: userEmail,
+          applicationType: "traveler",
+          userId: userId,
+          returnUrl,
+        },
+      });
 
-      if (uploadError) throw uploadError;
+      if (error) throw error;
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from("verification-documents")
-        .getPublicUrl(filePath);
-
-      // Update existing verification record with selfie_url in metadata
-      const { error: updateError } = await supabase
-        .from("customer_verifications")
-        .update({
-          metadata: {
-            selfie_url: publicUrl
-          }
-        })
-        .eq('id', documentUploadId);
-
-      if (updateError) throw updateError;
-
-      toast.success("Verification submitted! Awaiting admin review.");
-      
-      // Reset wizard and reload verifications
-      resetWizard();
-      loadVerifications();
-    } catch (error) {
-      console.error("Error uploading selfie:", error);
-      toast.error("Failed to upload selfie photo");
+      if (data?.url) {
+        // Redirect to Stripe Identity verification
+        window.location.href = data.url;
+      } else {
+        throw new Error("No verification URL returned");
+      }
+    } catch (error: any) {
+      console.error("Error starting verification:", error);
+      toast.error(error.message || "Failed to start verification. Please try again.");
     } finally {
-      setUploading(false);
+      setStarting(false);
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "approved":
-        return <CheckCircle className="h-5 w-5 text-green-600" />;
+        return <CheckCircle className="h-6 w-6 text-green-600" />;
       case "rejected":
-        return <XCircle className="h-5 w-5 text-red-600" />;
+        return <XCircle className="h-6 w-6 text-red-600" />;
       case "pending":
-        return <Clock className="h-5 w-5 text-yellow-600" />;
+        return <Clock className="h-6 w-6 text-yellow-600" />;
       default:
-        return <Clock className="h-5 w-5 text-gray-600" />;
+        return <Clock className="h-6 w-6 text-muted-foreground" />;
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "approved":
+        return "Verified";
+      case "rejected":
+        return "Verification Failed";
+      case "pending":
+        return "Verification Pending";
+      default:
+        return "Unknown Status";
     }
   };
 
@@ -182,9 +153,21 @@ export function CustomerVerificationUpload() {
       case "pending":
         return "text-yellow-600";
       default:
-        return "text-gray-600";
+        return "text-muted-foreground";
     }
   };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="py-12">
+          <div className="flex items-center justify-center">
+            <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -194,206 +177,125 @@ export function CustomerVerificationUpload() {
           Identity Verification
         </CardTitle>
         <CardDescription>
-          Verify your identity to build trust with travel agents and unlock instant booking
+          Verify your identity to build trust with travel agents and unlock premium features
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <Alert>
-          <Shield className="h-4 w-4" />
-          <AlertDescription>
-            Your documents are securely stored and only used for verification purposes. 
-            Verified accounts get priority support and access to instant booking.
-          </AlertDescription>
-        </Alert>
-
-        {/* Progress Indicator */}
-        {step !== 'list' && (
-          <div className="flex items-center justify-between mb-6">
-            <div className={`flex items-center gap-2 ${step === 'select' ? 'text-primary' : 'text-muted-foreground'}`}>
-              <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center ${step === 'select' ? 'border-primary bg-primary/10' : 'border-border'}`}>
-                1
-              </div>
-              <span className="text-sm font-medium hidden sm:inline">Select Type</span>
+        {/* Already verified */}
+        {verificationStatus?.status === "approved" && (
+          <div className="text-center py-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
+              <CheckCircle className="h-8 w-8 text-green-600" />
             </div>
-            <div className={`flex-1 h-0.5 mx-4 ${step === 'document' || step === 'selfie' ? 'bg-primary' : 'bg-border'}`} />
-            <div className={`flex items-center gap-2 ${step === 'document' ? 'text-primary' : 'text-muted-foreground'}`}>
-              <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center ${step === 'document' ? 'border-primary bg-primary/10' : 'border-border'}`}>
-                2
-              </div>
-              <span className="text-sm font-medium hidden sm:inline">Upload ID</span>
-            </div>
-            <div className={`flex-1 h-0.5 mx-4 ${step === 'selfie' ? 'bg-primary' : 'bg-border'}`} />
-            <div className={`flex items-center gap-2 ${step === 'selfie' ? 'text-primary' : 'text-muted-foreground'}`}>
-              <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center ${step === 'selfie' ? 'border-primary bg-primary/10' : 'border-border'}`}>
-                3
-              </div>
-              <span className="text-sm font-medium hidden sm:inline">Upload Selfie</span>
-            </div>
-          </div>
-        )}
-
-        {/* Step 1: List existing verifications */}
-        {step === 'list' && (
-          <>
-            {verifications.length > 0 && (
-              <div className="space-y-3">
-                <h3 className="font-semibold text-sm">Your Verifications</h3>
-                {verifications.map((verification, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      {getStatusIcon(verification.status)}
-                      <div>
-                        <p className="font-medium capitalize">
-                          {verification.verification_type.replace(/_/g, " ")}
-                        </p>
-                        <p className={`text-sm capitalize ${getStatusColor(verification.status)}`}>
-                          {verification.status}
-                        </p>
-                        {(verification as any).metadata?.selfie_url && (
-                          <p className="text-xs text-green-600">✓ Selfie uploaded</p>
-                        )}
-                      </div>
-                    </div>
-                    {verification.rejection_reason && (
-                      <p className="text-sm text-red-600">{verification.rejection_reason}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
+            <h3 className="text-xl font-semibold text-green-700 mb-2">Identity Verified</h3>
+            <p className="text-muted-foreground">
+              Your identity has been verified. You now have access to all premium features.
+            </p>
+            {verificationStatus.verified_at && (
+              <p className="text-sm text-muted-foreground mt-2">
+                Verified on {new Date(verificationStatus.verified_at).toLocaleDateString()}
+              </p>
             )}
+          </div>
+        )}
+
+        {/* Pending verification */}
+        {verificationStatus?.status === "pending" && (
+          <div className="text-center py-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-yellow-100 mb-4">
+              <Clock className="h-8 w-8 text-yellow-600" />
+            </div>
+            <h3 className="text-xl font-semibold text-yellow-700 mb-2">Verification In Progress</h3>
+            <p className="text-muted-foreground mb-4">
+              Your verification is being processed. This usually takes just a few minutes.
+            </p>
+            <Button variant="outline" onClick={loadVerificationStatus}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Check Status
+            </Button>
+          </div>
+        )}
+
+        {/* Rejected - allow retry */}
+        {verificationStatus?.status === "rejected" && (
+          <div className="space-y-6">
+            <Alert variant="destructive">
+              <XCircle className="h-4 w-4" />
+              <AlertDescription>
+                <strong>Verification unsuccessful.</strong>{" "}
+                {verificationStatus.rejection_reason || "Please try again with a valid government ID."}
+              </AlertDescription>
+            </Alert>
             
-            <Button onClick={() => setStep('select')} className="w-full">
-              <Upload className="h-4 w-4 mr-2" />
-              Start New Verification
-            </Button>
-          </>
-        )}
-
-        {/* Step 2: Select ID Type */}
-        {step === 'select' && (
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="verification-type">Select ID Type</Label>
-              <Select value={selectedIdType} onValueChange={setSelectedIdType}>
-                <SelectTrigger id="verification-type">
-                  <SelectValue placeholder="Choose document type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {verificationTypes.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex gap-2">
-              <Button 
-                onClick={() => setStep('document')} 
-                disabled={!selectedIdType}
-                className="flex-1"
-              >
-                Next: Upload Document
-              </Button>
-              <Button variant="ghost" onClick={resetWizard}>
-                Cancel
+            <div className="text-center">
+              <p className="text-muted-foreground mb-4">
+                You can try verifying again with a different document or better lighting.
+              </p>
+              <Button onClick={startVerification} disabled={starting} size="lg">
+                {starting ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    Starting...
+                  </>
+                ) : (
+                  <>
+                    <Shield className="h-4 w-4 mr-2" />
+                    Try Again
+                  </>
+                )}
               </Button>
             </div>
           </div>
         )}
 
-        {/* Step 3: Upload ID Document */}
-        {step === 'document' && (
-          <div className="space-y-4">
+        {/* Not yet started */}
+        {!verificationStatus && (
+          <div className="space-y-6">
             <Alert>
-              <Upload className="h-4 w-4" />
+              <Shield className="h-4 w-4" />
               <AlertDescription>
-                Upload a clear photo of your {selectedIdType.replace(/_/g, ' ')}. 
-                Make sure all text is readable and the document is not expired.
+                <strong>Secure verification powered by Stripe.</strong> Your documents are encrypted 
+                and only used for verification. Verified users get priority support and access to 
+                instant booking with trusted agents.
               </AlertDescription>
             </Alert>
-            <div>
-              <Label htmlFor="document-upload" className="capitalize">
-                Upload {selectedIdType.replace(/_/g, ' ')}
-              </Label>
-              <div className="mt-2">
-                <input
-                  id="document-upload"
-                  type="file"
-                  accept="image/*,.pdf"
-                  onChange={handleDocumentUpload}
-                  disabled={uploading}
-                  className="hidden"
-                />
-                <label htmlFor="document-upload">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={uploading}
-                    className="w-full"
-                    asChild
-                  >
-                    <span className="flex items-center gap-2 cursor-pointer">
-                      <Upload className="h-4 w-4" />
-                      {uploading ? "Uploading..." : "Choose File"}
-                    </span>
-                  </Button>
-                </label>
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                Accepted formats: JPG, PNG, PDF. Max size: 10MB
-              </p>
-            </div>
-            <Button variant="ghost" onClick={resetWizard} disabled={uploading}>
-              Cancel
-            </Button>
-          </div>
-        )}
 
-        {/* Step 4: Upload Selfie */}
-        {step === 'selfie' && (
-          <div className="space-y-4">
-            <Alert>
-              <Camera className="h-4 w-4" />
-              <AlertDescription>
-                Now take a selfie holding your ID document next to your face. 
-                Make sure both your face and the ID are clearly visible in the same photo.
-              </AlertDescription>
-            </Alert>
-            <div>
-              <Label htmlFor="selfie-upload">Upload Selfie Photo</Label>
-              <div className="mt-2">
-                <input
-                  id="selfie-upload"
-                  type="file"
-                  accept="image/*"
-                  capture="user"
-                  onChange={handleSelfieUpload}
-                  disabled={uploading}
-                  className="hidden"
-                />
-                <label htmlFor="selfie-upload">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={uploading}
-                    className="w-full"
-                    asChild
-                  >
-                    <span className="flex items-center gap-2 cursor-pointer">
-                      <Camera className="h-4 w-4" />
-                      {uploading ? "Uploading..." : "Take Selfie"}
-                    </span>
-                  </Button>
-                </label>
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                Hold your ID next to your face for verification
+            <div className="bg-muted/50 rounded-lg p-6">
+              <h3 className="font-semibold mb-4">What you'll need:</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+                  <span>A valid government-issued ID (passport, driver's license, or national ID)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+                  <span>Good lighting to capture a clear photo</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+                  <span>A device with a camera for the selfie verification</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="text-center pt-4">
+              <Button onClick={startVerification} disabled={starting} size="lg" className="min-w-[200px]">
+                {starting ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    Starting Verification...
+                  </>
+                ) : (
+                  <>
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Verify with Stripe
+                  </>
+                )}
+              </Button>
+              <p className="text-xs text-muted-foreground mt-3">
+                You'll be redirected to Stripe's secure verification page
               </p>
             </div>
-            <Button variant="ghost" onClick={resetWizard} disabled={uploading}>
-              Cancel
-            </Button>
           </div>
         )}
       </CardContent>

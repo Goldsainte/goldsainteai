@@ -3862,6 +3862,7 @@ export type Database = {
           rejection_reason: string | null
           reviewed_by: string | null
           status: string
+          stripe_verification_session_id: string | null
           updated_at: string
           user_id: string
           verification_type: string
@@ -3876,6 +3877,7 @@ export type Database = {
           rejection_reason?: string | null
           reviewed_by?: string | null
           status?: string
+          stripe_verification_session_id?: string | null
           updated_at?: string
           user_id: string
           verification_type: string
@@ -3890,6 +3892,7 @@ export type Database = {
           rejection_reason?: string | null
           reviewed_by?: string | null
           status?: string
+          stripe_verification_session_id?: string | null
           updated_at?: string
           user_id?: string
           verification_type?: string
