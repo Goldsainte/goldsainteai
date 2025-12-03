@@ -9,6 +9,7 @@ import { Sparkles, MapPin, Calendar, ArrowRight, RefreshCw } from "lucide-react"
 import { toast } from "sonner";
 import { ItineraryDetailDialog } from "@/components/collections/ItineraryDetailDialog";
 import { BackButton } from "@/components/ui/BackButton";
+import { CollectionsLoadingSkeleton } from "@/components/collections/CollectionsLoadingSkeleton";
 
 interface CuratedItinerary {
   id: string;
@@ -132,16 +133,7 @@ export default function CollectionsPage() {
         </div>
 
         {/* Loading state */}
-        {loading && (
-          <div className="flex flex-col items-center justify-center py-20 gap-4">
-            <div className="relative">
-              <Sparkles className="w-8 h-8 text-[#C7A962] animate-pulse" />
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Studying your travel signature and assembling itineraries…
-            </p>
-          </div>
-        )}
+        {loading && <CollectionsLoadingSkeleton />}
 
         {/* Refresh button & cache indicator */}
         {!loading && itineraries.length > 0 && (
