@@ -13181,6 +13181,8 @@ export type Database = {
         Args: { supplier_uuid: string }
         Returns: number
       }
+      can_approve_agents: { Args: { p_user_id?: string }; Returns: boolean }
+      can_approve_brands: { Args: { p_user_id?: string }; Returns: boolean }
       can_perform_engagement: {
         Args: {
           p_action_type: string
@@ -13262,6 +13264,7 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      is_super_admin: { Args: { p_user_id?: string }; Returns: boolean }
       is_trip_member: {
         Args: { p_status?: string; p_trip_id: string; p_user_id: string }
         Returns: boolean
