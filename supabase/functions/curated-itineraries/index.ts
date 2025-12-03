@@ -75,10 +75,23 @@ const DESTINATION_IMAGES: Record<string, string[]> = {
   "dubai": ["https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&h=600&fit=crop"],
   "uae": ["https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&h=600&fit=crop"],
   "maldives": ["https://images.unsplash.com/photo-1500259571355-332da5cb07aa?w=800&h=600&fit=crop"],
-  "safari": ["https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop"],
-  "kenya": ["https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop"],
-  "tanzania": ["https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop"],
-  "africa": ["https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop"],
+  "safari": [
+    "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=800&h=600&fit=crop", // Elephants at sunset
+    "https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=800&h=600&fit=crop", // Safari jeep with giraffe
+  ],
+  "kenya": [
+    "https://images.unsplash.com/photo-1489392191049-fc10c97e64b6?w=800&h=600&fit=crop", // Maasai Mara
+    "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=800&h=600&fit=crop", // Elephants
+  ],
+  "tanzania": [
+    "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=800&h=600&fit=crop", // Elephants
+    "https://images.unsplash.com/photo-1534177616064-ef6e3caa47a0?w=800&h=600&fit=crop", // Serengeti plains
+  ],
+  "serengeti": ["https://images.unsplash.com/photo-1534177616064-ef6e3caa47a0?w=800&h=600&fit=crop"],
+  "africa": [
+    "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=800&h=600&fit=crop", // Elephants
+    "https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=800&h=600&fit=crop", // Safari scene
+  ],
   "patagonia": ["https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop"],
   "chile": ["https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop"],
   "argentina": ["https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop"],
