@@ -189,7 +189,7 @@ export default function TravelerPreferencesOnboardingPage() {
           <p className="uppercase tracking-[0.25em] text-[10px] sm:text-[11px] text-[#7A7151] mb-4 font-medium">
             Goldsainte Onboarding
           </p>
-          <h1 className="font-secondary text-3xl sm:text-4xl md:text-5xl text-[#0a2225] mb-4">
+          <h1 className="font-secondary text-[26px] md:text-[40px] leading-[1.15] text-[#0a2225] mb-4">
             Let's learn your travel signature
           </h1>
           <p className="max-w-2xl mx-auto text-sm sm:text-base text-[#6E6650] leading-relaxed">
