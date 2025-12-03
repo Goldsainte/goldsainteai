@@ -15,6 +15,7 @@ interface TravelerOverviewTabProps {
   profile: {
     id: string;
     display_name?: string | null;
+    first_name?: string | null;
     avatar_url?: string | null;
     created_at?: string | null;
   } | null;
@@ -45,12 +46,12 @@ export function TravelerOverviewTab({ profile, stats, onAvatarUpdate }: Traveler
             <ProfilePhotoUploader
               userId={profile?.id || ""}
               currentAvatarUrl={profile?.avatar_url}
-              displayName={profile?.display_name || "Traveler"}
+              displayName={profile?.display_name || profile?.first_name || "Traveler"}
               onUploadComplete={onAvatarUpdate}
               size="lg"
             />
             <h2 className="mt-4 font-secondary text-2xl text-[#0a2225]">
-              {profile?.display_name || "Traveler"}
+              {profile?.display_name || profile?.first_name || "Traveler"}
             </h2>
             <p className="text-sm text-[#6B7280] mt-1">Member since {memberSince}</p>
             
