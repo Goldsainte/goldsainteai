@@ -93,6 +93,7 @@ export default function Marketplace() {
         .from("packaged_trips")
         .select(`
           id, slug, title, destination, cover_image_url, price_per_person, currency,
+          duration_nights, highlights, creator_type,
           duration_days, max_participants, current_bookings, difficulty_level,
           rating, review_count, available_from, available_until, tags,
           creator:profiles!packaged_trips_creator_id_fkey(id, full_name, avatar_url)
