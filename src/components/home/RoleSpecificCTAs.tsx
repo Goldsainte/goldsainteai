@@ -6,8 +6,8 @@ import { useTranslation } from "react-i18next";
 
 import travelerImage from "@/assets/home/hero-overwater-villa.jpg";
 import creatorImage from "@/assets/creator-canyon-views.jpg";
-import agentImage from "@/assets/seoul-autumn.jpg";
-import brandImage from "@/assets/home/hero-jungle-villa.jpg";
+import agentImage from "@/assets/card-expert-agents.jpg";
+import brandImage from "@/assets/luxury-infinity-pool.jpg";
 
 export function RoleSpecificCTAs() {
   const { t } = useTranslation();
