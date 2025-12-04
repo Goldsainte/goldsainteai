@@ -171,6 +171,7 @@ export default function CreatorOnboardingPage() {
   const [tosAccepted, setTosAccepted] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [creatorAgreementAccepted, setCreatorAgreementAccepted] = useState(false);
+  const [transparencyAccepted, setTransparencyAccepted] = useState(false);
 
   // NEW: TikTok Verification
   const [tiktokVerified, setTiktokVerified] = useState(false);
@@ -931,6 +932,8 @@ export default function CreatorOnboardingPage() {
                   onPrivacyChange={setPrivacyAccepted}
                   creatorAgreementAccepted={creatorAgreementAccepted}
                   onCreatorAgreementChange={setCreatorAgreementAccepted}
+                  transparencyAccepted={transparencyAccepted}
+                  onTransparencyChange={setTransparencyAccepted}
                 />
               </div>
             )}

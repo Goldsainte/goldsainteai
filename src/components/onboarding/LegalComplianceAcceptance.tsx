@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { FileText, Shield, Users, ExternalLink, CheckCircle } from "lucide-react";
+import { FileText, Shield, Users, ExternalLink, CheckCircle, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LegalComplianceAcceptanceProps {
@@ -11,12 +11,15 @@ interface LegalComplianceAcceptanceProps {
   onPrivacyChange: (accepted: boolean) => void;
   creatorAgreementAccepted: boolean;
   onCreatorAgreementChange: (accepted: boolean) => void;
+  transparencyAccepted: boolean;
+  onTransparencyChange: (accepted: boolean) => void;
 }
 
 const CURRENT_VERSIONS = {
   tos: "1.0",
   privacy: "1.0",
   creatorAgreement: "1.0",
+  transparency: "1.0",
 };
 
 export function LegalComplianceAcceptance({
@@ -26,6 +29,8 @@ export function LegalComplianceAcceptance({
   onPrivacyChange,
   creatorAgreementAccepted,
   onCreatorAgreementChange,
+  transparencyAccepted,
+  onTransparencyChange,
 }: LegalComplianceAcceptanceProps) {
   const [expandedDoc, setExpandedDoc] = useState<string | null>(null);
 
@@ -78,9 +83,25 @@ export function LegalComplianceAcceptance({
         "Performance expectations and metrics",
       ],
     },
+    {
+      id: "transparency",
+      title: "Transparency Agreement",
+      description: "Our commitment to honest communication and disclosures",
+      icon: Eye,
+      accepted: transparencyAccepted,
+      onChange: onTransparencyChange,
+      link: "/transparency-agreement",
+      summary: [
+        "All communications must stay on-platform",
+        "Sponsored content disclosure requirements",
+        "AI limitations and recommendations",
+        "Pricing and fee transparency",
+        "Review authenticity standards",
+      ],
+    },
   ];
 
-  const allAccepted = tosAccepted && privacyAccepted && creatorAgreementAccepted;
+  const allAccepted = tosAccepted && privacyAccepted && creatorAgreementAccepted && transparencyAccepted;
 
   return (
     <div className="space-y-6">
