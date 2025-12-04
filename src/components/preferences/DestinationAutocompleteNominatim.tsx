@@ -109,14 +109,25 @@ export const DestinationAutocompleteNominatim: React.FC<DestinationAutocompleteP
   }, []);
 
   const handleAddDestination = useCallback((destination: string) => {
-    if (value.includes(destination)) return;
+    const trimmed = destination.trim();
+    if (!trimmed) return;
+    if (value.includes(trimmed)) return;
     if (value.length >= maxSelections) return;
 
-    onChange([...value, destination]);
+    onChange([...value, trimmed]);
     setInput("");
     setSuggestions([]);
     setShowDropdown(false);
   }, [value, maxSelections, onChange]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (input.trim()) {
+        handleAddDestination(input);
+      }
+    }
+  };
 
   const handleRemoveDestination = useCallback((destination: string) => {
     onChange(value.filter((v) => v !== destination));
@@ -139,6 +150,7 @@ export const DestinationAutocompleteNominatim: React.FC<DestinationAutocompleteP
             onFocus={() => {
               if (suggestions.length > 0) setShowDropdown(true);
             }}
+            onKeyDown={handleKeyDown}
             className="pl-10 h-12 rounded-xl border-[#E5DFC6] bg-white focus:border-[#C7B892] focus:ring-[#C7B892]/20 text-[#0a2225] placeholder:text-[#9A9079]"
           />
           {loading && (
