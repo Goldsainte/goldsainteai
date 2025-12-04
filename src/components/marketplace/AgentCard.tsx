@@ -52,90 +52,80 @@ export const AgentCard = ({ agent }: AgentCardProps) => {
   const description = agent.bio || agent.description;
 
   return (
-    <div className="flex flex-col rounded-2xl border border-[#E5DFC6] bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-      {/* Header: Avatar + Name/Badge + Stats */}
-      <div className="flex items-start gap-3">
+    <div className="group flex flex-col rounded-2xl border border-[#E5DFC6] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+      {/* Header: Avatar + Name/Badge */}
+      <div className="flex items-center gap-3">
         {/* Avatar or Initials */}
-        {avatarUrl ? (
-          <img
-            src={avatarUrl}
-            alt={agent.agency_name}
-            className="h-11 w-11 rounded-full object-cover bg-[#FBF9F0]"
-          />
-        ) : (
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FBF9F0] text-sm font-semibold text-[#0a2225]/50">
-            {getInitials(agent.agency_name)}
-          </div>
-        )}
+        <div className="h-14 w-14 overflow-hidden rounded-full border-2 border-[#E5DFC6] bg-[#f7f3ea]">
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt={agent.agency_name}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-[#0a2225]/60">
+              {getInitials(agent.agency_name)}
+            </div>
+          )}
+        </div>
         
-        {/* Name + Badge + Rating/Reviews/Years/Location */}
+        {/* Name + Badge */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="text-sm font-semibold text-[#0a2225]">
+            <h3 className="truncate font-secondary text-base font-semibold text-[#0a2225]">
               {agent.agency_name}
             </h3>
             {agent.is_verified && (
               <span className="rounded-full bg-[#C7A962]/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#0a2225]">
-                Certified Agent
+                Certified
               </span>
             )}
           </div>
-          <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-[#0a2225]/60">
-            {agent.rating !== undefined && agent.total_reviews !== undefined && agent.total_reviews > 0 && (
-              <>
-                <span className="text-[#C7A962]">★</span>
-                <span className="text-[#0a2225]">{agent.rating.toFixed(1)}</span>
-                <span className="text-[#0a2225]/50">
-                  ({agent.total_reviews} reviews)
-                </span>
-              </>
-            )}
-            {yearsExperience && (
-              <>
-                <span className="text-[#0a2225]/30">•</span>
-                <span>{yearsExperience} yrs experience</span>
-              </>
-            )}
-            <span className="text-[#0a2225]/30">•</span>
-            <span>{getLocation()}</span>
+          <div className="truncate text-[12px] text-[#0a2225]/60">
+            {getLocation()}
           </div>
         </div>
       </div>
 
-      {/* Bio */}
-      {description && (
-        <p className="mt-2 line-clamp-2 text-xs text-[#0a2225]/70">
-          {description}
-        </p>
-      )}
-
-      {/* Trust Score */}
-      {agent.trust_score !== undefined && (
-        <div className="mt-3">
-          <p className="text-[10px] uppercase tracking-wide text-[#0a2225]/50">
-            Trust Score
-          </p>
-          <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-[#FBF9F0]">
-            <div
-              className="h-full rounded-full bg-[#C7A962]"
-              style={{ width: `${Math.min(agent.trust_score, 100)}%` }}
-            />
-          </div>
-        </div>
-      )}
+      {/* Stats Pills */}
+      <div className="mt-4 flex flex-wrap gap-2 text-[11px]">
+        {agent.rating !== undefined && agent.total_reviews !== undefined && agent.total_reviews > 0 && (
+          <span className="rounded-full bg-[#f7f3ea] px-3 py-1 text-[#0a2225]">
+            <span className="text-[#C7A962]">★</span> {agent.rating.toFixed(1)}
+          </span>
+        )}
+        {agent.total_reviews !== undefined && agent.total_reviews > 0 && (
+          <span className="rounded-full bg-[#f7f3ea] px-3 py-1 text-[#0a2225]">
+            {agent.total_reviews} reviews
+          </span>
+        )}
+        {yearsExperience && (
+          <span className="rounded-full bg-[#f7f3ea] px-3 py-1 text-[#0a2225]">
+            {yearsExperience}+ yrs
+          </span>
+        )}
+      </div>
 
       {/* Specialties */}
       {specialties.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-1">
-          {specialties.slice(0, 4).map((spec, idx) => (
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {specialties.slice(0, 3).map((spec, idx) => (
             <span
               key={idx}
-              className="rounded-full bg-[#C7A962]/10 px-2 py-0.5 text-[10px] font-medium text-[#0a2225]"
+              className="rounded-full bg-[#C7A962]/10 px-2.5 py-1 text-[10px] font-medium text-[#0a2225]"
             >
               {spec}
             </span>
           ))}
         </div>
+      )}
+
+      {/* Bio */}
+      {description && (
+        <p className="mt-3 line-clamp-2 text-[11px] text-[#0a2225]/50">
+          {description}
+        </p>
       )}
 
       {/* CTA Button */}
@@ -144,9 +134,9 @@ export const AgentCard = ({ agent }: AgentCardProps) => {
           e.stopPropagation();
           handleClick();
         }}
-        className="mt-3 inline-flex w-full items-center justify-center rounded-full bg-[#0C4D47] px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#0a3d39]"
+        className="mt-4 flex w-full items-center justify-center rounded-full bg-[#0c4d47] px-4 py-2 text-xs font-semibold text-white transition group-hover:bg-[#0a3d39]"
       >
-        View full profile
+        View profile
       </button>
     </div>
   );

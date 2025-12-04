@@ -197,7 +197,7 @@ export default function BrowseAgents() {
 
   const sortControl = (
     <select
-      className="rounded-full border border-[#E5DFC6] bg-white px-3 py-1 text-xs text-[#0a2225] focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
+      className="rounded-full border border-[#E5DFC6] bg-white px-4 py-2 text-xs text-[#0a2225] focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
       value={sortBy}
       onChange={(event) =>
         setSortBy(event.target.value as "rating" | "bookings" | "experience")
@@ -210,15 +210,15 @@ export default function BrowseAgents() {
   );
 
   const filtersPanel = (
-    <div className="space-y-4 text-xs">
-      <div className="space-y-1">
-        <label className="text-[11px] font-medium text-[#0a2225]/70">
+    <div className="space-y-5 text-xs">
+      <div className="space-y-2">
+        <label className="text-[11px] font-medium uppercase tracking-wider text-[#0a2225]/70">
           Destination focus
         </label>
         <input
           type="text"
           placeholder="e.g. Italy, Maldives"
-          className="w-full rounded-lg border border-[#E5DFC6] bg-white px-2 py-1.5 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
+          className="w-full rounded-xl border border-[#E5DFC6] bg-white px-3 py-2 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
           value={filters.destination ?? ""}
           onChange={(event) =>
             setFilters((prev) => ({ ...prev, destination: event.target.value }))
@@ -226,12 +226,12 @@ export default function BrowseAgents() {
         />
       </div>
 
-      <div className="space-y-1">
-        <label className="text-[11px] font-medium text-[#0a2225]/70">Specialty</label>
+      <div className="space-y-2">
+        <label className="text-[11px] font-medium uppercase tracking-wider text-[#0a2225]/70">Specialty</label>
         <input
           type="text"
           placeholder="Honeymoons, family, safari..."
-          className="w-full rounded-lg border border-[#E5DFC6] bg-white px-2 py-1.5 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
+          className="w-full rounded-xl border border-[#E5DFC6] bg-white px-3 py-2 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
           value={filters.specialty ?? ""}
           onChange={(event) =>
             setFilters((prev) => ({ ...prev, specialty: event.target.value }))
@@ -239,12 +239,12 @@ export default function BrowseAgents() {
         />
       </div>
 
-      <div className="space-y-1">
-        <label className="text-[11px] font-medium text-[#0a2225]/70">Language</label>
+      <div className="space-y-2">
+        <label className="text-[11px] font-medium uppercase tracking-wider text-[#0a2225]/70">Language</label>
         <input
           type="text"
           placeholder="e.g. English"
-          className="w-full rounded-lg border border-[#E5DFC6] bg-white px-2 py-1.5 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
+          className="w-full rounded-xl border border-[#E5DFC6] bg-white px-3 py-2 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
           value={filters.language ?? ""}
           onChange={(event) =>
             setFilters((prev) => ({ ...prev, language: event.target.value }))
@@ -252,15 +252,15 @@ export default function BrowseAgents() {
         />
       </div>
 
-      <div className="space-y-1">
-        <label className="text-[11px] font-medium text-[#0a2225]/70">Min rating</label>
+      <div className="space-y-2">
+        <label className="text-[11px] font-medium uppercase tracking-wider text-[#0a2225]/70">Min rating</label>
         <input
           type="number"
           min={1}
           max={5}
           step={0.1}
           placeholder="e.g. 4.5"
-          className="w-full rounded-lg border border-[#E5DFC6] bg-white px-2 py-1.5 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
+          className="w-full rounded-xl border border-[#E5DFC6] bg-white px-3 py-2 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
           value={filters.minRating ?? ""}
           onChange={(event) =>
             setFilters((prev) => ({
@@ -272,14 +272,14 @@ export default function BrowseAgents() {
       </div>
 
       <div className="space-y-2">
-        <div className="text-[11px] font-medium text-[#0a2225]/70">
+        <div className="text-[11px] font-medium uppercase tracking-wider text-[#0a2225]/70">
           Typical trip budget
         </div>
         <div className="flex gap-2">
           <input
             type="number"
             placeholder="Min"
-            className="w-1/2 rounded-lg border border-[#E5DFC6] bg-white px-2 py-1.5 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
+            className="w-1/2 rounded-xl border border-[#E5DFC6] bg-white px-3 py-2 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
             value={filters.minBudget ?? ""}
             onChange={(event) =>
               setFilters((prev) => ({
@@ -291,7 +291,7 @@ export default function BrowseAgents() {
           <input
             type="number"
             placeholder="Max"
-            className="w-1/2 rounded-lg border border-[#E5DFC6] bg-white px-2 py-1.5 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
+            className="w-1/2 rounded-xl border border-[#E5DFC6] bg-white px-3 py-2 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
             value={filters.maxBudget ?? ""}
             onChange={(event) =>
               setFilters((prev) => ({
@@ -305,7 +305,7 @@ export default function BrowseAgents() {
 
       <button
         type="button"
-        className="mt-2 w-full rounded-full border border-[#E5DFC6] bg-white px-3 py-1.5 text-[11px] text-[#0a2225] transition-colors hover:bg-[#FBF9F0]"
+        className="mt-3 w-full rounded-full border border-[#E5DFC6] bg-white px-4 py-2 text-[11px] font-medium text-[#0a2225] transition hover:bg-[#f7f3ea]"
         onClick={() => setFilters({ ...defaultFilters })}
       >
         Clear filters
@@ -314,11 +314,11 @@ export default function BrowseAgents() {
   );
 
   const headerRight = (
-    <div className="flex flex-col gap-3 sm:flex-row">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
       <input
         type="text"
         placeholder="Search agents by destination, specialty, or agency"
-        className="w-full rounded-full border border-[#E5DFC6] bg-white px-4 py-2 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50 sm:w-64"
+        className="w-full rounded-full border border-[#E5DFC6] bg-white px-4 py-2.5 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50 sm:w-72"
         value={filters.search}
         onChange={(event) =>
           setFilters((prev) => ({ ...prev, search: event.target.value }))
@@ -326,7 +326,7 @@ export default function BrowseAgents() {
       />
       <button
         type="button"
-        className="rounded-full bg-[#0C4D47] px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-[#0a3d39]"
+        className="rounded-full border border-[#E5DFC6] bg-white px-4 py-2.5 text-xs font-medium text-[#0a2225] transition hover:bg-[#f7f3ea]"
         onClick={() => navigate("/post-trip")}
       >
         Post a trip brief
@@ -335,7 +335,7 @@ export default function BrowseAgents() {
   );
 
   return (
-    <div className="min-h-screen bg-[#FDF9F0] flex-1">
+    <div className="min-h-screen bg-[#f7f3ea] flex-1">
       <div className="container max-w-6xl px-4 pt-4">
         <BackButton label="Back" />
       </div>
@@ -354,16 +354,16 @@ export default function BrowseAgents() {
           No agents match these filters yet. Try widening your search.
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {filteredAgents.map((agent) => (
             <button
               key={agent.id}
               type="button"
               onClick={() => navigate(`/agent/${agent.id}`)}
-              className="flex flex-col justify-between rounded-2xl border border-[#E5DFC6] bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+              className="group flex flex-col justify-between rounded-2xl border border-[#E5DFC6] bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
             >
               <div className="flex items-center gap-3">
-                <div className="h-12 w-12 overflow-hidden rounded-full bg-[#FBF9F0]">
+                <div className="h-14 w-14 overflow-hidden rounded-full border-2 border-[#E5DFC6] bg-[#f7f3ea]">
                   {agent.avatarUrl ? (
                     <img
                       src={agent.avatarUrl}
@@ -371,67 +371,64 @@ export default function BrowseAgents() {
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center text-sm font-medium text-[#0a2225]/40">
-                      {agent.displayName.charAt(0)}
+                    <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-[#0a2225]/60">
+                      {agent.displayName.charAt(0).toUpperCase()}
                     </div>
                   )}
                 </div>
                 <div className="min-w-0">
-                  <div className="truncate text-sm font-semibold text-[#0a2225]">
+                  <div className="truncate font-secondary text-base font-semibold text-[#0a2225]">
                     {agent.displayName}
                   </div>
-                  <div className="truncate text-[11px] text-[#0a2225]/60">
+                  <div className="truncate text-[12px] text-[#0a2225]/60">
                     {agent.agencyName || "Independent agent"}
                   </div>
                 </div>
               </div>
 
-              <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-[#0a2225]/70">
+              <div className="mt-4 flex flex-wrap gap-2 text-[11px]">
                 {(agent.baseCity || agent.baseCountry) && (
-                  <span className="rounded-full border border-[#E5DFC6] bg-[#FBF9F0] px-2 py-1">
+                  <span className="rounded-full bg-[#f7f3ea] px-3 py-1 text-[#0a2225]">
                     {[agent.baseCity, agent.baseCountry].filter(Boolean).join(", ")}
                   </span>
                 )}
                 {agent.rating != null && (
-                  <span className="rounded-full border border-[#E5DFC6] bg-[#FBF9F0] px-2 py-1">
-                    <span className="text-[#C7A962]">★</span> {agent.rating.toFixed(1)} rating
+                  <span className="rounded-full bg-[#f7f3ea] px-3 py-1 text-[#0a2225]">
+                    <span className="text-[#C7A962]">★</span> {agent.rating.toFixed(1)}
                   </span>
                 )}
                 {agent.totalReviews != null && agent.totalReviews > 0 && (
-                  <span className="rounded-full border border-[#E5DFC6] bg-[#FBF9F0] px-2 py-1">
+                  <span className="rounded-full bg-[#f7f3ea] px-3 py-1 text-[#0a2225]">
                     {agent.totalReviews} reviews
                   </span>
                 )}
                 {agent.yearsExperience != null && (
-                  <span className="rounded-full border border-[#E5DFC6] bg-[#FBF9F0] px-2 py-1">
-                    {agent.yearsExperience}+ yrs experience
+                  <span className="rounded-full bg-[#f7f3ea] px-3 py-1 text-[#0a2225]">
+                    {agent.yearsExperience}+ yrs
                   </span>
                 )}
               </div>
 
-              <div className="mt-3 flex flex-wrap gap-1">
+              <div className="mt-3 flex flex-wrap gap-1.5">
                 {agent.specialties.slice(0, 3).map((spec) => (
                   <span
                     key={spec}
-                    className="rounded-full bg-[#C7A962]/10 px-2 py-0.5 text-[10px] font-medium text-[#0a2225]"
+                    className="rounded-full bg-[#C7A962]/10 px-2.5 py-1 text-[10px] font-medium text-[#0a2225]"
                   >
                     {spec}
                   </span>
                 ))}
               </div>
 
-              {(agent.minBudget != null || agent.maxBudget != null) && (
-                <div className="mt-3 text-[10px] text-[#0a2225]/60">
-                  Typical trip budget: {agent.minBudget ? `$${agent.minBudget.toLocaleString()}` : "—"} – {" "}
-                  {agent.maxBudget ? `$${agent.maxBudget.toLocaleString()}` : "—"}
-                </div>
-              )}
-
               {agent.languages.length > 0 && (
-                <div className="mt-2 text-[10px] text-[#0a2225]/60">
+                <div className="mt-3 text-[11px] text-[#0a2225]/50">
                   Languages: {agent.languages.join(", ")}
                 </div>
               )}
+
+              <div className="mt-4 flex w-full items-center justify-center rounded-full bg-[#0c4d47] px-4 py-2 text-xs font-semibold text-white transition group-hover:bg-[#0a3d39]">
+                View profile
+              </div>
             </button>
           ))}
         </div>
