@@ -17,6 +17,7 @@ import { EmptyState } from "@/components/marketplace/EmptyState";
 import { BrandEmptyState } from "@/components/brand/BrandEmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
+import { invokeWithAuth } from "@/lib/supabaseHelpers";
 import { useQuery } from "@tanstack/react-query";
 
 type Tab = "trips" | "creators" | "agents" | "brands" | "trip-requests";
@@ -181,11 +182,11 @@ export default function Marketplace() {
   const { data: brands, isLoading: isLoadingBrands } = useQuery<BrandSummary[]>({
     queryKey: ["marketplace-brands"],
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke("ai-brand-discovery", {
+      const { data, error } = await invokeWithAuth<{ matches: any[] }>("ai-brand-discovery", {
         body: { userId: user?.id },
       });
 
-      if (error) throw error;
+      if (error) throw new Error(error);
 
       const matches = (data?.matches || []) as any[];
 
