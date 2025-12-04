@@ -27,6 +27,11 @@ const DEFAULT_LIMITS: Record<RateLimitKey, RateLimitDefaults> = {
   api: { maxRequests: 20, windowSeconds: 60 },
 };
 
+// Simple in-memory rate limit store (per edge function instance)
+// Note: This resets when the function instance is recycled, which is acceptable
+// for basic rate limiting in edge functions
+const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
+
 function getIdentifier(options: EnforceOptions): string {
   const base = options.keyType;
   const user = options.userId?.trim();
@@ -38,39 +43,50 @@ function getIdentifier(options: EnforceOptions): string {
   return `${base}:ip:${ip}`;
 }
 
-async function incrementCounter(
-  keyParts: Deno.KvKey,
+function checkRateLimit(
+  identifier: string,
   maxRequests: number,
   windowMs: number
-): Promise<RateLimitResult> {
-  const kv = await Deno.openKv();
+): RateLimitResult {
   const now = Date.now();
-  const bucket = Math.floor(now / windowMs) * windowMs;
-  const bucketKey: Deno.KvKey = [...keyParts, bucket];
-  const existing = await kv.get<number>(bucketKey);
-  const expireIn = windowMs - (now - bucket);
-  const nextCount = (existing.value ?? 0) + 1;
-
-  const atomic = kv.atomic().check(existing ?? { key: bucketKey, versionstamp: null }).set(
-    bucketKey,
-    nextCount,
-    { expireIn }
-  );
-
-  const result = await atomic.commit();
-  if (!result.ok) {
-    // Retry once if contention occurred
-    return incrementCounter(keyParts, maxRequests, windowMs);
+  const windowReset = new Date(now + windowMs);
+  
+  // Clean up expired entries periodically
+  if (Math.random() < 0.1) {
+    for (const [key, value] of rateLimitStore.entries()) {
+      if (value.resetAt < now) {
+        rateLimitStore.delete(key);
+      }
+    }
   }
 
-  const windowReset = new Date(bucket + windowMs);
-  const remaining = Math.max(maxRequests - nextCount, 0);
-  const allowed = nextCount <= maxRequests;
+  const existing = rateLimitStore.get(identifier);
+  
+  // If no existing entry or window expired, create new entry
+  if (!existing || existing.resetAt < now) {
+    rateLimitStore.set(identifier, { count: 1, resetAt: now + windowMs });
+    return {
+      allowed: true,
+      remaining: maxRequests - 1,
+      retryAfterSeconds: 0,
+      windowReset,
+    };
+  }
+
+  // Increment counter
+  existing.count += 1;
+  const allowed = existing.count <= maxRequests;
+  const remaining = Math.max(maxRequests - existing.count, 0);
   const retryAfterSeconds = allowed
     ? 0
-    : Math.max(Math.ceil((windowReset.getTime() - now) / 1000), 0);
+    : Math.max(Math.ceil((existing.resetAt - now) / 1000), 0);
 
-  return { allowed, remaining, retryAfterSeconds, windowReset };
+  return {
+    allowed,
+    remaining,
+    retryAfterSeconds,
+    windowReset: new Date(existing.resetAt),
+  };
 }
 
 export async function enforceRateLimit(options: EnforceOptions): Promise<Response | null> {
@@ -81,8 +97,7 @@ export async function enforceRateLimit(options: EnforceOptions): Promise<Respons
 
   try {
     const identifier = getIdentifier(options);
-    const keyParts: Deno.KvKey = ["rate-limit", identifier];
-    const result = await incrementCounter(keyParts, maxRequests, windowMs);
+    const result = checkRateLimit(identifier, maxRequests, windowMs);
 
     if (result.allowed) {
       return null;

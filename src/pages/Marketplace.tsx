@@ -180,17 +180,44 @@ export default function Marketplace() {
   });
 
   const { data: brands, isLoading: isLoadingBrands } = useQuery<BrandSummary[]>({
-    queryKey: ["marketplace-brands"],
+    queryKey: ["marketplace-brands", user?.id],
     queryFn: async () => {
-      const { data, error } = await invokeWithAuth<{ matches: any[] }>("ai-brand-discovery", {
-        body: { userId: user?.id },
-      });
+      // Personalized results for logged-in users
+      if (user?.id) {
+        const { data, error } = await invokeWithAuth<{ matches: any[] }>("ai-brand-discovery", {
+          body: { userId: user.id },
+        });
 
-      if (error) throw new Error(error);
+        if (error) throw new Error(error);
 
-      const matches = (data?.matches || []) as any[];
+        const matches = (data?.matches || []) as any[];
 
-      return matches.map((b: any) => ({
+        return matches.map((b: any) => ({
+          profile_id: b.profile_id,
+          name: b.name,
+          avatar_url: b.avatar_url,
+          cover_image_url: b.cover_image_url,
+          bio: b.bio,
+          brand_type: b.brand_type,
+          categories: b.categories,
+          regions: b.regions,
+          supplier_type: b.supplier_type,
+          supplier_rating: b.supplier_rating,
+          supplier_reviews: b.supplier_reviews,
+          match_score: b.match_score,
+        }));
+      }
+
+      // Basic results for guests - query view directly
+      const { data, error } = await supabase
+        .from("brand_profiles_discovery")
+        .select("profile_id, name, avatar_url, cover_image_url, bio, brand_type, categories, regions, supplier_rating, supplier_reviews")
+        .order("supplier_rating", { ascending: false, nullsFirst: false })
+        .limit(50);
+
+      if (error) throw error;
+
+      return (data || []).map((b: any) => ({
         profile_id: b.profile_id,
         name: b.name,
         avatar_url: b.avatar_url,
@@ -199,13 +226,13 @@ export default function Marketplace() {
         brand_type: b.brand_type,
         categories: b.categories,
         regions: b.regions,
-        supplier_type: b.supplier_type,
+        supplier_type: null,
         supplier_rating: b.supplier_rating,
         supplier_reviews: b.supplier_reviews,
-        match_score: b.match_score,
+        match_score: null,
       }));
     },
-    enabled: activeTab === "brands" && !!user,
+    enabled: activeTab === "brands",
   });
 
   const handleSearch = (newFilters: SearchFilters) => {
