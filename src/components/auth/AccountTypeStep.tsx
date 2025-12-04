@@ -10,6 +10,29 @@ interface Props {
   onComplete: () => void;
 }
 
+const roleOptions: { type: AccountType; title: string; description: string }[] = [
+  {
+    type: "traveler",
+    title: "Traveler",
+    description: "You want inspiration, trip ideas, and help turning moodboards into real itineraries.",
+  },
+  {
+    type: "creator",
+    title: "Creator",
+    description: "You make travel content and want hosted stays, brand collabs, and access to Goldsainte trips.",
+  },
+  {
+    type: "agent",
+    title: "Travel Agent",
+    description: "You design and book trips for clients and want a pipeline of qualified trip requests.",
+  },
+  {
+    type: "brand",
+    title: "Brand / Hotel",
+    description: "You're a hotel, resort, or lifestyle brand and want a curated presence and insights on Goldsainte.",
+  },
+];
+
 export function AccountTypeStep({ onComplete }: Props) {
   const [accountType, setAccountType] = useState<AccountType | null>(null);
   const [firstName, setFirstName] = useState("");
@@ -66,129 +89,96 @@ export function AccountTypeStep({ onComplete }: Props) {
     }
   };
 
-  const baseButton =
-    "flex-1 rounded-2xl border px-3 py-2 text-xs text-left transition-all flex flex-col gap-1";
-
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {/* Section header */}
       <div className="space-y-1">
-        <h2 className="text-lg font-semibold tracking-tight">
+        <h2 className="text-xl font-secondary text-[#0a2225]">
           Tell us who you are
         </h2>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-sm text-[#6B7280]">
           Goldsainte works best when we understand your role in the marketplace.
         </p>
       </div>
 
       {/* Role selection */}
-      <div className="grid grid-cols-1 gap-2 text-xs">
-        <button
-          type="button"
-          className={`${baseButton} ${
-            accountType === "traveler"
-              ? "border-primary bg-primary/5"
-              : "border-border bg-card"
-          }`}
-          onClick={() => setAccountType("traveler")}
-        >
-          <div className="font-medium">Traveler</div>
-          <div className="text-[11px] text-muted-foreground">
-            You want inspiration, trip ideas, and help turning moodboards into real itineraries.
-          </div>
-        </button>
-
-        <button
-          type="button"
-          className={`${baseButton} ${
-            accountType === "creator"
-              ? "border-primary bg-primary/5"
-              : "border-border bg-card"
-          }`}
-          onClick={() => setAccountType("creator")}
-        >
-          <div className="font-medium">Creator</div>
-          <div className="text-[11px] text-muted-foreground">
-            You make travel content and want hosted stays, brand collabs, and access to Goldsainte trips.
-          </div>
-        </button>
-
-        <button
-          type="button"
-          className={`${baseButton} ${
-            accountType === "agent"
-              ? "border-primary bg-primary/5"
-              : "border-border bg-card"
-          }`}
-          onClick={() => setAccountType("agent")}
-        >
-          <div className="font-medium">Travel Agent</div>
-          <div className="text-[11px] text-muted-foreground">
-            You design and book trips for clients and want a pipeline of qualified trip requests.
-          </div>
-        </button>
-
-        <button
-          type="button"
-          className={`${baseButton} ${
-            accountType === "brand"
-              ? "border-primary bg-primary/5"
-              : "border-border bg-card"
-          }`}
-          onClick={() => setAccountType("brand")}
-        >
-          <div className="font-medium">Brand / Hotel</div>
-          <div className="text-[11px] text-muted-foreground">
-            You&apos;re a hotel, resort, or lifestyle brand and want a curated presence, collections, and performance insights on Goldsainte.
-          </div>
-        </button>
+      <div className="grid grid-cols-1 gap-3">
+        {roleOptions.map((role) => (
+          <button
+            key={role.type}
+            type="button"
+            className={`w-full rounded-2xl border-2 px-5 py-4 text-left transition-all flex flex-col gap-1.5 ${
+              accountType === role.type
+                ? "border-[#C7A962] bg-[#FDF9F0]"
+                : "border-[#E5DFC6] bg-white hover:border-[#BFAD72] hover:bg-[#FDF9F0]/50"
+            }`}
+            onClick={() => setAccountType(role.type)}
+          >
+            <div className="font-secondary text-base text-[#0a2225]">{role.title}</div>
+            <div className="text-sm text-[#6B7280] leading-relaxed">
+              {role.description}
+            </div>
+          </button>
+        ))}
       </div>
 
       {/* Basic identity fields */}
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        <div className="space-y-1">
-          <Label htmlFor="firstName">First name</Label>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="firstName" className="text-sm font-medium text-[#0a2225]">
+            First name
+          </Label>
           <Input
             id="firstName"
             placeholder="Jordan"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
+            className="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20 rounded-xl h-11"
           />
         </div>
-        <div className="space-y-1">
-          <Label htmlFor="lastName">Last name</Label>
+        <div className="space-y-2">
+          <Label htmlFor="lastName" className="text-sm font-medium text-[#0a2225]">
+            Last name
+          </Label>
           <Input
             id="lastName"
             placeholder="Smith"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
+            className="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20 rounded-xl h-11"
           />
         </div>
       </div>
 
-      <div className="space-y-1">
-        <Label htmlFor="phone">Mobile number</Label>
+      <div className="space-y-2">
+        <Label htmlFor="phone" className="text-sm font-medium text-[#0a2225]">
+          Mobile number
+        </Label>
         <Input
           id="phone"
           placeholder="+1 (555) 000-0000"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
+          className="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20 rounded-xl h-11"
         />
-        <p className="text-[11px] text-muted-foreground">
+        <p className="text-xs text-[#6B7280]">
           Used for security and important updates about your trips and brand activity.
         </p>
       </div>
 
+      {/* Error message */}
       {error && (
-        <p className="text-xs text-destructive" role="alert">
+        <p className="text-sm text-red-600 bg-red-50 px-4 py-3 rounded-xl border border-red-200" role="alert">
           {error}
         </p>
       )}
 
+      {/* CTA Button */}
       <Button
         type="button"
         onClick={handleSave}
         disabled={saving}
-        className="w-full rounded-full text-sm font-semibold"
+        className="w-full rounded-full bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] py-3 h-12 text-base font-semibold"
       >
         {saving ? "Saving profile…" : "Continue to Goldsainte"}
       </Button>

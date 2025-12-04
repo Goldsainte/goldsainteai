@@ -52,30 +52,32 @@ export default function CompleteProfile() {
 
   if (isLoading || checkingProfile) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/20">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-[#FDF9F0]">
+        <Loader2 className="h-8 w-8 animate-spin text-[#C7A962]" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/20 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#FDF9F0] p-4">
       <div className="w-full max-w-md">
+        {/* Header */}
         <div className="text-center mb-8">
           <img 
             src={logomark} 
             alt="Goldsainte" 
-            className="h-12 w-auto mx-auto mb-4"
+            className="h-14 w-auto mx-auto mb-6"
           />
-          <h1 className="text-2xl font-semibold text-foreground mb-2">
+          <h1 className="text-3xl font-secondary text-[#0a2225] mb-2">
             Complete Your Profile
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-base text-[#6B7280]">
             Just a few more details to get started
           </p>
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
+        {/* Card */}
+        <div className="bg-white border border-[#E5DFC6] rounded-3xl p-8 shadow-lg">
           <AccountTypeStep onComplete={handleComplete} />
         </div>
       </div>
