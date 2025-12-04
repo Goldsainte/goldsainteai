@@ -233,24 +233,23 @@ export default function CreatorPublicProfilePage() {
             </Link>
           </div>
 
-          <div className="columns-2 md:columns-3 gap-3 space-y-3">
-            {(creator.featured_photos || []).map((src) => (
-              <img
-                key={src}
-                src={src}
-                alt="Storyboard"
-                className="w-full rounded-2xl object-cover"
-              />
-            ))}
-
-            {(!creator.featured_photos ||
-              creator.featured_photos.length === 0) && (
-              <div className="rounded-2xl bg-[#E5DFC6]/60 px-4 py-6 text-[11px] text-[#4a4a4a]">
-                This creator hasn&apos;t added storyboard photos yet. Once they
-                build trips in Goldsainte Creator Lab, their highlights will appear here.
-              </div>
-            )}
-          </div>
+          {creator.featured_photos && creator.featured_photos.length > 0 ? (
+            <div className="columns-2 md:columns-3 gap-3 space-y-3">
+              {creator.featured_photos.map((src) => (
+                <img
+                  key={src}
+                  src={src}
+                  alt="Storyboard"
+                  className="w-full rounded-2xl object-cover"
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl bg-[#E5DFC6]/60 px-4 py-6 text-[11px] text-[#4a4a4a]">
+              This creator hasn&apos;t added storyboard photos yet. Once they
+              build trips in Goldsainte Creator Lab, their highlights will appear here.
+            </div>
+          )}
         </div>
 
         {/* CTA: Partner with creator */}
