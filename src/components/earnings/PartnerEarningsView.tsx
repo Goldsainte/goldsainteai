@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Wallet } from "lucide-react";
+import { ArrowRight, Wallet } from "lucide-react";
+import { BackButton } from "@/components/ui/BackButton";
 import {
   getPartnerBookingEarnings,
   type PartnerEarningSnapshot,
@@ -62,91 +63,101 @@ export function PartnerEarningsView({
   const total = (snapshot?.pending || 0) + (snapshot?.released || 0);
 
   return (
-    <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
+    <main className="min-h-screen bg-[#FDF9F0] text-[#0a2225]">
       <section className="mx-auto max-w-5xl px-4 pt-14 pb-6 md:pt-16 md:pb-8">
-        <div className="flex items-center justify-between gap-2 mb-4">
-          <Link
-            to={backLink}
-            className="inline-flex items-center gap-1 text-[10px] text-[#8D8D8D]"
-          >
-            <ArrowLeft className="h-3 w-3" />
-            {backLabel}
-          </Link>
+        <div className="mb-6">
+          <BackButton to={backLink} label={backLabel} />
         </div>
+        
         <div className="flex items-center justify-between gap-4">
-          <div className="space-y-2">
-            <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
+          <div className="space-y-3">
+            <p className="text-xs uppercase tracking-[0.2em] font-medium text-[#C7A962]">
               Earnings
             </p>
-            <h1 className="font-display text-[22px] md:text-[24px] leading-tight">
+            <h1 className="font-secondary text-2xl md:text-3xl leading-tight text-[#0a2225]">
               {title}
             </h1>
-            <p className="text-[11px] md:text-[12px] text-[#4a4a4a] max-w-md">
+            <p className="text-sm text-[#6B7280] max-w-md leading-relaxed">
               {intro}
             </p>
           </div>
-          <div className="hidden md:flex items-center gap-2 text-[10px] text-[#8D8D8D]">
+          <div className="hidden md:flex items-center gap-2 text-xs text-[#6B7280]">
             <Wallet className="h-4 w-4 text-[#0c4d47]" />
             <span>Funds move from traveler to escrow to you.</span>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-4 pb-16 md:pb-20 space-y-5">
-        <div className="grid gap-3 md:grid-cols-3 text-[11px]">
-          <SummaryCard label="Released" value={snapshot ? formatMoney(snapshot.released, currency) : "—"} description="Already paid out" />
-          <SummaryCard label="Held in escrow" value={snapshot ? formatMoney(snapshot.pending, currency) : "—"} description="Awaiting milestone" />
-          <SummaryCard label="Lifetime" value={snapshot ? formatMoney(total, currency) : "—"} description="Total earned" />
+      <section className="mx-auto max-w-5xl px-4 pb-16 md:pb-20 space-y-6">
+        <div className="grid gap-4 md:grid-cols-3">
+          <SummaryCard 
+            label="Released" 
+            value={snapshot ? formatMoney(snapshot.released, currency) : "—"} 
+            description="Already paid out" 
+          />
+          <SummaryCard 
+            label="Held in escrow" 
+            value={snapshot ? formatMoney(snapshot.pending, currency) : "—"} 
+            description="Awaiting milestone" 
+          />
+          <SummaryCard 
+            label="Lifetime" 
+            value={snapshot ? formatMoney(total, currency) : "—"} 
+            description="Total earned" 
+            highlight
+          />
         </div>
 
-        <div className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 text-[11px] space-y-3">
+        <div className="rounded-2xl bg-white border border-[#E5DFC6] p-5 md:p-6 space-y-4">
           <div className="flex items-center justify-between gap-2">
             <div>
-              <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
+              <p className="text-xs uppercase tracking-[0.2em] font-medium text-[#C7A962]">
                 Booking payouts
               </p>
-              <p className="text-[12px] font-semibold">Latest activity</p>
+              <p className="text-base font-secondary font-semibold text-[#0a2225] mt-1">
+                Latest activity
+              </p>
             </div>
           </div>
 
-          {loading && <p className="text-[10px] text-[#8D8D8D]">Loading…</p>}
-          {error && <p className="text-[10px] text-red-600">{error}</p>}
+          {loading && <p className="text-sm text-[#6B7280]">Loading…</p>}
+          {error && <p className="text-sm text-red-600">{error}</p>}
 
           {!loading && !error && snapshot && snapshot.bookings.length === 0 && (
-            <p className="text-[10px] text-[#8D8D8D]">
+            <p className="text-sm text-[#6B7280]">
               Once travelers confirm bookings with you, each payout will appear here.
             </p>
           )}
 
           {!loading && !error && snapshot && snapshot.bookings.length > 0 && (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {snapshot.bookings.map((booking) => (
                 <Link
                   key={booking.id}
                   to={`/bookings/${booking.id}`}
-                  className="flex flex-col md:flex-row md:items-center justify-between gap-2 rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 hover:border-[#BFAD72]"
+                  className="flex flex-col md:flex-row md:items-center justify-between gap-3 rounded-xl border border-[#E5DFC6] bg-[#FDF9F0] px-4 py-3 hover:border-[#C7A962] transition-colors"
                 >
-                  <div className="space-y-0.5">
-                    <p className="text-[11px] font-semibold">
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-[#0a2225]">
                       Booking #{booking.id.slice(0, 6)}
                     </p>
-                    <p className="text-[10px] text-[#8D8D8D]">
+                    <p className="text-xs text-[#6B7280]">
                       Status: {booking.status} · Escrow: {booking.escrow_status || "HELD"}
                     </p>
                     {booking.commission_mode && (
-                      <p className="text-[10px] text-[#4a4a4a]">
+                      <p className="text-xs text-[#6B7280]">
                         Commission mode: {booking.commission_mode}
                       </p>
                     )}
                   </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <p className="text-[12px] font-semibold">
+                  <div className="flex flex-col items-end gap-1.5">
+                    <p className="text-base font-semibold text-[#C7A962]">
                       {formatMoney(booking.amount_cents, booking.currency || currency)}
                     </p>
-                    <p className="text-[9px] text-[#8D8D8D]">
+                    <p className="text-xs text-[#6B7280]">
                       {new Date(booking.created_at).toLocaleDateString()}
                     </p>
-                    <div className="inline-flex items-center gap-1 text-[10px] text-[#0c4d47]">
+                    <div className="inline-flex items-center gap-1 text-xs text-[#0c4d47] font-medium">
                       View booking
                       <ArrowRight className="h-3 w-3" />
                     </div>
@@ -157,7 +168,7 @@ export function PartnerEarningsView({
           )}
         </div>
 
-        <p className="text-[9px] text-[#8D8D8D] max-w-md">
+        <p className="text-xs text-[#6B7280] max-w-md leading-relaxed">
           Goldsainte holds traveler funds for a short protected window before releasing payouts to you and your partners. Need help?
           Reach out via support@goldsainte.com.
         </p>
@@ -170,18 +181,34 @@ function SummaryCard({
   label,
   value,
   description,
+  highlight = false,
 }: {
   label: string;
   value: string;
   description: string;
+  highlight?: boolean;
 }) {
   return (
-    <div className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-3 space-y-1.5">
-      <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
+    <div className={`rounded-2xl border p-4 space-y-2 ${
+      highlight 
+        ? "bg-[#0c4d47] border-[#0c4d47] text-white" 
+        : "bg-white border-[#E5DFC6]"
+    }`}>
+      <p className={`text-xs uppercase tracking-[0.15em] font-medium ${
+        highlight ? "text-white/70" : "text-[#6B7280]"
+      }`}>
         {label}
       </p>
-      <p className="text-[16px] font-semibold">{value}</p>
-      <p className="text-[10px] text-[#4a4a4a]">{description}</p>
+      <p className={`text-xl font-secondary font-semibold ${
+        highlight ? "text-white" : "text-[#C7A962]"
+      }`}>
+        {value}
+      </p>
+      <p className={`text-xs ${
+        highlight ? "text-white/70" : "text-[#6B7280]"
+      }`}>
+        {description}
+      </p>
     </div>
   );
 }
