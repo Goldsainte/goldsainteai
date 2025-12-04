@@ -1,11 +1,25 @@
 // src/pages/CreatorTripsPage.tsx
 import { useEffect, useState } from "react";
-import { getOpenTrips, Trip } from "@/services/tripService";
+import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
-import { Loader2, MapPin, Calendar, Users, DollarSign, Sparkles } from "lucide-react";
+import { Loader2, MapPin, Calendar, Users, Sparkles } from "lucide-react";
+
+interface TripRequest {
+  id: string;
+  title: string | null;
+  description: string | null;
+  destination: string | null;
+  start_date: string | null;
+  end_date: string | null;
+  travelers_adults: number | null;
+  travelers_children: number | null;
+  budget_min: number | null;
+  budget_max: number | null;
+  created_at: string;
+}
 
 export default function CreatorTripsPage() {
-  const [trips, setTrips] = useState<Trip[]>([]);
+  const [trips, setTrips] = useState<TripRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -13,9 +27,15 @@ export default function CreatorTripsPage() {
     async function load() {
       setLoading(true);
       try {
-        const data = await getOpenTrips();
+        const { data, error } = await supabase
+          .from("trip_requests")
+          .select("id, title, description, destination, start_date, end_date, travelers_adults, travelers_children, budget_min, budget_max, created_at")
+          .eq("status", "open")
+          .order("created_at", { ascending: false });
+        
+        if (error) throw error;
         if (!cancelled) {
-          setTrips(data);
+          setTrips(data || []);
         }
       } catch (err) {
         console.error("Error loading trips:", err);
@@ -30,6 +50,19 @@ export default function CreatorTripsPage() {
       cancelled = true;
     };
   }, []);
+
+  const formatBudget = (min: number | null, max: number | null) => {
+    if (!min && !max) return null;
+    if (min && max) return `$${min.toLocaleString()} – $${max.toLocaleString()}`;
+    if (min) return `From $${min.toLocaleString()}`;
+    if (max) return `Up to $${max.toLocaleString()}`;
+    return null;
+  };
+
+  const getTravelerCount = (adults: number | null, children: number | null) => {
+    const total = (adults || 0) + (children || 0);
+    return total > 0 ? total : null;
+  };
 
   return (
     <main className="min-h-screen bg-[#FDF9F0] text-[#0a2225] px-4 py-10">
@@ -72,59 +105,64 @@ export default function CreatorTripsPage() {
         {/* Trip Cards Grid */}
         {!loading && trips.length > 0 && (
           <div className="grid gap-4 md:grid-cols-2">
-            {trips.map((trip) => (
-              <Link
-                key={trip.id}
-                to={`/trip/${trip.id}`}
-                className="group block rounded-2xl border border-[#E5DFC6] bg-white p-5 shadow-sm hover:shadow-md hover:border-[#C7A962]/50 transition-all duration-200"
-              >
-                {/* Title & Budget */}
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <h2 className="font-secondary text-lg font-semibold text-[#0a2225] group-hover:text-[#0a2225]/80 transition-colors">
-                    {trip.title || "Untitled trip"}
-                  </h2>
-                  {trip.budget_range && (
-                    <span className="shrink-0 rounded-full bg-[#C7A962]/10 px-3 py-1 text-xs font-medium text-[#0a2225]">
-                      {trip.budget_range}
-                    </span>
-                  )}
-                </div>
+            {trips.map((trip) => {
+              const budget = formatBudget(trip.budget_min, trip.budget_max);
+              const travelerCount = getTravelerCount(trip.travelers_adults, trip.travelers_children);
+              
+              return (
+                <Link
+                  key={trip.id}
+                  to={`/marketplace/request/${trip.id}`}
+                  className="group block rounded-2xl border border-[#E5DFC6] bg-white p-5 shadow-sm hover:shadow-md hover:border-[#C7A962]/50 transition-all duration-200"
+                >
+                  {/* Title & Budget */}
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <h2 className="font-secondary text-lg font-semibold text-[#0a2225] group-hover:text-[#0a2225]/80 transition-colors">
+                      {trip.title || "Untitled trip"}
+                    </h2>
+                    {budget && (
+                      <span className="shrink-0 rounded-full bg-[#C7A962]/10 px-3 py-1 text-xs font-medium text-[#0a2225]">
+                        {budget}
+                      </span>
+                    )}
+                  </div>
 
-                {/* Description */}
-                {trip.description && (
-                  <p className="text-sm text-[#0a2225]/70 line-clamp-2 mb-4">
-                    {trip.description}
-                  </p>
-                )}
+                  {/* Description */}
+                  {trip.description && (
+                    <p className="text-sm text-[#0a2225]/70 line-clamp-2 mb-4">
+                      {trip.description}
+                    </p>
+                  )}
 
-                {/* Metadata */}
-                <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-[#0a2225]/60 mb-4">
-                  {trip.destination && (
-                    <span className="flex items-center gap-1.5">
-                      <MapPin className="h-3.5 w-3.5" />
-                      {trip.destination}
-                    </span>
-                  )}
-                  {trip.start_date && trip.end_date && (
-                    <span className="flex items-center gap-1.5">
-                      <Calendar className="h-3.5 w-3.5" />
-                      {new Date(trip.start_date).toLocaleDateString()} – {new Date(trip.end_date).toLocaleDateString()}
-                    </span>
-                  )}
-                  {trip.travelers_count && (
-                    <span className="flex items-center gap-1.5">
-                      <Users className="h-3.5 w-3.5" />
-                      {trip.travelers_count} traveler{trip.travelers_count > 1 ? "s" : ""}
-                    </span>
-                  )}
-                </div>
+                  {/* Metadata */}
+                  <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-[#0a2225]/60 mb-4">
+                    {trip.destination && (
+                      <span className="flex items-center gap-1.5">
+                        <MapPin className="h-3.5 w-3.5" />
+                        {trip.destination}
+                      </span>
+                    )}
+                    {trip.start_date && trip.end_date && (
+                      <span className="flex items-center gap-1.5">
+                        <Calendar className="h-3.5 w-3.5" />
+                        {new Date(trip.start_date).toLocaleDateString()} – {new Date(trip.end_date).toLocaleDateString()}
+                      </span>
+                    )}
+                    {travelerCount && (
+                      <span className="flex items-center gap-1.5">
+                        <Users className="h-3.5 w-3.5" />
+                        {travelerCount} traveler{travelerCount > 1 ? "s" : ""}
+                      </span>
+                    )}
+                  </div>
 
-                {/* CTA */}
-                <div className="text-sm font-medium text-[#C7A962] group-hover:text-[#B89952] transition-colors">
-                  View details →
-                </div>
-              </Link>
-            ))}
+                  {/* CTA */}
+                  <div className="text-sm font-medium text-[#C7A962] group-hover:text-[#B89952] transition-colors">
+                    View details →
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>
