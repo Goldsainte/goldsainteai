@@ -10,6 +10,7 @@ import { LuxurySelectionCard } from "@/components/onboarding/LuxurySelectionCard
 import { ProfilePhotoUploader } from "@/pages/traveler/components/ProfilePhotoUploader";
 import { DestinationAutocompleteNominatim } from "@/components/preferences/DestinationAutocompleteNominatim";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { 
   User, Camera, Globe, MapPin, Sparkles, CreditCard, 
   TrendingUp, Instagram, Youtube, Video, Shield, 
@@ -105,6 +106,7 @@ const LANGUAGES = [
 
 export default function CreatorOnboardingPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showWelcomeCard, setShowWelcomeCard] = useState(false);
@@ -400,7 +402,13 @@ export default function CreatorOnboardingPage() {
                 </div>
 
                 <div className="flex justify-center mb-6">
-                  <ProfilePhotoUploader currentUrl={avatarUrl} onUpload={setAvatarUrl} size="lg" />
+                  <ProfilePhotoUploader 
+                    userId={user?.id || ''} 
+                    currentAvatarUrl={avatarUrl || null} 
+                    displayName={displayName}
+                    onUploadComplete={setAvatarUrl} 
+                    size="lg" 
+                  />
                 </div>
 
                 <div className="space-y-4">
@@ -537,7 +545,11 @@ export default function CreatorOnboardingPage() {
 
                 <div>
                   <Label className="text-[#0a2225] font-medium mb-3 block">Primary Destinations * <span className="text-[#6B7280] font-normal">(regions you know best)</span></Label>
-                  <DestinationAutocompleteNominatim onSelect={addDestination} placeholder="Search destinations..." />
+                  <DestinationAutocompleteNominatim 
+                    value={destinations} 
+                    onChange={setDestinations}
+                    maxSelections={10}
+                  />
                   {destinations.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-3">
                       {destinations.map((dest) => (
