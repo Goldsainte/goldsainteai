@@ -14,8 +14,6 @@ import { OnboardingTour } from "@/components/OnboardingTour";
 import { WelcomeModal } from "@/components/WelcomeModal";
 import { OnboardingWelcomeModal } from "@/components/OnboardingWelcomeModal";
 import { ScrollToTop } from "@/components/ScrollToTop";
-import { SentryTestButton } from "@/components/SentryTestButton";
-import { SentryStatusChip } from "@/components/system/SentryStatusChip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ExpediaModalProvider } from "@/contexts/ExpediaModalContext";
@@ -134,8 +132,6 @@ function AppContent() {
       {hideHeader ? null : <Header />}
       <main id="main-content" className="flex-1 flex flex-col" tabIndex={-1}>
         <AppRoutes />
-        <SentryStatusChip />
-        <SentryTestButton />
       </main>
       {hideFooter ? null : <Footer />}
       {hideConciergeWidget ? null : (
