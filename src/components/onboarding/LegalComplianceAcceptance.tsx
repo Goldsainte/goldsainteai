@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { FileText, Shield, Users, ExternalLink, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -37,7 +37,7 @@ export function LegalComplianceAcceptance({
       icon: FileText,
       accepted: tosAccepted,
       onChange: onTosChange,
-      link: "/terms",
+      link: "/legal/terms",
       summary: [
         "Platform usage rights and responsibilities",
         "Account creation and security requirements",
@@ -53,7 +53,7 @@ export function LegalComplianceAcceptance({
       icon: Shield,
       accepted: privacyAccepted,
       onChange: onPrivacyChange,
-      link: "/privacy",
+      link: "/legal/privacy",
       summary: [
         "Personal information we collect",
         "How we use your data",
@@ -69,7 +69,7 @@ export function LegalComplianceAcceptance({
       icon: Users,
       accepted: creatorAgreementAccepted,
       onChange: onCreatorAgreementChange,
-      link: "/creator-agreement",
+      link: "/legal/creator-agreement",
       summary: [
         "Commission structure and payout terms",
         "Content guidelines and brand representation",
@@ -169,11 +169,10 @@ export function LegalComplianceAcceptance({
 
               <div className="mt-4 ml-16">
                 <label className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={doc.accepted}
-                    onChange={(e) => doc.onChange(e.target.checked)}
-                    className="mt-1 w-5 h-5 rounded border-[#C7A962] text-[#C7A962] focus:ring-[#C7A962]"
+                    onCheckedChange={(checked) => doc.onChange(checked as boolean)}
+                    className="mt-0.5 border-[#C7A962] data-[state=checked]:bg-[#C7A962] data-[state=checked]:border-[#C7A962]"
                   />
                   <span className="text-sm text-[#0a2225]">
                     I have read and agree to the {doc.title}{" "}
