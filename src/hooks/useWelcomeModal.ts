@@ -1,16 +1,43 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
 export type AccountType = "traveler" | "creator" | "agent";
+
+// Pages where welcome modal should NOT appear
+const EXCLUDED_PATH_PREFIXES = [
+  "/transparency-agreement",
+  "/privacy-policy",
+  "/terms-of-service",
+  "/creator-agreement",
+  "/trust-safety",
+  "/cancellation-refund-policy",
+  "/auth",
+  "/onboarding",
+  "/apply",
+  "/application",
+  "/legal",
+];
 
 export function useWelcomeModal() {
   const [open, setOpen] = useState(false);
   const [accountType, setAccountType] = useState<AccountType | null>(null);
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
     let cancelled = false;
+
+    // Check if current path should exclude the modal
+    const shouldExclude = EXCLUDED_PATH_PREFIXES.some(prefix =>
+      location.pathname.startsWith(prefix)
+    );
+
+    if (shouldExclude) {
+      setLoading(false);
+      return;
+    }
 
     async function load() {
       setLoading(true);
@@ -53,7 +80,7 @@ export function useWelcomeModal() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [location.pathname]);
 
   const dismiss = async () => {
     setOpen(false);
