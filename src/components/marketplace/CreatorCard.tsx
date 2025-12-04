@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { BadgeCheck } from "lucide-react";
 
 interface CreatorCardProps {
   creator: {
@@ -43,10 +44,10 @@ export const CreatorCard = ({ creator }: CreatorCardProps) => {
   };
 
   return (
-    <div className="flex flex-col rounded-2xl bg-background p-4 shadow-sm ring-1 ring-border/80 transition hover:-translate-y-1 hover:shadow-lg">
+    <div className="group flex flex-col rounded-2xl border border-[#E5DFC6] bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
       {/* Header with Avatar and Info */}
       <div className="flex items-center gap-3">
-        <div className="relative h-11 w-11 flex-shrink-0 overflow-hidden rounded-full bg-muted">
+        <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-full border-2 border-[#E5DFC6] bg-[#f7f3ea]">
           {creator.avatar_url ? (
             <img
               src={creator.avatar_url}
@@ -54,29 +55,30 @@ export const CreatorCard = ({ creator }: CreatorCardProps) => {
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-primary/10 text-sm font-semibold text-foreground">
+            <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-[#0a2225]/60">
               {getInitials(creator.full_name || creator.username)}
             </div>
           )}
         </div>
         <div className="flex flex-col">
-          <div className="flex items-center gap-1.5">
-            <span className="text-sm font-semibold text-foreground">
+          <div className="flex items-center gap-2">
+            <span className="font-secondary text-base font-semibold text-[#0a2225]">
               {creator.full_name || creator.username}
             </span>
             {creator.identity_verified && (
-              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
-                Verified Creator
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#C7A962]/10 px-2 py-0.5 text-[10px] font-medium text-[#0a2225]">
+                <BadgeCheck className="h-3 w-3 text-[#C7A962]" />
+                Verified
               </span>
             )}
           </div>
           {creator.username && (
-            <span className="text-xs text-muted-foreground">@{creator.username}</span>
+            <span className="text-[12px] text-[#0a2225]/60">@{creator.username}</span>
           )}
           {creator.rating !== undefined && creator.review_count !== undefined && creator.review_count > 0 && (
-            <div className="mt-0.5 flex items-center gap-1 text-xs text-foreground">
-              <span>★ {creator.rating.toFixed(1)}</span>
-              <span className="text-muted-foreground">
+            <div className="mt-0.5 flex items-center gap-1 text-xs text-[#0a2225]">
+              <span className="text-[#C7A962]">★</span> {creator.rating.toFixed(1)}
+              <span className="text-[#0a2225]/50">
                 ({creator.review_count} {creator.review_count === 1 ? 'review' : 'reviews'})
               </span>
             </div>
@@ -86,36 +88,36 @@ export const CreatorCard = ({ creator }: CreatorCardProps) => {
 
       {/* Bio */}
       {creator.bio && (
-        <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
+        <p className="mt-3 line-clamp-2 text-[13px] leading-relaxed text-[#0a2225]/70">
           {creator.bio}
         </p>
       )}
 
       {/* Stats */}
-      <div className="mt-3 flex items-center gap-4 text-xs">
+      <div className="mt-4 flex items-center gap-5 text-xs">
         <div>
-          <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-[#0a2225]/50">
             Trips Created
           </p>
-          <p className="font-semibold text-foreground">
+          <p className="font-semibold text-[#0a2225]">
             {creator.stats.trips_created}
           </p>
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
-            Avg. Engagement
+          <p className="text-[10px] font-medium uppercase tracking-wider text-[#0a2225]/50">
+            Engagement
           </p>
-          <p className="font-semibold text-foreground">
+          <p className="font-semibold text-[#0a2225]">
             {creator.stats.avg_engagement !== undefined 
               ? `${(creator.stats.avg_engagement * 100).toFixed(1)}%` 
               : "N/A"}
           </p>
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-[#0a2225]/50">
             Avg. Views
           </p>
-          <p className="font-semibold text-foreground">
+          <p className="font-semibold text-[#0a2225]">
             {formatNumber(creator.stats.avg_views)}
           </p>
         </div>
@@ -123,11 +125,11 @@ export const CreatorCard = ({ creator }: CreatorCardProps) => {
 
       {/* Specialties */}
       {creator.specialties && creator.specialties.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-1">
+        <div className="mt-4 flex flex-wrap gap-1.5">
           {creator.specialties.slice(0, 4).map((specialty, idx) => (
             <span
               key={idx}
-              className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-foreground"
+              className="rounded-full bg-[#C7A962]/10 px-2.5 py-1 text-[10px] font-medium text-[#0a2225]"
             >
               {specialty}
             </span>
@@ -141,7 +143,7 @@ export const CreatorCard = ({ creator }: CreatorCardProps) => {
           e.stopPropagation();
           handleClick();
         }}
-        className="mt-3 inline-flex w-full items-center justify-center rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-700"
+        className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-[#0c4d47] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#0a3d39]"
       >
         Send partnership proposal
       </button>
