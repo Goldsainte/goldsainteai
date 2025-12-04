@@ -21,10 +21,10 @@ const categories = [
 ];
 
 const popularRoutes = [
-  { path: '/my-trip-requests', label: 'My Trip Requests', icon: BookOpen },
+  { path: '/my-trips', label: 'My Trips', icon: BookOpen },
   { path: '/browse-agents', label: 'Browse Agents', icon: Briefcase },
-  { path: '/cocurated-marketplace', label: 'CoCurated Packages', icon: Sparkles },
-  { path: '/agent-onboarding', label: 'Become an Agent', icon: Users },
+  { path: '/marketplace', label: 'Marketplace', icon: Sparkles },
+  { path: '/apply/agent', label: 'Become an Agent', icon: Users },
   { path: '/creator-dashboard', label: 'Creator Dashboard', icon: Users },
   { path: '/corporate-contact', label: 'Contact Us', icon: UserCircle },
 ];
