@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { invokeWithAuth } from "@/lib/supabaseHelpers";
 import { Sparkles, TrendingUp, Video, DollarSign, ExternalLink, Plus } from "lucide-react";
 
 type CreatorStats = {
@@ -37,19 +37,15 @@ export default function CreatorDashboard() {
       setLoading(true);
       setError(null);
       try {
-        const { data, error: fnError } = await supabase.functions.invoke(
+        const { data, error: fnError } = await invokeWithAuth<CreatorStats>(
           "creator-dashboard-stats",
-          {
-            body: {},
-          }
+          { body: {} }
         );
 
         if (fnError) {
           console.error(fnError);
           if (!isMounted) return;
-          setError(
-            fnError.message || "Unable to load creator stats at the moment."
-          );
+          setError(fnError || "Unable to load creator stats at the moment.");
           setStats(EMPTY_STATS);
           return;
         }
