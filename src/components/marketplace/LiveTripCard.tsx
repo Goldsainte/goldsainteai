@@ -64,7 +64,7 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
 
   return (
     <article
-      onClick={() => navigate(`/trip/${trip.slug || trip.id}`)}
+      onClick={() => navigate(`/marketplace/trip/${trip.slug || trip.id}`)}
       className="group cursor-pointer overflow-hidden rounded-2xl border border-[#E5DFC6]/40 bg-white shadow-sm transition-all hover:shadow-md hover:border-[#C7B892]/60"
     >
       {/* Image Section */}
@@ -175,7 +175,7 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
             className="rounded-full bg-[#0C4D47] px-4 py-2 text-[13px] font-medium text-[#E5DFC6] transition-colors hover:bg-[#0a3d39]"
             onClick={(e) => {
               e.stopPropagation();
-              navigate(`/trip/${trip.slug || trip.id}`);
+              navigate(`/marketplace/trip/${trip.slug || trip.id}`);
             }}
           >
             View Trip
