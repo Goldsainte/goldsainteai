@@ -26,7 +26,7 @@ export function useRequireOnboarding() {
 
       const { data: profile, error } = await supabase
         .from("profiles")
-        .select("account_type, onboarding_completed")
+        .select("account_type, onboarding_completed, has_completed_creator_onboarding")
         .eq("id", user.id)
         .maybeSingle();
 
@@ -34,17 +34,35 @@ export function useRequireOnboarding() {
         console.error(error);
       }
 
-      if (!profile || !profile.onboarding_completed) {
-        // Role-based redirect for incomplete onboarding
-        const accountType = profile?.account_type;
-        if (accountType === 'creator') {
-          navigate("/tiktok-lab", { replace: true });
-        } else if (accountType === 'agent') {
-          navigate("/marketplace?tab=trip-requests", { replace: true });
-        } else {
-          // Travelers and unknown roles go to preferences
-          navigate("/onboarding/traveler/preferences", { replace: true });
+      // Check onboarding completion based on role
+      const accountType = profile?.account_type;
+      
+      // For creators, check both flags (backward compatibility)
+      if (accountType === 'creator') {
+        if (profile?.onboarding_completed || profile?.has_completed_creator_onboarding) {
+          // Creator has completed onboarding - allow access
+          if (!cancelled) {
+            setAllowed(true);
+            setChecking(false);
+          }
+          return;
         }
+        // Incomplete creator - redirect to creator onboarding
+        navigate("/onboarding/creator", { replace: true });
+        return;
+      }
+      
+      // For agents, redirect to application
+      if (accountType === 'agent') {
+        if (!profile?.onboarding_completed) {
+          navigate("/apply/agent", { replace: true });
+          return;
+        }
+      }
+      
+      // For travelers and others, check standard flag
+      if (!profile || !profile.onboarding_completed) {
+        navigate("/onboarding/traveler/preferences", { replace: true });
         return;
       }
 
