@@ -197,7 +197,7 @@ export default function BrowseAgents() {
 
   const sortControl = (
     <select
-      className="rounded-full border px-3 py-1 text-xs"
+      className="rounded-full border border-[#E5DFC6] bg-white px-3 py-1 text-xs text-[#0a2225] focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
       value={sortBy}
       onChange={(event) =>
         setSortBy(event.target.value as "rating" | "bookings" | "experience")
@@ -212,13 +212,13 @@ export default function BrowseAgents() {
   const filtersPanel = (
     <div className="space-y-4 text-xs">
       <div className="space-y-1">
-        <label className="text-[11px] font-medium text-slate-700">
+        <label className="text-[11px] font-medium text-[#0a2225]/70">
           Destination focus
         </label>
         <input
           type="text"
           placeholder="e.g. Italy, Maldives"
-          className="w-full rounded-lg border px-2 py-1 text-xs"
+          className="w-full rounded-lg border border-[#E5DFC6] bg-white px-2 py-1.5 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
           value={filters.destination ?? ""}
           onChange={(event) =>
             setFilters((prev) => ({ ...prev, destination: event.target.value }))
@@ -227,11 +227,11 @@ export default function BrowseAgents() {
       </div>
 
       <div className="space-y-1">
-        <label className="text-[11px] font-medium text-slate-700">Specialty</label>
+        <label className="text-[11px] font-medium text-[#0a2225]/70">Specialty</label>
         <input
           type="text"
           placeholder="Honeymoons, family, safari..."
-          className="w-full rounded-lg border px-2 py-1 text-xs"
+          className="w-full rounded-lg border border-[#E5DFC6] bg-white px-2 py-1.5 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
           value={filters.specialty ?? ""}
           onChange={(event) =>
             setFilters((prev) => ({ ...prev, specialty: event.target.value }))
@@ -240,11 +240,11 @@ export default function BrowseAgents() {
       </div>
 
       <div className="space-y-1">
-        <label className="text-[11px] font-medium text-slate-700">Language</label>
+        <label className="text-[11px] font-medium text-[#0a2225]/70">Language</label>
         <input
           type="text"
           placeholder="e.g. English"
-          className="w-full rounded-lg border px-2 py-1 text-xs"
+          className="w-full rounded-lg border border-[#E5DFC6] bg-white px-2 py-1.5 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
           value={filters.language ?? ""}
           onChange={(event) =>
             setFilters((prev) => ({ ...prev, language: event.target.value }))
@@ -253,14 +253,14 @@ export default function BrowseAgents() {
       </div>
 
       <div className="space-y-1">
-        <label className="text-[11px] font-medium text-slate-700">Min rating</label>
+        <label className="text-[11px] font-medium text-[#0a2225]/70">Min rating</label>
         <input
           type="number"
           min={1}
           max={5}
           step={0.1}
           placeholder="e.g. 4.5"
-          className="w-full rounded-lg border px-2 py-1 text-xs"
+          className="w-full rounded-lg border border-[#E5DFC6] bg-white px-2 py-1.5 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
           value={filters.minRating ?? ""}
           onChange={(event) =>
             setFilters((prev) => ({
@@ -272,14 +272,14 @@ export default function BrowseAgents() {
       </div>
 
       <div className="space-y-2">
-        <div className="text-[11px] font-medium text-slate-700">
+        <div className="text-[11px] font-medium text-[#0a2225]/70">
           Typical trip budget
         </div>
         <div className="flex gap-2">
           <input
             type="number"
             placeholder="Min"
-            className="w-1/2 rounded-lg border px-2 py-1 text-xs"
+            className="w-1/2 rounded-lg border border-[#E5DFC6] bg-white px-2 py-1.5 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
             value={filters.minBudget ?? ""}
             onChange={(event) =>
               setFilters((prev) => ({
@@ -291,7 +291,7 @@ export default function BrowseAgents() {
           <input
             type="number"
             placeholder="Max"
-            className="w-1/2 rounded-lg border px-2 py-1 text-xs"
+            className="w-1/2 rounded-lg border border-[#E5DFC6] bg-white px-2 py-1.5 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
             value={filters.maxBudget ?? ""}
             onChange={(event) =>
               setFilters((prev) => ({
@@ -305,7 +305,7 @@ export default function BrowseAgents() {
 
       <button
         type="button"
-        className="mt-2 w-full rounded-full border px-3 py-1 text-[11px] text-slate-700"
+        className="mt-2 w-full rounded-full border border-[#E5DFC6] bg-white px-3 py-1.5 text-[11px] text-[#0a2225] transition-colors hover:bg-[#FBF9F0]"
         onClick={() => setFilters({ ...defaultFilters })}
       >
         Clear filters
@@ -318,7 +318,7 @@ export default function BrowseAgents() {
       <input
         type="text"
         placeholder="Search agents by destination, specialty, or agency"
-        className="w-full rounded-full border px-4 py-2 text-xs sm:w-64"
+        className="w-full rounded-full border border-[#E5DFC6] bg-white px-4 py-2 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50 sm:w-64"
         value={filters.search}
         onChange={(event) =>
           setFilters((prev) => ({ ...prev, search: event.target.value }))
@@ -326,7 +326,7 @@ export default function BrowseAgents() {
       />
       <button
         type="button"
-        className="rounded-full border px-3 py-2 text-xs font-medium text-slate-700"
+        className="rounded-full bg-[#0C4D47] px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-[#0a3d39]"
         onClick={() => navigate("/post-trip")}
       >
         Post a trip brief
@@ -335,22 +335,22 @@ export default function BrowseAgents() {
   );
 
   return (
-    <div className="bg-background flex-1">
+    <div className="min-h-screen bg-[#FDF9F0] flex-1">
       <div className="container max-w-6xl px-4 pt-4">
         <BackButton label="Back" />
       </div>
       <MarketplaceShell
-        title="Browse verified travel agents"
-        subtitle="Find agents whose destinations, budgets, and style fit the trips you want to run through Goldsainte."
+        title="Browse Verified Travel Agents"
+        subtitle="Discover verified travel agents who specialize in your dream destinations. Every agent is vetted for quality and expertise."
         filters={filtersPanel}
         headerRight={headerRight}
         resultCount={filteredAgents.length}
         sortControl={sortControl}
       >
       {loading ? (
-        <div className="py-10 text-sm text-slate-500">Loading travel agents…</div>
+        <div className="py-10 text-sm text-[#0a2225]/60">Loading travel agents…</div>
       ) : filteredAgents.length === 0 ? (
-        <div className="py-10 text-sm text-slate-500">
+        <div className="py-10 text-sm text-[#0a2225]/60">
           No agents match these filters yet. Try widening your search.
         </div>
       ) : (
@@ -360,46 +360,50 @@ export default function BrowseAgents() {
               key={agent.id}
               type="button"
               onClick={() => navigate(`/agent/${agent.id}`)}
-              className="flex flex-col justify-between rounded-2xl border bg-white/80 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+              className="flex flex-col justify-between rounded-2xl border border-[#E5DFC6] bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
             >
               <div className="flex items-center gap-3">
-                <div className="h-12 w-12 overflow-hidden rounded-full bg-slate-100">
+                <div className="h-12 w-12 overflow-hidden rounded-full bg-[#FBF9F0]">
                   {agent.avatarUrl ? (
                     <img
                       src={agent.avatarUrl}
                       alt={agent.displayName}
                       className="h-full w-full object-cover"
                     />
-                  ) : null}
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-sm font-medium text-[#0a2225]/40">
+                      {agent.displayName.charAt(0)}
+                    </div>
+                  )}
                 </div>
                 <div className="min-w-0">
-                  <div className="truncate text-sm font-semibold text-slate-900">
+                  <div className="truncate text-sm font-semibold text-[#0a2225]">
                     {agent.displayName}
                   </div>
-                  <div className="truncate text-[11px] text-slate-500">
+                  <div className="truncate text-[11px] text-[#0a2225]/60">
                     {agent.agencyName || "Independent agent"}
                   </div>
                 </div>
               </div>
 
-              <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-slate-600">
+              <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-[#0a2225]/70">
                 {(agent.baseCity || agent.baseCountry) && (
-                  <span className="rounded-full bg-slate-50 px-2 py-1">
+                  <span className="rounded-full border border-[#E5DFC6] bg-[#FBF9F0] px-2 py-1">
                     {[agent.baseCity, agent.baseCountry].filter(Boolean).join(", ")}
                   </span>
                 )}
                 {agent.rating != null && (
-                  <span className="rounded-full bg-slate-50 px-2 py-1">
-                    {agent.rating.toFixed(1)}★ rating
+                  <span className="rounded-full border border-[#E5DFC6] bg-[#FBF9F0] px-2 py-1">
+                    <span className="text-[#C7A962]">★</span> {agent.rating.toFixed(1)} rating
                   </span>
                 )}
                 {agent.totalReviews != null && agent.totalReviews > 0 && (
-                  <span className="rounded-full bg-slate-50 px-2 py-1">
-                    {agent.totalReviews} Goldsainte reviews
+                  <span className="rounded-full border border-[#E5DFC6] bg-[#FBF9F0] px-2 py-1">
+                    {agent.totalReviews} reviews
                   </span>
                 )}
                 {agent.yearsExperience != null && (
-                  <span className="rounded-full bg-slate-50 px-2 py-1">
+                  <span className="rounded-full border border-[#E5DFC6] bg-[#FBF9F0] px-2 py-1">
                     {agent.yearsExperience}+ yrs experience
                   </span>
                 )}
@@ -409,7 +413,7 @@ export default function BrowseAgents() {
                 {agent.specialties.slice(0, 3).map((spec) => (
                   <span
                     key={spec}
-                    className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] text-emerald-800"
+                    className="rounded-full bg-[#C7A962]/10 px-2 py-0.5 text-[10px] font-medium text-[#0a2225]"
                   >
                     {spec}
                   </span>
@@ -417,14 +421,14 @@ export default function BrowseAgents() {
               </div>
 
               {(agent.minBudget != null || agent.maxBudget != null) && (
-                <div className="mt-3 text-[10px] text-slate-500">
+                <div className="mt-3 text-[10px] text-[#0a2225]/60">
                   Typical trip budget: {agent.minBudget ? `$${agent.minBudget.toLocaleString()}` : "—"} – {" "}
                   {agent.maxBudget ? `$${agent.maxBudget.toLocaleString()}` : "—"}
                 </div>
               )}
 
               {agent.languages.length > 0 && (
-                <div className="mt-2 text-[10px] text-slate-500">
+                <div className="mt-2 text-[10px] text-[#0a2225]/60">
                   Languages: {agent.languages.join(", ")}
                 </div>
               )}
