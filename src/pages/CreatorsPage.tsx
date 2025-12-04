@@ -5,6 +5,7 @@ import type { Database } from "@/integrations/supabase/types";
 import { useNavigate } from "react-router-dom";
 import { BackButton } from "@/components/ui/BackButton";
 import { useAuth } from "@/contexts/AuthContext";
+import { Sparkles } from "lucide-react";
 
 type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 
@@ -235,7 +236,7 @@ export default function CreatorsPage() {
 
   const sortControl = (
     <select
-      className="rounded-full border px-3 py-1 text-xs"
+      className="rounded-full border border-[#E5DFC6] bg-white px-4 py-2 text-xs text-[#0a2225] focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
       value={sortBy}
       onChange={(event) =>
         setSortBy(event.target.value as "followers" | "engagement" | "relevance")
@@ -248,14 +249,14 @@ export default function CreatorsPage() {
   );
 
   const filtersPanel = (
-    <div className="space-y-4 text-xs">
+    <div className="space-y-5 text-xs">
       <div className="space-y-2">
-        <div className="text-[11px] font-medium text-slate-700">Followers</div>
+        <div className="text-[11px] font-medium uppercase tracking-wider text-[#0a2225]/70">Followers</div>
         <div className="flex gap-2">
           <input
             type="number"
             placeholder="Min"
-            className="w-1/2 rounded-lg border px-2 py-1 text-xs"
+            className="w-1/2 rounded-xl border border-[#E5DFC6] bg-white px-3 py-2 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
             value={filters.followersMin ?? ""}
             onChange={(event) =>
               setFilters((prev) => ({
@@ -267,7 +268,7 @@ export default function CreatorsPage() {
           <input
             type="number"
             placeholder="Max"
-            className="w-1/2 rounded-lg border px-2 py-1 text-xs"
+            className="w-1/2 rounded-xl border border-[#E5DFC6] bg-white px-3 py-2 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
             value={filters.followersMax ?? ""}
             onChange={(event) =>
               setFilters((prev) => ({
@@ -279,14 +280,14 @@ export default function CreatorsPage() {
         </div>
       </div>
 
-      <div className="space-y-1">
-        <label className="text-[11px] font-medium text-slate-700">
+      <div className="space-y-2">
+        <label className="text-[11px] font-medium uppercase tracking-wider text-[#0a2225]/70">
           Min engagement rate (%)
         </label>
         <input
           type="number"
           placeholder="e.g. 3"
-          className="w-full rounded-lg border px-2 py-1 text-xs"
+          className="w-full rounded-xl border border-[#E5DFC6] bg-white px-3 py-2 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
           value={filters.engagementMin ?? ""}
           onChange={(event) =>
             setFilters((prev) => ({
@@ -297,12 +298,12 @@ export default function CreatorsPage() {
         />
       </div>
 
-      <div className="space-y-1">
-        <label className="text-[11px] font-medium text-slate-700">Creator location</label>
+      <div className="space-y-2">
+        <label className="text-[11px] font-medium uppercase tracking-wider text-[#0a2225]/70">Creator location</label>
         <input
           type="text"
           placeholder="Country or city"
-          className="w-full rounded-lg border px-2 py-1 text-xs"
+          className="w-full rounded-xl border border-[#E5DFC6] bg-white px-3 py-2 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
           value={filters.country ?? ""}
           onChange={(event) =>
             setFilters((prev) => ({ ...prev, country: event.target.value }))
@@ -310,12 +311,12 @@ export default function CreatorsPage() {
         />
       </div>
 
-      <div className="space-y-1">
-        <label className="text-[11px] font-medium text-slate-700">Language</label>
+      <div className="space-y-2">
+        <label className="text-[11px] font-medium uppercase tracking-wider text-[#0a2225]/70">Language</label>
         <input
           type="text"
           placeholder="e.g. English"
-          className="w-full rounded-lg border px-2 py-1 text-xs"
+          className="w-full rounded-xl border border-[#E5DFC6] bg-white px-3 py-2 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
           value={filters.language ?? ""}
           onChange={(event) =>
             setFilters((prev) => ({ ...prev, language: event.target.value }))
@@ -323,12 +324,12 @@ export default function CreatorsPage() {
         />
       </div>
 
-      <div className="space-y-1">
-        <label className="text-[11px] font-medium text-slate-700">Travel niche</label>
+      <div className="space-y-2">
+        <label className="text-[11px] font-medium uppercase tracking-wider text-[#0a2225]/70">Travel niche</label>
         <input
           type="text"
           placeholder="Luxury, family, solo..."
-          className="w-full rounded-lg border px-2 py-1 text-xs"
+          className="w-full rounded-xl border border-[#E5DFC6] bg-white px-3 py-2 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
           value={filters.niche ?? ""}
           onChange={(event) =>
             setFilters((prev) => ({ ...prev, niche: event.target.value }))
@@ -338,7 +339,7 @@ export default function CreatorsPage() {
 
       <button
         type="button"
-        className="mt-2 w-full rounded-full border px-3 py-1 text-[11px] text-slate-700"
+        className="mt-3 w-full rounded-full border border-[#E5DFC6] bg-white px-4 py-2 text-[11px] font-medium text-[#0a2225] transition hover:bg-[#f7f3ea]"
         onClick={() => setFilters({ ...defaultFilters })}
       >
         Clear filters
@@ -351,7 +352,7 @@ export default function CreatorsPage() {
       <input
         type="text"
         placeholder="Search creators by destination, vibe, or handle"
-        className="w-full rounded-full border px-4 py-2 text-xs sm:w-64"
+        className="w-full rounded-full border border-[#E5DFC6] bg-white px-4 py-2.5 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50 sm:w-72"
         value={filters.search}
         onChange={(event) =>
           setFilters((prev) => ({ ...prev, search: event.target.value }))
@@ -360,7 +361,7 @@ export default function CreatorsPage() {
       <div className="flex gap-2">
         <button
           type="button"
-          className="rounded-full border px-3 py-2 text-xs font-medium text-slate-700 bg-white hover:bg-slate-50"
+          className="rounded-full border border-[#E5DFC6] bg-white px-4 py-2.5 text-xs font-medium text-[#0a2225] transition hover:bg-[#f7f3ea]"
           onClick={() => navigate("/post-trip")}
         >
           Post a trip brief
@@ -368,10 +369,11 @@ export default function CreatorsPage() {
         {showCreatorLabButton && (
           <button
             type="button"
-            className="rounded-full bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-black"
+            className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#0a3d39]"
             onClick={() => navigate("/tiktok-lab")}
           >
-            Go to Goldsainte Creator Lab
+            <Sparkles className="h-3.5 w-3.5" />
+            Creator Studio
           </button>
         )}
       </div>
@@ -379,26 +381,26 @@ export default function CreatorsPage() {
   );
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="min-h-screen bg-[#f7f3ea]">
       <div className="container max-w-6xl px-4 pt-4">
         <BackButton label="Back" />
       </div>
       <MarketplaceShell
         title="Creator Marketplace"
-        subtitle="Discover TikTok travel creators and partner with them to sell trips through Goldsainte."
+        subtitle="Discover travel creators and partner with them to bring trips to life through Goldsainte."
         filters={filtersPanel}
         headerRight={headerRight}
         resultCount={filteredCreators.length}
         sortControl={sortControl}
       >
       {loading ? (
-        <div className="py-10 text-sm text-slate-500">Loading creators…</div>
+        <div className="py-10 text-sm text-[#0a2225]/60">Loading creators…</div>
       ) : filteredCreators.length === 0 ? (
-        <div className="py-10 text-sm text-slate-500">
+        <div className="py-10 text-sm text-[#0a2225]/60">
           No creators match these filters yet. Try widening your search.
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {filteredCreators.map((creator) => {
             const engagementRate = computeEngagementRate(creator);
             return (
@@ -406,51 +408,55 @@ export default function CreatorsPage() {
                 key={creator.id}
                 type="button"
                 onClick={() => navigate(`/creators/${creator.id}`)}
-                className="flex flex-col justify-between rounded-2xl border bg-white/80 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                className="group flex flex-col justify-between rounded-2xl border border-[#E5DFC6] bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
               >
                 <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 overflow-hidden rounded-full bg-slate-100">
+                  <div className="h-14 w-14 overflow-hidden rounded-full border-2 border-[#E5DFC6] bg-[#f7f3ea]">
                     {creator.avatarUrl ? (
                       <img
                         src={creator.avatarUrl}
                         alt={creator.displayName}
                         className="h-full w-full object-cover"
                       />
-                    ) : null}
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-[#0a2225]/60">
+                        {creator.displayName.charAt(0).toUpperCase()}
+                      </div>
+                    )}
                   </div>
                   <div className="min-w-0">
-                    <div className="truncate text-sm font-semibold text-slate-900">
+                    <div className="truncate font-secondary text-base font-semibold text-[#0a2225]">
                       {creator.displayName}
                     </div>
-                    <div className="truncate text-[11px] text-slate-500">
-                      {creator.tiktokHandle ? `@${creator.tiktokHandle}` : "TikTok creator"}
+                    <div className="truncate text-[12px] text-[#0a2225]/60">
+                      {creator.tiktokHandle ? `@${creator.tiktokHandle}` : "Creator"}
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-slate-600">
+                <div className="mt-4 flex flex-wrap gap-2 text-[11px]">
                   {creator.followers != null && (
-                    <span className="rounded-full bg-slate-50 px-2 py-1">
+                    <span className="rounded-full bg-[#f7f3ea] px-3 py-1 text-[#0a2225]">
                       {creator.followers.toLocaleString()} followers
                     </span>
                   )}
                   {engagementRate != null && (
-                    <span className="rounded-full bg-slate-50 px-2 py-1">
+                    <span className="rounded-full bg-[#f7f3ea] px-3 py-1 text-[#0a2225]">
                       {engagementRate.toFixed(1)}% engagement
                     </span>
                   )}
                   {(creator.city || creator.country) && (
-                    <span className="rounded-full bg-slate-50 px-2 py-1">
+                    <span className="rounded-full bg-[#f7f3ea] px-3 py-1 text-[#0a2225]">
                       {[creator.city, creator.country].filter(Boolean).join(", ")}
                     </span>
                   )}
                 </div>
 
-                <div className="mt-3 flex flex-wrap gap-1">
+                <div className="mt-3 flex flex-wrap gap-1.5">
                   {creator.niches.slice(0, 3).map((niche) => (
                     <span
                       key={niche}
-                      className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] text-emerald-800"
+                      className="rounded-full bg-[#C7A962]/10 px-2.5 py-1 text-[10px] font-medium text-[#0a2225]"
                     >
                       {niche}
                     </span>
@@ -458,10 +464,14 @@ export default function CreatorsPage() {
                 </div>
 
                 {creator.languages.length > 0 && (
-                  <div className="mt-3 text-[10px] text-slate-500">
+                  <div className="mt-3 text-[11px] text-[#0a2225]/50">
                     Languages: {creator.languages.join(", ")}
                   </div>
                 )}
+
+                <div className="mt-4 flex w-full items-center justify-center rounded-full bg-[#0c4d47] px-4 py-2 text-xs font-semibold text-white transition group-hover:bg-[#0a3d39]">
+                  View profile
+                </div>
               </button>
             );
           })}
