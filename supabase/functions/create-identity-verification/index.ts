@@ -312,9 +312,10 @@ async function createVerificationSession(
 
   try {
     // Determine return URL based on application type
+    const frontendUrl = Deno.env.get("FRONTEND_URL") || "https://goldsainte.ai";
     const defaultReturnUrl = applicationType === "traveler"
-      ? `${Deno.env.get("FRONTEND_URL") || "https://goldsainte.ai"}/customer-verification?status=complete`
-      : `${SUPABASE_URL}/apply/${applicationType}/verification-complete`;
+      ? `${frontendUrl}/customer-verification?status=complete`
+      : `${frontendUrl}/application/verification-complete?type=${applicationType}`;
 
     // Create verification session
     const verificationSession = await stripe.identity.verificationSessions.create(
