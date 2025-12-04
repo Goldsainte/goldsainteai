@@ -487,26 +487,30 @@ export const Header = () => {
                             </>
                           )}
                           
-                          <DropdownMenuSeparator className="bg-border/50" />
-                          
-                          {/* SETTINGS Section */}
-                          <div className="px-4 py-4">
-                            <div className="flex items-center justify-between gap-3">
-                              <Label htmlFor="preferences-toggle-mobile" className="text-sm font-medium cursor-pointer flex-1 leading-tight">
-                                Use My Preferences
-                              </Label>
-                              <Switch
-                                id="preferences-toggle-mobile"
-                                checked={usePreferences}
-                                onCheckedChange={togglePreferences}
-                                className="flex-shrink-0 h-6 w-11"
-                                aria-label="Toggle search preferences"
-                              />
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
-                              Apply saved preferences to searches
-                            </p>
-                          </div>
+                          {isTraveler && (
+                            <>
+                              <DropdownMenuSeparator className="bg-border/50" />
+                              
+                              {/* SETTINGS Section */}
+                              <div className="px-4 py-4">
+                                <div className="flex items-center justify-between gap-3">
+                                  <Label htmlFor="preferences-toggle-mobile" className="text-sm font-medium cursor-pointer flex-1 leading-tight">
+                                    Use My Preferences
+                                  </Label>
+                                  <Switch
+                                    id="preferences-toggle-mobile"
+                                    checked={usePreferences}
+                                    onCheckedChange={togglePreferences}
+                                    className="flex-shrink-0 h-6 w-11"
+                                    aria-label="Toggle search preferences"
+                                  />
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
+                                  Apply saved preferences to searches
+                                </p>
+                              </div>
+                            </>
+                          )}
                           
                           <DropdownMenuSeparator className="bg-border/50" />
                           
@@ -834,26 +838,30 @@ export const Header = () => {
                           </>
                         )}
                         
-                        <DropdownMenuSeparator className="bg-border/50" />
-                        
-                        {/* SETTINGS Section */}
-                        <div className="px-4 py-4">
-                          <div className="flex items-center justify-between gap-3">
-                            <Label htmlFor="preferences-toggle" className="text-sm font-medium cursor-pointer flex-1 leading-tight">
-                              Use My Preferences
-                            </Label>
-                            <Switch
-                              id="preferences-toggle"
-                              checked={usePreferences}
-                              onCheckedChange={togglePreferences}
-                              className="flex-shrink-0 h-6 w-11"
-                              aria-label="Toggle search preferences"
-                            />
-                          </div>
-                          <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
-                            Apply saved preferences to searches
-                          </p>
-                        </div>
+                        {isTraveler && (
+                          <>
+                            <DropdownMenuSeparator className="bg-border/50" />
+                            
+                            {/* SETTINGS Section */}
+                            <div className="px-4 py-4">
+                              <div className="flex items-center justify-between gap-3">
+                                <Label htmlFor="preferences-toggle" className="text-sm font-medium cursor-pointer flex-1 leading-tight">
+                                  Use My Preferences
+                                </Label>
+                                <Switch
+                                  id="preferences-toggle"
+                                  checked={usePreferences}
+                                  onCheckedChange={togglePreferences}
+                                  className="flex-shrink-0 h-6 w-11"
+                                  aria-label="Toggle search preferences"
+                                />
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
+                                Apply saved preferences to searches
+                              </p>
+                            </div>
+                          </>
+                        )}
                         
                         <DropdownMenuSeparator className="bg-border/50" />
                         
