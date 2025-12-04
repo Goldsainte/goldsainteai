@@ -234,7 +234,7 @@ export default function CreatorOnboardingPage() {
 
   const canProceed = () => {
     switch (currentStep) {
-      case 0: return displayName.trim().length > 0;
+      case 0: return displayName.trim().length > 0 && bio.trim().length > 0 && homeBase.trim().length > 0;
       case 1: return primaryPlatform.length > 0;
       case 2: return selectedNiches.length > 0;
       case 3: return destinations.length > 0;
@@ -489,7 +489,7 @@ export default function CreatorOnboardingPage() {
                   </div>
 
                   <div>
-                    <Label className="text-[#0a2225] font-medium">Bio / Tagline</Label>
+                    <Label className="text-[#0a2225] font-medium">Bio / Tagline *</Label>
                     <Textarea
                       value={bio}
                       onChange={(e) => setBio(e.target.value)}
@@ -499,7 +499,7 @@ export default function CreatorOnboardingPage() {
                   </div>
 
                   <div>
-                    <Label className="text-[#0a2225] font-medium">Home Base</Label>
+                    <Label className="text-[#0a2225] font-medium">Home Base *</Label>
                     <Input
                       value={homeBase}
                       onChange={(e) => setHomeBase(e.target.value)}
