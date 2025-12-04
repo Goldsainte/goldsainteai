@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, ImageIcon, Globe, Lock, Trash2, MoreVertical } from "lucide-react";
+import { Plus, ImageIcon, Globe, Lock, Trash2, MoreVertical, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { 
   getMyStoryboards, 
@@ -16,11 +16,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Header } from "@/components/Header";
+import { BackButton } from "@/components/ui/BackButton";
 import { toast } from "sonner";
 
 export default function MyStoryboardsPage() {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
+  const [accountType, setAccountType] = useState<string | null>(null);
   const [storyboards, setStoryboards] = useState<Storyboard[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -37,6 +39,16 @@ export default function MyStoryboardsPage() {
         return;
       }
       setUser(authUser);
+      
+      // Fetch account type for smart back navigation
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("account_type")
+        .eq("id", authUser.id)
+        .single();
+      
+      setAccountType(profile?.account_type || null);
+      
       const data = await getMyStoryboards(authUser.id);
       setStoryboards(data);
     } catch (err) {
@@ -60,12 +72,26 @@ export default function MyStoryboardsPage() {
     }
   };
 
+  // Smart back destination based on user role
+  const getBackDestination = () => {
+    switch (accountType) {
+      case "creator":
+        return "/tiktok-lab";
+      case "agent":
+        return "/agent-dashboard";
+      case "traveler":
+        return "/traveler";
+      default:
+        return "/";
+    }
+  };
+
   if (!user) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-[#FDF9F0]">
         <Header />
         <main className="container mx-auto max-w-4xl px-4 py-10">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-[#6B7280]">
             Please sign in to view your storyboards.
           </p>
         </main>
@@ -74,58 +100,66 @@ export default function MyStoryboardsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#FDF9F0]">
       <Header />
       <main className="container mx-auto max-w-6xl px-4 py-8 space-y-6">
-        <button
-          onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition"
-        >
-          <ArrowLeft className="h-3 w-3" />
-          Back
-        </button>
+        {/* Back Button */}
+        <BackButton 
+          to={getBackDestination()} 
+          label="Back to Dashboard" 
+        />
 
+        {/* Gold accent line */}
+        <div className="w-16 h-0.5 bg-[#C7A962]" />
+
+        {/* Header */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
-            <h1 className="text-2xl font-semibold tracking-tight">
+            <h1 className="text-2xl md:text-3xl font-secondary text-[#0a2225] tracking-tight">
               My Visual Storyboards
             </h1>
-            <p className="mt-1.5 text-xs text-muted-foreground max-w-2xl">
+            <p className="mt-2 text-sm text-[#6B7280] max-w-2xl leading-relaxed">
               Collect inspiration from creators, agents, and the Creator Lab. 
               Build your perfect trip visually, then convert to a Trip Request when ready.
             </p>
           </div>
           <Button
             size="sm"
-            className="rounded-full"
+            className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white"
             onClick={() => navigate("/storyboards/new")}
           >
-            <Plus className="mr-1 h-4 w-4" />
+            <Plus className="mr-1.5 h-4 w-4" />
             New Storyboard
           </Button>
         </div>
 
         {loading ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {[...Array(6)].map((_, i) => (
-              <Card key={i} className="h-48 animate-pulse bg-muted/40" />
+              <Card 
+                key={i} 
+                className="h-52 animate-pulse bg-white/60 border-[#E5DFC6] rounded-2xl" 
+              />
             ))}
           </div>
         ) : storyboards.length === 0 ? (
-          <Card className="mt-4 border-dashed border-border bg-muted/20">
-            <CardContent className="flex flex-col items-start gap-4 py-8 px-6">
+          <Card className="mt-6 border-dashed border-[#E5DFC6] bg-white rounded-2xl">
+            <CardContent className="flex flex-col items-center text-center gap-5 py-12 px-6">
+              <div className="w-16 h-16 rounded-full bg-[#FDF9F0] flex items-center justify-center">
+                <Sparkles className="h-8 w-8 text-[#C7A962]" />
+              </div>
               <div className="space-y-2">
-                <p className="font-medium text-foreground">No storyboards yet</p>
-                <p className="text-xs text-muted-foreground max-w-md">
+                <p className="font-secondary text-xl text-[#0a2225]">No storyboards yet</p>
+                <p className="text-sm text-[#6B7280] max-w-md leading-relaxed">
                   Start collecting travel inspiration! Save content from the Creator Lab, 
                   creator profiles, or agent recommendations to build your dream trip visually.
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap justify-center gap-3 mt-2">
                 <Button
                   size="sm"
                   variant="outline"
-                  className="rounded-full"
+                  className="rounded-full border-[#E5DFC6] text-[#0a2225] hover:bg-[#FDF9F0]"
                   onClick={() => navigate("/tiktok-lab")}
                 >
                   Open Creator Lab
@@ -133,7 +167,7 @@ export default function MyStoryboardsPage() {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="rounded-full"
+                  className="rounded-full border-[#E5DFC6] text-[#0a2225] hover:bg-[#FDF9F0]"
                   onClick={() => navigate("/creators")}
                 >
                   Browse Creators
@@ -142,17 +176,17 @@ export default function MyStoryboardsPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {storyboards.map((board) => (
               <Card
                 key={board.id}
-                className="group relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:shadow-lg"
+                className="group relative overflow-hidden rounded-2xl border border-[#E5DFC6] bg-white shadow-sm transition-all hover:shadow-lg hover:border-[#C7A962]/50"
               >
                 <div 
                   className="cursor-pointer"
                   onClick={() => navigate(`/storyboards/${board.id}`)}
                 >
-                  <div className="relative h-36 w-full overflow-hidden bg-gradient-to-br from-muted to-muted/40">
+                  <div className="relative h-40 w-full overflow-hidden bg-gradient-to-br from-[#FDF9F0] to-[#E5DFC6]/30">
                     {board.cover_image_url ? (
                       <img
                         src={board.cover_image_url}
@@ -161,13 +195,14 @@ export default function MyStoryboardsPage() {
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center">
-                        <ImageIcon className="h-10 w-10 text-muted-foreground/40" />
+                        <ImageIcon className="h-12 w-12 text-[#C7A962]/40" />
                       </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                     
+                    {/* Badges */}
                     <div className="absolute top-3 left-3 flex items-center gap-2">
-                      <span className="inline-flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-black/60 px-2.5 py-1 text-[10px] font-medium text-white backdrop-blur-sm">
                         {board.is_public ? (
                           <><Globe className="h-2.5 w-2.5" /> Public</>
                         ) : (
@@ -175,12 +210,13 @@ export default function MyStoryboardsPage() {
                         )}
                       </span>
                       {board.trip_request_id && (
-                        <span className="rounded-full bg-emerald-500/90 px-2 py-0.5 text-[10px] font-medium text-white">
+                        <span className="rounded-full bg-[#C7A962] px-2.5 py-1 text-[10px] font-medium text-white">
                           Converted
                         </span>
                       )}
                     </div>
 
+                    {/* Item count */}
                     <div className="absolute bottom-3 left-3">
                       <span className="text-xs font-medium text-white/90">
                         {board.items_count || 0} items
@@ -189,17 +225,18 @@ export default function MyStoryboardsPage() {
                   </div>
                   
                   <CardContent className="space-y-1.5 p-4">
-                    <h3 className="line-clamp-1 text-sm font-medium text-foreground">
+                    <h3 className="line-clamp-1 text-sm font-medium text-[#0a2225]">
                       {board.title}
                     </h3>
                     {board.description && (
-                      <p className="line-clamp-2 text-[11px] text-muted-foreground">
+                      <p className="line-clamp-2 text-xs text-[#6B7280]">
                         {board.description}
                       </p>
                     )}
                   </CardContent>
                 </div>
 
+                {/* Dropdown Menu */}
                 <div className="absolute top-3 right-3">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -212,12 +249,13 @@ export default function MyStoryboardsPage() {
                         <MoreVertical className="h-3.5 w-3.5 text-white" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuContent align="end" className="w-48 rounded-xl border-[#E5DFC6]">
                       <DropdownMenuItem 
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(`/storyboards/${board.id}`);
                         }}
+                        className="text-[#0a2225]"
                       >
                         View & Edit
                       </DropdownMenuItem>
@@ -227,6 +265,7 @@ export default function MyStoryboardsPage() {
                             e.stopPropagation();
                             navigate(`/post-trip?fromStoryboard=${board.id}`);
                           }}
+                          className="text-[#0a2225]"
                         >
                           Convert to Trip Request
                         </DropdownMenuItem>
