@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
+
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/contexts/AuthContext';
@@ -533,18 +533,18 @@ const Auth = () => {
   // Show loading state while auth is processing or redirecting
   if (authLoading || user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center bg-[#FDF9F0]">
         <div className="text-center space-y-4">
-          <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
-          <p className="text-muted-foreground">Loading...</p>
+          <Loader2 className="h-12 w-12 animate-spin mx-auto text-[#C7A962]" />
+          <p className="text-[#6B7280]">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md p-8 sm:p-10">
+    <div className="min-h-screen flex items-center justify-center bg-[#FDF9F0] p-4">
+      <div className="w-full max-w-md bg-white border border-[#E5DFC6] rounded-3xl p-8 sm:p-10 shadow-lg">
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <img src={logomark} alt="Goldsainte Logo" className="h-12 w-12" />
@@ -554,10 +554,10 @@ const Auth = () => {
         {step === 'account-type' && (
           <div className="space-y-6">
             <div className="text-center mb-6">
-              <h1 className="text-2xl sm:text-3xl font-semibold mb-2">
+              <h1 className="text-2xl sm:text-3xl font-secondary text-[#0a2225] mb-2">
                 Welcome to Goldsainte
               </h1>
-              <p className="text-xs sm:text-sm text-muted-foreground">
+              <p className="text-sm text-[#6B7280]">
                 Choose your account type to get started
               </p>
             </div>
@@ -568,10 +568,10 @@ const Auth = () => {
                   setSelectedAccountType('traveler');
                   setStep('email');
                 }}
-                className="p-4 rounded-lg border-2 border-border hover:border-primary hover:bg-accent/5 transition-all text-left"
+                className="p-5 rounded-2xl border-2 border-[#E5DFC6] hover:border-[#C7A962] hover:bg-[#FDF9F0]/50 transition-all text-left bg-white"
               >
-                <div className="font-semibold mb-1">Traveler</div>
-                <div className="text-xs text-muted-foreground">
+                <div className="font-secondary text-base text-[#0a2225] mb-1">Traveler</div>
+                <div className="text-sm text-[#6B7280]">
                   Book and plan luxury travel experiences
                 </div>
               </button>
@@ -581,10 +581,10 @@ const Auth = () => {
                   setSelectedAccountType('creator');
                   setStep('email');
                 }}
-                className="p-4 rounded-lg border-2 border-border hover:border-primary hover:bg-accent/5 transition-all text-left"
+                className="p-5 rounded-2xl border-2 border-[#E5DFC6] hover:border-[#C7A962] hover:bg-[#FDF9F0]/50 transition-all text-left bg-white"
               >
-                <div className="font-semibold mb-1">Creator</div>
-                <div className="text-xs text-muted-foreground">
+                <div className="font-secondary text-base text-[#0a2225] mb-1">Creator</div>
+                <div className="text-sm text-[#6B7280]">
                   Share travel content and inspire others
                 </div>
               </button>
@@ -594,10 +594,10 @@ const Auth = () => {
                   setSelectedAccountType('agent');
                   setStep('email');
                 }}
-                className="p-4 rounded-lg border-2 border-border hover:border-primary hover:bg-accent/5 transition-all text-left"
+                className="p-5 rounded-2xl border-2 border-[#E5DFC6] hover:border-[#C7A962] hover:bg-[#FDF9F0]/50 transition-all text-left bg-white"
               >
-                <div className="font-semibold mb-1">Travel Agent</div>
-                <div className="text-xs text-muted-foreground">
+                <div className="font-secondary text-base text-[#0a2225] mb-1">Travel Agent</div>
+                <div className="text-sm text-[#6B7280]">
                   Professional agents • Application required
                 </div>
               </button>
@@ -607,10 +607,10 @@ const Auth = () => {
                   setSelectedAccountType('brand');
                   setStep('email');
                 }}
-                className="p-4 rounded-lg border-2 border-border hover:border-primary hover:bg-accent/5 transition-all text-left"
+                className="p-5 rounded-2xl border-2 border-[#E5DFC6] hover:border-[#C7A962] hover:bg-[#FDF9F0]/50 transition-all text-left bg-white"
               >
-                <div className="font-semibold mb-1">Brand/Hotel</div>
-                <div className="text-xs text-muted-foreground">
+                <div className="font-secondary text-base text-[#0a2225] mb-1">Brand/Hotel</div>
+                <div className="text-sm text-[#6B7280]">
                   Hotels & lifestyle brands • Application required
                 </div>
               </button>
@@ -624,7 +624,7 @@ const Auth = () => {
                   setStep('email');
                   navigate('/auth', { replace: true });
                 }}
-                className="text-sm text-primary hover:underline font-medium"
+                className="text-sm text-[#C7A962] hover:text-[#BFAD72] hover:underline font-medium"
               >
                 Already have an account? Sign in
               </button>
@@ -636,10 +636,10 @@ const Auth = () => {
         {step === 'email' && (
           <>
             <div className="text-center mb-8">
-              <h1 className="text-2xl sm:text-3xl font-semibold mb-2">
+              <h1 className="text-2xl sm:text-3xl font-secondary text-[#0a2225] mb-2">
                 {isSignUpMode ? 'Create your account' : 'Welcome back'}
               </h1>
-              <p className="text-xs sm:text-sm text-muted-foreground">
+              <p className="text-sm text-[#6B7280]">
                 {isSignUpMode 
                   ? 'Enter your email to get started with Goldsainte.'
                   : 'Sign in to plan fast, save big, and travel smarter — powered by AI, agents, and creators.'}
@@ -651,7 +651,7 @@ const Auth = () => {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full h-12 bg-card border-2"
+                className="w-full h-12 bg-white border-2 border-[#E5DFC6] hover:border-[#C7A962] hover:bg-[#FDF9F0]/50 text-[#0a2225]"
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
               >
@@ -667,7 +667,7 @@ const Auth = () => {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full h-12 bg-card border-2"
+                className="w-full h-12 bg-white border-2 border-[#E5DFC6] hover:border-[#C7A962] hover:bg-[#FDF9F0]/50 text-[#0a2225]"
                 onClick={handleFacebookSignIn}
                 disabled={isLoading}
               >
@@ -680,7 +680,7 @@ const Auth = () => {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full h-12 bg-card border-2"
+                className="w-full h-12 bg-white border-2 border-[#E5DFC6] hover:border-[#C7A962] hover:bg-[#FDF9F0]/50 text-[#0a2225]"
                 onClick={handleTikTokSignIn}
                 disabled={isLoading}
               >
@@ -699,7 +699,7 @@ const Auth = () => {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full h-12 bg-card border-2"
+                className="w-full h-12 bg-white border-2 border-[#E5DFC6] hover:border-[#C7A962] hover:bg-[#FDF9F0]/50 text-[#0a2225]"
                 onClick={handleAppleSignIn}
                 disabled={isLoading}
               >
@@ -713,10 +713,10 @@ const Auth = () => {
             {/* OR Divider */}
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
+                <span className="w-full border-t border-[#E5DFC6]" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">OR</span>
+                <span className="bg-white px-2 text-[#6B7280]">OR</span>
               </div>
             </div>
 
@@ -728,7 +728,7 @@ const Auth = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
-                className="h-12"
+                className="h-12 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     handleContinueWithEmail();
@@ -736,7 +736,7 @@ const Auth = () => {
                 }}
               />
               <Button 
-                className="w-full h-12 bg-foreground text-background hover:bg-foreground/90"
+                className="w-full h-12 rounded-full bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6]"
                 onClick={handleContinueWithEmail}
                 disabled={isLoading}
               >
@@ -760,7 +760,7 @@ const Auth = () => {
                     setStep('email');
                     navigate('/auth', { replace: true });
                   }}
-                  className="block w-full text-sm text-primary hover:underline font-medium"
+                  className="block w-full text-sm text-[#C7A962] hover:text-[#BFAD72] hover:underline font-medium"
                 >
                   Already have an account? Sign in
                 </button>
@@ -768,7 +768,7 @@ const Auth = () => {
                 <button
                   type="button"
                   onClick={() => setStep('account-type')}
-                  className="block w-full text-sm text-primary hover:underline font-medium"
+                  className="block w-full text-sm text-[#C7A962] hover:text-[#BFAD72] hover:underline font-medium"
                 >
                   New to Goldsainte? Create an account
                 </button>
@@ -776,7 +776,7 @@ const Auth = () => {
               <button
                 type="button"
                 onClick={() => navigate('/')}
-                className="block w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="block w-full text-sm text-[#6B7280] hover:text-[#0a2225] transition-colors"
               >
                 Continue without signing in
               </button>
@@ -788,19 +788,19 @@ const Auth = () => {
         {/* Sign In Step */}
         {step === 'signin' && (
           <form onSubmit={handleSignIn} className="space-y-4">
-            <div className="text-xs text-muted-foreground mb-4">
-              Signing in as <span className="font-medium text-foreground">{email}</span>
+            <div className="text-sm text-[#6B7280] mb-4">
+              Signing in as <span className="font-medium text-[#0a2225]">{email}</span>
               {' '}
               <button
                 type="button"
                 onClick={() => setStep('email')}
-                className="text-primary hover:underline"
+                className="text-[#C7A962] hover:text-[#BFAD72] hover:underline"
               >
                 Change
               </button>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-sm font-medium text-[#0a2225]">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -809,12 +809,12 @@ const Auth = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={isLoading}
-                className="h-12"
+                className="h-12 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20"
               />
             </div>
             <Button 
               type="submit" 
-              className="w-full h-12 bg-foreground text-background hover:bg-foreground/90" 
+              className="w-full h-12 rounded-full bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6]" 
               disabled={isLoading}
             >
               {isLoading ? (
@@ -830,23 +830,23 @@ const Auth = () => {
               <button
                 type="button"
                 onClick={() => setStep('email')}
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-[#6B7280] hover:text-[#0a2225] transition-colors"
               >
                 ← Back
               </button>
               <button
                 type="button"
                 onClick={() => setStep('forgot-password')}
-                className="text-primary hover:underline"
+                className="text-[#C7A962] hover:text-[#BFAD72] hover:underline"
               >
                 Forgot password?
               </button>
             </div>
-            <div className="mt-3 text-center text-xs text-muted-foreground">
+            <div className="mt-3 text-center text-sm text-[#6B7280]">
               <button
                 type="button"
                 onClick={() => setStep('signup')}
-                className="hover:text-foreground hover:underline"
+                className="hover:text-[#0a2225] hover:underline"
               >
                 Need an account? Create one instead
               </button>
@@ -858,13 +858,13 @@ const Auth = () => {
         {step === 'signup' && (
           <form onSubmit={handleSignUp} className="space-y-4">
             <div className="text-center mb-6">
-              <h1 className="text-2xl sm:text-3xl font-semibold mb-2">
+              <h1 className="text-2xl sm:text-3xl font-secondary text-[#0a2225] mb-2">
                 {selectedAccountType === 'agent' && "Apply as Travel Agent"}
                 {selectedAccountType === 'brand' && "Apply as Brand"}
                 {selectedAccountType === 'traveler' && "Create Traveler Account"}
                 {selectedAccountType === 'creator' && "Create Creator Account"}
               </h1>
-              <p className="text-xs sm:text-sm text-muted-foreground">
+              <p className="text-sm text-[#6B7280]">
                 {(selectedAccountType === 'agent' || selectedAccountType === 'brand') 
                   ? "We'll redirect you to complete your application"
                   : "Enter your details to get started"
@@ -874,7 +874,7 @@ const Auth = () => {
 
             {/* Email field for all account types */}
             <div className="space-y-2">
-              <Label htmlFor="signupEmail">Email address</Label>
+              <Label htmlFor="signupEmail" className="text-sm font-medium text-[#0a2225]">Email address</Label>
               <Input
                 id="signupEmail"
                 type="email"
@@ -883,13 +883,13 @@ const Auth = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={isLoading}
-                className="h-12"
+                className="h-12 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
+                <Label htmlFor="firstName" className="text-sm font-medium text-[#0a2225]">First Name</Label>
                 <Input
                   id="firstName"
                   type="text"
@@ -898,11 +898,11 @@ const Auth = () => {
                   onChange={(e) => setFirstName(e.target.value)}
                   required
                   disabled={isLoading}
-                  className="h-12"
+                  className="h-12 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name</Label>
+                <Label htmlFor="lastName" className="text-sm font-medium text-[#0a2225]">Last Name</Label>
                 <Input
                   id="lastName"
                   type="text"
@@ -911,12 +911,12 @@ const Auth = () => {
                   onChange={(e) => setLastName(e.target.value)}
                   required
                   disabled={isLoading}
-                  className="h-12"
+                  className="h-12 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20"
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
+              <Label htmlFor="phone" className="text-sm font-medium text-[#0a2225]">Phone Number</Label>
               <Input
                 id="phone"
                 type="tel"
@@ -925,7 +925,7 @@ const Auth = () => {
                 onChange={(e) => setPhone(e.target.value)}
                 required
                 disabled={isLoading}
-                className="h-12"
+                className="h-12 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20"
               />
             </div>
 
@@ -936,16 +936,16 @@ const Auth = () => {
                 checked={smsOptIn}
                 onCheckedChange={(checked) => setSmsOptIn(checked === true)}
                 disabled={isLoading}
-                className="mt-0.5 h-4 w-4"
+                className="mt-0.5 h-4 w-4 border-[#E5DFC6] data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47]"
               />
               <div className="space-y-1">
                 <Label 
                   htmlFor="smsOptIn" 
-                  className="text-sm font-medium leading-none cursor-pointer"
+                  className="text-sm font-medium text-[#0a2225] leading-none cursor-pointer"
                 >
                   Text message notifications
                 </Label>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-[#6B7280]">
                   Receive trip updates, booking confirmations, and travel alerts via SMS. 
                   Message and data rates may apply.
                 </p>
@@ -955,7 +955,7 @@ const Auth = () => {
             {/* Only show password for traveler/creator */}
             {(selectedAccountType === 'traveler' || selectedAccountType === 'creator') && (
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-sm font-medium text-[#0a2225]">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -964,10 +964,10 @@ const Auth = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   disabled={isLoading}
-                  className="h-12"
+                  className="h-12 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20"
                   minLength={8}
                 />
-                <div className="text-xs text-muted-foreground space-y-1">
+                <div className="text-sm text-[#6B7280] space-y-1">
                   <p>Password must contain:</p>
                   <ul className="list-disc list-inside pl-2 space-y-0.5">
                     <li>At least 8 characters</li>
@@ -985,7 +985,7 @@ const Auth = () => {
                 type="button"
                 variant="outline"
                 onClick={() => setStep('account-type')}
-                className="flex-1"
+                className="flex-1 border-[#E5DFC6] hover:border-[#C7A962] hover:bg-[#FDF9F0]/50 text-[#0a2225]"
                 disabled={isLoading}
               >
                 Back
@@ -993,7 +993,7 @@ const Auth = () => {
               
               <Button
                 type="submit" 
-                className="flex-1 h-12" 
+                className="flex-1 h-12 rounded-full bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6]" 
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -1015,14 +1015,14 @@ const Auth = () => {
         {step === 'verify-email' && (
           <div className="space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-2xl font-semibold tracking-tight">
+              <h2 className="text-2xl font-secondary text-[#0a2225] tracking-tight">
                 Confirm your email
               </h2>
-              <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+              <p className="text-sm text-[#6B7280] max-w-sm mx-auto">
                 We've sent a confirmation link to{' '}
-                <span className="font-medium text-foreground">{email}</span>
+                <span className="font-medium text-[#0a2225]">{email}</span>
               </p>
-              <p className="text-xs text-muted-foreground max-w-md mx-auto mt-2">
+              <p className="text-sm text-[#6B7280] max-w-md mx-auto mt-2">
                 Please click the link in that email to verify your address and activate
                 your Goldsainte account. Check your spam folder if you don't see it.
               </p>
@@ -1031,7 +1031,7 @@ const Auth = () => {
             <div className="space-y-3 pt-4">
               <Button
                 type="button"
-                className="w-full h-12 bg-foreground text-background hover:bg-foreground/90"
+                className="w-full h-12 rounded-full bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6]"
                 onClick={async () => {
                   if (!email) return;
                   setIsLoading(true);
@@ -1077,14 +1077,14 @@ const Auth = () => {
               <button
                 type="button"
                 onClick={() => setStep("email")}
-                className="block w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="block w-full text-sm text-[#6B7280] hover:text-[#0a2225] transition-colors"
               >
                 Use a different email
               </button>
             </div>
 
-            <div className="mt-6 pt-6 border-t border-border">
-              <p className="text-xs text-muted-foreground">
+            <div className="mt-6 pt-6 border-t border-[#E5DFC6]">
+              <p className="text-sm text-[#6B7280]">
                 Once you verify your email, you'll be redirected back to complete your profile.
               </p>
             </div>
@@ -1095,7 +1095,7 @@ const Auth = () => {
         {step === 'forgot-password' && (
           <form onSubmit={handleForgotPassword} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="reset-email">Email</Label>
+              <Label htmlFor="reset-email" className="text-sm font-medium text-[#0a2225]">Email</Label>
               <Input
                 id="reset-email"
                 type="email"
@@ -1104,15 +1104,15 @@ const Auth = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={isLoading}
-                className="h-12"
+                className="h-12 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20"
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-sm text-[#6B7280]">
                 We'll send you a link to reset your password.
               </p>
             </div>
             <Button 
               type="submit" 
-              className="w-full h-12 bg-foreground text-background hover:bg-foreground/90" 
+              className="w-full h-12 rounded-full bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6]" 
               disabled={isLoading}
             >
               {isLoading ? (
@@ -1128,7 +1128,7 @@ const Auth = () => {
               <button
                 type="button"
                 onClick={() => setStep('signin')}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm text-[#6B7280] hover:text-[#0a2225] transition-colors"
               >
                 ← Back to sign in
               </button>
@@ -1140,7 +1140,7 @@ const Auth = () => {
         {step === 'profile' && (
           <AccountTypeStep onComplete={handleProfileComplete} />
         )}
-      </Card>
+      </div>
     </div>
   );
 };
