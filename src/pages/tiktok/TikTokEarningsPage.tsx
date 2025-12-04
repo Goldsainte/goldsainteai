@@ -7,7 +7,7 @@ export default function TikTokEarningsPage() {
       title="Creator earnings overview"
       intro="See how your storyboards and trip briefs convert into payouts. We keep traveler funds in escrow until their milestone releases."
       backLink="/tiktok-lab"
-      backLabel="Back to TikTok Lab"
+      backLabel="Back to Creator Studio"
     />
   );
 }

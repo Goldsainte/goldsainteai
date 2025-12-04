@@ -69,15 +69,20 @@ export function PartnerEarningsView({
           <BackButton to={backLink} label={backLabel} />
         </div>
         
+        <div className="w-16 h-0.5 bg-[#C7A962] mb-6" />
+        
         <div className="flex items-center justify-between gap-4">
-          <div className="space-y-3">
-            <p className="text-xs uppercase tracking-[0.2em] font-medium text-[#C7A962]">
-              Earnings
-            </p>
+          <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 border border-[#E5DFC6]">
+              <Wallet className="h-4 w-4 text-[#C7A962]" />
+              <span className="text-sm font-medium text-[#6B7280] tracking-wide">
+                Earnings
+              </span>
+            </div>
             <h1 className="font-secondary text-2xl md:text-3xl leading-tight text-[#0a2225]">
               {title}
             </h1>
-            <p className="text-sm text-[#6B7280] max-w-md leading-relaxed">
+            <p className="text-sm text-[#6B7280] max-w-xl leading-relaxed">
               {intro}
             </p>
           </div>
@@ -168,9 +173,8 @@ export function PartnerEarningsView({
           )}
         </div>
 
-        <p className="text-xs text-[#6B7280] max-w-md leading-relaxed">
-          Goldsainte holds traveler funds for a short protected window before releasing payouts to you and your partners. Need help?
-          Reach out via support@goldsainte.com.
+        <p className="text-xs text-[#6B7280] max-w-2xl leading-relaxed">
+          Goldsainte holds traveler funds for a short protected window before releasing payouts to you and your partners. Need help? Reach out via support@goldsainte.com.
         </p>
       </section>
     </main>
