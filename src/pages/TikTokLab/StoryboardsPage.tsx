@@ -4,8 +4,8 @@ import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BackButton } from "@/components/ui/BackButton";
 import { TravelStoryboard } from "@/components/storyboards/TravelStoryboard";
-
 type Storyboard = {
   id: string;
   title: string | null;
@@ -96,6 +96,7 @@ export default function TikTokLabStoryboardsPage() {
 
       <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
         <div className="mx-auto max-w-6xl px-4 py-10 md:py-12">
+          <BackButton label="Back to Creator Studio" to="/tiktok-lab" className="mb-4" />
           <header className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between mb-6">
             <div className="space-y-2">
               <h1 className="text-lg font-semibold tracking-tight md:text-xl">
