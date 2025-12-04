@@ -53,7 +53,7 @@ export function LegalComplianceAcceptance({
       icon: Shield,
       accepted: privacyAccepted,
       onChange: onPrivacyChange,
-      link: "/legal/privacy",
+      link: "/privacy-cookies",
       summary: [
         "Personal information we collect",
         "How we use your data",
