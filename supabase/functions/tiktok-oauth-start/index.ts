@@ -18,6 +18,17 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+    // Parse request body for return_to parameter
+    let returnTo = 'tiktok-lab';
+    try {
+      const body = await req.json();
+      if (body.return_to) {
+        returnTo = body.return_to;
+      }
+    } catch {
+      // No body or invalid JSON, use default
+    }
+
     // Generate random state for CSRF protection
     const state = crypto.randomUUID();
     
@@ -31,17 +42,18 @@ Deno.serve(async (req) => {
       userId = user?.id || null;
     }
 
-    // Store state in database
+    // Store state in database with return_to metadata
     await supabase.from('oauth_states').insert({
       state,
       provider: 'tiktok',
       user_id: userId,
       expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(), // 10 minutes
+      metadata: { return_to: returnTo },
     });
 
     // Build TikTok authorization URL
     const redirectUri = `${SUPABASE_URL}/functions/v1/tiktok-oauth-callback`;
-    const scope = 'user.info.basic,video.publish';
+    const scope = 'user.info.basic,user.info.stats,video.publish';
     
     const authorizeUrl = `https://www.tiktok.com/v2/auth/authorize/?` +
       `client_key=${encodeURIComponent(TIKTOK_CLIENT_KEY)}` +
@@ -50,7 +62,7 @@ Deno.serve(async (req) => {
       `&redirect_uri=${encodeURIComponent(redirectUri)}` +
       `&state=${encodeURIComponent(state)}`;
 
-    console.log('Generated TikTok OAuth URL:', authorizeUrl);
+    console.log('Generated TikTok OAuth URL with return_to:', returnTo);
 
     return new Response(
       JSON.stringify({ authorizeUrl }),

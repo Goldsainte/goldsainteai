@@ -26,11 +26,14 @@ Deno.serve(async (req) => {
 
     console.log('TikTok callback received:', { code: !!code, state, error });
 
+    // Default return path
+    let returnTo = 'tiktok-lab';
+
     // Handle error from TikTok
     if (error) {
       console.error('TikTok OAuth error:', error);
       return Response.redirect(
-        `${APP_URL}/tiktok-callback?error=${encodeURIComponent(error)}`,
+        `${APP_URL}/tiktok-callback?error=${encodeURIComponent(error)}&return_to=${returnTo}`,
         302
       );
     }
@@ -39,7 +42,7 @@ Deno.serve(async (req) => {
     if (!code || !state) {
       console.error('Missing code or state parameter');
       return Response.redirect(
-        `${APP_URL}/tiktok-callback?error=missing_parameters`,
+        `${APP_URL}/tiktok-callback?error=missing_parameters&return_to=${returnTo}`,
         302
       );
     }
@@ -56,9 +59,14 @@ Deno.serve(async (req) => {
     if (stateError || !stateRecord) {
       console.error('Invalid or expired state:', stateError);
       return Response.redirect(
-        `${APP_URL}/tiktok-callback?error=invalid_state`,
+        `${APP_URL}/tiktok-callback?error=invalid_state&return_to=${returnTo}`,
         302
       );
+    }
+
+    // Get return_to from state metadata
+    if (stateRecord.metadata?.return_to) {
+      returnTo = stateRecord.metadata.return_to;
     }
 
     // Delete the used state
@@ -87,24 +95,54 @@ Deno.serve(async (req) => {
     if (!tokenResponse.ok || tokenData.error) {
       console.error('Token exchange failed:', tokenData);
       return Response.redirect(
-        `${APP_URL}/tiktok-callback?error=token_exchange_failed`,
+        `${APP_URL}/tiktok-callback?error=token_exchange_failed&return_to=${returnTo}`,
         302
       );
     }
 
-    const { access_token, refresh_token, expires_in } = tokenData;
+    const { access_token, refresh_token, expires_in, open_id } = tokenData;
     const expiresAt = new Date(Date.now() + expires_in * 1000).toISOString();
 
-    // If user was logged in during OAuth start, store tokens in tiktok_tokens table
+    // Fetch user info including follower count
+    let followerCount = 0;
+    let tiktokUsername = '';
+    
+    try {
+      const userInfoResponse = await fetch(
+        'https://open.tiktokapis.com/v2/user/info/?fields=open_id,union_id,avatar_url,display_name,follower_count,username',
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${access_token}`,
+          },
+        }
+      );
+      
+      const userInfoData = await userInfoResponse.json();
+      console.log('TikTok user info response:', { success: userInfoResponse.ok, data: userInfoData });
+      
+      if (userInfoResponse.ok && userInfoData.data?.user) {
+        followerCount = userInfoData.data.user.follower_count || 0;
+        tiktokUsername = userInfoData.data.user.username || userInfoData.data.user.display_name || '';
+      }
+    } catch (userInfoError) {
+      console.error('Failed to fetch TikTok user info:', userInfoError);
+      // Continue without follower count - not a blocking error
+    }
+
+    // If user was logged in during OAuth start, store tokens
     if (stateRecord.user_id) {
+      // Store tokens in tiktok_tokens table
       const { error: upsertError } = await supabase
         .from('tiktok_tokens')
         .upsert({
           user_id: stateRecord.user_id,
-          tiktok_user_id: tokenData.open_id,
+          tiktok_user_id: open_id || tokenData.open_id,
           access_token,
           refresh_token,
           expires_at: expiresAt,
+          follower_count: followerCount,
+          username: tiktokUsername,
           updated_at: new Date().toISOString(),
         }, {
           onConflict: 'user_id'
@@ -113,17 +151,35 @@ Deno.serve(async (req) => {
       if (upsertError) {
         console.error('Failed to store tokens:', upsertError);
         return Response.redirect(
-          `${APP_URL}/tiktok-callback?error=update_failed`,
+          `${APP_URL}/tiktok-callback?error=update_failed&return_to=${returnTo}`,
           302
         );
       }
 
-      console.log('Successfully connected TikTok for user:', stateRecord.user_id);
-      return Response.redirect(`${APP_URL}/tiktok-callback?success=true`, 302);
+      // Update user's profile with verification status
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          tiktok_verified: true,
+          tiktok_follower_count: followerCount,
+          tiktok_verified_at: new Date().toISOString(),
+        })
+        .eq('id', stateRecord.user_id);
+
+      if (profileError) {
+        console.error('Failed to update profile:', profileError);
+        // Not blocking, continue with redirect
+      }
+
+      console.log('Successfully connected TikTok for user:', stateRecord.user_id, 'followers:', followerCount);
+      return Response.redirect(
+        `${APP_URL}/tiktok-callback?success=true&return_to=${encodeURIComponent(returnTo)}&followers=${followerCount}`,
+        302
+      );
     } else {
       // No user was logged in - redirect with error
       return Response.redirect(
-        `${APP_URL}/tiktok-callback?error=not_logged_in`,
+        `${APP_URL}/tiktok-callback?error=not_logged_in&return_to=${returnTo}`,
         302
       );
     }

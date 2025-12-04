@@ -12,15 +12,33 @@ export default function TikTokCallback() {
   useEffect(() => {
     const success = searchParams.get('success');
     const error = searchParams.get('error');
+    const returnTo = searchParams.get('return_to') || 'tiktok-lab';
+    const followers = searchParams.get('followers');
+
+    const getRedirectPath = () => {
+      if (returnTo === 'onboarding') {
+        // Redirect back to creator onboarding with verification params
+        const params = new URLSearchParams();
+        if (success === 'true') {
+          params.set('tiktok_verified', 'true');
+          if (followers) {
+            params.set('tiktok_followers', followers);
+          }
+        }
+        return `/onboarding/creator?${params.toString()}`;
+      }
+      return `/${returnTo}`;
+    };
 
     if (success === 'true') {
       setStatus('success');
+      const followerText = followers ? ` (${parseInt(followers).toLocaleString()} followers)` : '';
       toast({
         title: 'TikTok Connected!',
-        description: 'Your TikTok account has been successfully connected.',
+        description: `Your TikTok account has been successfully verified${followerText}.`,
       });
       setTimeout(() => {
-        navigate('/tiktok-lab');
+        navigate(getRedirectPath());
       }, 2000);
     } else if (error) {
       setStatus('error');
@@ -53,23 +71,26 @@ export default function TikTokCallback() {
       });
       
       setTimeout(() => {
-        navigate('/tiktok-lab');
+        navigate(getRedirectPath());
       }, 3000);
     }
   }, [searchParams, navigate, toast]);
 
+  const returnTo = searchParams.get('return_to') || 'tiktok-lab';
+  const redirectLabel = returnTo === 'onboarding' ? 'creator onboarding' : 'Goldsainte Creator Lab';
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-50">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg ring-1 ring-neutral-200/80">
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="w-full max-w-md rounded-2xl bg-card p-8 shadow-lg ring-1 ring-border">
         <div className="flex flex-col items-center gap-4">
           {status === 'processing' && (
             <>
-              <Loader2 className="h-12 w-12 animate-spin text-neutral-900" />
+              <Loader2 className="h-12 w-12 animate-spin text-foreground" />
               <div className="text-center">
-                <h2 className="text-lg font-semibold text-neutral-900">
+                <h2 className="text-lg font-semibold text-foreground">
                   Connecting TikTok...
                 </h2>
-                <p className="mt-2 text-sm text-neutral-600">
+                <p className="mt-2 text-sm text-muted-foreground">
                   Please wait while we complete the connection.
                 </p>
               </div>
@@ -94,11 +115,11 @@ export default function TikTokCallback() {
                 </svg>
               </div>
               <div className="text-center">
-                <h2 className="text-lg font-semibold text-neutral-900">
+                <h2 className="text-lg font-semibold text-foreground">
                   Success!
                 </h2>
-                <p className="mt-2 text-sm text-neutral-600">
-                  Redirecting to Goldsainte Creator Lab...
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Redirecting to {redirectLabel}...
                 </p>
               </div>
             </>
@@ -122,11 +143,11 @@ export default function TikTokCallback() {
                 </svg>
               </div>
               <div className="text-center">
-                <h2 className="text-lg font-semibold text-neutral-900">
+                <h2 className="text-lg font-semibold text-foreground">
                   Connection Failed
                 </h2>
-                <p className="mt-2 text-sm text-neutral-600">
-                  Redirecting back to Goldsainte Creator Lab...
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Redirecting back to {redirectLabel}...
                 </p>
               </div>
             </>

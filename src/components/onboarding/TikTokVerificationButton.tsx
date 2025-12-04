@@ -35,9 +35,10 @@ export function TikTokVerificationButton({
         return;
       }
 
-      // Call TikTok OAuth start function
+      // Call TikTok OAuth start function with return_to for proper redirect
       const { data, error } = await supabase.functions.invoke("tiktok-oauth-start", {
         headers: { Authorization: `Bearer ${session.access_token}` },
+        body: { return_to: "onboarding" },
       });
 
       if (error) throw error;
