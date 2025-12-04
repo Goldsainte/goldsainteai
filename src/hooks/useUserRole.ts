@@ -6,6 +6,8 @@ export const useUserRole = () => {
   const { user } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAgent, setIsAgent] = useState(false);
+  const [isCreator, setIsCreator] = useState(false);
+  const [isBrand, setIsBrand] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -13,21 +15,36 @@ export const useUserRole = () => {
       if (!user) {
         setIsAdmin(false);
         setIsAgent(false);
+        setIsCreator(false);
+        setIsBrand(false);
         setLoading(false);
         return;
       }
 
       try {
-        const { data, error } = await supabase
+        // Check user_roles table
+        const { data: rolesData, error: rolesError } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', user.id);
 
-        if (error) throw error;
+        if (rolesError) throw rolesError;
 
-        const roles = data?.map(r => r.role) || [];
+        const roles = rolesData?.map(r => r.role) || [];
         setIsAdmin(roles.includes('admin'));
         setIsAgent(roles.includes('agent'));
+        setIsBrand(roles.includes('brand'));
+
+        // Check profile account_type for creator status
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('account_type')
+          .eq('id', user.id)
+          .single();
+        
+        if (profileData?.account_type === 'creator') {
+          setIsCreator(true);
+        }
       } catch (error) {
         console.error('Error checking user roles:', error);
       } finally {
@@ -41,7 +58,10 @@ export const useUserRole = () => {
   return { 
     isAdmin, 
     isAgent, 
+    isCreator,
+    isBrand,
     loading,
     hasAgentAccess: isAdmin || isAgent,
+    hasCreatorAccess: isAdmin || isCreator,
   };
 };
