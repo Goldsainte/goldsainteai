@@ -22,7 +22,6 @@ const SearchResults = lazy(() => import('@/pages/SearchResults'));
 const MyStoryboardsPage = lazy(() => import('@/pages/storyboards/MyStoryboardsPage'));
 const StoryboardDetailPage = lazy(() => import('@/pages/storyboards/StoryboardDetailPage'));
 const Profile = lazy(() => import('@/pages/Profile'));
-const BrandOnboardingPage = lazy(() => import('@/pages/BrandOnboardingPage'));
 const BrandApplyPage = lazy(() => import('@/pages/apply/BrandOnboarding'));
 const BrandConsolePage = lazy(() => import('@/pages/BrandConsolePage'));
 const BrandCollectionDetailPage = lazy(() => import('@/pages/BrandCollectionDetailPage'));
@@ -53,7 +52,7 @@ const BrowseAgents = lazy(() => import('@/pages/BrowseAgents'));
 const CreatorsPage = lazy(() => import('@/pages/CreatorsPage'));
 const CreatorOnboardingPage = lazy(() => import('@/pages/onboarding/CreatorOnboardingPage'));
 const AgentProfile = lazy(() => import('@/pages/AgentProfile'));
-const AgentOnboarding = lazy(() => import('@/pages/AgentOnboarding'));
+
 const AgentDashboard = lazy(() => import('@/pages/AgentDashboard'));
 const AgentEarningsPage = lazy(() => import('@/pages/agent/AgentEarningsPage'));
 const AgentTripRequests = lazy(() => import('@/pages/AgentTripRequests'));
@@ -79,7 +78,7 @@ const AgentTripsPage = lazy(() => import('@/pages/AgentTripsPage'));
 const CreatorTripsPage = lazy(() => import('@/pages/CreatorTripsPage'));
 const TikTokLabDashboardPage = lazy(() => import('@/pages/tiktok/TikTokLabDashboardPage'));
 const TikTokEarningsPage = lazy(() => import('@/pages/tiktok/TikTokEarningsPage'));
-const AgentApplyPage = lazy(() => import('@/pages/agents/AgentApplyPage'));
+
 const StoryboardEditorPage = lazy(() => import('@/pages/StoryboardEditorPage'));
 const TikTokLabStoryboardEditorPage = lazy(() => import('@/pages/TikTokLab/StoryboardEditorPage'));
 const TikTokLabPage = lazy(() => import('@/pages/TikTokLabPage'));
@@ -97,7 +96,7 @@ const TikTokLabStoryboardsPage = lazy(() => import('@/pages/TikTokLab/Storyboard
 const TravelSettings = lazy(() => import('@/pages/TravelSettings'));
 const ApplicationStatusCheck = lazy(() => import('@/pages/ApplicationStatusCheck'));
 const AgentApplicationForm = lazy(() => import('@/pages/AgentApplicationForm'));
-const TravelSettings2 = lazy(() => import('@/pages/TravelSettings2'));
+
 const CreatorSettingsPage = lazy(() => import('@/pages/CreatorSettingsPage'));
 const MusicVolumeSettings = lazy(() => import('@/pages/MusicVolumeSettings'));
 // Legacy Instagram demo - disabled
@@ -398,7 +397,6 @@ export const AppRoutes = () => (
       <Route path="/creator-trips" element={<CreatorTripsPage />} />
       <Route path="/tiktok-lab" element={<TikTokLabDashboardPage />} />
       <Route path="/tiktok-lab/trips" element={<PartnerTripsPage />} />
-      <Route path="/apply/agent" element={<AgentApplyPage />} />
       <Route path="/tiktok-lab/earnings" element={<TikTokEarningsPage />} />
       <Route path="/storyboards" element={<RequireAuth><TikTokLabStoryboardsPage /></RequireAuth>} />
       <Route path="/storyboards/new" element={<RequireAuth><TikTokLabStoryboardEditorPage /></RequireAuth>} />
@@ -434,7 +432,6 @@ export const AppRoutes = () => (
         )}
       />
       <Route path="/agent/:agentId" element={<AgentProfile />} />
-      <Route path="/agent-onboarding" element={<AgentOnboarding />} />
       <Route path="/agent-dashboard" element={<RequireAgentTerms><AgentDashboard /></RequireAgentTerms>} />
       <Route
         path="/agent/earnings"
@@ -461,7 +458,6 @@ export const AppRoutes = () => (
       <Route path="/email-preview" element={<EmailPreview />} />
       <Route path="/billing-dashboard" element={<BillingDashboard />} />
       <Route path="/travel-settings" element={<CreatorSettingsPage />} />
-      <Route path="/travel-settings-2" element={<TravelSettings2 />} />
       <Route path="/travel-settings/general" element={<TravelSettings />} />
       <Route path="/travel-settings/music-volume" element={<MusicVolumeSettings />} />
       {/* Legacy Instagram demo routes - DISABLED

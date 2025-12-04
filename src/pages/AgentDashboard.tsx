@@ -136,7 +136,7 @@ export default function AgentDashboard() {
         
         if (!agentData) {
           toast.error('Please complete agent onboarding first');
-          navigate('/agent-onboarding');
+          navigate('/apply/agent');
           return;
         }
         
@@ -290,7 +290,7 @@ export default function AgentDashboard() {
               <p className="text-muted-foreground text-center mb-4">
                 You need to create an agent profile first
               </p>
-              <Button onClick={() => navigate('/agent-onboarding')}>Create Agent Profile</Button>
+              <Button onClick={() => navigate('/apply/agent')}>Create Agent Profile</Button>
             </CardContent>
           </Card>
         </main>
@@ -344,14 +344,6 @@ export default function AgentDashboard() {
 
         {/* Quick Access Navigation */}
         <div className="flex gap-3 mb-6">
-          <Button 
-            variant="outline" 
-            className="flex items-center gap-2"
-            onClick={() => navigate('/cocurated-dashboard')}
-          >
-            <Sparkles className="w-4 h-4" />
-            CoCurated™
-          </Button>
           <Button 
             variant="outline" 
             className="flex items-center gap-2"

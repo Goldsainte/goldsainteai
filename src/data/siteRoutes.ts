@@ -42,16 +42,13 @@ export const siteRoutes: RouteInfo[] = [
   { path: '/collabs/new', label: 'New Collaboration', description: 'Agents & creators partner on selling trips', category: 'social', requiresAuth: true },
   { path: '/tiktok-callback', label: 'TikTok Callback', description: 'OAuth callback handler for TikTok connection', category: 'social', requiresAuth: true },
   
-  // CoCurated
-  { path: '/cocurated-marketplace', label: 'CoCurated Marketplace', description: 'Expertly designed travel packages', category: 'cocurated' },
-  { path: '/tiktok-lab/storyboards', label: 'Storyboards', description: 'Manage collaborative trip storyboards', category: 'cocurated', requiresAuth: true },
-  { path: '/cocurated-dashboard', label: 'CoCurated Dashboard', description: 'Manage your packages', category: 'cocurated', requiresAuth: true },
-  { path: '/cocurated-create', label: 'Create Package', description: 'Create a new CoCurated package', category: 'cocurated', requiresAuth: true },
+  // Storyboards
+  { path: '/storyboards', label: 'Storyboards', description: 'Manage collaborative trip storyboards', category: 'social', requiresAuth: true },
   
   // Marketplace & Agents
   { path: '/marketplace', label: 'Marketplace', description: 'Browse services and products', category: 'marketplace' },
   { path: '/browse-agents', label: 'Browse Agents', description: 'Find travel agents', category: 'marketplace' },
-  { path: '/agent-onboarding', label: 'Become an Agent', description: 'Apply to be a travel agent', category: 'marketplace' },
+  { path: '/apply/agent', label: 'Become an Agent', description: 'Apply to be a travel agent', category: 'marketplace' },
   { path: '/agent-dashboard', label: 'Agent Dashboard', description: 'Manage agent work', category: 'marketplace', requiresAuth: true, requiresRole: 'agent' },
   { path: '/agent-trip-requests', label: 'Trip Requests', description: 'View trip requests', category: 'marketplace', requiresAuth: true, requiresRole: 'agent' },
   { path: '/agent-performance', label: 'Performance', description: 'View performance metrics', category: 'marketplace', requiresAuth: true, requiresRole: 'agent' },
