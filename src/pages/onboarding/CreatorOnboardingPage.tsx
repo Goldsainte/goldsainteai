@@ -15,10 +15,11 @@ import { LegalComplianceAcceptance } from "@/components/onboarding/LegalComplian
 import { TikTokVerificationButton } from "@/components/onboarding/TikTokVerificationButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { Checkbox } from "@/components/ui/checkbox";
 import { 
   User, Camera, Globe, MapPin, Sparkles, CreditCard, 
   TrendingUp, Instagram, Youtube, Video, Shield, 
-  MessageCircle, Clock, Calendar, Wallet, Heart,
+  MessageCircle, Clock, Wallet, Heart,
   CheckCircle, DollarSign, FileText, Users, Mic,
   Play, BookOpen, ArrowRight, Star, Building2, Image
 } from "lucide-react";
@@ -149,7 +150,6 @@ export default function CreatorOnboardingPage() {
   // Step 8: Commitment
   const [responseTime, setResponseTime] = useState(24);
   const [acceptsTransparency, setAcceptsTransparency] = useState(false);
-  const [acceptsBookingCalls, setAcceptsBookingCalls] = useState(false);
 
   // Step 9: Safety
   const [acceptsSafetyPolicy, setAcceptsSafetyPolicy] = useState(false);
@@ -300,7 +300,6 @@ export default function CreatorOnboardingPage() {
           ai_persona_tone: aiTone || null,
           ai_persona_audience: aiAudiences.length > 0 ? aiAudiences : null,
           travel_philosophy: travelPhilosophy || null,
-          accepts_booking_calls: acceptsBookingCalls,
           // NEW: Portfolio
           featured_photos: featuredPhotos.length > 0 ? featuredPhotos : null,
           // NEW: Brand Alignment
@@ -785,7 +784,11 @@ export default function CreatorOnboardingPage() {
                       <h3 className="font-medium text-[#0a2225] mb-2">Transparency Agreement</h3>
                       <p className="text-sm text-[#6B7280] mb-4">To protect both creators and travelers, all communications and transactions must stay on Goldsainte.</p>
                       <label className="flex items-start gap-3 cursor-pointer">
-                        <input type="checkbox" checked={acceptsTransparency} onChange={(e) => setAcceptsTransparency(e.target.checked)} className="mt-1 w-5 h-5 rounded border-[#C7A962] text-[#C7A962] focus:ring-[#C7A962]" />
+                        <Checkbox 
+                          checked={acceptsTransparency} 
+                          onCheckedChange={(checked) => setAcceptsTransparency(checked as boolean)} 
+                          className="mt-0.5 border-[#C7A962] data-[state=checked]:bg-[#C7A962] data-[state=checked]:border-[#C7A962]" 
+                        />
                         <span className="text-sm text-[#0a2225]">I agree to keep all communications on Goldsainte. No external DMs, no off-platform deals. *</span>
                       </label>
                     </div>
@@ -800,16 +803,6 @@ export default function CreatorOnboardingPage() {
                       <LuxurySelectionCard key={time.value} label={time.label} description={time.description} selected={responseTime === time.value} onSelect={() => setResponseTime(time.value)} variant="single" />
                     ))}
                   </div>
-                </div>
-
-                <div className="bg-white rounded-2xl p-6 border border-[#E5DFC6]">
-                  <label className="flex items-start gap-3 cursor-pointer">
-                    <input type="checkbox" checked={acceptsBookingCalls} onChange={(e) => setAcceptsBookingCalls(e.target.checked)} className="mt-1 w-5 h-5 rounded border-[#C7A962] text-[#C7A962] focus:ring-[#C7A962]" />
-                    <div>
-                      <span className="font-medium text-[#0a2225] flex items-center gap-2"><Calendar className="w-4 h-4 text-[#C7A962]" />Available for Booking Calls</span>
-                      <p className="text-sm text-[#6B7280] mt-1">Let travelers schedule video calls to discuss their trips</p>
-                    </div>
-                  </label>
                 </div>
               </div>
             )}
@@ -853,7 +846,11 @@ export default function CreatorOnboardingPage() {
 
                 <div className="bg-white rounded-2xl p-6 border-2 border-[#C7A962]">
                   <label className="flex items-start gap-3 cursor-pointer">
-                    <input type="checkbox" checked={acceptsSafetyPolicy} onChange={(e) => setAcceptsSafetyPolicy(e.target.checked)} className="mt-1 w-5 h-5 rounded border-[#C7A962] text-[#C7A962] focus:ring-[#C7A962]" />
+                    <Checkbox 
+                      checked={acceptsSafetyPolicy} 
+                      onCheckedChange={(checked) => setAcceptsSafetyPolicy(checked as boolean)} 
+                      className="mt-0.5 border-[#C7A962] data-[state=checked]:bg-[#C7A962] data-[state=checked]:border-[#C7A962]" 
+                    />
                     <span className="text-sm text-[#0a2225]">I have read and agree to Goldsainte's Creator Safety & Conduct Policy. I understand that violations may result in account suspension or termination. *</span>
                   </label>
                 </div>
