@@ -93,7 +93,7 @@ const Auth = () => {
         try {
           const { data: profile, error } = await supabase
             .from("profiles")
-            .select("account_type, onboarding_completed")
+            .select("account_type, onboarding_completed, is_profile_complete")
             .eq("id", user.id)
             .maybeSingle();
 
@@ -104,10 +104,11 @@ const Auth = () => {
             return;
           }
 
-          // Use centralized routing logic
+          // Use centralized routing logic with all parameters
           const path = getPostAuthDestination(
             profile?.account_type ?? null,
-            profile?.onboarding_completed ?? false
+            profile?.onboarding_completed ?? false,
+            profile?.is_profile_complete ?? false
           );
 
           navigate(path, { replace: true });
@@ -151,8 +152,13 @@ const Auth = () => {
       return;
     }
 
-    // Default to sign-in step - users can explicitly choose sign-up via the button
-    setStep('signin');
+    // If user came from signup flow (selected account type), go to signup form
+    if (isSignUpMode || selectedAccountType) {
+      setStep('signup');
+    } else {
+      // Default to sign-in for returning users
+      setStep('signin');
+    }
   };
 
   const handleSignIn = async (e: React.FormEvent) => {

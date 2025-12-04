@@ -1,16 +1,47 @@
 import { useNavigate } from 'react-router-dom';
 import { AccountTypeStep } from '@/components/auth/AccountTypeStep';
 import { useAuth } from '@/contexts/AuthContext';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import logomark from '@/assets/logomark-gold.png';
+import { Loader2 } from 'lucide-react';
 
 export default function CompleteProfile() {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
+  const [checkingProfile, setCheckingProfile] = useState(true);
 
   useEffect(() => {
     if (!isLoading && !user) {
       navigate('/auth');
+      return;
+    }
+
+    // Check if user already has an account type set (from signup metadata)
+    async function checkExistingAccountType() {
+      if (!user) return;
+      
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('account_type')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        // If account type is already set, skip role selection and go directly to onboarding
+        if (profile?.account_type) {
+          navigate('/onboarding', { replace: true });
+          return;
+        }
+      } catch (err) {
+        console.error('Error checking profile:', err);
+      }
+      
+      setCheckingProfile(false);
+    }
+
+    if (user && !isLoading) {
+      checkExistingAccountType();
     }
   }, [user, isLoading, navigate]);
 
@@ -19,10 +50,10 @@ export default function CompleteProfile() {
     navigate('/onboarding', { replace: true });
   };
 
-  if (isLoading) {
+  if (isLoading || checkingProfile) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/20">
-        <div className="animate-pulse">Loading...</div>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
