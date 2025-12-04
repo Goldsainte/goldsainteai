@@ -7759,6 +7759,7 @@ export type Database = {
           accepts_transparency_agreement: boolean | null
           account_status: string | null
           account_type: string | null
+          aesthetic_alignment: string[] | null
           agency_name: string | null
           agent_agency_name: string | null
           agent_license_authority: string | null
@@ -7781,6 +7782,8 @@ export type Database = {
           content_style_tags: string[] | null
           country: string | null
           created_at: string
+          creator_agreement_accepted_at: string | null
+          creator_agreement_version: string | null
           creator_avg_views: number | null
           creator_budget_levels: string[] | null
           creator_followers: number | null
@@ -7820,10 +7823,14 @@ export type Database = {
           phone_verified: boolean | null
           planning_fee_amount: number | null
           preferences: Json | null
+          preferred_brand_tiers: string[] | null
           preferred_currency: string | null
+          preferred_hotel_brands: string[] | null
           preferred_language: string | null
           pricing_model: string | null
           primary_platform: string | null
+          privacy_accepted_at: string | null
+          privacy_version: string | null
           profile_visibility: string | null
           response_commitment_hours: number | null
           restriction_expires_at: string | null
@@ -7842,13 +7849,18 @@ export type Database = {
           tax_id: string | null
           tiktok_access_token: string | null
           tiktok_connected_at: string | null
+          tiktok_follower_count: number | null
           tiktok_followers: number | null
           tiktok_handle: string | null
           tiktok_niche_tags: string[] | null
           tiktok_refresh_token: string | null
           tiktok_token_expires_at: string | null
           tiktok_username: string | null
+          tiktok_verified: boolean | null
+          tiktok_verified_at: string | null
           time_zone: string | null
+          tos_accepted_at: string | null
+          tos_version: string | null
           transparency_agreement_signed_at: string | null
           travel_philosophy: string | null
           unavailable_until: string | null
@@ -7864,6 +7876,7 @@ export type Database = {
           accepts_transparency_agreement?: boolean | null
           account_status?: string | null
           account_type?: string | null
+          aesthetic_alignment?: string[] | null
           agency_name?: string | null
           agent_agency_name?: string | null
           agent_license_authority?: string | null
@@ -7886,6 +7899,8 @@ export type Database = {
           content_style_tags?: string[] | null
           country?: string | null
           created_at?: string
+          creator_agreement_accepted_at?: string | null
+          creator_agreement_version?: string | null
           creator_avg_views?: number | null
           creator_budget_levels?: string[] | null
           creator_followers?: number | null
@@ -7925,10 +7940,14 @@ export type Database = {
           phone_verified?: boolean | null
           planning_fee_amount?: number | null
           preferences?: Json | null
+          preferred_brand_tiers?: string[] | null
           preferred_currency?: string | null
+          preferred_hotel_brands?: string[] | null
           preferred_language?: string | null
           pricing_model?: string | null
           primary_platform?: string | null
+          privacy_accepted_at?: string | null
+          privacy_version?: string | null
           profile_visibility?: string | null
           response_commitment_hours?: number | null
           restriction_expires_at?: string | null
@@ -7947,13 +7966,18 @@ export type Database = {
           tax_id?: string | null
           tiktok_access_token?: string | null
           tiktok_connected_at?: string | null
+          tiktok_follower_count?: number | null
           tiktok_followers?: number | null
           tiktok_handle?: string | null
           tiktok_niche_tags?: string[] | null
           tiktok_refresh_token?: string | null
           tiktok_token_expires_at?: string | null
           tiktok_username?: string | null
+          tiktok_verified?: boolean | null
+          tiktok_verified_at?: string | null
           time_zone?: string | null
+          tos_accepted_at?: string | null
+          tos_version?: string | null
           transparency_agreement_signed_at?: string | null
           travel_philosophy?: string | null
           unavailable_until?: string | null
@@ -7969,6 +7993,7 @@ export type Database = {
           accepts_transparency_agreement?: boolean | null
           account_status?: string | null
           account_type?: string | null
+          aesthetic_alignment?: string[] | null
           agency_name?: string | null
           agent_agency_name?: string | null
           agent_license_authority?: string | null
@@ -7991,6 +8016,8 @@ export type Database = {
           content_style_tags?: string[] | null
           country?: string | null
           created_at?: string
+          creator_agreement_accepted_at?: string | null
+          creator_agreement_version?: string | null
           creator_avg_views?: number | null
           creator_budget_levels?: string[] | null
           creator_followers?: number | null
@@ -8030,10 +8057,14 @@ export type Database = {
           phone_verified?: boolean | null
           planning_fee_amount?: number | null
           preferences?: Json | null
+          preferred_brand_tiers?: string[] | null
           preferred_currency?: string | null
+          preferred_hotel_brands?: string[] | null
           preferred_language?: string | null
           pricing_model?: string | null
           primary_platform?: string | null
+          privacy_accepted_at?: string | null
+          privacy_version?: string | null
           profile_visibility?: string | null
           response_commitment_hours?: number | null
           restriction_expires_at?: string | null
@@ -8052,13 +8083,18 @@ export type Database = {
           tax_id?: string | null
           tiktok_access_token?: string | null
           tiktok_connected_at?: string | null
+          tiktok_follower_count?: number | null
           tiktok_followers?: number | null
           tiktok_handle?: string | null
           tiktok_niche_tags?: string[] | null
           tiktok_refresh_token?: string | null
           tiktok_token_expires_at?: string | null
           tiktok_username?: string | null
+          tiktok_verified?: boolean | null
+          tiktok_verified_at?: string | null
           time_zone?: string | null
+          tos_accepted_at?: string | null
+          tos_version?: string | null
           transparency_agreement_signed_at?: string | null
           travel_philosophy?: string | null
           unavailable_until?: string | null

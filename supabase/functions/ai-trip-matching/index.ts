@@ -53,10 +53,16 @@ Deno.serve(async (req) => {
 
     console.log(`[ai-trip-matching] Trip tags:`, Array.from(tags));
 
-    // 2) Load candidate creators and agents
+    // 2) Load candidate creators and agents with AI persona data
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("id, account_type, creator_niches, agent_specialties, destinations_focus_tags, content_style_tags, creator_budget_levels")
+      .select(`
+        id, account_type, creator_niches, agent_specialties, 
+        destinations_focus_tags, content_style_tags, creator_budget_levels,
+        ai_persona_tone, ai_persona_audience, travel_philosophy,
+        preferred_brand_tiers, preferred_hotel_brands, aesthetic_alignment,
+        tiktok_verified, tiktok_follower_count
+      `)
       .in("account_type", ["creator", "agent"]);
 
     if (profilesError) {
@@ -66,7 +72,7 @@ Deno.serve(async (req) => {
 
     console.log(`[ai-trip-matching] Found ${profiles?.length || 0} potential candidates`);
 
-    // 3) Score each candidate
+    // 3) Score each candidate with enhanced AI persona matching
     type Candidate = {
       id: string;
       account_type: "creator" | "agent";
@@ -75,6 +81,14 @@ Deno.serve(async (req) => {
       destinations_focus_tags: string[] | null;
       content_style_tags: string[] | null;
       creator_budget_levels: string[] | null;
+      ai_persona_tone: string | null;
+      ai_persona_audience: string[] | null;
+      travel_philosophy: string | null;
+      preferred_brand_tiers: string[] | null;
+      preferred_hotel_brands: string[] | null;
+      aesthetic_alignment: string[] | null;
+      tiktok_verified: boolean | null;
+      tiktok_follower_count: number | null;
     };
 
     const candidates = (profiles ?? []) as Candidate[];
@@ -92,8 +106,9 @@ Deno.serve(async (req) => {
         (c.agent_specialties ?? []).forEach((t) => candidateTags.add(t.toLowerCase()));
       }
       (c.content_style_tags ?? []).forEach((t) => candidateTags.add(t.toLowerCase()));
+      (c.aesthetic_alignment ?? []).forEach((t) => candidateTags.add(t.toLowerCase()));
 
-      // Tag overlap scoring
+      // Tag overlap scoring (original logic)
       const matchedTags: string[] = [];
       tags.forEach((t) => {
         if (candidateTags.has(t)) {
@@ -137,9 +152,73 @@ Deno.serve(async (req) => {
         }
       }
 
-      // Role preference scoring
+      // NEW: AI Persona Tone Matching
+      if (c.ai_persona_tone) {
+        // Match tone with trip metadata aesthetic hints
+        const aestheticHints = metadata.aesthetic_hints as string[] || [];
+        const toneMatches = aestheticHints.some((hint: string) => 
+          hint.toLowerCase().includes(c.ai_persona_tone!.toLowerCase())
+        );
+        if (toneMatches) {
+          score += 8;
+          reasons.push(`${c.ai_persona_tone} tone matches your aesthetic`);
+        }
+      }
+
+      // NEW: AI Persona Audience Matching
+      if (c.ai_persona_audience && c.ai_persona_audience.length > 0) {
+        const tripCompanions = metadata.companions as string || "";
+        const audienceMatch = c.ai_persona_audience.some((audience: string) => {
+          const audienceLower = audience.toLowerCase();
+          if (audienceLower === "couples" && tripCompanions.includes("couple")) return true;
+          if (audienceLower === "solo" && tripCompanions.includes("solo")) return true;
+          if (audienceLower === "families" && tripCompanions.includes("family")) return true;
+          if (audienceLower === "groups" && tripCompanions.includes("friends")) return true;
+          return false;
+        });
+        if (audienceMatch) {
+          score += 10;
+          reasons.push("Specializes in your travel style");
+        }
+      }
+
+      // NEW: Travel Philosophy bonus (presence indicates engaged creator)
+      if (c.travel_philosophy && c.travel_philosophy.length > 50) {
+        score += 3;
+      }
+
+      // NEW: Brand Tier Alignment
+      if (c.preferred_brand_tiers && c.preferred_brand_tiers.length > 0) {
+        const tripBudget = trip.budget_max || trip.budget_min || 0;
+        const tiers = c.preferred_brand_tiers.map((t) => t.toLowerCase());
+        
+        if (tripBudget >= 20000 && tiers.includes("ultra_luxury")) {
+          score += 8;
+          reasons.push("Specializes in ultra-luxury");
+        } else if (tripBudget >= 10000 && tiers.includes("luxury")) {
+          score += 6;
+          reasons.push("Luxury specialist");
+        } else if (tripBudget >= 5000 && tiers.includes("premium")) {
+          score += 4;
+        }
+      }
+
+      // NEW: TikTok Verification Bonus
+      if (c.tiktok_verified) {
+        score += 5;
+        reasons.push("Verified creator");
+        
+        // Extra bonus for high follower count
+        if (c.tiktok_follower_count && c.tiktok_follower_count >= 100000) {
+          score += 5;
+        } else if (c.tiktok_follower_count && c.tiktok_follower_count >= 50000) {
+          score += 3;
+        }
+      }
+
+      // Role preference scoring (agents slightly preferred as primary)
       if (c.account_type === "agent") {
-        score += 2; // Slight preference for agents as primary assignee
+        score += 2;
       }
 
       return { candidate: c, match_score: score, reasons: reasons.join(" • ") };
