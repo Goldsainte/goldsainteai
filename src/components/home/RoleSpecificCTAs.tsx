@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 import { User, Video, Briefcase, Building2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import travelerImage from "@/assets/hero-overwater-villa.jpg";
+import travelerImage from "@/assets/home/hero-overwater-villa.jpg";
 import creatorImage from "@/assets/creator-canyon-views.jpg";
 import agentImage from "@/assets/seoul-autumn.jpg";
-import brandImage from "@/assets/hero-jungle-villa.jpg";
+import brandImage from "@/assets/home/hero-jungle-villa.jpg";
 
 export function RoleSpecificCTAs() {
   const { t } = useTranslation();
