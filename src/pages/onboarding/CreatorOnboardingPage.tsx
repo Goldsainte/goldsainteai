@@ -322,6 +322,9 @@ export default function CreatorOnboardingPage() {
           role: "creator",
           account_type: "creator",
           has_completed_creator_onboarding: true,
+          onboarding_completed: true,
+          onboarding_completed_at: now,
+          is_profile_complete: true,
         })
         .eq("id", user.id);
 
