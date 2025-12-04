@@ -27,6 +27,12 @@ const ACTIVITY_LEVELS = ["Easy", "Moderate", "Active", "Challenging"];
 
 const CURRENCIES = ["USD", "EUR", "GBP", "AUD", "CAD"];
 
+// Luxury form styling classes
+const labelClasses = "text-xs uppercase tracking-wider text-[#6B7280] font-medium";
+const inputClasses = "rounded-xl h-12 border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20 focus:border-[#C7A962] transition-all";
+const textareaClasses = "rounded-xl border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20 focus:border-[#C7A962] transition-all";
+const selectTriggerClasses = "rounded-xl h-12 border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20";
+
 export function TripBuilderForm({ initialData, onSave, saving, isEditing }: TripBuilderFormProps) {
   const [formData, setFormData] = useState({
     title: "",
@@ -152,97 +158,113 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
   const isValid = formData.title && formData.destination && formData.price_per_person && formData.duration_days;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <Tabs defaultValue="basics" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 bg-white border border-[#E5DFC6]">
-          <TabsTrigger value="basics" className="data-[state=active]:bg-[#C7A962]/10 data-[state=active]:text-[#0a2225]">
+        <TabsList className="w-full bg-[#FDF9F0] border-none rounded-full p-1.5 h-auto flex-wrap gap-1">
+          <TabsTrigger 
+            value="basics" 
+            className="rounded-full px-6 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#0a2225] data-[state=inactive]:text-[#6B7280] transition-all"
+          >
             Basics
           </TabsTrigger>
-          <TabsTrigger value="details" className="data-[state=active]:bg-[#C7A962]/10 data-[state=active]:text-[#0a2225]">
+          <TabsTrigger 
+            value="details" 
+            className="rounded-full px-6 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#0a2225] data-[state=inactive]:text-[#6B7280] transition-all"
+          >
             Details
           </TabsTrigger>
-          <TabsTrigger value="media" className="data-[state=active]:bg-[#C7A962]/10 data-[state=active]:text-[#0a2225]">
+          <TabsTrigger 
+            value="media" 
+            className="rounded-full px-6 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#0a2225] data-[state=inactive]:text-[#6B7280] transition-all"
+          >
             Media
           </TabsTrigger>
-          <TabsTrigger value="requirements" className="data-[state=active]:bg-[#C7A962]/10 data-[state=active]:text-[#0a2225]">
+          <TabsTrigger 
+            value="requirements" 
+            className="rounded-full px-6 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#0a2225] data-[state=inactive]:text-[#6B7280] transition-all"
+          >
             Requirements
           </TabsTrigger>
-          <TabsTrigger value="policies" className="data-[state=active]:bg-[#C7A962]/10 data-[state=active]:text-[#0a2225]">
+          <TabsTrigger 
+            value="policies" 
+            className="rounded-full px-6 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#0a2225] data-[state=inactive]:text-[#6B7280] transition-all"
+          >
             Policies
           </TabsTrigger>
         </TabsList>
 
         {/* BASICS TAB */}
-        <TabsContent value="basics" className="mt-6 space-y-6">
-          <Card className="border-[#E5DFC6] bg-white">
-            <CardHeader>
-              <CardTitle className="font-secondary text-lg text-[#0a2225]">Basic Information</CardTitle>
+        <TabsContent value="basics" className="mt-8 space-y-8">
+          <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardHeader className="pb-4">
+              <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
+              <CardTitle className="font-secondary text-xl text-[#0a2225]">Basic Information</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-5">
               <div className="space-y-2">
-                <Label className="text-[#0a2225]">Trip Title *</Label>
+                <Label className={labelClasses}>Trip Title *</Label>
                 <Input
                   value={formData.title}
                   onChange={(e) => updateField("title", e.target.value)}
                   placeholder="e.g., Amalfi Coast Long Weekend"
-                  className="border-[#E5DFC6] focus:ring-[#C7A962]"
+                  className={inputClasses}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label className="text-[#0a2225]">Host Tagline</Label>
+                <Label className={labelClasses}>Host Tagline</Label>
                 <Input
                   value={formData.host_tagline}
                   onChange={(e) => updateField("host_tagline", e.target.value)}
                   placeholder="e.g., Curated by a local Italy expert"
-                  className="border-[#E5DFC6] focus:ring-[#C7A962]"
+                  className={inputClasses}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label className="text-[#0a2225]">Destination *</Label>
+                <Label className={labelClasses}>Destination *</Label>
                 <Input
                   value={formData.destination}
                   onChange={(e) => updateField("destination", e.target.value)}
                   placeholder="e.g., Amalfi Coast, Italy"
-                  className="border-[#E5DFC6] focus:ring-[#C7A962]"
+                  className={inputClasses}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label className="text-[#0a2225]">Description</Label>
+                <Label className={labelClasses}>Description</Label>
                 <Textarea
                   value={formData.description}
                   onChange={(e) => updateField("description", e.target.value)}
                   placeholder="Describe this trip experience..."
                   rows={4}
-                  className="border-[#E5DFC6] focus:ring-[#C7A962]"
+                  className={textareaClasses}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-[#0a2225]">Trip Type</Label>
+                  <Label className={labelClasses}>Trip Type</Label>
                   <Select value={formData.trip_type} onValueChange={(v) => updateField("trip_type", v)}>
-                    <SelectTrigger className="border-[#E5DFC6]">
+                    <SelectTrigger className={selectTriggerClasses}>
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white border-[#E5DFC6] rounded-xl">
                       {TRIP_TYPES.map((type) => (
-                        <SelectItem key={type} value={type}>{type}</SelectItem>
+                        <SelectItem key={type} value={type} className="focus:bg-[#FDF9F0]">{type}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-[#0a2225]">Activity Level</Label>
+                  <Label className={labelClasses}>Activity Level</Label>
                   <Select value={formData.activity_level} onValueChange={(v) => updateField("activity_level", v)}>
-                    <SelectTrigger className="border-[#E5DFC6]">
+                    <SelectTrigger className={selectTriggerClasses}>
                       <SelectValue placeholder="Select level" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white border-[#E5DFC6] rounded-xl">
                       {ACTIVITY_LEVELS.map((level) => (
-                        <SelectItem key={level} value={level}>{level}</SelectItem>
+                        <SelectItem key={level} value={level} className="focus:bg-[#FDF9F0]">{level}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -251,41 +273,42 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
             </CardContent>
           </Card>
 
-          <Card className="border-[#E5DFC6] bg-white">
-            <CardHeader>
-              <CardTitle className="font-secondary text-lg text-[#0a2225]">Pricing & Duration</CardTitle>
+          <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardHeader className="pb-4">
+              <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
+              <CardTitle className="font-secondary text-xl text-[#0a2225]">Pricing & Duration</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-5">
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-[#0a2225]">Price per Person *</Label>
+                  <Label className={labelClasses}>Price per Person *</Label>
                   <Input
                     type="number"
                     value={formData.price_per_person}
                     onChange={(e) => updateField("price_per_person", e.target.value)}
                     placeholder="2500"
-                    className="border-[#E5DFC6] focus:ring-[#C7A962]"
+                    className={inputClasses}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-[#0a2225]">Original Price</Label>
+                  <Label className={labelClasses}>Original Price</Label>
                   <Input
                     type="number"
                     value={formData.original_price}
                     onChange={(e) => updateField("original_price", e.target.value)}
                     placeholder="For showing discounts"
-                    className="border-[#E5DFC6] focus:ring-[#C7A962]"
+                    className={inputClasses}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-[#0a2225]">Currency</Label>
+                  <Label className={labelClasses}>Currency</Label>
                   <Select value={formData.currency} onValueChange={(v) => updateField("currency", v)}>
-                    <SelectTrigger className="border-[#E5DFC6]">
+                    <SelectTrigger className={selectTriggerClasses}>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white border-[#E5DFC6] rounded-xl">
                       {CURRENCIES.map((c) => (
-                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                        <SelectItem key={c} value={c} className="focus:bg-[#FDF9F0]">{c}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -294,67 +317,67 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-[#0a2225]">Duration (Days) *</Label>
+                  <Label className={labelClasses}>Duration (Days) *</Label>
                   <Input
                     type="number"
                     value={formData.duration_days}
                     onChange={(e) => updateField("duration_days", e.target.value)}
                     placeholder="5"
-                    className="border-[#E5DFC6] focus:ring-[#C7A962]"
+                    className={inputClasses}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-[#0a2225]">Duration (Nights)</Label>
+                  <Label className={labelClasses}>Duration (Nights)</Label>
                   <Input
                     type="number"
                     value={formData.duration_nights}
                     onChange={(e) => updateField("duration_nights", e.target.value)}
                     placeholder="4"
-                    className="border-[#E5DFC6] focus:ring-[#C7A962]"
+                    className={inputClasses}
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-[#0a2225]">Min Participants</Label>
+                  <Label className={labelClasses}>Min Participants</Label>
                   <Input
                     type="number"
                     value={formData.min_participants}
                     onChange={(e) => updateField("min_participants", e.target.value)}
                     placeholder="1"
-                    className="border-[#E5DFC6] focus:ring-[#C7A962]"
+                    className={inputClasses}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-[#0a2225]">Max Participants</Label>
+                  <Label className={labelClasses}>Max Participants</Label>
                   <Input
                     type="number"
                     value={formData.max_participants}
                     onChange={(e) => updateField("max_participants", e.target.value)}
                     placeholder="12"
-                    className="border-[#E5DFC6] focus:ring-[#C7A962]"
+                    className={inputClasses}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-[#0a2225]">Deposit %</Label>
+                  <Label className={labelClasses}>Deposit %</Label>
                   <Input
                     type="number"
                     value={formData.deposit_percentage}
                     onChange={(e) => updateField("deposit_percentage", e.target.value)}
                     placeholder="30"
-                    className="border-[#E5DFC6] focus:ring-[#C7A962]"
+                    className={inputClasses}
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-[#0a2225]">Group Size Note</Label>
+                <Label className={labelClasses}>Group Size Note</Label>
                 <Input
                   value={formData.group_size_note}
                   onChange={(e) => updateField("group_size_note", e.target.value)}
                   placeholder="e.g., Small intimate group of 6-12 travelers"
-                  className="border-[#E5DFC6] focus:ring-[#C7A962]"
+                  className={inputClasses}
                 />
               </div>
             </CardContent>
@@ -362,10 +385,11 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
         </TabsContent>
 
         {/* DETAILS TAB */}
-        <TabsContent value="details" className="mt-6 space-y-6">
-          <Card className="border-[#E5DFC6] bg-white">
-            <CardHeader>
-              <CardTitle className="font-secondary text-lg text-[#0a2225]">Trip Highlights</CardTitle>
+        <TabsContent value="details" className="mt-8 space-y-8">
+          <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardHeader className="pb-4">
+              <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
+              <CardTitle className="font-secondary text-xl text-[#0a2225]">Trip Highlights</CardTitle>
             </CardHeader>
             <CardContent>
               <ArrayFieldEditor
@@ -376,9 +400,10 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
             </CardContent>
           </Card>
 
-          <Card className="border-[#E5DFC6] bg-white">
-            <CardHeader>
-              <CardTitle className="font-secondary text-lg text-[#0a2225]">What's Included</CardTitle>
+          <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardHeader className="pb-4">
+              <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
+              <CardTitle className="font-secondary text-xl text-[#0a2225]">What's Included</CardTitle>
             </CardHeader>
             <CardContent>
               <ArrayFieldEditor
@@ -389,9 +414,10 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
             </CardContent>
           </Card>
 
-          <Card className="border-[#E5DFC6] bg-white">
-            <CardHeader>
-              <CardTitle className="font-secondary text-lg text-[#0a2225]">What's Not Included</CardTitle>
+          <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardHeader className="pb-4">
+              <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
+              <CardTitle className="font-secondary text-xl text-[#0a2225]">What's Not Included</CardTitle>
             </CardHeader>
             <CardContent>
               <ArrayFieldEditor
@@ -402,47 +428,50 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
             </CardContent>
           </Card>
 
-          <Card className="border-[#E5DFC6] bg-white">
-            <CardHeader>
-              <CardTitle className="font-secondary text-lg text-[#0a2225]">Tags</CardTitle>
+          <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardHeader className="pb-4">
+              <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
+              <CardTitle className="font-secondary text-xl text-[#0a2225]">Tags</CardTitle>
             </CardHeader>
             <CardContent>
               <ArrayFieldEditor
                 items={formData.tags}
                 onChange={(items) => updateField("tags", items)}
-                placeholder="Add a tag (e.g., coastal, foodie, romantic)"
+                placeholder="Add a tag (e.g., foodie, couples, photography)"
               />
             </CardContent>
           </Card>
         </TabsContent>
 
         {/* MEDIA TAB */}
-        <TabsContent value="media" className="mt-6 space-y-6">
-          <Card className="border-[#E5DFC6] bg-white">
-            <CardHeader>
-              <CardTitle className="font-secondary text-lg text-[#0a2225]">Cover Image</CardTitle>
+        <TabsContent value="media" className="mt-8 space-y-8">
+          <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardHeader className="pb-4">
+              <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
+              <CardTitle className="font-secondary text-xl text-[#0a2225]">Cover Image</CardTitle>
             </CardHeader>
             <CardContent>
               <TripImageUploader
                 currentUrl={formData.cover_image_url}
                 onUpload={(url) => updateField("cover_image_url", url)}
-                label="Cover Image"
+                label="Upload a stunning cover image"
               />
             </CardContent>
           </Card>
 
-          <Card className="border-[#E5DFC6] bg-white">
-            <CardHeader>
-              <CardTitle className="font-secondary text-lg text-[#0a2225]">Image Gallery</CardTitle>
+          <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardHeader className="pb-4">
+              <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
+              <CardTitle className="font-secondary text-xl text-[#0a2225]">Image Gallery</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {formData.image_gallery.map((url, idx) => (
                   <div key={idx} className="relative group">
                     <img
                       src={url}
                       alt={`Gallery ${idx + 1}`}
-                      className="w-full aspect-[4/3] object-cover rounded-lg border border-[#E5DFC6]"
+                      className="w-full aspect-[4/3] object-cover rounded-xl border border-[#E5DFC6]"
                     />
                     <button
                       onClick={() => {
@@ -450,7 +479,7 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
                         newGallery.splice(idx, 1);
                         updateField("image_gallery", newGallery);
                       }}
-                      className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-2 right-2 p-1.5 bg-white/90 rounded-full text-red-500 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -458,25 +487,25 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
                 ))}
                 <TripImageUploader
                   onUpload={(url) => updateField("image_gallery", [...formData.image_gallery, url])}
-                  label="Add Image"
                   compact
                 />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-[#E5DFC6] bg-white">
-            <CardHeader>
-              <CardTitle className="font-secondary text-lg text-[#0a2225]">Video</CardTitle>
+          <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardHeader className="pb-4">
+              <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
+              <CardTitle className="font-secondary text-xl text-[#0a2225]">Video</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <Label className="text-[#0a2225]">Video URL (YouTube, Vimeo, etc.)</Label>
+                <Label className={labelClasses}>Video URL (YouTube or Vimeo)</Label>
                 <Input
                   value={formData.video_url}
                   onChange={(e) => updateField("video_url", e.target.value)}
                   placeholder="https://youtube.com/watch?v=..."
-                  className="border-[#E5DFC6] focus:ring-[#C7A962]"
+                  className={inputClasses}
                 />
               </div>
             </CardContent>
@@ -484,94 +513,101 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
         </TabsContent>
 
         {/* REQUIREMENTS TAB */}
-        <TabsContent value="requirements" className="mt-6 space-y-6">
-          <Card className="border-[#E5DFC6] bg-white">
-            <CardHeader>
-              <CardTitle className="font-secondary text-lg text-[#0a2225]">Travel Requirements</CardTitle>
+        <TabsContent value="requirements" className="mt-8 space-y-8">
+          <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardHeader className="pb-4">
+              <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
+              <CardTitle className="font-secondary text-xl text-[#0a2225]">Travel Requirements</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label className="text-[#0a2225]">Passport Required</Label>
-                <Switch
-                  checked={formData.passport_required}
-                  onCheckedChange={(v) => updateField("passport_required", v)}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label className="text-[#0a2225]">Visa Required</Label>
-                <Switch
-                  checked={formData.visa_required}
-                  onCheckedChange={(v) => updateField("visa_required", v)}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label className="text-[#0a2225]">Vaccination Required</Label>
-                <Switch
-                  checked={formData.vaccination_required}
-                  onCheckedChange={(v) => updateField("vaccination_required", v)}
-                />
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="flex items-center justify-between p-4 bg-[#FDF9F0] rounded-xl">
+                  <Label className={labelClasses}>Passport Required</Label>
+                  <Switch
+                    checked={formData.passport_required}
+                    onCheckedChange={(v) => updateField("passport_required", v)}
+                  />
+                </div>
+                <div className="flex items-center justify-between p-4 bg-[#FDF9F0] rounded-xl">
+                  <Label className={labelClasses}>Visa Required</Label>
+                  <Switch
+                    checked={formData.visa_required}
+                    onCheckedChange={(v) => updateField("visa_required", v)}
+                  />
+                </div>
+                <div className="flex items-center justify-between p-4 bg-[#FDF9F0] rounded-xl">
+                  <Label className={labelClasses}>Vaccination Required</Label>
+                  <Switch
+                    checked={formData.vaccination_required}
+                    onCheckedChange={(v) => updateField("vaccination_required", v)}
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-[#0a2225]">Fitness Level Required</Label>
+                <Label className={labelClasses}>Fitness Level Required</Label>
                 <Input
                   value={formData.fitness_level_required}
                   onChange={(e) => updateField("fitness_level_required", e.target.value)}
                   placeholder="e.g., Moderate fitness for walking tours"
-                  className="border-[#E5DFC6] focus:ring-[#C7A962]"
+                  className={inputClasses}
                 />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-[#E5DFC6] bg-white">
-            <CardHeader>
-              <CardTitle className="font-secondary text-lg text-[#0a2225]">Airport Information</CardTitle>
+          <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardHeader className="pb-4">
+              <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
+              <CardTitle className="font-secondary text-xl text-[#0a2225]">Airport Information</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label className="text-[#0a2225]">Recommended Arrival Airport</Label>
-                <Input
-                  value={formData.recommended_arrival_airport}
-                  onChange={(e) => updateField("recommended_arrival_airport", e.target.value)}
-                  placeholder="e.g., Naples International Airport (NAP)"
-                  className="border-[#E5DFC6] focus:ring-[#C7A962]"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[#0a2225]">Recommended Departure Airport</Label>
-                <Input
-                  value={formData.recommended_departure_airport}
-                  onChange={(e) => updateField("recommended_departure_airport", e.target.value)}
-                  placeholder="e.g., Naples International Airport (NAP)"
-                  className="border-[#E5DFC6] focus:ring-[#C7A962]"
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-[#E5DFC6] bg-white">
-            <CardHeader>
-              <CardTitle className="font-secondary text-lg text-[#0a2225]">Availability</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-5">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-[#0a2225]">Available From</Label>
+                  <Label className={labelClasses}>Recommended Arrival Airport</Label>
+                  <Input
+                    value={formData.recommended_arrival_airport}
+                    onChange={(e) => updateField("recommended_arrival_airport", e.target.value)}
+                    placeholder="e.g., Naples (NAP)"
+                    className={inputClasses}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className={labelClasses}>Recommended Departure Airport</Label>
+                  <Input
+                    value={formData.recommended_departure_airport}
+                    onChange={(e) => updateField("recommended_departure_airport", e.target.value)}
+                    placeholder="e.g., Rome Fiumicino (FCO)"
+                    className={inputClasses}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardHeader className="pb-4">
+              <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
+              <CardTitle className="font-secondary text-xl text-[#0a2225]">Availability</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className={labelClasses}>Available From</Label>
                   <Input
                     type="date"
                     value={formData.available_from}
                     onChange={(e) => updateField("available_from", e.target.value)}
-                    className="border-[#E5DFC6] focus:ring-[#C7A962]"
+                    className={inputClasses}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-[#0a2225]">Available Until</Label>
+                  <Label className={labelClasses}>Available Until</Label>
                   <Input
                     type="date"
                     value={formData.available_until}
                     onChange={(e) => updateField("available_until", e.target.value)}
-                    className="border-[#E5DFC6] focus:ring-[#C7A962]"
+                    className={inputClasses}
                   />
                 </div>
               </div>
@@ -580,54 +616,64 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
         </TabsContent>
 
         {/* POLICIES TAB */}
-        <TabsContent value="policies" className="mt-6 space-y-6">
-          <Card className="border-[#E5DFC6] bg-white">
-            <CardHeader>
-              <CardTitle className="font-secondary text-lg text-[#0a2225]">Cancellation & Refund Policies</CardTitle>
+        <TabsContent value="policies" className="mt-8 space-y-8">
+          <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardHeader className="pb-4">
+              <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
+              <CardTitle className="font-secondary text-xl text-[#0a2225]">Cancellation Policy</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label className="text-[#0a2225]">Cancellation Policy</Label>
-                <Textarea
-                  value={formData.cancellation_policy}
-                  onChange={(e) => updateField("cancellation_policy", e.target.value)}
-                  placeholder="Describe your cancellation policy..."
-                  rows={4}
-                  className="border-[#E5DFC6] focus:ring-[#C7A962]"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[#0a2225]">Refund Policy</Label>
-                <Textarea
-                  value={formData.refund_policy}
-                  onChange={(e) => updateField("refund_policy", e.target.value)}
-                  placeholder="Describe your refund policy..."
-                  rows={4}
-                  className="border-[#E5DFC6] focus:ring-[#C7A962]"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[#0a2225]">Terms & Conditions</Label>
-                <Textarea
-                  value={formData.terms_conditions}
-                  onChange={(e) => updateField("terms_conditions", e.target.value)}
-                  placeholder="Additional terms and conditions..."
-                  rows={4}
-                  className="border-[#E5DFC6] focus:ring-[#C7A962]"
-                />
-              </div>
+            <CardContent>
+              <Textarea
+                value={formData.cancellation_policy}
+                onChange={(e) => updateField("cancellation_policy", e.target.value)}
+                placeholder="Describe your cancellation policy..."
+                rows={4}
+                className={textareaClasses}
+              />
+            </CardContent>
+          </Card>
+
+          <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardHeader className="pb-4">
+              <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
+              <CardTitle className="font-secondary text-xl text-[#0a2225]">Refund Policy</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                value={formData.refund_policy}
+                onChange={(e) => updateField("refund_policy", e.target.value)}
+                placeholder="Describe your refund policy..."
+                rows={4}
+                className={textareaClasses}
+              />
+            </CardContent>
+          </Card>
+
+          <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardHeader className="pb-4">
+              <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
+              <CardTitle className="font-secondary text-xl text-[#0a2225]">Terms & Conditions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                value={formData.terms_conditions}
+                onChange={(e) => updateField("terms_conditions", e.target.value)}
+                placeholder="Additional terms and conditions..."
+                rows={4}
+                className={textareaClasses}
+              />
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
 
-      {/* Save Actions */}
-      <div className="flex items-center justify-end gap-3 pt-6 border-t border-[#E5DFC6]">
+      {/* Action Buttons */}
+      <div className="flex items-center justify-end gap-4 pt-6 border-t border-[#E5DFC6]">
         <Button
           variant="outline"
           onClick={() => onSave(preparePayload(), "draft")}
           disabled={saving || !isValid}
-          className="border-[#E5DFC6] text-[#0a2225]"
+          className="rounded-full px-8 py-2.5 border-[#E5DFC6] hover:bg-[#FDF9F0] text-[#0a2225] transition-all"
         >
           {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
           Save Draft
@@ -635,7 +681,7 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
         <Button
           onClick={() => onSave(preparePayload(), "published")}
           disabled={saving || !isValid}
-          className="bg-[#0a2225] hover:bg-[#0a2225]/90 text-white"
+          className="rounded-full px-8 py-2.5 bg-[#0a2225] hover:bg-[#0a2225]/90 text-white transition-all"
         >
           {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
           Publish Trip

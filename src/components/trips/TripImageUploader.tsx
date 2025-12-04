@@ -81,14 +81,14 @@ export function TripImageUploader({ currentUrl, onUpload, label, compact }: Trip
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
-          className="w-full aspect-[4/3] border-2 border-dashed border-[#E5DFC6] rounded-lg flex flex-col items-center justify-center gap-2 text-[#6B7280] hover:border-[#C7A962] hover:text-[#C7A962] transition-colors"
+          className="w-full aspect-[4/3] border-2 border-dashed border-[#E5DFC6] rounded-2xl flex flex-col items-center justify-center gap-2 text-[#6B7280] hover:border-[#C7A962] hover:text-[#C7A962] hover:bg-[#C7A962]/5 transition-all"
         >
           {uploading ? (
             <Loader2 className="h-6 w-6 animate-spin" />
           ) : (
             <>
               <ImagePlus className="h-6 w-6" />
-              <span className="text-xs">Add Image</span>
+              <span className="text-xs font-medium">Add Image</span>
             </>
           )}
         </button>
@@ -107,18 +107,19 @@ export function TripImageUploader({ currentUrl, onUpload, label, compact }: Trip
       />
 
       {currentUrl ? (
-        <div className="relative group">
+        <div className="relative group max-w-md">
           <img
             src={currentUrl}
             alt="Cover"
-            className="w-full max-w-md aspect-video object-cover rounded-lg border border-[#E5DFC6]"
+            className="w-full aspect-video object-cover rounded-2xl border border-[#E5DFC6]"
           />
-          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl flex items-center justify-center gap-3">
             <Button
               variant="secondary"
               size="sm"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
+              className="rounded-full px-5"
             >
               {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Replace"}
             </Button>
@@ -126,6 +127,7 @@ export function TripImageUploader({ currentUrl, onUpload, label, compact }: Trip
               variant="destructive"
               size="sm"
               onClick={() => onUpload("")}
+              className="rounded-full"
             >
               <X className="h-4 w-4" />
             </Button>
@@ -135,15 +137,17 @@ export function TripImageUploader({ currentUrl, onUpload, label, compact }: Trip
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
-          className="w-full max-w-md aspect-video border-2 border-dashed border-[#E5DFC6] rounded-lg flex flex-col items-center justify-center gap-3 text-[#6B7280] hover:border-[#C7A962] hover:text-[#C7A962] transition-colors"
+          className="w-full max-w-md aspect-video border-2 border-dashed border-[#E5DFC6] rounded-2xl flex flex-col items-center justify-center gap-3 text-[#6B7280] hover:border-[#C7A962] hover:text-[#C7A962] hover:bg-[#C7A962]/5 transition-all"
         >
           {uploading ? (
             <Loader2 className="h-8 w-8 animate-spin" />
           ) : (
             <>
-              <ImagePlus className="h-8 w-8" />
-              <span className="text-sm">{label || "Upload Cover Image"}</span>
-              <span className="text-xs">JPEG, PNG, WebP or GIF (max 5MB)</span>
+              <div className="w-16 h-16 rounded-full bg-[#FDF9F0] flex items-center justify-center">
+                <ImagePlus className="h-8 w-8" />
+              </div>
+              <span className="text-sm font-medium">{label || "Upload Cover Image"}</span>
+              <span className="text-xs text-[#6B7280]">JPEG, PNG, WebP or GIF (max 5MB)</span>
             </>
           )}
         </button>
