@@ -109,6 +109,13 @@ textarea {
   min-width: 44px;
 }
 
+/* Allow checkboxes to be their natural size */
+button[role="checkbox"],
+button[data-state] {
+  min-height: auto;
+  min-width: auto;
+}
+
 /* Better mobile input styles */
 input,
 textarea,
