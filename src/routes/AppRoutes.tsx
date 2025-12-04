@@ -122,7 +122,6 @@ const JournalListing = lazy(() => import('@/pages/JournalListing'));
 const JournalArticle = lazy(() => import('@/pages/JournalArticle'));
 const CreatorArticles = lazy(() => import('@/pages/CreatorArticles'));
 const CreatorArticleEditor = lazy(() => import('@/pages/CreatorArticleEditor'));
-const AffiliateManager = lazy(() => import('@/pages/AffiliateManager'));
 const SupplierManagement = lazy(() => import('@/pages/SupplierManagement'));
 const FleetManagementDashboard = lazy(() => import('@/components/FleetManagementDashboard'));
 const DriverManagementPanel = lazy(() => import('@/components/DriverManagementPanel'));
@@ -508,7 +507,6 @@ export const AppRoutes = () => (
       <Route path="/creator-articles" element={<CreatorArticles />} />
       <Route path="/creator-articles/new" element={<CreatorArticleEditor />} />
       <Route path="/creator-articles/edit/:id" element={<CreatorArticleEditor />} />
-      <Route path="/affiliate-manager" element={<AffiliateManager />} />
       <Route path="/supplier-management" element={<SupplierManagement />} />
       <Route path="/fleet-management" element={<FleetManagementDashboard />} />
       <Route path="/driver-management" element={<DriverManagementPanel />} />
