@@ -430,7 +430,7 @@ export const AppRoutes = () => (
       <Route path="/partner-bookings" element={<PartnerBookingsPage />} />
       <Route path="/bookings/:bookingId" element={<BookingDetailPage />} />
       {/* Duplicate /traveler route removed - consolidated to line 331 */}
-      <Route path="/partner" element={<PartnerConsolePage />} />
+      <Route path="/partner" element={<Navigate to="/marketplace" replace />} />
       <Route
         path="/partner/escrow"
         element={(
