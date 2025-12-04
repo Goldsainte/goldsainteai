@@ -1,7 +1,16 @@
 // src/pages/tiktok/TikTokLabDashboardPage.tsx
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Sparkles, ArrowRight, Film, Wallet, Layout } from "lucide-react";
+import { 
+  Sparkles, 
+  ArrowRight, 
+  Film, 
+  Wallet, 
+  Users, 
+  TrendingUp,
+  Plus,
+  BookOpen
+} from "lucide-react";
 
 import { AccountHealthCard } from "@/components/account/AccountHealthCard";
 import { TravelStoryboard } from "@/components/storyboards/TravelStoryboard";
@@ -19,15 +28,14 @@ export default function TikTokLabDashboardPage() {
   const [role, setRole] = useState<Role>("traveler");
   const [matches, setMatches] = useState<CreatorMatch[]>([]);
   const [loadingMatches, setLoadingMatches] = useState(true);
+  const [storyboardCount, setStoryboardCount] = useState(0);
 
-  // Simple fetch of "for you" matches – v1, you can make this smarter later
   useEffect(() => {
     let cancelled = false;
 
-    async function loadMatches() {
+    async function loadData() {
       setLoadingMatches(true);
       try {
-        // 1) get current user profile to know role & preferences
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
@@ -46,7 +54,15 @@ export default function TikTokLabDashboardPage() {
         else if (acctType === "creator") setRole("creator");
         else setRole("traveler");
 
-        // 2) load a small set of open trip requests
+        // Load storyboard count
+        const { count } = await supabase
+          .from("storyboards")
+          .select("id", { count: "exact", head: true })
+          .eq("owner_id", user.id);
+        
+        if (!cancelled) setStoryboardCount(count || 0);
+
+        // Load trip requests for matching
         const { data: trips } = await supabase
           .from("trip_requests")
           .select(
@@ -60,7 +76,6 @@ export default function TikTokLabDashboardPage() {
           return;
         }
 
-        // For creators, only show trips that want creators or both
         const relevantTrips: TripRequest[] = (
           acctType === "creator"
             ? trips.filter(
@@ -79,8 +94,6 @@ export default function TikTokLabDashboardPage() {
           wants_role: t.wants_role as "creator" | "agent" | "both" | null,
         }));
 
-        // Our existing matching util expects a trip + a creator profile.
-        // Here we cheat: we treat *you* as the creator and pick the best few trips.
         const creatorProfile: CreatorProfile = {
           id: profile.id,
           display_name: profile.display_name ?? "You",
@@ -91,17 +104,15 @@ export default function TikTokLabDashboardPage() {
 
         const allMatches = relevantTrips.map((trip: any) => {
           const match = computeCreatorMatchScore(trip, creatorProfile);
-          // Attach trip id for linking
           return {
             ...match,
             creator: {
               ...match.creator,
-              id: trip.id, // Pack trip id here
+              id: trip.id,
             },
           };
         });
 
-        // Filter and sort by score
         const sorted = allMatches
           .filter((m) => m.score > 0)
           .sort((a, b) => b.score - a.score)
@@ -113,148 +124,206 @@ export default function TikTokLabDashboardPage() {
       }
     }
 
-    loadMatches();
+    loadData();
     return () => {
       cancelled = true;
     };
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
-      {/* Header */}
-      <section className="mx-auto max-w-6xl px-4 pt-14 pb-6 md:pt-16 md:pb-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-[11px] border border-[#E5DFC6]">
-              <Sparkles className="h-3 w-3 text-[#BFAD72]" />
-              <span className="tracking-[0.16em] uppercase text-[#8D8D8D]">
-                Goldsainte Creator Lab
-              </span>
-            </div>
-            <h1 className="font-display text-[24px] md:text-[28px] leading-tight">
-              Your travel content, now bookable.
-            </h1>
-            <p className="text-[11px] md:text-[12px] text-[#4a4a4a] max-w-xl">
-              This is your control room for storyboards, trip briefs and
-              earnings. Goldsainte matches you with travelers who are actively
-              looking to book the trips you already create content about.
-            </p>
-          </div>
+    <main className="flex-1 bg-[#FDF9F0]">
+      <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
+        {/* Gold accent line */}
+        <div className="w-16 h-0.5 bg-[#C7A962] mb-6" />
 
-          <div className="flex flex-wrap gap-2 text-[11px]">
+        {/* Header */}
+        <header className="mb-12">
+          <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 border border-[#E5DFC6] mb-4">
+            <Sparkles className="h-4 w-4 text-[#C7A962]" />
+            <span className="text-sm font-medium text-[#6B7280] tracking-wide">
+              Creator Studio
+            </span>
+          </div>
+          
+          <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225] tracking-tight">
+            Creator Studio by <em>Goldsainte AI</em>
+          </h1>
+          <p className="mt-3 text-[#6B7280] text-base max-w-xl leading-relaxed">
+            Share your journeys. Earn commissions. Inspire travelers globally. 
+            This is your control room for storyboards, trip briefs, and earnings.
+          </p>
+
+          <div className="flex flex-wrap gap-3 mt-6">
             <Link
               to="/storyboards/new"
-              className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-4 py-2 font-semibold hover:bg-[#073331]"
+              className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-[#0a2225]/90 transition-colors"
             >
-              <Film className="h-3 w-3" />
-              Create a storyboard
+              <Film className="w-4 h-4" />
+              Create a Storyboard
             </Link>
             <Link
-              to="/post-trip"
-              className="inline-flex items-center gap-2 rounded-full bg-white border border-[#E5DFC6] text-[#0a2225] px-4 py-2 font-semibold"
+              to="/marketplace?tab=trip-requests"
+              className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-white px-6 py-3 text-sm font-medium text-[#0a2225] shadow-sm hover:bg-[#F6F0E4] transition-colors"
             >
-              <Layout className="h-3 w-3" />
-              View traveler briefs
+              <BookOpen className="w-4 h-4" />
+              Browse Trip Requests
             </Link>
           </div>
-        </div>
-      </section>
+        </header>
 
-      {/* Main grid */}
-      <section className="mx-auto max-w-6xl px-4 pb-16 md:pb-20">
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-          {/* Left column */}
-          <div className="space-y-5">
+        {/* Stats Grid */}
+        <section className="grid gap-6 md:grid-cols-3 mb-12">
+          <LuxuryStatCard
+            icon={<Film className="w-5 h-5 text-[#C7A962]" />}
+            label="Storyboards"
+            value={loadingMatches ? "—" : storyboardCount.toString()}
+            helper="Your travel stories"
+          />
+          <LuxuryStatCard
+            icon={<Users className="w-5 h-5 text-[#C7A962]" />}
+            label="Trip Matches"
+            value={loadingMatches ? "—" : matches.length.toString()}
+            helper="Travelers looking for you"
+          />
+          <LuxuryStatCard
+            icon={<Wallet className="w-5 h-5 text-[#C7A962]" />}
+            label="Estimated Earnings"
+            value="$0"
+            helper="Based on confirmed trips"
+          />
+        </section>
+
+        {/* Main Content Grid */}
+        <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
+          {/* Left Column */}
+          <div className="space-y-8">
+            {/* Trip Requests Section */}
             <MatchesPanel
               matches={matches}
               loading={loadingMatches}
-              role={role}
             />
-            <StoryboardsPanel />
+
+            {/* Storyboards Section */}
+            <StoryboardsPanel storyboardCount={storyboardCount} />
+
+            {/* Inspiration Section */}
             <InspirationPanel />
           </div>
 
-          {/* Right column - only show for creators/agents */}
+          {/* Right Column - Only for creators/agents */}
           {(role === "creator" || role === "agent") && (
-            <div className="space-y-5">
+            <div className="space-y-6">
               <EarningsSnapshot />
               <AccountHealthCard role={role === "agent" ? "agent" : "creator"} />
             </div>
           )}
         </div>
-      </section>
+      </div>
     </main>
   );
 }
 
-// ---- Sections ----
+// ---- Reusable Components ----
+
+function LuxuryStatCard({
+  icon,
+  label,
+  value,
+  helper,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  helper: string;
+}) {
+  return (
+    <div className="rounded-2xl bg-white border border-[#E5DFC6] p-6 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-full bg-[#F6F0E4] flex items-center justify-center">
+          {icon}
+        </div>
+        <span className="text-sm font-medium text-[#6B7280] uppercase tracking-wide">
+          {label}
+        </span>
+      </div>
+      <div className="font-secondary text-3xl text-[#0a2225]">
+        {value}
+      </div>
+      <p className="text-sm text-[#6B7280] mt-2">{helper}</p>
+    </div>
+  );
+}
+
+// ---- Section Panels ----
 
 type MatchesProps = {
   matches: CreatorMatch[];
   loading: boolean;
-  role: Role;
 };
 
 function MatchesPanel({ matches, loading }: MatchesProps) {
   return (
-    <section className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 text-[11px] space-y-3">
-      <div className="flex items-center justify-between gap-2">
+    <section className="rounded-2xl bg-white border border-[#E5DFC6] p-6 md:p-8 shadow-sm">
+      <div className="flex items-center justify-between mb-6">
         <div>
-          <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
-            For you
-          </p>
-          <p className="text-[12px] font-semibold">
-            Trip briefs we think you&apos;ll love
+          <h2 className="font-secondary text-xl md:text-2xl text-[#0a2225]">
+            Trip Requests for You
+          </h2>
+          <p className="text-sm text-[#6B7280] mt-1">
+            Based on your niches and style, these travelers are a great fit
           </p>
         </div>
         <Link
-          to="/my-trip-requests"
-          className="inline-flex items-center gap-1 text-[10px] text-[#0c4d47]"
+          to="/marketplace?tab=trip-requests"
+          className="inline-flex items-center gap-2 text-sm font-medium text-[#C7A962] hover:text-[#B39952] transition-colors"
         >
-          View all briefs
-          <ArrowRight className="h-3 w-3" />
+          View all
+          <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
 
-      <p className="text-[10px] text-[#4a4a4a]">
-        Based on your niches and budget level, these travelers are a strong fit
-        for your world. Send a proposal or save them for later.
-      </p>
-
       {loading ? (
-        <p className="text-[10px] text-[#8D8D8D] pt-2">Loading matches…</p>
+        <LuxuryEmptyState message="Finding your perfect matches..." />
       ) : matches.length === 0 ? (
-        <p className="text-[10px] text-[#8D8D8D] pt-2">
-          We don&apos;t have personalised matches yet. As you complete your
-          profile and travelers post more briefs, we&apos;ll surface the best
-          ones here.
-        </p>
+        <LuxuryEmptyState
+          message="No matches yet"
+          subtext="Complete your profile and check back as travelers post more briefs. We'll surface the best opportunities here."
+          action={
+            <Link
+              to="/marketplace?tab=trip-requests"
+              className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0a2225]/90 transition-colors mt-4"
+            >
+              Browse All Requests
+            </Link>
+          }
+        />
       ) : (
-        <div className="flex flex-col gap-2 pt-2">
+        <div className="space-y-4">
           {matches.map((m) => (
             <Link
               key={m.creator.id}
-              to={`/trip-requests/${m.creator.id}`}
-              className="flex flex-col md:flex-row md:items-center justify-between gap-2 rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 hover:border-[#BFAD72]"
+              to={`/marketplace/request/${m.creator.id}`}
+              className="flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-2xl border border-[#E5DFC6] bg-[#F6F0E4] p-5 hover:border-[#C7A962] hover:shadow-md transition-all"
             >
-              <div className="space-y-1">
-                <p className="text-[11px] font-semibold">
-                  Trip brief match
-                </p>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-xs font-medium text-[#0a2225]">
+                    <TrendingUp className="w-3 h-3 text-[#C7A962]" />
+                    Match Score: {m.score}
+                  </span>
+                </div>
+                <h3 className="font-medium text-[#0a2225]">
+                  Trip Brief Match
+                </h3>
                 {m.reasons.length > 0 && (
-                  <p className="text-[10px] text-[#4a4a4a]">
+                  <p className="text-sm text-[#6B7280] mt-1">
                     {m.reasons[0]}
                   </p>
                 )}
               </div>
-              <div className="flex items-center gap-2 text-[10px] text-[#8D8D8D]">
-                <span className="inline-flex items-center rounded-full bg-white px-2 py-0.5">
-                  Match score: {m.score}
-                </span>
-                <span className="inline-flex items-center rounded-full bg-[#0c4d47] text-[#E5DFC6] px-2 py-0.5">
-                  View brief
-                  <ArrowRight className="h-3 w-3 ml-1" />
-                </span>
+              <div className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] text-white px-4 py-2 text-sm font-medium">
+                View Brief
+                <ArrowRight className="h-4 w-4" />
               </div>
             </Link>
           ))}
@@ -264,123 +333,154 @@ function MatchesPanel({ matches, loading }: MatchesProps) {
   );
 }
 
-function StoryboardsPanel() {
+function StoryboardsPanel({ storyboardCount }: { storyboardCount: number }) {
   return (
-    <section className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 text-[11px] space-y-3">
-      <div className="flex items-center justify-between gap-2">
+    <section className="rounded-2xl bg-white border border-[#E5DFC6] p-6 md:p-8 shadow-sm">
+      <div className="flex items-center justify-between mb-6">
         <div>
-          <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
-            Your library
+          <h2 className="font-secondary text-xl md:text-2xl text-[#0a2225]">
+            Your Storyboards
+          </h2>
+          <p className="text-sm text-[#6B7280] mt-1">
+            Transform your best content into bookable travel experiences
           </p>
-          <p className="text-[12px] font-semibold">Storyboards</p>
         </div>
         <Link
           to="/storyboards"
-          className="inline-flex items-center gap-1 text-[10px] text-[#0c4d47]"
+          className="inline-flex items-center gap-2 text-sm font-medium text-[#C7A962] hover:text-[#B39952] transition-colors"
         >
           Manage all
-          <ArrowRight className="h-3 w-3" />
+          <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
 
-      <p className="text-[10px] text-[#4a4a4a]">
-        Storyboards are the bookable version of your content. Turn your most
-        loved trips into beautiful boards so agents can plug in pricing and
-        travelers can request them.
-      </p>
-
-      <div className="mt-2 flex flex-wrap gap-2">
-        <Link
-          to="/storyboards/new"
-          className="inline-flex items-center gap-2 rounded-2xl bg-[#0c4d47] text-[#E5DFC6] px-3 py-1.5 text-[10px] font-semibold hover:bg-[#073331]"
-        >
-          Create a storyboard
-        </Link>
-        <Link
-          to="/storyboards"
-          className="inline-flex items-center gap-2 rounded-2xl bg-[#f7f3ea] border border-[#E5DFC6] text-[10px] px-3 py-1.5"
-        >
-          See public wall
-        </Link>
-      </div>
+      {storyboardCount === 0 ? (
+        <LuxuryEmptyState
+          message="No storyboards yet"
+          subtext="Storyboards are the bookable version of your travel content. Create your first one to start earning from your journeys."
+          action={
+            <Link
+              to="/storyboards/new"
+              className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0a2225]/90 transition-colors mt-4"
+            >
+              <Plus className="w-4 h-4" />
+              Create Your First Storyboard
+            </Link>
+          }
+        />
+      ) : (
+        <div className="flex flex-wrap gap-3">
+          <Link
+            to="/storyboards/new"
+            className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0a2225]/90 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Create Storyboard
+          </Link>
+          <Link
+            to="/storyboards"
+            className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-[#F6F0E4] px-5 py-2.5 text-sm font-medium text-[#0a2225] hover:bg-[#E5DFC6] transition-colors"
+          >
+            View All ({storyboardCount})
+          </Link>
+        </div>
+      )}
     </section>
   );
 }
 
 function InspirationPanel() {
   return (
-    <section className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 text-[11px] space-y-3">
-      <div className="flex items-center justify-between gap-2">
+    <section className="rounded-2xl bg-white border border-[#E5DFC6] p-6 md:p-8 shadow-sm">
+      <div className="flex items-center justify-between mb-6">
         <div>
-          <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
-            Quick save
+          <h2 className="font-secondary text-xl md:text-2xl text-[#0a2225]">
+            Browse & Save Inspiration
+          </h2>
+          <p className="text-sm text-[#6B7280] mt-1">
+            Discover stunning destinations and save them to your storyboards
           </p>
-          <p className="text-[12px] font-semibold">Browse & save inspiration</p>
         </div>
         <Link
           to="/storyboards"
-          className="inline-flex items-center gap-1 text-[10px] text-[#0c4d47]"
+          className="inline-flex items-center gap-2 text-sm font-medium text-[#C7A962] hover:text-[#B39952] transition-colors"
         >
           See more
-          <ArrowRight className="h-3 w-3" />
+          <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
 
-      <p className="text-[10px] text-[#4a4a4a]">
-        Hover over any image to save it directly to your storyboards for trip planning.
-      </p>
-
-      <div className="pt-2">
-        <TravelStoryboard
-          title=""
-          subtitle=""
-          maxItems={8}
-          showSaveButtons={true}
-        />
-      </div>
+      <TravelStoryboard
+        title=""
+        subtitle=""
+        maxItems={8}
+        showSaveButtons={true}
+      />
     </section>
   );
 }
 
 function EarningsSnapshot() {
   return (
-    <section className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 text-[11px] space-y-3">
-      <div className="flex items-center justify-between gap-2">
-        <div>
-          <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
-            Earnings
-          </p>
-          <p className="text-[12px] font-semibold">This month at a glance</p>
-        </div>
+    <section className="rounded-2xl bg-white border border-[#E5DFC6] p-6 shadow-sm">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="font-secondary text-xl text-[#0a2225]">
+          Earnings
+        </h2>
         <Link
           to="/tiktok-lab/earnings"
-          className="inline-flex items-center gap-1 text-[10px] text-[#0c4d47]"
+          className="inline-flex items-center gap-1 text-sm font-medium text-[#C7A962] hover:text-[#B39952] transition-colors"
         >
-          View details
-          <ArrowRight className="h-3 w-3" />
+          Details
+          <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 text-[10px]">
-        <div className="rounded-2xl bg-[#f7f3ea] p-2">
-          <p className="text-[#8D8D8D] mb-1">Estimated earnings</p>
-          <p className="text-[15px] font-semibold">$0</p>
-          <p className="text-[#8D8D8D]">from confirmed trips</p>
+      <div className="space-y-4">
+        <div className="rounded-xl bg-[#F6F0E4] p-4">
+          <p className="text-sm text-[#6B7280] mb-1">Estimated earnings</p>
+          <p className="font-secondary text-2xl text-[#0a2225]">$0</p>
+          <p className="text-sm text-[#6B7280]">from confirmed trips</p>
         </div>
-        <div className="rounded-2xl bg-[#f7f3ea] p-2">
-          <p className="text-[#8D8D8D] mb-1">In discussion</p>
-          <p className="text-[15px] font-semibold">$0</p>
-          <p className="text-[#8D8D8D]">from active briefs</p>
+        <div className="rounded-xl bg-[#F6F0E4] p-4">
+          <p className="text-sm text-[#6B7280] mb-1">In discussion</p>
+          <p className="font-secondary text-2xl text-[#0a2225]">$0</p>
+          <p className="text-sm text-[#6B7280]">from active briefs</p>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 pt-2 border-t border-[#E5DFC6] text-[10px] text-[#4a4a4a]">
-        <Wallet className="h-3 w-3 text-[#0c4d47]" />
-        <p>
-          As trips are accepted and confirmed, you&apos;ll see estimated
-          earnings here. Goldsainte handles secure payments and payouts.
+      <div className="flex items-start gap-3 pt-4 mt-4 border-t border-[#E5DFC6]">
+        <Wallet className="h-5 w-5 text-[#C7A962] flex-shrink-0 mt-0.5" />
+        <p className="text-sm text-[#6B7280] leading-relaxed">
+          As trips are accepted and confirmed, you'll see estimated earnings here. 
+          Goldsainte handles secure payments and payouts.
         </p>
       </div>
     </section>
+  );
+}
+
+function LuxuryEmptyState({
+  message,
+  subtext,
+  action,
+}: {
+  message: string;
+  subtext?: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-xl bg-[#F6F0E4] p-8 text-center">
+      <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center mx-auto mb-4 shadow-sm">
+        <Film className="w-6 h-6 text-[#C7A962]" />
+      </div>
+      <h3 className="font-secondary text-lg text-[#0a2225]">{message}</h3>
+      {subtext && (
+        <p className="text-sm text-[#6B7280] mt-2 max-w-sm mx-auto leading-relaxed">
+          {subtext}
+        </p>
+      )}
+      {action}
+    </div>
   );
 }
