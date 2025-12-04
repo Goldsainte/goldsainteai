@@ -37,7 +37,7 @@ export default function MessagesPage() {
     <div className="min-h-screen bg-[#FDF9F0]">
       <div className="container mx-auto px-4 py-6 max-w-6xl">
         <div className="mb-6">
-          <BackButton />
+          <BackButton to="/" />
           <div className="flex items-center gap-3 mt-4">
             <Sparkles className="h-6 w-6 text-[#C7A962]" />
             <h1 className="font-secondary text-3xl font-semibold text-[#0a2225]">
