@@ -38,7 +38,7 @@ export function useRequireOnboarding() {
         // Role-based redirect for incomplete onboarding
         const accountType = profile?.account_type;
         if (accountType === 'creator') {
-          navigate("/creator-lab", { replace: true });
+          navigate("/tiktok-lab", { replace: true });
         } else if (accountType === 'agent') {
           navigate("/marketplace?tab=trip-requests", { replace: true });
         } else {
