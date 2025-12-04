@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +9,10 @@ import { LuxuryStepIndicator } from "@/components/onboarding/LuxuryStepIndicator
 import { LuxurySelectionCard } from "@/components/onboarding/LuxurySelectionCard";
 import { ProfilePhotoUploader } from "@/pages/traveler/components/ProfilePhotoUploader";
 import { DestinationAutocompleteNominatim } from "@/components/preferences/DestinationAutocompleteNominatim";
+import { FeaturedPhotosUploader } from "@/components/onboarding/FeaturedPhotosUploader";
+import { BrandAlignmentSelector } from "@/components/onboarding/BrandAlignmentSelector";
+import { LegalComplianceAcceptance } from "@/components/onboarding/LegalComplianceAcceptance";
+import { TikTokVerificationButton } from "@/components/onboarding/TikTokVerificationButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { 
@@ -16,7 +20,7 @@ import {
   TrendingUp, Instagram, Youtube, Video, Shield, 
   MessageCircle, Clock, Calendar, Wallet, Heart,
   CheckCircle, DollarSign, FileText, Users, Mic,
-  Play, BookOpen, ArrowRight, Star
+  Play, BookOpen, ArrowRight, Star, Building2, Image
 } from "lucide-react";
 
 const STEPS = [
@@ -24,12 +28,14 @@ const STEPS = [
   { title: "Social", icon: Globe },
   { title: "Niche", icon: Sparkles },
   { title: "Destinations", icon: MapPin },
+  { title: "Portfolio", icon: Image },
+  { title: "Brands", icon: Building2 },
   { title: "How It Works", icon: BookOpen },
-  { title: "Preview", icon: Camera },
   { title: "Pricing", icon: DollarSign },
   { title: "Commitment", icon: Shield },
   { title: "Safety", icon: Heart },
   { title: "AI Identity", icon: Mic },
+  { title: "Legal", icon: FileText },
   { title: "Payment", icon: CreditCard },
 ];
 
@@ -153,6 +159,39 @@ export default function CreatorOnboardingPage() {
   const [aiAudiences, setAiAudiences] = useState<string[]>([]);
   const [travelPhilosophy, setTravelPhilosophy] = useState("");
 
+  // NEW: Portfolio
+  const [featuredPhotos, setFeaturedPhotos] = useState<string[]>([]);
+
+  // NEW: Brand Alignment
+  const [preferredBrandTiers, setPreferredBrandTiers] = useState<string[]>([]);
+  const [preferredHotelBrands, setPreferredHotelBrands] = useState<string[]>([]);
+  const [aestheticAlignment, setAestheticAlignment] = useState<string[]>([]);
+
+  // NEW: Legal Compliance
+  const [tosAccepted, setTosAccepted] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [creatorAgreementAccepted, setCreatorAgreementAccepted] = useState(false);
+
+  // NEW: TikTok Verification
+  const [tiktokVerified, setTiktokVerified] = useState(false);
+  const [verifiedFollowerCount, setVerifiedFollowerCount] = useState<number | undefined>();
+
+  // Check for TikTok OAuth callback
+  const [searchParams] = useSearchParams();
+  
+  useEffect(() => {
+    const tiktokSuccess = searchParams.get("tiktok_verified");
+    const followers = searchParams.get("followers");
+    
+    if (tiktokSuccess === "true" && followers) {
+      setTiktokVerified(true);
+      setVerifiedFollowerCount(parseInt(followers));
+      toast.success("TikTok account verified successfully!");
+      // Clean URL
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, [searchParams]);
+
   const toggleNiche = (value: string) => {
     setSelectedNiches(prev => 
       prev.includes(value) ? prev.filter(n => n !== value) : [...prev, value]
@@ -199,13 +238,15 @@ export default function CreatorOnboardingPage() {
       case 1: return primaryPlatform.length > 0;
       case 2: return selectedNiches.length > 0;
       case 3: return destinations.length > 0;
-      case 4: return true;
-      case 5: return true;
-      case 6: return pricingModel.length > 0;
-      case 7: return acceptsTransparency;
-      case 8: return acceptsSafetyPolicy;
-      case 9: return true;
-      case 10: return true;
+      case 4: return true; // Portfolio optional
+      case 5: return true; // Brand alignment optional
+      case 6: return true; // How it works
+      case 7: return pricingModel.length > 0;
+      case 8: return acceptsTransparency;
+      case 9: return acceptsSafetyPolicy;
+      case 10: return true; // AI Identity optional
+      case 11: return tosAccepted && privacyAccepted && creatorAgreementAccepted; // Legal required
+      case 12: return true; // Payment optional
       default: return true;
     }
   };
@@ -227,6 +268,8 @@ export default function CreatorOnboardingPage() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
+
+      const now = new Date().toISOString();
 
       const { error } = await supabase
         .from("profiles")
@@ -251,13 +294,31 @@ export default function CreatorOnboardingPage() {
           itinerary_fee_amount: itineraryFee ? parseInt(itineraryFee) * 100 : null,
           response_commitment_hours: responseTime,
           accepts_transparency_agreement: acceptsTransparency,
-          transparency_agreement_signed_at: acceptsTransparency ? new Date().toISOString() : null,
+          transparency_agreement_signed_at: acceptsTransparency ? now : null,
           accepts_safety_policy: acceptsSafetyPolicy,
-          safety_policy_signed_at: acceptsSafetyPolicy ? new Date().toISOString() : null,
+          safety_policy_signed_at: acceptsSafetyPolicy ? now : null,
           ai_persona_tone: aiTone || null,
           ai_persona_audience: aiAudiences.length > 0 ? aiAudiences : null,
           travel_philosophy: travelPhilosophy || null,
           accepts_booking_calls: acceptsBookingCalls,
+          // NEW: Portfolio
+          featured_photos: featuredPhotos.length > 0 ? featuredPhotos : null,
+          // NEW: Brand Alignment
+          preferred_brand_tiers: preferredBrandTiers.length > 0 ? preferredBrandTiers : null,
+          preferred_hotel_brands: preferredHotelBrands.length > 0 ? preferredHotelBrands : null,
+          aesthetic_alignment: aestheticAlignment.length > 0 ? aestheticAlignment : null,
+          // NEW: Legal Compliance
+          tos_accepted_at: tosAccepted ? now : null,
+          privacy_accepted_at: privacyAccepted ? now : null,
+          creator_agreement_accepted_at: creatorAgreementAccepted ? now : null,
+          tos_version: tosAccepted ? "1.0" : null,
+          privacy_version: privacyAccepted ? "1.0" : null,
+          creator_agreement_version: creatorAgreementAccepted ? "1.0" : null,
+          // NEW: TikTok Verification
+          tiktok_verified: tiktokVerified,
+          tiktok_follower_count: verifiedFollowerCount || null,
+          tiktok_verified_at: tiktokVerified ? now : null,
+          // Final
           role: "creator",
           account_type: "creator",
           has_completed_creator_onboarding: true,
@@ -580,8 +641,50 @@ export default function CreatorOnboardingPage() {
               </div>
             )}
 
-            {/* Step 5: How Goldsainte Works */}
+            {/* Step 5: Portfolio */}
             {currentStep === 4 && (
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Your Portfolio</h2>
+                  <p className="text-[#6B7280]">Showcase your best travel content</p>
+                </div>
+
+                <FeaturedPhotosUploader
+                  userId={user?.id || ""}
+                  photos={featuredPhotos}
+                  onPhotosChange={setFeaturedPhotos}
+                  maxPhotos={6}
+                />
+
+                <div className="bg-[#FDF9F0] rounded-xl p-4 border border-[#E5DFC6]">
+                  <p className="text-sm text-[#6B7280]">
+                    <span className="text-[#C7A962] font-medium">Tip:</span> Upload your most stunning travel photos. These appear on your profile and help travelers understand your aesthetic.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Step 6: Brand Alignment */}
+            {currentStep === 5 && (
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Brand Alignment</h2>
+                  <p className="text-[#6B7280]">Which brands match your style?</p>
+                </div>
+
+                <BrandAlignmentSelector
+                  selectedTiers={preferredBrandTiers}
+                  onTiersChange={setPreferredBrandTiers}
+                  selectedBrands={preferredHotelBrands}
+                  onBrandsChange={setPreferredHotelBrands}
+                  selectedAesthetics={aestheticAlignment}
+                  onAestheticsChange={setAestheticAlignment}
+                />
+              </div>
+            )}
+
+            {/* Step 7: How Goldsainte Works */}
+            {currentStep === 6 && (
               <div className="space-y-8">
                 <div className="text-center mb-8">
                   <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">How Goldsainte Works</h2>
@@ -623,59 +726,24 @@ export default function CreatorOnboardingPage() {
               </div>
             )}
 
-            {/* Step 6: Preview */}
-            {currentStep === 5 && (
+            {/* Step 8: Pricing Model */}
+            {currentStep === 7 && (
               <div className="space-y-6">
                 <div className="text-center mb-8">
-                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Almost There</h2>
-                  <p className="text-[#6B7280]">Preview how travelers will see you</p>
+                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Your Pricing Model</h2>
+                  <p className="text-[#6B7280]">How do you want to earn on Goldsainte?</p>
                 </div>
 
-                <div className="bg-[#FDF9F0] rounded-2xl p-6 border border-[#E5DFC6]">
-                  <div className="flex items-start gap-4">
-                    {avatarUrl ? (
-                      <img src={avatarUrl} alt={displayName} className="w-20 h-20 rounded-full object-cover border-2 border-[#C7A962]" />
-                    ) : (
-                      <div className="w-20 h-20 rounded-full bg-[#E5DFC6] flex items-center justify-center"><User className="w-8 h-8 text-[#6B7280]" /></div>
-                    )}
-                    <div className="flex-1">
-                      <h3 className="font-secondary text-xl text-[#0a2225]">{displayName || "Your Name"}</h3>
-                      {homeBase && <p className="text-sm text-[#6B7280] flex items-center gap-1"><MapPin className="w-3 h-3" /> {homeBase}</p>}
-                      {bio && <p className="text-sm text-[#0a2225] mt-2">{bio}</p>}
-                    </div>
-                  </div>
-                  {selectedNiches.length > 0 && (
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {selectedNiches.slice(0, 4).map((niche) => (
-                        <span key={niche} className="px-3 py-1 bg-white border border-[#E5DFC6] rounded-full text-xs text-[#6B7280]">{TRAVEL_NICHES.find(n => n.value === niche)?.label}</span>
-                      ))}
-                    </div>
-                  )}
-                  {destinations.length > 0 && (
-                    <div className="mt-3 flex items-center gap-2 text-sm text-[#6B7280]">
-                      <Globe className="w-4 h-4" />
-                      {destinations.slice(0, 3).join(", ")}{destinations.length > 3 && ` +${destinations.length - 3} more`}
-                    </div>
-                  )}
-                </div>
-
-                <div className="bg-white rounded-2xl p-6 border border-[#E5DFC6]">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Play className="w-5 h-5 text-[#C7A962]" />
-                    <h3 className="font-medium text-[#0a2225]">How Storyboards Work</h3>
-                  </div>
-                  <p className="text-sm text-[#6B7280] mb-4">Your content becomes bookable. Travelers can save inspiration from your TikToks, photos, and posts into visual mood boards that become trip requests.</p>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="aspect-square bg-[#FDF9F0] rounded-lg border border-[#E5DFC6] flex items-center justify-center"><Camera className="w-6 h-6 text-[#C7A962]" /></div>
-                    ))}
-                  </div>
+                <div className="space-y-3">
+                  {PRICING_MODELS.map((model) => (
+                    <LuxurySelectionCard key={model.value} label={model.label} description={model.description} icon={model.icon} selected={pricingModel === model.value} onSelect={() => setPricingModel(model.value)} variant="single" />
+                  ))}
                 </div>
               </div>
             )}
 
-            {/* Step 7: Pricing Model */}
-            {currentStep === 6 && (
+            {/* Step 9: Commitment */}
+            {currentStep === 8 && (
               <div className="space-y-6">
                 <div className="text-center mb-8">
                   <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Your Pricing Model</h2>
