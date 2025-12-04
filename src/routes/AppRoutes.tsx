@@ -165,6 +165,7 @@ const TrustSafety = lazy(() => import('@/pages/TrustSafety'));
 const LegalTermsPage = lazy(() => import('@/pages/LegalTermsPage'));
 const LegalPrivacyPage = lazy(() => import('@/pages/LegalPrivacyPage'));
 const TrustSafetyPage = lazy(() => import('@/pages/TrustSafetyPage'));
+const LegalCreatorAgreementPage = lazy(() => import('@/pages/LegalCreatorAgreementPage'));
 const CancellationRefundPolicy = lazy(() => import('@/pages/CancellationRefundPolicy'));
 const CorporateContact = lazy(() => import('@/pages/CorporateContact'));
 const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
@@ -197,6 +198,7 @@ export const AppRoutes = () => (
       <Route path="/health" element={<HealthCheck />} />
       <Route path="/legal/terms" element={<LegalTermsPage />} />
       <Route path="/legal/privacy" element={<LegalPrivacyPage />} />
+      <Route path="/legal/creator-agreement" element={<LegalCreatorAgreementPage />} />
       <Route path="/cancellation-refund-policy" element={<CancellationRefundPolicy />} />
       <Route path="/corporate-contact" element={<CorporateContact />} />
       <Route path="/shop" element={<Shop />} />
