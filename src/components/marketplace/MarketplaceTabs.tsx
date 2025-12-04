@@ -18,10 +18,10 @@ export function MarketplaceTabs({ activeTab, onTabChange, accountType }: Marketp
   const tabs = [
     { 
       id: "trips", 
-      label: "Live Trips", 
-      shortLabel: "Trips", 
+      label: "Ready to Book", 
+      shortLabel: "Book", 
       icon: Plane,
-      description: "Pre-packaged trips ready to book from verified creators & agents"
+      description: "Pre-packaged trips you can book instantly from verified creators & agents"
     },
     { 
       id: "creators", 
