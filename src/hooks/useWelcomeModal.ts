@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 
 export type AccountType = "traveler" | "creator" | "agent";
 
+const WELCOME_MODAL_STORAGE_KEY = "goldsainte_welcome_shown";
+
 // Pages where welcome modal should NOT appear
 const EXCLUDED_PATH_PREFIXES = [
   "/transparency-agreement",
@@ -69,7 +71,11 @@ export function useWelcomeModal() {
         setDisplayName(name);
         setAccountType(profile.account_type as AccountType | null);
 
-        if (!profile.welcome_shown) {
+        // Check localStorage fallback first, then database
+        const localStorageSeen = localStorage.getItem(WELCOME_MODAL_STORAGE_KEY);
+        const hasSeenWelcome = profile.welcome_shown || localStorageSeen === "true";
+
+        if (!hasSeenWelcome) {
           setOpen(true);
         }
         setLoading(false);
@@ -84,7 +90,11 @@ export function useWelcomeModal() {
 
   const dismiss = async () => {
     setOpen(false);
-    // Fire and forget update
+    
+    // Always set localStorage as fallback to prevent modal reappearing
+    localStorage.setItem(WELCOME_MODAL_STORAGE_KEY, "true");
+    
+    // Also update database
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
@@ -94,7 +104,7 @@ export function useWelcomeModal() {
       .eq("id", user.id);
 
     if (error) {
-      console.error("Failed to set welcome_shown", error);
+      console.error("Failed to set welcome_shown in database, localStorage fallback active", error);
     }
   };
 

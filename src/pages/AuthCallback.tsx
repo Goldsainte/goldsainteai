@@ -70,19 +70,16 @@ const AuthCallback = () => {
           return;
         }
 
-        // Travelers with completed onboarding don't need strict profile completion
-        const isTravelerWithCompletedOnboarding = 
-          profile.account_type === 'traveler' && profile.onboarding_completed === true;
+        // Users with completed onboarding OR is_profile_complete should NOT be redirected
+        const hasCompletedOnboarding = profile.onboarding_completed === true;
+        const isProfileComplete = profile.is_profile_complete === true;
+        const hasValidAccountType = profile.account_type && 
+          ['traveler', 'creator', 'agent', 'brand'].includes(profile.account_type);
 
-        // Check if profile needs completion (bypass for travelers with completed onboarding)
-        const needsCompletion = !isTravelerWithCompletedOnboarding && (
-          !profile.is_profile_complete || 
-          !profile.account_type ||
-          !['traveler', 'creator', 'agent', 'brand'].includes(profile.account_type) ||
-          !profile.first_name ||
-          !profile.last_name ||
-          !profile.phone
-        );
+        // Only redirect to complete-profile if:
+        // 1. No account type set, OR
+        // 2. Invalid account type AND user has not completed onboarding/profile
+        const needsCompletion = !hasValidAccountType && !hasCompletedOnboarding && !isProfileComplete;
 
         if (needsCompletion) {
           navigate('/auth/complete-profile', { replace: true });
