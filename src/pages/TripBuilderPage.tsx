@@ -4,9 +4,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Save, Eye, Loader2 } from "lucide-react";
+import { Compass, Eye, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { TripBuilderForm } from "@/components/trips/TripBuilderForm";
+import { BackButton } from "@/components/ui/BackButton";
 
 export default function TripBuilderPage() {
   const { user, isLoading: authLoading } = useAuth();
@@ -139,49 +140,52 @@ export default function TripBuilderPage() {
 
   return (
     <div className="min-h-screen bg-[#FDF9F0]">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-[#E5DFC6]">
-        <div className="max-w-5xl mx-auto px-4 py-5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate(-1)}
-                className="text-[#0a2225] hover:bg-[#FDF9F0] rounded-full px-4"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
-              </Button>
-              <div>
-                <div className="w-12 h-0.5 bg-[#C7A962] mb-2" />
-                <h1 className="font-secondary text-2xl font-semibold text-[#0a2225]">
-                  {editId ? "Edit Trip" : "Create Ready to Book Trip"}
-                </h1>
-                <p className="text-sm text-[#6B7280] mt-1">
-                  Craft an unforgettable experience for the marketplace
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              {editId && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handlePreview}
-                  className="border-[#E5DFC6] hover:bg-[#FDF9F0] rounded-full px-5"
-                >
-                  <Eye className="h-4 w-4 mr-2" />
-                  Preview
-                </Button>
-              )}
-            </div>
-          </div>
+      {/* Editorial Header */}
+      <div className="max-w-6xl mx-auto px-6 py-12 md:py-16">
+        {/* Back button - own row */}
+        <div className="mb-6">
+          <BackButton label="Back to Dashboard" to="/partner" />
         </div>
+
+        {/* Gold accent line */}
+        <div className="w-16 h-0.5 bg-[#C7A962] mb-6" />
+
+        {/* Pill badge */}
+        <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 border border-[#E5DFC6] mb-4">
+          <Compass className="h-4 w-4 text-[#C7A962]" />
+          <span className="text-sm font-medium text-[#6B7280] tracking-wide">
+            Trip Builder
+          </span>
+        </div>
+
+        {/* Large serif title with italic brand */}
+        <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225] tracking-tight">
+          {editId ? "Edit Trip" : "Trip Builder"} by <em>Goldsainte AI</em>
+        </h1>
+
+        {/* Descriptive caption */}
+        <p className="mt-3 text-[#6B7280] text-base max-w-xl leading-relaxed">
+          Create ready-to-book experiences for the marketplace. 
+          Your curated trips inspire travelers and earn you commissions.
+        </p>
+
+        {/* Preview button for edit mode */}
+        {editId && (
+          <div className="mt-6">
+            <Button 
+              variant="outline" 
+              onClick={handlePreview} 
+              className="rounded-full px-6 border-[#E5DFC6] hover:bg-white"
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              Preview Trip
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Form */}
-      <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-6 pb-16">
         <TripBuilderForm
           initialData={tripData}
           onSave={handleSave}
