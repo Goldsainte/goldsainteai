@@ -541,6 +541,17 @@ export default function CreatorOnboardingPage() {
                   </div>
                 </div>
 
+                {/* TikTok Verification */}
+                <TikTokVerificationButton
+                  tiktokHandle={tiktokHandle}
+                  isVerified={tiktokVerified}
+                  followerCount={verifiedFollowerCount}
+                  onVerificationComplete={(verified, followers) => {
+                    setTiktokVerified(verified);
+                    setVerifiedFollowerCount(followers);
+                  }}
+                />
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label className="text-[#0a2225] font-medium">Instagram Handle</Label>
@@ -739,22 +750,6 @@ export default function CreatorOnboardingPage() {
                     <LuxurySelectionCard key={model.value} label={model.label} description={model.description} icon={model.icon} selected={pricingModel === model.value} onSelect={() => setPricingModel(model.value)} variant="single" />
                   ))}
                 </div>
-              </div>
-            )}
-
-            {/* Step 9: Commitment */}
-            {currentStep === 8 && (
-              <div className="space-y-6">
-                <div className="text-center mb-8">
-                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Your Pricing Model</h2>
-                  <p className="text-[#6B7280]">How do you want to earn on Goldsainte?</p>
-                </div>
-
-                <div className="space-y-3">
-                  {PRICING_MODELS.map((model) => (
-                    <LuxurySelectionCard key={model.value} label={model.label} description={model.description} icon={model.icon} selected={pricingModel === model.value} onSelect={() => setPricingModel(model.value)} variant="single" />
-                  ))}
-                </div>
 
                 {(pricingModel === "planning_fees" || pricingModel === "custom_itineraries") && (
                   <div className="mt-6 p-4 bg-[#FDF9F0] rounded-xl border border-[#E5DFC6]">
@@ -769,8 +764,8 @@ export default function CreatorOnboardingPage() {
               </div>
             )}
 
-            {/* Step 8: Commitment */}
-            {currentStep === 7 && (
+            {/* Step 9: Commitment */}
+            {currentStep === 8 && (
               <div className="space-y-6">
                 <div className="text-center mb-8">
                   <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Your Goldsainte Commitment</h2>
@@ -813,8 +808,8 @@ export default function CreatorOnboardingPage() {
               </div>
             )}
 
-            {/* Step 9: Safety & Conduct */}
-            {currentStep === 8 && (
+            {/* Step 10: Safety & Conduct */}
+            {currentStep === 9 && (
               <div className="space-y-6">
                 <div className="text-center mb-8">
                   <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Safety & Conduct</h2>
@@ -859,8 +854,8 @@ export default function CreatorOnboardingPage() {
               </div>
             )}
 
-            {/* Step 10: AI Identity */}
-            {currentStep === 9 && (
+            {/* Step 11: AI Identity */}
+            {currentStep === 10 && (
               <div className="space-y-6">
                 <div className="text-center mb-8">
                   <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Your AI Identity</h2>
@@ -909,8 +904,27 @@ export default function CreatorOnboardingPage() {
               </div>
             )}
 
-            {/* Step 11: Payment Setup */}
-            {currentStep === 10 && (
+            {/* Step 12: Legal Compliance */}
+            {currentStep === 11 && (
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Legal Agreements</h2>
+                  <p className="text-[#6B7280]">Review and accept our creator policies</p>
+                </div>
+
+                <LegalComplianceAcceptance
+                  tosAccepted={tosAccepted}
+                  onTosChange={setTosAccepted}
+                  privacyAccepted={privacyAccepted}
+                  onPrivacyChange={setPrivacyAccepted}
+                  creatorAgreementAccepted={creatorAgreementAccepted}
+                  onCreatorAgreementChange={setCreatorAgreementAccepted}
+                />
+              </div>
+            )}
+
+            {/* Step 13: Payment Setup */}
+            {currentStep === 12 && (
               <div className="space-y-6">
                 <div className="text-center mb-8">
                   <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Payment Setup</h2>
@@ -951,7 +965,7 @@ export default function CreatorOnboardingPage() {
               <Button variant="ghost" onClick={handleBack} disabled={currentStep === 0} className="text-[#6B7280] hover:text-[#0a2225] hover:bg-[#FDF9F0]">Back</Button>
 
               <div className="flex gap-3">
-                {currentStep === 10 && (
+                {currentStep === 12 && (
                   <Button variant="outline" onClick={handleStripeSetup} className="border-[#C7A962] text-[#C7A962] hover:bg-[#C7A962] hover:text-white">
                     <CreditCard className="w-4 h-4 mr-2" />Set Up Stripe Now
                   </Button>
