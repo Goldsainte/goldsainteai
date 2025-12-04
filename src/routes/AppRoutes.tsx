@@ -15,6 +15,7 @@ import { RequireAgentTerms } from '@/components/RequireAgentTerms';
 import { MarketingLayout, AuthLayout, MemberLayout, AdminLayout } from './Layouts';
 import { RouteSectionBoundary } from './RouteSectionBoundary';
 import { RequireAuth } from '@/components/routing/RequireAuth';
+import { OnboardingRouter } from '@/components/routing/OnboardingRouter';
 import { AdminGuard } from '@/hooks/useAdminGuard';
 
 const SearchResults = lazy(() => import('@/pages/SearchResults'));
@@ -211,8 +212,8 @@ export const AppRoutes = () => (
       <Route path="/auth/complete-profile" element={<CompleteProfile />} />
       <Route path="/application/verification-complete" element={<ApplicationVerificationComplete />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-      {/* Redirect /onboarding to traveler preferences */}
-      <Route path="/onboarding" element={<Navigate to="/onboarding/traveler/preferences" replace />} />
+      {/* Smart onboarding router - redirects based on account type */}
+      <Route path="/onboarding" element={<OnboardingRouter />} />
       <Route path="/onboarding/traveler/preferences" element={<TravelerPreferencesOnboardingPage />} />
       <Route path="/onboarding/creator" element={<CreatorOnboardingPage />} />
       <Route path="/brand/onboarding" element={<Navigate to="/apply/brand" replace />} />
