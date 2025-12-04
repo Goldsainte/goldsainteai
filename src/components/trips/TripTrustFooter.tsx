@@ -25,12 +25,12 @@ export function TripTrustFooter() {
   ];
 
   return (
-    <section className="mt-12 border-t border-[#E5DFC6]/50 bg-[#0a2225] py-12">
+    <section className="mt-12 border-t border-[#E5DFC6] bg-[#FDF9F0] py-12">
       <div className="mx-auto max-w-6xl px-4">
-        <p className="text-center text-[11px] font-semibold uppercase tracking-[0.25em] text-[#C7B892]">
+        <p className="text-center text-[11px] font-semibold uppercase tracking-[0.25em] text-[#C7A962]">
           Trust & Safety
         </p>
-        <h3 className="mt-2 text-center font-secondary text-xl font-semibold text-white">
+        <h3 className="mt-2 text-center font-secondary text-xl font-semibold text-[#0a2225]">
           Book with confidence
         </h3>
 
@@ -38,15 +38,15 @@ export function TripTrustFooter() {
           {trustPoints.map((point) => (
             <div
               key={point.title}
-              className="rounded-xl bg-white/5 p-5 text-center"
+              className="rounded-2xl border border-[#E5DFC6] bg-white p-5 text-center shadow-sm"
             >
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#C7B892]/20">
-                <point.icon className="h-5 w-5 text-[#C7B892]" />
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#C7A962]/15">
+                <point.icon className="h-5 w-5 text-[#C7A962]" />
               </div>
-              <h4 className="mt-3 text-[15px] font-semibold text-white">
+              <h4 className="mt-3 text-[15px] font-semibold text-[#0a2225]">
                 {point.title}
               </h4>
-              <p className="mt-1 text-[13px] leading-relaxed text-white/70">
+              <p className="mt-1 text-[13px] leading-relaxed text-[#6B7280]">
                 {point.description}
               </p>
             </div>
