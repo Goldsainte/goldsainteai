@@ -168,6 +168,7 @@ const TrustSafetyPage = lazy(() => import('@/pages/TrustSafetyPage'));
 const LegalCreatorAgreementPage = lazy(() => import('@/pages/LegalCreatorAgreementPage'));
 const CancellationRefundPolicy = lazy(() => import('@/pages/CancellationRefundPolicy'));
 const CorporateContact = lazy(() => import('@/pages/CorporateContact'));
+const TransparencyAgreement = lazy(() => import('@/pages/TransparencyAgreement'));
 const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
 
 const TravelerPreferencesOnboardingPage = lazy(() => import('@/pages/onboarding/TravelerPreferencesOnboardingPage'));
@@ -200,6 +201,7 @@ export const AppRoutes = () => (
       <Route path="/legal/privacy" element={<LegalPrivacyPage />} />
       <Route path="/legal/creator-agreement" element={<LegalCreatorAgreementPage />} />
       <Route path="/cancellation-refund-policy" element={<CancellationRefundPolicy />} />
+      <Route path="/transparency-agreement" element={<TransparencyAgreement />} />
       <Route path="/corporate-contact" element={<CorporateContact />} />
       <Route path="/shop" element={<Shop />} />
     </Route>
