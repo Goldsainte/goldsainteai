@@ -4,91 +4,54 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, MapPin, Calendar } from "lucide-react";
 import { useTranslation, Trans } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface FeaturedTrip {
   id: string;
+  slug: string;
   title: string;
   destination: string;
-  durationNights: number;
-  vibeTags: string[];
-  image: string;
-  curator: string;
-  priceFrom: number;
+  duration_nights: number;
+  cover_image_url: string;
+  price_per_person: number;
   currency: string;
+  creator_type: string;
+  highlights: string[] | null;
 }
 
 export function StoryboardsHighlight() {
   const { t } = useTranslation();
 
-  // These will eventually be fetched from packaged_trips table
-  const featuredTrips: FeaturedTrip[] = [
-    {
-      id: "amalfi-coast",
-      title: "Amalfi Coast Long Weekend",
-      destination: "Amalfi Coast, Italy",
-      durationNights: 4,
-      vibeTags: ["Romantic", "Coastal", "Foodie"],
-      image: "/home/jack-ward-rknrvCrfS1k-unsplash.jpg",
-      curator: t('home.storyboards.creatorAgentCollab'),
-      priceFrom: 2499,
-      currency: "USD",
-    },
-    {
-      id: "cape-town",
-      title: "Cape Town & Winelands",
-      destination: "Cape Town, South Africa",
-      durationNights: 6,
-      vibeTags: ["Adventure", "Wine", "Safari"],
-      image: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=800&auto=format&fit=crop",
-      curator: t('home.storyboards.agentCurated'),
-      priceFrom: 3299,
-      currency: "USD",
-    },
-    {
-      id: "tokyo",
-      title: "Tokyo for Food Lovers",
-      destination: "Tokyo, Japan",
-      durationNights: 5,
-      vibeTags: ["Foodie", "Culture", "Urban"],
-      image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&auto=format&fit=crop",
-      curator: t('home.storyboards.creatorAgentCollab'),
-      priceFrom: 4199,
-      currency: "USD",
-    },
-    {
-      id: "swiss-alps",
-      title: "Swiss Alps Ski Escape",
-      destination: "Zermatt, Switzerland",
-      durationNights: 5,
-      vibeTags: ["Skiing", "Luxury", "Mountains"],
-      image: "https://images.unsplash.com/photo-1551524164-687a55dd1126?w=800&auto=format&fit=crop",
-      curator: t('home.storyboards.agentCurated'),
-      priceFrom: 5499,
-      currency: "USD",
-    },
-    {
-      id: "morocco",
-      title: "Moroccan Desert Adventure",
-      destination: "Marrakech, Morocco",
-      durationNights: 6,
-      vibeTags: ["Adventure", "Desert", "Culture"],
-      image: "https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=800&auto=format&fit=crop",
-      curator: t('home.storyboards.creatorAgentCollab'),
-      priceFrom: 2899,
-      currency: "USD",
-    },
-    {
-      id: "bali",
-      title: "Bali Wellness Retreat",
-      destination: "Ubud, Bali",
-      durationNights: 4,
-      vibeTags: ["Wellness", "Yoga", "Nature"],
-      image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&auto=format&fit=crop",
-      curator: t('home.storyboards.agentCurated'),
-      priceFrom: 1899,
-      currency: "USD",
-    },
-  ];
+  const { data: featuredTrips, isLoading } = useQuery({
+    queryKey: ['featured-trips'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('packaged_trips')
+        .select('id, slug, title, destination, duration_nights, cover_image_url, price_per_person, currency, creator_type, highlights')
+        .eq('is_featured', true)
+        .eq('status', 'published')
+        .limit(6);
+      
+      if (error) throw error;
+      return data as FeaturedTrip[];
+    }
+  });
+
+  // Derive vibe tags from highlights or use defaults
+  const getVibeTags = (trip: FeaturedTrip): string[] => {
+    if (trip.highlights && trip.highlights.length > 0) {
+      return trip.highlights.slice(0, 3);
+    }
+    return ['Curated', 'Luxury'];
+  };
+
+  const getCuratorLabel = (creatorType: string): string => {
+    return creatorType === 'creator' 
+      ? t('home.storyboards.creatorAgentCollab')
+      : t('home.storyboards.agentCurated');
+  };
 
   const formatPrice = (price: number, currency: string) => {
     return new Intl.NumberFormat('en-US', {
@@ -116,16 +79,27 @@ export function StoryboardsHighlight() {
 
         {/* Featured trip tiles grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 mb-10">
-          {featuredTrips.map((trip) => (
+          {isLoading ? (
+            // Loading skeletons
+            Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="rounded-xl md:rounded-2xl overflow-hidden">
+                <Skeleton className="aspect-[4/5] md:aspect-[3/4] w-full" />
+                <div className="p-2.5 md:p-4 space-y-2">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-3 w-16" />
+                </div>
+              </div>
+            ))
+          ) : featuredTrips?.map((trip) => (
             <Link
               key={trip.id}
-              to={`/marketplace/trip/${trip.id}`}
+              to={`/marketplace/trip/${trip.slug}`}
               className="group overflow-hidden rounded-xl md:rounded-2xl bg-white shadow-sm border border-[#E5DFC6] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer"
             >
               {/* Image with gradient and badges */}
               <div className="relative aspect-[4/5] md:aspect-[3/4] overflow-hidden">
                 <img
-                  src={trip.image}
+                  src={trip.cover_image_url}
                   alt={trip.title}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
@@ -135,12 +109,12 @@ export function StoryboardsHighlight() {
                 {/* Duration badge - top right */}
                 <Badge className="absolute top-2 right-2 md:top-3 md:right-3 rounded-full text-[9px] md:text-[10px] bg-white/95 text-[#0a2225] border-0 shadow-sm px-2 py-0.5">
                   <Calendar className="h-2.5 w-2.5 md:h-3 md:w-3 mr-1" />
-                  {trip.durationNights} nights
+                  {trip.duration_nights} nights
                 </Badge>
 
                 {/* Price badge - top left */}
                 <Badge className="absolute top-2 left-2 md:top-3 md:left-3 rounded-full text-[10px] md:text-[11px] bg-[#0c4d47] text-white border-0 shadow-sm px-2.5 py-1 font-medium">
-                  From {formatPrice(trip.priceFrom, trip.currency)}
+                  From {formatPrice(trip.price_per_person, trip.currency)}
                 </Badge>
 
                 {/* Bottom overlay content */}
@@ -159,7 +133,7 @@ export function StoryboardsHighlight() {
               <div className="p-2.5 md:p-4 space-y-2">
                 {/* Vibe tags */}
                 <div className="flex flex-wrap gap-1">
-                  {trip.vibeTags.slice(0, 3).map((tag) => (
+                  {getVibeTags(trip).map((tag) => (
                     <Badge 
                       key={tag} 
                       variant="outline" 
@@ -171,7 +145,7 @@ export function StoryboardsHighlight() {
                 </div>
                 
                 {/* Curator credit */}
-                <p className="text-[9px] md:text-[10px] text-[#8D8D8D]">{trip.curator}</p>
+                <p className="text-[9px] md:text-[10px] text-[#8D8D8D]">{getCuratorLabel(trip.creator_type)}</p>
               </div>
             </Link>
           ))}
