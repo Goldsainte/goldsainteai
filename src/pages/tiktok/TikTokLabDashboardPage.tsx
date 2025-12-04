@@ -1,6 +1,7 @@
 // src/pages/tiktok/TikTokLabDashboardPage.tsx
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { BackButton } from "@/components/ui/BackButton";
 import { 
   Sparkles, 
   ArrowRight, 
@@ -138,6 +139,7 @@ export default function TikTokLabDashboardPage() {
 
         {/* Header */}
         <header className="mb-12">
+          <BackButton label="Back to Dashboard" to="/creator" className="mb-4" />
           <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 border border-[#E5DFC6] mb-4">
             <Sparkles className="h-4 w-4 text-[#C7A962]" />
             <span className="text-sm font-medium text-[#6B7280] tracking-wide">
