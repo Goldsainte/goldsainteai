@@ -819,9 +819,12 @@ export default function CreatorOnboardingPage() {
                   <div className="bg-[#FDF9F0] rounded-2xl p-6 border border-[#E5DFC6]">
                     <h3 className="font-medium text-[#0a2225] mb-3 flex items-center gap-2"><MessageCircle className="w-5 h-5 text-[#C7A962]" />Communication Standards</h3>
                     <ul className="text-sm text-[#6B7280] space-y-2">
+                      <li>• Maintain timely responses (respond within 24–48 hours unless otherwise specified)</li>
+                      <li>• Use clear, concise, and professional language at all times</li>
                       <li>• Respond professionally and respectfully to all inquiries</li>
-                      <li>• Provide accurate information about destinations and experiences</li>
-                      <li>• Set clear expectations about what's included in your services</li>
+                      <li>• Respect traveler boundaries and communication preferences</li>
+                      <li>• Never solicit personal relationships or interactions outside the platform</li>
+                      <li>• Keep all communication on-platform for transparency and safety</li>
                     </ul>
                   </div>
 
@@ -829,17 +832,23 @@ export default function CreatorOnboardingPage() {
                     <h3 className="font-medium text-[#0a2225] mb-3 flex items-center gap-2"><Shield className="w-5 h-5 text-[#C7A962]" />Harassment Policy</h3>
                     <ul className="text-sm text-[#6B7280] space-y-2">
                       <li>• Zero tolerance for harassment, discrimination, or inappropriate behavior</li>
-                      <li>• Report any concerning interactions immediately</li>
-                      <li>• Violations result in immediate account suspension</li>
+                      <li>• Do not use profanity, abusive language, or intimidating tone</li>
+                      <li>• Do not pressure travelers into bookings or upsells</li>
+                      <li>• Respect cultural differences and diverse traveler identities</li>
+                      <li>• Harassment includes online, verbal, visual, or implied behavior</li>
+                      <li>• Consequences may include permanent removal depending on severity</li>
                     </ul>
                   </div>
 
                   <div className="bg-[#FDF9F0] rounded-2xl p-6 border border-[#E5DFC6]">
                     <h3 className="font-medium text-[#0a2225] mb-3 flex items-center gap-2"><Heart className="w-5 h-5 text-[#C7A962]" />Traveler Safety</h3>
                     <ul className="text-sm text-[#6B7280] space-y-2">
+                      <li>• Verify all recommendations meet local laws and safety regulations</li>
+                      <li>• Never provide medical, legal, or emergency advice beyond publicly available guidance</li>
+                      <li>• Disclose any potential risks associated with activities or destinations</li>
+                      <li>• Do not accompany travelers in person unless part of an approved service</li>
+                      <li>• Prioritize traveler privacy—never share personal or trip details outside the platform</li>
                       <li>• Only recommend vetted, safe experiences and accommodations</li>
-                      <li>• Provide accurate safety information for destinations</li>
-                      <li>• Never encourage risky or illegal activities</li>
                     </ul>
                   </div>
                 </div>
