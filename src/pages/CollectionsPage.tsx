@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -30,8 +30,13 @@ export default function CollectionsPage() {
   const [preferences, setPreferences] = useState<any>(null);
   const [selectedItinerary, setSelectedItinerary] = useState<CuratedItinerary | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-
   const [wasCached, setWasCached] = useState(false);
+
+  // Route guard: redirect non-travelers away from Collections
+  const accountType = (user as any)?.user_metadata?.account_type?.toLowerCase();
+  if (accountType === 'creator' || accountType === 'agent' || accountType === 'brand') {
+    return <Navigate to="/partner" replace />;
+  }
 
   const loadCollections = async (isRefresh = false) => {
     if (!user) return;

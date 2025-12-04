@@ -25,13 +25,14 @@ interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
   authRequired?: boolean;
   showFor?: 'creator' | 'agent' | 'brand';
+  hideFor?: ('creator' | 'agent' | 'brand')[];
 }
 
 const items: NavItem[] = [
   { title: "Home", url: "/", icon: Home },
   { title: "Explore", url: "/explore", icon: Search },
-  { title: "My Collections", url: "/collections", icon: Sparkles, authRequired: true },
-  { title: "Traveler Console", url: "/traveler", icon: LayoutDashboard, authRequired: true },
+  { title: "My Collections", url: "/collections", icon: Sparkles, authRequired: true, hideFor: ['creator', 'agent', 'brand'] },
+  { title: "Traveler Console", url: "/traveler", icon: LayoutDashboard, authRequired: true, hideFor: ['creator', 'agent', 'brand'] },
   { title: "Marketplace", url: "/marketplace", icon: Briefcase, authRequired: true },
   { title: "My Jobs", url: "/my-jobs", icon: Briefcase, authRequired: true },
   { title: "Browse Agents", url: "/browse-agents", icon: Users },
@@ -61,6 +62,11 @@ export function AppSidebar() {
       if (item.showFor === 'creator' && !isCreator) return false;
       if (item.showFor === 'agent' && !isAgentAccount) return false;
       if (item.showFor === 'brand' && !isBrand) return false;
+    }
+    if (item.hideFor) {
+      if (item.hideFor.includes('creator') && isCreator) return false;
+      if (item.hideFor.includes('agent') && isAgentAccount) return false;
+      if (item.hideFor.includes('brand') && isBrand) return false;
     }
     return true;
   };
