@@ -307,13 +307,15 @@ export const Header = () => {
                             <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">My Account</p>
                           </div>
                           <div className="py-2">
-                            <DropdownMenuItem
-                              onClick={() => navigate('/traveler')}
-                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                            >
-                              <LayoutDashboard className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                              <span className="text-sm font-medium">Dashboard</span>
-                            </DropdownMenuItem>
+                            {isTraveler && (
+                              <DropdownMenuItem
+                                onClick={() => navigate('/traveler')}
+                                className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                              >
+                                <LayoutDashboard className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                <span className="text-sm font-medium">Dashboard</span>
+                              </DropdownMenuItem>
+                            )}
                             
                             {isTraveler && (
                               <DropdownMenuItem 
@@ -325,13 +327,15 @@ export const Header = () => {
                               </DropdownMenuItem>
                             )}
                             
-                            <DropdownMenuItem 
-                              onClick={() => navigate('/collections')} 
-                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                            >
-                              <Sparkles className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                              <span className="text-sm font-medium">My Collections</span>
-                            </DropdownMenuItem>
+                            {isTraveler && (
+                              <DropdownMenuItem 
+                                onClick={() => navigate('/collections')} 
+                                className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                              >
+                                <Sparkles className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                <span className="text-sm font-medium">My Collections</span>
+                              </DropdownMenuItem>
+                            )}
                             
                             <DropdownMenuItem 
                               onClick={() => navigate('/messages')} 
@@ -640,13 +644,15 @@ export const Header = () => {
                           <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">My Account</p>
                         </div>
                         <div className="py-2">
-                          <DropdownMenuItem
-                            onClick={() => navigate('/traveler')}
-                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                          >
-                            <LayoutDashboard className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">Dashboard</span>
-                          </DropdownMenuItem>
+                          {isTraveler && (
+                            <DropdownMenuItem
+                              onClick={() => navigate('/traveler')}
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                            >
+                              <LayoutDashboard className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                              <span className="text-sm font-medium">Dashboard</span>
+                            </DropdownMenuItem>
+                          )}
                           
                           {isTraveler && (
                             <DropdownMenuItem 
@@ -658,13 +664,15 @@ export const Header = () => {
                             </DropdownMenuItem>
                           )}
                           
-                          <DropdownMenuItem 
-                            onClick={() => navigate('/collections')} 
-                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                          >
-                            <Sparkles className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">My Collections</span>
-                          </DropdownMenuItem>
+                          {isTraveler && (
+                            <DropdownMenuItem 
+                              onClick={() => navigate('/collections')} 
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                            >
+                              <Sparkles className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                              <span className="text-sm font-medium">My Collections</span>
+                            </DropdownMenuItem>
+                          )}
                           
                           <DropdownMenuItem 
                             onClick={() => navigate('/messages')} 
