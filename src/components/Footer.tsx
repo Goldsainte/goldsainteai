@@ -1,20 +1,10 @@
-import { Instagram, Linkedin, Globe } from "lucide-react";
+import { Instagram, Linkedin } from "lucide-react";
 import { Link } from "react-router-dom";
 import verticalLogo from "@/assets/primary-vertical-logo-gold.png";
-import { useState } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
 import { useTranslation } from "react-i18next";
 
-const currencies = [
-  { code: "USD", symbol: "$", name: "US Dollar" },
-  { code: "EUR", symbol: "€", name: "Euro" },
-  { code: "GBP", symbol: "£", name: "British Pound" },
-  { code: "JPY", symbol: "¥", name: "Japanese Yen" },
-  { code: "AED", symbol: "د.إ", name: "UAE Dirham" },
-];
-
 export const Footer = () => {
-  const [selectedCurrency, setSelectedCurrency] = useState("USD");
   const { t } = useTranslation();
 
   const headingClasses = "font-secondary text-xs uppercase tracking-[0.18em] text-[#0a2225] mb-4";
@@ -170,46 +160,27 @@ export const Footer = () => {
           </div>
         </div>
 
-        {/* Currency Selector & Social Media */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-6 pb-6 sm:pb-8 border-b border-[#E5DFC6]">
-          {/* Currency Selector */}
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
-            <Globe className="h-4 w-4 text-[#6E6650]" />
-            <select 
-              value={selectedCurrency}
-              onChange={(e) => setSelectedCurrency(e.target.value)}
-              className="bg-[#FDFBF5] border border-[#E5DFC6] rounded px-3 py-2 text-sm text-[#4A4A4A] focus:outline-none focus:ring-2 focus:ring-[#C7B892]"
-            >
-              {currencies.map((curr) => (
-                <option key={curr.code} value={curr.code}>
-                  {curr.code} ({curr.symbol})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Social Media Links */}
-          <div className="flex items-center gap-3 sm:gap-4 flex-wrap justify-center">
-            <span className="text-xs sm:text-sm font-secondary uppercase tracking-[0.12em] text-[#0a2225] w-full sm:w-auto text-center sm:text-left">{t('footer.followUs')}</span>
-            <a 
-              href="https://www.linkedin.com/company/goldsainte/" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="text-[#4A4A4A] hover:text-[#C7B892] transition-colors" 
-              aria-label="LinkedIn"
-            >
-              <Linkedin className="h-5 w-5" />
-            </a>
-            <a 
-              href="https://www.instagram.com/goldsainteai/" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="text-[#4A4A4A] hover:text-[#C7B892] transition-colors" 
-              aria-label="Instagram"
-            >
-              <Instagram className="h-5 w-5" />
-            </a>
-          </div>
+        {/* Social Media */}
+        <div className="flex justify-center items-center gap-4 pb-6 sm:pb-8 border-b border-[#E5DFC6]">
+          <span className="text-xs sm:text-sm font-secondary uppercase tracking-[0.12em] text-[#0a2225]">{t('footer.followUs')}</span>
+          <a 
+            href="https://www.linkedin.com/company/goldsainte/" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-[#4A4A4A] hover:text-[#C7B892] transition-colors" 
+            aria-label="LinkedIn"
+          >
+            <Linkedin className="h-5 w-5" />
+          </a>
+          <a 
+            href="https://www.instagram.com/goldsainteai/" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-[#4A4A4A] hover:text-[#C7B892] transition-colors" 
+            aria-label="Instagram"
+          >
+            <Instagram className="h-5 w-5" />
+          </a>
         </div>
 
         {/* Logo & Copyright */}
