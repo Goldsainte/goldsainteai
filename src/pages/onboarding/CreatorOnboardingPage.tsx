@@ -1,205 +1,362 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { 
-  Sparkles, 
-  ArrowRight, 
-  ArrowLeft,
-  User,
-  Globe,
-  Palette,
-  MapPin,
-  BadgeCheck,
-  Camera,
-  Instagram,
-  Link as LinkIcon,
-  DollarSign,
-  Shield,
-  MessageSquare,
-  Check
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 import { LuxuryStepIndicator } from "@/components/onboarding/LuxuryStepIndicator";
 import { LuxurySelectionCard } from "@/components/onboarding/LuxurySelectionCard";
-import { LuxuryFormSection } from "@/components/onboarding/LuxuryFormSection";
-import { DestinationAutocompleteNominatim } from "@/components/preferences/DestinationAutocompleteNominatim";
 import { ProfilePhotoUploader } from "@/pages/traveler/components/ProfilePhotoUploader";
-import { cn } from "@/lib/utils";
-
-const NICHE_OPTIONS = [
-  { label: "European city breaks", description: "Paris, Rome, Barcelona & beyond" },
-  { label: "Beach escapes", description: "Coastal retreats & island hopping" },
-  { label: "Design hotels", description: "Boutique stays & architectural gems" },
-  { label: "Villas & homes", description: "Private rentals & luxury properties" },
-  { label: "Adventure", description: "Hiking, diving & outdoor thrills" },
-  { label: "Wellness", description: "Spas, retreats & mindful travel" },
-  { label: "Food & wine", description: "Culinary journeys & tastings" },
-  { label: "Nightlife", description: "Clubs, bars & after-hours" },
-  { label: "Family-friendly", description: "Kid-approved destinations" },
-  { label: "Hidden gems", description: "Off-the-beaten-path discoveries" },
-];
-
-const CONTENT_STYLE_OPTIONS = [
-  { label: "Cinematic", description: "Polished, film-like visuals" },
-  { label: "Documentary", description: "Storytelling & cultural deep-dives" },
-  { label: "Vlog-style", description: "Personal, day-in-my-life format" },
-  { label: "Photo-focused", description: "Photography-first content" },
-  { label: "Guides & tips", description: "Practical travel advice" },
-  { label: "Aesthetic reels", description: "Mood-driven short-form content" },
-];
-
-const BUDGET_OPTIONS = [
-  { label: "Affordable-chic", description: "Style on a smart budget" },
-  { label: "Classic luxury", description: "Four-star elegance" },
-  { label: "Ultra-luxury", description: "Five-star & beyond" },
-];
-
-const PLATFORM_OPTIONS = [
-  { label: "TikTok", icon: "🎵" },
-  { label: "Instagram", icon: "📸" },
-  { label: "YouTube", icon: "▶️" },
-  { label: "Multi-platform", icon: "🌐" },
-];
+import { DestinationAutocompleteNominatim } from "@/components/preferences/DestinationAutocompleteNominatim";
+import { supabase } from "@/integrations/supabase/client";
+import { 
+  User, Camera, Globe, MapPin, Sparkles, CreditCard, 
+  TrendingUp, Instagram, Youtube, Video, Shield, 
+  MessageCircle, Clock, Calendar, Wallet, Heart,
+  CheckCircle, DollarSign, FileText, Users, Mic,
+  Play, BookOpen, ArrowRight, Star
+} from "lucide-react";
 
 const STEPS = [
   { title: "Identity", icon: User },
   { title: "Social", icon: Globe },
-  { title: "Niche", icon: Palette },
-  { title: "Regions", icon: MapPin },
-  { title: "Platform", icon: BadgeCheck },
-  { title: "Launch", icon: Sparkles },
+  { title: "Niche", icon: Sparkles },
+  { title: "Destinations", icon: MapPin },
+  { title: "How It Works", icon: BookOpen },
+  { title: "Preview", icon: Camera },
+  { title: "Pricing", icon: DollarSign },
+  { title: "Commitment", icon: Shield },
+  { title: "Safety", icon: Heart },
+  { title: "AI Identity", icon: Mic },
+  { title: "Payment", icon: CreditCard },
+];
+
+const TRAVEL_NICHES = [
+  { value: "luxury", label: "Luxury & Ultra-Luxury", description: "5-star resorts, private villas, exclusive experiences" },
+  { value: "adventure", label: "Adventure & Outdoors", description: "Hiking, diving, safaris, extreme sports" },
+  { value: "wellness", label: "Wellness & Spa", description: "Retreats, yoga, meditation, healing journeys" },
+  { value: "culinary", label: "Food & Culinary", description: "Fine dining, cooking classes, food tours" },
+  { value: "cultural", label: "Culture & History", description: "Museums, architecture, local traditions" },
+  { value: "romantic", label: "Romantic & Honeymoons", description: "Couples getaways, proposals, anniversaries" },
+  { value: "family", label: "Family Travel", description: "Kid-friendly destinations, multi-gen trips" },
+  { value: "solo", label: "Solo Travel", description: "Independent journeys, self-discovery" },
+  { value: "design", label: "Design Hotels", description: "Boutique, architectural gems, aesthetic stays" },
+  { value: "sustainable", label: "Sustainable Travel", description: "Eco-lodges, conservation, responsible tourism" },
+];
+
+const CONTENT_STYLES = [
+  { value: "cinematic", label: "Cinematic", description: "High-production, movie-like visuals" },
+  { value: "documentary", label: "Documentary", description: "Storytelling, in-depth exploration" },
+  { value: "vlog", label: "Vlog-style", description: "Personal, day-in-the-life content" },
+  { value: "photo", label: "Photo-focused", description: "Stunning photography, visual inspiration" },
+  { value: "guides", label: "Guides & Tips", description: "Practical advice, how-tos, itineraries" },
+  { value: "aesthetic", label: "Aesthetic & Mood", description: "Vibes, atmosphere, sensory content" },
+];
+
+const BUDGET_LEVELS = [
+  { value: "budget", label: "Budget-Friendly", description: "Under $100/day experiences" },
+  { value: "mid", label: "Mid-Range", description: "$100-300/day sweet spot" },
+  { value: "luxury", label: "Luxury", description: "$300-1000/day experiences" },
+  { value: "ultra", label: "Ultra-Luxury", description: "$1000+/day exclusive" },
+];
+
+const PLATFORMS = [
+  { value: "tiktok", label: "TikTok", icon: Video },
+  { value: "instagram", label: "Instagram", icon: Instagram },
+  { value: "youtube", label: "YouTube", icon: Youtube },
+  { value: "multi", label: "Multi-Platform", icon: Globe },
+];
+
+const PRICING_MODELS = [
+  { value: "commission_only", label: "Commission Only", description: "I earn when travelers book through my content. No upfront fees.", icon: TrendingUp },
+  { value: "planning_fees", label: "Planning Fees", description: "I charge for custom trip planning in addition to commissions.", icon: FileText },
+  { value: "custom_itineraries", label: "Custom Itineraries", description: "I sell detailed, bookable itineraries as products.", icon: MapPin },
+  { value: "premium_content", label: "Premium Content", description: "I offer exclusive destination guides and premium resources.", icon: Star },
+];
+
+const RESPONSE_TIMES = [
+  { value: 4, label: "Within 4 hours", description: "Lightning fast responses" },
+  { value: 12, label: "Within 12 hours", description: "Same-day responses" },
+  { value: 24, label: "Within 24 hours", description: "Next-day responses" },
+  { value: 48, label: "Within 48 hours", description: "Flexible timeline" },
+];
+
+const AI_TONES = [
+  { value: "chic", label: "Chic & Sophisticated", description: "Refined, elegant, understated luxury" },
+  { value: "playful", label: "Playful & Adventurous", description: "Fun, energetic, spontaneous vibes" },
+  { value: "cinematic", label: "Cinematic & Editorial", description: "Dramatic, visual storytelling" },
+  { value: "warm", label: "Warm & Conversational", description: "Friendly, approachable, personal" },
+];
+
+const AI_AUDIENCES = [
+  { value: "couples", label: "Couples", description: "Romantic travelers" },
+  { value: "solo", label: "Solo Travelers", description: "Independent explorers" },
+  { value: "families", label: "Families", description: "Parents with kids" },
+  { value: "groups", label: "Groups", description: "Friends & celebrations" },
+  { value: "luxury_seekers", label: "Luxury Seekers", description: "High-end travelers" },
+  { value: "budget_conscious", label: "Budget-Conscious", description: "Value-focused travelers" },
+];
+
+const LANGUAGES = [
+  "English", "Spanish", "French", "German", "Italian", "Portuguese", 
+  "Mandarin", "Japanese", "Korean", "Arabic", "Hindi", "Dutch"
 ];
 
 export default function CreatorOnboardingPage() {
-  const { user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
-  const [saving, setSaving] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showWelcomeCard, setShowWelcomeCard] = useState(false);
 
-  // Form state
+  // Step 1: Identity
   const [displayName, setDisplayName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [bio, setBio] = useState("");
   const [homeBase, setHomeBase] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  
+
+  // Step 2: Social
   const [primaryPlatform, setPrimaryPlatform] = useState("");
   const [tiktokHandle, setTiktokHandle] = useState("");
   const [tiktokFollowers, setTiktokFollowers] = useState("");
   const [instagramHandle, setInstagramHandle] = useState("");
   const [instagramFollowers, setInstagramFollowers] = useState("");
   const [website, setWebsite] = useState("");
-  
-  const [niches, setNiches] = useState<string[]>([]);
-  const [contentStyles, setContentStyles] = useState<string[]>([]);
-  const [budgetLevels, setBudgetLevels] = useState<string[]>([]);
-  
-  const [destinationFocus, setDestinationFocus] = useState<string[]>([]);
-  const [languages, setLanguages] = useState<string[]>([]);
-  const [pov, setPov] = useState("");
-  
-  const [policyAccepted, setPolicyAccepted] = useState(false);
 
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user) {
-      navigate("/auth?returnTo=/onboarding/creator");
-    }
-  }, [authLoading, user, navigate]);
+  // Step 3: Niche & Style
+  const [selectedNiches, setSelectedNiches] = useState<string[]>([]);
+  const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
+  const [selectedBudgets, setSelectedBudgets] = useState<string[]>([]);
 
-  const toggleArrayValue = (arr: string[], setArr: (v: string[]) => void, value: string) => {
-    if (arr.includes(value)) {
-      setArr(arr.filter((v) => v !== value));
-    } else {
-      setArr([...arr, value]);
+  // Step 4: Destinations
+  const [destinations, setDestinations] = useState<string[]>([]);
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const [travelPov, setTravelPov] = useState("");
+
+  // Step 7: Pricing
+  const [pricingModel, setPricingModel] = useState("commission_only");
+  const [planningFee, setPlanningFee] = useState("");
+  const [itineraryFee, setItineraryFee] = useState("");
+
+  // Step 8: Commitment
+  const [responseTime, setResponseTime] = useState(24);
+  const [acceptsTransparency, setAcceptsTransparency] = useState(false);
+  const [acceptsBookingCalls, setAcceptsBookingCalls] = useState(false);
+
+  // Step 9: Safety
+  const [acceptsSafetyPolicy, setAcceptsSafetyPolicy] = useState(false);
+
+  // Step 10: AI Identity
+  const [aiTone, setAiTone] = useState("");
+  const [aiAudiences, setAiAudiences] = useState<string[]>([]);
+  const [travelPhilosophy, setTravelPhilosophy] = useState("");
+
+  const toggleNiche = (value: string) => {
+    setSelectedNiches(prev => 
+      prev.includes(value) ? prev.filter(n => n !== value) : [...prev, value]
+    );
+  };
+
+  const toggleStyle = (value: string) => {
+    setSelectedStyles(prev => 
+      prev.includes(value) ? prev.filter(s => s !== value) : [...prev, value]
+    );
+  };
+
+  const toggleBudget = (value: string) => {
+    setSelectedBudgets(prev => 
+      prev.includes(value) ? prev.filter(b => b !== value) : [...prev, value]
+    );
+  };
+
+  const toggleLanguage = (lang: string) => {
+    setSelectedLanguages(prev =>
+      prev.includes(lang) ? prev.filter(l => l !== lang) : [...prev, lang]
+    );
+  };
+
+  const toggleAudience = (value: string) => {
+    setAiAudiences(prev =>
+      prev.includes(value) ? prev.filter(a => a !== value) : [...prev, value]
+    );
+  };
+
+  const addDestination = (dest: string) => {
+    if (dest && !destinations.includes(dest)) {
+      setDestinations(prev => [...prev, dest]);
     }
   };
 
-  const goNext = () => {
+  const removeDestination = (dest: string) => {
+    setDestinations(prev => prev.filter(d => d !== dest));
+  };
+
+  const canProceed = () => {
+    switch (currentStep) {
+      case 0: return displayName.trim().length > 0;
+      case 1: return primaryPlatform.length > 0;
+      case 2: return selectedNiches.length > 0;
+      case 3: return destinations.length > 0;
+      case 4: return true;
+      case 5: return true;
+      case 6: return pricingModel.length > 0;
+      case 7: return acceptsTransparency;
+      case 8: return acceptsSafetyPolicy;
+      case 9: return true;
+      case 10: return true;
+      default: return true;
+    }
+  };
+
+  const handleNext = () => {
     if (currentStep < STEPS.length - 1) {
-      setCurrentStep(currentStep + 1);
+      setCurrentStep(prev => prev + 1);
     }
   };
 
-  const goPrev = () => {
+  const handleBack = () => {
     if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+      setCurrentStep(prev => prev - 1);
     }
   };
 
-  const handleFinish = async () => {
-    if (!user) return;
-    
-    if (!displayName.trim()) {
-      toast.error("Please add your display name");
-      setCurrentStep(0);
-      return;
-    }
-    if (!policyAccepted) {
-      toast.error("Please agree to the Goldsainte creator terms");
-      setCurrentStep(4);
-      return;
-    }
-
-    setSaving(true);
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
     try {
-      // Update profile with creator data
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
       const { error } = await supabase
         .from("profiles")
         .update({
-          display_name: displayName.trim(),
-          bio: bio.trim() || null,
-          home_base: homeBase.trim() || null,
-          avatar_url: avatarUrl,
-          tiktok_handle: tiktokHandle.trim() || null,
-          instagram_handle: instagramHandle.trim() || null,
-          website: website.trim() || null,
+          display_name: displayName,
+          avatar_url: avatarUrl || null,
+          bio: bio || null,
+          home_base: homeBase || null,
           primary_platform: primaryPlatform || null,
-          creator_niches: niches,
-          creator_budget_levels: budgetLevels,
-          creator_pov: pov.trim() || null,
-          content_style_tags: contentStyles,
-          destinations_focus_tags: destinationFocus,
-          languages: languages,
+          tiktok_handle: tiktokHandle || null,
+          tiktok_followers: tiktokFollowers ? parseInt(tiktokFollowers) : null,
+          instagram_handle: instagramHandle || null,
+          website: website || null,
+          creator_niches: selectedNiches,
+          content_style_tags: selectedStyles,
+          creator_budget_levels: selectedBudgets,
+          destinations_focus_tags: destinations,
+          languages: selectedLanguages,
+          creator_pov: travelPov || null,
+          pricing_model: pricingModel,
+          planning_fee_amount: planningFee ? parseInt(planningFee) * 100 : null,
+          itinerary_fee_amount: itineraryFee ? parseInt(itineraryFee) * 100 : null,
+          response_commitment_hours: responseTime,
+          accepts_transparency_agreement: acceptsTransparency,
+          transparency_agreement_signed_at: acceptsTransparency ? new Date().toISOString() : null,
+          accepts_safety_policy: acceptsSafetyPolicy,
+          safety_policy_signed_at: acceptsSafetyPolicy ? new Date().toISOString() : null,
+          ai_persona_tone: aiTone || null,
+          ai_persona_audience: aiAudiences.length > 0 ? aiAudiences : null,
+          travel_philosophy: travelPhilosophy || null,
+          accepts_booking_calls: acceptsBookingCalls,
           role: "creator",
           account_type: "creator",
           has_completed_creator_onboarding: true,
-          onboarding_completed: true,
-          onboarding_completed_at: new Date().toISOString(),
-          is_profile_complete: true,
         })
         .eq("id", user.id);
 
-      if (error) {
-        console.error("Error saving creator onboarding", error);
-        toast.error("We couldn't save your profile. Please try again.");
-        setSaving(false);
-        return;
-      }
-
-      toast.success("Welcome to Goldsainte Creator Lab!");
-      setTimeout(() => {
-        navigate("/tiktok-lab");
-      }, 800);
-    } catch (err) {
-      console.error("Error in handleFinish:", err);
-      toast.error("Something went wrong. Please try again.");
+      if (error) throw error;
+      setShowWelcomeCard(true);
+    } catch (error: any) {
+      console.error("Error saving creator profile:", error);
+      toast.error("Failed to save your profile. Please try again.");
     } finally {
-      setSaving(false);
+      setIsSubmitting(false);
     }
   };
 
-  if (authLoading) {
+  const handleStripeSetup = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Please sign in first");
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke("stripe-connect-link", {
+        headers: { Authorization: `Bearer ${session.access_token}` }
+      });
+
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (error: any) {
+      console.error("Error starting Stripe setup:", error);
+      toast.error("Failed to start payment setup. Please try again.");
+    }
+  };
+
+  // Welcome Card Screen
+  if (showWelcomeCard) {
     return (
-      <div className="min-h-screen bg-[#FDF9F0] flex items-center justify-center">
-        <div className="text-center space-y-3">
-          <div className="animate-pulse">
-            <Sparkles className="h-8 w-8 mx-auto text-[#C7A962]" />
+      <div className="min-h-screen bg-[#FDF9F0] flex items-center justify-center p-4">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-[#C7A962] rounded-full animate-pulse"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 2}s`,
+                opacity: 0.3 + Math.random() * 0.4,
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="relative z-10 max-w-lg w-full text-center">
+          <h1 className="font-secondary text-4xl md:text-5xl text-[#0a2225] mb-4">
+            Welcome to Goldsainte.
+          </h1>
+          <p className="text-[#6B7280] text-lg mb-12">
+            Your journeys inspire the world.
+          </p>
+
+          <div className="bg-white border-2 border-[#C7A962] rounded-2xl p-8 shadow-lg">
+            {avatarUrl ? (
+              <img 
+                src={avatarUrl} 
+                alt={displayName}
+                className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-2 border-[#C7A962]"
+              />
+            ) : (
+              <div className="w-24 h-24 rounded-full mx-auto mb-4 bg-[#FDF9F0] border-2 border-[#C7A962] flex items-center justify-center">
+                <User className="w-10 h-10 text-[#C7A962]" />
+              </div>
+            )}
+            
+            <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">
+              {displayName}
+            </h2>
+            
+            <div className="inline-flex items-center gap-2 px-4 py-1 bg-[#FDF9F0] border border-[#C7A962] rounded-full text-sm text-[#C7A962] font-medium mb-4">
+              <Sparkles className="w-4 h-4" />
+              Creator Partner
+            </div>
+
+            {travelPhilosophy && (
+              <p className="text-[#6B7280] text-sm italic mt-4 px-4">
+                "{travelPhilosophy}"
+              </p>
+            )}
           </div>
-          <p className="text-sm text-[#6E6650]">Loading...</p>
+
+          <Button
+            onClick={() => navigate("/creator-dashboard")}
+            className="mt-8 bg-[#0a2225] hover:bg-[#0a2225]/90 text-white px-8 py-6 rounded-xl text-lg"
+          >
+            View Your Dashboard
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </Button>
         </div>
       </div>
     );
@@ -207,484 +364,533 @@ export default function CreatorOnboardingPage() {
 
   return (
     <div className="min-h-screen bg-[#FDF9F0]">
-      {/* Decorative background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#C7B892]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#C7B892]/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
-      </div>
+      <div className="absolute top-0 right-0 w-96 h-96 bg-[#C7A962]/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#C7A962]/5 rounded-full blur-3xl" />
 
-      <div className="relative container max-w-4xl py-6 sm:py-12 px-4">
-        {/* Header */}
-        <div className="text-center mb-8 sm:mb-10">
-          <div className="w-16 h-0.5 bg-[#C7B892] mx-auto mb-6" />
-          <p className="uppercase tracking-[0.25em] text-[10px] sm:text-[11px] text-[#7A7151] mb-4 font-medium">
-            Creator Onboarding
+      <div className="relative z-10 max-w-3xl mx-auto px-4 py-8 md:py-12">
+        <div className="text-center mb-8">
+          <p className="text-[#C7A962] text-sm tracking-widest uppercase mb-2">
+            Creator Partnership
           </p>
-          <h1 className="font-secondary text-[26px] md:text-[40px] leading-[1.15] text-[#0a2225] mb-4">
-            Welcome to Goldsainte Creator Lab
+          <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225]">
+            Join Goldsainte
           </h1>
-          <p className="max-w-2xl mx-auto text-sm sm:text-base text-[#6E6650] leading-relaxed">
-            Let's build your creator profile so we can match you with the right travelers and agents.
-          </p>
         </div>
 
-        {/* Step Indicator */}
-        <LuxuryStepIndicator 
-          steps={STEPS} 
-          currentStep={currentStep}
-          onStepClick={(step) => step <= currentStep && setCurrentStep(step)}
-        />
+        <div className="mb-8">
+          <LuxuryStepIndicator
+            steps={STEPS}
+            currentStep={currentStep}
+            onStepClick={setCurrentStep}
+          />
+        </div>
 
-        {/* Main Card with stacked effect */}
         <div className="relative">
-          <div className="absolute inset-x-2 top-3 bottom-0 rounded-[28px] bg-[#E5DFC6]/30 -z-10" />
-          <div className="absolute inset-x-1 top-1.5 bottom-0 rounded-[28px] bg-[#E5DFC6]/50 -z-10" />
+          <div className="absolute inset-0 bg-white rounded-3xl transform rotate-1 shadow-sm border border-[#E5DFC6]" />
+          <div className="absolute inset-0 bg-white rounded-3xl transform -rotate-1 shadow-sm border border-[#E5DFC6]" />
           
-          <div className="rounded-[28px] border border-[#E5DFC6] bg-white/95 backdrop-blur-sm shadow-[0_24px_60px_rgba(10,34,37,0.12)]">
-            <div className="p-5 sm:p-8 md:p-10">
-              {/* Step 1: Identity */}
-              {currentStep === 0 && (
-                <div className="space-y-8">
-                  <div className="text-center mb-6">
-                    <h2 className="font-secondary text-xl sm:text-2xl text-[#0a2225] mb-2">
-                      Your creator identity
-                    </h2>
-                    <p className="text-sm text-[#6E6650]">
-                      How travelers and agents will see you on Goldsainte
-                    </p>
-                  </div>
+          <div className="relative bg-white rounded-3xl shadow-lg border border-[#E5DFC6] p-6 md:p-10">
+            
+            {/* Step 1: Identity */}
+            {currentStep === 0 && (
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Your Creator Identity</h2>
+                  <p className="text-[#6B7280]">How travelers will discover you</p>
+                </div>
 
-                  {/* Profile Photo */}
-                  <div className="flex justify-center">
-                    {user && (
-                      <ProfilePhotoUploader
-                        userId={user.id}
-                        currentAvatarUrl={avatarUrl}
-                        displayName={displayName}
-                        onUploadComplete={(url) => setAvatarUrl(url)}
-                        size="lg"
-                      />
-                    )}
-                  </div>
+                <div className="flex justify-center mb-6">
+                  <ProfilePhotoUploader currentUrl={avatarUrl} onUpload={setAvatarUrl} size="lg" />
+                </div>
 
-                  <LuxuryFormSection title="Display name" subtitle="Your creative name or brand">
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-[#0a2225] font-medium">Display Name *</Label>
                     <Input
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
-                      placeholder="e.g. JetLag & Champagne"
-                      className="rounded-xl border-[#E5DFC6] bg-white focus:border-[#C7B892] focus:ring-[#C7B892]/20"
+                      placeholder="Your creative name or brand"
+                      className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
                     />
-                  </LuxuryFormSection>
+                  </div>
 
-                  <LuxuryFormSection title="Bio" subtitle="What makes your travel content unique?" helperText="A few sentences about your travel style and what you're known for">
+                  <div>
+                    <Label className="text-[#0a2225] font-medium">Bio / Tagline</Label>
                     <Textarea
                       value={bio}
                       onChange={(e) => setBio(e.target.value)}
-                      placeholder="I create cinematic travel content that captures the soul of a destination..."
-                      className="min-h-[100px] rounded-xl border-[#E5DFC6] bg-white focus:border-[#C7B892] focus:ring-[#C7B892]/20"
+                      placeholder="What makes your content unique?"
+                      className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl min-h-[100px]"
                     />
-                  </LuxuryFormSection>
+                  </div>
 
-                  <LuxuryFormSection title="Home base" subtitle="Where are you based?">
+                  <div>
+                    <Label className="text-[#0a2225] font-medium">Home Base</Label>
                     <Input
                       value={homeBase}
                       onChange={(e) => setHomeBase(e.target.value)}
-                      placeholder="e.g. New York, London, Dubai"
-                      className="rounded-xl border-[#E5DFC6] bg-white focus:border-[#C7B892] focus:ring-[#C7B892]/20"
+                      placeholder="City, Country"
+                      className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
                     />
-                  </LuxuryFormSection>
+                  </div>
                 </div>
-              )}
+              </div>
+            )}
 
-              {/* Step 2: Social Universe */}
-              {currentStep === 1 && (
-                <div className="space-y-8">
-                  <div className="text-center mb-6">
-                    <h2 className="font-secondary text-xl sm:text-2xl text-[#0a2225] mb-2">
-                      Your social universe
-                    </h2>
-                    <p className="text-sm text-[#6E6650]">
-                      Connect your platforms so travelers can discover your content
-                    </p>
-                  </div>
-
-                  <LuxuryFormSection title="Primary platform" subtitle="Where does most of your audience follow you?">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                      {PLATFORM_OPTIONS.map((platform) => (
-                        <LuxurySelectionCard
-                          key={platform.label}
-                          label={`${platform.icon} ${platform.label}`}
-                          selected={primaryPlatform === platform.label}
-                          onSelect={() => setPrimaryPlatform(platform.label)}
-                          variant="single"
-                        />
-                      ))}
-                    </div>
-                  </LuxuryFormSection>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <LuxuryFormSection title="TikTok" icon={Globe}>
-                      <div className="space-y-3">
-                        <div className="flex items-center rounded-xl border border-[#E5DFC6] bg-white px-3">
-                          <span className="text-[#6E6650] text-sm mr-1">@</span>
-                          <Input
-                            value={tiktokHandle}
-                            onChange={(e) => setTiktokHandle(e.target.value)}
-                            placeholder="yourhandle"
-                            className="border-0 bg-transparent focus-visible:ring-0 px-0"
-                          />
-                        </div>
-                        <Input
-                          value={tiktokFollowers}
-                          onChange={(e) => setTiktokFollowers(e.target.value)}
-                          placeholder="Follower count (e.g. 50K)"
-                          className="rounded-xl border-[#E5DFC6] bg-white focus:border-[#C7B892] focus:ring-[#C7B892]/20"
-                        />
-                      </div>
-                    </LuxuryFormSection>
-
-                    <LuxuryFormSection title="Instagram" icon={Instagram}>
-                      <div className="space-y-3">
-                        <div className="flex items-center rounded-xl border border-[#E5DFC6] bg-white px-3">
-                          <span className="text-[#6E6650] text-sm mr-1">@</span>
-                          <Input
-                            value={instagramHandle}
-                            onChange={(e) => setInstagramHandle(e.target.value)}
-                            placeholder="yourhandle"
-                            className="border-0 bg-transparent focus-visible:ring-0 px-0"
-                          />
-                        </div>
-                        <Input
-                          value={instagramFollowers}
-                          onChange={(e) => setInstagramFollowers(e.target.value)}
-                          placeholder="Follower count (e.g. 25K)"
-                          className="rounded-xl border-[#E5DFC6] bg-white focus:border-[#C7B892] focus:ring-[#C7B892]/20"
-                        />
-                      </div>
-                    </LuxuryFormSection>
-                  </div>
-
-                  <LuxuryFormSection title="Website or portfolio" subtitle="Optional" icon={LinkIcon}>
-                    <Input
-                      value={website}
-                      onChange={(e) => setWebsite(e.target.value)}
-                      placeholder="https://yoursite.com"
-                      className="rounded-xl border-[#E5DFC6] bg-white focus:border-[#C7B892] focus:ring-[#C7B892]/20"
-                    />
-                  </LuxuryFormSection>
+            {/* Step 2: Social Universe */}
+            {currentStep === 1 && (
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Your Social Universe</h2>
+                  <p className="text-[#6B7280]">Where do you create magic?</p>
                 </div>
-              )}
 
-              {/* Step 3: Niche & Style */}
-              {currentStep === 2 && (
-                <div className="space-y-8">
-                  <div className="text-center mb-6">
-                    <h2 className="font-secondary text-xl sm:text-2xl text-[#0a2225] mb-2">
-                      Your travel niche & style
-                    </h2>
-                    <p className="text-sm text-[#6E6650]">
-                      This helps us match you with travelers who love your aesthetic
-                    </p>
+                <div>
+                  <Label className="text-[#0a2225] font-medium mb-3 block">Primary Platform *</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {PLATFORMS.map((platform) => (
+                      <LuxurySelectionCard
+                        key={platform.value}
+                        label={platform.label}
+                        icon={platform.icon}
+                        selected={primaryPlatform === platform.value}
+                        onSelect={() => setPrimaryPlatform(platform.value)}
+                        variant="single"
+                      />
+                    ))}
                   </div>
-
-                  <LuxuryFormSection title="Travel niches" subtitle="What types of travel do you create content about?" helperText="Select all that apply">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {NICHE_OPTIONS.map((niche) => (
-                        <LuxurySelectionCard
-                          key={niche.label}
-                          label={niche.label}
-                          description={niche.description}
-                          selected={niches.includes(niche.label)}
-                          onSelect={() => toggleArrayValue(niches, setNiches, niche.label)}
-                          variant="multi"
-                        />
-                      ))}
-                    </div>
-                  </LuxuryFormSection>
-
-                  <LuxuryFormSection title="Content style" subtitle="How would you describe your content?">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {CONTENT_STYLE_OPTIONS.map((style) => (
-                        <LuxurySelectionCard
-                          key={style.label}
-                          label={style.label}
-                          description={style.description}
-                          selected={contentStyles.includes(style.label)}
-                          onSelect={() => toggleArrayValue(contentStyles, setContentStyles, style.label)}
-                          variant="multi"
-                        />
-                      ))}
-                    </div>
-                  </LuxuryFormSection>
-
-                  <LuxuryFormSection title="Budget level" subtitle="What price range do you typically feature?">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      {BUDGET_OPTIONS.map((budget) => (
-                        <LuxurySelectionCard
-                          key={budget.label}
-                          label={budget.label}
-                          description={budget.description}
-                          selected={budgetLevels.includes(budget.label)}
-                          onSelect={() => toggleArrayValue(budgetLevels, setBudgetLevels, budget.label)}
-                          variant="multi"
-                        />
-                      ))}
-                    </div>
-                  </LuxuryFormSection>
                 </div>
-              )}
 
-              {/* Step 4: Regions & Languages */}
-              {currentStep === 3 && (
-                <div className="space-y-8">
-                  <div className="text-center mb-6">
-                    <h2 className="font-secondary text-xl sm:text-2xl text-[#0a2225] mb-2">
-                      Where you create magic
-                    </h2>
-                    <p className="text-sm text-[#6E6650]">
-                      Tell us about the destinations you know best
-                    </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-[#0a2225] font-medium">TikTok Handle</Label>
+                    <Input value={tiktokHandle} onChange={(e) => setTiktokHandle(e.target.value)} placeholder="@yourhandle" className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
                   </div>
+                  <div>
+                    <Label className="text-[#0a2225] font-medium">TikTok Followers</Label>
+                    <Input value={tiktokFollowers} onChange={(e) => setTiktokFollowers(e.target.value)} placeholder="e.g., 50000" type="number" className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
+                  </div>
+                </div>
 
-                  <LuxuryFormSection title="Destination focus" subtitle="Which regions or countries do you specialize in?" helperText="We'll prioritize matching you with travelers interested in these places">
-                    <DestinationAutocompleteNominatim
-                      value={destinationFocus}
-                      onChange={setDestinationFocus}
-                      maxSelections={12}
-                    />
-                  </LuxuryFormSection>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-[#0a2225] font-medium">Instagram Handle</Label>
+                    <Input value={instagramHandle} onChange={(e) => setInstagramHandle(e.target.value)} placeholder="@yourhandle" className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
+                  </div>
+                  <div>
+                    <Label className="text-[#0a2225] font-medium">Instagram Followers</Label>
+                    <Input value={instagramFollowers} onChange={(e) => setInstagramFollowers(e.target.value)} placeholder="e.g., 25000" type="number" className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
+                  </div>
+                </div>
 
-                  <LuxuryFormSection title="Languages" subtitle="What languages do you create content in?">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                      {['English', 'Spanish', 'French', 'German', 'Italian', 'Portuguese', 'Arabic', 'Mandarin'].map((lang) => (
-                        <LuxurySelectionCard
-                          key={lang}
-                          label={lang}
-                          selected={languages.includes(lang)}
-                          onSelect={() => toggleArrayValue(languages, setLanguages, lang)}
-                          variant="multi"
-                        />
+                <div>
+                  <Label className="text-[#0a2225] font-medium">Website / Portfolio</Label>
+                  <Input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://yoursite.com" className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Niche & Style */}
+            {currentStep === 2 && (
+              <div className="space-y-8">
+                <div className="text-center mb-8">
+                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Your Travel Niche & Style</h2>
+                  <p className="text-[#6B7280]">Help us match you with the right travelers</p>
+                </div>
+
+                <div>
+                  <Label className="text-[#0a2225] font-medium mb-3 block">Travel Niches * <span className="text-[#6B7280] font-normal">(select all that apply)</span></Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {TRAVEL_NICHES.map((niche) => (
+                      <LuxurySelectionCard key={niche.value} label={niche.label} description={niche.description} selected={selectedNiches.includes(niche.value)} onSelect={() => toggleNiche(niche.value)} />
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-[#0a2225] font-medium mb-3 block">Content Style</Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {CONTENT_STYLES.map((style) => (
+                      <LuxurySelectionCard key={style.value} label={style.label} description={style.description} selected={selectedStyles.includes(style.value)} onSelect={() => toggleStyle(style.value)} />
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-[#0a2225] font-medium mb-3 block">Budget Levels You Feature</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {BUDGET_LEVELS.map((budget) => (
+                      <LuxurySelectionCard key={budget.value} label={budget.label} description={budget.description} selected={selectedBudgets.includes(budget.value)} onSelect={() => toggleBudget(budget.value)} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 4: Destinations */}
+            {currentStep === 3 && (
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Where You Create Magic</h2>
+                  <p className="text-[#6B7280]">Your destination expertise</p>
+                </div>
+
+                <div>
+                  <Label className="text-[#0a2225] font-medium mb-3 block">Primary Destinations * <span className="text-[#6B7280] font-normal">(regions you know best)</span></Label>
+                  <DestinationAutocompleteNominatim onSelect={addDestination} placeholder="Search destinations..." />
+                  {destinations.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {destinations.map((dest) => (
+                        <span key={dest} className="inline-flex items-center gap-1 px-3 py-1 bg-[#FDF9F0] border border-[#C7A962] rounded-full text-sm text-[#0a2225]">
+                          {dest}
+                          <button onClick={() => removeDestination(dest)} className="ml-1 text-[#6B7280] hover:text-[#0a2225]">×</button>
+                        </span>
                       ))}
                     </div>
-                  </LuxuryFormSection>
-
-                  <LuxuryFormSection title="Your travel point of view" subtitle="What makes your recommendations unique?">
-                    <Textarea
-                      value={pov}
-                      onChange={(e) => setPov(e.target.value)}
-                      placeholder="I focus on finding those hidden local spots that tourists never see. I believe the best travel experiences come from connecting with locals and experiencing authentic culture..."
-                      className="min-h-[120px] rounded-xl border-[#E5DFC6] bg-white focus:border-[#C7B892] focus:ring-[#C7B892]/20"
-                    />
-                  </LuxuryFormSection>
+                  )}
                 </div>
-              )}
 
-              {/* Step 5: How Goldsainte Works */}
-              {currentStep === 4 && (
-                <div className="space-y-8">
-                  <div className="text-center mb-6">
-                    <h2 className="font-secondary text-xl sm:text-2xl text-[#0a2225] mb-2">
-                      How Goldsainte works for you
-                    </h2>
-                    <p className="text-sm text-[#6E6650]">
-                      Turn your travel content into bookable experiences
-                    </p>
-                  </div>
-
-                  {/* Visual explanation cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="p-5 rounded-2xl bg-[#F5EFE1] border border-[#E5DFC6]">
-                      <div className="w-10 h-10 rounded-full bg-[#C7B892]/20 flex items-center justify-center mb-4">
-                        <Sparkles className="w-5 h-5 text-[#7A7151]" />
-                      </div>
-                      <h3 className="font-medium text-[#0a2225] mb-2">Create storyboards</h3>
-                      <p className="text-sm text-[#6E6650] leading-relaxed">
-                        Turn your best trips into visual storyboards that travelers can book through Goldsainte.
-                      </p>
-                    </div>
-
-                    <div className="p-5 rounded-2xl bg-[#F5EFE1] border border-[#E5DFC6]">
-                      <div className="w-10 h-10 rounded-full bg-[#C7B892]/20 flex items-center justify-center mb-4">
-                        <DollarSign className="w-5 h-5 text-[#7A7151]" />
-                      </div>
-                      <h3 className="font-medium text-[#0a2225] mb-2">Earn commissions</h3>
-                      <p className="text-sm text-[#6E6650] leading-relaxed">
-                        When travelers book trips inspired by your content, you earn a percentage of the booking value.
-                      </p>
-                    </div>
-
-                    <div className="p-5 rounded-2xl bg-[#F5EFE1] border border-[#E5DFC6]">
-                      <div className="w-10 h-10 rounded-full bg-[#C7B892]/20 flex items-center justify-center mb-4">
-                        <Shield className="w-5 h-5 text-[#7A7151]" />
-                      </div>
-                      <h3 className="font-medium text-[#0a2225] mb-2">Protected payments</h3>
-                      <p className="text-sm text-[#6E6650] leading-relaxed">
-                        Goldsainte handles all payments, escrow, and automatic payouts. No invoices, no chasing DMs.
-                      </p>
-                    </div>
-
-                    <div className="p-5 rounded-2xl bg-[#F5EFE1] border border-[#E5DFC6]">
-                      <div className="w-10 h-10 rounded-full bg-[#C7B892]/20 flex items-center justify-center mb-4">
-                        <MessageSquare className="w-5 h-5 text-[#7A7151]" />
-                      </div>
-                      <h3 className="font-medium text-[#0a2225] mb-2">On-platform messaging</h3>
-                      <p className="text-sm text-[#6E6650] leading-relaxed">
-                        Communicate with travelers and agents safely on Goldsainte. Everything stays in one place.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Policy acceptance */}
-                  <div className="p-5 rounded-2xl bg-white border-2 border-[#E5DFC6]">
-                    <label className="flex items-start gap-4 cursor-pointer">
-                      <button
-                        type="button"
-                        onClick={() => setPolicyAccepted(!policyAccepted)}
-                        className={cn(
-                          "flex-shrink-0 w-6 h-6 rounded-md border-2 flex items-center justify-center mt-0.5 transition-all",
-                          policyAccepted
-                            ? "border-[#C7B892] bg-[#C7B892]"
-                            : "border-[#D4CDB8] bg-white hover:border-[#C7B892]/60"
-                        )}
-                      >
-                        {policyAccepted && <Check className="w-4 h-4 text-white" />}
+                <div>
+                  <Label className="text-[#0a2225] font-medium mb-3 block">Languages You Create In</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {LANGUAGES.map((lang) => (
+                      <button key={lang} type="button" onClick={() => toggleLanguage(lang)} className={`px-4 py-2 rounded-full text-sm transition-all ${selectedLanguages.includes(lang) ? "bg-[#C7A962] text-white" : "bg-[#FDF9F0] text-[#0a2225] border border-[#E5DFC6] hover:border-[#C7A962]"}`}>
+                        {lang}
                       </button>
-                      <div>
-                        <p className="font-medium text-[#0a2225] text-sm">
-                          I agree to keep trip conversations and payments on Goldsainte
-                        </p>
-                        <p className="text-xs text-[#6E6650] mt-1 leading-relaxed">
-                          No external DMs, no direct payment links, no off-platform deals. This protects everyone and ensures you get paid.
-                        </p>
-                      </div>
-                    </label>
+                    ))}
                   </div>
                 </div>
-              )}
 
-              {/* Step 6: Launch */}
-              {currentStep === 5 && (
-                <div className="space-y-8">
-                  <div className="text-center mb-6">
-                    <div className="w-16 h-16 rounded-full bg-[#C7B892]/20 flex items-center justify-center mx-auto mb-4">
-                      <Sparkles className="w-8 h-8 text-[#C7A962]" />
-                    </div>
-                    <h2 className="font-secondary text-xl sm:text-2xl text-[#0a2225] mb-2">
-                      You're all set!
-                    </h2>
-                    <p className="text-sm text-[#6E6650] max-w-md mx-auto">
-                      Your creator profile is ready. Head to Creator Lab to start building your first storyboard.
-                    </p>
-                  </div>
+                <div>
+                  <Label className="text-[#0a2225] font-medium">Your Travel Point of View</Label>
+                  <Textarea value={travelPov} onChange={(e) => setTravelPov(e.target.value)} placeholder="What's your unique perspective on travel?" className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl min-h-[120px]" />
+                </div>
+              </div>
+            )}
 
-                  {/* Profile preview card */}
-                  <div className="p-6 rounded-2xl bg-[#F5EFE1] border border-[#E5DFC6]">
-                    <div className="flex items-start gap-4">
-                      <div className="w-16 h-16 rounded-full bg-[#C7B892]/30 flex items-center justify-center overflow-hidden flex-shrink-0">
-                        {avatarUrl ? (
-                          <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
-                        ) : (
-                          <User className="w-8 h-8 text-[#7A7151]" />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-secondary text-lg text-[#0a2225]">
-                          {displayName || "Your Name"}
-                        </h3>
-                        {homeBase && (
-                          <p className="text-sm text-[#6E6650] flex items-center gap-1 mt-0.5">
-                            <MapPin className="w-3 h-3" /> {homeBase}
-                          </p>
-                        )}
-                        {bio && (
-                          <p className="text-sm text-[#6E6650] mt-2 line-clamp-2">{bio}</p>
-                        )}
-                        {niches.length > 0 && (
-                          <div className="flex flex-wrap gap-1.5 mt-3">
-                            {niches.slice(0, 4).map((niche) => (
-                              <span
-                                key={niche}
-                                className="px-2 py-0.5 text-[10px] rounded-full bg-[#C7B892]/20 text-[#7A7151]"
-                              >
-                                {niche}
-                              </span>
-                            ))}
-                            {niches.length > 4 && (
-                              <span className="px-2 py-0.5 text-[10px] rounded-full bg-[#C7B892]/20 text-[#7A7151]">
-                                +{niches.length - 4} more
-                              </span>
-                            )}
-                          </div>
-                        )}
+            {/* Step 5: How Goldsainte Works */}
+            {currentStep === 4 && (
+              <div className="space-y-8">
+                <div className="text-center mb-8">
+                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">How Goldsainte Works</h2>
+                  <p className="text-[#6B7280]">Understanding the three-sided marketplace</p>
+                </div>
+
+                <div className="space-y-4">
+                  {[
+                    { step: 1, title: "Traveler Posts a Trip Request", desc: "A traveler describes their dream trip, budget, and preferences. AI matches them with creators and agents." },
+                    { step: 2, title: "You Create & Collaborate", desc: "Build storyboards, refine itineraries, and work with certified agents to craft the perfect journey." },
+                    { step: 3, title: "Booking & Escrow", desc: "Traveler books and pays through Goldsainte. Funds are held in escrow until trip completion." },
+                    { step: 4, title: "You Get Paid", desc: "After trip completion, your commission is released automatically. No chasing payments." },
+                  ].map((item) => (
+                    <div key={item.step} className="bg-[#FDF9F0] rounded-2xl p-6 border border-[#E5DFC6]">
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 bg-[#C7A962] rounded-full flex items-center justify-center text-white font-medium">{item.step}</div>
+                        <div>
+                          <h3 className="font-medium text-[#0a2225] mb-1">{item.title}</h3>
+                          <p className="text-sm text-[#6B7280]">{item.desc}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  ))}
+                </div>
 
-                  {/* What's next */}
-                  <div className="space-y-3">
-                    <h4 className="font-medium text-[#0a2225] text-sm">What you can do in Creator Lab:</h4>
-                    <ul className="space-y-2">
-                      {[
-                        "Create storyboards from your best trips",
-                        "See incoming trip requests from travelers",
-                        "Track your earnings and payouts",
-                        "Collaborate with verified travel agents",
-                      ].map((item) => (
-                        <li key={item} className="flex items-center gap-2 text-sm text-[#6E6650]">
-                          <div className="w-5 h-5 rounded-full bg-[#C7B892]/20 flex items-center justify-center flex-shrink-0">
-                            <Check className="w-3 h-3 text-[#7A7151]" />
-                          </div>
-                          {item}
-                        </li>
+                <div className="bg-gradient-to-br from-[#0a2225] to-[#1a3a3f] rounded-2xl p-6 text-white">
+                  <h3 className="font-secondary text-lg mb-4 flex items-center gap-2">
+                    <Wallet className="w-5 h-5 text-[#C7A962]" />
+                    Commission Example
+                  </h3>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between"><span className="text-white/80">Booking Value</span><span className="font-medium">$3,000</span></div>
+                    <div className="flex justify-between"><span className="text-white/80">Platform Fee (15%)</span><span className="text-white/60">-$450</span></div>
+                    <div className="flex justify-between"><span className="text-white/80">Your Commission (10-20%)</span><span className="text-[#C7A962] font-medium">$300 - $600</span></div>
+                    <hr className="border-white/20" />
+                    <div className="flex justify-between pt-1"><span className="text-white/80">Payout Timing</span><span className="font-medium">After trip completion</span></div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 6: Preview */}
+            {currentStep === 5 && (
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Almost There</h2>
+                  <p className="text-[#6B7280]">Preview how travelers will see you</p>
+                </div>
+
+                <div className="bg-[#FDF9F0] rounded-2xl p-6 border border-[#E5DFC6]">
+                  <div className="flex items-start gap-4">
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt={displayName} className="w-20 h-20 rounded-full object-cover border-2 border-[#C7A962]" />
+                    ) : (
+                      <div className="w-20 h-20 rounded-full bg-[#E5DFC6] flex items-center justify-center"><User className="w-8 h-8 text-[#6B7280]" /></div>
+                    )}
+                    <div className="flex-1">
+                      <h3 className="font-secondary text-xl text-[#0a2225]">{displayName || "Your Name"}</h3>
+                      {homeBase && <p className="text-sm text-[#6B7280] flex items-center gap-1"><MapPin className="w-3 h-3" /> {homeBase}</p>}
+                      {bio && <p className="text-sm text-[#0a2225] mt-2">{bio}</p>}
+                    </div>
+                  </div>
+                  {selectedNiches.length > 0 && (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {selectedNiches.slice(0, 4).map((niche) => (
+                        <span key={niche} className="px-3 py-1 bg-white border border-[#E5DFC6] rounded-full text-xs text-[#6B7280]">{TRAVEL_NICHES.find(n => n.value === niche)?.label}</span>
                       ))}
+                    </div>
+                  )}
+                  {destinations.length > 0 && (
+                    <div className="mt-3 flex items-center gap-2 text-sm text-[#6B7280]">
+                      <Globe className="w-4 h-4" />
+                      {destinations.slice(0, 3).join(", ")}{destinations.length > 3 && ` +${destinations.length - 3} more`}
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-white rounded-2xl p-6 border border-[#E5DFC6]">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Play className="w-5 h-5 text-[#C7A962]" />
+                    <h3 className="font-medium text-[#0a2225]">How Storyboards Work</h3>
+                  </div>
+                  <p className="text-sm text-[#6B7280] mb-4">Your content becomes bookable. Travelers can save inspiration from your TikToks, photos, and posts into visual mood boards that become trip requests.</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="aspect-square bg-[#FDF9F0] rounded-lg border border-[#E5DFC6] flex items-center justify-center"><Camera className="w-6 h-6 text-[#C7A962]" /></div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 7: Pricing Model */}
+            {currentStep === 6 && (
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Your Pricing Model</h2>
+                  <p className="text-[#6B7280]">How do you want to earn on Goldsainte?</p>
+                </div>
+
+                <div className="space-y-3">
+                  {PRICING_MODELS.map((model) => (
+                    <LuxurySelectionCard key={model.value} label={model.label} description={model.description} icon={model.icon} selected={pricingModel === model.value} onSelect={() => setPricingModel(model.value)} variant="single" />
+                  ))}
+                </div>
+
+                {(pricingModel === "planning_fees" || pricingModel === "custom_itineraries") && (
+                  <div className="mt-6 p-4 bg-[#FDF9F0] rounded-xl border border-[#E5DFC6]">
+                    <Label className="text-[#0a2225] font-medium mb-3 block">{pricingModel === "planning_fees" ? "Planning Fee Amount" : "Itinerary Price"}</Label>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[#6B7280]">$</span>
+                      <Input value={pricingModel === "planning_fees" ? planningFee : itineraryFee} onChange={(e) => pricingModel === "planning_fees" ? setPlanningFee(e.target.value) : setItineraryFee(e.target.value)} placeholder="e.g., 150" type="number" className="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
+                    </div>
+                    <p className="text-xs text-[#6B7280] mt-2">This is in addition to your commission on bookings</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Step 8: Commitment */}
+            {currentStep === 7 && (
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Your Goldsainte Commitment</h2>
+                  <p className="text-[#6B7280]">Our partnership expectations</p>
+                </div>
+
+                <div className="bg-[#FDF9F0] rounded-2xl p-6 border border-[#E5DFC6]">
+                  <div className="flex items-start gap-3">
+                    <Shield className="w-6 h-6 text-[#C7A962] flex-shrink-0 mt-1" />
+                    <div>
+                      <h3 className="font-medium text-[#0a2225] mb-2">Transparency Agreement</h3>
+                      <p className="text-sm text-[#6B7280] mb-4">To protect both creators and travelers, all communications and transactions must stay on Goldsainte.</p>
+                      <label className="flex items-start gap-3 cursor-pointer">
+                        <input type="checkbox" checked={acceptsTransparency} onChange={(e) => setAcceptsTransparency(e.target.checked)} className="mt-1 w-5 h-5 rounded border-[#C7A962] text-[#C7A962] focus:ring-[#C7A962]" />
+                        <span className="text-sm text-[#0a2225]">I agree to keep all communications on Goldsainte. No external DMs, no off-platform deals. *</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-[#0a2225] font-medium mb-3 block flex items-center gap-2"><Clock className="w-4 h-4 text-[#C7A962]" />Response Commitment</Label>
+                  <p className="text-sm text-[#6B7280] mb-3">How quickly will you respond to traveler inquiries?</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {RESPONSE_TIMES.map((time) => (
+                      <LuxurySelectionCard key={time.value} label={time.label} description={time.description} selected={responseTime === time.value} onSelect={() => setResponseTime(time.value)} variant="single" />
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl p-6 border border-[#E5DFC6]">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input type="checkbox" checked={acceptsBookingCalls} onChange={(e) => setAcceptsBookingCalls(e.target.checked)} className="mt-1 w-5 h-5 rounded border-[#C7A962] text-[#C7A962] focus:ring-[#C7A962]" />
+                    <div>
+                      <span className="font-medium text-[#0a2225] flex items-center gap-2"><Calendar className="w-4 h-4 text-[#C7A962]" />Available for Booking Calls</span>
+                      <p className="text-sm text-[#6B7280] mt-1">Let travelers schedule video calls to discuss their trips</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            )}
+
+            {/* Step 9: Safety & Conduct */}
+            {currentStep === 8 && (
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Safety & Conduct</h2>
+                  <p className="text-[#6B7280]">Protecting our community</p>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="bg-[#FDF9F0] rounded-2xl p-6 border border-[#E5DFC6]">
+                    <h3 className="font-medium text-[#0a2225] mb-3 flex items-center gap-2"><MessageCircle className="w-5 h-5 text-[#C7A962]" />Communication Standards</h3>
+                    <ul className="text-sm text-[#6B7280] space-y-2">
+                      <li>• Respond professionally and respectfully to all inquiries</li>
+                      <li>• Provide accurate information about destinations and experiences</li>
+                      <li>• Set clear expectations about what's included in your services</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-[#FDF9F0] rounded-2xl p-6 border border-[#E5DFC6]">
+                    <h3 className="font-medium text-[#0a2225] mb-3 flex items-center gap-2"><Shield className="w-5 h-5 text-[#C7A962]" />Harassment Policy</h3>
+                    <ul className="text-sm text-[#6B7280] space-y-2">
+                      <li>• Zero tolerance for harassment, discrimination, or inappropriate behavior</li>
+                      <li>• Report any concerning interactions immediately</li>
+                      <li>• Violations result in immediate account suspension</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-[#FDF9F0] rounded-2xl p-6 border border-[#E5DFC6]">
+                    <h3 className="font-medium text-[#0a2225] mb-3 flex items-center gap-2"><Heart className="w-5 h-5 text-[#C7A962]" />Traveler Safety</h3>
+                    <ul className="text-sm text-[#6B7280] space-y-2">
+                      <li>• Only recommend vetted, safe experiences and accommodations</li>
+                      <li>• Provide accurate safety information for destinations</li>
+                      <li>• Never encourage risky or illegal activities</li>
                     </ul>
                   </div>
                 </div>
-              )}
 
-              {/* Navigation */}
-              <div className="flex items-center justify-between pt-8 border-t border-[#E5DFC6]/40 mt-8">
-                <Button
-                  variant="ghost"
-                  onClick={goPrev}
-                  disabled={currentStep === 0}
-                  className="text-[#6E6650] hover:text-[#0a2225] hover:bg-[#F5EFE1] text-sm rounded-full px-6 gap-2 disabled:opacity-40"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  Back
-                </Button>
-                
-                {currentStep < STEPS.length - 1 ? (
-                  <Button
-                    onClick={goNext}
-                    className="rounded-full px-8 bg-[#0a2225] hover:bg-[#0a2225]/90 text-white gap-2 shadow-lg shadow-[#0a2225]/20"
-                  >
-                    Continue
-                    <ArrowRight className="h-4 w-4" />
+                <div className="bg-white rounded-2xl p-6 border-2 border-[#C7A962]">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input type="checkbox" checked={acceptsSafetyPolicy} onChange={(e) => setAcceptsSafetyPolicy(e.target.checked)} className="mt-1 w-5 h-5 rounded border-[#C7A962] text-[#C7A962] focus:ring-[#C7A962]" />
+                    <span className="text-sm text-[#0a2225]">I have read and agree to Goldsainte's Creator Safety & Conduct Policy. I understand that violations may result in account suspension or termination. *</span>
+                  </label>
+                </div>
+              </div>
+            )}
+
+            {/* Step 10: AI Identity */}
+            {currentStep === 9 && (
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Your AI Identity</h2>
+                  <p className="text-[#6B7280]">Help Madison represent you authentically</p>
+                </div>
+
+                <div className="bg-[#FDF9F0] rounded-2xl p-4 border border-[#E5DFC6] mb-6">
+                  <p className="text-sm text-[#6B7280]"><span className="text-[#C7A962] font-medium">Optional but powerful:</span> These settings help Goldsainte.AI match you with the right travelers and respond on your behalf in your authentic voice.</p>
+                </div>
+
+                <div>
+                  <Label className="text-[#0a2225] font-medium mb-3 block">Your Tone & Voice</Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {AI_TONES.map((tone) => (
+                      <LuxurySelectionCard key={tone.value} label={tone.label} description={tone.description} selected={aiTone === tone.value} onSelect={() => setAiTone(tone.value)} variant="single" />
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-[#0a2225] font-medium mb-3 block">Who's Your Ideal Audience? <span className="text-[#6B7280] font-normal">(select all that apply)</span></Label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {AI_AUDIENCES.map((audience) => (
+                      <LuxurySelectionCard key={audience.value} label={audience.label} description={audience.description} selected={aiAudiences.includes(audience.value)} onSelect={() => toggleAudience(audience.value)} />
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-[#0a2225] font-medium">Travel Philosophy Statement</Label>
+                  <p className="text-sm text-[#6B7280] mb-2">A signature message that captures your essence (shown on your profile)</p>
+                  <Textarea value={travelPhilosophy} onChange={(e) => setTravelPhilosophy(e.target.value)} placeholder="e.g., 'I curate sophisticated, intentional journeys centered around design, culture, and connection.'" className="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl min-h-[100px]" />
+                </div>
+
+                {aiTone && (
+                  <div className="bg-gradient-to-br from-[#0a2225] to-[#1a3a3f] rounded-2xl p-6 text-white">
+                    <h3 className="font-secondary text-lg mb-3 flex items-center gap-2"><Sparkles className="w-5 h-5 text-[#C7A962]" />How Madison Might Respond For You</h3>
+                    <p className="text-sm text-white/80 italic">
+                      {aiTone === "chic" && '"This creator specializes in refined, design-forward experiences. Their aesthetic is understated luxury—think boutique hotels, curated dining, and moments of quiet elegance."'}
+                      {aiTone === "playful" && '"Get ready for an adventure! This creator brings energy and spontaneity to every trip. Perfect for travelers who love discovering hidden gems and saying yes to the unexpected."'}
+                      {aiTone === "cinematic" && '"Every journey tells a story. This creator captures destinations through a cinematic lens, transforming trips into visual narratives that you\'ll remember forever."'}
+                      {aiTone === "warm" && '"Think of them as a well-traveled friend who genuinely wants to help you find the perfect trip. They bring warmth, authenticity, and personal recommendations to every interaction."'}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Step 11: Payment Setup */}
+            {currentStep === 10 && (
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Payment Setup</h2>
+                  <p className="text-[#6B7280]">How you'll get paid for your work</p>
+                </div>
+
+                <div className="bg-[#FDF9F0] rounded-2xl p-6 border border-[#E5DFC6]">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-[#C7A962] rounded-full flex items-center justify-center"><CreditCard className="w-6 h-6 text-white" /></div>
+                    <div>
+                      <h3 className="font-medium text-[#0a2225] mb-1">Secure Payouts via Stripe</h3>
+                      <p className="text-sm text-[#6B7280]">We use Stripe Connect for fast, secure payouts. You'll need to complete verification to receive commissions.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 text-sm text-[#6B7280]"><CheckCircle className="w-5 h-5 text-[#C7A962]" /><span>Bank account or debit card for payouts</span></div>
+                  <div className="flex items-center gap-3 text-sm text-[#6B7280]"><CheckCircle className="w-5 h-5 text-[#C7A962]" /><span>Tax information (W9 for US creators)</span></div>
+                  <div className="flex items-center gap-3 text-sm text-[#6B7280]"><CheckCircle className="w-5 h-5 text-[#C7A962]" /><span>Identity verification for security</span></div>
+                </div>
+
+                <div className="bg-white rounded-2xl p-6 border border-[#E5DFC6]">
+                  <h3 className="font-medium text-[#0a2225] mb-4">Payout Schedule</h3>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between"><span className="text-[#6B7280]">Commission Release</span><span className="text-[#0a2225]">After trip completion</span></div>
+                    <div className="flex justify-between"><span className="text-[#6B7280]">Payout Frequency</span><span className="text-[#0a2225]">Daily (minimum delay)</span></div>
+                    <div className="flex justify-between"><span className="text-[#6B7280]">Processing Time</span><span className="text-[#0a2225]">1-2 business days</span></div>
+                  </div>
+                </div>
+
+                <p className="text-sm text-[#6B7280] text-center">You can complete payment setup now or later from your dashboard.</p>
+              </div>
+            )}
+
+            {/* Navigation buttons */}
+            <div className="flex justify-between mt-10 pt-6 border-t border-[#E5DFC6]">
+              <Button variant="ghost" onClick={handleBack} disabled={currentStep === 0} className="text-[#6B7280] hover:text-[#0a2225] hover:bg-[#FDF9F0]">Back</Button>
+
+              <div className="flex gap-3">
+                {currentStep === 10 && (
+                  <Button variant="outline" onClick={handleStripeSetup} className="border-[#C7A962] text-[#C7A962] hover:bg-[#C7A962] hover:text-white">
+                    <CreditCard className="w-4 h-4 mr-2" />Set Up Stripe Now
                   </Button>
+                )}
+
+                {currentStep < STEPS.length - 1 ? (
+                  <Button onClick={handleNext} disabled={!canProceed()} className="bg-[#0a2225] hover:bg-[#0a2225]/90 text-white px-8">Continue</Button>
                 ) : (
-                  <Button
-                    onClick={handleFinish}
-                    disabled={saving}
-                    className="rounded-full px-8 bg-[#0a2225] hover:bg-[#0a2225]/90 text-white gap-2 shadow-lg shadow-[#0a2225]/20"
-                  >
-                    {saving ? (
-                      <>
-                        <Sparkles className="h-4 w-4 animate-pulse" />
-                        Launching...
-                      </>
-                    ) : (
-                      <>
-                        Go to Creator Lab
-                        <ArrowRight className="h-4 w-4" />
-                      </>
-                    )}
+                  <Button onClick={handleSubmit} disabled={isSubmitting} className="bg-[#C7A962] hover:bg-[#C7A962]/90 text-white px-8">
+                    {isSubmitting ? "Launching..." : "Launch My Profile"}
+                    <Sparkles className="w-4 h-4 ml-2" />
                   </Button>
                 )}
               </div>
             </div>
           </div>
         </div>
+
+        <p className="text-center text-sm text-[#6B7280] mt-6">Step {currentStep + 1} of {STEPS.length}</p>
       </div>
     </div>
   );

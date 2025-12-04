@@ -7754,6 +7754,9 @@ export type Database = {
       }
       profiles: {
         Row: {
+          accepts_booking_calls: boolean | null
+          accepts_safety_policy: boolean | null
+          accepts_transparency_agreement: boolean | null
           account_status: string | null
           account_type: string | null
           agency_name: string | null
@@ -7765,9 +7768,12 @@ export type Database = {
           agent_years_experience: number | null
           ai_calls_reset_at: string | null
           ai_calls_used: number | null
+          ai_persona_audience: string[] | null
+          ai_persona_tone: string | null
           ai_subscription_tier: string | null
           auto_share_instagram: boolean | null
           auto_share_tiktok: boolean | null
+          availability_status: string | null
           avatar_url: string | null
           billing_address: Json | null
           bio: string | null
@@ -7800,6 +7806,7 @@ export type Database = {
           is_profile_complete: boolean | null
           is_shadowbanned: boolean | null
           is_verified: boolean | null
+          itinerary_fee_amount: number | null
           last_name: string | null
           last_seen_at: string | null
           last_warning_at: string | null
@@ -7811,13 +7818,17 @@ export type Database = {
           payout_schedule: string | null
           phone: string | null
           phone_verified: boolean | null
+          planning_fee_amount: number | null
           preferences: Json | null
           preferred_currency: string | null
           preferred_language: string | null
+          pricing_model: string | null
           primary_platform: string | null
           profile_visibility: string | null
+          response_commitment_hours: number | null
           restriction_expires_at: string | null
           role: string | null
+          safety_policy_signed_at: string | null
           show_account_type: boolean | null
           sms_notifications: boolean | null
           stripe_account_id: string | null
@@ -7838,6 +7849,9 @@ export type Database = {
           tiktok_token_expires_at: string | null
           tiktok_username: string | null
           time_zone: string | null
+          transparency_agreement_signed_at: string | null
+          travel_philosophy: string | null
+          unavailable_until: string | null
           updated_at: string
           username: string | null
           warning_count: number | null
@@ -7845,6 +7859,9 @@ export type Database = {
           welcome_shown: boolean
         }
         Insert: {
+          accepts_booking_calls?: boolean | null
+          accepts_safety_policy?: boolean | null
+          accepts_transparency_agreement?: boolean | null
           account_status?: string | null
           account_type?: string | null
           agency_name?: string | null
@@ -7856,9 +7873,12 @@ export type Database = {
           agent_years_experience?: number | null
           ai_calls_reset_at?: string | null
           ai_calls_used?: number | null
+          ai_persona_audience?: string[] | null
+          ai_persona_tone?: string | null
           ai_subscription_tier?: string | null
           auto_share_instagram?: boolean | null
           auto_share_tiktok?: boolean | null
+          availability_status?: string | null
           avatar_url?: string | null
           billing_address?: Json | null
           bio?: string | null
@@ -7891,6 +7911,7 @@ export type Database = {
           is_profile_complete?: boolean | null
           is_shadowbanned?: boolean | null
           is_verified?: boolean | null
+          itinerary_fee_amount?: number | null
           last_name?: string | null
           last_seen_at?: string | null
           last_warning_at?: string | null
@@ -7902,13 +7923,17 @@ export type Database = {
           payout_schedule?: string | null
           phone?: string | null
           phone_verified?: boolean | null
+          planning_fee_amount?: number | null
           preferences?: Json | null
           preferred_currency?: string | null
           preferred_language?: string | null
+          pricing_model?: string | null
           primary_platform?: string | null
           profile_visibility?: string | null
+          response_commitment_hours?: number | null
           restriction_expires_at?: string | null
           role?: string | null
+          safety_policy_signed_at?: string | null
           show_account_type?: boolean | null
           sms_notifications?: boolean | null
           stripe_account_id?: string | null
@@ -7929,6 +7954,9 @@ export type Database = {
           tiktok_token_expires_at?: string | null
           tiktok_username?: string | null
           time_zone?: string | null
+          transparency_agreement_signed_at?: string | null
+          travel_philosophy?: string | null
+          unavailable_until?: string | null
           updated_at?: string
           username?: string | null
           warning_count?: number | null
@@ -7936,6 +7964,9 @@ export type Database = {
           welcome_shown?: boolean
         }
         Update: {
+          accepts_booking_calls?: boolean | null
+          accepts_safety_policy?: boolean | null
+          accepts_transparency_agreement?: boolean | null
           account_status?: string | null
           account_type?: string | null
           agency_name?: string | null
@@ -7947,9 +7978,12 @@ export type Database = {
           agent_years_experience?: number | null
           ai_calls_reset_at?: string | null
           ai_calls_used?: number | null
+          ai_persona_audience?: string[] | null
+          ai_persona_tone?: string | null
           ai_subscription_tier?: string | null
           auto_share_instagram?: boolean | null
           auto_share_tiktok?: boolean | null
+          availability_status?: string | null
           avatar_url?: string | null
           billing_address?: Json | null
           bio?: string | null
@@ -7982,6 +8016,7 @@ export type Database = {
           is_profile_complete?: boolean | null
           is_shadowbanned?: boolean | null
           is_verified?: boolean | null
+          itinerary_fee_amount?: number | null
           last_name?: string | null
           last_seen_at?: string | null
           last_warning_at?: string | null
@@ -7993,13 +8028,17 @@ export type Database = {
           payout_schedule?: string | null
           phone?: string | null
           phone_verified?: boolean | null
+          planning_fee_amount?: number | null
           preferences?: Json | null
           preferred_currency?: string | null
           preferred_language?: string | null
+          pricing_model?: string | null
           primary_platform?: string | null
           profile_visibility?: string | null
+          response_commitment_hours?: number | null
           restriction_expires_at?: string | null
           role?: string | null
+          safety_policy_signed_at?: string | null
           show_account_type?: boolean | null
           sms_notifications?: boolean | null
           stripe_account_id?: string | null
@@ -8020,6 +8059,9 @@ export type Database = {
           tiktok_token_expires_at?: string | null
           tiktok_username?: string | null
           time_zone?: string | null
+          transparency_agreement_signed_at?: string | null
+          travel_philosophy?: string | null
+          unavailable_until?: string | null
           updated_at?: string
           username?: string | null
           warning_count?: number | null
