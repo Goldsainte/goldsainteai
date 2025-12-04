@@ -6,7 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, FileText, Shield, Building } from 'lucide-react';
+import { Loader2, FileText, Shield, Building, Eye } from 'lucide-react';
 
 interface AgentTermsAcceptanceModalProps {
   open: boolean;
@@ -20,8 +20,9 @@ export const AgentTermsAcceptanceModal = ({ open, agentId, onAccepted }: AgentTe
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [vendorAccepted, setVendorAccepted] = useState(false);
+  const [transparencyAccepted, setTransparencyAccepted] = useState(false);
 
-  const allAccepted = termsAccepted && privacyAccepted && vendorAccepted;
+  const allAccepted = termsAccepted && privacyAccepted && vendorAccepted && transparencyAccepted;
 
   const handleAcceptAll = async () => {
     if (!allAccepted) return;
@@ -33,7 +34,8 @@ export const AgentTermsAcceptanceModal = ({ open, agentId, onAccepted }: AgentTe
           agentId,
           termsVersion: 'v1.0',
           privacyVersion: 'v1.0',
-          vendorVersion: 'v1.0'
+          vendorVersion: 'v1.0',
+          transparencyVersion: 'v1.0'
         }
       });
 
@@ -162,6 +164,39 @@ export const AgentTermsAcceptanceModal = ({ open, agentId, onAccepted }: AgentTe
                 />
                 <label htmlFor="vendor" className="text-sm font-medium cursor-pointer">
                   I have read and agree to the Vendor Agreement
+                </label>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Transparency Agreement */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Eye className="h-5 w-5 text-primary" />
+                <h3 className="text-lg font-semibold">Transparency Agreement</h3>
+              </div>
+              <div className="text-sm space-y-2 text-muted-foreground">
+                <p className="font-medium">1. On-Platform Communication</p>
+                <p>All campaign communications and transactions must stay on the Goldsainte Platform. No external DMs, calls, or side deals...</p>
+                
+                <p className="font-medium mt-4">2. Pricing & Fee Transparency</p>
+                <p>Clearly represent pricing, commissions, and any markups. No misleading quotes or hidden costs...</p>
+                
+                <p className="font-medium mt-4">3. Sponsored Content Disclosure</p>
+                <p>Disclose any compensation, gifted stays, or affiliate relationships when promoting experiences...</p>
+                
+                <p className="font-medium mt-4">4. AI & Recommendations</p>
+                <p>You are responsible for verifying AI-assisted suggestions. AI may not reflect real-time availability...</p>
+              </div>
+              <div className="flex items-center space-x-2 mt-4 p-3 bg-secondary rounded-lg">
+                <Checkbox 
+                  id="transparency" 
+                  checked={transparencyAccepted}
+                  onCheckedChange={(checked) => setTransparencyAccepted(checked as boolean)}
+                />
+                <label htmlFor="transparency" className="text-sm font-medium cursor-pointer">
+                  I have read and agree to the <a href="/transparency-agreement" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Transparency Agreement</a>
                 </label>
               </div>
             </div>
