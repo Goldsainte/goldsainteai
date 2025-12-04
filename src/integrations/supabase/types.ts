@@ -7810,6 +7810,7 @@ export type Database = {
           is_shadowbanned: boolean | null
           is_verified: boolean | null
           itinerary_fee_amount: number | null
+          languages: string[] | null
           last_name: string | null
           last_seen_at: string | null
           last_warning_at: string | null
@@ -7927,6 +7928,7 @@ export type Database = {
           is_shadowbanned?: boolean | null
           is_verified?: boolean | null
           itinerary_fee_amount?: number | null
+          languages?: string[] | null
           last_name?: string | null
           last_seen_at?: string | null
           last_warning_at?: string | null
@@ -8044,6 +8046,7 @@ export type Database = {
           is_shadowbanned?: boolean | null
           is_verified?: boolean | null
           itinerary_fee_amount?: number | null
+          languages?: string[] | null
           last_name?: string | null
           last_seen_at?: string | null
           last_warning_at?: string | null
