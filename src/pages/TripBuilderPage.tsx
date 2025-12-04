@@ -140,35 +140,36 @@ export default function TripBuilderPage() {
   return (
     <div className="min-h-screen bg-[#FDF9F0]">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white border-b border-[#E5DFC6] shadow-sm">
-        <div className="max-w-5xl mx-auto px-4 py-4">
+      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-[#E5DFC6]">
+        <div className="max-w-5xl mx-auto px-4 py-5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-6">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate(-1)}
-                className="text-[#0a2225]"
+                className="text-[#0a2225] hover:bg-[#FDF9F0] rounded-full px-4"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
               </Button>
               <div>
-                <h1 className="font-secondary text-xl font-semibold text-[#0a2225]">
+                <div className="w-12 h-0.5 bg-[#C7A962] mb-2" />
+                <h1 className="font-secondary text-2xl font-semibold text-[#0a2225]">
                   {editId ? "Edit Trip" : "Create Ready to Book Trip"}
                 </h1>
-                <p className="text-sm text-[#6B7280]">
-                  Build a complete trip package for the marketplace
+                <p className="text-sm text-[#6B7280] mt-1">
+                  Craft an unforgettable experience for the marketplace
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               {editId && (
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handlePreview}
-                  className="border-[#E5DFC6]"
+                  className="border-[#E5DFC6] hover:bg-[#FDF9F0] rounded-full px-5"
                 >
                   <Eye className="h-4 w-4 mr-2" />
                   Preview
