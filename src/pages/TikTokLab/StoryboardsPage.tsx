@@ -105,15 +105,17 @@ export default function TikTokLabStoryboardsPage() {
                 {copy.headerSubtitle}
               </p>
             </div>
-            <Button
-              asChild
-              className="rounded-full bg-[#0c4d47] text-[#E5DFC6] text-xs font-semibold hover:bg-[#073331]"
-            >
-              <Link to="/storyboards/new">
-                <Plus className="h-3 w-3 mr-1" />
-                New storyboard
-              </Link>
-            </Button>
+            {!loading && storyboards.length > 0 && (
+              <Button
+                asChild
+                className="rounded-full bg-[#0c4d47] text-[#E5DFC6] text-xs font-semibold hover:bg-[#073331]"
+              >
+                <Link to="/storyboards/new">
+                  <Plus className="h-3 w-3 mr-1" />
+                  New storyboard
+                </Link>
+              </Button>
+            )}
           </header>
 
           {loading ? (
