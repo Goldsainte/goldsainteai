@@ -33,36 +33,36 @@ export function HomeHero() {
             {t('home.hero.mainDescription')}
           </p>
 
-          {/* Primary CTAs - Mobile optimized layout */}
-          <div className="flex flex-col gap-3 pt-1 md:flex-row md:flex-wrap md:items-center">
-            {/* Primary CTA - Full width on mobile */}
+          {/* Primary CTAs - Stacked layout */}
+          <div className="flex flex-col gap-3 pt-1 max-w-sm">
+            {/* Row 1: Post a Dream Trip - Full width */}
             <Link
               to="/post-trip"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-6 py-3 text-sm font-semibold text-[#E5DFC6] shadow-sm hover:bg-[#073331] w-full md:w-auto"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-6 py-3 text-sm font-semibold text-[#E5DFC6] shadow-sm hover:bg-[#073331] w-full"
             >
               {t('home.hero.postDreamTrip')}
             </Link>
 
-            {/* Secondary CTAs - Row of 2 on mobile */}
-            <div className="flex gap-2 w-full md:w-auto">
+            {/* Row 2: Browse Creators + Browse Agents - Side by side */}
+            <div className="flex gap-2 w-full">
               <Link
                 to="/creators"
-                className="flex-1 md:flex-none text-center rounded-full border border-[#BFAD72] bg-white px-4 py-2.5 text-sm font-semibold text-[#0a2225] transition-all hover:bg-[#BFAD72] hover:text-white"
+                className="flex-1 text-center rounded-full border border-[#BFAD72] bg-white px-4 py-2.5 text-sm font-semibold text-[#0a2225] transition-all hover:bg-[#BFAD72] hover:text-white"
               >
                 {t('home.hero.browseCreators')}
               </Link>
               <Link
                 to="/agents"
-                className="flex-1 md:flex-none text-center rounded-full border border-[#E5DFC6] bg-white px-4 py-2.5 text-sm font-semibold text-[#0a2225] transition-all hover:bg-[#BFAD72] hover:text-white"
+                className="flex-1 text-center rounded-full border border-[#E5DFC6] bg-white px-4 py-2.5 text-sm font-semibold text-[#0a2225] transition-all hover:bg-[#BFAD72] hover:text-white"
               >
                 {t('home.hero.browseAgents')}
               </Link>
             </div>
 
-            {/* Marketplace - Full width on mobile */}
+            {/* Row 3: Marketplace - Full width, same size as primary */}
             <Link
               to="/marketplace"
-              className="text-center rounded-full border border-[#E5DFC6] bg-white px-4 py-2.5 text-sm font-semibold text-[#0a2225] transition-all hover:bg-[#BFAD72] hover:text-white w-full md:w-auto"
+              className="inline-flex items-center justify-center rounded-full border border-[#E5DFC6] bg-white px-6 py-3 text-sm font-semibold text-[#0a2225] transition-all hover:bg-[#BFAD72] hover:text-white w-full"
             >
               {t('home.hero.marketplace')}
             </Link>
