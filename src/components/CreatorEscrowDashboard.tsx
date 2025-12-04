@@ -1,90 +1,172 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, CheckCircle, Info, AlertTriangle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Clock, CheckCircle, Info, AlertTriangle, Shield, Sparkles, ArrowRight } from "lucide-react";
 
 export const CreatorEscrowDashboard = () => {
   return (
-    <div className="space-y-6">
-      <Alert>
-        <Info className="h-4 w-4" />
-        <AlertDescription>
-          Escrow system is active! Payments are held securely and released when milestones are met.
-        </AlertDescription>
-      </Alert>
-
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending in Escrow</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">$0.00</div>
-            <p className="text-xs text-muted-foreground mt-1">Awaiting milestone completion</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Released</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">$0.00</div>
-            <p className="text-xs text-muted-foreground mt-1">Successfully paid out</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Under Dispute</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-orange-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">$0.00</div>
-            <p className="text-xs text-muted-foreground mt-1">Being reviewed</p>
-          </CardContent>
-        </Card>
+    <div className="space-y-8">
+      {/* Info Alert */}
+      <div className="bg-[#0c4d47]/5 border border-[#0c4d47]/20 rounded-2xl p-4 flex items-start gap-3">
+        <div className="w-8 h-8 rounded-full bg-[#0c4d47]/10 flex items-center justify-center flex-shrink-0">
+          <Shield className="h-4 w-4 text-[#0c4d47]" />
+        </div>
+        <div>
+          <p className="text-sm font-medium text-[#0a2225]">
+            Escrow system is active
+          </p>
+          <p className="text-sm text-[#6B7280]">
+            Payments are held securely and released when milestones are met.
+          </p>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>How Escrow Works</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <h4 className="font-semibold">Platform Fee: 15%</h4>
-            <p className="text-sm text-muted-foreground">
-              A 15% platform fee covers payment processing, support, and platform operations.
-            </p>
-          </div>
+      {/* Stats Grid */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <StatCard
+          icon={<Clock className="h-5 w-5 text-[#C7A962]" />}
+          label="Pending in Escrow"
+          value="$0.00"
+          helper="Awaiting milestone completion"
+        />
+        <StatCard
+          icon={<CheckCircle className="h-5 w-5 text-[#0c4d47]" />}
+          label="Total Released"
+          value="$0.00"
+          helper="Successfully paid out"
+          highlight
+        />
+        <StatCard
+          icon={<AlertTriangle className="h-5 w-5 text-amber-500" />}
+          label="Under Dispute"
+          value="$0.00"
+          helper="Being reviewed"
+        />
+      </div>
 
-          <div className="space-y-2">
-            <h4 className="font-semibold">Milestone-Based Releases</h4>
-            <p className="text-sm text-muted-foreground">
-              Earnings are released as you complete milestones. Submit evidence and get paid after customer approval.
-            </p>
+      {/* How Escrow Works */}
+      <div className="bg-white border border-[#E5DFC6] rounded-2xl overflow-hidden">
+        <div className="px-6 py-5 border-b border-[#E5DFC6]">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-[#C7A962]" />
+            <h3 className="text-lg font-secondary text-[#0a2225]">
+              How Escrow Works
+            </h3>
           </div>
-
-          <div className="space-y-2">
-            <h4 className="font-semibold">Upfront Payout (Verified Creators)</h4>
-            <p className="text-sm text-muted-foreground">
-              Verified creators receive 20-30% upfront. The remaining 70-80% is held in escrow until milestones are met.
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <h4 className="font-semibold">Example Breakdown</h4>
-            <div className="bg-muted p-4 rounded-lg text-sm space-y-1">
-              <p>• Customer pays: $5,000</p>
-              <p>• Platform fee (15%): $750</p>
-              <p>• Your earnings: $4,250</p>
-              <p>• Upfront (20%): $850</p>
-              <p>• Held in escrow: $3,400</p>
+        </div>
+        
+        <div className="p-6 space-y-6">
+          {/* Platform Fee */}
+          <div className="flex gap-4">
+            <div className="w-10 h-10 rounded-full bg-[#FDF9F0] flex items-center justify-center flex-shrink-0">
+              <span className="text-sm font-secondary text-[#C7A962]">1</span>
+            </div>
+            <div>
+              <h4 className="font-medium text-[#0a2225] mb-1">
+                Platform Fee: <span className="text-[#C7A962]">15%</span>
+              </h4>
+              <p className="text-sm text-[#6B7280]">
+                A 15% platform fee covers payment processing, support, and platform operations.
+              </p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Milestone Releases */}
+          <div className="flex gap-4">
+            <div className="w-10 h-10 rounded-full bg-[#FDF9F0] flex items-center justify-center flex-shrink-0">
+              <span className="text-sm font-secondary text-[#C7A962]">2</span>
+            </div>
+            <div>
+              <h4 className="font-medium text-[#0a2225] mb-1">
+                Milestone-Based Releases
+              </h4>
+              <p className="text-sm text-[#6B7280]">
+                Earnings are released as you complete milestones. Submit evidence and get paid after customer approval.
+              </p>
+            </div>
+          </div>
+
+          {/* Upfront Payout */}
+          <div className="flex gap-4">
+            <div className="w-10 h-10 rounded-full bg-[#FDF9F0] flex items-center justify-center flex-shrink-0">
+              <span className="text-sm font-secondary text-[#C7A962]">3</span>
+            </div>
+            <div>
+              <h4 className="font-medium text-[#0a2225] mb-1">
+                Upfront Payout <span className="text-xs px-2 py-0.5 rounded-full bg-[#C7A962]/10 text-[#C7A962] ml-1">Verified Creators</span>
+              </h4>
+              <p className="text-sm text-[#6B7280]">
+                Verified creators receive 20-30% upfront. The remaining 70-80% is held in escrow until milestones are met.
+              </p>
+            </div>
+          </div>
+
+          {/* Example Breakdown */}
+          <div className="bg-[#FDF9F0] border border-[#E5DFC6] rounded-xl p-5 mt-6">
+            <p className="text-xs uppercase tracking-wider text-[#C7A962] font-medium mb-4">
+              Example Breakdown
+            </p>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-[#6B7280]">Customer pays</span>
+                <span className="font-medium text-[#0a2225]">$5,000</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-[#6B7280]">Platform fee (15%)</span>
+                <span className="text-[#6B7280]">-$750</span>
+              </div>
+              <div className="h-px bg-[#E5DFC6] my-2" />
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-medium text-[#0a2225]">Your earnings</span>
+                <span className="font-secondary text-lg text-[#C7A962]">$4,250</span>
+              </div>
+              <div className="h-px bg-[#E5DFC6] my-2" />
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-[#6B7280] flex items-center gap-1">
+                  <ArrowRight className="w-3 h-3" /> Upfront (20%)
+                </span>
+                <span className="text-[#0c4d47] font-medium">$850</span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-[#6B7280] flex items-center gap-1">
+                  <ArrowRight className="w-3 h-3" /> Held in escrow
+                </span>
+                <span className="text-[#6B7280]">$3,400</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
+
+function StatCard({
+  icon,
+  label,
+  value,
+  helper,
+  highlight = false,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  helper: string;
+  highlight?: boolean;
+}) {
+  return (
+    <div className={`rounded-2xl p-5 space-y-3 transition-all ${
+      highlight 
+        ? "bg-white border-2 border-[#C7A962] shadow-sm" 
+        : "bg-white border border-[#E5DFC6]"
+    }`}>
+      <div className="flex items-center justify-between">
+        {icon}
+        <p className="text-xs uppercase tracking-wider text-[#6B7280] font-medium">
+          {label}
+        </p>
+      </div>
+      <p className={`text-2xl font-secondary ${highlight ? "text-[#C7A962]" : "text-[#0a2225]"}`}>
+        {value}
+      </p>
+      <p className="text-xs text-[#9CA3AF]">{helper}</p>
+    </div>
+  );
+}
