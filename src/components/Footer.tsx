@@ -62,6 +62,7 @@ export const Footer = () => {
                 <li><Link to="/about#legal" className={linkClasses}>{t('footer.companyInfo')}</Link></li>
                 <li><Link to="/privacy-cookies" className={linkClasses}>{t('footer.privacyCookies')}</Link></li>
                 <li><Link to="/about#terms" className={linkClasses}>{t('footer.termsOfService')}</Link></li>
+                <li><Link to="/legal/creator-agreement" className={linkClasses}>Creator Partnership Agreement</Link></li>
                 <li><Link to="/about#accessibility" className={linkClasses}>{t('footer.accessibilityStatement')}</Link></li>
                 <li><Link to="/community-guidelines" className={linkClasses}>{t('footer.communityGuidelines')}</Link></li>
                 <li><Link to="/about#dispute-resolution" className={linkClasses}>{t('footer.disputeResolution')}</Link></li>
@@ -133,6 +134,7 @@ export const Footer = () => {
               <li><Link to="/about#legal" className={linkClasses}>{t('footer.companyInfo')}</Link></li>
               <li><Link to="/privacy-cookies" className={linkClasses}>{t('footer.privacyCookies')}</Link></li>
               <li><Link to="/about#terms" className={linkClasses}>{t('footer.termsOfService')}</Link></li>
+              <li><Link to="/legal/creator-agreement" className={linkClasses}>Creator Partnership Agreement</Link></li>
               <li><Link to="/about#accessibility" className={linkClasses}>{t('footer.accessibilityStatement')}</Link></li>
               <li><Link to="/community-guidelines" className={linkClasses}>{t('footer.communityGuidelines')}</Link></li>
               <li><Link to="/about#dispute-resolution" className={linkClasses}>{t('footer.disputeResolution')}</Link></li>
