@@ -46,7 +46,7 @@ export default function LeftNav() {
         
         {/* TikTok Lab - Creators, Agents, Brands only */}
         {(isCreator || isAgentAccount || isBrand) && (
-          <NavItemLink to="/tiktok-lab"><Video className="w-6 h-6" /> TikTok Lab</NavItemLink>
+          <NavItemLink to="/tiktok-lab"><Video className="w-6 h-6" /> Creator Studio</NavItemLink>
         )}
         
         <NavItemLink to="/post-trip"><PlaneTakeoff className="w-6 h-6" /> Post a Trip</NavItemLink>
