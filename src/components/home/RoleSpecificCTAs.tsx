@@ -4,6 +4,11 @@ import { Button } from "@/components/ui/button";
 import { User, Video, Briefcase, Building2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import travelerImage from "@/assets/hero-overwater-villa.jpg";
+import creatorImage from "@/assets/creator-canyon-views.jpg";
+import agentImage from "@/assets/seoul-autumn.jpg";
+import brandImage from "@/assets/hero-jungle-villa.jpg";
+
 export function RoleSpecificCTAs() {
   const { t } = useTranslation();
 
@@ -14,7 +19,7 @@ export function RoleSpecificCTAs() {
       body: t('home.rolesCTA.traveler.body'),
       buttonText: t('home.rolesCTA.traveler.button'),
       link: "/auth?mode=signup&role=traveler",
-      backgroundImage: "/home/christian-lambert-vmIWr0NnpCQ-unsplash.jpeg",
+      backgroundImage: travelerImage,
     },
     {
       icon: Video,
@@ -22,7 +27,7 @@ export function RoleSpecificCTAs() {
       body: t('home.rolesCTA.joinAsCreator.body'),
       buttonText: t('home.rolesCTA.joinAsCreator.button'),
       link: "/auth?mode=signup&role=creator",
-      backgroundImage: "/home/justin-clark-JkT5-MulyiE-unsplash.jpg",
+      backgroundImage: creatorImage,
     },
     {
       icon: Briefcase,
@@ -30,7 +35,7 @@ export function RoleSpecificCTAs() {
       body: t('home.rolesCTA.applyAsAgent.body'),
       buttonText: t('home.rolesCTA.applyAsAgent.button'),
       link: "/apply/agent",
-      backgroundImage: "/home/nicolas-meunier-WKGmcxLdXC4-unsplash.jpeg",
+      backgroundImage: agentImage,
     },
     {
       icon: Building2,
@@ -38,7 +43,7 @@ export function RoleSpecificCTAs() {
       body: t('home.rolesCTA.applyAsBrand.body'),
       buttonText: t('home.rolesCTA.applyAsBrand.button'),
       link: "/apply/brand",
-      backgroundImage: "/home/amanoi-vietnam-702398-unsplash.jpeg",
+      backgroundImage: brandImage,
     },
   ];
 
