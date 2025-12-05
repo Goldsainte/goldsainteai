@@ -54,13 +54,6 @@ export function MarketplaceHeader() {
               </Link>
             </div>
 
-            {/* Browse Brands - Full width on mobile */}
-            <Link
-              to="/marketplace?tab=brands"
-              className="text-center rounded-full border border-[#E5DFC6]/60 bg-white px-4 py-2.5 text-sm font-medium text-[#0a2225] transition hover:bg-[#BFAD72] hover:text-white w-full sm:w-auto"
-            >
-              Browse Brands
-            </Link>
           </div>
 
           {/* Marketplace Legal Disclaimer - Condensed on mobile */}
