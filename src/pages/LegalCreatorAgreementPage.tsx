@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Helmet } from 'react-helmet-async';
 import { Button } from "@/components/ui/button";
 import { ArrowUp } from "lucide-react";
+import { BackButton } from "@/components/ui/BackButton";
 
 export default function LegalCreatorAgreementPage() {
   useEffect(() => {
@@ -17,6 +18,7 @@ export default function LegalCreatorAgreementPage() {
       <Helmet>
         <title>Creator Partnership Agreement · Goldsainte</title>
       </Helmet>
+      <BackButton className="mb-6" />
 
       {/* Header */}
       <header className="mb-12 text-center">

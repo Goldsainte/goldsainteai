@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, AlertCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { BackButton } from "@/components/ui/BackButton";
 
 interface Guideline {
   id: string;
@@ -59,6 +60,7 @@ export default function CommunityGuidelines() {
   return (
     <>
       <div className="container py-8 max-w-4xl">
+        <BackButton className="mb-6" />
         <div className="mb-8">
           <h1 className="text-3xl font-bold flex items-center gap-2 mb-2">
             <Shield className="h-8 w-8" />

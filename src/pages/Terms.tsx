@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowUp } from "lucide-react";
+import { BackButton } from "@/components/ui/BackButton";
 
 export default function Terms() {
   useEffect(() => {
@@ -14,6 +15,8 @@ export default function Terms() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <BackButton className="mb-6" />
+      
       {/* Header */}
       <header className="mb-12 text-center">
         <h1 className="text-4xl font-bold mb-3">Goldsainte Terms of Service</h1>

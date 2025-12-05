@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async';
+import { BackButton } from '@/components/ui/BackButton';
 
 export default function LegalTermsPage() {
   return (
@@ -6,6 +7,7 @@ export default function LegalTermsPage() {
       <Helmet>
         <title>Terms of Service · Goldsainte</title>
       </Helmet>
+      <BackButton className="mb-4" />
       <header className="space-y-2">
         <p className="text-[11px] uppercase tracking-[0.2em] text-[#7A7151]">Legal</p>
         <h1 className="font-secondary text-3xl text-[#0a2225]">Terms of Service</h1>

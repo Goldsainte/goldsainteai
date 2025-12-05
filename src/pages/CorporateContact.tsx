@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Building2, Users, Briefcase, Info, TrendingUp, Search, HelpCircle, BookOpen, MessageSquare, Mail, Copy } from "lucide-react";
+import { Building2, Users, Briefcase, Info, TrendingUp, Search, HelpCircle, BookOpen, MessageSquare, Mail, Copy } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/accordion";
 import primaryLogoGreen from "@/assets/primary-horizontal-logo-green.svg";
 import { useToast } from "@/hooks/use-toast";
+import { BackButton } from "@/components/ui/BackButton";
 
 export default function CorporateContact() {
   const navigate = useNavigate();
@@ -105,15 +106,7 @@ export default function CorporateContact() {
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 md:py-12 max-w-5xl">
         {/* Back Button */}
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/')}
-          className="mb-6 h-12 text-sm sm:text-base"
-          size="lg"
-        >
-          <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-          Back
-        </Button>
+        <BackButton className="mb-6" />
 
         {/* Logo Section */}
         <div className="flex justify-center mb-6 sm:mb-8">

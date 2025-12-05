@@ -7,12 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronLeft, Camera, CheckCircle2, Loader2, Shield, Trash2 } from "lucide-react";
+import { Camera, CheckCircle2, Loader2, Shield, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AccountTypeSelector } from "@/components/AccountTypeSelector";
 import { BusinessVerificationUpload } from "@/components/BusinessVerificationUpload";
 import { BusinessVerifiedBadge } from "@/components/badges/BusinessVerifiedBadge";
+import { BackButton } from "@/components/ui/BackButton";
 
 interface Profile {
   username: string | null;
@@ -272,16 +273,7 @@ const TravelSettings = () => {
       {/* Header */}
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-lg border-b">
         <div className="flex items-center gap-4 p-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={async () => {
-              const { data: { user } } = await supabase.auth.getUser();
-              if (user) navigate(`/creator/${user.id}`);
-            }}
-          >
-            <ChevronLeft className="h-6 w-6" />
-          </Button>
+          <BackButton />
           <Avatar className="h-9 w-9">
             <AvatarImage src={profile.avatar_url || undefined} />
             <AvatarFallback className="bg-primary text-primary-foreground text-sm">

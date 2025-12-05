@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Briefcase, MapPin, DollarSign, Clock, ArrowLeft, MessageSquare, CheckCircle, Sparkles, Shield } from "lucide-react";
+import { Briefcase, MapPin, DollarSign, Clock, MessageSquare, CheckCircle, Sparkles, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { JobMessaging } from "@/components/JobMessaging";
 import { StripeConnectOnboarding } from "@/components/StripeConnectOnboarding";
@@ -26,6 +26,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PaymentMilestonesManager } from "@/components/PaymentMilestonesManager";
 import { InvoiceGenerator } from "@/components/InvoiceGenerator";
 import { AgentCreatorCollabs } from "@/components/AgentCreatorCollabs";
+import { BackButton } from "@/components/ui/BackButton";
 
 export default function AgentDashboard() {
   const { user, isLoading: authLoading } = useAuth();
@@ -302,14 +303,7 @@ export default function AgentDashboard() {
     <div className="min-h-screen bg-background flex flex-col">
       
       <main className="flex-1 container mx-auto px-4 py-8">
-        <Button
-          variant="ghost"
-          onClick={() => navigate(-1)}
-          className="mb-6"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
-        </Button>
+        <BackButton className="mb-6" />
         
         <div className="flex items-center justify-between mb-8">
           <div>

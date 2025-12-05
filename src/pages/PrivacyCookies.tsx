@@ -4,6 +4,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { ArrowUp, Mail, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import { BackButton } from "@/components/ui/BackButton";
 
 const PrivacyCookies = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -23,8 +24,11 @@ const PrivacyCookies = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <div className="container mx-auto max-w-4xl px-4 pt-6">
+        <BackButton className="mb-4" />
+      </div>
       {/* Hero Section */}
-      <section className="relative py-20 px-4 bg-gradient-to-b from-primary/5 to-background">
+      <section className="relative py-12 px-4 bg-gradient-to-b from-primary/5 to-background">
         <div className="container mx-auto max-w-4xl text-center">
           <h1 className="text-2xl sm:text-3xl font-bold mb-6">
             Privacy and Cookies Policy

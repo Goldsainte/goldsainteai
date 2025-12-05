@@ -8,6 +8,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useTranslation } from "react-i18next";
+import { BackButton } from "@/components/ui/BackButton";
 import founderImage from "@/assets/founder.jpg";
 import ticketmasterLogo from "@/assets/TicketMaster_wordmark.svg";
 import openaiLogo from "@/assets/OpenAI_Logo.svg";
@@ -101,6 +102,7 @@ const About = () => {
 
   return (
     <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 md:py-12 max-w-5xl">
+      <BackButton className="mb-6" />
       {/* Page Header */}
       <div className="text-center mb-8 sm:mb-12">
         <div className="flex justify-center mb-4 sm:mb-6">

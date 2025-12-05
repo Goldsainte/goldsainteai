@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async';
+import { BackButton } from '@/components/ui/BackButton';
 
 export default function TrustSafetyPage() {
   return (
@@ -6,6 +7,7 @@ export default function TrustSafetyPage() {
       <Helmet>
         <title>Trust &amp; Safety · Goldsainte</title>
       </Helmet>
+      <BackButton className="mb-4" />
       <header className="space-y-2">
         <p className="text-[11px] uppercase tracking-[0.2em] text-[#7A7151]">Safety</p>
         <h1 className="font-secondary text-3xl text-[#0a2225]">Trust &amp; Safety</h1>
