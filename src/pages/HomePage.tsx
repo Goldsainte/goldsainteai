@@ -10,8 +10,8 @@ export default function HomePage() {
       <StoryboardsHighlight />
       <BuiltForEverySideSection />
       <HowGoldsainteWorksSection />
-      <TrustSafetyPaymentsSection />
       <RoleSpecificCTAs />
+      <TrustSafetyPaymentsSection />
     </main>
   );
 }
