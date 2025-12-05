@@ -34,11 +34,11 @@ export default function Index() {
         {/* How Goldsainte AI works - luxury redesign */}
         <HowGoldsainteWorksSection />
 
-        {/* Trust, safety & payments - luxury redesign */}
-        <TrustSafetyPaymentsSection />
-
         {/* Role-specific CTAs - three-way sign up */}
         <RoleSpecificCTAs />
+
+        {/* Trust, safety & payments - luxury redesign */}
+        <TrustSafetyPaymentsSection />
 
         {/* Trust messaging - mobile only, after role CTAs */}
         <TrustFooterMobile />

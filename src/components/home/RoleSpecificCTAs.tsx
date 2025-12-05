@@ -49,10 +49,16 @@ export function RoleSpecificCTAs() {
 
   return (
     <section className="bg-[#FDF9F0] py-20 md:py-24">
-      <div className="mx-auto max-w-6xl px-4">
-        <h2 className="text-center font-secondary text-[26px] leading-snug text-[#0a2225] md:text-4xl lg:text-[42px] mb-14">
+      <div className="mx-auto max-w-6xl px-4 text-center">
+        <p className="inline-flex rounded-full bg-[#0c4d47] px-3 py-1 text-[10px] md:text-xs font-medium uppercase tracking-[0.12em] text-[#D4C07A] mb-4">
+          Join the marketplace
+        </p>
+        <h2 className="font-secondary text-[26px] leading-snug text-[#0a2225] md:text-4xl lg:text-[42px] mb-3">
           Choose how you join <em>Goldsainte</em>
         </h2>
+        <p className="max-w-xl mx-auto text-sm md:text-base text-[#5A5A5A] mb-14">
+          Whether you're planning your next journey, sharing your adventures, or crafting unforgettable itineraries — there's a place for you here.
+        </p>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {roles.map((role, index) => {
