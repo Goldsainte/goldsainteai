@@ -469,71 +469,101 @@ export const TrustSafetyPaymentsSection: React.FC = () => {
   return (
     <section className="bg-[#FDF9F0] px-4 py-16 md:py-24">
       <div className="mx-auto max-w-6xl">
-        {/* Section Header */}
-        <div className="mb-12 md:mb-16 text-center">
-          <p className="inline-flex rounded-full bg-[#C7A962]/10 border border-[#C7A962]/30 px-4 py-1.5 text-[10px] md:text-xs font-medium uppercase tracking-[0.15em] text-[#8B7355] mb-5">
-            {t('home.trustSafety.badge')}
-          </p>
-          <h2 className="font-secondary text-[26px] leading-[1.15] text-[#0a2225] md:text-[40px] mb-3">
-            {t('home.trustSafety.title')}
-          </h2>
-          <p className="max-w-2xl mx-auto text-sm md:text-base text-[#5A5A5A] leading-relaxed">
-            {t('home.trustSafety.description')}
-          </p>
-        </div>
+        {/* Two-Column Layout */}
+        <div className="flex flex-col lg:flex-row gap-10 lg:gap-14">
+          {/* Left Column: Header + Accordion */}
+          <div className="lg:w-[55%]">
+            {/* Section Header - Left Aligned */}
+            <div className="mb-8 md:mb-10">
+              <p className="inline-flex rounded-full bg-[#C7A962]/10 border border-[#C7A962]/30 px-4 py-1.5 text-[10px] md:text-xs font-medium uppercase tracking-[0.15em] text-[#8B7355] mb-5">
+                {t('home.trustSafety.badge')}
+              </p>
+              <h2 className="font-secondary text-[26px] leading-[1.15] text-[#0a2225] md:text-[40px] mb-3">
+                {t('home.trustSafety.title')}
+              </h2>
+              <p className="max-w-xl text-sm md:text-base text-[#5A5A5A] leading-relaxed">
+                {t('home.trustSafety.description')}
+              </p>
+            </div>
 
-        {/* Accordion */}
-        <div className="max-w-3xl mx-auto">
-          <Accordion
-            type="single"
-            collapsible
-            value={openItem}
-            onValueChange={(value) => value && setOpenItem(value)}
-            className="space-y-4"
-          >
-            {items.map((item) => {
-              const Icon = item.icon;
-              const isActive = openItem === item.id;
-              return (
-                <AccordionItem
-                  key={item.id}
-                  value={item.id}
-                  className="border-0"
-                >
-                  <AccordionTrigger
-                    className={cn(
-                      "flex items-center gap-4 px-6 py-5 rounded-xl transition-all duration-500 hover:no-underline",
-                      "[&>svg]:transition-all [&>svg]:duration-500 [&>svg]:text-[#C7A962]",
-                      isActive
-                        ? "bg-[#FDFBF7] border-l-4 border-l-[#C7A962] shadow-[0_4px_20px_rgba(199,169,98,0.08)]"
-                        : "bg-white border-l-4 border-l-transparent hover:bg-[#FDFBF7] hover:border-l-[#C7A962]/50"
-                    )}
+            {/* Accordion */}
+            <Accordion
+              type="single"
+              collapsible
+              value={openItem}
+              onValueChange={(value) => value && setOpenItem(value)}
+              className="space-y-4"
+            >
+              {items.map((item) => {
+                const Icon = item.icon;
+                const isActive = openItem === item.id;
+                return (
+                  <AccordionItem
+                    key={item.id}
+                    value={item.id}
+                    className="border-0"
                   >
-                    <div className={cn(
-                      "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500",
-                      isActive ? "bg-[#C7A962]/15" : "bg-[#F5EFE1]"
-                    )}>
-                      <Icon className="w-5 h-5 text-[#C7A962]" />
-                    </div>
-                    <span className="font-secondary text-lg text-[#0a2225] flex-1 text-left">
-                      {item.title}
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionContent className="pt-4 pb-2 px-6 pl-20">
-                    <p className="text-sm leading-relaxed text-[#6B7280]">
-                      {item.body}
-                    </p>
-                  </AccordionContent>
-                </AccordionItem>
-              );
-            })}
-          </Accordion>
-        </div>
+                    <AccordionTrigger
+                      className={cn(
+                        "flex items-center gap-4 px-6 py-5 rounded-xl transition-all duration-500 hover:no-underline",
+                        "[&>svg]:transition-all [&>svg]:duration-500 [&>svg]:text-[#C7A962]",
+                        isActive
+                          ? "bg-[#FDFBF7] border-l-4 border-l-[#C7A962] shadow-[0_4px_20px_rgba(199,169,98,0.08)]"
+                          : "bg-white border-l-4 border-l-transparent hover:bg-[#FDFBF7] hover:border-l-[#C7A962]/50"
+                      )}
+                    >
+                      <div className={cn(
+                        "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500",
+                        isActive ? "bg-[#C7A962]/15" : "bg-[#F5EFE1]"
+                      )}>
+                        <Icon className="w-5 h-5 text-[#C7A962]" />
+                      </div>
+                      <span className="font-secondary text-lg text-[#0a2225] flex-1 text-left">
+                        {item.title}
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent className="pt-4 pb-2 px-6 pl-20">
+                      <p className="text-sm leading-relaxed text-[#6B7280]">
+                        {item.body}
+                      </p>
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              })}
+            </Accordion>
+          </div>
 
-        {/* Footer Note */}
-        <p className="mt-10 md:mt-12 text-center text-[13px] text-[#8B8B8B] max-w-md mx-auto">
-          All communication and payments stay inside Goldsainte. No phone numbers, no side deals — just protected, organized travel.
-        </p>
+          {/* Right Column: Editorial Image Panel */}
+          <div className="lg:w-[45%] flex items-center justify-center">
+            <div className="relative w-full max-w-md">
+              {/* Subtle background frame */}
+              <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-[32px] border border-[#E5DFC6]/70 bg-[#F5EFE1]/30" />
+              
+              {/* Image container */}
+              <div className="relative overflow-hidden rounded-[32px] shadow-[0_24px_60px_rgba(10,34,37,0.12)]">
+                <img
+                  src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80"
+                  alt="Luxury resort trust & safety"
+                  className="w-full h-[280px] md:h-[420px] object-cover"
+                  loading="lazy"
+                />
+                
+                {/* Gradient overlay with trust message */}
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-5 md:p-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <ShieldCheck className="w-4 h-4 text-[#D4C07A]" />
+                    <span className="text-white/90 text-sm font-medium tracking-wide">
+                      Protected Journeys
+                    </span>
+                  </div>
+                  <p className="text-white/80 text-xs leading-relaxed max-w-xs">
+                    All communication and payments stay inside Goldsainte — no phone numbers, no side deals.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
