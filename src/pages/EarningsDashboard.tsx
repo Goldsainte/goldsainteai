@@ -1,12 +1,13 @@
 // src/pages/EarningsDashboard.tsx
 import { useEffect, useState } from "react";
-import { ArrowLeft, Wallet, Clock, Lock, CheckCircle } from "lucide-react";
+import { Wallet, Clock, Lock, CheckCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   getMyEarningsSummary,
   getMyLatestEarnings,
   requestPayout,
 } from "@/services/earningsService";
+import { BackButton } from "@/components/ui/BackButton";
 
 export default function EarningsDashboard() {
   const navigate = useNavigate();
@@ -79,13 +80,7 @@ export default function EarningsDashboard() {
     <main className="min-h-screen bg-[#FDF9F0] text-[#0a2225] px-4 py-8">
       <div className="mx-auto max-w-5xl space-y-8">
         {/* Back Button */}
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-sm text-[#6B7280] hover:text-[#0a2225] transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back</span>
-        </button>
+        <BackButton />
 
         {/* Header */}
         <header className="space-y-2">

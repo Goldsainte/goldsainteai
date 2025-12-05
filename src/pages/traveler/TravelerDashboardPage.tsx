@@ -14,6 +14,7 @@ import { TravelerStoryboardsTab } from "./components/TravelerStoryboardsTab";
 import { TravelerSettingsTab } from "./components/TravelerSettingsTab";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { BackButton } from "@/components/ui/BackButton";
 
 interface Profile {
   id: string;
@@ -122,6 +123,7 @@ export default function TravelerDashboardPage() {
   return (
     <main className="min-h-screen bg-[#FDF9F0] pb-24 lg:pb-0">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 md:py-12">
+        <BackButton className="mb-4" />
         {/* Sticky Header */}
         <header className="mb-6 md:mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6">

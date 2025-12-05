@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Search, BookOpen, CreditCard, XCircle, UserCircle, Sparkles, Users, Briefcase, MapPin } from 'lucide-react';
+import { Search, BookOpen, CreditCard, XCircle, UserCircle, Sparkles, Users, Briefcase, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { BackButton } from '@/components/ui/BackButton';
 import { Input } from '@/components/ui/input';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { HelpCenterChat } from '@/components/HelpCenterChat';
@@ -45,17 +46,7 @@ export default function HelpCenter() {
     <div className="flex-1 bg-background">
       <div className="container mx-auto px-4 md:px-6 py-8 max-w-6xl">
         {/* Back Button */}
-        <Button
-          variant="ghost"
-          size="sm"
-          asChild
-          className="mb-6"
-        >
-          <Link to="/">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Home
-          </Link>
-        </Button>
+        <BackButton className="mb-6" />
 
         {/* Logo */}
         <div className="flex justify-center mb-6 sm:mb-8">

@@ -6,10 +6,11 @@ import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CreditCard, Settings, Sparkles, Briefcase, ArrowLeft, MapPin, Globe, Phone, User, Mail, Share2, LayoutDashboard, ArrowUpRight } from "lucide-react";
+import { CreditCard, Settings, Sparkles, Briefcase, MapPin, Globe, Phone, User, Mail, Share2, LayoutDashboard, ArrowUpRight } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { EditProfileDialog } from "@/components/EditProfileDialog";
+import { BackButton } from "@/components/ui/BackButton";
 
 interface Profile {
   id: string;
@@ -78,14 +79,7 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-background flex flex-col pb-24 md:pb-0">
       <main className="flex-1 container mx-auto px-4 py-4 md:py-8 max-w-3xl">
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/')}
-          className="mb-4"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
-        </Button>
+        <BackButton className="mb-4" />
 
         {/* Profile Header */}
         <div className="space-y-4 mb-6">

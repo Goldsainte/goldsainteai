@@ -9,6 +9,7 @@ import { Download, CreditCard, Calendar, DollarSign, FileText } from "lucide-rea
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { BackButton } from "@/components/ui/BackButton";
 
 interface BillingInfo {
   customer: any;
@@ -116,6 +117,7 @@ const BillingDashboard = () => {
 
   return (
     <div className="container mx-auto p-6 max-w-6xl">
+      <BackButton className="mb-6" />
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Billing Dashboard</h1>

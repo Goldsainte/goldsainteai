@@ -82,7 +82,7 @@ export default function CreatorDashboard() {
       <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
         {/* Back button */}
         <div className="mb-6">
-          <BackButton label="Back to Home" to="/" />
+          <BackButton />
         </div>
 
         {/* Gold accent line */}

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { ArrowUp } from "lucide-react";
+import { BackButton } from "@/components/ui/BackButton";
 
 export default function TransparencyAgreement() {
   useEffect(() => {
@@ -18,6 +19,7 @@ export default function TransparencyAgreement() {
         <title>Transparency Agreement · Goldsainte</title>
         <meta name="description" content="Learn about Goldsainte's commitment to transparency, honest communication, and on-platform collaboration between creators, brands, and travelers." />
       </Helmet>
+      <BackButton className="mb-6" />
 
       {/* Header */}
       <header className="mb-6 text-center">

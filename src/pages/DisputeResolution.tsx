@@ -13,6 +13,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, FileText, Scale, Users, AlertCircle } from "lucide-react";
+import { BackButton } from "@/components/ui/BackButton";
 
 const disputeSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -78,6 +79,7 @@ const DisputeResolution = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-5xl">
+      <BackButton className="mb-6" />
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-4">Dispute Resolution</h1>

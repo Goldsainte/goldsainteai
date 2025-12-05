@@ -19,6 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { invokeWithAuth } from "@/lib/supabaseHelpers";
 import { useQuery } from "@tanstack/react-query";
+import { BackButton } from "@/components/ui/BackButton";
 
 type Tab = "trips" | "creators" | "agents" | "brands" | "trip-requests";
 
@@ -349,6 +350,9 @@ export default function Marketplace() {
       </Helmet>
 
       <div className="min-h-screen bg-[#FDF9F0] pb-24 lg:pb-0">
+        <div className="mx-auto max-w-6xl px-4 pt-4">
+          <BackButton className="mb-2" />
+        </div>
         <MarketplaceHeader />
         <MarketplaceSearch onSearch={handleSearch} filters={filters} />
 

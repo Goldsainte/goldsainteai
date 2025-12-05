@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BackButton } from "@/components/ui/BackButton";
 
 const WhatWeDo = () => {
   const scrollToTop = () => {
@@ -9,6 +10,7 @@ const WhatWeDo = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <BackButton className="mb-6" />
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4">What We Do</h1>

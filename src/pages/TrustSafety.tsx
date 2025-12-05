@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Shield, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { BackButton } from "@/components/ui/BackButton";
 
 interface UserReport {
   id: string;
@@ -137,6 +138,7 @@ export default function TrustSafety() {
 
   return (
     <div className="container py-8 max-w-6xl">
+      <BackButton className="mb-6" />
       <div className="mb-8">
         <h1 className="text-3xl font-bold flex items-center gap-2">
           <Shield className="h-8 w-8" />
