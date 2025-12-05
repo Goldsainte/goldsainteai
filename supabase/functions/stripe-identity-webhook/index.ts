@@ -657,13 +657,13 @@ async function processVerificationCompleted(
   const { data: agentApp } = await supabaseClient
     .from("agent_applications")
     .select("id, email, first_name, last_name")
-    .eq("stripe_session_id", sessionId)
+    .eq("stripe_verification_session_id", sessionId)
     .single();
 
   const { data: brandApp } = await supabaseClient
     .from("brand_applications")
     .select("id, primary_contact_email, brand_name")
-    .eq("stripe_session_id", sessionId)
+    .eq("stripe_verification_session_id", sessionId)
     .single();
 
   const { data: travelerVerification } = await supabaseClient
