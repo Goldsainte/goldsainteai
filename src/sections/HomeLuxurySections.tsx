@@ -113,6 +113,9 @@ export const BuiltForEverySideSection: React.FC = () => {
         <h2 className="font-secondary text-[28px] md:text-4xl lg:text-[42px] leading-tight text-[#0a2225]">
           {t('home.builtForEverySide.title')}
         </h2>
+        <p className="max-w-2xl mx-auto text-sm md:text-base text-[#5A5A5A] mt-3">
+          Each role brings something essential — travelers bring the vision, creators bring the aesthetic, agents refine the details, brands shape the experience. Goldsainte brings them together in one cinematic journey.
+        </p>
       </div>
 
       {/* Horizontal scroll container with peek effect */}
@@ -303,8 +306,8 @@ export const HowGoldsainteWorksSection: React.FC = () => {
           <h2 className="font-secondary text-[26px] leading-[1.15] text-[#0a2225] md:text-[40px] mb-3">
             How <span className="italic">Goldsainte AI</span> works
           </h2>
-          <p className="max-w-xl mx-auto text-sm md:text-base text-[#5A5A5A]">
-            From inspiration to booking, AI handles the heavy lifting.
+          <p className="max-w-2xl mx-auto text-sm md:text-base text-[#5A5A5A] leading-relaxed">
+            Goldsainte AI listens to your style, curates the right creators and certified agents, and quietly orchestrates the journey in the background — while you stay in the experience. From mood board to booking confirmation, every step feels effortless.
           </p>
         </div>
 
@@ -462,7 +465,7 @@ export const TrustSafetyPaymentsSection: React.FC = () => {
   ];
 
   return (
-    <section className="bg-[#FDF9F0] px-4 py-16 md:py-24">
+    <section className="bg-white px-4 py-16 md:py-24">
       <div className="mx-auto flex max-w-6xl flex-col gap-8">
         <div className="space-y-3 text-center md:text-left">
           <p className="text-[11px] uppercase tracking-[0.22em] text-[#7A7151]">
