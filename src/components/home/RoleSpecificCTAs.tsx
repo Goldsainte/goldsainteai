@@ -49,14 +49,14 @@ export function RoleSpecificCTAs() {
 
   return (
     <section className="bg-white py-20 md:py-24">
-      <div className="mx-auto max-w-6xl px-4 text-center">
+      <div className="mx-auto max-w-6xl px-4 text-left">
         <p className="inline-flex rounded-full bg-[#0c4d47] px-3 py-1 text-[10px] md:text-xs font-medium uppercase tracking-[0.12em] text-[#D4C07A] mb-4">
           The Goldsainte Experience Awaits
         </p>
         <h2 className="font-secondary text-[26px] leading-snug text-[#0a2225] md:text-4xl lg:text-[42px] mb-3">
           Choose how you join <em>Goldsainte AI</em>
         </h2>
-        <p className="max-w-xl mx-auto text-sm md:text-base text-[#5A5A5A] mb-14">
+        <p className="max-w-xl text-sm md:text-base text-[#5A5A5A] mb-14">
           Whether you're planning your next journey, sharing your adventures, or crafting unforgettable itineraries — there's a place for you here.
         </p>
 
