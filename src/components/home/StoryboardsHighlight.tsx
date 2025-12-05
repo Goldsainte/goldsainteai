@@ -167,7 +167,7 @@ export function StoryboardsHighlight() {
             asChild
             variant="outline"
             size="lg"
-            className="w-full sm:w-auto border-[#0c4d47] text-[#0c4d47] hover:bg-[#0c4d47]/5"
+            className="w-full sm:w-auto border-[#0c4d47] text-[#0c4d47] hover:bg-[#0c4d47]/5 text-sm md:text-base"
           >
             <Link to="/marketplace">
               {t('home.storyboards.exploreStoryboards')}
