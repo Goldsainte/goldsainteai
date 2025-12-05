@@ -333,7 +333,7 @@ export const HowGoldsainteWorksSection: React.FC = () => {
                   >
                     <AccordionTrigger
                       className={cn(
-                        "flex items-center gap-4 px-6 py-5 rounded-xl transition-all duration-500 hover:no-underline",
+                        "flex items-center gap-3 md:gap-4 px-4 md:px-6 py-4 md:py-5 rounded-xl transition-all duration-500 hover:no-underline",
                         "[&>svg]:transition-all [&>svg]:duration-500 [&>svg]:text-[#C7A962]",
                         isActive
                           ? "bg-[#FDFBF7] border-l-4 border-l-[#C7A962] shadow-[0_4px_20px_rgba(199,169,98,0.08)]"
@@ -341,12 +341,12 @@ export const HowGoldsainteWorksSection: React.FC = () => {
                       )}
                     >
                       <div className={cn(
-                        "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500",
+                        "w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-all duration-500",
                         isActive ? "bg-[#C7A962]/15" : "bg-[#F5EFE1]"
                       )}>
-                        <TabIcon className="w-5 h-5 text-[#C7A962]" />
+                        <TabIcon className="w-4 h-4 md:w-5 md:h-5 text-[#C7A962]" />
                       </div>
-                      <span className="font-secondary text-lg text-[#0a2225] flex-1 text-left">
+                      <span className="font-secondary text-base md:text-lg text-[#0a2225] flex-1 text-left">
                         {tab.label}
                       </span>
                     </AccordionTrigger>
@@ -505,7 +505,7 @@ export const TrustSafetyPaymentsSection: React.FC = () => {
                   >
                     <AccordionTrigger
                       className={cn(
-                        "flex items-center gap-4 px-6 py-5 rounded-xl transition-all duration-500 hover:no-underline",
+                        "flex items-center gap-3 md:gap-4 px-4 md:px-6 py-4 md:py-5 rounded-xl transition-all duration-500 hover:no-underline",
                         "[&>svg]:transition-all [&>svg]:duration-500 [&>svg]:text-[#C7A962]",
                         isActive
                           ? "bg-[#FDFBF7] border-l-4 border-l-[#C7A962] shadow-[0_4px_20px_rgba(199,169,98,0.08)]"
@@ -513,12 +513,12 @@ export const TrustSafetyPaymentsSection: React.FC = () => {
                       )}
                     >
                       <div className={cn(
-                        "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500",
+                        "w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-all duration-500",
                         isActive ? "bg-[#C7A962]/15" : "bg-[#F5EFE1]"
                       )}>
-                        <Icon className="w-5 h-5 text-[#C7A962]" />
+                        <Icon className="w-4 h-4 md:w-5 md:h-5 text-[#C7A962]" />
                       </div>
-                      <span className="font-secondary text-lg text-[#0a2225] flex-1 text-left">
+                      <span className="font-secondary text-base md:text-lg text-[#0a2225] flex-1 text-left">
                         {item.title}
                       </span>
                     </AccordionTrigger>
