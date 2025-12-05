@@ -279,6 +279,14 @@ const tabsData: TabData[] = [
   },
 ];
 
+// Tab-specific hero images mapping
+const tabImages: Record<string, string> = {
+  personalizes: santoriniStepsImg,
+  creates: mountainBridgeImg,
+  matches: veniceGondolaImg,
+  books: hotAirBalloonsImg,
+};
+
 export const HowGoldsainteWorksSection: React.FC = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("personalizes");
@@ -326,35 +334,76 @@ export const HowGoldsainteWorksSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Feature Grid */}
-        <div className="grid gap-4 md:gap-6 md:grid-cols-2">
-          {activeTabData.features.map((feature, index) => {
-            const FeatureIcon = feature.icon;
-            return (
-              <div
-                key={feature.title}
-                className={cn(
-                  "rounded-2xl border border-[#E5DFC6] bg-white p-5 md:p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5",
-                  "animate-in fade-in slide-in-from-bottom-2"
-                )}
-                style={{ animationDelay: `${index * 75}ms`, animationFillMode: "both" }}
-              >
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#0c4d47]/10 flex items-center justify-center">
-                    <FeatureIcon className="w-5 h-5 md:w-6 md:h-6 text-[#0c4d47]" />
+        {/* Two-Column Layout: Features + Image */}
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+          {/* Left: Feature Grid */}
+          <div className="lg:w-[55%]">
+            <div className="grid gap-4 md:gap-5 md:grid-cols-2">
+              {activeTabData.features.map((feature, index) => {
+                const FeatureIcon = feature.icon;
+                return (
+                  <div
+                    key={feature.title}
+                    className={cn(
+                      "rounded-2xl border border-[#E5DFC6] bg-white p-4 md:p-5 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5",
+                      "animate-in fade-in slide-in-from-bottom-2"
+                    )}
+                    style={{ animationDelay: `${index * 75}ms`, animationFillMode: "both" }}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-9 h-9 md:w-10 md:h-10 rounded-full bg-[#0c4d47]/10 flex items-center justify-center">
+                        <FeatureIcon className="w-4 h-4 md:w-5 md:h-5 text-[#0c4d47]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-secondary text-sm md:text-base text-[#0a2225] mb-1">
+                          {feature.title}
+                        </h4>
+                        <p className="text-[12px] md:text-[13px] leading-relaxed text-[#5A5A5A]">
+                          {feature.description}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-secondary text-base md:text-lg text-[#0a2225] mb-1.5">
-                      {feature.title}
-                    </h4>
-                    <p className="text-[13px] md:text-sm leading-relaxed text-[#5A5A5A]">
-                      {feature.description}
-                    </p>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Right: Dynamic Image Panel */}
+          <div className="lg:w-[45%] flex items-center justify-center">
+            <div className="relative w-full max-w-md">
+              {/* Subtle background frame */}
+              <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-[32px] border border-[#E5DFC6]/70 bg-[#F5EFE1]/30" />
+              
+              {/* Image container with smooth transitions */}
+              <div className="relative overflow-hidden rounded-[32px] shadow-[0_24px_60px_rgba(10,34,37,0.12)]">
+                {Object.entries(tabImages).map(([tabId, imageSrc]) => (
+                  <img
+                    key={tabId}
+                    src={imageSrc}
+                    alt={`${tabId} travel inspiration`}
+                    className={cn(
+                      "w-full h-[280px] md:h-[420px] object-cover transition-opacity duration-500",
+                      activeTab === tabId ? "opacity-100" : "opacity-0 absolute inset-0"
+                    )}
+                  />
+                ))}
+                
+                {/* Gradient overlay with tab label */}
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent p-5 md:p-6">
+                  <div className="flex items-center gap-2">
+                    {(() => {
+                      const TabIcon = activeTabData.icon;
+                      return <TabIcon className="w-4 h-4 text-[#D4C07A]" />;
+                    })()}
+                    <span className="text-white/90 text-sm font-medium tracking-wide">
+                      {activeTabData.label}
+                    </span>
                   </div>
                 </div>
               </div>
-            );
-          })}
+            </div>
+          </div>
         </div>
 
         {/* Footer Note */}
