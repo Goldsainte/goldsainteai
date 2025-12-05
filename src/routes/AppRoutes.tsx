@@ -404,8 +404,8 @@ export const AppRoutes = () => (
         )}
       />
       <Route path="/tiktok-lab" element={<TikTokLabDashboardPage />} />
-      <Route path="/tiktok-lab/trips" element={<PartnerTripsPage />} />
-      <Route path="/tiktok-lab/earnings" element={<TikTokEarningsPage />} />
+      <Route path="/tiktok-lab/trips" element={<RequireAuth><PartnerTripsPage /></RequireAuth>} />
+      <Route path="/tiktok-lab/earnings" element={<RequireAuth><TikTokEarningsPage /></RequireAuth>} />
       <Route path="/storyboards" element={<RequireAuth><TikTokLabStoryboardsPage /></RequireAuth>} />
       <Route path="/storyboards/new" element={<RequireAuth><TikTokLabStoryboardEditorPage /></RequireAuth>} />
       <Route path="/storyboards/:id" element={<RequireAuth><TikTokLabStoryboardEditorPage /></RequireAuth>} />
@@ -488,7 +488,7 @@ export const AppRoutes = () => (
           </RouteSectionBoundary>
         )}
       />
-      <Route path="/creator-dashboard" element={<CreatorDashboard />} />
+      <Route path="/creator-dashboard" element={<RequireAuth><CreatorDashboard /></RequireAuth>} />
       <Route path="/console/brand" element={<BrandConsolePage />} />
       {/* Legacy social feed routes - DISABLED
       <Route path="/search" element={<Search />} />
