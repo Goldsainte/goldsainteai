@@ -51,7 +51,7 @@ export function RoleSpecificCTAs() {
     <section className="bg-white py-20 md:py-24">
       <div className="mx-auto max-w-6xl px-4 text-center">
         <p className="inline-flex rounded-full bg-[#0c4d47] px-3 py-1 text-[10px] md:text-xs font-medium uppercase tracking-[0.12em] text-[#D4C07A] mb-4">
-          Join the marketplace
+          The Goldsainte Experience Awaits
         </p>
         <h2 className="font-secondary text-[26px] leading-snug text-[#0a2225] md:text-4xl lg:text-[42px] mb-3">
           Choose how you join <em>Goldsainte AI</em>
