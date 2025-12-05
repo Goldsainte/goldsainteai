@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import { OptimizedImage } from "@/components/OptimizedImage";
 import { useTranslation } from "react-i18next";
+import type { LucideIcon } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -151,7 +152,7 @@ export const BuiltForEverySideSection: React.FC = () => {
 /*  How Goldsainte AI works - 4 Tabbed Categories                             */
 /* -------------------------------------------------------------------------- */
 
-import { Sparkles, Palette, Users, CreditCard, Heart, Brain, Rss, Star, Wand2, Layers, ArrowRightLeft, Bookmark, Target, MessageSquare, Building2, UserCheck, Mic, Shield, Bell, MessagesSquare } from "lucide-react";
+import { Sparkles, Palette, Users, CreditCard, Heart, Brain, Rss, Star, Wand2, Layers, ArrowRightLeft, Bookmark, Target, MessageSquare, Building2, UserCheck, Mic, Shield, Bell, MessagesSquare, ShieldCheck, Lock, Scale } from "lucide-react";
 
 type AIFeature = {
   icon: React.ElementType;
@@ -433,20 +434,28 @@ export const HowGoldsainteWorksSection: React.FC = () => {
 export const TrustSafetyPaymentsSection: React.FC = () => {
   const { t } = useTranslation();
 
-  const items = [
+  const items: { id: string; icon: LucideIcon; title: string; body: string }[] = [
     {
+      id: "identity",
+      icon: ShieldCheck,
       title: t('home.trustSafety.item1.title'),
       body: t('home.trustSafety.item1.body'),
     },
     {
+      id: "escrow",
+      icon: Lock,
       title: t('home.trustSafety.item2.title'),
       body: t('home.trustSafety.item2.body'),
     },
     {
+      id: "safe",
+      icon: MessageSquare,
       title: t('home.trustSafety.item3.title'),
       body: t('home.trustSafety.item3.body'),
     },
     {
+      id: "dispute",
+      icon: Scale,
       title: t('home.trustSafety.item4.title'),
       body: t('home.trustSafety.item4.body'),
     },
@@ -467,21 +476,32 @@ export const TrustSafetyPaymentsSection: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          {items.map((item) => (
-            <div
-              key={item.title}
-              className="rounded-2xl border border-[#E5DFC6] bg-white p-5 shadow-[0_8px_20px_rgba(10,34,37,0.08)]"
-            >
-              <h3 className="text-sm font-semibold text-[#0a2225]">
-                {item.title}
-              </h3>
-              <p className="mt-2 text-[13px] leading-relaxed text-[#4A4A4A]">
-                {item.body}
-              </p>
-            </div>
-          ))}
-        </div>
+        <Accordion type="single" collapsible defaultValue="identity" className="space-y-3">
+          {items.map((item) => {
+            const Icon = item.icon;
+            return (
+              <AccordionItem
+                key={item.id}
+                value={item.id}
+                className="rounded-2xl border border-[#E5DFC6] bg-white overflow-hidden shadow-[0_4px_12px_rgba(10,34,37,0.06)] data-[state=open]:shadow-[0_8px_24px_rgba(10,34,37,0.1)] transition-shadow duration-300"
+              >
+                <AccordionTrigger className="px-5 py-4 hover:no-underline group data-[state=open]:bg-[#0c4d47] data-[state=open]:text-white transition-colors duration-300">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0c4d47]/10 group-data-[state=open]:bg-white/20 transition-colors duration-300">
+                      <Icon className="h-4 w-4 text-[#0c4d47] group-data-[state=open]:text-white transition-colors duration-300" />
+                    </div>
+                    <span className="text-sm font-semibold text-left">{item.title}</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-5 pb-5 pt-3 bg-[#FDFBF7]">
+                  <p className="text-[13px] leading-relaxed text-[#4A4A4A] pl-12">
+                    {item.body}
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+            );
+          })}
+        </Accordion>
       </div>
     </section>
   );
