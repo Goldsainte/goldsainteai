@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { invokeWithAuth } from "@/lib/supabaseHelpers";
 import { Sparkles, TrendingUp, Video, DollarSign, ExternalLink, Plus } from "lucide-react";
+import { BackButton } from "@/components/ui/BackButton";
 
 type CreatorStats = {
   tiktokConnected: boolean;
@@ -79,8 +80,21 @@ export default function CreatorDashboard() {
   return (
     <div className="flex-1 bg-[#FDF9F0]">
       <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
+        {/* Back button */}
+        <div className="mb-6">
+          <BackButton label="Back to Home" to="/" />
+        </div>
+
         {/* Gold accent line */}
         <div className="w-16 h-0.5 bg-[#C7A962] mb-6" />
+
+        {/* Pill badge */}
+        <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 border border-[#E5DFC6] mb-4">
+          <Sparkles className="h-4 w-4 text-[#C7A962]" />
+          <span className="text-sm font-medium text-[#6B7280] tracking-wide">
+            Creator Studio
+          </span>
+        </div>
         
         {/* Header */}
         <header className="mb-12">
