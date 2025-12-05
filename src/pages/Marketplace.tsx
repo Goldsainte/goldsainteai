@@ -341,7 +341,7 @@ export default function Marketplace() {
   return (
     <>
       <Helmet>
-        <title>Marketplace · Goldsainte</title>
+        <title>The Collection · Goldsainte</title>
         <meta
           name="description"
           content="Browse curated trips, verified creators, certified agents, and traveler briefs. Book luxury experiences or post your dream trip."

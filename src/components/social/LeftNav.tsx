@@ -40,7 +40,7 @@ export default function LeftNav() {
       <div className="px-3 pb-4 text-2xl font-extrabold">GOLDSAINTE</div>
       <nav className="space-y-1">
         <NavItemLink to="/"><Home className="w-6 h-6" /> Home</NavItemLink>
-        <NavItemLink to="/marketplace"><Store className="w-6 h-6" /> Marketplace</NavItemLink>
+        <NavItemLink to="/marketplace"><Store className="w-6 h-6" /> The Collection</NavItemLink>
         <NavItemLink to="/browse-creators"><Users className="w-6 h-6" /> Browse Creators</NavItemLink>
         <NavItemLink to="/browse-agents"><Building className="w-6 h-6" /> Browse Agents</NavItemLink>
         

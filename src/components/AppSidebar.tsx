@@ -33,7 +33,7 @@ const items: NavItem[] = [
   { title: "Explore", url: "/explore", icon: Search },
   { title: "My Collections", url: "/collections", icon: Sparkles, authRequired: true, hideFor: ['creator', 'agent', 'brand'] },
   { title: "Traveler Console", url: "/traveler", icon: LayoutDashboard, authRequired: true, hideFor: ['creator', 'agent', 'brand'] },
-  { title: "Marketplace", url: "/marketplace", icon: Briefcase, authRequired: true },
+  { title: "The Collection", url: "/marketplace", icon: Briefcase, authRequired: true },
   { title: "My Jobs", url: "/my-jobs", icon: Briefcase, authRequired: true },
   { title: "Browse Agents", url: "/browse-agents", icon: Users },
   { title: "Creator Earnings", url: "/tiktok-lab/earnings", icon: DollarSign, authRequired: true, showFor: "creator" },
