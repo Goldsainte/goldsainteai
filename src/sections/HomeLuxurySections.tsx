@@ -106,14 +106,14 @@ export const BuiltForEverySideSection: React.FC = () => {
   return (
     <section className="bg-[#FDF9F0] py-16 md:py-24 overflow-hidden">
       {/* Section header - centered */}
-      <div className="text-center mb-10 md:mb-12 px-4">
+      <div className="text-left mb-10 md:mb-12 px-4">
         <p className="inline-flex rounded-full bg-[#0c4d47] px-3 py-1 text-[10px] md:text-xs font-medium uppercase tracking-[0.12em] text-[#D4C07A] mb-4">
           {t('home.builtForEverySide.badge')}
         </p>
         <h2 className="font-secondary text-[28px] md:text-4xl lg:text-[42px] leading-tight text-[#0a2225]">
           {t('home.builtForEverySide.title')}
         </h2>
-        <p className="max-w-2xl mx-auto text-sm md:text-base text-[#5A5A5A] mt-3">
+        <p className="max-w-2xl text-sm md:text-base text-[#5A5A5A] mt-3">
           Each role brings something essential — travelers bring the vision, creators bring the aesthetic, agents refine the details, brands shape the experience. Goldsainte brings them together in one cinematic journey.
         </p>
       </div>
@@ -299,14 +299,14 @@ export const HowGoldsainteWorksSection: React.FC = () => {
     <section className="bg-[#FDF9F0] px-4 py-16 md:py-24">
       <div className="mx-auto max-w-6xl">
         {/* Section Header */}
-        <div className="mb-12 md:mb-16 text-center">
+        <div className="mb-12 md:mb-16 text-left">
           <p className="inline-flex rounded-full bg-[#C7A962]/10 border border-[#C7A962]/30 px-4 py-1.5 text-[10px] md:text-xs font-medium uppercase tracking-[0.15em] text-[#8B7355] mb-5">
             Powered by AI
           </p>
           <h2 className="font-secondary text-[26px] leading-[1.15] text-[#0a2225] md:text-[40px] mb-3">
             How <span className="italic">Goldsainte AI</span> works
           </h2>
-          <p className="max-w-2xl mx-auto text-sm md:text-base text-[#5A5A5A] leading-relaxed">
+          <p className="max-w-2xl text-sm md:text-base text-[#5A5A5A] leading-relaxed">
             Goldsainte AI listens to your style, curates the right creators and certified agents, and quietly orchestrates the journey in the background — while you stay in the experience. From mood board to booking confirmation, every step feels effortless.
           </p>
         </div>
