@@ -66,7 +66,7 @@ export function RoleSpecificCTAs() {
             return (
               <div
                 key={index}
-                className="group flex flex-col rounded-2xl border border-[#E5DFC6] bg-white shadow-sm overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                className="group flex flex-col rounded-2xl border border-[#E5DFC6] bg-[#F5EFE1] shadow-sm overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
               >
                 {/* Background image banner */}
                 <div className="relative h-44 overflow-hidden">
