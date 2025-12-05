@@ -155,7 +155,7 @@ export const BuiltForEverySideSection: React.FC = () => {
 /*  How Goldsainte AI works - 4 Tabbed Categories                             */
 /* -------------------------------------------------------------------------- */
 
-import { Sparkles, Palette, Users, CreditCard, Heart, Brain, Rss, Star, Wand2, Layers, ArrowRightLeft, Bookmark, Target, MessageSquare, Building2, UserCheck, Mic, Shield, Bell, MessagesSquare, ShieldCheck, Lock, Scale } from "lucide-react";
+import { Sparkles, Palette, Users, CreditCard, Heart, Brain, Rss, Star, Wand2, Layers, ArrowRightLeft, Bookmark, Target, MessageSquare, Building2, UserCheck, Mic, Shield, Bell, MessagesSquare, ShieldCheck, Lock, Scale, Fingerprint, BadgeCheck, Eye, Wallet, RefreshCw, MessageCircle, FileText, Ban, Gavel, Clock, FileCheck } from "lucide-react";
 
 type AIFeature = {
   icon: React.ElementType;
@@ -291,7 +291,7 @@ const tabImages: Record<string, string> = {
 
 export const HowGoldsainteWorksSection: React.FC = () => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState("personalizes");
+  const [activeTab, setActiveTab] = useState("");
 
   const activeTabData = tabsData.find((tab) => tab.id === activeTab) || tabsData[0];
 
@@ -437,32 +437,56 @@ export const HowGoldsainteWorksSection: React.FC = () => {
 
 export const TrustSafetyPaymentsSection: React.FC = () => {
   const { t } = useTranslation();
-  const [openItem, setOpenItem] = useState<string>("identity");
+  const [openItem, setOpenItem] = useState<string>("");
 
-  const items: { id: string; icon: LucideIcon; title: string; body: string }[] = [
+  const items: { id: string; icon: LucideIcon; title: string; body: string; subFeatures: { icon: LucideIcon; title: string; description: string }[] }[] = [
     {
       id: "identity",
       icon: ShieldCheck,
       title: t('home.trustSafety.item1.title'),
       body: t('home.trustSafety.item1.body'),
+      subFeatures: [
+        { icon: UserCheck, title: "Verified professionals", description: "Every agent and creator is identity-verified before joining." },
+        { icon: Fingerprint, title: "Stripe Identity", description: "Government ID + selfie matching for all marketplace participants." },
+        { icon: BadgeCheck, title: "Background checks", description: "Enhanced screening for travel professionals handling your trips." },
+        { icon: Eye, title: "Continuous monitoring", description: "Ongoing compliance and performance tracking." },
+      ],
     },
     {
       id: "escrow",
       icon: Lock,
       title: t('home.trustSafety.item2.title'),
       body: t('home.trustSafety.item2.body'),
+      subFeatures: [
+        { icon: Wallet, title: "Secure escrow", description: "Funds held safely until trip milestones are completed." },
+        { icon: CreditCard, title: "Milestone releases", description: "Payments released in stages as your trip progresses." },
+        { icon: ShieldCheck, title: "Fraud protection", description: "Stripe-powered payment processing with chargeback protection." },
+        { icon: RefreshCw, title: "Easy refunds", description: "Clear refund policies with automated processing." },
+      ],
     },
     {
       id: "safe",
       icon: MessageSquare,
       title: t('home.trustSafety.item3.title'),
       body: t('home.trustSafety.item3.body'),
+      subFeatures: [
+        { icon: MessageCircle, title: "On-platform messaging", description: "All conversations stay inside Goldsainte for your protection." },
+        { icon: FileText, title: "Full audit trail", description: "Every message and decision is documented and accessible." },
+        { icon: Ban, title: "No side deals", description: "Payments and bookings must stay on-platform." },
+        { icon: Bell, title: "Real-time alerts", description: "Instant notifications for important trip updates." },
+      ],
     },
     {
       id: "dispute",
       icon: Scale,
       title: t('home.trustSafety.item4.title'),
       body: t('home.trustSafety.item4.body'),
+      subFeatures: [
+        { icon: Gavel, title: "Fair mediation", description: "Impartial dispute resolution by our trust team." },
+        { icon: Clock, title: "Quick turnaround", description: "Most disputes resolved within 48-72 hours." },
+        { icon: FileCheck, title: "Clear policies", description: "Transparent terms govern all marketplace transactions." },
+        { icon: Users, title: "Human support", description: "Real people review and resolve complex issues." },
+      ],
     },
   ];
 
@@ -522,10 +546,34 @@ export const TrustSafetyPaymentsSection: React.FC = () => {
                         {item.title}
                       </span>
                     </AccordionTrigger>
-                    <AccordionContent className="pt-4 pb-2 px-6 pl-20">
-                      <p className="text-sm leading-relaxed text-[#6B7280]">
-                        {item.body}
-                      </p>
+                    <AccordionContent className="pt-6 pb-3 px-2">
+                      <div className="grid gap-5 md:grid-cols-2">
+                        {item.subFeatures.map((feature, index) => {
+                          const FeatureIcon = feature.icon;
+                          return (
+                            <div
+                              key={feature.title}
+                              className={cn(
+                                "flex items-start gap-4 group",
+                                "animate-in fade-in slide-in-from-bottom-3 duration-500"
+                              )}
+                              style={{ animationDelay: `${index * 80}ms`, animationFillMode: "both" }}
+                            >
+                              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#F5EFE1] flex items-center justify-center group-hover:bg-[#C7A962]/15 transition-colors duration-300">
+                                <FeatureIcon className="w-5 h-5 text-[#C7A962]" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-secondary text-base text-[#0a2225] mb-1.5">
+                                  {feature.title}
+                                </h4>
+                                <p className="text-sm leading-relaxed text-[#6B7280]">
+                                  {feature.description}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
                 );
