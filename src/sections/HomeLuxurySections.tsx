@@ -296,11 +296,11 @@ export const HowGoldsainteWorksSection: React.FC = () => {
   const activeTabData = tabsData.find((tab) => tab.id === activeTab) || tabsData[0];
 
   return (
-    <section className="bg-white px-4 py-16 md:py-24">
+    <section className="bg-[#FDF9F0] px-4 py-16 md:py-24">
       <div className="mx-auto max-w-6xl">
         {/* Section Header */}
-        <div className="mb-10 md:mb-14 text-center">
-          <p className="inline-flex rounded-full bg-[#0c4d47] px-3 py-1 text-[10px] md:text-xs font-medium uppercase tracking-[0.12em] text-[#D4C07A] mb-4">
+        <div className="mb-12 md:mb-16 text-center">
+          <p className="inline-flex rounded-full bg-[#C7A962]/10 border border-[#C7A962]/30 px-4 py-1.5 text-[10px] md:text-xs font-medium uppercase tracking-[0.15em] text-[#8B7355] mb-5">
             Powered by AI
           </p>
           <h2 className="font-secondary text-[26px] leading-[1.15] text-[#0a2225] md:text-[40px] mb-3">
@@ -312,7 +312,7 @@ export const HowGoldsainteWorksSection: React.FC = () => {
         </div>
 
         {/* Two-Column Layout: Accordion + Image */}
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+        <div className="flex flex-col lg:flex-row gap-10 lg:gap-14">
           {/* Left: Accordion */}
           <div className="lg:w-[55%]">
             <Accordion
@@ -320,7 +320,7 @@ export const HowGoldsainteWorksSection: React.FC = () => {
               collapsible
               value={activeTab}
               onValueChange={(value) => value && setActiveTab(value)}
-              className="space-y-3"
+              className="space-y-4"
             >
               {tabsData.map((tab) => {
                 const TabIcon = tab.icon;
@@ -333,45 +333,46 @@ export const HowGoldsainteWorksSection: React.FC = () => {
                   >
                     <AccordionTrigger
                       className={cn(
-                        "flex items-center gap-3 px-5 py-4 rounded-2xl border transition-all duration-300 hover:no-underline [&>svg]:transition-transform [&>svg]:duration-300",
+                        "flex items-center gap-4 px-6 py-5 rounded-xl transition-all duration-500 hover:no-underline",
+                        "[&>svg]:transition-all [&>svg]:duration-500 [&>svg]:text-[#C7A962]",
                         isActive
-                          ? "bg-[#0c4d47] text-white border-[#0c4d47] [&>svg]:text-[#D4C07A]"
-                          : "bg-white text-[#0a2225] border-[#E5DFC6] hover:bg-[#FDFBF7] hover:border-[#D4C07A]/50"
+                          ? "bg-[#FDFBF7] border-l-4 border-l-[#C7A962] shadow-[0_4px_20px_rgba(199,169,98,0.08)]"
+                          : "bg-white border-l-4 border-l-transparent hover:bg-[#FDFBF7] hover:border-l-[#C7A962]/50"
                       )}
                     >
-                      <TabIcon className={cn(
-                        "w-5 h-5 flex-shrink-0",
-                        isActive ? "text-[#D4C07A]" : "text-[#0c4d47]"
-                      )} />
-                      <span className="font-secondary text-base flex-1 text-left">
+                      <div className={cn(
+                        "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500",
+                        isActive ? "bg-[#C7A962]/15" : "bg-[#F5EFE1]"
+                      )}>
+                        <TabIcon className="w-5 h-5 text-[#C7A962]" />
+                      </div>
+                      <span className="font-secondary text-lg text-[#0a2225] flex-1 text-left">
                         {tab.label}
                       </span>
                     </AccordionTrigger>
-                    <AccordionContent className="pt-4 pb-2 px-1">
-                      <div className="grid gap-3 md:gap-4 md:grid-cols-2">
+                    <AccordionContent className="pt-6 pb-3 px-2">
+                      <div className="grid gap-5 md:grid-cols-2">
                         {tab.features.map((feature, index) => {
                           const FeatureIcon = feature.icon;
                           return (
                             <div
                               key={feature.title}
                               className={cn(
-                                "rounded-xl border border-[#E5DFC6] bg-white p-4 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5",
-                                "animate-in fade-in slide-in-from-bottom-2"
+                                "flex items-start gap-4 group",
+                                "animate-in fade-in slide-in-from-bottom-3 duration-500"
                               )}
-                              style={{ animationDelay: `${index * 50}ms`, animationFillMode: "both" }}
+                              style={{ animationDelay: `${index * 80}ms`, animationFillMode: "both" }}
                             >
-                              <div className="flex items-start gap-3">
-                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#0c4d47]/10 flex items-center justify-center">
-                                  <FeatureIcon className="w-4 h-4 text-[#0c4d47]" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <h4 className="font-secondary text-sm text-[#0a2225] mb-1">
-                                    {feature.title}
-                                  </h4>
-                                  <p className="text-[12px] leading-relaxed text-[#5A5A5A]">
-                                    {feature.description}
-                                  </p>
-                                </div>
+                              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#F5EFE1] flex items-center justify-center group-hover:bg-[#C7A962]/15 transition-colors duration-300">
+                                <FeatureIcon className="w-5 h-5 text-[#C7A962]" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-secondary text-base text-[#0a2225] mb-1.5">
+                                  {feature.title}
+                                </h4>
+                                <p className="text-sm leading-relaxed text-[#6B7280]">
+                                  {feature.description}
+                                </p>
                               </div>
                             </div>
                           );
