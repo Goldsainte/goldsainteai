@@ -309,64 +309,77 @@ export const HowGoldsainteWorksSection: React.FC = () => {
           </p>
         </div>
 
-        {/* Tab Bar */}
-        <div className="flex justify-center mb-8 md:mb-12">
-          <div className="inline-flex gap-1 md:gap-2 p-1 rounded-full bg-[#F5EFE1] border border-[#E5DFC6]">
-            {tabsData.map((tab) => {
-              const IconComponent = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={cn(
-                    "flex items-center gap-1.5 md:gap-2 px-3 md:px-5 py-2 md:py-2.5 rounded-full text-xs md:text-sm font-medium transition-all duration-300",
-                    isActive
-                      ? "bg-white text-[#0a2225] shadow-sm"
-                      : "text-[#6B7280] hover:text-[#0a2225]"
-                  )}
-                >
-                  <IconComponent className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                  <span className="hidden sm:inline">{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Two-Column Layout: Features + Image */}
+        {/* Two-Column Layout: Accordion + Image */}
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-          {/* Left: Feature Grid */}
+          {/* Left: Accordion */}
           <div className="lg:w-[55%]">
-            <div className="grid gap-4 md:gap-5 md:grid-cols-2">
-              {activeTabData.features.map((feature, index) => {
-                const FeatureIcon = feature.icon;
+            <Accordion
+              type="single"
+              collapsible
+              value={activeTab}
+              onValueChange={(value) => value && setActiveTab(value)}
+              className="space-y-3"
+            >
+              {tabsData.map((tab) => {
+                const TabIcon = tab.icon;
+                const isActive = activeTab === tab.id;
                 return (
-                  <div
-                    key={feature.title}
-                    className={cn(
-                      "rounded-2xl border border-[#E5DFC6] bg-white p-4 md:p-5 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5",
-                      "animate-in fade-in slide-in-from-bottom-2"
-                    )}
-                    style={{ animationDelay: `${index * 75}ms`, animationFillMode: "both" }}
+                  <AccordionItem
+                    key={tab.id}
+                    value={tab.id}
+                    className="border-0"
                   >
-                    <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-9 h-9 md:w-10 md:h-10 rounded-full bg-[#0c4d47]/10 flex items-center justify-center">
-                        <FeatureIcon className="w-4 h-4 md:w-5 md:h-5 text-[#0c4d47]" />
+                    <AccordionTrigger
+                      className={cn(
+                        "flex items-center gap-3 px-5 py-4 rounded-2xl border transition-all duration-300 hover:no-underline [&>svg]:transition-transform [&>svg]:duration-300",
+                        isActive
+                          ? "bg-[#0c4d47] text-white border-[#0c4d47] [&>svg]:text-[#D4C07A]"
+                          : "bg-white text-[#0a2225] border-[#E5DFC6] hover:bg-[#FDFBF7] hover:border-[#D4C07A]/50"
+                      )}
+                    >
+                      <TabIcon className={cn(
+                        "w-5 h-5 flex-shrink-0",
+                        isActive ? "text-[#D4C07A]" : "text-[#0c4d47]"
+                      )} />
+                      <span className="font-secondary text-base flex-1 text-left">
+                        {tab.label}
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent className="pt-4 pb-2 px-1">
+                      <div className="grid gap-3 md:gap-4 md:grid-cols-2">
+                        {tab.features.map((feature, index) => {
+                          const FeatureIcon = feature.icon;
+                          return (
+                            <div
+                              key={feature.title}
+                              className={cn(
+                                "rounded-xl border border-[#E5DFC6] bg-white p-4 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5",
+                                "animate-in fade-in slide-in-from-bottom-2"
+                              )}
+                              style={{ animationDelay: `${index * 50}ms`, animationFillMode: "both" }}
+                            >
+                              <div className="flex items-start gap-3">
+                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#0c4d47]/10 flex items-center justify-center">
+                                  <FeatureIcon className="w-4 h-4 text-[#0c4d47]" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="font-secondary text-sm text-[#0a2225] mb-1">
+                                    {feature.title}
+                                  </h4>
+                                  <p className="text-[12px] leading-relaxed text-[#5A5A5A]">
+                                    {feature.description}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-secondary text-sm md:text-base text-[#0a2225] mb-1">
-                          {feature.title}
-                        </h4>
-                        <p className="text-[12px] md:text-[13px] leading-relaxed text-[#5A5A5A]">
-                          {feature.description}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                    </AccordionContent>
+                  </AccordionItem>
                 );
               })}
-            </div>
+            </Accordion>
           </div>
 
           {/* Right: Dynamic Image Panel */}
