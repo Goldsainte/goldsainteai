@@ -54,7 +54,7 @@ export function RoleSpecificCTAs() {
           Join the marketplace
         </p>
         <h2 className="font-secondary text-[26px] leading-snug text-[#0a2225] md:text-4xl lg:text-[42px] mb-3">
-          Choose how you join <em>Goldsainte</em>
+          Choose how you join <em>Goldsainte AI</em>
         </h2>
         <p className="max-w-xl mx-auto text-sm md:text-base text-[#5A5A5A] mb-14">
           Whether you're planning your next journey, sharing your adventures, or crafting unforgettable itineraries — there's a place for you here.
