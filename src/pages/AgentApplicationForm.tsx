@@ -923,7 +923,7 @@ export default function AgentApplicationForm() {
   );
 
   // Luxury input styling
-  const luxuryInputClasses = "min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg";
+  const luxuryInputClasses = "min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg placeholder:text-sm";
 
   return (
     <div className="min-h-screen bg-[#FDF9F0] px-4 py-12 md:py-16">
