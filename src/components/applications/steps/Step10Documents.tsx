@@ -7,7 +7,7 @@ interface Step10Props {
   setFormData: (data: any) => void;
 }
 
-const luxuryInputClasses = "mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg";
+const luxuryInputClasses = "mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg placeholder:text-sm";
 
 export const Step10Documents = ({ formData, setFormData }: Step10Props) => {
   return (
