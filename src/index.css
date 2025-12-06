@@ -147,10 +147,16 @@ All colors MUST be HSL.
 @layer base {
 /* Mobile responsiveness - prevent horizontal overflow on iPhone */
 /* Viewport guard - prevent horizontal overflow globally */
-html, body, #root, #main-content {
+html, body {
   width: 100%;
   max-width: 100svw;
-  overflow-x: clip;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+#root, #main-content {
+  width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
 }
 
