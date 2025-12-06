@@ -153,7 +153,7 @@ export const BuiltForEverySideSection: React.FC = () => {
 
         {/* Scrollable cards container */}
         <div 
-          className="flex gap-5 md:gap-6 overflow-x-auto px-4 lg:px-[calc((100vw-1280px)/2+16px)] pb-4 snap-x snap-mandatory scrollbar-hide"
+          className="flex gap-5 md:gap-6 overflow-x-auto px-4 lg:px-[max(16px,calc((100vw-1152px)/2))] pb-4 snap-x snap-mandatory scrollbar-hide"
           style={{ 
             scrollbarWidth: 'none', 
             msOverflowStyle: 'none',
