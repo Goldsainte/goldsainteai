@@ -11,9 +11,9 @@ export function HomeHero() {
 
   return (
     <section className="bg-[#f7f3ea] text-[#0a2225]">
-      <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 pb-8 pt-16 md:flex-row md:items-center md:pt-20 md:pb-12">
+      <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 pb-8 pt-20 md:flex-row md:items-center md:pt-24 lg:pt-28 md:pb-12">
         {/* LEFT: Copy & CTAs */}
-        <div className="w-full md:w-[52%] space-y-5">
+        <div className="w-full md:w-[52%] space-y-6">
           <div className="inline-flex items-center gap-1 md:gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-2.5 md:px-3 py-1.5 text-[11px] md:text-sm font-medium uppercase tracking-[0.08em] md:tracking-[0.12em] text-[#073331] whitespace-nowrap">
             <span>{t('common.travelers')}</span>
             <span className="h-[1px] w-2 md:w-4 bg-[#073331]/30" />
