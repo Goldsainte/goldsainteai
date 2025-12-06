@@ -160,14 +160,21 @@ html, body {
   box-sizing: border-box;
 }
 
-/* Height chain for single scroll context */
-html, body, #root {
+/* Height chain for footer at bottom with proper scrolling */
+html {
   height: 100%;
+}
+
+body {
+  min-height: 100%;
   margin: 0;
   padding: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 #root {
+  flex: 1;
   display: flex;
   flex-direction: column;
 }
