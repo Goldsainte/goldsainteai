@@ -504,7 +504,11 @@ export default function BrandOnboarding() {
       const { sessionId, url } = sessionData;
 
       // Step 2: Save application to database (WITHOUT user_id)
+      // Generate UUID client-side to avoid needing SELECT permission after insert
+      const applicationId = crypto.randomUUID();
+      
       const applicationData = {
+        id: applicationId,
         status: 'pending_verification',
         primary_contact_name: formData.primaryContactName,
         primary_contact_email: formData.primaryContactEmail,
@@ -548,19 +552,15 @@ export default function BrandOnboarding() {
         submitted_at: new Date().toISOString()
       };
 
-      const { data: insertedApplication, error: dbError } = await supabase
+      const { error: dbError } = await supabase
         .from('brand_applications')
-        .insert(applicationData as any)
-        .select('id')
-        .single();
+        .insert(applicationData as any);
 
       if (dbError) throw dbError;
 
       // Store application ID and email in localStorage for verification complete page
-      if (insertedApplication) {
-        localStorage.setItem('brand_application_id', insertedApplication.id);
-        localStorage.setItem('brand_application_email', formData.primaryContactEmail);
-      }
+      localStorage.setItem('brand_application_id', applicationId);
+      localStorage.setItem('brand_application_email', formData.primaryContactEmail);
 
       // Step 4: Redirect to Stripe Identity Verification
       setVerificationStatus('success');
