@@ -1016,7 +1016,7 @@ export default function BrandOnboarding() {
                     <button
                       type="button"
                       onClick={() => setFormData({ ...formData, logoUrl: '' })}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 btn-icon-sm"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -1052,7 +1052,7 @@ export default function BrandOnboarding() {
                     <button
                       type="button"
                       onClick={() => setFormData({ ...formData, coverImageUrl: '' })}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 btn-icon-sm"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -1084,7 +1084,7 @@ export default function BrandOnboarding() {
                     <button
                       type="button"
                       onClick={() => removeGalleryImage(index)}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 btn-icon-sm"
                     >
                       <X className="h-3 w-3" />
                     </button>
