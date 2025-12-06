@@ -59,16 +59,18 @@ const personasCarouselData: PersonaCarouselCardProps[] = [
   },
 ];
 
-const PersonaCarouselCard: React.FC<PersonaCarouselCardProps> = ({
+const PersonaCarouselCard: React.FC<PersonaCarouselCardProps & { index: number }> = ({
   image,
   headline,
   tagline,
   href,
+  index,
 }) => {
   return (
     <a
       href={href}
-      className="group relative aspect-[3/4] w-[280px] md:w-[300px] lg:w-[320px] flex-shrink-0 overflow-hidden rounded-[28px] snap-center cursor-pointer"
+      className="group relative aspect-[3/4] w-[280px] md:w-[300px] lg:w-[320px] flex-shrink-0 overflow-hidden rounded-[28px] snap-center cursor-pointer transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(199,169,98,0.2)] ring-1 ring-transparent hover:ring-[#C7A962]/30 animate-in fade-in slide-in-from-bottom-4"
+      style={{ animationDelay: `${index * 120}ms`, animationFillMode: "both" }}
     >
       {/* Full-bleed image with hover zoom */}
       <img
@@ -77,22 +79,27 @@ const PersonaCarouselCard: React.FC<PersonaCarouselCardProps> = ({
         className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
       />
 
-      {/* Dark gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity duration-300 group-hover:from-black/80" />
+      {/* Enhanced gradient overlay with gold bottom accent */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-black/5 transition-opacity duration-300 group-hover:from-black/85" />
+      
+      {/* Gold bottom border accent */}
+      <div className="absolute inset-x-0 bottom-0 h-[3px] bg-gradient-to-r from-transparent via-[#C7A962]/0 to-transparent group-hover:via-[#C7A962]/80 transition-all duration-500" />
 
       {/* Text content pinned to bottom */}
       <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
-        <span className="mb-2 inline-block rounded-full bg-white/20 backdrop-blur-sm px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.15em] text-white/95">
+        {/* Gold-accented pill badge */}
+        <span className="mb-3 inline-block rounded-full bg-[#C7A962]/20 border border-[#C7A962]/40 backdrop-blur-sm px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#F5EFE1]">
           {headline}
         </span>
-        <p className="text-[15px] md:text-base font-light text-white/90 leading-relaxed">
+        {/* Serif headline for editorial feel */}
+        <p className="font-light text-[15px] md:text-base text-white/95 leading-relaxed tracking-wide">
           {tagline}
         </p>
       </div>
 
-      {/* Hover arrow indicator */}
-      <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      {/* Hover arrow indicator with gold accent */}
+      <div className="absolute top-4 right-4 w-9 h-9 rounded-full bg-[#C7A962]/20 border border-[#C7A962]/30 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-105">
+        <svg className="w-4 h-4 text-[#F5EFE1]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
         </svg>
       </div>
@@ -105,15 +112,18 @@ export const BuiltForEverySideSection: React.FC = () => {
 
   return (
     <section className="bg-[#FDF9F0] py-16 md:py-24 overflow-hidden">
-      {/* Section header - centered */}
-      <div className="text-left mb-10 md:mb-12 px-4">
-        <p className="inline-flex rounded-full bg-[#0c4d47] px-3 py-1 text-[10px] md:text-xs font-medium uppercase tracking-[0.12em] text-[#D4C07A] mb-4">
+      {/* Section header - elevated typography */}
+      <div className="text-left mb-12 md:mb-14 px-4">
+        <p className="inline-flex rounded-full bg-[#0c4d47] px-4 py-1.5 text-[10px] md:text-xs font-medium uppercase tracking-[0.14em] text-[#D4C07A] mb-3">
           {t('home.builtForEverySide.badge')}
         </p>
-        <h2 className="font-secondary text-[28px] md:text-4xl lg:text-[42px] leading-tight text-[#0a2225]">
-          {t('home.builtForEverySide.title')}
+        {/* Gold decorative line */}
+        <div className="w-14 h-[3px] bg-gradient-to-r from-[#C7A962] to-[#C7A962]/40 mb-5" />
+        <h2 className="font-secondary text-[30px] md:text-[40px] lg:text-[46px] leading-[1.1] tracking-tight text-[#0a2225]">
+          Built for every side of{" "}
+          <span className="italic">luxury travel</span>
         </h2>
-        <p className="max-w-2xl text-sm md:text-base text-[#5A5A5A] mt-3">
+        <p className="max-w-2xl text-sm md:text-base text-[#5A5A5A] mt-4 leading-relaxed font-light">
           Each role brings something essential — travelers bring the vision, creators bring the aesthetic, agents refine the details, brands shape the experience. Goldsainte brings them together in one cinematic journey.
         </p>
       </div>
@@ -121,11 +131,11 @@ export const BuiltForEverySideSection: React.FC = () => {
       {/* Horizontal scroll container with peek effect */}
       <div className="relative">
         {/* Left fade gradient (desktop only) */}
-        <div className="hidden lg:block absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#FDF9F0] to-transparent z-10 pointer-events-none" />
+        <div className="hidden lg:block absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-[#FDF9F0] to-transparent z-10 pointer-events-none" />
 
         {/* Scrollable cards container */}
         <div 
-          className="flex gap-4 md:gap-5 overflow-x-auto px-6 md:px-8 lg:px-[calc((100vw-1280px)/2+32px)] pb-4 snap-x snap-mandatory"
+          className="flex gap-5 md:gap-6 overflow-x-auto px-6 md:px-8 lg:px-[calc((100vw-1280px)/2+32px)] pb-4 snap-x snap-mandatory scrollbar-hide"
           style={{ 
             scrollbarWidth: 'none', 
             msOverflowStyle: 'none',
@@ -134,18 +144,20 @@ export const BuiltForEverySideSection: React.FC = () => {
           <style>{`
             .scrollbar-hide::-webkit-scrollbar { display: none; }
           `}</style>
-          {personasCarouselData.map((persona) => (
-            <PersonaCarouselCard key={persona.headline} {...persona} />
+          {personasCarouselData.map((persona, index) => (
+            <PersonaCarouselCard key={persona.headline} {...persona} index={index} />
           ))}
         </div>
 
         {/* Right fade gradient (desktop only) */}
-        <div className="hidden lg:block absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#FDF9F0] to-transparent z-10 pointer-events-none" />
+        <div className="hidden lg:block absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-[#FDF9F0] to-transparent z-10 pointer-events-none" />
       </div>
 
-      {/* Scroll hint for mobile */}
-      <p className="mt-6 text-center text-[11px] uppercase tracking-[0.15em] text-[#9A9A9A] lg:hidden">
-        Swipe to explore →
+      {/* Refined scroll hint for mobile with gold arrows */}
+      <p className="mt-8 text-center text-[11px] uppercase tracking-[0.18em] text-[#8B8B8B] lg:hidden font-light">
+        <span className="text-[#C7A962]">←</span>
+        <span className="mx-2">Swipe to explore</span>
+        <span className="text-[#C7A962]">→</span>
       </p>
     </section>
   );
