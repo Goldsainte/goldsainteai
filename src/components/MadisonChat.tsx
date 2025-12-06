@@ -168,28 +168,18 @@ export function MadisonChat({
   return (
     <div className="flex flex-col bg-white border border-[#E5DFC6] rounded-2xl shadow-sm overflow-hidden h-[500px]">
       {/* Header */}
-      <div className="border-b border-[#E5DFC6] px-5 py-4 bg-[#FDFBF7]">
-        <div className="flex items-center gap-2 mb-1">
-          <Sparkles className="h-4 w-4 text-[#C7A962]" />
-          <span className="text-xs font-medium tracking-[0.1em] uppercase text-[#C7A962]">
-            AI Concierge
-          </span>
-        </div>
-        <h2 className="text-lg font-secondary text-[#0a2225]">Madison</h2>
+      <div className="border-b border-[#E5DFC6] px-5 py-3 bg-[#FDFBF7] flex items-center gap-2">
+        <Sparkles className="h-4 w-4 text-[#C7A962]" />
+        <h2 className="text-base font-secondary text-[#0a2225]">Madison</h2>
       </div>
 
       {/* Messages */}
       <ScrollArea className="flex-1 px-5 py-4">
         <div ref={scrollRef} className="space-y-4">
           {messages.length === 0 && !initialContext && (
-            <div className="py-12 text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#F6F0E4] mb-4">
-                <Sparkles className="h-5 w-5 text-[#C7A962]" />
-              </div>
-              <p className="font-secondary text-lg text-[#0a2225] mb-2">Hi, I'm Madison</p>
-              <p className="text-sm text-[#6B7280]">
-                Try: "I want to go to Morocco in May for 7 days."
-              </p>
+            <div className="py-16 text-center">
+              <Sparkles className="h-5 w-5 text-[#C7A962] mx-auto mb-3" />
+              <p className="text-sm text-[#6B7280]">Morocco in May, 7 days</p>
             </div>
           )}
 
@@ -256,7 +246,7 @@ export function MadisonChat({
       <div className="border-t border-[#E5DFC6] px-5 py-4 bg-[#FDFBF7]">
         <div className="flex gap-3">
           <Input
-            placeholder='Type a message... (e.g., "I want to go to Morocco")'
+            placeholder="Where would you like to go?"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
