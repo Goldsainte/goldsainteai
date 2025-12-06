@@ -109,9 +109,10 @@ textarea {
   min-width: 44px;
 }
 
-/* Allow checkboxes to be their natural size */
+/* Allow checkboxes and small icon buttons to be their natural size */
 button[role="checkbox"],
-button[data-state] {
+button[data-state],
+.btn-icon-sm {
   min-height: auto;
   min-width: auto;
 }
