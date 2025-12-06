@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Send, Loader2, Mic, MicOff, Trash2, Filter, Radio, Volume2 } from "lucide-react";
+import { X, Send, Loader2, Mic, MicOff, Trash2, Filter, Radio, Volume2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -226,7 +226,7 @@ export const AIBookingConcierge = () => {
         // Set default greeting even without user
         setMessages([{
           role: 'assistant',
-          content: `Welcome — I'm Madison, your Goldsainte travel concierge.\nI'm here to help you turn inspiration into something bookable.\n\nTell me what sparked the idea — a TikTok, a photo, a vibe, a mood—\nand I'll shape it into a visual storyboard you can refine, share, and book.\n\nWhen you're ready, I can also match you with creators whose style matches yours, and certified agents who can bring the journey to life with five-star precision.`
+          content: `Where would you like to go?`
         }]);
         return;
       }
@@ -273,7 +273,7 @@ export const AIBookingConcierge = () => {
         console.log('Setting Madison\'s intro greeting');
         setMessages([{
           role: 'assistant',
-          content: `Welcome — I'm Madison, your Goldsainte travel concierge.\nI'm here to help you turn inspiration into something bookable.\n\nTell me what sparked the idea — a TikTok, a photo, a vibe, a mood—\nand I'll shape it into a visual storyboard you can refine, share, and book.\n\nWhen you're ready, I can also match you with creators whose style matches yours, and certified agents who can bring the journey to life with five-star precision.`
+          content: `Where would you like to go?`
         }]);
       }
     };
@@ -1439,53 +1439,24 @@ export const AIBookingConcierge = () => {
       } ${isMinimized ? 'h-16' : 'h-[65vh] sm:h-[70vh] md:h-[600px] max-h-[65vh] sm:max-h-[70vh] md:max-h-[600px]'}`}
     >
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-accent p-3 sm:p-4 rounded-t-lg flex items-center justify-between">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-          <div className="relative flex-shrink-0">
-            <img src={logomark} alt="Goldsainte" className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 object-contain" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <h3 className="font-serif text-base sm:text-lg md:text-xl font-bold text-primary-foreground truncate">AI Concierge</h3>
-            <p className="text-[10px] sm:text-xs text-primary-foreground/80 truncate hidden sm:block">Powered by Goldsainte</p>
-          </div>
+      <div className="bg-white border-b border-[#E5DFC6] p-3 sm:p-4 rounded-t-lg flex items-center justify-between">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <Sparkles className="h-4 w-4 text-[#C7A962] flex-shrink-0" />
+          <h3 className="font-secondary text-lg text-[#0a2225]">Madison</h3>
         </div>
-        <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
+        <div className="flex items-center gap-1 flex-shrink-0">
           <MusicIndicator
             isPlaying={isMusicPlaying}
             onToggle={handleMusicToggle}
-            className="text-primary-foreground border-primary-foreground/20"
+            className="text-[#6B7280] border-[#E5DFC6]"
           />
-          <VoiceStatusChip
-            state={
-              voiceMode || wakeWordActive ? 'listening' : 
-              wakeWordPrimed ? 'idle' : 
-              'muted'
-            }
-            onClick={enableWakeWordPipeline}
-            className="text-primary-foreground border-primary-foreground/20"
-          />
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={clearConversation}
-                className="text-primary-foreground hover:bg-white/10 h-7 w-7 sm:h-8 sm:w-8 min-h-[44px] min-w-[44px] -m-2"
-              >
-                <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Clear conversation</p>
-            </TooltipContent>
-          </Tooltip>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setIsOpen(false)}
-            className="text-primary-foreground hover:bg-white/10 h-7 w-7 sm:h-8 sm:w-8 min-h-[44px] min-w-[44px] -m-2"
+            className="text-[#6B7280] hover:bg-[#f7f3ea] h-8 w-8 min-h-[44px] min-w-[44px]"
           >
-            <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <X className="h-4 w-4" />
           </Button>
         </div>
       </div>
@@ -1531,40 +1502,19 @@ export const AIBookingConcierge = () => {
                     >
                       {msg.role === 'assistant' && (
                         <div className="flex-shrink-0">
-                          <img 
-                            src={logomark} 
-                            alt="Goldsainte" 
-                            className="w-5 h-5 sm:w-6 sm:h-6 object-contain rounded-full bg-gradient-to-br from-primary to-accent p-0.5 sm:p-1"
-                          />
+                          <Sparkles className="w-5 h-5 text-[#C7A962]" />
                         </div>
                       )}
                       <div
-                        className={`max-w-[80%] sm:max-w-[75%] break-words rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 ${
+                        className={`max-w-[80%] sm:max-w-[75%] break-words rounded-2xl px-3 py-2 sm:px-4 sm:py-3 ${
                           msg.role === 'user'
-                            ? 'bg-gradient-to-r from-primary to-accent text-primary-foreground'
-                            : 'bg-muted text-foreground'
+                            ? 'bg-[#0c4d47] text-white'
+                            : 'bg-[#f7f3ea] border border-[#E5DFC6] text-[#0a2225]'
                         }`}
                       >
-                        <p className="text-[11px] sm:text-xs md:text-sm whitespace-pre-wrap break-words leading-relaxed">{msg.content}</p>
+                        <p className="text-sm whitespace-pre-wrap break-words leading-relaxed">{msg.content}</p>
                       </div>
                     </div>
-                    
-                    {/* Add storyboard CTA after last assistant message */}
-                    {isLastAssistant && sessionId && msg.content && (
-                      <div className="mt-2 ml-7 sm:ml-8 pt-2 border-t border-border/40">
-                        <p className="text-[10px] text-muted-foreground/80 mb-2">
-                          Want me to open a storyboard with these ideas?
-                        </p>
-                        <StartStoryboardFromChat sessionId={sessionId} ownerRole="traveler" />
-                        
-                        <button
-                          onClick={() => navigate(`/concierge?sessionId=${sessionId}`)}
-                          className="mt-2 text-[10px] text-primary underline underline-offset-2 hover:text-primary/80"
-                        >
-                          Open full trip planner →
-                        </button>
-                      </div>
-                    )}
                   
                   {/* Display tool results */}
                   {msg.toolResults && msg.toolResults.length > 0 && msg.toolResults.map((result, resultIdx) => {
