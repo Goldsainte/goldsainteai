@@ -131,7 +131,7 @@ export const BuiltForEverySideSection: React.FC = () => {
   return (
     <section className="bg-[#FDF9F0] pt-16 pb-8 md:pt-24 md:pb-12 overflow-hidden">
       {/* Section header - elevated typography */}
-      <div className="text-left mb-12 md:mb-14 px-4">
+      <div className="mx-auto max-w-6xl px-4 text-left mb-12 md:mb-14">
         <p className="inline-flex rounded-full bg-[#0c4d47] px-4 py-1.5 text-[10px] md:text-xs font-medium uppercase tracking-[0.14em] text-[#D4C07A] mb-3">
           {t('home.builtForEverySide.badge')}
         </p>
@@ -148,12 +148,12 @@ export const BuiltForEverySideSection: React.FC = () => {
 
       {/* Horizontal scroll container with peek effect */}
       <div className="relative">
-        {/* Left fade gradient (desktop only) */}
-        <div className="hidden lg:block absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-[#FDF9F0] to-transparent z-10 pointer-events-none" />
+        {/* Left fade gradient */}
+        <div className="absolute left-0 top-0 bottom-0 w-8 md:w-12 lg:w-20 bg-gradient-to-r from-[#FDF9F0] to-transparent z-10 pointer-events-none" />
 
         {/* Scrollable cards container */}
         <div 
-          className="flex gap-5 md:gap-6 overflow-x-auto px-6 md:px-8 lg:px-[calc((100vw-1280px)/2+32px)] pb-4 snap-x snap-mandatory scrollbar-hide"
+          className="flex gap-5 md:gap-6 overflow-x-auto px-4 lg:px-[calc((100vw-1280px)/2+16px)] pb-4 snap-x snap-mandatory scrollbar-hide"
           style={{ 
             scrollbarWidth: 'none', 
             msOverflowStyle: 'none',
@@ -167,8 +167,8 @@ export const BuiltForEverySideSection: React.FC = () => {
           ))}
         </div>
 
-        {/* Right fade gradient (desktop only) */}
-        <div className="hidden lg:block absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-[#FDF9F0] to-transparent z-10 pointer-events-none" />
+        {/* Right fade gradient */}
+        <div className="absolute right-0 top-0 bottom-0 w-8 md:w-12 lg:w-20 bg-gradient-to-l from-[#FDF9F0] to-transparent z-10 pointer-events-none" />
       </div>
 
       {/* Refined scroll hint for mobile with gold arrows */}
