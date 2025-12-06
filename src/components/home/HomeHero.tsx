@@ -87,6 +87,9 @@ export function HomeHero() {
                     src={heroMainImg}
                     alt={t('home.hero.infinityPool')}
                     className="h-full w-full object-cover"
+                    loading="eager"
+                    fetchPriority="high"
+                    decoding="async"
                   />
                 </div>
 
@@ -96,6 +99,9 @@ export function HomeHero() {
                     src={heroSecondaryImg}
                     alt={t('home.hero.treehouseHammock')}
                     className="h-full w-full object-cover"
+                    loading="eager"
+                    fetchPriority="high"
+                    decoding="async"
                   />
                 </div>
                 <div className="overflow-hidden rounded-3xl">
@@ -103,6 +109,9 @@ export function HomeHero() {
                     src={heroTertiaryImg}
                     alt={t('home.hero.friendsHiking')}
                     className="h-full w-full object-cover"
+                    loading="eager"
+                    fetchPriority="high"
+                    decoding="async"
                   />
                 </div>
               </div>
