@@ -13,7 +13,7 @@ const DESTINATION_IMAGES: Record<string, string> = {
   "los angeles":
     "https://images.unsplash.com/photo-1506976785307-8732e854ad03?auto=format&fit=crop&w=1600&q=80",
   bali:
-    "https://images.unsplash.com/photo-1546484127-94c7d7cf0e6b?auto=format&fit=crop&w=1600&q=80",
+    "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1600&q=80",
   santorini:
     "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=1600&q=80",
   dubai:
