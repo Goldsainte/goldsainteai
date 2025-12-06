@@ -129,7 +129,7 @@ export const BuiltForEverySideSection: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <section className="bg-[#FDF9F0] py-16 md:py-24 overflow-hidden">
+    <section className="bg-[#FDF9F0] pt-16 pb-8 md:pt-24 md:pb-12 overflow-hidden">
       {/* Section header - elevated typography */}
       <div className="text-left mb-12 md:mb-14 px-4">
         <p className="inline-flex rounded-full bg-[#0c4d47] px-4 py-1.5 text-[10px] md:text-xs font-medium uppercase tracking-[0.14em] text-[#D4C07A] mb-3">
@@ -326,7 +326,7 @@ export const HowGoldsainteWorksSection: React.FC = () => {
   const activeTabData = tabsData.find((tab) => tab.id === activeTab) || tabsData[0];
 
   return (
-    <section className="bg-[#FDF9F0] px-4 py-16 md:py-24">
+    <section className="bg-[#FDF9F0] px-4 pt-10 pb-16 md:pt-14 md:pb-24">
       <div className="mx-auto max-w-6xl">
         {/* Section Header */}
         <div className="mb-12 md:mb-16 text-left">
