@@ -69,36 +69,54 @@ const PersonaCarouselCard: React.FC<PersonaCarouselCardProps & { index: number }
   return (
     <a
       href={href}
-      className="group relative aspect-[3/4] w-[280px] md:w-[300px] lg:w-[320px] flex-shrink-0 overflow-hidden rounded-[28px] snap-center cursor-pointer transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(199,169,98,0.2)] ring-1 ring-transparent hover:ring-[#C7A962]/30 animate-in fade-in slide-in-from-bottom-4"
+      className="group relative aspect-[3/4] w-[280px] md:w-[300px] lg:w-[320px] flex-shrink-0 overflow-hidden rounded-[28px] snap-center cursor-pointer transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(199,169,98,0.25)] ring-1 ring-[#C7A962]/15 hover:ring-[#C7A962]/40 animate-in fade-in slide-in-from-bottom-4"
       style={{ animationDelay: `${index * 120}ms`, animationFillMode: "both" }}
     >
-      {/* Full-bleed image with hover zoom */}
+      {/* Full-bleed image with enhanced hover zoom */}
       <img
         src={image}
         alt={headline}
-        className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+        className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
       />
 
-      {/* Enhanced gradient overlay with gold bottom accent */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-black/5 transition-opacity duration-300 group-hover:from-black/85" />
-      
-      {/* Gold bottom border accent */}
-      <div className="absolute inset-x-0 bottom-0 h-[3px] bg-gradient-to-r from-transparent via-[#C7A962]/0 to-transparent group-hover:via-[#C7A962]/80 transition-all duration-500" />
+      {/* Inner vignette effect */}
+      <div className="absolute inset-0 shadow-[inset_0_0_100px_rgba(0,0,0,0.2)] pointer-events-none" />
 
-      {/* Text content pinned to bottom */}
-      <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
-        {/* Gold-accented pill badge */}
-        <span className="mb-3 inline-block rounded-full bg-[#C7A962]/20 border border-[#C7A962]/40 backdrop-blur-sm px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#F5EFE1]">
+      {/* Enhanced gradient overlay - more dramatic */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 via-50% to-transparent transition-all duration-500" />
+      
+      {/* Double-line frame on hover - white inner */}
+      <div className="absolute inset-3 rounded-[20px] border border-white/0 group-hover:border-white/25 transition-all duration-500 pointer-events-none" />
+      
+      {/* Gold bottom border accent - always visible, intensifies on hover */}
+      <div className="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-transparent via-[#C7A962]/30 to-transparent group-hover:via-[#C7A962]/90 transition-all duration-500" />
+
+      {/* Decorative gold corner accents - top left */}
+      <div className="absolute top-4 left-4 w-8 h-8 opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-[1.5px] bg-gradient-to-r from-[#C7A962]/80 to-transparent" />
+        <div className="absolute top-0 left-0 h-full w-[1.5px] bg-gradient-to-b from-[#C7A962]/80 to-transparent" />
+      </div>
+      
+      {/* Decorative gold corner accents - bottom right */}
+      <div className="absolute bottom-4 right-4 w-8 h-8 opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none">
+        <div className="absolute bottom-0 right-0 w-full h-[1.5px] bg-gradient-to-l from-[#C7A962]/80 to-transparent" />
+        <div className="absolute bottom-0 right-0 h-full w-[1.5px] bg-gradient-to-t from-[#C7A962]/80 to-transparent" />
+      </div>
+
+      {/* Text content with parallax animation */}
+      <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6 transition-transform duration-500 group-hover:-translate-y-1">
+        {/* Gold-accented pill badge - enhanced */}
+        <span className="mb-3 inline-block rounded-full bg-[#C7A962]/25 border border-[#C7A962]/50 backdrop-blur-sm px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#F5EFE1] shadow-sm">
           {headline}
         </span>
-        {/* Serif headline for editorial feel */}
-        <p className="font-light text-[15px] md:text-base text-white/95 leading-relaxed tracking-wide">
+        {/* Serif italic tagline for editorial feel */}
+        <p className="font-secondary font-light italic text-[15px] md:text-base text-white/95 leading-relaxed tracking-wide">
           {tagline}
         </p>
       </div>
 
-      {/* Hover arrow indicator with gold accent */}
-      <div className="absolute top-4 right-4 w-9 h-9 rounded-full bg-[#C7A962]/20 border border-[#C7A962]/30 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-105">
+      {/* Hover arrow indicator with slide-in animation */}
+      <div className="absolute top-4 right-4 w-9 h-9 rounded-full bg-[#C7A962]/25 border border-[#C7A962]/40 backdrop-blur-sm flex items-center justify-center opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-400 delay-75">
         <svg className="w-4 h-4 text-[#F5EFE1]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
         </svg>
