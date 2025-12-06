@@ -321,7 +321,7 @@ const tabImages: Record<string, string> = {
 
 export const HowGoldsainteWorksSection: React.FC = () => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState("");
+  const [activeTab, setActiveTab] = useState("personalizes");
 
   const activeTabData = tabsData.find((tab) => tab.id === activeTab) || tabsData[0];
 
