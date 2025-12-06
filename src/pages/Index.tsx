@@ -21,7 +21,7 @@ export default function Index() {
         />
       </Helmet>
 
-      <main className="min-h-screen bg-[#f7f3ea] text-foreground">
+      <div className="flex-1 bg-[#f7f3ea] text-foreground">
         {/* Hero with Expedia search + brand positioning */}
         <HomeHero />
 
@@ -42,7 +42,7 @@ export default function Index() {
 
         {/* Trust messaging - mobile only, after role CTAs */}
         <TrustFooterMobile />
-      </main>
+      </div>
     </>
   );
 }
