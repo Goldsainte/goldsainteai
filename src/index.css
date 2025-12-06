@@ -160,22 +160,16 @@ html, body {
   box-sizing: border-box;
 }
 
-/* Height chain for footer at bottom on first paint */
-html {
+/* Height chain for single scroll context */
+html, body, #root {
   height: 100%;
-}
-
-body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
+  margin: 0;
+  padding: 0;
 }
 
 #root {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
 }
 
 .viewport-guard {
