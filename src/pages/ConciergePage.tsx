@@ -1,5 +1,4 @@
 import { useSearchParams } from "react-router-dom";
-import { Sparkles } from "lucide-react";
 import { MadisonChat } from "@/components/MadisonChat";
 import { BackButton } from "@/components/ui/BackButton";
 
@@ -28,22 +27,9 @@ export default function ConciergePage() {
           </div>
         )}
 
-        {/* Intro Section */}
-        <div className="mb-8 text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Sparkles className="h-5 w-5 text-[#C7A962]" />
-            <span className="text-xs font-medium tracking-[0.15em] uppercase text-[#C7A962]">
-              AI Concierge
-            </span>
-          </div>
-        <h1 className="text-3xl md:text-4xl font-secondary text-[#0a2225] mb-4">
-          Madison by Goldsainte AI
-        </h1>
-        <p className="text-base text-[#0a2225]/80 leading-relaxed max-w-2xl mx-auto">
-          Bring me your ideas—I'll help you shape your first itinerary, refine your trip brief, 
-          craft a visual storyboard, and connect you with creators and certified agents whose 
-          style complements your vision.
-        </p>
+        {/* Minimal Header */}
+        <div className="mb-6 text-center">
+          <h1 className="text-2xl font-secondary text-[#0a2225]">Madison</h1>
         </div>
 
         {/* Chat Interface */}

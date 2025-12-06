@@ -1,14 +1,6 @@
 export const MADISON_NAME = "Madison";
 
-export const MADISON_VOICE_INTRO = `
-Welcome — I'm Madison, your Goldsainte travel concierge.
-I'm here to help you turn inspiration into something bookable.
-
-Tell me what sparked the idea — a TikTok, a photo, a vibe, a mood—
-and I'll shape it into a visual storyboard you can refine, share, and book.
-
-When you're ready, I can also match you with creators whose style matches yours, and certified agents who can bring the journey to life with five-star precision.
-`;
+export const MADISON_VOICE_INTRO = `Where would you like to go?`;
 
 export const MADISON_PLANNER_INTRO = `
 Your Goldsainte Concierge

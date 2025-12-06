@@ -3,7 +3,6 @@ import { X, Mic, MicOff, Send, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { MADISON_NAME, MADISON_VOICE_INTRO } from "@/lib/madisonPersona";
-import { StartStoryboardFromChat } from "./StartStoryboardFromChat";
 import { VoiceConciergeButton } from "@/components/VoiceConciergeButton";
 
 type Message = {
@@ -175,11 +174,6 @@ export function VoiceConciergeWidget() {
     }
   }, [open, sessionId]);
 
-  const lastAssistantIndex = messages.reduce(
-    (lastIdx, msg, i) => (msg.role === "assistant" ? i : lastIdx),
-    -1
-  );
-
   return (
     <>
       {/* Floating button */}
@@ -189,17 +183,14 @@ export function VoiceConciergeWidget() {
       {open && (
         <div className="fixed bottom-20 right-4 z-40 w-[320px] max-w-[90vw] rounded-[28px] border border-[#E5DFC6] bg-white text-[#0a2225] shadow-2xl">
           <div className="flex items-center justify-between border-b border-[#E5DFC6] px-4 py-3">
-            <div>
-              <p className="text-xs uppercase tracking-[0.18em] text-[#8D8D8D]">Goldsainte Concierge</p>
-              <p className="text-sm font-semibold">{MADISON_NAME}</p>
-            </div>
+            <p className="text-sm font-secondary font-medium text-[#0a2225]">{MADISON_NAME}</p>
             <button
               type="button"
               onClick={handleClose}
-              className="rounded-full bg-[#f7f3ea] p-1 hover:bg-[#f0e8d9]"
-              aria-label="Close concierge"
+              className="rounded-full bg-[#f7f3ea] p-1.5 hover:bg-[#f0e8d9]"
+              aria-label="Close"
             >
-              <X className="h-3.5 w-3.5" />
+              <X className="h-3 w-3" />
             </button>
           </div>
 
@@ -211,28 +202,18 @@ export function VoiceConciergeWidget() {
             ) : (
               <>
                 <div className="max-h-[260px] overflow-y-auto space-y-2">
-                  {messages.map((m, idx) => {
+                  {messages.map((m) => {
                     const isAssistant = m.role === "assistant";
-                    const isLastAssistant = isAssistant && idx === lastAssistantIndex;
-
                     return (
                       <div key={m.id} className={`flex ${isAssistant ? "justify-start" : "justify-end"}`}>
                         <div
-                          className={`max-w-[85%] rounded-2xl px-3 py-2 ${
+                          className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
                             isAssistant
                               ? "bg-[#f7f3ea] text-[#0a2225]"
-                              : "bg-[#0c4d47] text-[#E5DFC6]"
+                              : "bg-[#0c4d47] text-white"
                           }`}
                         >
                           {m.content}
-                          {isLastAssistant && sessionId && (
-                            <div className="mt-2 border-t border-black/10 pt-2">
-                              <p className="mb-1 text-xs text-[#4a4a4a]">
-                                Want Madison to lay this out visually?
-                              </p>
-                              <StartStoryboardFromChat sessionId={sessionId} ownerRole="traveler" />
-                            </div>
-                          )}
                         </div>
                       </div>
                     );
@@ -272,33 +253,25 @@ export function VoiceConciergeWidget() {
                   </div>
                 )}
 
-                <div className="flex items-center justify-between border-t border-[#E5DFC6] pt-2">
+                <div className="flex items-center justify-between pt-2">
                   <button
                     type="button"
                     onClick={listening ? stopListening : startListening}
-                    className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs ${
-                      listening
-                        ? "bg-[#0c4d47] text-[#E5DFC6]"
-                        : "bg-[#f7f3ea] text-[#0a2225]"
-                    }`}
+                    className="text-xs text-[#6B7280] hover:text-[#0a2225] transition-colors"
                   >
                     {listening ? (
-                      <>
-                        <MicOff className="h-3 w-3" /> Stop
-                      </>
+                      <span className="flex items-center gap-1"><MicOff className="h-3 w-3" /> Stop</span>
                     ) : (
-                      <>
-                        <Mic className="h-3 w-3" /> Voice note
-                      </>
+                      <span className="flex items-center gap-1"><Mic className="h-3 w-3" /> Voice</span>
                     )}
                   </button>
 
                   <button
                     type="button"
                     onClick={() => navigate(sessionId ? `/concierge?sessionId=${sessionId}` : '/concierge')}
-                    className="text-xs font-semibold text-[#0c4d47] underline underline-offset-2"
+                    className="text-xs text-[#C7A962] hover:text-[#B39952] transition-colors"
                   >
-                    Open full trip planner
+                    Full view
                   </button>
                 </div>
               </>
