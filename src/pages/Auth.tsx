@@ -215,7 +215,9 @@ const Auth = () => {
           .eq("id", user.id)
           .maybeSingle();
 
-        if (!profile?.account_type || !profile?.is_profile_complete) {
+        // Only redirect to profile setup if account_type missing AND not already completed
+        // Legacy users with onboarding_completed/is_profile_complete should go to marketplace
+        if (!profile?.account_type && !profile?.is_profile_complete) {
           setStep('profile');
           setIsLoading(false);
           return;

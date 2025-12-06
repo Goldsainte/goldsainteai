@@ -10,8 +10,12 @@ export function getPostAuthDestination(
   onboardingCompleted?: boolean,
   isProfileComplete?: boolean
 ): string {
-  // No account type yet → send to role picker onboarding
+  // No account type yet → check if legacy user with completion flags
   if (!accountType) {
+    // If user is marked as complete, they're a legacy user - send to marketplace
+    if (onboardingCompleted || isProfileComplete) {
+      return "/marketplace";
+    }
     return "/onboarding";
   }
 
