@@ -87,6 +87,9 @@ verify_jwt = true
 [functions.realtime-voice-session]
 verify_jwt = true
 
+[functions.realtime-sdp-relay]
+verify_jwt = false
+
 [functions.madison]
 verify_jwt = true
 
