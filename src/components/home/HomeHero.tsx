@@ -11,9 +11,9 @@ export function HomeHero() {
 
   return (
     <section className="bg-[#f7f3ea] text-[#0a2225]">
-      <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 pb-8 pt-20 md:flex-row md:items-center md:pt-24 lg:pt-28 md:pb-12">
-        {/* LEFT: Copy & CTAs */}
-        <div className="w-full md:w-[52%] space-y-6">
+      <div className="mx-auto max-w-6xl px-4 pb-8 pt-12 md:pt-16 lg:pt-20 md:pb-12">
+        {/* Centered Pill Badge */}
+        <div className="flex justify-center mb-8 md:mb-10">
           <div className="inline-flex items-center gap-1 md:gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-2.5 md:px-3 py-1.5 text-[11px] md:text-sm font-medium uppercase tracking-[0.08em] md:tracking-[0.12em] text-[#073331] whitespace-nowrap">
             <span>{t('common.travelers')}</span>
             <span className="h-[1px] w-2 md:w-4 bg-[#073331]/30" />
@@ -23,8 +23,13 @@ export function HomeHero() {
             <span className="h-[1px] w-2 md:w-4 bg-[#073331]/30" />
             <span>{t('common.brands')}</span>
           </div>
+        </div>
 
-          <h1 className="font-display text-3xl leading-snug md:text-4xl lg:text-[42px]">
+        {/* Two Column Layout */}
+        <div className="flex flex-col gap-10 md:flex-row md:items-center">
+          {/* LEFT: Copy & CTAs */}
+          <div className="w-full md:w-[52%] space-y-5">
+            <h1 className="font-display text-3xl leading-snug md:text-4xl lg:text-[42px]">
             Where <em>inspiration</em> becomes a <em>storyboard</em> — and the perfect <em>creator + agent</em>{" "}
             team builds the trip.
           </h1>
@@ -113,6 +118,7 @@ export function HomeHero() {
               </div>
             </div>
           </div>
+        </div>
         </div>
       </div>
 
