@@ -13,7 +13,7 @@ export function HomeHero() {
     <section className="bg-[#f7f3ea] text-[#0a2225]">
       <div className="mx-auto max-w-6xl px-4 pb-8 pt-12 md:pt-16 lg:pt-20 md:pb-12">
         {/* Centered Pill Badge */}
-        <div className="flex justify-center mb-8 md:mb-10">
+        <div className="flex justify-center md:justify-start mb-8 md:mb-10">
           <div className="inline-flex items-center gap-1 md:gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-2.5 md:px-3 py-1.5 text-[11px] md:text-sm font-medium uppercase tracking-[0.08em] md:tracking-[0.12em] text-[#073331] whitespace-nowrap">
             <span>{t('common.travelers')}</span>
             <span className="h-[1px] w-2 md:w-4 bg-[#073331]/30" />
