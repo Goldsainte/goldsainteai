@@ -447,6 +447,15 @@ export const Header = () => {
                               </AccordionTrigger>
                               <AccordionContent className="pb-0">
                                 <div className="py-1">
+                                  {(isCreator || isAgentAccount) && (
+                                    <DropdownMenuItem 
+                                      onClick={() => navigate('/trip-builder')} 
+                                      className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                                    >
+                                      <Plus className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                      <span className="text-sm font-medium">Create Trip Package</span>
+                                    </DropdownMenuItem>
+                                  )}
                                   <DropdownMenuItem 
                                     onClick={() => navigate('/apply/agent')} 
                                     className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
