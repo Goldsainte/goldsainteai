@@ -60,14 +60,14 @@ export function ArrayFieldEditor({ items, onChange, placeholder }: ArrayFieldEdi
           onChange={(e) => setNewItem(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder || "Add item"}
-          className="flex-1 rounded-xl h-12 border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20 focus:border-[#C7A962] transition-all"
+          className="flex-1 rounded-xl h-10 sm:h-12 text-xs sm:text-sm border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20 focus:border-[#C7A962] transition-all"
         />
         <Button
           type="button"
           variant="outline"
           onClick={addItem}
           disabled={!newItem.trim()}
-          className="rounded-full px-5 h-12 border-[#E5DFC6] text-[#0a2225] hover:bg-[#FDF9F0] hover:border-[#C7A962] disabled:opacity-50 transition-all"
+          className="rounded-full px-4 sm:px-5 h-10 sm:h-12 border-[#E5DFC6] text-[#0a2225] hover:bg-[#FDF9F0] hover:border-[#C7A962] disabled:opacity-50 transition-all"
         >
           <Plus className="h-4 w-4" />
         </Button>
