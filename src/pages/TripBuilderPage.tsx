@@ -141,7 +141,7 @@ export default function TripBuilderPage() {
   return (
     <div className="min-h-screen bg-[#FDF9F0]">
       {/* Editorial Header */}
-      <div className="max-w-6xl mx-auto px-6 py-12 md:py-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-16">
         {/* Back button - own row */}
         <div className="mb-6">
           <BackButton />
@@ -159,7 +159,7 @@ export default function TripBuilderPage() {
         </div>
 
         {/* Large serif title with italic brand */}
-        <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225] tracking-tight">
+        <h1 className="font-secondary text-2xl sm:text-3xl md:text-4xl text-[#0a2225] tracking-tight">
           {editId ? "Edit Trip" : "Trip Builder"} by <em>Goldsainte AI</em>
         </h1>
 
@@ -185,7 +185,7 @@ export default function TripBuilderPage() {
       </div>
 
       {/* Form */}
-      <div className="max-w-6xl mx-auto px-6 pb-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-12 md:pb-16">
         <TripBuilderForm
           initialData={tripData}
           onSave={handleSave}

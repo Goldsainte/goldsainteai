@@ -28,7 +28,7 @@ const ACTIVITY_LEVELS = ["Easy", "Moderate", "Active", "Challenging"];
 const CURRENCIES = ["USD", "EUR", "GBP", "AUD", "CAD"];
 
 // Luxury form styling classes
-const labelClasses = "text-xs uppercase tracking-wider text-[#6B7280] font-medium";
+const labelClasses = "text-[11px] sm:text-xs uppercase tracking-wider text-[#6B7280] font-medium";
 const inputClasses = "rounded-xl h-12 border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20 focus:border-[#C7A962] transition-all";
 const textareaClasses = "rounded-xl border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20 focus:border-[#C7A962] transition-all";
 const selectTriggerClasses = "rounded-xl h-12 border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20";
@@ -160,34 +160,34 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
   return (
     <div className="space-y-8">
       <Tabs defaultValue="basics" className="w-full">
-        <TabsList className="w-full bg-[#FDF9F0] border-none rounded-full p-1.5 h-auto flex-wrap gap-1">
+        <TabsList className="w-full bg-[#FDF9F0] border-none rounded-xl sm:rounded-full p-1 sm:p-1.5 h-auto flex overflow-x-auto gap-1 scrollbar-hide">
           <TabsTrigger 
             value="basics" 
-            className="rounded-full px-6 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#0a2225] data-[state=inactive]:text-[#6B7280] transition-all"
+            className="rounded-full px-3 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#0a2225] data-[state=inactive]:text-[#6B7280] transition-all"
           >
             Basics
           </TabsTrigger>
           <TabsTrigger 
             value="details" 
-            className="rounded-full px-6 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#0a2225] data-[state=inactive]:text-[#6B7280] transition-all"
+            className="rounded-full px-3 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#0a2225] data-[state=inactive]:text-[#6B7280] transition-all"
           >
             Details
           </TabsTrigger>
           <TabsTrigger 
             value="media" 
-            className="rounded-full px-6 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#0a2225] data-[state=inactive]:text-[#6B7280] transition-all"
+            className="rounded-full px-3 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#0a2225] data-[state=inactive]:text-[#6B7280] transition-all"
           >
             Media
           </TabsTrigger>
           <TabsTrigger 
             value="requirements" 
-            className="rounded-full px-6 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#0a2225] data-[state=inactive]:text-[#6B7280] transition-all"
+            className="rounded-full px-3 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#0a2225] data-[state=inactive]:text-[#6B7280] transition-all"
           >
             Requirements
           </TabsTrigger>
           <TabsTrigger 
             value="policies" 
-            className="rounded-full px-6 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#0a2225] data-[state=inactive]:text-[#6B7280] transition-all"
+            className="rounded-full px-3 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#0a2225] data-[state=inactive]:text-[#6B7280] transition-all"
           >
             Policies
           </TabsTrigger>
@@ -198,7 +198,7 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
           <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
             <CardHeader className="pb-4">
               <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
-              <CardTitle className="font-secondary text-xl text-[#0a2225]">Basic Information</CardTitle>
+              <CardTitle className="font-secondary text-lg sm:text-xl text-[#0a2225]">Basic Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-5">
               <div className="space-y-2">
@@ -242,7 +242,7 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
                   <Label className={labelClasses}>Trip Type</Label>
                   <Select value={formData.trip_type} onValueChange={(v) => updateField("trip_type", v)}>
@@ -276,10 +276,10 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
           <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
             <CardHeader className="pb-4">
               <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
-              <CardTitle className="font-secondary text-xl text-[#0a2225]">Pricing & Duration</CardTitle>
+              <CardTitle className="font-secondary text-lg sm:text-xl text-[#0a2225]">Pricing & Duration</CardTitle>
             </CardHeader>
             <CardContent className="space-y-5">
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                 <div className="space-y-2">
                   <Label className={labelClasses}>Price per Person *</Label>
                   <Input
@@ -315,7 +315,7 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
                   <Label className={labelClasses}>Duration (Days) *</Label>
                   <Input
@@ -338,7 +338,7 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                 <div className="space-y-2">
                   <Label className={labelClasses}>Min Participants</Label>
                   <Input
@@ -559,10 +559,10 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
           <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
             <CardHeader className="pb-4">
               <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
-              <CardTitle className="font-secondary text-xl text-[#0a2225]">Airport Information</CardTitle>
+              <CardTitle className="font-secondary text-lg sm:text-xl text-[#0a2225]">Airport Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-5">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
                   <Label className={labelClasses}>Recommended Arrival Airport</Label>
                   <Input
@@ -588,10 +588,10 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
           <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
             <CardHeader className="pb-4">
               <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
-              <CardTitle className="font-secondary text-xl text-[#0a2225]">Availability</CardTitle>
+              <CardTitle className="font-secondary text-lg sm:text-xl text-[#0a2225]">Availability</CardTitle>
             </CardHeader>
             <CardContent className="space-y-5">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
                   <Label className={labelClasses}>Available From</Label>
                   <Input
@@ -620,7 +620,7 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
           <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
             <CardHeader className="pb-4">
               <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
-              <CardTitle className="font-secondary text-xl text-[#0a2225]">Cancellation Policy</CardTitle>
+              <CardTitle className="font-secondary text-lg sm:text-xl text-[#0a2225]">Cancellation Policy</CardTitle>
             </CardHeader>
             <CardContent>
               <Textarea
@@ -636,7 +636,7 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
           <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
             <CardHeader className="pb-4">
               <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
-              <CardTitle className="font-secondary text-xl text-[#0a2225]">Refund Policy</CardTitle>
+              <CardTitle className="font-secondary text-lg sm:text-xl text-[#0a2225]">Refund Policy</CardTitle>
             </CardHeader>
             <CardContent>
               <Textarea
@@ -652,7 +652,7 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
           <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
             <CardHeader className="pb-4">
               <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
-              <CardTitle className="font-secondary text-xl text-[#0a2225]">Terms & Conditions</CardTitle>
+              <CardTitle className="font-secondary text-lg sm:text-xl text-[#0a2225]">Terms & Conditions</CardTitle>
             </CardHeader>
             <CardContent>
               <Textarea
@@ -668,12 +668,12 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
       </Tabs>
 
       {/* Action Buttons */}
-      <div className="flex items-center justify-end gap-4 pt-6 border-t border-[#E5DFC6]">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 pt-6 border-t border-[#E5DFC6]">
         <Button
           variant="outline"
           onClick={() => onSave(preparePayload(), "draft")}
           disabled={saving || !isValid}
-          className="rounded-full px-8 py-2.5 border-[#E5DFC6] hover:bg-[#FDF9F0] text-[#0a2225] transition-all"
+          className="rounded-full px-6 sm:px-8 py-2.5 w-full sm:w-auto border-[#E5DFC6] hover:bg-[#FDF9F0] text-[#0a2225] transition-all"
         >
           {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
           Save Draft
@@ -681,7 +681,7 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
         <Button
           onClick={() => onSave(preparePayload(), "published")}
           disabled={saving || !isValid}
-          className="rounded-full px-8 py-2.5 bg-[#0a2225] hover:bg-[#0a2225]/90 text-white transition-all"
+          className="rounded-full px-6 sm:px-8 py-2.5 w-full sm:w-auto bg-[#0a2225] hover:bg-[#0a2225]/90 text-white transition-all"
         >
           {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
           Publish Trip
