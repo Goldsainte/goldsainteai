@@ -144,7 +144,7 @@ export default function TripBuilderPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-16">
         {/* Back button - own row */}
         <div className="mb-6">
-          <BackButton />
+          <BackButton to={isAgent ? "/agent-dashboard" : "/creator-dashboard"} />
         </div>
 
         {/* Gold accent line */}
