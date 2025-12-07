@@ -114,6 +114,13 @@ export default function CreatorDashboard() {
               Open Creator Lab
             </Link>
             <Link
+              to="/trip-builder"
+              className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-white px-6 py-3 text-sm font-medium text-[#0a2225] shadow-sm hover:bg-[#F6F0E4] transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Create Trip Package
+            </Link>
+            <Link
               to="/marketplace"
               className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-white px-6 py-3 text-sm font-medium text-[#0a2225] shadow-sm hover:bg-[#F6F0E4] transition-colors"
             >
