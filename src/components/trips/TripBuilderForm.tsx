@@ -29,9 +29,9 @@ const CURRENCIES = ["USD", "EUR", "GBP", "AUD", "CAD"];
 
 // Luxury form styling classes
 const labelClasses = "text-[11px] sm:text-xs uppercase tracking-wider text-[#6B7280] font-medium";
-const inputClasses = "rounded-xl h-12 border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20 focus:border-[#C7A962] transition-all";
+const inputClasses = "rounded-xl h-10 sm:h-12 text-sm sm:text-base border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20 focus:border-[#C7A962] transition-all";
 const textareaClasses = "rounded-xl border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20 focus:border-[#C7A962] transition-all";
-const selectTriggerClasses = "rounded-xl h-12 border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20";
+const selectTriggerClasses = "rounded-xl h-10 sm:h-12 text-sm sm:text-base border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20";
 
 export function TripBuilderForm({ initialData, onSave, saving, isEditing }: TripBuilderFormProps) {
   const [formData, setFormData] = useState({
