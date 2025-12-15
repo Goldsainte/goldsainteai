@@ -923,11 +923,11 @@ export default function AgentApplicationForm() {
   );
 
   // Luxury input styling
-  const luxuryInputClasses = "min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 focus:ring-offset-0 rounded-lg placeholder:text-sm";
+  const luxuryInputClasses = "min-h-[48px] w-full max-w-full border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 focus:ring-offset-0 rounded-lg placeholder:text-sm box-border";
 
   return (
-    <div className="min-h-screen bg-[#FDF9F0] px-4 py-12 md:py-16">
-      <div className="mx-auto max-w-4xl">
+    <div className="min-h-screen bg-[#FDF9F0] px-3 sm:px-4 py-8 md:py-16 overflow-x-hidden">
+      <div className="mx-auto max-w-4xl w-full">
         {/* Luxury Header */}
         <div className="mb-10 text-center">
           <h1 className="mb-4 font-secondary text-[26px] md:text-[31px] lg:text-[36px] text-[#0a2225]">
@@ -955,7 +955,7 @@ export default function AgentApplicationForm() {
 
         {/* Luxury Card Container */}
         <Card className="bg-white border border-[#E5DFC6] rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
-          <CardContent className="p-6 md:p-10">
+          <CardContent className="p-4 sm:p-6 md:p-10">
             {step === 1 && renderStep1()}
             {step === 2 && (
               <>
