@@ -9,7 +9,7 @@ interface Step9Props {
   setFormData: (data: any) => void;
 }
 
-const luxuryInputClasses = "mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 focus:ring-offset-0 rounded-lg placeholder:text-sm";
+const luxuryInputClasses = "mt-1.5 min-h-[48px] w-full max-w-full border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 focus:ring-offset-0 rounded-lg placeholder:text-sm box-border";
 
 export const Step9Financial = ({ formData, setFormData }: Step9Props) => {
   return (

@@ -13219,21 +13219,21 @@ export type Database = {
       calculate_commission_split:
         | {
             Args: {
-              p_agent_percentage: number
-              p_influencer_percentage: number
-              p_platform_percentage: number
-              p_retail_price: number
-              p_wholesale_cost: number
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
               _agent_commission_pct: number
               _brand_commission_pct: number
               _creator_commission_pct: number
               _platform_commission_pct: number
               _total_price_cents: number
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_agent_percentage: number
+              p_influencer_percentage: number
+              p_platform_percentage: number
+              p_retail_price: number
+              p_wholesale_cost: number
             }
             Returns: Json
           }
