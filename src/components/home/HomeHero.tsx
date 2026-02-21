@@ -34,7 +34,7 @@ export function HomeHero() {
             team builds the trip.
           </h1>
 
-          <p className="max-w-xl text-sm md:text-base leading-relaxed text-[#4a4a4a]">
+          <p className="max-w-xl text-sm md:text-base leading-relaxed text-[#4a4a4a] whitespace-pre-line">
             {t('home.hero.mainDescription')}
           </p>
 
