@@ -28,6 +28,8 @@ export function RoleSpecificCTAs() {
       buttonText: t('home.rolesCTA.joinAsCreator.button'),
       link: "/auth?mode=signup&role=creator",
       backgroundImage: creatorImage,
+      browseLink: "/creators",
+      browseLabel: "Browse creators",
     },
     {
       icon: Briefcase,
@@ -36,6 +38,8 @@ export function RoleSpecificCTAs() {
       buttonText: t('home.rolesCTA.applyAsAgent.button'),
       link: "/apply/agent",
       backgroundImage: agentImage,
+      browseLink: "/agents",
+      browseLabel: "Browse agents",
     },
     {
       icon: Building2,
@@ -103,6 +107,15 @@ export function RoleSpecificCTAs() {
                       {role.buttonText}
                     </Link>
                   </Button>
+
+                  {role.browseLink && (
+                    <Link
+                      to={role.browseLink}
+                      className="mt-2.5 block text-center text-[13px] font-medium text-[#0c4d47] hover:underline transition-colors duration-200"
+                    >
+                      {role.browseLabel}
+                    </Link>
+                  )}
                 </div>
               </div>
             );
