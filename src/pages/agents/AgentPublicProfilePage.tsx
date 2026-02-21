@@ -1,175 +1,263 @@
-// src/pages/agents/AgentPublicProfilePage.tsx
-import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { CheckCircle2, MapPin, ArrowRight } from "lucide-react";
+import { ProfileHero } from "@/components/profile/ProfileHero";
+import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
+import { ProfileTripsGrid } from "@/components/profile/ProfileTripsGrid";
+import { toast } from "sonner";
+
+interface AgentProfile {
+  id: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  agent_verification_status: string | null;
+  tiktok_handle: string | null;
+  instagram_handle: string | null;
+  location: string | null;
+  featured_photos: string[] | null;
+}
+
+interface AgentDetails {
+  agency_name: string | null;
+  rating: number | null;
+  total_reviews: number | null;
+  specializations: string[] | null;
+  destinations: string[] | null;
+  website: string | null;
+  experience_years: number | null;
+}
 
 export default function AgentPublicProfilePage() {
   const { id } = useParams();
-  const [agent, setAgent] = useState<any>(null);
+  const navigate = useNavigate();
+  const [agent, setAgent] = useState<AgentProfile | null>(null);
+  const [details, setDetails] = useState<AgentDetails | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadAgent() {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select(
-          `
-          id,
-          full_name,
-          avatar_url,
-          bio,
-          specialties,
-          agent_verification_status,
-          tiktok_handle,
-          instagram_handle,
-          location,
-          featured_photos
-        `
-        )
-        .eq("id", id)
-        .maybeSingle();
-
-      setAgent(data);
+    if (!id) return;
+    (async () => {
+      const [profileRes, agentRes] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select(
+            "id, full_name, avatar_url, bio, agent_verification_status, tiktok_handle, instagram_handle, location, featured_photos"
+          )
+          .eq("id", id)
+          .maybeSingle(),
+        supabase
+          .from("travel_agents")
+          .select(
+            "agency_name, rating, total_reviews, specializations, destinations, website, experience_years"
+          )
+          .eq("user_id", id)
+          .maybeSingle(),
+      ]);
+      setAgent(profileRes.data as AgentProfile | null);
+      setDetails(agentRes.data as AgentDetails | null);
       setLoading(false);
-    }
-
-    loadAgent();
+    })();
   }, [id]);
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#f7f3ea] p-8">
-        <p className="text-[12px]">Loading agent...</p>
-      </main>
+      <div className="min-h-screen bg-[#FDF9F0]">
+        <div className="animate-pulse">
+          <div className="h-64 md:h-80 bg-[#E5DFC6]" />
+          <div className="mx-auto max-w-6xl px-4 py-8">
+            <div className="h-8 w-64 rounded bg-[#E5DFC6]" />
+            <div className="mt-4 h-4 w-96 rounded bg-[#E5DFC6]" />
+          </div>
+        </div>
+      </div>
     );
   }
 
   if (!agent) {
     return (
-      <main className="min-h-screen bg-[#f7f3ea] p-8">
-        <p className="text-[12px]">Agent not found.</p>
-      </main>
+      <div className="min-h-screen bg-[#FDF9F0]">
+        <div className="mx-auto max-w-6xl px-4 py-16 text-center">
+          <h1 className="font-secondary text-2xl text-[#0a2225]">
+            Agent not found
+          </h1>
+          <p className="mt-2 text-sm text-[#6B7280]">
+            We couldn't find this agent. They may have been removed or haven't completed onboarding.
+          </p>
+          <button
+            onClick={() => navigate("/agents")}
+            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#0c4d47] px-5 py-2.5 text-sm text-white hover:bg-[#0a3d39]"
+          >
+            Browse agents
+          </button>
+        </div>
+      </div>
     );
   }
 
-  return (
-    <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
-      {/* HERO */}
-      <section className="relative h-[340px] w-full overflow-hidden rounded-b-3xl">
-        <img
-          src={
-            agent.featured_photos?.[0] ||
-            "/images/default-agent-hero.jpg"
-          }
-          className="h-full w-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/30" />
+  const isVerified = agent.agent_verification_status === "verified";
+  const allSpecialties = [
+    ...(details?.specializations || []),
+  ].filter((v, i, a) => a.indexOf(v) === i);
 
-        <div className="absolute bottom-6 left-6 text-white">
-          <h1 className="font-display text-[32px] mb-1">{agent.full_name}</h1>
-          <div className="flex items-center gap-2 text-[12px]">
-            {agent.agent_verification_status === "verified" && (
-              <span className="inline-flex items-center gap-1 bg-[#0c4d47] rounded-full px-2 py-1 text-[10px] text-[#E5DFC6]">
-                <CheckCircle2 className="h-3 w-3" /> Verified Agent
-              </span>
-            )}
-            {agent.location && (
-              <span className="flex items-center gap-1 text-[11px]">
-                <MapPin className="h-3 w-3" /> {agent.location}
-              </span>
-            )}
+  const socialLinks = [
+    agent.tiktok_handle && {
+      platform: "TikTok",
+      handle: agent.tiktok_handle,
+      url: `https://www.tiktok.com/@${agent.tiktok_handle}`,
+    },
+    agent.instagram_handle && {
+      platform: "Instagram",
+      handle: agent.instagram_handle,
+      url: `https://www.instagram.com/${agent.instagram_handle}`,
+    },
+  ].filter(Boolean) as { platform: string; handle: string; url: string }[];
+
+  const displayName =
+    details?.agency_name || agent.full_name || "Travel Agent";
+
+  return (
+    <>
+      <Helmet>
+        <title>{displayName} · Goldsainte Agents</title>
+        <meta
+          name="description"
+          content={
+            agent.bio || `Discover ${displayName} on Goldsainte`
+          }
+        />
+      </Helmet>
+
+      <div className="min-h-screen bg-[#FDF9F0]">
+        {/* Back bar */}
+        <div className="sticky top-0 z-10 bg-[#FDF9F0]/80 backdrop-blur-sm border-b border-[#E5DFC6]/40">
+          <div className="mx-auto max-w-6xl px-4 py-3">
+            <button
+              onClick={() => navigate(-1)}
+              className="inline-flex items-center gap-2 text-sm text-[#4a4a4a] hover:text-[#0a2225] transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </button>
           </div>
         </div>
-      </section>
 
-      {/* CONTENT */}
-      <section className="max-w-5xl mx-auto px-4 py-10">
-        {/* Bio */}
-        <div className="mb-8 max-w-2xl">
-          <p className="text-[12px] leading-relaxed text-[#4a4a4a]">
-            {agent.bio ||
-              "This agent hasn't added a bio yet, but their trips speak for themselves."}
-          </p>
-        </div>
+        {/* Hero */}
+        <ProfileHero
+          name={displayName}
+          coverImage={agent.featured_photos?.[0]}
+          avatarUrl={agent.avatar_url}
+          isVerified={isVerified}
+          verifiedLabel="Verified Agent"
+          location={agent.location}
+          pills={allSpecialties.slice(0, 4)}
+          rating={details?.rating}
+          reviewCount={details?.total_reviews}
+        />
 
-        {/* Specialties */}
-        {agent.specialties?.length > 0 && (
-          <div className="mb-10">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-[#8D8D8D] mb-2">
-              Specialties
-            </p>
+        {/* Two-column layout */}
+        <div className="mx-auto max-w-6xl px-4 py-8">
+          <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+            {/* Left column */}
+            <div className="space-y-8">
+              {/* About */}
+              <section>
+                <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151]">
+                  About {displayName}
+                </h2>
+                <p className="mt-3 text-[#0a2225] leading-relaxed whitespace-pre-line">
+                  {agent.bio ||
+                    "This agent hasn't added a bio yet, but their trips speak for themselves."}
+                </p>
+              </section>
 
-            <div className="flex flex-wrap gap-2">
-              {agent.specialties.map((tag: string) => (
-                <span
-                  key={tag}
-                  className="rounded-full bg-[#E5DFC6] text-[#0a2225] text-[11px] px-3 py-1"
-                >
-                  {tag}
-                </span>
-              ))}
+              {/* Specialties */}
+              {allSpecialties.length > 0 && (
+                <section>
+                  <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-3">
+                    Specialties
+                  </h2>
+                  <div className="flex flex-wrap gap-2">
+                    {allSpecialties.map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-full bg-[#C7B892]/20 border border-[#C7B892]/30 px-4 py-1.5 text-sm text-[#0a2225]"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Destinations */}
+              {details?.destinations && details.destinations.length > 0 && (
+                <section>
+                  <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-3">
+                    Destinations
+                  </h2>
+                  <div className="flex flex-wrap gap-2">
+                    {details.destinations.map((dest) => (
+                      <span
+                        key={dest}
+                        className="inline-flex items-center gap-1 rounded-full bg-white border border-[#E5DFC6] px-4 py-1.5 text-sm text-[#0a2225]"
+                      >
+                        {dest}
+                      </span>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Gallery */}
+              {agent.featured_photos && agent.featured_photos.length > 0 && (
+                <section>
+                  <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-4">
+                    Portfolio
+                  </h2>
+                  <div className="columns-2 md:columns-3 gap-3 space-y-3">
+                    {agent.featured_photos.map((src) => (
+                      <img
+                        key={src}
+                        src={src}
+                        alt="Portfolio"
+                        className="w-full rounded-2xl object-cover"
+                        loading="lazy"
+                      />
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Trips */}
+              <ProfileTripsGrid creatorId={agent.id} creatorType="agent" />
+            </div>
+
+            {/* Right column — sticky sidebar */}
+            <div className="lg:sticky lg:top-20 lg:self-start">
+              <ProfileSidebar
+                name={displayName}
+                rating={details?.rating}
+                reviewCount={details?.total_reviews}
+                website={details?.website}
+                socialLinks={socialLinks}
+                onRequestTrip={() =>
+                  navigate(`/post-trip?agentId=${agent.id}`)
+                }
+                onSaveToStoryboard={() =>
+                  toast.info("Save to storyboard", {
+                    description: "Coming soon!",
+                  })
+                }
+                showHowItWorks
+                showTrustBadges
+              />
             </div>
           </div>
-        )}
-
-        {/* Social */}
-        <div className="mb-12">
-          <p className="text-[11px] uppercase tracking-[0.16em] text-[#8D8D8D] mb-2">
-            Social
-          </p>
-
-          <div className="flex flex-col gap-1 text-[12px]">
-            {agent.tiktok_handle && (
-              <a
-                href={`https://www.tiktok.com/@${agent.tiktok_handle}`}
-                target="_blank"
-                className="underline underline-offset-2"
-              >
-                TikTok @{agent.tiktok_handle}
-              </a>
-            )}
-
-            {agent.instagram_handle && (
-              <a
-                href={`https://www.instagram.com/${agent.instagram_handle}`}
-                target="_blank"
-                className="underline underline-offset-2"
-              >
-                Instagram @{agent.instagram_handle}
-              </a>
-            )}
-          </div>
         </div>
-
-        {/* Pinterest-style photo wall */}
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.16em] text-[#8D8D8D] mb-4">
-            Storyboard Preview
-          </p>
-
-          <div className="columns-2 md:columns-3 gap-3 space-y-3">
-            {(agent.featured_photos || []).map((src: string) => (
-              <img
-                key={src}
-                src={src}
-                className="w-full rounded-2xl object-cover"
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* CTA */}
-        <div className="mt-12">
-          <a
-            href={`/post-trip?agentId=${agent.id}`}
-            className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-6 py-3 text-[12px] hover:bg-[#073331]"
-          >
-            Request a trip from {agent.full_name}
-            <ArrowRight className="h-4 w-4" />
-          </a>
-        </div>
-      </section>
-    </main>
+      </div>
+    </>
   );
 }
