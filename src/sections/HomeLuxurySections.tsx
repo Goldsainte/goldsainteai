@@ -326,7 +326,7 @@ export const HowGoldsainteWorksSection: React.FC = () => {
   const activeTabData = tabsData.find((tab) => tab.id === activeTab) || tabsData[0];
 
   return (
-    <section className="bg-[#FDF9F0] px-4 pt-10 pb-16 md:pt-14 md:pb-24">
+    <section id="how-it-works" className="bg-[#FDF9F0] px-4 pt-10 pb-16 md:pt-14 md:pb-24 scroll-mt-16">
       <div className="mx-auto max-w-6xl">
         {/* Section Header */}
         <div className="mb-12 md:mb-16 text-left">
