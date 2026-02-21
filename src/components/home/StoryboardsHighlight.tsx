@@ -149,25 +149,14 @@ export function StoryboardsHighlight() {
         </div>
 
         {/* CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4">
+        <div className="flex justify-center">
           <Button
             asChild
             size="lg"
-            className="w-full sm:w-auto bg-[#0c4d47] text-[#E5DFC6] hover:bg-[#073331] shadow-sm"
-          >
-            <Link to="/concierge">
-              <Sparkles className="mr-2 h-4 w-4" />
-              {t('home.storyboards.startWithMadison')}
-            </Link>
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-            size="lg"
-            className="w-full sm:w-auto border-[#0c4d47] text-[#0c4d47] hover:bg-[#0c4d47]/5 text-xs md:text-sm lg:text-base"
+            className="bg-[#0c4d47] text-[#E5DFC6] hover:bg-[#073331] shadow-sm"
           >
             <Link to="/marketplace">
-              {t('home.storyboards.exploreStoryboards')}
+              {t('home.storyboards.exploreAll')}
             </Link>
           </Button>
         </div>
