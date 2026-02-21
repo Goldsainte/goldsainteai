@@ -1,40 +1,28 @@
 
 
-# Simplify Curated Journeys CTAs to Single Button
+# Update "How Goldsainte AI Works" Description Copy
 
 ## What Changes
-Replace the two buttons ("Start a storyboard with Madison" and "Explore the Creator & Travel Agent Marketplace Collection") with a single primary CTA: **"Explore All Curated Journeys"**.
+Update the description paragraph in the "How Goldsainte AI Works" section.
+
+**Current:**
+"Goldsainte AI listens to your style, curates the right creators and certified agents, and quietly orchestrates the journey in the background — while you stay in the experience. From mood board to booking confirmation, every step feels effortless."
+
+**New:**
+"Goldsainte transforms your travel ideas into a structured storyboard, then intelligently matches it within our curated marketplace of expert agents and creators. They compete to design and price your journey — while our AI streamlines the process from inspiration to booking."
 
 ## Why
-- Two buttons create unnecessary decision fatigue under a browse-oriented section
-- "Explore All Curated Journeys" is a natural next step after seeing the trip tiles
-- The Madison/concierge CTA lives in the hero already, so it doesn't need to repeat here
-- Keeps the section focused: see trips, want more, click one button
+- Shifts from abstract/poetic language to concrete value proposition
+- Introduces the competitive marketplace concept (agents/creators compete)
+- Explains the actual product flow: ideas to storyboard to marketplace matching to booking
 
 ## Technical Details
 
-**File: `src/components/home/StoryboardsHighlight.tsx` (lines 139-155)**
+Two files need updating:
 
-Replace the two-button flex container with a single centered primary button:
+**File: `src/sections/HomeLuxurySections.tsx` (line 340)**
+Replace the hardcoded paragraph text with the new copy.
 
-```tsx
-<div className="flex justify-center">
-  <Button
-    asChild
-    size="lg"
-    className="bg-[#0c4d47] text-[#E5DFC6] hover:bg-[#073331] shadow-sm"
-  >
-    <Link to="/marketplace">
-      {t('home.storyboards.exploreAll')}
-    </Link>
-  </Button>
-</div>
-```
-
-**File: `src/i18n/locales/en.json`**
-
-Add a new key inside `home.storyboards`:
-- `"exploreAll": "Explore All Curated Journeys"`
-
-The existing `startWithMadison` and `exploreStoryboards` keys can remain for potential use elsewhere.
+**File: `src/i18n/locales/en.json` (line 127)**
+Update the `home.howItWorks.description` key with the new copy (for i18n consistency, even though the section currently uses hardcoded text).
 
