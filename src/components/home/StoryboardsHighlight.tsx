@@ -67,10 +67,7 @@ export function StoryboardsHighlight() {
       <div className="mx-auto max-w-6xl px-4">
         <div className="text-left mb-10 md:mb-12">
           <h2 className="font-secondary text-[26px] leading-snug text-[#0a2225] md:text-[31px] lg:text-[36px] mb-4">
-            <Trans 
-              i18nKey="home.storyboards.title" 
-              components={{ em: <em className="font-secondary italic" /> }} 
-            />
+            {t('home.storyboards.title')}
           </h2>
           <p className="max-w-3xl text-sm leading-relaxed text-[#4a4a4a] md:text-base">
             {t('home.storyboards.description')}
