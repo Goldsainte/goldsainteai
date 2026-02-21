@@ -337,7 +337,7 @@ export const HowGoldsainteWorksSection: React.FC = () => {
             How <span className="italic">Goldsainte AI</span> works
           </h2>
           <p className="max-w-2xl text-sm md:text-base text-[#5A5A5A] leading-relaxed">
-            Goldsainte AI listens to your style, curates the right creators and certified agents, and quietly orchestrates the journey in the background — while you stay in the experience. From mood board to booking confirmation, every step feels effortless.
+            Goldsainte transforms your travel ideas into a structured storyboard, then intelligently matches it within our curated marketplace of expert agents and creators. They compete to design and price your journey — while our AI streamlines the process from inspiration to booking.
           </p>
         </div>
 
