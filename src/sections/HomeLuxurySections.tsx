@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { OptimizedImage } from "@/components/OptimizedImage";
 import { useTranslation } from "react-i18next";
@@ -30,6 +31,8 @@ type PersonaCarouselCardProps = {
   headline: string;
   tagline: string;
   href: string;
+  browseHref?: string;
+  browseLabel?: string;
 };
 
 const personasCarouselData: PersonaCarouselCardProps[] = [
@@ -44,12 +47,16 @@ const personasCarouselData: PersonaCarouselCardProps[] = [
     headline: "Creators",
     tagline: "Turn your content into bookable experiences.",
     href: "/auth?mode=signup&role=creator",
+    browseHref: "/creators",
+    browseLabel: "Browse Creators",
   },
   {
     image: agentPlanningImg,
     headline: "Agents",
     tagline: "Verified leads delivered to your inbox.",
     href: "/apply/agent",
+    browseHref: "/agents",
+    browseLabel: "Browse Agents",
   },
   {
     image: tropicalHideawayImg,
@@ -64,6 +71,8 @@ const PersonaCarouselCard: React.FC<PersonaCarouselCardProps & { index: number }
   headline,
   tagline,
   href,
+  browseHref,
+  browseLabel,
   index,
 }) => {
   return (
@@ -113,6 +122,15 @@ const PersonaCarouselCard: React.FC<PersonaCarouselCardProps & { index: number }
         <p className="font-secondary font-light italic text-[15px] md:text-base text-white/95 leading-relaxed tracking-wide">
           {tagline}
         </p>
+        {browseHref && browseLabel && (
+          <Link
+            to={browseHref}
+            onClick={(e) => e.stopPropagation()}
+            className="mt-2.5 inline-block text-[13px] font-medium text-[#F5EFE1]/80 hover:text-white hover:underline transition-colors duration-200"
+          >
+            {browseLabel} →
+          </Link>
+        )}
       </div>
 
       {/* Hover arrow indicator with slide-in animation */}
