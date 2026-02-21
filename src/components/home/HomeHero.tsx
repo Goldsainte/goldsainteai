@@ -30,9 +30,9 @@ export function HomeHero() {
           {/* LEFT: Copy & CTAs */}
           <div className="w-full md:w-[52%] space-y-5">
             <h1 className="font-display text-3xl leading-snug md:text-4xl lg:text-[42px]">
-            Where <em>inspiration</em> becomes a <em>storyboard</em> — and the perfect <em>creator + agent</em>{" "}
-            team builds the trip.
-          </h1>
+            Turn Your Travel Vision Into a <em>Storyboard</em> — Then Let{" "}
+            <em>Creators & Agents</em> Compete to Bring It to Life.
+           </h1>
 
           <p className="max-w-xl text-sm md:text-base leading-relaxed text-[#4a4a4a] whitespace-pre-line">
             {t('home.hero.mainDescription')}
