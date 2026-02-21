@@ -1,44 +1,38 @@
 
-
-# Simplify Hero CTAs
+# Move "How Goldsainte AI Works" Directly Below the Hero
 
 ## What Changes
-Replace the current 4-button layout (Post a dream trip, Browse creators, Browse agents, Marketplace) with two focused CTAs:
+Reorder the homepage so the "How Goldsainte AI Works" section appears immediately after the Hero, before Storyboards Highlight. This ensures first-time visitors instantly understand *what* Goldsainte AI does before seeing the marketplace details.
 
-- **Primary:** "Create Your Travel Storyboard" (full-width, dark green)
-- **Secondary:** "See How It Works" (full-width, outlined)
+**Current order:**
+1. Hero
+2. Storyboards Highlight
+3. Built for Every Side
+4. How Goldsainte AI Works
+5. Role-Specific CTAs
+6. Trust, Safety and Payments
+
+**New order:**
+1. Hero
+2. How Goldsainte AI Works
+3. Storyboards Highlight
+4. Built for Every Side
+5. Role-Specific CTAs
+6. Trust, Safety and Payments
 
 ## Why
-- Reduces decision paralysis from 4 choices to 2
-- Focuses the hero on the core action (storyboard creation)
-- "See How It Works" scrolls or links to the how-it-works section for users not yet ready to commit
-- Browse creators/agents remain accessible via the navigation and other page sections
+- The "See How It Works" CTA in the hero now anchors directly to this section — placing it immediately below creates a seamless scroll experience
+- Users understand the AI value proposition before diving into marketplace details
+- The existing copy is strong and already in place: *"Goldsainte AI listens to your style, curates the right creators and certified agents, and quietly orchestrates the journey in the background..."*
 
 ## Technical Details
 
-**File: `src/components/home/HomeHero.tsx` (lines 47-74)**
+**File: `src/pages/Index.tsx`**
 
-Replace the entire CTA block (3 rows, 4 buttons) with:
+Move `<HowGoldsainteWorksSection />` from its current position (after `BuiltForEverySideSection`) to directly after `<HomeHero />`, before `<StoryboardsHighlight />`.
 
-```
-<div className="flex flex-col gap-3 pt-1 max-w-sm">
-  <Link to="/post-trip" className="... bg-[#0c4d47] ...">
-    Create Your Travel Storyboard
-  </Link>
-  <a href="#how-it-works" className="... border border-[#BFAD72] bg-white ...">
-    See How It Works
-  </a>
-</div>
-```
+**File: `src/pages/HomePage.tsx`**
 
-The secondary CTA will use an anchor link (`#how-it-works`) to smooth-scroll to the How Goldsainte Works section on the same page. An `id="how-it-works"` will be added to the corresponding section wrapper.
+Same reorder — move `<HowGoldsainteWorksSection />` to right after `<HomeHero />`.
 
-**File: `src/i18n/locales/en.json`**
-
-- Update `postDreamTrip` key to "Create Your Travel Storyboard"
-- Add a new `seeHowItWorks` key with value "See How It Works"
-- The `browseCreators`, `browseAgents`, and `marketplace` keys can remain for use elsewhere
-
-**File: `src/sections/HomeLuxurySections.tsx`**
-
-- Add `id="how-it-works"` to the HowGoldsainteWorksSection wrapper element so the anchor link lands correctly
+No content or styling changes needed — purely a section reorder in both page files.
