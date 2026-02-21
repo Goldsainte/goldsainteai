@@ -1,100 +1,75 @@
 
 
-# Wire Up Trip Detail Page: Request to Book, Ask a Question, and How It Works
+# Restore and Wire Storyboard to Post a Trip
 
-## The Problems
+## The Problem
 
-1. **"Request to Book" goes nowhere** -- `TripBookingSidebar` navigates to `/marketplace/trip/:id/book` which doesn't exist as a route
-2. **"Ask a Question" goes nowhere useful** -- navigates to `/messages?tripId=...` but doesn't create a conversation with the trip's creator/agent
-3. **"How it Works" steps are decorative** -- they describe a flow (share details, get matched, book securely) that isn't actually wired
-4. **The `TrovaTripDetailPage` doesn't pass creator/agent context to the sidebar** -- so even if the buttons worked, the sidebar doesn't know who to contact
+The storyboard builder on the Post a Trip page has two critical issues:
+
+1. **It's hidden** -- buried behind a small "Add visual storyboard" collapsible toggle on the final review step. Most users will never see it.
+2. **It's disconnected** -- even when a user builds a storyboard and clicks "Save storyboard," the resulting `storyboardId` is captured in React state but **never written to the database** when the trip is submitted. The `handleSubmit` function inserts into `trip_requests` without any storyboard reference.
+
+This means storyboard photos, experiences, and links are lost on submission and never appear in the marketplace.
 
 ## The Fix
 
-### 1. Pass creator/agent data into `TripBookingSidebar`
+### 1. Promote the Storyboard Builder to Its Own Step
 
-**File: `src/components/trips/TripBookingSidebar.tsx`**
-- Add new props: `creatorId`, `creatorType` (creator or agent), `agentId` (optional)
-- These identify who the trip belongs to so the buttons can act on it
+Move the storyboard builder from a hidden collapsible on Step 5 to **Step 4** (its own dedicated step), and shift the current Steps 4-5 forward. The new flow becomes:
 
-**File: `src/pages/marketplace/TrovaTripDetailPage.tsx`**
-- Pass the trip's `creator_id`, `creator_type`, and `agent_id` down to `TripBookingSidebar`
+| Step | Content |
+|------|---------|
+| 1 | Destination and Dates |
+| 2 | Travelers and Budget |
+| 3 | Style and Interests |
+| 4 | **Visual Storyboard** (new dedicated step) |
+| 5 | Flexibility and Responder Role |
+| 6 | Review and Post |
 
-### 2. Wire "Request to Book" to create a real booking inquiry
+The storyboard builder will render full-width with clear messaging: "Build your visual brief -- this is what creators and agents see when they receive your trip."
 
-Instead of navigating to a non-existent `/book` route, the button will:
-- Check if the user is logged in (redirect to `/auth` if not)
-- Insert a row into `trip_bookings` with the trip ID, traveler ID, and the trip's creator/agent as partner
-- Show a success toast: "Booking request sent! Your host will be in touch."
-- Navigate to `/messages` so the user can follow up
+### 2. Link the Storyboard to the Trip Request on Submit
 
-### 3. Wire "Ask a Question" to open a real conversation
+When the form is submitted in `handleSubmit`:
 
-Instead of navigating to a dead-end, the button will:
-- Check if the user is logged in (redirect to `/auth` if not)
-- Look for an existing `user_conversations` row between the user and the trip's agent
-- If none exists, create one with an initial message referencing the trip
-- Navigate to `/messages?conversation=:id`
-- If the trip only has a `creator_id` (no agent), fall back to creating a conversation context or show a "Contact host" toast with guidance
+- Include the `storyboardId` in `source_metadata` as `source_storyboard_id`
+- After inserting the `trip_request`, update the `storyboards` row to set `trip_request_id` to the newly created trip request ID
 
-### 4. Update "How It Works" to reflect real actions
+This creates a two-way link:
+- `trip_requests.source_metadata.source_storyboard_id` points to the storyboard
+- `storyboards.trip_request_id` points back to the trip request
 
-Replace the generic steps with trip-specific wording:
-1. "Select your dates and guests" (they can do this above)
-2. "Request to book with {hostName}" (links to the actual host)
-3. "Pay securely through Goldsainte" (escrow messaging)
+### 3. Display the Storyboard in the Marketplace
+
+The `TripStoryboardViewer` component already queries storyboards by `trip_request_id` and renders them. Once the link is established in step 2, trip detail pages in the marketplace will automatically show the traveler's storyboard images and experiences.
 
 ## Technical Details
 
-### File: `src/components/trips/TripBookingSidebar.tsx`
+### File: `src/pages/trips/PostTripPage.tsx`
 
-**Props changes:**
-```
-+ creatorId?: string;
-+ creatorType?: string;
-+ agentId?: string;
-```
+**Step count change:**
+- `TOTAL_STEPS` changes from `5` to `6`
+- Step labels array updated to include "Storyboard" at index 3
 
-**`handleRequestToBook`:**
-- Import `useAuth` from `@/contexts/AuthContext`
-- Import `supabase` client
-- If not logged in, navigate to `/auth`
-- Insert into `trip_bookings`:
-  - `trip_request_id`: null (this is a direct booking, not from a request)
-  - `traveler_id`: user.id
-  - `partner_id`: creatorId or agentId
-  - `partner_role`: creatorType
-  - `total_price`: pricePerPerson (placeholder, host confirms later)
-  - `currency`: currency
-  - `status`: 'pending'
-- Toast success, navigate to `/messages`
+**Step 4 content (new):**
+- Render `StoryboardBuilder` component directly (not collapsed)
+- Pass `mode="traveler"`, `initialTitle={title || destination}`, `destination={destination}`
+- `onSaved` callback sets `storyboardId` state
 
-**`handleAskQuestion`:**
-- If not logged in, navigate to `/auth`
-- Query `user_conversations` for existing conversation between user and the agent/creator
-- If found, navigate to it
-- If not found, create a new conversation and navigate to it
-- If no agent_id available, show a toast explaining the host will be contacted
+**Step rendering shift:**
+- Current step 3 (Flexibility/Role) becomes step 4
+- Current step 4 (Review) becomes step 5
+- Remove the collapsible storyboard section from the review step
 
-### File: `src/pages/marketplace/TrovaTripDetailPage.tsx`
+**`handleSubmit` changes:**
+- After inserting `trip_request`, capture the returned `id`
+- Include `source_storyboard_id: storyboardId` in `source_metadata` if storyboardId exists
+- If `storyboardId` exists, update `storyboards` table: `SET trip_request_id = newTripRequestId WHERE id = storyboardId`
 
-**Changes to the `TripBookingSidebar` call (around line 263):**
-```tsx
-<TripBookingSidebar
-  tripId={trip.id}
-  pricePerPerson={trip.original_price || trip.price_per_person || 0}
-  currency={trip.currency || "USD"}
-  spotsAvailable={spotsAvailable || undefined}
-  hostName={trip.creator?.full_name || undefined}
-  creatorId={trip.creator_id || undefined}
-  creatorType={(trip as any).creator_type || "creator"}
-  agentId={(trip as any).agent_id || undefined}
-/>
-```
+### No database migration needed
+- `storyboards.trip_request_id` column already exists
+- `trip_requests.source_metadata` (jsonb) already exists and can hold `source_storyboard_id`
 
-Also update the TripData interface to include `creator_type` and `agent_id` fields, and add them to the select query.
-
-### No database changes needed
-- `trip_bookings` table already exists with the right schema
-- `user_conversations` table already exists
-- Both have appropriate columns for this flow
+### Marketplace display
+- `TripStoryboardViewer` already queries by `trip_request_id` -- no changes needed there
+- Once the link is written on submit, storyboard items will automatically appear on trip detail pages
