@@ -1,6 +1,6 @@
 // src/pages/trips/PostTripPage.tsx
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { ArrowLeft, ArrowRight, X, Sparkles, ChevronDown, ChevronUp, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
@@ -28,6 +28,7 @@ const stepMeta = [
 
 export default function PostTripPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
@@ -69,6 +70,38 @@ export default function PostTripPage() {
     "Food & wine", "Design hotels", "Adventure", "Wellness",
     "Nightlife", "Culture & museums", "Family-friendly", "Honeymoon / romance",
   ];
+
+  // Restore form state from sessionStorage after auth redirect
+  useEffect(() => {
+    const saved = sessionStorage.getItem('goldsainte:pendingTrip');
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        if (data.destination) setDestination(data.destination);
+        if (data.title) setTitle(data.title);
+        if (data.startsOn) setStartsOn(data.startsOn);
+        if (data.endsOn) setEndsOn(data.endsOn);
+        if (data.budgetMin) setBudgetMin(data.budgetMin);
+        if (data.budgetMax) setBudgetMax(data.budgetMax);
+        if (data.budgetLevel) setBudgetLevel(data.budgetLevel);
+        if (data.adults) setAdults(data.adults);
+        if (data.children) setChildren(data.children);
+        if (data.occasion) setOccasion(data.occasion);
+        if (data.accommodationStyle) setAccommodationStyle(data.accommodationStyle);
+        if (data.pace) setPace(data.pace);
+        if (data.interests) setInterests(data.interests);
+        if (data.aestheticTags) setAestheticTags(data.aestheticTags);
+        if (data.flexibility) setFlexibility(data.flexibility);
+        if (data.specialNotes) setSpecialNotes(data.specialNotes);
+        if (data.wantsRole) setWantsRole(data.wantsRole);
+        if (data.storyboardId) setStoryboardId(data.storyboardId);
+        if (data.currentStep != null) setCurrentStep(data.currentStep);
+      } catch (e) {
+        console.error('Failed to restore pending trip data', e);
+      }
+      sessionStorage.removeItem('goldsainte:pendingTrip');
+    }
+  }, []);
 
   // Auto-populate from AI Collection prefill
   useEffect(() => {
@@ -147,7 +180,17 @@ export default function PostTripPage() {
     setError(null);
     setSubmitting(true);
     try {
-      if (!user) throw new Error("Please sign in before posting a trip.");
+      if (!user) {
+        // Save all form state so it survives the auth redirect
+        sessionStorage.setItem('goldsainte:pendingTrip', JSON.stringify({
+          destination, title, startsOn, endsOn, budgetMin, budgetMax,
+          budgetLevel, adults, children, occasion, accommodationStyle,
+          pace, interests, aestheticTags, flexibility, specialNotes,
+          wantsRole, storyboardId, currentStep,
+        }));
+        navigate(`/auth?returnTo=${encodeURIComponent('/post-trip')}`);
+        return;
+      }
       const sourceMetadata: Record<string, any> = hasItineraryPrefill && itineraryPrefill ? {
         source_type: "ai_collection",
         collection_title: itineraryPrefill.title,

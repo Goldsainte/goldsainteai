@@ -777,7 +777,10 @@ const Auth = () => {
               )}
               <button
                 type="button"
-                onClick={() => navigate('/')}
+                onClick={() => {
+                  const returnTo = getRedirectPathFromSearch(location.search);
+                  navigate(returnTo || '/');
+                }}
                 className="block w-full text-sm text-[#6B7280] hover:text-[#0a2225] transition-colors"
               >
                 Continue without signing in

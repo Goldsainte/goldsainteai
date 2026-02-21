@@ -362,11 +362,7 @@ export const AppRoutes = () => (
       />
       <Route
         path="/post-trip"
-        element={(
-          <RequireAuth>
-            <PostTripPage />
-          </RequireAuth>
-        )}
+        element={<PostTripPage />}
       />
       <Route
         path="/trip-requests/:tripRequestId"

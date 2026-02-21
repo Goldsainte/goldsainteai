@@ -176,7 +176,14 @@ export function StoryboardBuilder({
         const {
           data: { user },
         } = await supabase.auth.getUser();
-        if (!user) throw new Error("Not signed in");
+
+        // Guest save: persist locally so work isn't lost
+        if (!user) {
+          sessionStorage.setItem('goldsainte:pendingStoryboard', JSON.stringify({ title, items }));
+          if (onSaved) onSaved("pending-auth");
+          setSaving(false);
+          return;
+        }
 
         const { data, error } = await supabase
           .from("storyboards")
