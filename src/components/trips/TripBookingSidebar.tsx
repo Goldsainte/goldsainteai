@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Users, Star, Shield, MessageCircle, CreditCard } from "lucide-react";
+import { Star, Shield, MessageCircle, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface TripBookingSidebarProps {
   tripId: string;
@@ -13,6 +15,9 @@ interface TripBookingSidebarProps {
   spotsAvailable?: number;
   depositPercentage?: number;
   hostName?: string;
+  creatorId?: string;
+  creatorType?: string;
+  agentId?: string;
 }
 
 export function TripBookingSidebar({
@@ -24,9 +29,14 @@ export function TripBookingSidebar({
   spotsAvailable,
   depositPercentage = 25,
   hostName,
+  creatorId,
+  creatorType,
+  agentId,
 }: TripBookingSidebarProps) {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [isAskLoading, setIsAskLoading] = useState(false);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -36,16 +46,105 @@ export function TripBookingSidebar({
     }).format(price);
   };
 
-  const handleRequestToBook = () => {
+  const partnerId = agentId || creatorId;
+  const partnerRole = agentId ? "agent" : (creatorType || "creator");
+
+  const handleRequestToBook = async () => {
+    if (!user) {
+      navigate(`/auth?redirect=/marketplace/trip/${tripId}`);
+      return;
+    }
+
+    if (!partnerId) {
+      toast.error("Unable to process booking request. Host information is missing.");
+      return;
+    }
+
     setIsLoading(true);
-    // Navigate to booking flow
-    navigate(`/marketplace/trip/${tripId}/book`);
+    try {
+      const { error } = await supabase.from("trip_bookings").insert({
+        traveler_id: user.id,
+        partner_id: partnerId,
+        partner_role: partnerRole,
+        total_price: pricePerPerson,
+        currency,
+        status: "pending",
+        partner_payout: 0,
+        platform_commission: 0,
+        metadata: { trip_id: tripId, source: "direct_booking" },
+      } as any);
+
+      if (error) throw error;
+
+      toast.success("Booking request sent! Your host will be in touch.");
+      navigate("/messages");
+    } catch (err: any) {
+      console.error("Booking error:", err);
+      toast.error("Failed to send booking request. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleAskQuestion = () => {
-    // Open chat or contact modal
-    navigate(`/messages?tripId=${tripId}`);
+  const handleAskQuestion = async () => {
+    if (!user) {
+      navigate(`/auth?redirect=/marketplace/trip/${tripId}`);
+      return;
+    }
+
+    if (!partnerId) {
+      toast.error("Unable to contact host. Host information is missing.");
+      return;
+    }
+
+    setIsAskLoading(true);
+    try {
+      // Check for existing conversation
+      const { data: existing } = await supabase
+        .from("user_conversations")
+        .select("id")
+        .eq("customer_id", user.id)
+        .eq("agent_id", partnerId)
+        .limit(1)
+        .maybeSingle();
+
+      let conversationId = existing?.id;
+
+      if (!conversationId) {
+        // Create new conversation
+        const { data: newConvo, error: convoError } = await supabase
+          .from("user_conversations")
+          .insert({
+            customer_id: user.id,
+            agent_id: partnerId,
+            conversation_type: "trip_inquiry",
+            status: "active",
+          })
+          .select("id")
+          .single();
+
+        if (convoError) throw convoError;
+        conversationId = newConvo.id;
+
+        // Send initial message
+        await supabase.from("conversation_messages").insert([{
+          conversation_id: conversationId,
+          sender_id: user.id,
+          sender_type: "customer",
+          message_text: `Hi! I have a question about your trip${hostName ? ` hosted by ${hostName}` : ""}. Could you tell me more?`,
+        }]);
+      }
+
+      navigate(`/messages?conversation=${conversationId}`);
+    } catch (err: any) {
+      console.error("Ask question error:", err);
+      toast.error("Failed to start conversation. Please try again.");
+    } finally {
+      setIsAskLoading(false);
+    }
   };
+
+  const displayHostName = hostName || "your host";
 
   return (
     <div className="rounded-2xl border border-[#E5DFC6] bg-white p-6 shadow-lg">
@@ -87,15 +186,16 @@ export function TripBookingSidebar({
           disabled={isLoading}
           className="w-full bg-[#0C4D47] py-6 text-base font-semibold hover:bg-[#0C4D47]/90"
         >
-          Request to Book
+          {isLoading ? "Sending..." : "Request to Book"}
         </Button>
         <Button
           variant="outline"
           onClick={handleAskQuestion}
+          disabled={isAskLoading}
           className="w-full border-[#E5DFC6] py-6 text-base hover:bg-[#FDF9F0]"
         >
           <MessageCircle className="mr-2 h-4 w-4" />
-          Ask a Question
+          {isAskLoading ? "Opening..." : "Ask a Question"}
         </Button>
       </div>
 
@@ -119,9 +219,9 @@ export function TripBookingSidebar({
         </p>
         <div className="mt-3 space-y-3">
           {[
-            { step: 1, text: "Share your travel details" },
-            { step: 2, text: "Get matched with your host" },
-            { step: 3, text: "Book securely on Goldsainte" },
+            { step: 1, text: "Select your dates and group size" },
+            { step: 2, text: `Request to book with ${displayHostName}` },
+            { step: 3, text: "Pay securely through Goldsainte" },
           ].map((item) => (
             <div key={item.step} className="flex items-center gap-3">
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#0C4D47] text-xs font-semibold text-white">
