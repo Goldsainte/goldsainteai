@@ -1,19 +1,26 @@
 
-# Update Hero Headline
+
+# Update Hero Description Text
 
 ## What Changes
-Replace the current hero headline with the suggested alternative that includes both creators and agents:
-
-**Current:** "Where inspiration becomes a storyboard -- and the perfect creator + agent team builds the trip."
-
-**New:** "Turn Your Travel Vision Into a Storyboard -- Then Let Creators & Agents Compete to Bring It to Life."
+Replace the current `mainDescription` text in the English locale file with the refined version that introduces "curated travel marketplace" language and adds "destinations" to the storyboard elements.
 
 ## Technical Details
 
-Two files need updating:
+**File:** `src/i18n/locales/en.json` (line 76, `mainDescription` key)
 
-**1. `src/components/home/HomeHero.tsx` (lines 32-35)**
-The headline is hardcoded in the component with `<em>` tags for italic styling. Replace with the new text, applying `<em>` tags to key phrases for visual consistency (e.g., "Storyboard", "Creators & Agents").
+**Current:**
+> A travel storyboard turns your ideas into a structured, day-by-day vision of your trip -- the experiences, pacing, and priorities that matter most to you.\n\nOnce created, your storyboard is shared with vetted travel agents and creators who compete to design and price your perfect journey.\n\nYou choose the best proposal -- and your story becomes reality.
 
-**2. `src/i18n/locales/en.json` (line 75)**
-Update the `mainHeadline` translation key to match the new text.
+**New:**
+> A travel storyboard transforms your ideas into a structured, day-by-day plan -- outlining the experiences, pacing, destinations, and priorities that matter most to you.\n\nOnce created, your storyboard enters our curated travel marketplace, where vetted agents and creators compete to design and price your perfect journey.\n\nYou choose the best proposal -- and your story becomes reality.
+
+Key wording changes:
+- "turns" to "transforms"
+- "vision of your trip" to "plan"
+- "the experiences" to "outlining the experiences"
+- Added "destinations" to the list
+- "is shared with vetted travel agents and creators" to "enters our curated travel marketplace, where vetted agents and creators"
+
+No component changes needed -- the `whitespace-pre-line` class is already in place on the rendering `<p>` tag.
+
