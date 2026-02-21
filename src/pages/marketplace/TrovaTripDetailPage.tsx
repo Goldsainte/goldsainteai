@@ -266,6 +266,9 @@ export default function TrovaTripDetailPage() {
                 currency={trip.currency || "USD"}
                 spotsAvailable={spotsAvailable || undefined}
                 hostName={trip.creator?.full_name || undefined}
+                creatorId={trip.creator_id || undefined}
+                creatorType={(trip as any).creator_type || "creator"}
+                agentId={(trip as any).agent_id || undefined}
               />
             </div>
           </div>

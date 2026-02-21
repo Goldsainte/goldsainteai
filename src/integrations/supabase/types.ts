@@ -10209,14 +10209,14 @@ export type Database = {
           payment_client_secret: string | null
           payment_url: string | null
           platform_commission: number
-          proposal_id: string
+          proposal_id: string | null
           status: string
           stripe_payment_intent_id: string | null
           stripe_payment_status: string | null
           stripe_transfer_group: string | null
           total_price: number
           traveler_id: string
-          trip_request_id: string
+          trip_request_id: string | null
           updated_at: string
         }
         Insert: {
@@ -10225,19 +10225,19 @@ export type Database = {
           id?: string
           metadata?: Json | null
           partner_id: string
-          partner_payout: number
+          partner_payout?: number
           partner_role: string
           payment_client_secret?: string | null
           payment_url?: string | null
-          platform_commission: number
-          proposal_id: string
+          platform_commission?: number
+          proposal_id?: string | null
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_payment_status?: string | null
           stripe_transfer_group?: string | null
           total_price: number
           traveler_id: string
-          trip_request_id: string
+          trip_request_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -10251,14 +10251,14 @@ export type Database = {
           payment_client_secret?: string | null
           payment_url?: string | null
           platform_commission?: number
-          proposal_id?: string
+          proposal_id?: string | null
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_payment_status?: string | null
           stripe_transfer_group?: string | null
           total_price?: number
           traveler_id?: string
-          trip_request_id?: string
+          trip_request_id?: string | null
           updated_at?: string
         }
         Relationships: [
