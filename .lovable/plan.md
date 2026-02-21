@@ -1,33 +1,89 @@
 
-# Add Browse Creators & Agents Access from the Homepage
 
-## What Changes
-Add navigation links from the homepage so visitors can discover and browse creator and agent profiles directly.
+# Simplify the Post a Trip Page
 
-## Where the Links Will Go
+## The Problem
+The current `/post-trip` page shows every field at once in one long scrolling form — 6+ sections, 15+ inputs, pill selectors, textareas, and a storyboard builder all stacked together. It feels like a generic admin form, not a luxury editorial experience.
 
-### 1. "Built for Every Side" Cards (HomeLuxurySections.tsx)
-Currently the "Creators" and "Agents" cards link to signup/apply pages. We'll add a secondary "Browse" link to each card so visitors can explore existing profiles without signing up:
-- **Creators card**: Keep existing CTA, add a "Browse Creators" text link pointing to `/creators`
-- **Agents card**: Keep existing CTA, add a "Browse Agents" text link pointing to `/agents`
+## The Solution: Multi-Step Wizard with Editorial Pacing
 
-### 2. "Choose How You Join" Section (RoleSpecificCTAs.tsx)
-Add subtle "Browse" links below each Creator and Agent card button:
-- Under "Join as a Creator" button: small "Browse creators" link to `/creators`
-- Under "Apply as an Agent" button: small "Browse agents" link to `/agents`
+Replace the single long form with a clean, stepped wizard that shows one section at a time. Each step gets its own full screen with generous whitespace, serif headers, and a progress indicator — matching the calm, editorial pacing of Mr & Mrs Smith.
 
-### 3. Storyboards Highlight Section (StoryboardsHighlight.tsx)
-The "Explore All Curated Journeys" button already links to `/marketplace` -- no changes needed here since the marketplace trip cards already show the host, which links to their profile.
+### Step Flow
 
-## Technical Details
+```text
+Step 1: "Where are you dreaming of?"
+   - Destination input
+   - Start & end dates
+   - Trip nickname (optional)
 
-### File: `src/sections/HomeLuxurySections.tsx`
-In the "Built for Every Side" carousel data (around lines 36-59), add a `browseHref` and `browseLabel` field to the Creators and Agents entries. In the card rendering (around line 170), render a small secondary link below the existing CTA when `browseHref` is present.
+Step 2: "Who's coming along?"
+   - Adults & children
+   - Occasion (optional)
+   - Budget range + budget style pills
 
-### File: `src/components/home/RoleSpecificCTAs.tsx`
-Add an optional `browseLink` and `browseLabel` field to the Creator and Agent role objects. Render a small centered text link (styled as `text-[13px] text-[#0c4d47] hover:underline`) below the button when present.
+Step 3: "Set the mood"
+   - Accommodation style
+   - Trip pace pills
+   - Interest pills (Food & wine, Design hotels, etc.)
+   - Aesthetic tags (if from storyboard)
 
-### Design
-- Secondary links styled as understated text links: `text-[13px] font-medium text-[#0c4d47] hover:underline`
-- Keeps the primary CTAs (signup/apply) prominent while giving browsers a discovery path
-- Matches the luxury aesthetic -- no extra buttons, just elegant text links
+Step 4: "Anything else?"
+   - Flexibility textarea
+   - Special notes textarea
+   - Who should respond (creator/agent/both) pills
+
+Step 5: "Review & post"
+   - Clean summary card of all selections
+   - Trust & safety note (condensed to one line + link)
+   - Submit button
+```
+
+The storyboard builder is moved out of the main flow — it becomes an optional "Add visual storyboard" expandable section on the review step, so it doesn't overwhelm first-time users.
+
+### Design Details
+
+**Layout per step:**
+- Centered column, max-w-2xl (narrower than current max-w-6xl)
+- Serif heading (font-secondary, text-2xl) as the step question
+- Short subtitle in muted text
+- Generous vertical padding (py-16 on desktop)
+- Inputs remain cream-background with gold-focus borders
+
+**Progress indicator:**
+- Minimal dot stepper at top (5 dots, active = dark teal, completed = gold)
+- Step count text: "Step 2 of 5" in small muted text
+
+**Navigation:**
+- "Back" and "Continue" buttons at bottom, pill-shaped
+- Back = ghost style, Continue = dark teal filled
+- Keyboard: Enter advances to next step
+
+**Animations:**
+- Simple fade transition between steps (CSS only, no library needed)
+
+### Technical Approach
+
+**File: `src/pages/trips/PostTripPage.tsx`** — Full rewrite
+- All existing state variables remain unchanged
+- Form submission logic stays identical
+- Wrap content in a step state machine (useState for currentStep 1-5)
+- Each step rendered conditionally
+- Prefill logic (storyboard, AI collection) still works on mount
+- StoryboardBuilder moved to an expandable section in step 5
+
+No new files needed — this is a layout restructure of the existing page, not new components.
+
+### What Gets Removed/Simplified
+- The "Build your visual storyboard" section no longer dominates the form — becomes optional on review step
+- Trust & safety block condensed from a full card to a single line with "View safety guidelines" link
+- AI itinerary preview becomes a collapsible on the review step instead of mid-form
+- Bottom disclaimer text shortened
+
+### What Stays the Same
+- All form fields and their values
+- Form submission to `trip_requests` table
+- Storyboard and itinerary prefill hooks
+- All state management
+- Route and auth requirements
+
