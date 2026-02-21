@@ -17,8 +17,15 @@ interface FeaturedTrip {
   cover_image_url: string;
   price_per_person: number;
   currency: string;
+  creator_id: string;
   creator_type: string;
   highlights: string[] | null;
+  profiles: {
+    id: string;
+    full_name: string | null;
+    avatar_url: string | null;
+    username: string | null;
+  } | null;
 }
 
 export function StoryboardsHighlight() {
@@ -29,7 +36,7 @@ export function StoryboardsHighlight() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('packaged_trips')
-        .select('id, slug, title, destination, duration_nights, cover_image_url, price_per_person, currency, creator_type, highlights')
+        .select('id, slug, title, destination, duration_nights, cover_image_url, price_per_person, currency, creator_id, creator_type, highlights, profiles!packaged_trips_creator_id_fkey(id, full_name, avatar_url, username)')
         .eq('is_featured', true)
         .eq('status', 'published')
         .limit(6);
@@ -141,8 +148,28 @@ export function StoryboardsHighlight() {
                   ))}
                 </div>
                 
-                {/* Curator credit */}
-                <p className="text-[9px] md:text-[10px] text-[#8D8D8D]">{getCuratorLabel(trip.creator_type)}</p>
+                {/* Creator/Agent attribution */}
+                {trip.profiles?.full_name ? (
+                  <Link
+                    to={trip.creator_type === 'agent' ? `/agents/${trip.profiles.id}` : `/creators/${trip.profiles.id}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex items-center gap-1.5 group/host"
+                  >
+                    <img
+                      src={trip.profiles.avatar_url || '/placeholder.svg'}
+                      alt={trip.profiles.full_name}
+                      className="h-5 w-5 rounded-full object-cover ring-1 ring-[#E5DFC6]"
+                    />
+                    <span className="text-[10px] md:text-[11px] font-medium text-[#0a2225] group-hover/host:underline">
+                      By {trip.profiles.full_name}
+                    </span>
+                    <span className="rounded-full bg-[#C7B892]/20 px-1.5 py-0.5 text-[8px] font-medium text-[#7A7151]">
+                      {trip.creator_type === 'agent' ? 'Agent' : 'Creator'}
+                    </span>
+                  </Link>
+                ) : (
+                  <p className="text-[9px] md:text-[10px] text-[#8D8D8D]">{getCuratorLabel(trip.creator_type)}</p>
+                )}
               </div>
             </Link>
           ))}
