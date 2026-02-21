@@ -1,19 +1,19 @@
 
-
-# Replace Hero Description Text
+# Update Hero Headline
 
 ## What Changes
-Update the `mainDescription` value in the English locale file (`src/i18n/locales/en.json`, line 76) to replace the current single-paragraph description with the new three-paragraph storyboard-focused copy.
+Replace the current hero headline with the suggested alternative that includes both creators and agents:
+
+**Current:** "Where inspiration becomes a storyboard -- and the perfect creator + agent team builds the trip."
+
+**New:** "Turn Your Travel Vision Into a Storyboard -- Then Let Creators & Agents Compete to Bring It to Life."
 
 ## Technical Details
 
-**File:** `src/i18n/locales/en.json` (line 76)
+Two files need updating:
 
-**Current text:**
-> Goldsainte turns inspiration into itinerary. Post your dream trip, match instantly with creators and certified agents whose style fits yours, co-design the journey through a shared storyboard, and book the entire experience inside a trusted luxury marketplace.
+**1. `src/components/home/HomeHero.tsx` (lines 32-35)**
+The headline is hardcoded in the component with `<em>` tags for italic styling. Replace with the new text, applying `<em>` tags to key phrases for visual consistency (e.g., "Storyboard", "Creators & Agents").
 
-**New text:**
-> A travel storyboard turns your ideas into a structured, day-by-day vision of your trip -- the experiences, pacing, and priorities that matter most to you.\n\nOnce created, your storyboard is shared with vetted travel agents and creators who compete to design and price your perfect journey.\n\nYou choose the best proposal -- and your story becomes reality.
-
-The three paragraphs will be joined with `\n\n` line breaks in the JSON string. The component rendering this text will need to preserve those line breaks (e.g., via `whitespace-pre-line` CSS or splitting into separate `<p>` tags). I'll verify the rendering component and adjust if needed to ensure the paragraph breaks display correctly.
-
+**2. `src/i18n/locales/en.json` (line 75)**
+Update the `mainHeadline` translation key to match the new text.
