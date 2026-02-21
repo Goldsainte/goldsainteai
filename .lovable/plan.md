@@ -1,35 +1,40 @@
 
 
-# Update Storyboards Section Title and Description
+# Simplify Curated Journeys CTAs to Single Button
 
 ## What Changes
-Update the title and description text for the Storyboards Highlight section to shift from explaining what storyboards are to a benefit-driven marketplace value proposition.
-
-## Copy Changes
-
-**Title:**
-- Current: "Storyboards: The Blueprint for Every Goldsainte AI Journey"
-- New: "Curated Journeys, Ready to Book or Personalize"
-
-**Description:**
-- Current: "Every trip on Goldsainte starts as a storyboard -- a visual brief that blends your saved TikToks, creator content, mood images and curated experiences. It's how travelers express what they want to feel, and how creators and agents collaborate without chaos."
-- New: "Explore expertly designed trips you can book instantly -- or customize with a creator or agent to make them your own."
+Replace the two buttons ("Start a storyboard with Madison" and "Explore the Creator & Travel Agent Marketplace Collection") with a single primary CTA: **"Explore All Curated Journeys"**.
 
 ## Why
-- Shifts from feature explanation to user benefit
-- "Ready to Book or Personalize" communicates the dual value clearly
-- Shorter, punchier description reduces cognitive load
-- Aligns with the simplified CTA strategy already in place
+- Two buttons create unnecessary decision fatigue under a browse-oriented section
+- "Explore All Curated Journeys" is a natural next step after seeing the trip tiles
+- The Madison/concierge CTA lives in the hero already, so it doesn't need to repeat here
+- Keeps the section focused: see trips, want more, click one button
 
 ## Technical Details
 
-**File: `src/i18n/locales/en.json` (lines 174-175)**
+**File: `src/components/home/StoryboardsHighlight.tsx` (lines 139-155)**
 
-Update two keys inside `home.storyboards`:
-- `title`: Change to `"Curated Journeys, Ready to Book or Personalize"` (remove the `<em>` tags since they are no longer needed)
-- `description`: Change to `"Explore expertly designed trips you can book instantly — or customize with a creator or agent to make them your own."`
+Replace the two-button flex container with a single centered primary button:
 
-**File: `src/components/home/StoryboardsHighlight.tsx` (line ~73)**
+```tsx
+<div className="flex justify-center">
+  <Button
+    asChild
+    size="lg"
+    className="bg-[#0c4d47] text-[#E5DFC6] hover:bg-[#073331] shadow-sm"
+  >
+    <Link to="/marketplace">
+      {t('home.storyboards.exploreAll')}
+    </Link>
+  </Button>
+</div>
+```
 
-Since the title no longer contains `<em>` tags, simplify the rendering from `<Trans>` with components to a plain `{t('home.storyboards.title')}` call. This is a minor cleanup -- the `Trans` component would still work, but removing it keeps the code clean.
+**File: `src/i18n/locales/en.json`**
+
+Add a new key inside `home.storyboards`:
+- `"exploreAll": "Explore All Curated Journeys"`
+
+The existing `startWithMadison` and `exploreStoryboards` keys can remain for potential use elsewhere.
 
