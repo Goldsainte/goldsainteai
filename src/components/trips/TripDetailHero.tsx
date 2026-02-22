@@ -106,7 +106,9 @@ export function TripDetailHero({
         <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
           <h1 className="font-secondary text-3xl md:text-5xl font-bold text-white drop-shadow-lg">
             {title}
-            <span className="text-[#C7B892]"> with {hostName}</span>
+            {hostName && hostName !== "Host" && (
+              <span className="text-[#C7B892]"> with {hostName}</span>
+            )}
           </h1>
         </div>
       </div>
