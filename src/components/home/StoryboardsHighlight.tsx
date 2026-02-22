@@ -152,7 +152,14 @@ export function StoryboardsHighlight() {
                 </div>
                 
                 {/* Creator/Agent attribution */}
-                {trip.profiles?.full_name ? (
+                {trip.creator_type === 'platform' ? (
+                  <div className="flex items-center gap-1.5">
+                    <Sparkles className="h-3.5 w-3.5 text-[#C7A962]" />
+                    <span className="text-[10px] md:text-[11px] font-medium text-[#7A7151]">
+                      Goldsainte Curated
+                    </span>
+                  </div>
+                ) : trip.profiles?.full_name ? (
                   <Link
                     to={trip.creator_type === 'agent' ? `/agents/${trip.profiles.id}` : `/creators/${trip.profiles.id}`}
                     onClick={(e) => e.stopPropagation()}

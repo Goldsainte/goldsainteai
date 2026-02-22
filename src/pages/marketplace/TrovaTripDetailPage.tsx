@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { TripDetailHero } from "@/components/trips/TripDetailHero";
 import { TripAboutSection } from "@/components/trips/TripAboutSection";
@@ -144,9 +144,9 @@ export default function TrovaTripDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-[#f7f3ea]">
         <div className="flex h-[60vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <Loader2 className="h-8 w-8 animate-spin text-[#0C4D47]" />
         </div>
       </div>
     );
@@ -154,15 +154,15 @@ export default function TrovaTripDetailPage() {
 
   if (error || !trip) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-[#f7f3ea]">
         <div className="container mx-auto max-w-4xl px-4 py-20 text-center">
-          <h1 className="font-secondary text-2xl font-semibold text-foreground">
+          <h1 className="font-secondary text-2xl font-semibold text-[#0a2225]">
             Trip not found
           </h1>
-          <p className="mt-2 text-muted-foreground">{error || "This trip doesn't exist or has been removed."}</p>
+          <p className="mt-2 text-[#6B7280]">{error || "This trip doesn't exist or has been removed."}</p>
           <Button
             onClick={() => navigate("/marketplace")}
-            className="mt-6"
+            className="mt-6 bg-[#0C4D47] hover:bg-[#073331]"
           >
             Browse Trips
           </Button>
@@ -181,15 +181,17 @@ export default function TrovaTripDetailPage() {
     ? trip.max_participants - trip.current_bookings 
     : trip.max_participants;
 
+  const isPlatformTrip = trip.creator_type === 'platform' && !trip.creator?.full_name;
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#f7f3ea]">
 
       <main className="container mx-auto max-w-7xl px-4 py-8">
         {/* Back Button */}
         <Button
           variant="ghost"
           onClick={() => navigate(-1)}
-          className="mb-6 gap-2 text-foreground hover:bg-muted/30"
+          className="mb-6 gap-2 text-[#0a2225] hover:bg-[#FDF9F0]"
         >
           <ArrowLeft className="h-4 w-4" />
           Back
@@ -218,13 +220,34 @@ export default function TrovaTripDetailPage() {
           <div className="space-y-6 lg:col-span-2">
             <TripAboutSection description={trip.description || ""} />
             
-            <MeetYourHostCard
-              hostId={trip.creator?.id || trip.creator_id}
-              hostName={trip.creator?.full_name || "Host"}
-              hostAvatar={trip.creator?.avatar_url}
-              hostBio={trip.creator?.bio}
-              hostType="creator"
-            />
+            {isPlatformTrip ? (
+              <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7A7151]">
+                  Curated By
+                </p>
+                <div className="mt-4 flex items-start gap-4">
+                  <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-full bg-[#0C4D47]">
+                    <Sparkles className="h-8 w-8 text-[#C7B892]" />
+                  </div>
+                  <div>
+                    <h3 className="font-secondary text-xl font-semibold text-[#0a2225]">
+                      Goldsainte Concierge
+                    </h3>
+                    <p className="mt-2 text-[14px] leading-relaxed text-[#4a4a4a]">
+                      This journey is curated by the Goldsainte team — handpicked experiences, vetted partners, and white-glove service from start to finish.
+                    </p>
+                  </div>
+                </div>
+              </section>
+            ) : (
+              <MeetYourHostCard
+                hostId={trip.creator?.id || trip.creator_id}
+                hostName={trip.creator?.full_name || "Host"}
+                hostAvatar={trip.creator?.avatar_url}
+                hostBio={trip.creator?.bio}
+                hostType="creator"
+              />
+            )}
 
             {activities.length > 0 && (
               <TripActivitiesSection activities={activities} />
