@@ -190,7 +190,13 @@ export default function TrovaTripDetailPage() {
         {/* Back Button */}
         <Button
           variant="ghost"
-          onClick={() => navigate(-1)}
+          onClick={() => {
+            if (window.history.length > 1) {
+              navigate(-1);
+            } else {
+              navigate("/marketplace");
+            }
+          }}
           className="mb-6 gap-2 text-[#0a2225] hover:bg-[#FDF9F0]"
         >
           <ArrowLeft className="h-4 w-4" />
