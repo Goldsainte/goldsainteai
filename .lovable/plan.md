@@ -1,95 +1,21 @@
 
-# Allow Guest Access to Post a Trip (Auth Only at Final Submit)
 
-## What Changes
+# Update Storyboards Highlight Section Heading
 
-### 1. Remove `RequireAuth` from `/post-trip` route
+## Change
 
-**File: `src/routes/AppRoutes.tsx`** (around line 363-369)
+**File: `src/components/home/StoryboardsHighlight.tsx`**
 
-Remove the `RequireAuth` wrapper so guests can browse the entire wizard, build storyboards, and only be stopped at the final "Post this trip" button.
+Update the section heading from:
 
-### 2. Gate submission on auth, not page access
+> **Curated Journeys, Ready to Book or Personalize**
 
-**File: `src/pages/trips/PostTripPage.tsx`**
+To:
 
-In `handleSubmit` (line 150), instead of `throw new Error("Please sign in")`:
-- Save the full form state (destination, dates, budget, storyboard items, etc.) to `sessionStorage` under key `goldsainte:pendingTrip`
-- Redirect to `/auth?returnTo=/post-trip` so the user can sign up or sign in
-- On mount, check `sessionStorage` for saved form state and restore all fields if found, then clear storage
+> **Curated Journeys by Creators & Certified Agents**
+> *Book instantly. Personalize effortlessly.*
 
-This preserves all work across the auth redirect.
+The main heading keeps its current styling. A new subtitle line is added below it with smaller, muted text (e.g., `text-base md:text-lg text-[#4a4a4a]`), following the same pattern used in the hero description.
 
-### 3. Let StoryboardBuilder work without auth
+No other files or backend changes needed -- this is a single heading update in one component.
 
-**File: `src/components/storyboards/StoryboardBuilder.tsx`**
-
-In `saveStoryboard()` (line 179), when no user is signed in:
-- Instead of throwing an error, store the storyboard data (title + items) into `sessionStorage` under key `goldsainte:pendingStoryboard`
-- Call `onSaved("pending-auth")` so the parent wizard knows items were collected and shows the "Visual storyboard attached" badge on the review step
-- Show a toast: "Your storyboard is saved locally. Sign in when you're ready to post."
-
-When the user returns after auth, `PostTripPage` restores state including the storyboard marker.
-
-### 4. Fix "Continue without signing in" button
-
-**File: `src/pages/Auth.tsx`** (line 780)
-
-Change `onClick={() => navigate('/')}` to read the `redirect` or `returnTo` query param and navigate there instead:
-```
-onClick={() => {
-  const returnTo = getRedirectPathFromSearch(location.search);
-  navigate(returnTo || '/');
-}}
-```
-
-This uses the existing `getRedirectPathFromSearch` helper from `src/lib/auth/redirect.ts`, which already handles both `redirect` and `returnTo` params with path sanitization.
-
-## Technical Details
-
-### sessionStorage keys
-- `goldsainte:pendingTrip` -- JSON of all form fields + `storyboardId`
-- `goldsainte:pendingStoryboard` -- JSON of title + items array (used by StoryboardBuilder for guest saves)
-
-### PostTripPage restore logic (on mount)
-```typescript
-useEffect(() => {
-  const saved = sessionStorage.getItem('goldsainte:pendingTrip');
-  if (saved) {
-    const data = JSON.parse(saved);
-    setDestination(data.destination || '');
-    setTitle(data.title || '');
-    // ... restore all fields
-    setStoryboardId(data.storyboardId || null);
-    setCurrentStep(data.currentStep || 0);
-    sessionStorage.removeItem('goldsainte:pendingTrip');
-  }
-}, []);
-```
-
-### PostTripPage submit gate
-```typescript
-if (!user) {
-  sessionStorage.setItem('goldsainte:pendingTrip', JSON.stringify({
-    destination, title, startsOn, endsOn, budgetMin, budgetMax,
-    budgetLevel, adults, children, occasion, accommodationStyle,
-    pace, interests, aestheticTags, flexibility, specialNotes,
-    wantsRole, storyboardId, currentStep
-  }));
-  navigate(`/auth?returnTo=${encodeURIComponent('/post-trip')}`);
-  return;
-}
-```
-
-### StoryboardBuilder guest save
-```typescript
-if (!user) {
-  sessionStorage.setItem('goldsainte:pendingStoryboard', JSON.stringify({ title, items }));
-  if (onSaved) onSaved("pending-auth");
-  setSaving(false);
-  return;
-}
-```
-
-### No database changes needed
-All changes are client-side routing and state management.
