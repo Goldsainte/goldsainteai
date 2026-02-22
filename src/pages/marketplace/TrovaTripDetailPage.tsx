@@ -45,6 +45,8 @@ interface TripData {
   essential_info?: Record<string, string> | null;
   current_bookings?: number | null;
   creator_id?: string | null;
+  creator_type?: string | null;
+  agent_id?: string | null;
   creator?: {
     id: string;
     full_name: string | null;
@@ -267,8 +269,8 @@ export default function TrovaTripDetailPage() {
                 spotsAvailable={spotsAvailable || undefined}
                 hostName={trip.creator?.full_name || undefined}
                 creatorId={trip.creator_id || undefined}
-                creatorType={(trip as any).creator_type || "creator"}
-                agentId={(trip as any).agent_id || undefined}
+                creatorType={trip.creator_type || "creator"}
+                agentId={trip.agent_id || undefined}
               />
             </div>
           </div>

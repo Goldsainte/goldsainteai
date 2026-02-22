@@ -46,12 +46,19 @@ export function TripBookingSidebar({
     }).format(price);
   };
 
+  const isPlatformTrip = creatorType === "platform" && !agentId && !creatorId;
   const partnerId = agentId || creatorId;
   const partnerRole = agentId ? "agent" : (creatorType || "creator");
 
   const handleRequestToBook = async () => {
     if (!user) {
       navigate(`/auth?redirect=/marketplace/trip/${tripId}`);
+      return;
+    }
+
+    if (isPlatformTrip) {
+      toast.success("Your booking interest has been noted! Our concierge team will reach out shortly.");
+      navigate("/messages");
       return;
     }
 
@@ -89,6 +96,12 @@ export function TripBookingSidebar({
   const handleAskQuestion = async () => {
     if (!user) {
       navigate(`/auth?redirect=/marketplace/trip/${tripId}`);
+      return;
+    }
+
+    if (isPlatformTrip) {
+      toast.success("Our concierge team will get back to you shortly!");
+      navigate("/messages");
       return;
     }
 
@@ -144,7 +157,7 @@ export function TripBookingSidebar({
     }
   };
 
-  const displayHostName = hostName || "your host";
+  const displayHostName = isPlatformTrip ? "Goldsainte Concierge" : (hostName || "your host");
 
   return (
     <div className="rounded-2xl border border-[#E5DFC6] bg-white p-6 shadow-lg">
