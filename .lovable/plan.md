@@ -1,53 +1,124 @@
 
-# Fix "Host Information Missing" for Platform-Curated Trips
 
-## Root Cause
+# Align Platform-Curated Trips with Mr & Mrs Smith Aesthetic
 
-All 6 featured trips in the "Curated Journeys" section have `creator_id = NULL`, `agent_id = NULL`, and `creator_type = 'platform'`. These are platform-curated trips with no host assigned. When you click "Request to Book" or "Ask a Question," the `TripBookingSidebar` checks for a `partnerId` (derived from `agentId || creatorId`) and finds nothing, so it shows the error.
+## Overview
 
-## The Fix
+The trip detail page and homepage cards for platform-curated trips need several refinements to match the warm, editorial luxury feel used across the rest of the site. The content and information stays -- this is purely a visual and copy polish.
 
-### 1. Create a platform host profile
+## Changes
 
-Create a dedicated Goldsainte platform profile in the `profiles` table to act as the "host" for platform-curated trips. This profile handles booking requests and inquiries for any trip not tied to a specific creator or agent.
+### 1. Trip Detail Page Background & Chrome
 
-### 2. Update the featured trips
+**File: `src/pages/marketplace/TrovaTripDetailPage.tsx`**
 
-Set `creator_id` on all platform-curated trips to point to the Goldsainte platform profile, so the booking and messaging flows have a valid partner to route to.
+- Change page background from generic `bg-background` to warm cream `bg-[#f7f3ea]`
+- Update Back button to use luxury tokens: `text-[#0a2225] hover:bg-[#FDF9F0]`
+- Update loading spinner color to use `text-[#0C4D47]`
+- Update error state to use luxury tokens (`bg-[#f7f3ea]`, `text-[#0a2225]`, serif heading)
 
-### 3. Update TripBookingSidebar to handle platform trips gracefully
+### 2. Hero Title -- Handle Platform Trips Gracefully
 
-In `TripBookingSidebar`, add a fallback: if `creatorType` is `'platform'` and no `creatorId`/`agentId` is provided, show "Goldsainte Concierge" as the host name and route booking requests to the platform profile.
+**File: `src/components/trips/TripDetailHero.tsx`**
 
-### 4. Update TrovaTripDetailPage to pass creator_type
+- When `hostName` is "Host" (the generic fallback), hide the "with Host" suffix entirely and just show the trip title
+- This keeps the hero clean and editorial for platform trips without a named host
 
-Add `creator_type` to the `TripData` interface (it's already fetched via `SELECT *` but cast with `as any`). This ensures the sidebar gets the correct type without unsafe casts.
+### 3. Meet Your Host Card -- Platform Concierge Treatment
+
+**File: `src/pages/marketplace/TrovaTripDetailPage.tsx`**
+
+- When `creator_type === 'platform'` and there is no real creator profile, replace the `MeetYourHostCard` with a "Curated by Goldsainte" card that shows:
+  - The Goldsainte logo/icon instead of a broken placeholder avatar
+  - "Goldsainte Concierge" as the name
+  - A short editorial description: "This journey is curated by the Goldsainte team -- handpicked experiences, vetted partners, and white-glove service from start to finish."
+  - No "View Full Profile" link (since there is no profile page)
+
+### 4. Homepage Cards -- Platform Trip Attribution
+
+**File: `src/components/home/StoryboardsHighlight.tsx`**
+
+- For platform trips (where `creator_type === 'platform'` and no `profiles` data), show "Goldsainte Curated" with a small gold sparkle icon instead of "Agent-curated journey"
+- This differentiates platform trips from agent/creator trips with a premium feel
+
+### 5. Booking Sidebar -- Concierge Polish
+
+**File: `src/components/trips/TripBookingSidebar.tsx`**
+
+- For platform trips, change "Verified host" trust badge to "Goldsainte Curated" since there is no individual host to verify
 
 ## Technical Details
 
-### Database: Create platform profile
+### TrovaTripDetailPage.tsx -- Background & Platform Host
 
-A database migration will insert a platform profile into the `profiles` table with a known ID and `account_type = 'admin'`. Then update all `packaged_trips` where `creator_id IS NULL` to point to this profile.
+```typescript
+// Page wrapper
+<div className="min-h-screen bg-[#f7f3ea]">
 
-### File: `src/pages/marketplace/TrovaTripDetailPage.tsx`
+// Loading state
+<Loader2 className="h-8 w-8 animate-spin text-[#0C4D47]" />
 
-- Add `creator_type?: string | null` to the `TripData` interface
-- Replace `(trip as any).creator_type` with `trip.creator_type`
-- Replace `(trip as any).agent_id` with `trip.agent_id` (also add to interface)
+// Back button
+<Button variant="ghost" className="mb-6 gap-2 text-[#0a2225] hover:bg-[#FDF9F0]">
 
-### File: `src/components/trips/TripBookingSidebar.tsx`
+// Conditional host card
+{trip.creator_type === 'platform' && !trip.creator?.full_name ? (
+  <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6">
+    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7A7151]">
+      Curated By
+    </p>
+    <div className="mt-4 flex items-start gap-4">
+      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#0C4D47]">
+        <Sparkles className="h-8 w-8 text-[#C7B892]" />
+      </div>
+      <div>
+        <h3 className="font-secondary text-xl font-semibold text-[#0a2225]">
+          Goldsainte Concierge
+        </h3>
+        <p className="mt-2 text-[14px] leading-relaxed text-[#4a4a4a]">
+          This journey is curated by the Goldsainte team...
+        </p>
+      </div>
+    </div>
+  </section>
+) : (
+  <MeetYourHostCard ... />
+)}
+```
 
-- When `creatorType === 'platform'` and no `creatorId`/`agentId`, use the platform profile ID as fallback `partnerId`
-- Display "Goldsainte Concierge" as the host name in the "How it works" section
-- Adjust the "Request to Book" flow to route platform bookings appropriately
+### TripDetailHero.tsx -- Clean Title
 
-### Alternative approach (simpler, no new profile needed)
+```typescript
+// Only show "with hostName" when hostName is a real name
+<h1 className="font-secondary text-3xl md:text-5xl font-bold text-white drop-shadow-lg">
+  {title}
+  {hostName && hostName !== "Host" && (
+    <span className="text-[#C7B892]"> with {hostName}</span>
+  )}
+</h1>
+```
 
-Instead of creating a platform profile, we could:
-- Skip the database insert entirely
-- When `creatorType === 'platform'`, change "Request to Book" to link to a contact/inquiry form or the AI Concierge
-- Change "Ask a Question" to open a general support conversation
+### StoryboardsHighlight.tsx -- Platform Attribution
 
-This avoids fake host profiles but changes the user flow for platform trips. The booking would go through a different path than creator/agent trips.
+```typescript
+// In the creator attribution section, for platform trips:
+{trip.creator_type === 'platform' ? (
+  <div className="flex items-center gap-1.5">
+    <Sparkles className="h-4 w-4 text-[#C7A962]" />
+    <span className="text-[10px] md:text-[11px] font-medium text-[#7A7151]">
+      Goldsainte Curated
+    </span>
+  </div>
+) : trip.profiles?.full_name ? ( ... ) : ( ... )}
+```
 
-Both approaches work. The first is more consistent (all trips behave the same). The second is lighter but requires different UI behavior for platform trips.
+### TripBookingSidebar.tsx -- Trust Badge
+
+```typescript
+// For platform trips, swap "Verified host" with "Goldsainte Curated"
+{ icon: Shield, text: isPlatformTrip ? "Goldsainte Curated" : "Verified host" },
+```
+
+## No Database Changes
+
+All changes are frontend styling and conditional rendering.
