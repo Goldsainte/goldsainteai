@@ -14,7 +14,6 @@ export function TripStoryboardViewer({ tripId }: { tripId: string }) {
     async function load() {
       setLoading(true);
       
-      // Find storyboard with this trip_request_id
       const { data: storyboard, error: sbError } = await supabase
         .from("storyboards")
         .select("id")
@@ -53,58 +52,46 @@ export function TripStoryboardViewer({ tripId }: { tripId: string }) {
 
   if (loading) {
     return (
-      <div className="rounded-3xl bg-black/30 border border-[#BFAD72]/30 p-4 text-xs text-[#E5DFC6]/80">
-        Loading trip storyboard…
-      </div>
+      <div className="h-24 rounded-xl bg-[#FDFBF5] animate-pulse" />
     );
   }
 
   if (items.length === 0) {
     return (
-      <div className="rounded-3xl bg-black/30 border border-[#BFAD72]/30 p-4 text-xs text-[#E5DFC6]/80">
-        Your creator or agent hasn't built a visual storyboard yet. Once they do,
-        you'll see the full mood of your journey here.
+      <div className="rounded-xl border border-dashed border-[#E5DFC6] px-4 py-6 text-center text-[11px] text-[#6B7280]">
+        No storyboard yet. Once the traveler creates a visual brief, it will appear here.
       </div>
     );
   }
 
   return (
-    <section className="rounded-3xl bg-black/30 border border-[#BFAD72]/30 p-4 space-y-3">
-      <h2 className="text-sm font-semibold text-[#E5DFC6]">
-        Trip storyboard
-      </h2>
-      <p className="text-[11px] text-[#E5DFC6]/80">
-        A visual preview of the hotels, moments, and scenes your trip is built
-        around — curated by your creator and agent.
-      </p>
-      <div className="grid gap-2 md:grid-cols-3 auto-rows-[140px]">
-        {items.map((item) => (
-          <article
-            key={item.id}
-            className="relative rounded-2xl overflow-hidden border border-white/10 bg-gradient-to-br from-[#0c4d47] via-[#0a2225] to-[#BFAD72]"
-          >
-            {item.image_url && (
-              <div
-                className="absolute inset-0 bg-cover bg-center"
-                style={{ backgroundImage: `url(${item.image_url})` }}
-              />
+    <div className="grid gap-2 grid-cols-2 sm:grid-cols-3 auto-rows-[110px]">
+      {items.map((item) => (
+        <article
+          key={item.id}
+          className="relative rounded-xl overflow-hidden border border-[#E5DFC6] bg-[#FDFBF5]"
+        >
+          {item.image_url && (
+            <div
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${item.image_url})` }}
+            />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          <div className="relative h-full flex flex-col justify-end p-2">
+            {item.subtitle && (
+              <p className="text-[10px] text-white font-medium line-clamp-2 drop-shadow-sm">
+                {item.subtitle}
+              </p>
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-            <div className="relative h-full flex flex-col justify-end p-2">
-              {item.subtitle && (
-                <p className="text-[10px] text-[#E5DFC6] line-clamp-2">
-                  {item.subtitle}
-                </p>
-              )}
-              {item.title && (
-                <p className="text-[9px] text-[#BFAD72] mt-0.5">
-                  {item.title}
-                </p>
-              )}
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
+            {item.title && (
+              <p className="text-[9px] text-[#C7A962] mt-0.5 drop-shadow-sm">
+                {item.title}
+              </p>
+            )}
+          </div>
+        </article>
+      ))}
+    </div>
   );
 }
