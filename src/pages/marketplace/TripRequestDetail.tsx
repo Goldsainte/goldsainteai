@@ -114,7 +114,7 @@ export default function TripRequestDetail() {
         .from("trip_requests")
         .select("*")
         .eq("id", id)
-        .single();
+        .maybeSingle();
 
       if (tripError) throw tripError;
 
@@ -170,21 +170,27 @@ export default function TripRequestDetail() {
         // Owner sees full proposal details
         const { data: proposalsData, error: proposalsError } = await supabase
           .from("trip_proposals")
-          .select(`
-            *,
-            profiles!proposer_id (
-              id,
-              full_name,
-              avatar_url
-            )
-          `)
+          .select("*")
           .eq("trip_request_id", id)
           .order("created_at", { ascending: false });
 
         if (proposalsError) throw proposalsError;
 
+        // Fetch proposer profiles separately (no FK exists)
+        const proposerIds = [...new Set((proposalsData || []).map((p: any) => p.proposer_id).filter(Boolean))];
+        let profilesMap: Record<string, any> = {};
+        if (proposerIds.length > 0) {
+          const { data: profilesData } = await supabase
+            .from("profiles")
+            .select("id, full_name, avatar_url")
+            .in("id", proposerIds);
+          for (const p of profilesData || []) {
+            profilesMap[p.id] = p;
+          }
+        }
+
     const mappedProposals: Proposal[] = (proposalsData || []).map((proposal: any) => {
-      const proposer = proposal.profiles || {};
+      const proposer = profilesMap[proposal.proposer_id] || {};
       const nights = proposal.nights || 7;
       return {
         id: proposal.id,
