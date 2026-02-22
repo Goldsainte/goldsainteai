@@ -31,11 +31,11 @@ export default function Index() {
         {/* Storyboards highlight - core differentiator */}
         <StoryboardsHighlight />
 
-        {/* Built for every side - luxury redesign */}
-        <BuiltForEverySideSection />
-
         {/* Role-specific CTAs - three-way sign up */}
         <RoleSpecificCTAs />
+
+        {/* Built for every side - hidden for now, uncomment to re-enable */}
+        {/* <BuiltForEverySideSection /> */}
 
         {/* Trust, safety & payments - luxury redesign */}
         <TrustSafetyPaymentsSection />

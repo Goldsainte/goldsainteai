@@ -9,8 +9,8 @@ export default function HomePage() {
       <HomeHero />
       <HowGoldsainteWorksSection />
       <StoryboardsHighlight />
-      <BuiltForEverySideSection />
       <RoleSpecificCTAs />
+      {/* <BuiltForEverySideSection /> */}
       <TrustSafetyPaymentsSection />
     </main>
   );
