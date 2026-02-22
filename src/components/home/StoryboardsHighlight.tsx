@@ -73,9 +73,12 @@ export function StoryboardsHighlight() {
     <section className="bg-white border-y border-[#E5DFC6]/30 py-16 md:py-20">
       <div className="mx-auto max-w-6xl px-4">
         <div className="text-left mb-10 md:mb-12">
-          <h2 className="font-secondary text-[26px] leading-snug text-[#0a2225] md:text-[31px] lg:text-[36px] mb-4">
-            {t('home.storyboards.title')}
+          <h2 className="font-secondary text-[26px] leading-snug text-[#0a2225] md:text-[31px] lg:text-[36px] mb-2">
+            Curated Journeys by Creators &amp; Certified Agents
           </h2>
+          <p className="text-base md:text-lg text-[#4a4a4a] italic mb-4">
+            Book instantly. Personalize effortlessly.
+          </p>
           <p className="max-w-3xl text-sm leading-relaxed text-[#4a4a4a] md:text-base">
             {t('home.storyboards.description')}
           </p>
