@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { MapPin, Calendar } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 
 interface LiveTripCardProps {
   trip: {
@@ -31,24 +30,6 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
     }).format(price);
   };
 
-  // Derive vibe tags from highlights or tags, fallback to defaults
-  const getVibeTags = (): string[] => {
-    if (trip.highlights && trip.highlights.length > 0) {
-      return trip.highlights.slice(0, 3);
-    }
-    if (trip.tags && trip.tags.length > 0) {
-      return trip.tags.slice(0, 3);
-    }
-    return ['Curated', 'Luxury'];
-  };
-
-  const getCuratorLabel = (): string => {
-    return trip.creator_type === 'creator' 
-      ? 'Creator + Agent collab'
-      : 'Agent-curated journey';
-  };
-
-  // Use duration_nights if available, otherwise fall back to duration_days
   const getDuration = (): number => {
     return trip.duration_nights ?? trip.duration_days ?? 0;
   };
@@ -56,58 +37,38 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
   return (
     <article
       onClick={() => navigate(`/marketplace/trip/${trip.slug || trip.id}`)}
-      className="group overflow-hidden rounded-xl md:rounded-2xl bg-white shadow-sm border border-[#E5DFC6] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer"
+      className="group cursor-pointer space-y-2.5"
     >
-      {/* Image with gradient and badges */}
-      <div className="relative aspect-[4/5] md:aspect-[3/4] overflow-hidden">
+      {/* Clean image — no overlay, no badges on image */}
+      <div className="relative aspect-[4/3] overflow-hidden rounded-xl md:rounded-2xl">
         <img
           src={trip.cover_image_url || "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800"}
           alt={trip.title}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-        
-        {/* Duration badge - top right */}
-        <Badge className="absolute top-2 right-2 md:top-3 md:right-3 rounded-full text-[9px] md:text-[10px] bg-white/95 text-[#0a2225] border-0 shadow-sm px-2 py-0.5">
-          <Calendar className="h-2.5 w-2.5 md:h-3 md:w-3 mr-1" />
-          {getDuration()} nights
-        </Badge>
+      </div>
 
-        {/* Price badge - top left */}
-        <Badge className="absolute top-2 left-2 md:top-3 md:left-3 rounded-full text-[10px] md:text-[11px] bg-[#0c4d47] text-white border-0 shadow-sm px-2.5 py-1 font-medium">
-          From {formatPrice(trip.price_per_person, trip.currency)}
-        </Badge>
-
-        {/* Bottom overlay content */}
-        <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4">
-          <h3 className="font-secondary text-sm md:text-base text-white font-medium leading-tight mb-1">
+      {/* Content below image */}
+      <div className="space-y-1 px-0.5">
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="font-secondary text-sm md:text-[15px] text-[#0a2225] font-medium leading-snug line-clamp-1">
             {trip.title}
           </h3>
-          <p className="flex items-center gap-1 text-[10px] md:text-xs text-white/90">
-            <MapPin className="h-2.5 w-2.5 md:h-3 md:w-3 flex-shrink-0" />
-            <span className="truncate">{trip.destination}</span>
-          </p>
+          <span className="text-sm md:text-[15px] font-semibold text-[#0a2225] whitespace-nowrap">
+            {formatPrice(trip.price_per_person, trip.currency)}
+          </span>
         </div>
-      </div>
-      
-      {/* Content below image */}
-      <div className="p-2.5 md:p-4 space-y-2">
-        {/* Vibe tags */}
-        <div className="flex flex-wrap gap-1">
-          {getVibeTags().map((tag) => (
-            <Badge 
-              key={tag} 
-              variant="outline" 
-              className="rounded-full text-[8px] md:text-[9px] px-1.5 md:px-2 py-0 border-[#E5DFC6] text-[#6B7280] bg-[#FDF9F0]/50"
-            >
-              {tag}
-            </Badge>
-          ))}
-        </div>
-        
-        {/* Curator credit */}
-        <p className="text-[9px] md:text-[10px] text-[#8D8D8D]">{getCuratorLabel()}</p>
+
+        <p className="flex items-center gap-1 text-[13px] text-[#6B7280]">
+          <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+          <span className="truncate">{trip.destination}</span>
+        </p>
+
+        <p className="flex items-center gap-1 text-[13px] text-[#6B7280]">
+          <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
+          <span>{getDuration()} nights</span>
+        </p>
       </div>
     </article>
   );

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Calendar, MapPin, ArrowRight, Users, HandCoins, Sparkles, Trash2, Plane, Globe } from "lucide-react";
+import { getTripRequestImageUrl } from "@/utils/tripImages";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyTrips, type TravelerTrip } from "@/services/tripsService";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -255,7 +256,7 @@ export default function MyTripsPage() {
                     </Button>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {requests.map((req) => (
                       <TripRequestRow 
                         key={req.id} 
@@ -472,73 +473,72 @@ function TripRequestRow({ req, onDelete }: { req: TripRequestWithProposals; onDe
       : "bg-[#8D8D8D]/10 text-[#8D8D8D] ring-[#8D8D8D]/30";
 
   return (
-    <Link
-      to={`/trip-request/${req.id}`}
-      className="flex flex-col gap-3 rounded-3xl bg-white/95 p-4 text-xs text-[#0a2225] shadow-sm ring-1 ring-[#E5DFC6] hover:ring-[#BFAD72]"
-    >
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <p className="text-xs text-[#8D8D8D]">
-            Posted {new Date(req.created_at).toLocaleDateString()}
-          </p>
-          <h2 className="mt-1 line-clamp-2 text-sm font-semibold">
-            {req.title || `Trip to ${req.destination || "somewhere special"}`}
-          </h2>
+    <div className="group relative cursor-pointer space-y-2.5">
+      <Link to={`/trip-request/${req.id}`} className="block">
+        {/* Destination image */}
+        <div className="relative aspect-[4/3] overflow-hidden rounded-xl md:rounded-2xl">
+          <img
+            src={getTripRequestImageUrl(req.destination)}
+            alt={req.destination || "Trip destination"}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
+          />
+          {/* Status badge */}
+          <span
+            className={`absolute top-2.5 left-2.5 inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-medium ring-1 ${statusColor}`}
+          >
+            {statusLabel}
+          </span>
         </div>
-        <span
-          className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ${statusColor}`}
-        >
-          {statusLabel}
-        </span>
-      </div>
 
-      <div className="grid gap-3 md:grid-cols-3">
-        <div className="space-y-1 text-sm text-[#4a4a4a]">
-          <p className="flex items-center gap-1">
-            <MapPin className="h-3 w-3 text-[#8D8D8D]" />
-            <span>{req.destination || "Destination TBD"}</span>
+        {/* Content below image */}
+        <div className="space-y-1 px-0.5 pt-1">
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="font-secondary text-sm md:text-[15px] text-[#0a2225] font-medium leading-snug line-clamp-1">
+              {req.title || `Trip to ${req.destination || "somewhere special"}`}
+            </h3>
+          </div>
+
+          <p className="flex items-center gap-1 text-[13px] text-[#6B7280]">
+            <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+            <span className="truncate">{req.destination || "Destination TBD"}</span>
           </p>
-          <p className="flex items-center gap-1">
-            <Calendar className="h-3 w-3 text-[#8D8D8D]" />
+
+          <p className="flex items-center gap-1 text-[13px] text-[#6B7280]">
+            <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
             <span className="line-clamp-1">{dates}</span>
           </p>
-        </div>
-        <div className="space-y-1 text-sm text-[#4a4a4a]">
-          <p className="flex items-center gap-1">
-            <Users className="h-3 w-3 text-[#8D8D8D]" />
-            <span>{travelers || "Unknown"} travelers</span>
-          </p>
-          <p className="flex items-center gap-1">
-            <HandCoins className="h-3 w-3 text-[#8D8D8D]" />
-            <span>{budget}</span>
-          </p>
-        </div>
-        <div className="space-y-1 text-sm text-[#4a4a4a]">
-          <p>
-            <span className="font-medium">{proposalCount}</span> proposal
-            {proposalCount === 1 ? "" : "s"} received
-          </p>
-          {acceptedCount > 0 && (
-            <p className="text-emerald-700">
-              {acceptedCount} proposal
-              {acceptedCount === 1 ? "" : "s"} marked as accepted
-            </p>
-          )}
-        </div>
-      </div>
 
-      <div className="flex items-center justify-between text-sm">
-        <span className="text-[#0c4d47]">View full brief & proposals →</span>
-        <button
-          onClick={handleDelete}
-          disabled={isDeleting}
-          className="inline-flex items-center gap-1 text-xs text-red-600 hover:text-red-700 disabled:opacity-50"
-        >
-          <Trash2 className="h-3 w-3" />
-          {isDeleting ? "Deleting..." : "Delete"}
-        </button>
-      </div>
-    </Link>
+          <div className="flex items-center gap-3 text-[13px] text-[#6B7280]">
+            {travelers > 0 && (
+              <span className="flex items-center gap-1">
+                <Users className="h-3.5 w-3.5" />
+                {travelers}
+              </span>
+            )}
+            <span className="flex items-center gap-1">
+              <HandCoins className="h-3.5 w-3.5" />
+              {budget}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between pt-0.5">
+            <span className="text-[12px] text-[#8D8D8D]">
+              {proposalCount} proposal{proposalCount === 1 ? "" : "s"}
+            </span>
+          </div>
+        </div>
+      </Link>
+
+      {/* Delete button */}
+      <button
+        onClick={handleDelete}
+        disabled={isDeleting}
+        className="absolute top-2.5 right-2.5 rounded-full bg-white/90 p-1.5 text-[#8D8D8D] opacity-0 shadow-sm transition-opacity hover:text-red-600 group-hover:opacity-100"
+      >
+        <Trash2 className="h-3.5 w-3.5" />
+      </button>
+    </div>
   );
 }
 
