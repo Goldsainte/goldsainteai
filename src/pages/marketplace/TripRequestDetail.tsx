@@ -84,7 +84,7 @@ type TravelerProfile = {
   created_at?: string | null;
 };
 
-// Luxury input class - elevated sizing
+// Luxury input class
 const luxuryInputClass =
   "w-full rounded-xl border border-[#E5DFC6] bg-[#FDFBF5] px-4 py-3 text-sm text-[#0a2225] placeholder:text-[#9A9079] focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50 focus:border-[#C7A962] transition-colors";
 
@@ -94,19 +94,6 @@ function GoldLabel({ children }: { children: React.ReactNode }) {
     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7A7151]">
       {children}
     </p>
-  );
-}
-
-// Gold bar accent header
-function SectionHeader({ label, title }: { label: string; title: string }) {
-  return (
-    <div className="flex items-start gap-3">
-      <div className="w-1 self-stretch rounded-full bg-[#C7A962]" />
-      <div>
-        <GoldLabel>{label}</GoldLabel>
-        <h2 className="mt-1 font-secondary text-xl text-[#0a2225]">{title}</h2>
-      </div>
-    </div>
   );
 }
 
@@ -173,7 +160,6 @@ export default function TripRequestDetail() {
         return;
       }
 
-      // Fetch traveler profile
       if (tripData.user_id) {
         const { data: profileData } = await supabase
           .from("profiles")
@@ -216,7 +202,6 @@ export default function TripRequestDetail() {
 
       const isRequestOwner = user?.id === tripData.user_id;
 
-      // Fetch current user's profile for proposer card
       if (user && !isRequestOwner) {
         const { data: myProfile } = await supabase
           .from("profiles")
@@ -433,30 +418,27 @@ export default function TripRequestDetail() {
 
   return (
     <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
-      {/* ===================== HERO ===================== */}
-      <div className="relative h-[340px] w-full overflow-hidden md:h-[420px]">
+      {/* ===================== HERO (compact 280px) ===================== */}
+      <div className="relative h-[240px] w-full overflow-hidden md:h-[280px]">
         <img
           src={getTripRequestImageUrl(request.destination)}
           alt={request.destination || request.tripTitle}
           className="h-full w-full object-cover"
           loading="eager"
         />
-        {/* Vignette overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
 
-        <div className="absolute bottom-0 left-0 right-0 px-4 pb-8 md:pb-10">
+        <div className="absolute bottom-0 left-0 right-0 px-4 pb-6">
           <div className="mx-auto max-w-6xl">
-            {/* Back link */}
             <button
               type="button"
               onClick={() => navigate('/marketplace?tab=trip-requests')}
-              className="mb-4 text-xs font-medium text-white/70 hover:text-white transition-colors"
+              className="mb-3 text-xs font-medium text-white/70 hover:text-white transition-colors"
             >
               ← Back to trip requests
             </button>
 
-            {/* Status badge */}
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.15em] text-white backdrop-blur-sm">
+            <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-white backdrop-blur-sm">
               <span
                 className={[
                   "inline-flex h-2 w-2 rounded-full",
@@ -470,383 +452,97 @@ export default function TripRequestDetail() {
               {request.status === "open" ? "Open Request" : request.status === "in_progress" ? "In Progress" : "Closed"}
             </div>
 
-            {/* Title */}
-            <h1 className="font-secondary text-3xl md:text-4xl lg:text-5xl text-white leading-tight max-w-3xl">
+            <h1 className="font-secondary text-2xl md:text-3xl lg:text-4xl text-white leading-tight max-w-3xl">
               {request.tripTitle}
             </h1>
 
-            {/* Info pills row */}
-            <div className="mt-4 flex flex-wrap items-center gap-2.5">
+            <div className="mt-3 flex flex-wrap items-center gap-2">
               {request.destination && request.destination !== "Not specified" && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1.5 text-sm text-white backdrop-blur-sm">
-                  <MapPin className="h-3.5 w-3.5" />
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs text-white backdrop-blur-sm">
+                  <MapPin className="h-3 w-3" />
                   {request.destination}
                 </span>
               )}
               {request.dateRangeLabel && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1.5 text-sm text-white backdrop-blur-sm">
-                  <Calendar className="h-3.5 w-3.5" />
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs text-white backdrop-blur-sm">
+                  <Calendar className="h-3 w-3" />
                   {request.dateRangeLabel}
                 </span>
               )}
               {request.travelers > 0 && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1.5 text-sm text-white backdrop-blur-sm">
-                  <Users className="h-3.5 w-3.5" />
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs text-white backdrop-blur-sm">
+                  <Users className="h-3 w-3" />
                   {request.travelers} {request.travelers === 1 ? "traveler" : "travelers"}
                 </span>
               )}
               {(request.budgetMin > 0 || request.budgetMax > 0) && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#C7A962]/25 border border-[#C7A962]/40 px-3.5 py-1.5 text-sm font-semibold text-[#C7A962] backdrop-blur-sm">
-                  <DollarSign className="h-3.5 w-3.5" />
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#C7A962]/25 border border-[#C7A962]/40 px-3 py-1 text-xs font-semibold text-[#C7A962] backdrop-blur-sm">
+                  <DollarSign className="h-3 w-3" />
                   {formatCurrency(request.budgetMin)} – {formatCurrency(request.budgetMax)}
                 </span>
               )}
             </div>
-
-            {/* Posted by traveler */}
-            {travelerProfile && (
-              <div className="mt-4 flex items-center gap-2.5">
-                <Avatar className="h-8 w-8 border-2 border-white/30">
-                  {travelerProfile.avatar_url ? (
-                    <AvatarImage src={travelerProfile.avatar_url} alt={travelerName} />
-                  ) : null}
-                  <AvatarFallback className="bg-white/20 text-white text-xs font-semibold">
-                    {travelerName.substring(0, 2).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="text-sm text-white/80">
-                  Posted by <span className="font-medium text-white">{travelerName}</span>
-                </span>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
-      {/* ===================== FULL-WIDTH STORYBOARD ===================== */}
-      <div className="w-full border-b border-[#E5DFC6] bg-white py-10 md:py-14">
-        <div className="mx-auto max-w-6xl px-4">
-          <div className="mb-6">
-            <GoldLabel>Visual Brief</GoldLabel>
-            <h2 className="mt-1 font-secondary text-2xl text-[#0a2225]">
-              The traveler's <em>inspiration</em> for this journey
-            </h2>
-            <p className="mt-1.5 text-sm text-[#6B7280] max-w-xl">
-              A curated mood board of places, experiences, and aesthetics — the visual brief that defines this trip.
-            </p>
-          </div>
-          <TripStoryboardViewer tripId={request.id} variant="gallery" />
-        </div>
-      </div>
+      {/* ===================== TWO-COLUMN MARKETPLACE LAYOUT ===================== */}
+      <div className="mx-auto max-w-6xl px-4 py-6 md:py-8">
+        <div className="flex flex-col gap-6 lg:flex-row">
 
-      {/* ===================== TWO-COLUMN LAYOUT ===================== */}
-      <div className="mx-auto max-w-6xl px-4 py-10 md:py-14">
-        <div className="flex flex-col gap-10 lg:flex-row">
-          {/* LEFT: Proposals list + submit form */}
-          <div className="w-full lg:w-2/3 space-y-8">
-            {/* Proposal submission form */}
-            {!isRequestOwner && request.status === "open" && (
-              <div className="rounded-2xl border border-[#E5DFC6] bg-white p-6 md:p-8 shadow-sm">
-                <SectionHeader label="Your Proposal" title="Submit a proposal" />
-                <p className="mt-2 text-sm text-[#6B7280] leading-relaxed max-w-lg">
-                  Share your pricing, itinerary vision, and why you're the perfect match for this trip.
-                </p>
+          {/* ===== LEFT COLUMN: Brief + Proposals + Form ===== */}
+          <div className="flex-1 min-w-0 space-y-6">
 
-                {/* Proposer Profile Card */}
-                {userProfile && (
-                  <div className="mt-6 flex items-start gap-4 rounded-2xl border border-[#E5DFC6] bg-[#FDFBF5] p-5">
-                    <Avatar className="h-14 w-14 border-2 border-[#E5DFC6]">
-                      {userProfile.avatar_url ? (
-                        <AvatarImage src={userProfile.avatar_url} alt={profileName || "You"} />
-                      ) : null}
-                      <AvatarFallback className="bg-[#0c4d47] text-white text-sm font-semibold">
-                        {(profileName || "?").substring(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-base font-semibold text-[#0a2225]">
-                        {profileName || "Your Profile"}
-                      </p>
-                      {userProfile.bio && (
-                        <p className="mt-1 text-sm text-[#6B7280] line-clamp-2 leading-relaxed">
-                          {userProfile.bio.substring(0, 140)}
-                          {userProfile.bio.length > 140 ? "…" : ""}
-                        </p>
-                      )}
-                      <div className="mt-3 flex items-center gap-3">
-                        {userProfile.tiktok_handle && (
-                          <a
-                            href={`https://tiktok.com/@${userProfile.tiktok_handle.replace("@", "")}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[#0a2225]/50 hover:text-[#0a2225] transition-colors"
-                            title="TikTok"
-                          >
-                            <TikTokIcon className="h-4.5 w-4.5" />
-                          </a>
-                        )}
-                        {userProfile.instagram_handle && (
-                          <a
-                            href={`https://instagram.com/${userProfile.instagram_handle.replace("@", "")}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[#0a2225]/50 hover:text-[#0a2225] transition-colors"
-                            title="Instagram"
-                          >
-                            <Instagram className="h-4.5 w-4.5" />
-                          </a>
-                        )}
-                        {userProfile.website && (
-                          <a
-                            href={userProfile.website.startsWith("http") ? userProfile.website : `https://${userProfile.website}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[#0a2225]/50 hover:text-[#0a2225] transition-colors"
-                            title="Website"
-                          >
-                            <Globe className="h-4.5 w-4.5" />
-                          </a>
-                        )}
-                        <Link
-                          to="/travel-settings"
-                          className="ml-auto text-xs font-medium text-[#7A7151] hover:text-[#0a2225] underline underline-offset-2"
-                        >
-                          Edit profile
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <form onSubmit={handleSubmitProposal} className="mt-6 space-y-6 text-sm">
-                  {/* Price + timeline */}
-                  <div className="grid gap-4 md:grid-cols-3">
-                    <div className="space-y-1.5">
-                      <label className="font-medium text-[#0a2225]">Price (USD)</label>
-                      <input
-                        type="number"
-                        min={0}
-                        required
-                        className={luxuryInputClass}
-                        placeholder="e.g. 6500"
-                        value={newProposal.priceFrom}
-                        onChange={(e) => setNewProposal((prev) => ({ ...prev, priceFrom: e.target.value }))}
-                      />
-                      <p className="text-xs text-[#9A9079]">
-                        Total estimated trip price.
-                      </p>
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="font-medium text-[#0a2225]">Timeline (days)</label>
-                      <input
-                        type="text"
-                        className={luxuryInputClass}
-                        placeholder="e.g. 3–5"
-                        value={newProposal.timelineLabel}
-                        onChange={(e) => setNewProposal((prev) => ({ ...prev, timelineLabel: e.target.value }))}
-                      />
-                      <p className="text-xs text-[#9A9079]">
-                        Approximate trip length.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Included / not included */}
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-1.5">
-                      <label className="font-medium text-[#0a2225]">Included in this proposal</label>
-                      <textarea
-                        rows={3}
-                        className={luxuryInputClass}
-                        placeholder="Hotels, private transfers, daily breakfast, guided experiences…"
-                        value={newProposal.included}
-                        onChange={(e) => setNewProposal((prev) => ({ ...prev, included: e.target.value }))}
-                      />
-                      <p className="text-xs text-[#9A9079]">
-                        Be specific about flights, hotels, transport, and activities.
-                      </p>
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="font-medium text-[#0a2225]">
-                        Not included / optional add-ons
-                      </label>
-                      <textarea
-                        rows={3}
-                        className={luxuryInputClass}
-                        placeholder="International flights, travel insurance, most dinners…"
-                        value={newProposal.notIncluded}
-                        onChange={(e) => setNewProposal((prev) => ({ ...prev, notIncluded: e.target.value }))}
-                      />
-                      <p className="text-xs text-[#9A9079]">
-                        Help the traveler understand what's extra.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Itinerary overview */}
-                  <div className="space-y-1.5">
-                    <label className="font-medium text-[#0a2225]">Sample itinerary overview</label>
-                    <textarea
-                      rows={4}
-                      required
-                      className={luxuryInputClass}
-                      placeholder={`Day 1: Arrival & check-in · Day 2: Private yacht & coastal exploring · Day 3: Wine country · Day 4: Departure…`}
-                      value={newProposal.itineraryOverview}
-                      onChange={(e) => setNewProposal((prev) => ({ ...prev, itineraryOverview: e.target.value }))}
-                    />
-                    <p className="text-xs text-[#9A9079]">
-                      A concise day-by-day outline so the traveler can feel the trip.
-                    </p>
-                  </div>
-
-                  {/* Why you're a great fit */}
-                  <div className="space-y-1.5">
-                    <label className="font-medium text-[#0a2225]">Why you're a great fit</label>
-                    <textarea
-                      rows={3}
-                      required
-                      className={luxuryInputClass}
-                      placeholder="Your expertise with this destination, hotel partners, on-the-ground connections…"
-                      value={newProposal.fitReason}
-                      onChange={(e) => setNewProposal((prev) => ({ ...prev, fitReason: e.target.value }))}
-                    />
-                    <p className="text-xs text-[#9A9079]">
-                      Your editorial intro — why this trip is perfectly matched to you.
-                    </p>
-                  </div>
-
-                  {/* Cancellation policy */}
-                  <div className="space-y-3">
-                    <CancellationPolicySelector
-                      selectedPolicyId={newProposal.cancellationPolicyId || undefined}
-                      onPolicySelect={(policyId) =>
-                        setNewProposal((prev) => ({ ...prev, cancellationPolicyId: policyId }))
-                      }
-                    />
-                    <div className="space-y-1.5">
-                      <label className="font-medium text-[#0a2225]">
-                        Additional cancellation / refund terms (optional)
-                      </label>
-                      <textarea
-                        rows={3}
-                        className={luxuryInputClass}
-                        placeholder="Add any agency-specific nuances, blackout dates, or non-refundable elements."
-                        value={newProposal.customCancellationTerms}
-                        onChange={(e) => setNewProposal((prev) => ({ ...prev, customCancellationTerms: e.target.value }))}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Deposit */}
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-1.5">
-                      <label className="font-medium text-[#0a2225]">Required deposit (%)</label>
-                      <input
-                        type="number"
-                        min={0}
-                        max={100}
-                        className={luxuryInputClass}
-                        placeholder="e.g. 30"
-                        value={newProposal.depositPercentage}
-                        onChange={(e) => setNewProposal((prev) => ({ ...prev, depositPercentage: e.target.value }))}
-                      />
-                      <p className="text-xs text-[#9A9079]">
-                        If left blank, treated as due in full.
-                      </p>
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="font-medium text-[#0a2225]">Deposit due (days after acceptance)</label>
-                      <input
-                        type="number"
-                        min={0}
-                        className={luxuryInputClass}
-                        placeholder="e.g. 3"
-                        value={newProposal.depositDueDays}
-                        onChange={(e) => setNewProposal((prev) => ({ ...prev, depositDueDays: e.target.value }))}
-                      />
-                      <p className="text-xs text-[#9A9079]">
-                        When the traveler must pay the deposit.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Legal acknowledgements */}
-                  <div className="space-y-3 rounded-2xl border border-[#E5DFC6] bg-[#FDFBF5] px-5 py-4">
-                    <p className="text-sm font-semibold text-[#0a2225]">
-                      Legal & policy acknowledgements
-                    </p>
-                    <label className="flex items-start gap-2.5 text-xs text-[#6B7280] leading-relaxed">
-                      <Checkbox
-                        checked={newProposal.ackGoldsaintePolicies}
-                        onCheckedChange={(checked) =>
-                          setNewProposal((prev) => ({ ...prev, ackGoldsaintePolicies: Boolean(checked) }))
-                        }
-                      />
-                      <span>
-                        I understand that Goldsainte operates as a marketplace and that I, as the
-                        travel professional, am solely responsible for trip delivery, supplier
-                        contracts, and compliance. I've reviewed the{" "}
-                        <Link to="/cancellation-refund-policy" className="underline underline-offset-2 text-[#7A7151]" target="_blank">
-                          Cancellation & Refund Policy
-                        </Link>{" "}
-                        and{" "}
-                        <Link to="/terms" className="underline underline-offset-2 text-[#7A7151]" target="_blank">
-                          Terms & Conditions
-                        </Link>.
-                      </span>
-                    </label>
-                    <label className="flex items-start gap-2.5 text-xs text-[#6B7280] leading-relaxed">
-                      <Checkbox
-                        checked={newProposal.ackAgentCancellation}
-                        onCheckedChange={(checked) =>
-                          setNewProposal((prev) => ({ ...prev, ackAgentCancellation: Boolean(checked) }))
-                        }
-                      />
-                      <span>
-                        I confirm that the cancellation, refund, and deposit terms in this
-                        proposal are accurate, clearly communicated, and will be honored exactly
-                        as stated if the traveler accepts.
-                      </span>
-                    </label>
-                  </div>
-
-                  <MarketplaceDisclaimer size="sm" />
-
-                  {/* Submit */}
-                  <div className="flex items-center justify-end gap-3 pt-2">
-                    <button
-                      type="submit"
-                      disabled={submittingProposal}
-                      className="inline-flex items-center rounded-full bg-[#0c4d47] px-8 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-[#0c4d47]/90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-70"
-                    >
-                      {submittingProposal ? "Submitting..." : "Submit proposal"}
-                    </button>
-                  </div>
-                </form>
+            {/* Trip Brief Card */}
+            <div className="rounded-2xl border border-[#E5DFC6] bg-white p-5 md:p-6 shadow-sm space-y-5">
+              <div>
+                <GoldLabel>Trip Brief</GoldLabel>
+                <h2 className="mt-1 font-secondary text-lg text-[#0a2225]">{request.tripTitle}</h2>
               </div>
-            )}
 
-            {/* Proposals list */}
+              {request.description && (
+                <div>
+                  <p className="text-sm text-[#0a2225] leading-relaxed whitespace-pre-line">{request.description}</p>
+                </div>
+              )}
+
+              {request.specialRequests && (
+                <div className="border-t border-[#E5DFC6] pt-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#7A7151] mb-2">Special Requests</p>
+                  <p className="text-sm text-[#0a2225] leading-relaxed">{request.specialRequests}</p>
+                </div>
+              )}
+
+              <div className="border-t border-[#E5DFC6] pt-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#7A7151] mb-3">Visual Brief</p>
+                <TripStoryboardViewer tripId={request.id} variant="gallery" />
+              </div>
+            </div>
+
+            {/* Proposals section */}
             <div className="space-y-4">
-              <SectionHeader
-                label="Responses"
-                title={`Proposals`}
-              />
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center rounded-full bg-[#FDFBF5] border border-[#E5DFC6] px-3 py-1 text-xs font-semibold text-[#7A7151]">
-                  {isRequestOwner ? proposals.length : proposalsCount} {(isRequestOwner ? proposals.length : proposalsCount) === 1 ? "proposal" : "proposals"}
-                </span>
-                {isRequestOwner && (
-                  <p className="text-xs text-[#6B7280]">
-                    Compare pricing, approach, and reviews before accepting.
-                  </p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <h2 className="font-secondary text-lg text-[#0a2225]">Proposals</h2>
+                  <span className="inline-flex items-center rounded-full bg-[#FDFBF5] border border-[#E5DFC6] px-2.5 py-0.5 text-xs font-semibold text-[#7A7151]">
+                    {isRequestOwner ? proposals.length : proposalsCount}
+                  </span>
+                </div>
+                {!isRequestOwner && request.status === "open" && (
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById("proposal-form")?.scrollIntoView({ behavior: "smooth" })}
+                    className="text-xs font-semibold text-[#0c4d47] hover:underline"
+                  >
+                    Submit a proposal ↓
+                  </button>
                 )}
               </div>
 
               {isRequestOwner ? (
                 proposals.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-[#E5DFC6] bg-white px-6 py-10 text-center shadow-sm">
-                    <p className="font-secondary text-lg text-[#0a2225]">No proposals yet</p>
+                  <div className="rounded-2xl border border-dashed border-[#E5DFC6] bg-white px-6 py-8 text-center shadow-sm">
+                    <p className="font-secondary text-base text-[#0a2225]">No proposals yet</p>
                     <p className="mt-1 text-sm text-[#6B7280]">
                       As agents and creators respond, their proposals will appear here.
                     </p>
@@ -883,14 +579,13 @@ export default function TripRequestDetail() {
                         )}
 
                         {isRequestOwner && proposal.status !== "accepted" && proposal.status !== "declined" && (
-                          <div className="mx-2 rounded-2xl border border-[#E5DFC6] bg-[#FDFBF5] p-4 text-xs text-[#0a2225] leading-relaxed">
+                          <div className="mx-2 rounded-xl border border-[#E5DFC6] bg-[#FDFBF5] p-3 text-xs text-[#0a2225] leading-relaxed">
                             <p>
                               <span className="font-semibold">By accepting this proposal</span>, your trip and payments stay protected by Goldsainte.
                             </p>
-                            <p className="mt-1.5">
+                            <p className="mt-1">
                               For your safety, please do not send direct bank transfers or share
-                              phone numbers to finalize payment. All payments and changes should
-                              go through this platform.
+                              phone numbers to finalize payment.
                             </p>
                           </div>
                         )}
@@ -899,43 +594,183 @@ export default function TripRequestDetail() {
                   </div>
                 )
               ) : (
-                <div className="rounded-2xl border border-dashed border-[#E5DFC6] bg-white px-6 py-8 text-center shadow-sm">
-                  <p className="font-secondary text-lg text-[#0a2225]">
+                <div className="rounded-2xl border border-dashed border-[#E5DFC6] bg-white px-6 py-6 text-center shadow-sm">
+                  <p className="font-secondary text-base text-[#0a2225]">
                     {proposalsCount > 0 ? `${proposalsCount} ${proposalsCount === 1 ? 'proposal' : 'proposals'} submitted` : "Be the first to propose"}
                   </p>
                   <p className="mt-1 text-sm text-[#6B7280]">
                     {proposalsCount > 0 
                       ? "Your proposal will only be visible to the trip owner."
-                      : "No proposals yet — submit yours above."}
+                      : "No proposals yet — submit yours below."}
                   </p>
                 </div>
               )}
-
-              <MarketplaceDisclaimer size="sm" align="center" />
             </div>
+
+            {/* Proposal Form (below proposals) */}
+            {!isRequestOwner && request.status === "open" && (
+              <div id="proposal-form" className="rounded-2xl border border-[#E5DFC6] bg-white p-5 md:p-6 shadow-sm">
+                <GoldLabel>Your Proposal</GoldLabel>
+                <h2 className="mt-1 font-secondary text-lg text-[#0a2225]">Submit a proposal</h2>
+                <p className="mt-1 text-sm text-[#6B7280] leading-relaxed max-w-lg">
+                  Share your pricing, itinerary, and why you're the perfect match.
+                </p>
+
+                {userProfile && (
+                  <div className="mt-4 flex items-start gap-3 rounded-xl border border-[#E5DFC6] bg-[#FDFBF5] p-4">
+                    <Avatar className="h-11 w-11 border-2 border-[#E5DFC6]">
+                      {userProfile.avatar_url ? (
+                        <AvatarImage src={userProfile.avatar_url} alt={profileName || "You"} />
+                      ) : null}
+                      <AvatarFallback className="bg-[#0c4d47] text-white text-xs font-semibold">
+                        {(profileName || "?").substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-[#0a2225]">
+                        {profileName || "Your Profile"}
+                      </p>
+                      {userProfile.bio && (
+                        <p className="mt-0.5 text-xs text-[#6B7280] line-clamp-2 leading-relaxed">
+                          {userProfile.bio.substring(0, 120)}
+                          {userProfile.bio.length > 120 ? "…" : ""}
+                        </p>
+                      )}
+                      <div className="mt-2 flex items-center gap-2.5">
+                        {userProfile.tiktok_handle && (
+                          <a href={`https://tiktok.com/@${userProfile.tiktok_handle.replace("@", "")}`} target="_blank" rel="noopener noreferrer" className="text-[#0a2225]/50 hover:text-[#0a2225] transition-colors" title="TikTok">
+                            <TikTokIcon className="h-4 w-4" />
+                          </a>
+                        )}
+                        {userProfile.instagram_handle && (
+                          <a href={`https://instagram.com/${userProfile.instagram_handle.replace("@", "")}`} target="_blank" rel="noopener noreferrer" className="text-[#0a2225]/50 hover:text-[#0a2225] transition-colors" title="Instagram">
+                            <Instagram className="h-4 w-4" />
+                          </a>
+                        )}
+                        {userProfile.website && (
+                          <a href={userProfile.website.startsWith("http") ? userProfile.website : `https://${userProfile.website}`} target="_blank" rel="noopener noreferrer" className="text-[#0a2225]/50 hover:text-[#0a2225] transition-colors" title="Website">
+                            <Globe className="h-4 w-4" />
+                          </a>
+                        )}
+                        <Link to="/travel-settings" className="ml-auto text-xs font-medium text-[#7A7151] hover:text-[#0a2225] underline underline-offset-2">
+                          Edit profile
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmitProposal} className="mt-5 space-y-5 text-sm">
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div className="space-y-1.5">
+                      <label className="font-medium text-[#0a2225]">Price (USD)</label>
+                      <input type="number" min={0} required className={luxuryInputClass} placeholder="e.g. 6500" value={newProposal.priceFrom} onChange={(e) => setNewProposal((prev) => ({ ...prev, priceFrom: e.target.value }))} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="font-medium text-[#0a2225]">Timeline (days)</label>
+                      <input type="text" className={luxuryInputClass} placeholder="e.g. 3–5" value={newProposal.timelineLabel} onChange={(e) => setNewProposal((prev) => ({ ...prev, timelineLabel: e.target.value }))} />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-1.5">
+                      <label className="font-medium text-[#0a2225]">Included</label>
+                      <textarea rows={3} className={luxuryInputClass} placeholder="Hotels, transfers, breakfast, guided experiences…" value={newProposal.included} onChange={(e) => setNewProposal((prev) => ({ ...prev, included: e.target.value }))} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="font-medium text-[#0a2225]">Not included</label>
+                      <textarea rows={3} className={luxuryInputClass} placeholder="Flights, travel insurance, most dinners…" value={newProposal.notIncluded} onChange={(e) => setNewProposal((prev) => ({ ...prev, notIncluded: e.target.value }))} />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="font-medium text-[#0a2225]">Itinerary overview</label>
+                    <textarea rows={4} required className={luxuryInputClass} placeholder="Day 1: Arrival · Day 2: Private yacht · Day 3: Wine country…" value={newProposal.itineraryOverview} onChange={(e) => setNewProposal((prev) => ({ ...prev, itineraryOverview: e.target.value }))} />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="font-medium text-[#0a2225]">Why you're a great fit</label>
+                    <textarea rows={3} required className={luxuryInputClass} placeholder="Your expertise, hotel partners, on-the-ground connections…" value={newProposal.fitReason} onChange={(e) => setNewProposal((prev) => ({ ...prev, fitReason: e.target.value }))} />
+                  </div>
+
+                  <div className="space-y-3">
+                    <CancellationPolicySelector
+                      selectedPolicyId={newProposal.cancellationPolicyId || undefined}
+                      onPolicySelect={(policyId) => setNewProposal((prev) => ({ ...prev, cancellationPolicyId: policyId }))}
+                    />
+                    <div className="space-y-1.5">
+                      <label className="font-medium text-[#0a2225]">Additional cancellation terms (optional)</label>
+                      <textarea rows={2} className={luxuryInputClass} placeholder="Blackout dates, non-refundable elements…" value={newProposal.customCancellationTerms} onChange={(e) => setNewProposal((prev) => ({ ...prev, customCancellationTerms: e.target.value }))} />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-1.5">
+                      <label className="font-medium text-[#0a2225]">Deposit (%)</label>
+                      <input type="number" min={0} max={100} className={luxuryInputClass} placeholder="e.g. 30" value={newProposal.depositPercentage} onChange={(e) => setNewProposal((prev) => ({ ...prev, depositPercentage: e.target.value }))} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="font-medium text-[#0a2225]">Deposit due (days)</label>
+                      <input type="number" min={0} className={luxuryInputClass} placeholder="e.g. 3" value={newProposal.depositDueDays} onChange={(e) => setNewProposal((prev) => ({ ...prev, depositDueDays: e.target.value }))} />
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 rounded-xl border border-[#E5DFC6] bg-[#FDFBF5] px-4 py-3">
+                    <p className="text-sm font-semibold text-[#0a2225]">Policy acknowledgements</p>
+                    <label className="flex items-start gap-2 text-xs text-[#6B7280] leading-relaxed">
+                      <Checkbox checked={newProposal.ackGoldsaintePolicies} onCheckedChange={(checked) => setNewProposal((prev) => ({ ...prev, ackGoldsaintePolicies: Boolean(checked) }))} />
+                      <span>
+                        I understand that Goldsainte operates as a marketplace and I am solely responsible for trip delivery. I've reviewed the{" "}
+                        <Link to="/cancellation-refund-policy" className="underline underline-offset-2 text-[#7A7151]" target="_blank">Cancellation Policy</Link>{" "}and{" "}
+                        <Link to="/terms" className="underline underline-offset-2 text-[#7A7151]" target="_blank">Terms</Link>.
+                      </span>
+                    </label>
+                    <label className="flex items-start gap-2 text-xs text-[#6B7280] leading-relaxed">
+                      <Checkbox checked={newProposal.ackAgentCancellation} onCheckedChange={(checked) => setNewProposal((prev) => ({ ...prev, ackAgentCancellation: Boolean(checked) }))} />
+                      <span>I confirm the cancellation, refund, and deposit terms in this proposal are accurate and will be honored.</span>
+                    </label>
+                  </div>
+
+                  <MarketplaceDisclaimer size="sm" />
+
+                  <div className="flex items-center justify-end pt-1">
+                    <button
+                      type="submit"
+                      disabled={submittingProposal}
+                      className="inline-flex items-center rounded-full bg-[#0c4d47] px-7 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-[#0c4d47]/90 disabled:cursor-not-allowed disabled:opacity-70"
+                    >
+                      {submittingProposal ? "Submitting..." : "Submit proposal"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            <MarketplaceDisclaimer size="sm" align="center" />
           </div>
 
-          {/* RIGHT: Sidebar */}
-          <aside className="w-full lg:w-1/3">
-            <div className="sticky top-20 space-y-6">
-              {/* Traveler Card */}
+          {/* ===== RIGHT SIDEBAR (380px, sticky) ===== */}
+          <aside className="w-full lg:w-[380px] lg:flex-shrink-0">
+            <div className="sticky top-20 space-y-5">
+
+              {/* Posted By */}
               {travelerProfile && (
-                <div className="rounded-2xl border border-[#E5DFC6] bg-white p-6 shadow-sm">
+                <div className="rounded-2xl border border-[#E5DFC6] bg-white p-5 shadow-sm">
                   <GoldLabel>Posted by</GoldLabel>
                   <div className="mt-3 flex items-center gap-3">
-                    <Avatar className="h-12 w-12 border-2 border-[#E5DFC6]">
+                    <Avatar className="h-10 w-10 border-2 border-[#E5DFC6]">
                       {travelerProfile.avatar_url ? (
                         <AvatarImage src={travelerProfile.avatar_url} alt={travelerName} />
                       ) : null}
-                      <AvatarFallback className="bg-[#0c4d47] text-white text-sm font-semibold">
+                      <AvatarFallback className="bg-[#0c4d47] text-white text-xs font-semibold">
                         {travelerName.substring(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-secondary text-base text-[#0a2225]">{travelerName}</p>
+                      <p className="font-secondary text-sm text-[#0a2225]">{travelerName}</p>
                       {travelerProfile.created_at && (
                         <p className="text-xs text-[#9A9079]">
-                          Member since {new Date(travelerProfile.created_at).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                          Member since {new Date(travelerProfile.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
                         </p>
                       )}
                     </div>
@@ -944,10 +779,9 @@ export default function TripRequestDetail() {
               )}
 
               {/* Trip Summary */}
-              <div className="rounded-2xl border border-[#E5DFC6] bg-white p-6 md:p-8 shadow-sm">
-                <GoldLabel>Overview</GoldLabel>
-                <h2 className="mt-1 font-secondary text-xl text-[#0a2225]">Trip Summary</h2>
-                <div className="mt-5 space-y-4">
+              <div className="rounded-2xl border border-[#E5DFC6] bg-white p-5 shadow-sm">
+                <GoldLabel>Trip Details</GoldLabel>
+                <div className="mt-3 space-y-3">
                   {[
                     { label: "Destination", value: request.destination },
                     { label: "Departing from", value: request.departingFrom },
@@ -956,47 +790,42 @@ export default function TripRequestDetail() {
                     { label: "Trip style", value: request.tripType },
                     { label: "Travel style", value: request.travelStyle },
                   ].map((row, i) => (
-                    <div key={i} className="flex justify-between gap-3 border-b border-[#E5DFC6]/60 pb-3 last:border-0 last:pb-0">
-                      <span className="text-sm text-[#9A9079]">{row.label}</span>
-                      <span className="text-sm font-medium text-[#0a2225] text-right">{row.value}</span>
+                    <div key={i} className="flex justify-between gap-2 border-b border-[#E5DFC6]/50 pb-2.5 last:border-0 last:pb-0">
+                      <span className="text-xs text-[#9A9079]">{row.label}</span>
+                      <span className="text-xs font-medium text-[#0a2225] text-right">{row.value}</span>
                     </div>
                   ))}
                 </div>
 
-                {/* Budget highlight */}
                 {(request.budgetMin > 0 || request.budgetMax > 0) && (
-                  <div className="mt-5 rounded-xl border border-[#C7A962]/30 bg-[#C7A962]/5 px-4 py-3">
-                    <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#7A7151]">Budget Range</p>
-                    <p className="mt-1 font-secondary text-xl text-[#0a2225]">
+                  <div className="mt-4 rounded-xl border border-[#C7A962]/30 bg-[#C7A962]/5 px-4 py-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#7A7151]">Budget</p>
+                    <p className="mt-0.5 font-secondary text-lg text-[#0a2225]">
                       {formatCurrency(request.budgetMin)} – {formatCurrency(request.budgetMax)}
                     </p>
                   </div>
                 )}
-
-                {/* Description + special requests */}
-                <div className="mt-6 border-t border-[#E5DFC6] pt-5 space-y-5">
-                  <div>
-                    <GoldLabel>Trip overview</GoldLabel>
-                    <p className="mt-2 text-sm text-[#0a2225] leading-relaxed">{request.description}</p>
-                  </div>
-
-                  {request.specialRequests && (
-                    <div>
-                      <GoldLabel>Special requests</GoldLabel>
-                      <p className="mt-2 text-sm text-[#0a2225] leading-relaxed">{request.specialRequests}</p>
-                    </div>
-                  )}
-                </div>
               </div>
 
+              {/* Submit Proposal CTA */}
+              {!isRequestOwner && request.status === "open" && (
+                <button
+                  type="button"
+                  onClick={() => document.getElementById("proposal-form")?.scrollIntoView({ behavior: "smooth" })}
+                  className="w-full rounded-full bg-[#0c4d47] px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-[#0c4d47]/90"
+                >
+                  Submit a Proposal
+                </button>
+              )}
+
               {/* Tips card */}
-              <div className="rounded-2xl bg-[#0c4d47] p-6 md:p-8 text-emerald-50 shadow-sm">
-                <h3 className="font-secondary text-lg font-semibold text-white">Tips for choosing a proposal</h3>
-                <ul className="mt-3 list-disc space-y-2 pl-4 text-sm text-emerald-50/90">
-                  <li>Compare what's included: flights, hotels, transfers, tours.</li>
-                  <li>Look at reviews and experience with similar trips.</li>
-                  <li>Ask clarifying questions in chat before approving.</li>
-                  <li>Confirm cancellation policies and payment schedule.</li>
+              <div className="rounded-2xl bg-[#0c4d47] p-5 text-emerald-50 shadow-sm">
+                <h3 className="font-secondary text-sm font-semibold text-white">Tips for proposals</h3>
+                <ul className="mt-2 list-disc space-y-1.5 pl-4 text-xs text-emerald-50/90">
+                  <li>Compare what's included: flights, hotels, transfers.</li>
+                  <li>Check reviews and destination experience.</li>
+                  <li>Ask questions in chat before accepting.</li>
+                  <li>Confirm cancellation and payment terms.</li>
                 </ul>
               </div>
             </div>
