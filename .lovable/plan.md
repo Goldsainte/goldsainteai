@@ -1,51 +1,26 @@
 
-# Fix: Storyboard Photos Not Persisting After Auth Redirect
+# Move Visual Brief: Remove Top, Promote Sidebar
 
-## Root Cause
+## What's Happening Now
 
-When a traveler builds a storyboard during the trip posting flow, here is what happens:
+There are two "Visual Brief" / Storyboard sections on the Trip Request Detail page:
 
-1. They add ~15 photos in the StoryboardBuilder (Step 4)
-2. They click "Save storyboard"
-3. If they are NOT logged in, the builder saves items to browser sessionStorage and returns a placeholder ID of `"pending-auth"`
-4. They proceed through the rest of the form and hit Submit
-5. The form redirects them to login, saving form state (including `storyboardId: "pending-auth"`) to sessionStorage
-6. After login, the form restores from sessionStorage -- but **never recreates the storyboard in the database**
-7. On submit, it tries to link `storyboard.id = "pending-auth"` which does not exist
-8. Result: zero storyboards, zero storyboard items in the database
+1. **Full-width gallery** (right below the hero) -- the large horizontal scrolling version with editorial intro text
+2. **Sidebar compact version** (in the right column, near the bottom) -- a smaller grid-based storyboard viewer
 
-Even when the user IS logged in, there is a second issue: the user might add photos but not click "Save storyboard" before proceeding to the next step, losing everything.
+## The Change
 
-**Current state:** The `storyboards` table has 0 rows. The `storyboard_items` table has 0 rows. The Amalfi Coast trip has `source_metadata: { source_storyboard_id: "pending-auth" }`.
+- **Remove** the full-width gallery section (lines 526-540) that sits between the hero and the two-column layout
+- **Remove** the compact sidebar storyboard card (lines 992-1002)
+- **Add** the sidebar-style storyboard into the full-width position (right below the hero), keeping the gallery variant for the larger display but using the sidebar's position in the page flow
 
-## The Fix
+In short: one single Visual Brief section, placed right after the hero in the full-width slot, using the gallery variant for best visual impact.
 
-### 1. Restore pending storyboard after auth redirect (`PostTripPage.tsx`)
+## Technical Details
 
-After login, when the form detects `storyboardId === "pending-auth"`, check sessionStorage for the saved storyboard data (`goldsainte:pendingStoryboard`). If found:
-- Create the storyboard in the database (insert into `storyboards`)
-- Insert all saved items into `storyboard_items`
-- Update `storyboardId` state with the real database ID
-- Clear the sessionStorage entry
+### File: `src/pages/marketplace/TripRequestDetail.tsx`
 
-### 2. Auto-save storyboard when leaving Step 4 (`PostTripPage.tsx`)
+1. **Keep** the full-width storyboard section (lines 526-540) with its gallery variant -- this is the one the user wants to keep (it has the photos they see in the screenshot)
+2. **Remove** the sidebar compact storyboard card (lines 992-1002) -- this is the duplicate at the bottom that should be eliminated
 
-When the user clicks "Next" on Step 4 (the storyboard step), if they have added items but haven't saved yet, automatically trigger the save. This prevents data loss from users who add photos but forget to click "Save storyboard."
-
-### 3. Fix the StoryboardBuilder guest save to preserve full item data (`StoryboardBuilder.tsx`)
-
-The current guest save only stores `{ title, items }`. Ensure it stores the complete item data structure so everything can be faithfully restored after login.
-
-## Files Changed
-
-| File | Change |
-|------|--------|
-| `src/pages/trips/PostTripPage.tsx` | Add post-auth storyboard restoration logic; auto-save on step transition |
-| `src/components/storyboards/StoryboardBuilder.tsx` | Expose a `save()` method via ref or callback so PostTripPage can trigger saves; improve guest data persistence |
-
-## What This Solves
-
-- The ~15 Amalfi Coast photos (and any future storyboard) will actually persist to the database
-- The storyboard will be properly linked to the trip request via `trip_request_id`
-- The `TripStoryboardViewer` on the marketplace detail page will display the photos
-- Works for both logged-in users (auto-save on step change) and guest users (restore after auth)
+This results in a single "Visual Brief" section positioned right after the hero, exactly matching the screenshot the user shared.
