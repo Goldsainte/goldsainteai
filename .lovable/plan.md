@@ -1,78 +1,48 @@
 
 
-# Trip Request Detail Page -- Full Luxury Elevation
+# Fix "Request to Book" -- Persist Booking Interest + Require Auth
 
-## The Problem
+## What's Happening Now
 
-The previous redesign added some luxury tokens (gold labels, serif headers, cream inputs) but the page still feels flat and utilitarian compared to polished pages like Creator/Agent profiles, the marketplace, and the Creator Studio. Key issues:
+When a traveler clicks "Request to Book" on a platform trip (which is most marketplace trips right now), the code:
+1. Checks for auth (already redirects to login if not signed in -- good)
+2. Shows a toast: "Your booking interest has been noted!"
+3. Navigates to /messages
+4. **Saves nothing to the database** -- the interest vanishes
 
-- The hero image uses a generic stock photo mapper instead of the trip's actual storyboard or a higher-quality destination hero
-- Text sizing is too small throughout (11px, 10px labels feel cramped, not editorial)
-- The proposal form reads like a boring admin form, not a luxury experience
-- Cards lack the generous padding, subtle shadows, and breathing room seen elsewhere
-- The "Untitled Trip" fallback looks unpolished -- needs a more elegant fallback
-- The sidebar summary card is dense and clinical rather than editorial
-- The storyboard section is buried in the sidebar and too small to appreciate
-- No traveler info card (who posted this request) -- agents/creators want to know who they're proposing to
-- The back button and overall spacing feel generic
+The existing `trip_bookings` table requires a `partner_id` (the host), which platform trips don't have, so it can't be used here.
 
-## Plan
+## The Fix
 
-### 1. Elevate the Hero Section
-- Increase hero height and add a subtle vignette overlay
-- Use larger serif title (text-3xl to text-4xl) with more generous spacing
-- Add a "Posted by [Traveler Name]" line with avatar in the hero
-- Show budget range as a prominent gold-accent pill in the hero alongside destination/dates/travelers
-- Better fallback title: "Trip to [Destination]" instead of "Untitled Trip"
+### 1. Create a `booking_interests` table
 
-### 2. Promote the Storyboard to a Full-Width Section
-- Move the storyboard OUT of the sidebar and into a full-width section between the hero and the two-column layout
-- Make it a horizontal scrollable gallery with larger tiles (180px height instead of 110px)
-- Add editorial intro text: "The traveler's visual inspiration for this journey"
-- This makes the storyboard impossible to miss -- it becomes the first thing agents see after the hero
+A lightweight table to capture every "Request to Book" click:
 
-### 3. Redesign the Sidebar as an Editorial Summary
-- "Trip Summary" card gets more generous padding (p-6 to p-8), larger serif header
-- Each detail row uses a gold accent divider between items instead of cramped flex rows
-- Budget range gets its own highlighted card-within-card with gold border
-- Add trip style/travel style as elegant pill badges
-- Add a "Traveler" card showing who posted the request (avatar, name, member since)
+| Column | Type | Notes |
+|--------|------|-------|
+| id | uuid (PK) | Auto-generated |
+| user_id | uuid (NOT NULL) | The traveler |
+| trip_id | text (NOT NULL) | The packaged trip ID |
+| status | text | Default `'pending'` |
+| notes | text | Optional (future use) |
+| created_at | timestamptz | Auto-set |
 
-### 4. Elevate the Proposal Form
-- Section headers use the gold bar accent pattern (vertical gold bar + serif title) used in onboarding forms
-- Increase input sizes from text-xs to text-sm, and padding from py-2.5 to py-3
-- Add more spacing between form sections (space-y-6 instead of space-y-4)
-- "Your Profile" card gets a more prominent layout with larger avatar and bolder social icons
-- The submit button gets larger (py-3 px-8) with a subtle gold shimmer hover effect
-- Legal section uses a softer design with more readable text (text-xs not text-[11px])
+RLS policies:
+- Authenticated users can insert their own records (`user_id = auth.uid()`)
+- Authenticated users can read their own records
 
-### 5. Typography and Spacing Pass
-- Minimum text size: 12px (no more text-[10px] or text-[9px])
-- Increase vertical spacing between major sections
-- Description and special requests sections get editorial-style typography (text-sm leading-relaxed)
-- Gold accent labels increase from text-[11px] to text-xs for better readability
+### 2. Update `TripBookingSidebar.tsx`
 
-### 6. Empty States and Edge Cases
-- "Untitled Trip" becomes "Trip to [Destination]" or just the destination name
-- Empty proposals state gets a serif headline and editorial tone
-- Storyboard empty state gets a more inviting illustration-style message
+Replace the platform-trip toast-only path with an actual database insert:
 
-## Technical Details
+- Insert a record into `booking_interests` before showing the success toast
+- Keep the same user-facing message and navigation to `/messages`
+- Add error handling if the insert fails
 
-### Files Modified
+### Files Changed
 
-**`src/pages/marketplace/TripRequestDetail.tsx`** -- Major restyle:
-- Restructure layout: Hero -> Full-width Storyboard -> Two-column (Form + Sidebar)
-- Increase all text sizes, padding, and spacing to match luxury standard
-- Add traveler profile card in sidebar
-- Move storyboard from sidebar to full-width section
-- Better title fallback logic
-- Larger, more editorial form inputs and labels
+| File | Change |
+|------|--------|
+| Database migration | Create `booking_interests` table + RLS |
+| `src/components/trips/TripBookingSidebar.tsx` | Insert into `booking_interests` for platform trips before showing toast |
 
-**`src/components/TripStoryboardViewer.tsx`** -- Add a "gallery" variant:
-- New `variant` prop: "sidebar" (current compact grid) or "gallery" (horizontal scroll, larger tiles)
-- Gallery variant uses horizontal scrolling with snap points and larger 180px tiles
-- Maintains existing sidebar variant as default
-
-### No database changes needed
-All data is already available -- profiles, storyboards, trip requests.
