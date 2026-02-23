@@ -989,18 +989,6 @@ export default function TripRequestDetail() {
                 </div>
               </div>
 
-              {/* Sidebar Storyboard (compact) */}
-              <div className="rounded-2xl border border-[#E5DFC6] bg-white p-6 shadow-sm">
-                <GoldLabel>Visual Brief</GoldLabel>
-                <h2 className="mt-1 font-secondary text-xl text-[#0a2225]">Storyboard</h2>
-                <p className="mt-1.5 text-xs text-[#9A9079]">
-                  The traveler's curated mood board for this journey.
-                </p>
-                <div className="mt-4">
-                  <TripStoryboardViewer tripId={request.id} variant="sidebar" />
-                </div>
-              </div>
-
               {/* Tips card */}
               <div className="rounded-2xl bg-[#0c4d47] p-6 md:p-8 text-emerald-50 shadow-sm">
                 <h3 className="font-secondary text-lg font-semibold text-white">Tips for choosing a proposal</h3>
