@@ -1,68 +1,68 @@
 
 
-# Redesign Trip Request Detail as a Proper Marketplace Brief
+# Redesign My Trips + Marketplace Cards to Match Airbnb-Style Layout
 
-## The Problem
+## Two Issues to Address
 
-The current page has layout and spacing issues that make it feel like a blog post rather than a professional three-way marketplace request page (like Fiverr, Upwork, or Bark). Specific issues:
+### 1. Navigation to My Trips
+"My Trips" is currently accessible via the profile dropdown menu in the header (for travelers). This is the correct pattern and mirrors how Airbnb handles "Trips" -- it lives in the user menu, not as a top-level nav item. No changes needed here.
 
-- The full-width storyboard section between the hero and content creates a massive visual gap
-- The two-column split is 2/3 + 1/3 which makes the left column feel sparse when there are no proposals
-- Excessive vertical padding (py-10, py-14) between sections creates a disconnected feel
-- The "Visual Brief" section has verbose editorial copy that belongs on a magazine, not a marketplace
-- The proposal form dominates the page even though most visitors are browsing
-- The sidebar cards feel like afterthoughts rather than key decision-making elements
+### 2. Card Design Overhaul (Both Pages)
 
-## The Redesign
+**Current problems:**
+- **Marketplace cards** use a very tall `aspect-[4/5]` image ratio making them massive -- more like magazine covers than browse-able listings
+- **My Trips request cards** are plain text rows with no images at all -- they look like a spreadsheet, not a travel platform
+- Neither matches the compact, scannable Airbnb grid pattern shown in the reference
 
-Restructure as a clean, scannable marketplace brief with the Mr and Mrs Smith luxury aesthetic preserved.
+## The Plan
 
-### New Layout Structure
+### A. Marketplace LiveTripCard -- Make Compact Like Airbnb
 
-```text
-+----------------------------------------------------------+
-|  HERO (shorter: 280px, tighter overlay)                   |
-|  Title + destination/dates/travelers/budget pills          |
-+----------------------------------------------------------+
-|                                                            |
-|  LEFT COLUMN (flex-1, ~60%)    |  RIGHT SIDEBAR (380px)   |
-|                                |                           |
-|  [Trip Brief card]             |  [Posted By card]         |
-|   - Description                |  [Trip Summary card]      |
-|   - Special requests           |   - Destination           |
-|   - Visual Brief (inline)      |   - Dates                 |
-|                                |   - Travelers             |
-|  [Proposals section]           |   - Style                 |
-|   - Count + CTA               |   - Budget (highlighted)  |
-|   - Proposal cards             |  [Submit Proposal CTA]    |
-|                                |  [Tips card]              |
-|  [Proposal Form]               |                           |
-|   (collapsed by default for    |                           |
-|    non-owners, visible for     |                           |
-|    agents/creators)            |                           |
-+----------------------------------------------------------+
-```
+Change the card layout from tall editorial cards to compact Airbnb-style cards:
+- Reduce image aspect ratio from `aspect-[4/5]` to `aspect-[4/3]` (landscape, not portrait)
+- Remove the dark gradient overlay on images -- Airbnb keeps images clean
+- Move title, location, and price BELOW the image (not overlaid on it)
+- Keep the price badge and duration badge but style them more subtly
+- Remove the "Curator credit" line to keep cards lean
+- Grid changes from 3 columns to 4 columns on large screens (`lg:grid-cols-4`)
 
-### Key Changes
+**File:** `src/components/marketplace/LiveTripCard.tsx`
+**File:** `src/components/marketplace/LiveTripGrid.tsx` (grid columns)
 
-1. **Shorter hero** -- reduce from 420px to 280px on desktop; tighter padding
-2. **Move storyboard inline** -- the Visual Brief becomes a compact horizontal scroll inside the main "Trip Brief" card, not a full-width section. No verbose editorial copy, just a label and the images
-3. **Move description/special requests to main column** -- currently buried in the sidebar, these belong in the main content area as the "brief" itself
-4. **Tighter sidebar** -- fixed 380px width, sticky, contains: Posted By, Trip Summary (compact key-value rows), Budget highlight, a "Submit a Proposal" CTA button (scrolls to form), and Tips
-5. **Reduce vertical spacing** -- use py-6/py-8 instead of py-10/py-14; gap-6 instead of gap-10
-6. **Proposal form** -- keep it in the left column but move it below proposals so the brief + proposals are the primary content
+### B. My Trips Request Cards -- Add Visual Identity
+
+Transform the plain text `TripRequestRow` into a visual card with:
+- A destination placeholder image (gradient or stock based on destination name)
+- Compact card layout: image on left (small square ~100px), details on right
+- Or grid layout similar to Airbnb: small square image on top, details below
+- Keep status badge, destination, dates, travelers, budget, and proposal count
+- Keep the delete button and "View brief" link
+- Use the same compact card proportions as the new marketplace cards
+
+**File:** `src/pages/trips/MyTripsPage.tsx` (TripRequestRow component)
+
+### C. Grid Layout Consistency
+
+Both pages should use a responsive multi-column grid:
+- Mobile: 1 column
+- Tablet: 2 columns
+- Desktop: 3-4 columns
+
+This replaces the current stacked list layout on My Trips.
+
+## Technical Details
 
 ### Files Changed
 
 | File | Change |
 |------|--------|
-| `src/pages/marketplace/TripRequestDetail.tsx` | Complete layout restructure: shorter hero, inline storyboard, description in main column, tighter spacing, sidebar reorganization, proposal form repositioned |
+| `src/components/marketplace/LiveTripCard.tsx` | Reduce image to `aspect-[4/3]`, move title/price below image, remove gradient overlay, cleaner Airbnb-style layout |
+| `src/components/marketplace/LiveTripGrid.tsx` | Change grid to `sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4` |
+| `src/pages/trips/MyTripsPage.tsx` | Redesign `TripRequestRow` as a visual card with destination-based gradient/placeholder image, switch requests list from vertical stack to responsive grid |
 
 ### Design Tokens Preserved
-
-- Cream background `#f7f3ea`, white cards with `#E5DFC6` borders
-- Gold accents `#C7A962`, dark teal `#0c4d47` CTAs
+- Cream background, white cards, `#E5DFC6` borders
+- Gold accents, dark teal CTAs
 - Serif headers via `font-secondary`
-- Rounded-2xl cards with soft shadows
-- All existing data fetching and proposal logic unchanged
+- Rounded corners, soft shadows
 
