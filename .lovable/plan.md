@@ -1,121 +1,78 @@
 
 
-# Trip Request Detail Page: Luxury Redesign + Storyboard + Profile Linking
+# Trip Request Detail Page -- Full Luxury Elevation
 
-## Overview
+## The Problem
 
-Redesign the Trip Request Detail page (`/marketplace/request/:id`) to match the Farfetch x Mr & Mrs Smith luxury aesthetic used across the rest of Goldsainte, and add two critical missing features:
+The previous redesign added some luxury tokens (gold labels, serif headers, cream inputs) but the page still feels flat and utilitarian compared to polished pages like Creator/Agent profiles, the marketplace, and the Creator Studio. Key issues:
 
-1. **Traveler's Storyboard** -- display the storyboard attached to this trip request so agents/creators can see the visual brief
-2. **Proposer Profile Linking** -- let the proposal form auto-attach the submitter's profile with socials (TikTok, Instagram, website)
+- The hero image uses a generic stock photo mapper instead of the trip's actual storyboard or a higher-quality destination hero
+- Text sizing is too small throughout (11px, 10px labels feel cramped, not editorial)
+- The proposal form reads like a boring admin form, not a luxury experience
+- Cards lack the generous padding, subtle shadows, and breathing room seen elsewhere
+- The "Untitled Trip" fallback looks unpolished -- needs a more elegant fallback
+- The sidebar summary card is dense and clinical rather than editorial
+- The storyboard section is buried in the sidebar and too small to appreciate
+- No traveler info card (who posted this request) -- agents/creators want to know who they're proposing to
+- The back button and overall spacing feel generic
 
----
+## Plan
 
-## Design Changes (Luxury Aesthetic)
+### 1. Elevate the Hero Section
+- Increase hero height and add a subtle vignette overlay
+- Use larger serif title (text-3xl to text-4xl) with more generous spacing
+- Add a "Posted by [Traveler Name]" line with avatar in the hero
+- Show budget range as a prominent gold-accent pill in the hero alongside destination/dates/travelers
+- Better fallback title: "Trip to [Destination]" instead of "Untitled Trip"
 
-Apply consistent Goldsainte design tokens throughout the page:
+### 2. Promote the Storyboard to a Full-Width Section
+- Move the storyboard OUT of the sidebar and into a full-width section between the hero and the two-column layout
+- Make it a horizontal scrollable gallery with larger tiles (180px height instead of 110px)
+- Add editorial intro text: "The traveler's visual inspiration for this journey"
+- This makes the storyboard impossible to miss -- it becomes the first thing agents see after the hero
 
-- **Background**: cream `#f7f3ea` (already present)
-- **Cards**: white `#FFFFFF` with `border-[#E5DFC6]` borders, `rounded-2xl`, soft shadows
-- **Headers**: serif font via `font-secondary` (Playfair Display)
-- **Labels**: uppercase `text-[11px] tracking-[0.2em] text-[#7A7151]` gold accent labels for section headers
-- **Inputs**: cream background `bg-[#FDFBF5]`, gold focus ring `focus:ring-[#C7A962]`, `border-[#E5DFC6]`
-- **Submit button**: dark teal `bg-[#0c4d47]` with white text, `rounded-full`
-- **Back link**: styled as subtle gold-accented text link
-- **Sidebar cards**: white cards with `border-[#E5DFC6]`, serif section titles
-- **Tips card**: keep dark teal `bg-[#0c4d47]` but refine typography to match luxury system
+### 3. Redesign the Sidebar as an Editorial Summary
+- "Trip Summary" card gets more generous padding (p-6 to p-8), larger serif header
+- Each detail row uses a gold accent divider between items instead of cramped flex rows
+- Budget range gets its own highlighted card-within-card with gold border
+- Add trip style/travel style as elegant pill badges
+- Add a "Traveler" card showing who posted the request (avatar, name, member since)
 
-### Specific UI refinements:
-- Section titles like "Submit a proposal", "Trip summary", "Proposals" become serif (`font-secondary`) with gold accent labels above them
-- Form labels use `text-[#0a2225] font-medium` instead of generic `text-foreground`
-- Helper text uses `text-[#6B7280]` instead of `text-muted-foreground`
-- Proposal count badge uses gold accent styling
+### 4. Elevate the Proposal Form
+- Section headers use the gold bar accent pattern (vertical gold bar + serif title) used in onboarding forms
+- Increase input sizes from text-xs to text-sm, and padding from py-2.5 to py-3
+- Add more spacing between form sections (space-y-6 instead of space-y-4)
+- "Your Profile" card gets a more prominent layout with larger avatar and bolder social icons
+- The submit button gets larger (py-3 px-8) with a subtle gold shimmer hover effect
+- Legal section uses a softer design with more readable text (text-xs not text-[11px])
 
----
+### 5. Typography and Spacing Pass
+- Minimum text size: 12px (no more text-[10px] or text-[9px])
+- Increase vertical spacing between major sections
+- Description and special requests sections get editorial-style typography (text-sm leading-relaxed)
+- Gold accent labels increase from text-[11px] to text-xs for better readability
 
-## Feature: Traveler's Storyboard Section
-
-Add the existing `TripStoryboardViewer` component to the sidebar, between the Trip Summary card and the Tips card. This component already:
-- Queries `storyboards` table by `trip_request_id`
-- Fetches and displays `storyboard_items` in a visual grid
-- Shows a graceful empty state if no storyboard exists
-
-The storyboard viewer's dark styling will be updated to match the luxury aesthetic (white card with gold borders instead of dark overlay).
-
-### Implementation:
-- Import `TripStoryboardViewer` in `TripRequestDetail.tsx`
-- Place it in the sidebar `<aside>` between Trip Summary and Tips
-- Wrap it in a luxury-styled card container
-- Pass `tripId={request.id}` (the trip request ID)
-
----
-
-## Feature: Proposer Profile Auto-Linking
-
-When an agent or creator opens the proposal form, automatically display their profile info at the top of the form:
-
-1. Fetch the current user's profile on load (display_name, avatar_url, tiktok_handle, instagram_handle, website, bio)
-2. Show a "Your Profile" preview card at the top of the proposal form with:
-   - Avatar + name
-   - Social links (TikTok, Instagram, website) as clickable icons
-   - Short bio excerpt
-   - "Edit Profile" link to their profile settings
-3. This data is already stored in the `profiles` table -- no schema changes needed
-4. The proposer_id is already saved with the proposal, so the profile is inherently linked
-
----
+### 6. Empty States and Edge Cases
+- "Untitled Trip" becomes "Trip to [Destination]" or just the destination name
+- Empty proposals state gets a serif headline and editorial tone
+- Storyboard empty state gets a more inviting illustration-style message
 
 ## Technical Details
 
-### File: `src/pages/marketplace/TripRequestDetail.tsx`
+### Files Modified
 
-**Changes:**
-1. Add import for `TripStoryboardViewer`
-2. Add state for current user's profile (`userProfile`)
-3. Fetch user profile in `fetchData()` when user is logged in and not the owner
-4. Restyle all cards, inputs, labels, and buttons to use luxury design tokens
-5. Add `TripStoryboardViewer` in sidebar
-6. Add proposer profile preview card at top of proposal form
-7. Add social icons (TikTok, Instagram, Globe) from lucide-react
+**`src/pages/marketplace/TripRequestDetail.tsx`** -- Major restyle:
+- Restructure layout: Hero -> Full-width Storyboard -> Two-column (Form + Sidebar)
+- Increase all text sizes, padding, and spacing to match luxury standard
+- Add traveler profile card in sidebar
+- Move storyboard from sidebar to full-width section
+- Better title fallback logic
+- Larger, more editorial form inputs and labels
 
-**Profile fields fetched for proposer card:**
-- `display_name`, `full_name`, `avatar_url`
-- `tiktok_handle`, `instagram_handle`, `website`
-- `bio` (first ~100 chars)
+**`src/components/TripStoryboardViewer.tsx`** -- Add a "gallery" variant:
+- New `variant` prop: "sidebar" (current compact grid) or "gallery" (horizontal scroll, larger tiles)
+- Gallery variant uses horizontal scrolling with snap points and larger 180px tiles
+- Maintains existing sidebar variant as default
 
-### No database migrations needed
-- `storyboards.trip_request_id` already exists
-- Profile social fields already exist
-- `proposer_id` is already saved on proposals
-
----
-
-## Updated Sidebar Layout
-
-```text
-+---------------------------+
-| Trip Summary              |
-| (destination, dates, etc) |
-+---------------------------+
-|                           |
-| Trip Storyboard           |
-| (visual mood board grid)  |
-|                           |
-+---------------------------+
-| Tips for Choosing         |
-| (dark teal card)          |
-+---------------------------+
-```
-
----
-
-## Summary of Changes
-
-| Area | What Changes |
-|------|-------------|
-| Entire page | Luxury aesthetic: serif headers, gold accents, cream inputs, refined typography |
-| Sidebar | Add TripStoryboardViewer showing traveler's visual brief |
-| Proposal form | Add auto-populated "Your Profile" card with avatar, socials, bio |
-| Proposal form | Restyle all inputs/labels/buttons to match luxury system |
-| Back button | Gold-accented styling |
-
+### No database changes needed
+All data is already available -- profiles, storyboards, trip requests.
