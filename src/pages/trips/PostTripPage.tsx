@@ -1,5 +1,5 @@
 // src/pages/trips/PostTripPage.tsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { ArrowLeft, ArrowRight, X, Sparkles, ChevronDown, ChevronUp, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -65,7 +65,7 @@ export default function PostTripPage() {
   const [error, setError] = useState<string | null>(null);
   const [showSafetyModal, setShowSafetyModal] = useState(false);
   const [storyboardId, setStoryboardId] = useState<string | null>(null);
-
+  const storyboardSaveRef = useRef<(() => Promise<void>) | null>(null);
   const interestOptions = [
     "Food & wine", "Design hotels", "Adventure", "Wellness",
     "Nightlife", "Culture & museums", "Family-friendly", "Honeymoon / romance",
@@ -102,6 +102,62 @@ export default function PostTripPage() {
       sessionStorage.removeItem('goldsainte:pendingTrip');
     }
   }, []);
+
+  // After auth redirect, restore pending storyboard from sessionStorage into the database
+  useEffect(() => {
+    if (!user || storyboardId !== "pending-auth") return;
+
+    const pendingRaw = sessionStorage.getItem('goldsainte:pendingStoryboard');
+    if (!pendingRaw) return;
+
+    (async () => {
+      try {
+        const pending = JSON.parse(pendingRaw);
+        const sbTitle = pending.title || destination || "My storyboard";
+        const sbMode = pending.mode || "traveler";
+        const sbItems: any[] = pending.items || [];
+
+        // Create storyboard record
+        const { data: sb, error: sbError } = await supabase
+          .from("storyboards")
+          .insert({
+            owner_id: user.id,
+            role: sbMode,
+            title: sbTitle,
+          })
+          .select("id")
+          .single();
+
+        if (sbError) throw sbError;
+
+        // Insert all items
+        if (sbItems.length > 0) {
+          const rows = sbItems.map((item: any, index: number) => ({
+            storyboard_id: sb.id,
+            item_type: item.kind === "photo" ? "image" : item.kind,
+            source_type: item.source,
+            position: item.position ?? index,
+            image_url: item.kind === "photo" ? (item.data?.full_url || item.data?.thumb_url) : null,
+            title: item.data?.title || item.data?.alt || null,
+            metadata: item.data,
+          }));
+
+          const { error: itemsError } = await supabase
+            .from("storyboard_items")
+            .insert(rows);
+
+          if (itemsError) throw itemsError;
+        }
+
+        // Update state with real ID
+        setStoryboardId(sb.id);
+        sessionStorage.removeItem('goldsainte:pendingStoryboard');
+        console.log(`[PostTripPage] Restored pending storyboard → ${sb.id} with ${sbItems.length} items`);
+      } catch (err) {
+        console.error('[PostTripPage] Failed to restore pending storyboard:', err);
+      }
+    })();
+  }, [user, storyboardId]);
 
   // Auto-populate from AI Collection prefill
   useEffect(() => {
@@ -156,12 +212,22 @@ export default function PostTripPage() {
     );
   }
 
-  function goNext() {
+  async function goNext() {
     if (currentStep === 0 && (!destination || !startsOn || !endsOn)) {
       setError("Please fill in destination and dates.");
       return;
     }
     setError(null);
+
+    // Auto-save storyboard when leaving step 4 (index 3) if user hasn't saved yet
+    if (currentStep === 3 && !storyboardId && storyboardSaveRef.current) {
+      try {
+        await storyboardSaveRef.current();
+      } catch (err) {
+        console.error('[PostTripPage] Auto-save storyboard failed:', err);
+      }
+    }
+
     if (currentStep < TOTAL_STEPS - 1) setCurrentStep(s => s + 1);
   }
 
@@ -471,6 +537,7 @@ export default function PostTripPage() {
                 initialTitle={title || destination}
                 destination={destination}
                 onSaved={(id) => setStoryboardId(id)}
+                saveRef={storyboardSaveRef}
               />
               {storyboardId && (
                 <p className="text-xs text-[#0c4d47] flex items-center gap-1.5">

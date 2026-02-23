@@ -8,6 +8,8 @@ type StoryboardBuilderProps = {
   mode: "traveler" | "creator" | "agent";
   destination?: string | null;
   onSaved?: (storyboardId: string) => void;
+  /** Expose save function so parent can trigger saves (e.g. on step transition) */
+  saveRef?: React.MutableRefObject<(() => Promise<void>) | null>;
 };
 
 type Item = {
@@ -43,6 +45,7 @@ export function StoryboardBuilder({
   mode,
   destination,
   onSaved,
+  saveRef,
 }: StoryboardBuilderProps) {
   const [title, setTitle] = useState(initialTitle || "");
   const [items, setItems] = useState<Item[]>([]);
@@ -56,6 +59,12 @@ export function StoryboardBuilder({
   const [saving, setSaving] = useState(false);
   const [linkInput, setLinkInput] = useState("");
   const [searchError, setSearchError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (saveRef) {
+      saveRef.current = saveStoryboard;
+    }
+  });
 
   useEffect(() => {
     if (!storyboardId) return;
@@ -179,7 +188,15 @@ export function StoryboardBuilder({
 
         // Guest save: persist locally so work isn't lost
         if (!user) {
-          sessionStorage.setItem('goldsainte:pendingStoryboard', JSON.stringify({ title, items }));
+          // Store complete item data so it can be faithfully restored after login
+          sessionStorage.setItem('goldsainte:pendingStoryboard', JSON.stringify({
+            title,
+            mode,
+            items: items.map((item, index) => ({
+              ...item,
+              position: index,
+            })),
+          }));
           if (onSaved) onSaved("pending-auth");
           setSaving(false);
           return;
