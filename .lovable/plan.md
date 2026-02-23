@@ -1,26 +1,68 @@
 
-# Move Visual Brief: Remove Top, Promote Sidebar
 
-## What's Happening Now
+# Redesign Trip Request Detail as a Proper Marketplace Brief
 
-There are two "Visual Brief" / Storyboard sections on the Trip Request Detail page:
+## The Problem
 
-1. **Full-width gallery** (right below the hero) -- the large horizontal scrolling version with editorial intro text
-2. **Sidebar compact version** (in the right column, near the bottom) -- a smaller grid-based storyboard viewer
+The current page has layout and spacing issues that make it feel like a blog post rather than a professional three-way marketplace request page (like Fiverr, Upwork, or Bark). Specific issues:
 
-## The Change
+- The full-width storyboard section between the hero and content creates a massive visual gap
+- The two-column split is 2/3 + 1/3 which makes the left column feel sparse when there are no proposals
+- Excessive vertical padding (py-10, py-14) between sections creates a disconnected feel
+- The "Visual Brief" section has verbose editorial copy that belongs on a magazine, not a marketplace
+- The proposal form dominates the page even though most visitors are browsing
+- The sidebar cards feel like afterthoughts rather than key decision-making elements
 
-- **Remove** the full-width gallery section (lines 526-540) that sits between the hero and the two-column layout
-- **Remove** the compact sidebar storyboard card (lines 992-1002)
-- **Add** the sidebar-style storyboard into the full-width position (right below the hero), keeping the gallery variant for the larger display but using the sidebar's position in the page flow
+## The Redesign
 
-In short: one single Visual Brief section, placed right after the hero in the full-width slot, using the gallery variant for best visual impact.
+Restructure as a clean, scannable marketplace brief with the Mr and Mrs Smith luxury aesthetic preserved.
 
-## Technical Details
+### New Layout Structure
 
-### File: `src/pages/marketplace/TripRequestDetail.tsx`
+```text
++----------------------------------------------------------+
+|  HERO (shorter: 280px, tighter overlay)                   |
+|  Title + destination/dates/travelers/budget pills          |
++----------------------------------------------------------+
+|                                                            |
+|  LEFT COLUMN (flex-1, ~60%)    |  RIGHT SIDEBAR (380px)   |
+|                                |                           |
+|  [Trip Brief card]             |  [Posted By card]         |
+|   - Description                |  [Trip Summary card]      |
+|   - Special requests           |   - Destination           |
+|   - Visual Brief (inline)      |   - Dates                 |
+|                                |   - Travelers             |
+|  [Proposals section]           |   - Style                 |
+|   - Count + CTA               |   - Budget (highlighted)  |
+|   - Proposal cards             |  [Submit Proposal CTA]    |
+|                                |  [Tips card]              |
+|  [Proposal Form]               |                           |
+|   (collapsed by default for    |                           |
+|    non-owners, visible for     |                           |
+|    agents/creators)            |                           |
++----------------------------------------------------------+
+```
 
-1. **Keep** the full-width storyboard section (lines 526-540) with its gallery variant -- this is the one the user wants to keep (it has the photos they see in the screenshot)
-2. **Remove** the sidebar compact storyboard card (lines 992-1002) -- this is the duplicate at the bottom that should be eliminated
+### Key Changes
 
-This results in a single "Visual Brief" section positioned right after the hero, exactly matching the screenshot the user shared.
+1. **Shorter hero** -- reduce from 420px to 280px on desktop; tighter padding
+2. **Move storyboard inline** -- the Visual Brief becomes a compact horizontal scroll inside the main "Trip Brief" card, not a full-width section. No verbose editorial copy, just a label and the images
+3. **Move description/special requests to main column** -- currently buried in the sidebar, these belong in the main content area as the "brief" itself
+4. **Tighter sidebar** -- fixed 380px width, sticky, contains: Posted By, Trip Summary (compact key-value rows), Budget highlight, a "Submit a Proposal" CTA button (scrolls to form), and Tips
+5. **Reduce vertical spacing** -- use py-6/py-8 instead of py-10/py-14; gap-6 instead of gap-10
+6. **Proposal form** -- keep it in the left column but move it below proposals so the brief + proposals are the primary content
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `src/pages/marketplace/TripRequestDetail.tsx` | Complete layout restructure: shorter hero, inline storyboard, description in main column, tighter spacing, sidebar reorganization, proposal form repositioned |
+
+### Design Tokens Preserved
+
+- Cream background `#f7f3ea`, white cards with `#E5DFC6` borders
+- Gold accents `#C7A962`, dark teal `#0c4d47` CTAs
+- Serif headers via `font-secondary`
+- Rounded-2xl cards with soft shadows
+- All existing data fetching and proposal logic unchanged
+
