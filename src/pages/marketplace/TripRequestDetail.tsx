@@ -5,7 +5,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ProposalCard from "@/components/marketplace/ProposalCard";
-import { Loader2, MapPin, Calendar, Users, Globe, Instagram } from "lucide-react";
+import { Loader2, MapPin, Calendar, Users, Globe, Instagram, DollarSign } from "lucide-react";
 import { CancellationPolicySelector } from "@/components/CancellationPolicySelector";
 import { Checkbox } from "@/components/ui/checkbox";
 import { MarketplaceDisclaimer } from "@/components/policies/MarketplaceDisclaimer";
@@ -78,20 +78,39 @@ type UserProfile = {
   bio: string | null;
 };
 
-// Luxury input class
+type TravelerProfile = {
+  full_name: string | null;
+  avatar_url: string | null;
+  created_at?: string | null;
+};
+
+// Luxury input class - elevated sizing
 const luxuryInputClass =
-  "w-full rounded-xl border border-[#E5DFC6] bg-[#FDFBF5] px-3 py-2.5 text-xs text-[#0a2225] placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50 focus:border-[#C7A962] transition-colors";
+  "w-full rounded-xl border border-[#E5DFC6] bg-[#FDFBF5] px-4 py-3 text-sm text-[#0a2225] placeholder:text-[#9A9079] focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50 focus:border-[#C7A962] transition-colors";
 
 // Gold section label
 function GoldLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7A7151]">
+    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7A7151]">
       {children}
     </p>
   );
 }
 
-// TikTok icon (lucide doesn't have one)
+// Gold bar accent header
+function SectionHeader({ label, title }: { label: string; title: string }) {
+  return (
+    <div className="flex items-start gap-3">
+      <div className="w-1 self-stretch rounded-full bg-[#C7A962]" />
+      <div>
+        <GoldLabel>{label}</GoldLabel>
+        <h2 className="mt-1 font-secondary text-xl text-[#0a2225]">{title}</h2>
+      </div>
+    </div>
+  );
+}
+
+// TikTok icon
 function TikTokIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
@@ -111,6 +130,7 @@ export default function TripRequestDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [travelerProfile, setTravelerProfile] = useState<TravelerProfile | null>(null);
 
   const [newProposal, setNewProposal] = useState({
     priceFrom: "",
@@ -153,14 +173,14 @@ export default function TripRequestDetail() {
         return;
       }
 
-      let travelerProfile = null;
+      // Fetch traveler profile
       if (tripData.user_id) {
         const { data: profileData } = await supabase
           .from("profiles")
-          .select("full_name, avatar_url")
+          .select("full_name, avatar_url, created_at")
           .eq("id", tripData.user_id)
           .single();
-        travelerProfile = profileData;
+        setTravelerProfile(profileData);
       }
 
       const tripStyle = typeof tripData.trip_style === 'string' 
@@ -169,11 +189,14 @@ export default function TripRequestDetail() {
           ? tripData.travel_styles[0] 
           : "Not specified";
 
+      const destination = tripData.destination || "Not specified";
+      const titleFallback = tripData.title || (destination !== "Not specified" ? `Trip to ${destination}` : "New Trip Request");
+
       const mappedRequest: TripRequest = {
         id: tripData.id,
-        tripTitle: tripData.title || "Untitled Trip",
+        tripTitle: titleFallback,
         status: tripData.status as any,
-        destination: tripData.destination || "Not specified",
+        destination,
         departingFrom: tripData.departure_city || "Not specified",
         dateRangeLabel: tripData.start_date && tripData.end_date
           ? `${new Date(tripData.start_date).toLocaleDateString()} – ${new Date(tripData.end_date).toLocaleDateString()}${tripData.flexible_dates ? " (flexible)" : ""}`
@@ -396,8 +419,9 @@ export default function TripRequestDetail() {
   if (error || !request) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f7f3ea]">
-        <div className="rounded-2xl border border-[#E5DFC6] bg-white px-6 py-5 text-sm text-[#0a2225] shadow-sm">
-          {error || "Trip request not found."}
+        <div className="rounded-2xl border border-[#E5DFC6] bg-white px-8 py-6 text-sm text-[#0a2225] shadow-sm text-center">
+          <p className="font-secondary text-lg mb-1">Something went wrong</p>
+          <p className="text-[#6B7280]">{error || "Trip request not found."}</p>
         </div>
       </div>
     );
@@ -405,118 +429,160 @@ export default function TripRequestDetail() {
 
   const isRequestOwner = user?.id === request.userId;
   const profileName = userProfile?.display_name || userProfile?.full_name;
+  const travelerName = travelerProfile?.full_name || "A Goldsainte Traveler";
 
   return (
     <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
-      {/* Hero Header */}
-      <div className="relative h-64 w-full overflow-hidden md:h-80">
+      {/* ===================== HERO ===================== */}
+      <div className="relative h-[340px] w-full overflow-hidden md:h-[420px]">
         <img
           src={getTripRequestImageUrl(request.destination)}
           alt={request.destination || request.tripTitle}
           className="h-full w-full object-cover"
           loading="eager"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+        {/* Vignette overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/10" />
 
-        <div className="absolute bottom-6 left-1/2 w-full max-w-6xl -translate-x-1/2 px-4">
-          <div className="flex flex-col gap-2 text-white">
-            <div className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em]">
+        <div className="absolute bottom-0 left-0 right-0 px-4 pb-8 md:pb-10">
+          <div className="mx-auto max-w-6xl">
+            {/* Back link */}
+            <button
+              type="button"
+              onClick={() => navigate('/marketplace?tab=trip-requests')}
+              className="mb-4 text-xs font-medium text-white/70 hover:text-white transition-colors"
+            >
+              ← Back to trip requests
+            </button>
+
+            {/* Status badge */}
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.15em] text-white backdrop-blur-sm">
               <span
                 className={[
-                  "inline-flex h-1.5 w-1.5 rounded-full",
+                  "inline-flex h-2 w-2 rounded-full",
                   request.status === "open"
-                    ? "bg-emerald-300"
+                    ? "bg-emerald-400"
                     : request.status === "in_progress"
-                    ? "bg-amber-300"
+                    ? "bg-amber-400"
                     : "bg-gray-400",
                 ].join(" ")}
               />
-              Trip Request
+              {request.status === "open" ? "Open Request" : request.status === "in_progress" ? "In Progress" : "Closed"}
             </div>
-            <h1 className="font-secondary text-2xl md:text-3xl">
+
+            {/* Title */}
+            <h1 className="font-secondary text-3xl md:text-4xl lg:text-5xl text-white leading-tight max-w-3xl">
               {request.tripTitle}
             </h1>
-            <div className="flex flex-wrap items-center gap-3 text-[12px] text-white/85">
-              {request.destination && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-black/40 px-3 py-1 backdrop-blur-sm">
+
+            {/* Info pills row */}
+            <div className="mt-4 flex flex-wrap items-center gap-2.5">
+              {request.destination && request.destination !== "Not specified" && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1.5 text-sm text-white backdrop-blur-sm">
                   <MapPin className="h-3.5 w-3.5" />
-                  <span className="max-w-[200px] truncate md:max-w-xs">
-                    {request.destination}
-                  </span>
+                  {request.destination}
                 </span>
               )}
               {request.dateRangeLabel && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-black/30 px-3 py-1 backdrop-blur-sm">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1.5 text-sm text-white backdrop-blur-sm">
                   <Calendar className="h-3.5 w-3.5" />
                   {request.dateRangeLabel}
                 </span>
               )}
               {request.travelers > 0 && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-black/30 px-3 py-1 backdrop-blur-sm">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1.5 text-sm text-white backdrop-blur-sm">
                   <Users className="h-3.5 w-3.5" />
                   {request.travelers} {request.travelers === 1 ? "traveler" : "travelers"}
                 </span>
               )}
+              {(request.budgetMin > 0 || request.budgetMax > 0) && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#C7A962]/25 border border-[#C7A962]/40 px-3.5 py-1.5 text-sm font-semibold text-[#C7A962] backdrop-blur-sm">
+                  <DollarSign className="h-3.5 w-3.5" />
+                  {formatCurrency(request.budgetMin)} – {formatCurrency(request.budgetMax)}
+                </span>
+              )}
             </div>
+
+            {/* Posted by traveler */}
+            {travelerProfile && (
+              <div className="mt-4 flex items-center gap-2.5">
+                <Avatar className="h-8 w-8 border-2 border-white/30">
+                  {travelerProfile.avatar_url ? (
+                    <AvatarImage src={travelerProfile.avatar_url} alt={travelerName} />
+                  ) : null}
+                  <AvatarFallback className="bg-white/20 text-white text-xs font-semibold">
+                    {travelerName.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-sm text-white/80">
+                  Posted by <span className="font-medium text-white">{travelerName}</span>
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 md:py-10">
-        {/* Back button */}
-        <button
-          type="button"
-          onClick={() => navigate('/marketplace?tab=trip-requests')}
-          className="self-start text-xs font-medium text-[#7A7151] hover:text-[#0a2225] transition-colors"
-        >
-          ← Back to trip requests
-        </button>
+      {/* ===================== FULL-WIDTH STORYBOARD ===================== */}
+      <div className="w-full border-b border-[#E5DFC6] bg-white py-10 md:py-14">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="mb-6">
+            <GoldLabel>Visual Brief</GoldLabel>
+            <h2 className="mt-1 font-secondary text-2xl text-[#0a2225]">
+              The traveler's <em>inspiration</em> for this journey
+            </h2>
+            <p className="mt-1.5 text-sm text-[#6B7280] max-w-xl">
+              A curated mood board of places, experiences, and aesthetics — the visual brief that defines this trip.
+            </p>
+          </div>
+          <TripStoryboardViewer tripId={request.id} variant="gallery" />
+        </div>
+      </div>
 
-        <div className="flex flex-col gap-6 md:flex-row">
+      {/* ===================== TWO-COLUMN LAYOUT ===================== */}
+      <div className="mx-auto max-w-6xl px-4 py-10 md:py-14">
+        <div className="flex flex-col gap-10 lg:flex-row">
           {/* LEFT: Proposals list + submit form */}
-          <div className="w-full md:w-2/3">
+          <div className="w-full lg:w-2/3 space-y-8">
             {/* Proposal submission form */}
             {!isRequestOwner && request.status === "open" && (
-              <div className="mb-5 rounded-2xl border border-[#E5DFC6] bg-white p-5 shadow-sm">
-                <GoldLabel>Your Proposal</GoldLabel>
-                <h2 className="mt-1 font-secondary text-lg text-[#0a2225]">
-                  Submit a proposal
-                </h2>
-                <p className="mt-1 text-[11px] text-[#6B7280]">
-                  Share your pricing range and a clear outline of how you'll design and manage this trip.
+              <div className="rounded-2xl border border-[#E5DFC6] bg-white p-6 md:p-8 shadow-sm">
+                <SectionHeader label="Your Proposal" title="Submit a proposal" />
+                <p className="mt-2 text-sm text-[#6B7280] leading-relaxed max-w-lg">
+                  Share your pricing, itinerary vision, and why you're the perfect match for this trip.
                 </p>
 
                 {/* Proposer Profile Card */}
                 {userProfile && (
-                  <div className="mt-4 flex items-start gap-3 rounded-xl border border-[#E5DFC6] bg-[#FDFBF5] p-3">
-                    <Avatar className="h-10 w-10 border border-[#E5DFC6]">
+                  <div className="mt-6 flex items-start gap-4 rounded-2xl border border-[#E5DFC6] bg-[#FDFBF5] p-5">
+                    <Avatar className="h-14 w-14 border-2 border-[#E5DFC6]">
                       {userProfile.avatar_url ? (
                         <AvatarImage src={userProfile.avatar_url} alt={profileName || "You"} />
                       ) : null}
-                      <AvatarFallback className="bg-[#0c4d47] text-white text-xs font-semibold">
+                      <AvatarFallback className="bg-[#0c4d47] text-white text-sm font-semibold">
                         {(profileName || "?").substring(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-[#0a2225]">
+                      <p className="text-base font-semibold text-[#0a2225]">
                         {profileName || "Your Profile"}
                       </p>
                       {userProfile.bio && (
-                        <p className="mt-0.5 text-[11px] text-[#6B7280] line-clamp-2">
-                          {userProfile.bio.substring(0, 120)}
-                          {userProfile.bio.length > 120 ? "…" : ""}
+                        <p className="mt-1 text-sm text-[#6B7280] line-clamp-2 leading-relaxed">
+                          {userProfile.bio.substring(0, 140)}
+                          {userProfile.bio.length > 140 ? "…" : ""}
                         </p>
                       )}
-                      <div className="mt-1.5 flex items-center gap-2">
+                      <div className="mt-3 flex items-center gap-3">
                         {userProfile.tiktok_handle && (
                           <a
                             href={`https://tiktok.com/@${userProfile.tiktok_handle.replace("@", "")}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[#0a2225]/60 hover:text-[#0a2225] transition-colors"
+                            className="text-[#0a2225]/50 hover:text-[#0a2225] transition-colors"
                             title="TikTok"
                           >
-                            <TikTokIcon className="h-3.5 w-3.5" />
+                            <TikTokIcon className="h-4.5 w-4.5" />
                           </a>
                         )}
                         {userProfile.instagram_handle && (
@@ -524,10 +590,10 @@ export default function TripRequestDetail() {
                             href={`https://instagram.com/${userProfile.instagram_handle.replace("@", "")}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[#0a2225]/60 hover:text-[#0a2225] transition-colors"
+                            className="text-[#0a2225]/50 hover:text-[#0a2225] transition-colors"
                             title="Instagram"
                           >
-                            <Instagram className="h-3.5 w-3.5" />
+                            <Instagram className="h-4.5 w-4.5" />
                           </a>
                         )}
                         {userProfile.website && (
@@ -535,15 +601,15 @@ export default function TripRequestDetail() {
                             href={userProfile.website.startsWith("http") ? userProfile.website : `https://${userProfile.website}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[#0a2225]/60 hover:text-[#0a2225] transition-colors"
+                            className="text-[#0a2225]/50 hover:text-[#0a2225] transition-colors"
                             title="Website"
                           >
-                            <Globe className="h-3.5 w-3.5" />
+                            <Globe className="h-4.5 w-4.5" />
                           </a>
                         )}
                         <Link
                           to="/travel-settings"
-                          className="ml-auto text-[10px] font-medium text-[#7A7151] hover:text-[#0a2225] underline underline-offset-2"
+                          className="ml-auto text-xs font-medium text-[#7A7151] hover:text-[#0a2225] underline underline-offset-2"
                         >
                           Edit profile
                         </Link>
@@ -552,10 +618,10 @@ export default function TripRequestDetail() {
                   </div>
                 )}
 
-                <form onSubmit={handleSubmitProposal} className="mt-4 space-y-4 text-xs">
+                <form onSubmit={handleSubmitProposal} className="mt-6 space-y-6 text-sm">
                   {/* Price + timeline */}
-                  <div className="grid gap-3 md:grid-cols-3">
-                    <div className="space-y-1">
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div className="space-y-1.5">
                       <label className="font-medium text-[#0a2225]">Price (USD)</label>
                       <input
                         type="number"
@@ -566,11 +632,11 @@ export default function TripRequestDetail() {
                         value={newProposal.priceFrom}
                         onChange={(e) => setNewProposal((prev) => ({ ...prev, priceFrom: e.target.value }))}
                       />
-                      <p className="text-[10px] text-[#6B7280]">
-                        Total estimated trip price per request details.
+                      <p className="text-xs text-[#9A9079]">
+                        Total estimated trip price.
                       </p>
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1.5">
                       <label className="font-medium text-[#0a2225]">Timeline (days)</label>
                       <input
                         type="text"
@@ -579,46 +645,46 @@ export default function TripRequestDetail() {
                         value={newProposal.timelineLabel}
                         onChange={(e) => setNewProposal((prev) => ({ ...prev, timelineLabel: e.target.value }))}
                       />
-                      <p className="text-[10px] text-[#6B7280]">
-                        Approximate trip length based on your proposed itinerary.
+                      <p className="text-xs text-[#9A9079]">
+                        Approximate trip length.
                       </p>
                     </div>
                   </div>
 
                   {/* Included / not included */}
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <div className="space-y-1">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-1.5">
                       <label className="font-medium text-[#0a2225]">Included in this proposal</label>
                       <textarea
                         rows={3}
                         className={luxuryInputClass}
-                        placeholder="Hotels, private transfers, daily breakfast, guided experiences, concierge support…"
+                        placeholder="Hotels, private transfers, daily breakfast, guided experiences…"
                         value={newProposal.included}
                         onChange={(e) => setNewProposal((prev) => ({ ...prev, included: e.target.value }))}
                       />
-                      <p className="text-[10px] text-[#6B7280]">
-                        Be specific about flights, hotels, ground transport, activities, and support.
+                      <p className="text-xs text-[#9A9079]">
+                        Be specific about flights, hotels, transport, and activities.
                       </p>
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1.5">
                       <label className="font-medium text-[#0a2225]">
                         Not included / optional add-ons
                       </label>
                       <textarea
                         rows={3}
                         className={luxuryInputClass}
-                        placeholder="International flights, travel insurance, most dinners, spa treatments, optional excursions…"
+                        placeholder="International flights, travel insurance, most dinners…"
                         value={newProposal.notIncluded}
                         onChange={(e) => setNewProposal((prev) => ({ ...prev, notIncluded: e.target.value }))}
                       />
-                      <p className="text-[10px] text-[#6B7280]">
-                        Help the traveler understand what&apos;s extra or upgradable.
+                      <p className="text-xs text-[#9A9079]">
+                        Help the traveler understand what's extra.
                       </p>
                     </div>
                   </div>
 
                   {/* Itinerary overview */}
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     <label className="font-medium text-[#0a2225]">Sample itinerary overview</label>
                     <textarea
                       rows={4}
@@ -628,37 +694,37 @@ export default function TripRequestDetail() {
                       value={newProposal.itineraryOverview}
                       onChange={(e) => setNewProposal((prev) => ({ ...prev, itineraryOverview: e.target.value }))}
                     />
-                    <p className="text-[10px] text-[#6B7280]">
-                      A concise day-by-day outline so the traveler can instantly feel the trip.
+                    <p className="text-xs text-[#9A9079]">
+                      A concise day-by-day outline so the traveler can feel the trip.
                     </p>
                   </div>
 
                   {/* Why you're a great fit */}
-                  <div className="space-y-1">
-                    <label className="font-medium text-[#0a2225]">Why you&apos;re a great fit</label>
+                  <div className="space-y-1.5">
+                    <label className="font-medium text-[#0a2225]">Why you're a great fit</label>
                     <textarea
                       rows={3}
                       required
                       className={luxuryInputClass}
-                      placeholder="Your expertise with this destination, hotel partners, on-the-ground connections, and similar trips you've designed."
+                      placeholder="Your expertise with this destination, hotel partners, on-the-ground connections…"
                       value={newProposal.fitReason}
                       onChange={(e) => setNewProposal((prev) => ({ ...prev, fitReason: e.target.value }))}
                     />
-                    <p className="text-[10px] text-[#6B7280]">
-                      Think of this as your editorial intro – why this trip is perfectly matched to you.
+                    <p className="text-xs text-[#9A9079]">
+                      Your editorial intro — why this trip is perfectly matched to you.
                     </p>
                   </div>
 
                   {/* Cancellation policy */}
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <CancellationPolicySelector
                       selectedPolicyId={newProposal.cancellationPolicyId || undefined}
                       onPolicySelect={(policyId) =>
                         setNewProposal((prev) => ({ ...prev, cancellationPolicyId: policyId }))
                       }
                     />
-                    <div className="space-y-1">
-                      <label className="font-medium text-[#0a2225] text-xs">
+                    <div className="space-y-1.5">
+                      <label className="font-medium text-[#0a2225]">
                         Additional cancellation / refund terms (optional)
                       </label>
                       <textarea
@@ -672,9 +738,9 @@ export default function TripRequestDetail() {
                   </div>
 
                   {/* Deposit */}
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <div className="space-y-1">
-                      <label className="font-medium text-[#0a2225] text-xs">Required deposit (%)</label>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-1.5">
+                      <label className="font-medium text-[#0a2225]">Required deposit (%)</label>
                       <input
                         type="number"
                         min={0}
@@ -684,12 +750,12 @@ export default function TripRequestDetail() {
                         value={newProposal.depositPercentage}
                         onChange={(e) => setNewProposal((prev) => ({ ...prev, depositPercentage: e.target.value }))}
                       />
-                      <p className="text-[10px] text-[#6B7280]">
-                        If left blank, we'll treat this as due in full at confirmation.
+                      <p className="text-xs text-[#9A9079]">
+                        If left blank, treated as due in full.
                       </p>
                     </div>
-                    <div className="space-y-1">
-                      <label className="font-medium text-[#0a2225] text-xs">Deposit due (days after acceptance)</label>
+                    <div className="space-y-1.5">
+                      <label className="font-medium text-[#0a2225]">Deposit due (days after acceptance)</label>
                       <input
                         type="number"
                         min={0}
@@ -698,18 +764,18 @@ export default function TripRequestDetail() {
                         value={newProposal.depositDueDays}
                         onChange={(e) => setNewProposal((prev) => ({ ...prev, depositDueDays: e.target.value }))}
                       />
-                      <p className="text-[10px] text-[#6B7280]">
-                        When the traveler must pay the deposit to keep this proposal valid.
+                      <p className="text-xs text-[#9A9079]">
+                        When the traveler must pay the deposit.
                       </p>
                     </div>
                   </div>
 
                   {/* Legal acknowledgements */}
-                  <div className="space-y-2 rounded-xl border border-[#E5DFC6] bg-[#FDFBF5] px-3 py-3">
-                    <p className="text-[11px] font-semibold text-[#0a2225]">
+                  <div className="space-y-3 rounded-2xl border border-[#E5DFC6] bg-[#FDFBF5] px-5 py-4">
+                    <p className="text-sm font-semibold text-[#0a2225]">
                       Legal & policy acknowledgements
                     </p>
-                    <label className="flex items-start gap-2 text-[11px] text-[#6B7280]">
+                    <label className="flex items-start gap-2.5 text-xs text-[#6B7280] leading-relaxed">
                       <Checkbox
                         checked={newProposal.ackGoldsaintePolicies}
                         onCheckedChange={(checked) =>
@@ -729,7 +795,7 @@ export default function TripRequestDetail() {
                         </Link>.
                       </span>
                     </label>
-                    <label className="flex items-start gap-2 text-[11px] text-[#6B7280]">
+                    <label className="flex items-start gap-2.5 text-xs text-[#6B7280] leading-relaxed">
                       <Checkbox
                         checked={newProposal.ackAgentCancellation}
                         onCheckedChange={(checked) =>
@@ -747,11 +813,11 @@ export default function TripRequestDetail() {
                   <MarketplaceDisclaimer size="sm" />
 
                   {/* Submit */}
-                  <div className="flex items-center justify-end gap-2 pt-1">
+                  <div className="flex items-center justify-end gap-3 pt-2">
                     <button
                       type="submit"
                       disabled={submittingProposal}
-                      className="inline-flex items-center rounded-full bg-[#0c4d47] px-5 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#0c4d47]/90 disabled:cursor-not-allowed disabled:opacity-70"
+                      className="inline-flex items-center rounded-full bg-[#0c4d47] px-8 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-[#0c4d47]/90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-70"
                     >
                       {submittingProposal ? "Submitting..." : "Submit proposal"}
                     </button>
@@ -761,41 +827,42 @@ export default function TripRequestDetail() {
             )}
 
             {/* Proposals list */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <GoldLabel>Responses</GoldLabel>
-                  <h2 className="mt-0.5 font-secondary text-lg text-[#0a2225]">
-                    Proposals{" "}
-                    <span className="ml-1 inline-flex items-center rounded-full bg-[#FDFBF5] border border-[#E5DFC6] px-2 py-0.5 text-[11px] font-semibold text-[#7A7151]">
-                      {isRequestOwner ? proposals.length : proposalsCount}
-                    </span>
-                  </h2>
-                </div>
+            <div className="space-y-4">
+              <SectionHeader
+                label="Responses"
+                title={`Proposals`}
+              />
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center rounded-full bg-[#FDFBF5] border border-[#E5DFC6] px-3 py-1 text-xs font-semibold text-[#7A7151]">
+                  {isRequestOwner ? proposals.length : proposalsCount} {(isRequestOwner ? proposals.length : proposalsCount) === 1 ? "proposal" : "proposals"}
+                </span>
                 {isRequestOwner && (
-                  <p className="text-[11px] text-[#6B7280]">
-                    Compare pricing, approach, and reviews before accepting one proposal.
+                  <p className="text-xs text-[#6B7280]">
+                    Compare pricing, approach, and reviews before accepting.
                   </p>
                 )}
               </div>
 
               {isRequestOwner ? (
                 proposals.length === 0 ? (
-                  <div className="rounded-2xl border border-[#E5DFC6] bg-white px-4 py-4 text-xs text-[#6B7280] shadow-sm">
-                    No proposals yet. As agents and creators respond, they'll appear here.
+                  <div className="rounded-2xl border border-dashed border-[#E5DFC6] bg-white px-6 py-10 text-center shadow-sm">
+                    <p className="font-secondary text-lg text-[#0a2225]">No proposals yet</p>
+                    <p className="mt-1 text-sm text-[#6B7280]">
+                      As agents and creators respond, their proposals will appear here.
+                    </p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {proposals.map((proposal) => (
                       <div key={proposal.id} className="space-y-3">
                         <ProposalCard proposal={proposal} showAdminInsights={isAdmin} />
                         
                         {isRequestOwner && (
-                          <div className="flex items-center justify-between gap-2 px-2">
+                          <div className="flex items-center justify-between gap-3 px-2">
                             <button
                               type="button"
                               onClick={() => toast.info("Chat feature coming soon")}
-                              className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFC6] bg-white px-3 py-1.5 text-xs font-medium text-[#0a2225] hover:border-[#C7A962] transition-colors"
+                              className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFC6] bg-white px-4 py-2 text-sm font-medium text-[#0a2225] hover:border-[#C7A962] transition-colors"
                             >
                               Message
                             </button>
@@ -804,7 +871,7 @@ export default function TripRequestDetail() {
                               onClick={() => handleAcceptProposal(proposal.id)}
                               disabled={proposal.status === "accepted" || proposal.status === "declined"}
                               className={[
-                                "inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm transition-colors",
+                                "inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold shadow-sm transition-colors",
                                 proposal.status === "accepted" || proposal.status === "declined"
                                   ? "cursor-not-allowed bg-[#E5DFC6]/50 text-[#6B7280]"
                                   : "bg-[#0c4d47] text-white hover:bg-[#0c4d47]/90",
@@ -816,11 +883,11 @@ export default function TripRequestDetail() {
                         )}
 
                         {isRequestOwner && proposal.status !== "accepted" && proposal.status !== "declined" && (
-                          <div className="mx-2 rounded-2xl border border-[#E5DFC6] bg-[#FDFBF5] p-2.5 text-[10px] text-[#0a2225]">
+                          <div className="mx-2 rounded-2xl border border-[#E5DFC6] bg-[#FDFBF5] p-4 text-xs text-[#0a2225] leading-relaxed">
                             <p>
                               <span className="font-semibold">By accepting this proposal</span>, your trip and payments stay protected by Goldsainte.
                             </p>
-                            <p className="mt-1">
+                            <p className="mt-1.5">
                               For your safety, please do not send direct bank transfers or share
                               phone numbers to finalize payment. All payments and changes should
                               go through this platform.
@@ -832,10 +899,15 @@ export default function TripRequestDetail() {
                   </div>
                 )
               ) : (
-                <div className="rounded-2xl border border-[#E5DFC6] bg-white px-4 py-4 text-xs text-[#6B7280] shadow-sm">
-                  {proposalsCount > 0 
-                    ? `${proposalsCount} ${proposalsCount === 1 ? 'proposal' : 'proposals'} submitted so far. Your proposal will only be visible to the trip owner.`
-                    : "No proposals yet. Be the first to submit a proposal!"}
+                <div className="rounded-2xl border border-dashed border-[#E5DFC6] bg-white px-6 py-8 text-center shadow-sm">
+                  <p className="font-secondary text-lg text-[#0a2225]">
+                    {proposalsCount > 0 ? `${proposalsCount} ${proposalsCount === 1 ? 'proposal' : 'proposals'} submitted` : "Be the first to propose"}
+                  </p>
+                  <p className="mt-1 text-sm text-[#6B7280]">
+                    {proposalsCount > 0 
+                      ? "Your proposal will only be visible to the trip owner."
+                      : "No proposals yet — submit yours above."}
+                  </p>
                 </div>
               )}
 
@@ -844,75 +916,98 @@ export default function TripRequestDetail() {
           </div>
 
           {/* RIGHT: Sidebar */}
-          <aside className="w-full md:w-1/3">
-            <div className="sticky top-20 space-y-4">
-              {/* Trip Summary */}
-              <div className="rounded-2xl border border-[#E5DFC6] bg-white p-5 shadow-sm">
-                <GoldLabel>Overview</GoldLabel>
-                <h2 className="mt-1 font-secondary text-lg text-[#0a2225]">Trip summary</h2>
-                <div className="mt-3 space-y-2.5 text-xs text-[#0a2225]">
-                  <div className="flex justify-between gap-3">
-                    <span className="text-[#6B7280]">Destination</span>
-                    <span className="font-medium">{request.destination}</span>
-                  </div>
-                  <div className="flex justify-between gap-3">
-                    <span className="text-[#6B7280]">Departing from</span>
-                    <span className="font-medium">{request.departingFrom}</span>
-                  </div>
-                  <div className="flex justify-between gap-3">
-                    <span className="text-[#6B7280]">Dates</span>
-                    <span className="text-right font-medium">{request.dateRangeLabel}</span>
-                  </div>
-                  <div className="flex justify-between gap-3">
-                    <span className="text-[#6B7280]">Travelers</span>
-                    <span className="font-medium">
-                      {request.travelers} {request.travelers === 1 ? "person" : "people"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between gap-3">
-                    <span className="text-[#6B7280]">Budget range</span>
-                    <span className="text-right font-semibold text-[#0a2225]">
-                      {formatCurrency(request.budgetMin)} – {formatCurrency(request.budgetMax)}
-                    </span>
+          <aside className="w-full lg:w-1/3">
+            <div className="sticky top-20 space-y-6">
+              {/* Traveler Card */}
+              {travelerProfile && (
+                <div className="rounded-2xl border border-[#E5DFC6] bg-white p-6 shadow-sm">
+                  <GoldLabel>Posted by</GoldLabel>
+                  <div className="mt-3 flex items-center gap-3">
+                    <Avatar className="h-12 w-12 border-2 border-[#E5DFC6]">
+                      {travelerProfile.avatar_url ? (
+                        <AvatarImage src={travelerProfile.avatar_url} alt={travelerName} />
+                      ) : null}
+                      <AvatarFallback className="bg-[#0c4d47] text-white text-sm font-semibold">
+                        {travelerName.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-secondary text-base text-[#0a2225]">{travelerName}</p>
+                      {travelerProfile.created_at && (
+                        <p className="text-xs text-[#9A9079]">
+                          Member since {new Date(travelerProfile.created_at).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
+              )}
 
-                <div className="mt-4 border-t border-[#E5DFC6] pt-3 text-xs">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7A7151]">
-                    Trip overview
-                  </p>
-                  <p className="mt-1 text-[#0a2225]">{request.description}</p>
+              {/* Trip Summary */}
+              <div className="rounded-2xl border border-[#E5DFC6] bg-white p-6 md:p-8 shadow-sm">
+                <GoldLabel>Overview</GoldLabel>
+                <h2 className="mt-1 font-secondary text-xl text-[#0a2225]">Trip Summary</h2>
+                <div className="mt-5 space-y-4">
+                  {[
+                    { label: "Destination", value: request.destination },
+                    { label: "Departing from", value: request.departingFrom },
+                    { label: "Dates", value: request.dateRangeLabel },
+                    { label: "Travelers", value: `${request.travelers} ${request.travelers === 1 ? "person" : "people"}` },
+                    { label: "Trip style", value: request.tripType },
+                    { label: "Travel style", value: request.travelStyle },
+                  ].map((row, i) => (
+                    <div key={i} className="flex justify-between gap-3 border-b border-[#E5DFC6]/60 pb-3 last:border-0 last:pb-0">
+                      <span className="text-sm text-[#9A9079]">{row.label}</span>
+                      <span className="text-sm font-medium text-[#0a2225] text-right">{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Budget highlight */}
+                {(request.budgetMin > 0 || request.budgetMax > 0) && (
+                  <div className="mt-5 rounded-xl border border-[#C7A962]/30 bg-[#C7A962]/5 px-4 py-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#7A7151]">Budget Range</p>
+                    <p className="mt-1 font-secondary text-xl text-[#0a2225]">
+                      {formatCurrency(request.budgetMin)} – {formatCurrency(request.budgetMax)}
+                    </p>
+                  </div>
+                )}
+
+                {/* Description + special requests */}
+                <div className="mt-6 border-t border-[#E5DFC6] pt-5 space-y-5">
+                  <div>
+                    <GoldLabel>Trip overview</GoldLabel>
+                    <p className="mt-2 text-sm text-[#0a2225] leading-relaxed">{request.description}</p>
+                  </div>
 
                   {request.specialRequests && (
-                    <>
-                      <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7A7151]">
-                        Special requests
-                      </p>
-                      <p className="mt-1 text-[#0a2225]">{request.specialRequests}</p>
-                    </>
+                    <div>
+                      <GoldLabel>Special requests</GoldLabel>
+                      <p className="mt-2 text-sm text-[#0a2225] leading-relaxed">{request.specialRequests}</p>
+                    </div>
                   )}
                 </div>
               </div>
 
-              {/* Trip Storyboard */}
-              <div className="rounded-2xl border border-[#E5DFC6] bg-white p-5 shadow-sm">
+              {/* Sidebar Storyboard (compact) */}
+              <div className="rounded-2xl border border-[#E5DFC6] bg-white p-6 shadow-sm">
                 <GoldLabel>Visual Brief</GoldLabel>
-                <h2 className="mt-1 font-secondary text-lg text-[#0a2225]">Trip Storyboard</h2>
-                <p className="mt-1 text-[11px] text-[#6B7280]">
-                  The traveler's visual mood board — curated inspiration for this journey.
+                <h2 className="mt-1 font-secondary text-xl text-[#0a2225]">Storyboard</h2>
+                <p className="mt-1.5 text-xs text-[#9A9079]">
+                  The traveler's curated mood board for this journey.
                 </p>
-                <div className="mt-3">
-                  <TripStoryboardViewer tripId={request.id} />
+                <div className="mt-4">
+                  <TripStoryboardViewer tripId={request.id} variant="sidebar" />
                 </div>
               </div>
 
               {/* Tips card */}
-              <div className="rounded-2xl bg-[#0c4d47] p-5 text-xs text-emerald-50 shadow-sm">
-                <h3 className="font-secondary text-base font-semibold text-white">Tips for choosing a proposal</h3>
-                <ul className="mt-2 list-disc space-y-1.5 pl-4 text-emerald-50/90 text-[11px]">
+              <div className="rounded-2xl bg-[#0c4d47] p-6 md:p-8 text-emerald-50 shadow-sm">
+                <h3 className="font-secondary text-lg font-semibold text-white">Tips for choosing a proposal</h3>
+                <ul className="mt-3 list-disc space-y-2 pl-4 text-sm text-emerald-50/90">
                   <li>Compare what's included: flights, hotels, transfers, tours.</li>
                   <li>Look at reviews and experience with similar trips.</li>
-                  <li>Ask clarifying questions in chat before approving a proposal.</li>
+                  <li>Ask clarifying questions in chat before approving.</li>
                   <li>Confirm cancellation policies and payment schedule.</li>
                 </ul>
               </div>
