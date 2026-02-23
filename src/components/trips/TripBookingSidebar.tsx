@@ -57,8 +57,24 @@ export function TripBookingSidebar({
     }
 
     if (isPlatformTrip) {
-      toast.success("Your booking interest has been noted! Our concierge team will reach out shortly.");
-      navigate("/messages");
+      setIsLoading(true);
+      try {
+        const { error } = await supabase.from("booking_interests").insert({
+          user_id: user.id,
+          trip_id: tripId,
+          status: "pending",
+        } as any);
+
+        if (error) throw error;
+
+        toast.success("Your booking interest has been noted! Our concierge team will reach out shortly.");
+        navigate("/messages");
+      } catch (err: any) {
+        console.error("Booking interest error:", err);
+        toast.error("Failed to save your booking interest. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
       return;
     }
 
