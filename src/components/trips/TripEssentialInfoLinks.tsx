@@ -1,4 +1,4 @@
-import { Shield, FileText, AlertTriangle, MapPin, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { findLocationCoordinates } from "@/lib/locationMapping";
 
 interface EssentialInfo {
@@ -115,55 +115,36 @@ const COUNTRY_URL_MAPPING: Record<string, { stateDept: string; lonelyPlanet: str
   "french polynesia": { stateDept: "FrenchPolynesia", lonelyPlanet: "french-polynesia" },
 };
 
-// Get country from destination string (handles cities like "Paris, France" or just "France")
 function getCountryFromDestination(destination?: string): string | null {
   if (!destination) return null;
-  
   const lowerDest = destination.toLowerCase().trim();
-  
-  // Direct match
-  if (COUNTRY_URL_MAPPING[lowerDest]) {
-    return lowerDest;
-  }
-  
-  // Check if destination contains a country name
+  if (COUNTRY_URL_MAPPING[lowerDest]) return lowerDest;
   for (const country of Object.keys(COUNTRY_URL_MAPPING)) {
-    if (lowerDest.includes(country)) {
-      return country;
-    }
+    if (lowerDest.includes(country)) return country;
   }
-  
-  // Try to get country from locationMapping
   const coords = findLocationCoordinates(destination);
   if (coords?.country) {
     const countryLower = coords.country.toLowerCase();
-    if (COUNTRY_URL_MAPPING[countryLower]) {
-      return countryLower;
-    }
+    if (COUNTRY_URL_MAPPING[countryLower]) return countryLower;
   }
-  
   return null;
 }
 
-// Build State Dept travel alerts URL for country
 function getTravelAlertsUrl(destination?: string): string {
   const country = getCountryFromDestination(destination);
   if (country && COUNTRY_URL_MAPPING[country]) {
     return `https://travel.state.gov/content/travel/en/international-travel/International-Travel-Country-Information-Pages/${COUNTRY_URL_MAPPING[country].stateDept}.html`;
   }
-  // Fallback to general travel advisories page
   return "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories.html";
 }
 
-// Build Lonely Planet destination guide URL for country
 function getDestinationGuideUrl(destination?: string): string {
   const country = getCountryFromDestination(destination);
   if (country && COUNTRY_URL_MAPPING[country]) {
     return `https://www.lonelyplanet.com/${COUNTRY_URL_MAPPING[country].lonelyPlanet}`;
   }
-  // Fallback: try to create URL from destination slug
   if (destination) {
-    return `https://www.lonelyplanet.com/${destination.toLowerCase().replace(/[,\s]+/g, '-').replace(/-+/g, '-')}`;
+    return `https://www.lonelyplanet.com/${destination.toLowerCase().replace(/[,\\s]+/g, '-').replace(/-+/g, '-')}`;
   }
   return "https://www.lonelyplanet.com/";
 }
@@ -171,22 +152,18 @@ function getDestinationGuideUrl(destination?: string): string {
 export function TripEssentialInfoLinks({ essentialInfo, destination }: TripEssentialInfoLinksProps) {
   const links = [
     {
-      icon: Shield,
       label: "Travel Protection",
       href: essentialInfo?.travel_protection || "https://www.allianztravelinsurance.com/",
     },
     {
-      icon: FileText,
       label: "Visa Requirements",
       href: essentialInfo?.visa_requirements || "https://www.usa.gov/visas-citizens-traveling-abroad",
     },
     {
-      icon: AlertTriangle,
       label: "Travel Alerts",
       href: essentialInfo?.travel_alerts || getTravelAlertsUrl(destination),
     },
     {
-      icon: MapPin,
       label: "Destination Guide",
       href: essentialInfo?.destination_guide || getDestinationGuideUrl(destination),
     },
@@ -207,7 +184,6 @@ export function TripEssentialInfoLinks({ essentialInfo, destination }: TripEssen
             rel="noopener noreferrer"
             className="flex items-center gap-3 rounded-xl border border-[#E5DFC6] bg-[#FDF9F0] p-4 transition hover:border-[#C7B892] hover:bg-[#C7B892]/10"
           >
-            <link.icon className="h-5 w-5 text-[#0C4D47]" />
             <span className="flex-1 text-sm font-medium text-[#0a2225]">{link.label}</span>
             <ExternalLink className="h-4 w-4 text-[#6B7280]" />
           </a>

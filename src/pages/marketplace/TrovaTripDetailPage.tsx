@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Loader2, Sparkles } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { TripDetailHero } from "@/components/trips/TripDetailHero";
 import { TripAboutSection } from "@/components/trips/TripAboutSection";
@@ -231,10 +231,7 @@ export default function TrovaTripDetailPage() {
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7A7151]">
                   Curated By
                 </p>
-                <div className="mt-4 flex items-start gap-4">
-                  <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-full bg-[#0C4D47]">
-                    <Sparkles className="h-8 w-8 text-[#C7B892]" />
-                  </div>
+                <div className="mt-4">
                   <div>
                     <h3 className="font-secondary text-xl font-semibold text-[#0a2225]">
                       Goldsainte Concierge

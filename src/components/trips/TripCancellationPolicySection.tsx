@@ -1,5 +1,3 @@
-import { AlertCircle, Check, X, Shield } from "lucide-react";
-
 interface CancellationTier {
   status: string;
   refund: string;
@@ -28,6 +26,18 @@ const DEFAULT_TIERS: CancellationTier[] = [
   },
 ];
 
+const TIER_COLORS = [
+  "border-l-emerald-500",
+  "border-l-amber-500",
+  "border-l-red-500",
+];
+
+const TIER_TEXT_COLORS = [
+  "text-emerald-600",
+  "text-amber-600",
+  "text-red-600",
+];
+
 export function TripCancellationPolicySection({ tiers = DEFAULT_TIERS }: TripCancellationPolicySectionProps) {
   return (
     <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6">
@@ -42,45 +52,25 @@ export function TripCancellationPolicySection({ tiers = DEFAULT_TIERS }: TripCan
         {tiers.map((tier, idx) => (
           <div
             key={tier.status}
-            className="rounded-xl border border-[#E5DFC6] p-4"
+            className={`rounded-xl border border-[#E5DFC6] border-l-4 ${TIER_COLORS[idx] || TIER_COLORS[2]} p-4`}
           >
-            <div className="flex items-center gap-3">
-              <div className={`flex h-8 w-8 items-center justify-center rounded-full ${
-                idx === 0 ? "bg-emerald-100" : idx === 1 ? "bg-amber-100" : "bg-red-100"
-              }`}>
-                {idx === 0 ? (
-                  <Check className="h-4 w-4 text-emerald-600" />
-                ) : idx === 1 ? (
-                  <AlertCircle className="h-4 w-4 text-amber-600" />
-                ) : (
-                  <X className="h-4 w-4 text-red-600" />
-                )}
-              </div>
-              <div>
-                <p className="font-medium text-[#0a2225]">{tier.status}</p>
-                <p className={`text-sm font-semibold ${
-                  idx === 0 ? "text-emerald-600" : idx === 1 ? "text-amber-600" : "text-red-600"
-                }`}>
-                  {tier.refund}
-                </p>
-              </div>
-            </div>
-            <p className="mt-3 text-sm text-[#6B7280]">{tier.description}</p>
+            <p className="font-medium text-[#0a2225]">{tier.status}</p>
+            <p className={`text-sm font-semibold ${TIER_TEXT_COLORS[idx] || TIER_TEXT_COLORS[2]}`}>
+              {tier.refund}
+            </p>
+            <p className="mt-2 text-sm text-[#6B7280]">{tier.description}</p>
           </div>
         ))}
       </div>
 
       {/* Insurance Recommendation */}
-      <div className="mt-6 flex items-start gap-3 rounded-xl bg-[#0C4D47]/10 p-4">
-        <Shield className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#0C4D47]" />
-        <div>
-          <p className="font-medium text-[#0a2225]">
-            Highly Recommended: Protect Your Adventure
-          </p>
-          <p className="mt-1 text-sm text-[#4a4a4a]">
-            We strongly encourage purchasing travel insurance with trip cancellation coverage to safeguard your investment. With travel insurance, you're covered in case of unexpected events—from illness to emergencies—that could affect your plans.
-          </p>
-        </div>
+      <div className="mt-6 rounded-xl border border-[#E5DFC6] bg-[#FDF9F0] p-4">
+        <p className="font-medium text-[#0a2225]">
+          Highly Recommended: Protect Your Adventure
+        </p>
+        <p className="mt-1 text-sm text-[#4a4a4a]">
+          We strongly encourage purchasing travel insurance with trip cancellation coverage to safeguard your investment. With travel insurance, you're covered in case of unexpected events—from illness to emergencies—that could affect your plans.
+        </p>
       </div>
 
       <a
