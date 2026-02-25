@@ -1,73 +1,75 @@
 
 
-# Trip Request Detail Page — Redesign for Agent/Creator Clarity
+# Proposal Submission Flow — End-to-End Test Results
 
-## Problems Identified
+## Critical Bug Found: Proposals Cannot Be Submitted
 
-From the screenshot and code review, this page confuses agents/creators in several ways:
+The proposal form in `TripRequestDetail.tsx` has a **blocking bug** that prevents any agent or creator from successfully submitting a proposal.
 
-| Issue | Detail |
-|---|---|
-| **Tips card is written for travelers, not agents** | "Check reviews and destination experience", "Ask questions in chat before accepting" — these are buyer tips, not seller tips |
-| **"Trip style: Not specified" clutter** | Rows showing "Not specified" add noise and make the brief look incomplete |
-| **"Posted by" card is buried** | It appears below the proposals section in the sidebar — agents should see WHO they're proposing to immediately |
-| **Empty proposals section dominates** | "Proposals 0" with a large empty card takes prime real estate when the agent should be reading the brief |
-| **Sidebar order is wrong for agents** | Should be: Traveler → Trip Details → Budget → CTA → Tips. Currently: Traveler → Details → Budget → CTA → Tips (close but tips content is wrong) |
-| **No clear "what happens next" guidance** | Agent doesn't know the workflow: submit → traveler reviews → accepts → booking created |
-| **Marketplace disclaimer appears twice** | Once inside the proposal form area, once below — redundant |
-| **Labels like "Trip style" vs "Travel style"** | Ambiguous — merge into one or use clearer labels like "Accommodation" and "Pace" |
+### Root Cause
 
-## Plan
+The `handleSubmitProposal` function (line 365-386) inserts into `trip_proposals` but **never sets `proposer_id`**:
 
-### 1. Reorder & Clean Up the Page Layout
-
-**Left column — streamline for agents:**
-- **Trip Brief card** — keep as-is (description, special requests, vibes, must-haves, dealbreakers, visual brief) — this is good
-- **Remove the standalone "Proposals" section for non-owners** — agents don't need to see "0 proposals" or "3 proposals submitted". Just show the proposal count as a small note near the CTA. Only the trip OWNER sees the full proposals list
-- **Proposal form** — keep below the brief, but add a clear section header: "Ready to propose?" with a one-line explanation of the workflow
-
-**Right sidebar — reorder for agent context:**
-1. **Posted by** card — MOVE TO TOP so agents immediately see who the traveler is
-2. **Trip Details** card — filter out "Not specified" rows, rename confusing labels
-3. **Budget** card — keep
-4. **Submit Proposal CTA** — keep
-5. **"How it works" card** — REPLACE the current tips card with agent-focused workflow steps
-6. Remove duplicate MarketplaceDisclaimer from below the left column (keep only the one inside the form)
-
-### 2. Fix the Tips Card → "How It Works" for Agents
-
-Replace the current traveler-focused tips with agent/creator workflow guidance:
-
-```
-How it works
-1. Review the traveler's brief and visual inspiration
-2. Submit your proposal with pricing and itinerary
-3. The traveler reviews and compares proposals
-4. If accepted, it becomes a confirmed booking
+```typescript
+// Current code — proposer_id is MISSING
+const { data: proposalData, error: proposalError } = await supabase
+  .from("trip_proposals")
+  .insert({
+    trip_request_id: id,
+    ...(proposerRole === 'agent' ? { agent_id: user.id } : { creator_id: user.id }),
+    price_from: parseFloat(newProposal.priceFrom),
+    // ...
+  } as any)
 ```
 
-### 3. Clean Up Trip Details Sidebar
+This fails for two reasons:
 
-- **Hide rows where value is "Not specified"** — don't show empty data
-- Rename "Trip style" → "Trip type" and "Travel style" → "Accommodation preference"
-- Add trip length row if available from source_metadata
+1. **Schema requirement**: `proposer_id` is a required (non-nullable) column on `trip_proposals`. The insert will fail with a NOT NULL constraint violation.
+2. **RLS policy**: The only INSERT policy is `auth.uid() = proposer_id`. Without `proposer_id`, RLS will reject the row even if the schema somehow allowed it.
 
-### 4. Simplify Proposals Section for Non-Owners
+### Secondary Issue
 
-For agents/creators viewing the page:
-- Remove the large empty "Be the first to propose" card
-- Instead, show a small inline note above the proposal form: "Be the first to submit a proposal" or "2 proposals already submitted — stand out with yours"
-- This reduces visual noise and keeps the focus on the brief + form
+`acknowledged_goldsainte_policies` is not a column in the `trip_proposals` table. The `as any` cast hides this TypeScript error. The database will either silently ignore it or error.
 
-### 5. Move "Posted by" to Top of Sidebar
+### Additional Issue: `inclusions`/`exclusions` type mismatch
 
-Currently buried — move it to position 1 in the sidebar so agents immediately see the traveler identity and trust signals.
+The form sends these as plain strings, but the schema defines them as `string[]` (arrays). The insert may fail or store incorrectly.
 
-## Files to Edit
+## Fix Plan
 
-| File | Changes |
-|---|---|
-| `src/pages/marketplace/TripRequestDetail.tsx` | Reorder sidebar (Posted by → top), hide "Not specified" rows, replace tips card with "How it works" steps, simplify non-owner proposals section, remove duplicate disclaimer, rename ambiguous labels |
+### File: `src/pages/marketplace/TripRequestDetail.tsx`
 
-Single file edit. No database changes.
+**1. Add `proposer_id` and `proposer_role` to the insert** (line ~367):
+```typescript
+.insert({
+  trip_request_id: id,
+  proposer_id: user.id,           // ← ADD THIS (required)
+  proposer_role: proposerRole,    // ← ADD THIS (required)
+  ...(proposerRole === 'agent' ? { agent_id: user.id } : { creator_id: user.id }),
+  price_from: parseFloat(newProposal.priceFrom),
+  // ...rest
+})
+```
+
+**2. Remove `acknowledged_goldsainte_policies`** from the insert object — it's not a database column.
+
+**3. Fix `inclusions`/`exclusions` to send as arrays**, splitting the textarea by newlines:
+```typescript
+inclusions: newProposal.included ? newProposal.included.split('\n').filter(Boolean) : null,
+exclusions: newProposal.notIncluded ? newProposal.notIncluded.split('\n').filter(Boolean) : null,
+```
+
+**4. Remove the `as any` cast** so TypeScript can catch future schema mismatches.
+
+### Summary of Changes
+
+| Issue | Severity | Fix |
+|---|---|---|
+| Missing `proposer_id` | **P0 — blocks all submissions** | Add `proposer_id: user.id` to insert |
+| Missing `proposer_role` in insert | P0 — required column | Add `proposer_role: proposerRole` |
+| `acknowledged_goldsainte_policies` not a column | P2 — silently ignored or errors | Remove from insert |
+| `inclusions`/`exclusions` sent as strings, schema expects arrays | P1 — data corruption | Split by newline into arrays |
+| `as any` cast hiding type errors | P2 — maintenance risk | Remove cast |
+
+Single file to edit: `src/pages/marketplace/TripRequestDetail.tsx`
 
