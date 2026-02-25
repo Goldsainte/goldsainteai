@@ -257,9 +257,14 @@ export default function StoryboardEditorPage() {
   async function submitToMarketplace() {
     if (!storyboardId || !storyboard) return;
 
-    // Validate required fields
-    if (!tripFields.destination.trim()) {
-      toast({ title: "Destination required", description: "Please add a destination in Trip Details before submitting.", variant: "destructive" });
+    // MVP validation
+    const errors: string[] = [];
+    if (!tripFields.destination.trim()) errors.push("Destination is required.");
+    if (!tripFields.start_date && !tripFields.end_date && !tripFields.trip_length_days) errors.push("Add dates or trip length.");
+    if (itemCount < 3) errors.push(`Add at least 3 visual pins (currently ${itemCount}).`);
+
+    if (errors.length > 0) {
+      toast({ title: "Can't submit yet", description: errors.join(" "), variant: "destructive" });
       setTripDetailsOpen(true);
       return;
     }
@@ -376,8 +381,12 @@ export default function StoryboardEditorPage() {
                   {storyboard.title || "Untitled Storyboard"}
                 </h1>
                 {isSubmitted && (
-                  <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 text-[10px] shrink-0">
-                    Submitted
+                  <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 text-[10px] shrink-0 gap-1.5">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                    </span>
+                    Live in Marketplace
                   </Badge>
                 )}
               </div>
@@ -468,7 +477,7 @@ export default function StoryboardEditorPage() {
                 )}
                 {isSubmitted && storyboard.trip_request_id && (
                   <Button variant="default" size="sm" asChild className="rounded-full text-[11px] bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6]">
-                    <Link to="/my-trip-requests">View Trip Request <ArrowRight className="h-3 w-3 ml-1" /></Link>
+                    <Link to={`/marketplace/request/${storyboard.trip_request_id}`}>View Marketplace Listing <ArrowRight className="h-3 w-3 ml-1" /></Link>
                   </Button>
                 )}
               </div>
