@@ -58,6 +58,7 @@ export default function PostTripPage() {
   const [aestheticTags, setAestheticTags] = useState<string[]>([]);
   const [flexibility, setFlexibility] = useState("");
   const [specialNotes, setSpecialNotes] = useState("");
+  const [departureCity, setDepartureCity] = useState("");
   const [wantsRole, setWantsRole] = useState<WantsRole>("both");
   const [showItineraryPreview, setShowItineraryPreview] = useState(false);
   // showStoryboardBuilder removed — storyboard is now a dedicated step
@@ -95,6 +96,7 @@ export default function PostTripPage() {
         if (data.aestheticTags) setAestheticTags(data.aestheticTags);
         if (data.flexibility) setFlexibility(data.flexibility);
         if (data.specialNotes) setSpecialNotes(data.specialNotes);
+        if (data.departureCity) setDepartureCity(data.departureCity);
         if (data.wantsRole) setWantsRole(data.wantsRole);
         if (data.storyboardId) setStoryboardId(data.storyboardId);
         if (data.currentStep != null) setCurrentStep(data.currentStep);
@@ -254,7 +256,7 @@ export default function PostTripPage() {
           destination, title, startsOn, endsOn, budgetMin, budgetMax,
           budgetLevel, adults, children, occasion, accommodationStyle,
           pace, interests, aestheticTags, flexibility, specialNotes,
-          wantsRole, storyboardId, currentStep,
+          departureCity, wantsRole, storyboardId, currentStep,
         }));
         navigate(`/auth?returnTo=${encodeURIComponent('/post-trip')}`);
         return;
@@ -290,6 +292,7 @@ export default function PostTripPage() {
           interests: interests.length > 0 ? interests : null,
           flexibility: flexibility || null,
           special_notes: specialNotes || null,
+          departure_city: departureCity || null,
           wants_role: wantsRole,
           status: "open",
           source_metadata: Object.keys(sourceMetadata).length > 0 ? sourceMetadata : null,
@@ -413,6 +416,13 @@ export default function PostTripPage() {
                 </label>
                 <input type="text" value={destination} onChange={e => setDestination(e.target.value)}
                   className={inputCls} placeholder="Amalfi Coast, Paris & Provence, Bali..." />
+              </div>
+              <div>
+                <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">
+                  Departing from <span className="text-[#9A9079]">(optional)</span>
+                </label>
+                <input type="text" value={departureCity} onChange={e => setDepartureCity(e.target.value)}
+                  className={inputCls} placeholder="New York, London, Los Angeles..." />
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
@@ -605,6 +615,7 @@ export default function PostTripPage() {
             <>
               <div className="rounded-2xl bg-white border border-[#E5DFC6] divide-y divide-[#E5DFC6]">
                 <SummaryRow label="Destination" value={destination} />
+                {departureCity && <SummaryRow label="Departing from" value={departureCity} />}
                 <SummaryRow label="Dates" value={`${startsOn} → ${endsOn}`} />
                 {title && <SummaryRow label="Trip name" value={title} />}
                 <SummaryRow label="Travelers" value={`${adults} adult${Number(adults) !== 1 ? "s" : ""}${Number(children) > 0 ? `, ${children} child${Number(children) !== 1 ? "ren" : ""}` : ""}`} />
