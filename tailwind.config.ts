@@ -124,6 +124,14 @@ export default {
           "50%": { width: "70%" },
           "100%": { width: "100%" },
         },
+        "scroll-left": {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+        "scroll-right": {
+          "0%": { transform: "translateX(-50%)" },
+          "100%": { transform: "translateX(0)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -132,6 +140,8 @@ export default {
         "fade-up": "fade-up 0.5s ease-out forwards",
         "gold-pulse": "gold-pulse 2s infinite ease-in-out",
         "progress-line": "progress-line 3s infinite ease-in-out",
+        "scroll-left": "scroll-left 60s linear infinite",
+        "scroll-right": "scroll-right 60s linear infinite",
       },
       spacing: {
         'safe': 'env(safe-area-inset-bottom)',

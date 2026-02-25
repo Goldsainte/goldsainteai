@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
 import { toast } from "sonner";
 import { StoryboardBuilder } from "@/components/storyboards/StoryboardBuilder";
-import { TravelStoryboard } from "@/components/storyboards/TravelStoryboard";
+import { InspirationCarousel } from "@/components/storyboards/InspirationCarousel";
 import { useAuth } from "@/contexts/AuthContext";
 import { useStoryboardPrefill } from "@/hooks/useStoryboardPrefill";
 import { useItineraryPrefill } from "@/hooks/useItineraryPrefill";
@@ -548,19 +548,15 @@ export default function PostTripPage() {
                 </p>
               )}
 
-              {/* Browse inspiration gallery */}
+              {/* Browse inspiration carousel */}
               <div className="mt-6 space-y-3">
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-4 w-4 text-[#C7A962]" />
-                  <p className="text-xs font-medium text-[#4a4a4a]">
-                    Or browse curated inspiration — tap any image to add it
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Browse thousands of curated photos — tap to add
                   </p>
                 </div>
-                <TravelStoryboard
-                  maxItems={24}
-                  title=""
-                  subtitle=""
-                  highlightTags={destination ? [destination.toLowerCase()] : []}
+                <InspirationCarousel
                   onImageClick={(img) => {
                     storyboardAddItemRef.current?.({
                       kind: "photo",
