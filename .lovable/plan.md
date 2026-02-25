@@ -1,21 +1,20 @@
 
 
-# Apply Airbnb-Style Card Design to Storyboards Highlight Section
+# Airbnb-Style Card Redesign for "Choose How You Join" Section
 
 ## Current State
-The "Curated Journeys" section on the homepage uses tall editorial-style cards (`aspect-[4/5]` mobile, `aspect-[3/4]` desktop) with dark gradient overlays and text overlaid on images -- the same pattern that was already fixed in the marketplace.
+The role cards use a fixed-height image (`h-44`) with a dark gradient overlay and an icon badge overlaid on the image. This is the same editorial pattern we already replaced in the marketplace and Curated Journeys sections.
 
 ## Changes
 
-### File: `src/components/home/StoryboardsHighlight.tsx`
+### File: `src/components/home/RoleSpecificCTAs.tsx`
 
-1. **Image aspect ratio**: Change from `aspect-[4/5] md:aspect-[3/4]` to `aspect-[4/3]` (landscape, matching marketplace)
-2. **Remove gradient overlay**: Delete the `bg-gradient-to-t from-black/60` div
-3. **Remove overlaid content**: Remove the title, location, price badge, and duration badge from on top of the image -- keep images clean
-4. **Move all metadata below image**: Title, destination, price, and duration go into the content area below the image, styled consistently with `LiveTripCard`
-5. **Keep vibe tags and creator attribution** below, same as current
-6. **Update loading skeletons** to match the new `aspect-[4/3]` ratio
-7. **Grid**: Change to `grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4` for 4-column desktop layout matching marketplace
+1. **Image aspect ratio**: Replace `h-44` with `aspect-[4/3]` for consistent landscape ratio matching marketplace cards
+2. **Remove gradient overlay**: Delete the `bg-gradient-to-t from-black/40` div
+3. **Remove icon overlay from image**: Move the role icon out of the image area and into the metadata section below
+4. **Clean image**: Image becomes a clean, unobstructed photo with rounded corners and hover scale effect
+5. **Restructure content below image**: Icon + title on same row, body text, then CTA button — cleaner visual hierarchy
+6. **Card styling**: Remove border, use lighter shadow approach matching marketplace cards (rounded-xl, no border, subtle shadow)
 
 ### Card structure after change:
 ```text
@@ -25,11 +24,10 @@ The "Curated Journeys" section on the homepage uses tall editorial-style cards (
 │   (no overlay)      │
 │                     │
 ├─────────────────────┤
-│ Title          Price│
-│ 📍 Destination      │
-│ 📅 X nights         │
-│ [tag] [tag]         │
-│ 👤 By Creator       │
+│ 🔵 Title            │
+│ Description text    │
+│ [CTA Button]       │
+│ Browse link         │
 └─────────────────────┘
 ```
 
