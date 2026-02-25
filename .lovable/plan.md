@@ -1,34 +1,29 @@
 
 
-# Simplify Profile Menu
+# Remove Menu Items from Profile Menu
 
-## What Changes
+## Items to Remove
 
-The profile dropdown menu (both mobile and desktop) currently has too many items. The user wants it streamlined.
-
-### Items to Remove
-- **Dashboard** (Quick Access) -- remove entirely
-- **Madison by Goldsainte AI** (Quick Access) -- remove entirely
-- **Browse Creators** (Discover section) -- remove entirely
-- **Browse Agents** (Discover section) -- remove entirely
-- **My Collections** (My Account section) -- remove entirely
-
-### Items to Rename
-- **"The Collection"** → **"Travel Marketplace"**
-
-### Items to Keep (no change)
-- Travel Marketplace (renamed), My Trips, Messages, Storyboards, Post a Trip, Creator Studio, Available Trips, Collab Opportunities, Partner Bookings, Earnings & Billing section, Professional section, Company section, Admin section (admin-only, already gated), Language selector, Preferences toggle, Sign Out
+1. **Creator Studio** -- from the Discover accordion (both mobile and desktop)
+2. **Collab Opportunities** -- from the My Account accordion (both mobile and desktop)
+3. **Partner Bookings** -- from the My Account accordion (both mobile and desktop)
+4. **Earnings & Billing** -- entire accordion section (both mobile and desktop)
 
 ## Technical Details
 
 ### File: `src/components/Header.tsx`
 
-Both the mobile menu (lines 251-566) and desktop menu (lines 619-944) need identical changes:
+**Mobile menu removals:**
+- Lines 292-300: Creator Studio item in Discover
+- Lines 344-363: Collab Opportunities + Partner Bookings in My Account
+- Lines 368-404: Entire Earnings & Billing accordion section
 
-1. **Quick Access section**: Remove Dashboard and Madison items, keep only Travel Marketplace (renamed)
-2. **Discover accordion**: Remove Browse Creators and Browse Agents items, keep Storyboards, Post a Trip, Creator Studio
-3. **My Account accordion**: Remove My Collections item, keep My Trips, Messages, and role-specific items
-4. **Rename** "The Collection" text to "Travel Marketplace" in both menus
+**Desktop menu removals:**
+- Lines 623-631: Creator Studio item in Discover
+- Lines 675-694: Collab Opportunities + Partner Bookings in My Account
+- Lines 699-735: Entire Earnings & Billing accordion section
 
-No other files need changes -- Admin section is already gated behind `isAdmin`.
+Also clean up unused variables: `showPartnerBookings` (line 53) since Partner Bookings is removed. The `HandCoins`, `ShieldCheck`, `CreditCard` imports can also be removed if no longer used elsewhere.
+
+No other files affected.
 
