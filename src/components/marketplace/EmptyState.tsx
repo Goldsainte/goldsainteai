@@ -34,8 +34,8 @@ export function EmptyState({ type, onAction }: EmptyStateProps) {
     },
     "trip-requests": {
       icon: Compass,
-      title: "No trip requests found",
-      description: "Post your dream trip and let experts bid to bring it to life.",
+      title: "No traveler briefs yet",
+      description: "When travelers post trip requests, they'll appear here for you to review and propose on.",
       actionLabel: "Post your dream trip",
     },
   };
