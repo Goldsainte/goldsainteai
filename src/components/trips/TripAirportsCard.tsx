@@ -1,5 +1,3 @@
-import { Plane } from "lucide-react";
-
 interface TripAirportsCardProps {
   arrivalAirport?: string;
   departureAirport?: string;
@@ -16,12 +14,10 @@ export function TripAirportsCard({ arrivalAirport, departureAirport }: TripAirpo
 
       <div className="mt-4 space-y-4">
         {arrivalAirport && (
-          <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FDF9F0]">
-              <Plane className="h-5 w-5 text-[#0C4D47]" />
-            </div>
+          <div className="flex items-baseline gap-3">
+            <span className="inline-block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#C7A962]" />
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-[#7A7151]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7A7151]">
                 Recommended Arrival Airport
               </p>
               <p className="mt-0.5 font-medium text-[#0a2225]">{arrivalAirport}</p>
@@ -30,12 +26,10 @@ export function TripAirportsCard({ arrivalAirport, departureAirport }: TripAirpo
         )}
 
         {departureAirport && (
-          <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FDF9F0]">
-              <Plane className="h-5 w-5 rotate-90 text-[#0C4D47]" />
-            </div>
+          <div className="flex items-baseline gap-3">
+            <span className="inline-block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#C7A962]" />
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-[#7A7151]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7A7151]">
                 Recommended Departure Airport
               </p>
               <p className="mt-0.5 font-medium text-[#0a2225]">{departureAirport}</p>
