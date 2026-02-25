@@ -29,16 +29,16 @@ export function TripTrustBadges({ totalTravelers = 30000 }: TripTrustBadgesProps
   ];
 
   return (
-    <section className="rounded-2xl border border-[#E5DFC6] bg-[#0a2225] p-6">
+    <section className="rounded-2xl border border-[#E5DFC6] bg-[#FDF9F0] p-6">
       {/* Header */}
       <div className="text-center">
         <div className="mx-auto flex items-center justify-center gap-2">
-          <Users className="h-5 w-5 text-[#C7B892]" />
-          <span className="text-sm font-medium text-[#C7B892]">
+          <Users className="h-5 w-5 text-[#C7A962]" />
+          <span className="text-sm font-medium text-[#C7A962]">
             Join {totalTravelers.toLocaleString()}+ Travelers Who've Booked With Goldsainte
           </span>
         </div>
-        <p className="mt-2 font-secondary text-xl font-semibold text-white">
+        <p className="mt-2 font-secondary text-xl font-semibold text-[#0a2225]">
           Explore the world with confidence. You're in great company!
         </p>
       </div>
@@ -48,15 +48,15 @@ export function TripTrustBadges({ totalTravelers = 30000 }: TripTrustBadgesProps
         {badges.map((badge) => (
           <div
             key={badge.title}
-            className="rounded-xl bg-white/5 p-4 text-center"
+            className="rounded-2xl border border-[#E5DFC6] bg-white p-5 text-center shadow-sm"
           >
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#C7B892]/20">
-              <badge.icon className="h-5 w-5 text-[#C7B892]" />
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#C7A962]/15">
+              <badge.icon className="h-5 w-5 text-[#C7A962]" />
             </div>
-            <h4 className="mt-3 text-[14px] font-semibold text-white">
+            <h4 className="mt-3 text-[15px] font-semibold text-[#0a2225]">
               {badge.title}
             </h4>
-            <p className="mt-1 text-[12px] leading-relaxed text-white/70">
+            <p className="mt-1 text-[13px] leading-relaxed text-[#6B7280]">
               {badge.description}
             </p>
           </div>
