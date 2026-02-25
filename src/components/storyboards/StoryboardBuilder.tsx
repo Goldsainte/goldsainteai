@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Plus, Link as LinkIcon, Image, MapPin } from "lucide-react";
+import { Loader2, Plus, Link as LinkIcon, Image } from "lucide-react";
 
 type StoryboardBuilderProps = {
   storyboardId?: string;
@@ -8,16 +8,14 @@ type StoryboardBuilderProps = {
   mode: "traveler" | "creator" | "agent";
   destination?: string | null;
   onSaved?: (storyboardId: string) => void;
-  /** Expose save function so parent can trigger saves (e.g. on step transition) */
   saveRef?: React.MutableRefObject<(() => Promise<void>) | null>;
-  /** Expose a function that lets the parent inject items (e.g. from an inspiration gallery) */
   addItemRef?: React.MutableRefObject<((item: Item) => void) | null>;
 };
 
 type Item = {
   id?: string;
-  kind: "photo" | "video" | "experience" | "note";
-  source: "unsplash" | "viator" | "youtube" | "tiktok" | "instagram" | "manual";
+  kind: "photo" | "video" | "note";
+  source: "unsplash" | "youtube" | "tiktok" | "instagram" | "manual";
   data: any;
 };
 
@@ -26,19 +24,6 @@ type UnsplashPhoto = {
   urls: { small: string; full?: string };
   alt_description: string | null;
   location?: { name?: string | null };
-};
-
-type ViatorProduct = {
-  productCode?: string;
-  title?: string;
-  shortDescription?: string;
-  thumbnailURL?: string;
-  destination?: string;
-  rating?: number;
-  reviewCount?: number;
-  fromPrice?: number;
-  currency?: string;
-  productUrl?: string | null;
 };
 
 export function StoryboardBuilder({
@@ -52,13 +37,10 @@ export function StoryboardBuilder({
 }: StoryboardBuilderProps) {
   const [title, setTitle] = useState(initialTitle || "");
   const [items, setItems] = useState<Item[]>([]);
-  const [activeTab, setActiveTab] = useState<"photos" | "experiences" | "links">(
-    "photos"
-  );
+  const [activeTab, setActiveTab] = useState<"photos" | "links">("photos");
   const [search, setSearch] = useState("");
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [photoResults, setPhotoResults] = useState<UnsplashPhoto[]>([]);
-  const [experienceResults, setExperienceResults] = useState<ViatorProduct[]>([]);
   const [saving, setSaving] = useState(false);
   const [linkInput, setLinkInput] = useState("");
   const [searchError, setSearchError] = useState<string | null>(null);
@@ -96,17 +78,6 @@ export function StoryboardBuilder({
         if (error) throw error;
         if (data?.error) throw new Error(data.error);
         setPhotoResults(data?.results || []);
-      } else if (activeTab === "experiences") {
-        const { data, error } = await supabase.functions.invoke("viator-search", {
-          body: { 
-            q: search,
-            location: destination || undefined
-          },
-        });
-        
-        if (error) throw error;
-        if (data?.error) throw new Error(data.error);
-        setExperienceResults(data?.results || []);
       }
     } catch (error) {
       console.error("Search error:", error);
@@ -131,37 +102,6 @@ export function StoryboardBuilder({
         },
       },
     ]);
-  }
-
-  function addExperience(prod: ViatorProduct) {
-    setItems((prev) => [
-      ...prev,
-      {
-        kind: "experience",
-        source: "viator",
-        data: {
-          product_code: prod.productCode,
-          title: prod.title,
-          summary: prod.shortDescription,
-          thumbnail: prod.thumbnailURL,
-          destination: prod.destination,
-          rating: prod.rating,
-          fromPrice: prod.fromPrice,
-          currency: prod.currency,
-        },
-      },
-    ]);
-  }
-
-  function buildViatorBookingUrl(prod: ViatorProduct): string {
-    // If Viator returned a direct product URL, use it
-    if (prod.productUrl) return prod.productUrl;
-    
-    // Otherwise construct a search URL with product details
-    const searchText = `${prod.title || ""} ${prod.destination || ""}`.trim();
-    if (!searchText) return "https://www.viator.com/";
-    
-    return `https://www.viator.com/searchResults/all?text=${encodeURIComponent(searchText)}`;
   }
 
   function addLink() {
@@ -197,9 +137,7 @@ export function StoryboardBuilder({
           data: { user },
         } = await supabase.auth.getUser();
 
-        // Guest save: persist locally so work isn't lost
         if (!user) {
-          // Store complete item data so it can be faithfully restored after login
           sessionStorage.setItem('goldsainte:pendingStoryboard', JSON.stringify({
             title,
             mode,
@@ -227,7 +165,6 @@ export function StoryboardBuilder({
         sbId = data.id;
       }
 
-      // Insert items
       const rows = items.map((item, index) => ({
         storyboard_id: sbId,
         item_type: item.kind === "photo" ? "image" : item.kind,
@@ -298,12 +235,6 @@ export function StoryboardBuilder({
           <Image className="h-3 w-3" /> Photos
         </TabButton>
         <TabButton
-          active={activeTab === "experiences"}
-          onClick={() => setActiveTab("experiences")}
-        >
-          <MapPin className="h-3 w-3" /> Experiences
-        </TabButton>
-        <TabButton
           active={activeTab === "links"}
           onClick={() => setActiveTab("links")}
         >
@@ -312,17 +243,13 @@ export function StoryboardBuilder({
       </div>
 
       {/* Search bar */}
-      {activeTab !== "links" && (
+      {activeTab === "photos" && (
         <div className="mb-4 flex gap-2">
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && runSearch()}
-            placeholder={
-              activeTab === "photos"
-                ? "Search destinations, hotels, moods…"
-                : "Search activities, tours, experiences…"
-            }
+            placeholder="Search destinations, hotels, moods…"
             className="flex-1 rounded-full border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-xs outline-none placeholder:text-[#8D8D8D]"
           />
           <button
@@ -379,83 +306,11 @@ export function StoryboardBuilder({
         </>
       )}
 
-      {activeTab === "experiences" && (
-        <>
-          {experienceResults.length === 0 && !loadingSearch && search && !searchError && (
-            <p className="mb-4 py-8 text-center text-sm text-muted-foreground">
-              No experiences found. Try a different search term or destination.
-            </p>
-          )}
-          <div className="grid gap-3 mb-4">
-            {experienceResults.map((ex, idx) => (
-            <button
-              key={ex.productCode || idx}
-              type="button"
-              onClick={() => addExperience(ex)}
-              className="flex items-start gap-3 rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] p-3 text-left hover:border-[#BFAD72]"
-            >
-              {ex.thumbnailURL && (
-                <img
-                  src={ex.thumbnailURL}
-                  alt={ex.title || ""}
-                  className="h-16 w-16 rounded-xl object-cover"
-                />
-              )}
-              <div className="flex-1">
-                <p className="text-xs font-semibold text-[#0a2225]">
-                  {ex.title}
-                </p>
-                <p className="text-xs text-[#4a4a4a] line-clamp-2">
-                  {ex.shortDescription}
-                </p>
-                
-                {ex.rating && (
-                  <div className="mt-1 flex items-center gap-1">
-                    <span className="text-[10px] text-[#BFAD72]">★</span>
-                    <span className="text-[10px] text-[#4a4a4a]">
-                      {ex.rating.toFixed(1)}
-                    </span>
-                    {ex.reviewCount && (
-                      <span className="text-[10px] text-[#8D8D8D]">
-                        ({ex.reviewCount} reviews)
-                      </span>
-                    )}
-                  </div>
-                )}
-                
-                {ex.destination && (
-                  <p className="mt-0.5 text-[10px] text-[#8D8D8D]">
-                    {ex.destination}
-                  </p>
-                )}
-                
-                {ex.fromPrice && (
-                  <p className="mt-1 text-[10px] font-semibold text-[#0a2225]">
-                    From {ex.currency || "USD"} {ex.fromPrice.toFixed(0)}
-                  </p>
-                )}
-                
-                <a
-                  href={buildViatorBookingUrl(ex)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="mt-2 inline-block text-[10px] font-semibold text-[#BFAD72] underline hover:text-[#e3d59a]"
-                >
-                  View & book on Viator →
-                </a>
-              </div>
-            </button>
-          ))}
-          </div>
-        </>
-      )}
-
       {activeTab === "links" && (
         <div className="mb-4 space-y-2">
           <p className="text-xs text-[#4a4a4a]">
             Paste any TikTok, Reel or YouTube link that inspired this trip. We'll
-            keep them together with your photos & experiences.
+            keep them together with your photos.
           </p>
           <div className="flex gap-2">
             <input
@@ -483,7 +338,7 @@ export function StoryboardBuilder({
         </p>
         {items.length === 0 ? (
           <p className="text-xs text-[#8D8D8D]">
-            Start dropping in photos, experiences and links — this becomes the
+            Start dropping in photos and links — this becomes the
             visual brief your agent or creator works from.
           </p>
         ) : (
@@ -497,21 +352,6 @@ export function StoryboardBuilder({
                     alt={item.data.alt || "Photo"}
                     className="w-full rounded-2xl object-cover"
                   />
-                );
-              }
-              if (item.kind === "experience") {
-                return (
-                  <div
-                    key={idx}
-                    className="break-inside-avoid rounded-2xl bg-[#f7f3ea] border border-[#E5DFC6] p-2 text-xs"
-                  >
-                    <p className="font-semibold mb-1">
-                      {item.data.title || "Experience"}
-                    </p>
-                    <p className="text-[#4a4a4a] line-clamp-3">
-                      {item.data.summary}
-                    </p>
-                  </div>
                 );
               }
               if (item.kind === "video") {
