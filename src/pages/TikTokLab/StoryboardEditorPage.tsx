@@ -19,6 +19,12 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
 
 type StoryboardData = {
   id: string;
@@ -571,56 +577,71 @@ export default function StoryboardEditorPage() {
                   </FieldBlock>
                 </div>
 
-                {/* Vibe & Experience Tags */}
-                <FieldBlock label="Vibe & Experience Tags">
-                  <div className="flex flex-wrap gap-1.5">
-                    {INTEREST_OPTIONS.map(interest => (
-                      <button key={interest} type="button" onClick={() => toggleArrayField("interests", interest)}
-                        className={`rounded-full px-3 py-1 text-[11px] border transition ${
-                          tripFields.interests.includes(interest)
-                            ? "bg-[#0c4d47] text-[#E5DFC6] border-[#0c4d47]"
-                            : "bg-white text-[#4a4a4a] border-[#E5DFC6] hover:border-[#0c4d47]"
-                        }`}
-                      >
-                        {interest}
-                      </button>
-                    ))}
-                  </div>
-                </FieldBlock>
+                {/* Vibe Tags, Must-Haves & Dealbreakers Accordions */}
+                <Accordion type="multiple" className="space-y-3">
+                  <AccordionItem value="vibes" className="rounded-xl border border-[#E5DFC6] overflow-hidden">
+                    <AccordionTrigger className="px-4 py-3 hover:no-underline text-[13px] font-semibold text-[#0a2225]">
+                      Vibe & Experience Tags{tripFields.interests.length > 0 && ` · ${tripFields.interests.length} selected`}
+                    </AccordionTrigger>
+                    <AccordionContent className="bg-[#FDF9F0]/30 px-4 py-4">
+                      <div className="flex flex-wrap gap-1.5">
+                        {INTEREST_OPTIONS.map(interest => (
+                          <button key={interest} type="button" onClick={() => toggleArrayField("interests", interest)}
+                            className={`rounded-full px-3 py-1 text-[11px] border transition ${
+                              tripFields.interests.includes(interest)
+                                ? "bg-[#0c4d47] text-[#E5DFC6] border-[#0c4d47]"
+                                : "bg-white text-[#4a4a4a] border-[#E5DFC6] hover:border-[#0c4d47]"
+                            }`}
+                          >
+                            {interest}
+                          </button>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
 
-                {/* Must-Haves */}
-                <FieldBlock label="Must-Haves">
-                  <div className="flex flex-wrap gap-1.5">
-                    {MUST_HAVE_OPTIONS.map(item => (
-                      <button key={item} type="button" onClick={() => toggleArrayField("must_haves", item)}
-                        className={`rounded-full px-3 py-1 text-[11px] border transition ${
-                          tripFields.must_haves.includes(item)
-                            ? "bg-emerald-700 text-white border-emerald-700"
-                            : "bg-white text-[#4a4a4a] border-[#E5DFC6] hover:border-emerald-600"
-                        }`}
-                      >
-                        {item}
-                      </button>
-                    ))}
-                  </div>
-                </FieldBlock>
+                  <AccordionItem value="must-haves" className="rounded-xl border border-[#E5DFC6] overflow-hidden">
+                    <AccordionTrigger className="px-4 py-3 hover:no-underline text-[13px] font-semibold text-emerald-800">
+                      Must-Haves{tripFields.must_haves.length > 0 && ` · ${tripFields.must_haves.length} selected`}
+                    </AccordionTrigger>
+                    <AccordionContent className="bg-[#FDF9F0]/30 px-4 py-4">
+                      <div className="flex flex-wrap gap-1.5">
+                        {MUST_HAVE_OPTIONS.map(item => (
+                          <button key={item} type="button" onClick={() => toggleArrayField("must_haves", item)}
+                            className={`rounded-full px-3 py-1 text-[11px] border transition ${
+                              tripFields.must_haves.includes(item)
+                                ? "bg-emerald-700 text-white border-emerald-700"
+                                : "bg-white text-[#4a4a4a] border-[#E5DFC6] hover:border-emerald-600"
+                            }`}
+                          >
+                            {item}
+                          </button>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
 
-                {/* Dealbreakers */}
-                <FieldBlock label="Dealbreakers">
-                  <div className="flex flex-wrap gap-1.5">
-                    {DEALBREAKER_OPTIONS.map(item => (
-                      <button key={item} type="button" onClick={() => toggleArrayField("dealbreakers", item)}
-                        className={`rounded-full px-3 py-1 text-[11px] border transition ${
-                          tripFields.dealbreakers.includes(item)
-                            ? "bg-red-600 text-white border-red-600"
-                            : "bg-white text-[#4a4a4a] border-[#E5DFC6] hover:border-red-400"
-                        }`}
-                      >
-                        {item}
-                      </button>
-                    ))}
-                  </div>
-                </FieldBlock>
+                  <AccordionItem value="dealbreakers" className="rounded-xl border border-[#E5DFC6] overflow-hidden">
+                    <AccordionTrigger className="px-4 py-3 hover:no-underline text-[13px] font-semibold text-red-700">
+                      Dealbreakers{tripFields.dealbreakers.length > 0 && ` · ${tripFields.dealbreakers.length} selected`}
+                    </AccordionTrigger>
+                    <AccordionContent className="bg-[#FDF9F0]/30 px-4 py-4">
+                      <div className="flex flex-wrap gap-1.5">
+                        {DEALBREAKER_OPTIONS.map(item => (
+                          <button key={item} type="button" onClick={() => toggleArrayField("dealbreakers", item)}
+                            className={`rounded-full px-3 py-1 text-[11px] border transition ${
+                              tripFields.dealbreakers.includes(item)
+                                ? "bg-red-600 text-white border-red-600"
+                                : "bg-white text-[#4a4a4a] border-[#E5DFC6] hover:border-red-400"
+                            }`}
+                          >
+                            {item}
+                          </button>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
 
                 {/* Special Notes */}
                 <FieldBlock label="Special Notes">
