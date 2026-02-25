@@ -1,36 +1,26 @@
 
 
-# Redesign Trip Request Cards to Match Airbnb-Style LiveTripCard
+# Remove Creators, Agents, Brands Tabs from Marketplace
 
-## Problem
-The Trip Request cards in the marketplace (`TripRequestGrid.tsx`) use a bordered card container with a gradient overlay on images and boxed content — visually different from the clean, minimal Airbnb-style layout used by the "Ready to Book" cards (`LiveTripCard.tsx`).
+## What changes
+Strip the marketplace tabs down to just **Ready to Book** and **Trip Requests**. The Creators, Agents, and Brands tabs (and their corresponding grid rendering logic) will be removed from the marketplace page.
 
-## Solution
-Restyle `TripRequestGrid.tsx` to match the `LiveTripCard` pattern: no card border/container, clean rounded image (aspect-[4/3]), content below with `font-secondary` serif title, `text-[#6B7280]` metadata, and no gradient overlay on the image.
+## Files to modify
 
-### File: `src/components/marketplace/TripRequestGrid.tsx`
+### 1. `src/components/marketplace/MarketplaceTabs.tsx`
+- Remove the Creators, Agents, and Brands tab objects from the `tabs` array
+- Keep only "trips" (Ready to Book) and "trip-requests" (Trip Requests)
+- Update the `Tab` type union from `"trips" | "creators" | "agents" | "brands" | "trip-requests"` to `"trips" | "trip-requests"`
+- Remove unused icon imports (`Users`, `Briefcase`, `Building2`)
+- Make Trip Requests always visible (remove the `isTraveler` conditional, remove `accountType` prop)
 
-**Changes:**
-- Remove the bordered card wrapper (`border border-[#E5DFC6]/40 bg-white shadow-sm`) — use a clean `group cursor-pointer space-y-2.5` container like LiveTripCard
-- Image: switch from `h-40` to `aspect-[4/3]` with `rounded-xl md:rounded-2xl`, remove the dark gradient overlay
-- Destination: move from an overlay pill on the image to a `text-[13px] text-[#6B7280]` line below the title with `MapPin` icon (matching LiveTripCard)
-- Title: use `font-secondary text-sm md:text-[15px] text-[#0a2225] font-medium` matching LiveTripCard
-- Remove the description paragraph (LiveTripCard doesn't show descriptions)
-- Budget and date: use the same `text-[13px] text-[#6B7280]` style with small icons, matching LiveTripCard's metadata lines
-- Grid: switch to `gap-x-6 gap-y-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4` to match LiveTripGrid
+### 2. `src/pages/Marketplace.tsx`
+- Update the `Tab` type from `"trips" | "creators" | "agents" | "brands" | "trip-requests"` to `"trips" | "trip-requests"`
+- Remove the conditional rendering blocks for `activeTab === "creators"`, `activeTab === "agents"`, and `activeTab === "brands"`
+- Remove unused imports: `CreatorGrid`, `AgentGrid`, `BrandGrid`, `BrandEmptyState`, `BrandSummary`
+- Remove the data-fetching logic for creators, agents, and brands (queries, state, effects) since those tabs no longer exist
+- Keep all trips and trip-requests data fetching intact
 
-### Technical Detail
-The card structure will mirror `LiveTripCard` exactly:
-```
-article (space-y-2.5, no border)
-  └─ div (aspect-[4/3], rounded-xl, overflow-hidden)
-      └─ img (clean, no gradient overlay)
-  └─ div (space-y-1, px-0.5)
-      └─ h3 (font-secondary, title + budget on same row)
-      └─ p (MapPin + destination)
-      └─ p (Calendar + posted date)
-```
-
-## Files Modified (1 file)
-- `src/components/marketplace/TripRequestGrid.tsx`
+## Technical detail
+The `MarketplaceTabs` component type signature changes from accepting 5 tab values to 2. The `accountType` prop becomes unnecessary since Trip Requests will be visible to all users in the marketplace context. Creators, Agents, and Brands remain accessible via their dedicated routes (`/creators`, `/agents`) linked from elsewhere in the app — they are just removed from the marketplace tab bar.
 
