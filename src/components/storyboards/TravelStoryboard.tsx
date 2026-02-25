@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
-import { ExperienceCard } from "./ExperienceCard";
+
 import { SaveToStoryboardButton } from "./SaveToStoryboardButton";
 
 type StoryboardItemRow = Database["public"]["Tables"]["storyboard_items"]["Row"];
@@ -218,13 +218,9 @@ export function TravelStoryboard({
                   className="w-full rounded-xl object-cover"
                 />
               ) : (
-                <ExperienceCard
-                  dayNumber={undefined}
-                  timeOfDay={undefined}
-                  caption={item.subtitle || "Experience"}
-                  locationLabel={item.title ?? undefined}
-                  categoryTag={undefined}
-                />
+                <div className="rounded-xl border border-border bg-card p-3 text-xs text-muted-foreground">
+                  {item.title || item.subtitle || "Item"}
+                </div>
               )}
             </div>
           ))}
