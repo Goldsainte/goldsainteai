@@ -67,8 +67,6 @@ export const Footer = () => {
             <AccordionTrigger className={headingClasses}>{t('footer.partners')}</AccordionTrigger>
             <AccordionContent>
               <ul className="space-y-3 text-sm">
-              <li><Link to="/apply/agent" className={linkClasses}>{t('footer.becomeAgent')}</Link></li>
-                <li><Link to="/creators" className={linkClasses}>{t('footer.influencerProgram')}</Link></li>
                 <li><Link to="/apply/brand" className={linkClasses}>{t('footer.listYourCompany')}</Link></li>
               </ul>
             </AccordionContent>
@@ -137,8 +135,6 @@ export const Footer = () => {
           <div>
             <h4 className={headingClasses}>{t('footer.partners')}</h4>
             <ul className="space-y-3 text-sm">
-              <li><Link to="/apply/agent" className={linkClasses}>{t('footer.becomeAgent')}</Link></li>
-              <li><Link to="/creators" className={linkClasses}>{t('footer.influencerProgram')}</Link></li>
               <li><Link to="/apply/brand" className={linkClasses}>{t('footer.listYourCompany')}</Link></li>
             </ul>
           </div>
