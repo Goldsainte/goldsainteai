@@ -1,47 +1,91 @@
 
 
-# Add Search Bar to My Storyboards Page + Link Storage Clarity
+# Fix Storyboard Cards to Match Airbnb-Style Grid
 
-## Answers to Your Questions
+## Problem
+The storyboard cards on My Storyboards page use a dark teal gradient placeholder with a small icon when there's no cover image. This looks nothing like the Airbnb-style cards used on the homepage and marketplace (clean aspect-[4/3] images, metadata below, no dark overlays).
 
-**Where are links stored?**
-Links are saved in the `storyboard_items` table as rows with `item_type = 'video'`, `source_type = 'tiktok' / 'youtube' / 'instagram' / 'manual'`, and the URL stored inside the `metadata` JSONB column (as `{ url: "..." }`).
+## Root Cause
+1. `cover_image_url` is null for most storyboards because users rarely set an explicit cover
+2. The card uses a dark gradient fallback instead of pulling the first item's image
+3. The card layout (fixed `h-36` height, dark gradient) doesn't match the Airbnb pattern used elsewhere
 
-**Can users see their added links?**
-Yes — when viewing/editing a storyboard via StoryboardBuilder, links appear in the "Storyboard preview" section as dark cards showing the source platform and URL. However, on the My Storyboards listing page there is currently no inline preview of links.
+## Changes
 
-**Do links convert when posting a trip?**
-Yes. When "Convert to Trip" is clicked, the `storyboardId` is passed to the Post a Trip wizard, and StoryboardBuilder loads ALL items (photos AND links) from `storyboard_items`. Links are included in the conversion.
+### 1. `src/pages/TikTokLab/StoryboardsPage.tsx` — Fetch first item image as cover fallback
 
----
+In the `load()` function, after fetching storyboards, for any storyboard without a `cover_image_url`, fetch the first `storyboard_item` with an `image_url` to use as the cover. This mirrors what the TravelerStoryboardsTab already does with item counts.
 
-## Problem: Missing Search Bar
+```tsx
+// After mapping storyboards, enrich with first-item image
+const enriched = await Promise.all(
+  mapped.map(async (sb) => {
+    if (sb.cover_image_url) return sb;
+    const { data: firstItem } = await supabase
+      .from("storyboard_items")
+      .select("image_url")
+      .eq("storyboard_id", sb.id)
+      .not("image_url", "is", null)
+      .order("position", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    return { ...sb, cover_image_url: firstItem?.image_url || null };
+  })
+);
+setStoryboards(enriched);
+```
 
-The search bar (photo search + link paste) lives inside `StoryboardBuilder`, which is only rendered on the storyboard editor page (`/storyboards/new` or `/storyboards/:id`). The My Storyboards listing page (`/storyboards`) only shows `TravelStoryboard` (a curated gallery) under "Browse Inspiration" — it has no search/add capability.
+### 2. `src/pages/TikTokLab/StoryboardsPage.tsx` — Redesign `StoryboardCard` to Airbnb style
 
-## Plan
+Replace the current card layout with the same pattern used in `LiveTripCard`, `StoryboardsHighlight`, and `RoleSpecificCTAs`:
 
-### `src/pages/TikTokLab/StoryboardsPage.tsx`
+- **Image**: `aspect-[4/3]` with `rounded-xl md:rounded-2xl`, clean image with no dark gradient overlay. When no image exists, show a cream placeholder with a subtle icon.
+- **Metadata below image**: Title as `text-sm font-medium`, description as muted text, tags as small pills — all in a clean section below the image (not overlaid).
+- **Item count badge**: Small pill in top-right corner of the image area (matching the current badge style).
+- **Convert to Trip**: Keep the hover slide-up CTA bar.
+- **Grid**: Change to `grid gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4` for 4-column on large screens.
 
-Add a search + link input section above "Browse Inspiration":
-
-1. **Photo search bar** — a text input + "Search" button that calls the `unsplash-search` edge function (same as StoryboardBuilder does). Results display as a grid of clickable images.
-
-2. **Link paste bar** — a text input + "Add" button for TikTok/Reels/YouTube URLs.
-
-3. **Storyboard selector** — when the user clicks a photo or adds a link, show a small dropdown/dialog asking "Which storyboard?" listing their existing boards (or "Create new"). Then call the `save-to-storyboard` edge function to persist the item.
-
-4. **Tab toggle** — "Photos" and "Links" tabs matching the StoryboardBuilder pattern, so users can switch between searching photos and pasting links.
+```tsx
+function StoryboardCard({ storyboard }: { storyboard: Storyboard }) {
+  const navigate = useNavigate();
+  return (
+    <Link to={`/storyboards/${storyboard.id}`} className="group cursor-pointer space-y-2.5">
+      {/* Clean image — Airbnb style */}
+      <div className="relative aspect-[4/3] overflow-hidden rounded-xl md:rounded-2xl">
+        {storyboard.cover_image_url ? (
+          <img
+            src={storyboard.cover_image_url}
+            alt={storyboard.title || "Storyboard"}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="h-full w-full bg-[#F0EBE0] flex items-center justify-center">
+            <ImageIcon className="h-10 w-10 text-[#C7A962]/30" />
+          </div>
+        )}
+        {/* Item count badge */}
+        {storyboard.item_count > 0 && (
+          <span className="absolute top-2.5 right-2.5 ...">
+            {storyboard.item_count} items
+          </span>
+        )}
+        {/* Convert to Trip hover */}
+        <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 ..." onClick={...}>
+          Convert to Trip →
+        </div>
+      </div>
+      {/* Metadata below image */}
+      <div className="space-y-1 px-0.5">
+        <h3 className="text-sm font-medium line-clamp-1">{storyboard.title || "Untitled"}</h3>
+        {storyboard.description && <p className="text-xs text-[#6B7280] line-clamp-1">...</p>}
+      </div>
+    </Link>
+  );
+}
+```
 
 ### Files to Edit
+- **`src/pages/TikTokLab/StoryboardsPage.tsx`** — Both the data fetching (add first-item image fallback) and the card component (Airbnb-style layout)
 
-- **`src/pages/TikTokLab/StoryboardsPage.tsx`** — Add the search/link section between the storyboard grid and "Browse Inspiration". Include:
-  - Photo/Link tab toggle
-  - Search input + results grid (photos tab)
-  - Link paste input (links tab)
-  - Storyboard picker dialog (reuse existing storyboard list from state)
-  - Call `unsplash-search` edge function for photo search
-  - Call `save-to-storyboard` edge function to persist items
-
-No database changes needed — all tables and edge functions already exist.
+No database changes needed.
 
