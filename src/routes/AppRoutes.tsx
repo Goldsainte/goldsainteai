@@ -70,18 +70,16 @@ const TravelerDashboardPage = lazy(() => import('@/pages/traveler/TravelerDashbo
 const MyTripsPage = lazy(() => import('@/pages/trips/MyTripsPage'));
 const PostTripPage = lazy(() => import('@/pages/trips/PostTripPage'));
 const TripRequestDetailPageNew = lazy(() => import('@/pages/trips/TripRequestDetailPage'));
-const PartnerTripsPage = lazy(() => import('@/pages/tiktok/PartnerTripsPage'));
+
 const ProposalDetailPage = lazy(() => import('@/pages/proposals/ProposalDetailPage'));
 const ProposalsForTripPage = lazy(() => import('@/pages/proposals/ProposalsForTripPage'));
 const StoryboardSharePage = lazy(() => import('@/pages/public/StoryboardSharePage'));
 const AgentTripsPage = lazy(() => import('@/pages/AgentTripsPage'));
 const CreatorTripsPage = lazy(() => import('@/pages/CreatorTripsPage'));
-const TikTokLabDashboardPage = lazy(() => import('@/pages/tiktok/TikTokLabDashboardPage'));
-const TikTokEarningsPage = lazy(() => import('@/pages/tiktok/TikTokEarningsPage'));
 
 const StoryboardEditorPage = lazy(() => import('@/pages/StoryboardEditorPage'));
 const TikTokLabStoryboardEditorPage = lazy(() => import('@/pages/TikTokLab/StoryboardEditorPage'));
-const TikTokLabPage = lazy(() => import('@/pages/TikTokLabPage'));
+
 const TikTokLabStoryboardDetailPage = lazy(() => import('@/pages/TikTokLab/StoryboardDetailPage'));
 const ConciergePage = lazy(() => import('@/pages/ConciergePage'));
 const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
@@ -102,7 +100,7 @@ const MusicVolumeSettings = lazy(() => import('@/pages/MusicVolumeSettings'));
 // Legacy Instagram demo - disabled
 // const InstagramCallback = lazy(() => import('@/pages/InstagramCallback'));
 // const InstagramAPI = lazy(() => import('@/pages/InstagramAPI'));
-const TikTokLab = lazy(() => import('@/pages/TikTokLab'));
+
 const TikTokCallback = lazy(() => import('@/pages/TikTokCallback'));
 const CreatorDashboard = lazy(() => import('@/pages/CreatorDashboard'));
 // New TikTok creator ecosystem pages
@@ -399,18 +397,10 @@ export const AppRoutes = () => (
           </RequireAuth>
         )}
       />
-      <Route path="/tiktok-lab" element={<TikTokLabDashboardPage />} />
-      <Route path="/tiktok-lab/trips" element={<RequireAuth><PartnerTripsPage /></RequireAuth>} />
-      <Route path="/tiktok-lab/earnings" element={<RequireAuth><TikTokEarningsPage /></RequireAuth>} />
       <Route path="/storyboards" element={<RequireAuth><TikTokLabStoryboardsPage /></RequireAuth>} />
       <Route path="/storyboards/new" element={<RequireAuth><TikTokLabStoryboardEditorPage /></RequireAuth>} />
       <Route path="/storyboards/:id" element={<RequireAuth><TikTokLabStoryboardEditorPage /></RequireAuth>} />
       <Route path="/storyboards/:id/edit" element={<RequireAuth><TikTokLabStoryboardEditorPage /></RequireAuth>} />
-      {/* Legacy TikTok Lab storyboard routes - redirect to new storyboard system */}
-      <Route path="/tiktok-lab/storyboards" element={<Navigate to="/storyboards" replace />} />
-      <Route path="/tiktok-lab/storyboards/new" element={<Navigate to="/storyboards/new" replace />} />
-      <Route path="/tiktok-lab/storyboards/:id" element={<Navigate to="/storyboards/:id" replace />} />
-      <Route path="/tiktok-lab/storyboards/:id/edit" element={<Navigate to="/storyboards/:id" replace />} />
       <Route path="/notifications" element={<NotificationsPage />} />
       <Route path="/messages" element={<RequireAuth><MessagesPage /></RequireAuth>} />
       <Route path="/marketplace-guidelines" element={<MarketplaceGuidelinesPage />} />
@@ -468,14 +458,6 @@ export const AppRoutes = () => (
       <Route path="/instagram-callback" element={<InstagramCallback />} />
       <Route path="/instagram-api" element={<InstagramAPI />} />
       */}
-      <Route
-        path="/tiktok-lab"
-        element={(
-          <RouteSectionBoundary section="tiktok-lab">
-            <TikTokLab />
-          </RouteSectionBoundary>
-        )}
-      />
       <Route
         path="/tiktok-callback"
         element={(

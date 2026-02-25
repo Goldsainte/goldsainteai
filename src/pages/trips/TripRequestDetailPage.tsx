@@ -131,11 +131,11 @@ export default function TripRequestDetailPage() {
       <section className="mx-auto max-w-5xl px-4 pt-14 pb-6 md:pt-16 md:pb-8">
         <div className="flex items-center justify-between mb-4">
           <Link
-            to={isTraveler ? "/my-trips" : "/tiktok-lab"}
+            to={isTraveler ? "/my-trips" : "/marketplace"}
             className="inline-flex items-center gap-1 text-[10px] text-[#8D8D8D]"
           >
             <ArrowLeft className="h-3 w-3" />
-            {isTraveler ? "Back to My Trips" : "Back to Goldsainte Creator Lab"}
+            {isTraveler ? "Back to My Trips" : "Back to Marketplace"}
           </Link>
         </div>
 

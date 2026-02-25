@@ -67,7 +67,7 @@ export const CuratedDestinationCollections = () => {
             <Card
               key={collection.title}
               className="relative h-72 md:h-80 lg:h-96 overflow-hidden cursor-pointer group border-luxury-gold/20 hover:shadow-xl transition-all duration-500"
-              onClick={() => navigate('/tiktok-lab/storyboards')}
+              onClick={() => navigate('/storyboards')}
             >
               <img
                 src={collection.imageUrl}
