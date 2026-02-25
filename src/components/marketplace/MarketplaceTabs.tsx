@@ -1,4 +1,4 @@
-import { Plane, Users, Briefcase, Building2, FileText } from "lucide-react";
+import { Plane, FileText } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -8,13 +8,10 @@ import {
 
 interface MarketplaceTabsProps {
   activeTab: string;
-  onTabChange: (tab: "trips" | "creators" | "agents" | "brands" | "trip-requests") => void;
-  accountType?: string | null;
+  onTabChange: (tab: "trips" | "trip-requests") => void;
 }
 
-export function MarketplaceTabs({ activeTab, onTabChange, accountType }: MarketplaceTabsProps) {
-  const isTraveler = !accountType || accountType === "traveler";
-
+export function MarketplaceTabs({ activeTab, onTabChange }: MarketplaceTabsProps) {
   const tabs = [
     { 
       id: "trips", 
@@ -24,33 +21,12 @@ export function MarketplaceTabs({ activeTab, onTabChange, accountType }: Marketp
       description: "Pre-packaged trips you can book instantly from verified creators & agents"
     },
     { 
-      id: "creators", 
-      label: "Creators", 
-      shortLabel: "Creators", 
-      icon: Users,
-      description: "Browse travel influencers and content creators for inspiration or collaboration"
-    },
-    { 
-      id: "agents", 
-      label: "Agents", 
-      shortLabel: "Agents", 
-      icon: Briefcase,
-      description: "Find verified travel agents who can plan and book your perfect trip"
-    },
-    { 
-      id: "brands", 
-      label: "Brands", 
-      shortLabel: "Brands", 
-      icon: Building2,
-      description: "Discover luxury hotels, resorts, and travel brands"
-    },
-    ...(!isTraveler ? [{ 
       id: "trip-requests", 
       label: "Trip Requests", 
       shortLabel: "Requests", 
       icon: FileText,
       description: "Trip briefs from travelers looking for creators or agents to help plan their journey"
-    }] : []),
+    },
   ] as const;
 
   return (
@@ -64,7 +40,7 @@ export function MarketplaceTabs({ activeTab, onTabChange, accountType }: Marketp
               <Tooltip key={tab.id}>
                 <TooltipTrigger asChild>
                   <button
-                    onClick={() => onTabChange(tab.id as "trips" | "creators" | "agents" | "brands" | "trip-requests")}
+                    onClick={() => onTabChange(tab.id as "trips" | "trip-requests")}
                     className={`
                       flex flex-col items-center gap-0.5 rounded-full px-2.5 py-1.5 sm:flex-row sm:gap-1.5 sm:px-4 sm:py-2.5 
                       text-[10px] sm:text-sm font-semibold transition-all whitespace-nowrap touch-manipulation min-h-[44px] min-w-[44px]
