@@ -217,9 +217,29 @@ export default function PostTripPage() {
   }
 
   async function goNext() {
-    if (currentStep === 0 && (!destination || !startsOn || !endsOn)) {
-      setError("Please fill in destination and dates.");
-      return;
+    if (currentStep === 0) {
+      if (!destination || !departureCity || !startsOn || !endsOn || !title) {
+        setError("Please fill in all fields.");
+        return;
+      }
+    }
+    if (currentStep === 1) {
+      if (!adults || !occasion || !budgetMin || !budgetMax) {
+        setError("Please fill in all fields.");
+        return;
+      }
+    }
+    if (currentStep === 2) {
+      if (!accommodationStyle || interests.length === 0) {
+        setError("Please fill in all fields and select at least one interest.");
+        return;
+      }
+    }
+    if (currentStep === 4) {
+      if (!flexibility || !specialNotes) {
+        setError("Please fill in all fields.");
+        return;
+      }
     }
     setError(null);
 
@@ -243,8 +263,8 @@ export default function PostTripPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!destination || !startsOn || !endsOn) {
-      setError("Please fill in destination and dates.");
+    if (!destination || !departureCity || !startsOn || !endsOn || !title || !occasion || !budgetMin || !budgetMax || !accommodationStyle || interests.length === 0 || !flexibility || !specialNotes) {
+      setError("Please fill in all required fields.");
       return;
     }
     setError(null);
@@ -419,7 +439,7 @@ export default function PostTripPage() {
               </div>
               <div>
                 <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">
-                  Departing from <span className="text-[#9A9079]">(optional)</span>
+                  Departing from <span className="text-red-500">*</span>
                 </label>
                 <input type="text" value={departureCity} onChange={e => setDepartureCity(e.target.value)}
                   className={inputCls} placeholder="New York, London, Los Angeles..." />
@@ -439,7 +459,7 @@ export default function PostTripPage() {
                 </div>
               </div>
               <div>
-                <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">Trip nickname <span className="text-[#9A9079]">(optional)</span></label>
+                <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">Trip nickname <span className="text-red-500">*</span></label>
                 <input type="text" value={title} onChange={e => setTitle(e.target.value)}
                   className={inputCls} placeholder="Example: Amalfi anniversary escape" />
               </div>
@@ -459,19 +479,19 @@ export default function PostTripPage() {
                   <input type="number" min={0} value={children} onChange={e => setChildren(e.target.value)} className={inputCls} />
                 </div>
                 <div>
-                  <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">Occasion <span className="text-[#9A9079]">(optional)</span></label>
+                  <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">Occasion <span className="text-red-500">*</span></label>
                   <input type="text" value={occasion} onChange={e => setOccasion(e.target.value)}
                     className={inputCls} placeholder="Honeymoon, birthday..." />
                 </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">Budget from (total)</label>
+                  <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">Budget from (total) <span className="text-red-500">*</span></label>
                   <input type="number" min={0} value={budgetMin} onChange={e => setBudgetMin(e.target.value)}
                     className={inputCls} placeholder="e.g. 7000" />
                 </div>
                 <div>
-                  <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">Budget to (total)</label>
+                  <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">Budget to (total) <span className="text-red-500">*</span></label>
                   <input type="number" min={0} value={budgetMax} onChange={e => setBudgetMax(e.target.value)}
                     className={inputCls} placeholder="e.g. 12000" />
                 </div>
@@ -491,7 +511,7 @@ export default function PostTripPage() {
           {currentStep === 2 && (
             <>
               <div>
-                <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">Accommodation style <span className="text-[#9A9079]">(optional)</span></label>
+                <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">Accommodation style <span className="text-red-500">*</span></label>
                 <input type="text" value={accommodationStyle} onChange={e => setAccommodationStyle(e.target.value)}
                   className={inputCls} placeholder="Design hotels, villas, all-inclusive..." />
               </div>
@@ -504,7 +524,7 @@ export default function PostTripPage() {
                 </div>
               </div>
               <div>
-                <label className="block mb-2 text-xs text-[#4a4a4a] font-medium">What matters most?</label>
+                <label className="block mb-2 text-xs text-[#4a4a4a] font-medium">What matters most? <span className="text-red-500">*</span></label>
                 <div className="flex flex-wrap gap-2">
                   {interestOptions.map(label => (
                     <Pill key={label} selected={interests.includes(label)} onClick={() => toggleInterest(label)}>{label}</Pill>
@@ -588,13 +608,13 @@ export default function PostTripPage() {
           {currentStep === 4 && (
             <>
               <div>
-                <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">How flexible are you? <span className="text-[#9A9079]">(optional)</span></label>
+                <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">How flexible are you? <span className="text-red-500">*</span></label>
                 <textarea value={flexibility} onChange={e => setFlexibility(e.target.value)}
                   className={cn(inputCls, "min-h-[100px] resize-none")}
                   placeholder="Dates can move, happy to consider nearby towns..." />
               </div>
               <div>
-                <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">Special notes <span className="text-[#9A9079]">(optional)</span></label>
+                <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">Special notes <span className="text-red-500">*</span></label>
                 <textarea value={specialNotes} onChange={e => setSpecialNotes(e.target.value)}
                   className={cn(inputCls, "min-h-[120px] resize-none")}
                   placeholder="Allergies, accessibility needs, non-negotiables..." />
@@ -615,18 +635,18 @@ export default function PostTripPage() {
             <>
               <div className="rounded-2xl bg-white border border-[#E5DFC6] divide-y divide-[#E5DFC6]">
                 <SummaryRow label="Destination" value={destination} />
-                {departureCity && <SummaryRow label="Departing from" value={departureCity} />}
+                <SummaryRow label="Departing from" value={departureCity} />
                 <SummaryRow label="Dates" value={`${startsOn} → ${endsOn}`} />
-                {title && <SummaryRow label="Trip name" value={title} />}
+                <SummaryRow label="Trip name" value={title} />
                 <SummaryRow label="Travelers" value={`${adults} adult${Number(adults) !== 1 ? "s" : ""}${Number(children) > 0 ? `, ${children} child${Number(children) !== 1 ? "ren" : ""}` : ""}`} />
-                {occasion && <SummaryRow label="Occasion" value={occasion} />}
-                {(budgetMin || budgetMax) && <SummaryRow label="Budget" value={`${budgetMin ? `$${Number(budgetMin).toLocaleString()}` : "—"} – ${budgetMax ? `$${Number(budgetMax).toLocaleString()}` : "—"} (${budgetLabels.find(b => b[0] === budgetLevel)?.[1]})`} />}
-                {accommodationStyle && <SummaryRow label="Accommodation" value={accommodationStyle} />}
+                <SummaryRow label="Occasion" value={occasion} />
+                <SummaryRow label="Budget" value={`$${Number(budgetMin).toLocaleString()} – $${Number(budgetMax).toLocaleString()} (${budgetLabels.find(b => b[0] === budgetLevel)?.[1]})`} />
+                <SummaryRow label="Accommodation" value={accommodationStyle} />
                 <SummaryRow label="Pace" value={paceLabels.find(p => p[0] === pace)?.[1] || pace} />
-                {interests.length > 0 && <SummaryRow label="Interests" value={interests.join(", ")} />}
+                <SummaryRow label="Interests" value={interests.join(", ")} />
                 {aestheticTags.length > 0 && <SummaryRow label="Aesthetic" value={aestheticTags.join(", ")} />}
-                {flexibility && <SummaryRow label="Flexibility" value={flexibility} />}
-                {specialNotes && <SummaryRow label="Notes" value={specialNotes} />}
+                <SummaryRow label="Flexibility" value={flexibility} />
+                <SummaryRow label="Notes" value={specialNotes} />
                 <SummaryRow label="Respond" value={roleLabels.find(r => r[0] === wantsRole)?.[1] || wantsRole} />
               </div>
 
