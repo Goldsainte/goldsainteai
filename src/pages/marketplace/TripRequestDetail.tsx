@@ -5,10 +5,9 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ProposalCard from "@/components/marketplace/ProposalCard";
+import { ProposalWizard } from "@/components/marketplace/ProposalWizard";
 import { Loader2, MapPin, Calendar, Users, Globe, Instagram, DollarSign } from "lucide-react";
-import { CancellationPolicySelector } from "@/components/CancellationPolicySelector";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MarketplaceDisclaimer } from "@/components/policies/MarketplaceDisclaimer";
 import { getTripRequestImageUrl } from "@/utils/tripImages";
 import { TripStoryboardViewer } from "@/components/TripStoryboardViewer";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -662,17 +661,9 @@ export default function TripRequestDetail() {
 
             {/* Proposal Form (below proposals) */}
             {!isRequestOwner && request.status === "open" && (
-              <div id="proposal-form" className="rounded-2xl border border-[#E5DFC6] bg-white p-5 md:p-6 shadow-sm">
-                <GoldLabel>Ready to propose?</GoldLabel>
-                <h2 className="mt-1 font-secondary text-lg text-[#0a2225]">Submit your proposal</h2>
-                <p className="mt-1 text-sm text-[#6B7280] leading-relaxed max-w-lg">
-                  {proposalsCount > 0
-                    ? `${proposalsCount} ${proposalsCount === 1 ? 'proposal has' : 'proposals have'} already been submitted — stand out with yours.`
-                    : "Be the first to submit a proposal for this trip. Share your pricing, itinerary, and why you're the perfect match."}
-                </p>
-
+              <div id="proposal-form">
                 {userProfile && (
-                  <div className="mt-4 flex items-start gap-3 rounded-xl border border-[#E5DFC6] bg-[#FDFBF5] p-4">
+                  <div className="mb-4 flex items-start gap-3 rounded-xl border border-[#E5DFC6] bg-[#FDFBF5] p-4">
                     <Avatar className="h-11 w-11 border-2 border-[#E5DFC6]">
                       {userProfile.avatar_url ? (
                         <AvatarImage src={userProfile.avatar_url} alt={profileName || "You"} />
@@ -714,90 +705,13 @@ export default function TripRequestDetail() {
                     </div>
                   </div>
                 )}
-
-                <form onSubmit={handleSubmitProposal} className="mt-5 space-y-5 text-sm">
-                  <div className="grid gap-4 md:grid-cols-3">
-                    <div className="space-y-1.5">
-                      <label className="font-medium text-[#0a2225]">Price (USD)</label>
-                      <input type="number" min={0} required className={luxuryInputClass} placeholder="e.g. 6500" value={newProposal.priceFrom} onChange={(e) => setNewProposal((prev) => ({ ...prev, priceFrom: e.target.value }))} />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="font-medium text-[#0a2225]">Timeline (days)</label>
-                      <input type="text" className={luxuryInputClass} placeholder="e.g. 3–5" value={newProposal.timelineLabel} onChange={(e) => setNewProposal((prev) => ({ ...prev, timelineLabel: e.target.value }))} />
-                    </div>
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-1.5">
-                      <label className="font-medium text-[#0a2225]">Included</label>
-                      <textarea rows={3} className={luxuryInputClass} placeholder="Hotels, transfers, breakfast, guided experiences…" value={newProposal.included} onChange={(e) => setNewProposal((prev) => ({ ...prev, included: e.target.value }))} />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="font-medium text-[#0a2225]">Not included</label>
-                      <textarea rows={3} className={luxuryInputClass} placeholder="Flights, travel insurance, most dinners…" value={newProposal.notIncluded} onChange={(e) => setNewProposal((prev) => ({ ...prev, notIncluded: e.target.value }))} />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="font-medium text-[#0a2225]">Itinerary overview</label>
-                    <textarea rows={4} required className={luxuryInputClass} placeholder="Day 1: Arrival · Day 2: Private yacht · Day 3: Wine country…" value={newProposal.itineraryOverview} onChange={(e) => setNewProposal((prev) => ({ ...prev, itineraryOverview: e.target.value }))} />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="font-medium text-[#0a2225]">Why you're a great fit</label>
-                    <textarea rows={3} required className={luxuryInputClass} placeholder="Your expertise, hotel partners, on-the-ground connections…" value={newProposal.fitReason} onChange={(e) => setNewProposal((prev) => ({ ...prev, fitReason: e.target.value }))} />
-                  </div>
-
-                  <div className="space-y-3">
-                    <CancellationPolicySelector
-                      selectedPolicyId={newProposal.cancellationPolicyId || undefined}
-                      onPolicySelect={(policyId) => setNewProposal((prev) => ({ ...prev, cancellationPolicyId: policyId }))}
-                    />
-                    <div className="space-y-1.5">
-                      <label className="font-medium text-[#0a2225]">Additional cancellation terms (optional)</label>
-                      <textarea rows={2} className={luxuryInputClass} placeholder="Blackout dates, non-refundable elements…" value={newProposal.customCancellationTerms} onChange={(e) => setNewProposal((prev) => ({ ...prev, customCancellationTerms: e.target.value }))} />
-                    </div>
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-1.5">
-                      <label className="font-medium text-[#0a2225]">Deposit (%)</label>
-                      <input type="number" min={0} max={100} className={luxuryInputClass} placeholder="e.g. 30" value={newProposal.depositPercentage} onChange={(e) => setNewProposal((prev) => ({ ...prev, depositPercentage: e.target.value }))} />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="font-medium text-[#0a2225]">Deposit due (days)</label>
-                      <input type="number" min={0} className={luxuryInputClass} placeholder="e.g. 3" value={newProposal.depositDueDays} onChange={(e) => setNewProposal((prev) => ({ ...prev, depositDueDays: e.target.value }))} />
-                    </div>
-                  </div>
-
-                  <div className="space-y-3 rounded-xl border border-[#E5DFC6] bg-[#FDFBF5] px-4 py-3">
-                    <p className="text-sm font-semibold text-[#0a2225]">Policy acknowledgements</p>
-                    <label className="flex items-start gap-2 text-xs text-[#6B7280] leading-relaxed">
-                      <Checkbox checked={newProposal.ackGoldsaintePolicies} onCheckedChange={(checked) => setNewProposal((prev) => ({ ...prev, ackGoldsaintePolicies: Boolean(checked) }))} />
-                      <span>
-                        I understand that Goldsainte operates as a marketplace and I am solely responsible for trip delivery. I've reviewed the{" "}
-                        <Link to="/cancellation-refund-policy" className="underline underline-offset-2 text-[#7A7151]" target="_blank">Cancellation Policy</Link>{" "}and{" "}
-                        <Link to="/terms" className="underline underline-offset-2 text-[#7A7151]" target="_blank">Terms</Link>.
-                      </span>
-                    </label>
-                    <label className="flex items-start gap-2 text-xs text-[#6B7280] leading-relaxed">
-                      <Checkbox checked={newProposal.ackAgentCancellation} onCheckedChange={(checked) => setNewProposal((prev) => ({ ...prev, ackAgentCancellation: Boolean(checked) }))} />
-                      <span>I confirm the cancellation, refund, and deposit terms in this proposal are accurate and will be honored.</span>
-                    </label>
-                  </div>
-
-                  <MarketplaceDisclaimer size="sm" />
-
-                  <div className="flex items-center justify-end pt-1">
-                    <button
-                      type="submit"
-                      disabled={submittingProposal}
-                      className="inline-flex items-center rounded-full bg-[#0c4d47] px-7 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-[#0c4d47]/90 disabled:cursor-not-allowed disabled:opacity-70"
-                    >
-                      {submittingProposal ? "Submitting..." : "Submit proposal"}
-                    </button>
-                  </div>
-                </form>
+                <ProposalWizard
+                  newProposal={newProposal}
+                  setNewProposal={setNewProposal}
+                  onSubmit={handleSubmitProposal}
+                  submittingProposal={submittingProposal}
+                  proposalsCount={proposalsCount}
+                />
               </div>
             )}
 
