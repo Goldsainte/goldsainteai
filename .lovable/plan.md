@@ -1,64 +1,81 @@
 
 
-# Part 3–6: Storyboard → Marketplace Conversion & Detail Page Enrichment
+# Marketplace Trip Request Cards — Clarity for Agents & Creators
 
-## Current State
+## Problem
 
-The storyboard editor already has:
-- All structured fields (destination, dates, budget, travelers, vibes, must-haves, dealbreakers)
-- A "Submit to Marketplace" button that creates a `trip_requests` row and links the storyboard
-- Status tracking (draft → submitted)
-- Visual Brief gallery on the marketplace detail page via `TripStoryboardViewer`
+The "Custom Requests" grid cards look like product listings rather than traveler briefs seeking proposals. An agent or creator can't tell at a glance: who posted this, what kind of trip they want, how competitive it is, or that they should respond.
 
-**What's missing per the spec:**
+## Changes
 
-| Requirement | Status |
-|---|---|
-| Marketplace detail page shows vibe tags, must-haves, dealbreakers, trip length | Missing — only basic fields displayed |
-| Storyboard status shows "Live in Marketplace" | Missing — only "Submitted" badge |
-| MVP validation (3+ visual pins required) | Missing |
-| Lock storyboard after submission (prevent edits) | Missing |
-| Marketplace detail page displays source_metadata fields | Missing — must-haves, dealbreakers, budget_per_person, trip_length_days stored in source_metadata but never read back |
+### 1. `TripRequestGrid.tsx` — Enriched Cards
 
-## Plan
+**Add to each card:**
+- **Traveler avatar + name** (or "A Goldsainte Traveler" fallback) at the top of the card — immediately signals "a person posted this"
+- **"Seeking proposals" label** — small badge below the image so it's unambiguous this is a request, not a listing
+- **Vibe/interest tags** — show up to 3 pill tags from `interests` array (e.g. "Romantic", "Wellness") so agents can pre-qualify fit
+- **Travelers count** — "2 travelers" line next to destination
+- **Trip length** if available — "7 days" alongside the date
+- **Relative time** — "Posted 2h ago" instead of absolute date (using `date-fns` `formatDistanceToNow`)
+- **Proposal count badge** — "3 proposals" in a small pill, giving urgency signal
 
-### 1. Storyboard Editor — MVP Validation & Lock
+**Data requirements:** The parent `Marketplace.tsx` query for `trip_requests` needs to join `profiles` (for traveler name/avatar) and get a count of `trip_proposals`. Update the query to:
+```sql
+select *, profiles!trip_requests_user_id_fkey(full_name, avatar_url), trip_proposals(count)
+```
 
-**`src/pages/TikTokLab/StoryboardEditorPage.tsx`**
+Update the `TripRequest` interface in the grid to include: `travelers_adults`, `travelers_children`, `interests`, `profiles`, `proposal_count`.
 
-- **MVP validation** in `submitToMarketplace`: require at least 3 visual pins (`itemCount >= 3`), destination, and either dates or trip length. Show specific toast errors for each missing requirement.
-- **Lock after submission**: when `storyboard.status === "submitted"`, disable all trip detail fields, hide the "Submit to Marketplace" button, and show a "Live in Marketplace" badge (replacing "Submitted"). Add a link to view the marketplace listing (`/marketplace/request/${storyboard.trip_request_id}`).
-- **Status label update**: change the badge from "Submitted" to "Live in Marketplace" with a green pulse dot.
+### 2. `TripRequestGrid.tsx` — Card Layout Redesign
 
-### 2. Marketplace Detail Page — Display Rich Trip Data
+Current layout: image → title + budget → destination → date
 
-**`src/pages/marketplace/TripRequestDetail.tsx`**
+New layout:
+```text
+┌─────────────────────────────┐
+│  [4:3 destination image]    │
+│  ┌─────────────────────┐    │
+│  │ Seeking proposals    │    │  ← overlay badge, bottom-left
+│  └─────────────────────┘    │
+├─────────────────────────────┤
+│ 🧑 Jane D. · 2 travelers   │  ← avatar + name + travelers
+│ Trip to Amalfi Coast        │  ← title
+│ 📍 Italy · 7 days           │  ← destination + trip length
+│ Romantic · Wellness · Food  │  ← up to 3 vibe tags as pills
+│ $5,000–$8,000 · 3 proposals │  ← budget + proposal count
+│ Posted 2h ago               │  ← relative time
+└─────────────────────────────┘
+```
 
-The detail page currently reads `trip_requests` but ignores `source_metadata` (where must-haves, dealbreakers, trip_length_days, budget_per_person are stored). Changes:
+### 3. `Marketplace.tsx` — Update Query
 
-- **Fetch source_metadata** from the trip request query (already selected via `select("*")`).
-- **Parse and display** in the right sidebar "Trip Details" card:
-  - Trip length (days) — from `source_metadata.trip_length_days`
-  - Budget scope — "per person" or "total trip" from `source_metadata.budget_per_person`
-- **Add new sections** to the left column Trip Brief card (below description, above Visual Brief):
-  - **Vibe Tags** — pill badges from `interests` column (already on `trip_requests`)
-  - **Must-Haves** — emerald pill badges from `source_metadata.must_haves`
-  - **Dealbreakers** — red pill badges from `source_metadata.dealbreakers`
-- **Expand the `TripRequest` type** to include `interests`, `tripLengthDays`, `budgetPerPerson`, `mustHaves`, `dealbreakers`.
-- **Map from raw data** in the `fetchData` function, parsing `source_metadata` JSON.
+Expand the `trip-requests-unified` query to fetch:
+- `profiles(full_name, avatar_url)` via the user_id FK
+- `trip_proposals(count)` for proposal count
+- `interests`, `travelers_adults`, `travelers_children`, `source_metadata` for trip length
 
-### 3. No Database Changes Required
+Map the enriched data into the `TripRequestGrid` props.
 
-All the data is already persisted:
-- `interests` is a direct column on `trip_requests`
-- `must_haves`, `dealbreakers`, `trip_length_days`, `budget_per_person` are stored in `source_metadata` JSON on `trip_requests`
+### 4. `MarketplaceTabs.tsx` — Rename for Clarity
 
-No migration needed.
+Change "Custom Requests" → **"Traveler Briefs"** (or "Open Briefs") and update the tooltip description to: *"Real travelers looking for a custom trip — review their brief and submit your proposal"*
 
-### Files to Edit
+This small rename removes the ambiguity of whose "request" it is.
+
+### 5. `EmptyState.tsx` — Update Trip Requests Copy
+
+Change the empty state for `trip-requests`:
+- Title: "No traveler briefs yet"
+- Description: "When travelers post trip requests, they'll appear here for you to review and propose on."
+
+## Files to Edit
 
 | File | Changes |
 |---|---|
-| `src/pages/TikTokLab/StoryboardEditorPage.tsx` | MVP validation (3+ pins), lock fields after submission, "Live in Marketplace" badge with link |
-| `src/pages/marketplace/TripRequestDetail.tsx` | Parse source_metadata, display vibe tags, must-haves, dealbreakers, trip length, budget scope |
+| `src/components/marketplace/TripRequestGrid.tsx` | Enriched card layout with avatar, vibe tags, proposal count, relative time, "Seeking proposals" badge |
+| `src/pages/Marketplace.tsx` | Expand trip_requests query to join profiles + count proposals, pass enriched data |
+| `src/components/marketplace/MarketplaceTabs.tsx` | Rename "Custom Requests" → "Traveler Briefs" |
+| `src/components/marketplace/EmptyState.tsx` | Update trip-requests empty state copy |
+
+No database changes needed — all data already exists.
 
