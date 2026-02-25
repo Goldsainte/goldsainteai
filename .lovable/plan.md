@@ -1,60 +1,113 @@
 
 
-# Show Full Storyboard Details When Clicking a Storyboard
+# Travel Storyboards → Marketplace Conversion: Gap Analysis & Plan
 
-## Problem
-When you click on an existing storyboard, the editor page only shows photos in a builder interface. None of the storyboard metadata you entered is visible — no title display, no description, no tags, no creation date, no cover image. The page immediately jumps into "edit mode" with just photos and a search bar, giving you no context about what this storyboard was about.
+## What Already Exists
 
-## Root Cause
-1. `StoryboardEditorPage` fetches only 4 fields (`id, title, created_at, related_concierge_session_id`) — ignoring `description`, `tags`, `cover_image_url`, `is_public`, `role`, `updated_at`
-2. The fetched title is never even displayed — it's only used for the page heading ("Edit Storyboard")
-3. `StoryboardBuilder` receives the `storyboardId` but only loads items (photos/links). It has no concept of displaying storyboard-level details
-4. There is no "detail view" section — only an "edit view"
+The storyboard system is largely built. Here is the current state:
 
-## Plan
+| Feature | Status |
+|---|---|
+| Create a new storyboard | Done — `/storyboards/new` |
+| Name the storyboard | Done — title input in StoryboardBuilder |
+| Add cover image | Partial — `cover_image_url` column exists but no UI to set it |
+| Add visual pins (images, links, videos, notes) | Done — photos via Unsplash search, links via paste |
+| Add structured trip details | Missing — storyboard has description/tags but no trip-specific fields (destination, dates, budget, travelers, pace, interests) |
+| Save as draft | Done — saves to `storyboards` table |
+| Submit to marketplace | Partial — "Convert to Trip" button exists, redirects to `/post-trip?fromStoryboard=ID`, but only pre-fills title and description. No structured trip fields transfer. |
+| Pinterest-style visual grid | Partial — masonry columns layout exists but no drag-to-reorder, no delete items |
 
-### 1. `src/pages/TikTokLab/StoryboardEditorPage.tsx` — Full detail header + enriched data fetch
+## What Needs to Be Built
 
-**Fetch all storyboard fields:**
-Update the query from `select("id, title, created_at, related_concierge_session_id")` to `select("*")` to get description, tags, cover_image_url, is_public, role, updated_at, trip_request_id, etc.
+### 1. Structured Trip Details on Storyboard (Database)
 
-**Add a detail hero section above the builder:**
-When in edit mode, render a full storyboard detail header between the "Back" link and the StoryboardBuilder:
+Add optional trip-planning fields to the `storyboards` table so users can enter structured details directly on the storyboard before converting:
+
+```sql
+ALTER TABLE public.storyboards
+  ADD COLUMN IF NOT EXISTS destination text,
+  ADD COLUMN IF NOT EXISTS departure_city text,
+  ADD COLUMN IF NOT EXISTS start_date date,
+  ADD COLUMN IF NOT EXISTS end_date date,
+  ADD COLUMN IF NOT EXISTS budget_min numeric,
+  ADD COLUMN IF NOT EXISTS budget_max numeric,
+  ADD COLUMN IF NOT EXISTS budget_level text,
+  ADD COLUMN IF NOT EXISTS travelers_adults integer DEFAULT 2,
+  ADD COLUMN IF NOT EXISTS travelers_children integer DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS occasion text,
+  ADD COLUMN IF NOT EXISTS accommodation_style text,
+  ADD COLUMN IF NOT EXISTS pace text,
+  ADD COLUMN IF NOT EXISTS interests text[] DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS flexibility text,
+  ADD COLUMN IF NOT EXISTS special_notes text,
+  ADD COLUMN IF NOT EXISTS status text DEFAULT 'draft';
+```
+
+The `status` field enables draft vs. submitted tracking (`draft` | `submitted`).
+
+### 2. Cover Image Upload UI
+
+**`src/pages/TikTokLab/StoryboardEditorPage.tsx`** — In the detail hero section, add a "Set cover image" button that:
+- Lets user pick from existing storyboard items (click any photo to set as cover)
+- Updates `cover_image_url` on the `storyboards` row
+- Shows immediately in the hero
+
+### 3. Trip Details Section in Editor
+
+**`src/pages/TikTokLab/StoryboardEditorPage.tsx`** — Add a collapsible "Trip Details" section below the hero and above the builder. This section contains the structured fields (destination, dates, budget, travelers, pace, interests, etc.) that mirror the PostTripPage wizard but in a single-page layout. Fields auto-save on blur or change.
 
 ```text
 ┌──────────────────────────────────────────────────┐
-│  [Cover image — full width, aspect-[21/9]]       │
-│                                                  │
+│  [Cover Image Hero]                              │
+│  Title · Description · Tags                      │
+│  [Edit Details] [Submit to Marketplace →]        │
 ├──────────────────────────────────────────────────┤
-│  Title (large, serif)                            │
-│  Description (body text)                         │
-│  Tags: [beach] [honeymoon] [luxury]              │
-│  Created: Jan 15, 2026  ·  12 items  ·  Private  │
-│  [Edit Details]  [Convert to Trip →]             │
-└──────────────────────────────────────────────────┘
-│  StoryboardBuilder (existing — photos/links)     │
+│  ▼ Trip Details (collapsible)                    │
+│    Destination    Departure City                 │
+│    Start Date     End Date                       │
+│    Adults         Children        Occasion       │
+│    Budget $min – $max   Budget Style             │
+│    Accommodation Style  Pace                     │
+│    Interests: [pills]                            │
+│    Flexibility    Special Notes                  │
+├──────────────────────────────────────────────────┤
+│  StoryboardBuilder (photos/links)                │
 └──────────────────────────────────────────────────┘
 ```
 
-- **Cover image**: Full-width banner with `aspect-[21/9]` or `aspect-[16/7]`, rounded corners, gradient overlay at bottom. Falls back to cream placeholder if no cover.
-- **Title**: Displayed as `text-2xl font-display` heading (not an input).
-- **Description**: Full text shown, not truncated.
-- **Tags**: Pill badges matching the listing page style.
-- **Meta row**: Created date, item count (fetched from items), public/private badge.
-- **Actions**: "Edit Details" button opens a dialog to edit title/description/tags. "Convert to Trip" button links to `/post-trip?fromStoryboard=ID`.
+### 4. "Submit to Marketplace" Button
 
-**Add an "Edit Details" dialog:**
-A simple dialog with inputs for title, description, tags, and visibility toggle. On save, updates the `storyboards` row via Supabase and refreshes the local state.
+Replace the current "Convert to Trip" link (which redirects to `/post-trip`) with an inline "Submit to Marketplace" action that:
+1. Validates all required trip details are filled in
+2. Creates a `trip_requests` row directly from the storyboard data
+3. Links the storyboard to the trip request (`trip_request_id`)
+4. Updates storyboard `status` to `submitted`
+5. Shows success toast and navigates to `/my-trip-requests`
 
-### 2. `src/components/storyboards/StoryboardBuilder.tsx` — Pre-fill title from loaded storyboard
+This eliminates the redirect to the 6-step wizard when the user has already filled in details on the storyboard itself. The "Convert to Trip" link remains as a fallback for users who prefer the guided wizard.
 
-Currently, when editing an existing storyboard, the title input starts blank because `initialTitle` is only set from the URL query param. Update the component to also fetch the storyboard's title when `storyboardId` is provided, so the title input shows the saved title.
+### 5. Delete Items from Storyboard
 
-Add to the existing `loadItems` effect: also fetch the storyboard title and set it if `initialTitle` is empty.
+**`src/components/storyboards/StoryboardBuilder.tsx`** — Add an X button on each item in the preview grid to remove items. For saved items (with `id`), delete from `storyboard_items` table. For unsaved items, remove from local state.
+
+### 6. Improved Prefill for Post-Trip Wizard
+
+**`src/hooks/useStoryboardPrefill.ts`** — When converting via the wizard (`/post-trip?fromStoryboard=ID`), fetch all the new structured fields from the storyboard and pre-fill the wizard form with them (destination, dates, budget, travelers, pace, interests, etc.), not just title and description.
 
 ### Files to Edit
-- **`src/pages/TikTokLab/StoryboardEditorPage.tsx`** — Fetch all fields, add detail hero section, add edit details dialog
-- **`src/components/storyboards/StoryboardBuilder.tsx`** — Load and display saved title when editing existing storyboard
 
-No database changes needed — all fields already exist in the `storyboards` table.
+| File | Changes |
+|---|---|
+| **Database migration** | Add trip detail columns + status to `storyboards` table |
+| **`src/pages/TikTokLab/StoryboardEditorPage.tsx`** | Cover image picker, trip details section, submit to marketplace action |
+| **`src/components/storyboards/StoryboardBuilder.tsx`** | Delete items, set-as-cover button on photos |
+| **`src/hooks/useStoryboardPrefill.ts`** | Fetch and map all new structured fields for wizard prefill |
+| **`src/integrations/supabase/types.ts`** | Auto-updated after migration |
+
+### What This Does NOT Change
+
+- The PostTripPage wizard remains intact as an alternative path
+- The storyboard remains a "Pinterest-style" visual board at its core
+- No changes to RLS policies (existing owner-based policies cover the new columns)
+- No changes to the marketplace trip request display
 
