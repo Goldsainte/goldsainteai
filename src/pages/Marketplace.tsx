@@ -108,17 +108,24 @@ export default function Marketplace() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("trip_requests")
-        .select(`
-          *,
-          profiles!trip_requests_user_id_fkey(full_name, avatar_url),
-          trip_proposals(count)
-        `)
+        .select(`*, trip_proposals(count)`)
         .eq("status", "open")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return (data || []).map((r: any) => ({
+      if (!data || data.length === 0) return [];
+
+      // Fetch profiles separately (no direct FK between trip_requests and profiles)
+      const userIds = [...new Set(data.map((r: any) => r.user_id).filter(Boolean))];
+      const { data: profiles } = userIds.length > 0
+        ? await supabase.from("profiles").select("id, full_name, avatar_url").in("id", userIds)
+        : { data: [] };
+
+      const profileMap = new Map((profiles || []).map((p: any) => [p.id, p]));
+
+      return data.map((r: any) => ({
         ...r,
+        profiles: profileMap.get(r.user_id) || null,
         proposal_count: r.trip_proposals?.[0]?.count || 0,
       }));
     },
