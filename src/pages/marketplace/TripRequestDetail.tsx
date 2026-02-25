@@ -575,6 +575,27 @@ export default function TripRequestDetail() {
               </div>
             </div>
 
+            {/* Inline CTA — visible for non-owners on open requests */}
+            {!isRequestOwner && request.status === "open" && (
+              <div className="rounded-2xl border border-[#C7A962]/40 bg-gradient-to-r from-[#FDFBF5] to-[#F5F0E0] p-5 shadow-sm flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                <div className="flex-1 min-w-0">
+                  <p className="font-secondary text-sm font-semibold text-[#0a2225]">
+                    Interested in this trip?
+                  </p>
+                  <p className="text-xs text-[#6B7280] mt-0.5">
+                    Submit your proposal with pricing, itinerary & why you're the perfect fit.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => document.getElementById("proposal-form")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                  className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-[#0c4d47] px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-[#0c4d47]/90 min-h-[44px]"
+                >
+                  Jump to Proposal Form ↓
+                </button>
+              </div>
+            )}
+
             {/* Proposals section — only show full list for trip owner */}
             {isRequestOwner && (
               <div className="space-y-4">
@@ -879,6 +900,29 @@ export default function TripRequestDetail() {
           </aside>
         </div>
       </div>
+
+      {/* Sticky mobile CTA bar — visible below lg breakpoint for non-owners on open requests */}
+      {!isRequestOwner && request.status === "open" && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/95 backdrop-blur-md border-t border-[#E5DFC6] px-4 py-3 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+          <div className="mx-auto max-w-2xl flex items-center justify-between gap-3">
+            {(request.budgetMin > 0 || request.budgetMax > 0) && (
+              <div className="min-w-0">
+                <p className="text-[10px] uppercase tracking-[0.15em] text-[#9A9079] font-semibold">Budget</p>
+                <p className="font-secondary text-sm font-semibold text-[#0a2225] truncate">
+                  {formatCurrency(request.budgetMin)} – {formatCurrency(request.budgetMax)}
+                </p>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => document.getElementById("proposal-form")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+              className="inline-flex items-center rounded-full bg-[#0c4d47] px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-[#0c4d47]/90 whitespace-nowrap min-h-[44px]"
+            >
+              Submit a Proposal
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
