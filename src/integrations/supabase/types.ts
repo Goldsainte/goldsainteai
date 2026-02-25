@@ -9008,49 +9008,97 @@ export type Database = {
       }
       storyboards: {
         Row: {
+          accommodation_style: string | null
+          budget_level: string | null
+          budget_max: number | null
+          budget_min: number | null
           cover_image_url: string | null
           created_at: string
+          departure_city: string | null
           description: string | null
+          destination: string | null
+          end_date: string | null
+          flexibility: string | null
           id: string
+          interests: string[] | null
           is_public: boolean
+          occasion: string | null
           original_storyboard_id: string | null
           owner_id: string
+          pace: string | null
           role: string
           source_creator_id: string | null
+          special_notes: string | null
+          start_date: string | null
+          status: string | null
           tags: string[] | null
           title: string
+          travelers_adults: number | null
+          travelers_children: number | null
           trip_request_id: string | null
           updated_at: string
           view_count: number
         }
         Insert: {
+          accommodation_style?: string | null
+          budget_level?: string | null
+          budget_max?: number | null
+          budget_min?: number | null
           cover_image_url?: string | null
           created_at?: string
+          departure_city?: string | null
           description?: string | null
+          destination?: string | null
+          end_date?: string | null
+          flexibility?: string | null
           id?: string
+          interests?: string[] | null
           is_public?: boolean
+          occasion?: string | null
           original_storyboard_id?: string | null
           owner_id: string
+          pace?: string | null
           role: string
           source_creator_id?: string | null
+          special_notes?: string | null
+          start_date?: string | null
+          status?: string | null
           tags?: string[] | null
           title: string
+          travelers_adults?: number | null
+          travelers_children?: number | null
           trip_request_id?: string | null
           updated_at?: string
           view_count?: number
         }
         Update: {
+          accommodation_style?: string | null
+          budget_level?: string | null
+          budget_max?: number | null
+          budget_min?: number | null
           cover_image_url?: string | null
           created_at?: string
+          departure_city?: string | null
           description?: string | null
+          destination?: string | null
+          end_date?: string | null
+          flexibility?: string | null
           id?: string
+          interests?: string[] | null
           is_public?: boolean
+          occasion?: string | null
           original_storyboard_id?: string | null
           owner_id?: string
+          pace?: string | null
           role?: string
           source_creator_id?: string | null
+          special_notes?: string | null
+          start_date?: string | null
+          status?: string | null
           tags?: string[] | null
           title?: string
+          travelers_adults?: number | null
+          travelers_children?: number | null
           trip_request_id?: string | null
           updated_at?: string
           view_count?: number
