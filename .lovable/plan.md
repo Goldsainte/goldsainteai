@@ -1,40 +1,41 @@
 
 
-# Merge Inspiration Browsing into Post a Trip (Step 4)
+# Remove "Hey Goldsainte" Wake Word Feature
 
-## What you're asking
-Right now, the Post a Trip wizard (Step 4 — "Build your visual brief") only shows the `StoryboardBuilder` which requires travelers to **search** for photos or experiences. Separately, the homepage and standalone storyboard pages have a beautiful browsable masonry grid of curated travel inspiration photos (the `TravelStoryboard` component pulling from the media library). You want that browsable inspiration gallery **merged into** the Post a Trip Step 4 so travelers can browse and tap photos to add them to their storyboard without needing to search.
+## Scope
+Strip out the wake word detection system entirely — the `WakeWordDetector` utility, all references in `AIBookingConcierge`, the settings toggle, the voice status message for wake-active state, the test WAV file, and related test specs.
 
-## Changes
+## Files to Delete (2 files)
+1. `src/utils/WakeWordDetector.ts` — the wake word detector class
+2. `public/test/hey-goldsainte.wav` — test audio file for loopback testing
 
-### 1. `src/pages/trips/PostTripPage.tsx` — Add inspiration gallery below StoryboardBuilder
-- Import `TravelStoryboard` component
-- In Step 4 (currentStep === 3), add a new section below the `StoryboardBuilder` titled something like "Browse inspiration" with the `TravelStoryboard` masonry grid
-- Wire `onImageClick` so tapping a photo from the gallery adds it to the storyboard builder's items list
-- Pass the destination as a highlight tag to surface relevant images first
+## Files to Edit
 
-### 2. `src/components/storyboards/StoryboardBuilder.tsx` — Expose an `addExternalPhoto` method
-- Currently photos can only be added via internal Unsplash search results. We need to expose a way for the parent (PostTripPage) to programmatically add a photo item to the builder's `items` state
-- Add an `externalAddRef` prop (a `React.MutableRefObject`) that exposes an `addPhoto(url, label)` function, OR
-- Simpler approach: accept an `onImageClick` callback pattern where the parent passes clicked images down. Since the builder owns the items state, the cleanest approach is to add an imperative ref that lets the parent push items into the builder
+### 1. `src/components/AIBookingConcierge.tsx`
+- Remove import of `WakeWordDetector`
+- Remove `wakeWordDetectorRef`, `wakeWordActive` state, `wakeWordPrimed` state
+- Remove all wake word initialization logic (the `WakeWordDetector` constructor calls, `.start()`, `.stop()`)
+- Remove wake word pause/resume during voice calls
+- Remove the loopback test that fetches `hey-goldsainte.wav`
+- Remove wake-active `VoiceStatusMessage` rendering
+- Remove `wakeWordDetectorRef` prop passed to `VoiceDiagnosticsPanel`
+- Clean up the unmount effect that stops wake word
 
-### 3. No standalone storyboard routes removed
-The standalone `/storyboards/new` pages stay for agents/creators who use them independently. This change only enhances the traveler Post a Trip flow.
+### 2. `src/components/AIChatSettingsPanel.tsx`
+- Remove `wakeWordEnabled` from the `ChatPreferences` type and `DEFAULT_PREFERENCES`
+- Remove the "Wake Word Detection" toggle UI block
 
-## How it works for the traveler
+### 3. `src/components/concierge/VoiceStatusMessage.tsx`
+- Remove the `'wake-active'` status option and its message string
 
-Step 4 of Post a Trip will now show:
-1. The existing `StoryboardBuilder` (search for photos, experiences, paste links) at the top
-2. A new "Browse inspiration" section below with the curated masonry grid from `TravelStoryboard`
-3. Tapping any photo in the gallery instantly adds it to the storyboard preview above
-4. The rest of the flow (auto-save on Next, linking to trip request) stays the same
+### 4. `src/components/VoiceDiagnosticsPanel.tsx`
+- Remove `wakeWordDetectorRef` prop
+- Remove wake word status detection logic
 
-## Technical detail
+### 5. `src/components/partners/PartnersFAQ.tsx`
+- Update the FAQ answer that mentions "Hey Goldsainte" to remove that reference
 
-The `StoryboardBuilder` component will gain an `addItemRef` prop:
-```typescript
-addItemRef?: React.MutableRefObject<((item: Item) => void) | null>;
-```
-
-The parent (`PostTripPage`) will hold this ref and pass it to `StoryboardBuilder`. When a `TravelStoryboard` image is clicked, the parent calls `addItemRef.current(...)` to inject the photo into the builder's items array. This avoids lifting state out of the builder while still allowing external additions.
+### 6. Test files (cleanup)
+- `e2e/critical-voice.spec.ts` — remove or update the wake word test
+- `tests/04-homepage.spec.ts` and `tests/06-voice-concierge.spec.ts` — remove `Hey Goldsainte` selectors from locator strings
 
