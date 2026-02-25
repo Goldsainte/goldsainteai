@@ -10,6 +10,8 @@ type StoryboardBuilderProps = {
   onSaved?: (storyboardId: string) => void;
   /** Expose save function so parent can trigger saves (e.g. on step transition) */
   saveRef?: React.MutableRefObject<(() => Promise<void>) | null>;
+  /** Expose a function that lets the parent inject items (e.g. from an inspiration gallery) */
+  addItemRef?: React.MutableRefObject<((item: Item) => void) | null>;
 };
 
 type Item = {
@@ -46,6 +48,7 @@ export function StoryboardBuilder({
   destination,
   onSaved,
   saveRef,
+  addItemRef,
 }: StoryboardBuilderProps) {
   const [title, setTitle] = useState(initialTitle || "");
   const [items, setItems] = useState<Item[]>([]);
@@ -63,6 +66,14 @@ export function StoryboardBuilder({
   useEffect(() => {
     if (saveRef) {
       saveRef.current = saveStoryboard;
+    }
+  });
+
+  useEffect(() => {
+    if (addItemRef) {
+      addItemRef.current = (item: Item) => {
+        setItems((prev) => [...prev, item]);
+      };
     }
   });
 
