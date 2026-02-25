@@ -62,7 +62,22 @@ export default function TikTokLabStoryboardsPage() {
             item_count: s.storyboard_items?.[0]?.count ?? 0,
             storyboard_items: undefined,
           }));
-          setStoryboards(mapped);
+          // Enrich storyboards without cover images with first item image
+          const enriched = await Promise.all(
+            mapped.map(async (sb) => {
+              if (sb.cover_image_url) return sb;
+              const { data: firstItem } = await supabase
+                .from("storyboard_items")
+                .select("image_url")
+                .eq("storyboard_id", sb.id)
+                .not("image_url", "is", null)
+                .order("position", { ascending: true })
+                .limit(1)
+                .maybeSingle();
+              return { ...sb, cover_image_url: firstItem?.image_url || null };
+            })
+          );
+          setStoryboards(enriched);
         }
         setLoading(false);
       }
@@ -121,15 +136,21 @@ export default function TikTokLabStoryboardsPage() {
 
           {/* Storyboard grid / empty / loading */}
           {loading ? (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="rounded-2xl bg-white/90 border border-[#E5DFC6] p-4 h-56 animate-pulse" />
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="space-y-2.5">
+                  <div className="aspect-[4/3] rounded-xl md:rounded-2xl bg-white/90 animate-pulse" />
+                  <div className="space-y-1.5 px-0.5">
+                    <div className="h-4 w-3/4 rounded bg-white/90 animate-pulse" />
+                    <div className="h-3 w-1/2 rounded bg-white/90 animate-pulse" />
+                  </div>
+                </div>
               ))}
             </div>
           ) : storyboards.length === 0 ? (
             <StoryboardsEmptyState />
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {storyboards.map((sb) => (
                 <StoryboardCard key={sb.id} storyboard={sb} />
               ))}
@@ -161,56 +182,64 @@ function StoryboardCard({ storyboard }: { storyboard: Storyboard }) {
   return (
     <Link
       to={`/storyboards/${storyboard.id}`}
-      className="group relative rounded-2xl bg-white/90 border border-[#E5DFC6] overflow-hidden hover:border-[#BFAD72] transition-colors"
+      className="group cursor-pointer space-y-2.5"
     >
-      {/* Cover */}
-      <div className="relative h-36 bg-gradient-to-br from-[#0a2225] to-[#0c4d47] flex items-center justify-center overflow-hidden">
+      {/* Clean image — Airbnb style */}
+      <div className="relative aspect-[4/3] overflow-hidden rounded-xl md:rounded-2xl">
         {storyboard.cover_image_url ? (
           <img
             src={storyboard.cover_image_url}
-            alt={storyboard.title || "Storyboard cover"}
-            className="h-full w-full object-cover"
+            alt={storyboard.title || "Storyboard"}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
           />
         ) : (
-          <ImageIcon className="h-8 w-8 text-[#BFAD72]/50" />
+          <div className="h-full w-full bg-[#F0EBE0] flex items-center justify-center">
+            <ImageIcon className="h-10 w-10 text-[#C7A962]/30" />
+          </div>
         )}
+
+        {/* Item count badge */}
         {typeof storyboard.item_count === "number" && storyboard.item_count > 0 && (
-          <span className="absolute top-2 right-2 rounded-full bg-black/50 backdrop-blur-sm px-2 py-0.5 text-[10px] font-medium text-white">
+          <span className="absolute top-2.5 right-2.5 rounded-full bg-black/50 backdrop-blur-sm px-2 py-0.5 text-[10px] font-medium text-white">
             {storyboard.item_count} item{storyboard.item_count !== 1 ? "s" : ""}
           </span>
         )}
+
+        {/* Convert to Trip hover CTA */}
+        <div
+          className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-[#0c4d47] text-[#E5DFC6] text-xs font-semibold text-center py-2.5 flex items-center justify-center gap-1 cursor-pointer"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            navigate(`/post-trip?fromStoryboard=${storyboard.id}`);
+          }}
+        >
+          Convert to Trip
+          <ArrowRight className="h-3 w-3" />
+        </div>
       </div>
 
-      {/* Info */}
-      <div className="p-4 space-y-1.5">
-        <h3 className="text-sm font-semibold line-clamp-1">
+      {/* Metadata below image */}
+      <div className="space-y-1 px-0.5">
+        <h3 className="font-secondary text-sm md:text-[15px] text-[#0a2225] font-medium leading-snug line-clamp-1">
           {storyboard.title || "Untitled storyboard"}
         </h3>
         {storyboard.description && (
-          <p className="text-xs text-[#8D8D8D] line-clamp-2">{storyboard.description}</p>
+          <p className="text-[13px] text-[#6B7280] line-clamp-1">{storyboard.description}</p>
         )}
         {storyboard.tags && storyboard.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1 pt-0.5">
             {storyboard.tags.slice(0, 3).map((tag) => (
-              <span key={tag} className="inline-flex rounded-full bg-[#f7f3ea] px-2 py-0.5 text-[9px] text-[#4a4a4a]">
+              <span
+                key={tag}
+                className="inline-flex rounded-full border border-[#E5DFC6] bg-[#FDF9F0]/50 px-1.5 py-0 text-[9px] text-[#6B7280]"
+              >
                 {tag}
               </span>
             ))}
           </div>
         )}
-      </div>
-
-      {/* Hover: Convert to Trip */}
-      <div
-        className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform bg-[#0c4d47] text-[#E5DFC6] text-xs font-semibold text-center py-2 flex items-center justify-center gap-1 cursor-pointer"
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          navigate(`/post-trip?fromStoryboard=${storyboard.id}`);
-        }}
-      >
-        Convert to Trip
-        <ArrowRight className="h-3 w-3" />
       </div>
     </Link>
   );
