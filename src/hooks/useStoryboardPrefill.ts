@@ -5,8 +5,22 @@ import { getStoryboardById, type Storyboard } from "@/services/storyboardsServic
 export type TripPrefill = {
   title: string;
   destination: string;
+  departure_city: string;
   description: string;
   tags: string[];
+  start_date: string;
+  end_date: string;
+  budget_min: string;
+  budget_max: string;
+  budget_level: string;
+  travelers_adults: string;
+  travelers_children: string;
+  occasion: string;
+  accommodation_style: string;
+  pace: string;
+  interests: string[];
+  flexibility: string;
+  special_notes: string;
 };
 
 export function useStoryboardPrefill() {
@@ -22,7 +36,6 @@ export function useStoryboardPrefill() {
 
   useEffect(() => {
     if (!storyboardId) return;
-
     let cancelled = false;
 
     async function load() {
@@ -39,19 +52,33 @@ export function useStoryboardPrefill() {
           return;
         }
 
+        const sbAny = sb as any;
+
         const title = sb.title || "Trip inspired by storyboard";
         const description = sb.description 
           ? `Inspired by "${sb.title}". ${sb.description}`
           : `Trip inspired by my Goldsainte storyboard.`;
-        
-        const tags = sb.tags || [];
 
         setSourceStoryboard(sb);
         setPrefill({
           title,
-          destination: "",
+          destination: sbAny.destination || "",
+          departure_city: sbAny.departure_city || "",
           description,
-          tags,
+          tags: sb.tags || [],
+          start_date: sbAny.start_date || "",
+          end_date: sbAny.end_date || "",
+          budget_min: sbAny.budget_min?.toString() || "",
+          budget_max: sbAny.budget_max?.toString() || "",
+          budget_level: sbAny.budget_level || "",
+          travelers_adults: sbAny.travelers_adults?.toString() || "2",
+          travelers_children: sbAny.travelers_children?.toString() || "0",
+          occasion: sbAny.occasion || "",
+          accommodation_style: sbAny.accommodation_style || "",
+          pace: sbAny.pace || "",
+          interests: sbAny.interests || [],
+          flexibility: sbAny.flexibility || "",
+          special_notes: sbAny.special_notes || "",
         });
       } catch (err: any) {
         console.error(err);
@@ -66,9 +93,7 @@ export function useStoryboardPrefill() {
     }
 
     load();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [storyboardId]);
 
   return { storyboardId, loading, prefill, sourceStoryboard, error };
