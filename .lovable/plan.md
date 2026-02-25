@@ -1,75 +1,65 @@
 
 
-# Proposal Submission Flow — End-to-End Test Results
+# Traveler Briefs Not Showing — Root Cause & Fix
 
-## Critical Bug Found: Proposals Cannot Be Submitted
+## Problem
 
-The proposal form in `TripRequestDetail.tsx` has a **blocking bug** that prevents any agent or creator from successfully submitting a proposal.
+The database has 8 open trip requests, but the marketplace shows "No traveler briefs yet."
 
-### Root Cause
+## Root Cause
 
-The `handleSubmitProposal` function (line 365-386) inserts into `trip_proposals` but **never sets `proposer_id`**:
+The query in `Marketplace.tsx` uses this join:
 
 ```typescript
-// Current code — proposer_id is MISSING
-const { data: proposalData, error: proposalError } = await supabase
-  .from("trip_proposals")
-  .insert({
-    trip_request_id: id,
-    ...(proposerRole === 'agent' ? { agent_id: user.id } : { creator_id: user.id }),
-    price_from: parseFloat(newProposal.priceFrom),
-    // ...
-  } as any)
+profiles!trip_requests_user_id_fkey(full_name, avatar_url)
 ```
 
-This fails for two reasons:
+But the foreign key `trip_requests_user_id_fkey` points to **`auth.users`**, not `public.profiles`. PostgREST cannot resolve this join hint, so the entire query fails silently (or returns an error that gets swallowed), resulting in zero results.
 
-1. **Schema requirement**: `proposer_id` is a required (non-nullable) column on `trip_proposals`. The insert will fail with a NOT NULL constraint violation.
-2. **RLS policy**: The only INSERT policy is `auth.uid() = proposer_id`. Without `proposer_id`, RLS will reject the row even if the schema somehow allowed it.
+## Fix
 
-### Secondary Issue
+### File: `src/pages/Marketplace.tsx`
 
-`acknowledged_goldsainte_policies` is not a column in the `trip_proposals` table. The `as any` cast hides this TypeScript error. The database will either silently ignore it or error.
+Remove the FK hint from the profiles join. Since `trip_requests.user_id` and `profiles.id` share the same UUID values, PostgREST can infer the relationship if there's a FK from profiles to auth.users — but the safest approach is to drop the explicit hint and let PostgREST auto-detect via column name matching:
 
-### Additional Issue: `inclusions`/`exclusions` type mismatch
-
-The form sends these as plain strings, but the schema defines them as `string[]` (arrays). The insert may fail or store incorrectly.
-
-## Fix Plan
-
-### File: `src/pages/marketplace/TripRequestDetail.tsx`
-
-**1. Add `proposer_id` and `proposer_role` to the insert** (line ~367):
 ```typescript
-.insert({
-  trip_request_id: id,
-  proposer_id: user.id,           // ← ADD THIS (required)
-  proposer_role: proposerRole,    // ← ADD THIS (required)
-  ...(proposerRole === 'agent' ? { agent_id: user.id } : { creator_id: user.id }),
-  price_from: parseFloat(newProposal.priceFrom),
-  // ...rest
-})
+.select(`
+  *,
+  profiles(full_name, avatar_url),
+  trip_proposals(count)
+`)
 ```
 
-**2. Remove `acknowledged_goldsainte_policies`** from the insert object — it's not a database column.
+If PostgREST still can't infer the join (because there's no direct FK between `trip_requests` and `profiles`), we fall back to fetching profiles separately after the main query — similar to what `tripRequestsService.ts` already does.
 
-**3. Fix `inclusions`/`exclusions` to send as arrays**, splitting the textarea by newlines:
+### Fallback approach (if the implicit join doesn't work)
+
+Fetch trip requests without the profiles join, then batch-fetch profiles by user_id:
+
 ```typescript
-inclusions: newProposal.included ? newProposal.included.split('\n').filter(Boolean) : null,
-exclusions: newProposal.notIncluded ? newProposal.notIncluded.split('\n').filter(Boolean) : null,
+const { data, error } = await supabase
+  .from("trip_requests")
+  .select(`*, trip_proposals(count)`)
+  .eq("status", "open")
+  .order("created_at", { ascending: false });
+
+// Then fetch profiles for all unique user_ids
+const userIds = [...new Set(data.map(r => r.user_id).filter(Boolean))];
+const { data: profiles } = await supabase
+  .from("profiles")
+  .select("id, full_name, avatar_url")
+  .in("id", userIds);
+
+// Merge profiles into requests
 ```
 
-**4. Remove the `as any` cast** so TypeScript can catch future schema mismatches.
+This mirrors the pattern already used in `tripRequestsService.ts` (lines 68-75).
 
-### Summary of Changes
+## Files to Edit
 
-| Issue | Severity | Fix |
-|---|---|---|
-| Missing `proposer_id` | **P0 — blocks all submissions** | Add `proposer_id: user.id` to insert |
-| Missing `proposer_role` in insert | P0 — required column | Add `proposer_role: proposerRole` |
-| `acknowledged_goldsainte_policies` not a column | P2 — silently ignored or errors | Remove from insert |
-| `inclusions`/`exclusions` sent as strings, schema expects arrays | P1 — data corruption | Split by newline into arrays |
-| `as any` cast hiding type errors | P2 — maintenance risk | Remove cast |
+| File | Change |
+|---|---|
+| `src/pages/Marketplace.tsx` | Fix the profiles join in the `trip-requests-unified` query — remove the broken FK hint or switch to a two-step fetch |
 
-Single file to edit: `src/pages/marketplace/TripRequestDetail.tsx`
+Single file, single query fix. No database changes needed.
 
