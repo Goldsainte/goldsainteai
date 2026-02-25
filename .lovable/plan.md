@@ -1,35 +1,39 @@
 
+# Add Two New Featured Destinations to Curated Journeys
 
-# Airbnb-Style Card Redesign for "Choose How You Join" Section
+## Destinations to Add
 
-## Current State
-The role cards use a fixed-height image (`h-44`) with a dark gradient overlay and an icon badge overlaid on the image. This is the same editorial pattern we already replaced in the marketplace and Curated Journeys sections.
+1. **Marrakech, Morocco** -- A luxury riad and desert experience
+2. **Swiss Alps, Switzerland** -- A premium alpine escape
 
-## Changes
+Both will be inserted into the `packaged_trips` table as `platform`-curated, `published`, and `is_featured = true` trips, matching the exact data pattern of the existing 6 trips.
 
-### File: `src/components/home/RoleSpecificCTAs.tsx`
+## Database Insert
 
-1. **Image aspect ratio**: Replace `h-44` with `aspect-[4/3]` for consistent landscape ratio matching marketplace cards
-2. **Remove gradient overlay**: Delete the `bg-gradient-to-t from-black/40` div
-3. **Remove icon overlay from image**: Move the role icon out of the image area and into the metadata section below
-4. **Clean image**: Image becomes a clean, unobstructed photo with rounded corners and hover scale effect
-5. **Restructure content below image**: Icon + title on same row, body text, then CTA button — cleaner visual hierarchy
-6. **Card styling**: Remove border, use lighter shadow approach matching marketplace cards (rounded-xl, no border, subtle shadow)
+Two new rows in `packaged_trips` with these values:
 
-### Card structure after change:
-```text
-┌─────────────────────┐
-│                     │
-│   Clean image 4:3   │
-│   (no overlay)      │
-│                     │
-├─────────────────────┤
-│ 🔵 Title            │
-│ Description text    │
-│ [CTA Button]       │
-│ Browse link         │
-└─────────────────────┘
-```
+| Field | Marrakech | Swiss Alps |
+|-------|-----------|------------|
+| title | Marrakech Riad & Desert Escape | Swiss Alps Alpine Retreat |
+| slug | marrakech | swiss-alps |
+| destination | Marrakech, Morocco | Swiss Alps, Switzerland |
+| duration_days | 6 | 5 |
+| duration_nights | 5 | 4 |
+| price_per_person | 2,599 | 3,999 |
+| currency | USD | USD |
+| creator_type | platform | platform |
+| status | published | published |
+| is_featured | true | true |
+| cover_image_url | Unsplash Marrakech photo | Unsplash Swiss Alps photo |
+| highlights | `["Luxury Riad Stay", "Sahara Desert Tour", "Souk Experience"]` | `["Mountain Views", "Luxury Chalet", "Alpine Wellness"]` |
+| description | Curated luxury experience... | Premium alpine escape... |
 
-No other files affected.
+**Cover images** will use high-quality Unsplash photos matching the existing aesthetic (landscape-oriented, editorial quality):
+- Marrakech: `https://images.unsplash.com/photo-1597212618440-806262de4f6b?w=1200`
+- Swiss Alps: `https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1200`
 
+## No Code Changes Needed
+
+The `StoryboardsHighlight` component already queries all `packaged_trips` where `is_featured = true` and `status = 'published'`, so these new trips will appear automatically in the grid once inserted. The Airbnb-style card layout (aspect-[4/3], clean image, metadata below) will apply automatically.
+
+The grid will go from 6 to 8 trips, filling two full rows in the 4-column desktop layout.
