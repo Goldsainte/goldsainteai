@@ -1,52 +1,40 @@
 
 
-# Delete Creator Studio (TikTok Lab)
+# Merge Inspiration Browsing into Post a Trip (Step 4)
 
-## Scope
+## What you're asking
+Right now, the Post a Trip wizard (Step 4 — "Build your visual brief") only shows the `StoryboardBuilder` which requires travelers to **search** for photos or experiences. Separately, the homepage and standalone storyboard pages have a beautiful browsable masonry grid of curated travel inspiration photos (the `TravelStoryboard` component pulling from the media library). You want that browsable inspiration gallery **merged into** the Post a Trip Step 4 so travelers can browse and tap photos to add them to their storyboard without needing to search.
 
-Remove the Creator Studio feature entirely — the `/tiktok-lab` routes, dashboard page, TikTok story composer, earnings page, partner trips page, and all navigation links pointing to it. Storyboard routes (`/storyboards/*`) are kept since they exist independently.
+## Changes
 
-## Files to Delete (6 files)
+### 1. `src/pages/trips/PostTripPage.tsx` — Add inspiration gallery below StoryboardBuilder
+- Import `TravelStoryboard` component
+- In Step 4 (currentStep === 3), add a new section below the `StoryboardBuilder` titled something like "Browse inspiration" with the `TravelStoryboard` masonry grid
+- Wire `onImageClick` so tapping a photo from the gallery adds it to the storyboard builder's items list
+- Pass the destination as a highlight tag to surface relevant images first
 
-1. `src/pages/TikTokLab.tsx` — legacy TikTok Lab composer page
-2. `src/pages/TikTokLabPage.tsx` — landing/marketing page for Creator Lab
-3. `src/pages/tiktok/TikTokLabDashboardPage.tsx` — Creator Studio dashboard
-4. `src/pages/tiktok/TikTokEarningsPage.tsx` — Creator earnings page
-5. `src/pages/tiktok/PartnerTripsPage.tsx` — Partner trips page (served at `/tiktok-lab/trips`)
-6. `src/services/creatorLabService.ts` — Creator Lab metrics service
+### 2. `src/components/storyboards/StoryboardBuilder.tsx` — Expose an `addExternalPhoto` method
+- Currently photos can only be added via internal Unsplash search results. We need to expose a way for the parent (PostTripPage) to programmatically add a photo item to the builder's `items` state
+- Add an `externalAddRef` prop (a `React.MutableRefObject`) that exposes an `addPhoto(url, label)` function, OR
+- Simpler approach: accept an `onImageClick` callback pattern where the parent passes clicked images down. Since the builder owns the items state, the cleanest approach is to add an imperative ref that lets the parent push items into the builder
 
-## Files to Edit (7 files)
+### 3. No standalone storyboard routes removed
+The standalone `/storyboards/new` pages stay for agents/creators who use them independently. This change only enhances the traveler Post a Trip flow.
 
-### 1. `src/routes/AppRoutes.tsx`
-- Remove lazy imports: `TikTokLabDashboardPage`, `TikTokEarningsPage`, `TikTokLabPage`, `TikTokLab` (the legacy one)
-- Remove all `/tiktok-lab` routes (lines 402-413 and 471-478): dashboard, trips, earnings, and legacy storyboard redirects
-- Keep `/storyboards` routes as-is
+## How it works for the traveler
 
-### 2. `src/components/social/LeftNav.tsx`
-- Remove the "Creator Studio" nav item block (the `NavItemLink` to `/tiktok-lab` with the `Video` icon), including the conditional `(isCreator || isAgentAccount || isBrand)` wrapper
-- Remove the `Video` icon import
+Step 4 of Post a Trip will now show:
+1. The existing `StoryboardBuilder` (search for photos, experiences, paste links) at the top
+2. A new "Browse inspiration" section below with the curated masonry grid from `TravelStoryboard`
+3. Tapping any photo in the gallery instantly adds it to the storyboard preview above
+4. The rest of the flow (auto-save on Next, linking to trip request) stays the same
 
-### 3. `src/components/Footer.tsx`
-- Remove both footer links to `/tiktok-lab` ("Creator Studio") — appears in two footer column variants
+## Technical detail
 
-### 4. `src/components/FeedSidebar.tsx`
-- Remove the `{ to: "/tiktok-lab", icon: Video, label: "Goldsainte Creator Lab" }` sidebar entry
+The `StoryboardBuilder` component will gain an `addItemRef` prop:
+```typescript
+addItemRef?: React.MutableRefObject<((item: Item) => void) | null>;
+```
 
-### 5. `src/pages/CreatorsPage.tsx`
-- Remove the "Creator Studio" button that navigates to `/tiktok-lab` (lines ~369-378)
-- Remove the `showCreatorLabButton` variable and its conditional
-
-### 6. `src/components/home/TikTokLabHighlight.tsx`
-- Remove or gut this component since it links to `/tiktok-lab`; alternatively delete the file and remove its usage from wherever it's imported
-
-### 7. `src/pages/trips/TripRequestDetailPage.tsx`
-- Change the back link from `/tiktok-lab` to `/marketplace` for non-traveler users
-
-### 8. `src/components/CuratedDestinationCollections.tsx` and `src/components/TopDestinationsSection.tsx`
-- Change `navigate('/tiktok-lab/storyboards')` to `navigate('/storyboards')` (the storyboards route still exists)
-
-## What stays
-- `/storyboards`, `/storyboards/new`, `/storyboards/:id` routes and their pages remain — storyboards are a standalone feature
-- Creator Dashboard at `/creator-dashboard` remains (separate feature)
-- TikTok OAuth callback page remains (may be useful for future integrations)
+The parent (`PostTripPage`) will hold this ref and pass it to `StoryboardBuilder`. When a `TravelStoryboard` image is clicked, the parent calls `addItemRef.current(...)` to inject the photo into the builder's items array. This avoids lifting state out of the builder while still allowing external additions.
 
