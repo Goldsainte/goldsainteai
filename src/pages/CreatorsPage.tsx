@@ -5,7 +5,7 @@ import type { Database } from "@/integrations/supabase/types";
 import { useNavigate } from "react-router-dom";
 import { BackButton } from "@/components/ui/BackButton";
 import { useAuth } from "@/contexts/AuthContext";
-import { Sparkles } from "lucide-react";
+
 
 type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 
@@ -119,7 +119,7 @@ export default function CreatorsPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const accountType = ((user as any)?.user_metadata?.account_type as string | undefined)?.toLowerCase() ?? null;
-  const showCreatorLabButton = accountType === "creator" || accountType === "agent" || accountType === "brand";
+  
 
   useEffect(() => {
     async function loadCreators() {
@@ -366,16 +366,6 @@ export default function CreatorsPage() {
         >
           Post a trip brief
         </button>
-        {showCreatorLabButton && (
-          <button
-            type="button"
-            className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#0a3d39]"
-            onClick={() => navigate("/tiktok-lab")}
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-            Creator Studio
-          </button>
-        )}
       </div>
     </div>
   );

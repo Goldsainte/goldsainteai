@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { usePanelStore } from "@/stores/panelStore";
-import { Home, Users, Video, Search, MessageCircle, Bell, BarChart3, User2, Store, Building, PlaneTakeoff, Sparkles } from "lucide-react";
+import { Home, Users, Search, MessageCircle, Bell, BarChart3, User2, Store, Building, PlaneTakeoff, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
@@ -44,10 +44,6 @@ export default function LeftNav() {
         <NavItemLink to="/browse-creators"><Users className="w-6 h-6" /> Browse Creators</NavItemLink>
         <NavItemLink to="/browse-agents"><Building className="w-6 h-6" /> Browse Agents</NavItemLink>
         
-        {/* TikTok Lab - Creators, Agents, Brands only */}
-        {(isCreator || isAgentAccount || isBrand) && (
-          <NavItemLink to="/tiktok-lab"><Video className="w-6 h-6" /> Creator Studio</NavItemLink>
-        )}
         
         <NavItemLink to="/post-trip"><PlaneTakeoff className="w-6 h-6" /> Post a Trip</NavItemLink>
         
