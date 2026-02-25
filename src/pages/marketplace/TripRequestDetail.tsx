@@ -366,21 +366,22 @@ export default function TripRequestDetail() {
         .from("trip_proposals")
         .insert({
           trip_request_id: id,
+          proposer_id: user.id,
+          proposer_role: proposerRole,
           ...(proposerRole === 'agent' ? { agent_id: user.id } : { creator_id: user.id }),
           price_from: parseFloat(newProposal.priceFrom),
           currency: "USD",
           nights: parseInt(newProposal.timelineLabel) || 7,
           status: "sent",
-          inclusions: newProposal.included || null,
-          exclusions: newProposal.notIncluded || null,
+          inclusions: newProposal.included ? newProposal.included.split('\n').filter(Boolean) : null,
+          exclusions: newProposal.notIncluded ? newProposal.notIncluded.split('\n').filter(Boolean) : null,
           message: newProposal.itineraryOverview,
           headline: newProposal.fitReason || `${proposerRole === "agent" ? "Agent" : "Creator"} proposal`,
           cancellation_policy_id: newProposal.cancellationPolicyId || null,
           custom_cancellation_terms: newProposal.customCancellationTerms || null,
           deposit_percentage: newProposal.depositPercentage ? parseFloat(newProposal.depositPercentage) : null,
           deposit_due_days: newProposal.depositDueDays ? parseInt(newProposal.depositDueDays) : null,
-          acknowledged_goldsainte_policies: true,
-        } as any)
+        })
         .select()
         .single();
       if (proposalError) throw proposalError;
