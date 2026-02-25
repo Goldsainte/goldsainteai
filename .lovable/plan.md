@@ -1,39 +1,58 @@
 
 
-# Remove Experiences from Storyboard and Post a Trip
+# Infinite Rotating Inspiration Carousel for Post a Trip Step 4
 
-## Scope
-Strip out the "Experiences" tab (Viator search integration) from the `StoryboardBuilder` component and remove the `ExperienceCard` component. This removes the ability to search/add Viator experiences from storyboards and the Post a Trip wizard. Photos and links remain.
+## Problem
+The current "browse curated inspiration" section in Step 4 renders a static masonry grid of 24 images fetched once from the media library. The user wants this to feel like an endlessly rotating stream of thousands of food, travel, luxury, and vacation photos that the traveler can browse and tap to add.
 
-## Files to Delete (1 file)
-1. `src/components/storyboards/ExperienceCard.tsx` — standalone experience card component
+## Approach
+Replace the static `TravelStoryboard` masonry grid in Step 4 with a new `InspirationCarousel` component — a horizontally auto-scrolling strip of photo cards that:
 
-## Files to Edit
+1. **Fetches in pages** from `storyboard_media_library` (e.g. 50 images per batch), loading more as the user scrolls or as the carousel loops
+2. **Auto-scrolls continuously** like a ticker/marquee, pausing on hover so users can tap
+3. **Shows multiple rows** (2 rows of horizontal scroll) to maximize density
+4. **Renders thousands over time** by paginating with random offset ordering so each session feels fresh
+5. Tapping a photo still calls the existing `storyboardAddItemRef.current?.(...)` to add it to the builder
 
-### 1. `src/components/storyboards/StoryboardBuilder.tsx`
-- Remove `ViatorProduct` type definition (lines 31-42)
-- Remove `MapPin` from lucide imports
-- Remove `"experience"` from the `Item.kind` union and `"viator"` from `Item.source` union
-- Change `activeTab` state type from `"photos" | "experiences" | "links"` to `"photos" | "links"`
-- Remove `experienceResults` state (line 61)
-- Remove the `else if (activeTab === "experiences")` branch in `runSearch()` (lines 99-110)
-- Remove `addExperience()` function (lines 136-154)
-- Remove `buildViatorBookingUrl()` function (lines 156-165)
-- Remove the Experiences `TabButton` (lines 300-305)
-- Update search placeholder to remove the experiences variant (line 322-324 — just use the photos placeholder always)
-- Remove the entire `activeTab === "experiences"` results block (lines 382-452)
-- Remove the `item.kind === "experience"` preview block (lines 502-516)
-- Update empty-state text from "photos, experiences and links" to "photos and links" (lines 456-458 and 486-487)
+## Changes
 
-### 2. `src/components/storyboards/TravelStoryboard.tsx`
-- Remove `ExperienceCard` import (line 5)
-- In the items render (lines 210-228), remove the `ExperienceCard` fallback for non-image items; either skip non-image items or render a simple text fallback
+### 1. New component: `src/components/storyboards/InspirationCarousel.tsx`
+- Two horizontal rows of portrait-aspect photo cards auto-scrolling in opposite directions (top row left, bottom row right) for visual richness
+- Uses CSS `@keyframes` marquee animation on the row containers for smooth infinite scroll
+- Pauses animation on hover (`[&:hover]` sets `animation-play-state: paused`)
+- Each image is a clickable card — on tap, fires `onImageClick(image)`
+- Loads images from `storyboard_media_library` with `mood_tags` filtering for luxury aesthetic
+- Fetches 100+ images, splits into two rows, duplicates each row's content to create seamless loop illusion
+- Random ordering (`order` by random seed) so every page load shows different sequence
 
-### 3. `src/i18n/locales/en.json`
-- Update `storyboardDescription` (line 87) to remove "and Viator experiences" from the copy
+### 2. Edit: `src/pages/trips/PostTripPage.tsx` (lines 551-577)
+- Replace the `TravelStoryboard` import and usage with the new `InspirationCarousel`
+- Keep the same `onImageClick` handler wiring
+- Update the header text to something like "Browse thousands of curated photos — tap to add"
 
-## What stays
-- The `viator-search` edge function stays deployed (no harm, may be useful later)
-- Photos tab and Links tab remain fully functional
-- The inspiration gallery (`TravelStoryboard`) in Post a Trip Step 4 remains
+### 3. Edit: `tailwind.config.ts`
+- Add `scroll-left` and `scroll-right` keyframe animations for the marquee effect:
+  - `scroll-left`: `translateX(0)` → `translateX(-50%)` (since content is doubled)
+  - `scroll-right`: `translateX(-50%)` → `translateX(0)`
+- Duration ~60s for smooth, leisurely pace
+
+## How it works visually
+
+```text
+┌──────────────────────────────────────────────┐
+│  ← ← ← Row 1 scrolling left  ← ← ←        │
+│  [img][img][img][img][img][img][img]...       │
+│                                              │
+│  → → → Row 2 scrolling right → → →          │
+│  [img][img][img][img][img][img][img]...       │
+└──────────────────────────────────────────────┘
+  Hover pauses. Tap any image → added to builder.
+```
+
+Each row contains ~50 images duplicated (so 100 DOM nodes per row), creating a seamless infinite loop via CSS animation. Two rows scrolling opposite directions creates a dynamic, living gallery feel. Portrait aspect cards (`aspect-[3/4]`, ~120px wide) keep it compact in the wizard.
+
+## What stays the same
+- The `TravelStoryboard` component itself is untouched (used elsewhere)
+- The `storyboardAddItemRef` wiring and item format stay identical
+- The StoryboardBuilder above remains unchanged
 
