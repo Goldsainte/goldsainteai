@@ -1,93 +1,47 @@
 
 
-# Convert to Trip: Pre-fill Post-a-Trip with Storyboard Data
+# Add Search Bar to My Storyboards Page + Link Storage Clarity
 
-## Problem
-When a user clicks "Convert to Trip" on a storyboard card, two things are broken:
-1. On the TikTokLab StoryboardsPage, the card links to the storyboard detail page instead of `/post-trip?fromStoryboard=ID`
-2. When arriving at `/post-trip?fromStoryboard=ID`, the storyboard's images and items are NOT loaded into the StoryboardBuilder on Step 4 — the builder starts empty because the existing TODO on line 64 of `StoryboardBuilder.tsx` was never implemented
+## Answers to Your Questions
 
-## Changes
+**Where are links stored?**
+Links are saved in the `storyboard_items` table as rows with `item_type = 'video'`, `source_type = 'tiktok' / 'youtube' / 'instagram' / 'manual'`, and the URL stored inside the `metadata` JSONB column (as `{ url: "..." }`).
 
-### 1. `src/pages/TikTokLab/StoryboardsPage.tsx` — Fix "Convert to Trip" click target
+**Can users see their added links?**
+Yes — when viewing/editing a storyboard via StoryboardBuilder, links appear in the "Storyboard preview" section as dark cards showing the source platform and URL. However, on the My Storyboards listing page there is currently no inline preview of links.
 
-The StoryboardCard is currently a `<Link to={/storyboards/${id}}>` with a hover overlay saying "Convert to Trip". The hover overlay needs to intercept the click and navigate to `/post-trip?fromStoryboard=${id}` instead of going to the detail page. The card itself should still link to the detail page for normal clicks (on the top portion).
+**Do links convert when posting a trip?**
+Yes. When "Convert to Trip" is clicked, the `storyboardId` is passed to the Post a Trip wizard, and StoryboardBuilder loads ALL items (photos AND links) from `storyboard_items`. Links are included in the conversion.
 
-- Add an `onClick` handler on the "Convert to Trip" overlay that calls `e.preventDefault(); e.stopPropagation(); navigate(/post-trip?fromStoryboard=${id})`
-- Import `useNavigate` (wrap the card list in a component or use inline navigation)
+---
 
-### 2. `src/hooks/useStoryboardPrefill.ts` — Include storyboard items in prefill
+## Problem: Missing Search Bar
 
-Currently the hook loads the storyboard via `getStoryboardById` (which already fetches items), but only extracts title/description/tags into `prefill`. The storyboard items are available on `sourceStoryboard.items` but never used.
+The search bar (photo search + link paste) lives inside `StoryboardBuilder`, which is only rendered on the storyboard editor page (`/storyboards/new` or `/storyboards/:id`). The My Storyboards listing page (`/storyboards`) only shows `TravelStoryboard` (a curated gallery) under "Browse Inspiration" — it has no search/add capability.
 
-No changes needed here — `sourceStoryboard` already contains `items`. The consumer (PostTripPage) needs to use them.
+## Plan
 
-### 3. `src/pages/trips/PostTripPage.tsx` — Pass storyboard ID and set it when prefilling from storyboard
+### `src/pages/TikTokLab/StoryboardsPage.tsx`
 
-When `fromStoryboard` is present:
-- Set `storyboardId` state to the storyboard's ID so the StoryboardBuilder knows it's editing an existing board
-- Pass `storyboardId={storyboardIdFromQuery || storyboardId}` to StoryboardBuilder on Step 4
+Add a search + link input section above "Browse Inspiration":
 
-Add a `useEffect` that sets `storyboardId` from the query param:
-```tsx
-useEffect(() => {
-  if (storyboardIdFromQuery && !storyboardId) {
-    setStoryboardId(storyboardIdFromQuery);
-  }
-}, [storyboardIdFromQuery]);
-```
+1. **Photo search bar** — a text input + "Search" button that calls the `unsplash-search` edge function (same as StoryboardBuilder does). Results display as a grid of clickable images.
 
-Update the StoryboardBuilder usage to pass the storyboard ID:
-```tsx
-<StoryboardBuilder
-  storyboardId={storyboardId || undefined}
-  mode="traveler"
-  ...
-/>
-```
+2. **Link paste bar** — a text input + "Add" button for TikTok/Reels/YouTube URLs.
 
-### 4. `src/components/storyboards/StoryboardBuilder.tsx` — Load existing items when storyboardId is provided
+3. **Storyboard selector** — when the user clicks a photo or adds a link, show a small dropdown/dialog asking "Which storyboard?" listing their existing boards (or "Create new"). Then call the `save-to-storyboard` edge function to persist the item.
 
-Replace the TODO on line 62-65 with actual loading logic:
-```tsx
-useEffect(() => {
-  if (!storyboardId) return;
-  let cancelled = false;
+4. **Tab toggle** — "Photos" and "Links" tabs matching the StoryboardBuilder pattern, so users can switch between searching photos and pasting links.
 
-  async function loadItems() {
-    const { data, error } = await supabase
-      .from("storyboard_items")
-      .select("*")
-      .eq("storyboard_id", storyboardId)
-      .order("position", { ascending: true });
+### Files to Edit
 
-    if (cancelled || error) return;
+- **`src/pages/TikTokLab/StoryboardsPage.tsx`** — Add the search/link section between the storyboard grid and "Browse Inspiration". Include:
+  - Photo/Link tab toggle
+  - Search input + results grid (photos tab)
+  - Link paste input (links tab)
+  - Storyboard picker dialog (reuse existing storyboard list from state)
+  - Call `unsplash-search` edge function for photo search
+  - Call `save-to-storyboard` edge function to persist items
 
-    const mapped = (data || []).map(item => ({
-      id: item.id,
-      kind: (item.item_type === "image" ? "photo" : item.item_type) as Item["kind"],
-      source: (item.source_type || "manual") as Item["source"],
-      data: {
-        thumb_url: item.image_url,
-        full_url: item.image_url,
-        alt: item.title || "Storyboard item",
-        title: item.title,
-        ...(item.metadata as Record<string, any> || {}),
-      },
-    }));
-
-    setItems(mapped);
-  }
-
-  loadItems();
-  return () => { cancelled = true; };
-}, [storyboardId]);
-```
-
-This ensures that when a user converts a storyboard to a trip, all their saved photos/items appear in the Step 4 builder, pre-populated and ready to submit.
-
-## Files to Edit
-1. `src/pages/TikTokLab/StoryboardsPage.tsx` — Fix Convert to Trip click to navigate to `/post-trip?fromStoryboard=ID`
-2. `src/pages/trips/PostTripPage.tsx` — Set storyboardId from query param, pass to StoryboardBuilder
-3. `src/components/storyboards/StoryboardBuilder.tsx` — Load existing storyboard items when storyboardId is provided
+No database changes needed — all tables and edge functions already exist.
 
