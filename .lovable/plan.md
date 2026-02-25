@@ -1,44 +1,36 @@
 
 
-# Send Email Notification on "Request to Book"
+# Redesign Trip Request Cards to Match Airbnb-Style LiveTripCard
 
 ## Problem
-When a traveler clicks "Request to Book" on a platform trip, the system inserts a row into `booking_interests` and shows a toast — but no email is sent to the Goldsainte team (concierge/admin), so the team never knows someone wants to book.
+The Trip Request cards in the marketplace (`TripRequestGrid.tsx`) use a bordered card container with a gradient overlay on images and boxed content — visually different from the clean, minimal Airbnb-style layout used by the "Ready to Book" cards (`LiveTripCard.tsx`).
 
 ## Solution
-Create a new edge function `notify-booking-interest` that sends an email via Resend to the concierge/admin team whenever a booking interest is created. Then call it from `TripBookingSidebar` after the successful insert.
+Restyle `TripRequestGrid.tsx` to match the `LiveTripCard` pattern: no card border/container, clean rounded image (aspect-[4/3]), content below with `font-secondary` serif title, `text-[#6B7280]` metadata, and no gradient overlay on the image.
 
-## Implementation
+### File: `src/components/marketplace/TripRequestGrid.tsx`
 
-### 1. New Edge Function: `supabase/functions/notify-booking-interest/index.ts`
-- Accepts `{ bookingInterestId, userId, tripId }`
-- Uses service role key to fetch:
-  - Traveler profile (name, email) from `profiles`
-  - Trip details (title, destination, price) from `packaged_trips`
-- Sends a branded Goldsainte email via Resend to `concierge@goldsainte.com` (configurable via `CONCIERGE_EMAIL` secret) containing:
-  - Traveler name and email
-  - Trip name and destination
-  - Timestamp of interest
-  - Link to view the booking interest in admin
-- Also creates an in-app notification for admin users
-- Uses the same Goldsainte email template style as the proposal-received email (cream/gold/dark teal palette)
+**Changes:**
+- Remove the bordered card wrapper (`border border-[#E5DFC6]/40 bg-white shadow-sm`) — use a clean `group cursor-pointer space-y-2.5` container like LiveTripCard
+- Image: switch from `h-40` to `aspect-[4/3]` with `rounded-xl md:rounded-2xl`, remove the dark gradient overlay
+- Destination: move from an overlay pill on the image to a `text-[13px] text-[#6B7280]` line below the title with `MapPin` icon (matching LiveTripCard)
+- Title: use `font-secondary text-sm md:text-[15px] text-[#0a2225] font-medium` matching LiveTripCard
+- Remove the description paragraph (LiveTripCard doesn't show descriptions)
+- Budget and date: use the same `text-[13px] text-[#6B7280]` style with small icons, matching LiveTripCard's metadata lines
+- Grid: switch to `gap-x-6 gap-y-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4` to match LiveTripGrid
 
-### 2. Update `src/components/trips/TripBookingSidebar.tsx`
-- After successful `booking_interests` insert (line 70), invoke the new edge function:
-  ```typescript
-  supabase.functions.invoke("notify-booking-interest", {
-    body: { bookingInterestId: data.id, userId: user.id, tripId }
-  });
-  ```
-- Fire-and-forget (don't block the user flow on email delivery)
+### Technical Detail
+The card structure will mirror `LiveTripCard` exactly:
+```
+article (space-y-2.5, no border)
+  └─ div (aspect-[4/3], rounded-xl, overflow-hidden)
+      └─ img (clean, no gradient overlay)
+  └─ div (space-y-1, px-0.5)
+      └─ h3 (font-secondary, title + budget on same row)
+      └─ p (MapPin + destination)
+      └─ p (Calendar + posted date)
+```
 
-### 3. Config: `supabase/config.toml`
-- Add `[functions.notify-booking-interest]` with `verify_jwt = false`
-
-### 4. Secret needed
-- `CONCIERGE_EMAIL` — the email address that should receive booking interest notifications (e.g. `concierge@goldsainte.com`). Falls back to fetching admin users from `admin_users` table if not set.
-
-## Files
-- **New**: `supabase/functions/notify-booking-interest/index.ts`
-- **Edit**: `src/components/trips/TripBookingSidebar.tsx` (add function invoke after insert)
+## Files Modified (1 file)
+- `src/components/marketplace/TripRequestGrid.tsx`
 
