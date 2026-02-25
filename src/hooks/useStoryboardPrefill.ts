@@ -21,6 +21,10 @@ export type TripPrefill = {
   interests: string[];
   flexibility: string;
   special_notes: string;
+  trip_length_days: string;
+  budget_per_person: boolean;
+  must_haves: string[];
+  dealbreakers: string[];
 };
 
 export function useStoryboardPrefill() {
@@ -79,6 +83,10 @@ export function useStoryboardPrefill() {
           interests: sbAny.interests || [],
           flexibility: sbAny.flexibility || "",
           special_notes: sbAny.special_notes || "",
+          trip_length_days: sbAny.trip_length_days?.toString() || "",
+          budget_per_person: sbAny.budget_per_person ?? false,
+          must_haves: sbAny.must_haves || [],
+          dealbreakers: sbAny.dealbreakers || [],
         });
       } catch (err: any) {
         console.error(err);

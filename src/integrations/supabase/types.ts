@@ -9012,8 +9012,10 @@ export type Database = {
           budget_level: string | null
           budget_max: number | null
           budget_min: number | null
+          budget_per_person: boolean | null
           cover_image_url: string | null
           created_at: string
+          dealbreakers: string[] | null
           departure_city: string | null
           description: string | null
           destination: string | null
@@ -9022,6 +9024,7 @@ export type Database = {
           id: string
           interests: string[] | null
           is_public: boolean
+          must_haves: string[] | null
           occasion: string | null
           original_storyboard_id: string | null
           owner_id: string
@@ -9035,6 +9038,7 @@ export type Database = {
           title: string
           travelers_adults: number | null
           travelers_children: number | null
+          trip_length_days: number | null
           trip_request_id: string | null
           updated_at: string
           view_count: number
@@ -9044,8 +9048,10 @@ export type Database = {
           budget_level?: string | null
           budget_max?: number | null
           budget_min?: number | null
+          budget_per_person?: boolean | null
           cover_image_url?: string | null
           created_at?: string
+          dealbreakers?: string[] | null
           departure_city?: string | null
           description?: string | null
           destination?: string | null
@@ -9054,6 +9060,7 @@ export type Database = {
           id?: string
           interests?: string[] | null
           is_public?: boolean
+          must_haves?: string[] | null
           occasion?: string | null
           original_storyboard_id?: string | null
           owner_id: string
@@ -9067,6 +9074,7 @@ export type Database = {
           title: string
           travelers_adults?: number | null
           travelers_children?: number | null
+          trip_length_days?: number | null
           trip_request_id?: string | null
           updated_at?: string
           view_count?: number
@@ -9076,8 +9084,10 @@ export type Database = {
           budget_level?: string | null
           budget_max?: number | null
           budget_min?: number | null
+          budget_per_person?: boolean | null
           cover_image_url?: string | null
           created_at?: string
+          dealbreakers?: string[] | null
           departure_city?: string | null
           description?: string | null
           destination?: string | null
@@ -9086,6 +9096,7 @@ export type Database = {
           id?: string
           interests?: string[] | null
           is_public?: boolean
+          must_haves?: string[] | null
           occasion?: string | null
           original_storyboard_id?: string | null
           owner_id?: string
@@ -9099,6 +9110,7 @@ export type Database = {
           title?: string
           travelers_adults?: number | null
           travelers_children?: number | null
+          trip_length_days?: number | null
           trip_request_id?: string | null
           updated_at?: string
           view_count?: number
