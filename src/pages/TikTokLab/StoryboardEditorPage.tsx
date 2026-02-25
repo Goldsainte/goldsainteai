@@ -48,13 +48,27 @@ type StoryboardData = {
   flexibility: string | null;
   special_notes: string | null;
   status: string | null;
+  trip_length_days: number | null;
+  budget_per_person: boolean | null;
+  must_haves: string[] | null;
+  dealbreakers: string[] | null;
   [key: string]: any;
 };
 
 const INTEREST_OPTIONS = [
-  "Beach", "Mountains", "City", "Culture", "Food & Wine", "Adventure",
-  "Wellness", "Shopping", "Nightlife", "History", "Nature", "Photography",
-  "Art", "Architecture", "Surfing", "Diving", "Hiking", "Safari",
+  "Romantic", "Adventure", "Wellness", "Cultural", "Nightlife",
+  "Relaxation", "Luxury", "Family-friendly", "Food-focused", "Beach", "City",
+];
+
+const MUST_HAVE_OPTIONS = [
+  "5-star hotel", "Boutique hotel", "All-inclusive", "Private transfers",
+  "Yacht day", "Guided tours", "Michelin dining", "Spa day",
+  "VIP nightlife", "Child-friendly activities",
+];
+
+const DEALBREAKER_OPTIONS = [
+  "No red-eye flights", "No long layovers", "No hostels",
+  "No tourist-heavy areas", "No shared rooms",
 ];
 
 const PACE_OPTIONS = ["Relaxed", "Moderate", "Active", "Adventure"];
@@ -106,6 +120,10 @@ export default function StoryboardEditorPage() {
     interests: [] as string[],
     flexibility: "",
     special_notes: "",
+    trip_length_days: "",
+    budget_per_person: false,
+    must_haves: [] as string[],
+    dealbreakers: [] as string[],
   });
 
   useEffect(() => {
@@ -148,6 +166,10 @@ export default function StoryboardEditorPage() {
         interests: sb.interests || [],
         flexibility: sb.flexibility || "",
         special_notes: sb.special_notes || "",
+        trip_length_days: sb.trip_length_days?.toString() || "",
+        budget_per_person: sb.budget_per_person ?? false,
+        must_haves: sb.must_haves || [],
+        dealbreakers: sb.dealbreakers || [],
       });
 
       // Auto-open trip details if any field is filled
@@ -164,9 +186,11 @@ export default function StoryboardEditorPage() {
     const updateData: Record<string, any> = {};
     if (["budget_min", "budget_max"].includes(field)) {
       updateData[field] = value ? parseFloat(value) : null;
-    } else if (["travelers_adults", "travelers_children"].includes(field)) {
+    } else if (["travelers_adults", "travelers_children", "trip_length_days"].includes(field)) {
       updateData[field] = value ? parseInt(value) : null;
-    } else if (field === "interests") {
+    } else if (["interests", "must_haves", "dealbreakers"].includes(field)) {
+      updateData[field] = value;
+    } else if (field === "budget_per_person") {
       updateData[field] = value;
     } else {
       updateData[field] = value || null;
@@ -178,13 +202,13 @@ export default function StoryboardEditorPage() {
     setTripFields(prev => ({ ...prev, [field]: value }));
   }
 
-  function toggleInterest(interest: string) {
-    const current = tripFields.interests;
-    const updated = current.includes(interest)
-      ? current.filter(i => i !== interest)
-      : [...current, interest];
-    setTripFields(prev => ({ ...prev, interests: updated }));
-    saveTripField("interests", updated);
+  function toggleArrayField(field: "interests" | "must_haves" | "dealbreakers", value: string) {
+    const current = tripFields[field] as string[];
+    const updated = current.includes(value)
+      ? current.filter(i => i !== value)
+      : [...current, value];
+    setTripFields(prev => ({ ...prev, [field]: updated }));
+    saveTripField(field, updated);
   }
 
   // Cover image picker
@@ -260,7 +284,14 @@ export default function StoryboardEditorPage() {
         flexibility: tripFields.flexibility || null,
         special_notes: tripFields.special_notes || null,
         status: "open",
-        source_metadata: { storyboard_id: storyboardId, items_count: itemCount },
+        source_metadata: {
+          storyboard_id: storyboardId,
+          items_count: itemCount,
+          trip_length_days: tripFields.trip_length_days ? parseInt(tripFields.trip_length_days) : null,
+          budget_per_person: tripFields.budget_per_person,
+          must_haves: tripFields.must_haves,
+          dealbreakers: tripFields.dealbreakers,
+        },
       }).select("id").single();
 
       if (tripError) throw tripError;
@@ -360,7 +391,7 @@ export default function StoryboardEditorPage() {
               )}
 
               {/* Trip summary pills */}
-              {(storyboard.destination || storyboard.occasion || storyboard.budget_max) && (
+              {(storyboard.destination || storyboard.occasion || storyboard.budget_max || (storyboard.must_haves && storyboard.must_haves.length > 0) || (storyboard.dealbreakers && storyboard.dealbreakers.length > 0)) && (
                 <div className="mt-3 flex flex-wrap gap-1.5">
                   {storyboard.destination && (
                     <Badge variant="outline" className="rounded-full text-[10px] border-[#0c4d47]/30 text-[#0c4d47]">
@@ -374,13 +405,28 @@ export default function StoryboardEditorPage() {
                   )}
                   {storyboard.budget_max && (
                     <Badge variant="outline" className="rounded-full text-[10px] border-[#0c4d47]/30 text-[#0c4d47]">
-                      <DollarSign className="h-2.5 w-2.5 mr-1" /> Up to ${Number(storyboard.budget_max).toLocaleString()}
+                      <DollarSign className="h-2.5 w-2.5 mr-1" /> Up to ${Number(storyboard.budget_max).toLocaleString()}{storyboard.budget_per_person ? " /person" : ""}
                     </Badge>
                   )}
                   {(storyboard.travelers_adults && storyboard.travelers_adults > 0) && (
                     <Badge variant="outline" className="rounded-full text-[10px] border-[#0c4d47]/30 text-[#0c4d47]">
                       <Users className="h-2.5 w-2.5 mr-1" /> {storyboard.travelers_adults} adult{storyboard.travelers_adults !== 1 ? "s" : ""}
                       {storyboard.travelers_children ? `, ${storyboard.travelers_children} child${storyboard.travelers_children !== 1 ? "ren" : ""}` : ""}
+                    </Badge>
+                  )}
+                  {storyboard.trip_length_days && (
+                    <Badge variant="outline" className="rounded-full text-[10px] border-[#0c4d47]/30 text-[#0c4d47]">
+                      <CalendarDays className="h-2.5 w-2.5 mr-1" /> {storyboard.trip_length_days} days
+                    </Badge>
+                  )}
+                  {storyboard.must_haves && storyboard.must_haves.length > 0 && (
+                    <Badge variant="outline" className="rounded-full text-[10px] border-emerald-400/50 text-emerald-700">
+                      ✓ {storyboard.must_haves.length} must-have{storyboard.must_haves.length !== 1 ? "s" : ""}
+                    </Badge>
+                  )}
+                  {storyboard.dealbreakers && storyboard.dealbreakers.length > 0 && (
+                    <Badge variant="outline" className="rounded-full text-[10px] border-red-300/50 text-red-600">
+                      ✗ {storyboard.dealbreakers.length} dealbreaker{storyboard.dealbreakers.length !== 1 ? "s" : ""}
                     </Badge>
                   )}
                 </div>
@@ -449,13 +495,16 @@ export default function StoryboardEditorPage() {
                   </FieldBlock>
                 </div>
 
-                {/* Row 2: Dates */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Row 2: Dates + Trip Length */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <FieldBlock label="Start Date">
                     <input type="date" value={tripFields.start_date} onChange={e => { updateTripField("start_date", e.target.value); saveTripField("start_date", e.target.value); }} className="field-input" />
                   </FieldBlock>
                   <FieldBlock label="End Date">
                     <input type="date" value={tripFields.end_date} onChange={e => { updateTripField("end_date", e.target.value); saveTripField("end_date", e.target.value); }} className="field-input" />
+                  </FieldBlock>
+                  <FieldBlock label="Trip Length (days)" className="col-span-2 md:col-span-1">
+                    <input type="number" min="1" max="90" value={tripFields.trip_length_days} onChange={e => updateTripField("trip_length_days", e.target.value)} onBlur={() => saveTripField("trip_length_days", tripFields.trip_length_days)} placeholder="e.g. 7" className="field-input" />
                   </FieldBlock>
                 </div>
 
@@ -491,6 +540,15 @@ export default function StoryboardEditorPage() {
                   </FieldBlock>
                 </div>
 
+                {/* Budget per-person toggle */}
+                <div className="flex items-center gap-3">
+                  <button type="button" onClick={() => { const v = !tripFields.budget_per_person; updateTripField("budget_per_person", v); saveTripField("budget_per_person", v); }}
+                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${tripFields.budget_per_person ? "bg-[#0c4d47]" : "bg-[#E5DFC6]"}`}>
+                    <span className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${tripFields.budget_per_person ? "translate-x-[18px]" : "translate-x-[3px]"}`} />
+                  </button>
+                  <span className="text-[12px] text-[#4a4a4a]">{tripFields.budget_per_person ? "Budget is per person" : "Budget is for the total trip"}</span>
+                </div>
+
                 {/* Row 5: Accommodation + Pace + Flexibility */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <FieldBlock label="Accommodation Style">
@@ -513,11 +571,11 @@ export default function StoryboardEditorPage() {
                   </FieldBlock>
                 </div>
 
-                {/* Interests */}
-                <FieldBlock label="Interests">
+                {/* Vibe & Experience Tags */}
+                <FieldBlock label="Vibe & Experience Tags">
                   <div className="flex flex-wrap gap-1.5">
                     {INTEREST_OPTIONS.map(interest => (
-                      <button key={interest} type="button" onClick={() => toggleInterest(interest)}
+                      <button key={interest} type="button" onClick={() => toggleArrayField("interests", interest)}
                         className={`rounded-full px-3 py-1 text-[11px] border transition ${
                           tripFields.interests.includes(interest)
                             ? "bg-[#0c4d47] text-[#E5DFC6] border-[#0c4d47]"
@@ -525,6 +583,40 @@ export default function StoryboardEditorPage() {
                         }`}
                       >
                         {interest}
+                      </button>
+                    ))}
+                  </div>
+                </FieldBlock>
+
+                {/* Must-Haves */}
+                <FieldBlock label="Must-Haves">
+                  <div className="flex flex-wrap gap-1.5">
+                    {MUST_HAVE_OPTIONS.map(item => (
+                      <button key={item} type="button" onClick={() => toggleArrayField("must_haves", item)}
+                        className={`rounded-full px-3 py-1 text-[11px] border transition ${
+                          tripFields.must_haves.includes(item)
+                            ? "bg-emerald-700 text-white border-emerald-700"
+                            : "bg-white text-[#4a4a4a] border-[#E5DFC6] hover:border-emerald-600"
+                        }`}
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                </FieldBlock>
+
+                {/* Dealbreakers */}
+                <FieldBlock label="Dealbreakers">
+                  <div className="flex flex-wrap gap-1.5">
+                    {DEALBREAKER_OPTIONS.map(item => (
+                      <button key={item} type="button" onClick={() => toggleArrayField("dealbreakers", item)}
+                        className={`rounded-full px-3 py-1 text-[11px] border transition ${
+                          tripFields.dealbreakers.includes(item)
+                            ? "bg-red-600 text-white border-red-600"
+                            : "bg-white text-[#4a4a4a] border-[#E5DFC6] hover:border-red-400"
+                        }`}
+                      >
+                        {item}
                       </button>
                     ))}
                   </div>
