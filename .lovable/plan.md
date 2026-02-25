@@ -1,23 +1,36 @@
 
 
-# Update Swiss Alps Cover Image
+# Add Extensive FAQs to All Trip Detail Pages
 
 ## Problem
-The current Swiss Alps cover image (`photo-1531366936337`) is actually a northern lights/aurora borealis photo -- not representative of the Swiss Alps at all.
+The `TripDetailPage` (used at `/trip/:slug`) renders the `TripFAQs` component, which only shows FAQs if the trip has them stored in the database `faqs` JSON column. Most trips have no FAQ data, so the section is completely absent.
+
+Meanwhile, the `TrovaTripDetailPage` (used at `/marketplace/trip/:id`) already uses `TripFAQAccordion`, which has a comprehensive set of 8 default FAQs organized by category that display when no trip-specific FAQs exist.
 
 ## Fix
-Update the `cover_image_url` for the Swiss Alps trip (ID: `ae0ba7ec-39b7-4cd1-8419-fae30b732a30`) in the `packaged_trips` table to a proper Swiss Alps landscape photo.
+Replace `TripFAQs` with `TripFAQAccordion` in `TripDetailPage`. This gives every trip an extensive FAQ section automatically, while still allowing trip-specific FAQs to override when present in the database.
 
-**New image:** `https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1600&q=80`
+### File: `src/pages/trips/TripDetailPage.tsx`
 
-This is a stunning high-altitude Swiss Alps panorama with snow-capped peaks, green valleys, and clear skies -- matches the luxury alpine retreat aesthetic perfectly.
+1. Change import from `TripFAQs` to `TripFAQAccordion`
+2. Replace the `TripFAQs` usage with `TripFAQAccordion`, passing DB FAQs when available or falling back to defaults
+3. Remove the conditional rendering (`trip.faqs && length > 0` guard) so the section always appears
 
-**Database update:**
-```sql
-UPDATE packaged_trips
-SET cover_image_url = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1600&q=80'
-WHERE id = 'ae0ba7ec-39b7-4cd1-8419-fae30b732a30';
-```
+### Default FAQs provided by `TripFAQAccordion` (already built):
 
-No code changes needed -- the component will automatically display the new image.
+**Traveling with Goldsainte** (4 questions)
+- What's it like to travel on a Goldsainte Trip?
+- How does a Goldsainte Trip actually work?
+- Can I book solo?
+- What if I need to cancel?
+
+**Accommodations** (1 question)
+- What does 'or similar' mean next to accommodations?
+
+**General Travel Questions** (3 questions)
+- Are flights included in the trip cost?
+- Do I need any vaccines?
+- Can you accommodate my dietary needs?
+
+No database changes needed. No new components needed.
 
