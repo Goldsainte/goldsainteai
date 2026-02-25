@@ -77,9 +77,7 @@ export default function TikTokLabStoryboardsPage() {
   const backLabel = isCreatorOrAgent ? "Back to Creator Studio" : "Back to Dashboard";
   const backTo = isCreatorOrAgent ? "/tiktok-lab" : "/dashboard";
 
-  const subtitle = isCreatorOrAgent
-    ? "Curate visual mood boards from your travel content. Each storyboard can become a bookable trip template your audience requests through Goldsainte."
-    : "Collect photos, destinations, and aesthetic ideas that inspire you. Think of this as your personal Pinterest board for travel — a space to dream before you commit.";
+  const subtitle = "Think Pinterest — but for planning a trip. Save hotels, destinations, restaurants, videos, and experiences into one visual board. When you're ready, submit your storyboard to the marketplace and let creators or certified agents turn your ideas into a fully designed trip.";
 
   return (
     <>
@@ -96,7 +94,7 @@ export default function TikTokLabStoryboardsPage() {
           <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="space-y-1.5">
               <span className="inline-block text-[10px] font-bold uppercase tracking-[0.2em] text-[#BFAD72]">
-                Your Visual Scratchpad
+                Your Travel Planning Board
               </span>
               <h1 className="text-xl font-semibold tracking-tight md:text-2xl">
                 My Storyboards
