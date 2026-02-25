@@ -61,7 +61,35 @@ export function StoryboardBuilder({
 
   useEffect(() => {
     if (!storyboardId) return;
-    // TODO: load existing items for edit mode
+    let cancelled = false;
+
+    async function loadItems() {
+      const { data, error } = await supabase
+        .from("storyboard_items")
+        .select("*")
+        .eq("storyboard_id", storyboardId!)
+        .order("position", { ascending: true });
+
+      if (cancelled || error) return;
+
+      const mapped: Item[] = (data || []).map((item: any) => ({
+        id: item.id,
+        kind: (item.item_type === "image" ? "photo" : item.item_type) as Item["kind"],
+        source: (item.source_type || "manual") as Item["source"],
+        data: {
+          thumb_url: item.image_url,
+          full_url: item.image_url,
+          alt: item.title || "Storyboard item",
+          title: item.title,
+          ...((item.metadata as Record<string, any>) || {}),
+        },
+      }));
+
+      setItems(mapped);
+    }
+
+    loadItems();
+    return () => { cancelled = true; };
   }, [storyboardId]);
 
   async function runSearch() {

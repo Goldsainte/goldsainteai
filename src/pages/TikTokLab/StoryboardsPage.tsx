@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Image as ImageIcon, Sparkles, ArrowRight } from "lucide-react";
@@ -157,6 +157,7 @@ export default function TikTokLabStoryboardsPage() {
 /* ── Card ─────────────────────────────────────────── */
 
 function StoryboardCard({ storyboard }: { storyboard: Storyboard }) {
+  const navigate = useNavigate();
   return (
     <Link
       to={`/storyboards/${storyboard.id}`}
@@ -200,7 +201,14 @@ function StoryboardCard({ storyboard }: { storyboard: Storyboard }) {
       </div>
 
       {/* Hover: Convert to Trip */}
-      <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform bg-[#0c4d47] text-[#E5DFC6] text-xs font-semibold text-center py-2 flex items-center justify-center gap-1">
+      <div
+        className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform bg-[#0c4d47] text-[#E5DFC6] text-xs font-semibold text-center py-2 flex items-center justify-center gap-1 cursor-pointer"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          navigate(`/post-trip?fromStoryboard=${storyboard.id}`);
+        }}
+      >
         Convert to Trip
         <ArrowRight className="h-3 w-3" />
       </div>

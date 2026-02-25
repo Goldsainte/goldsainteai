@@ -179,6 +179,13 @@ export default function PostTripPage() {
     }
   }, [hasItineraryPrefill, itineraryPrefill]);
 
+  // Set storyboardId from query param so StoryboardBuilder loads existing items
+  useEffect(() => {
+    if (storyboardIdFromQuery && !storyboardId) {
+      setStoryboardId(storyboardIdFromQuery);
+    }
+  }, [storyboardIdFromQuery]);
+
   // Auto-populate form when storyboard prefill data loads
   useEffect(() => {
     if (prefill && !hasItineraryPrefill) {
@@ -565,6 +572,7 @@ export default function PostTripPage() {
                 </div>
               </div>
               <StoryboardBuilder
+                storyboardId={storyboardId || undefined}
                 mode="traveler"
                 initialTitle={title || destination}
                 destination={destination}
