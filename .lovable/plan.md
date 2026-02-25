@@ -1,29 +1,37 @@
 
 
-# Remove Menu Items from Profile Menu
+# Apply Airbnb-Style Card Design to Storyboards Highlight Section
 
-## Items to Remove
+## Current State
+The "Curated Journeys" section on the homepage uses tall editorial-style cards (`aspect-[4/5]` mobile, `aspect-[3/4]` desktop) with dark gradient overlays and text overlaid on images -- the same pattern that was already fixed in the marketplace.
 
-1. **Creator Studio** -- from the Discover accordion (both mobile and desktop)
-2. **Collab Opportunities** -- from the My Account accordion (both mobile and desktop)
-3. **Partner Bookings** -- from the My Account accordion (both mobile and desktop)
-4. **Earnings & Billing** -- entire accordion section (both mobile and desktop)
+## Changes
 
-## Technical Details
+### File: `src/components/home/StoryboardsHighlight.tsx`
 
-### File: `src/components/Header.tsx`
+1. **Image aspect ratio**: Change from `aspect-[4/5] md:aspect-[3/4]` to `aspect-[4/3]` (landscape, matching marketplace)
+2. **Remove gradient overlay**: Delete the `bg-gradient-to-t from-black/60` div
+3. **Remove overlaid content**: Remove the title, location, price badge, and duration badge from on top of the image -- keep images clean
+4. **Move all metadata below image**: Title, destination, price, and duration go into the content area below the image, styled consistently with `LiveTripCard`
+5. **Keep vibe tags and creator attribution** below, same as current
+6. **Update loading skeletons** to match the new `aspect-[4/3]` ratio
+7. **Grid**: Change to `grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4` for 4-column desktop layout matching marketplace
 
-**Mobile menu removals:**
-- Lines 292-300: Creator Studio item in Discover
-- Lines 344-363: Collab Opportunities + Partner Bookings in My Account
-- Lines 368-404: Entire Earnings & Billing accordion section
-
-**Desktop menu removals:**
-- Lines 623-631: Creator Studio item in Discover
-- Lines 675-694: Collab Opportunities + Partner Bookings in My Account
-- Lines 699-735: Entire Earnings & Billing accordion section
-
-Also clean up unused variables: `showPartnerBookings` (line 53) since Partner Bookings is removed. The `HandCoins`, `ShieldCheck`, `CreditCard` imports can also be removed if no longer used elsewhere.
+### Card structure after change:
+```text
+┌─────────────────────┐
+│                     │
+│   Clean image 4:3   │
+│   (no overlay)      │
+│                     │
+├─────────────────────┤
+│ Title          Price│
+│ 📍 Destination      │
+│ 📅 X nights         │
+│ [tag] [tag]         │
+│ 👤 By Creator       │
+└─────────────────────┘
+```
 
 No other files affected.
 
