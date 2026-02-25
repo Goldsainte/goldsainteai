@@ -66,6 +66,11 @@ type TripRequest = {
   specialRequests?: string;
   createdAt: string;
   userId: string;
+  interests?: string[];
+  tripLengthDays?: number | null;
+  budgetPerPerson?: boolean;
+  mustHaves?: string[];
+  dealbreakers?: string[];
 };
 
 type UserProfile = {
@@ -178,6 +183,9 @@ export default function TripRequestDetail() {
       const destination = tripData.destination || "Not specified";
       const titleFallback = tripData.title || (destination !== "Not specified" ? `Trip to ${destination}` : "New Trip Request");
 
+      // Parse source_metadata for enriched fields
+      const sourceMeta = typeof tripData.source_metadata === 'object' && tripData.source_metadata ? tripData.source_metadata as Record<string, any> : {};
+
       const mappedRequest: TripRequest = {
         id: tripData.id,
         tripTitle: titleFallback,
@@ -196,6 +204,11 @@ export default function TripRequestDetail() {
         specialRequests: tripData.special_notes,
         createdAt: tripData.created_at,
         userId: tripData.user_id,
+        interests: Array.isArray(tripData.interests) ? tripData.interests : [],
+        tripLengthDays: sourceMeta.trip_length_days || null,
+        budgetPerPerson: sourceMeta.budget_per_person || false,
+        mustHaves: Array.isArray(sourceMeta.must_haves) ? sourceMeta.must_haves : [],
+        dealbreakers: Array.isArray(sourceMeta.dealbreakers) ? sourceMeta.dealbreakers : [],
       };
 
       setRequest(mappedRequest);
@@ -513,6 +526,48 @@ export default function TripRequestDetail() {
                 </div>
               )}
 
+              {/* Vibe Tags */}
+              {request.interests && request.interests.length > 0 && (
+                <div className="border-t border-[#E5DFC6] pt-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#7A7151] mb-2">Vibe & Experience Tags</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {request.interests.map(tag => (
+                      <span key={tag} className="inline-flex items-center rounded-full bg-[#0c4d47]/10 border border-[#0c4d47]/20 px-2.5 py-1 text-[11px] font-medium text-[#0c4d47]">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Must-Haves */}
+              {request.mustHaves && request.mustHaves.length > 0 && (
+                <div className="border-t border-[#E5DFC6] pt-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.15em] text-emerald-700 mb-2">Must-Haves</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {request.mustHaves.map(item => (
+                      <span key={item} className="inline-flex items-center rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
+                        ✓ {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Dealbreakers */}
+              {request.dealbreakers && request.dealbreakers.length > 0 && (
+                <div className="border-t border-[#E5DFC6] pt-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.15em] text-red-600 mb-2">Dealbreakers</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {request.dealbreakers.map(item => (
+                      <span key={item} className="inline-flex items-center rounded-full bg-red-50 border border-red-200 px-2.5 py-1 text-[11px] font-medium text-red-600">
+                        ✗ {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="border-t border-[#E5DFC6] pt-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#7A7151] mb-3">Visual Brief</p>
                 <TripStoryboardViewer tripId={request.id} variant="gallery" />
@@ -786,6 +841,7 @@ export default function TripRequestDetail() {
                     { label: "Destination", value: request.destination },
                     { label: "Departing from", value: request.departingFrom },
                     { label: "Dates", value: request.dateRangeLabel },
+                    ...(request.tripLengthDays ? [{ label: "Trip length", value: `${request.tripLengthDays} days` }] : []),
                     { label: "Travelers", value: `${request.travelers} ${request.travelers === 1 ? "person" : "people"}` },
                     { label: "Trip style", value: request.tripType },
                     { label: "Travel style", value: request.travelStyle },
@@ -802,6 +858,7 @@ export default function TripRequestDetail() {
                     <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#7A7151]">Budget</p>
                     <p className="mt-0.5 font-secondary text-lg text-[#0a2225]">
                       {formatCurrency(request.budgetMin)} – {formatCurrency(request.budgetMax)}
+                      {request.budgetPerPerson && <span className="text-xs font-normal text-[#9A9079] ml-1">per person</span>}
                     </p>
                   </div>
                 )}
