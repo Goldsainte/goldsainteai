@@ -85,15 +85,16 @@ export function StoryboardsHighlight() {
         </div>
 
         {/* Featured trip tiles grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 mb-10">
+        <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-10">
           {isLoading ? (
             // Loading skeletons
-            Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="rounded-xl md:rounded-2xl overflow-hidden">
-                <Skeleton className="aspect-[4/5] md:aspect-[3/4] w-full" />
-                <div className="p-2.5 md:p-4 space-y-2">
-                  <Skeleton className="h-4 w-20" />
-                  <Skeleton className="h-3 w-16" />
+            Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="space-y-2.5">
+                <Skeleton className="aspect-[4/3] w-full rounded-xl md:rounded-2xl" />
+                <div className="space-y-1.5 px-0.5">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-1/2" />
+                  <Skeleton className="h-3 w-1/3" />
                 </div>
               </div>
             ))
@@ -101,45 +102,41 @@ export function StoryboardsHighlight() {
             <Link
               key={trip.id}
               to={`/marketplace/trip/${trip.slug}`}
-              className="group overflow-hidden rounded-xl md:rounded-2xl bg-white shadow-sm border border-[#E5DFC6] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer"
+              className="group cursor-pointer space-y-2.5"
             >
-              {/* Image with gradient and badges */}
-              <div className="relative aspect-[4/5] md:aspect-[3/4] overflow-hidden">
+              {/* Clean image — no overlay, no badges */}
+              <div className="relative aspect-[4/3] overflow-hidden rounded-xl md:rounded-2xl">
                 <img
                   src={trip.cover_image_url}
                   alt={trip.title}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                
-                {/* Duration badge - top right */}
-                <Badge className="absolute top-2 right-2 md:top-3 md:right-3 rounded-full text-[9px] md:text-[10px] bg-white/95 text-[#0a2225] border-0 shadow-sm px-2 py-0.5">
-                  <Calendar className="h-2.5 w-2.5 md:h-3 md:w-3 mr-1" />
-                  {trip.duration_nights} nights
-                </Badge>
+              </div>
 
-                {/* Price badge - top left */}
-                <Badge className="absolute top-2 left-2 md:top-3 md:left-3 rounded-full text-[10px] md:text-[11px] bg-[#0c4d47] text-white border-0 shadow-sm px-2.5 py-1 font-medium">
-                  From {formatPrice(trip.price_per_person, trip.currency)}
-                </Badge>
-
-                {/* Bottom overlay content */}
-                <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4">
-                  <h3 className="font-secondary text-sm md:text-base text-white font-medium leading-tight mb-1">
+              {/* Content below image */}
+              <div className="space-y-1 px-0.5">
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="font-secondary text-sm md:text-[15px] text-[#0a2225] font-medium leading-snug line-clamp-1">
                     {trip.title}
                   </h3>
-                  <p className="flex items-center gap-1 text-[10px] md:text-xs text-white/90">
-                    <MapPin className="h-2.5 w-2.5 md:h-3 md:w-3 flex-shrink-0" />
-                    <span className="truncate">{trip.destination}</span>
-                  </p>
+                  <span className="text-sm md:text-[15px] font-semibold text-[#0a2225] whitespace-nowrap">
+                    {formatPrice(trip.price_per_person, trip.currency)}
+                  </span>
                 </div>
-              </div>
-              
-              {/* Content below image */}
-              <div className="p-2.5 md:p-4 space-y-2">
+
+                <p className="flex items-center gap-1 text-[13px] text-[#6B7280]">
+                  <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+                  <span className="truncate">{trip.destination}</span>
+                </p>
+
+                <p className="flex items-center gap-1 text-[13px] text-[#6B7280]">
+                  <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
+                  <span>{trip.duration_nights} nights</span>
+                </p>
+
                 {/* Vibe tags */}
-                <div className="flex flex-wrap gap-1">
+                <div className="flex flex-wrap gap-1 pt-1">
                   {getVibeTags(trip).map((tag) => (
                     <Badge 
                       key={tag} 
@@ -153,32 +150,36 @@ export function StoryboardsHighlight() {
                 
                 {/* Creator/Agent attribution */}
                 {trip.creator_type === 'platform' ? (
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 pt-1">
                     <Sparkles className="h-3.5 w-3.5 text-[#C7A962]" />
                     <span className="text-[10px] md:text-[11px] font-medium text-[#7A7151]">
                       Goldsainte Curated
                     </span>
                   </div>
                 ) : trip.profiles?.full_name ? (
-                  <Link
-                    to={trip.creator_type === 'agent' ? `/agents/${trip.profiles.id}` : `/creators/${trip.profiles.id}`}
+                  <div
                     onClick={(e) => e.stopPropagation()}
-                    className="flex items-center gap-1.5 group/host"
+                    className="pt-1"
                   >
-                    <img
-                      src={trip.profiles.avatar_url || '/placeholder.svg'}
-                      alt={trip.profiles.full_name}
-                      className="h-5 w-5 rounded-full object-cover ring-1 ring-[#E5DFC6]"
-                    />
-                    <span className="text-[10px] md:text-[11px] font-medium text-[#0a2225] group-hover/host:underline">
-                      By {trip.profiles.full_name}
-                    </span>
-                    <span className="rounded-full bg-[#C7B892]/20 px-1.5 py-0.5 text-[8px] font-medium text-[#7A7151]">
-                      {trip.creator_type === 'agent' ? 'Agent' : 'Creator'}
-                    </span>
-                  </Link>
+                    <Link
+                      to={trip.creator_type === 'agent' ? `/agents/${trip.profiles.id}` : `/creators/${trip.profiles.id}`}
+                      className="flex items-center gap-1.5 group/host"
+                    >
+                      <img
+                        src={trip.profiles.avatar_url || '/placeholder.svg'}
+                        alt={trip.profiles.full_name}
+                        className="h-5 w-5 rounded-full object-cover ring-1 ring-[#E5DFC6]"
+                      />
+                      <span className="text-[10px] md:text-[11px] font-medium text-[#0a2225] group-hover/host:underline">
+                        By {trip.profiles.full_name}
+                      </span>
+                      <span className="rounded-full bg-[#C7B892]/20 px-1.5 py-0.5 text-[8px] font-medium text-[#7A7151]">
+                        {trip.creator_type === 'agent' ? 'Agent' : 'Creator'}
+                      </span>
+                    </Link>
+                  </div>
                 ) : (
-                  <p className="text-[9px] md:text-[10px] text-[#8D8D8D]">{getCuratorLabel(trip.creator_type)}</p>
+                  <p className="text-[9px] md:text-[10px] text-[#8D8D8D] pt-1">{getCuratorLabel(trip.creator_type)}</p>
                 )}
               </div>
             </Link>
