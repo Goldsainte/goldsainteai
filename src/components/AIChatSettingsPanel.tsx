@@ -12,7 +12,6 @@ import { useToast } from "@/hooks/use-toast";
 export interface ChatPreferences {
   general: {
     voiceEnabled: boolean;
-    wakeWordEnabled: boolean;
     autoSaveConversation: boolean;
     voiceLanguage: string;
   };
@@ -39,7 +38,6 @@ export interface ChatPreferences {
 const DEFAULT_PREFERENCES: ChatPreferences = {
   general: {
     voiceEnabled: true,
-    wakeWordEnabled: true,
     autoSaveConversation: true,
     voiceLanguage: 'en',
   },
@@ -133,21 +131,6 @@ export const AIChatSettingsPanel = ({ open, onClose, preferences, onPreferencesC
                 />
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Wake Word Detection</Label>
-                  <p className="text-sm text-muted-foreground">Activate with "Hey Goldsainte"</p>
-                </div>
-                <Switch
-                  checked={localPrefs.general.wakeWordEnabled}
-                  onCheckedChange={(checked) =>
-                    setLocalPrefs({
-                      ...localPrefs,
-                      general: { ...localPrefs.general, wakeWordEnabled: checked },
-                    })
-                  }
-                />
-              </div>
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
@@ -486,7 +469,7 @@ export const countNonDefaultPreferences = (preferences: ChatPreferences): number
   
   // General preferences
   if (preferences.general.voiceEnabled !== DEFAULT_PREFERENCES.general.voiceEnabled) count++;
-  if (preferences.general.wakeWordEnabled !== DEFAULT_PREFERENCES.general.wakeWordEnabled) count++;
+  
   if (preferences.general.autoSaveConversation !== DEFAULT_PREFERENCES.general.autoSaveConversation) count++;
   if (preferences.general.voiceLanguage !== DEFAULT_PREFERENCES.general.voiceLanguage) count++;
   

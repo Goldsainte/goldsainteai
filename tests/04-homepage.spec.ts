@@ -53,7 +53,7 @@ test.describe('Homepage', () => {
 
   test('should open AI concierge widget', async ({ page }) => {
     // Look for concierge trigger button
-    const conciergeButton = page.locator('[data-testid="concierge-trigger"], button:has-text("Hey Goldsainte"), [aria-label="AI Concierge"]').first();
+    const conciergeButton = page.locator('[data-testid="concierge-trigger"], [aria-label="AI Concierge"]').first();
     
     if (await conciergeButton.isVisible()) {
       await conciergeButton.click();

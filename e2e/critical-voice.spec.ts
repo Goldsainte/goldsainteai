@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Voice AI Concierge Critical Flow', () => {
-  test('wake word detection and voice mode activation', async ({ page, context }) => {
+  test('voice mode activation via mic button', async ({ page, context }) => {
     // Grant microphone permissions
     await context.grantPermissions(['microphone']);
 
@@ -14,7 +14,7 @@ test.describe('Voice AI Concierge Critical Flow', () => {
     const conciergeWidget = page.locator('[data-testid="ai-booking-concierge"]');
     
     if (await conciergeWidget.isVisible()) {
-      // Click mic button to activate voice mode (fallback test)
+      // Click mic button to activate voice mode
       const micButton = page.locator('button[aria-label*="microphone"], button[aria-label*="voice"]').first();
       
       if (await micButton.isVisible()) {

@@ -6,8 +6,6 @@ import { Badge } from "@/components/ui/badge";
 
 interface DiagnosticsData {
   permissionStatus: PermissionState | 'unknown';
-  wakeWordStatus: 'active' | 'inactive' | 'unsupported' | 'error';
-  wakeWordError?: string;
   browserSupport: {
     speechRecognition: boolean;
     mediaDevices: boolean;
@@ -23,7 +21,6 @@ interface VoiceDiagnosticsPanelProps {
   isOpen: boolean;
   onClose: () => void;
   voiceChatRef: any;
-  wakeWordDetectorRef: any;
   holdMusicRef: any;
   metrics?: {
     micPermission: PermissionState | 'unknown';
@@ -50,14 +47,12 @@ export const VoiceDiagnosticsPanel = ({
   isOpen, 
   onClose,
   voiceChatRef,
-  wakeWordDetectorRef,
   holdMusicRef,
   metrics,
   onLoopbackTest
 }: VoiceDiagnosticsPanelProps) => {
   const [diagnostics, setDiagnostics] = useState<DiagnosticsData>({
     permissionStatus: 'unknown',
-    wakeWordStatus: 'inactive',
     browserSupport: {
       speechRecognition: false,
       mediaDevices: false,
@@ -98,13 +93,6 @@ export const VoiceDiagnosticsPanel = ({
         }
       }
 
-      // Check wake word status
-      let wakeWordStatus: 'active' | 'inactive' | 'unsupported' | 'error' = 'inactive';
-      if (!speechRecognition) {
-        wakeWordStatus = 'unsupported';
-      } else if (wakeWordDetectorRef.current) {
-        wakeWordStatus = 'active';
-      }
 
       // Check voice connection state
       const voiceConnectionState = voiceChatRef.current?.pc?.connectionState || 'disconnected';
@@ -119,7 +107,6 @@ export const VoiceDiagnosticsPanel = ({
 
       setDiagnostics({
         permissionStatus,
-        wakeWordStatus,
         browserSupport: {
           speechRecognition,
           mediaDevices,
@@ -136,7 +123,7 @@ export const VoiceDiagnosticsPanel = ({
     const interval = setInterval(updateDiagnostics, 1000);
 
     return () => clearInterval(interval);
-  }, [isOpen, voiceChatRef, wakeWordDetectorRef, holdMusicRef]);
+  }, [isOpen, voiceChatRef, holdMusicRef]);
 
   if (!isOpen) return null;
 
@@ -234,27 +221,6 @@ export const VoiceDiagnosticsPanel = ({
             )}
           </div>
 
-          {/* Wake Word Status */}
-          <div>
-            <h3 className="font-semibold mb-2">Wake Word Detection</h3>
-            <div className="flex items-center gap-2">
-              <StatusIcon status={
-                diagnostics.wakeWordStatus === 'active' ? 'good' : 
-                diagnostics.wakeWordStatus === 'unsupported' ? 'error' : 'warning'
-              } />
-              <Badge variant={
-                diagnostics.wakeWordStatus === 'active' ? 'default' : 
-                diagnostics.wakeWordStatus === 'unsupported' ? 'destructive' : 'secondary'
-              }>
-                {diagnostics.wakeWordStatus.toUpperCase()}
-              </Badge>
-            </div>
-            {diagnostics.wakeWordStatus === 'unsupported' && (
-              <p className="text-xs text-destructive mt-2">
-                iOS Safari does not support wake word detection. Use the microphone button instead.
-              </p>
-            )}
-          </div>
 
           {/* Voice Connection */}
           <div>

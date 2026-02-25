@@ -1,16 +1,15 @@
 import { cn } from "@/lib/utils";
 
 interface VoiceStatusMessageProps {
-  status: 'wake-active' | 'listening' | 'responding' | 'idle';
+  status: 'listening' | 'responding' | 'idle';
   className?: string;
 }
 
 export const VoiceStatusMessage = ({ status, className }: VoiceStatusMessageProps) => {
   const messages = {
-    'wake-active': "Listening for 'Hey Goldsainte'…",
     'listening': "Listening…",
     'responding': "Responding…",
-    'idle': "Say 'Hey Goldsainte' or click 🎙️ to start",
+    'idle': "Click 🎙️ to start",
   };
 
   return (
