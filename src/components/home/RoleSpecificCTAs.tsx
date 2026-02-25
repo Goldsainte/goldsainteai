@@ -70,37 +70,36 @@ export function RoleSpecificCTAs() {
             return (
               <div
                 key={index}
-                className="group flex flex-col rounded-2xl border border-[#E5DFC6] bg-[#F5EFE1] shadow-sm overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                className="group cursor-pointer space-y-2.5"
               >
-                {/* Background image banner */}
-                <div className="relative h-44 overflow-hidden">
+                {/* Clean image — no overlay */}
+                <div className="relative aspect-[4/3] overflow-hidden rounded-xl md:rounded-2xl">
                   <img
                     src={role.backgroundImage}
                     alt=""
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                  
-                  {/* Icon overlay */}
-                  <div className="absolute bottom-4 left-5">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white border border-[#C7B892]/40 backdrop-blur-sm shadow-sm">
-                      <Icon className="h-5 w-5 text-[#0c4d47]" />
-                    </div>
-                  </div>
                 </div>
 
-                {/* Content */}
-                <div className="flex flex-col flex-1 p-6">
-                  <h3 className="font-secondary text-lg text-[#0a2225] mb-2">
-                    {role.title}
-                  </h3>
+                {/* Content below image */}
+                <div className="space-y-2 px-0.5">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0c4d47]/10">
+                      <Icon className="h-4 w-4 text-[#0c4d47]" />
+                    </div>
+                    <h3 className="font-secondary text-sm md:text-[15px] text-[#0a2225] font-medium leading-snug">
+                      {role.title}
+                    </h3>
+                  </div>
                   
-                  <p className="text-sm leading-relaxed text-[#4a4a4a] mb-5 flex-1">
+                  <p className="text-[13px] leading-relaxed text-[#6B7280]">
                     {role.body}
                   </p>
 
                   <Button
                     asChild
+                    size="sm"
                     className="w-full rounded-full bg-[#0c4d47] text-[#E5DFC6] hover:bg-[#073331] transition-colors duration-300"
                   >
                     <Link to={role.link}>
@@ -111,7 +110,7 @@ export function RoleSpecificCTAs() {
                   {role.browseLink && (
                     <Link
                       to={role.browseLink}
-                      className="mt-2.5 block text-center text-[13px] font-medium text-[#0c4d47] hover:underline transition-colors duration-200"
+                      className="block text-center text-[13px] font-medium text-[#0c4d47] hover:underline transition-colors duration-200"
                     >
                       {role.browseLabel}
                     </Link>
