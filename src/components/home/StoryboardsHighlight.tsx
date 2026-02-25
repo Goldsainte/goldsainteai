@@ -39,7 +39,7 @@ export function StoryboardsHighlight() {
         .select('id, slug, title, destination, duration_nights, cover_image_url, price_per_person, currency, creator_id, creator_type, highlights, profiles!packaged_trips_creator_id_fkey(id, full_name, avatar_url, username)')
         .eq('is_featured', true)
         .eq('status', 'published')
-        .limit(6);
+        .limit(8);
       
       if (error) throw error;
       return data as FeaturedTrip[];
