@@ -2,13 +2,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation, useParams, Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { useRequireOnboarding } from "@/hooks/useRequireOnboarding";
 import { StoryboardBuilder } from "@/components/storyboards/StoryboardBuilder";
 import { TravelStoryboard } from "@/components/storyboards/TravelStoryboard";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function StoryboardEditorPage() {
-  const { checking, allowed } = useRequireOnboarding();
   const params = useParams<{ id: string }>();
   const location = useLocation();
   const navigate = useNavigate();
@@ -56,14 +54,6 @@ export default function StoryboardEditorPage() {
       setLoadingStoryboard(false);
     })();
   }, [storyboardId]);
-
-  if (checking || !allowed) {
-    return (
-      <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225] flex items-center justify-center">
-        <p className="text-[11px]">Preparing your storyboard editor…</p>
-      </main>
-    );
-  }
 
   function handleStoryboardSaved(id: string) {
     navigate("/storyboards");
