@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info, Sparkles, CreditCard, PlaneTakeoff, HandCoins, ShieldCheck, Car, MessageCircle } from "lucide-react";
+import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Settings, Info, Sparkles, PlaneTakeoff, Car, MessageCircle } from "lucide-react";
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
 import { CreateMomentModal } from "@/components/CreateMomentModal";
@@ -50,8 +50,7 @@ export const Header = () => {
   const isCreator = accountType === "creator";
   const isAgentAccount = accountType === "agent";
   const isBrand = accountType === "brand";
-  const showPartnerBookings = isCreator || isAgentAccount;
-  const primaryBookingsPath = showPartnerBookings ? "/partner-bookings" : "/my-bookings";
+  const primaryBookingsPath = "/my-bookings";
 
   const handleLanguageChange = (language: string) => {
     setCurrentLanguage(language);
@@ -289,15 +288,6 @@ export const Header = () => {
                                     <PlaneTakeoff className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                                     <span className="text-sm font-medium">Post a Trip</span>
                                   </DropdownMenuItem>
-                                  {(isCreator || isAgentAccount || isBrand) && (
-                                    <DropdownMenuItem 
-                                      onClick={() => navigate('/tiktok-lab')} 
-                                      className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                                    >
-                                      <Video className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                      <span className="text-sm font-medium">Creator Studio</span>
-                                    </DropdownMenuItem>
-                                  )}
                                 </div>
                               </AccordionContent>
                             </AccordionItem>
@@ -341,67 +331,9 @@ export const Header = () => {
                                       <span className="text-sm font-medium">Available Trips</span>
                                     </DropdownMenuItem>
                                   )}
-                                  {isCreator && (
-                                    <>
-                                      <DropdownMenuItem 
-                                        onClick={() => navigate('/creator-trips')} 
-                                        className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                                      >
-                                        <Video className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                        <span className="text-sm font-medium">Collab Opportunities</span>
-                                      </DropdownMenuItem>
-                                    </>
-                                  )}
-                                  {showPartnerBookings && (
-                                    <DropdownMenuItem 
-                                      onClick={() => navigate('/partner-bookings')} 
-                                      className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                                    >
-                                      <Calendar className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                      <span className="text-sm font-medium">Partner Bookings</span>
-                                    </DropdownMenuItem>
-                                  )}
                                 </div>
                               </AccordionContent>
                             </AccordionItem>
-
-                            {/* EARNINGS & BILLING Section - Creators/Agents/Brands only */}
-                            {(isCreator || isAgentAccount || isBrand) && (
-                              <AccordionItem value="earnings" className="border-b-0">
-                                <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-secondary/5 [&[data-state=open]]:bg-secondary/5">
-                                  <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Earnings & Billing</p>
-                                </AccordionTrigger>
-                                <AccordionContent className="pb-0">
-                                  <div className="py-1">
-                                    {isCreator && (
-                                      <DropdownMenuItem 
-                                        onClick={() => navigate('/tiktok-lab/earnings')} 
-                                        className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                                      >
-                                        <HandCoins className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                        <span className="text-sm font-medium">Earnings</span>
-                                      </DropdownMenuItem>
-                                    )}
-                                    <DropdownMenuItem 
-                                      onClick={() => navigate('/partner/escrow')} 
-                                      className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                                    >
-                                      <ShieldCheck className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                      <span className="text-sm font-medium">Escrow & Milestones</span>
-                                    </DropdownMenuItem>
-                                    {!isCreator && (
-                                      <DropdownMenuItem 
-                                        onClick={() => navigate('/billing-dashboard')} 
-                                        className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                                      >
-                                        <CreditCard className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                        <span className="text-sm font-medium">Billing</span>
-                                      </DropdownMenuItem>
-                                    )}
-                                  </div>
-                                </AccordionContent>
-                              </AccordionItem>
-                            )}
 
                             {/* PROFESSIONAL Section */}
                             <AccordionItem value="professional" className="border-b-0">
@@ -620,15 +552,6 @@ export const Header = () => {
                                   <PlaneTakeoff className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                                   <span className="text-sm font-medium">Post a Trip</span>
                                 </DropdownMenuItem>
-                                {(isCreator || isAgentAccount || isBrand) && (
-                                  <DropdownMenuItem 
-                                    onClick={() => navigate('/tiktok-lab')} 
-                                    className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                                  >
-                                    <Video className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                                    <span className="text-sm font-medium">Creator Studio</span>
-                                  </DropdownMenuItem>
-                                )}
                               </div>
                             </AccordionContent>
                           </AccordionItem>
@@ -672,67 +595,9 @@ export const Header = () => {
                                     <span className="text-sm font-medium">Available Trips</span>
                                   </DropdownMenuItem>
                                 )}
-                                {isCreator && (
-                                  <>
-                                    <DropdownMenuItem 
-                                      onClick={() => navigate('/creator-trips')} 
-                                      className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                                    >
-                                      <Video className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                                      <span className="text-sm font-medium">Collab Opportunities</span>
-                                    </DropdownMenuItem>
-                                  </>
-                                )}
-                                {showPartnerBookings && (
-                                  <DropdownMenuItem 
-                                    onClick={() => navigate('/partner-bookings')} 
-                                    className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                                  >
-                                    <Calendar className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                                    <span className="text-sm font-medium">Partner Bookings</span>
-                                  </DropdownMenuItem>
-                                )}
                               </div>
                             </AccordionContent>
                           </AccordionItem>
-
-                          {/* EARNINGS & BILLING Section - Creators/Agents/Brands only */}
-                          {(isCreator || isAgentAccount || isBrand) && (
-                            <AccordionItem value="earnings" className="border-b-0">
-                              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-secondary/5 [&[data-state=open]]:bg-secondary/5">
-                                <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Earnings & Billing</p>
-                              </AccordionTrigger>
-                              <AccordionContent className="pb-0">
-                                <div className="py-1">
-                                  {isCreator && (
-                                    <DropdownMenuItem 
-                                      onClick={() => navigate('/tiktok-lab/earnings')} 
-                                      className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                                    >
-                                      <HandCoins className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                                      <span className="text-sm font-medium">Earnings</span>
-                                    </DropdownMenuItem>
-                                  )}
-                                  <DropdownMenuItem 
-                                    onClick={() => navigate('/partner/escrow')} 
-                                    className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                                  >
-                                    <ShieldCheck className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                                    <span className="text-sm font-medium">Escrow & Milestones</span>
-                                  </DropdownMenuItem>
-                                  {!isCreator && (
-                                    <DropdownMenuItem 
-                                      onClick={() => navigate('/billing-dashboard')} 
-                                      className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                                    >
-                                      <CreditCard className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                                      <span className="text-sm font-medium">Billing</span>
-                                    </DropdownMenuItem>
-                                  )}
-                                </div>
-                              </AccordionContent>
-                            </AccordionItem>
-                          )}
 
                           {/* PROFESSIONAL Section */}
                           <AccordionItem value="professional" className="border-b-0">
