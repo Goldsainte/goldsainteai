@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Send, Loader2, Mic, MicOff, Trash2, Filter, Radio, Volume2, Sparkles } from "lucide-react";
+import { X, Send, Loader2, Mic, MicOff, Trash2, Filter, Volume2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -13,7 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import logomark from "@/assets/logomark-seal-gold.png";
 import { RealtimeVoiceChat } from "@/utils/VoiceUtils";
-import { WakeWordDetector } from "@/utils/WakeWordDetector";
+
 import { HoldMusicGenerator } from "@/utils/HoldMusicGenerator";
 import { HoldMusicController } from "@/utils/HoldMusicController";
 import { BackgroundMusicController } from "@/utils/BackgroundMusicController";
@@ -52,7 +52,7 @@ export const AIBookingConcierge = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [voiceMode, setVoiceMode] = useState(false);
   const [voiceStatus, setVoiceStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'error' | 'needs-user-gesture'>('disconnected');
-  const [wakeWordActive, setWakeWordActive] = useState(false);
+  
   const [isProcessing, setIsProcessing] = useState(false);
   const [isPushToTalkActive, setIsPushToTalkActive] = useState(false);
   const [selectedUberProduct, setSelectedUberProduct] = useState<any>(null);
@@ -87,7 +87,7 @@ export const AIBookingConcierge = () => {
   const pushToTalkTimerRef = useRef<NodeJS.Timeout | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const voiceChatRef = useRef<RealtimeVoiceChat | null>(null);
-  const wakeWordDetectorRef = useRef<WakeWordDetector | null>(null);
+  
   const holdMusicRef = useRef<HoldMusicGenerator | null>(null);
   const musicControllerRef = useRef<HoldMusicController | null>(null);
   const bgMusicRef = useRef<BackgroundMusicController | null>(null);
@@ -97,7 +97,7 @@ export const AIBookingConcierge = () => {
   const workletNodeRef = useRef<AudioWorkletNode | null>(null);
   const resamplerNodeRef = useRef<AudioWorkletNode | null>(null);
   const keepAliveOscRef = useRef<OscillatorNode | null>(null);
-  const [wakeWordPrimed, setWakeWordPrimed] = useState(false);
+  
   const [diagMetrics, setDiagMetrics] = useState({
     micPermission: 'unknown' as PermissionState | 'unknown',
     micStreamActive: false,
@@ -651,12 +651,6 @@ export const AIBookingConcierge = () => {
           await bgMusicRef.current.arm();
         }
 
-        // Pause wake word while in active voice call to avoid mic conflicts
-        if (wakeWordDetectorRef.current) {
-          console.log('⏸️ Pausing wake word detection during voice call');
-          wakeWordDetectorRef.current.stop();
-          setWakeWordActive(false);
-        }
 
         // Step 1: Proactively request microphone permission
         console.log('🎤 [Step 2/6] Requesting microphone permission...');
@@ -680,7 +674,7 @@ export const AIBookingConcierge = () => {
             description: errorMsg,
             variant: "destructive",
           });
-          startWakeWordDetection();
+          return;
           return;
         }
         
@@ -1116,14 +1110,6 @@ export const AIBookingConcierge = () => {
           variant: "destructive",
         });
         
-        // Resume wake word detection after error with delay
-        console.log('🔄 Resuming wake word detection after voice error');
-        setTimeout(async () => {
-          safelyCancelSpeechSynthesis();
-          safelyStopHoldMusic();
-          await new Promise(r => setTimeout(r, 200));
-          await startWakeWordDetection();
-        }, 200);
       }
     } else {
       console.log('📴 Ending voice mode...');
@@ -1135,171 +1121,15 @@ export const AIBookingConcierge = () => {
       if (holdMusicRef.current) {
         holdMusicRef.current.stop();
       }
-      console.log('▶️ Resuming wake word detection after delay');
-      setTimeout(async () => {
-        safelyCancelSpeechSynthesis();
-        safelyStopHoldMusic();
-        await new Promise(r => setTimeout(r, 200));
-        await startWakeWordDetection();
-      }, 200);
     }
   };
 
-  const startWakeWordDetection = async () => {
-    try {
-      // Check browser support first
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        console.warn('⚠️ [WAKE_WORD] Not supported (Safari/iOS)');
-        // Don't show toast on every re-arm attempt
-        return;
-      }
-
-      console.log('🎤 [WAKE_WORD] Starting detection...');
-      
-      // CRITICAL: Stop all audio before starting recognition
-      safelyCancelSpeechSynthesis();
-      safelyStopHoldMusic();
-      
-      // Wait for audio to settle
-      await new Promise(r => setTimeout(r, 100));
-      
-      // Initialize detector if not exists
-      if (!wakeWordDetectorRef.current) {
-        wakeWordDetectorRef.current = new WakeWordDetector(() => {
-          console.log('🎯 [WAKE_WORD] Wake word detected!');
-          console.log('📊 [TELEMETRY] wake_word_detected', { timestamp: new Date().toISOString() });
-          
-          // Recognition already stopped inside detector
-          setWakeWordActive(false);
-          
-          // Open widget if not already open
-          if (!isOpen) {
-            console.log('🪟 [WAKE_WORD] Opening widget');
-            setIsOpen(true);
-          }
-          
-          // Activate voice mode (cleaner than toggleVoiceMode)
-          if (!voiceMode) {
-            console.log('🎤 [WAKE_WORD] Activating voice mode');
-            toggleVoiceMode();
-          }
-        });
-      }
-      
-      // Start the detector
-      await wakeWordDetectorRef.current.start();
-      
-      setWakeWordActive(true);
-      console.log('✅ [WAKE_WORD] Detection started');
-      
-    } catch (error: any) {
-      console.error('❌ [WAKE_WORD] Error:', error);
-      console.log('📊 [TELEMETRY] wake_word_error', { 
-        error: error instanceof Error ? error.message : 'Unknown error',
-        errorType: error?.name,
-        timestamp: new Date().toISOString() 
-      });
-      
-      // Only show toast if it's a permission error
-      if (error?.name === 'NotAllowedError') {
-        toast({
-          title: "Microphone Permission Required",
-          description: "Please allow microphone access to use wake word",
-          variant: "destructive",
-        });
-      }
-    }
-  };
-
-  // One-time user gesture to enable wake word pipeline (simplified)
-  const enableWakeWordPipeline = async () => {
-    try {
-      console.log('🎤 [ENABLE_WAKE] Starting wake word detection');
-      
-      // 1) Stop any hold music / TTS
-      safelyCancelSpeechSynthesis();
-      safelyStopHoldMusic();
-      
-      // 2) Wait for audio to settle
-      await new Promise(r => setTimeout(r, 100));
-      
-      // 3) Initialize WakeWordDetector if not exists
-      if (!wakeWordDetectorRef.current) {
-        wakeWordDetectorRef.current = new WakeWordDetector(() => {
-          console.log('🎯 Wake word callback fired');
-          // Detection stopped inside detector; now activate voice
-          if (!isOpen) setIsOpen(true);
-          if (!voiceMode) toggleVoiceMode();
-        });
-      }
-      
-      // 4) Start detection
-      await wakeWordDetectorRef.current.start();
-      
-      setWakeWordPrimed(true);
-      setWakeWordActive(true);
-      
-      toast({
-        title: "Wake Word Active",
-        description: "Say 'Hey Goldsainte' to activate voice mode (Chrome only)",
-      });
-    } catch (error: any) {
-      console.error('❌ [ENABLE_WAKE] Error:', error);
-      toast({
-        title: "Wake Word Error",
-        description: error?.message || "Failed to enable wake word",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Loopback test: Feed test WAV through KWS pipeline
-  const runLoopbackTest = async () => {
-    try {
-      console.log('🧪 [LOOPBACK] Starting loopback test');
-      toast({ title: 'Loopback Test', description: 'Testing KWS with sample audio...' });
-
-      const resp = await fetch('/test/hey-goldsainte.wav', { cache: 'reload' });
-      if (!resp.ok) throw new Error('Test WAV not found');
-      
-      const arrayBuffer = await resp.arrayBuffer();
-      console.log('🧪 [LOOPBACK] Loaded test WAV:', arrayBuffer.byteLength, 'bytes');
-      
-      // For this test, just verify the audio pipeline is loaded
-      if (!workletNodeRef.current) {
-        toast({ 
-          title: 'Loopback Test Failed', 
-          description: 'Enable wake word first', 
-          variant: 'destructive' 
-        });
-        return;
-      }
-
-      toast({ 
-        title: 'Loopback Test Complete', 
-        description: 'KWS pipeline is loaded. Check diagnostics for live metrics.' 
-      });
-    } catch (e: any) {
-      console.error('❌ [LOOPBACK] Test failed:', e);
-      toast({ 
-        title: 'Loopback Test Failed', 
-        description: e?.message || 'Failed to run test', 
-        variant: 'destructive' 
-      });
-    }
-  };
 
   const handlePushToTalkStart = async () => {
     if (isPushToTalkActive || voiceMode) return;
     
     setIsPushToTalkActive(true);
     
-    // Stop wake word detection while push-to-talk is active
-    if (wakeWordDetectorRef.current) {
-      wakeWordDetectorRef.current.stop();
-      setWakeWordActive(false);
-    }
     
     // Start voice mode
     await toggleVoiceMode();
@@ -1319,8 +1149,6 @@ export const AIBookingConcierge = () => {
       if (voiceMode) {
         toggleVoiceMode();
       }
-      // Resume wake word detection
-      startWakeWordDetection();
     }, 500);
   };
 
@@ -1355,23 +1183,16 @@ export const AIBookingConcierge = () => {
     }
   };
 
-  // Start wake word detection globally on component mount (not tied to widget open state)
+  // Cleanup on unmount
   useEffect(() => {
-    console.log('🎤 [GLOBAL] Starting wake word detection on mount');
-    startWakeWordDetection();
-
     return () => {
-      console.log('🧹 [GLOBAL] Component unmounting - stopping voice and wake word');
+      console.log('🧹 [GLOBAL] Component unmounting - stopping voice');
       voiceChatRef.current?.disconnect();
-      if (wakeWordDetectorRef.current) {
-        wakeWordDetectorRef.current.stop();
-        wakeWordDetectorRef.current = null;
-      }
       if (pushToTalkTimerRef.current) {
         clearTimeout(pushToTalkTimerRef.current);
       }
     };
-  }, []); // Empty deps - run once on mount, cleanup on unmount
+  }, []);
 
   if (!isOpen) {
     return (
@@ -1388,15 +1209,6 @@ export const AIBookingConcierge = () => {
               data-tour="ai-widget"
             >
               <div className="relative">
-                {wakeWordActive && (
-                  <Badge 
-                    variant="secondary" 
-                    className="hidden md:flex absolute -top-8 right-0 text-xs whitespace-nowrap animate-pulse"
-                  >
-                    <Radio className="w-3 h-3 mr-1" />
-                    Listening for "Hey Goldsainte"
-                  </Badge>
-                )}
                 <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-full blur-md opacity-60 group-hover:opacity-80 transition-opacity" />
                 <div className="relative bg-gradient-to-br from-primary to-accent p-2.5 md:p-3 rounded-full shadow-xl hover:scale-110 transition-transform">
                   <img 
@@ -1411,9 +1223,6 @@ export const AIBookingConcierge = () => {
           <TooltipContent side="left">
             <div className="space-y-1">
               <p className="font-semibold">Goldsainte AI Concierge</p>
-              {wakeWordActive && (
-                <p className="text-xs text-muted-foreground">Say "Hey Goldsainte" or click to start</p>
-              )}
             </div>
           </TooltipContent>
         </Tooltip>
@@ -1423,10 +1232,8 @@ export const AIBookingConcierge = () => {
           isOpen={showDiagnostics}
           onClose={() => setShowDiagnostics(false)}
           voiceChatRef={voiceChatRef}
-          wakeWordDetectorRef={wakeWordDetectorRef}
           holdMusicRef={holdMusicRef}
           metrics={diagMetrics}
-          onLoopbackTest={runLoopbackTest}
         />
       </>
     );
@@ -1479,9 +1286,6 @@ export const AIBookingConcierge = () => {
               )}
 
               {/* Voice Status Message */}
-              {wakeWordActive && !voiceMode && (
-                <VoiceStatusMessage status="wake-active" />
-              )}
               {voiceMode && isProcessing && (
                 <VoiceStatusMessage status="responding" />
               )}
@@ -1864,7 +1668,6 @@ export const AIBookingConcierge = () => {
         isOpen={showDiagnostics}
         onClose={() => setShowDiagnostics(false)}
         voiceChatRef={voiceChatRef}
-        wakeWordDetectorRef={wakeWordDetectorRef}
         holdMusicRef={holdMusicRef}
       />
 

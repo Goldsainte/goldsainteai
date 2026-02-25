@@ -15,7 +15,7 @@ test.describe('Voice AI Concierge', () => {
 
   test('should display concierge trigger button', async ({ page }) => {
     // Look for concierge button
-    const conciergeButton = page.locator('[data-testid="concierge-trigger"], button[aria-label*="concierge"], button:has-text("Hey Goldsainte")').first();
+    const conciergeButton = page.locator('[data-testid="concierge-trigger"], button[aria-label*="concierge"]').first();
     
     // Button should be visible
     await expect(conciergeButton).toBeVisible({ timeout: 10000 });

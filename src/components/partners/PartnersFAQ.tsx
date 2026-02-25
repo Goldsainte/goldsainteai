@@ -16,7 +16,7 @@ const faqs = [
   },
   {
     question: "How does the AI Concierge feature vendors?",
-    answer: "Our 'Hey Goldsainte' AI concierge uses voice recognition to help travelers book services. Promoted Vendors receive priority in AI search results, making your business more discoverable when travelers ask for transportation recommendations."
+    answer: "Our AI concierge uses voice recognition to help travelers book services. Promoted Vendors receive priority in AI search results, making your business more discoverable when travelers ask for transportation recommendations."
   },
   {
     question: "Can I collaborate with travel creators?",
