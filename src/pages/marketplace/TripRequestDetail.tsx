@@ -574,28 +574,17 @@ export default function TripRequestDetail() {
               </div>
             </div>
 
-            {/* Proposals section */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
+            {/* Proposals section — only show full list for trip owner */}
+            {isRequestOwner && (
+              <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <h2 className="font-secondary text-lg text-[#0a2225]">Proposals</h2>
                   <span className="inline-flex items-center rounded-full bg-[#FDFBF5] border border-[#E5DFC6] px-2.5 py-0.5 text-xs font-semibold text-[#7A7151]">
-                    {isRequestOwner ? proposals.length : proposalsCount}
+                    {proposals.length}
                   </span>
                 </div>
-                {!isRequestOwner && request.status === "open" && (
-                  <button
-                    type="button"
-                    onClick={() => document.getElementById("proposal-form")?.scrollIntoView({ behavior: "smooth" })}
-                    className="text-xs font-semibold text-[#0c4d47] hover:underline"
-                  >
-                    Submit a proposal ↓
-                  </button>
-                )}
-              </div>
 
-              {isRequestOwner ? (
-                proposals.length === 0 ? (
+                {proposals.length === 0 ? (
                   <div className="rounded-2xl border border-dashed border-[#E5DFC6] bg-white px-6 py-8 text-center shadow-sm">
                     <p className="font-secondary text-base text-[#0a2225]">No proposals yet</p>
                     <p className="mt-1 text-sm text-[#6B7280]">
@@ -608,32 +597,30 @@ export default function TripRequestDetail() {
                       <div key={proposal.id} className="space-y-3">
                         <ProposalCard proposal={proposal} showAdminInsights={isAdmin} />
                         
-                        {isRequestOwner && (
-                          <div className="flex items-center justify-between gap-3 px-2">
-                            <button
-                              type="button"
-                              onClick={() => toast.info("Chat feature coming soon")}
-                              className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFC6] bg-white px-4 py-2 text-sm font-medium text-[#0a2225] hover:border-[#C7A962] transition-colors"
-                            >
-                              Message
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleAcceptProposal(proposal.id)}
-                              disabled={proposal.status === "accepted" || proposal.status === "declined"}
-                              className={[
-                                "inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold shadow-sm transition-colors",
-                                proposal.status === "accepted" || proposal.status === "declined"
-                                  ? "cursor-not-allowed bg-[#E5DFC6]/50 text-[#6B7280]"
-                                  : "bg-[#0c4d47] text-white hover:bg-[#0c4d47]/90",
-                              ].join(" ")}
-                            >
-                              {proposal.status === "accepted" ? "Accepted" : "Accept proposal"}
-                            </button>
-                          </div>
-                        )}
+                        <div className="flex items-center justify-between gap-3 px-2">
+                          <button
+                            type="button"
+                            onClick={() => toast.info("Chat feature coming soon")}
+                            className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFC6] bg-white px-4 py-2 text-sm font-medium text-[#0a2225] hover:border-[#C7A962] transition-colors"
+                          >
+                            Message
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleAcceptProposal(proposal.id)}
+                            disabled={proposal.status === "accepted" || proposal.status === "declined"}
+                            className={[
+                              "inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold shadow-sm transition-colors",
+                              proposal.status === "accepted" || proposal.status === "declined"
+                                ? "cursor-not-allowed bg-[#E5DFC6]/50 text-[#6B7280]"
+                                : "bg-[#0c4d47] text-white hover:bg-[#0c4d47]/90",
+                            ].join(" ")}
+                          >
+                            {proposal.status === "accepted" ? "Accepted" : "Accept proposal"}
+                          </button>
+                        </div>
 
-                        {isRequestOwner && proposal.status !== "accepted" && proposal.status !== "declined" && (
+                        {proposal.status !== "accepted" && proposal.status !== "declined" && (
                           <div className="mx-2 rounded-xl border border-[#E5DFC6] bg-[#FDFBF5] p-3 text-xs text-[#0a2225] leading-relaxed">
                             <p>
                               <span className="font-semibold">By accepting this proposal</span>, your trip and payments stay protected by Goldsainte.
@@ -647,28 +634,19 @@ export default function TripRequestDetail() {
                       </div>
                     ))}
                   </div>
-                )
-              ) : (
-                <div className="rounded-2xl border border-dashed border-[#E5DFC6] bg-white px-6 py-6 text-center shadow-sm">
-                  <p className="font-secondary text-base text-[#0a2225]">
-                    {proposalsCount > 0 ? `${proposalsCount} ${proposalsCount === 1 ? 'proposal' : 'proposals'} submitted` : "Be the first to propose"}
-                  </p>
-                  <p className="mt-1 text-sm text-[#6B7280]">
-                    {proposalsCount > 0 
-                      ? "Your proposal will only be visible to the trip owner."
-                      : "No proposals yet — submit yours below."}
-                  </p>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
 
             {/* Proposal Form (below proposals) */}
             {!isRequestOwner && request.status === "open" && (
               <div id="proposal-form" className="rounded-2xl border border-[#E5DFC6] bg-white p-5 md:p-6 shadow-sm">
-                <GoldLabel>Your Proposal</GoldLabel>
-                <h2 className="mt-1 font-secondary text-lg text-[#0a2225]">Submit a proposal</h2>
+                <GoldLabel>Ready to propose?</GoldLabel>
+                <h2 className="mt-1 font-secondary text-lg text-[#0a2225]">Submit your proposal</h2>
                 <p className="mt-1 text-sm text-[#6B7280] leading-relaxed max-w-lg">
-                  Share your pricing, itinerary, and why you're the perfect match.
+                  {proposalsCount > 0
+                    ? `${proposalsCount} ${proposalsCount === 1 ? 'proposal has' : 'proposals have'} already been submitted — stand out with yours.`
+                    : "Be the first to submit a proposal for this trip. Share your pricing, itinerary, and why you're the perfect match."}
                 </p>
 
                 {userProfile && (
@@ -801,7 +779,6 @@ export default function TripRequestDetail() {
               </div>
             )}
 
-            <MarketplaceDisclaimer size="sm" align="center" />
           </div>
 
           {/* ===== RIGHT SIDEBAR (380px, sticky) ===== */}
@@ -843,9 +820,9 @@ export default function TripRequestDetail() {
                     { label: "Dates", value: request.dateRangeLabel },
                     ...(request.tripLengthDays ? [{ label: "Trip length", value: `${request.tripLengthDays} days` }] : []),
                     { label: "Travelers", value: `${request.travelers} ${request.travelers === 1 ? "person" : "people"}` },
-                    { label: "Trip style", value: request.tripType },
-                    { label: "Travel style", value: request.travelStyle },
-                  ].map((row, i) => (
+                    { label: "Trip type", value: request.tripType },
+                    { label: "Accommodation", value: request.travelStyle },
+                  ].filter(row => row.value && row.value !== "Not specified" && row.value !== "Dates TBD").map((row, i) => (
                     <div key={i} className="flex justify-between gap-2 border-b border-[#E5DFC6]/50 pb-2.5 last:border-0 last:pb-0">
                       <span className="text-xs text-[#9A9079]">{row.label}</span>
                       <span className="text-xs font-medium text-[#0a2225] text-right">{row.value}</span>
@@ -875,15 +852,27 @@ export default function TripRequestDetail() {
                 </button>
               )}
 
-              {/* Tips card */}
+              {/* How it works — agent/creator guidance */}
               <div className="rounded-2xl bg-[#0c4d47] p-5 text-emerald-50 shadow-sm">
-                <h3 className="font-secondary text-sm font-semibold text-white">Tips for proposals</h3>
-                <ul className="mt-2 list-disc space-y-1.5 pl-4 text-xs text-emerald-50/90">
-                  <li>Compare what's included: flights, hotels, transfers.</li>
-                  <li>Check reviews and destination experience.</li>
-                  <li>Ask questions in chat before accepting.</li>
-                  <li>Confirm cancellation and payment terms.</li>
-                </ul>
+                <h3 className="font-secondary text-sm font-semibold text-white">How it works</h3>
+                <ol className="mt-3 space-y-2.5 text-xs text-emerald-50/90">
+                  <li className="flex items-start gap-2.5">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/15 text-[10px] font-bold text-white">1</span>
+                    <span>Review the traveler's brief and visual inspiration</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/15 text-[10px] font-bold text-white">2</span>
+                    <span>Submit your proposal with pricing and itinerary</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/15 text-[10px] font-bold text-white">3</span>
+                    <span>The traveler reviews and compares proposals</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/15 text-[10px] font-bold text-white">4</span>
+                    <span>If accepted, it becomes a confirmed booking</span>
+                  </li>
+                </ol>
               </div>
             </div>
           </aside>
