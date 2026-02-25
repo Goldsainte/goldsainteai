@@ -1,51 +1,64 @@
 
 
-# Problem: Proposal Submission CTA is Invisible
+# Redesign Proposal Form as Multi-Step Wizard
 
-## What's Actually Happening
+## Overview
 
-The proposal form and the "Submit a Proposal" button **do exist** in the code — they're just buried where agents can't find them:
+Extract the proposal form (currently lines 664-801) from `TripRequestDetail.tsx` into a dedicated multi-step wizard component. The wizard will use the existing luxury design language (cream backgrounds, gold accents, rounded cards) and mirror the `LuxuryStepIndicator` pattern already used in onboarding.
 
-1. **The proposal form** sits at the very bottom of the left column, below the Trip Brief card, Visual Brief gallery, and any proposals section — requiring extensive scrolling
-2. **The "Submit a Proposal" CTA** is in the right sidebar, which on smaller screens stacks **below** the entire left column — meaning agents have to scroll past EVERYTHING to see it
-3. **No visible call-to-action** appears near the top of the page on any screen size
+## Step Breakdown
 
-The screenshot confirms this: the agent sees the hero, trip brief, special requests, vibe tags, and visual brief — but zero indication that there's a proposal form below.
+The current form fields naturally group into 4 steps:
 
-## Fix Plan
+| Step | Title | Fields |
+|---|---|---|
+| 1 — Pricing | Pricing & Timeline | Price (USD), Timeline (days), Deposit %, Deposit due days |
+| 2 — Itinerary | What's Included | Included (textarea), Not included (textarea), Itinerary overview (textarea) |
+| 3 — Fit | Why You | "Why you're a great fit" (textarea) |
+| 4 — Policies | Confirm & Submit | Cancellation policy selector, custom cancellation terms, both policy acknowledgement checkboxes, MarketplaceDisclaimer, Submit button |
 
-### Add a Prominent Floating/Sticky CTA for Non-Owners
+## New Component
 
-**File: `src/pages/marketplace/TripRequestDetail.tsx`**
+**File: `src/components/marketplace/ProposalWizard.tsx`**
 
-1. **Add a sticky bottom bar on mobile** (visible on screens below `lg:`) with a "Submit a Proposal" button that scrolls to the form — similar to how booking apps show a sticky "Book Now" bar:
+- Receives `newProposal` state, `setNewProposal`, `onSubmit`, `submittingProposal`, `proposalsCount`, `userProfile` as props
+- Internal `wizardStep` state (0-3)
+- Renders `LuxuryStepIndicator` at the top with 4 steps (icons: DollarSign, FileText, User, Shield)
+- Each step is a card with the same `luxuryInputClass` styling
+- "Next" button validates required fields per step before advancing; "Back" button goes to previous step
+- Step 4 shows summary of previous steps in a compact review block, plus the policy checkboxes and Submit button
+- Profile card (lines 674-716) stays above the wizard as context
+- Smooth crossfade transition between steps using CSS opacity/translate
 
-```
-┌─────────────────────────────────────────┐
-│  Budget: $5,000–$10,000    [Submit a Proposal]  │
-└─────────────────────────────────────────┘
-```
+## Changes to `TripRequestDetail.tsx`
 
-This renders at the bottom of the viewport, fixed position, only for non-owners when the request is open.
+- Import `ProposalWizard`
+- Replace the inline form block (lines 664-801) with `<ProposalWizard ... />`
+- Keep the `id="proposal-form"` on the wrapper div so scroll-to-form CTAs still work
+- All state (`newProposal`, `setNewProposal`, `handleSubmitProposal`, `submittingProposal`) stays in the parent — the wizard is purely presentational
 
-2. **Add an inline CTA right after the Trip Brief card** (above the Visual Brief) so agents see a clear prompt without scrolling to the very bottom:
+## Per-Step Validation
 
-```
-"Interested in this trip? Submit your proposal below."
-[Jump to Proposal Form ↓]
-```
-
-This is a lightweight text + button that smooth-scrolls to `#proposal-form`.
-
-3. **Keep the existing sidebar CTA** for desktop — it's fine at `lg:` breakpoint.
-
-### Summary
-
-| Change | Detail |
+| Step | Required to advance |
 |---|---|
-| Sticky mobile CTA bar | Fixed bottom bar with "Submit a Proposal" button, visible below `lg:` breakpoint, only for non-owners on open requests |
-| Inline CTA after brief | Small prompt + scroll button placed between the Trip Brief card and Visual Brief section |
-| No form changes | The existing proposal form stays where it is — we're just making it findable |
+| 1 | Price > 0 |
+| 2 | Itinerary overview non-empty |
+| 3 | Fit reason non-empty |
+| 4 | Both checkboxes checked (enforced by submit button disabled state, already exists) |
 
-Single file edit: `src/pages/marketplace/TripRequestDetail.tsx`
+"Back" is always enabled. Users can click completed steps in the indicator to jump back.
+
+## Visual Design
+
+- Step indicator: reuses `LuxuryStepIndicator` with gold completed states and check marks
+- Card container: `rounded-2xl border border-[#E5DFC6] bg-white p-5 md:p-6 shadow-sm` (matches current)
+- Step transition: `transition-opacity duration-200` for a lightweight fade
+- Progress text below indicator: "Step 1 of 4 — Pricing & Timeline"
+
+## Files
+
+| File | Action |
+|---|---|
+| `src/components/marketplace/ProposalWizard.tsx` | Create — multi-step wizard component |
+| `src/pages/marketplace/TripRequestDetail.tsx` | Edit — replace inline form with `<ProposalWizard />` |
 
