@@ -8,7 +8,7 @@ import { TripBookingCard } from "@/components/trips/TripBookingCard";
 import { TripItinerary } from "@/components/trips/TripItinerary";
 import { TripInclusions } from "@/components/trips/TripInclusions";
 import { TripHostSection } from "@/components/trips/TripHostSection";
-import { TripFAQs } from "@/components/trips/TripFAQs";
+import { TripFAQAccordion } from "@/components/trips/TripFAQAccordion";
 import { TripTrustFooter } from "@/components/trips/TripTrustFooter";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -164,9 +164,7 @@ export default function TripDetailPage() {
               )}
 
               {/* FAQs */}
-              {trip.faqs && (trip.faqs as any[]).length > 0 && (
-                <TripFAQs faqs={trip.faqs as Array<{ question: string; answer: string }>} />
-              )}
+              <TripFAQAccordion faqs={trip.faqs as Array<{ question: string; answer: string; category?: string }> || undefined} />
             </div>
 
             {/* Right Column - Booking Card (Sticky) */}
