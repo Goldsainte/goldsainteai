@@ -1,24 +1,64 @@
 
 
-# Make Vibe Tags, Must-Haves & Dealbreakers Collapsible Accordions
+# Part 3–6: Storyboard → Marketplace Conversion & Detail Page Enrichment
 
-## What Changes
+## Current State
 
-Convert the three pill-selection sections (Vibe & Experience Tags, Must-Haves, Dealbreakers) from always-visible `FieldBlock` wrappers into collapsible accordion items using the existing `Accordion` component from `@/components/ui/accordion`.
+The storyboard editor already has:
+- All structured fields (destination, dates, budget, travelers, vibes, must-haves, dealbreakers)
+- A "Submit to Marketplace" button that creates a `trip_requests` row and links the storyboard
+- Status tracking (draft → submitted)
+- Visual Brief gallery on the marketplace detail page via `TripStoryboardViewer`
 
-## Implementation
+**What's missing per the spec:**
 
-### `src/pages/TikTokLab/StoryboardEditorPage.tsx`
+| Requirement | Status |
+|---|---|
+| Marketplace detail page shows vibe tags, must-haves, dealbreakers, trip length | Missing — only basic fields displayed |
+| Storyboard status shows "Live in Marketplace" | Missing — only "Submitted" badge |
+| MVP validation (3+ visual pins required) | Missing |
+| Lock storyboard after submission (prevent edits) | Missing |
+| Marketplace detail page displays source_metadata fields | Missing — must-haves, dealbreakers, budget_per_person, trip_length_days stored in source_metadata but never read back |
 
-1. **Add import** for `Accordion, AccordionItem, AccordionTrigger, AccordionContent` from `@/components/ui/accordion`.
+## Plan
 
-2. **Replace lines 574-623** — wrap the three sections in a single `<Accordion type="multiple">` so users can open any combination. Each section becomes an `AccordionItem`:
+### 1. Storyboard Editor — MVP Validation & Lock
 
-   - **Vibe & Experience Tags** — AccordionTrigger shows label + count of selected tags (e.g. "Vibe & Experience Tags · 3 selected"). Content contains the existing pill buttons.
-   - **Must-Haves** — Same pattern with emerald styling. Shows count of selected items.
-   - **Dealbreakers** — Same pattern with red styling. Shows count of selected items.
+**`src/pages/TikTokLab/StoryboardEditorPage.tsx`**
 
-3. Styling: AccordionItems get `rounded-xl border border-[#E5DFC6] overflow-hidden` to match the existing trip details aesthetic. Triggers use `hover:no-underline` and `px-4 py-3`. Content gets the cream background `bg-[#FDF9F0]/30 px-4 py-4`.
+- **MVP validation** in `submitToMarketplace`: require at least 3 visual pins (`itemCount >= 3`), destination, and either dates or trip length. Show specific toast errors for each missing requirement.
+- **Lock after submission**: when `storyboard.status === "submitted"`, disable all trip detail fields, hide the "Submit to Marketplace" button, and show a "Live in Marketplace" badge (replacing "Submitted"). Add a link to view the marketplace listing (`/marketplace/request/${storyboard.trip_request_id}`).
+- **Status label update**: change the badge from "Submitted" to "Live in Marketplace" with a green pulse dot.
 
-No database changes. No new files. Single file edit.
+### 2. Marketplace Detail Page — Display Rich Trip Data
+
+**`src/pages/marketplace/TripRequestDetail.tsx`**
+
+The detail page currently reads `trip_requests` but ignores `source_metadata` (where must-haves, dealbreakers, trip_length_days, budget_per_person are stored). Changes:
+
+- **Fetch source_metadata** from the trip request query (already selected via `select("*")`).
+- **Parse and display** in the right sidebar "Trip Details" card:
+  - Trip length (days) — from `source_metadata.trip_length_days`
+  - Budget scope — "per person" or "total trip" from `source_metadata.budget_per_person`
+- **Add new sections** to the left column Trip Brief card (below description, above Visual Brief):
+  - **Vibe Tags** — pill badges from `interests` column (already on `trip_requests`)
+  - **Must-Haves** — emerald pill badges from `source_metadata.must_haves`
+  - **Dealbreakers** — red pill badges from `source_metadata.dealbreakers`
+- **Expand the `TripRequest` type** to include `interests`, `tripLengthDays`, `budgetPerPerson`, `mustHaves`, `dealbreakers`.
+- **Map from raw data** in the `fetchData` function, parsing `source_metadata` JSON.
+
+### 3. No Database Changes Required
+
+All the data is already persisted:
+- `interests` is a direct column on `trip_requests`
+- `must_haves`, `dealbreakers`, `trip_length_days`, `budget_per_person` are stored in `source_metadata` JSON on `trip_requests`
+
+No migration needed.
+
+### Files to Edit
+
+| File | Changes |
+|---|---|
+| `src/pages/TikTokLab/StoryboardEditorPage.tsx` | MVP validation (3+ pins), lock fields after submission, "Live in Marketplace" badge with link |
+| `src/pages/marketplace/TripRequestDetail.tsx` | Parse source_metadata, display vibe tags, must-haves, dealbreakers, trip length, budget scope |
 
