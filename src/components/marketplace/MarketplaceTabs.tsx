@@ -15,17 +15,17 @@ export function MarketplaceTabs({ activeTab, onTabChange }: MarketplaceTabsProps
   const tabs = [
     { 
       id: "trips", 
-      label: "Ready to Book", 
-      shortLabel: "Book", 
+      label: "Curated Trips", 
+      shortLabel: "Curated", 
       icon: Plane,
-      description: "Pre-packaged trips you can book instantly from verified creators & agents"
+      description: "Pre-packaged trips from verified creators & agents, ready to book instantly"
     },
     { 
       id: "trip-requests", 
-      label: "Trip Requests", 
-      shortLabel: "Requests", 
+      label: "Custom Requests", 
+      shortLabel: "Custom", 
       icon: FileText,
-      description: "Trip briefs from travelers looking for creators or agents to help plan their journey"
+      description: "Travelers looking for a custom quote — submit a proposal to plan their dream trip"
     },
   ] as const;
 
