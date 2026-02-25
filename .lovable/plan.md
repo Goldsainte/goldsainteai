@@ -1,113 +1,71 @@
 
 
-# Travel Storyboards → Marketplace Conversion: Gap Analysis & Plan
+# Part 2: Structured Storyboard Fields — Must-Haves, Dealbreakers, Budget & Vibe Tags
 
-## What Already Exists
+## Current State
 
-The storyboard system is largely built. Here is the current state:
+The storyboard editor already has a collapsible "Trip Details" section with: destination, departure city, dates, travelers, occasion, budget min/max, budget level, accommodation style, pace, flexibility, interests pills, and special notes.
 
-| Feature | Status |
-|---|---|
-| Create a new storyboard | Done — `/storyboards/new` |
-| Name the storyboard | Done — title input in StoryboardBuilder |
-| Add cover image | Partial — `cover_image_url` column exists but no UI to set it |
-| Add visual pins (images, links, videos, notes) | Done — photos via Unsplash search, links via paste |
-| Add structured trip details | Missing — storyboard has description/tags but no trip-specific fields (destination, dates, budget, travelers, pace, interests) |
-| Save as draft | Done — saves to `storyboards` table |
-| Submit to marketplace | Partial — "Convert to Trip" button exists, redirects to `/post-trip?fromStoryboard=ID`, but only pre-fills title and description. No structured trip fields transfer. |
-| Pinterest-style visual grid | Partial — masonry columns layout exists but no drag-to-reorder, no delete items |
+**What's missing per the spec:**
 
-## What Needs to Be Built
+| Spec Requirement | DB Column | UI | Status |
+|---|---|---|---|
+| Trip length (days) | Missing | Missing | New |
+| Budget per-person toggle | Missing | Missing | New |
+| Vibe & Experience Tags (Romantic, Wellness, etc.) | `interests` exists but has wrong options | Partially built | Update options |
+| Must-Haves (5-star hotel, yacht day, etc.) | Missing | Missing | New |
+| Dealbreakers (no red-eyes, no hostels, etc.) | Missing | Missing | New |
 
-### 1. Structured Trip Details on Storyboard (Database)
+## Plan
 
-Add optional trip-planning fields to the `storyboards` table so users can enter structured details directly on the storyboard before converting:
+### 1. Database Migration
+
+Add 3 new columns to `storyboards`:
 
 ```sql
 ALTER TABLE public.storyboards
-  ADD COLUMN IF NOT EXISTS destination text,
-  ADD COLUMN IF NOT EXISTS departure_city text,
-  ADD COLUMN IF NOT EXISTS start_date date,
-  ADD COLUMN IF NOT EXISTS end_date date,
-  ADD COLUMN IF NOT EXISTS budget_min numeric,
-  ADD COLUMN IF NOT EXISTS budget_max numeric,
-  ADD COLUMN IF NOT EXISTS budget_level text,
-  ADD COLUMN IF NOT EXISTS travelers_adults integer DEFAULT 2,
-  ADD COLUMN IF NOT EXISTS travelers_children integer DEFAULT 0,
-  ADD COLUMN IF NOT EXISTS occasion text,
-  ADD COLUMN IF NOT EXISTS accommodation_style text,
-  ADD COLUMN IF NOT EXISTS pace text,
-  ADD COLUMN IF NOT EXISTS interests text[] DEFAULT '{}',
-  ADD COLUMN IF NOT EXISTS flexibility text,
-  ADD COLUMN IF NOT EXISTS special_notes text,
-  ADD COLUMN IF NOT EXISTS status text DEFAULT 'draft';
+  ADD COLUMN IF NOT EXISTS trip_length_days integer,
+  ADD COLUMN IF NOT EXISTS budget_per_person boolean DEFAULT false,
+  ADD COLUMN IF NOT EXISTS must_haves text[] DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS dealbreakers text[] DEFAULT '{}';
 ```
 
-The `status` field enables draft vs. submitted tracking (`draft` | `submitted`).
+No RLS changes needed — existing owner-based policies cover new columns.
 
-### 2. Cover Image Upload UI
+### 2. `src/pages/TikTokLab/StoryboardEditorPage.tsx`
 
-**`src/pages/TikTokLab/StoryboardEditorPage.tsx`** — In the detail hero section, add a "Set cover image" button that:
-- Lets user pick from existing storyboard items (click any photo to set as cover)
-- Updates `cover_image_url` on the `storyboards` row
-- Shows immediately in the hero
+**Update option arrays** at the top of the file:
 
-### 3. Trip Details Section in Editor
+- Replace `INTEREST_OPTIONS` with the spec's vibe/experience tags: Romantic, Adventure, Wellness, Cultural, Nightlife, Relaxation, Luxury, Family-friendly, Food-focused, Beach, City
+- Add `MUST_HAVE_OPTIONS`: 5-star hotel, Boutique hotel, All-inclusive, Private transfers, Yacht day, Guided tours, Michelin dining, Spa day, VIP nightlife, Child-friendly activities
+- Add `DEALBREAKER_OPTIONS`: No red-eye flights, No long layovers, No hostels, No tourist-heavy areas, No shared rooms
 
-**`src/pages/TikTokLab/StoryboardEditorPage.tsx`** — Add a collapsible "Trip Details" section below the hero and above the builder. This section contains the structured fields (destination, dates, budget, travelers, pace, interests, etc.) that mirror the PostTripPage wizard but in a single-page layout. Fields auto-save on blur or change.
+**Expand `StoryboardData` type** to include `trip_length_days`, `budget_per_person`, `must_haves`, `dealbreakers`.
+
+**Expand `tripFields` state** to include the 4 new fields.
+
+**Update Trip Details form** — add 4 new sections inside the collapsible:
 
 ```text
-┌──────────────────────────────────────────────────┐
-│  [Cover Image Hero]                              │
-│  Title · Description · Tags                      │
-│  [Edit Details] [Submit to Marketplace →]        │
-├──────────────────────────────────────────────────┤
-│  ▼ Trip Details (collapsible)                    │
-│    Destination    Departure City                 │
-│    Start Date     End Date                       │
-│    Adults         Children        Occasion       │
-│    Budget $min – $max   Budget Style             │
-│    Accommodation Style  Pace                     │
-│    Interests: [pills]                            │
-│    Flexibility    Special Notes                  │
-├──────────────────────────────────────────────────┤
-│  StoryboardBuilder (photos/links)                │
-└──────────────────────────────────────────────────┘
+Existing rows...
+├── [NEW] Trip Length (days) input — between Dates row and Travelers row
+├── [NEW] Budget per-person toggle — next to Budget Level
+├── [NEW] Vibe & Experience Tags — replaces current Interests (same toggle-pill UI, new labels)
+├── [NEW] Must-Haves — toggle pills (same pattern as interests)
+├── [NEW] Dealbreakers — toggle pills + optional free-text input
+└── Special Notes (existing)
 ```
 
-### 4. "Submit to Marketplace" Button
+All new fields auto-save on blur/change using the existing `saveTripField` callback, which already handles arrays and integers. The `submitToMarketplace` function already passes all `tripFields` to `trip_requests`, so new fields will need to be mapped there too (if those columns exist on `trip_requests` — if not, they go into `source_metadata` JSON).
 
-Replace the current "Convert to Trip" link (which redirects to `/post-trip`) with an inline "Submit to Marketplace" action that:
-1. Validates all required trip details are filled in
-2. Creates a `trip_requests` row directly from the storyboard data
-3. Links the storyboard to the trip request (`trip_request_id`)
-4. Updates storyboard `status` to `submitted`
-5. Shows success toast and navigates to `/my-trip-requests`
+**Update the hero summary pills** to show must-haves count and dealbreakers count if populated.
 
-This eliminates the redirect to the 6-step wizard when the user has already filled in details on the storyboard itself. The "Convert to Trip" link remains as a fallback for users who prefer the guided wizard.
+### 3. Pre-fill Hook Update
 
-### 5. Delete Items from Storyboard
-
-**`src/components/storyboards/StoryboardBuilder.tsx`** — Add an X button on each item in the preview grid to remove items. For saved items (with `id`), delete from `storyboard_items` table. For unsaved items, remove from local state.
-
-### 6. Improved Prefill for Post-Trip Wizard
-
-**`src/hooks/useStoryboardPrefill.ts`** — When converting via the wizard (`/post-trip?fromStoryboard=ID`), fetch all the new structured fields from the storyboard and pre-fill the wizard form with them (destination, dates, budget, travelers, pace, interests, etc.), not just title and description.
+**`src/hooks/useStoryboardPrefill.ts`** — Map the 4 new fields so the Post-Trip wizard also receives them when using the "Use Trip Wizard" fallback path.
 
 ### Files to Edit
-
-| File | Changes |
-|---|---|
-| **Database migration** | Add trip detail columns + status to `storyboards` table |
-| **`src/pages/TikTokLab/StoryboardEditorPage.tsx`** | Cover image picker, trip details section, submit to marketplace action |
-| **`src/components/storyboards/StoryboardBuilder.tsx`** | Delete items, set-as-cover button on photos |
-| **`src/hooks/useStoryboardPrefill.ts`** | Fetch and map all new structured fields for wizard prefill |
-| **`src/integrations/supabase/types.ts`** | Auto-updated after migration |
-
-### What This Does NOT Change
-
-- The PostTripPage wizard remains intact as an alternative path
-- The storyboard remains a "Pinterest-style" visual board at its core
-- No changes to RLS policies (existing owner-based policies cover the new columns)
-- No changes to the marketplace trip request display
+- **Database migration** — Add `trip_length_days`, `budget_per_person`, `must_haves`, `dealbreakers` columns
+- **`src/pages/TikTokLab/StoryboardEditorPage.tsx`** — New fields in type, state, form UI, and submit logic
+- **`src/hooks/useStoryboardPrefill.ts`** — Map new fields for wizard prefill
 
