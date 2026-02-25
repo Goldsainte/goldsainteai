@@ -1,81 +1,73 @@
 
 
-# Marketplace Trip Request Cards — Clarity for Agents & Creators
+# Trip Request Detail Page — Redesign for Agent/Creator Clarity
 
-## Problem
+## Problems Identified
 
-The "Custom Requests" grid cards look like product listings rather than traveler briefs seeking proposals. An agent or creator can't tell at a glance: who posted this, what kind of trip they want, how competitive it is, or that they should respond.
+From the screenshot and code review, this page confuses agents/creators in several ways:
 
-## Changes
+| Issue | Detail |
+|---|---|
+| **Tips card is written for travelers, not agents** | "Check reviews and destination experience", "Ask questions in chat before accepting" — these are buyer tips, not seller tips |
+| **"Trip style: Not specified" clutter** | Rows showing "Not specified" add noise and make the brief look incomplete |
+| **"Posted by" card is buried** | It appears below the proposals section in the sidebar — agents should see WHO they're proposing to immediately |
+| **Empty proposals section dominates** | "Proposals 0" with a large empty card takes prime real estate when the agent should be reading the brief |
+| **Sidebar order is wrong for agents** | Should be: Traveler → Trip Details → Budget → CTA → Tips. Currently: Traveler → Details → Budget → CTA → Tips (close but tips content is wrong) |
+| **No clear "what happens next" guidance** | Agent doesn't know the workflow: submit → traveler reviews → accepts → booking created |
+| **Marketplace disclaimer appears twice** | Once inside the proposal form area, once below — redundant |
+| **Labels like "Trip style" vs "Travel style"** | Ambiguous — merge into one or use clearer labels like "Accommodation" and "Pace" |
 
-### 1. `TripRequestGrid.tsx` — Enriched Cards
+## Plan
 
-**Add to each card:**
-- **Traveler avatar + name** (or "A Goldsainte Traveler" fallback) at the top of the card — immediately signals "a person posted this"
-- **"Seeking proposals" label** — small badge below the image so it's unambiguous this is a request, not a listing
-- **Vibe/interest tags** — show up to 3 pill tags from `interests` array (e.g. "Romantic", "Wellness") so agents can pre-qualify fit
-- **Travelers count** — "2 travelers" line next to destination
-- **Trip length** if available — "7 days" alongside the date
-- **Relative time** — "Posted 2h ago" instead of absolute date (using `date-fns` `formatDistanceToNow`)
-- **Proposal count badge** — "3 proposals" in a small pill, giving urgency signal
+### 1. Reorder & Clean Up the Page Layout
 
-**Data requirements:** The parent `Marketplace.tsx` query for `trip_requests` needs to join `profiles` (for traveler name/avatar) and get a count of `trip_proposals`. Update the query to:
-```sql
-select *, profiles!trip_requests_user_id_fkey(full_name, avatar_url), trip_proposals(count)
+**Left column — streamline for agents:**
+- **Trip Brief card** — keep as-is (description, special requests, vibes, must-haves, dealbreakers, visual brief) — this is good
+- **Remove the standalone "Proposals" section for non-owners** — agents don't need to see "0 proposals" or "3 proposals submitted". Just show the proposal count as a small note near the CTA. Only the trip OWNER sees the full proposals list
+- **Proposal form** — keep below the brief, but add a clear section header: "Ready to propose?" with a one-line explanation of the workflow
+
+**Right sidebar — reorder for agent context:**
+1. **Posted by** card — MOVE TO TOP so agents immediately see who the traveler is
+2. **Trip Details** card — filter out "Not specified" rows, rename confusing labels
+3. **Budget** card — keep
+4. **Submit Proposal CTA** — keep
+5. **"How it works" card** — REPLACE the current tips card with agent-focused workflow steps
+6. Remove duplicate MarketplaceDisclaimer from below the left column (keep only the one inside the form)
+
+### 2. Fix the Tips Card → "How It Works" for Agents
+
+Replace the current traveler-focused tips with agent/creator workflow guidance:
+
+```
+How it works
+1. Review the traveler's brief and visual inspiration
+2. Submit your proposal with pricing and itinerary
+3. The traveler reviews and compares proposals
+4. If accepted, it becomes a confirmed booking
 ```
 
-Update the `TripRequest` interface in the grid to include: `travelers_adults`, `travelers_children`, `interests`, `profiles`, `proposal_count`.
+### 3. Clean Up Trip Details Sidebar
 
-### 2. `TripRequestGrid.tsx` — Card Layout Redesign
+- **Hide rows where value is "Not specified"** — don't show empty data
+- Rename "Trip style" → "Trip type" and "Travel style" → "Accommodation preference"
+- Add trip length row if available from source_metadata
 
-Current layout: image → title + budget → destination → date
+### 4. Simplify Proposals Section for Non-Owners
 
-New layout:
-```text
-┌─────────────────────────────┐
-│  [4:3 destination image]    │
-│  ┌─────────────────────┐    │
-│  │ Seeking proposals    │    │  ← overlay badge, bottom-left
-│  └─────────────────────┘    │
-├─────────────────────────────┤
-│ 🧑 Jane D. · 2 travelers   │  ← avatar + name + travelers
-│ Trip to Amalfi Coast        │  ← title
-│ 📍 Italy · 7 days           │  ← destination + trip length
-│ Romantic · Wellness · Food  │  ← up to 3 vibe tags as pills
-│ $5,000–$8,000 · 3 proposals │  ← budget + proposal count
-│ Posted 2h ago               │  ← relative time
-└─────────────────────────────┘
-```
+For agents/creators viewing the page:
+- Remove the large empty "Be the first to propose" card
+- Instead, show a small inline note above the proposal form: "Be the first to submit a proposal" or "2 proposals already submitted — stand out with yours"
+- This reduces visual noise and keeps the focus on the brief + form
 
-### 3. `Marketplace.tsx` — Update Query
+### 5. Move "Posted by" to Top of Sidebar
 
-Expand the `trip-requests-unified` query to fetch:
-- `profiles(full_name, avatar_url)` via the user_id FK
-- `trip_proposals(count)` for proposal count
-- `interests`, `travelers_adults`, `travelers_children`, `source_metadata` for trip length
-
-Map the enriched data into the `TripRequestGrid` props.
-
-### 4. `MarketplaceTabs.tsx` — Rename for Clarity
-
-Change "Custom Requests" → **"Traveler Briefs"** (or "Open Briefs") and update the tooltip description to: *"Real travelers looking for a custom trip — review their brief and submit your proposal"*
-
-This small rename removes the ambiguity of whose "request" it is.
-
-### 5. `EmptyState.tsx` — Update Trip Requests Copy
-
-Change the empty state for `trip-requests`:
-- Title: "No traveler briefs yet"
-- Description: "When travelers post trip requests, they'll appear here for you to review and propose on."
+Currently buried — move it to position 1 in the sidebar so agents immediately see the traveler identity and trust signals.
 
 ## Files to Edit
 
 | File | Changes |
 |---|---|
-| `src/components/marketplace/TripRequestGrid.tsx` | Enriched card layout with avatar, vibe tags, proposal count, relative time, "Seeking proposals" badge |
-| `src/pages/Marketplace.tsx` | Expand trip_requests query to join profiles + count proposals, pass enriched data |
-| `src/components/marketplace/MarketplaceTabs.tsx` | Rename "Custom Requests" → "Traveler Briefs" |
-| `src/components/marketplace/EmptyState.tsx` | Update trip-requests empty state copy |
+| `src/pages/marketplace/TripRequestDetail.tsx` | Reorder sidebar (Posted by → top), hide "Not specified" rows, replace tips card with "How it works" steps, simplify non-owner proposals section, remove duplicate disclaimer, rename ambiguous labels |
 
-No database changes needed — all data already exists.
+Single file edit. No database changes.
 
