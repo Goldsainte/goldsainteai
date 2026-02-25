@@ -64,15 +64,29 @@ export function StoryboardBuilder({
     let cancelled = false;
 
     async function loadItems() {
-      const { data, error } = await supabase
-        .from("storyboard_items")
-        .select("*")
-        .eq("storyboard_id", storyboardId!)
-        .order("position", { ascending: true });
+      const [itemsResult, sbResult] = await Promise.all([
+        supabase
+          .from("storyboard_items")
+          .select("*")
+          .eq("storyboard_id", storyboardId!)
+          .order("position", { ascending: true }),
+        supabase
+          .from("storyboards")
+          .select("title")
+          .eq("id", storyboardId!)
+          .single(),
+      ]);
 
-      if (cancelled || error) return;
+      if (cancelled) return;
 
-      const mapped: Item[] = (data || []).map((item: any) => ({
+      // Pre-fill title from saved storyboard if not already set
+      if (sbResult.data?.title && !title) {
+        setTitle(sbResult.data.title);
+      }
+
+      if (itemsResult.error) return;
+
+      const mapped: Item[] = (itemsResult.data || []).map((item: any) => ({
         id: item.id,
         kind: (item.item_type === "image" ? "photo" : item.item_type) as Item["kind"],
         source: (item.source_type || "manual") as Item["source"],
