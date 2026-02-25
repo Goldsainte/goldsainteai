@@ -1,65 +1,51 @@
 
 
-# Traveler Briefs Not Showing — Root Cause & Fix
+# Problem: Proposal Submission CTA is Invisible
 
-## Problem
+## What's Actually Happening
 
-The database has 8 open trip requests, but the marketplace shows "No traveler briefs yet."
+The proposal form and the "Submit a Proposal" button **do exist** in the code — they're just buried where agents can't find them:
 
-## Root Cause
+1. **The proposal form** sits at the very bottom of the left column, below the Trip Brief card, Visual Brief gallery, and any proposals section — requiring extensive scrolling
+2. **The "Submit a Proposal" CTA** is in the right sidebar, which on smaller screens stacks **below** the entire left column — meaning agents have to scroll past EVERYTHING to see it
+3. **No visible call-to-action** appears near the top of the page on any screen size
 
-The query in `Marketplace.tsx` uses this join:
+The screenshot confirms this: the agent sees the hero, trip brief, special requests, vibe tags, and visual brief — but zero indication that there's a proposal form below.
 
-```typescript
-profiles!trip_requests_user_id_fkey(full_name, avatar_url)
+## Fix Plan
+
+### Add a Prominent Floating/Sticky CTA for Non-Owners
+
+**File: `src/pages/marketplace/TripRequestDetail.tsx`**
+
+1. **Add a sticky bottom bar on mobile** (visible on screens below `lg:`) with a "Submit a Proposal" button that scrolls to the form — similar to how booking apps show a sticky "Book Now" bar:
+
+```
+┌─────────────────────────────────────────┐
+│  Budget: $5,000–$10,000    [Submit a Proposal]  │
+└─────────────────────────────────────────┘
 ```
 
-But the foreign key `trip_requests_user_id_fkey` points to **`auth.users`**, not `public.profiles`. PostgREST cannot resolve this join hint, so the entire query fails silently (or returns an error that gets swallowed), resulting in zero results.
+This renders at the bottom of the viewport, fixed position, only for non-owners when the request is open.
 
-## Fix
+2. **Add an inline CTA right after the Trip Brief card** (above the Visual Brief) so agents see a clear prompt without scrolling to the very bottom:
 
-### File: `src/pages/Marketplace.tsx`
-
-Remove the FK hint from the profiles join. Since `trip_requests.user_id` and `profiles.id` share the same UUID values, PostgREST can infer the relationship if there's a FK from profiles to auth.users — but the safest approach is to drop the explicit hint and let PostgREST auto-detect via column name matching:
-
-```typescript
-.select(`
-  *,
-  profiles(full_name, avatar_url),
-  trip_proposals(count)
-`)
+```
+"Interested in this trip? Submit your proposal below."
+[Jump to Proposal Form ↓]
 ```
 
-If PostgREST still can't infer the join (because there's no direct FK between `trip_requests` and `profiles`), we fall back to fetching profiles separately after the main query — similar to what `tripRequestsService.ts` already does.
+This is a lightweight text + button that smooth-scrolls to `#proposal-form`.
 
-### Fallback approach (if the implicit join doesn't work)
+3. **Keep the existing sidebar CTA** for desktop — it's fine at `lg:` breakpoint.
 
-Fetch trip requests without the profiles join, then batch-fetch profiles by user_id:
+### Summary
 
-```typescript
-const { data, error } = await supabase
-  .from("trip_requests")
-  .select(`*, trip_proposals(count)`)
-  .eq("status", "open")
-  .order("created_at", { ascending: false });
-
-// Then fetch profiles for all unique user_ids
-const userIds = [...new Set(data.map(r => r.user_id).filter(Boolean))];
-const { data: profiles } = await supabase
-  .from("profiles")
-  .select("id, full_name, avatar_url")
-  .in("id", userIds);
-
-// Merge profiles into requests
-```
-
-This mirrors the pattern already used in `tripRequestsService.ts` (lines 68-75).
-
-## Files to Edit
-
-| File | Change |
+| Change | Detail |
 |---|---|
-| `src/pages/Marketplace.tsx` | Fix the profiles join in the `trip-requests-unified` query — remove the broken FK hint or switch to a two-step fetch |
+| Sticky mobile CTA bar | Fixed bottom bar with "Submit a Proposal" button, visible below `lg:` breakpoint, only for non-owners on open requests |
+| Inline CTA after brief | Small prompt + scroll button placed between the Trip Brief card and Visual Brief section |
+| No form changes | The existing proposal form stays where it is — we're just making it findable |
 
-Single file, single query fix. No database changes needed.
+Single file edit: `src/pages/marketplace/TripRequestDetail.tsx`
 
