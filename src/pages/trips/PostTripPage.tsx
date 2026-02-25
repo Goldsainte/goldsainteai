@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
 import { toast } from "sonner";
 import { StoryboardBuilder } from "@/components/storyboards/StoryboardBuilder";
+import { TravelStoryboard } from "@/components/storyboards/TravelStoryboard";
 import { useAuth } from "@/contexts/AuthContext";
 import { useStoryboardPrefill } from "@/hooks/useStoryboardPrefill";
 import { useItineraryPrefill } from "@/hooks/useItineraryPrefill";
@@ -66,6 +67,7 @@ export default function PostTripPage() {
   const [showSafetyModal, setShowSafetyModal] = useState(false);
   const [storyboardId, setStoryboardId] = useState<string | null>(null);
   const storyboardSaveRef = useRef<(() => Promise<void>) | null>(null);
+  const storyboardAddItemRef = useRef<((item: any) => void) | null>(null);
   const interestOptions = [
     "Food & wine", "Design hotels", "Adventure", "Wellness",
     "Nightlife", "Culture & museums", "Family-friendly", "Honeymoon / romance",
@@ -538,12 +540,41 @@ export default function PostTripPage() {
                 destination={destination}
                 onSaved={(id) => setStoryboardId(id)}
                 saveRef={storyboardSaveRef}
+                addItemRef={storyboardAddItemRef}
               />
               {storyboardId && (
                 <p className="text-xs text-[#0c4d47] flex items-center gap-1.5">
                   <Check className="h-3.5 w-3.5" /> Storyboard saved
                 </p>
               )}
+
+              {/* Browse inspiration gallery */}
+              <div className="mt-6 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-[#C7A962]" />
+                  <p className="text-xs font-medium text-[#4a4a4a]">
+                    Or browse curated inspiration — tap any image to add it
+                  </p>
+                </div>
+                <TravelStoryboard
+                  maxItems={24}
+                  title=""
+                  subtitle=""
+                  highlightTags={destination ? [destination.toLowerCase()] : []}
+                  onImageClick={(img) => {
+                    storyboardAddItemRef.current?.({
+                      kind: "photo",
+                      source: "manual",
+                      data: {
+                        thumb_url: img.thumbnail_url || img.url,
+                        full_url: img.url,
+                        alt: img.label || "Inspiration photo",
+                        location: img.destination_tags?.[0] || null,
+                      },
+                    });
+                  }}
+                />
+              </div>
             </div>
           )}
 
