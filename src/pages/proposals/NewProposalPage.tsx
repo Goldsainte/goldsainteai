@@ -237,6 +237,7 @@ export default function NewProposalPage() {
     if (!user || !tripData) return;
     setSubmitting(true);
 
+    try {
     const inclusions = inclusionsText.split("\n").map((s) => s.trim()).filter(Boolean);
     const exclusions = exclusionsText.split("\n").map((s) => s.trim()).filter(Boolean);
 
@@ -258,11 +259,14 @@ export default function NewProposalPage() {
       pricing_confirmed: pricingConfirmed === "confirmed",
       balance_due: balanceDue,
       deposit_refundable: depositRefundable,
-      cancellation_windows: cancellationWindows,
+      cancellation_windows: cancellationWindows.map((w: any) => ({
+        label: w.label || w.band || "",
+        refund_percent: w.refund_percent ?? w.refund_pct ?? 0,
+      })),
       ...(hasPlanningFee && planningFee ? { planning_fee: planningFee, planning_fee_refundable: planningFeeRefundable } : {}),
       ...(changeFee ? { change_fee: changeFee } : {}),
       ...(supplierDependent ? { supplier_dependent: true, supplier_dependent_note: supplierDependentNote } : {}),
-      external_links: externalLinks.filter((l) => l.trim()),
+      external_links: externalLinks.filter((l) => l.trim()).map((url) => ({ label: url, url })),
       // Commission model fields
       commission_model: commissionModel,
       ...(commissionModel === "percentage" ? {
@@ -343,9 +347,14 @@ export default function NewProposalPage() {
       body: { tripRequestId: tripId },
     }).catch((err) => console.error("Notification error:", err));
 
-    setSubmitting(false);
     toast.success("Proposal submitted successfully!");
     navigate(`/proposals/${insertedData.id}`);
+    } catch (err) {
+      console.error("Proposal submission failed:", err);
+      toast.error("An unexpected error occurred while submitting your proposal. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (loading) {
