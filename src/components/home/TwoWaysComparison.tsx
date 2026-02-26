@@ -1,4 +1,5 @@
 import { Check } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const marketplaceFeatures = [
   "Receive multiple custom trip designs",
@@ -26,7 +27,7 @@ const storyboardingFeatures = [
   "Designed specifically for travel (not generic boards)",
 ];
 
-function FeatureCard({ title, features }: { title: string; features: string[] }) {
+function FeatureCard({ title, features, linkTo, linkLabel }: { title: string; features: string[]; linkTo?: string; linkLabel?: string }) {
   return (
     <div className="rounded-2xl border border-[#0c4d47] bg-[#FDF9F0] p-6 md:p-8 text-left">
       <h3 className="font-secondary text-xl md:text-2xl text-[#0a2225] mb-1">{title}</h3>
@@ -44,6 +45,16 @@ function FeatureCard({ title, features }: { title: string; features: string[] })
           </div>
         ))}
       </div>
+      {linkTo && linkLabel && (
+        <div className="mt-6 text-center">
+          <Link
+            to={linkTo}
+            className="inline-block rounded-full bg-[#0c4d47] px-6 py-2.5 text-sm font-medium text-[#E5DFC6] tracking-wide hover:bg-[#0a3d39] transition-colors"
+          >
+            {linkLabel}
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
@@ -63,8 +74,8 @@ export function TwoWaysComparison() {
           Whether you want experts to design your trip or prefer to curate your own vision first — Goldsainte has you covered.
         </p>
         <div className="grid md:grid-cols-2 gap-6">
-          <FeatureCard title="Travel Marketplace" features={marketplaceFeatures} />
-          <FeatureCard title="Storyboarding" features={storyboardingFeatures} />
+          <FeatureCard title="Travel Marketplace" features={marketplaceFeatures} linkTo="/marketplace" linkLabel="Explore the Marketplace" />
+          <FeatureCard title="Storyboarding" features={storyboardingFeatures} linkTo="/storyboards" linkLabel="Create a Storyboard" />
         </div>
       </div>
     </section>
