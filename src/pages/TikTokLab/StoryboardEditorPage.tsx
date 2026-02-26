@@ -522,6 +522,50 @@ export default function StoryboardEditorPage() {
           </div>
         )}
 
+        {/* ── Step Guide ── */}
+        {!loadingStoryboard && !isSubmitted && (effectiveMode === "create" || (effectiveMode === "edit" && storyboard)) && (
+          <div className="mb-6 rounded-2xl border border-[#E5DFC6] bg-white/95 px-5 py-4">
+            <div className="flex items-center gap-0">
+              {/* Step 1 */}
+              <div className="flex items-center gap-2">
+                {readiness.hasDestination && readiness.hasDates ? (
+                  <CheckCircle2 className="h-6 w-6 text-[#0c4d47] shrink-0" />
+                ) : (
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#0c4d47] text-[11px] font-bold text-[#0c4d47]">1</span>
+                )}
+                <div className="flex flex-col">
+                  <span className="text-[12px] font-semibold text-[#0a2225]">Trip Details</span>
+                  <span className="rounded-full bg-[#0c4d47]/10 px-2 py-0.5 text-[10px] font-medium text-[#0c4d47] w-fit">Required</span>
+                </div>
+              </div>
+              {/* Connector */}
+              <div className="mx-3 flex-1 border-t border-dashed border-[#E5DFC6]" />
+              {/* Step 2 */}
+              <div className="flex items-center gap-2">
+                {readiness.hasPhotos ? (
+                  <CheckCircle2 className="h-6 w-6 text-[#0c4d47] shrink-0" />
+                ) : (
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#0c4d47] text-[11px] font-bold text-[#0c4d47]">2</span>
+                )}
+                <div className="flex flex-col">
+                  <span className="text-[12px] font-semibold text-[#0a2225]">Add Photos</span>
+                  <span className="rounded-full bg-[#0c4d47]/10 px-2 py-0.5 text-[10px] font-medium text-[#0c4d47] w-fit">Required · min 3</span>
+                </div>
+              </div>
+              {/* Connector */}
+              <div className="mx-3 flex-1 border-t border-dashed border-[#E5DFC6]" />
+              {/* Step 3 */}
+              <div className="flex items-center gap-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#E5DFC6] text-[11px] font-bold text-[#8D8D8D]">3</span>
+                <div className="flex flex-col">
+                  <span className="text-[12px] font-semibold text-[#0a2225]">Browse Inspiration</span>
+                  <span className="rounded-full bg-[#E5DFC6] px-2 py-0.5 text-[10px] font-medium text-[#8D8D8D] w-fit">Optional</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ── Trip Details Collapsible (create + edit mode) ── */}
         {!loadingStoryboard && !isSubmitted && (effectiveMode === "create" || (effectiveMode === "edit" && storyboard)) && (
           <Collapsible open={tripDetailsOpen} onOpenChange={setTripDetailsOpen} className="mb-6">
@@ -714,8 +758,8 @@ export default function StoryboardEditorPage() {
         {/* Create mode heading */}
         {effectiveMode === "create" && (
           <div className="mb-6">
-            <h1 className="font-display text-[28px] text-[#0a2225]">Create Storyboard</h1>
-            <p className="mt-2 text-[13px] text-[#4a4a4a]">Build a visual storyboard with photos, experiences, and links to inspire your trips and packages.</p>
+            <h1 className="font-display text-[28px] text-[#0a2225]">Build Your Trip Board</h1>
+            <p className="mt-2 text-[13px] text-[#4a4a4a]">Follow the steps above to create your storyboard. Only steps 1 and 2 are needed to submit.</p>
           </div>
         )}
 
@@ -723,7 +767,13 @@ export default function StoryboardEditorPage() {
 
         {effectiveMode === "create" && (
           <div className="mt-10 pt-8 border-t border-[#E5DFC6]">
-            <TravelStoryboard title="Browse Inspiration" subtitle="Save visual ideas to your storyboard. Click the save button on any image to add it." showSaveButtons={true} maxItems={50} />
+            <div className="flex items-center gap-2 mb-1">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-[#E5DFC6] text-[10px] font-bold text-[#8D8D8D]">3</span>
+              <span className="text-sm font-semibold text-[#0a2225]">Browse Inspiration</span>
+              <span className="rounded-full bg-[#E5DFC6] px-2 py-0.5 text-[10px] font-medium text-[#8D8D8D]">Optional</span>
+            </div>
+            <p className="text-[12px] text-[#8D8D8D] mb-4 ml-7">Save ideas from our library to your board</p>
+            <TravelStoryboard title="" subtitle="Click the save button on any image to add it." showSaveButtons={true} maxItems={50} />
           </div>
         )}
       </div>
