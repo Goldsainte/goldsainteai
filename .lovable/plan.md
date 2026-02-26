@@ -1,36 +1,26 @@
 
 
-# Fix: "Something went wrong" error after proposal submission
+# Fix: Back Button on Proposal Pages Should Navigate to Marketplace/Trip Briefs
 
-## Root Cause Analysis
+## Problem
 
-The `handleSubmit` function in `NewProposalPage.tsx` (lines 236-349) has **no try/catch wrapper**. If any of the async operations throw an uncaught exception (supabase insert, attachment save, or navigation), the unhandled promise rejection crashes the app. The MemberLayout error boundary catches it and shows "Something went wrong while loading the member experience."
-
-Additionally, there's a **data shape mismatch** in `cancellation_windows`:
-- **Stored** (NewProposalPage): `{ band: string; refund_pct: number }`
-- **Read** (ProposalDetailPage): expects `{ label: string; refund_percent: number }`
-
-And `external_links`:
-- **Stored**: `string[]` (plain strings)
-- **Read**: expects `{ label: string; url: string }[]`
-
-These mismatches could cause rendering crashes on the detail page when accessing properties on the wrong type.
+All proposal pages (`NewProposalPage`, `ProposalDetailPage`, `ProposalsForTripPage`) use `navigate(-1)` for their back buttons. If the browser history stack doesn't have the expected previous page (e.g., user opened the link directly, or history was cleared), `navigate(-1)` lands on `/` which shows a 404.
 
 ## Changes
 
 ### File 1: `src/pages/proposals/NewProposalPage.tsx`
 
-1. **Wrap `handleSubmit` in try/catch** — catch any thrown errors and show a toast instead of crashing.
+**Line 389** — Replace `navigate(-1)` with a deterministic back target. Since we know the `tripId` from the URL query param, navigate to `/marketplace/request/${tripId}` (the trip brief detail page). Fallback to `/marketplace` if no tripId.
 
-2. **Fix `cancellation_windows` shape** in the `priceBreakdown` object (line 261) — map `{ band, refund_pct }` to `{ label, refund_percent }` so the detail page can read it correctly.
-
-3. **Fix `external_links` shape** (line 265) — store as `{ label: string; url: string }[]` instead of `string[]`.
+Also update the error-state back button on **line 372** the same way.
 
 ### File 2: `src/pages/proposals/ProposalDetailPage.tsx`
 
-1. **Add defensive guards** on `cancellation_windows` and `external_links` rendering to handle both old and new data shapes without crashing.
+**Line 216** — Replace `navigate(-1)` with navigation to the trip brief page if the trip ID is available, otherwise `/marketplace`.
 
-2. **Add defensive guard** on `payment_schedule` rendering to handle `{ name, percentage }` shape (from form) in addition to `{ label, due_on, amount }` shape.
+### File 3: `src/pages/proposals/ProposalsForTripPage.tsx`
 
-These are small, focused fixes — wrap the submit in try/catch and add null-safe property access on the detail page to prevent render crashes from data shape mismatches.
+**Line 96** — Same fix: navigate to `/marketplace/request/${tripId}` or `/marketplace`.
+
+These are three single-line changes — replacing `navigate(-1)` with a deterministic route derived from the trip ID already available in each component.
 
