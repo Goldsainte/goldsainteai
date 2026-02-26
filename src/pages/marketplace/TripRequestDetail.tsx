@@ -400,7 +400,7 @@ export default function TripRequestDetail() {
                   {travelerProfile.avatar_url ? (
                     <AvatarImage src={travelerProfile.avatar_url} alt={travelerName} />
                   ) : null}
-                  <AvatarFallback className="bg-[hsl(var(--gs-green-dark))] text-white text-sm font-semibold">
+                  <AvatarFallback className="bg-[#0c4d47] text-white text-sm font-semibold">
                     {travelerName.substring(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
@@ -536,7 +536,7 @@ export default function TripRequestDetail() {
                             className={`inline-flex items-center rounded-full px-5 py-2.5 text-[14px] font-semibold shadow-sm transition-colors ${
                               proposal.status === "accepted" || proposal.status === "declined"
                                 ? "cursor-not-allowed bg-muted text-muted-foreground"
-                                : "bg-[hsl(var(--gs-green-dark))] text-white hover:opacity-90"
+                                : "bg-[#0c4d47] text-white hover:opacity-90"
                             }`}
                           >
                             {proposal.status === "accepted" ? "Accepted" : "Accept Proposal"}
@@ -585,7 +585,7 @@ export default function TripRequestDetail() {
                     <button
                       type="button"
                       onClick={handleSubmitProposal}
-                      className="w-full rounded-full bg-[hsl(var(--gs-green-dark))] px-6 py-3.5 text-[15px] font-semibold text-white shadow-md transition hover:opacity-90 min-h-[48px]"
+                      className="w-full rounded-full bg-[#0c4d47] px-6 py-3.5 text-[15px] font-semibold text-white shadow-md transition hover:opacity-90 min-h-[48px]"
                     >
                       Submit Your Proposal
                     </button>
@@ -600,7 +600,7 @@ export default function TripRequestDetail() {
               </div>
 
               {/* How it works — compact dark card */}
-              <div className="rounded-2xl bg-[hsl(var(--gs-green-dark))] p-5 text-white">
+              <div className="rounded-2xl bg-[#0c4d47] p-5 text-white">
                 <h3 className="font-secondary text-base font-semibold">How it works</h3>
                 <ol className="mt-3 space-y-3 text-[13px] text-white/85">
                   {[
@@ -638,7 +638,7 @@ export default function TripRequestDetail() {
             <button
               type="button"
               onClick={handleSubmitProposal}
-              className="inline-flex items-center rounded-full bg-[hsl(var(--gs-green-dark))] px-6 py-3 text-[14px] font-semibold text-white shadow-md transition hover:opacity-90 whitespace-nowrap min-h-[44px]"
+              className="inline-flex items-center rounded-full bg-[#0c4d47] px-6 py-3 text-[14px] font-semibold text-white shadow-md transition hover:opacity-90 whitespace-nowrap min-h-[44px]"
             >
               Submit Your Proposal
             </button>
