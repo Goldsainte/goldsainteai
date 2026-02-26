@@ -16,7 +16,7 @@ interface AssetData {
 interface RequestBody {
   userId: string;
   storyboardId: string;
-  assetType: 'photo' | 'video' | 'experience' | 'note';
+  assetType: 'photo' | 'video' | 'experience' | 'note' | 'brand_collection' | 'creator_profile';
   assetData: AssetData;
 }
 
@@ -79,47 +79,51 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Get the next order_index
+    // Get the next position
     const { data: maxOrderData } = await supabaseClient
       .from('storyboard_items')
-      .select('order_index')
+      .select('position')
       .eq('storyboard_id', storyboardId)
-      .order('order_index', { ascending: false })
+      .order('position', { ascending: false })
       .limit(1)
       .single();
 
-    const nextOrderIndex = (maxOrderData?.order_index ?? -1) + 1;
+    const nextPosition = (maxOrderData?.position ?? -1) + 1;
 
-    // Map assetType to kind
-    const kindMap: Record<string, string> = {
-      photo: 'photo',
+    // Map assetType to item_type (actual column)
+    const itemTypeMap: Record<string, string> = {
+      photo: 'image',
       video: 'video',
       experience: 'experience',
       note: 'note',
+      brand_collection: 'image',
+      creator_profile: 'image',
     };
 
-    // Map assetType to source
-    const sourceMap: Record<string, string> = {
+    // Map assetType to source_type (actual column)
+    const sourceTypeMap: Record<string, string> = {
       photo: assetData.data?.source || 'manual',
       video: 'manual',
       experience: 'viator',
       note: 'manual',
+      brand_collection: 'media_library',
+      creator_profile: 'creator',
     };
 
-    // Insert into storyboard_items
+    // Insert into storyboard_items using correct column names
     const { data: newItem, error: insertError } = await supabaseClient
       .from('storyboard_items')
       .insert({
         storyboard_id: storyboardId,
-        kind: kindMap[assetType],
-        source: sourceMap[assetType],
-        media_url: assetData.media_url || null,
-        caption: assetData.caption || null,
-        location_label: assetData.location || null,
-        category_tag: assetData.category || null,
-        order_index: nextOrderIndex,
-        layout_type: 'standard',
-        data: assetData.data || null,
+        item_type: itemTypeMap[assetType] || 'image',
+        source_type: sourceTypeMap[assetType] || 'manual',
+        source_id: assetData.data?.source_id || null,
+        image_url: assetData.media_url || assetData.data?.cover_image_url || null,
+        title: assetData.caption || null,
+        subtitle: assetData.location || null,
+        description: assetData.data?.description || null,
+        position: nextPosition,
+        metadata: assetData.data || null,
       })
       .select('id')
       .single();

@@ -16,6 +16,7 @@ interface SaveToStoryboardButtonProps {
     avatar_url?: string;
     tags?: string[];
   };
+  mediaUrl?: string;
   variant?: "default" | "outline" | "ghost";
   size?: "default" | "sm" | "lg";
   className?: string;
@@ -24,6 +25,7 @@ interface SaveToStoryboardButtonProps {
 export function SaveToStoryboardButton({
   assetType,
   assetData,
+  mediaUrl,
   variant = "outline",
   size = "default",
   className = "",
@@ -76,7 +78,16 @@ export function SaveToStoryboardButton({
         userId: session.user.id,
         storyboardId,
         assetType,
-        assetData,
+        assetData: {
+          ...assetData,
+          media_url: mediaUrl || assetData.cover_image_url || assetData.avatar_url,
+          caption: assetData.title || assetData.name,
+          data: {
+            ...assetData,
+            cover_image_url: assetData.cover_image_url,
+            source_id: assetData.id,
+          },
+        },
       },
     });
 
