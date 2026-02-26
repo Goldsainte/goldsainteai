@@ -115,17 +115,22 @@ export default function NewProposalPage() {
       ...(proposerRole === "agent" ? { agent_id: user.id } : { creator_id: user.id }),
     };
 
-    const { error } = await supabase.from("trip_proposals").insert(payload);
+    const { data: insertedData, error } = await supabase.from("trip_proposals").insert(payload).select("id").single();
     setSubmitting(false);
 
-    if (error) {
+    if (error || !insertedData) {
       console.error("Proposal submit error", error);
       toast.error("Failed to submit proposal. Please try again.");
       return;
     }
 
+    // Fire notification to traveler (non-blocking)
+    supabase.functions.invoke("notify-trip-proposal", {
+      body: { tripRequestId: tripId },
+    }).catch((err) => console.error("Notification error:", err));
+
     toast.success("Proposal submitted successfully!");
-    navigate(`/trip-requests/${tripId}`);
+    navigate(`/proposals/${insertedData.id}`);
   };
 
   if (loading) {

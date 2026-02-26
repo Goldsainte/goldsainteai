@@ -5,8 +5,6 @@ import {
   ArrowLeft,
   MapPin,
   Calendar,
-  Users,
-  Shield,
   CheckCircle2,
   XCircle,
 } from "lucide-react";
@@ -22,17 +20,10 @@ import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
 
 type AccountType = "traveler" | "creator" | "agent" | "admin" | null;
 
-function formatMoney(
-  amount: number | null | undefined,
-  currency: string = "USD"
-) {
+function formatMoney(amount: number | null | undefined, currency = "USD") {
   if (!amount) return "—";
   try {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency,
-      maximumFractionDigits: 0,
-    }).format(amount);
+    return new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount);
   } catch {
     return `${currency} ${amount.toFixed(0)}`;
   }
@@ -42,24 +33,26 @@ function formatDate(dateStr?: string | null) {
   if (!dateStr) return null;
   const d = new Date(dateStr);
   if (Number.isNaN(d.getTime())) return null;
-  return d.toLocaleDateString();
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
 function humanStatus(status: string) {
-  switch (status) {
-    case "pending":
-      return "Awaiting your decision";
-    case "accepted":
-      return "Accepted";
-    case "declined":
-      return "Declined";
-    case "withdrawn":
-      return "Withdrawn";
-    case "expired":
-      return "Expired";
-    default:
-      return status;
-  }
+  const map: Record<string, string> = {
+    pending: "Awaiting Review",
+    sent: "Awaiting Review",
+    traveler_review: "Under Review",
+    accepted: "Accepted",
+    declined: "Declined",
+    withdrawn: "Withdrawn",
+    expired: "Expired",
+  };
+  return map[status] || status;
+}
+
+function statusColor(status: string) {
+  if (status === "accepted") return "bg-[#0c4d47] text-white";
+  if (status === "declined" || status === "withdrawn" || status === "expired") return "bg-muted text-muted-foreground";
+  return "bg-[#C7A962]/15 text-[#0a2225] border border-[#C7A962]/40";
 }
 
 export default function ProposalDetailPage() {
@@ -72,12 +65,10 @@ export default function ProposalDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [showSafetyModal, setShowSafetyModal] = useState(false);
-
   const navigate = useNavigate();
 
   useEffect(() => {
     let cancelled = false;
-
     async function load() {
       if (!proposalId) return;
       try {
@@ -85,9 +76,7 @@ export default function ProposalDetailPage() {
           supabase.auth.getUser(),
           getProposalDetail(proposalId),
         ]);
-
         if (cancelled) return;
-
         const user = authData.user;
         if (user) {
           setCurrentUserId(user.id);
@@ -96,10 +85,8 @@ export default function ProposalDetailPage() {
             .select("account_type")
             .eq("id", user.id)
             .maybeSingle();
-          const type = (profile?.account_type || "traveler") as AccountType;
-          setAccountType(type);
+          setAccountType((profile?.account_type || "traveler") as AccountType);
         }
-
         setProposal(detail);
       } catch (err: any) {
         if (!cancelled) setError(err.message || "Failed to load proposal.");
@@ -107,18 +94,14 @@ export default function ProposalDetailPage() {
         if (!cancelled) setLoading(false);
       }
     }
-
     load();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [proposalId]);
 
   const isTraveler = proposal && currentUserId === proposal.traveler?.id;
-  const isPartner =
-    !isTraveler && (accountType === "creator" || accountType === "agent");
+  const isPending = proposal?.status === "pending" || proposal?.status === "sent" || proposal?.status === "traveler_review";
 
-  async function handleAcceptConfirmed() {
+  async function handleAccept() {
     if (!proposalId || !proposal) return;
     setActionError(null);
     setActionLoading("accept");
@@ -128,7 +111,6 @@ export default function ProposalDetailPage() {
       if (bookingId) {
         navigate(`/bookings/${bookingId}`);
       } else {
-        // fall back: reload proposal
         const refreshed = await getProposalDetail(proposalId);
         setProposal(refreshed);
       }
@@ -155,342 +137,254 @@ export default function ProposalDetailPage() {
   }
 
   const trip = proposal?.trip_request;
-  const title =
-    proposal?.headline ||
-    trip?.title ||
-    trip?.destination ||
-    "Trip proposal";
+  const title = proposal?.headline || trip?.title || trip?.destination || "Trip Proposal";
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <p className="text-sm text-muted-foreground animate-pulse">Loading proposal…</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4">
+        <p className="text-sm text-destructive">{error}</p>
+        <button onClick={() => navigate(-1)} className="text-sm text-[#0c4d47] underline">Go back</button>
+      </div>
+    );
+  }
+
+  if (!proposal) return null;
 
   return (
-    <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
-      <section className="mx-auto max-w-5xl px-4 pt-14 pb-6 md:pt-16 md:pb-8">
-        <div className="flex items-center justify-between mb-4">
+    <main className="min-h-screen bg-white text-foreground">
+      {/* Hero header */}
+      <section className="bg-[#FDF9F0] border-b border-[#E5DFC6]/60">
+        <div className="mx-auto max-w-5xl px-4 pt-10 pb-8 md:pt-14 md:pb-10">
           <Link
-            to={isTraveler ? "/my-trips" : "/tiktok-lab/trips"}
-            className="inline-flex items-center gap-1 text-[10px] text-[#8D8D8D]"
+            to={isTraveler ? "/my-trips" : "/marketplace/trip-requests"}
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-6"
           >
-            <ArrowLeft className="h-3 w-3" />
+            <ArrowLeft className="h-3.5 w-3.5" />
             Back to trips
           </Link>
-        </div>
 
-        {loading && (
-          <p className="text-[11px] text-[#8D8D8D]">Loading proposal…</p>
-        )}
-        {error && (
-          <p className="text-[11px] text-red-600">{error}</p>
-        )}
-
-        {proposal && (
-          <>
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-              <div className="space-y-1">
-                <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
-                  Trip proposal
-                </p>
-                <h1 className="font-display text-[22px] md:text-[24px] leading-tight">
-                  {title}
-                </h1>
-                <div className="flex flex-wrap gap-2 text-[10px] text-[#4a4a4a]">
-                  {trip?.destination && (
-                    <span className="inline-flex items-center gap-1">
-                      <MapPin className="h-3 w-3" />
-                      {trip.destination}
-                    </span>
-                  )}
-                  {trip?.start_date && (
-                    <span className="inline-flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      {formatDate(trip.start_date)}
-                      {trip.end_date && ` – ${formatDate(trip.end_date)}`}
-                    </span>
-                  )}
-                  {proposal.nights && (
-                    <span className="inline-flex items-center gap-1">
-                      <Users className="h-3 w-3" />
-                      {proposal.nights} night{proposal.nights === 1 ? "" : "s"}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="text-right space-y-1">
-                <span
-                  className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[10px] ${
-                    proposal.status === "pending"
-                      ? "bg-[#0c4d47] text-[#E5DFC6]"
-                      : proposal.status === "accepted"
-                      ? "bg-[#E5DFC6] text-[#0c4d47] border border-[#0c4d47]"
-                      : "bg-[#f7f3ea] text-[#8D8D8D] border border-[#E5DFC6]"
-                  }`}
-                >
-                  {humanStatus(proposal.status)}
-                </span>
-                <p className="text-[11px] font-semibold">
-                  {formatMoney(proposal.price_from, proposal.currency || "USD")}
-                </p>
-                {proposal.valid_until && proposal.status === "pending" && (
-                  <p className="text-[9px] text-[#8D8D8D]">
-                    Valid until {formatDate(proposal.valid_until)}
-                  </p>
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+            <div className="space-y-2">
+              <p className="text-xs uppercase tracking-[0.18em] text-[#C7A962] font-medium">
+                Trip Proposal
+              </p>
+              <h1 className="font-secondary text-2xl md:text-[28px] leading-tight text-[#0a2225]">
+                {title}
+              </h1>
+              <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+                {trip?.destination && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <MapPin className="h-3.5 w-3.5" />
+                    {trip.destination}
+                  </span>
+                )}
+                {trip?.start_date && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <Calendar className="h-3.5 w-3.5" />
+                    {formatDate(trip.start_date)}
+                    {trip.end_date && ` – ${formatDate(trip.end_date)}`}
+                  </span>
+                )}
+                {proposal.nights && (
+                  <span>{proposal.nights} night{proposal.nights === 1 ? "" : "s"}</span>
                 )}
               </div>
             </div>
-          </>
-        )}
+
+            <div className="flex flex-col items-start md:items-end gap-2">
+              <span className={`inline-flex items-center rounded-full px-4 py-1.5 text-xs font-semibold ${statusColor(proposal.status)}`}>
+                {humanStatus(proposal.status)}
+              </span>
+              <p className="font-secondary text-3xl md:text-4xl text-[#0a2225] font-semibold">
+                {formatMoney(proposal.price_from, proposal.currency || "USD")}
+              </p>
+              {proposal.valid_until && isPending && (
+                <p className="text-xs text-muted-foreground">
+                  Valid until {formatDate(proposal.valid_until)}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
       </section>
 
-      {proposal && (
-        <section className="mx-auto max-w-5xl px-4 pb-16 md:pb-20">
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-            {/* Left: details */}
-            <div className="space-y-5 text-[11px]">
-              {/* Itinerary + message */}
-              <div className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 space-y-3">
-                <div className="flex items-center justify-between gap-2">
-                  <div>
-                    <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
-                      Overview
-                    </p>
-                    <p className="text-[12px] font-semibold">
-                      How your {proposal.proposer?.role || "partner"} imagines this trip
-                    </p>
-                  </div>
-                  <Shield className="h-4 w-4 text-[#0c4d47]" />
-                </div>
-
-                {proposal.message && (
-                  <div>
-                    <p className="text-[10px] text-[#8D8D8D] mb-1">
-                      Personal note
-                    </p>
-                    <p className="text-[11px] text-[#4a4a4a] whitespace-pre-line">
-                      {proposal.message}
-                    </p>
-                  </div>
-                )}
-
-                {proposal.inclusions && (
-                  <div>
-                    <p className="text-[10px] text-[#8D8D8D] mb-1">
-                      What&apos;s included
-                    </p>
-                    <p className="text-[11px] text-[#4a4a4a] whitespace-pre-line">
-                      {proposal.inclusions}
-                    </p>
-                  </div>
-                )}
-
-                {proposal.exclusions && (
-                  <div>
-                    <p className="text-[10px] text-[#8D8D8D] mb-1">
-                      What&apos;s not included
-                    </p>
-                    <p className="text-[11px] text-[#4a4a4a] whitespace-pre-line">
-                      {proposal.exclusions}
-                    </p>
-                  </div>
-                )}
-
-                {!proposal.message &&
-                  !proposal.inclusions &&
-                  !proposal.exclusions && (
-                    <p className="text-[10px] text-[#8D8D8D]">
-                      This proposal doesn&apos;t have details filled in yet.
-                      Please ask your {proposal.proposer?.role || "partner"} in chat to clarify
-                      what&apos;s included.
-                    </p>
-                  )}
-              </div>
-
-              {/* Payment schedule */}
-              <div className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 space-y-3">
-                <div className="flex items-center justify-between gap-2">
-                  <div>
-                    <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
-                      Payment plan
-                    </p>
-                    <p className="text-[12px] font-semibold">
-                      How payment would work
-                    </p>
-                  </div>
-                </div>
-
-                {proposal.payment_schedule && proposal.payment_schedule.length > 0 ? (
-                  <ul className="space-y-1.5">
-                    {proposal.payment_schedule.map((item, idx) => (
-                      <li
-                        key={`${item.label}-${idx}`}
-                        className="flex items-center justify-between gap-2 text-[10px]"
-                      >
-                        <div>
-                          <p className="font-semibold">{item.label}</p>
-                          {item.due_on && (
-                            <p className="text-[#8D8D8D]">
-                              Due {formatDate(item.due_on)}
-                            </p>
-                          )}
-                        </div>
-                        <p className="font-semibold">
-                          {item.amount
-                            ? formatMoney(item.amount, proposal.currency || "USD")
-                            : "—"}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-[10px] text-[#8D8D8D]">
-                    Payment schedule hasn&apos;t been specified. You can confirm
-                    deposit and balance structure with your {proposal.proposer?.role || "partner"} before moving ahead.
-                  </p>
-                )}
-
-                <p className="text-[9px] text-[#8D8D8D] pt-1">
-                  All payments are handled through Goldsainte&apos;s secure flow
-                  so that your booking and any eligible refunds or payouts stay
-                  protected.
+      {/* Two-column layout */}
+      <section className="mx-auto max-w-5xl px-4 py-10 md:py-14">
+        <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
+          {/* Left: Main content */}
+          <div className="space-y-8">
+            {/* Pitch / Message */}
+            {proposal.message && (
+              <div className="bg-white rounded-2xl shadow-[0_1px_12px_rgba(0,0,0,0.06)] p-6 md:p-8">
+                <p className="text-xs uppercase tracking-[0.16em] text-[#C7A962] font-medium mb-2">The Pitch</p>
+                <p className="text-[15px] leading-relaxed text-[#0a2225] whitespace-pre-line">
+                  {proposal.message}
                 </p>
               </div>
+            )}
 
-              <TrustSafetyInline />
+            {/* Inclusions */}
+            {proposal.inclusions && (
+              <div className="bg-white rounded-2xl shadow-[0_1px_12px_rgba(0,0,0,0.06)] p-6 md:p-8">
+                <p className="text-xs uppercase tracking-[0.16em] text-[#C7A962] font-medium mb-3">What's Included</p>
+                <p className="text-[15px] leading-relaxed text-[#0a2225] whitespace-pre-line">
+                  {proposal.inclusions}
+                </p>
+              </div>
+            )}
+
+            {/* Exclusions */}
+            {proposal.exclusions && (
+              <div className="bg-white rounded-2xl shadow-[0_1px_12px_rgba(0,0,0,0.06)] p-6 md:p-8">
+                <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground font-medium mb-3">What's Not Included</p>
+                <p className="text-[15px] leading-relaxed text-muted-foreground whitespace-pre-line">
+                  {proposal.exclusions}
+                </p>
+              </div>
+            )}
+
+            {/* No content fallback */}
+            {!proposal.message && !proposal.inclusions && !proposal.exclusions && (
+              <div className="bg-[#FDF9F0] rounded-2xl p-6 md:p-8 text-center">
+                <p className="text-sm text-muted-foreground">
+                  This proposal doesn't have detailed notes yet. Ask your {proposal.proposer?.role || "partner"} for more information via chat.
+                </p>
+              </div>
+            )}
+
+            {/* Payment Schedule */}
+            <div className="bg-white rounded-2xl shadow-[0_1px_12px_rgba(0,0,0,0.06)] p-6 md:p-8">
+              <p className="text-xs uppercase tracking-[0.16em] text-[#C7A962] font-medium mb-4">Payment Plan</p>
+              {proposal.payment_schedule && proposal.payment_schedule.length > 0 ? (
+                <div className="space-y-3">
+                  {proposal.payment_schedule.map((item, idx) => (
+                    <div key={`${item.label}-${idx}`} className="flex items-center justify-between py-3 border-b border-[#E5DFC6]/40 last:border-0">
+                      <div>
+                        <p className="text-sm font-semibold text-[#0a2225]">{item.label}</p>
+                        {item.due_on && <p className="text-xs text-muted-foreground mt-0.5">Due {formatDate(item.due_on)}</p>}
+                      </div>
+                      <p className="text-sm font-semibold text-[#0a2225]">
+                        {item.amount ? formatMoney(item.amount, proposal.currency || "USD") : "—"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Payment schedule hasn't been specified yet. You can confirm the deposit and balance structure with your {proposal.proposer?.role || "partner"} before proceeding.
+                </p>
+              )}
+              <p className="text-xs text-muted-foreground mt-4 pt-3 border-t border-[#E5DFC6]/40">
+                All payments are handled through Goldsainte's secure flow so your booking and any eligible refunds stay protected.
+              </p>
             </div>
 
-            {/* Right: people + actions */}
-            <div className="space-y-5 text-[11px]">
-              {/* Who sent this */}
-              <div className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 space-y-3">
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
-                    Who this is from
-                  </p>
-                  <p className="text-[12px] font-semibold">
-                    Your Goldsainte partner
-                  </p>
-                </div>
+            <TrustSafetyInline />
+          </div>
 
-                <div className="space-y-1 text-[10px]">
-                  {proposal.proposer && (
-                    <p>
-                      {proposal.proposer.role === "creator" ? "Creator" : "Travel agent"}:{" "}
-                      <span className="font-semibold">
-                        {proposal.proposer.display_name}
-                      </span>
+          {/* Right: Sticky sidebar */}
+          <div className="space-y-6">
+            <div className="lg:sticky lg:top-24 space-y-6">
+              {/* Proposer info */}
+              <div className="bg-[#FDF9F0] rounded-2xl p-6">
+                <p className="text-xs uppercase tracking-[0.16em] text-[#C7A962] font-medium mb-3">Your Goldsainte Partner</p>
+                {proposal.proposer && (
+                  <div className="space-y-1">
+                    <p className="text-base font-semibold text-[#0a2225]">
+                      {proposal.proposer.display_name}
                     </p>
-                  )}
-                  {proposal.traveler && (
-                    <p className="text-[#8D8D8D]">
-                      For traveler:{" "}
-                      <span className="font-semibold">
-                        {proposal.traveler.display_name}
-                      </span>
+                    <p className="text-sm text-muted-foreground capitalize">
+                      {proposal.proposer.role === "creator" ? "TikTok Creator" : "Travel Agent"}
                     </p>
-                  )}
-                </div>
-
-                <p className="text-[9px] text-[#8D8D8D]">
-                  All communication and key decisions should happen in your
-                  Goldsainte trip chat so that we can help if anything doesn&apos;t
-                  go to plan.
-                </p>
+                  </div>
+                )}
+                {proposal.traveler && (
+                  <p className="text-xs text-muted-foreground mt-3">
+                    Prepared for <span className="font-medium">{proposal.traveler.display_name}</span>
+                  </p>
+                )}
               </div>
 
               {/* Actions */}
-              <div className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 space-y-3">
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
-                    Next steps
-                  </p>
-                  <p className="text-[12px] font-semibold">
-                    What you can do with this proposal
-                  </p>
-                </div>
+              <div className="bg-white rounded-2xl shadow-[0_1px_12px_rgba(0,0,0,0.06)] p-6 space-y-4">
+                <p className="text-xs uppercase tracking-[0.16em] text-[#C7A962] font-medium">Next Steps</p>
 
-                {actionError && (
-                  <p className="text-[10px] text-red-600">{actionError}</p>
-                )}
+                {actionError && <p className="text-sm text-destructive">{actionError}</p>}
 
                 {isTraveler ? (
                   <>
-                    {proposal.status === "pending" && (
-                      <div className="space-y-3">
-                        <div className="rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea]/80 p-3 space-y-1">
-                          <p className="text-[11px] font-semibold text-[#0a2225]">Before you confirm</p>
-                          <p className="text-[10px] text-[#4a4a4a]">
-                            Please make sure you&apos;re comfortable with the itinerary, total price, and cancellation terms. Keep all future
-                            changes, payments, and approvals inside Goldsainte so everything stays protected.
+                    {isPending && (
+                      <div className="space-y-4">
+                        <div className="bg-[#FDF9F0] rounded-xl p-4 space-y-2">
+                          <p className="text-sm font-semibold text-[#0a2225]">Before you confirm</p>
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            Make sure you're comfortable with the itinerary, total price, and cancellation terms. Keep all changes and payments inside Goldsainte for protection.
                           </p>
                           <button
                             type="button"
                             onClick={() => setShowSafetyModal(true)}
-                            className="text-[10px] font-semibold text-[#0c4d47] underline-offset-4 hover:underline"
+                            className="text-xs font-semibold text-[#0c4d47] hover:underline underline-offset-4"
                           >
-                            Review safety &amp; liability details
+                            Review safety & liability details →
                           </button>
                         </div>
-                        <p className="text-[10px] text-[#4a4a4a]">
-                          If this feels right, you can accept and move into Goldsainte&apos;s protected booking flow. If not, you can
-                          decline and wait for other options.
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          <button
-                            type="button"
-                            onClick={handleAcceptConfirmed}
-                            disabled={actionLoading === "accept"}
-                            className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-4 py-1.5 text-[10px] font-semibold hover:bg-[#073331] disabled:opacity-60"
-                          >
-                            {actionLoading === "accept"
-                              ? "Accepting…"
-                              : "Accept & continue to booking"}
-                            <CheckCircle2 className="h-3 w-3" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={handleDecline}
-                            disabled={actionLoading === "decline"}
-                            className="inline-flex items-center gap-2 rounded-full bg-[#f7f3ea] text-[#0a2225] border border-[#E5DFC6] px-4 py-1.5 text-[10px] font-semibold hover:border-[#BFAD72] disabled:opacity-60"
-                          >
-                            {actionLoading === "decline"
-                              ? "Updating…"
-                              : "Decline this proposal"}
-                            <XCircle className="h-3 w-3" />
-                          </button>
-                        </div>
+
+                        <button
+                          type="button"
+                          onClick={handleAccept}
+                          disabled={actionLoading === "accept"}
+                          className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#0c4d47] text-white px-6 py-3.5 text-sm font-semibold hover:bg-[#073331] disabled:opacity-60 transition-colors"
+                        >
+                          {actionLoading === "accept" ? "Accepting…" : "Accept & Continue to Booking"}
+                          <CheckCircle2 className="h-4 w-4" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={handleDecline}
+                          disabled={actionLoading === "decline"}
+                          className="w-full flex items-center justify-center gap-2 rounded-xl bg-white text-[#0a2225] border border-[#E5DFC6] px-6 py-3.5 text-sm font-semibold hover:border-[#C7A962] disabled:opacity-60 transition-colors"
+                        >
+                          {actionLoading === "decline" ? "Updating…" : "Decline This Proposal"}
+                          <XCircle className="h-4 w-4" />
+                        </button>
                       </div>
                     )}
 
-                    {proposal.status !== "pending" && proposal.status === "accepted" && (
-                      <div className="rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea]/80 p-3 space-y-1">
-                        <p className="text-[11px] font-semibold text-[#0c4d47]">Your booking is confirmed.</p>
-                        <p className="text-[10px] text-[#4a4a4a]">
+                    {proposal.status === "accepted" && (
+                      <div className="bg-[#0c4d47]/5 rounded-xl p-4 space-y-1">
+                        <p className="text-sm font-semibold text-[#0c4d47]">Your booking is confirmed</p>
+                        <p className="text-sm text-muted-foreground">
                           All future changes, questions, and approvals should be handled inside Goldsainte to keep your trip protected.
                         </p>
                       </div>
                     )}
 
-                    {proposal.status !== "pending" && proposal.status !== "accepted" && (
-                      <p className="text-[10px] text-[#4a4a4a]">
-                        This proposal is{" "}
-                        <span className="font-semibold">
-                          {humanStatus(proposal.status)}
-                        </span>
-                        . If your plans have changed significantly, you can post a new trip or review other proposals from your trip
-                        view.
+                    {!isPending && proposal.status !== "accepted" && (
+                      <p className="text-sm text-muted-foreground">
+                        This proposal is <span className="font-semibold">{humanStatus(proposal.status)}</span>.
+                        You can post a new trip or review other proposals from your trip view.
                       </p>
                     )}
                   </>
                 ) : (
-                  <p className="text-[10px] text-[#4a4a4a]">
-                    This is how the traveler will see your proposal. If you need
-                    to adjust it, edit from your proposals list once editing
-                    is implemented, or send clarifications in the trip chat.
+                  <p className="text-sm text-muted-foreground">
+                    This is how the traveler will see your proposal. You can send clarifications via the trip chat.
                   </p>
                 )}
               </div>
             </div>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       <TrustSafetyModal
         open={showSafetyModal}
