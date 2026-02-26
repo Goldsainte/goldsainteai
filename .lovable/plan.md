@@ -1,13 +1,11 @@
 
 
-# Change TwoWaysComparison Background to White
+# Change RoleSpecificCTAs Background to Cream
 
-Single-line change in `src/components/home/TwoWaysComparison.tsx`, line 55:
+Single-line change in `src/components/home/RoleSpecificCTAs.tsx`, line 55:
 
-Change `bg-[#FDF9F0]` to `bg-white` on the section element.
+Change `bg-white` to `bg-[#FDF9F0]` (the standard Goldsainte cream).
 
-**Before:** `<section className="bg-[#FDF9F0] py-16 md:py-24">`
-**After:** `<section className="bg-white py-16 md:py-24">`
-
-No other files need changes.
+**File:** `src/components/home/RoleSpecificCTAs.tsx`  
+**Line 55:** `<section className="bg-white py-20 md:py-24">` → `<section className="bg-[#FDF9F0] py-20 md:py-24">`
 
