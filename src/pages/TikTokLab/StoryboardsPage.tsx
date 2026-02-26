@@ -138,8 +138,11 @@ export default function TikTokLabStoryboardsPage() {
               <h1 className="text-xl font-semibold tracking-tight md:text-2xl">
                 My Storyboards
               </h1>
-              <p className="text-xs text-[#4a4a4a] md:text-sm">
-                Create your travel vision. When you're ready, turn it into a trip request.
+              <p className="text-sm font-medium text-[#4B5563]">
+                Plan visually. Post confidently.
+              </p>
+              <p className="text-xs text-[#6B7280] max-w-2xl leading-relaxed">
+                Save hotels, restaurants, destinations, and experiences into a private board. When you're ready, turn your storyboard into a trip request and receive proposals from trusted creators and travel agents.
               </p>
             </div>
 
@@ -199,7 +202,7 @@ export default function TikTokLabStoryboardsPage() {
             >
               <Link to="/storyboards/new">
                 <Plus className="h-4 w-4 mr-1.5" />
-                Create New Storyboard
+                Start a Trip Board
               </Link>
             </Button>
           </header>
@@ -214,6 +217,9 @@ export default function TikTokLabStoryboardsPage() {
                 Browse Inspiration
               </TabsTrigger>
             </TabsList>
+              <p className="text-[11px] text-[#9CA3AF] mt-1">
+                Your boards are private until you choose to post them.
+              </p>
 
             <TabsContent value="my-storyboards">
               {loading ? (
