@@ -1,88 +1,50 @@
 
 
-# Proposal Workspace Redesign — Fiverr/Upwork-Style Bid Experience
+# Redesign Trip Request Detail Page + Route to Proposal Workspace
 
-## Overview
+## Problem
 
-Transform the proposal submission from an inline form on the trip detail page into a dedicated, distraction-free wizard workspace at `/proposals/new?tripId=...`. This route already exists as a navigation target (line 381 of `TripRequestDetailPage`) but has no page behind it.
+The `/marketplace/request/:id` page (`src/pages/marketplace/TripRequestDetail.tsx`, 842 lines) is the page you're seeing. It has all the problems you described:
+- The inline proposal form is buried below a long trip brief scroll
+- Multiple competing CTAs ("Jump to Proposal Form", sidebar "Submit a Proposal", bottom green button)
+- Beige-on-beige, visually dense, no clear separation between viewing and bidding
+- No value pitch area — just price/timeline fields
+- The "Submit Proposal" buttons scroll to an inline form instead of navigating to the dedicated workspace we already built
 
 ## What Changes
 
-### 1. New Page: `src/pages/proposals/NewProposalPage.tsx`
+### 1. Remove Inline Proposal Form from Trip Request Detail Page
 
-A full-screen, focused proposal workspace with:
+**File:** `src/pages/marketplace/TripRequestDetail.tsx`
 
-- **No main site footer or extra nav** — clean workspace chrome only
-- **Compact top bar** showing trip title, budget range, dates, and destination as pills
-- **4-step wizard** (one step visible at a time, not a long scroll):
+- **Remove** the entire inline `ProposalWizard` form section (lines ~662-716) and the "Jump to Proposal Form" CTA card (lines ~578-596)
+- **Replace** all "Submit Proposal" buttons (sidebar CTA at line 782, inline CTA) with a single navigation action: `navigate(\`/proposals/new?tripId=${request.id}\`)`
+- This makes the trip detail page purely a **listing view** — clean, scannable, no form clutter
 
-```text
-Step 1: Your Pitch
-├── Large textarea: "Describe your proposed itinerary and why you're the best fit"
-├── Role selector (Creator / Agent)
-├── Headline input
-├── Optional: attach PDF, link to sample trip
-│
-Step 2: Pricing
-├── Total trip price (per person)
-├── Deposit percentage slider/input
-├── Timeline to deliver full itinerary (days)
-├── Timeline to confirm bookings (days)
-├── Collaboration toggle + commission split (existing logic preserved)
-├── Estimated earnings after platform fee (calculated live)
-│
-Step 3: Deliverables
-├── Checkboxes:
-│   ├── Full itinerary PDF
-│   ├── Booking management included
-│   ├── On-trip support
-│   ├── Revisions included
-│   ├── Concierge services
-├── Optional short notes per deliverable
-│
-Step 4: Review & Submit
-├── Summary card with all entered data
-│   ├── Price + deposit + timeline
-│   ├── Pitch preview
-│   ├── Deliverables list
-├── Competitive context sidebar:
-│   ├── "X proposals submitted so far"
-│   ├── "Traveler budget: $X – $Y"
-│   ├── "Proposal expires in X days"
-│   ├── "Estimated earnings: $X after platform fee"
-├── Primary CTA: "Submit Proposal" (bold, anchored at bottom)
-```
+### 2. Clean Up Visual Hierarchy on Listing Page
 
-- **Visual design**: White background for the workspace area, subtle shadow cards for each section, stronger spacing, no heavy beige. Goldsainte green (`#0c4d47`) for primary actions.
+- Change background from `bg-[#f7f3ea]` to `bg-white` for the main content area below the hero
+- Replace thin beige borders with subtle shadows on cards
+- Remove the user profile card that shows before the form (no longer needed — profile shows in the workspace)
+- Keep: hero, trip brief card, vibe tags, must-haves/dealbreakers, visual brief, sidebar (posted by, trip details, budget, how it works)
 
-### 2. Route Registration: `src/routes/AppRoutes.tsx`
+### 3. Single Primary CTA
 
-Add a new route:
-```
-/proposals/new → NewProposalPage (wrapped in RequireAuth)
-```
+- One bold CTA in the sticky sidebar: "Submit Your Proposal" → navigates to `/proposals/new?tripId=...`
+- On mobile: sticky bottom bar with the same CTA
+- Remove all duplicate scroll-to-form buttons
 
-### 3. Competitive Energy Elements
+### 4. Add Competitive Context to Sidebar
 
-- Query `trip_proposals` count for the trip to show "X proposals submitted so far"
-- Show traveler budget range from trip request data
-- Display "You are bidding on this trip" header
-- Show calculated "Estimated earnings after platform fee" (85% or 80% of quoted price)
-- Auto-set proposal expiry (e.g., 14 days) and display countdown
+- Show proposal count ("X proposals submitted") in the sidebar
+- Show "Be the first to propose" if count is 0
+- This data is already fetched (`proposalsCount` state)
 
-### 4. Data Flow
-
-- On submit, inserts into `trip_proposals` table using the same fields as the current `TripRequestDetailPage` form (proposer_id, proposer_role, headline, message, price_from, etc.)
-- New optional fields for deliverables stored in `message` or a new JSON column — will use the existing `inclusions` array column on `trip_proposals` for deliverable items
-- Deposit percentage → `deposit_percentage` column (already exists)
-- Collaboration/commission split → same logic as current form
-
-### 5. Files Created/Modified
+### Files Modified
 
 | File | Action |
 |------|--------|
-| `src/pages/proposals/NewProposalPage.tsx` | **Create** — the main 4-step wizard workspace |
-| `src/routes/AppRoutes.tsx` | **Edit** — add `/proposals/new` route |
+| `src/pages/marketplace/TripRequestDetail.tsx` | **Major edit** — remove inline form, clean up CTAs, update visual hierarchy, add competitive context to sidebar |
 
-No database migrations needed — all columns used (`headline`, `message`, `price_from`, `inclusions`, `deposit_percentage`, `nights`, `valid_until`, `proposer_id`, `proposer_role`, `agent_id`, `creator_id`, `creator_commission_pct`, `agent_commission_pct`) already exist on `trip_proposals`.
+No new files needed. The proposal workspace at `/proposals/new` already exists and works.
 
