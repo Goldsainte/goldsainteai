@@ -14,9 +14,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import {
   ArrowLeft, ArrowRight, Send, MapPin, Calendar, DollarSign,
-  Clock, Users, ChevronLeft, Upload, X, FileText, Plus, Trash2, AlertCircle,
+  Clock, Users, ChevronLeft, Upload, X, FileText, Plus, Trash2, AlertCircle, Info, Percent,
 } from "lucide-react";
 import { format } from "date-fns";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { HOST_FEE_PCT, GUEST_FEE_PCT } from "@/lib/booking/commission";
 
 type TripRequestData = {
   id: string;
@@ -32,6 +34,8 @@ type TripRequestData = {
 type Milestone = { name: string; percentage: number };
 type CancellationWindow = { band: string; refund_pct: number };
 type UploadedFile = { name: string; path: string; size: number; type: string };
+type CommissionModel = "percentage" | "flat_fee" | "hybrid";
+type CommissionTier = { threshold: number; pct: number };
 
 const STEPS = [
   "Your Pitch",
@@ -101,6 +105,19 @@ export default function NewProposalPage() {
   ]);
   const [deliveryDays, setDeliveryDays] = useState<number | "">(7);
 
+  // Commission model
+  const [commissionModel, setCommissionModel] = useState<CommissionModel>("percentage");
+  const [commissionPct, setCommissionPct] = useState<number | "">(15);
+  const [commissionTiered, setCommissionTiered] = useState(false);
+  const [commissionTiers, setCommissionTiers] = useState<CommissionTier[]>([
+    { threshold: 5000, pct: 20 },
+    { threshold: Infinity, pct: 15 },
+  ]);
+  const [flatFeeAmount, setFlatFeeAmount] = useState<number | "">("");
+  const [flatFeeCovers, setFlatFeeCovers] = useState("planning");
+  const [hybridFlatFee, setHybridFlatFee] = useState<number | "">("");
+  const [hybridCommissionPct, setHybridCommissionPct] = useState<number | "">(10);
+
   // Step 3 — Cancellation
   const [depositRefundable, setDepositRefundable] = useState("non_refundable");
   const [cancellationWindows, setCancellationWindows] = useState<CancellationWindow[]>(DEFAULT_CANCELLATION_WINDOWS);
@@ -128,10 +145,41 @@ export default function NewProposalPage() {
   const [ackDeposit, setAckDeposit] = useState(false);
   const [ackCancellation, setAckCancellation] = useState(false);
 
-  const estimatedEarnings = useMemo(() => {
-    if (!priceFrom || typeof priceFrom !== "number") return 0;
-    return Math.round(priceFrom * 0.965);
-  }, [priceFrom]);
+  const commissionCalc = useMemo(() => {
+    const tripCost = typeof priceFrom === "number" ? priceFrom : 0;
+    if (tripCost <= 0) return { commission: 0, hostFee: 0, guestFee: 0, agentPayout: 0, travelerTotal: 0 };
+
+    let commission = 0;
+    if (commissionModel === "percentage") {
+      const pct = typeof commissionPct === "number" ? commissionPct : 0;
+      if (commissionTiered && commissionTiers.length > 0) {
+        let remaining = tripCost;
+        let prevThreshold = 0;
+        for (const tier of commissionTiers) {
+          const bracketSize = tier.threshold === Infinity ? remaining : Math.min(remaining, tier.threshold - prevThreshold);
+          if (bracketSize <= 0) break;
+          commission += bracketSize * (tier.pct / 100);
+          remaining -= bracketSize;
+          prevThreshold = tier.threshold;
+        }
+      } else {
+        commission = tripCost * (pct / 100);
+      }
+    } else if (commissionModel === "flat_fee") {
+      commission = typeof flatFeeAmount === "number" ? flatFeeAmount : 0;
+    } else if (commissionModel === "hybrid") {
+      const flat = typeof hybridFlatFee === "number" ? hybridFlatFee : 0;
+      const pct = typeof hybridCommissionPct === "number" ? hybridCommissionPct : 0;
+      commission = flat + tripCost * (pct / 100);
+    }
+
+    const hostFee = Math.round(tripCost * HOST_FEE_PCT);
+    const guestFee = Math.round(tripCost * GUEST_FEE_PCT);
+    const agentPayout = Math.round(commission - hostFee);
+    const travelerTotal = tripCost + guestFee;
+
+    return { commission: Math.round(commission), hostFee, guestFee, agentPayout, travelerTotal };
+  }, [priceFrom, commissionModel, commissionPct, commissionTiered, commissionTiers, flatFeeAmount, hybridFlatFee, hybridCommissionPct]);
 
   useEffect(() => {
     if (!tripId) return;
@@ -215,6 +263,28 @@ export default function NewProposalPage() {
       ...(changeFee ? { change_fee: changeFee } : {}),
       ...(supplierDependent ? { supplier_dependent: true, supplier_dependent_note: supplierDependentNote } : {}),
       external_links: externalLinks.filter((l) => l.trim()),
+      // Commission model fields
+      commission_model: commissionModel,
+      ...(commissionModel === "percentage" ? {
+        commission_pct: commissionPct,
+        commission_tiered: commissionTiered,
+        ...(commissionTiered ? { commission_tiers: commissionTiers } : {}),
+      } : {}),
+      ...(commissionModel === "flat_fee" ? {
+        flat_fee_amount: flatFeeAmount,
+        flat_fee_covers: flatFeeCovers,
+      } : {}),
+      ...(commissionModel === "hybrid" ? {
+        hybrid_flat_fee: hybridFlatFee,
+        hybrid_commission_pct: hybridCommissionPct,
+      } : {}),
+      host_fee_pct: HOST_FEE_PCT * 100,
+      guest_fee_pct: GUEST_FEE_PCT * 100,
+      platform_total_pct: (HOST_FEE_PCT + GUEST_FEE_PCT) * 100,
+      agent_commission_estimate: commissionCalc.commission,
+      agent_payout_estimate: commissionCalc.agentPayout,
+      traveler_total_estimate: commissionCalc.travelerTotal,
+      guest_service_fee_estimate: commissionCalc.guestFee,
     };
 
     const paymentSchedule = paymentScheduleType === "milestone" || paymentScheduleType === "custom"
@@ -565,167 +635,273 @@ export default function NewProposalPage() {
                     </div>
                   </div>
 
-                  {/* Planning fee */}
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3 rounded-lg border p-4">
-                      <Checkbox
-                        id="planning-fee"
-                        checked={hasPlanningFee}
-                        onCheckedChange={(c) => setHasPlanningFee(!!c)}
-                        className="mt-0.5"
-                      />
-                      <div className="flex-1">
-                        <Label htmlFor="planning-fee" className="cursor-pointer font-medium">Includes separate planning fee</Label>
-                        <p className="text-xs text-muted-foreground mt-0.5">A fee charged for trip planning, separate from booking costs.</p>
-                      </div>
+                  {/* Commission Pricing Model */}
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="text-sm font-semibold">How You Earn</Label>
+                      <p className="text-xs text-muted-foreground mt-0.5">Select how your commission is structured for this trip.</p>
                     </div>
-                    {hasPlanningFee && (
-                      <div className="pl-4 space-y-3">
-                        <div className="relative">
-                          <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            type="number"
-                            min={0}
-                            placeholder="Planning fee amount"
-                            className="pl-9"
-                            value={planningFee}
-                            onChange={(e) => setPlanningFee(e.target.value ? Number(e.target.value) : "")}
-                          />
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Checkbox
-                            id="planning-refundable"
-                            checked={planningFeeRefundable}
-                            onCheckedChange={(c) => setPlanningFeeRefundable(!!c)}
-                          />
-                          <Label htmlFor="planning-refundable" className="text-sm cursor-pointer">Planning fee is refundable</Label>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="space-y-3">
-                    <Label>Deposit: {depositPct}%</Label>
-                    <Slider value={[depositPct]} onValueChange={([v]) => setDepositPct(v)} min={10} max={100} step={5} className="w-full" />
-                    {typeof priceFrom === "number" && priceFrom > 0 && (
-                      <p className="text-xs text-muted-foreground">Deposit: ${Math.round(priceFrom * depositPct / 100).toLocaleString()}</p>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="deposit-due">Deposit Due Within (days)</Label>
-                      <Input
-                        id="deposit-due"
-                        type="number"
-                        min={1}
-                        value={depositDueDays}
-                        onChange={(e) => setDepositDueDays(e.target.value ? Number(e.target.value) : "")}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="delivery-days">Deliver Itinerary (days)</Label>
-                      <Input
-                        id="delivery-days"
-                        type="number"
-                        min={1}
-                        value={deliveryDays}
-                        onChange={(e) => setDeliveryDays(e.target.value ? Number(e.target.value) : "")}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Remaining Balance Due</Label>
-                    <Select value={balanceDue} onValueChange={setBalanceDue}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="before_departure">Before departure</SelectItem>
-                        <SelectItem value="upon_delivery">Upon itinerary delivery</SelectItem>
-                        <SelectItem value="custom">Custom date (specified in terms)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-3">
-                    <Label>Is Pricing Confirmed?</Label>
-                    <RadioGroup value={pricingConfirmed} onValueChange={setPricingConfirmed} className="flex gap-3">
-                      <label className={`flex-1 flex items-center gap-2 rounded-lg border p-3 cursor-pointer transition-colors ${pricingConfirmed === "confirmed" ? "border-[#0c4d47] bg-[#0c4d47]/5" : "hover:bg-muted/30"}`}>
-                        <RadioGroupItem value="confirmed" />
-                        <span className="text-sm font-medium">Confirmed</span>
-                      </label>
-                      <label className={`flex-1 flex items-center gap-2 rounded-lg border p-3 cursor-pointer transition-colors ${pricingConfirmed === "estimate" ? "border-[#0c4d47] bg-[#0c4d47]/5" : "hover:bg-muted/30"}`}>
-                        <RadioGroupItem value="estimate" />
-                        <span className="text-sm font-medium">Estimate</span>
-                      </label>
-                    </RadioGroup>
-                    {pricingConfirmed === "estimate" && (
-                      <p className="text-xs text-amber-600 flex items-center gap-1"><AlertCircle className="h-3 w-3" /> Pricing is subject to availability and may change.</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-3">
-                    <Label>Payment Schedule</Label>
-                    <Select value={paymentScheduleType} onValueChange={setPaymentScheduleType}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="full_on_acceptance">Full payment on acceptance</SelectItem>
-                        <SelectItem value="50_50">50/50 split</SelectItem>
-                        <SelectItem value="milestone">Milestone-based</SelectItem>
-                        <SelectItem value="custom">Custom</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    {(paymentScheduleType === "milestone" || paymentScheduleType === "custom") && (
-                      <div className="space-y-2 pl-1">
-                        {milestones.map((m, i) => (
-                          <div key={i} className="flex items-center gap-2">
-                            <Input
-                              placeholder="Milestone name"
-                              value={m.name}
-                              onChange={(e) => {
-                                const next = [...milestones];
-                                next[i] = { ...m, name: e.target.value };
-                                setMilestones(next);
-                              }}
-                              className="flex-1"
-                            />
-                            <Input
-                              type="number"
-                              min={0}
-                              max={100}
-                              placeholder="%"
-                              value={m.percentage}
-                              onChange={(e) => {
-                                const next = [...milestones];
-                                next[i] = { ...m, percentage: Number(e.target.value) || 0 };
-                                setMilestones(next);
-                              }}
-                              className="w-20"
-                            />
-                            <span className="text-sm text-muted-foreground">%</span>
-                            {milestones.length > 1 && (
-                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setMilestones((prev) => prev.filter((_, j) => j !== i))}>
-                                <Trash2 className="h-3.5 w-3.5" />
-                              </Button>
-                            )}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {([
+                        { value: "percentage" as CommissionModel, label: "Percentage Commission", desc: "Earn a % of total trip value", icon: Percent },
+                        { value: "flat_fee" as CommissionModel, label: "Flat Planning Fee", desc: "Charge a fixed service fee", icon: DollarSign },
+                        { value: "hybrid" as CommissionModel, label: "Hybrid", desc: "Fixed fee + % commission", icon: Plus },
+                      ]).map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setCommissionModel(opt.value)}
+                          className={`flex flex-col items-start gap-2 rounded-lg border-2 p-4 text-left transition-all ${
+                            commissionModel === opt.value
+                              ? "border-[#0c4d47] bg-[#0c4d47]/5"
+                              : "border-border hover:border-muted-foreground/30"
+                          }`}
+                        >
+                          <opt.icon className={`h-5 w-5 ${commissionModel === opt.value ? "text-[#0c4d47]" : "text-muted-foreground"}`} />
+                          <div>
+                            <p className="text-sm font-medium">{opt.label}</p>
+                            <p className="text-xs text-muted-foreground">{opt.desc}</p>
                           </div>
-                        ))}
-                        <Button variant="outline" size="sm" onClick={() => setMilestones((prev) => [...prev, { name: "", percentage: 0 }])}>
-                          <Plus className="h-3.5 w-3.5 mr-1" /> Add Milestone
-                        </Button>
-                        {milestones.reduce((sum, m) => sum + m.percentage, 0) !== 100 && (
-                          <p className="text-xs text-destructive flex items-center gap-1">
-                            <AlertCircle className="h-3 w-3" /> Milestones must total 100% (currently {milestones.reduce((sum, m) => sum + m.percentage, 0)}%)
-                          </p>
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Percentage Commission Fields */}
+                    {commissionModel === "percentage" && (
+                      <div className="space-y-4 pl-1">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Label htmlFor="commission-pct">Commission %</Label>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-[280px]">
+                                  <p className="text-xs">Industry standard is 10–20% commission on total trip value. Luxury and bespoke experiences may command 15–25%.</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+                          <div className="relative w-32">
+                            <Input
+                              id="commission-pct"
+                              type="number"
+                              min={1}
+                              max={50}
+                              step={0.5}
+                              value={commissionPct}
+                              onChange={(e) => setCommissionPct(e.target.value ? Number(e.target.value) : "")}
+                              className="pr-8"
+                            />
+                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">%</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-3 rounded-lg border p-4">
+                          <Checkbox
+                            id="tiered-commission"
+                            checked={commissionTiered}
+                            onCheckedChange={(c) => setCommissionTiered(!!c)}
+                            className="mt-0.5"
+                          />
+                          <div>
+                            <Label htmlFor="tiered-commission" className="cursor-pointer font-medium">Tiered commission</Label>
+                            <p className="text-xs text-muted-foreground mt-0.5">e.g. 20% on the first $5,000 and 15% above</p>
+                          </div>
+                        </div>
+
+                        {commissionTiered && (
+                          <div className="space-y-2 pl-4">
+                            {commissionTiers.map((tier, i) => (
+                              <div key={i} className="flex items-center gap-2">
+                                <span className="text-xs text-muted-foreground whitespace-nowrap">
+                                  {i === 0 ? "First" : "Above"} $
+                                </span>
+                                <Input
+                                  type="number"
+                                  min={0}
+                                  placeholder="Threshold"
+                                  value={tier.threshold === Infinity ? "" : tier.threshold}
+                                  onChange={(e) => {
+                                    const next = [...commissionTiers];
+                                    next[i] = { ...tier, threshold: e.target.value ? Number(e.target.value) : Infinity };
+                                    setCommissionTiers(next);
+                                  }}
+                                  className="w-28"
+                                  disabled={i === commissionTiers.length - 1}
+                                />
+                                <span className="text-xs text-muted-foreground">at</span>
+                                <Input
+                                  type="number"
+                                  min={1}
+                                  max={50}
+                                  step={0.5}
+                                  value={tier.pct}
+                                  onChange={(e) => {
+                                    const next = [...commissionTiers];
+                                    next[i] = { ...tier, pct: Number(e.target.value) || 0 };
+                                    setCommissionTiers(next);
+                                  }}
+                                  className="w-20"
+                                />
+                                <span className="text-xs text-muted-foreground">%</span>
+                                {commissionTiers.length > 2 && (
+                                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCommissionTiers((prev) => prev.filter((_, j) => j !== i))}>
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </Button>
+                                )}
+                              </div>
+                            ))}
+                            <Button variant="outline" size="sm" onClick={() => {
+                              const last = commissionTiers[commissionTiers.length - 1];
+                              setCommissionTiers((prev) => [
+                                ...prev.slice(0, -1),
+                                { ...prev[prev.length - 2], threshold: prev[prev.length - 2]?.threshold || 5000 },
+                                { threshold: Infinity, pct: last.pct }
+                              ]);
+                            }}>
+                              <Plus className="h-3.5 w-3.5 mr-1" /> Add Tier
+                            </Button>
+                          </div>
                         )}
                       </div>
                     )}
+
+                    {/* Flat Fee Fields */}
+                    {commissionModel === "flat_fee" && (
+                      <div className="space-y-4 pl-1">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Label htmlFor="flat-fee">Fee Amount</Label>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-[280px]">
+                                  <p className="text-xs">Typical flat fees range from $299–$1,500+ depending on trip complexity.</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+                          <div className="relative w-40">
+                            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              id="flat-fee"
+                              type="number"
+                              min={0}
+                              placeholder="0"
+                              className="pl-9"
+                              value={flatFeeAmount}
+                              onChange={(e) => setFlatFeeAmount(e.target.value ? Number(e.target.value) : "")}
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Fee Covers</Label>
+                          <Select value={flatFeeCovers} onValueChange={setFlatFeeCovers}>
+                            <SelectTrigger className="w-60"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="planning">Planning only</SelectItem>
+                              <SelectItem value="execution">Planning + Execution</SelectItem>
+                              <SelectItem value="full_service">Full service</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Hybrid Fields */}
+                    {commissionModel === "hybrid" && (
+                      <div className="space-y-4 pl-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-[280px]">
+                                <p className="text-xs">Common hybrid: $500 planning fee + 10% commission on bookings.</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <span className="text-xs text-muted-foreground">Flat fee + percentage commission</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="hybrid-flat">Flat Fee</Label>
+                            <div className="relative">
+                              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                id="hybrid-flat"
+                                type="number"
+                                min={0}
+                                placeholder="0"
+                                className="pl-9"
+                                value={hybridFlatFee}
+                                onChange={(e) => setHybridFlatFee(e.target.value ? Number(e.target.value) : "")}
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="hybrid-pct">Commission %</Label>
+                            <div className="relative">
+                              <Input
+                                id="hybrid-pct"
+                                type="number"
+                                min={1}
+                                max={50}
+                                step={0.5}
+                                value={hybridCommissionPct}
+                                onChange={(e) => setHybridCommissionPct(e.target.value ? Number(e.target.value) : "")}
+                                className="pr-8"
+                              />
+                              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">%</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  {estimatedEarnings > 0 && (
-                    <div className="rounded-lg bg-[#0c4d47]/5 border border-[#0c4d47]/20 p-4">
-                      <p className="text-sm font-medium text-[#0c4d47]">Estimated Earnings: ${estimatedEarnings.toLocaleString()}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">After 3.5% platform fee</p>
+                  {/* Fee Breakdown Card */}
+                  {commissionCalc.commission > 0 && (
+                    <div className="rounded-lg border-2 border-[#0c4d47]/20 bg-[#0c4d47]/5 p-5 space-y-4">
+                      <p className="text-sm font-semibold text-foreground">Fee Breakdown</p>
+
+                      {/* Agent side */}
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Your Commission</span>
+                          <span className="font-medium text-foreground">${commissionCalc.commission.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Platform fee (3.5%)</span>
+                          <span className="text-destructive">-${commissionCalc.hostFee.toLocaleString()}</span>
+                        </div>
+                        <div className="border-t border-[#0c4d47]/20 pt-1.5 flex justify-between text-sm font-semibold">
+                          <span className="text-[#0c4d47]">Your Estimated Payout</span>
+                          <span className="text-[#0c4d47]">${commissionCalc.agentPayout.toLocaleString()}</span>
+                        </div>
+                      </div>
+
+                      {/* Traveler side */}
+                      <div className="border-t border-[#0c4d47]/20 pt-3 space-y-1.5">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">What the Traveler Pays</p>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Trip Cost</span>
+                          <span className="font-medium text-foreground">${(typeof priceFrom === "number" ? priceFrom : 0).toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Service Fee (3.5%)</span>
+                          <span className="text-foreground">+${commissionCalc.guestFee.toLocaleString()}</span>
+                        </div>
+                        <div className="border-t border-[#0c4d47]/20 pt-1.5 flex justify-between text-sm font-semibold">
+                          <span className="text-foreground">Traveler Total</span>
+                          <span className="text-foreground">${commissionCalc.travelerTotal.toLocaleString()}</span>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </CardContent>
@@ -1243,11 +1419,11 @@ export default function NewProposalPage() {
                     <span>Proposal valid for 14 days</span>
                   </div>
 
-                  {estimatedEarnings > 0 && (
+                   {commissionCalc.agentPayout > 0 && (
                     <div className="flex items-center gap-2">
                       <DollarSign className="h-4 w-4 text-[#0c4d47]" />
                       <span className="font-medium text-[#0c4d47]">
-                        Est. earnings: ${estimatedEarnings.toLocaleString()}
+                        Est. payout: ${commissionCalc.agentPayout.toLocaleString()}
                       </span>
                     </div>
                   )}
