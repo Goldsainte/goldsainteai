@@ -1,90 +1,68 @@
 
 
-# Redesign My Storyboards Page — Clean Workflow Hierarchy
+# Tighten Storyboard Cards & Page Polish
 
-## Problem
+## Changes — all in `src/pages/TikTokLab/StoryboardsPage.tsx`
 
-The current `/storyboards` page (`TikTokLabStoryboardsPage`) suffers from:
-1. **Identity crisis** — tries to be a dashboard, creation studio, and feed simultaneously
-2. **Heavy explainer box** interrupts momentum (belongs on a landing page, not inside the tool)
-3. **Long subtitle** reads like marketing copy, not a tool interface
-4. **No clear primary action** — user doesn't know what to do first
-5. **"Browse Inspiration" section** blends into the storyboard grid with no visual separation
-6. **"Convert to Trip"** CTA is buried in hover state and floating copy
+### 1. Remove duplicate actions on cards — keep ONE CTA
 
-## Design — Option A (Cleanest)
+The hover "Convert to Trip" overlay AND the persistent "Post to Marketplace" link are redundant. Remove the hover overlay entirely. Keep only the persistent link, renamed to "Post to Marketplace →" (already done). This gives one clear action per card.
 
-Restructure the page into a focused tool with clear hierarchy:
+**Lines 281–292** — delete the entire hover CTA div.
 
-```text
-┌─────────────────────────────────────────┐
-│ ← Back to Dashboard                    │
-│                                         │
-│ MY STORYBOARDS                          │
-│ Create a visual board. Post when ready. │
-│                                         │
-│ [+ Create New Storyboard]  ← PRIMARY   │
-│                                         │
-│ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐       │
-│ │ sb1 │ │ sb2 │ │ sb3 │ │ sb4 │       │
-│ │     │ │     │ │     │ │     │       │
-│ │ Post│ │ Post│ │ Post│ │ Post│       │
-│ └─────┘ └─────┘ └─────┘ └─────┘       │
-│                                         │
-│  What's the difference between          │
-│  Storyboard & Post a Trip? ← subtle    │
-│                                         │
-│ ── Browse Inspiration ──── [tab/section]│
-│ ┌───┐┌───┐┌───┐┌───┐┌───┐┌───┐        │
-│ └───┘└───┘└───┘└───┘└───┘└───┘        │
-└─────────────────────────────────────────┘
+### 2. Rename any remaining "Convert to Trip" references
+
+Already handled by removing the hover overlay. The only card CTA becomes "Post to Marketplace →" (line 324), which is already correct.
+
+### 3. Elevate subtitle tone
+
+**Line 141** — change from:
+`Create a visual board. Post when ready.`
+to:
+`Create your travel vision. When you're ready, turn it into a trip request.`
+
+### 4. Add status badge + "last edited" metadata to cards
+
+Add a `Draft` badge (top-left of card image) and a relative timestamp ("Edited 3 days ago") below the title. This makes cards informative at a glance.
+
+- Badge logic: show "Draft" for all cards currently (future: "Live" if `is_public` is true or linked to a marketplace post). Uses a simple styled `<span>`.
+- Relative time: use `date-fns` `formatDistanceToNow` on `created_at`.
+
+**In StoryboardCard**, after the item count badge (line 279), add:
+```tsx
+<span className="absolute top-2.5 left-2.5 rounded-full bg-white/80 backdrop-blur-sm px-2 py-0.5 text-[10px] font-semibold text-[#6B7280]">
+  Draft
+</span>
 ```
 
-## Changes
+**Below the description** (after line 305), add:
+```tsx
+<p className="text-[11px] text-[#9CA3AF]">
+  Edited {formatDistanceToNow(new Date(storyboard.created_at), { addSuffix: true })}
+</p>
+```
 
-### File: `src/pages/TikTokLab/StoryboardsPage.tsx`
+Requires adding `import { formatDistanceToNow } from "date-fns"` at top.
 
-This is the only file that needs significant changes:
+### 5. Redesign empty state to feel inspiring
 
-1. **Remove** the `StoryboardExplainerCard` import and usage (lines 9, 157)
+Replace the current minimal empty state with a warmer, more editorial design:
+- Larger visual area with a gradient or subtle illustration
+- Headline: "Your first storyboard starts here"
+- Copy: "Pin destinations, hotels, and moments that inspire you. When the vision is clear, post it as a trip request."
+- Prominent CTA button
+- A secondary subtle link: "or browse inspiration →" that switches to the inspiration tab
 
-2. **Replace subtitle** (line 117):
-   - From: "Think Pinterest — but for planning a trip. Save hotels, destinations, restaurants..."
-   - To: "Create a visual board. Post when ready."
+### Summary of lines affected
 
-3. **Add subtle explainer link** — a small text link below the subtitle: "What's the difference between Storyboard & Post a Trip?" that opens a modal/dialog containing the comparison content (reusing the two-column layout from `StoryboardExplainerCard`)
+| What | Lines | Action |
+|------|-------|--------|
+| Add `date-fns` import | 1 | Add import |
+| Subtitle text | 141 | Edit |
+| Hover CTA overlay | 281–292 | Delete |
+| Draft badge on card | After 279 | Insert |
+| Edited timestamp | After 305 | Insert |
+| Empty state redesign | 334–352 | Rewrite |
 
-4. **Make "Create New Storyboard" the dominant CTA**:
-   - Move the `+ New storyboard` button to appear prominently below the subtitle (not just in the header row)
-   - Show it always, not just when `storyboards.length > 0`
-   - Make it larger and more prominent
-
-5. **Add "Post to Marketplace →" to each storyboard card** — the existing hover CTA is good but also add a persistent subtle link beneath each card's metadata so it's visible without hovering (especially important on mobile where hover doesn't exist)
-
-6. **Separate "Browse Inspiration" with tabs** — wrap the storyboard grid and Browse Inspiration in a `Tabs` component with two tabs: "My Storyboards" and "Browse Inspiration". This gives each section its own space instead of stacking them.
-
-7. **Update empty state** — simplify copy to match the new tone. Remove the "Browse Inspiration" scroll button since it now has its own tab.
-
-### Detailed structure of the redesigned page:
-
-**Header area:**
-- Back button (existing role-aware logic, unchanged)
-- Gold accent label: "Your Travel Planning Board"
-- Title: "My Storyboards"
-- Subtitle: "Create a visual board. Post when ready."
-- Subtle link: "What's the difference between Storyboard & Post a Trip?" → opens Dialog with the two-column comparison content from `StoryboardExplainerCard`
-- Primary CTA button: `+ Create New Storyboard` (always visible, prominent)
-
-**Tabs:**
-- Tab 1: **My Storyboards** — grid of storyboard cards (existing grid). Each card gets a persistent "Post to Marketplace →" link below metadata for unconverted boards
-- Tab 2: **Browse Inspiration** — the existing `TravelStoryboard` component
-
-**Modal/Dialog:**
-- Triggered by the subtle link
-- Contains the same two-column Storyboard vs Post a Trip comparison from `StoryboardExplainerCard`
-- Dismissible, non-intrusive
-
-### Files affected:
-- `src/pages/TikTokLab/StoryboardsPage.tsx` — main redesign (all changes above)
-- No other files need changes. `StoryboardExplainerCard` can remain in the codebase for now (it's just no longer imported on this page).
+Single file change. No database or routing changes needed.
 
