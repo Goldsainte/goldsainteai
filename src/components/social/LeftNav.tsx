@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { usePanelStore } from "@/stores/panelStore";
-import { Home, Users, Search, MessageCircle, Bell, BarChart3, User2, Store, Building, PlaneTakeoff, Sparkles } from "lucide-react";
+import { Home, Users, Search, MessageCircle, Bell, BarChart3, User2, Store, Building, PlaneTakeoff, Sparkles, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
@@ -46,6 +46,11 @@ export default function LeftNav() {
         
         
         <NavItemLink to="/post-trip"><PlaneTakeoff className="w-6 h-6" /> Post a Trip</NavItemLink>
+        
+        {/* My Proposals - Agents and Creators */}
+        {(isAgentAccount || isCreator) && (
+          <NavItemLink to="/my-proposals"><FileText className="w-6 h-6" /> My Proposals</NavItemLink>
+        )}
         
         {/* My Collections - Authenticated users only */}
         {user && (

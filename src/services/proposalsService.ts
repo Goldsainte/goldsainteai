@@ -261,6 +261,61 @@ export type ProposalListItem = {
   } | null;
 };
 
+export type MyProposalListItem = ProposalListItem & {
+  trip_title: string | null;
+  trip_destination: string | null;
+  trip_start_date: string | null;
+  trip_end_date: string | null;
+  trip_request_id: string | null;
+};
+
+export async function getMyProposals(): Promise<MyProposalListItem[]> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from("trip_proposals")
+    .select("id, status, price_from, currency, nights, headline, created_at, valid_until, proposer_id, proposer_role, trip_request_id")
+    .eq("proposer_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error loading my proposals", error);
+    throw new Error("Could not load your proposals.");
+  }
+  if (!data || data.length === 0) return [];
+
+  // Fetch trip request details
+  const tripIds = [...new Set(data.map(p => p.trip_request_id).filter(Boolean))] as string[];
+  let tripMap: Record<string, { title: string | null; destination: string | null; start_date: string | null; end_date: string | null }> = {};
+
+  if (tripIds.length > 0) {
+    const { data: trips } = await supabase
+      .from("trip_requests")
+      .select("id, title, destination, start_date, end_date")
+      .in("id", tripIds);
+    if (trips) {
+      tripMap = trips.reduce((acc, t) => {
+        acc[t.id] = { title: t.title, destination: t.destination, start_date: t.start_date, end_date: t.end_date };
+        return acc;
+      }, {} as typeof tripMap);
+    }
+  }
+
+  return data.map(p => {
+    const trip = p.trip_request_id ? tripMap[p.trip_request_id] : null;
+    return {
+      ...p,
+      proposer: { id: user.id, display_name: null },
+      trip_title: trip?.title ?? null,
+      trip_destination: trip?.destination ?? null,
+      trip_start_date: trip?.start_date ?? null,
+      trip_end_date: trip?.end_date ?? null,
+      trip_request_id: p.trip_request_id,
+    };
+  });
+}
+
 export async function getProposalsForTrip(
   tripRequestId: string
 ): Promise<ProposalListItem[]> {
