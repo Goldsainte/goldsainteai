@@ -1,84 +1,80 @@
 
 
-# My Proposals Dashboard for Agents & Creators
+# Change Platform Fee to 7% Total (3.5% Host + 3.5% Guest)
 
 ## Overview
 
-Create a new page at `/my-proposals` that shows all proposals the current user has submitted across all trips, with status filtering, search, and quick navigation to each proposal detail.
+Update the platform fee from 15% to **7% total**, split evenly: **3.5% from the agent/creator** (deducted from payout) and **3.5% from the traveler** (added to their total).
 
-## Current State
+```text
+Example: Agent quotes $10,000 trip
 
-- Proposals are only viewable per-trip via `/proposals?tripId=X` (ProposalsForTripPage)
-- There is no cross-trip view for agents/creators to see all their submitted proposals
-- The `proposalsService.ts` has `getProposalsForTrip()` but no "get my proposals" function
-- The existing `ProposalCard` component in `ProposalsForTripPage.tsx` can serve as a design reference
+Agent sees:
+  Trip price:              $10,000
+  Platform fee (3.5%):       -$350
+  Your payout:              $9,650
 
-## Changes
+Traveler sees:
+  Trip cost:              $10,000
+  Service fee (3.5%):        +$350
+  Total due:             $10,350
 
-### File 1: `src/services/proposalsService.ts`
-
-Add a new function `getMyProposals()` that:
-- Gets the current authenticated user
-- Queries `trip_proposals` filtered by `proposer_id = user.id`
-- Joins trip request data (title, destination, start_date, end_date) via a separate query on `trip_requests`
-- Returns an extended list item type that includes trip context (destination, dates, title)
-- Orders by `created_at` descending
-
-New type `MyProposalListItem` extends `ProposalListItem` with:
-- `trip_title: string | null`
-- `trip_destination: string | null`
-- `trip_start_date: string | null`
-- `trip_end_date: string | null`
-
-### File 2: `src/pages/proposals/MyProposalsPage.tsx` (NEW)
-
-New page with:
-
-**Header section** — cream background matching existing pages:
-- "My Proposals" title
-- Subtitle: "All proposals you've submitted across trips"
-- Back button to marketplace
-
-**Status filter tabs** — using existing `Tabs` component:
-- All | Sent | Accepted | Declined | Withdrawn | Expired
-- Each tab shows a count badge
-- Filters the list client-side
-
-**Proposal cards list** — each card shows:
-- Headline (or "Trip Proposal" fallback)
-- Trip destination + dates (the trip context, which ProposalsForTripPage doesn't show)
-- Price
-- Status badge with human-readable label
-- Sent date + valid until
-- Click navigates to `/proposals/:id`
-
-**Empty states** — per-tab empty messages:
-- "All" tab: "You haven't submitted any proposals yet"
-- Filtered tabs: "No {status} proposals"
-
-Design follows existing Goldsainte luxury patterns: cream hero, gold accents, rounded cards, serif headings.
-
-### File 3: `src/routes/AppRoutes.tsx`
-
-Add route:
-```
-<Route path="/my-proposals" element={<RequireAuth><MyProposalsPage /></RequireAuth>} />
+Goldsainte collects:    $350 + $350 = $700 (7%)
 ```
 
-Add lazy import for `MyProposalsPage`.
+## All Files Requiring Changes
 
-### File 4: Navigation updates
+Every hardcoded 15% / 0.15 / 0.85 platform fee reference must be updated. Here is the full list:
 
-Add "My Proposals" link to the agent/creator navigation areas. Search for where agent-specific nav items exist (sidebar or header) and add the link there, gated by `hasAgentAccess || hasCreatorAccess`.
+### Frontend
 
-## Files Modified
+| File | Current | Change |
+|------|---------|--------|
+| `src/lib/booking/commission.ts` (line 26) | `platformPct = 0.15` (collab) / `0.2` (solo) | Change both to `0.035` (host-side 3.5%). Add `guestFeePct = 0.035` |
+| `src/pages/proposals/NewProposalPage.tsx` (line 133) | `priceFrom * 0.85` | `priceFrom * 0.965` (after 3.5% host fee) |
+| `src/pages/proposals/NewProposalPage.tsx` (line 728) | "After 15% platform fee" | "After 3.5% platform fee" |
+| `src/components/trips/ProposalCard.tsx` (line 95) | `totalPriceCents * 0.15` | `totalPriceCents * 0.035` |
+| `src/components/trips/TripBookingPanel.tsx` (lines 91, 182) | `amountTotalCents * 0.15` / "Platform fee (15%)" | `* 0.035` / "Platform fee (3.5%)" |
+| `src/pages/TripRequestDetailPage.tsx` (line 400) | `totalPriceCents * 0.15` | `totalPriceCents * 0.035` |
+| `src/components/AgentBidForm.tsx` (lines 43-46, 100-103) | `0.03` service fee + `0.15` success fee | `0.035` guest service fee + `0.035` host fee |
+| `src/components/CreatorEscrowDashboard.tsx` (lines 63, 66, 112) | "15%" labels, "$750" example, "$4,250" earnings | "7% total (3.5% + 3.5%)" labels, update example to $5,000 → $175 host fee → $4,825 earnings |
+| `src/components/partners/PartnersFAQ.tsx` (line 31) | "15% of each booking" | "7% of each booking (3.5% from partner, 3.5% from traveler)" |
+| `src/pages/onboarding/CreatorOnboardingPage.tsx` (line 737) | "Platform Fee (15%)" / "-$450" | "Platform Fee (3.5%)" / "-$105" |
 
-| File | Action |
-|------|--------|
-| `src/services/proposalsService.ts` | Add `MyProposalListItem` type + `getMyProposals()` function |
-| `src/pages/proposals/MyProposalsPage.tsx` | New page — proposals dashboard with status tabs and card list |
-| `src/routes/AppRoutes.tsx` | Add `/my-proposals` route with lazy import |
-| Navigation component (Header/Sidebar) | Add "My Proposals" link for agents/creators |
+### Backend (Edge Functions)
 
-No database changes needed — all data already queryable via existing `trip_proposals` table with RLS.
+| File | Current | Change |
+|------|---------|--------|
+| `supabase/functions/_shared/commissionCalculator.ts` (line 34) | `PLATFORM_FEE_RATE = 0.1` | `HOST_FEE_RATE = 0.035`, `GUEST_FEE_RATE = 0.035` |
+| `supabase/functions/calculate-creator-commission/index.ts` (line ~73) | `commissionWithTier * 0.1` | `amount * 0.035` (host fee on booking subtotal) |
+| `supabase/functions/create-package-payment-plan/index.ts` (lines 63-64) | `totalAmount * 0.15` / `totalAmount * 0.85` | `totalAmount * 0.035` / `totalAmount * 0.965` |
+| `supabase/functions/process-installment-payment/index.ts` (line 69) | `installment.amount * 0.15` | `installment.amount * 0.035` |
+
+### Commission utility update (`src/lib/booking/commission.ts`)
+
+Extend `CommissionBreakdown` to include:
+- `hostFee` / `hostFeePct` (3.5%, deducted from agent)
+- `guestFee` / `guestFeePct` (3.5%, added to traveler)
+- `travelerTotal` (trip cost + guest fee)
+
+Remove the collab vs solo distinction for platform rate — it is now always 3.5% per side regardless of mode.
+
+### Escrow dashboard example update
+
+```text
+Customer pays:           $5,000
++ Service fee (3.5%):     +$175
+= Traveler total:        $5,175
+
+Your earnings:           $5,000
+- Platform fee (3.5%):    -$175
+= Your payout:           $4,825
+
+  Upfront (20%):          $965
+  Held in escrow:        $3,860
+```
+
+## Summary
+
+17 files touched across frontend and backend. The core change is simple — replace all `0.15` / `0.85` / `15%` platform fee references with the 3.5% host + 3.5% guest split totaling 7%.
 
