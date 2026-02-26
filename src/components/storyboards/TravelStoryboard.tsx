@@ -1,7 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 import { SaveToStoryboardButton } from "./SaveToStoryboardButton";
 
@@ -106,6 +109,11 @@ function diversifyImages(images: StoryboardImage[], limit: number): StoryboardIm
   return result.sort(() => Math.random() - 0.5);
 }
 
+const FILTER_MOOD_PILLS = [
+  "luxury", "beach", "adventure", "dining", "romantic",
+  "safari", "wellness", "mountain", "island", "historic",
+];
+
 export function TravelStoryboard({
   storyboardId,
   title = "Travel storyboard",
@@ -118,6 +126,30 @@ export function TravelStoryboard({
   const [images, setImages] = useState<StoryboardImage[]>([]);
   const [items, setItems] = useState<StoryboardItemRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeMoods, setActiveMoods] = useState<string[]>([]);
+
+  const toggleMood = (mood: string) => {
+    setActiveMoods(prev =>
+      prev.includes(mood) ? prev.filter(m => m !== mood) : [...prev, mood]
+    );
+  };
+
+  const filteredImages = useMemo(() => {
+    if (!searchQuery && activeMoods.length === 0) return images;
+    const q = searchQuery.toLowerCase();
+    return images.filter(img => {
+      const matchesSearch =
+        !q ||
+        (img.label && img.label.toLowerCase().includes(q)) ||
+        (img.destination_tags && img.destination_tags.some(t => t.toLowerCase().includes(q))) ||
+        (img.mood_tags && img.mood_tags.some(t => t.toLowerCase().includes(q)));
+      const matchesMood =
+        activeMoods.length === 0 ||
+        (img.mood_tags && img.mood_tags.some(t => activeMoods.includes(t.toLowerCase())));
+      return matchesSearch && matchesMood;
+    });
+  }, [images, searchQuery, activeMoods]);
 
   useEffect(() => {
     let isMounted = true;
@@ -186,15 +218,55 @@ export function TravelStoryboard({
   }, [storyboardId, maxItems]);
 
   return (
-    <section className="space-y-3">
+    <section className="space-y-5">
       <div>
-        <h2 className="text-sm font-semibold text-foreground md:text-base">
+        <h2 className="text-base font-secondary font-semibold text-foreground md:text-lg">
           {title}
         </h2>
-        <p className="mt-1 text-[11px] text-muted-foreground md:text-xs">
+        <p className="mt-1 text-xs text-muted-foreground md:text-sm">
           {subtitle}
         </p>
       </div>
+
+      {/* Search & filters — only when browsing the media library */}
+      {!storyboardId && (
+        <div className="space-y-3">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Search by destination, mood, or keyword…"
+              className="pl-9 pr-9 rounded-full border-[#E5DFC6] bg-white text-sm h-10"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {FILTER_MOOD_PILLS.map(mood => (
+              <Badge
+                key={mood}
+                variant={activeMoods.includes(mood) ? "default" : "outline"}
+                className={cn(
+                  "cursor-pointer rounded-full px-3 py-1 text-xs capitalize transition-colors select-none",
+                  activeMoods.includes(mood)
+                    ? "bg-[#0c4d47] text-[#E5DFC6] hover:bg-[#073331]"
+                    : "border-[#E5DFC6] text-muted-foreground hover:bg-[#f7f3ea]"
+                )}
+                onClick={() => toggleMood(mood)}
+              >
+                {mood}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <div className="h-40 rounded-2xl bg-muted/60 animate-pulse" />
@@ -225,14 +297,14 @@ export function TravelStoryboard({
             </div>
           ))}
         </div>
-      ) : images.length > 0 ? (
+      ) : filteredImages.length > 0 ? (
         <div
           className={cn(
             "columns-2 gap-2 sm:columns-3 md:columns-4",
             "space-y-2"
           )}
         >
-          {images.map((img) => (
+          {filteredImages.map((img) => (
             <figure
               key={img.id}
               className={cn(
@@ -266,6 +338,7 @@ export function TravelStoryboard({
                       cover_image_url: img.url,
                       tags: [...(img.destination_tags || []), ...(img.mood_tags || [])],
                     }}
+                    mediaUrl={img.url}
                     variant="outline"
                     size="sm"
                     className="rounded-full bg-white/90 hover:bg-white shadow-md"
