@@ -1,43 +1,43 @@
 
 
-# Elevate My Storyboards Page to Match Marketplace Aesthetic
+# Fix Browse Inspiration: Add Search + Fix Broken Save Flow
 
-## File: `src/pages/TikTokLab/StoryboardsPage.tsx`
+## Problem 1: No Search
+The `TravelStoryboard` component has no search or filter input. Users can only scroll through a static grid with no way to find specific images.
 
-### 1. Header typography — scale up to match marketplace
-- Gold label: `text-[10px]` → `text-xs` with same tracking
-- Title `h1`: `text-xl md:text-2xl` → `text-2xl md:text-3xl` + add `font-secondary` (Playfair Display serif)
-- Subtitle "Plan visually...": `text-sm` → `text-base font-secondary`
-- Description paragraph: `text-xs` → `text-sm`
-- Explainer link: `text-[11px]` → `text-xs`
+## Problem 2: Broken Save Flow
+The `save-to-storyboard` edge function inserts columns that **don't exist** on the `storyboard_items` table. The edge function uses `kind`, `source`, `media_url`, `caption`, `location_label`, `category_tag`, `order_index`, `layout_type`, `data` — but the actual table columns are `item_type`, `image_url`, `title`, `subtitle`, `description`, `source_type`, `source_id`, `position`, `metadata`. Every save silently fails.
 
-### 2. CTA button — refine placement
-- Move the "Start a Trip Board" button to sit inline with the header title row (flex row on desktop, stacked on mobile) instead of floating below the explainer link
-- Use the same pill style but ensure proper spacing: `px-6 py-3` for more visual weight
+Additionally, `SaveToStoryboardButton` passes `assetType: "brand_collection"` which isn't mapped in the edge function's `kindMap` (only handles `photo`, `video`, `experience`, `note`).
 
-### 3. Tabs — elevate styling
-- Tab triggers: `text-xs` → `text-sm` with proper padding
-- Match the marketplace pill-tab style: `rounded-full border border-[#E5DFC6] bg-white p-1` inline-flex container
-- Privacy note: `text-[11px]` → `text-xs`
+---
 
-### 4. Storyboard cards — match marketplace trip cards
-- Grid: keep `md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4` (same as marketplace)
-- Image aspect ratio: keep `aspect-[4/3]` but add white card wrapper with `bg-white rounded-2xl border border-[#E5DFC6] overflow-hidden shadow-sm hover:shadow-md transition-shadow`
-- Card title: `text-sm md:text-[15px]` → `font-secondary text-base` (serif, larger)
-- Description: `text-[13px]` → `text-sm`
-- Edited timestamp: `text-[11px]` → `text-xs`
-- Tags: `text-[9px]` → `text-[11px]`
-- Item count badge: `text-[10px]` → `text-xs`
-- Draft badge: `text-[10px]` → `text-xs`
-- "Post to Marketplace" link: `text-[11px]` → `text-sm`
-- Move metadata inside card padding (`p-4`) below the image, matching marketplace cards
+## Changes
 
-### 5. Empty state — refine
-- Icons: slightly smaller, more restrained
-- Title: add `font-secondary` serif
-- Description: `text-sm` → `text-base`
-- "or browse inspiration" link: `text-[11px]` → `text-sm`
+### 1. Add search/filter to `TravelStoryboard` component
+- Add a search input at the top of the component that filters images by `label`, `destination_tags`, and `mood_tags`
+- Add pill-style tag filters for popular mood categories (luxury, beach, adventure, dining, etc.)
+- Style to match the editorial aesthetic (serif labels, gold accents)
+
+### 2. Fix the edge function `save-to-storyboard/index.ts`
+Remap the insert to use the correct column names:
+- `kind` → `item_type`
+- `media_url` → `image_url`
+- `caption` → `title`
+- `location_label` → `subtitle`
+- `order_index` → `position`
+- `data` → `metadata`
+- Remove `layout_type` and `category_tag` (don't exist)
+- Add `source_type` and `source_id` mapping
+- Add `brand_collection` to the type map
+
+### 3. Fix `SaveToStoryboardButton` asset type
+- When saving an inspiration image, pass `assetType: "photo"` instead of `"brand_collection"`, or update the edge function to handle `brand_collection` by mapping it to `item_type: "image"`.
 
 ### Summary
-Single file change. All modifications are styling/typography — no logic, routing, or data changes. The goal is consistent font sizes, card structure with white card wrappers, serif headers, and proper spacing to match the marketplace's Farfetch × Mr & Mrs Smith aesthetic.
+| Fix | File |
+|-----|------|
+| Add search input + tag filters | `src/components/storyboards/TravelStoryboard.tsx` |
+| Fix column name mismatches | `supabase/functions/save-to-storyboard/index.ts` |
+| Fix asset type mapping | `supabase/functions/save-to-storyboard/index.ts` |
 
