@@ -68,8 +68,8 @@ Deno.serve(async (req) => {
     const baseCommission = amount * baseRate;
     const commissionWithTier = baseCommission * tierMultiplier;
 
-    // Platform fee (10% of commission)
-    const platformFee = commissionWithTier * 0.1;
+    // Platform host fee (3.5% of booking subtotal)
+    const platformFee = amount * 0.035;
     const netPayout = commissionWithTier - platformFee;
 
     // Hold period: 14 days from now for bookings, immediate for others

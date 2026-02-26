@@ -1,5 +1,10 @@
 export type CommissionMode = "solo_creator" | "solo_agent" | "collab";
 
+/** Platform fee constants — 7% total, split evenly */
+export const HOST_FEE_PCT = 0.035; // 3.5% deducted from agent/creator
+export const GUEST_FEE_PCT = 0.035; // 3.5% added to traveler
+export const PLATFORM_TOTAL_PCT = HOST_FEE_PCT + GUEST_FEE_PCT; // 7%
+
 export interface CommissionInput {
   totalPriceCents: number;
   commissionMode: CommissionMode;
@@ -14,6 +19,11 @@ export interface CommissionBreakdown {
   creatorAmount: number;
   agentPct: number;
   agentAmount: number;
+  hostFee: number;
+  hostFeePct: number;
+  guestFee: number;
+  guestFeePct: number;
+  travelerTotal: number;
 }
 
 export function calculateCommissions({
@@ -23,7 +33,7 @@ export function calculateCommissions({
   proposalAgentPct,
 }: CommissionInput): CommissionBreakdown {
   const total = Math.max(totalPriceCents || 0, 0);
-  const platformPct = commissionMode === "collab" ? 0.15 : 0.2;
+  const platformPct = HOST_FEE_PCT; // host-side fee is always 3.5%
   const remainingPct = 1 - platformPct;
 
   let creatorPct = 0;
@@ -54,6 +64,10 @@ export function calculateCommissions({
   const creatorAmount = Math.round(total * creatorPct);
   const agentAmount = Math.round(total * agentPct);
 
+  const hostFee = Math.round(total * HOST_FEE_PCT);
+  const guestFee = Math.round(total * GUEST_FEE_PCT);
+  const travelerTotal = total + guestFee;
+
   return {
     platformPct: platformPct * 100,
     platformFeeAmount,
@@ -61,6 +75,11 @@ export function calculateCommissions({
     creatorAmount,
     agentPct: agentPct * 100,
     agentAmount,
+    hostFee,
+    hostFeePct: HOST_FEE_PCT * 100,
+    guestFee,
+    guestFeePct: GUEST_FEE_PCT * 100,
+    travelerTotal,
   };
 }
 

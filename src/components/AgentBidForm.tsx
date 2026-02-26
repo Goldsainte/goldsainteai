@@ -40,9 +40,9 @@ export function AgentBidForm({
     const price = parseFloat(agentPrice);
     if (isNaN(price) || price <= 0) return null;
 
-    const serviceFee = price * 0.03;
+    const serviceFee = price * 0.035;
     const customerPrice = price + serviceFee;
-    const successFee = price * 0.15;
+    const successFee = price * 0.035;
     const agentPayout = price - successFee;
 
     return {
@@ -97,9 +97,9 @@ export function AgentBidForm({
       }
 
       // Calculate pricing
-      const serviceFee = price * 0.03;
+      const serviceFee = price * 0.035;
       const customerPrice = price + serviceFee;
-      const successFee = price * 0.15;
+      const successFee = price * 0.035;
       const agentPayout = price - successFee;
 
       // Insert bid

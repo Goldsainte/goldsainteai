@@ -31,7 +31,9 @@ export const BASE_COMMISSION_RATES: Record<string, number> = {
   partnership: 0.2, // 20% for partnership earnings (negotiated)
 };
 
-export const PLATFORM_FEE_RATE = 0.1; // 10% of commission
+export const HOST_FEE_RATE = 0.035; // 3.5% of booking subtotal (deducted from creator)
+export const GUEST_FEE_RATE = 0.035; // 3.5% of booking subtotal (added to traveler)
+export const PLATFORM_FEE_RATE = HOST_FEE_RATE; // backward compat — host-side fee
 
 export function calculateCommission(
   amount: number,

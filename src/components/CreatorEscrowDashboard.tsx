@@ -60,10 +60,10 @@ export const CreatorEscrowDashboard = () => {
             </div>
             <div>
               <h4 className="font-medium text-[#0a2225] mb-1">
-                Platform Fee: <span className="text-[#C7A962]">15%</span>
+                Platform Fee: <span className="text-[#C7A962]">7% total (3.5% + 3.5%)</span>
               </h4>
               <p className="text-sm text-[#6B7280]">
-                A 15% platform fee covers payment processing, support, and platform operations.
+                A 3.5% host fee is deducted from your payout. An additional 3.5% service fee is added to the traveler's total. Total platform take: 7%.
               </p>
             </div>
           </div>
@@ -109,13 +109,13 @@ export const CreatorEscrowDashboard = () => {
                 <span className="font-medium text-[#0a2225]">$5,000</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-[#6B7280]">Platform fee (15%)</span>
-                <span className="text-[#6B7280]">-$750</span>
+                <span className="text-[#6B7280]">Platform fee (3.5%)</span>
+                <span className="text-[#6B7280]">-$175</span>
               </div>
               <div className="h-px bg-[#E5DFC6] my-2" />
               <div className="flex items-center justify-between text-sm">
                 <span className="font-medium text-[#0a2225]">Your earnings</span>
-                <span className="font-secondary text-lg text-[#C7A962]">$4,250</span>
+                <span className="font-secondary text-lg text-[#C7A962]">$4,825</span>
               </div>
               <div className="h-px bg-[#E5DFC6] my-2" />
               <div className="flex items-center justify-between text-xs">

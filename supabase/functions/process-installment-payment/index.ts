@@ -66,7 +66,7 @@ serve(async (req) => {
       amount: Math.round(installment.amount * 100),
       currency: installment.currency.toLowerCase(),
       customer: customerId,
-      application_fee_amount: Math.round(installment.amount * 0.15 * 100),
+      application_fee_amount: Math.round(installment.amount * 0.035 * 100),
       transfer_data: installment.payment_plan.package.profiles?.stripe_account_id ? {
         destination: installment.payment_plan.package.profiles.stripe_account_id,
       } : undefined,

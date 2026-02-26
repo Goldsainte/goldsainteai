@@ -28,7 +28,7 @@ const faqs = [
   },
   {
     question: "What commission does Goldsainte take?",
-    answer: "Our standard commission is 15% of each booking. This covers payment processing, customer support, marketing, and platform maintenance. There are no hidden fees or additional charges beyond this transparent commission structure."
+    answer: "Our total platform fee is 7% of each booking — split evenly as 3.5% from partners and 3.5% from travelers. This covers payment processing, customer support, marketing, and platform maintenance. There are no hidden fees or additional charges."
   },
   {
     question: "Can I set my own prices?",
