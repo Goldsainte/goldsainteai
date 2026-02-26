@@ -1,14 +1,21 @@
 
 
-# Remove "From Unsplash" and "From your library" Labels
+# Fix Broken "Create New Storyboard" Link
 
-## File: `src/components/storyboards/TravelStoryboard.tsx`
+## Problem
+In `SaveToStoryboardButton.tsx`, the "Create New Storyboard" button navigates to `/trip/create?returnTo=...` — a route that doesn't exist. This results in the "Trip not found" page shown in the screenshot.
 
-### Changes
-1. **Remove the "From Unsplash" header row** (lines 368-378) — delete the entire div containing the label, spinner, and photo count
-2. **Remove the "Photos by Unsplash" attribution link** (lines 430-437)
-3. **Remove the "From your library" label** (lines 444-448)
-4. Keep the searching spinner inline somewhere subtle (e.g. next to the search input or just the shimmer skeleton is enough)
+## Fix — `src/components/storyboards/SaveToStoryboardButton.tsx`
 
-Result: Unsplash and local images will render seamlessly in one continuous grid without section dividers.
+Change the `handleCreateNew` function to navigate to `/storyboards/new` instead of `/trip/create`. This route exists and loads the storyboard editor page.
+
+```tsx
+// Before
+navigate("/trip/create?returnTo=" + encodeURIComponent(window.location.pathname));
+
+// After
+navigate("/storyboards/new");
+```
+
+Single line change in one file.
 
