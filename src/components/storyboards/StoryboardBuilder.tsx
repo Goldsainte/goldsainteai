@@ -2,11 +2,34 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Plus, Link as LinkIcon, Image, X } from "lucide-react";
 
+type TripFieldsForInsert = {
+  destination?: string;
+  departure_city?: string;
+  start_date?: string;
+  end_date?: string;
+  budget_min?: string;
+  budget_max?: string;
+  budget_level?: string;
+  travelers_adults?: string;
+  travelers_children?: string;
+  occasion?: string;
+  accommodation_style?: string;
+  pace?: string;
+  interests?: string[];
+  flexibility?: string;
+  special_notes?: string;
+  trip_length_days?: string;
+  budget_per_person?: boolean;
+  must_haves?: string[];
+  dealbreakers?: string[];
+};
+
 type StoryboardBuilderProps = {
   storyboardId?: string;
   initialTitle?: string;
   mode: "traveler" | "creator" | "agent";
   destination?: string | null;
+  tripFields?: TripFieldsForInsert;
   onSaved?: (storyboardId: string) => void;
   saveRef?: React.MutableRefObject<(() => Promise<void>) | null>;
   addItemRef?: React.MutableRefObject<((item: Item) => void) | null>;
@@ -31,6 +54,7 @@ export function StoryboardBuilder({
   initialTitle,
   mode,
   destination,
+  tripFields: tripFieldsProp,
   onSaved,
   saveRef,
   addItemRef,
@@ -139,7 +163,30 @@ export function StoryboardBuilder({
           setSaving(false);
           return;
         }
-        const { data, error } = await supabase.from("storyboards").insert({ owner_id: user.id, role: mode, title }).select("id").single();
+        // Build insert payload, including trip fields if provided
+        const insertPayload: Record<string, any> = { owner_id: user.id, role: mode, title };
+        if (tripFieldsProp) {
+          if (tripFieldsProp.destination) insertPayload.destination = tripFieldsProp.destination;
+          if (tripFieldsProp.departure_city) insertPayload.departure_city = tripFieldsProp.departure_city;
+          if (tripFieldsProp.start_date) insertPayload.start_date = tripFieldsProp.start_date;
+          if (tripFieldsProp.end_date) insertPayload.end_date = tripFieldsProp.end_date;
+          if (tripFieldsProp.budget_min) insertPayload.budget_min = parseFloat(tripFieldsProp.budget_min);
+          if (tripFieldsProp.budget_max) insertPayload.budget_max = parseFloat(tripFieldsProp.budget_max);
+          if (tripFieldsProp.budget_level) insertPayload.budget_level = tripFieldsProp.budget_level;
+          if (tripFieldsProp.travelers_adults) insertPayload.travelers_adults = parseInt(tripFieldsProp.travelers_adults);
+          if (tripFieldsProp.travelers_children) insertPayload.travelers_children = parseInt(tripFieldsProp.travelers_children);
+          if (tripFieldsProp.occasion) insertPayload.occasion = tripFieldsProp.occasion;
+          if (tripFieldsProp.accommodation_style) insertPayload.accommodation_style = tripFieldsProp.accommodation_style;
+          if (tripFieldsProp.pace) insertPayload.pace = tripFieldsProp.pace;
+          if (tripFieldsProp.interests?.length) insertPayload.interests = tripFieldsProp.interests;
+          if (tripFieldsProp.flexibility) insertPayload.flexibility = tripFieldsProp.flexibility;
+          if (tripFieldsProp.special_notes) insertPayload.special_notes = tripFieldsProp.special_notes;
+          if (tripFieldsProp.trip_length_days) insertPayload.trip_length_days = parseInt(tripFieldsProp.trip_length_days);
+          if (tripFieldsProp.budget_per_person !== undefined) insertPayload.budget_per_person = tripFieldsProp.budget_per_person;
+          if (tripFieldsProp.must_haves?.length) insertPayload.must_haves = tripFieldsProp.must_haves;
+          if (tripFieldsProp.dealbreakers?.length) insertPayload.dealbreakers = tripFieldsProp.dealbreakers;
+        }
+        const { data, error } = await supabase.from("storyboards").insert(insertPayload as any).select("id").single();
         if (error) throw error;
         sbId = data.id;
       }
