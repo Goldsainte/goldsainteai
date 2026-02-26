@@ -7,6 +7,32 @@ export type PaymentScheduleItem = {
   amount: number | null;
 };
 
+export type PriceBreakdown = {
+  service_level?: string | null;
+  revision_count?: number | null;
+  support_level?: string | null;
+  pricing_type?: string | null;
+  pricing_confirmed?: boolean | null;
+  planning_fee?: number | null;
+  planning_fee_refundable?: boolean | null;
+  balance_due?: string | null;
+  deposit_refundable?: string | null;
+  cancellation_windows?: { label: string; refund_percent: number }[] | null;
+  change_fee?: number | null;
+  supplier_dependent?: boolean | null;
+  supplier_dependent_note?: string | null;
+  external_links?: { label: string; url: string }[] | null;
+  handles_supplier_payments?: boolean | null;
+};
+
+export type ProposalAttachment = {
+  id: string;
+  file_name: string;
+  file_path: string;
+  file_type: string | null;
+  file_size: number | null;
+};
+
 export type ProposalDetail = {
   id: string;
   status: string;
@@ -20,6 +46,12 @@ export type ProposalDetail = {
   payment_schedule: PaymentScheduleItem[] | null;
   valid_until: string | null;
   created_at: string;
+  itinerary_summary: string | null;
+  deposit_percentage: number | null;
+  deposit_due_days: number | null;
+  custom_cancellation_terms: string | null;
+  price_breakdown: PriceBreakdown | null;
+  attachments: ProposalAttachment[];
 
   trip_request: {
     id: string;
@@ -65,7 +97,12 @@ export async function getProposalDetail(
       created_at,
       proposer_id,
       proposer_role,
-      trip_request_id
+      trip_request_id,
+      itinerary_summary,
+      deposit_percentage,
+      deposit_due_days,
+      custom_cancellation_terms,
+      price_breakdown
     `
     )
     .eq("id", id)
@@ -126,6 +163,23 @@ export async function getProposalDetail(
     }
   }
 
+  let priceBreakdown: PriceBreakdown | null = null;
+  if (data.price_breakdown) {
+    try {
+      priceBreakdown = typeof data.price_breakdown === 'string'
+        ? JSON.parse(data.price_breakdown)
+        : data.price_breakdown as PriceBreakdown;
+    } catch {
+      priceBreakdown = null;
+    }
+  }
+
+  // Fetch attachments
+  const { data: attachments } = await supabase
+    .from("proposal_attachments")
+    .select("id, file_name, file_path, file_type, file_size")
+    .eq("proposal_id", id);
+
   return {
     id: data.id,
     status: data.status,
@@ -139,6 +193,12 @@ export async function getProposalDetail(
     payment_schedule: schedule,
     valid_until: data.valid_until,
     created_at: data.created_at,
+    itinerary_summary: data.itinerary_summary ?? null,
+    deposit_percentage: data.deposit_percentage ?? null,
+    deposit_due_days: data.deposit_due_days ?? null,
+    custom_cancellation_terms: data.custom_cancellation_terms ?? null,
+    price_breakdown: priceBreakdown,
+    attachments: (attachments ?? []) as ProposalAttachment[],
     trip_request: tripRequest ? {
       id: tripRequest.id,
       title: tripRequest.title,
