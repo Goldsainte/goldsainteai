@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Image as ImageIcon, Sparkles, ArrowRight, Lightbulb } from "lucide-react";
+import { Plus, Image as ImageIcon, Sparkles, ArrowRight, Lightbulb, MapPin, Hotel } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { BackButton } from "@/components/ui/BackButton";
 import { TravelStoryboard } from "@/components/storyboards/TravelStoryboard";
@@ -138,7 +139,7 @@ export default function TikTokLabStoryboardsPage() {
                 My Storyboards
               </h1>
               <p className="text-xs text-[#4a4a4a] md:text-sm">
-                Create a visual board. Post when ready.
+                Create your travel vision. When you're ready, turn it into a trip request.
               </p>
             </div>
 
@@ -278,18 +279,10 @@ function StoryboardCard({ storyboard }: { storyboard: Storyboard }) {
             </span>
           )}
 
-          {/* Convert to Trip hover CTA */}
-          <div
-            className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-[#0c4d47] text-[#E5DFC6] text-xs font-semibold text-center py-2.5 flex items-center justify-center gap-1 cursor-pointer"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              navigate(`/post-trip?fromStoryboard=${storyboard.id}`);
-            }}
-          >
-            Convert to Trip
-            <ArrowRight className="h-3 w-3" />
-          </div>
+          {/* Draft badge */}
+          <span className="absolute top-2.5 left-2.5 rounded-full bg-white/80 backdrop-blur-sm px-2 py-0.5 text-[10px] font-semibold text-[#6B7280]">
+            Draft
+          </span>
         </div>
       </Link>
 
@@ -303,6 +296,9 @@ function StoryboardCard({ storyboard }: { storyboard: Storyboard }) {
         {storyboard.description && (
           <p className="text-[13px] text-[#6B7280] line-clamp-1">{storyboard.description}</p>
         )}
+        <p className="text-[11px] text-[#9CA3AF]">
+          Edited {formatDistanceToNow(new Date(storyboard.created_at), { addSuffix: true })}
+        </p>
         {storyboard.tags && storyboard.tags.length > 0 && (
           <div className="flex flex-wrap gap-1 pt-0.5">
             {storyboard.tags.slice(0, 3).map((tag) => (
@@ -333,21 +329,39 @@ function StoryboardCard({ storyboard }: { storyboard: Storyboard }) {
 
 function StoryboardsEmptyState() {
   return (
-    <div className="rounded-3xl bg-white/90 border border-[#E5DFC6] p-10 text-center space-y-4">
-      <Sparkles className="h-10 w-10 mx-auto text-[#BFAD72]" />
-      <h2 className="text-lg font-semibold">Start your first storyboard</h2>
-      <p className="text-sm text-[#4a4a4a] max-w-md mx-auto">
-        Collect destinations, hotels, and experiences into a visual board. When you're ready, post it as a trip.
-      </p>
-      <Button
-        asChild
-        className="rounded-full bg-[#0c4d47] text-[#E5DFC6] text-xs font-semibold hover:bg-[#073331]"
-      >
-        <Link to="/storyboards/new">
-          <Plus className="h-3 w-3 mr-1" />
-          Create a Storyboard
-        </Link>
-      </Button>
+    <div className="rounded-3xl bg-gradient-to-br from-[#f7f3ea] via-white to-[#E5DFC6]/30 border border-[#E5DFC6] p-12 md:p-16 text-center space-y-6">
+      <div className="mx-auto flex items-center justify-center gap-3 text-[#BFAD72]">
+        <MapPin className="h-7 w-7" />
+        <Sparkles className="h-9 w-9" />
+        <Hotel className="h-7 w-7" />
+      </div>
+      <div className="space-y-2">
+        <h2 className="text-lg md:text-xl font-semibold tracking-tight">Your first storyboard starts here</h2>
+        <p className="text-sm text-[#4a4a4a] max-w-md mx-auto leading-relaxed">
+          Pin destinations, hotels, and moments that inspire you. When the vision is clear, post it as a trip request.
+        </p>
+      </div>
+      <div className="flex flex-col items-center gap-3">
+        <Button
+          asChild
+          size="lg"
+          className="rounded-full bg-[#0c4d47] text-[#E5DFC6] font-semibold hover:bg-[#073331]"
+        >
+          <Link to="/storyboards/new">
+            <Plus className="h-4 w-4 mr-1.5" />
+            Create a Storyboard
+          </Link>
+        </Button>
+        <button
+          onClick={() => {
+            const tab = document.querySelector('[data-state="inactive"][value="inspiration"]') as HTMLElement;
+            tab?.click();
+          }}
+          className="text-[11px] text-[#8D8D8D] hover:text-[#0a2225] transition-colors"
+        >
+          or browse inspiration →
+        </button>
+      </div>
     </div>
   );
 }
