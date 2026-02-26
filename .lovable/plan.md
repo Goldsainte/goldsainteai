@@ -1,21 +1,27 @@
 
 
-# Fix Broken "Create New Storyboard" Link
+# Fix "Start a Trip Board" Post-Save Navigation
 
 ## Problem
-In `SaveToStoryboardButton.tsx`, the "Create New Storyboard" button navigates to `/trip/create?returnTo=...` — a route that doesn't exist. This results in the "Trip not found" page shown in the screenshot.
+When a user creates a new storyboard via "Start a Trip Board", the `handleStoryboardSaved` callback navigates to `/storyboards` (the listing page). This means the user never sees the Trip Details form or the "Submit to Marketplace" button — those only render in edit mode (when the storyboard ID is in the URL).
 
-## Fix — `src/components/storyboards/SaveToStoryboardButton.tsx`
+## Fix — `src/pages/TikTokLab/StoryboardEditorPage.tsx`
 
-Change the `handleCreateNew` function to navigate to `/storyboards/new` instead of `/trip/create`. This route exists and loads the storyboard editor page.
+Change `handleStoryboardSaved` to navigate to the newly created storyboard's edit page instead of the listing:
 
 ```tsx
 // Before
-navigate("/trip/create?returnTo=" + encodeURIComponent(window.location.pathname));
+function handleStoryboardSaved(id: string) {
+  navigate("/storyboards");
+}
 
 // After
-navigate("/storyboards/new");
+function handleStoryboardSaved(id: string) {
+  navigate(`/storyboards/${id}`);
+}
 ```
 
-Single line change in one file.
+This opens the storyboard in edit mode where Trip Details, Submit to Marketplace, and Use Trip Wizard are all visible and functional.
+
+Single line change, one file.
 
