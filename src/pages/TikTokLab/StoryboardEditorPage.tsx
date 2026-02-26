@@ -15,11 +15,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+// Collapsible removed — replaced by stepped Accordion
 import {
   Accordion,
   AccordionItem,
@@ -100,7 +96,7 @@ export default function StoryboardEditorPage() {
   const [editOpen, setEditOpen] = useState(false);
   const [coverPickerOpen, setCoverPickerOpen] = useState(false);
   const [storyboardItems, setStoryboardItems] = useState<any[]>([]);
-  const [tripDetailsOpen, setTripDetailsOpen] = useState(false);
+  // No longer needed — accordion handles open/close
   const [submitting, setSubmitting] = useState(false);
 
   // Edit form state
@@ -180,8 +176,7 @@ export default function StoryboardEditorPage() {
       });
 
       // Auto-open trip details if any field is filled
-      const hasTripData = sb.destination || sb.start_date || sb.budget_min || sb.occasion;
-      if (hasTripData) setTripDetailsOpen(true);
+      // Accordion default state handled via defaultValue prop
 
       setLoadingStoryboard(false);
     })();
@@ -266,7 +261,6 @@ export default function StoryboardEditorPage() {
 
     if (errors.length > 0) {
       toast({ title: "Can't submit yet", description: errors.join(" "), variant: "destructive" });
-      setTripDetailsOpen(true);
       return;
     }
 
@@ -522,258 +516,245 @@ export default function StoryboardEditorPage() {
           </div>
         )}
 
-        {/* ── Step Guide ── */}
+        {/* ── Stepped Accordion ── */}
         {!loadingStoryboard && !isSubmitted && (effectiveMode === "create" || (effectiveMode === "edit" && storyboard)) && (
-          <div className="mb-6 rounded-2xl border border-[#E5DFC6] bg-white/95 px-5 py-4">
-            <div className="flex items-center gap-0">
-              {/* Step 1 */}
-              <div className="flex items-center gap-2">
-                {readiness.hasDestination && readiness.hasDates ? (
-                  <CheckCircle2 className="h-6 w-6 text-[#0c4d47] shrink-0" />
-                ) : (
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#0c4d47] text-[11px] font-bold text-[#0c4d47]">1</span>
-                )}
-                <div className="flex flex-col">
-                  <span className="text-[12px] font-semibold text-[#0a2225]">Trip Details</span>
-                  <span className="rounded-full bg-[#0c4d47]/10 px-2 py-0.5 text-[10px] font-medium text-[#0c4d47] w-fit">Required</span>
-                </div>
+          <>
+            {/* Page heading */}
+            {effectiveMode === "create" && (
+              <div className="mb-6">
+                <h1 className="font-display text-[28px] text-[#0a2225]">Build Your Trip Board</h1>
+                <p className="mt-2 text-[13px] text-[#4a4a4a]">Complete the steps below to create your storyboard. Steps 1 and 2 are required to submit.</p>
               </div>
-              {/* Connector */}
-              <div className="mx-3 flex-1 border-t border-dashed border-[#E5DFC6]" />
-              {/* Step 2 */}
-              <div className="flex items-center gap-2">
-                {readiness.hasPhotos ? (
-                  <CheckCircle2 className="h-6 w-6 text-[#0c4d47] shrink-0" />
-                ) : (
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#0c4d47] text-[11px] font-bold text-[#0c4d47]">2</span>
-                )}
-                <div className="flex flex-col">
-                  <span className="text-[12px] font-semibold text-[#0a2225]">Add Photos</span>
-                  <span className="rounded-full bg-[#0c4d47]/10 px-2 py-0.5 text-[10px] font-medium text-[#0c4d47] w-fit">Required · min 3</span>
-                </div>
-              </div>
-              {/* Connector */}
-              <div className="mx-3 flex-1 border-t border-dashed border-[#E5DFC6]" />
-              {/* Step 3 */}
-              <div className="flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#E5DFC6] text-[11px] font-bold text-[#8D8D8D]">3</span>
-                <div className="flex flex-col">
-                  <span className="text-[12px] font-semibold text-[#0a2225]">Browse Inspiration</span>
-                  <span className="rounded-full bg-[#E5DFC6] px-2 py-0.5 text-[10px] font-medium text-[#8D8D8D] w-fit">Optional</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+            )}
 
-        {/* ── Trip Details Collapsible (create + edit mode) ── */}
-        {!loadingStoryboard && !isSubmitted && (effectiveMode === "create" || (effectiveMode === "edit" && storyboard)) && (
-          <Collapsible open={tripDetailsOpen} onOpenChange={setTripDetailsOpen} className="mb-6">
-            <CollapsibleTrigger asChild>
-              <button className="w-full flex items-center justify-between rounded-2xl border border-[#E5DFC6] bg-white/95 px-5 py-3 text-left hover:bg-[#f7f3ea]/50 transition">
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-[#0c4d47]" />
-                  <span className="text-sm font-semibold text-[#0a2225]">Trip Details</span>
-                  <span className={`text-[11px] ${readyCount === 3 ? "text-[#0c4d47] font-medium" : "text-[#8D8D8D]"}`}>— {readyCount}/3 ready</span>
-                </div>
-                {tripDetailsOpen ? <ChevronUp className="h-4 w-4 text-[#8D8D8D]" /> : <ChevronDown className="h-4 w-4 text-[#8D8D8D]" />}
-              </button>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <div className="mt-2 rounded-2xl border border-[#E5DFC6] bg-white/95 p-5 space-y-5">
-                {/* Readiness checklist */}
-                <div className="rounded-xl border border-[#E5DFC6] bg-[#f7f3ea]/60 p-3 space-y-2">
-                  <span className="text-[11px] font-semibold text-[#0a2225]">Marketplace readiness</span>
-                  <ReadinessChecklist />
-                </div>
-                {/* Row 1: Destination + Departure */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FieldBlock label="Destination *">
-                    <input value={tripFields.destination} onChange={e => updateTripField("destination", e.target.value)} onBlur={() => saveTripField("destination", tripFields.destination)} placeholder="e.g. Bali, Italy, Maldives" className="field-input" />
-                  </FieldBlock>
-                  <FieldBlock label="Departure City">
-                    <input value={tripFields.departure_city} onChange={e => updateTripField("departure_city", e.target.value)} onBlur={() => saveTripField("departure_city", tripFields.departure_city)} placeholder="e.g. New York, London" className="field-input" />
-                  </FieldBlock>
-                </div>
-
-                {/* Row 2: Dates + Trip Length */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <FieldBlock label="Start Date">
-                    <input type="date" value={tripFields.start_date} onChange={e => { updateTripField("start_date", e.target.value); saveTripField("start_date", e.target.value); }} className="field-input" />
-                  </FieldBlock>
-                  <FieldBlock label="End Date">
-                    <input type="date" value={tripFields.end_date} onChange={e => { updateTripField("end_date", e.target.value); saveTripField("end_date", e.target.value); }} className="field-input" />
-                  </FieldBlock>
-                  <FieldBlock label="Trip Length (days)" className="col-span-2 md:col-span-1">
-                    <input type="number" min="1" max="90" value={tripFields.trip_length_days} onChange={e => updateTripField("trip_length_days", e.target.value)} onBlur={() => saveTripField("trip_length_days", tripFields.trip_length_days)} placeholder="e.g. 7" className="field-input" />
-                  </FieldBlock>
-                </div>
-
-                {/* Row 3: Travelers + Occasion */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <FieldBlock label="Adults">
-                    <input type="number" min="1" max="20" value={tripFields.travelers_adults} onChange={e => updateTripField("travelers_adults", e.target.value)} onBlur={() => saveTripField("travelers_adults", tripFields.travelers_adults)} className="field-input" />
-                  </FieldBlock>
-                  <FieldBlock label="Children">
-                    <input type="number" min="0" max="20" value={tripFields.travelers_children} onChange={e => updateTripField("travelers_children", e.target.value)} onBlur={() => saveTripField("travelers_children", tripFields.travelers_children)} className="field-input" />
-                  </FieldBlock>
-                  <FieldBlock label="Occasion" className="col-span-2 md:col-span-1">
-                    <select value={tripFields.occasion} onChange={e => { updateTripField("occasion", e.target.value); saveTripField("occasion", e.target.value); }} className="field-input">
-                      <option value="">Select...</option>
-                      {OCCASION_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                    </select>
-                  </FieldBlock>
-                </div>
-
-                {/* Row 4: Budget */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <FieldBlock label="Budget Min ($)">
-                    <input type="number" min="0" value={tripFields.budget_min} onChange={e => updateTripField("budget_min", e.target.value)} onBlur={() => saveTripField("budget_min", tripFields.budget_min)} placeholder="1000" className="field-input" />
-                  </FieldBlock>
-                  <FieldBlock label="Budget Max ($)">
-                    <input type="number" min="0" value={tripFields.budget_max} onChange={e => updateTripField("budget_max", e.target.value)} onBlur={() => saveTripField("budget_max", tripFields.budget_max)} placeholder="5000" className="field-input" />
-                  </FieldBlock>
-                  <FieldBlock label="Budget Level" className="col-span-2 md:col-span-1">
-                    <select value={tripFields.budget_level} onChange={e => { updateTripField("budget_level", e.target.value); saveTripField("budget_level", e.target.value); }} className="field-input">
-                      <option value="">Select...</option>
-                      {BUDGET_LEVEL_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                    </select>
-                  </FieldBlock>
-                </div>
-
-                {/* Budget per-person toggle */}
-                <div className="flex items-center gap-3">
-                  <button type="button" onClick={() => { const v = !tripFields.budget_per_person; updateTripField("budget_per_person", v); saveTripField("budget_per_person", v); }}
-                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${tripFields.budget_per_person ? "bg-[#0c4d47]" : "bg-[#E5DFC6]"}`}>
-                    <span className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${tripFields.budget_per_person ? "translate-x-[18px]" : "translate-x-[3px]"}`} />
-                  </button>
-                  <span className="text-[12px] text-[#4a4a4a]">{tripFields.budget_per_person ? "Budget is per person" : "Budget is for the total trip"}</span>
-                </div>
-
-                {/* Row 5: Accommodation + Pace + Flexibility */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <FieldBlock label="Accommodation Style">
-                    <select value={tripFields.accommodation_style} onChange={e => { updateTripField("accommodation_style", e.target.value); saveTripField("accommodation_style", e.target.value); }} className="field-input">
-                      <option value="">Select...</option>
-                      {ACCOMMODATION_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                    </select>
-                  </FieldBlock>
-                  <FieldBlock label="Pace">
-                    <select value={tripFields.pace} onChange={e => { updateTripField("pace", e.target.value); saveTripField("pace", e.target.value); }} className="field-input">
-                      <option value="">Select...</option>
-                      {PACE_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                    </select>
-                  </FieldBlock>
-                  <FieldBlock label="Date Flexibility">
-                    <select value={tripFields.flexibility} onChange={e => { updateTripField("flexibility", e.target.value); saveTripField("flexibility", e.target.value); }} className="field-input">
-                      <option value="">Select...</option>
-                      {FLEXIBILITY_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                    </select>
-                  </FieldBlock>
-                </div>
-
-                {/* Vibe Tags, Must-Haves & Dealbreakers Accordions */}
-                <Accordion type="multiple" className="space-y-3">
-                  <AccordionItem value="vibes" className="rounded-xl border border-[#E5DFC6] overflow-hidden">
-                    <AccordionTrigger className="px-4 py-3 hover:no-underline text-[13px] font-semibold text-[#0a2225]">
-                      Vibe & Experience Tags{tripFields.interests.length > 0 && ` · ${tripFields.interests.length} selected`}
-                    </AccordionTrigger>
-                    <AccordionContent className="bg-[#FDF9F0]/30 px-4 py-4">
-                      <div className="flex flex-wrap gap-1.5">
-                        {INTEREST_OPTIONS.map(interest => (
-                          <button key={interest} type="button" onClick={() => toggleArrayField("interests", interest)}
-                            className={`rounded-full px-3 py-1 text-[11px] border transition ${
-                              tripFields.interests.includes(interest)
-                                ? "bg-[#0c4d47] text-[#E5DFC6] border-[#0c4d47]"
-                                : "bg-white text-[#4a4a4a] border-[#E5DFC6] hover:border-[#0c4d47]"
-                            }`}
-                          >
-                            {interest}
-                          </button>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-
-                  <AccordionItem value="must-haves" className="rounded-xl border border-[#E5DFC6] overflow-hidden">
-                    <AccordionTrigger className="px-4 py-3 hover:no-underline text-[13px] font-semibold text-emerald-800">
-                      Must-Haves{tripFields.must_haves.length > 0 && ` · ${tripFields.must_haves.length} selected`}
-                    </AccordionTrigger>
-                    <AccordionContent className="bg-[#FDF9F0]/30 px-4 py-4">
-                      <div className="flex flex-wrap gap-1.5">
-                        {MUST_HAVE_OPTIONS.map(item => (
-                          <button key={item} type="button" onClick={() => toggleArrayField("must_haves", item)}
-                            className={`rounded-full px-3 py-1 text-[11px] border transition ${
-                              tripFields.must_haves.includes(item)
-                                ? "bg-emerald-700 text-white border-emerald-700"
-                                : "bg-white text-[#4a4a4a] border-[#E5DFC6] hover:border-emerald-600"
-                            }`}
-                          >
-                            {item}
-                          </button>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-
-                  <AccordionItem value="dealbreakers" className="rounded-xl border border-[#E5DFC6] overflow-hidden">
-                    <AccordionTrigger className="px-4 py-3 hover:no-underline text-[13px] font-semibold text-red-700">
-                      Dealbreakers{tripFields.dealbreakers.length > 0 && ` · ${tripFields.dealbreakers.length} selected`}
-                    </AccordionTrigger>
-                    <AccordionContent className="bg-[#FDF9F0]/30 px-4 py-4">
-                      <div className="flex flex-wrap gap-1.5">
-                        {DEALBREAKER_OPTIONS.map(item => (
-                          <button key={item} type="button" onClick={() => toggleArrayField("dealbreakers", item)}
-                            className={`rounded-full px-3 py-1 text-[11px] border transition ${
-                              tripFields.dealbreakers.includes(item)
-                                ? "bg-red-600 text-white border-red-600"
-                                : "bg-white text-[#4a4a4a] border-[#E5DFC6] hover:border-red-400"
-                            }`}
-                          >
-                            {item}
-                          </button>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-
-                {/* Special Notes */}
-                <FieldBlock label="Special Notes">
-                  <textarea value={tripFields.special_notes} onChange={e => updateTripField("special_notes", e.target.value)} onBlur={() => saveTripField("special_notes", tripFields.special_notes)} rows={3} placeholder="Anything else your travel agent should know..." className="field-input resize-none" />
-                </FieldBlock>
-
-                {/* Marketplace hint in create mode */}
-                {effectiveMode === "create" && (
-                  <div className="rounded-xl border border-[#E5DFC6] bg-[#FDF9F0] px-4 py-3 text-[12px] text-[#4a4a4a] flex items-start gap-2">
-                    <Sparkles className="h-4 w-4 text-[#0c4d47] shrink-0 mt-0.5" />
-                    <span>Save your storyboard first, then submit to the marketplace so travel agents can bid on your trip.</span>
+            <Accordion
+              type="multiple"
+              defaultValue={effectiveMode === "edit" ? ["step-photos"] : ["step-details"]}
+              className="space-y-3"
+            >
+              {/* ─── Step 1: Trip Details ─── */}
+              <AccordionItem value="step-details" className="rounded-2xl border border-[#E5DFC6] bg-white/95 overflow-hidden">
+                <AccordionTrigger className="px-5 py-4 hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    {readiness.hasDestination && readiness.hasDates ? (
+                      <CheckCircle2 className="h-6 w-6 text-[#0c4d47] shrink-0" />
+                    ) : (
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#0c4d47] text-[11px] font-bold text-[#0c4d47]">1</span>
+                    )}
+                    <span className="text-sm font-semibold text-[#0a2225]">Trip Details</span>
+                    <span className="rounded-full bg-[#0c4d47]/10 px-2 py-0.5 text-[10px] font-medium text-[#0c4d47]">Required</span>
                   </div>
-                )}
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+                </AccordionTrigger>
+                <AccordionContent className="px-5 pb-5">
+                  <div className="space-y-5">
+                    {/* Readiness checklist */}
+                    <div className="rounded-xl border border-[#E5DFC6] bg-[#f7f3ea]/60 p-3 space-y-2">
+                      <span className="text-[11px] font-semibold text-[#0a2225]">Marketplace readiness</span>
+                      <ReadinessChecklist />
+                    </div>
+                    {/* Row 1: Destination + Departure */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FieldBlock label="Destination *">
+                        <input value={tripFields.destination} onChange={e => updateTripField("destination", e.target.value)} onBlur={() => saveTripField("destination", tripFields.destination)} placeholder="e.g. Bali, Italy, Maldives" className="field-input" />
+                      </FieldBlock>
+                      <FieldBlock label="Departure City">
+                        <input value={tripFields.departure_city} onChange={e => updateTripField("departure_city", e.target.value)} onBlur={() => saveTripField("departure_city", tripFields.departure_city)} placeholder="e.g. New York, London" className="field-input" />
+                      </FieldBlock>
+                    </div>
+                    {/* Row 2: Dates + Trip Length */}
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      <FieldBlock label="Start Date">
+                        <input type="date" value={tripFields.start_date} onChange={e => { updateTripField("start_date", e.target.value); saveTripField("start_date", e.target.value); }} className="field-input" />
+                      </FieldBlock>
+                      <FieldBlock label="End Date">
+                        <input type="date" value={tripFields.end_date} onChange={e => { updateTripField("end_date", e.target.value); saveTripField("end_date", e.target.value); }} className="field-input" />
+                      </FieldBlock>
+                      <FieldBlock label="Trip Length (days)" className="col-span-2 md:col-span-1">
+                        <input type="number" min="1" max="90" value={tripFields.trip_length_days} onChange={e => updateTripField("trip_length_days", e.target.value)} onBlur={() => saveTripField("trip_length_days", tripFields.trip_length_days)} placeholder="e.g. 7" className="field-input" />
+                      </FieldBlock>
+                    </div>
+                    {/* Row 3: Travelers + Occasion */}
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      <FieldBlock label="Adults">
+                        <input type="number" min="1" max="20" value={tripFields.travelers_adults} onChange={e => updateTripField("travelers_adults", e.target.value)} onBlur={() => saveTripField("travelers_adults", tripFields.travelers_adults)} className="field-input" />
+                      </FieldBlock>
+                      <FieldBlock label="Children">
+                        <input type="number" min="0" max="20" value={tripFields.travelers_children} onChange={e => updateTripField("travelers_children", e.target.value)} onBlur={() => saveTripField("travelers_children", tripFields.travelers_children)} className="field-input" />
+                      </FieldBlock>
+                      <FieldBlock label="Occasion" className="col-span-2 md:col-span-1">
+                        <select value={tripFields.occasion} onChange={e => { updateTripField("occasion", e.target.value); saveTripField("occasion", e.target.value); }} className="field-input">
+                          <option value="">Select...</option>
+                          {OCCASION_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                        </select>
+                      </FieldBlock>
+                    </div>
+                    {/* Row 4: Budget */}
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      <FieldBlock label="Budget Min ($)">
+                        <input type="number" min="0" value={tripFields.budget_min} onChange={e => updateTripField("budget_min", e.target.value)} onBlur={() => saveTripField("budget_min", tripFields.budget_min)} placeholder="1000" className="field-input" />
+                      </FieldBlock>
+                      <FieldBlock label="Budget Max ($)">
+                        <input type="number" min="0" value={tripFields.budget_max} onChange={e => updateTripField("budget_max", e.target.value)} onBlur={() => saveTripField("budget_max", tripFields.budget_max)} placeholder="5000" className="field-input" />
+                      </FieldBlock>
+                      <FieldBlock label="Budget Level" className="col-span-2 md:col-span-1">
+                        <select value={tripFields.budget_level} onChange={e => { updateTripField("budget_level", e.target.value); saveTripField("budget_level", e.target.value); }} className="field-input">
+                          <option value="">Select...</option>
+                          {BUDGET_LEVEL_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                        </select>
+                      </FieldBlock>
+                    </div>
+                    {/* Budget per-person toggle */}
+                    <div className="flex items-center gap-3">
+                      <button type="button" onClick={() => { const v = !tripFields.budget_per_person; updateTripField("budget_per_person", v); saveTripField("budget_per_person", v); }}
+                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${tripFields.budget_per_person ? "bg-[#0c4d47]" : "bg-[#E5DFC6]"}`}>
+                        <span className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${tripFields.budget_per_person ? "translate-x-[18px]" : "translate-x-[3px]"}`} />
+                      </button>
+                      <span className="text-[12px] text-[#4a4a4a]">{tripFields.budget_per_person ? "Budget is per person" : "Budget is for the total trip"}</span>
+                    </div>
+                    {/* Row 5: Accommodation + Pace + Flexibility */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <FieldBlock label="Accommodation Style">
+                        <select value={tripFields.accommodation_style} onChange={e => { updateTripField("accommodation_style", e.target.value); saveTripField("accommodation_style", e.target.value); }} className="field-input">
+                          <option value="">Select...</option>
+                          {ACCOMMODATION_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                        </select>
+                      </FieldBlock>
+                      <FieldBlock label="Pace">
+                        <select value={tripFields.pace} onChange={e => { updateTripField("pace", e.target.value); saveTripField("pace", e.target.value); }} className="field-input">
+                          <option value="">Select...</option>
+                          {PACE_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                        </select>
+                      </FieldBlock>
+                      <FieldBlock label="Date Flexibility">
+                        <select value={tripFields.flexibility} onChange={e => { updateTripField("flexibility", e.target.value); saveTripField("flexibility", e.target.value); }} className="field-input">
+                          <option value="">Select...</option>
+                          {FLEXIBILITY_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                        </select>
+                      </FieldBlock>
+                    </div>
+                    {/* Vibe Tags, Must-Haves & Dealbreakers */}
+                    <Accordion type="multiple" className="space-y-3">
+                      <AccordionItem value="vibes" className="rounded-xl border border-[#E5DFC6] overflow-hidden">
+                        <AccordionTrigger className="px-4 py-3 hover:no-underline text-[13px] font-semibold text-[#0a2225]">
+                          Vibe & Experience Tags{tripFields.interests.length > 0 && ` · ${tripFields.interests.length} selected`}
+                        </AccordionTrigger>
+                        <AccordionContent className="bg-[#FDF9F0]/30 px-4 py-4">
+                          <div className="flex flex-wrap gap-1.5">
+                            {INTEREST_OPTIONS.map(interest => (
+                              <button key={interest} type="button" onClick={() => toggleArrayField("interests", interest)}
+                                className={`rounded-full px-3 py-1 text-[11px] border transition ${
+                                  tripFields.interests.includes(interest)
+                                    ? "bg-[#0c4d47] text-[#E5DFC6] border-[#0c4d47]"
+                                    : "bg-white text-[#4a4a4a] border-[#E5DFC6] hover:border-[#0c4d47]"
+                                }`}
+                              >
+                                {interest}
+                              </button>
+                            ))}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                      <AccordionItem value="must-haves" className="rounded-xl border border-[#E5DFC6] overflow-hidden">
+                        <AccordionTrigger className="px-4 py-3 hover:no-underline text-[13px] font-semibold text-emerald-800">
+                          Must-Haves{tripFields.must_haves.length > 0 && ` · ${tripFields.must_haves.length} selected`}
+                        </AccordionTrigger>
+                        <AccordionContent className="bg-[#FDF9F0]/30 px-4 py-4">
+                          <div className="flex flex-wrap gap-1.5">
+                            {MUST_HAVE_OPTIONS.map(item => (
+                              <button key={item} type="button" onClick={() => toggleArrayField("must_haves", item)}
+                                className={`rounded-full px-3 py-1 text-[11px] border transition ${
+                                  tripFields.must_haves.includes(item)
+                                    ? "bg-emerald-700 text-white border-emerald-700"
+                                    : "bg-white text-[#4a4a4a] border-[#E5DFC6] hover:border-emerald-600"
+                                }`}
+                              >
+                                {item}
+                              </button>
+                            ))}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                      <AccordionItem value="dealbreakers" className="rounded-xl border border-[#E5DFC6] overflow-hidden">
+                        <AccordionTrigger className="px-4 py-3 hover:no-underline text-[13px] font-semibold text-red-700">
+                          Dealbreakers{tripFields.dealbreakers.length > 0 && ` · ${tripFields.dealbreakers.length} selected`}
+                        </AccordionTrigger>
+                        <AccordionContent className="bg-[#FDF9F0]/30 px-4 py-4">
+                          <div className="flex flex-wrap gap-1.5">
+                            {DEALBREAKER_OPTIONS.map(item => (
+                              <button key={item} type="button" onClick={() => toggleArrayField("dealbreakers", item)}
+                                className={`rounded-full px-3 py-1 text-[11px] border transition ${
+                                  tripFields.dealbreakers.includes(item)
+                                    ? "bg-red-600 text-white border-red-600"
+                                    : "bg-white text-[#4a4a4a] border-[#E5DFC6] hover:border-red-400"
+                                }`}
+                              >
+                                {item}
+                              </button>
+                            ))}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                    {/* Special Notes */}
+                    <FieldBlock label="Special Notes">
+                      <textarea value={tripFields.special_notes} onChange={e => updateTripField("special_notes", e.target.value)} onBlur={() => saveTripField("special_notes", tripFields.special_notes)} rows={3} placeholder="Anything else your travel agent should know..." className="field-input resize-none" />
+                    </FieldBlock>
+                    {/* Marketplace hint in create mode */}
+                    {effectiveMode === "create" && (
+                      <div className="rounded-xl border border-[#E5DFC6] bg-[#FDF9F0] px-4 py-3 text-[12px] text-[#4a4a4a] flex items-start gap-2">
+                        <Sparkles className="h-4 w-4 text-[#0c4d47] shrink-0 mt-0.5" />
+                        <span>Save your storyboard first, then submit to the marketplace so travel agents can bid on your trip.</span>
+                      </div>
+                    )}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* ─── Step 2: Add Photos ─── */}
+              <AccordionItem value="step-photos" className="rounded-2xl border border-[#E5DFC6] bg-white/95 overflow-hidden">
+                <AccordionTrigger className="px-5 py-4 hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    {readiness.hasPhotos ? (
+                      <CheckCircle2 className="h-6 w-6 text-[#0c4d47] shrink-0" />
+                    ) : (
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#0c4d47] text-[11px] font-bold text-[#0c4d47]">2</span>
+                    )}
+                    <span className="text-sm font-semibold text-[#0a2225]">Add Photos</span>
+                    <span className="rounded-full bg-[#0c4d47]/10 px-2 py-0.5 text-[10px] font-medium text-[#0c4d47]">Required · min 3</span>
+                    {itemCount > 0 && (
+                      <span className="text-[11px] text-[#8D8D8D]">· {itemCount} photo{itemCount !== 1 ? "s" : ""}</span>
+                    )}
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-5 pb-5">
+                  <StoryboardBuilder storyboardId={storyboardId} initialTitle={storyboard?.title || initialTitle} mode="creator" tripFields={effectiveMode === "create" ? tripFields : undefined} onSaved={handleStoryboardSaved} />
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* ─── Step 3: Browse Inspiration ─── */}
+              {effectiveMode === "create" && (
+                <AccordionItem value="step-inspiration" className="rounded-2xl border border-[#E5DFC6] bg-white/95 overflow-hidden">
+                  <AccordionTrigger className="px-5 py-4 hover:no-underline">
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#E5DFC6] text-[11px] font-bold text-[#8D8D8D]">3</span>
+                      <span className="text-sm font-semibold text-[#0a2225]">Browse Inspiration</span>
+                      <span className="rounded-full bg-[#E5DFC6] px-2 py-0.5 text-[10px] font-medium text-[#8D8D8D]">Optional</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-5 pb-5">
+                    <p className="text-[12px] text-[#8D8D8D] mb-4">Save ideas from our library to your board</p>
+                    <TravelStoryboard title="" subtitle="Click the save button on any image to add it." showSaveButtons={true} maxItems={50} />
+                  </AccordionContent>
+                </AccordionItem>
+              )}
+            </Accordion>
+          </>
         )}
 
-        {/* Create mode heading */}
-        {effectiveMode === "create" && (
-          <div className="mb-6">
-            <h1 className="font-display text-[28px] text-[#0a2225]">Build Your Trip Board</h1>
-            <p className="mt-2 text-[13px] text-[#4a4a4a]">Follow the steps above to create your storyboard. Only steps 1 and 2 are needed to submit.</p>
-          </div>
-        )}
-
-        <StoryboardBuilder storyboardId={storyboardId} initialTitle={storyboard?.title || initialTitle} mode="creator" tripFields={effectiveMode === "create" ? tripFields : undefined} onSaved={handleStoryboardSaved} />
-
-        {effectiveMode === "create" && (
-          <div className="mt-10 pt-8 border-t border-[#E5DFC6]">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-[#E5DFC6] text-[10px] font-bold text-[#8D8D8D]">3</span>
-              <span className="text-sm font-semibold text-[#0a2225]">Browse Inspiration</span>
-              <span className="rounded-full bg-[#E5DFC6] px-2 py-0.5 text-[10px] font-medium text-[#8D8D8D]">Optional</span>
-            </div>
-            <p className="text-[12px] text-[#8D8D8D] mb-4 ml-7">Save ideas from our library to your board</p>
-            <TravelStoryboard title="" subtitle="Click the save button on any image to add it." showSaveButtons={true} maxItems={50} />
+        {/* Edit mode: StoryboardBuilder outside accordion */}
+        {effectiveMode === "edit" && !loadingStoryboard && storyboard && !isSubmitted && (
+          <div className="mt-6">
+            <StoryboardBuilder storyboardId={storyboardId} initialTitle={storyboard?.title || initialTitle} mode="creator" onSaved={handleStoryboardSaved} />
           </div>
         )}
       </div>
