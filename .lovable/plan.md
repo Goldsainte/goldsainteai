@@ -1,43 +1,39 @@
 
 
-# Fix Browse Inspiration: Add Search + Fix Broken Save Flow
+# Wire Search Bar to Unsplash API
 
-## Problem 1: No Search
-The `TravelStoryboard` component has no search or filter input. Users can only scroll through a static grid with no way to find specific images.
+## Problem
+The search bar only filters the pre-loaded local media library images client-side. It needs to call the existing `unsplash-search` edge function to pull fresh photos from Unsplash when users type a query or click a mood filter.
 
-## Problem 2: Broken Save Flow
-The `save-to-storyboard` edge function inserts columns that **don't exist** on the `storyboard_items` table. The edge function uses `kind`, `source`, `media_url`, `caption`, `location_label`, `category_tag`, `order_index`, `layout_type`, `data` — but the actual table columns are `item_type`, `image_url`, `title`, `subtitle`, `description`, `source_type`, `source_id`, `position`, `metadata`. Every save silently fails.
+## Changes — `src/components/storyboards/TravelStoryboard.tsx`
 
-Additionally, `SaveToStoryboardButton` passes `assetType: "brand_collection"` which isn't mapped in the edge function's `kindMap` (only handles `photo`, `video`, `experience`, `note`).
+### 1. Add debounced Unsplash search
+- Add a `useEffect` that watches `searchQuery` (debounced ~400ms) and `activeMoods`
+- When either has a value, call the `unsplash-search` edge function via `supabase.functions.invoke("unsplash-search", { body: { q } })`
+- For mood pills with no text search, use the mood name as the query (e.g. `q: "luxury travel"`)
+- Map Unsplash results to the `StoryboardImage` shape: `id` from Unsplash photo id, `url` from `urls.regular`, `thumbnail_url` from `urls.small`, `label` from `description` or `alt_description`
+- Store Unsplash results in a new `unsplashResults` state
+- Show Unsplash results **above** local library results, with a subtle "From Unsplash" label divider
 
----
+### 2. Combine results display
+- When search/mood is active and Unsplash results exist, render those first in the masonry grid
+- Keep the local `filteredImages` below as a secondary section with a "From your library" divider
+- When search is empty and no moods active, show only local library (current behavior)
 
-## Changes
+### 3. Loading state for search
+- Add a `searching` boolean state for Unsplash fetch in-progress
+- Show a subtle inline spinner or shimmer row while Unsplash results load
 
-### 1. Add search/filter to `TravelStoryboard` component
-- Add a search input at the top of the component that filters images by `label`, `destination_tags`, and `mood_tags`
-- Add pill-style tag filters for popular mood categories (luxury, beach, adventure, dining, etc.)
-- Style to match the editorial aesthetic (serif labels, gold accents)
+### 4. Unsplash attribution
+- Add small "Photos by Unsplash" text link at bottom of Unsplash results per their API guidelines
 
-### 2. Fix the edge function `save-to-storyboard/index.ts`
-Remap the insert to use the correct column names:
-- `kind` → `item_type`
-- `media_url` → `image_url`
-- `caption` → `title`
-- `location_label` → `subtitle`
-- `order_index` → `position`
-- `data` → `metadata`
-- Remove `layout_type` and `category_tag` (don't exist)
-- Add `source_type` and `source_id` mapping
-- Add `brand_collection` to the type map
+| Change | Detail |
+|--------|--------|
+| New state: `unsplashResults`, `searching` | Hold Unsplash API results |
+| New `useEffect` with debounce | Trigger Unsplash search on query/mood change |
+| Map Unsplash response → `StoryboardImage` | Normalize data shape |
+| Split grid into Unsplash + local sections | Show external results prominently |
+| Attribution link | Unsplash API requirement |
 
-### 3. Fix `SaveToStoryboardButton` asset type
-- When saving an inspiration image, pass `assetType: "photo"` instead of `"brand_collection"`, or update the edge function to handle `brand_collection` by mapping it to `item_type: "image"`.
-
-### Summary
-| Fix | File |
-|-----|------|
-| Add search input + tag filters | `src/components/storyboards/TravelStoryboard.tsx` |
-| Fix column name mismatches | `supabase/functions/save-to-storyboard/index.ts` |
-| Fix asset type mapping | `supabase/functions/save-to-storyboard/index.ts` |
+Single file change: `src/components/storyboards/TravelStoryboard.tsx`
 
