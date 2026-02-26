@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useLocation, useParams, Link } from "react-router-dom";
-import { ArrowLeft, Globe, Lock, Pencil, CalendarDays, ImageIcon, ArrowRight, ChevronDown, ChevronUp, Send, X, MapPin, Users, DollarSign, Sparkles } from "lucide-react";
+import { ArrowLeft, Globe, Lock, Pencil, CalendarDays, ImageIcon, ArrowRight, ChevronDown, ChevronUp, Send, X, MapPin, Users, DollarSign, Sparkles, CheckCircle2, Circle } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { StoryboardBuilder } from "@/components/storyboards/StoryboardBuilder";
 import { TravelStoryboard } from "@/components/storyboards/TravelStoryboard";
 import { supabase } from "@/integrations/supabase/client";
@@ -331,6 +332,39 @@ export default function StoryboardEditorPage() {
 
   const isSubmitted = storyboard?.status === "submitted";
 
+  // Readiness checklist logic
+  const readiness = {
+    hasDestination: !!tripFields.destination?.trim(),
+    hasDates: !!(tripFields.start_date || tripFields.end_date || tripFields.trip_length_days),
+    hasPhotos: itemCount >= 3,
+  };
+  const readyCount = [readiness.hasDestination, readiness.hasDates, readiness.hasPhotos].filter(Boolean).length;
+  const readinessItems = [
+    { done: readiness.hasDestination, label: "Destination" },
+    { done: readiness.hasDates, label: "Dates or trip length" },
+    { done: readiness.hasPhotos, label: `At least 3 photos (${itemCount}/3)` },
+  ];
+
+  const ReadinessChecklist = ({ compact = false }: { compact?: boolean }) => (
+    <div className={compact ? "space-y-1.5" : "space-y-2"}>
+      {!compact && (
+        <Progress value={(readyCount / 3) * 100} className="h-1.5 bg-[#E5DFC6]" />
+      )}
+      {readinessItems.map((item) => (
+        <div key={item.label} className="flex items-center gap-2">
+          {item.done ? (
+            <CheckCircle2 className="h-3.5 w-3.5 text-[#0c4d47] shrink-0" />
+          ) : (
+            <Circle className="h-3.5 w-3.5 text-[#8D8D8D] shrink-0" />
+          )}
+          <span className={`text-[11px] ${item.done ? "text-[#0c4d47] font-medium" : "text-[#8D8D8D]"}`}>
+            {item.label}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <main className="min-h-screen bg-[#f7f3ea] px-4 py-8">
       <div className="mx-auto max-w-5xl">
@@ -465,7 +499,10 @@ export default function StoryboardEditorPage() {
                 </Button>
                 {!isSubmitted && (
                   <>
-                    <Button variant="default" size="sm" onClick={submitToMarketplace} disabled={submitting} className="rounded-full text-[11px] bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6]">
+                    <div className="w-full">
+                      <ReadinessChecklist compact />
+                    </div>
+                    <Button variant="default" size="sm" onClick={submitToMarketplace} disabled={submitting || readyCount < 3} className="rounded-full text-[11px] bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] disabled:opacity-50">
                       <Send className="h-3 w-3 mr-1" /> {submitting ? "Submitting…" : "Submit to Marketplace"}
                     </Button>
                     <Button variant="ghost" size="sm" asChild className="rounded-full text-[11px] text-[#8D8D8D] hover:text-[#0a2225]">
@@ -493,13 +530,18 @@ export default function StoryboardEditorPage() {
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-[#0c4d47]" />
                   <span className="text-sm font-semibold text-[#0a2225]">Trip Details</span>
-                  <span className="text-[11px] text-[#8D8D8D]">— fill in to submit to marketplace</span>
+                  <span className={`text-[11px] ${readyCount === 3 ? "text-[#0c4d47] font-medium" : "text-[#8D8D8D]"}`}>— {readyCount}/3 ready</span>
                 </div>
                 {tripDetailsOpen ? <ChevronUp className="h-4 w-4 text-[#8D8D8D]" /> : <ChevronDown className="h-4 w-4 text-[#8D8D8D]" />}
               </button>
             </CollapsibleTrigger>
             <CollapsibleContent>
               <div className="mt-2 rounded-2xl border border-[#E5DFC6] bg-white/95 p-5 space-y-5">
+                {/* Readiness checklist */}
+                <div className="rounded-xl border border-[#E5DFC6] bg-[#f7f3ea]/60 p-3 space-y-2">
+                  <span className="text-[11px] font-semibold text-[#0a2225]">Marketplace readiness</span>
+                  <ReadinessChecklist />
+                </div>
                 {/* Row 1: Destination + Departure */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FieldBlock label="Destination *">
