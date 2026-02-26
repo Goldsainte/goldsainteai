@@ -73,6 +73,7 @@ const TripRequestDetailPageNew = lazy(() => import('@/pages/trips/TripRequestDet
 
 const ProposalDetailPage = lazy(() => import('@/pages/proposals/ProposalDetailPage'));
 const ProposalsForTripPage = lazy(() => import('@/pages/proposals/ProposalsForTripPage'));
+const NewProposalPage = lazy(() => import('@/pages/proposals/NewProposalPage'));
 const StoryboardSharePage = lazy(() => import('@/pages/public/StoryboardSharePage'));
 const AgentTripsPage = lazy(() => import('@/pages/AgentTripsPage'));
 const CreatorTripsPage = lazy(() => import('@/pages/CreatorTripsPage'));
@@ -367,6 +368,14 @@ export const AppRoutes = () => (
         element={(
           <RequireAuth>
             <TripRequestDetailPageNew />
+          </RequireAuth>
+        )}
+      />
+      <Route
+        path="/proposals/new"
+        element={(
+          <RequireAuth>
+            <NewProposalPage />
           </RequireAuth>
         )}
       />
