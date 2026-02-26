@@ -36,7 +36,7 @@ function FeatureCard({ title, features }: { title: string; features: string[] })
           <div
             key={i}
             className={`flex items-start gap-3 px-3 py-2.5 rounded-lg ${
-              i % 2 === 1 ? "bg-[#FAF7F0]" : ""
+              i % 2 === 1 ? "bg-white" : ""
             }`}
           >
             <Check className="w-4 h-4 text-[#C7A962] mt-0.5 shrink-0" strokeWidth={3} />
