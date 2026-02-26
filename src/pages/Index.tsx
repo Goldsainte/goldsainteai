@@ -4,6 +4,7 @@ import { HomeHero } from "@/components/home/HomeHero";
 import { StoryboardsHighlight } from "@/components/home/StoryboardsHighlight";
 import { RoleSpecificCTAs } from "@/components/home/RoleSpecificCTAs";
 import { TrustFooterMobile } from "@/components/home/TrustFooterMobile";
+import { TwoWaysComparison } from "@/components/home/TwoWaysComparison";
 import {
   BuiltForEverySideSection,
   HowGoldsainteWorksSection,
@@ -25,7 +26,10 @@ export default function Index() {
         {/* Hero with Expedia search + brand positioning */}
         <HomeHero />
 
-        {/* How Goldsainte AI works - immediately after hero for clarity */}
+        {/* Two ways comparison - immediately after hero */}
+        <TwoWaysComparison />
+
+        {/* How Goldsainte AI works */}
         <HowGoldsainteWorksSection />
 
         {/* Storyboards highlight - core differentiator */}
