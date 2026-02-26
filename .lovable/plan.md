@@ -1,30 +1,54 @@
 
 
-# Route All Storyboard Links to My Storyboards Page
+# Fix Storyboard Back Button 404
 
 ## Problem
 
-The previous fix incorrectly changed links to point to `/storyboards/new` (the Create Storyboard editor — screenshot 2). The user wants every storyboard link across the site to go to `/storyboards` (the My Storyboards listing page — screenshot 1). The creation editor should only be reachable from the "+ New storyboard" button on that listing page itself.
+The back button on the My Storyboards page (`/storyboards`) navigates to `/dashboard` for non-creator/non-agent users (e.g., travelers). The route `/dashboard` does not exist in `AppRoutes.tsx`, causing a 404 page.
 
-## Changes
+## Root Cause
 
-Revert or update all external `/storyboards/new` links back to `/storyboards`. The "+ New storyboard" button on the My Storyboards page itself stays as-is since it's the intended entry point to the editor.
+In `src/pages/TikTokLab/StoryboardsPage.tsx` line 93:
+```typescript
+const backTo = isCreatorOrAgent ? "/creator-dashboard" : "/dashboard";
+```
 
-### Files to update (7 files, 11 locations):
+`/dashboard` is not a valid route. Travelers should go to `/traveler`, and unknown account types should go to `/` (home).
 
-| File | What changes |
-|------|-------------|
-| `src/components/home/TwoWaysComparison.tsx` | `linkTo="/storyboards/new"` → `linkTo="/storyboards"` |
-| `src/pages/CreatorTripPage.tsx` | `to="/storyboards/new"` → `to="/storyboards"` |
-| `src/pages/traveler/components/TravelerStoryboardsTab.tsx` | 2 links `/storyboards/new` → `/storyboards` |
-| `src/pages/traveler/components/TravelerOverviewTab.tsx` | `to="/storyboards/new"` → `to="/storyboards"` |
-| `src/components/AIBookingConcierge.tsx` | 4 navigate calls `/storyboards/new` → `/storyboards` |
-| `src/components/MadisonChat.tsx` | 2 references `/storyboards/new` → `/storyboards` |
-| `src/pages/CollectionsPage.tsx` | `to="/storyboards/new"` → `to="/storyboards"` |
+## Fix
 
-### Not changed (intentionally kept at `/storyboards/new`):
-- **`MyStoryboardsPage.tsx`** — the "+ New storyboard" button lives on the listing page itself; this is the correct entry point to the editor.
-- **`AgentDashboard.tsx`** — agent-specific storyboard builder at `/agent-dashboard/storyboards/new` is a separate flow.
+### File: `src/pages/TikTokLab/StoryboardsPage.tsx`
 
-All changes are single-string replacements. No logic changes.
+Replace the simple ternary on lines 92–93 with role-aware routing:
+
+```typescript
+const backLabel = (() => {
+  switch (accountType) {
+    case "creator":
+    case "agent":
+      return "Back to Creator Studio";
+    case "traveler":
+      return "Back to Dashboard";
+    default:
+      return "Back";
+  }
+})();
+
+const backTo = (() => {
+  switch (accountType) {
+    case "creator":
+      return "/creator-dashboard";
+    case "agent":
+      return "/agent-dashboard";
+    case "traveler":
+      return "/traveler";
+    default:
+      return "/";
+  }
+})();
+```
+
+This mirrors the same logic already used in `MyStoryboardsPage.tsx` (lines 76–87), ensuring consistency and valid navigation for all user types.
+
+### Single file change, no other files affected.
 
