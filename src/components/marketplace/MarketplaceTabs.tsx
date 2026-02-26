@@ -22,10 +22,10 @@ export function MarketplaceTabs({ activeTab, onTabChange }: MarketplaceTabsProps
     },
     { 
       id: "trip-requests", 
-      label: "Traveler Briefs", 
-      shortLabel: "Briefs", 
+      label: "Trip Requests", 
+      shortLabel: "Requests", 
       icon: FileText,
-      description: "Real travelers looking for a custom trip — review their brief and submit your proposal"
+      description: "Real travelers looking for a custom trip — review their request and submit your proposal"
     },
   ] as const;
 
