@@ -36,7 +36,7 @@ const items: NavItem[] = [
   { title: "The Collection", url: "/marketplace", icon: Briefcase, authRequired: true },
   { title: "My Jobs", url: "/my-jobs", icon: Briefcase, authRequired: true },
   { title: "Browse Agents", url: "/browse-agents", icon: Users },
-  { title: "Creator Earnings", url: "/tiktok-lab/earnings", icon: DollarSign, authRequired: true, showFor: "creator" },
+  { title: "Creator Earnings", url: "/agent/earnings", icon: DollarSign, authRequired: true, showFor: "creator" },
   { title: "About", url: "/about", icon: Info },
 ];
 

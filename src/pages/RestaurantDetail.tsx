@@ -34,7 +34,7 @@ export default function RestaurantDetail() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <h2 className="font-secondary text-2xl mb-4">Restaurant not found</h2>
-          <Button onClick={() => navigate('/tiktok-lab/storyboards')}>
+          <Button onClick={() => navigate('/storyboards')}>
             Back to Storyboards
           </Button>
         </div>

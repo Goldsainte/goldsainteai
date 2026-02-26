@@ -176,7 +176,7 @@ export const AIBookingConcierge = () => {
         });
 
         // Navigate to storyboard editor with concierge context
-        navigate(`/trip/${(data.trip as any).id}/storyboard?from=concierge`);
+        navigate(`/storyboards/new?from=concierge`);
 
         return true;
       }
@@ -526,7 +526,7 @@ export const AIBookingConcierge = () => {
         });
         
         // Navigate to storyboard editor with concierge context
-        navigate(`/trip/${data.trip.id}/storyboard?from=concierge`);
+navigate(`/storyboards/new?from=concierge`);
       }
       
       // Handle auth required response
@@ -611,7 +611,7 @@ export const AIBookingConcierge = () => {
         });
         
         // Navigate to storyboard editor with concierge context
-        navigate(`/trip/${data.trip.id}/storyboard?from=concierge`);
+        navigate(`/storyboards/new?from=concierge`);
       }
 
       saveConversationData();
@@ -931,7 +931,7 @@ export const AIBookingConcierge = () => {
                       });
 
                       setTimeout(() => {
-                        navigate(`/trip/${data.trip.id}/storyboard?from=voice`);
+                        navigate(`/storyboards/new?from=voice`);
                       }, 2000);
                     }
                     

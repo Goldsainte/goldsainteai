@@ -29,7 +29,7 @@ export const WinterSunHero = () => {
         <Button
           size="lg"
           className="bg-luxury-gold text-luxury-emerald hover:bg-luxury-gold/90 transition-all duration-300"
-          onClick={() => navigate('/tiktok-lab/storyboards')}
+          onClick={() => navigate('/storyboards')}
         >
           {t('home.winterSun.cta')}
         </Button>

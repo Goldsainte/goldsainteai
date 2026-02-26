@@ -32,7 +32,7 @@ export const TopAttractionsSection = ({ attractions, onAttractionClick }: TopAtt
               } else {
                 const searchParams = new URLSearchParams(window.location.search);
                 const currentDest = searchParams.get('destination') || '';
-                navigate('/tiktok-lab/storyboards');
+                navigate('/storyboards');
               }
             }}
           >
