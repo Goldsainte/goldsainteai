@@ -1,13 +1,11 @@
 
 
-# Alternate Bullet Row Backgrounds in FeatureCard
+# Change Border Color to Goldsainte Green
 
-In `src/components/home/TwoWaysComparison.tsx`, the alternating row currently uses `bg-[#FAF7F0]` which is very close to the card's `bg-[#FDF9F0]` background — making the alternation nearly invisible.
+Single change in `src/components/home/TwoWaysComparison.tsx`, line 35:
 
-**Change (line 40):** Update the alternating row background from `bg-[#FAF7F0]` to `bg-white` so every other row clearly stands out against the cream card background.
+Update the border color on the `FeatureCard` wrapper from `border-[#E5DFC6]` to `border-[#0c4d47]` (Goldsainte dark teal/green).
 
-**Before:** `i % 2 === 1 ? "bg-[#FAF7F0]" : ""`
-**After:** `i % 2 === 1 ? "bg-white" : ""`
-
-Single line change, affects both cards since they share the `FeatureCard` component.
+**File:** `src/components/home/TwoWaysComparison.tsx`  
+**Line 35:** `border-[#E5DFC6]` → `border-[#0c4d47]`
 
