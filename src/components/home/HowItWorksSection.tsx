@@ -115,12 +115,13 @@ export function HowItWorksSection() {
               </div>
               <div className="mt-4 rounded-2xl bg-[#0c4d47] px-4 py-3 text-sm text-[#E5DFC6]">
                 <p className="font-semibold mb-1">
-                  Every trip begins with a storyboard.
+                  Every journey begins with a vision.
                 </p>
-                <p className="text-xs text-[#E5DFC6]/90">
-                  Creators curate scenes like these; agents turn them into a
-                  bookable itinerary — flights, suites, drivers, dinners. You
-                  see the trip before you ever click "Book".
+                <p className="text-xs text-[#E5DFC6]/90 whitespace-pre-line">
+                  Save the moments that move you — TikToks, Reels, YouTube clips, images that capture the feeling.
+Creators refine the aesthetic. Advisors design the details.
+
+You experience the trip long before you ever click Book.
                 </p>
               </div>
             </div>
