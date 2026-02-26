@@ -447,6 +447,91 @@ export default function ProposalDetailPage() {
                         </span>
                       </div>
                     )}
+
+                    {/* Commission Structure */}
+                    {pb?.commission_model && (
+                      <div className="border-t pt-2 mt-2 space-y-1.5">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Commission Structure</p>
+                        {pb.commission_model === "percentage" && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Commission</span>
+                            <span className="font-medium text-foreground">{pb.commission_pct}% on total trip value</span>
+                          </div>
+                        )}
+                        {pb.commission_model === "flat_fee" && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Service Fee</span>
+                            <span className="font-medium text-foreground">
+                              {formatMoney(pb.flat_fee_amount, proposal.currency || "USD")}
+                              <span className="text-xs text-muted-foreground ml-1">
+                                ({pb.flat_fee_covers === "planning" ? "Planning only" : pb.flat_fee_covers === "execution" ? "Planning + Execution" : "Full service"})
+                              </span>
+                            </span>
+                          </div>
+                        )}
+                        {pb.commission_model === "hybrid" && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Service Fee + Commission</span>
+                            <span className="font-medium text-foreground">
+                              {formatMoney(pb.hybrid_flat_fee, proposal.currency || "USD")} + {pb.hybrid_commission_pct}%
+                            </span>
+                          </div>
+                        )}
+                        {pb.commission_tiered && pb.commission_tiers && Array.isArray(pb.commission_tiers) && (
+                          <div className="pl-2 space-y-1">
+                            {(pb.commission_tiers as Array<{threshold: number; pct: number}>).map((tier, i) => (
+                              <p key={i} className="text-xs text-muted-foreground">
+                                {tier.threshold === Infinity || !tier.threshold
+                                  ? `Above previous tier`
+                                  : i === 0
+                                    ? `First ${formatMoney(tier.threshold, proposal.currency || "USD")}`
+                                    : `Above ${formatMoney((pb.commission_tiers as Array<{threshold: number}>)[i - 1]?.threshold, proposal.currency || "USD")}`
+                                } at {tier.pct}%
+                              </p>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Traveler-facing fee rows */}
+                    {pb?.guest_service_fee_estimate && proposal.price_from && (
+                      <div className="border-t pt-2 mt-2 space-y-1.5">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground flex items-center gap-1">
+                            Service Fee (3.5%)
+                            <span title="Covers Goldsainte traveler protection, support, and secure payment processing." className="cursor-help">
+                              <Info className="h-3 w-3 text-muted-foreground" />
+                            </span>
+                          </span>
+                          <span className="text-foreground">+{formatMoney(pb.guest_service_fee_estimate, proposal.currency || "USD")}</span>
+                        </div>
+                        <div className="flex justify-between text-sm font-semibold">
+                          <span className="text-foreground">Traveler Total</span>
+                          <span className="text-foreground">{formatMoney(pb.traveler_total_estimate, proposal.currency || "USD")}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Agent-facing rows (only for proposer) */}
+                    {isProposer && pb?.agent_commission_estimate != null && (
+                      <div className="border-t pt-2 mt-2 space-y-1.5">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Your Earnings</p>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Your Commission</span>
+                          <span className="font-medium text-foreground">{formatMoney(pb.agent_commission_estimate, proposal.currency || "USD")}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Platform Fee (3.5%)</span>
+                          <span className="text-destructive">-{formatMoney(Math.round((proposal.price_from || 0) * 0.035), proposal.currency || "USD")}</span>
+                        </div>
+                        <div className="flex justify-between text-sm font-semibold">
+                          <span className="text-emerald-700">Your Payout</span>
+                          <span className="text-emerald-700">{formatMoney(pb.agent_payout_estimate, proposal.currency || "USD")}</span>
+                        </div>
+                      </div>
+                    )}
+
                     {pb?.planning_fee && (
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">

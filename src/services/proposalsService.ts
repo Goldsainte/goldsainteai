@@ -23,6 +23,22 @@ export type PriceBreakdown = {
   supplier_dependent_note?: string | null;
   external_links?: { label: string; url: string }[] | null;
   handles_supplier_payments?: boolean | null;
+  // Commission model fields
+  commission_model?: "percentage" | "flat_fee" | "hybrid" | null;
+  commission_pct?: number | null;
+  commission_tiered?: boolean | null;
+  commission_tiers?: { threshold: number; pct: number }[] | null;
+  flat_fee_amount?: number | null;
+  flat_fee_covers?: string | null;
+  hybrid_flat_fee?: number | null;
+  hybrid_commission_pct?: number | null;
+  host_fee_pct?: number | null;
+  guest_fee_pct?: number | null;
+  platform_total_pct?: number | null;
+  agent_commission_estimate?: number | null;
+  agent_payout_estimate?: number | null;
+  traveler_total_estimate?: number | null;
+  guest_service_fee_estimate?: number | null;
 };
 
 export type ProposalAttachment = {
