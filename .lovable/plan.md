@@ -1,63 +1,84 @@
 
 
-# Fix Post-Submission Flow + Redesign Proposal Pages
+# Complete Redesign: Trip Request Detail Page
 
-## Problems Identified
+## Problems (from screenshots)
 
-1. **Broken post-submission redirect**: `NewProposalPage` navigates to `/trip-requests/${tripId}` after submit — a route that just shows the trip detail again, not the proposal. Should redirect to the proposal detail page with the actual proposal ID.
+1. **"Posted By" card floats randomly in the sidebar** — feels disconnected, not how marketplace listings work. On Airbnb/Fiverr, the poster identity is integrated into the brief header, not a standalone card.
+2. **Too many small cards stacked in the sidebar** — Posted By, Trip Details, Competitive Context, How It Works — four separate cards creating visual clutter.
+3. **Beige borders and gold labels everywhere** — `border-[#E5DFC6]`, `text-[#7A7151]` uppercase labels on every section. Over-designed, not clean.
+4. **Text is too small** — 11-12px body text throughout. A luxury marketplace should have confident, readable 14-15px body copy.
+5. **"Visual Brief" section with empty state** dominates the page with a beige box saying "No storyboard yet" — wasted space.
+6. **The hero image is generic stock** — Bali temple for a Germany trip. This is a data issue but the hero treatment itself (dark gradient, pills) is acceptable.
 
-2. **ProposalDetailPage is visually broken**: Uses 9-11px text throughout, beige-on-beige (`bg-[#f7f3ea]`), thin borders, no serif headers. Completely mismatches the Farfetch x Mr & Mrs Smith luxury aesthetic used everywhere else. This is the page the traveler lands on to review a proposal.
+## Redesign Approach
 
-3. **ProposalsForTripPage is similarly broken**: Same tiny text, no luxury tokens. This is where a traveler compares proposals for their trip.
+Rewrite the page to feel like a **luxury Airbnb listing crossed with a Fiverr job posting**:
 
-4. **No traveler notification**: The `notify-trip-proposal` edge function doesn't exist. When an agent submits a proposal, the traveler gets no notification and has no idea where to find it.
+### Layout: Single-column hero + two-column body
 
-5. **Dead-end navigation**: "Back to trips" links point to `/my-trips` or `/tiktok-lab/trips` — generic routes that may not help the traveler find their proposals.
+```text
+┌─────────────────────────────────────────────┐
+│  HERO: Full-width image, title, status pill │
+│  Info pills: destination, dates, travelers  │
+└─────────────────────────────────────────────┘
+┌──────────────────────┬──────────────────────┐
+│                      │                      │
+│  MAIN COLUMN         │  SIDEBAR (sticky)    │
+│                      │                      │
+│  Traveler identity   │  Budget card         │
+│  (avatar + name      │  (large, prominent)  │
+│   inline, not card)  │                      │
+│                      │  Submit CTA          │
+│  Description         │                      │
+│  (15px, spacious)    │  Competitive context │
+│                      │  (inline, not card)  │
+│  Trip details grid   │                      │
+│  (clean 2-col, no    │  How it works        │
+│   beige borders)     │  (minimal list)      │
+│                      │                      │
+│  Interests tags      │                      │
+│  Must-haves          │                      │
+│  Dealbreakers        │                      │
+│                      │                      │
+│  Visual brief        │                      │
+│  (only if exists)    │                      │
+│                      │                      │
+│  [Owner: Proposals]  │                      │
+└──────────────────────┴──────────────────────┘
+```
 
-## What Changes
+### Specific Changes
 
-### 1. Fix Post-Submission Redirect (`NewProposalPage.tsx`)
+**1. Traveler identity moves into main column, inline**
+- Small avatar + "Posted by {name} · Member since {date}" as a single line below the hero, not a sidebar card. Like how Airbnb shows the host at the top of the listing description.
 
-Change `handleSubmit` to:
-- Capture the inserted proposal's ID from the Supabase response
-- Navigate to `/proposals/${newProposalId}` instead of `/trip-requests/${tripId}`
-- Show a proper success state
+**2. Trip details become a clean grid in main column**
+- Remove from sidebar. Display as a subtle 2×3 or 3×2 grid with label/value pairs separated by light dividers — no beige borders, no cards. Just clean typography.
 
-### 2. Redesign `ProposalDetailPage.tsx` — Full Luxury Overhaul
+**3. Sidebar simplifies to 2 elements**
+- **Budget card** (prominent, with gold accent) + **Submit CTA button** + competitive context as a single line ("1 proposal submitted") — not a separate card with icon.
+- **How it works** stays as a compact dark card at bottom of sidebar.
 
-- **Background**: `bg-white` main, cream `#FDF9F0` accent cards
-- **Typography**: Serif headers (`font-secondary`) at 24-28px for title, body text at 14-15px (not 9-11px), labels at 12-13px
-- **Layout**: Two-column with main content (pitch, inclusions, payment plan) and sticky sidebar (proposer info, actions, trust)
-- **Cards**: White with subtle shadows (`shadow-[0_1px_12px_rgba(0,0,0,0.06)]`), rounded-2xl, no thin beige borders
-- **Status badges**: Larger, properly styled with Goldsainte green
-- **Action buttons**: Full-width, bold CTAs (Accept / Decline) with proper sizing
-- **Price display**: Large, prominent, styled as a hero element
+**4. Typography upgrade**
+- Description body text: 15px, `leading-relaxed`
+- Section labels: 13px semibold, no ALL-CAPS tracking (feels sterile). Use sentence case or title case.
+- Trip detail values: 14px
 
-### 3. Redesign `ProposalsForTripPage.tsx` — Luxury Comparison View
+**5. Hide empty Visual Brief**
+- Only render the storyboard section if the traveler actually has content. No empty beige boxes.
 
-- Same luxury tokens as above
-- Proposal cards as proper comparison cards with larger text, clear pricing, proposer name
-- Proper serif header "Proposals for [Trip Title]"
-- Body text at readable sizes (14px+)
+**6. Special Requests rendered inline**
+- Merge into description flow with a subtle label, not a separate bordered section.
 
-### 4. Create `notify-trip-proposal` Edge Function
+**7. Remove redundant gold label styling**
+- Replace `GoldLabel` component with simpler section headers using serif font at 16-18px.
 
-- Triggered after proposal insert in `NewProposalPage`
-- Inserts an in-app notification for the traveler: "You received a new proposal for [Trip Title]"
-- Links to `/proposals/${proposalId}` so the traveler can find it directly
-- Sends email notification via Resend if configured (same pattern as `notify-new-bid`)
-
-### 5. Connect Traveler Discovery Path
-
-- Ensure `/my-trips?tab=requests` shows proposal counts per trip request
-- Each trip request links to `/proposals/for-trip?tripId=...` so the traveler can see all proposals
-
-## Files Modified
+### File Modified
 
 | File | Action |
 |------|--------|
-| `src/pages/proposals/NewProposalPage.tsx` | **Edit** — fix redirect to use proposal ID, call notification function |
-| `src/pages/proposals/ProposalDetailPage.tsx` | **Major rewrite** — luxury aesthetic, proper typography, better layout |
-| `src/pages/proposals/ProposalsForTripPage.tsx` | **Major rewrite** — luxury aesthetic, readable text, proper cards |
-| `supabase/functions/notify-trip-proposal/index.ts` | **Create** — traveler notification on new proposal |
+| `src/pages/marketplace/TripRequestDetail.tsx` | **Major rewrite** — restructure layout, move traveler identity inline, simplify sidebar, upgrade typography, hide empty states |
+
+No new files needed.
 
