@@ -101,7 +101,7 @@ export function MadisonChat({
       let messageContent = response?.message ?? "I'm having trouble responding right now. Can you try again?";
       
       if (response?.action === "trip_created" && response.storyboard?.id && response.trip?.id) {
-        const storyboardUrl = `/storyboards/new?from=madison`;
+        const storyboardUrl = `/storyboards?from=madison`;
         messageContent += `\n\n[View your storyboard →](${storyboardUrl})`;
       }
 
@@ -134,7 +134,7 @@ export function MadisonChat({
         const tripId = response.trip.id;
         // If storyboard exists, send straight to storyboard editor
         if (response.storyboard?.id) {
-          navigate(`/storyboards/new?from=madison`);
+          navigate(`/storyboards?from=madison`);
         } else {
           navigate(`/trip/${tripId}`);
         }

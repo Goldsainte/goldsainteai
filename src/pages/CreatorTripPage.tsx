@@ -153,7 +153,7 @@ export default function CreatorTripPage() {
                 Request a custom version
               </button>
               <Link 
-                to={`/storyboards/new`}
+                to={`/storyboards`}
                 className="w-full rounded-full bg-[#BFAD72] px-4 py-2 text-sm font-semibold text-[#0a2225] hover:bg-[#d4c58d] text-center"
               >
                 Open storyboard

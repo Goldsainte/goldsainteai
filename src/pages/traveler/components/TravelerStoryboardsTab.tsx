@@ -130,7 +130,7 @@ export function TravelerStoryboardsTab({ userId }: TravelerStoryboardsTabProps) 
         Create visual mood boards of your dream trips. Save inspiration, organize ideas, and share with travel experts.
       </p>
       <Button asChild className="bg-[#0a2225] hover:bg-[#0a2225]/90 text-white rounded-full px-6">
-        <Link to="/storyboards/new">
+        <Link to="/storyboards">
           <Plus className="h-4 w-4 mr-2" />
           Create Your First Storyboard
         </Link>
@@ -157,7 +157,7 @@ export function TravelerStoryboardsTab({ userId }: TravelerStoryboardsTabProps) 
           <h2 className="font-secondary text-2xl text-[#0a2225] mt-1">Storyboards</h2>
         </div>
         <Button asChild className="bg-[#0a2225] hover:bg-[#0a2225]/90 text-white rounded-full px-6">
-          <Link to="/storyboards/new">
+          <Link to="/storyboards">
             <Plus className="h-4 w-4 mr-2" />
             New Storyboard
           </Link>
