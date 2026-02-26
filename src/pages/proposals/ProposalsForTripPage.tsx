@@ -93,7 +93,7 @@ export default function ProposalsForTripPage() {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4">
         <p className="text-sm text-destructive">{error}</p>
-        <button onClick={() => navigate(-1)} className="text-sm text-[#0c4d47] underline">Go back</button>
+        <button onClick={() => navigate(tripId ? `/marketplace/request/${tripId}` : '/marketplace/trip-requests')} className="text-sm text-[#0c4d47] underline">Go back</button>
       </div>
     );
   }
