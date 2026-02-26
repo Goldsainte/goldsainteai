@@ -1,27 +1,26 @@
 
 
-# Make Trip Details Visible on the Create Storyboard Page
+# Add Marketplace Readiness Checklist
 
-## Problem
-The "Start a Trip Board" button goes to `/storyboards/new` (create mode), but Trip Details and "Submit to Marketplace" only appear after saving (edit mode). Users expect to fill in trip details and post to the marketplace from this page directly.
-
-## Approach
-Instead of hiding Trip Details behind `effectiveMode === "edit"`, show a simplified Trip Details section on the create page too. The fields will be stored in local state and saved together when the user clicks "Save storyboard". After save, the user is redirected to the edit page (already fixed) where they can submit to marketplace.
+## What
+Add a visual progress checklist inside the Trip Details collapsible header area showing what's needed before submitting. Requirements match the existing validation: destination, dates/trip length, and at least 3 photos.
 
 ## Changes — `src/pages/TikTokLab/StoryboardEditorPage.tsx`
 
-1. **Show Trip Details collapsible in create mode too** — Change the guard on the Trip Details section (line 489) from `effectiveMode === "edit"` to show in both modes. In create mode, fields save to local state only (no auto-save to DB since there's no ID yet).
+1. **Create a readiness checklist component inline** — Below the Trip Details collapsible trigger (around line 490), add a small checklist with three items:
+   - Destination filled → `tripFields.destination.trim()`
+   - Dates or trip length added → `tripFields.start_date || tripFields.end_date || tripFields.trip_length_days`
+   - At least 3 photos → `itemCount >= 3`
 
-2. **Pass trip fields into StoryboardBuilder's save flow** — When saving a new storyboard in create mode, include the trip detail fields (destination, dates, budget, etc.) in the initial insert so they're persisted on first save.
+   Each item shows a green check or gray circle, with a progress bar showing X/3 complete.
 
-3. **Show a "Submit to Marketplace" hint in create mode** — Add a small note below Trip Details saying "Save your storyboard first, then submit to the marketplace" so the user knows the workflow.
+2. **Update the collapsible trigger subtitle** — Replace the static "fill in to submit to marketplace" text with a dynamic "X/3 ready" indicator so users see progress at a glance without opening the section.
 
-## Changes — `src/components/storyboards/StoryboardBuilder.tsx`
+3. **Show checklist above the Submit button** — In edit mode, display the same checklist items near the "Submit to Marketplace" button so users know exactly what's missing before clicking.
 
-4. **Accept optional trip fields prop** — Add an optional `tripFields` prop so the parent can pass in trip detail data to be included in the storyboard insert.
-
-5. **Include trip fields in the storyboard insert** — When creating a new storyboard, spread the trip fields into the insert payload.
-
-## Result
-Users will see Trip Details immediately when they click "Start a Trip Board". After filling in details and saving, they land on the edit page with "Submit to Marketplace" ready to click.
+## Visual Design
+- Uses existing `CheckCircle2` and `Circle` icons from lucide-react
+- Green (#0c4d47) for completed items, muted gray for incomplete
+- Small `Progress` bar from existing UI components showing fraction complete
+- Consistent with the warm luxury design language already in use
 
