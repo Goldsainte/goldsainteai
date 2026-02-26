@@ -110,7 +110,7 @@ export function SaveToStoryboardButton({
 
   const handleCreateNew = () => {
     setOpen(false);
-    navigate("/trip/create?returnTo=" + encodeURIComponent(window.location.pathname));
+    navigate("/storyboards/new");
   };
 
   return (
