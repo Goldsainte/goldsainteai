@@ -1,10 +1,11 @@
-import { useEffect, useState, useMemo } from "react";
-import { Search, X } from "lucide-react";
+import { useEffect, useState, useMemo, useRef, useCallback } from "react";
+import { Search, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { invokeWithAuth } from "@/lib/supabaseHelpers";
 
 import { SaveToStoryboardButton } from "./SaveToStoryboardButton";
 
@@ -128,12 +129,72 @@ export function TravelStoryboard({
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeMoods, setActiveMoods] = useState<string[]>([]);
+  const [unsplashResults, setUnsplashResults] = useState<StoryboardImage[]>([]);
+  const [searching, setSearching] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const toggleMood = (mood: string) => {
     setActiveMoods(prev =>
       prev.includes(mood) ? prev.filter(m => m !== mood) : [...prev, mood]
     );
   };
+
+  // Debounced Unsplash search
+  const searchUnsplash = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setUnsplashResults([]);
+      setSearching(false);
+      return;
+    }
+    setSearching(true);
+    try {
+      const { data, error } = await invokeWithAuth<{ results: any[] }>("unsplash-search", {
+        body: { q: query },
+      });
+      if (error || !data?.results) {
+        console.error("[Unsplash] search error:", error);
+        setUnsplashResults([]);
+      } else {
+        const mapped: StoryboardImage[] = data.results.map((photo: any) => ({
+          id: `unsplash-${photo.id}`,
+          url: photo.urls?.regular || photo.urls?.full,
+          thumbnail_url: photo.urls?.small,
+          label: photo.description || photo.alt_description || null,
+          destination_tags: photo.tags?.map((t: any) => t.title) || [],
+          mood_tags: [],
+        }));
+        setUnsplashResults(mapped);
+      }
+    } catch (err) {
+      console.error("[Unsplash] unexpected error:", err);
+      setUnsplashResults([]);
+    } finally {
+      setSearching(false);
+    }
+  }, []);
+
+  // Watch searchQuery + activeMoods → trigger Unsplash search
+  useEffect(() => {
+    if (storyboardId) return;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    const query = searchQuery.trim()
+      || (activeMoods.length > 0 ? activeMoods.map(m => `${m} travel`).join(" ") : "");
+
+    if (!query) {
+      setUnsplashResults([]);
+      return;
+    }
+
+    setSearching(true);
+    debounceRef.current = setTimeout(() => {
+      searchUnsplash(query);
+    }, 400);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [searchQuery, activeMoods, storyboardId, searchUnsplash]);
 
   const filteredImages = useMemo(() => {
     if (!searchQuery && activeMoods.length === 0) return images;
@@ -150,6 +211,8 @@ export function TravelStoryboard({
       return matchesSearch && matchesMood;
     });
   }, [images, searchQuery, activeMoods]);
+
+  const hasActiveSearch = searchQuery.trim() !== "" || activeMoods.length > 0;
 
   useEffect(() => {
     let isMounted = true;
@@ -297,60 +360,144 @@ export function TravelStoryboard({
             </div>
           ))}
         </div>
-      ) : filteredImages.length > 0 ? (
-        <div
-          className={cn(
-            "columns-2 gap-2 sm:columns-3 md:columns-4",
-            "space-y-2"
-          )}
-        >
-          {filteredImages.map((img) => (
-            <figure
-              key={img.id}
-              className={cn(
-                "group relative overflow-hidden rounded-xl bg-muted",
-                onImageClick && "cursor-pointer"
-              )}
-            >
-              <div onClick={() => onImageClick?.(img)}>
-                <img
-                  src={img.thumbnail_url || img.url}
-                  alt={img.label || "Storyboard"}
-                  loading="lazy"
-                  onError={(e) => {
-                    e.currentTarget.src = FALLBACK_IMAGE;
-                  }}
-                  className="h-full w-full transform object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                />
-                {(img.label || (img.destination_tags && img.destination_tags[0])) && (
-                  <figcaption className="pointer-events-none absolute inset-x-2 bottom-2 rounded-full bg-black/45 px-2 py-1 text-[10px] font-medium text-white shadow-sm backdrop-blur">
-                    {img.label || img.destination_tags?.[0]}
-                  </figcaption>
+      ) : (
+        <div className="space-y-6">
+          {/* Unsplash results when searching */}
+          {hasActiveSearch && (searching || unsplashResults.length > 0) && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  From Unsplash
+                </span>
+                {searching && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
+                {!searching && unsplashResults.length > 0 && (
+                  <span className="text-[10px] text-muted-foreground">
+                    {unsplashResults.length} photos
+                  </span>
                 )}
               </div>
-              {showSaveButtons && (
-                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <SaveToStoryboardButton
-                    assetType="brand_collection"
-                    assetData={{
-                      id: img.id,
-                      title: img.label || undefined,
-                      cover_image_url: img.url,
-                      tags: [...(img.destination_tags || []), ...(img.mood_tags || [])],
-                    }}
-                    mediaUrl={img.url}
-                    variant="outline"
-                    size="sm"
-                    className="rounded-full bg-white/90 hover:bg-white shadow-md"
-                  />
+              {searching && unsplashResults.length === 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                  {Array.from({ length: 8 }).map((_, i) => (
+                    <div key={i} className="aspect-[3/4] rounded-xl bg-muted/60 animate-pulse" />
+                  ))}
+                </div>
+              ) : (
+                <div className={cn("columns-2 gap-2 sm:columns-3 md:columns-4", "space-y-2")}>
+                  {unsplashResults.map((img) => (
+                    <figure
+                      key={img.id}
+                      className={cn(
+                        "group relative overflow-hidden rounded-xl bg-muted break-inside-avoid",
+                        onImageClick && "cursor-pointer"
+                      )}
+                    >
+                      <div onClick={() => onImageClick?.(img)}>
+                        <img
+                          src={img.thumbnail_url || img.url}
+                          alt={img.label || "Unsplash photo"}
+                          loading="lazy"
+                          onError={(e) => { e.currentTarget.src = FALLBACK_IMAGE; }}
+                          className="h-full w-full transform object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                        />
+                        {img.label && (
+                          <figcaption className="pointer-events-none absolute inset-x-2 bottom-2 rounded-full bg-black/45 px-2 py-1 text-[10px] font-medium text-white shadow-sm backdrop-blur">
+                            {img.label}
+                          </figcaption>
+                        )}
+                      </div>
+                      {showSaveButtons && (
+                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <SaveToStoryboardButton
+                            assetType="brand_collection"
+                            assetData={{
+                              id: img.id,
+                              title: img.label || undefined,
+                              cover_image_url: img.url,
+                              tags: [...(img.destination_tags || []), ...(img.mood_tags || [])],
+                            }}
+                            mediaUrl={img.url}
+                            variant="outline"
+                            size="sm"
+                            className="rounded-full bg-white/90 hover:bg-white shadow-md"
+                          />
+                        </div>
+                      )}
+                    </figure>
+                  ))}
                 </div>
               )}
-            </figure>
-          ))}
-        </div>
-      ) : (
-        <div className="rounded-2xl border border-dashed border-muted-foreground/30 px-4 py-8 text-center text-[11px] text-muted-foreground">
-          No storyboard content yet.
+              {unsplashResults.length > 0 && (
+                <p className="text-[10px] text-muted-foreground text-center">
+                  Photos by{" "}
+                  <a href="https://unsplash.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">
+                    Unsplash
+                  </a>
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Local library section */}
+          {filteredImages.length > 0 && (
+            <div className="space-y-3">
+              {hasActiveSearch && unsplashResults.length > 0 && (
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  From your library
+                </span>
+              )}
+              <div className={cn("columns-2 gap-2 sm:columns-3 md:columns-4", "space-y-2")}>
+                {filteredImages.map((img) => (
+                  <figure
+                    key={img.id}
+                    className={cn(
+                      "group relative overflow-hidden rounded-xl bg-muted break-inside-avoid",
+                      onImageClick && "cursor-pointer"
+                    )}
+                  >
+                    <div onClick={() => onImageClick?.(img)}>
+                      <img
+                        src={img.thumbnail_url || img.url}
+                        alt={img.label || "Storyboard"}
+                        loading="lazy"
+                        onError={(e) => { e.currentTarget.src = FALLBACK_IMAGE; }}
+                        className="h-full w-full transform object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                      />
+                      {(img.label || (img.destination_tags && img.destination_tags[0])) && (
+                        <figcaption className="pointer-events-none absolute inset-x-2 bottom-2 rounded-full bg-black/45 px-2 py-1 text-[10px] font-medium text-white shadow-sm backdrop-blur">
+                          {img.label || img.destination_tags?.[0]}
+                        </figcaption>
+                      )}
+                    </div>
+                    {showSaveButtons && (
+                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <SaveToStoryboardButton
+                          assetType="brand_collection"
+                          assetData={{
+                            id: img.id,
+                            title: img.label || undefined,
+                            cover_image_url: img.url,
+                            tags: [...(img.destination_tags || []), ...(img.mood_tags || [])],
+                          }}
+                          mediaUrl={img.url}
+                          variant="outline"
+                          size="sm"
+                          className="rounded-full bg-white/90 hover:bg-white shadow-md"
+                        />
+                      </div>
+                    )}
+                  </figure>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Empty state */}
+          {!searching && unsplashResults.length === 0 && filteredImages.length === 0 && (
+            <div className="rounded-2xl border border-dashed border-muted-foreground/30 px-4 py-8 text-center text-[11px] text-muted-foreground">
+              No storyboard content yet.
+            </div>
+          )}
         </div>
       )}
     </section>
