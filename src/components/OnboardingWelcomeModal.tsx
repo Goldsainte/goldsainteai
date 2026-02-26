@@ -25,7 +25,7 @@ export function OnboardingWelcomeModal() {
       "Book through Goldsainte so payments, changes, and disputes stay protected.",
       "Keep all messaging and payments on-platform — phone numbers and personal emails stay private until your trip is confirmed.",
     ];
-    primaryCta = { label: "Post your first trip", href: "/post-trip" };
+    primaryCta = { label: "Set up your Traveler Hub", href: "/traveler" };
   } else if (accountType === "creator") {
     title = "Welcome to the creator side of Goldsainte";
     bullets = [

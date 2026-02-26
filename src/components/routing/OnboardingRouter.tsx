@@ -48,8 +48,8 @@ export function OnboardingRouter() {
         // Route based on account type
         switch (profile.account_type) {
           case 'traveler':
-            // Travelers go to preferences wizard
-            setDestination('/onboarding/traveler/preferences');
+            // Travelers go straight to Traveler Hub
+            setDestination('/traveler');
             break;
           case 'creator':
             // Creators go to creator onboarding

@@ -75,6 +75,8 @@ export function AccountTypeStep({ onComplete }: Props) {
           phone: phone.trim(),
           account_type: accountType,
           is_profile_complete: accountType !== "brand",
+          // Auto-complete onboarding for travelers (no legacy AI intake)
+          onboarding_completed: accountType === "traveler" ? true : undefined,
           updated_at: new Date().toISOString(),
         });
 

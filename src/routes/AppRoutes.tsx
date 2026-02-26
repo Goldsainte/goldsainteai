@@ -83,7 +83,7 @@ const StoryboardEditorPage = lazy(() => import('@/pages/StoryboardEditorPage'));
 const TikTokLabStoryboardEditorPage = lazy(() => import('@/pages/TikTokLab/StoryboardEditorPage'));
 
 const TikTokLabStoryboardDetailPage = lazy(() => import('@/pages/TikTokLab/StoryboardDetailPage'));
-const ConciergePage = lazy(() => import('@/pages/ConciergePage'));
+// ConciergePage removed — redirects to /traveler
 const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
 const MarketplaceGuidelinesPage = lazy(() => import('@/pages/MarketplaceGuidelinesPage'));
 const HomePage = lazy(() => import('@/pages/HomePage'));
@@ -217,7 +217,7 @@ export const AppRoutes = () => (
       <Route path="/reset-password" element={<ResetPassword />} />
       {/* Smart onboarding router - redirects based on account type */}
       <Route path="/onboarding" element={<OnboardingRouter />} />
-      <Route path="/onboarding/traveler/preferences" element={<TravelerPreferencesOnboardingPage />} />
+      <Route path="/onboarding/traveler/preferences" element={<Navigate to="/traveler" replace />} />
       <Route path="/onboarding/creator" element={<CreatorOnboardingPage />} />
       <Route path="/brand/onboarding" element={<Navigate to="/apply/brand" replace />} />
       <Route path="/apply/brand" element={<BrandApplyPage />} />
@@ -422,14 +422,7 @@ export const AppRoutes = () => (
       <Route path="/notifications" element={<NotificationsPage />} />
       <Route path="/messages" element={<RequireAuth><MessagesPage /></RequireAuth>} />
       <Route path="/marketplace-guidelines" element={<MarketplaceGuidelinesPage />} />
-      <Route 
-        path="/concierge" 
-        element={
-          <RequireAuth>
-            <ConciergePage />
-          </RequireAuth>
-        } 
-      />
+      <Route path="/concierge" element={<Navigate to="/traveler" replace />} />
       <Route path="/my-bookings" element={<MyBookingsPage />} />
       <Route path="/partner-bookings" element={<PartnerBookingsPage />} />
       <Route path="/bookings/:bookingId" element={<BookingDetailPage />} />
