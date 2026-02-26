@@ -107,7 +107,7 @@ export default function CreatorDashboard() {
           
           <div className="flex flex-wrap gap-3 mt-6">
             <Link
-              to="/tiktok-lab"
+              to="/storyboards"
               className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-[#0a2225]/90 transition-colors"
             >
               <Sparkles className="w-4 h-4" />
@@ -188,7 +188,7 @@ export default function CreatorDashboard() {
                   {stats.tiktokConnected ? "Connected" : "Not Connected"}
                 </div>
                 <Link
-                  to="/tiktok-lab"
+                  to="/storyboards"
                   className="rounded-full bg-[#0a2225] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0a2225]/90 transition-colors"
                 >
                   {stats.tiktokConnected ? "Manage" : "Connect"}
@@ -217,7 +217,7 @@ export default function CreatorDashboard() {
               </p>
             </div>
             <Link
-              to="/tiktok-lab"
+              to="/storyboards"
               className="inline-flex items-center gap-2 rounded-full border border-[#C7A962] bg-[#C7A962]/10 px-5 py-2.5 text-sm font-medium text-[#0a2225] hover:bg-[#C7A962]/20 transition-colors"
             >
               <Plus className="w-4 h-4" />
@@ -234,7 +234,7 @@ export default function CreatorDashboard() {
                 subtext="Start creating travel stories in Creator Lab to see them here."
                 action={
                   <Link
-                    to="/tiktok-lab"
+                    to="/storyboards"
                     className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0a2225]/90 transition-colors mt-4"
                   >
                     Create Your First Story

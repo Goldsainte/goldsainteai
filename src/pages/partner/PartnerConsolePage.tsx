@@ -91,7 +91,7 @@ export default function PartnerConsolePage() {
           </div>
           <div className="flex flex-wrap gap-2 text-[11px]">
             <Link
-              to="/tiktok-lab"
+              to="/storyboards"
               className="rounded-full bg-primary text-primary-foreground px-3 py-1 font-semibold hover:bg-primary/90"
             >
               Open Goldsainte Creator Lab
@@ -266,7 +266,7 @@ export default function PartnerConsolePage() {
             </p>
           </div>
           <Link
-            to="/tiktok-lab"
+            to="/storyboards"
             className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-[11px] hover:bg-accent/50"
           >
             Open Goldsainte Creator Lab

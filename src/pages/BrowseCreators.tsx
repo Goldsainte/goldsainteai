@@ -90,7 +90,7 @@ export default function BrowseCreators() {
             </p>
           </div>
           <Link
-            to="/tiktok-lab"
+            to="/storyboards"
             className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-neutral-800"
           >
             Go to Goldsainte Creator Lab

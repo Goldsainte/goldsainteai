@@ -76,7 +76,7 @@ export default function MyStoryboardsPage() {
   const getBackDestination = () => {
     switch (accountType) {
       case "creator":
-        return "/tiktok-lab";
+        return "/creator-dashboard";
       case "agent":
         return "/agent-dashboard";
       case "traveler":
@@ -160,7 +160,7 @@ export default function MyStoryboardsPage() {
                   size="sm"
                   variant="outline"
                   className="rounded-full border-[#E5DFC6] text-[#0a2225] hover:bg-[#FDF9F0]"
-                  onClick={() => navigate("/tiktok-lab")}
+                  onClick={() => navigate("/storyboards/new")}
                 >
                   Open Creator Lab
                 </Button>
