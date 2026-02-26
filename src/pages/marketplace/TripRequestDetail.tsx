@@ -322,6 +322,17 @@ export default function TripRequestDetail() {
 
   return (
     <main className="min-h-screen bg-white text-foreground">
+      {/* Back Button — above hero, always readable */}
+      <div className="mx-auto max-w-5xl px-4 pt-6 pb-3">
+        <button
+          type="button"
+          onClick={() => navigate('/marketplace?tab=trip-requests')}
+          className="flex items-center gap-2 text-[13px] text-muted-foreground hover:text-foreground transition-colors"
+        >
+          ← Back to trip requests
+        </button>
+      </div>
+
       {/* ===================== HERO ===================== */}
       <div className="relative h-[260px] w-full overflow-hidden md:h-[320px]">
         <img
@@ -334,14 +345,6 @@ export default function TripRequestDetail() {
 
         <div className="absolute bottom-0 left-0 right-0 px-4 pb-8">
           <div className="mx-auto max-w-5xl">
-            <button
-              type="button"
-              onClick={() => navigate('/marketplace?tab=trip-requests')}
-              className="mb-4 text-[13px] text-white/70 hover:text-white transition-colors"
-            >
-              ← Back to trip requests
-            </button>
-
             <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-[13px] font-medium text-white backdrop-blur-sm">
               <span
                 className={`inline-flex h-2 w-2 rounded-full ${
