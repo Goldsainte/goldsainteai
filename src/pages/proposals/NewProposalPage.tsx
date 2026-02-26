@@ -369,7 +369,7 @@ export default function NewProposalPage() {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
         <p className="text-muted-foreground">Trip request not found.</p>
-        <Button variant="outline" onClick={() => navigate(-1)}>Go Back</Button>
+        <Button variant="outline" onClick={() => navigate(tripId ? `/marketplace/request/${tripId}` : '/marketplace')}>Go Back</Button>
       </div>
     );
   }
@@ -386,7 +386,7 @@ export default function NewProposalPage() {
       {/* Top Bar */}
       <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur-sm">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-4">
-          <button onClick={() => navigate(-1)} className="text-muted-foreground hover:text-foreground transition-colors">
+          <button onClick={() => navigate(tripId ? `/marketplace/request/${tripId}` : '/marketplace')} className="text-muted-foreground hover:text-foreground transition-colors">
             <ChevronLeft className="h-5 w-5" />
           </button>
           <div className="flex-1 min-w-0">
