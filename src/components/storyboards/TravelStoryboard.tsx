@@ -365,17 +365,6 @@ export function TravelStoryboard({
           {/* Unsplash results when searching */}
           {hasActiveSearch && (searching || unsplashResults.length > 0) && (
             <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  From Unsplash
-                </span>
-                {searching && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
-                {!searching && unsplashResults.length > 0 && (
-                  <span className="text-[10px] text-muted-foreground">
-                    {unsplashResults.length} photos
-                  </span>
-                )}
-              </div>
               {searching && unsplashResults.length === 0 ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                   {Array.from({ length: 8 }).map((_, i) => (
@@ -427,25 +416,12 @@ export function TravelStoryboard({
                   ))}
                 </div>
               )}
-              {unsplashResults.length > 0 && (
-                <p className="text-[10px] text-muted-foreground text-center">
-                  Photos by{" "}
-                  <a href="https://unsplash.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">
-                    Unsplash
-                  </a>
-                </p>
-              )}
             </div>
           )}
 
           {/* Local library section */}
           {filteredImages.length > 0 && (
             <div className="space-y-3">
-              {hasActiveSearch && unsplashResults.length > 0 && (
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  From your library
-                </span>
-              )}
               <div className={cn("columns-2 gap-2 sm:columns-3 md:columns-4", "space-y-2")}>
                 {filteredImages.map((img) => (
                   <figure
