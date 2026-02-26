@@ -324,7 +324,7 @@ export default function StoryboardEditorPage() {
   }
 
   function handleStoryboardSaved(id: string) {
-    navigate("/storyboards");
+    navigate(`/storyboards/${id}`);
   }
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
