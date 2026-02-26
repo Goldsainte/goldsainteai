@@ -28,7 +28,7 @@ const storyboardingFeatures = [
 
 function FeatureCard({ title, features }: { title: string; features: string[] }) {
   return (
-    <div className="rounded-2xl border border-[#0c4d47] bg-[#FDF9F0] p-6 md:p-8">
+    <div className="rounded-2xl border border-[#0c4d47] bg-[#FDF9F0] p-6 md:p-8 text-left">
       <h3 className="font-secondary text-xl md:text-2xl text-[#0a2225] mb-1">{title}</h3>
       <div className="w-10 h-px bg-[#C7A962] mb-5" />
       <div className="space-y-0">
