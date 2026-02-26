@@ -1,48 +1,31 @@
 
 
-# Update "Why Goldsainte" Section Copy & Features
+# Update Storyboard Caption Copy
 
-## Changes — `src/components/home/TwoWaysComparison.tsx`
+Two files need updating with the new verbiage.
 
-### 1. Update heading and subtitle (lines 70–75)
+## 1. `src/i18n/locales/en.json` (lines 86–87)
 
-- **Heading:** "Two Distinct Ways to Design Your Journey"
-- **Subtitle:** "Whether you want expert-crafted precision or prefer to shape your vision first, Goldsainte gives you a seamless path forward."
+Replace translation keys:
 
-### 2. Replace marketplace features (lines 4–15)
+- `storyboardCaption`: `"Every journey begins with a vision."`
+- `storyboardDescription`: `"Save the moments that move you — TikToks, Reels, YouTube clips, images that capture the feeling.\nCreators refine the aesthetic. Advisors design the details.\n\nYou experience the trip long before you ever click Book."`
 
-New list (6 items instead of 10):
-- Receive custom trip concepts tailored to your style
-- Collaborate with vetted creators & certified travel advisors
-- Compare personalized proposals side-by-side
-- Transparent pricing and secure booking
-- Built-in messaging for effortless collaboration
-- From vision to confirmed booking — all in one place
+## 2. `src/components/home/HowItWorksSection.tsx` (lines 117–124)
 
-### 3. Replace storyboarding features (lines 17–28)
+Replace the hardcoded caption block with:
 
-New list (6 items):
-- Save hotels, experiences, and inspiration in one place
-- Shape your aesthetic with visual planning
-- Turn ideas into a structured travel brief
-- Guide creators and agents with clear direction
-- Refine and edit before sharing
-- Designed specifically for travel — not generic boards
+```tsx
+<p className="font-semibold mb-1">
+  Every journey begins with a vision.
+</p>
+<p className="text-xs text-[#E5DFC6]/90 whitespace-pre-line">
+  Save the moments that move you — TikToks, Reels, YouTube clips, images that capture the feeling.
+Creators refine the aesthetic. Advisors design the details.
 
-### 4. Add descriptive subtitle to each card
+You experience the trip long before you ever click Book.
+</p>
+```
 
-Update `FeatureCard` to accept an optional `subtitle` prop displayed below the title and gold divider:
-- Marketplace: "For travelers who want experts to design the experience."
-- Storyboarding: "For travelers who want to define the vibe before committing."
-
-### 5. Update button labels (line 77–78)
-
-- Marketplace: "Explore Expert-Designed Trips"
-- Storyboarding: "Start Your Storyboard"
-
-### 6. Add arrow prefix to button text
-
-Prepend "→ " to each button label for the directional feel requested, or use a small ArrowRight icon inline.
-
-Single file, copy-only changes. No logic or routing changes.
+Two files, copy-only changes.
 
