@@ -114,8 +114,8 @@ export function AgentBidForm({
           platform_service_fee: serviceFee,
           platform_success_fee: successFee,
           agent_payout_amount: agentPayout,
-          service_fee_percentage: 3.0,
-          success_fee_percentage: 15.0,
+          service_fee_percentage: 3.5,
+          success_fee_percentage: 3.5,
           estimated_completion_days: days,
           proposal_details: proposal,
           currency: currency,
@@ -217,14 +217,14 @@ export function AgentBidForm({
                 <span className="text-muted-foreground">Client Pays:</span>
                 <span className="font-medium">{currency} {pricing.customerPrice}</span>
                 
-                <span className="text-muted-foreground">Service Fee (3%):</span>
-                <span className="text-red-600">-{currency} {pricing.serviceFee}</span>
+                <span className="text-muted-foreground">Service Fee (3.5%):</span>
+                <span className="text-destructive">-{currency} {pricing.serviceFee}</span>
                 
-                <span className="text-muted-foreground">Success Fee (15%):</span>
-                <span className="text-red-600">-{currency} {pricing.successFee}</span>
+                <span className="text-muted-foreground">Success Fee (3.5%):</span>
+                <span className="text-destructive">-{currency} {pricing.successFee}</span>
                 
                 <span className="text-muted-foreground font-semibold">You Receive:</span>
-                <span className="font-semibold text-green-600">{currency} {pricing.agentPayout}</span>
+                <span className="font-semibold text-primary">{currency} {pricing.agentPayout}</span>
               </div>
             </div>
           )}
