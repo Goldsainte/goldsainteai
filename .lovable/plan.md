@@ -1,31 +1,64 @@
 
 
-# Merge Step Guide Into Accordion Sections
+# Simplify Traveler Onboarding: Remove AI Intake, Route to Traveler Hub
 
-## Problem
-The page currently shows a step guide banner **plus** all three content sections (Trip Details, Add Photos, Browse Inspiration) at once. The step guide helps with labeling but doesn't reduce visual density -- users still see everything simultaneously.
+## Summary
+Remove the multi-page traveler preferences wizard and Madison-based AI intake. New travelers go straight from account creation to the Traveler Hub (`/traveler`) where they fill out their profile. The flow becomes: **Sign Up → Complete Profile (role picker) → Traveler Hub**.
 
-## Approach
-Replace the separate step guide banner and individual sections with a single **stepped accordion** where each step IS its own collapsible panel. Only one section is open at a time (or the user can open multiple). This provides progressive disclosure -- users focus on one task at a time while still seeing their progress on the others.
+## Changes
 
-## Changes -- `src/pages/TikTokLab/StoryboardEditorPage.tsx`
+### 1. Update post-auth routing (`src/lib/auth/postAuthRouting.ts`)
+- Change traveler destination from `/onboarding/traveler/preferences` to `/traveler`
+- For travelers, skip the `onboarding_completed` check — treat account type + profile complete as sufficient
+- Auto-mark `onboarding_completed = true` is no longer a gate for travelers
 
-1. **Remove the standalone Step Guide banner** (lines 525-567) -- it becomes redundant because each accordion trigger now shows the step number, title, required/optional badge, and completion checkmark.
+### 2. Update `useRequireOnboarding` hook (`src/hooks/useRequireOnboarding.ts`)
+- For travelers: remove the redirect to `/onboarding/traveler/preferences`
+- Instead, just allow access if user has `account_type = 'traveler'` (regardless of `onboarding_completed`)
+- Keep creator/agent checks as-is
 
-2. **Wrap all three sections in a single `<Accordion type="multiple">`** with three items:
-   - **Step 1: Trip Details** -- Contains the existing trip fields (currently inside the Collapsible). Trigger shows "1 Trip Details [Required] [X/2 done]" with CheckCircle2 when destination + dates are filled.
-   - **Step 2: Add Photos** -- Contains the existing `<StoryboardBuilder>` component. Trigger shows "2 Add Photos [Required · min 3] [N photos]" with CheckCircle2 when >= 3 photos.
-   - **Step 3: Browse Inspiration** -- Contains the existing `<TravelStoryboard>` component. Trigger shows "3 Browse Inspiration [Optional]" in muted styling.
+### 3. Update `OnboardingRouter` (`src/components/routing/OnboardingRouter.tsx`)
+- Change the `case 'traveler'` destination from `/onboarding/traveler/preferences` to `/traveler`
 
-3. **Remove the existing Trip Details `<Collapsible>`** -- replaced by AccordionItem.
+### 4. Update routes (`src/routes/AppRoutes.tsx`)
+- Remove the `/onboarding/traveler/preferences` route (or redirect it to `/traveler`)
+- Keep `/onboarding/creator` and other non-traveler onboarding routes intact
 
-4. **Default open state** -- In create mode, Step 1 is open by default. In edit mode, Step 2 is open by default (since details are likely already filled).
+### 5. Update `OnboardingWelcomeModal` (`src/components/OnboardingWelcomeModal.tsx`)
+- Change traveler CTA from "Post your first trip" → "Set up your Traveler Hub" pointing to `/traveler`
 
-5. **Keep the "Build Your Trip Board" heading and subtitle** above the accordion for context.
+### 6. Mark legacy preferences page as redirect
+- Change `TravelerPreferencesOnboardingPage` route to `<Navigate to="/traveler" replace />` so any old links still work
 
-## Visual Design
-- Each AccordionTrigger: step number circle (or green check), title, and required/optional pill -- same styling as current step guide
-- Dashed connector lines removed (not needed when sections are stacked vertically)
-- AccordionContent has the same rounded card styling currently used for Trip Details content
-- Consistent with existing accordion patterns used for Vibe Tags, Must-Haves, Dealbreakers inside Trip Details
+### 7. Remove Madison references
+- Remove `MadisonChat` component usage from `ConciergePage.tsx` (replace with redirect to `/traveler` or marketplace)
+- Remove the `/concierge` route or redirect it
+- Remove `AIBookingConcierge` floating widget from `App.tsx`
+- Remove `src/lib/madisonPersona.ts`
+- Remove `src/hooks/useMadisonConversation.ts`
+- Remove `src/components/MadisonChat.tsx`
+
+### 8. Clean up `RequireOnboarding` (`src/components/routing/RequireOnboarding.tsx`)
+- Update to skip the preferences check for travelers — if profile exists with `account_type = 'traveler'`, allow through
+
+### 9. Auto-complete onboarding flag for new travelers
+- In `CompleteProfile.tsx` (the role picker page), when a user selects "traveler", also set `onboarding_completed: true` and `is_profile_complete: true` so they aren't caught by legacy guards
+
+## Files affected
+- `src/lib/auth/postAuthRouting.ts`
+- `src/hooks/useRequireOnboarding.ts`
+- `src/components/routing/OnboardingRouter.tsx`
+- `src/components/routing/RequireOnboarding.tsx`
+- `src/routes/AppRoutes.tsx`
+- `src/components/OnboardingWelcomeModal.tsx`
+- `src/App.tsx` (remove AIBookingConcierge)
+- `src/pages/ConciergePage.tsx` (redirect or simplify)
+- `src/pages/CompleteProfile.tsx` (auto-set onboarding flags for travelers)
+- Delete: `src/lib/madisonPersona.ts`, `src/components/MadisonChat.tsx`
+
+## Not touched
+- Creator onboarding (`CreatorOnboardingPage.tsx`) — stays as-is
+- Agent/brand application flows — unchanged
+- Traveler Hub page itself — already exists with Profile, Settings, Preferences tabs
+- `TravelPreferencesWizard` component — stays available inside Settings tab of Traveler Hub for optional use
 
