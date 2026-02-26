@@ -186,9 +186,9 @@ export default function StoryboardEditorPage() {
     })();
   }, [storyboardId]);
 
-  // Auto-save trip field on blur
+  // Auto-save trip field on blur (only in edit mode when we have an ID)
   const saveTripField = useCallback(async (field: string, value: any) => {
-    if (!storyboardId) return;
+    if (!storyboardId) return; // In create mode, just keep in local state
     const updateData: Record<string, any> = {};
     if (["budget_min", "budget_max"].includes(field)) {
       updateData[field] = value ? parseFloat(value) : null;
@@ -485,8 +485,8 @@ export default function StoryboardEditorPage() {
           </div>
         )}
 
-        {/* ── Trip Details Collapsible (edit mode) ── */}
-        {effectiveMode === "edit" && storyboard && !loadingStoryboard && !isSubmitted && (
+        {/* ── Trip Details Collapsible (create + edit mode) ── */}
+        {!loadingStoryboard && !isSubmitted && (effectiveMode === "create" || (effectiveMode === "edit" && storyboard)) && (
           <Collapsible open={tripDetailsOpen} onOpenChange={setTripDetailsOpen} className="mb-6">
             <CollapsibleTrigger asChild>
               <button className="w-full flex items-center justify-between rounded-2xl border border-[#E5DFC6] bg-white/95 px-5 py-3 text-left hover:bg-[#f7f3ea]/50 transition">
@@ -656,6 +656,14 @@ export default function StoryboardEditorPage() {
                 <FieldBlock label="Special Notes">
                   <textarea value={tripFields.special_notes} onChange={e => updateTripField("special_notes", e.target.value)} onBlur={() => saveTripField("special_notes", tripFields.special_notes)} rows={3} placeholder="Anything else your travel agent should know..." className="field-input resize-none" />
                 </FieldBlock>
+
+                {/* Marketplace hint in create mode */}
+                {effectiveMode === "create" && (
+                  <div className="rounded-xl border border-[#E5DFC6] bg-[#FDF9F0] px-4 py-3 text-[12px] text-[#4a4a4a] flex items-start gap-2">
+                    <Sparkles className="h-4 w-4 text-[#0c4d47] shrink-0 mt-0.5" />
+                    <span>Save your storyboard first, then submit to the marketplace so travel agents can bid on your trip.</span>
+                  </div>
+                )}
               </div>
             </CollapsibleContent>
           </Collapsible>
@@ -669,7 +677,7 @@ export default function StoryboardEditorPage() {
           </div>
         )}
 
-        <StoryboardBuilder storyboardId={storyboardId} initialTitle={storyboard?.title || initialTitle} mode="creator" onSaved={handleStoryboardSaved} />
+        <StoryboardBuilder storyboardId={storyboardId} initialTitle={storyboard?.title || initialTitle} mode="creator" tripFields={effectiveMode === "create" ? tripFields : undefined} onSaved={handleStoryboardSaved} />
 
         {effectiveMode === "create" && (
           <div className="mt-10 pt-8 border-t border-[#E5DFC6]">
