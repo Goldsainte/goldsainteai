@@ -582,15 +582,19 @@ export default function ProposalDetailPage() {
 
                   {pb?.cancellation_windows && pb.cancellation_windows.length > 0 ? (
                     <div className="rounded-lg border overflow-hidden">
-                      {pb.cancellation_windows.map((window, i) => (
-                        <div
-                          key={i}
-                          className={`flex items-center justify-between px-4 py-3 text-sm border-b last:border-0 ${cancellationTierColor(window.label)}`}
-                        >
-                          <span className="font-medium">{window.label}</span>
-                          <span className="font-semibold">{window.refund_percent}% refund</span>
-                        </div>
-                      ))}
+                      {pb.cancellation_windows.map((window: any, i: number) => {
+                        const label = window.label || window.band || `Window ${i + 1}`;
+                        const refund = window.refund_percent ?? window.refund_pct ?? 0;
+                        return (
+                          <div
+                            key={i}
+                            className={`flex items-center justify-between px-4 py-3 text-sm border-b last:border-0 ${cancellationTierColor(label)}`}
+                          >
+                            <span className="font-medium">{label}</span>
+                            <span className="font-semibold">{refund}% refund</span>
+                          </div>
+                        );
+                      })}
                     </div>
                   ) : (
                     <div className="bg-muted/50 rounded-lg p-4">
@@ -636,15 +640,23 @@ export default function ProposalDetailPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {proposal.payment_schedule.map((item, idx) => (
-                            <tr key={`${item.label}-${idx}`} className="border-t">
-                              <td className="px-4 py-3 font-medium text-foreground">{item.label}</td>
-                              <td className="px-4 py-3 text-muted-foreground">{item.due_on ? formatDate(item.due_on) : "—"}</td>
-                              <td className="px-4 py-3 text-right font-semibold text-foreground">
-                                {item.amount ? formatMoney(item.amount, proposal.currency || "USD") : "—"}
-                              </td>
-                            </tr>
-                          ))}
+                          {proposal.payment_schedule.map((item: any, idx: number) => {
+                            const milestoneLabel = item.label || item.name || `Payment ${idx + 1}`;
+                            const milestoneAmount = item.amount
+                              ? formatMoney(item.amount, proposal.currency || "USD")
+                              : item.percentage != null
+                                ? `${item.percentage}%`
+                                : "—";
+                            return (
+                              <tr key={`${milestoneLabel}-${idx}`} className="border-t">
+                                <td className="px-4 py-3 font-medium text-foreground">{milestoneLabel}</td>
+                                <td className="px-4 py-3 text-muted-foreground">{item.due_on ? formatDate(item.due_on) : "—"}</td>
+                                <td className="px-4 py-3 text-right font-semibold text-foreground">
+                                  {milestoneAmount}
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     </div>
@@ -689,19 +701,23 @@ export default function ProposalDetailPage() {
                       </Button>
                     </div>
                   ))}
-                  {pb?.external_links?.map((link, i) => (
+                  {pb?.external_links?.map((link: any, i: number) => {
+                    const url = typeof link === "string" ? link : link?.url || "";
+                    const label = typeof link === "string" ? link : (link?.label || link?.url || "Link");
+                    return (
                     <div key={i} className="flex items-center justify-between py-2.5 border-b last:border-0">
                       <div className="flex items-center gap-3 text-sm">
                         <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-foreground">{link.label || link.url}</span>
+                        <span className="text-foreground">{label}</span>
                       </div>
                       <Button variant="ghost" size="xs" asChild>
-                        <a href={link.url} target="_blank" rel="noopener noreferrer">
+                        <a href={url} target="_blank" rel="noopener noreferrer">
                           <ExternalLink className="h-3.5 w-3.5" />
                         </a>
                       </Button>
                     </div>
-                  ))}
+                    );
+                  })}
                 </CardContent>
               </Card>
             )}
