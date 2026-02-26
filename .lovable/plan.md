@@ -1,60 +1,48 @@
 
 
-# Polish Storyboard Page Copy & Microcopy
+# Update "Why Goldsainte" Section Copy & Features
 
-## Changes — all in `src/pages/TikTokLab/StoryboardsPage.tsx`
+## Changes — `src/components/home/TwoWaysComparison.tsx`
 
-### 1. Update subtitle copy (lines 141–143)
+### 1. Update heading and subtitle (lines 70–75)
 
-Replace the current one-liner with the fuller strategic framing:
+- **Heading:** "Two Distinct Ways to Design Your Journey"
+- **Subtitle:** "Whether you want expert-crafted precision or prefer to shape your vision first, Goldsainte gives you a seamless path forward."
 
-**From:**
-```
-Create your travel vision. When you're ready, turn it into a trip request.
-```
+### 2. Replace marketplace features (lines 4–15)
 
-**To:**
-```
-Plan visually. Post confidently.
-```
+New list (6 items instead of 10):
+- Receive custom trip concepts tailored to your style
+- Collaborate with vetted creators & certified travel advisors
+- Compare personalized proposals side-by-side
+- Transparent pricing and secure booking
+- Built-in messaging for effortless collaboration
+- From vision to confirmed booking — all in one place
 
-Plus add a second line of descriptive copy below it:
-```
-Save hotels, restaurants, destinations, and experiences into a private board. When you're ready, turn your storyboard into a trip request and receive proposals from trusted creators and travel agents.
-```
+### 3. Replace storyboarding features (lines 17–28)
 
-This communicates the full arc: visual → actionable → marketplace.
+New list (6 items):
+- Save hotels, experiences, and inspiration in one place
+- Shape your aesthetic with visual planning
+- Turn ideas into a structured travel brief
+- Guide creators and agents with clear direction
+- Refine and edit before sharing
+- Designed specifically for travel — not generic boards
 
-### 2. Rename CTA button (lines 200–203)
+### 4. Add descriptive subtitle to each card
 
-**From:** `Create New Storyboard`
-**To:** `Start a Trip Board`
+Update `FeatureCard` to accept an optional `subtitle` prop displayed below the title and gold divider:
+- Marketplace: "For travelers who want experts to design the experience."
+- Storyboarding: "For travelers who want to define the vibe before committing."
 
-Feels like momentum rather than a mechanical tool action.
+### 5. Update button labels (line 77–78)
 
-### 3. Add microcopy under tabs (after line 216)
+- Marketplace: "Explore Expert-Designed Trips"
+- Storyboarding: "Start Your Storyboard"
 
-Insert a subtle privacy clarifier below the TabsList:
+### 6. Add arrow prefix to button text
 
-```tsx
-<p className="text-[11px] text-[#9CA3AF]">
-  Your boards are private until you choose to post them.
-</p>
-```
+Prepend "→ " to each button label for the directional feel requested, or use a small ArrowRight icon inline.
 
-This removes ambiguity about visibility and builds trust.
-
-### 4. Update accent label (line 136)
-
-Keep "Your Travel Planning Board" as-is — it already works well with the new copy.
-
-### Summary
-
-| What | Lines | Action |
-|------|-------|--------|
-| Subtitle copy | 141–143 | Rewrite to two-part copy |
-| CTA button text | 200–203 | Rename to "Start a Trip Board" |
-| Privacy microcopy | After 216 | Insert under tabs |
-
-Single file, copy-only changes. No logic or structural changes needed.
+Single file, copy-only changes. No logic or routing changes.
 
