@@ -89,8 +89,30 @@ export default function TikTokLabStoryboardsPage() {
 
   const isCreatorOrAgent = accountType === "creator" || accountType === "agent";
 
-  const backLabel = isCreatorOrAgent ? "Back to Creator Studio" : "Back to Dashboard";
-  const backTo = isCreatorOrAgent ? "/creator-dashboard" : "/dashboard";
+  const backLabel = (() => {
+    switch (accountType) {
+      case "creator":
+      case "agent":
+        return "Back to Creator Studio";
+      case "traveler":
+        return "Back to Dashboard";
+      default:
+        return "Back";
+    }
+  })();
+
+  const backTo = (() => {
+    switch (accountType) {
+      case "creator":
+        return "/creator-dashboard";
+      case "agent":
+        return "/agent-dashboard";
+      case "traveler":
+        return "/traveler";
+      default:
+        return "/";
+    }
+  })();
 
   const subtitle = "Think Pinterest — but for planning a trip. Save hotels, destinations, restaurants, videos, and experiences into one visual board. When you're ready, submit your storyboard to the marketplace and let creators or certified agents turn your ideas into a fully designed trip.";
 
