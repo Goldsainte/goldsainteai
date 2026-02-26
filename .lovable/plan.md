@@ -1,26 +1,24 @@
 
 
-# Fix: Back Button on Proposal Pages Should Navigate to Marketplace/Trip Briefs
+# Add CTA Pill Buttons to "Why Goldsainte" Section
 
-## Problem
+## Overview
 
-All proposal pages (`NewProposalPage`, `ProposalDetailPage`, `ProposalsForTripPage`) use `navigate(-1)` for their back buttons. If the browser history stack doesn't have the expected previous page (e.g., user opened the link directly, or history was cleared), `navigate(-1)` lands on `/` which shows a 404.
+Add a pill-style CTA button beneath each feature card in the `TwoWaysComparison` component — one linking to `/marketplace` and one linking to `/storyboards`.
 
 ## Changes
 
-### File 1: `src/pages/proposals/NewProposalPage.tsx`
+### File: `src/components/home/TwoWaysComparison.tsx`
 
-**Line 389** — Replace `navigate(-1)` with a deterministic back target. Since we know the `tripId` from the URL query param, navigate to `/marketplace/request/${tripId}` (the trip brief detail page). Fallback to `/marketplace` if no tripId.
+1. Import `Link` from `react-router-dom`.
 
-Also update the error-state back button on **line 372** the same way.
+2. Update the `FeatureCard` component to accept optional `linkTo` and `linkLabel` props. Render a pill-style `Link` button below the feature list, styled consistently with the existing design system (rounded-full, GS green background `#0c4d47`, gold/cream text `#E5DFC6`, hover state).
 
-### File 2: `src/pages/proposals/ProposalDetailPage.tsx`
+3. Pass the following to each card:
+   - **Travel Marketplace** card: `linkTo="/marketplace"` / `linkLabel="Explore the Marketplace"`
+   - **Storyboarding** card: `linkTo="/storyboards"` / `linkLabel="Create a Storyboard"`
 
-**Line 216** — Replace `navigate(-1)` with navigation to the trip brief page if the trip ID is available, otherwise `/marketplace`.
+### Visual Style
 
-### File 3: `src/pages/proposals/ProposalsForTripPage.tsx`
-
-**Line 96** — Same fix: navigate to `/marketplace/request/${tripId}` or `/marketplace`.
-
-These are three single-line changes — replacing `navigate(-1)` with a deterministic route derived from the trip ID already available in each component.
+The pill buttons will match the existing site aesthetic — rounded-full, compact padding, centered below each card's feature list. Same treatment as the hero CTAs.
 
