@@ -397,7 +397,7 @@ export default function TripRequestDetailPage() {
       }
 
       const totalPriceCents = accepted.price_from * 100;
-      const platformCommissionCents = Math.round(totalPriceCents * 0.15); // e.g. 15% commission
+      const platformCommissionCents = Math.round(totalPriceCents * 0.035); // 3.5% host fee
 
       const booking = await createBookingFromProposal({
         tripId: trip.id,

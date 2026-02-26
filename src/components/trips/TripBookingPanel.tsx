@@ -87,8 +87,8 @@ export function TripBookingPanel({
       if (fnError) throw fnError;
       if (!result) throw new Error("No result from checkout function");
 
-      // Calculate commission split for display (15% platform)
-      const platformCommission = Math.round(amountTotalCents * 0.15);
+      // Calculate commission split for display (3.5% platform host fee)
+      const platformCommission = Math.round(amountTotalCents * 0.035);
       const partnerPayout = amountTotalCents - platformCommission;
 
       const updated: TripBooking = {
@@ -179,7 +179,7 @@ export function TripBookingPanel({
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[#7A7151]">Platform fee (15%):</span>
+              <span className="text-[#7A7151]">Platform fee (3.5%):</span>
               <span className="text-[#7A7151]">
                 {formatCurrency(booking.platform_commission || 0, booking.currency)}
               </span>

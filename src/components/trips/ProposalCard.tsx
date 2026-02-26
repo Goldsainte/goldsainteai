@@ -91,8 +91,8 @@ export function ProposalCard({
       const { data: userData } = await supabase.auth.getUser();
       const totalPriceCents = proposal.price_from || 0;
       
-      // Calculate 15% platform commission
-      const platformCommission = Math.round(totalPriceCents * 0.15);
+      // Calculate 3.5% platform host fee
+      const platformCommission = Math.round(totalPriceCents * 0.035);
       const partnerPayout = totalPriceCents - platformCommission;
       
       const { error: bookingError } = await supabase.from("trip_bookings").upsert(

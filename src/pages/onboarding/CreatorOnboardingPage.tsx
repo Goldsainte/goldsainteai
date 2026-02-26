@@ -734,7 +734,7 @@ export default function CreatorOnboardingPage() {
                   </h3>
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between"><span className="text-white/80">Booking Value</span><span className="font-medium">$3,000</span></div>
-                    <div className="flex justify-between"><span className="text-white/80">Platform Fee (15%)</span><span className="text-white/60">-$450</span></div>
+                    <div className="flex justify-between"><span className="text-white/80">Platform Fee (3.5%)</span><span className="text-white/60">-$105</span></div>
                     <div className="flex justify-between"><span className="text-white/80">Your Commission (10-20%)</span><span className="text-[#C7A962] font-medium">$300 - $600</span></div>
                     <hr className="border-white/20" />
                     <div className="flex justify-between pt-1"><span className="text-white/80">Payout Timing</span><span className="font-medium">After trip completion</span></div>

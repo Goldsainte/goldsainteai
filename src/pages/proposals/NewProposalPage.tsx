@@ -130,7 +130,7 @@ export default function NewProposalPage() {
 
   const estimatedEarnings = useMemo(() => {
     if (!priceFrom || typeof priceFrom !== "number") return 0;
-    return Math.round(priceFrom * 0.85);
+    return Math.round(priceFrom * 0.965);
   }, [priceFrom]);
 
   useEffect(() => {
@@ -725,7 +725,7 @@ export default function NewProposalPage() {
                   {estimatedEarnings > 0 && (
                     <div className="rounded-lg bg-[#0c4d47]/5 border border-[#0c4d47]/20 p-4">
                       <p className="text-sm font-medium text-[#0c4d47]">Estimated Earnings: ${estimatedEarnings.toLocaleString()}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">After 15% platform fee</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">After 3.5% platform fee</p>
                     </div>
                   )}
                 </CardContent>

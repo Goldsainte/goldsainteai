@@ -59,16 +59,16 @@ serve(async (req) => {
       customerId = customer.id;
     }
 
-    // Calculate platform fee (15%)
-    const platformFeeAmount = Math.round(totalAmount * 0.15 * 100);
-    const creatorAmount = Math.round((totalAmount * 0.85) * 100);
+    // Calculate platform host fee (3.5%)
+    const platformFeeAmount = Math.round(totalAmount * 0.035 * 100);
+    const creatorAmount = Math.round((totalAmount * 0.965) * 100);
 
     // Create deposit payment intent
     const depositPaymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(depositAmount * 100),
       currency: package_data.currency.toLowerCase(),
       customer: customerId,
-      application_fee_amount: Math.round(depositAmount * 0.15 * 100),
+      application_fee_amount: Math.round(depositAmount * 0.035 * 100),
       transfer_data: package_data.profiles?.stripe_account_id ? {
         destination: package_data.profiles.stripe_account_id,
       } : undefined,
@@ -135,7 +135,7 @@ serve(async (req) => {
       (package_data.upfront_payout_percentage || 20) : 0;
     
     if (upfrontPercentage > 0) {
-      const upfrontAmount = (totalAmount * 0.85 * upfrontPercentage) / 100; // After platform fee
+      const upfrontAmount = (totalAmount * 0.965 * upfrontPercentage) / 100; // After 3.5% platform fee
       await supabaseClient
         .from('creator_escrow_payouts')
         .insert({
@@ -145,7 +145,7 @@ serve(async (req) => {
           payout_type: 'upfront',
           amount: upfrontAmount,
           currency: package_data.currency,
-          platform_fee: (upfrontAmount / 0.85) * 0.15,
+          platform_fee: (upfrontAmount / 0.965) * 0.035,
           net_amount: upfrontAmount,
           status: 'pending',
           milestone_description: 'Upfront payout for verified creator'
