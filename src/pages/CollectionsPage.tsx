@@ -301,7 +301,7 @@ export default function CollectionsPage() {
                 
                 <div className="flex flex-col sm:flex-row gap-3 pt-4 justify-center md:justify-start">
                   <Button asChild className="rounded-full px-6 bg-[#0a2225] hover:bg-[#0a2225]/90">
-                    <Link to="/storyboards/new">
+                    <Link to="/storyboards">
                       <Sparkles className="h-4 w-4 mr-2" />
                       Begin Your Storyboard
                     </Link>

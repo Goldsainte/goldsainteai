@@ -75,7 +75,7 @@ export function TwoWaysComparison() {
         </p>
         <div className="grid md:grid-cols-2 gap-6">
           <FeatureCard title="Travel Marketplace" features={marketplaceFeatures} linkTo="/marketplace" linkLabel="Explore the Marketplace" />
-          <FeatureCard title="Storyboarding" features={storyboardingFeatures} linkTo="/storyboards/new" linkLabel="Create a Storyboard" />
+          <FeatureCard title="Storyboarding" features={storyboardingFeatures} linkTo="/storyboards" linkLabel="Create a Storyboard" />
         </div>
       </div>
     </section>

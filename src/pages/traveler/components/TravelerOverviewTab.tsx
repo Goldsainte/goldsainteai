@@ -249,7 +249,7 @@ export function TravelerOverviewTab({ profile, stats, onAvatarUpdate }: Traveler
                 </Link>
               </Button>
               <Button asChild variant="outline" className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#F6F0E4] rounded-full px-6">
-                <Link to="/storyboards/new">
+                <Link to="/storyboards">
                   Create Storyboard
                 </Link>
               </Button>
