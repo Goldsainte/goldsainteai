@@ -1,80 +1,128 @@
 
 
-# Change Platform Fee to 7% Total (3.5% Host + 3.5% Guest)
+# Add Commission Pricing Model to Proposal Form
 
-## Overview
+## Current State
 
-Update the platform fee from 15% to **7% total**, split evenly: **3.5% from the agent/creator** (deducted from payout) and **3.5% from the traveler** (added to their total).
+The proposal form (Step 2: Pricing & Payment) currently has:
+- Pricing type (per person / total)
+- Trip cost input (single dollar amount)
+- Optional planning fee checkbox with amount
+- Deposit slider, balance due, payment schedule
+- Estimated earnings shown as `priceFrom * 0.965` (after 3.5% platform fee)
 
-```text
-Example: Agent quotes $10,000 trip
+There is **no way for agents to define how they earn** — no commission percentage, no flat fee vs percentage selector, no tiered brackets. The traveler sees a single "Trip Cost" with no breakdown of what portion is commission vs planning fees.
 
-Agent sees:
-  Trip price:              $10,000
-  Platform fee (3.5%):       -$350
-  Your payout:              $9,650
+The `price_breakdown` JSONB column already stores arbitrary data, so no schema changes are needed.
 
-Traveler sees:
-  Trip cost:              $10,000
-  Service fee (3.5%):        +$350
-  Total due:             $10,350
+## Changes
 
-Goldsainte collects:    $350 + $350 = $700 (7%)
-```
+### File 1: `src/pages/proposals/NewProposalPage.tsx`
 
-## All Files Requiring Changes
+**New state variables** (after line 102):
+- `commissionModel`: `"percentage" | "flat_fee" | "hybrid"` — default `"percentage"`
+- `commissionPct`: `number | ""` — default `15`
+- `commissionTiered`: `boolean` — default `false`
+- `commissionTiers`: `{ threshold: number; pct: number }[]` — default `[{ threshold: 5000, pct: 20 }, { threshold: Infinity, pct: 15 }]`
+- `flatFeeAmount`: `number | ""` — for flat fee model
+- `flatFeeCovers`: `string` — default `"planning"` (options: planning, execution, full_service)
+- `hybridFlatFee`: `number | ""`
+- `hybridCommissionPct`: `number | ""`
 
-Every hardcoded 15% / 0.15 / 0.85 platform fee reference must be updated. Here is the full list:
+**New UI section** inserted into Step 2 (between the Trip Cost input at line 566 and the planning fee section at line 568):
 
-### Frontend
+1. **Pricing Model selector** — 3-option radio card group:
+   - "Percentage Commission" — subtitle: "Earn a % of total trip value"
+   - "Flat Planning Fee" — subtitle: "Charge a fixed service fee"
+   - "Hybrid" — subtitle: "Fixed fee + percentage commission"
 
-| File | Current | Change |
-|------|---------|--------|
-| `src/lib/booking/commission.ts` (line 26) | `platformPct = 0.15` (collab) / `0.2` (solo) | Change both to `0.035` (host-side 3.5%). Add `guestFeePct = 0.035` |
-| `src/pages/proposals/NewProposalPage.tsx` (line 133) | `priceFrom * 0.85` | `priceFrom * 0.965` (after 3.5% host fee) |
-| `src/pages/proposals/NewProposalPage.tsx` (line 728) | "After 15% platform fee" | "After 3.5% platform fee" |
-| `src/components/trips/ProposalCard.tsx` (line 95) | `totalPriceCents * 0.15` | `totalPriceCents * 0.035` |
-| `src/components/trips/TripBookingPanel.tsx` (lines 91, 182) | `amountTotalCents * 0.15` / "Platform fee (15%)" | `* 0.035` / "Platform fee (3.5%)" |
-| `src/pages/TripRequestDetailPage.tsx` (line 400) | `totalPriceCents * 0.15` | `totalPriceCents * 0.035` |
-| `src/components/AgentBidForm.tsx` (lines 43-46, 100-103) | `0.03` service fee + `0.15` success fee | `0.035` guest service fee + `0.035` host fee |
-| `src/components/CreatorEscrowDashboard.tsx` (lines 63, 66, 112) | "15%" labels, "$750" example, "$4,250" earnings | "7% total (3.5% + 3.5%)" labels, update example to $5,000 → $175 host fee → $4,825 earnings |
-| `src/components/partners/PartnersFAQ.tsx` (line 31) | "15% of each booking" | "7% of each booking (3.5% from partner, 3.5% from traveler)" |
-| `src/pages/onboarding/CreatorOnboardingPage.tsx` (line 737) | "Platform Fee (15%)" / "-$450" | "Platform Fee (3.5%)" / "-$105" |
+2. **Conditional inputs based on model:**
 
-### Backend (Edge Functions)
+   If **percentage**:
+   - Commission % input (numeric, decimals allowed, min 1, max 50)
+   - Tooltip icon: "Industry standard is 10–20% commission on total trip value. Luxury and bespoke experiences may command 15–25%."
+   - "Is it tiered?" checkbox
+   - If tiered: editable tier rows (threshold $ + percentage %), with add/remove buttons — e.g. "First $5,000 at 20%" / "Above $5,000 at 15%"
 
-| File | Current | Change |
-|------|---------|--------|
-| `supabase/functions/_shared/commissionCalculator.ts` (line 34) | `PLATFORM_FEE_RATE = 0.1` | `HOST_FEE_RATE = 0.035`, `GUEST_FEE_RATE = 0.035` |
-| `supabase/functions/calculate-creator-commission/index.ts` (line ~73) | `commissionWithTier * 0.1` | `amount * 0.035` (host fee on booking subtotal) |
-| `supabase/functions/create-package-payment-plan/index.ts` (lines 63-64) | `totalAmount * 0.15` / `totalAmount * 0.85` | `totalAmount * 0.035` / `totalAmount * 0.965` |
-| `supabase/functions/process-installment-payment/index.ts` (line 69) | `installment.amount * 0.15` | `installment.amount * 0.035` |
+   If **flat fee**:
+   - Fee amount input ($)
+   - "Fee covers" select: Planning only / Planning + Execution / Full service
+   - Tooltip icon: "Typical flat fees range from $299–$1,500+ depending on trip complexity."
 
-### Commission utility update (`src/lib/booking/commission.ts`)
+   If **hybrid**:
+   - Flat fee input ($)
+   - Commission % input
+   - Tooltip icon: "Common hybrid: $500 planning fee + 10% commission on bookings."
 
-Extend `CommissionBreakdown` to include:
-- `hostFee` / `hostFeePct` (3.5%, deducted from agent)
-- `guestFee` / `guestFeePct` (3.5%, added to traveler)
-- `travelerTotal` (trip cost + guest fee)
-
-Remove the collab vs solo distinction for platform rate — it is now always 3.5% per side regardless of mode.
-
-### Escrow dashboard example update
+3. **Replace the earnings summary** (lines 725-730) with a detailed breakdown card:
 
 ```text
-Customer pays:           $5,000
-+ Service fee (3.5%):     +$175
-= Traveler total:        $5,175
-
-Your earnings:           $5,000
-- Platform fee (3.5%):    -$175
-= Your payout:           $4,825
-
-  Upfront (20%):          $965
-  Held in escrow:        $3,860
+┌─────────────────────────────────────────┐
+│  Fee Breakdown                          │
+│                                         │
+│  Your Commission              $1,500    │
+│  Platform fee (3.5%):           -$350   │
+│  ─────────────────────────────────────  │
+│  Your Estimated Payout        $1,150    │
+│                                         │
+│  What the Traveler Pays                 │
+│  Trip Cost                   $10,000    │
+│  Service Fee (3.5%)             +$350   │
+│  ─────────────────────────────────────  │
+│  Traveler Total              $10,350    │
+└─────────────────────────────────────────┘
 ```
 
-## Summary
+**Update estimated earnings calculation** (lines 131-134) — dynamic logic based on model:
 
-17 files touched across frontend and backend. The core change is simple — replace all `0.15` / `0.85` / `15%` platform fee references with the 3.5% host + 3.5% guest split totaling 7%.
+```
+if percentage: commission = tripCost × (commissionPct / 100)
+  if tiered: sum of (min(tripCost, threshold) × tier_pct) per bracket
+if flat_fee: commission = flatFeeAmount
+if hybrid: commission = hybridFlatFee + (tripCost × hybridCommissionPct / 100)
+
+hostFee = tripCost × 0.035
+guestFee = tripCost × 0.035
+agentPayout = commission - hostFee
+travelerTotal = tripCost + guestFee
+```
+
+**Update `priceBreakdown` object** (lines 204-218) — add fields:
+```
+commission_model, commission_pct, commission_tiered, commission_tiers,
+flat_fee_amount, flat_fee_covers, hybrid_flat_fee, hybrid_commission_pct,
+host_fee_pct: 3.5, guest_fee_pct: 3.5, platform_total_pct: 7,
+agent_commission_estimate, agent_payout_estimate, traveler_total_estimate, guest_service_fee_estimate
+```
+
+**Remove the existing planning fee section** (lines 568-605) since it's now subsumed by the flat fee / hybrid model options.
+
+### File 2: `src/pages/proposals/ProposalDetailPage.tsx`
+
+**Enhance the Pricing Breakdown section** (lines 432-484):
+
+Add a "Commission Structure" sub-section between the pricing type and trip cost rows:
+- If `commission_model === "percentage"`: "Commission: X% on total trip value"
+- If `commission_model === "flat_fee"`: "Service Fee: $X (covers: planning/execution/full service)"
+- If `commission_model === "hybrid"`: "Service Fee: $X + Y% commission"
+- If tiered: render tier bracket rows (e.g. "First $5,000 at 20%", "Above $5,000 at 15%")
+
+Add **transparent traveler-facing rows** after the trip cost:
+- "Service Fee (3.5%)" row showing the guest fee amount
+- "Traveler Total" row showing trip cost + guest fee
+- Tooltip on service fee: "Covers Goldsainte traveler protection, support, and secure payment processing."
+
+Add **agent-facing rows** (visible only when current user is the proposer):
+- "Your Commission" — the agent's commission from their selected model
+- "Platform Fee (3.5%)" — host fee deducted
+- "Your Payout" — net earnings
+
+## Files Modified
+
+| File | Action |
+|------|--------|
+| `src/pages/proposals/NewProposalPage.tsx` | Add commission model selector (percentage/flat/hybrid), tiered support, dynamic earnings calculation with 3.5%/3.5% split breakdown, update `price_breakdown` payload |
+| `src/pages/proposals/ProposalDetailPage.tsx` | Display commission structure + split fee breakdown for agent and traveler views |
+
+No database changes needed — all new fields stored in the existing `price_breakdown` JSONB column.
 
