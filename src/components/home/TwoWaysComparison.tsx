@@ -50,7 +50,7 @@ function FeatureCard({ title, features }: { title: string; features: string[] })
 
 export function TwoWaysComparison() {
   return (
-    <section className="bg-[#FDF9F0] py-16 md:py-24">
+    <section className="bg-white py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-4 text-center">
         <span className="inline-block rounded-full border border-[#0c4d47] bg-[#0c4d47] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#bfad72] mb-4">
           Why Goldsainte
