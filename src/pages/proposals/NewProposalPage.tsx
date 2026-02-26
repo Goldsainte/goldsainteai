@@ -148,7 +148,7 @@ export default function NewProposalPage() {
   }, [tripId]);
 
   const canAdvance = () => {
-    if (step === 0) return headline.trim().length > 0 && message.trim().length > 10;
+    if (step === 0) return headline.trim().length > 0 && message.trim().length >= 5;
     if (step === 1) return inclusionsText.trim().length > 0;
     if (step === 2) return typeof priceFrom === "number" && priceFrom > 0;
     if (step === 6) return ackTerms && ackDeposit && ackCancellation;
@@ -384,7 +384,7 @@ export default function NewProposalPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="headline">Headline</Label>
+                    <Label htmlFor="headline">Headline <span className="text-destructive">*</span></Label>
                     <Input
                       id="headline"
                       placeholder="e.g. 7-Night Luxury Safari with Private Guide"
@@ -392,10 +392,13 @@ export default function NewProposalPage() {
                       onChange={(e) => setHeadline(e.target.value)}
                       maxLength={120}
                     />
+                    {headline.length === 0 && (
+                      <p className="text-xs text-destructive">Required</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="message">Your Proposal</Label>
+                    <Label htmlFor="message">Your Proposal <span className="text-destructive">*</span></Label>
                     <Textarea
                       id="message"
                       placeholder="Describe your proposed itinerary, unique experiences, and why you're the best fit for this trip…"
@@ -403,7 +406,14 @@ export default function NewProposalPage() {
                       onChange={(e) => setMessage(e.target.value)}
                       className="min-h-[180px]"
                     />
-                    <p className="text-xs text-muted-foreground text-right">{message.length} characters</p>
+                    <div className="flex justify-between">
+                      {message.trim().length < 5 ? (
+                        <p className="text-xs text-destructive">Minimum 5 characters required</p>
+                      ) : (
+                        <span />
+                      )}
+                      <p className="text-xs text-muted-foreground">{message.length} characters</p>
+                    </div>
                   </div>
 
                   <div className="space-y-2">
@@ -1266,24 +1276,31 @@ export default function NewProposalPage() {
             <ArrowLeft className="h-4 w-4 mr-1" /> Back
           </Button>
 
-          {step < 6 ? (
-            <Button
-              onClick={() => setStep((s) => s + 1)}
-              disabled={!canAdvance()}
-              className="bg-[#0c4d47] hover:bg-[#0a3f3a] text-white"
-            >
-              Continue <ArrowRight className="h-4 w-4 ml-1" />
-            </Button>
-          ) : (
-            <Button
-              onClick={handleSubmit}
-              disabled={submitting || !canAdvance()}
-              className="bg-[#0c4d47] hover:bg-[#0a3f3a] text-white px-8"
-              size="lg"
-            >
-              {submitting ? "Submitting…" : "Submit Proposal"} <Send className="h-4 w-4 ml-2" />
-            </Button>
-          )}
+          <div className="flex items-center gap-3">
+            {!canAdvance() && (
+              <p className="text-xs text-destructive flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" /> Fill in required fields to continue
+              </p>
+            )}
+            {step < 6 ? (
+              <Button
+                onClick={() => setStep((s) => s + 1)}
+                disabled={!canAdvance()}
+                className="bg-[#0c4d47] hover:bg-[#0a3f3a] text-white"
+              >
+                Continue <ArrowRight className="h-4 w-4 ml-1" />
+              </Button>
+            ) : (
+              <Button
+                onClick={handleSubmit}
+                disabled={submitting || !canAdvance()}
+                className="bg-[#0c4d47] hover:bg-[#0a3f3a] text-white px-8"
+                size="lg"
+              >
+                {submitting ? "Submitting…" : "Submit Proposal"} <Send className="h-4 w-4 ml-2" />
+              </Button>
+            )}
+          </div>
         </div>
       </footer>
     </div>
