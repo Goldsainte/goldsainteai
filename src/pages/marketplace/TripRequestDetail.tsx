@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ProposalCard from "@/components/marketplace/ProposalCard";
-import { ProposalWizard } from "@/components/marketplace/ProposalWizard";
-import { Loader2, MapPin, Calendar, Users, Globe, Instagram, DollarSign } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Loader2, MapPin, Calendar, Users, DollarSign, Send } from "lucide-react";
 import { getTripRequestImageUrl } from "@/utils/tripImages";
 import { TripStoryboardViewer } from "@/components/TripStoryboardViewer";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -72,41 +70,17 @@ type TripRequest = {
   dealbreakers?: string[];
 };
 
-type UserProfile = {
-  display_name: string | null;
-  full_name: string | null;
-  avatar_url: string | null;
-  tiktok_handle: string | null;
-  instagram_handle: string | null;
-  website: string | null;
-  bio: string | null;
-};
-
 type TravelerProfile = {
   full_name: string | null;
   avatar_url: string | null;
   created_at?: string | null;
 };
 
-// Luxury input class
-const luxuryInputClass =
-  "w-full rounded-xl border border-[#E5DFC6] bg-[#FDFBF5] px-4 py-3 text-sm text-[#0a2225] placeholder:text-[#9A9079] focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50 focus:border-[#C7A962] transition-colors";
-
-// Gold section label
 function GoldLabel({ children }: { children: React.ReactNode }) {
   return (
     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7A7151]">
       {children}
     </p>
-  );
-}
-
-// TikTok icon
-function TikTokIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.75a8.18 8.18 0 004.77 1.52V6.84a4.84 4.84 0 01-1-.15z" />
-    </svg>
   );
 }
 
@@ -120,26 +94,7 @@ export default function TripRequestDetail() {
   const [proposalsCount, setProposalsCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [travelerProfile, setTravelerProfile] = useState<TravelerProfile | null>(null);
-
-  const [newProposal, setNewProposal] = useState({
-    priceFrom: "",
-    priceTo: "",
-    timelineLabel: "",
-    message: "",
-    included: "",
-    notIncluded: "",
-    itineraryOverview: "",
-    fitReason: "",
-    cancellationPolicyId: "" as string | "",
-    customCancellationTerms: "",
-    depositPercentage: "",
-    depositDueDays: "",
-    ackGoldsaintePolicies: false,
-    ackAgentCancellation: false,
-  });
-  const [submittingProposal, setSubmittingProposal] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -158,7 +113,6 @@ export default function TripRequestDetail() {
         .maybeSingle();
 
       if (tripError) throw tripError;
-
       if (!tripData) {
         setError("Trip request not found.");
         return;
@@ -173,16 +127,15 @@ export default function TripRequestDetail() {
         setTravelerProfile(profileData);
       }
 
-      const tripStyle = typeof tripData.trip_style === 'string' 
-        ? tripData.trip_style 
-        : Array.isArray(tripData.travel_styles) && tripData.travel_styles.length > 0 
-          ? tripData.travel_styles[0] 
+      const tripStyle = typeof tripData.trip_style === 'string'
+        ? tripData.trip_style
+        : Array.isArray(tripData.travel_styles) && tripData.travel_styles.length > 0
+          ? tripData.travel_styles[0]
           : "Not specified";
 
       const destination = tripData.destination || "Not specified";
       const titleFallback = tripData.title || (destination !== "Not specified" ? `Trip to ${destination}` : "New Trip Request");
 
-      // Parse source_metadata for enriched fields
       const sourceMeta = typeof tripData.source_metadata === 'object' && tripData.source_metadata ? tripData.source_metadata as Record<string, any> : {};
 
       const mappedRequest: TripRequest = {
@@ -213,15 +166,6 @@ export default function TripRequestDetail() {
       setRequest(mappedRequest);
 
       const isRequestOwner = user?.id === tripData.user_id;
-
-      if (user && !isRequestOwner) {
-        const { data: myProfile } = await supabase
-          .from("profiles")
-          .select("display_name, full_name, avatar_url, tiktok_handle, instagram_handle, website, bio")
-          .eq("id", user.id)
-          .maybeSingle();
-        setUserProfile(myProfile);
-      }
 
       if (isRequestOwner) {
         const { data: proposalsData, error: proposalsError } = await supabase
@@ -329,86 +273,18 @@ export default function TripRequestDetail() {
     }
   }
 
-  async function handleSubmitProposal(e: React.FormEvent) {
-    e.preventDefault();
+  function handleSubmitProposal() {
     if (!user) {
       toast.error("Please sign in to submit a proposal");
       navigate("/auth");
       return;
     }
-    const { data: agent } = await supabase
-      .from('travel_agents')
-      .select('terms_accepted')
-      .eq('user_id', user.id)
-      .maybeSingle();
-    if (!agent?.terms_accepted) {
-      toast.error("Please accept agent terms before submitting proposals");
-      return;
-    }
-    if (!newProposal.ackGoldsaintePolicies || !newProposal.ackAgentCancellation) {
-      toast.error("Please confirm all required policy acknowledgements before submitting.");
-      return;
-    }
-    if (!newProposal.priceFrom || !newProposal.itineraryOverview || !newProposal.fitReason) {
-      toast.error("Please fill in price, itinerary overview, and why you're a great fit");
-      return;
-    }
-    setSubmittingProposal(true);
-    try {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("account_type")
-        .eq("id", user.id)
-        .single();
-      const proposerRole = profile?.account_type === "agent" ? "agent" : "creator";
-      const { data: proposalData, error: proposalError } = await supabase
-        .from("trip_proposals")
-        .insert({
-          trip_request_id: id,
-          proposer_id: user.id,
-          proposer_role: proposerRole,
-          ...(proposerRole === 'agent' ? { agent_id: user.id } : { creator_id: user.id }),
-          price_from: parseFloat(newProposal.priceFrom),
-          currency: "USD",
-          nights: parseInt(newProposal.timelineLabel) || 7,
-          status: "sent",
-          inclusions: newProposal.included ? newProposal.included.split('\n').filter(Boolean) : null,
-          exclusions: newProposal.notIncluded ? newProposal.notIncluded.split('\n').filter(Boolean) : null,
-          message: newProposal.itineraryOverview,
-          headline: newProposal.fitReason || `${proposerRole === "agent" ? "Agent" : "Creator"} proposal`,
-          cancellation_policy_id: newProposal.cancellationPolicyId || null,
-          custom_cancellation_terms: newProposal.customCancellationTerms || null,
-          deposit_percentage: newProposal.depositPercentage ? parseFloat(newProposal.depositPercentage) : null,
-          deposit_due_days: newProposal.depositDueDays ? parseInt(newProposal.depositDueDays) : null,
-        })
-        .select()
-        .single();
-      if (proposalError) throw proposalError;
-      if (proposalData?.id) {
-        supabase.functions
-          .invoke("compute-proposal-insights", { body: { proposalId: proposalData.id } })
-          .catch((err) => console.error("Admin insights error:", err));
-      }
-      toast.success("Proposal submitted successfully!");
-      setNewProposal({
-        priceFrom: "", priceTo: "", timelineLabel: "", message: "",
-        included: "", notIncluded: "", itineraryOverview: "", fitReason: "",
-        cancellationPolicyId: "", customCancellationTerms: "",
-        depositPercentage: "", depositDueDays: "",
-        ackGoldsaintePolicies: false, ackAgentCancellation: false,
-      });
-      fetchData();
-    } catch (err: any) {
-      console.error(err);
-      toast.error("Failed to submit proposal");
-    } finally {
-      setSubmittingProposal(false);
-    }
+    navigate(`/proposals/new?tripId=${request?.id}`);
   }
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f7f3ea] text-[#0a2225]">
+      <div className="flex min-h-screen items-center justify-center bg-white text-[#0a2225]">
         <Loader2 className="h-8 w-8 animate-spin text-[#C7A962]" />
       </div>
     );
@@ -416,8 +292,8 @@ export default function TripRequestDetail() {
 
   if (error || !request) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f7f3ea]">
-        <div className="rounded-2xl border border-[#E5DFC6] bg-white px-8 py-6 text-sm text-[#0a2225] shadow-sm text-center">
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <div className="rounded-2xl bg-white px-8 py-6 text-sm text-[#0a2225] shadow-lg text-center">
           <p className="font-secondary text-lg mb-1">Something went wrong</p>
           <p className="text-[#6B7280]">{error || "Trip request not found."}</p>
         </div>
@@ -426,12 +302,11 @@ export default function TripRequestDetail() {
   }
 
   const isRequestOwner = user?.id === request.userId;
-  const profileName = userProfile?.display_name || userProfile?.full_name;
   const travelerName = travelerProfile?.full_name || "A Goldsainte Traveler";
 
   return (
-    <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
-      {/* ===================== HERO (compact 280px) ===================== */}
+    <main className="min-h-screen bg-white text-[#0a2225]">
+      {/* ===================== HERO ===================== */}
       <div className="relative h-[240px] w-full overflow-hidden md:h-[280px]">
         <img
           src={getTripRequestImageUrl(request.destination)}
@@ -499,15 +374,15 @@ export default function TripRequestDetail() {
         </div>
       </div>
 
-      {/* ===================== TWO-COLUMN MARKETPLACE LAYOUT ===================== */}
+      {/* ===================== TWO-COLUMN LAYOUT ===================== */}
       <div className="mx-auto max-w-6xl px-4 py-6 md:py-8">
         <div className="flex flex-col gap-6 lg:flex-row">
 
-          {/* ===== LEFT COLUMN: Brief + Proposals + Form ===== */}
+          {/* ===== LEFT COLUMN: Brief Only ===== */}
           <div className="flex-1 min-w-0 space-y-6">
 
             {/* Trip Brief Card */}
-            <div className="rounded-2xl border border-[#E5DFC6] bg-white p-5 md:p-6 shadow-sm space-y-5">
+            <div className="rounded-2xl bg-white p-5 md:p-6 shadow-[0_1px_12px_rgba(0,0,0,0.06)] space-y-5">
               <div>
                 <GoldLabel>Trip Brief</GoldLabel>
                 <h2 className="mt-1 font-secondary text-lg text-[#0a2225]">{request.tripTitle}</h2>
@@ -520,7 +395,7 @@ export default function TripRequestDetail() {
               )}
 
               {request.specialRequests && (
-                <div className="border-t border-[#E5DFC6] pt-4">
+                <div className="border-t border-[#E5DFC6]/60 pt-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#7A7151] mb-2">Special Requests</p>
                   <p className="text-sm text-[#0a2225] leading-relaxed">{request.specialRequests}</p>
                 </div>
@@ -528,7 +403,7 @@ export default function TripRequestDetail() {
 
               {/* Vibe Tags */}
               {request.interests && request.interests.length > 0 && (
-                <div className="border-t border-[#E5DFC6] pt-4">
+                <div className="border-t border-[#E5DFC6]/60 pt-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#7A7151] mb-2">Vibe & Experience Tags</p>
                   <div className="flex flex-wrap gap-1.5">
                     {request.interests.map(tag => (
@@ -542,7 +417,7 @@ export default function TripRequestDetail() {
 
               {/* Must-Haves */}
               {request.mustHaves && request.mustHaves.length > 0 && (
-                <div className="border-t border-[#E5DFC6] pt-4">
+                <div className="border-t border-[#E5DFC6]/60 pt-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.15em] text-emerald-700 mb-2">Must-Haves</p>
                   <div className="flex flex-wrap gap-1.5">
                     {request.mustHaves.map(item => (
@@ -556,7 +431,7 @@ export default function TripRequestDetail() {
 
               {/* Dealbreakers */}
               {request.dealbreakers && request.dealbreakers.length > 0 && (
-                <div className="border-t border-[#E5DFC6] pt-4">
+                <div className="border-t border-[#E5DFC6]/60 pt-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.15em] text-red-600 mb-2">Dealbreakers</p>
                   <div className="flex flex-wrap gap-1.5">
                     {request.dealbreakers.map(item => (
@@ -568,34 +443,13 @@ export default function TripRequestDetail() {
                 </div>
               )}
 
-              <div className="border-t border-[#E5DFC6] pt-4">
+              <div className="border-t border-[#E5DFC6]/60 pt-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#7A7151] mb-3">Visual Brief</p>
                 <TripStoryboardViewer tripId={request.id} variant="gallery" />
               </div>
             </div>
 
-            {/* Inline CTA — visible for non-owners on open requests */}
-            {!isRequestOwner && request.status === "open" && (
-              <div className="rounded-2xl border border-[#C7A962]/40 bg-gradient-to-r from-[#FDFBF5] to-[#F5F0E0] p-5 shadow-sm flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-                <div className="flex-1 min-w-0">
-                  <p className="font-secondary text-sm font-semibold text-[#0a2225]">
-                    Interested in this trip?
-                  </p>
-                  <p className="text-xs text-[#6B7280] mt-0.5">
-                    Submit your proposal with pricing, itinerary & why you're the perfect fit.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => document.getElementById("proposal-form")?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                  className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-[#0c4d47] px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-[#0c4d47]/90 min-h-[44px]"
-                >
-                  Jump to Proposal Form ↓
-                </button>
-              </div>
-            )}
-
-            {/* Proposals section — only show full list for trip owner */}
+            {/* Proposals section — only for trip owner */}
             {isRequestOwner && (
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
@@ -617,7 +471,7 @@ export default function TripRequestDetail() {
                     {proposals.map((proposal) => (
                       <div key={proposal.id} className="space-y-3">
                         <ProposalCard proposal={proposal} showAdminInsights={isAdmin} />
-                        
+
                         <div className="flex items-center justify-between gap-3 px-2">
                           <button
                             type="button"
@@ -659,62 +513,6 @@ export default function TripRequestDetail() {
               </div>
             )}
 
-            {/* Proposal Form (below proposals) */}
-            {!isRequestOwner && request.status === "open" && (
-              <div id="proposal-form">
-                {userProfile && (
-                  <div className="mb-4 flex items-start gap-3 rounded-xl border border-[#E5DFC6] bg-[#FDFBF5] p-4">
-                    <Avatar className="h-11 w-11 border-2 border-[#E5DFC6]">
-                      {userProfile.avatar_url ? (
-                        <AvatarImage src={userProfile.avatar_url} alt={profileName || "You"} />
-                      ) : null}
-                      <AvatarFallback className="bg-[#0c4d47] text-white text-xs font-semibold">
-                        {(profileName || "?").substring(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-[#0a2225]">
-                        {profileName || "Your Profile"}
-                      </p>
-                      {userProfile.bio && (
-                        <p className="mt-0.5 text-xs text-[#6B7280] line-clamp-2 leading-relaxed">
-                          {userProfile.bio.substring(0, 120)}
-                          {userProfile.bio.length > 120 ? "…" : ""}
-                        </p>
-                      )}
-                      <div className="mt-2 flex items-center gap-2.5">
-                        {userProfile.tiktok_handle && (
-                          <a href={`https://tiktok.com/@${userProfile.tiktok_handle.replace("@", "")}`} target="_blank" rel="noopener noreferrer" className="text-[#0a2225]/50 hover:text-[#0a2225] transition-colors" title="TikTok">
-                            <TikTokIcon className="h-4 w-4" />
-                          </a>
-                        )}
-                        {userProfile.instagram_handle && (
-                          <a href={`https://instagram.com/${userProfile.instagram_handle.replace("@", "")}`} target="_blank" rel="noopener noreferrer" className="text-[#0a2225]/50 hover:text-[#0a2225] transition-colors" title="Instagram">
-                            <Instagram className="h-4 w-4" />
-                          </a>
-                        )}
-                        {userProfile.website && (
-                          <a href={userProfile.website.startsWith("http") ? userProfile.website : `https://${userProfile.website}`} target="_blank" rel="noopener noreferrer" className="text-[#0a2225]/50 hover:text-[#0a2225] transition-colors" title="Website">
-                            <Globe className="h-4 w-4" />
-                          </a>
-                        )}
-                        <Link to="/travel-settings" className="ml-auto text-xs font-medium text-[#7A7151] hover:text-[#0a2225] underline underline-offset-2">
-                          Edit profile
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                <ProposalWizard
-                  newProposal={newProposal}
-                  setNewProposal={setNewProposal}
-                  onSubmit={handleSubmitProposal}
-                  submittingProposal={submittingProposal}
-                  proposalsCount={proposalsCount}
-                />
-              </div>
-            )}
-
           </div>
 
           {/* ===== RIGHT SIDEBAR (380px, sticky) ===== */}
@@ -723,7 +521,7 @@ export default function TripRequestDetail() {
 
               {/* Posted By */}
               {travelerProfile && (
-                <div className="rounded-2xl border border-[#E5DFC6] bg-white p-5 shadow-sm">
+                <div className="rounded-2xl bg-white p-5 shadow-[0_1px_12px_rgba(0,0,0,0.06)]">
                   <GoldLabel>Posted by</GoldLabel>
                   <div className="mt-3 flex items-center gap-3">
                     <Avatar className="h-10 w-10 border-2 border-[#E5DFC6]">
@@ -747,7 +545,7 @@ export default function TripRequestDetail() {
               )}
 
               {/* Trip Summary */}
-              <div className="rounded-2xl border border-[#E5DFC6] bg-white p-5 shadow-sm">
+              <div className="rounded-2xl bg-white p-5 shadow-[0_1px_12px_rgba(0,0,0,0.06)]">
                 <GoldLabel>Trip Details</GoldLabel>
                 <div className="mt-3 space-y-3">
                   {[
@@ -759,7 +557,7 @@ export default function TripRequestDetail() {
                     { label: "Trip type", value: request.tripType },
                     { label: "Accommodation", value: request.travelStyle },
                   ].filter(row => row.value && row.value !== "Not specified" && row.value !== "Dates TBD").map((row, i) => (
-                    <div key={i} className="flex justify-between gap-2 border-b border-[#E5DFC6]/50 pb-2.5 last:border-0 last:pb-0">
+                    <div key={i} className="flex justify-between gap-2 border-b border-[#E5DFC6]/40 pb-2.5 last:border-0 last:pb-0">
                       <span className="text-xs text-[#9A9079]">{row.label}</span>
                       <span className="text-xs font-medium text-[#0a2225] text-right">{row.value}</span>
                     </div>
@@ -777,19 +575,39 @@ export default function TripRequestDetail() {
                 )}
               </div>
 
-              {/* Submit Proposal CTA */}
+              {/* Competitive Context + CTA */}
               {!isRequestOwner && request.status === "open" && (
-                <button
-                  type="button"
-                  onClick={() => document.getElementById("proposal-form")?.scrollIntoView({ behavior: "smooth" })}
-                  className="w-full rounded-full bg-[#0c4d47] px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-[#0c4d47]/90"
-                >
-                  Submit a Proposal
-                </button>
+                <div className="rounded-2xl bg-white p-5 shadow-[0_1px_12px_rgba(0,0,0,0.06)] space-y-4">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0c4d47]/10">
+                      <Send className="h-4 w-4 text-[#0c4d47]" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-[#0a2225]">
+                        {proposalsCount === 0
+                          ? "Be the first to propose"
+                          : `${proposalsCount} proposal${proposalsCount === 1 ? "" : "s"} submitted`}
+                      </p>
+                      <p className="text-xs text-[#9A9079]">
+                        {proposalsCount === 0
+                          ? "No one has bid on this trip yet"
+                          : "Stand out with a compelling proposal"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleSubmitProposal}
+                    className="w-full rounded-full bg-[#0c4d47] px-6 py-3.5 text-sm font-semibold text-white shadow-md transition hover:bg-[#0c4d47]/90 hover:shadow-lg min-h-[48px]"
+                  >
+                    Submit Your Proposal
+                  </button>
+                </div>
               )}
 
-              {/* How it works — agent/creator guidance */}
-              <div className="rounded-2xl bg-[#0c4d47] p-5 text-emerald-50 shadow-sm">
+              {/* How it works */}
+              <div className="rounded-2xl bg-[#0c4d47] p-5 text-emerald-50 shadow-[0_1px_12px_rgba(0,0,0,0.06)]">
                 <h3 className="font-secondary text-sm font-semibold text-white">How it works</h3>
                 <ol className="mt-3 space-y-2.5 text-xs text-emerald-50/90">
                   <li className="flex items-start gap-2.5">
@@ -815,9 +633,9 @@ export default function TripRequestDetail() {
         </div>
       </div>
 
-      {/* Sticky mobile CTA bar — visible below lg breakpoint for non-owners on open requests */}
+      {/* Sticky mobile CTA bar */}
       {!isRequestOwner && request.status === "open" && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/95 backdrop-blur-md border-t border-[#E5DFC6] px-4 py-3 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+        <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/95 backdrop-blur-md border-t border-[#E5DFC6]/60 px-4 py-3 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
           <div className="mx-auto max-w-2xl flex items-center justify-between gap-3">
             {(request.budgetMin > 0 || request.budgetMax > 0) && (
               <div className="min-w-0">
@@ -829,10 +647,10 @@ export default function TripRequestDetail() {
             )}
             <button
               type="button"
-              onClick={() => document.getElementById("proposal-form")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+              onClick={handleSubmitProposal}
               className="inline-flex items-center rounded-full bg-[#0c4d47] px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-[#0c4d47]/90 whitespace-nowrap min-h-[44px]"
             >
-              Submit a Proposal
+              Submit Your Proposal
             </button>
           </div>
         </div>
