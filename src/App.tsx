@@ -1,4 +1,4 @@
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter, useLocation, useNavigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -22,9 +22,7 @@ import { usePresence } from "@/hooks/usePresence";
 import { ensureCSRFToken } from "@/lib/security/csrf";
 import { AppRoutes } from "@/routes/AppRoutes";
 
-const AIBookingConcierge = lazy(() =>
-  import("@/components/AIBookingConcierge").then((m) => ({ default: m.AIBookingConcierge })),
-);
+// AIBookingConcierge removed — Madison no longer exists
 
 const queryClient = new QueryClient();
 
@@ -39,15 +37,7 @@ const HIDE_HEADER_PAGES = new Set([
   "/travel-settings",
 ]);
 
-const HIDE_CONCIERGE_WIDGET_PAGES = new Set([
-  // Legacy social feed - disabled
-  // "/travel-feed",
-  // "/journeys",
-  // "/search",
-  // "/trending",
-  "/creator/:id",
-  "/travel-settings",
-]);
+// HIDE_CONCIERGE_WIDGET_PAGES removed — widget no longer exists
 
 const HIDE_FOOTER_PREFIXES = [
   "/auth",
@@ -121,8 +111,6 @@ function AppContent() {
 
   const hideHeader = shouldHideForPath(location.pathname, HIDE_HEADER_PAGES);
   const hideFooter = shouldHideForPath(location.pathname, HIDE_FOOTER_PREFIXES);
-  const hideConciergeWidget = shouldHideForPath(location.pathname, HIDE_CONCIERGE_WIDGET_PAGES);
-
   return (
     <div className="flex-1 flex flex-col w-full max-w-full">
       <SkipNavigation />
@@ -134,12 +122,6 @@ function AppContent() {
         <AppRoutes />
       </main>
       {hideFooter ? null : <Footer />}
-      {hideConciergeWidget ? null : (
-        <Suspense fallback={null}>
-          <AIBookingConcierge />
-        </Suspense>
-      )}
-      
     </div>
   );
 }

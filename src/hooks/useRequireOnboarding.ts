@@ -60,9 +60,18 @@ export function useRequireOnboarding() {
         }
       }
       
-      // For travelers and others, check standard flag
+      // Travelers are always allowed through (no legacy AI intake gate)
+      if (accountType === 'traveler') {
+        if (!cancelled) {
+          setAllowed(true);
+          setChecking(false);
+        }
+        return;
+      }
+
+      // For others, check standard flag
       if (!profile || !profile.onboarding_completed) {
-        navigate("/onboarding/traveler/preferences", { replace: true });
+        navigate("/onboarding", { replace: true });
         return;
       }
 

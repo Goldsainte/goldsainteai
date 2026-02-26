@@ -17,11 +17,14 @@ export function RequireOnboarding({ children }: { children: React.ReactNode }) {
 
       const { data } = await supabase
         .from('profiles')
-        .select('onboarding_completed')
+        .select('onboarding_completed, account_type')
         .eq('id', user.id)
         .single();
 
-      if (!data?.onboarding_completed) {
+      // Travelers skip legacy onboarding gate
+      if (data?.account_type === 'traveler') {
+        setChecking(false);
+      } else if (!data?.onboarding_completed) {
         navigate('/onboarding');
       } else {
         setChecking(false);

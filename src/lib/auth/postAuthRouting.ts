@@ -24,11 +24,10 @@ export function getPostAuthDestination(
   // - Creators/Agents/Brands check is_profile_complete (application/profile flow)
   
   if (accountType === "traveler") {
-    // Travelers need to complete preferences onboarding
+    // Travelers go straight to Traveler Hub (no legacy AI intake)
     if (!onboardingCompleted) {
-      return "/onboarding/traveler/preferences";
+      return "/traveler";
     }
-    // Traveler with completed onboarding → marketplace
     return "/marketplace";
   }
 
