@@ -249,139 +249,89 @@ export const Header = () => {
                     >
                       {user ? (
                         <>
-                          {/* QUICK ACCESS - Always Visible */}
-                          <div className="px-4 py-3 border-b border-border/50">
-                            <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Quick Access</p>
-                          </div>
+                          {/* Flat menu items */}
                           <div className="py-2">
                             <DropdownMenuItem
                               onClick={() => navigate('/marketplace')}
-                              className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                             >
                               <ShoppingCart className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                               <span className="text-sm font-medium">Travel Marketplace</span>
                             </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => navigate('/storyboards')}
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <Plane className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm font-medium">Storyboards</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => navigate('/post-trip')}
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <PlaneTakeoff className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm font-medium">Post a Trip</span>
+                            </DropdownMenuItem>
+                            {isTraveler && (
+                              <DropdownMenuItem 
+                                onClick={() => navigate('/my-trips')} 
+                                className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                              >
+                                <Plane className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                <span className="text-sm font-medium">My Trips</span>
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem 
+                              onClick={() => navigate('/messages')} 
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <div className="relative flex-shrink-0">
+                                <MessageCircle className="h-5 w-5 text-muted-foreground" />
+                                {unreadMessageCount > 0 && (
+                                  <span className="absolute -top-1 -right-1 h-4 min-w-[16px] rounded-full bg-primary text-[9px] font-bold text-primary-foreground flex items-center justify-center px-1">
+                                    {unreadMessageCount > 99 ? "99+" : unreadMessageCount}
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-sm font-medium">Messages</span>
+                            </DropdownMenuItem>
+                            {isAgentAccount && (
+                              <DropdownMenuItem 
+                                onClick={() => navigate('/agent-trips')} 
+                                className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                              >
+                                <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                <span className="text-sm font-medium">Available Trips</span>
+                              </DropdownMenuItem>
+                            )}
+                            {(isCreator || isAgentAccount) && (
+                              <DropdownMenuItem 
+                                onClick={() => navigate('/trip-builder')} 
+                                className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                              >
+                                <Plus className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                <span className="text-sm font-medium">Create Trip Package</span>
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem 
+                              onClick={() => navigate('/apply/agent')} 
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm font-medium">Become an Agent</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => navigate('/about')}
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <Info className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm font-medium">About</span>
+                            </DropdownMenuItem>
                           </div>
-                          
-                          <DropdownMenuSeparator className="bg-border/50" />
-                          
-                          {/* ACCORDION SECTIONS */}
-                          <Accordion type="multiple" className="w-full">
-                            {/* DISCOVER Section */}
-                            <AccordionItem value="discover" className="border-b-0">
-                              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-secondary/5 [&[data-state=open]]:bg-secondary/5">
-                                <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Discover</p>
-                              </AccordionTrigger>
-                              <AccordionContent className="pb-0">
-                                <div className="py-1">
-                                  <DropdownMenuItem
-                                    onClick={() => navigate('/storyboards')}
-                                    className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                                  >
-                                    <Plane className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                    <span className="text-sm font-medium">Storyboards</span>
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    onClick={() => navigate('/post-trip')}
-                                    className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                                  >
-                                    <PlaneTakeoff className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                    <span className="text-sm font-medium">Post a Trip</span>
-                                  </DropdownMenuItem>
-                                </div>
-                              </AccordionContent>
-                            </AccordionItem>
 
-                            {/* MY ACCOUNT Section */}
-                            <AccordionItem value="account" className="border-b-0">
-                              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-secondary/5 [&[data-state=open]]:bg-secondary/5">
-                                <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">My Account</p>
-                              </AccordionTrigger>
-                              <AccordionContent className="pb-0">
-                                <div className="py-1">
-                                  {isTraveler && (
-                                    <DropdownMenuItem 
-                                      onClick={() => navigate('/my-trips')} 
-                                      className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                                    >
-                                      <Plane className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                      <span className="text-sm font-medium">My Trips</span>
-                                    </DropdownMenuItem>
-                                  )}
-                                  <DropdownMenuItem 
-                                    onClick={() => navigate('/messages')} 
-                                    className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                                  >
-                                    <div className="relative flex-shrink-0">
-                                      <MessageCircle className="h-5 w-5 text-muted-foreground" />
-                                      {unreadMessageCount > 0 && (
-                                        <span className="absolute -top-1 -right-1 h-4 min-w-[16px] rounded-full bg-primary text-[9px] font-bold text-primary-foreground flex items-center justify-center px-1">
-                                          {unreadMessageCount > 99 ? "99+" : unreadMessageCount}
-                                        </span>
-                                      )}
-                                    </div>
-                                    <span className="text-sm font-medium">Messages</span>
-                                  </DropdownMenuItem>
-                                  {isAgentAccount && (
-                                    <DropdownMenuItem 
-                                      onClick={() => navigate('/agent-trips')} 
-                                      className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                                    >
-                                      <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                      <span className="text-sm font-medium">Available Trips</span>
-                                    </DropdownMenuItem>
-                                  )}
-                                </div>
-                              </AccordionContent>
-                            </AccordionItem>
-
-                            {/* PROFESSIONAL Section */}
-                            <AccordionItem value="professional" className="border-b-0">
-                              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-secondary/5 [&[data-state=open]]:bg-secondary/5">
-                                <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Professional</p>
-                              </AccordionTrigger>
-                              <AccordionContent className="pb-0">
-                                <div className="py-1">
-                                  {(isCreator || isAgentAccount) && (
-                                    <DropdownMenuItem 
-                                      onClick={() => navigate('/trip-builder')} 
-                                      className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                                    >
-                                      <Plus className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                      <span className="text-sm font-medium">Create Trip Package</span>
-                                    </DropdownMenuItem>
-                                  )}
-                                  <DropdownMenuItem 
-                                    onClick={() => navigate('/apply/agent')} 
-                                    className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                                  >
-                                    <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                    <span className="text-sm font-medium">Become an Agent</span>
-                                  </DropdownMenuItem>
-                                </div>
-                              </AccordionContent>
-                            </AccordionItem>
-
-                            {/* COMPANY Section */}
-                            <AccordionItem value="company" className="border-b-0">
-                              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-secondary/5 [&[data-state=open]]:bg-secondary/5">
-                                <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Company</p>
-                              </AccordionTrigger>
-                              <AccordionContent className="pb-0">
-                                <div className="py-1">
-                                  <DropdownMenuItem
-                                    onClick={() => navigate('/about')}
-                                    className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                                  >
-                                    <Info className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                    <span className="text-sm font-medium">About</span>
-                                  </DropdownMenuItem>
-                                </div>
-                              </AccordionContent>
-                            </AccordionItem>
-
-                            {/* ADMIN Section - Admin only */}
-                            {isAdmin && (
+                          {/* ADMIN Section - Admin only */}
+                          {isAdmin && (
+                            <Accordion type="multiple" className="w-full">
                               <AccordionItem value="admin" className="border-b-0">
                                 <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-secondary/5 [&[data-state=open]]:bg-secondary/5">
                                   <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Admin</p>
@@ -407,8 +357,8 @@ export const Header = () => {
                                   </div>
                                 </AccordionContent>
                               </AccordionItem>
-                            )}
-                          </Accordion>
+                            </Accordion>
+                          )}
                           
                           {isTraveler && (
                             <>
@@ -513,10 +463,7 @@ export const Header = () => {
                   >
                     {user ? (
                       <>
-                        {/* QUICK ACCESS - Always Visible */}
-                        <div className="px-4 py-3 border-b border-border/50">
-                          <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Quick Access</p>
-                        </div>
+                        {/* Flat menu items */}
                         <div className="py-2">
                           <DropdownMenuItem
                             onClick={() => navigate('/marketplace')}
@@ -525,118 +472,80 @@ export const Header = () => {
                             <ShoppingCart className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                             <span className="text-sm font-medium">Travel Marketplace</span>
                           </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => navigate('/storyboards')}
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <Plane className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">Storyboards</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => navigate('/post-trip')}
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <PlaneTakeoff className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">Post a Trip</span>
+                          </DropdownMenuItem>
+                          {isTraveler && (
+                            <DropdownMenuItem 
+                              onClick={() => navigate('/my-trips')} 
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                            >
+                              <Plane className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                              <span className="text-sm font-medium">My Trips</span>
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/messages')} 
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <div className="relative flex-shrink-0">
+                              <MessageCircle className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300" />
+                              {unreadMessageCount > 0 && (
+                                <span className="absolute -top-1 -right-1 h-4 min-w-[16px] rounded-full bg-primary text-[9px] font-bold text-primary-foreground flex items-center justify-center px-1">
+                                  {unreadMessageCount > 99 ? "99+" : unreadMessageCount}
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-sm font-medium">Messages</span>
+                          </DropdownMenuItem>
+                          {isAgentAccount && (
+                            <DropdownMenuItem 
+                              onClick={() => navigate('/agent-trips')} 
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                            >
+                              <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                              <span className="text-sm font-medium">Available Trips</span>
+                            </DropdownMenuItem>
+                          )}
+                          {(isCreator || isAgentAccount) && (
+                            <DropdownMenuItem 
+                              onClick={() => navigate('/trip-builder')} 
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                            >
+                              <Plus className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                              <span className="text-sm font-medium">Create Trip Package</span>
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/apply/agent')} 
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">Become an Agent</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => navigate('/about')}
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <Info className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">About</span>
+                          </DropdownMenuItem>
                         </div>
-                        
-                        <DropdownMenuSeparator className="bg-border/50" />
-                        
-                        {/* ACCORDION SECTIONS */}
-                        <Accordion type="multiple" className="w-full">
-                          {/* DISCOVER Section */}
-                          <AccordionItem value="discover" className="border-b-0">
-                            <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-secondary/5 [&[data-state=open]]:bg-secondary/5">
-                              <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Discover</p>
-                            </AccordionTrigger>
-                            <AccordionContent className="pb-0">
-                              <div className="py-1">
-                                <DropdownMenuItem
-                                  onClick={() => navigate('/storyboards')}
-                                  className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                                >
-                                  <Plane className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                                  <span className="text-sm font-medium">Storyboards</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => navigate('/post-trip')}
-                                  className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                                >
-                                  <PlaneTakeoff className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                                  <span className="text-sm font-medium">Post a Trip</span>
-                                </DropdownMenuItem>
-                              </div>
-                            </AccordionContent>
-                          </AccordionItem>
 
-                          {/* MY ACCOUNT Section */}
-                          <AccordionItem value="account" className="border-b-0">
-                            <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-secondary/5 [&[data-state=open]]:bg-secondary/5">
-                              <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">My Account</p>
-                            </AccordionTrigger>
-                            <AccordionContent className="pb-0">
-                              <div className="py-1">
-                                {isTraveler && (
-                                  <DropdownMenuItem 
-                                    onClick={() => navigate('/my-trips')} 
-                                    className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                                  >
-                                    <Plane className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                                    <span className="text-sm font-medium">My Trips</span>
-                                  </DropdownMenuItem>
-                                )}
-                                <DropdownMenuItem 
-                                  onClick={() => navigate('/messages')} 
-                                  className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                                >
-                                  <div className="relative flex-shrink-0">
-                                    <MessageCircle className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300" />
-                                    {unreadMessageCount > 0 && (
-                                      <span className="absolute -top-1 -right-1 h-4 min-w-[16px] rounded-full bg-primary text-[9px] font-bold text-primary-foreground flex items-center justify-center px-1">
-                                        {unreadMessageCount > 99 ? "99+" : unreadMessageCount}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <span className="text-sm font-medium">Messages</span>
-                                </DropdownMenuItem>
-                                {isAgentAccount && (
-                                  <DropdownMenuItem 
-                                    onClick={() => navigate('/agent-trips')} 
-                                    className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                                  >
-                                    <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                                    <span className="text-sm font-medium">Available Trips</span>
-                                  </DropdownMenuItem>
-                                )}
-                              </div>
-                            </AccordionContent>
-                          </AccordionItem>
-
-                          {/* PROFESSIONAL Section */}
-                          <AccordionItem value="professional" className="border-b-0">
-                            <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-secondary/5 [&[data-state=open]]:bg-secondary/5">
-                              <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Professional</p>
-                            </AccordionTrigger>
-                            <AccordionContent className="pb-0">
-                              <div className="py-1">
-                                <DropdownMenuItem 
-                                  onClick={() => navigate('/apply/agent')} 
-                                  className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                                >
-                                  <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                                  <span className="text-sm font-medium">Become an Agent</span>
-                                </DropdownMenuItem>
-                              </div>
-                            </AccordionContent>
-                          </AccordionItem>
-
-                          {/* COMPANY Section */}
-                          <AccordionItem value="company" className="border-b-0">
-                            <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-secondary/5 [&[data-state=open]]:bg-secondary/5">
-                              <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Company</p>
-                            </AccordionTrigger>
-                            <AccordionContent className="pb-0">
-                              <div className="py-1">
-                                <DropdownMenuItem
-                                  onClick={() => navigate('/about')}
-                                  className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                                >
-                                  <Info className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                                  <span className="text-sm font-medium">About</span>
-                                </DropdownMenuItem>
-                              </div>
-                            </AccordionContent>
-                          </AccordionItem>
-
-                          {/* ADMIN Section - Admin only */}
-                          {isAdmin && (
+                        {/* ADMIN Section - Admin only */}
+                        {isAdmin && (
+                          <Accordion type="multiple" className="w-full">
                             <AccordionItem value="admin" className="border-b-0">
                               <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-secondary/5 [&[data-state=open]]:bg-secondary/5">
                                 <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">Admin</p>
@@ -662,8 +571,8 @@ export const Header = () => {
                                 </div>
                               </AccordionContent>
                             </AccordionItem>
-                          )}
-                        </Accordion>
+                          </Accordion>
+                        )}
                         
                         {isTraveler && (
                           <>
@@ -763,12 +672,12 @@ export const Header = () => {
             </button>
 
             <button
-              onClick={() => navigate('/concierge')}
+              onClick={() => navigate('/storyboards')}
               className="flex flex-col items-center justify-center gap-0.5 hover:bg-muted transition-colors min-h-[44px]"
-              aria-label="Madison by Goldsainte AI"
+              aria-label="Storyboards"
             >
-              <Sparkles className="h-5 w-5" />
-              <span className="text-[10px]">Madison</span>
+              <Plane className="h-5 w-5" />
+              <span className="text-[10px]">Storyboards</span>
             </button>
 
             <button
