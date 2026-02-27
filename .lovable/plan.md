@@ -1,48 +1,34 @@
 
 
-# Reorganize Menu Bar with User Greeting
+# Fix: Skip Account Type Screen When Role Is Pre-selected
 
-## Changes to `src/components/Header.tsx`
+## Problem
+When users click role-specific CTAs from the homepage (e.g., `/auth?mode=signup&role=traveler`), the `role` param is correctly parsed and stored in `selectedAccountType`, but `getInitialStep()` (line 41-48) always returns `'account-type'` for signup mode, ignoring the pre-selected role.
 
-### 1. Fetch user's name alongside avatar
-Extend the existing `fetchProfileAvatar` query to also select `display_name, full_name` from profiles. Store in a new `profileName` state variable. Display as "Hello [Name]" at the top of the dropdown.
+## Changes
 
-### 2. Reorganize menu items (both mobile and desktop dropdowns) to match the reference image
+### `src/pages/Auth.tsx` — Update `getInitialStep()`
+Change the initial step logic so that if `role` is already provided in the URL, skip the account-type selection and go straight to the email step:
 
-**New order:**
-
-```text
-┌──────────────────────────┐
-│ Hello, Radu D            │  ← greeting with user name
-├──────────────────────────┤
-│ Core Experience          │
-│  Travel Marketplace      │
-│  Storyboards             │
-│  Post a Trip             │
-│  My Trips                │
-│  Messages                │
-├──────────────────────────┤
-│ Account                  │
-│  My Profile              │
-├──────────────────────────┤
-│ Secondary                │
-│  Become an Agent         │
-├──────────────────────────┤
-│ Informational            │
-│  About                   │
-├──────────────────────────┤
-│ Admin (if admin)         │
-├──────────────────────────┤
-│ Language selector        │
-│ Sign Out                 │
-└──────────────────────────┘
+```typescript
+const getInitialStep = (): AuthStep => {
+  if (mode === 'signup') {
+    // If role already selected via URL, skip account-type picker
+    if (roleFromUrl && ['traveler', 'creator', 'agent', 'brand'].includes(roleFromUrl)) {
+      return 'email';
+    }
+    return 'account-type';
+  }
+  return 'email';
+};
 ```
 
-### 3. Role-specific items stay conditional
-- "My Trips" visible for travelers
-- "Available Trips" / "Create Trip Package" for agents/creators
-- Admin accordion for admins only
+That's it. The rest of the flow already works correctly:
+- `selectedAccountType` is already initialized from `roleFromUrl` (line 51-53)
+- `isSignUpMode` correctly detects signup context (line 65)
+- `handleContinueWithEmail` routes to signup form when `selectedAccountType` is set (line 156)
+- `handleSignUp` passes `selectedAccountType` to Supabase metadata and the `handle_new_user` trigger stores it in `profiles.account_type`
+- Agent/brand roles correctly redirect to application flows (lines 282-318)
 
-### Files modified
-- `src/components/Header.tsx` — add `profileName` state, extend profile query, add greeting header, reorder menu items in both mobile and desktop dropdowns
+No other files need changes.
 
