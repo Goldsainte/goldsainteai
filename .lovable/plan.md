@@ -1,57 +1,58 @@
 
 
-# Functional & On-Brand Marketplace Search Bar
+# Diverse Unsplash Cover Image Selection System
 
-## Summary
-Rewrite `MarketplaceSearch.tsx` to be fully functional, on-brand, and wire all filters end-to-end through `Marketplace.tsx` queries. Add a date range picker, traveler stepper, active filter chips, and proper filtering logic for both tabs.
+## Current State
+There is **no auto-cover-image selection** today. Trip creators manually upload covers via `TripBuilderForm`. When no cover is set, `LiveTripCard` falls back to a single hardcoded Unsplash URL (`photo-1469474968028-56623f02e42e`). The duplicate problem stems from this single fallback and from creators not uploading covers.
 
-## Changes
+## Plan
 
-### 1. Wire search filters into database queries (`src/pages/Marketplace.tsx`)
+### 1. Database: `city_image_usage` tracking table (migration)
+```sql
+CREATE TABLE public.city_image_usage (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  city_slug TEXT NOT NULL,
+  unsplash_photo_id TEXT NOT NULL,
+  unsplash_url TEXT NOT NULL,
+  photographer TEXT,
+  used_count INTEGER DEFAULT 1,
+  last_used_at TIMESTAMPTZ DEFAULT now(),
+  created_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(city_slug, unsplash_photo_id)
+);
+CREATE INDEX idx_city_image_city_slug ON public.city_image_usage(city_slug);
+```
+RLS: public read, service-role write (edge function writes to it).
 
-**Curated Trips query** — add filters to the `queryKey` and query builder:
-- `destination`: `.ilike("destination", `%${destination}%`)`
-- `startDate` (available_from): `.gte("available_until", startDate)` (trip must still be available)
-- `endDate` (available_until): `.lte("available_from", endDate)` (trip must start before checkout)
-- `travelers`: `.gte("max_participants", travelers)` (enough capacity)
-- Persist all filters to URL search params (destination, startDate, endDate, travelers) and restore on load
-- Initialize state from URL params for all fields
+### 2. Edge function: `select-trip-cover` 
+New edge function that:
+- Accepts `{ destination: string, trip_id?: string }`
+- Normalizes destination → `city_slug` (lowercase, trim, slugify)
+- Queries Unsplash API with rotating themed keywords: `"{city} skyline"`, `"{city} luxury hotel"`, `"{city} beach"`, `"{city} street"`, `"{city} nature"`, `"{city} food"` — picks 2-3 themes per call, requests `per_page=15` each to build a pool of 30-45 candidates
+- Fetches `city_image_usage` for that `city_slug` to get recently-used photo IDs
+- Filters out any photo used in the last 15 entries for that city (no-repeat window)
+- Also filters out same photographer within last 5 uses
+- If pool gets too small (<5), expands query with `"{city}, {country}"` or landmark variants; if still small, falls back to least-recently-used
+- Applies weighted random selection (higher Unsplash relevance score → higher weight, seeded by `trip_id` if provided for determinism)
+- Upserts selected photo into `city_image_usage`
+- Returns `{ url, unsplash_photo_id, photographer }`
 
-**Trip Requests query** — add similar client-side or server-side filtering:
-- `destination`: `.ilike("destination", `%${destination}%`)`  
-- `startDate`/`endDate`: filter overlap with `start_date`/`end_date`
-- `travelers`: compare against `travelers_adults + travelers_children`
+### 3. Wire into Trip Builder (`TripBuilderForm.tsx`)
+- When destination field is filled and cover_image_url is empty, auto-call `select-trip-cover` to suggest a cover
+- Show the suggested image with a "Shuffle" button (calls the function again) and "Upload your own" option
+- Only auto-assign if creator hasn't uploaded a custom image
 
-**Empty state** — update to show "No trips match your filters" with a "Clear filters" reset button when filters are active but no results found.
+### 4. Replace hardcoded fallback in `LiveTripCard.tsx`
+- Remove the hardcoded Unsplash fallback URL
+- For trips without covers: either show a placeholder gradient/icon, or call the cover selection at display time (cached per trip)
+- Preferred: assign covers at creation time so display is always instant
 
-### 2. Redesign `MarketplaceSearch.tsx` — on-brand luxury styling
-
-Replace the current search bar with a refined single-card design:
-- **Container**: `rounded-2xl border border-[#E5DFC6] bg-white shadow-sm` with softer padding
-- **Where field**: MapPin icon, placeholder "Where are you going?"
-- **Dates field**: Replace two native date inputs with the existing `MobileDatePicker` component (mode="range") — one interaction for check-in/check-out, renders as a popover on desktop and drawer on mobile
-- **Travelers field**: Replace number input with a +/– stepper (`Minus` / `Plus` icons from lucide, min 1, max 20)
-- **Search button**: Gold circle `bg-[#BFAD72] hover:bg-[#9d8f5d]` with white Search icon
-- **Mobile**: Collapsible pill stays but inputs get the same upgrades (date range picker, stepper)
-- Typography: labels in `text-[#8D8D8D] text-xs uppercase tracking-wider`, values in `text-[#0a2225] text-sm`
-
-### 3. Add active filter chips below search bar
-
-After search is performed, show removable chips below the bar:
-- Chips for: destination, date range ("Mar 10–15"), travelers count
-- Each chip has an × to remove that specific filter
-- "Clear all" link when any filters are active
-- Styled as `rounded-full border border-[#E5DFC6] bg-[#FBF9F0] px-3 py-1 text-xs text-[#0a2225]`
-
-### 4. Date validation
-- Check-out must be after check-in (enforced via `disabled` prop on calendar)
-- If user clears check-in, also clear check-out
-
-### 5. Update EmptyState for filtered results
-- Add a new variant or prop `hasFilters` to EmptyState
-- When filters are active: "No trips match your filters" + "Clear filters" button instead of "Post your dream trip"
+### 5. Backfill existing trips (optional one-time)
+- A small admin action or edge function that finds `packaged_trips` with null `cover_image_url`, calls `select-trip-cover` for each, and updates the row
 
 ### Files modified
-- `src/components/marketplace/MarketplaceSearch.tsx` — full rewrite with date range picker, stepper, chips, on-brand styling
-- `src/pages/Marketplace.tsx` — wire all filters into both queries, persist all to URL params, pass reset handler
+- **New migration** — `city_image_usage` table + RLS
+- **New edge function** — `supabase/functions/select-trip-cover/index.ts`
+- **`src/components/trips/TripBuilderForm.tsx`** — auto-suggest cover + shuffle button
+- **`src/components/marketplace/LiveTripCard.tsx`** — remove hardcoded fallback
 
