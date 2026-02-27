@@ -34,12 +34,6 @@ export const OnboardingTour = () => {
       disableBeacon: true,
     },
     {
-      target: '[data-tour="ai-widget"]',
-      content: "Your personal AI Booking Concierge! Chat anytime for travel advice, bookings, itinerary changes, or recommendations. It's like having a travel expert in your pocket.",
-      placement: window.innerWidth < 768 ? "top" : "left",
-      disableBeacon: true,
-    },
-    {
       target: '[data-tour="traditional-search"]',
       content: "Prefer the classic way? Use our traditional search to filter by dates, prices, and preferences. Perfect for when you know exactly what you want.",
       placement: "bottom",

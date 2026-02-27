@@ -142,19 +142,6 @@ test.describe('Critical Production Flows - P0 Validation', () => {
       await expect(page.getByRole('heading', { name: /trip you'\s*re dreaming of/i })).toBeVisible();
     });
 
-    test('floating concierge opens Madison widget and planner link', async ({ page }) => {
-      await page.goto('/');
-      const conciergeButton = page.getByTestId('voice-concierge-button');
-      await expect(conciergeButton).toBeVisible();
-      await conciergeButton.click();
-
-      const widgetHeader = page.locator('text=/Goldsainte Concierge/i');
-      await expect(widgetHeader).toBeVisible();
-
-      const fullPlanner = page.getByRole('button', { name: /Open full trip planner/i });
-      await fullPlanner.click();
-      await expect(page).toHaveURL(/\/concierge/);
-    });
   });
 
   test.describe('P0-4: TikTok Lab Storyboard Navigation', () => {

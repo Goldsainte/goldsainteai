@@ -872,7 +872,7 @@ export default function CreatorOnboardingPage() {
               <div className="space-y-6">
                 <div className="text-center mb-8">
                   <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Your AI Identity</h2>
-                  <p className="text-[#6B7280]">Help Madison represent you authentically</p>
+                  <p className="text-[#6B7280]">Help Goldsainte AI represent you authentically</p>
                 </div>
 
                 <div className="bg-[#FDF9F0] rounded-2xl p-4 border border-[#E5DFC6] mb-6">
@@ -905,7 +905,7 @@ export default function CreatorOnboardingPage() {
 
                 {aiTone && (
                   <div className="bg-gradient-to-br from-[#0a2225] to-[#1a3a3f] rounded-2xl p-6 text-white">
-                    <h3 className="font-secondary text-lg mb-3 flex items-center gap-2"><Sparkles className="w-5 h-5 text-[#C7A962]" />How Madison Might Respond For You</h3>
+                    <h3 className="font-secondary text-lg mb-3 flex items-center gap-2"><Sparkles className="w-5 h-5 text-[#C7A962]" />How Goldsainte AI Might Respond For You</h3>
                     <p className="text-sm text-white/80 italic">
                       {aiTone === "chic" && '"This creator specializes in refined, design-forward experiences. Their aesthetic is understated luxury—think boutique hotels, curated dining, and moments of quiet elegance."'}
                       {aiTone === "playful" && '"Get ready for an adventure! This creator brings energy and spontaneity to every trip. Perfect for travelers who love discovering hidden gems and saying yes to the unexpected."'}

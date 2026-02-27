@@ -132,23 +132,6 @@ export function TravelerOverviewTab({ profile, stats, onAvatarUpdate }: Traveler
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="madison" className="bg-gradient-to-br from-[#0a2225] to-[#1a3a3f] border-none rounded-2xl overflow-hidden">
-                <AccordionTrigger className="px-4 py-4 hover:no-underline">
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="p-2 bg-white/10 rounded-xl">
-                      <MessageCircle className="h-4 w-4 text-[#C7A962]" />
-                    </div>
-                    <span className="text-sm font-medium text-white">Ask Madison</span>
-                    <span className="ml-auto mr-2 text-xs text-[#C7A962]">AI Concierge</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="px-4 pb-4">
-                  <p className="text-sm text-white/70 mb-3">Plan your next adventure with AI assistance</p>
-                  <Link to="/concierge" className="inline-flex items-center text-sm text-white hover:text-[#C7A962] transition-colors">
-                    Start chatting <ArrowRight className="h-4 w-4 ml-1" />
-                  </Link>
-                </AccordionContent>
-              </AccordionItem>
             </Accordion>
           </div>
         ) : (
@@ -208,23 +191,6 @@ export function TravelerOverviewTab({ profile, stats, onAvatarUpdate }: Traveler
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-[#0a2225] to-[#1a3a3f] border-none rounded-2xl hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-xs text-[#C7A962] font-medium tracking-wider uppercase">Ask Madison</p>
-                    <p className="text-lg font-secondary text-white mt-2">Your AI Concierge</p>
-                    <p className="text-sm text-white/70 mt-1">Plan your next adventure</p>
-                  </div>
-                  <div className="p-3 bg-white/10 rounded-xl">
-                    <MessageCircle className="h-5 w-5 text-[#C7A962]" />
-                  </div>
-                </div>
-                <Link to="/concierge" className="mt-4 inline-flex items-center text-sm text-white hover:text-[#C7A962] transition-colors">
-                  Start chatting <ArrowRight className="h-4 w-4 ml-1" />
-                </Link>
-              </CardContent>
-            </Card>
           </div>
         )}
       </div>

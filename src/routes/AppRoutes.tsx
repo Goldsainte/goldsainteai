@@ -83,7 +83,7 @@ const StoryboardEditorPage = lazy(() => import('@/pages/StoryboardEditorPage'));
 const TikTokLabStoryboardEditorPage = lazy(() => import('@/pages/TikTokLab/StoryboardEditorPage'));
 
 const TikTokLabStoryboardDetailPage = lazy(() => import('@/pages/TikTokLab/StoryboardDetailPage'));
-// ConciergePage removed — redirects to /traveler
+
 const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
 const MarketplaceGuidelinesPage = lazy(() => import('@/pages/MarketplaceGuidelinesPage'));
 const HomePage = lazy(() => import('@/pages/HomePage'));
@@ -422,7 +422,7 @@ export const AppRoutes = () => (
       <Route path="/notifications" element={<NotificationsPage />} />
       <Route path="/messages" element={<RequireAuth><MessagesPage /></RequireAuth>} />
       <Route path="/marketplace-guidelines" element={<MarketplaceGuidelinesPage />} />
-      <Route path="/concierge" element={<Navigate to="/traveler" replace />} />
+      
       <Route path="/my-bookings" element={<MyBookingsPage />} />
       <Route path="/partner-bookings" element={<PartnerBookingsPage />} />
       <Route path="/bookings/:bookingId" element={<BookingDetailPage />} />

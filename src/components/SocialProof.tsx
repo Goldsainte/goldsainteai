@@ -13,7 +13,7 @@ const testimonials: Testimonial[] = [
   {
     name: "Sarah K.",
     location: "New York",
-    quote: "Goldsainte transformed how I travel. The AI concierge understood exactly what I wanted.",
+    quote: "Goldsainte transformed how I travel. The AI matching understood exactly what I wanted.",
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&q=80",
     rating: 5
   },

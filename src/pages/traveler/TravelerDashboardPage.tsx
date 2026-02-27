@@ -155,13 +155,6 @@ export default function TravelerDashboardPage() {
                 <Plus className="h-4 w-4" />
                 Post Trip
               </button>
-              <button
-                onClick={() => navigate("/concierge")}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full border border-[#E5DFC6] bg-white text-[#0a2225] px-5 py-2.5 text-sm font-medium hover:bg-[#F6F0E4] transition-colors"
-              >
-                <MessageCircle className="h-4 w-4 text-[#C7A962]" />
-                Ask Madison
-              </button>
             </div>
           </div>
         </header>
