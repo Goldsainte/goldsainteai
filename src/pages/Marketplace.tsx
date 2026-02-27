@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useAuth } from "@/contexts/AuthContext";
@@ -6,9 +6,8 @@ import { MarketplaceHeader } from "@/components/marketplace/MarketplaceHeader";
 import { MarketplaceSearch } from "@/components/marketplace/MarketplaceSearch";
 import { MarketplaceFilters } from "@/components/marketplace/MarketplaceFilters";
 import { MarketplaceTabs } from "@/components/marketplace/MarketplaceTabs";
-import { TripGrid } from "@/components/marketplace/TripGrid";
-import { TripRequestGrid } from "@/components/marketplace/TripRequestGrid";
 import { LiveTripGrid } from "@/components/marketplace/LiveTripGrid";
+import { TripRequestGrid } from "@/components/marketplace/TripRequestGrid";
 import { EmptyState } from "@/components/marketplace/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,9 +16,8 @@ import { BackButton } from "@/components/ui/BackButton";
 
 type Tab = "trips" | "trip-requests";
 
-// Map UI filter names to database tag variants (case-insensitive matching)
 const FILTER_TAG_MAP: Record<string, string[]> = {
-  "Top Rated": [], // Special handling - sort by rating instead of filtering
+  "Top Rated": [],
   "Luxury": ["luxury", "high-end", "Luxury"],
   "Budget Friendly": ["budget", "budget-friendly", "Budget Friendly"],
   "All-Inclusive": ["all-inclusive", "All-Inclusive"],
@@ -45,7 +43,7 @@ export default function Marketplace() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  
+
   const validTabs: Tab[] = ["trips", "trip-requests"];
   const rawTab = (searchParams.get("tab") as string) || "trips";
   const initialTab: Tab = validTabs.includes(rawTab as Tab) ? (rawTab as Tab) : "trips";
@@ -53,23 +51,36 @@ export default function Marketplace() {
   const [activeTab, setActiveTab] = useState<Tab>(initialTab);
   const [filters, setFilters] = useState<SearchFilters>({
     destination: searchParams.get("destination") || "",
-    travelers: parseInt(searchParams.get("travelers") || "1"),
+    startDate: searchParams.get("startDate") || undefined,
+    endDate: searchParams.get("endDate") || undefined,
+    travelers: parseInt(searchParams.get("travelers") || "1") || 1,
   });
 
+  // Persist filters to URL
   useEffect(() => {
     const params = new URLSearchParams();
     params.set("tab", activeTab);
     if (filters.destination) params.set("destination", filters.destination);
-    if (filters.travelers && filters.travelers > 1) {
-      params.set("travelers", filters.travelers.toString());
-    }
+    if (filters.startDate) params.set("startDate", filters.startDate);
+    if (filters.endDate) params.set("endDate", filters.endDate);
+    if (filters.travelers && filters.travelers > 1) params.set("travelers", filters.travelers.toString());
     setSearchParams(params, { replace: true });
   }, [activeTab, filters, setSearchParams]);
 
+  const hasActiveFilters = !!(
+    filters.destination ||
+    filters.startDate ||
+    filters.endDate ||
+    (filters.travelers && filters.travelers > 1)
+  );
 
-  // Live Trips query
+  const handleClearFilters = () => {
+    setFilters({ destination: "", travelers: 1 });
+  };
+
+  // Live Trips query — wired with search filters
   const { data: liveTrips, isLoading: isLoadingTrips } = useQuery({
-    queryKey: ["marketplace-live-trips", filters.category],
+    queryKey: ["marketplace-live-trips", filters.category, filters.destination, filters.startDate, filters.endDate, filters.travelers],
     queryFn: async () => {
       let query = supabase
         .from("packaged_trips")
@@ -82,13 +93,31 @@ export default function Marketplace() {
         `)
         .eq("status", "published");
 
-      // Apply category filter if selected (except "Top Rated" which is sort-only)
+      // Destination filter
+      if (filters.destination) {
+        query = query.ilike("destination", `%${filters.destination}%`);
+      }
+
+      // Date filters: trip must overlap with requested range
+      if (filters.startDate) {
+        query = query.gte("available_until", filters.startDate);
+      }
+      if (filters.endDate) {
+        query = query.lte("available_from", filters.endDate);
+      }
+
+      // Travelers capacity
+      if (filters.travelers && filters.travelers > 1) {
+        query = query.gte("max_participants", filters.travelers);
+      }
+
+      // Category tag filter
       if (filters.category && filters.category !== "Top Rated") {
         const tagVariants = FILTER_TAG_MAP[filters.category] || [filters.category.toLowerCase()];
         query = query.overlaps("tags", tagVariants);
       }
 
-      // Sort: "Top Rated" by rating, otherwise by created_at
+      // Sort
       if (filters.category === "Top Rated") {
         query = query.order("rating", { ascending: false, nullsFirst: false });
       } else {
@@ -102,28 +131,52 @@ export default function Marketplace() {
     enabled: activeTab === "trips",
   });
 
-
+  // Trip Requests query — wired with search filters
   const { data: tripRequests, isLoading: isLoadingRequests } = useQuery({
-    queryKey: ["trip-requests-unified"],
+    queryKey: ["trip-requests-unified", filters.destination, filters.startDate, filters.endDate, filters.travelers],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("trip_requests")
         .select(`*, trip_proposals(count)`)
-        .eq("status", "open")
-        .order("created_at", { ascending: false });
+        .eq("status", "open");
 
+      // Destination filter
+      if (filters.destination) {
+        query = query.ilike("destination", `%${filters.destination}%`);
+      }
+
+      // Date overlap: request overlaps with search range
+      if (filters.startDate) {
+        query = query.gte("end_date", filters.startDate);
+      }
+      if (filters.endDate) {
+        query = query.lte("start_date", filters.endDate);
+      }
+
+      query = query.order("created_at", { ascending: false });
+
+      const { data, error } = await query;
       if (error) throw error;
       if (!data || data.length === 0) return [];
 
-      // Fetch profiles separately (no direct FK between trip_requests and profiles)
-      const userIds = [...new Set(data.map((r: any) => r.user_id).filter(Boolean))];
+      // Client-side traveler filter
+      let filtered = data;
+      if (filters.travelers && filters.travelers > 1) {
+        filtered = data.filter((r: any) => {
+          const total = (r.travelers_adults || 0) + (r.travelers_children || 0);
+          return total >= filters.travelers!;
+        });
+      }
+
+      // Fetch profiles
+      const userIds = [...new Set(filtered.map((r: any) => r.user_id).filter(Boolean))];
       const { data: profiles } = userIds.length > 0
         ? await supabase.from("profiles").select("id, full_name, avatar_url").in("id", userIds)
         : { data: [] };
 
       const profileMap = new Map((profiles || []).map((p: any) => [p.id, p]));
 
-      return data.map((r: any) => ({
+      return filtered.map((r: any) => ({
         ...r,
         profiles: profileMap.get(r.user_id) || null,
         proposal_count: r.trip_proposals?.[0]?.count || 0,
@@ -132,9 +185,8 @@ export default function Marketplace() {
     enabled: activeTab === "trip-requests",
   });
 
-
   const handleSearch = (newFilters: SearchFilters) => {
-    setFilters(newFilters);
+    setFilters((prev) => ({ ...prev, ...newFilters }));
   };
 
   const handleTabChange = (tab: Tab) => {
@@ -142,7 +194,6 @@ export default function Marketplace() {
   };
 
   const renderContent = () => {
-    // Live Trips tab
     if (activeTab === "trips") {
       if (isLoadingTrips) {
         return (
@@ -158,6 +209,8 @@ export default function Marketplace() {
           <EmptyState
             type="trips"
             onAction={() => navigate("/post-trip")}
+            hasFilters={hasActiveFilters}
+            onClearFilters={handleClearFilters}
           />
         );
       }
@@ -176,7 +229,12 @@ export default function Marketplace() {
       }
       if (!tripRequests?.length) {
         return (
-          <EmptyState type="trip-requests" onAction={() => navigate("/post-trip")} />
+          <EmptyState
+            type="trip-requests"
+            onAction={() => navigate("/post-trip")}
+            hasFilters={hasActiveFilters}
+            onClearFilters={handleClearFilters}
+          />
         );
       }
       return <TripRequestGrid requests={tripRequests} />;
@@ -200,10 +258,9 @@ export default function Marketplace() {
           <BackButton className="mb-2" />
         </div>
         <MarketplaceHeader />
-        <MarketplaceSearch onSearch={handleSearch} filters={filters} />
+        <MarketplaceSearch onSearch={handleSearch} filters={filters} onClearFilters={handleClearFilters} />
 
         <div className="mx-auto max-w-6xl px-4 py-4 md:py-8">
-          {/* Mobile: Stack tabs and filters vertically */}
           <div className="mb-6 md:mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <MarketplaceTabs activeTab={activeTab} onTabChange={handleTabChange} />
             <MarketplaceFilters filters={filters} onFilterChange={setFilters} />

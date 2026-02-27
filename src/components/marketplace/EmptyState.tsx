@@ -1,12 +1,35 @@
 import { Button } from "@/components/ui/button";
-import { Compass, Users, Briefcase, MapPin } from "lucide-react";
+import { Compass, Users, Briefcase, MapPin, SearchX } from "lucide-react";
 
 interface EmptyStateProps {
   type: "trips" | "creators" | "agents" | "brands" | "trip-requests";
   onAction: () => void;
+  hasFilters?: boolean;
+  onClearFilters?: () => void;
 }
 
-export function EmptyState({ type, onAction }: EmptyStateProps) {
+export function EmptyState({ type, onAction, hasFilters, onClearFilters }: EmptyStateProps) {
+  // Filtered empty state
+  if (hasFilters) {
+    return (
+      <div className="flex min-h-[400px] flex-col items-center justify-center rounded-2xl border border-[#E5DFC6]/30 bg-white p-12 text-center">
+        <div className="mb-4 rounded-full bg-[#FBF9F0] p-4">
+          <SearchX className="h-8 w-8 text-[#BFAD72]" />
+        </div>
+        <h3 className="mb-2 font-display text-2xl text-[#0a2225]">No results match your filters</h3>
+        <p className="mb-6 max-w-sm text-sm text-[#4a4a4a]">
+          Try adjusting your search criteria or clearing your filters to see all available options.
+        </p>
+        <Button
+          onClick={onClearFilters || onAction}
+          className="rounded-full bg-[#0c4d47] px-6 py-2.5 font-semibold text-[#E5DFC6] hover:bg-[#073331]"
+        >
+          Clear filters
+        </Button>
+      </div>
+    );
+  }
+
   const config = {
     trips: {
       icon: MapPin,
