@@ -1,21 +1,32 @@
 
 
-# Add Profile/Traveler Hub Link to Menus & Remove Preferences Toggle
+# Investigation: Storyboard Data Separation
 
-## Changes in `src/components/Header.tsx`
+## Finding
+After thorough investigation, the storyboards **are correctly separated by user** at every level:
 
-### 1. Add "My Profile" menu item to both mobile and desktop dropdown menus
-- Add a "My Profile" `DropdownMenuItem` near the top of the flat menu list (after Travel Marketplace)
-- Routes based on role: travelers → `/traveler`, creators → `/creator/${user.id}`, agents → `/agent-dashboard`
-- Uses `User` icon
+1. **Database (RLS)**: The SELECT policy on `storyboards` is `(auth.uid() = owner_id) OR (is_public = true)`. All storyboards have `is_public = false`, so users can only see their own.
+2. **Application queries**: Every query (Traveler Hub, Storyboards page, dashboard stats) filters by `.eq("owner_id", authUser.id)`.
+3. **Actual data**: powell's "Summer" storyboard has `owner_id = 1cf40a00...` (powell's ID). Radu's ID is `12412527...` and owns 0 storyboards.
 
-### 2. Remove "Apply saved preferences to searches" toggle
-- Remove the entire `{isTraveler && (<>...</>)}` block containing the "Use My Preferences" switch and "Apply saved preferences to searches" text from **both** mobile (lines 363-386) and desktop (lines 577-600) dropdown menus
-- Also remove the `usePreferences` state, `fetchPreferences` useEffect, and `togglePreferences` function since they become unused
-- Remove `Switch` and `Label` imports if no longer used elsewhere
+## Possible Explanations for What You're Seeing
+- **Same browser session**: If you logged out of one account and into another without a full page refresh, React Query cache may still hold the previous user's storyboards. A hard refresh (Cmd+Shift+R) would fix this.
+- **Shared device**: If both accounts were used in the same browser, stale cached data may appear briefly before refetching.
 
-## Changes in `src/components/social/LeftNav.tsx`
+## Recommended Fix
+Even though the data is correct, we should add a **React Query cache clear on user change** to prevent stale data from a previous session appearing momentarily.
 
-### 3. Fix Profile button routing for travelers
-- Change the Profile `NavItemBtn` to route travelers to `/traveler` instead of always going to `/creator/${user.id}`
+### Changes
+
+#### 1. Create `useUserChange` hook to clear cache on user switch
+- New file: `src/hooks/useUserChange.ts`
+- Watches `user.id` changes and calls `queryClient.clear()` when user switches
+- Also clears relevant `localStorage`/`sessionStorage` items
+
+#### 2. Wire it into the app
+- Call `useUserChange()` in `App.tsx` or the auth context provider so it runs globally
+
+#### 3. Add ownership guard to StoryboardEditorPage
+- In `StoryboardEditorPage.tsx`, after loading the storyboard, verify `storyboard.owner_id === authUser.id` before displaying it (for non-public storyboards)
+- Show "not authorized" or redirect if mismatched
 
