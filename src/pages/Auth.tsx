@@ -820,7 +820,7 @@ const Auth = () => {
         {/* Bottom editorial text */}
         <div className="absolute bottom-12 left-10 right-10">
           <p className="font-secondary text-3xl leading-snug" style={{ color: '#FFFFFF', textShadow: '0 2px 20px rgba(0,0,0,0.3)' }}>
-            Where luxury meets<br />effortless travel.
+            Design the journey<br />before you live it.
           </p>
           <p className="mt-3 text-sm tracking-wide" style={{ color: 'rgba(255,255,255,0.7)', letterSpacing: '0.1em' }}>
             GOLDSAINTE
