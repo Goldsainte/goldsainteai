@@ -53,9 +53,9 @@ export function RecipientSearchModal({
       try {
         const { data, error } = await supabase
           .from("profiles")
-          .select("id, display_name, avatar_url, account_type, is_verified")
+          .select("id, display_name, full_name, avatar_url, account_type, is_verified")
           .neq("id", user?.id || "")
-          .ilike("display_name", `%${search}%`)
+          .or(`display_name.ilike.%${search}%,full_name.ilike.%${search}%`)
           .limit(10);
 
         if (error) throw error;
@@ -75,7 +75,7 @@ export function RecipientSearchModal({
   const handleSelect = (recipient: Recipient) => {
     onSelectRecipient({
       id: recipient.id,
-      name: recipient.display_name || "User",
+      name: recipient.display_name || (recipient as any).full_name || "User",
     });
     onOpenChange(false);
   };
