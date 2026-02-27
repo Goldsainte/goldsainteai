@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { MapPin, Search, ChevronDown, Users, Minus, Plus, X, Calendar as CalendarIcon } from "lucide-react";
@@ -10,6 +10,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { MobileDatePicker } from "@/components/MobileDatePicker";
+import { useDestinationSuggestions } from "@/hooks/useDestinationSuggestions";
 import type { SearchFilters } from "@/pages/Marketplace";
 
 interface MarketplaceSearchProps {
@@ -31,6 +32,42 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters }: Marketp
   });
   const [travelers, setTravelers] = useState(filters.travelers || 1);
   const [isOpen, setIsOpen] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const mobileInputRef = useRef<HTMLInputElement>(null);
+  const mobileSuggestionsRef = useRef<HTMLDivElement>(null);
+
+  const { data: allDestinations = [] } = useDestinationSuggestions();
+
+  const filteredSuggestions = useMemo(() => {
+    if (!destination.trim()) return allDestinations.slice(0, 8);
+    const q = destination.toLowerCase();
+    return allDestinations
+      .filter((d) => d.toLowerCase().includes(q))
+      .slice(0, 8);
+  }, [destination, allDestinations]);
+
+  // Close suggestions on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (
+        suggestionsRef.current && !suggestionsRef.current.contains(e.target as Node) &&
+        inputRef.current && !inputRef.current.contains(e.target as Node) &&
+        (!mobileSuggestionsRef.current || !mobileSuggestionsRef.current.contains(e.target as Node)) &&
+        (!mobileInputRef.current || !mobileInputRef.current.contains(e.target as Node))
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const selectSuggestion = (value: string) => {
+    setDestination(value);
+    setShowSuggestions(false);
+  };
 
   // Sync local state when external filters change (e.g. URL restore)
   useEffect(() => {
@@ -152,14 +189,42 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters }: Marketp
             <div className="relative min-w-0">
               <MapPin className="absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D8D8D]" />
               <Input
+                ref={inputRef}
                 className="w-full truncate border-0 bg-transparent p-0 pl-6 text-sm text-[#0a2225] placeholder:text-[#8D8D8D] focus-visible:ring-0 focus-visible:ring-offset-0"
                 placeholder="Where are you going?"
                 value={destination}
-                onChange={(e) => setDestination(e.target.value)}
+                onChange={(e) => {
+                  setDestination(e.target.value);
+                  setShowSuggestions(true);
+                }}
+                onFocus={() => setShowSuggestions(true)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSearch();
+                  if (e.key === "Enter") {
+                    setShowSuggestions(false);
+                    handleSearch();
+                  }
                 }}
               />
+              {/* Autocomplete dropdown */}
+              {showSuggestions && filteredSuggestions.length > 0 && (
+                <div
+                  ref={suggestionsRef}
+                  className="absolute left-0 top-full z-50 mt-2 w-64 rounded-xl border border-[#E5DFC6] bg-white py-1 shadow-lg"
+                >
+                  {filteredSuggestions.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-[#0a2225] transition hover:bg-[#FBF9F0]"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => selectSuggestion(s)}
+                    >
+                      <MapPin className="h-3.5 w-3.5 text-[#BFAD72]" />
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -226,11 +291,35 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters }: Marketp
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D8D8D]" />
                   <Input
+                    ref={mobileInputRef}
                     className="w-full rounded-xl border-[#E5DFC6] bg-[#FBF9F0] pl-10 text-sm text-[#0a2225] placeholder:text-[#8D8D8D] focus:border-[#BFAD72] focus:ring-[#BFAD72]"
                     placeholder="Where are you going?"
                     value={destination}
-                    onChange={(e) => setDestination(e.target.value)}
+                    onChange={(e) => {
+                      setDestination(e.target.value);
+                      setShowSuggestions(true);
+                    }}
+                    onFocus={() => setShowSuggestions(true)}
                   />
+                  {showSuggestions && filteredSuggestions.length > 0 && (
+                    <div
+                      ref={mobileSuggestionsRef}
+                      className="absolute left-0 top-full z-50 mt-1 w-full rounded-xl border border-[#E5DFC6] bg-white py-1 shadow-lg"
+                    >
+                      {filteredSuggestions.map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-[#0a2225] transition hover:bg-[#FBF9F0]"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => selectSuggestion(s)}
+                        >
+                          <MapPin className="h-3.5 w-3.5 text-[#BFAD72]" />
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
