@@ -42,6 +42,7 @@ export const Header = () => {
   const [uploadInitialTab, setUploadInitialTab] = useState<"photo" | "video">("photo");
   const [createMomentOpen, setCreateMomentOpen] = useState(false);
   const [profileAvatarUrl, setProfileAvatarUrl] = useState<string | null>(null);
+  const [profileName, setProfileName] = useState<string | null>(null);
   const { openModal: openExpediaModal } = useExpediaModal();
   const { unreadCount: unreadMessageCount } = useUnreadMessageCount();
   const accountType = ((user as any)?.user_metadata?.account_type as string | undefined)?.toLowerCase() ?? null;
@@ -71,12 +72,13 @@ export const Header = () => {
     const fetchProfileAvatar = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('avatar_url')
+        .select('avatar_url, display_name, full_name')
         .eq('id', user.id)
         .maybeSingle();
       
       if (data) {
         setProfileAvatarUrl(data.avatar_url);
+        setProfileName(data.display_name || data.full_name || null);
       }
     };
 
@@ -206,7 +208,14 @@ export const Header = () => {
                     >
                       {user ? (
                         <>
-                          {/* Flat menu items */}
+                          {/* Greeting */}
+                          <div className="px-4 py-3 border-b border-border/30">
+                            <p className="text-sm font-semibold text-[#BFAD72]">
+                              Hello, {profileName || 'there'}
+                            </p>
+                          </div>
+
+                          {/* Core Experience */}
                           <div className="py-2">
                             <DropdownMenuItem
                               onClick={() => navigate('/marketplace')}
@@ -214,13 +223,6 @@ export const Header = () => {
                             >
                               <ShoppingCart className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                               <span className="text-sm font-medium">Travel Marketplace</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => navigate(getProfilePath())}
-                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                            >
-                              <User className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                              <span className="text-sm font-medium">My Profile</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => navigate('/storyboards')}
@@ -245,20 +247,6 @@ export const Header = () => {
                                 <span className="text-sm font-medium">My Trips</span>
                               </DropdownMenuItem>
                             )}
-                            <DropdownMenuItem 
-                              onClick={() => navigate('/messages')} 
-                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                            >
-                              <div className="relative flex-shrink-0">
-                                <MessageCircle className="h-5 w-5 text-muted-foreground" />
-                                {unreadMessageCount > 0 && (
-                                  <span className="absolute -top-1 -right-1 h-4 min-w-[16px] rounded-full bg-primary text-[9px] font-bold text-primary-foreground flex items-center justify-center px-1">
-                                    {unreadMessageCount > 99 ? "99+" : unreadMessageCount}
-                                  </span>
-                                )}
-                              </div>
-                              <span className="text-sm font-medium">Messages</span>
-                            </DropdownMenuItem>
                             {isAgentAccount && (
                               <DropdownMenuItem 
                                 onClick={() => navigate('/agent-trips')} 
@@ -278,12 +266,51 @@ export const Header = () => {
                               </DropdownMenuItem>
                             )}
                             <DropdownMenuItem 
+                              onClick={() => navigate('/messages')} 
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <div className="relative flex-shrink-0">
+                                <MessageCircle className="h-5 w-5 text-muted-foreground" />
+                                {unreadMessageCount > 0 && (
+                                  <span className="absolute -top-1 -right-1 h-4 min-w-[16px] rounded-full bg-primary text-[9px] font-bold text-primary-foreground flex items-center justify-center px-1">
+                                    {unreadMessageCount > 99 ? "99+" : unreadMessageCount}
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-sm font-medium">Messages</span>
+                            </DropdownMenuItem>
+                          </div>
+
+                          <DropdownMenuSeparator className="bg-border/50" />
+
+                          {/* Account */}
+                          <div className="py-2">
+                            <DropdownMenuItem
+                              onClick={() => navigate(getProfilePath())}
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <User className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm font-medium">My Profile</span>
+                            </DropdownMenuItem>
+                          </div>
+
+                          <DropdownMenuSeparator className="bg-border/50" />
+
+                          {/* Secondary */}
+                          <div className="py-2">
+                            <DropdownMenuItem 
                               onClick={() => navigate('/apply/agent')} 
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                             >
                               <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                               <span className="text-sm font-medium">Become an Agent</span>
                             </DropdownMenuItem>
+                          </div>
+
+                          <DropdownMenuSeparator className="bg-border/50" />
+
+                          {/* Informational */}
+                          <div className="py-2">
                             <DropdownMenuItem
                               onClick={() => navigate('/about')}
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
@@ -405,7 +432,14 @@ export const Header = () => {
                   >
                     {user ? (
                       <>
-                        {/* Flat menu items */}
+                        {/* Greeting */}
+                        <div className="px-4 py-3 border-b border-border/30">
+                          <p className="text-sm font-semibold text-[#BFAD72]">
+                            Hello, {profileName || 'there'}
+                          </p>
+                        </div>
+
+                        {/* Core Experience */}
                         <div className="py-2">
                           <DropdownMenuItem
                             onClick={() => navigate('/marketplace')}
@@ -413,13 +447,6 @@ export const Header = () => {
                           >
                             <ShoppingCart className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                             <span className="text-sm font-medium">Travel Marketplace</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => navigate(getProfilePath())}
-                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                          >
-                            <User className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">My Profile</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => navigate('/storyboards')}
@@ -444,20 +471,6 @@ export const Header = () => {
                               <span className="text-sm font-medium">My Trips</span>
                             </DropdownMenuItem>
                           )}
-                          <DropdownMenuItem 
-                            onClick={() => navigate('/messages')} 
-                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                          >
-                            <div className="relative flex-shrink-0">
-                              <MessageCircle className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300" />
-                              {unreadMessageCount > 0 && (
-                                <span className="absolute -top-1 -right-1 h-4 min-w-[16px] rounded-full bg-primary text-[9px] font-bold text-primary-foreground flex items-center justify-center px-1">
-                                  {unreadMessageCount > 99 ? "99+" : unreadMessageCount}
-                                </span>
-                              )}
-                            </div>
-                            <span className="text-sm font-medium">Messages</span>
-                          </DropdownMenuItem>
                           {isAgentAccount && (
                             <DropdownMenuItem 
                               onClick={() => navigate('/agent-trips')} 
@@ -477,12 +490,51 @@ export const Header = () => {
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuItem 
+                            onClick={() => navigate('/messages')} 
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <div className="relative flex-shrink-0">
+                              <MessageCircle className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300" />
+                              {unreadMessageCount > 0 && (
+                                <span className="absolute -top-1 -right-1 h-4 min-w-[16px] rounded-full bg-primary text-[9px] font-bold text-primary-foreground flex items-center justify-center px-1">
+                                  {unreadMessageCount > 99 ? "99+" : unreadMessageCount}
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-sm font-medium">Messages</span>
+                          </DropdownMenuItem>
+                        </div>
+
+                        <DropdownMenuSeparator className="bg-border/50" />
+
+                        {/* Account */}
+                        <div className="py-2">
+                          <DropdownMenuItem
+                            onClick={() => navigate(getProfilePath())}
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <User className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">My Profile</span>
+                          </DropdownMenuItem>
+                        </div>
+
+                        <DropdownMenuSeparator className="bg-border/50" />
+
+                        {/* Secondary */}
+                        <div className="py-2">
+                          <DropdownMenuItem 
                             onClick={() => navigate('/apply/agent')} 
                             className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                           >
                             <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                             <span className="text-sm font-medium">Become an Agent</span>
                           </DropdownMenuItem>
+                        </div>
+
+                        <DropdownMenuSeparator className="bg-border/50" />
+
+                        {/* Informational */}
+                        <div className="py-2">
                           <DropdownMenuItem
                             onClick={() => navigate('/about')}
                             className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
