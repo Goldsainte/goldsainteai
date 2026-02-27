@@ -39,11 +39,13 @@ const Auth = () => {
   
   // Determine initial step based on URL mode
   const getInitialStep = (): AuthStep => {
-    // Sign Up flow → show role selection first
     if (mode === 'signup') {
+      // If role already selected via URL, skip account-type picker
+      if (roleFromUrl && ['traveler', 'creator', 'agent', 'brand'].includes(roleFromUrl)) {
+        return 'email';
+      }
       return 'account-type';
     }
-    // Sign In flow (default) → go directly to email/password form
     return 'email';
   };
   
