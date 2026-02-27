@@ -17,15 +17,17 @@ export function OnboardingWelcomeModal() {
     href: "/",
   };
 
+  let subtitle = "";
+
   if (accountType === "traveler") {
-    title = "Welcome to your Goldsainte travel studio";
+    title = "Welcome to your private Goldsainte studio.";
+    subtitle = "This is where your next journey is thoughtfully designed.";
     bullets = [
-      "Post a trip brief and get matched with creators + agents who fit your vibe.",
-      "Review proposals and storyboards before you commit to anything.",
-      "Book through Goldsainte so payments, changes, and disputes stay protected.",
-      "Keep all messaging and payments on-platform — phone numbers and personal emails stay private until your trip is confirmed.",
+      "Share your vision.",
+      "Review curated proposals from trusted experts.",
+      "Confirm your trip with discretion and protection.",
     ];
-    primaryCta = { label: "Set up your Traveler Hub", href: "/traveler" };
+    primaryCta = { label: "Begin Your Journey", href: "/traveler" };
   } else if (accountType === "creator") {
     title = "Welcome to the creator side of Goldsainte";
     bullets = [
@@ -79,12 +81,12 @@ export function OnboardingWelcomeModal() {
 
             {/* Title & Greeting */}
             <div className="space-y-1.5 sm:space-y-2">
-              <p className="text-xs sm:text-sm text-[#4A4A4A]">
-                Hi {name}, welcome in.
-              </p>
               <h2 className="font-secondary text-lg sm:text-xl md:text-2xl font-semibold text-[#0a2225] leading-tight">
                 {title}
               </h2>
+              {subtitle && (
+                <p className="text-xs sm:text-sm text-[#7A7151]">{subtitle}</p>
+              )}
             </div>
 
             {/* Bullet Cards */}
@@ -94,7 +96,7 @@ export function OnboardingWelcomeModal() {
                   key={idx}
                   className="flex gap-2 sm:gap-3 rounded-xl border border-[#E5DFC6] bg-white/80 px-2.5 sm:px-3 py-2"
                 >
-                  <span className="mt-1 h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-[#C7B892] flex-shrink-0" />
+                  <span className="mt-1 h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-[#C7A962] flex-shrink-0" />
                   <span className="text-[11px] sm:text-[12px] text-[#3F3A33] leading-relaxed">{b}</span>
                 </li>
               ))}
@@ -105,13 +107,13 @@ export function OnboardingWelcomeModal() {
               <Link
                 to={primaryCta.href}
                 onClick={dismiss}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0a2225] text-[#E5DFC6] px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold hover:bg-[#0a2225]/90 transition-colors whitespace-nowrap"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] text-[#FDF9F0] px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold hover:bg-[#0c4d47]/90 transition-colors whitespace-nowrap"
               >
                 {primaryCta.label}
                 <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </Link>
               <p className="text-[10px] sm:text-[11px] text-[#7A7151] leading-relaxed">
-                You can always find this view again from your dashboard.
+                Your studio remains here whenever you return.
               </p>
             </div>
           </div>
