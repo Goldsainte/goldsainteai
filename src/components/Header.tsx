@@ -5,8 +5,7 @@ import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
 import { CreateMomentModal } from "@/components/CreateMomentModal";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+  
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from "@/components/ui/sheet";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -36,7 +35,7 @@ export const Header = () => {
   const isMobile = useIsMobile();
   const { language: currentLanguage, setLanguage: setCurrentLanguage } = useLanguage();
   const { t } = useTranslation();
-  const [usePreferences, setUsePreferences] = useState(true);
+  
   
   const [createSheetOpen, setCreateSheetOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
@@ -60,24 +59,7 @@ export const Header = () => {
     });
   };
 
-  // Fetch user's preference setting
-  useEffect(() => {
-    const fetchPreferences = async () => {
-      if (!user) return;
-      
-      const { data } = await supabase
-        .from('user_booking_preferences')
-        .select('use_preferences_in_search')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      
-      if (data) {
-        setUsePreferences(data.use_preferences_in_search ?? true);
-      }
-    };
-
-    fetchPreferences();
-  }, [user]);
+  
 
   // Fetch and subscribe to profile avatar changes
   useEffect(() => {
@@ -168,35 +150,10 @@ export const Header = () => {
     setUploadModalOpen(false);
   };
 
-  const togglePreferences = async (checked: boolean) => {
-    setUsePreferences(checked);
-    
-    if (!user) return;
-    
-    const { error } = await supabase
-      .from('user_booking_preferences')
-      .upsert({
-        user_id: user.id,
-        use_preferences_in_search: checked
-      }, {
-        onConflict: 'user_id'
-      });
-    
-    if (error) {
-      console.error('Error updating preference:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save preference",
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: checked ? "Preferences enabled" : "Preferences disabled",
-        description: checked 
-          ? "Search results will match your saved preferences" 
-          : "Search results will show all available options",
-      });
-    }
+  const getProfilePath = () => {
+    if (isCreator) return `/creator/${user?.id}`;
+    if (isAgentAccount) return '/agent-dashboard';
+    return '/traveler';
   };
 
   const handleServiceClick = (service: string) => {
@@ -257,6 +214,13 @@ export const Header = () => {
                             >
                               <ShoppingCart className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                               <span className="text-sm font-medium">Travel Marketplace</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => navigate(getProfilePath())}
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <User className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm font-medium">My Profile</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => navigate('/storyboards')}
@@ -360,30 +324,8 @@ export const Header = () => {
                             </Accordion>
                           )}
                           
-                          {isTraveler && (
-                            <>
-                              <DropdownMenuSeparator className="bg-border/50" />
-                              
-                              {/* SETTINGS Section */}
-                              <div className="px-4 py-4">
-                                <div className="flex items-center justify-between gap-3">
-                                  <Label htmlFor="preferences-toggle-mobile" className="text-sm font-medium cursor-pointer flex-1 leading-tight">
-                                    Use My Preferences
-                                  </Label>
-                                  <Switch
-                                    id="preferences-toggle-mobile"
-                                    checked={usePreferences}
-                                    onCheckedChange={togglePreferences}
-                                    className="flex-shrink-0 h-6 w-11"
-                                    aria-label="Toggle search preferences"
-                                  />
-                                </div>
-                                <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
-                                  Apply saved preferences to searches
-                                </p>
-                              </div>
-                            </>
-                          )}
+                          
+                          
                           
                           <DropdownMenuSeparator className="bg-border/50" />
                           
@@ -471,6 +413,13 @@ export const Header = () => {
                           >
                             <ShoppingCart className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                             <span className="text-sm font-medium">Travel Marketplace</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => navigate(getProfilePath())}
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <User className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">My Profile</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => navigate('/storyboards')}
@@ -574,30 +523,7 @@ export const Header = () => {
                           </Accordion>
                         )}
                         
-                        {isTraveler && (
-                          <>
-                            <DropdownMenuSeparator className="bg-border/50" />
-                            
-                            {/* SETTINGS Section */}
-                            <div className="px-4 py-4">
-                              <div className="flex items-center justify-between gap-3">
-                                <Label htmlFor="preferences-toggle" className="text-sm font-medium cursor-pointer flex-1 leading-tight">
-                                  Use My Preferences
-                                </Label>
-                                <Switch
-                                  id="preferences-toggle"
-                                  checked={usePreferences}
-                                  onCheckedChange={togglePreferences}
-                                  className="flex-shrink-0 h-6 w-11"
-                                  aria-label="Toggle search preferences"
-                                />
-                              </div>
-                              <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
-                                Apply saved preferences to searches
-                              </p>
-                            </div>
-                          </>
-                        )}
+                        
                         
                         <DropdownMenuSeparator className="bg-border/50" />
                         
