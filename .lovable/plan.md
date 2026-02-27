@@ -1,64 +1,60 @@
 
 
-# Messaging System Audit & Fix Plan
+# Remove All "Ask Madison" / Concierge Functionality
 
-## Current State Assessment
+## Summary
+Remove all references to "Madison," "Ask Madison," voice concierge, and the `/concierge` route across the entire codebase. This is a broad cleanup touching ~15 files.
 
-### What's working
-- **Database schema**: `dm_conversations`, `direct_messages`, and `message_settings` tables exist with proper foreign keys
-- **RLS policies**: All three tables have correct SELECT/INSERT/UPDATE policies scoped to participants
-- **Edge functions**: `get-conversations`, `send-direct-message`, and `manage-conversation` are fully implemented with auth verification, content filtering, blocking, and notification creation
-- **Frontend**: `DirectMessageInbox`, `RecipientSearchModal`, `NewMessageModal`, realtime subscriptions, and unread count tracking are all wired up
-- **Recipient search**: Queries `profiles` table by `display_name`, shows `account_type` labels (Traveler, Creator, Travel Agent)
+## Changes
 
-### Root problem
-The messaging system is **fully wired and functional**. The reason you see no users in the inbox is:
-1. **Zero conversations exist** in `dm_conversations` (confirmed: count = 0)
-2. **Most profiles have NULL `display_name`** — the recipient search requires `display_name` to be set (via `ilike`), so most users are invisible in search
-3. There are no test agent accounts — only traveler, creator, and brand accounts exist
+### 1. Remove concierge component files entirely
+Delete these files (no longer needed):
+- `src/components/concierge/WelcomeCard.tsx`
+- `src/components/concierge/VoiceStatusMessage.tsx`
+- `src/components/concierge/VoiceStatusChip.tsx`
+- `src/components/concierge/MusicIndicator.tsx`
+- `src/components/concierge/ResultCards.tsx`
+- `src/components/concierge/ConciergeIntroModal.tsx`
+- `src/components/concierge/StartStoryboardFromChat.tsx`
+- `src/components/VoiceConciergeButton.tsx`
+- `src/ai/prompts/goldsainteConciergePrompt.ts`
 
-### Profile data gaps
-| User | account_type | display_name | full_name |
-|------|-------------|-------------|-----------|
-| 12412527... | traveler | NULL | (empty) |
-| 3c9c947b... | traveler | NULL | Traveller 01 |
-| bd8a00c9... | creator | NULL | Radu D |
-| bd421884... | creator | asdfad | Jimmy johns |
-| 1cf40a00... | NULL | NULL | NULL |
+### 2. Remove the `/concierge` route
+In `src/routes/AppRoutes.tsx`: remove the `<Route path="/concierge" .../>` line.
 
-Only 1 user has a `display_name` set, so only 1 user would appear in recipient search.
+### 3. Remove "Ask Madison" button from Traveler Dashboard
+In `src/pages/traveler/TravelerDashboardPage.tsx` (lines 158-164): remove the "Ask Madison" button entirely, keeping only the "Post Trip" button.
 
-## Plan
+### 4. Remove Madison accordion + card from TravelerOverviewTab
+In `src/pages/traveler/components/TravelerOverviewTab.tsx`:
+- Remove the "madison" AccordionItem (lines 135-151) from mobile view
+- Remove the "Ask Madison" Card (lines 211-227) from desktop grid, leaving 3 stat cards
 
-### 1. Fix existing profiles — populate `display_name` from `full_name`
-Use a data update (not migration) to set `display_name = full_name` for all profiles where `display_name` is NULL but `full_name` is not empty. This immediately makes existing users discoverable in recipient search.
+### 5. Remove "Ask Madison" links from other pages
+- `src/pages/CollectionsPage.tsx` (lines 235-245): Remove the "Ask Madison" button
+- `src/pages/TripInboxPage.tsx` (lines 70-72): Remove the "Ask Madison" button
+- `src/pages/CreatorTripPage.tsx` (lines 161-166): Remove the "Open in Madison" link
+- `src/components/collections/ItineraryDetailDialog.tsx` (lines 199-208): Remove the "Ask Madison" button
 
-### 2. Fix the `handle_new_user()` trigger to auto-set `display_name`
-Add a migration to update the trigger so new signups automatically get `display_name` populated from `full_name` (or first_name + last_name). This prevents future profiles from being invisible.
+### 6. Remove concierge session link from StoryboardEditorPage
+In `src/pages/TikTokLab/StoryboardEditorPage.tsx` (lines 370-379): Remove the "Created from your conversation with Madison" banner.
 
-### 3. Fix RecipientSearchModal to also search `full_name`
-Currently it only searches `display_name`. Update the query to also match against `full_name` so users without `display_name` are still findable.
+### 7. Remove AI concierge onboarding tour step
+In `src/components/OnboardingTour.tsx` (lines 36-41): Remove the `ai-widget` tour step.
 
-### 4. No test account creation needed
-Creating auth users programmatically requires admin API access that should not be done through code changes. The existing real accounts will become visible once `display_name` is populated. You can test messaging between your existing accounts (traveler and creator profiles already exist).
+### 8. Clean up App.tsx comments
+In `src/App.tsx`: Remove the leftover comments about AIBookingConcierge and HIDE_CONCIERGE_WIDGET_PAGES (lines 26, 41).
 
-### Technical Details
+### 9. Update marketing/text references
+- `src/sections/HomeLuxurySections.tsx` (line 311): Rewrite "Hey Goldsainte" voice activation description to remove Madison reference
+- `src/components/partners/ValueProposition.tsx` (line 10): Rewrite to remove "Hey Goldsainte" voice concierge reference
+- `src/components/partners/PricingTiers.tsx` (line 12): Change "AI concierge" to "AI matching"
+- `src/components/home/HowItWorksTimeline.tsx` (line 14): Rewrite step 2 to remove "Madison" name
+- `src/components/SocialProof.tsx` (line 16): Rewrite quote to remove "AI concierge"
+- `src/pages/onboarding/CreatorOnboardingPage.tsx`: Update Madison references in AI identity section
 
-**Data update** (via insert tool):
-```sql
-UPDATE profiles SET display_name = full_name 
-WHERE display_name IS NULL AND full_name IS NOT NULL AND full_name != '';
-```
-
-**Migration** — update `handle_new_user()` trigger to include:
-```sql
-display_name = COALESCE(
-  NEW.raw_user_meta_data->>'display_name',
-  NEW.raw_user_meta_data->>'full_name',
-  ''
-)
-```
-
-**Code change** in `RecipientSearchModal.tsx`:
-- Change `.ilike("display_name", ...)` to `.or(`display_name.ilike.%${search}%,full_name.ilike.%${search}%`)` so both fields are searched
+### 10. Remove test files
+- `tests/06-voice-concierge.spec.ts`: Delete entirely
+- `e2e/critical-flows.spec.ts` (line 156): Remove concierge URL assertion
+- `e2e/critical-voice.spec.ts`: Delete entirely
 
