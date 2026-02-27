@@ -1,32 +1,64 @@
 
 
-# Investigation: Storyboard Data Separation
+# Messaging System Audit & Fix Plan
 
-## Finding
-After thorough investigation, the storyboards **are correctly separated by user** at every level:
+## Current State Assessment
 
-1. **Database (RLS)**: The SELECT policy on `storyboards` is `(auth.uid() = owner_id) OR (is_public = true)`. All storyboards have `is_public = false`, so users can only see their own.
-2. **Application queries**: Every query (Traveler Hub, Storyboards page, dashboard stats) filters by `.eq("owner_id", authUser.id)`.
-3. **Actual data**: powell's "Summer" storyboard has `owner_id = 1cf40a00...` (powell's ID). Radu's ID is `12412527...` and owns 0 storyboards.
+### What's working
+- **Database schema**: `dm_conversations`, `direct_messages`, and `message_settings` tables exist with proper foreign keys
+- **RLS policies**: All three tables have correct SELECT/INSERT/UPDATE policies scoped to participants
+- **Edge functions**: `get-conversations`, `send-direct-message`, and `manage-conversation` are fully implemented with auth verification, content filtering, blocking, and notification creation
+- **Frontend**: `DirectMessageInbox`, `RecipientSearchModal`, `NewMessageModal`, realtime subscriptions, and unread count tracking are all wired up
+- **Recipient search**: Queries `profiles` table by `display_name`, shows `account_type` labels (Traveler, Creator, Travel Agent)
 
-## Possible Explanations for What You're Seeing
-- **Same browser session**: If you logged out of one account and into another without a full page refresh, React Query cache may still hold the previous user's storyboards. A hard refresh (Cmd+Shift+R) would fix this.
-- **Shared device**: If both accounts were used in the same browser, stale cached data may appear briefly before refetching.
+### Root problem
+The messaging system is **fully wired and functional**. The reason you see no users in the inbox is:
+1. **Zero conversations exist** in `dm_conversations` (confirmed: count = 0)
+2. **Most profiles have NULL `display_name`** — the recipient search requires `display_name` to be set (via `ilike`), so most users are invisible in search
+3. There are no test agent accounts — only traveler, creator, and brand accounts exist
 
-## Recommended Fix
-Even though the data is correct, we should add a **React Query cache clear on user change** to prevent stale data from a previous session appearing momentarily.
+### Profile data gaps
+| User | account_type | display_name | full_name |
+|------|-------------|-------------|-----------|
+| 12412527... | traveler | NULL | (empty) |
+| 3c9c947b... | traveler | NULL | Traveller 01 |
+| bd8a00c9... | creator | NULL | Radu D |
+| bd421884... | creator | asdfad | Jimmy johns |
+| 1cf40a00... | NULL | NULL | NULL |
 
-### Changes
+Only 1 user has a `display_name` set, so only 1 user would appear in recipient search.
 
-#### 1. Create `useUserChange` hook to clear cache on user switch
-- New file: `src/hooks/useUserChange.ts`
-- Watches `user.id` changes and calls `queryClient.clear()` when user switches
-- Also clears relevant `localStorage`/`sessionStorage` items
+## Plan
 
-#### 2. Wire it into the app
-- Call `useUserChange()` in `App.tsx` or the auth context provider so it runs globally
+### 1. Fix existing profiles — populate `display_name` from `full_name`
+Use a data update (not migration) to set `display_name = full_name` for all profiles where `display_name` is NULL but `full_name` is not empty. This immediately makes existing users discoverable in recipient search.
 
-#### 3. Add ownership guard to StoryboardEditorPage
-- In `StoryboardEditorPage.tsx`, after loading the storyboard, verify `storyboard.owner_id === authUser.id` before displaying it (for non-public storyboards)
-- Show "not authorized" or redirect if mismatched
+### 2. Fix the `handle_new_user()` trigger to auto-set `display_name`
+Add a migration to update the trigger so new signups automatically get `display_name` populated from `full_name` (or first_name + last_name). This prevents future profiles from being invisible.
+
+### 3. Fix RecipientSearchModal to also search `full_name`
+Currently it only searches `display_name`. Update the query to also match against `full_name` so users without `display_name` are still findable.
+
+### 4. No test account creation needed
+Creating auth users programmatically requires admin API access that should not be done through code changes. The existing real accounts will become visible once `display_name` is populated. You can test messaging between your existing accounts (traveler and creator profiles already exist).
+
+### Technical Details
+
+**Data update** (via insert tool):
+```sql
+UPDATE profiles SET display_name = full_name 
+WHERE display_name IS NULL AND full_name IS NOT NULL AND full_name != '';
+```
+
+**Migration** — update `handle_new_user()` trigger to include:
+```sql
+display_name = COALESCE(
+  NEW.raw_user_meta_data->>'display_name',
+  NEW.raw_user_meta_data->>'full_name',
+  ''
+)
+```
+
+**Code change** in `RecipientSearchModal.tsx`:
+- Change `.ilike("display_name", ...)` to `.or(`display_name.ilike.%${search}%,full_name.ilike.%${search}%`)` so both fields are searched
 
