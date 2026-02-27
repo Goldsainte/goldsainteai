@@ -377,7 +377,7 @@ const Auth = () => {
                 Welcome to Goldsainte
               </h1>
               <p className="text-sm mt-2 tracking-wide uppercase" style={{ color: '#9A9384', letterSpacing: '0.12em', fontSize: '11px' }}>
-                Choose your account type to get started
+                Select how you want to shape your next adventure
               </p>
             </div>
 
@@ -433,8 +433,8 @@ const Auth = () => {
               </h1>
               <p className="mt-2 tracking-wide" style={{ color: '#9A9384', letterSpacing: '0.08em', fontSize: '12px' }}>
                 {isSignUpMode 
-                  ? 'Enter your email to get started'
-                  : 'Sign in to continue your journey'}
+                  ? 'Start designing your perfect journey'
+                  : 'Pick up where you left off'}
               </p>
             </div>
             <div className="space-y-4">
