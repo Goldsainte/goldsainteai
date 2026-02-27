@@ -1,7 +1,7 @@
 import { useWelcomeModal } from "@/hooks/useWelcomeModal";
 import { Sparkles, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import welcomeHeroImage from "@/assets/luxury-venice-sunset.jpg";
+import welcomeHeroImage from "@/assets/luxury-infinity-pool.jpg";
 
 export function OnboardingWelcomeModal() {
   const { open, dismiss, accountType, displayName, loading } = useWelcomeModal();
