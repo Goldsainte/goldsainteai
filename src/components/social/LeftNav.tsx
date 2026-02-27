@@ -80,8 +80,12 @@ export default function LeftNav() {
         )}
         
         <NavItemBtn onClick={() => {
-          supabase.auth.getUser().then(({ data: { user } }) => {
-            if (user) window.location.href = `/creator/${user.id}`;
+          supabase.auth.getUser().then(({ data: { user: u } }) => {
+            if (!u) return;
+            const at = ((u as any)?.user_metadata?.account_type as string | undefined)?.toLowerCase();
+            if (at === 'creator') window.location.href = `/creator/${u.id}`;
+            else if (at === 'agent') navigate('/agent-dashboard');
+            else navigate('/traveler');
           });
         }}><User2 className="w-6 h-6" /> Profile</NavItemBtn>
       </nav>
