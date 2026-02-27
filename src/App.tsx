@@ -19,6 +19,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ExpediaModalProvider } from "@/contexts/ExpediaModalContext";
 
 import { usePresence } from "@/hooks/usePresence";
+import { useUserChange } from "@/hooks/useUserChange";
 import { ensureCSRFToken } from "@/lib/security/csrf";
 import { AppRoutes } from "@/routes/AppRoutes";
 
@@ -83,6 +84,7 @@ function AppContent() {
   const location = useLocation();
   const navigate = useNavigate();
   usePresence();
+  useUserChange();
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
   useEffect(() => {
