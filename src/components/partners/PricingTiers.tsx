@@ -9,7 +9,7 @@ const tiers = [
     description: "Perfect for getting started",
     features: [
       "Profile listing on platform",
-      "Discoverable by agents, creators, and AI concierge",
+      "Discoverable by agents, creators, and AI matching",
       "Access to all booking requests",
       "Basic analytics dashboard",
       "Email support",

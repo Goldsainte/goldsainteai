@@ -366,18 +366,6 @@ export default function StoryboardEditorPage() {
           <ArrowLeft className="h-3 w-3" /> Back to storyboards
         </Link>
 
-        {/* Concierge origin banner */}
-        {storyboard?.related_concierge_session_id && !loadingStoryboard && (
-          <div className="mb-4 rounded-2xl border border-[#E5DFC6] bg-white/90 px-3 py-2 text-[11px] flex flex-wrap items-center justify-between gap-2">
-            <div className="text-[#4a4a4a]">
-              <span className="font-semibold text-[#0a2225]">Created from your conversation with Madison</span>
-              <span className="text-[#8D8D8D]"> · {formatDate(storyboard.created_at)}</span>
-            </div>
-            <Link to={`/concierge?sessionId=${storyboard.related_concierge_session_id}`} className="text-[10px] font-semibold text-[#0c4d47] underline underline-offset-2 hover:text-[#073331]">
-              View that concierge thread
-            </Link>
-          </div>
-        )}
 
         {/* ── Detail Hero Section (edit mode only) ── */}
         {effectiveMode === "edit" && storyboard && !loadingStoryboard && (

@@ -7,7 +7,7 @@ const benefits = [
     icon: Mic,
     title: "Voice-Activated, AI-Driven Discovery",
     bullets: [
-      "Travelers use the \"Hey Goldsainte\" voice concierge to search and book — hands-free",
+      "Travelers use AI-powered search and matching to discover and book — effortlessly",
       "Your services are surfaced in real-time conversations about flights, hotels, and transportation",
       "Personalized AI agents match your offerings with traveler preferences and budgets"
     ]

@@ -308,7 +308,7 @@ const tabsData: TabData[] = [
       {
         icon: Mic,
         title: "Voice Activation",
-        description: "Just say 'Hey Goldsainte' — ask Madison anything about your trip, refine your storyboard, or get matched with a creator, all hands-free.",
+        description: "Use voice commands to search trips, refine your storyboard, or get matched with a creator — all hands-free.",
       },
       {
         icon: Shield,

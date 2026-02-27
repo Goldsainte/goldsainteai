@@ -67,9 +67,6 @@ export default function TripInboxPage() {
               <Button asChild size="sm" className="rounded-full text-xs">
                 <Link to="/collections">Browse collections</Link>
               </Button>
-              <Button asChild size="sm" variant="outline" className="rounded-full text-xs">
-                <Link to="/concierge">Ask Madison</Link>
-              </Button>
             </div>
           </CardContent>
         </Card>

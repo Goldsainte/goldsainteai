@@ -158,12 +158,6 @@ export default function CreatorTripPage() {
               >
                 Open storyboard
               </Link>
-              <Link
-                to={`/concierge?fromTripId=${id}`}
-                className="w-full rounded-full border border-neutral-200 px-4 py-2 text-sm font-semibold text-neutral-900 hover:bg-neutral-50 text-center"
-              >
-                Open in Madison
-              </Link>
             </div>
 
             <p className="mt-2 text-[11px] text-neutral-500">

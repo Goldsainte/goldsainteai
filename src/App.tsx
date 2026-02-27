@@ -23,7 +23,7 @@ import { useUserChange } from "@/hooks/useUserChange";
 import { ensureCSRFToken } from "@/lib/security/csrf";
 import { AppRoutes } from "@/routes/AppRoutes";
 
-// AIBookingConcierge removed — Madison no longer exists
+
 
 const queryClient = new QueryClient();
 
@@ -38,7 +38,7 @@ const HIDE_HEADER_PAGES = new Set([
   "/travel-settings",
 ]);
 
-// HIDE_CONCIERGE_WIDGET_PAGES removed — widget no longer exists
+
 
 const HIDE_FOOTER_PREFIXES = [
   "/auth",

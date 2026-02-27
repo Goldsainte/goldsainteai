@@ -196,16 +196,6 @@ export function ItineraryDetailDialog({ itinerary, open, onOpenChange }: Itinera
                   Post to Marketplace
                 </Link>
               </Button>
-              <Button 
-                asChild
-                variant="outline"
-                className="flex-1 rounded-full border-[#E5DFC6] hover:bg-[#F6F0E4]"
-              >
-                <Link to={`/concierge?destination=${encodeURIComponent(itinerary.primaryDestination)}&context=${encodeURIComponent(itinerary.title)}&nights=${itinerary.durationNights}&vibes=${encodeURIComponent(itinerary.vibeTags.join(','))}`}>
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  Ask Madison
-                </Link>
-              </Button>
             </div>
           </div>
         </div>

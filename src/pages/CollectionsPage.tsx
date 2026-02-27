@@ -232,17 +232,6 @@ export default function CollectionsPage() {
                         Post to Marketplace
                       </Link>
                     </Button>
-                    <Button 
-                      asChild
-                      size="sm" 
-                      variant="ghost" 
-                      className="rounded-full px-3 text-xs text-muted-foreground hover:text-[#0a2225]"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Link to={`/concierge?destination=${encodeURIComponent(trip.primaryDestination)}`}>
-                        Ask Madison
-                      </Link>
-                    </Button>
                   </div>
                 </div>
               </Card>
