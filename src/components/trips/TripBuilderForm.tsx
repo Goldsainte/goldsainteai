@@ -7,7 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Save, Send, Plus, X, ImagePlus, Loader2 } from "lucide-react";
+import { Save, Send, Plus, X, ImagePlus, Loader2, Shuffle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { ArrayFieldEditor } from "./ArrayFieldEditor";
 import { TripImageUploader } from "./TripImageUploader";
 
@@ -34,6 +36,8 @@ const textareaClasses = "rounded-xl border-[#E5DFC6] bg-white focus:ring-2 focus
 const selectTriggerClasses = "rounded-xl h-10 sm:h-12 text-sm sm:text-base border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20";
 
 export function TripBuilderForm({ initialData, onSave, saving, isEditing }: TripBuilderFormProps) {
+  const [suggestingCover, setSuggestingCover] = useState(false);
+  const [coverSuggested, setCoverSuggested] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -115,6 +119,36 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
   const updateField = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
+
+  const suggestCoverImage = async (dest?: string) => {
+    const destination = dest || formData.destination;
+    if (!destination?.trim()) return;
+    
+    setSuggestingCover(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("select-trip-cover", {
+        body: { destination },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        updateField("cover_image_url", data.url);
+        setCoverSuggested(true);
+        toast.success("Cover image suggested — click Shuffle for alternatives");
+      }
+    } catch (err: any) {
+      console.error("[suggestCover]", err);
+    } finally {
+      setSuggestingCover(false);
+    }
+  };
+
+  // Auto-suggest cover when destination changes and no cover is set
+  useEffect(() => {
+    if (formData.destination?.trim() && !formData.cover_image_url && !coverSuggested && !initialData?.cover_image_url) {
+      const timer = setTimeout(() => suggestCoverImage(formData.destination), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [formData.destination]);
 
   const preparePayload = () => {
     return {
@@ -450,12 +484,29 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
               <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
               <CardTitle className="font-secondary text-xl text-[#0a2225]">Cover Image</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
               <TripImageUploader
                 currentUrl={formData.cover_image_url}
-                onUpload={(url) => updateField("cover_image_url", url)}
+                onUpload={(url) => { updateField("cover_image_url", url); setCoverSuggested(false); }}
                 label="Upload a stunning cover image"
               />
+              {formData.destination?.trim() && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => suggestCoverImage()}
+                  disabled={suggestingCover}
+                  className="rounded-full border-[#E5DFC6] hover:bg-[#FDF9F0] text-[#6B7280]"
+                >
+                  {suggestingCover ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Shuffle className="h-4 w-4 mr-2" />
+                  )}
+                  {formData.cover_image_url ? "Shuffle Cover" : "Auto-suggest Cover"}
+                </Button>
+              )}
             </CardContent>
           </Card>
 

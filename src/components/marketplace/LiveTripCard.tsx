@@ -41,12 +41,18 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
     >
       {/* Clean image — no overlay, no badges on image */}
       <div className="relative aspect-[4/3] overflow-hidden rounded-xl md:rounded-2xl">
-        <img
-          src={trip.cover_image_url || "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800"}
-          alt={trip.title}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          loading="lazy"
-        />
+        {trip.cover_image_url ? (
+          <img
+            src={trip.cover_image_url}
+            alt={trip.title}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
+          />
+        ) : (
+          <div className="h-full w-full bg-gradient-to-br from-[#C7A962]/20 via-[#E5DFC6]/30 to-[#0a2225]/10 flex items-center justify-center">
+            <MapPin className="h-8 w-8 text-[#C7A962]/40" />
+          </div>
+        )}
       </div>
 
       {/* Content below image */}

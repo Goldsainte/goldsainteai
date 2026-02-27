@@ -2879,6 +2879,39 @@ export type Database = {
           },
         ]
       }
+      city_image_usage: {
+        Row: {
+          city_slug: string
+          created_at: string | null
+          id: string
+          last_used_at: string | null
+          photographer: string | null
+          unsplash_photo_id: string
+          unsplash_url: string
+          used_count: number | null
+        }
+        Insert: {
+          city_slug: string
+          created_at?: string | null
+          id?: string
+          last_used_at?: string | null
+          photographer?: string | null
+          unsplash_photo_id: string
+          unsplash_url: string
+          used_count?: number | null
+        }
+        Update: {
+          city_slug?: string
+          created_at?: string | null
+          id?: string
+          last_used_at?: string | null
+          photographer?: string | null
+          unsplash_photo_id?: string
+          unsplash_url?: string
+          used_count?: number | null
+        }
+        Relationships: []
+      }
       close_friends: {
         Row: {
           created_at: string
