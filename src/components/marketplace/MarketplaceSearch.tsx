@@ -1,69 +1,159 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { MapPin, Calendar, Users, Search, ChevronDown } from "lucide-react";
+import { MapPin, Search, ChevronDown, Users, Minus, Plus, X, Calendar as CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { DateRange } from "react-day-picker";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { MobileDatePicker } from "@/components/MobileDatePicker";
 import type { SearchFilters } from "@/pages/Marketplace";
 
 interface MarketplaceSearchProps {
   onSearch: (filters: SearchFilters) => void;
   filters: SearchFilters;
+  onClearFilters?: () => void;
 }
 
-export function MarketplaceSearch({ onSearch, filters }: MarketplaceSearchProps) {
+export function MarketplaceSearch({ onSearch, filters, onClearFilters }: MarketplaceSearchProps) {
   const [destination, setDestination] = useState(filters.destination || "");
-  const [startDate, setStartDate] = useState(filters.startDate || "");
-  const [endDate, setEndDate] = useState(filters.endDate || "");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
+    if (filters.startDate || filters.endDate) {
+      return {
+        from: filters.startDate ? new Date(filters.startDate + "T00:00:00") : undefined,
+        to: filters.endDate ? new Date(filters.endDate + "T00:00:00") : undefined,
+      };
+    }
+    return undefined;
+  });
   const [travelers, setTravelers] = useState(filters.travelers || 1);
   const [isOpen, setIsOpen] = useState(false);
 
+  // Sync local state when external filters change (e.g. URL restore)
+  useEffect(() => {
+    setDestination(filters.destination || "");
+    setTravelers(filters.travelers || 1);
+    if (filters.startDate || filters.endDate) {
+      setDateRange({
+        from: filters.startDate ? new Date(filters.startDate + "T00:00:00") : undefined,
+        to: filters.endDate ? new Date(filters.endDate + "T00:00:00") : undefined,
+      });
+    } else {
+      setDateRange(undefined);
+    }
+  }, [filters.destination, filters.startDate, filters.endDate, filters.travelers]);
+
   const handleSearch = () => {
     onSearch({
-      destination,
-      startDate,
-      endDate,
+      destination: destination.trim(),
+      startDate: dateRange?.from ? format(dateRange.from, "yyyy-MM-dd") : undefined,
+      endDate: dateRange?.to ? format(dateRange.to, "yyyy-MM-dd") : undefined,
       travelers,
     });
     setIsOpen(false);
   };
 
-  // Build summary text for collapsed state
+  const handleDateRangeChange = (range: DateRange | undefined) => {
+    setDateRange(range);
+    // If clearing from, also clear to
+    if (!range?.from) {
+      setDateRange(undefined);
+    }
+  };
+
+  const hasActiveFilters = !!(
+    filters.destination ||
+    filters.startDate ||
+    filters.endDate ||
+    (filters.travelers && filters.travelers > 1)
+  );
+
+  const handleRemoveFilter = (key: "destination" | "dates" | "travelers") => {
+    const updated = { ...filters };
+    if (key === "destination") {
+      updated.destination = "";
+      setDestination("");
+    } else if (key === "dates") {
+      updated.startDate = undefined;
+      updated.endDate = undefined;
+      setDateRange(undefined);
+    } else if (key === "travelers") {
+      updated.travelers = 1;
+      setTravelers(1);
+    }
+    onSearch(updated);
+  };
+
+  // Summary text for mobile collapsed state
   const getSummaryText = () => {
     const parts: string[] = [];
     if (destination) parts.push(destination);
     else parts.push("Anywhere");
-    
-    if (startDate) {
-      const date = new Date(startDate);
-      parts.push(date.toLocaleDateString("en-US", { month: "short", day: "numeric" }));
+
+    if (dateRange?.from) {
+      const fromStr = format(dateRange.from, "MMM d");
+      const toStr = dateRange.to ? format(dateRange.to, "MMM d") : "";
+      parts.push(toStr ? `${fromStr}–${toStr}` : fromStr);
     } else {
       parts.push("Any dates");
     }
-    
+
     parts.push(`${travelers} traveler${travelers > 1 ? "s" : ""}`);
-    
     return parts.join(" · ");
   };
+
+  const dateDisplayText = () => {
+    if (dateRange?.from) {
+      const fromStr = format(dateRange.from, "MMM d");
+      if (dateRange.to) return `${fromStr} – ${format(dateRange.to, "MMM d")}`;
+      return fromStr;
+    }
+    return "";
+  };
+
+  // Traveler stepper component
+  const TravelerStepper = ({ compact = false }: { compact?: boolean }) => (
+    <div className="flex items-center gap-2">
+      <button
+        type="button"
+        onClick={() => setTravelers(Math.max(1, travelers - 1))}
+        disabled={travelers <= 1}
+        className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E5DFC6] text-[#0a2225] transition hover:border-[#BFAD72] disabled:opacity-30 disabled:cursor-not-allowed"
+      >
+        <Minus className="h-3.5 w-3.5" />
+      </button>
+      <span className={`min-w-[2ch] text-center text-sm font-medium text-[#0a2225] ${compact ? "" : "tabular-nums"}`}>
+        {travelers}
+      </span>
+      <button
+        type="button"
+        onClick={() => setTravelers(Math.min(20, travelers + 1))}
+        disabled={travelers >= 20}
+        className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E5DFC6] text-[#0a2225] transition hover:border-[#BFAD72] disabled:opacity-30 disabled:cursor-not-allowed"
+      >
+        <Plus className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  );
 
   return (
     <section className="border-b border-[#E5DFC6]/30 bg-white">
       <div className="mx-auto max-w-4xl px-4 py-4 md:py-6">
-        {/* Desktop: Full search form */}
+        {/* Desktop search bar */}
         <div className="hidden md:flex flex-col gap-4 rounded-2xl border border-[#E5DFC6] bg-white p-3 shadow-sm md:flex-row md:items-center md:divide-x md:divide-[#E5DFC6]/30">
           {/* Where */}
           <div className="flex min-w-0 flex-1 flex-col gap-1.5 px-3">
-            <label className="text-xs font-semibold uppercase tracking-wider text-[#8D8D8D]">
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-[#8D8D8D]">
               Where
             </label>
             <div className="relative min-w-0">
               <MapPin className="absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D8D8D]" />
               <Input
                 className="w-full truncate border-0 bg-transparent p-0 pl-6 text-sm text-[#0a2225] placeholder:text-[#8D8D8D] focus-visible:ring-0 focus-visible:ring-offset-0"
-                placeholder="Search destinations..."
+                placeholder="Where are you going?"
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
                 onKeyDown={(e) => {
@@ -73,54 +163,28 @@ export function MarketplaceSearch({ onSearch, filters }: MarketplaceSearchProps)
             </div>
           </div>
 
-          {/* Check-in */}
+          {/* Dates — using MobileDatePicker in range mode */}
           <div className="flex flex-1 flex-col gap-1.5 px-3">
-            <label className="text-xs font-semibold uppercase tracking-wider text-[#8D8D8D]">
-              Check-in
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-[#8D8D8D]">
+              Dates
             </label>
-            <div className="relative">
-              <Calendar className="absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D8D8D]" />
-              <Input
-                type="date"
-                className="border-0 bg-transparent p-0 pl-6 text-sm text-[#0a2225] placeholder:text-[#8D8D8D] focus-visible:ring-0 focus-visible:ring-offset-0"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {/* Check-out */}
-          <div className="flex flex-1 flex-col gap-1.5 px-3">
-            <label className="text-xs font-semibold uppercase tracking-wider text-[#8D8D8D]">
-              Check-out
-            </label>
-            <div className="relative">
-              <Calendar className="absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D8D8D]" />
-              <Input
-                type="date"
-                className="border-0 bg-transparent p-0 pl-6 text-sm text-[#0a2225] placeholder:text-[#8D8D8D] focus-visible:ring-0 focus-visible:ring-offset-0"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                min={startDate}
-              />
-            </div>
+            <MobileDatePicker
+              mode="range"
+              dateRange={dateRange}
+              onDateRangeChange={handleDateRangeChange}
+              placeholder="Check-in – Check-out"
+              className="border-0 bg-transparent p-0 pl-0 text-sm text-[#0a2225] placeholder:text-[#8D8D8D] focus-visible:ring-0 focus-visible:ring-offset-0 min-h-0 h-auto rounded-none shadow-none hover:bg-transparent"
+            />
           </div>
 
           {/* Travelers */}
           <div className="flex flex-1 flex-col gap-1.5 px-3">
-            <label className="text-xs font-semibold uppercase tracking-wider text-[#8D8D8D]">
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-[#8D8D8D]">
               Travelers
             </label>
-            <div className="relative">
-              <Users className="absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D8D8D]" />
-              <Input
-                type="number"
-                min="1"
-                className="border-0 bg-transparent p-0 pl-6 text-sm text-[#0a2225] placeholder:text-[#8D8D8D] focus-visible:ring-0 focus-visible:ring-offset-0"
-                placeholder="Add guests"
-                value={travelers}
-                onChange={(e) => setTravelers(parseInt(e.target.value) || 1)}
-              />
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-[#8D8D8D]" />
+              <TravelerStepper />
             </div>
           </div>
 
@@ -128,7 +192,7 @@ export function MarketplaceSearch({ onSearch, filters }: MarketplaceSearchProps)
           <div className="flex items-center px-3 pt-1 md:pt-0">
             <Button
               size="icon"
-              className="h-12 w-12 rounded-full bg-[#BFAD72] hover:bg-[#9d8f5d]"
+              className="h-12 w-12 rounded-full bg-[#BFAD72] hover:bg-[#9d8f5d] shadow-sm"
               onClick={handleSearch}
             >
               <Search className="h-5 w-5 text-white" />
@@ -152,72 +216,49 @@ export function MarketplaceSearch({ onSearch, filters }: MarketplaceSearchProps)
                 <ChevronDown className={`h-5 w-5 text-[#8D8D8D] transition-transform ${isOpen ? "rotate-180" : ""}`} />
               </button>
             </CollapsibleTrigger>
-            
+
             <CollapsibleContent className="mt-3 rounded-2xl border border-[#E5DFC6] bg-white p-4 shadow-sm space-y-4">
               {/* Where */}
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-[#8D8D8D]">
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-[#8D8D8D]">
                   Where
                 </label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D8D8D]" />
                   <Input
                     className="w-full rounded-xl border-[#E5DFC6] bg-[#FBF9F0] pl-10 text-sm text-[#0a2225] placeholder:text-[#8D8D8D] focus:border-[#BFAD72] focus:ring-[#BFAD72]"
-                    placeholder="Search destinations..."
+                    placeholder="Where are you going?"
                     value={destination}
                     onChange={(e) => setDestination(e.target.value)}
                   />
                 </div>
               </div>
 
-              {/* Dates row */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-[#8D8D8D]">
-                    Check-in
-                  </label>
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D8D8D]" />
-                    <Input
-                      type="date"
-                      className="w-full rounded-xl border-[#E5DFC6] bg-[#FBF9F0] pl-10 text-sm text-[#0a2225] focus:border-[#BFAD72] focus:ring-[#BFAD72]"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-[#8D8D8D]">
-                    Check-out
-                  </label>
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D8D8D]" />
-                    <Input
-                      type="date"
-                      className="w-full rounded-xl border-[#E5DFC6] bg-[#FBF9F0] pl-10 text-sm text-[#0a2225] focus:border-[#BFAD72] focus:ring-[#BFAD72]"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
-                      min={startDate}
-                    />
-                  </div>
-                </div>
+              {/* Dates */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-[#8D8D8D]">
+                  Dates
+                </label>
+                <MobileDatePicker
+                  mode="range"
+                  dateRange={dateRange}
+                  onDateRangeChange={handleDateRangeChange}
+                  placeholder="Check-in – Check-out"
+                  className="w-full rounded-xl border-[#E5DFC6] bg-[#FBF9F0] text-sm text-[#0a2225] focus:border-[#BFAD72] focus:ring-[#BFAD72]"
+                />
               </div>
 
               {/* Travelers */}
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-[#8D8D8D]">
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-[#8D8D8D]">
                   Travelers
                 </label>
-                <div className="relative">
-                  <Users className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D8D8D]" />
-                  <Input
-                    type="number"
-                    min="1"
-                    className="w-full rounded-xl border-[#E5DFC6] bg-[#FBF9F0] pl-10 text-sm text-[#0a2225] focus:border-[#BFAD72] focus:ring-[#BFAD72]"
-                    placeholder="Add guests"
-                    value={travelers}
-                    onChange={(e) => setTravelers(parseInt(e.target.value) || 1)}
-                  />
+                <div className="flex items-center gap-3 rounded-xl border border-[#E5DFC6] bg-[#FBF9F0] px-4 py-2.5">
+                  <Users className="h-4 w-4 text-[#8D8D8D]" />
+                  <span className="flex-1 text-sm text-[#0a2225]">
+                    {travelers} traveler{travelers > 1 ? "s" : ""}
+                  </span>
+                  <TravelerStepper compact />
                 </div>
               </div>
 
@@ -232,6 +273,47 @@ export function MarketplaceSearch({ onSearch, filters }: MarketplaceSearchProps)
             </CollapsibleContent>
           </Collapsible>
         </div>
+
+        {/* Active filter chips */}
+        {hasActiveFilters && (
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {filters.destination && (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFC6] bg-[#FBF9F0] px-3 py-1 text-xs text-[#0a2225]">
+                <MapPin className="h-3 w-3 text-[#8D8D8D]" />
+                {filters.destination}
+                <button onClick={() => handleRemoveFilter("destination")} className="ml-0.5 hover:text-[#BFAD72]">
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+            {(filters.startDate || filters.endDate) && (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFC6] bg-[#FBF9F0] px-3 py-1 text-xs text-[#0a2225]">
+                <CalendarIcon className="h-3 w-3 text-[#8D8D8D]" />
+                {filters.startDate && format(new Date(filters.startDate + "T00:00:00"), "MMM d")}
+                {filters.startDate && filters.endDate && "–"}
+                {filters.endDate && format(new Date(filters.endDate + "T00:00:00"), "MMM d")}
+                <button onClick={() => handleRemoveFilter("dates")} className="ml-0.5 hover:text-[#BFAD72]">
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+            {filters.travelers && filters.travelers > 1 && (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFC6] bg-[#FBF9F0] px-3 py-1 text-xs text-[#0a2225]">
+                <Users className="h-3 w-3 text-[#8D8D8D]" />
+                {filters.travelers} travelers
+                <button onClick={() => handleRemoveFilter("travelers")} className="ml-0.5 hover:text-[#BFAD72]">
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+            <button
+              onClick={onClearFilters}
+              className="text-xs font-medium text-[#BFAD72] hover:text-[#9d8f5d] transition-colors"
+            >
+              Clear all
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );
