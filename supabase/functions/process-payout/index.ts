@@ -56,22 +56,24 @@ Deno.serve(async (req) => {
     if (booking.creator_id && booking.creator_earnings) {
       notifications.push({
         user_id: booking.creator_id,
-        notification_type: 'payout_sent_creator',
+        type: 'payout_completed',
         title: 'Your payout is on its way',
         message: `We've sent your payout for this trip. Amount: ${booking.creator_earnings} ${booking.currency || 'USD'}.`,
-        link: `/bookings/${bookingId}`,
-        metadata: { bookingId, amount: booking.creator_earnings, currency: booking.currency },
+        action_url: `/bookings/${bookingId}`,
+        entity_type: 'booking',
+        entity_id: bookingId,
       });
     }
 
     if (booking.agent_id && booking.agent_earnings) {
       notifications.push({
         user_id: booking.agent_id,
-        notification_type: 'payout_sent_agent',
+        type: 'payout_completed',
         title: 'Your payout is on its way',
         message: `We've sent your payout for this trip. Amount: ${booking.agent_earnings} ${booking.currency || 'USD'}.`,
-        link: `/bookings/${bookingId}`,
-        metadata: { bookingId, amount: booking.agent_earnings, currency: booking.currency },
+        action_url: `/bookings/${bookingId}`,
+        entity_type: 'booking',
+        entity_id: bookingId,
       });
     }
 

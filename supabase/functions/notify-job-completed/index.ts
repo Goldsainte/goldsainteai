@@ -39,11 +39,12 @@ Deno.serve(async (req) => {
     // Notify customer to review completion
     await supabaseClient.from('notifications').insert({
       user_id: job.user_id,
-      notification_type: 'job_completed_review',
+      type: 'review_received',
       title: '✅ Job Completed - Review Required',
       message: `${agent?.agency_name || 'Your agent'} has marked "${job.title}" as complete. Please review their work and approve or request revisions.`,
-      metadata: { jobId, submissionId },
-      link: `/marketplace`,
+      entity_type: 'marketplace_job',
+      entity_id: jobId,
+      action_url: `/marketplace`,
     });
 
     console.log(`Job completion notification sent for job ${jobId}`);

@@ -67,14 +67,12 @@ Deno.serve(async (req) => {
       if (profile) {
         await supabaseClient.from('notifications').insert({
           user_id: profile.id,
-          notification_type: type,
+          type: type,
           title: subject,
           message,
-          metadata: {
-            ...metadata,
-            booking_id: bookingId
-          },
-          link: `/bookings/${bookingId}`
+          entity_type: 'booking',
+          entity_id: bookingId,
+          action_url: `/bookings/${bookingId}`
         });
       }
 

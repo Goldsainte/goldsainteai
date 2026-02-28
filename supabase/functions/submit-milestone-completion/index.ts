@@ -81,14 +81,12 @@ serve(async (req) => {
       .from('notifications')
       .insert({
         user_id: escrowTransaction.customer_id,
-        notification_type: 'milestone_completed',
+        type: 'milestone_funded',
         title: 'Milestone Completed',
         message: `${milestone.milestone_name} has been marked complete. Please review.`,
-        metadata: {
-          milestone_id: milestoneId,
-          escrow_id: milestone.escrow_transaction_id
-        },
-        link: '/my-bookings'
+        entity_type: 'payment_milestone',
+        entity_id: milestoneId,
+        action_url: '/my-bookings'
       });
 
     console.log(`Milestone ${milestoneId} marked as completed by creator`);

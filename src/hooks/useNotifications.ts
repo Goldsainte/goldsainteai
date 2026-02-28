@@ -5,7 +5,11 @@ export type Notification = {
   id: string;
   user_id: string;
   type: string;
-  payload: any;
+  title: string;
+  message: string;
+  action_url: string | null;
+  entity_type: string | null;
+  entity_id: string | null;
   read: boolean;
   created_at: string;
 };
@@ -40,9 +44,13 @@ export function useNotifications() {
           setNotifications(data?.map((n: any) => ({
             id: n.id,
             user_id: n.user_id,
-            type: n.notification_type || n.type || 'general',
-            payload: n.metadata || n.payload || {},
-            read: n.is_read !== undefined ? n.is_read : (n.read || false),
+            type: n.type || 'general',
+            title: n.title || '',
+            message: n.message || '',
+            action_url: n.action_url || null,
+            entity_type: n.entity_type || null,
+            entity_id: n.entity_id || null,
+            read: n.is_read ?? false,
             created_at: n.created_at
           })) ?? []);
         }
@@ -56,14 +64,8 @@ export function useNotifications() {
       .channel('notifications-changes')
       .on(
         'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'notifications'
-        },
-        () => {
-          load();
-        }
+        { event: '*', schema: 'public', table: 'notifications' },
+        () => { load(); }
       )
       .subscribe();
 
@@ -86,7 +88,6 @@ export function useNotifications() {
   async function markAllAsRead() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    
     await supabase
       .from("notifications")
       .update({ is_read: true })

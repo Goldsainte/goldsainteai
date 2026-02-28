@@ -60,22 +60,24 @@ Deno.serve(async (req) => {
     // Notify customer via in-app notification
     await supabaseClient.from('notifications').insert({
       user_id: customerId,
-      notification_type: 'bid_accepted',
+      type: 'system_announcement',
       title: '🎉 Bid Accepted!',
       message: `Your bid for "${job.title}" has been accepted. Payment of ${bid.currency} ${bid.customer_facing_price} is required to proceed.`,
-      metadata: { jobId, bidId, agentId },
-      link: `/marketplace`,
+      entity_type: 'agent_bid',
+      entity_id: bidId,
+      action_url: `/marketplace`,
     });
 
     // Notify agent via in-app notification
     if (agent.user_id) {
       await supabaseClient.from('notifications').insert({
         user_id: agent.user_id,
-        notification_type: 'bid_accepted_agent',
+        type: 'system_announcement',
         title: '🎉 Your Bid Was Accepted!',
         message: `Congratulations! Your bid for "${job.title}" has been accepted. The customer will process payment shortly.`,
-        metadata: { jobId, bidId },
-        link: `/agent-dashboard`,
+        entity_type: 'agent_bid',
+        entity_id: bidId,
+        action_url: `/agent-dashboard`,
       });
     }
 

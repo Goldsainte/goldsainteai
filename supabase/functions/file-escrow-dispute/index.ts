@@ -109,15 +109,12 @@ serve(async (req) => {
       .from('notifications')
       .insert({
         user_id: otherPartyId,
-        notification_type: 'dispute_filed',
+        type: 'system_announcement',
         title: 'Dispute Filed',
         message: `A dispute has been filed regarding your transaction`,
-        metadata: {
-          dispute_id: dispute.id,
-          escrow_id: disputeData.escrowTransactionId,
-          dispute_type: disputeData.disputeType
-        },
-        link: '/my-bookings'
+        entity_type: 'escrow_dispute',
+        entity_id: dispute.id,
+        action_url: '/my-bookings'
       });
 
     // Notify admins
@@ -129,11 +126,12 @@ serve(async (req) => {
     if (admins && admins.length > 0) {
       const adminNotifications = admins.map(admin => ({
         user_id: admin.user_id,
-        notification_type: 'admin_dispute_alert',
+        type: 'system_announcement',
         title: 'New Dispute',
         message: `New ${disputeData.disputeType} dispute requires review`,
-        metadata: { dispute_id: dispute.id },
-        link: '/admin/disputes'
+        entity_type: 'escrow_dispute',
+        entity_id: dispute.id,
+        action_url: '/admin/disputes'
       }));
 
       await supabaseClient

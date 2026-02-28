@@ -47,11 +47,12 @@ Deno.serve(async (req) => {
     if (agent?.user_id) {
       await supabaseClient.from('notifications').insert({
         user_id: agent.user_id,
-        notification_type: 'milestone_approved',
+        type: 'milestone_released',
         title: '✅ Milestone Approved!',
         message: `Milestone "${milestone.title}" for "${job.title}" has been approved. Payment of ${milestone.currency} ${milestone.amount} will be released.`,
-        metadata: { milestoneId, jobId, amount: milestone.amount },
-        link: `/agent-dashboard`,
+        entity_type: 'booking_milestone',
+        entity_id: milestoneId,
+        action_url: `/agent-dashboard`,
       });
     }
 

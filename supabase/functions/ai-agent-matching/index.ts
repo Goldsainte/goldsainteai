@@ -160,15 +160,12 @@ Deno.serve(async (req) => {
             .from('notifications')
             .insert({
               user_id: agent.user_id,
-              notification_type: 'priority_job_match',
+              type: 'system_announcement',
               title: '🎯 Priority Job Match',
               message: `You're a ${match.match_score}% match for ${job.title}`,
-              metadata: {
-                job_id: jobId,
-                match_score: match.match_score,
-                confidence_level: match.confidence_level
-              },
-              link: `/marketplace?job=${jobId}`
+              entity_type: 'marketplace_job',
+              entity_id: jobId,
+              action_url: `/marketplace?job=${jobId}`
             });
 
           // Send priority email

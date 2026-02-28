@@ -94,11 +94,12 @@ serve(async (req) => {
         .from('notifications')
         .insert({
           user_id: escrowTransaction.creator_id,
-          notification_type: 'milestone_rejected',
+          type: 'system_announcement',
           title: 'Milestone Rejected',
           message: `${milestone.milestone_name} was rejected. Reason: ${rejectionReason}`,
-          metadata: { milestone_id: milestoneId },
-          link: '/creator-dashboard'
+          entity_type: 'payment_milestone',
+          entity_id: milestoneId,
+          action_url: '/creator-dashboard'
         });
 
       return new Response(
@@ -168,15 +169,12 @@ serve(async (req) => {
       .from('notifications')
       .insert({
         user_id: escrowTransaction.creator_id,
-        notification_type: 'payment_released',
+        type: 'milestone_released',
         title: 'Payment Released',
         message: `$${milestone.amount} released for ${milestone.milestone_name}`,
-        metadata: {
-          milestone_id: milestoneId,
-          amount: milestone.amount,
-          transfer_id: transfer.id
-        },
-        link: '/creator-dashboard'
+        entity_type: 'payment_milestone',
+        entity_id: milestoneId,
+        action_url: '/creator-dashboard'
       });
 
     console.log(`Milestone ${milestoneId} payment released: $${milestone.amount}`);

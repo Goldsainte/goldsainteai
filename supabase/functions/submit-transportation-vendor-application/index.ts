@@ -285,14 +285,12 @@ serve(async (req) => {
       if (adminRoles && adminRoles.length > 0) {
         const notifications = adminRoles.map((admin) => ({
           user_id: admin.user_id,
-          notification_type: 'admin_alert',
+          type: 'system_announcement',
           title: 'New Transportation Vendor Application',
           message: `${applicationData.businessName} has submitted an application for review`,
-          metadata: {
-            supplier_id: supplier.id,
-            business_name: applicationData.businessName,
-          },
-          link: '/admin/transport-vendor-vetting',
+          entity_type: 'supplier',
+          entity_id: supplier.id,
+          action_url: '/admin/transport-vendor-vetting',
         }));
 
         await supabase.from('notifications').insert(notifications);

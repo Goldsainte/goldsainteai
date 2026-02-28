@@ -11,36 +11,36 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
+const NOTIFICATION_ICONS: Record<string, string> = {
+  like: '❤️',
+  comment: '💬',
+  follow: '👤',
+  tag: '🏷️',
+  collaboration_invite: '🤝',
+  collaboration_accepted: '✅',
+  partnership_request: '💼',
+  partnership_approved: '✅',
+  partnership_rejected: '❌',
+  moment_reply: '💬',
+  moment_interaction: '⭐',
+  message_received: '✉️',
+  verification: '🛡️',
+  new_proposal: '📋',
+  proposal_accepted: '✅',
+  proposal_declined: '❌',
+  tier_upgrade: '🏆',
+};
+
 export const NotificationCenter = () => {
   const navigate = useNavigate();
-  const {
-    notifications,
-    unreadCount,
-    markAsRead,
-    markAllAsRead,
-  } = useNotifications();
-
-  const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case 'trip_posted':
-        return '✈️';
-      case 'proposal_received':
-        return '💼';
-      case 'proposal_accepted':
-        return '✅';
-      default:
-        return '📢';
-    }
-  };
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
 
   const handleNotificationClick = (notification: any) => {
     if (!notification.read) {
       markAsRead(notification.id);
     }
-    
-    // Navigate based on payload
-    if (notification.payload?.trip_id) {
-      navigate(`/trip/${notification.payload.trip_id}`);
+    if (notification.action_url) {
+      navigate(notification.action_url);
     }
   };
 
@@ -63,12 +63,7 @@ export const NotificationCenter = () => {
         <div className="flex items-center justify-between p-4 border-b">
           <h3 className="font-semibold text-lg">Notifications</h3>
           {unreadCount > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={markAllAsRead}
-              className="text-xs"
-            >
+            <Button variant="ghost" size="sm" onClick={markAllAsRead} className="text-xs">
               <Check className="h-3 w-3 mr-1" />
               Mark all read
             </Button>
@@ -93,26 +88,20 @@ export const NotificationCenter = () => {
                 >
                   <div className="flex gap-3">
                     <div className="text-2xl flex-shrink-0">
-                      {getNotificationIcon(notification.type)}
+                      {NOTIFICATION_ICONS[notification.type] || '📢'}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
-                        <h4 className="font-medium text-sm">
-                          {notification.payload?.title || notification.type}
-                        </h4>
+                        <h4 className="font-medium text-sm">{notification.title}</h4>
                         {!notification.read && (
                           <div className="h-2 w-2 rounded-full bg-primary flex-shrink-0 mt-1" />
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {typeof notification.payload === 'string' 
-                          ? notification.payload 
-                          : notification.payload?.message || 'New notification'}
+                        {notification.message || 'New notification'}
                       </p>
                       <p className="text-xs text-muted-foreground mt-2">
-                        {formatDistanceToNow(new Date(notification.created_at), {
-                          addSuffix: true,
-                        })}
+                        {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
                       </p>
                     </div>
                   </div>

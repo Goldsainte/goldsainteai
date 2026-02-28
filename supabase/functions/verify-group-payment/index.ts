@@ -121,8 +121,8 @@ serve(async (req) => {
             user_id: job.user_id,
             title: 'All Payments Received!',
             message: `All travelers have completed payment for "${job.title}". Your booking is now fully confirmed.`,
-            notification_type: 'payment_complete',
-            link: `/my-jobs/${jobId}`
+            type: 'payment_received',
+            action_url: `/my-jobs/${jobId}`
           });
 
         // Notify agent if assigned
@@ -133,8 +133,8 @@ serve(async (req) => {
               user_id: job.travel_agents.user_id,
               title: 'Group Booking Fully Paid',
               message: `All payments received for "${job.title}". You can now proceed with the booking.`,
-              notification_type: 'payment_received',
-              link: `/agent-dashboard/jobs/${jobId}`
+              type: 'payment_received',
+              action_url: `/agent-dashboard/jobs/${jobId}`
             });
         }
       }

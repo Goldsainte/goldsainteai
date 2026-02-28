@@ -52,11 +52,12 @@ Deno.serve(async (req) => {
       // Create in-app notification
       await supabaseClient.from('notifications').insert({
         user_id: creator.id,
-        notification_type: 'cocurated_opportunity',
+        type: 'system_announcement',
         title: '🎨 New CoCurated Trip Opportunity',
         message: `A traveler is looking for a content creator to design their ${job.destination} experience. This matches your profile!`,
-        metadata: { jobId, destination: job.destination },
-        link: `/marketplace?job=${jobId}`,
+        entity_type: 'marketplace_job',
+        entity_id: jobId,
+        action_url: `/marketplace?job=${jobId}`,
       });
 
       // Send email notification

@@ -598,10 +598,10 @@ async function updateTravelerVerification(
     // Create notification for the user
     await supabaseClient.from("notifications").insert({
       user_id: verification.user_id,
-      notification_type: "verification",
+      type: "verification",
       title: "Identity Verified ✓",
       message: "Your identity has been verified! You now have a verified badge on your profile.",
-      link: "/profile",
+      action_url: "/profile",
       created_at: new Date().toISOString(),
     });
 
@@ -625,10 +625,10 @@ async function updateTravelerVerification(
     // Create notification for the user
     await supabaseClient.from("notifications").insert({
       user_id: verification.user_id,
-      notification_type: "verification",
+      type: "verification",
       title: "Verification Update",
       message: `Your identity verification was not successful. ${last_error?.reason || "Please try again."}`,
-      link: "/customer-verification",
+      action_url: "/customer-verification",
       created_at: new Date().toISOString(),
     });
 

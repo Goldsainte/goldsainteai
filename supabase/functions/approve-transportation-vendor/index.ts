@@ -89,10 +89,10 @@ serve(async (req) => {
         .from('notifications')
         .insert({
           user_id: supplier.user_id,
-          notification_type: 'vendor_approval',
+          type: 'system_announcement',
           title: 'Application Approved!',
           message: 'Your transportation vendor application has been approved. You can now access your vendor dashboard.',
-          link: '/transportation-vendor-dashboard',
+          action_url: '/transportation-vendor-dashboard',
         });
 
       if (notificationError) {
@@ -122,7 +122,7 @@ serve(async (req) => {
         .from('notifications')
         .insert({
           user_id: supplier.user_id,
-          notification_type: 'vendor_rejection',
+          type: 'system_announcement',
           title: 'Application Status Update',
           message: `Your transportation vendor application requires additional information. ${notes || ''}`,
         });
