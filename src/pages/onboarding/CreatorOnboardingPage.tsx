@@ -177,7 +177,10 @@ export default function CreatorOnboardingPage() {
   const [tiktokVerified, setTiktokVerified] = useState(false);
   const [verifiedFollowerCount, setVerifiedFollowerCount] = useState<number | undefined>();
 
-  // Check for TikTok OAuth callback
+  // Stripe setup tracking
+  const [stripeSetupStarted, setStripeSetupStarted] = useState(false);
+
+  // Check for TikTok OAuth callback and existing Stripe setup
   const [searchParams] = useSearchParams();
   
   useEffect(() => {
@@ -188,10 +191,44 @@ export default function CreatorOnboardingPage() {
       setTiktokVerified(true);
       setVerifiedFollowerCount(parseInt(followers));
       toast.success("TikTok account verified successfully!");
-      // Clean URL
       window.history.replaceState({}, "", window.location.pathname);
     }
-  }, [searchParams]);
+
+    // Check if Stripe is already set up
+    async function checkStripe() {
+      if (!user) return;
+      const { data } = await supabase
+        .from("profiles")
+        .select("stripe_account_id")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (data?.stripe_account_id) {
+        setStripeSetupStarted(true);
+      }
+    }
+    checkStripe();
+  }, [searchParams, user]);
+
+  const handleSkip = async () => {
+    try {
+      if (!user) return;
+      await supabase
+        .from("profiles")
+        .update({
+          account_type: "creator",
+          role: "creator",
+          display_name: displayName || undefined,
+          avatar_url: avatarUrl || undefined,
+          bio: bio || undefined,
+        })
+        .eq("id", user.id);
+      toast.success("Progress saved! You can finish onboarding anytime from your dashboard.");
+      navigate("/creator-dashboard");
+    } catch (error) {
+      console.error("Error saving partial progress:", error);
+      toast.error("Failed to save progress.");
+    }
+  };
 
   const toggleNiche = (value: string) => {
     setSelectedNiches(prev => 
@@ -247,7 +284,7 @@ export default function CreatorOnboardingPage() {
       case 9: return acceptsSafetyPolicy;
       case 10: return true; // AI Identity optional
       case 11: return tosAccepted && privacyAccepted && creatorAgreementAccepted; // Legal required
-      case 12: return true; // Payment optional
+      case 12: return stripeSetupStarted; // Payment required
       default: return true;
     }
   };
@@ -352,6 +389,7 @@ export default function CreatorOnboardingPage() {
 
       if (error) throw error;
       if (data?.url) {
+        setStripeSetupStarted(true);
         window.location.href = data.url;
       }
     } catch (error: any) {
@@ -971,25 +1009,34 @@ export default function CreatorOnboardingPage() {
                   </div>
                 </div>
 
-                <p className="text-sm text-[#6B7280] text-center">You can complete payment setup now or later from your dashboard.</p>
+                <p className="text-sm text-[#6B7280] text-center">Complete Stripe Connect setup to launch your profile. This is required to receive commissions.</p>
               </div>
             )}
 
             {/* Navigation buttons */}
             <div className="flex justify-between mt-10 pt-6 border-t border-[#E5DFC6]">
-              <Button variant="ghost" onClick={handleBack} disabled={currentStep === 0} className="text-[#6B7280] hover:text-[#0a2225] hover:bg-[#FDF9F0]">Back</Button>
+              <div className="flex items-center gap-3">
+                <Button variant="ghost" onClick={handleBack} disabled={currentStep === 0} className="text-[#6B7280] hover:text-[#0a2225] hover:bg-[#FDF9F0]">Back</Button>
+                <Button
+                  variant="ghost"
+                  onClick={handleSkip}
+                  className="text-[#6B7280] hover:text-[#C7A962] hover:bg-[#FDF9F0] text-sm"
+                >
+                  Skip for Now
+                </Button>
+              </div>
 
               <div className="flex gap-3">
                 {currentStep === 12 && (
                   <Button variant="outline" onClick={handleStripeSetup} className="border-[#C7A962] text-[#C7A962] hover:bg-[#C7A962] hover:text-white">
-                    <CreditCard className="w-4 h-4 mr-2" />Set Up Stripe Now
+                    <CreditCard className="w-4 h-4 mr-2" />{stripeSetupStarted ? "Stripe Connected ✓" : "Set Up Stripe Now"}
                   </Button>
                 )}
 
                 {currentStep < STEPS.length - 1 ? (
                   <Button onClick={handleNext} disabled={!canProceed()} className="bg-[#0a2225] hover:bg-[#0a2225]/90 text-white px-8">Continue</Button>
                 ) : (
-                  <Button onClick={handleSubmit} disabled={isSubmitting} className="bg-[#C7A962] hover:bg-[#C7A962]/90 text-white px-8">
+                  <Button onClick={handleSubmit} disabled={isSubmitting || !canProceed()} className="bg-[#C7A962] hover:bg-[#C7A962]/90 text-white px-8">
                     {isSubmitting ? "Launching..." : "Launch My Profile"}
                     <Sparkles className="w-4 h-4 ml-2" />
                   </Button>
