@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { invokeWithAuth } from "@/lib/supabaseHelpers";
-import { Sparkles, TrendingUp, Video, DollarSign, ExternalLink, Plus } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { Sparkles, TrendingUp, Video, DollarSign, ExternalLink, Plus, AlertCircle } from "lucide-react";
 import { BackButton } from "@/components/ui/BackButton";
 
 type CreatorStats = {
@@ -27,9 +29,26 @@ const EMPTY_STATS: CreatorStats = {
 };
 
 export default function CreatorDashboard() {
+  const { user } = useAuth();
   const [stats, setStats] = useState<CreatorStats>(EMPTY_STATS);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [onboardingIncomplete, setOnboardingIncomplete] = useState(false);
+
+  useEffect(() => {
+    async function checkOnboarding() {
+      if (!user) return;
+      const { data } = await supabase
+        .from("profiles")
+        .select("has_completed_creator_onboarding")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (data && !data.has_completed_creator_onboarding) {
+        setOnboardingIncomplete(true);
+      }
+    }
+    checkOnboarding();
+  }, [user]);
 
   useEffect(() => {
     let isMounted = true;
@@ -96,6 +115,25 @@ export default function CreatorDashboard() {
           </span>
         </div>
         
+        {/* Onboarding incomplete banner */}
+        {onboardingIncomplete && (
+          <div className="mb-8 rounded-2xl border border-[#C7A962] bg-[#C7A962]/10 px-6 py-5 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 text-[#C7A962] flex-shrink-0" />
+              <div>
+                <p className="font-medium text-[#0a2225]">Complete Your Creator Profile</p>
+                <p className="text-sm text-[#6B7280]">Finish onboarding to unlock all features and start earning commissions.</p>
+              </div>
+            </div>
+            <Link
+              to="/onboarding/creator"
+              className="inline-flex items-center gap-2 rounded-full bg-[#C7A962] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#B39952] transition-colors whitespace-nowrap"
+            >
+              Complete Setup
+            </Link>
+          </div>
+        )}
+
         {/* Header */}
         <header className="mb-12">
           <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225] tracking-tight">
