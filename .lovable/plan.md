@@ -1,27 +1,29 @@
 
 
-## Fix: Populate email in profiles for messaging search
+## Elevate Notifications Page to Mr & Mrs Smith Luxury Aesthetic
 
-The recipient search correctly queries `profiles.email`, but that column is empty for users because the `handle_new_user()` trigger never copies the email from `auth.users` into `profiles`.
+The current page uses tiny text sizes (9-11px), a generic icon circle, and lacks the serif typography and editorial spacing used throughout the rest of the app. Here's the plan:
 
-### Changes needed:
+### Changes in `src/pages/NotificationsPage.tsx`:
 
-1. **Database migration** — Backfill existing users' emails from `auth.users` into `profiles.email`:
-```sql
-UPDATE public.profiles p
-SET email = u.email
-FROM auth.users u
-WHERE p.id = u.id AND (p.email IS NULL OR p.email = '');
-```
+1. **Remove the icon circle** — Per the editorial typography standard, drop the Sparkles icon in the green circle. Use a simple gold divider or no icon at all.
 
-2. **Update `handle_new_user()` trigger** — Add `NEW.email` to the insert so future signups automatically have their email in profiles:
-```sql
-email = COALESCE(NEW.email, '')
-```
-Add to the INSERT columns and VALUES, and add an `ON CONFLICT DO UPDATE` clause to also set email if missing.
+2. **Header typography** — Change the h1 from `font-display text-[20px]` to `font-secondary` (Playfair Display) with responsive sizing `text-2xl md:text-3xl`. The subtitle label should use `text-xs tracking-[0.2em] uppercase text-[#C7A962] font-medium` (gold, not gray).
 
-3. **No frontend changes needed** — The search filter `email.ilike.%${search}%` already exists in `RecipientSearchModal.tsx` from the previous change.
+3. **Description text** — Increase from `text-sm` to `text-base md:text-lg` with `text-[#6B7280]` and add `max-w-2xl` for editorial line length.
 
-### Privacy note
-The `profiles` table already has an `email` column and existing RLS policies. Storing email there enables search but the column is only used server-side in the ilike filter — the email is not returned in the `.select()` call and won't be displayed in the UI.
+4. **Card container** — Keep `rounded-2xl` (not 3xl), increase padding to `p-6 md:p-8`, remove `text-[11px]` base size.
+
+5. **Notification items** — Scale up typography:
+   - Title: `text-sm md:text-base font-medium` (not 11px)
+   - Message: `text-sm text-[#6B7280]` (not 10px)  
+   - Timestamp: `text-xs text-[#9CA3AF]` (not 9px), use `formatDistanceToNow` from date-fns for relative time ("2 hours ago")
+   - Add `px-4 md:px-6 py-4 md:py-5` padding per item, with `rounded-xl` hover state
+   - Unread items: subtle left gold border (`border-l-2 border-[#C7A962]`) instead of background color change
+
+6. **Empty state** — Use serif heading "Nothing new yet" with editorial body copy, no icon, centered with generous padding (`py-16`).
+
+7. **Loading state** — Use `text-sm text-[#6B7280]` instead of 10px.
+
+8. **Import `formatDistanceToNow`** from date-fns to replace raw `toLocaleString()`.
 
