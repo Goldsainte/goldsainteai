@@ -3,23 +3,51 @@ import { Link } from "react-router-dom";
 import { invokeWithAuth } from "@/lib/supabaseHelpers";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Sparkles, FileText, DollarSign, Plus, AlertCircle } from "lucide-react";
+import {
+  Sparkles,
+  Send,
+  CheckCircle2,
+  BarChart3,
+  DollarSign,
+  Clock,
+  Plus,
+  AlertCircle,
+  Search,
+  TrendingUp,
+} from "lucide-react";
 import { BackButton } from "@/components/ui/BackButton";
+import { ProposalStatusBadge } from "@/components/proposals/ProposalStatusBadge";
+import type { TripProposalStatus } from "@/services/proposalService";
+
+type RecentProposal = {
+  id: string;
+  tripRequestId: string;
+  status: TripProposalStatus;
+  createdAt: string;
+  destination: string;
+  tripTitle: string;
+};
 
 type CreatorStats = {
-  totalTripStories: number;
-  totalEstimatedEarnings: number;
-  recentStories: {
-    id: string;
-    title: string;
-    createdAt: string;
-  }[];
+  activeProposals: number;
+  acceptedProposals: number;
+  totalProposalsSent: number;
+  responseRate: number;
+  totalEarnings: number;
+  pendingEarnings: number;
+  recentProposals: RecentProposal[];
+  openTripRequests: number;
 };
 
 const EMPTY_STATS: CreatorStats = {
-  totalTripStories: 0,
-  totalEstimatedEarnings: 0,
-  recentStories: [],
+  activeProposals: 0,
+  acceptedProposals: 0,
+  totalProposalsSent: 0,
+  responseRate: 0,
+  totalEarnings: 0,
+  pendingEarnings: 0,
+  recentProposals: [],
+  openTripRequests: 0,
 };
 
 export default function CreatorDashboard() {
@@ -65,11 +93,15 @@ export default function CreatorDashboard() {
         }
 
         if (!isMounted) return;
-
         setStats({
-          totalTripStories: data?.totalTripStories ?? 0,
-          totalEstimatedEarnings: data?.totalEstimatedEarnings ?? 0,
-          recentStories: data?.recentStories ?? [],
+          activeProposals: data?.activeProposals ?? 0,
+          acceptedProposals: data?.acceptedProposals ?? 0,
+          totalProposalsSent: data?.totalProposalsSent ?? 0,
+          responseRate: data?.responseRate ?? 0,
+          totalEarnings: data?.totalEarnings ?? 0,
+          pendingEarnings: data?.pendingEarnings ?? 0,
+          recentProposals: data?.recentProposals ?? [],
+          openTripRequests: data?.openTripRequests ?? 0,
         });
       } catch (e: any) {
         console.error(e);
@@ -82,32 +114,28 @@ export default function CreatorDashboard() {
     }
 
     loadStats();
-
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, []);
+
+  const fmt = (n: number) =>
+    `$${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
 
   return (
     <div className="flex-1 bg-[#FDF9F0]">
       <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
-        {/* Back button */}
         <div className="mb-6">
           <BackButton />
         </div>
 
-        {/* Gold accent line */}
         <div className="w-16 h-0.5 bg-[#C7A962] mb-6" />
 
-        {/* Pill badge */}
         <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 border border-[#E5DFC6] mb-4">
           <Sparkles className="h-4 w-4 text-[#C7A962]" />
           <span className="text-sm font-medium text-[#6B7280] tracking-wide">
             Creator Studio
           </span>
         </div>
-        
-        {/* Onboarding incomplete banner */}
+
         {onboardingIncomplete && (
           <div className="mb-8 rounded-2xl border border-[#C7A962] bg-[#C7A962]/10 px-6 py-5 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -132,16 +160,16 @@ export default function CreatorDashboard() {
             Creator Dashboard
           </h1>
           <p className="mt-3 text-[#6B7280] text-base max-w-xl leading-relaxed">
-            Track your content performance and see how your travel stories are inspiring journeys through Goldsainte.
+            Track your proposals, earnings, and marketplace activity at a glance.
           </p>
-          
+
           <div className="flex flex-wrap gap-3 mt-6">
             <Link
-              to="/storyboards"
+              to="/marketplace"
               className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-[#0a2225]/90 transition-colors"
             >
-              <Sparkles className="w-4 h-4" />
-              Open Creator Lab
+              <Search className="w-4 h-4" />
+              Browse Trip Requests
             </Link>
             <Link
               to="/trip-builder"
@@ -159,92 +187,125 @@ export default function CreatorDashboard() {
           </div>
         </header>
 
-        {/* Stats Grid */}
-        <section className="grid gap-6 md:grid-cols-2 mb-12">
+        {/* Stats Grid — 3x2 */}
+        <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-12">
           <LuxuryStatCard
-            icon={<FileText className="w-5 h-5 text-[#C7A962]" />}
-            label="Trip Stories"
-            value={loading ? "—" : stats.totalTripStories.toString()}
-            helper="Stories created in Creator Lab"
+            icon={<Send className="w-5 h-5 text-[#C7A962]" />}
+            label="Active Proposals"
+            value={loading ? "—" : stats.activeProposals.toString()}
+            helper="Pending, sent, or under review"
+          />
+          <LuxuryStatCard
+            icon={<CheckCircle2 className="w-5 h-5 text-[#C7A962]" />}
+            label="Accepted"
+            value={loading ? "—" : stats.acceptedProposals.toString()}
+            helper="Proposals accepted by travelers"
+          />
+          <LuxuryStatCard
+            icon={<BarChart3 className="w-5 h-5 text-[#C7A962]" />}
+            label="Total Sent"
+            value={loading ? "—" : stats.totalProposalsSent.toString()}
+            helper="Lifetime proposals submitted"
+          />
+          <LuxuryStatCard
+            icon={<TrendingUp className="w-5 h-5 text-[#C7A962]" />}
+            label="Response Rate"
+            value={loading ? "—" : `${stats.responseRate}%`}
+            helper="Proposals that got a response"
           />
           <LuxuryStatCard
             icon={<DollarSign className="w-5 h-5 text-[#C7A962]" />}
-            label="Estimated Earnings"
-            value={
-              loading
-                ? "—"
-                : `$${stats.totalEstimatedEarnings.toLocaleString("en-US", {
-                    maximumFractionDigits: 0,
-                  })}`
-            }
-            helper="Based on trips sold"
+            label="Total Earnings"
+            value={loading ? "—" : fmt(stats.totalEarnings)}
+            helper="Completed & paid earnings"
+          />
+          <LuxuryStatCard
+            icon={<Clock className="w-5 h-5 text-[#C7A962]" />}
+            label="Pending Earnings"
+            value={loading ? "—" : fmt(stats.pendingEarnings)}
+            helper="Awaiting payout"
           />
         </section>
 
+        {/* Open Trip Requests banner */}
+        {!loading && stats.openTripRequests > 0 && (
+          <Link
+            to="/marketplace?tab=trip-requests"
+            className="mb-8 flex items-center justify-between rounded-2xl border border-[#C7A962]/30 bg-[#C7A962]/5 px-6 py-4 hover:bg-[#C7A962]/10 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <Search className="w-5 h-5 text-[#C7A962]" />
+              <span className="text-sm font-medium text-[#0a2225]">
+                {stats.openTripRequests} open trip request{stats.openTripRequests !== 1 ? "s" : ""} in the marketplace
+              </span>
+            </div>
+            <span className="text-sm text-[#C7A962] font-medium">View all →</span>
+          </Link>
+        )}
 
-        {/* Error State */}
         {error && (
           <div className="mb-8 rounded-2xl border border-red-200 bg-red-50 px-6 py-4 text-sm text-red-700">
             {error}
           </div>
         )}
 
-        {/* Recent Stories */}
+        {/* Recent Proposals */}
         <section>
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="font-secondary text-2xl text-[#0a2225]">
-                Recent Stories
+                Recent Proposals
               </h2>
               <p className="mt-1 text-sm text-[#6B7280]">
-                Your latest trip stories from Creator Lab
+                Your latest bids on trip requests
               </p>
             </div>
             <Link
-              to="/storyboards"
+              to="/my-proposals"
               className="inline-flex items-center gap-2 rounded-full border border-[#C7A962] bg-[#C7A962]/10 px-5 py-2.5 text-sm font-medium text-[#0a2225] hover:bg-[#C7A962]/20 transition-colors"
             >
-              <Plus className="w-4 h-4" />
-              Create Story
+              View All Proposals
             </Link>
           </div>
 
           <div className="space-y-4">
             {loading ? (
-              <LuxuryEmptyState message="Loading your stories..." />
-            ) : stats.recentStories.length === 0 ? (
-              <LuxuryEmptyState 
-                message="No stories yet"
-                subtext="Start creating travel stories in Creator Lab to see them here."
+              <LuxuryEmptyState message="Loading your proposals..." />
+            ) : stats.recentProposals.length === 0 ? (
+              <LuxuryEmptyState
+                message="No proposals yet"
+                subtext="Browse open trip requests in the marketplace and submit your first bid."
                 action={
                   <Link
-                    to="/storyboards"
+                    to="/marketplace"
                     className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0a2225]/90 transition-colors mt-4"
                   >
-                    Create Your First Story
+                    Browse Trip Requests
                   </Link>
                 }
               />
             ) : (
-              stats.recentStories.map((story) => (
-                <div
-                  key={story.id}
+              stats.recentProposals.map((proposal) => (
+                <Link
+                  key={proposal.id}
+                  to={`/marketplace/request/${proposal.tripRequestId}`}
                   className="flex items-center justify-between gap-4 rounded-2xl bg-white border border-[#E5DFC6] p-5 hover:shadow-md transition-shadow"
                 >
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-[#0a2225] truncate">
-                      {story.title}
+                      {proposal.tripTitle}
                     </h3>
                     <p className="text-sm text-[#6B7280] mt-0.5">
-                      {new Date(story.createdAt).toLocaleDateString('en-US', {
-                        month: 'long',
-                        day: 'numeric',
-                        year: 'numeric'
+                      {proposal.destination} ·{" "}
+                      {new Date(proposal.createdAt).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
                       })}
                     </p>
                   </div>
-                  
-                </div>
+                  <ProposalStatusBadge status={proposal.status} />
+                </Link>
               ))
             )}
           </div>
@@ -275,27 +336,25 @@ function LuxuryStatCard({
           {label}
         </span>
       </div>
-      <div className="font-secondary text-3xl text-[#0a2225]">
-        {value}
-      </div>
+      <div className="font-secondary text-3xl text-[#0a2225]">{value}</div>
       <p className="text-sm text-[#6B7280] mt-2">{helper}</p>
     </div>
   );
 }
 
-function LuxuryEmptyState({ 
-  message, 
-  subtext, 
-  action 
-}: { 
-  message: string; 
+function LuxuryEmptyState({
+  message,
+  subtext,
+  action,
+}: {
+  message: string;
   subtext?: string;
   action?: React.ReactNode;
 }) {
   return (
     <div className="rounded-2xl bg-white border border-[#E5DFC6] p-12 text-center">
       <div className="w-16 h-16 rounded-full bg-[#F6F0E4] flex items-center justify-center mx-auto mb-4">
-        <FileText className="w-7 h-7 text-[#C7A962]" />
+        <Send className="w-7 h-7 text-[#C7A962]" />
       </div>
       <h3 className="font-secondary text-xl text-[#0a2225]">{message}</h3>
       {subtext && (
