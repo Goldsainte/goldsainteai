@@ -1,26 +1,27 @@
 
 
-## Add username and email search to messaging recipient finder
+## Fix: Populate email in profiles for messaging search
 
-### Change: `src/components/messaging/RecipientSearchModal.tsx`
+The recipient search correctly queries `profiles.email`, but that column is empty for users because the `handle_new_user()` trigger never copies the email from `auth.users` into `profiles`.
 
-**Line 58** — Expand the `.or()` filter to also match `username` and `email`:
-```
-.or(`display_name.ilike.%${search}%,full_name.ilike.%${search}%,username.ilike.%${search}%,email.ilike.%${search}%`)
-```
+### Changes needed:
 
-**Line 56** — Add `username` to the select:
-```
-.select("id, display_name, full_name, username, avatar_url, account_type, is_verified")
-```
-
-**Line 14** — Add `username` to the `Recipient` interface:
-```ts
-username: string | null;
+1. **Database migration** — Backfill existing users' emails from `auth.users` into `profiles.email`:
+```sql
+UPDATE public.profiles p
+SET email = u.email
+FROM auth.users u
+WHERE p.id = u.id AND (p.email IS NULL OR p.email = '');
 ```
 
-**Lines 109, 155, 161, 167** — Update UI to show username when available:
-- Placeholder: `"Search by name, username, or email..."`
-- Below display name, show `@username` if present
-- Show matched email hint if the search looks like an email
+2. **Update `handle_new_user()` trigger** — Add `NEW.email` to the insert so future signups automatically have their email in profiles:
+```sql
+email = COALESCE(NEW.email, '')
+```
+Add to the INSERT columns and VALUES, and add an `ON CONFLICT DO UPDATE` clause to also set email if missing.
+
+3. **No frontend changes needed** — The search filter `email.ilike.%${search}%` already exists in `RecipientSearchModal.tsx` from the previous change.
+
+### Privacy note
+The `profiles` table already has an `email` column and existing RLS policies. Storing email there enables search but the column is only used server-side in the ilike filter — the email is not returned in the `.select()` call and won't be displayed in the UI.
 
