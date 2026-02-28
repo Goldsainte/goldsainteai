@@ -34,7 +34,6 @@ const HIDE_HEADER_PAGES = new Set([
   // Legacy social feed - disabled
   // "/travel-feed",
   // "/journeys",
-  "/creator/:id",
   "/travel-settings",
 ]);
 
@@ -52,7 +51,7 @@ const HIDE_FOOTER_PREFIXES = [
   // "/journeys",
   // "/search",
   // "/trending",
-  "/creator/:id",
+  
   "/travel-settings",
   "/creator-dashboard",
   "/your-activity",
