@@ -3,27 +3,21 @@ import { Link } from "react-router-dom";
 import { invokeWithAuth } from "@/lib/supabaseHelpers";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Sparkles, TrendingUp, Video, DollarSign, ExternalLink, Plus, AlertCircle } from "lucide-react";
+import { Sparkles, FileText, DollarSign, Plus, AlertCircle } from "lucide-react";
 import { BackButton } from "@/components/ui/BackButton";
 
 type CreatorStats = {
-  tiktokConnected: boolean;
   totalTripStories: number;
-  totalTripsLinked: number;
   totalEstimatedEarnings: number;
   recentStories: {
     id: string;
     title: string;
     createdAt: string;
-    postedToTikTok: boolean;
-    tiktokVideoId?: string | null;
   }[];
 };
 
 const EMPTY_STATS: CreatorStats = {
-  tiktokConnected: false,
   totalTripStories: 0,
-  totalTripsLinked: 0,
   totalEstimatedEarnings: 0,
   recentStories: [],
 };
@@ -73,9 +67,7 @@ export default function CreatorDashboard() {
         if (!isMounted) return;
 
         setStats({
-          tiktokConnected: !!data?.tiktokConnected,
           totalTripStories: data?.totalTripStories ?? 0,
-          totalTripsLinked: data?.totalTripsLinked ?? 0,
           totalEstimatedEarnings: data?.totalEstimatedEarnings ?? 0,
           recentStories: data?.recentStories ?? [],
         });
@@ -168,18 +160,12 @@ export default function CreatorDashboard() {
         </header>
 
         {/* Stats Grid */}
-        <section className="grid gap-6 md:grid-cols-3 mb-12">
+        <section className="grid gap-6 md:grid-cols-2 mb-12">
           <LuxuryStatCard
-            icon={<Video className="w-5 h-5 text-[#C7A962]" />}
+            icon={<FileText className="w-5 h-5 text-[#C7A962]" />}
             label="Trip Stories"
             value={loading ? "—" : stats.totalTripStories.toString()}
             helper="Stories created in Creator Lab"
-          />
-          <LuxuryStatCard
-            icon={<TrendingUp className="w-5 h-5 text-[#C7A962]" />}
-            label="TikTok Linked"
-            value={loading ? "—" : stats.totalTripsLinked.toString()}
-            helper="Trips with content attached"
           />
           <LuxuryStatCard
             icon={<DollarSign className="w-5 h-5 text-[#C7A962]" />}
@@ -195,46 +181,6 @@ export default function CreatorDashboard() {
           />
         </section>
 
-        {/* TikTok Connection Card */}
-        <section className="mb-12">
-          <div className="rounded-2xl bg-white border border-[#E5DFC6] p-8 shadow-sm">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-[#F6F0E4] flex items-center justify-center flex-shrink-0">
-                  <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
-                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
-                  </svg>
-                </div>
-                <div>
-                  <h2 className="font-secondary text-xl text-[#0a2225]">
-                    TikTok Connection
-                  </h2>
-                  <p className="mt-1 text-sm text-[#6B7280] max-w-md">
-                    {stats.tiktokConnected
-                      ? "Your TikTok account is connected. You're ready to publish stories directly from Creator Lab."
-                      : "Connect your TikTok account to publish stories and track performance across platforms."}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-4">
-                <div className={`px-4 py-1.5 rounded-full text-sm font-medium ${
-                  stats.tiktokConnected 
-                    ? "bg-emerald-50 text-emerald-700" 
-                    : "bg-amber-50 text-amber-700"
-                }`}>
-                  {stats.tiktokConnected ? "Connected" : "Not Connected"}
-                </div>
-                <Link
-                  to="/storyboards"
-                  className="rounded-full bg-[#0a2225] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0a2225]/90 transition-colors"
-                >
-                  {stats.tiktokConnected ? "Manage" : "Connect"}
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* Error State */}
         {error && (
@@ -298,27 +244,6 @@ export default function CreatorDashboard() {
                     </p>
                   </div>
                   
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-medium ${
-                        story.postedToTikTok
-                          ? "bg-emerald-50 text-emerald-700"
-                          : "bg-[#F6F0E4] text-[#6B7280]"
-                      }`}
-                    >
-                      {story.postedToTikTok ? "Published" : "Draft"}
-                    </span>
-                    {story.tiktokVideoId && (
-                      <a
-                        href={`https://www.tiktok.com/@goldsainte/video/${story.tiktokVideoId}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-sm font-medium text-[#C7A962] hover:text-[#B39952] transition-colors"
-                      >
-                        View <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                    )}
-                  </div>
                 </div>
               ))
             )}
@@ -370,7 +295,7 @@ function LuxuryEmptyState({
   return (
     <div className="rounded-2xl bg-white border border-[#E5DFC6] p-12 text-center">
       <div className="w-16 h-16 rounded-full bg-[#F6F0E4] flex items-center justify-center mx-auto mb-4">
-        <Video className="w-7 h-7 text-[#C7A962]" />
+        <FileText className="w-7 h-7 text-[#C7A962]" />
       </div>
       <h3 className="font-secondary text-xl text-[#0a2225]">{message}</h3>
       {subtext && (
