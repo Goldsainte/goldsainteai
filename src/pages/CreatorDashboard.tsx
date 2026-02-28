@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, Navigate } from "react-router-dom";
 import { invokeWithAuth } from "@/lib/supabaseHelpers";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -19,6 +19,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useUserRole } from "@/hooks/useUserRole";
 import { CreatorOverviewTab } from "./creator/components/CreatorOverviewTab";
 import { CreatorProposalsTab } from "./creator/components/CreatorProposalsTab";
 import { CreatorTripsTab } from "./creator/components/CreatorTripsTab";
@@ -69,6 +70,7 @@ export default function CreatorDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { hasCreatorAccess, loading: roleLoading } = useUserRole();
   const [stats, setStats] = useState<CreatorStats>(EMPTY_STATS);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -129,6 +131,11 @@ export default function CreatorDashboard() {
     return () => { isMounted = false; };
   }, []);
 
+  // Redirect non-creators away
+  if (!roleLoading && !hasCreatorAccess) {
+    return <Navigate to="/traveler" replace />;
+  }
+
   const displayName = profile?.display_name || profile?.first_name || profile?.full_name || "Creator";
 
   const getInitials = (name?: string | null) => {
@@ -157,7 +164,7 @@ export default function CreatorDashboard() {
               <div>
                 <p className="text-xs text-[#C7A962] font-medium tracking-wider uppercase flex items-center gap-1.5">
                   <Sparkles className="h-3 w-3" />
-                  Creator Studio
+                  Creator Dashboard
                 </p>
                 <h1 className="font-secondary text-xl md:text-2xl lg:text-3xl text-[#0a2225]">
                   Welcome back, {displayName.split(" ")[0]}

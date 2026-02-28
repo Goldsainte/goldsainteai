@@ -97,7 +97,7 @@ export default function TikTokLabStoryboardsPage() {
     switch (accountType) {
       case "creator":
       case "agent":
-        return "Back to Creator Studio";
+        return "Back to Dashboard";
       case "traveler":
         return "Back to Dashboard";
       default:

@@ -474,10 +474,10 @@ export default function CreatorOnboardingPage() {
       <div className="relative z-10 max-w-3xl mx-auto px-4 py-8 md:py-12">
         <div className="text-center mb-8">
           <p className="text-[#C7A962] text-sm tracking-widest uppercase mb-2">
-            Creator Studio
+            Creator Dashboard
           </p>
           <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225]">
-            Creator Studio by <span className="italic">Goldsainte AI</span>
+            Creator Dashboard by <span className="italic">Goldsainte AI</span>
           </h1>
           <p className="text-[#6B7280] mt-3 text-lg">
             Share your journeys. Earn commissions. Inspire travelers globally.
