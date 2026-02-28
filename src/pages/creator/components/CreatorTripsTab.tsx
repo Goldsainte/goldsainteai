@@ -1,0 +1,20 @@
+import { Link } from "react-router-dom";
+import { Plus } from "lucide-react";
+
+export function CreatorTripsTab() {
+  return (
+    <div className="bg-white border border-[#E5DFC6] rounded-2xl p-8 md:p-12 text-center">
+      <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">My Trip Packages</h2>
+      <p className="text-sm text-[#6B7280] max-w-md mx-auto mb-6">
+        Create and manage curated trip packages for travelers to discover and book.
+      </p>
+      <Link
+        to="/trip-builder"
+        className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] px-6 py-3 text-sm font-medium text-white hover:bg-[#0a2225]/90 transition-colors"
+      >
+        <Plus className="h-4 w-4" />
+        Create Trip Package
+      </Link>
+    </div>
+  );
+}

@@ -1,22 +1,29 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { invokeWithAuth } from "@/lib/supabaseHelpers";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   Sparkles,
-  Send,
-  CheckCircle2,
-  BarChart3,
-  DollarSign,
-  Clock,
+  Search,
   Plus,
   AlertCircle,
-  Search,
-  TrendingUp,
+  Send,
+  FileText,
+  Map,
+  DollarSign,
+  Settings,
 } from "lucide-react";
 import { BackButton } from "@/components/ui/BackButton";
-import { ProposalStatusBadge } from "@/components/proposals/ProposalStatusBadge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { CreatorOverviewTab } from "./creator/components/CreatorOverviewTab";
+import { CreatorProposalsTab } from "./creator/components/CreatorProposalsTab";
+import { CreatorTripsTab } from "./creator/components/CreatorTripsTab";
+import { CreatorEarningsTab } from "./creator/components/CreatorEarningsTab";
+import { CreatorSettingsTab } from "./creator/components/CreatorSettingsTab";
 import type { TripProposalStatus } from "@/services/proposalService";
 
 type RecentProposal = {
@@ -50,31 +57,41 @@ const EMPTY_STATS: CreatorStats = {
   openTripRequests: 0,
 };
 
+interface Profile {
+  display_name: string | null;
+  first_name: string | null;
+  full_name: string | null;
+  avatar_url: string | null;
+  has_completed_creator_onboarding: boolean | null;
+}
+
 export default function CreatorDashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [stats, setStats] = useState<CreatorStats>(EMPTY_STATS);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [onboardingIncomplete, setOnboardingIncomplete] = useState(false);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [activeTab, setActiveTab] = useState("overview");
+
+  const onboardingIncomplete = profile && !profile.has_completed_creator_onboarding;
 
   useEffect(() => {
-    async function checkOnboarding() {
+    async function loadProfile() {
       if (!user) return;
       const { data } = await supabase
         .from("profiles")
-        .select("has_completed_creator_onboarding")
+        .select("display_name, first_name, full_name, avatar_url, has_completed_creator_onboarding")
         .eq("id", user.id)
         .maybeSingle();
-      if (data && !data.has_completed_creator_onboarding) {
-        setOnboardingIncomplete(true);
-      }
+      if (data) setProfile(data as Profile);
     }
-    checkOnboarding();
+    loadProfile();
   }, [user]);
 
   useEffect(() => {
     let isMounted = true;
-
     async function loadStats() {
       setLoading(true);
       setError(null);
@@ -83,15 +100,12 @@ export default function CreatorDashboard() {
           "creator-dashboard-stats",
           { body: {} }
         );
-
         if (fnError) {
-          console.error(fnError);
           if (!isMounted) return;
           setError(fnError || "Unable to load creator stats at the moment.");
           setStats(EMPTY_STATS);
           return;
         }
-
         if (!isMounted) return;
         setStats({
           activeProposals: data?.activeProposals ?? 0,
@@ -103,8 +117,7 @@ export default function CreatorDashboard() {
           recentProposals: data?.recentProposals ?? [],
           openTripRequests: data?.openTripRequests ?? 0,
         });
-      } catch (e: any) {
-        console.error(e);
+      } catch {
         if (!isMounted) return;
         setError("Unexpected error while loading stats.");
         setStats(EMPTY_STATS);
@@ -112,30 +125,66 @@ export default function CreatorDashboard() {
         if (isMounted) setLoading(false);
       }
     }
-
     loadStats();
     return () => { isMounted = false; };
   }, []);
 
-  const fmt = (n: number) =>
-    `$${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+  const displayName = profile?.display_name || profile?.first_name || profile?.full_name || "Creator";
+
+  const getInitials = (name?: string | null) => {
+    if (!name) return "?";
+    return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+  };
+
+  const tabTriggerClass =
+    "rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors";
 
   return (
-    <div className="flex-1 bg-[#FDF9F0]">
-      <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
-        <div className="mb-6">
-          <BackButton />
-        </div>
+    <main className="min-h-screen bg-[#FDF9F0] pb-24 lg:pb-0">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 md:py-12">
+        <BackButton className="mb-4" />
 
-        <div className="w-16 h-0.5 bg-[#C7A962] mb-6" />
+        {/* Header */}
+        <header className="mb-6 md:mb-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6">
+            <div className="flex items-center gap-3 md:gap-4">
+              <Avatar className="h-12 w-12 md:h-16 md:w-16 border-2 border-[#E5DFC6]">
+                <AvatarImage src={profile?.avatar_url || undefined} alt={displayName} />
+                <AvatarFallback className="bg-[#F6F0E4] text-[#0a2225] text-base md:text-lg font-secondary">
+                  {getInitials(displayName)}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="text-xs text-[#C7A962] font-medium tracking-wider uppercase flex items-center gap-1.5">
+                  <Sparkles className="h-3 w-3" />
+                  Creator Studio
+                </p>
+                <h1 className="font-secondary text-xl md:text-2xl lg:text-3xl text-[#0a2225]">
+                  Welcome back, {displayName.split(" ")[0]}
+                </h1>
+              </div>
+            </div>
 
-        <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 border border-[#E5DFC6] mb-4">
-          <Sparkles className="h-4 w-4 text-[#C7A962]" />
-          <span className="text-sm font-medium text-[#6B7280] tracking-wide">
-            Creator Studio
-          </span>
-        </div>
+            <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-3">
+              <button
+                onClick={() => navigate("/marketplace")}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-[#0a2225] text-white px-5 py-2.5 text-sm font-medium hover:bg-[#0a2225]/90 transition-colors"
+              >
+                <Search className="h-4 w-4" />
+                Browse Trip Requests
+              </button>
+              <button
+                onClick={() => navigate("/trip-builder")}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full border border-[#E5DFC6] bg-white text-[#0a2225] px-5 py-2.5 text-sm font-medium hover:bg-[#F6F0E4] transition-colors"
+              >
+                <Plus className="h-4 w-4" />
+                Create Trip Package
+              </button>
+            </div>
+          </div>
+        </header>
 
+        {/* Onboarding Banner */}
         {onboardingIncomplete && (
           <div className="mb-8 rounded-2xl border border-[#C7A962] bg-[#C7A962]/10 px-6 py-5 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -154,213 +203,86 @@ export default function CreatorDashboard() {
           </div>
         )}
 
-        {/* Header */}
-        <header className="mb-12">
-          <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225] tracking-tight">
-            Creator Dashboard
-          </h1>
-          <p className="mt-3 text-[#6B7280] text-base max-w-xl leading-relaxed">
-            Track your proposals, earnings, and marketplace activity at a glance.
-          </p>
-
-          <div className="flex flex-wrap gap-3 mt-6">
-            <Link
-              to="/marketplace"
-              className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-[#0a2225]/90 transition-colors"
-            >
-              <Search className="w-4 h-4" />
-              Browse Trip Requests
-            </Link>
-            <Link
-              to="/trip-builder"
-              className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-white px-6 py-3 text-sm font-medium text-[#0a2225] shadow-sm hover:bg-[#F6F0E4] transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Create Trip Package
-            </Link>
-            <Link
-              to="/marketplace"
-              className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-white px-6 py-3 text-sm font-medium text-[#0a2225] shadow-sm hover:bg-[#F6F0E4] transition-colors"
-            >
-              View Marketplace
-            </Link>
-          </div>
-        </header>
-
-        {/* Stats Grid — 3x2 */}
-        <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-12">
-          <LuxuryStatCard
-            icon={<Send className="w-5 h-5 text-[#C7A962]" />}
-            label="Active Proposals"
-            value={loading ? "—" : stats.activeProposals.toString()}
-            helper="Pending, sent, or under review"
-          />
-          <LuxuryStatCard
-            icon={<CheckCircle2 className="w-5 h-5 text-[#C7A962]" />}
-            label="Accepted"
-            value={loading ? "—" : stats.acceptedProposals.toString()}
-            helper="Proposals accepted by travelers"
-          />
-          <LuxuryStatCard
-            icon={<BarChart3 className="w-5 h-5 text-[#C7A962]" />}
-            label="Total Sent"
-            value={loading ? "—" : stats.totalProposalsSent.toString()}
-            helper="Lifetime proposals submitted"
-          />
-          <LuxuryStatCard
-            icon={<TrendingUp className="w-5 h-5 text-[#C7A962]" />}
-            label="Response Rate"
-            value={loading ? "—" : `${stats.responseRate}%`}
-            helper="Proposals that got a response"
-          />
-          <LuxuryStatCard
-            icon={<DollarSign className="w-5 h-5 text-[#C7A962]" />}
-            label="Total Earnings"
-            value={loading ? "—" : fmt(stats.totalEarnings)}
-            helper="Completed & paid earnings"
-          />
-          <LuxuryStatCard
-            icon={<Clock className="w-5 h-5 text-[#C7A962]" />}
-            label="Pending Earnings"
-            value={loading ? "—" : fmt(stats.pendingEarnings)}
-            helper="Awaiting payout"
-          />
-        </section>
-
-        {/* Open Trip Requests banner */}
-        {!loading && stats.openTripRequests > 0 && (
-          <Link
-            to="/marketplace?tab=trip-requests"
-            className="mb-8 flex items-center justify-between rounded-2xl border border-[#C7A962]/30 bg-[#C7A962]/5 px-6 py-4 hover:bg-[#C7A962]/10 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <Search className="w-5 h-5 text-[#C7A962]" />
-              <span className="text-sm font-medium text-[#0a2225]">
-                {stats.openTripRequests} open trip request{stats.openTripRequests !== 1 ? "s" : ""} in the marketplace
-              </span>
-            </div>
-            <span className="text-sm text-[#C7A962] font-medium">View all →</span>
-          </Link>
-        )}
-
         {error && (
           <div className="mb-8 rounded-2xl border border-red-200 bg-red-50 px-6 py-4 text-sm text-red-700">
             {error}
           </div>
         )}
 
-        {/* Recent Proposals */}
-        <section>
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="font-secondary text-2xl text-[#0a2225]">
-                Recent Proposals
-              </h2>
-              <p className="mt-1 text-sm text-[#6B7280]">
-                Your latest bids on trip requests
-              </p>
-            </div>
-            <Link
-              to="/my-proposals"
-              className="inline-flex items-center gap-2 rounded-full border border-[#C7A962] bg-[#C7A962]/10 px-5 py-2.5 text-sm font-medium text-[#0a2225] hover:bg-[#C7A962]/20 transition-colors"
-            >
-              View All Proposals
-            </Link>
-          </div>
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+          {isMobile ? (
+            <Select value={activeTab} onValueChange={setActiveTab}>
+              <SelectTrigger className="w-full bg-white border-[#E5DFC6] rounded-full h-12 px-4 text-sm font-medium text-[#0a2225]">
+                <SelectValue>
+                  <span className="flex items-center gap-2">
+                    {activeTab === "overview" && <><Sparkles className="h-4 w-4 text-[#C7A962]" /> Overview</>}
+                    {activeTab === "proposals" && <><FileText className="h-4 w-4 text-[#C7A962]" /> Proposals</>}
+                    {activeTab === "trips" && <><Map className="h-4 w-4 text-[#C7A962]" /> My Trips</>}
+                    {activeTab === "earnings" && <><DollarSign className="h-4 w-4 text-[#C7A962]" /> Earnings</>}
+                    {activeTab === "settings" && <><Settings className="h-4 w-4 text-[#C7A962]" /> Settings</>}
+                  </span>
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent className="bg-white border-[#E5DFC6] rounded-xl">
+                <SelectItem value="overview" className="py-3">
+                  <span className="flex items-center gap-2"><Sparkles className="h-4 w-4" /> Overview</span>
+                </SelectItem>
+                <SelectItem value="proposals" className="py-3">
+                  <span className="flex items-center gap-2"><FileText className="h-4 w-4" /> Proposals</span>
+                </SelectItem>
+                <SelectItem value="trips" className="py-3">
+                  <span className="flex items-center gap-2"><Map className="h-4 w-4" /> My Trips</span>
+                </SelectItem>
+                <SelectItem value="earnings" className="py-3">
+                  <span className="flex items-center gap-2"><DollarSign className="h-4 w-4" /> Earnings</span>
+                </SelectItem>
+                <SelectItem value="settings" className="py-3">
+                  <span className="flex items-center gap-2"><Settings className="h-4 w-4" /> Settings</span>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          ) : (
+            <TabsList className="bg-white border border-[#E5DFC6] rounded-full p-1.5 h-auto flex flex-nowrap justify-start gap-1">
+              <TabsTrigger value="overview" className={tabTriggerClass}>
+                <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Overview
+              </TabsTrigger>
+              <TabsTrigger value="proposals" className={tabTriggerClass}>
+                <FileText className="h-3.5 w-3.5 mr-1.5" /> Proposals
+              </TabsTrigger>
+              <TabsTrigger value="trips" className={tabTriggerClass}>
+                <Map className="h-3.5 w-3.5 mr-1.5" /> My Trips
+              </TabsTrigger>
+              <TabsTrigger value="earnings" className={tabTriggerClass}>
+                <DollarSign className="h-3.5 w-3.5 mr-1.5" /> Earnings
+              </TabsTrigger>
+              <TabsTrigger value="settings" className={tabTriggerClass}>
+                <Settings className="h-3.5 w-3.5 mr-1.5" /> Settings
+              </TabsTrigger>
+            </TabsList>
+          )}
 
-          <div className="space-y-4">
-            {loading ? (
-              <LuxuryEmptyState message="Loading your proposals..." />
-            ) : stats.recentProposals.length === 0 ? (
-              <LuxuryEmptyState
-                message="No proposals yet"
-                subtext="Browse open trip requests in the marketplace and submit your first bid."
-                action={
-                  <Link
-                    to="/marketplace"
-                    className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0a2225]/90 transition-colors mt-4"
-                  >
-                    Browse Trip Requests
-                  </Link>
-                }
-              />
-            ) : (
-              stats.recentProposals.map((proposal) => (
-                <Link
-                  key={proposal.id}
-                  to={`/marketplace/request/${proposal.tripRequestId}`}
-                  className="flex items-center justify-between gap-4 rounded-2xl bg-white border border-[#E5DFC6] p-5 hover:shadow-md transition-shadow"
-                >
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-[#0a2225] truncate">
-                      {proposal.tripTitle}
-                    </h3>
-                    <p className="text-sm text-[#6B7280] mt-0.5">
-                      {proposal.destination} ·{" "}
-                      {new Date(proposal.createdAt).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </p>
-                  </div>
-                  <ProposalStatusBadge status={proposal.status} />
-                </Link>
-              ))
-            )}
-          </div>
-        </section>
-      </div>
-    </div>
-  );
-}
+          <TabsContent value="overview" className="mt-0">
+            <CreatorOverviewTab stats={stats} loading={loading} />
+          </TabsContent>
 
-function LuxuryStatCard({
-  icon,
-  label,
-  value,
-  helper,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  helper: string;
-}) {
-  return (
-    <div className="rounded-2xl bg-white border border-[#E5DFC6] p-6 shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-full bg-[#F6F0E4] flex items-center justify-center">
-          {icon}
-        </div>
-        <span className="text-sm font-medium text-[#6B7280] uppercase tracking-wide">
-          {label}
-        </span>
-      </div>
-      <div className="font-secondary text-3xl text-[#0a2225]">{value}</div>
-      <p className="text-sm text-[#6B7280] mt-2">{helper}</p>
-    </div>
-  );
-}
+          <TabsContent value="proposals" className="mt-0">
+            <CreatorProposalsTab />
+          </TabsContent>
 
-function LuxuryEmptyState({
-  message,
-  subtext,
-  action,
-}: {
-  message: string;
-  subtext?: string;
-  action?: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-2xl bg-white border border-[#E5DFC6] p-12 text-center">
-      <div className="w-16 h-16 rounded-full bg-[#F6F0E4] flex items-center justify-center mx-auto mb-4">
-        <Send className="w-7 h-7 text-[#C7A962]" />
+          <TabsContent value="trips" className="mt-0">
+            <CreatorTripsTab />
+          </TabsContent>
+
+          <TabsContent value="earnings" className="mt-0">
+            <CreatorEarningsTab />
+          </TabsContent>
+
+          <TabsContent value="settings" className="mt-0">
+            <CreatorSettingsTab />
+          </TabsContent>
+        </Tabs>
       </div>
-      <h3 className="font-secondary text-xl text-[#0a2225]">{message}</h3>
-      {subtext && (
-        <p className="text-sm text-[#6B7280] mt-2 max-w-sm mx-auto">{subtext}</p>
-      )}
-      {action}
-    </div>
+    </main>
   );
 }
