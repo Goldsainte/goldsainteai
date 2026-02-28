@@ -1,17 +1,13 @@
 
 
-## Fix: Agent Signup Button Consistency + "Skip for Now" Option
+## Fix: Remove Raw Edge Function Error from Creator Dashboard
 
-### 1. Match button shapes — `src/pages/Auth.tsx` (lines 694-718)
+The error banner at lines 213-217 of `src/pages/CreatorDashboard.tsx` displays the raw edge function error message ("Edge Function returned a non-2xx status code") to users. This happens when `creator-dashboard-stats` fails, which is expected if the function isn't deployed or has issues.
 
-The Back button uses `rounded-xl` while the Continue to Application button uses `rounded-full`. Both should use the same shape (`rounded-xl`) and height (`h-12`).
+### Change — `src/pages/CreatorDashboard.tsx`
 
-**Change line 707:** `className="flex-1 h-12 rounded-full"` → `className="flex-1 h-12 rounded-xl"`
-**Change line 699:** add `h-12` to Back button class so both match dimensions.
+1. **Remove the error banner entirely** (lines 213-217) — the red error box that displays `{error}`.
+2. **Update the error handling in `loadStats`** (lines 105-109 and 122-125) — instead of setting error state, just silently use `EMPTY_STATS` so the dashboard still renders cleanly with zeroed-out values. Remove the `error` state variable entirely since it's no longer needed.
 
-### 2. Add "Skip for Now" link — `src/pages/Auth.tsx`
-
-Below the button row (after line 719), add a centered "Skip for now" text link that navigates the user to the traveler flow instead. This allows someone who selected agent/brand to defer the full application and still create their account as a traveler.
-
-The link will only appear when `selectedAccountType === 'agent' || selectedAccountType === 'brand'`. Clicking it will set the account type to `'traveler'` and submit the signup form normally, bypassing the agent application redirect.
+This way the dashboard always renders gracefully with zero values when the backend is unavailable, rather than showing a scary red error message.
 
