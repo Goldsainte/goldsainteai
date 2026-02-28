@@ -46,11 +46,12 @@ Deno.serve(async (req) => {
     // Notify customer via in-app notification
     await supabaseClient.from('notifications').insert({
       user_id: job.user_id,
-      notification_type: 'new_bid',
+      type: 'new_bid',
       title: '📬 New Bid Received!',
       message: `${agent?.agency_name || 'An agent'} placed a bid of ${bid.currency} ${bid.customer_facing_price} on "${job.title}".`,
-      metadata: { jobId, bidId },
-      link: `/marketplace`,
+      entity_type: 'agent_bid',
+      entity_id: bidId,
+      action_url: `/marketplace`,
     });
 
     // Send email notification to customer

@@ -237,10 +237,12 @@ serve(async (req) => {
     // Create notification for recipient
     await supabase.from("notifications").insert({
       user_id: recipientId,
-      notification_type: isNewConversation ? "message_request" : "new_message",
+      type: "message_received",
       title: isNewConversation ? "New message request" : "New message",
       message: `You have a new message`,
-      link: `/messages?conversation=${targetConversationId}`,
+      action_url: `/messages?conversation=${targetConversationId}`,
+      entity_type: 'conversation',
+      entity_id: targetConversationId,
       is_read: false,
     });
 

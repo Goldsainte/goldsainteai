@@ -143,17 +143,13 @@ serve(async (req) => {
     // Create notification
     await supabaseClient.from("notifications").insert({
       user_id: user.id,
-      notification_type: "booking_cancellation",
+      type: "system_announcement",
       title: "Cancellation Request Received",
       message: refundAmount > 0 
         ? `Your cancellation request has been received. You will receive a refund of ${refundPercentage}% (${booking.currency} ${refundAmount.toFixed(2)}).`
         : "Your booking has been cancelled. No refund is available due to the cancellation policy.",
-      metadata: {
-        booking_id: bookingId,
-        cancellation_id: cancellation.id,
-        refund_amount: refundAmount,
-        refund_percentage: refundPercentage,
-      },
+      entity_type: 'booking_cancellation',
+      entity_id: cancellation.id,
     });
 
     console.log("Cancellation created successfully:", cancellation.id);

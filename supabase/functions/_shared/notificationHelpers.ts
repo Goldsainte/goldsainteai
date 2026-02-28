@@ -1,13 +1,13 @@
-// supabase/functions/_shared/notificationHelpers.ts
 import { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 export type CreateNotificationInput = {
   user_id: string;
-  notification_type: string;
+  type: string;
   title: string;
   message?: string | null;
-  link?: string | null;
-  metadata?: any;
+  action_url?: string | null;
+  entity_type?: string | null;
+  entity_id?: string | null;
 };
 
 export async function createNotification(
@@ -16,11 +16,12 @@ export async function createNotification(
 ) {
   const { error } = await supabase.from('notifications').insert({
     user_id: input.user_id,
-    notification_type: input.notification_type,
+    type: input.type,
     title: input.title,
     message: input.message ?? null,
-    link: input.link ?? null,
-    metadata: input.metadata ?? null,
+    action_url: input.action_url ?? null,
+    entity_type: input.entity_type ?? null,
+    entity_id: input.entity_id ?? null,
     is_read: false,
   });
 
@@ -36,11 +37,12 @@ export async function createNotifications(
 ) {
   const rows = inputs.map((input) => ({
     user_id: input.user_id,
-    notification_type: input.notification_type,
+    type: input.type,
     title: input.title,
     message: input.message ?? null,
-    link: input.link ?? null,
-    metadata: input.metadata ?? null,
+    action_url: input.action_url ?? null,
+    entity_type: input.entity_type ?? null,
+    entity_id: input.entity_id ?? null,
     is_read: false,
   }));
 

@@ -148,15 +148,11 @@ serve(async (req) => {
     // Create notification
     await supabaseClient.from("notifications").insert({
       user_id: cancellation.user_id,
-      notification_type: "refund_processed",
+      type: "payment_received",
       title: "Refund Processed",
       message: `Your refund of ${cancellation.currency} ${cancellation.refund_amount.toFixed(2)} has been processed. It may take 5-10 business days to appear in your account.`,
-      metadata: {
-        booking_id: cancellation.booking_id,
-        cancellation_id: cancellationId,
-        refund_amount: cancellation.refund_amount,
-        stripe_refund_id: refund.id,
-      },
+      entity_type: 'booking_cancellation',
+      entity_id: cancellationId,
     });
 
     console.log("Refund processed successfully");

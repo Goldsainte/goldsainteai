@@ -37,33 +37,36 @@ Deno.serve(async (req) => {
     if (eventType === 'proposal_created') {
       notifications.push({
         user_id: travelerId,
-        notification_type: 'proposal_received',
+        type: 'new_proposal',
         title: 'You have a new trip proposal',
         message: 'A Goldsainte partner has sent a proposal for your trip. Review the details and accept if it feels right.',
-        link: `/trip-requests/${tripRequestId}`,
-        metadata: { proposalId, tripRequestId },
+        action_url: `/trip-requests/${tripRequestId}`,
+        entity_type: 'trip_proposal',
+        entity_id: proposalId,
       });
     }
 
     if (eventType === 'proposal_updated') {
       notifications.push({
         user_id: travelerId,
-        notification_type: 'proposal_updated',
+        type: 'new_proposal',
         title: 'A proposal was updated',
         message: 'One of your proposals has been updated with new details or pricing. Take a look before you decide.',
-        link: `/trip-requests/${tripRequestId}`,
-        metadata: { proposalId, tripRequestId },
+        action_url: `/trip-requests/${tripRequestId}`,
+        entity_type: 'trip_proposal',
+        entity_id: proposalId,
       });
     }
 
     if (eventType === 'proposal_withdrawn') {
       notifications.push({
         user_id: travelerId,
-        notification_type: 'proposal_withdrawn',
+        type: 'proposal_declined',
         title: 'A proposal is no longer available',
         message: 'One of your proposals has been withdrawn. If you still want this trip, other partners may send options soon.',
-        link: `/trip-requests/${tripRequestId}`,
-        metadata: { proposalId, tripRequestId },
+        action_url: `/trip-requests/${tripRequestId}`,
+        entity_type: 'trip_proposal',
+        entity_id: proposalId,
       });
     }
 

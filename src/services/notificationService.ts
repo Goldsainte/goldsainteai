@@ -1,4 +1,3 @@
-// src/services/notificationService.ts
 import { supabase } from "@/integrations/supabase/client";
 
 export type Notification = {

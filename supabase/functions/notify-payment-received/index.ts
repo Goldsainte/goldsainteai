@@ -39,22 +39,24 @@ Deno.serve(async (req) => {
     // Notify customer
     await supabaseClient.from('notifications').insert({
       user_id: job.user_id,
-      notification_type: 'payment_processed',
+      type: 'payment_received',
       title: '💳 Payment Processed',
       message: `Your payment of ${currency} ${amount} for "${job.title}" has been successfully processed and held in escrow.`,
-      metadata: { jobId, amount, currency },
-      link: `/marketplace`,
+      entity_type: 'marketplace_job',
+      entity_id: jobId,
+      action_url: `/marketplace`,
     });
 
     // Notify agent
     if (agent?.user_id) {
       await supabaseClient.from('notifications').insert({
         user_id: agent.user_id,
-        notification_type: 'payment_received',
+        type: 'payment_received',
         title: '💰 Payment Received!',
         message: `Payment of ${currency} ${amount} received for "${job.title}". Funds are held in escrow and will be released upon completion approval.`,
-        metadata: { jobId, amount, currency },
-        link: `/agent-dashboard`,
+        entity_type: 'marketplace_job',
+        entity_id: jobId,
+        action_url: `/agent-dashboard`,
       });
     }
 

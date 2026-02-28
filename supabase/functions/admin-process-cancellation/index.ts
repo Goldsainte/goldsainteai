@@ -105,17 +105,13 @@ serve(async (req) => {
       // Create notification for user
       await supabaseClient.from("notifications").insert({
         user_id: cancellation.user_id,
-        notification_type: "cancellation_approved",
+        type: "system_announcement",
         title: "Cancellation Approved",
         message: finalRefundAmount > 0
           ? `Your cancellation has been approved. You will receive a refund of ${finalRefundPercentage}% (${booking.currency} ${finalRefundAmount.toFixed(2)}).`
           : "Your cancellation has been approved. No refund will be issued per the cancellation policy.",
-        metadata: {
-          booking_id: cancellation.booking_id,
-          cancellation_id: cancellationId,
-          refund_amount: finalRefundAmount,
-          refund_percentage: finalRefundPercentage,
-        },
+        entity_type: 'booking_cancellation',
+        entity_id: cancellationId,
       });
 
       console.log("Cancellation approved:", { cancellationId, finalRefundAmount, finalRefundPercentage });
@@ -161,15 +157,13 @@ serve(async (req) => {
       // Create notification for user
       await supabaseClient.from("notifications").insert({
         user_id: cancellation.user_id,
-        notification_type: "cancellation_rejected",
+        type: "system_announcement",
         title: "Cancellation Request Rejected",
         message: adminNotes
           ? `Your cancellation request has been rejected. Reason: ${adminNotes}`
           : "Your cancellation request has been rejected. Please contact support for more information.",
-        metadata: {
-          booking_id: cancellation.booking_id,
-          cancellation_id: cancellationId,
-        },
+        entity_type: 'booking_cancellation',
+        entity_id: cancellationId,
       });
 
       console.log("Cancellation rejected:", { cancellationId });

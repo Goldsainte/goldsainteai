@@ -49,15 +49,11 @@ serve(async (req) => {
       if (template) {
         await supabase.from('notifications').insert({
           user_id: template.creator_id,
-          notification_type: 'template_purchase',
+          type: 'system_announcement',
           title: 'Template Purchased',
           message: `Someone purchased your template "${template.template_name}" for ${data.coins_paid} coins`,
-          metadata: {
-            template_id,
-            buyer_id: user.id,
-            coins_paid: data.coins_paid,
-            transaction_id: data.transaction_id
-          }
+          entity_type: 'itinerary_template',
+          entity_id: template_id,
         });
       }
     }

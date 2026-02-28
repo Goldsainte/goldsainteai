@@ -97,11 +97,12 @@ serve(async (req) => {
     if (admins && admins.length > 0) {
       const notifications = admins.map(admin => ({
         user_id: admin.user_id,
-        notification_type: 'supplier_application',
+        type: 'supplier_application',
         title: 'New Supplier Application',
         message: `${applicationData.name} has applied as a ${applicationData.supplierType}`,
-        metadata: { supplier_id: supplier.id },
-        link: '/admin/suppliers'
+        entity_type: 'supplier',
+        entity_id: supplier.id,
+        action_url: '/admin/suppliers'
       }));
 
       await supabaseClient

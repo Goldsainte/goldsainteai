@@ -123,20 +123,12 @@ serve(async (req) => {
               .from('notifications')
               .insert({
                 user_id: alert.user_id,
-                notification_type: 'price_alert',
+                type: 'price_alert',
                 title: '✈️ Price Drop Alert!',
                 message: `Flight from ${alert.origin_code} to ${alert.destination_code} is now ${alert.currency} ${currentPrice.toFixed(2)}! (${savingsPercent}% below your target)`,
-                metadata: {
-                  alert_id: alert.id,
-                  origin: alert.origin_code,
-                  destination: alert.destination_code,
-                  departure_date: alert.departure_date,
-                  current_price: currentPrice,
-                  target_price: alert.target_price,
-                  savings: savingsAmount,
-                  currency: alert.currency
-                },
-                link: `/search-results?type=flights&origin=${alert.origin_code}&destination=${alert.destination_code}&departureDate=${alert.departure_date}${alert.return_date ? `&returnDate=${alert.return_date}` : ''}&adults=${alert.adults}&cabinClass=${alert.cabin_class}`
+                entity_type: 'flight_price_alert',
+                entity_id: alert.id,
+                action_url: `/search-results?type=flights&origin=${alert.origin_code}&destination=${alert.destination_code}&departureDate=${alert.departure_date}${alert.return_date ? `&returnDate=${alert.return_date}` : ''}&adults=${alert.adults}&cabinClass=${alert.cabin_class}`
               });
 
             // Update last notified time

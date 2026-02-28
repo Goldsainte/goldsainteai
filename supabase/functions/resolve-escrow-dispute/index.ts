@@ -127,19 +127,21 @@ serve(async (req) => {
     const notifications = [
       {
         user_id: escrowTransaction.creator_id,
-        notification_type: 'dispute_resolved',
+        type: 'system_announcement',
         title: 'Dispute Resolved',
         message: `Dispute has been ${resolutionData.resolution.replace(/_/g, ' ')}`,
-        metadata: { dispute_id: resolutionData.disputeId, refund_id: refundId },
-        link: '/creator-dashboard'
+        entity_type: 'escrow_dispute',
+        entity_id: resolutionData.disputeId,
+        action_url: '/creator-dashboard'
       },
       {
         user_id: escrowTransaction.customer_id,
-        notification_type: 'dispute_resolved',
+        type: 'system_announcement',
         title: 'Dispute Resolved',
         message: `Dispute has been ${resolutionData.resolution.replace(/_/g, ' ')}`,
-        metadata: { dispute_id: resolutionData.disputeId, refund_id: refundId },
-        link: '/my-bookings'
+        entity_type: 'escrow_dispute',
+        entity_id: resolutionData.disputeId,
+        action_url: '/my-bookings'
       }
     ];
 
