@@ -1,16 +1,15 @@
 
 
-## Fix: Update the actual mobile bottom nav in Header.tsx
+## Show Full Labels on Mobile Pill Buttons
 
-The labels didn't change because the mobile bottom nav the user sees is **not** `MobileBottomNav.tsx` — it's an inline nav rendered directly inside `src/components/Header.tsx` (lines 629-687). That's the one currently showing "Collections".
+### File: `src/components/marketplace/MarketplaceTabs.tsx`
 
-### Changes in `src/components/Header.tsx`
+**Problem:** On mobile, the tabs show `shortLabel` ("Curated", "Requests") instead of the full `label` ("Curated Trips", "Trip Requests"). The layout uses `flex-col` on mobile making them compact.
 
-**Lines 643-650** — Replace the "Collections" button:
-- Label: `"Collections"` → `"Post a Trip"`
-- Route: `/collections` → `/post-trip`
-- Icon: `Sparkles` → `PlaneTakeoff`
-- Remove auth gate (no need to check `user` for this route)
+**Changes (lines 44-56):**
+1. Remove the `flex-col` mobile layout — use `flex-row` with `gap-1.5` at all sizes
+2. Show the full `tab.label` at all breakpoints instead of switching between `shortLabel` and `label`
+3. Increase mobile horizontal padding from `px-2.5` to `px-4` and text from `text-[10px]` to `text-xs`
 
-**Additionally**, update the Storyboards button icon (line 657) from `Plane` to `Sparkles` to match the intended icon set, and ensure `PlaneTakeoff` is imported.
+This ensures the pill buttons display "Curated Trips" and "Trip Requests" on mobile, matching desktop.
 
