@@ -95,13 +95,8 @@ export function CreatorEarningsTab() {
                     Booking #{booking.id.slice(0, 6)}
                   </p>
                   <p className="text-xs text-[#6B7280]">
-                    Status: {booking.status} · Escrow: {booking.escrow_status || "HELD"}
+                    Status: {booking.status} · Payout: {booking.payout_status || "pending"}
                   </p>
-                  {booking.commission_mode && (
-                    <p className="text-xs text-[#6B7280]">
-                      Commission mode: {booking.commission_mode}
-                    </p>
-                  )}
                 </div>
                 <div className="flex flex-col items-end gap-1.5">
                   <p className="text-base font-semibold text-[#C7A962]">
