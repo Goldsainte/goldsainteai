@@ -377,6 +377,15 @@ export function DirectMessageInbox() {
                     conversation={conv}
                     isActive={selectedConversation?.id === conv.id}
                     onClick={() => handleSelectConversation(conv)}
+                    onDelete={activeTab === "archived" ? async () => {
+                      try {
+                        await manageConversation(conv.id, "delete");
+                        if (selectedConversation?.id === conv.id) setSelectedConversation(null);
+                        toast({ title: "Conversation deleted permanently" });
+                      } catch (e: any) {
+                        toast({ title: "Error", description: e.message, variant: "destructive" });
+                      }
+                    } : undefined}
                   />
                 ))
               )}
@@ -630,49 +639,65 @@ function ConversationItem({
   conversation,
   isActive,
   onClick,
+  onDelete,
 }: {
   conversation: Conversation;
   isActive: boolean;
   onClick: () => void;
+  onDelete?: () => void;
 }) {
   return (
-    <button
-      onClick={onClick}
-      className={`w-full p-3 rounded-xl text-left transition-all mb-1.5 ${
-        isActive 
-          ? "bg-white border border-[#C7A962]/30 shadow-sm" 
-          : "hover:bg-white/80 border border-transparent"
-      }`}
-    >
-      <div className="flex items-start gap-3">
-        <Avatar className="h-10 w-10 border-2 border-[#E5DFC6]">
-          <AvatarImage src={conversation.otherParticipant.avatarUrl || undefined} />
-          <AvatarFallback className="bg-[#F6F0E4] text-[#0a2225] font-secondary">
-            {conversation.otherParticipant.displayName.charAt(0)}
-          </AvatarFallback>
-        </Avatar>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between gap-2">
-            <span className="font-secondary font-medium truncate text-sm text-[#0a2225]">
-              {conversation.otherParticipant.displayName}
-            </span>
-            {conversation.lastMessageAt && (
-              <span className="text-[10px] text-[#9CA3AF] whitespace-nowrap">
-                {formatDistanceToNow(new Date(conversation.lastMessageAt), { addSuffix: true })}
+    <div className="relative group">
+      <button
+        onClick={onClick}
+        className={`w-full p-3 rounded-xl text-left transition-all mb-1.5 ${
+          isActive 
+            ? "bg-white border border-[#C7A962]/30 shadow-sm" 
+            : "hover:bg-white/80 border border-transparent"
+        }`}
+      >
+        <div className="flex items-start gap-3">
+          <Avatar className="h-10 w-10 border-2 border-[#E5DFC6]">
+            <AvatarImage src={conversation.otherParticipant.avatarUrl || undefined} />
+            <AvatarFallback className="bg-[#F6F0E4] text-[#0a2225] font-secondary">
+              {conversation.otherParticipant.displayName.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-secondary font-medium truncate text-sm text-[#0a2225]">
+                {conversation.otherParticipant.displayName}
               </span>
-            )}
+              {conversation.lastMessageAt && (
+                <span className="text-[10px] text-[#9CA3AF] whitespace-nowrap">
+                  {formatDistanceToNow(new Date(conversation.lastMessageAt), { addSuffix: true })}
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-[#5a6c6e] truncate mt-0.5">
+              {conversation.lastMessagePreview || "No messages yet"}
+            </p>
           </div>
-          <p className="text-xs text-[#5a6c6e] truncate mt-0.5">
-            {conversation.lastMessagePreview || "No messages yet"}
-          </p>
+          {conversation.unreadCount > 0 && (
+            <Badge className="h-5 w-5 p-0 flex items-center justify-center text-[10px] bg-[#C7A962] text-white rounded-full">
+              {conversation.unreadCount}
+            </Badge>
+          )}
         </div>
-        {conversation.unreadCount > 0 && (
-          <Badge className="h-5 w-5 p-0 flex items-center justify-center text-[10px] bg-[#C7A962] text-white rounded-full">
-            {conversation.unreadCount}
-          </Badge>
-        )}
-      </div>
-    </button>
+      </button>
+      {onDelete && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-[#9CA3AF] hover:text-red-500 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100"
+          title="Delete permanently"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
+      )}
+    </div>
   );
 }
 
