@@ -17,7 +17,7 @@ import {
 import { BackButton } from "@/components/ui/BackButton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { ProfilePhotoUploader } from "@/pages/traveler/components/ProfilePhotoUploader";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useUserRole } from "@/hooks/useUserRole";
 import { CreatorOverviewTab } from "./creator/components/CreatorOverviewTab";
@@ -155,12 +155,15 @@ export default function CreatorDashboard() {
         <header className="mb-6 md:mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6">
             <div className="flex items-center gap-3 md:gap-4">
-              <Avatar className="h-12 w-12 md:h-16 md:w-16 border-2 border-[#E5DFC6]">
-                <AvatarImage src={profile?.avatar_url || undefined} alt={displayName} />
-                <AvatarFallback className="bg-[#F6F0E4] text-[#0a2225] text-base md:text-lg font-secondary">
-                  {getInitials(displayName)}
-                </AvatarFallback>
-              </Avatar>
+              <ProfilePhotoUploader
+                userId={user?.id || ""}
+                currentAvatarUrl={profile?.avatar_url}
+                displayName={displayName}
+                onUploadComplete={(url) =>
+                  setProfile((prev) => prev ? { ...prev, avatar_url: url } : prev)
+                }
+                size="sm"
+              />
               <div>
                 <p className="text-xs text-[#C7A962] font-medium tracking-wider uppercase flex items-center gap-1.5">
                   <Sparkles className="h-3 w-3" />
