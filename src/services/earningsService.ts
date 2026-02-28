@@ -38,8 +38,8 @@ export interface PayoutEntry {
 export interface PartnerEarningBooking {
   id: string;
   status: string;
-  commission_mode: string | null;
-  escrow_status: string | null;
+  payout_status: string | null;
+  payout_paid_at: string | null;
   currency: string | null;
   created_at: string;
   amount_cents: number;
@@ -259,12 +259,12 @@ export async function getPartnerBookingEarnings(role: "creator" | "agent"): Prom
 
   const column = role === "creator" ? "creator_id" : "agent_id";
   const amountColumn = role === "creator"
-    ? "creator_commission_amount_cents"
-    : "agent_commission_amount_cents";
+    ? "creator_payout_cents"
+    : "agent_payout_cents";
 
   const { data, error } = await supabase
     .from("bookings")
-    .select(`id, status, escrow_status, commission_mode, currency, created_at, ${amountColumn}`)
+    .select(`id, status, payout_status, payout_paid_at, currency, created_at, ${amountColumn}`)
     .eq(column, user.id)
     .order("created_at", { ascending: false });
 
@@ -276,8 +276,8 @@ export async function getPartnerBookingEarnings(role: "creator" | "agent"): Prom
   const bookings: PartnerEarningBooking[] = (data || []).map((row: any) => ({
     id: row.id,
     status: row.status,
-    commission_mode: row.commission_mode,
-    escrow_status: row.escrow_status,
+    payout_status: row.payout_status,
+    payout_paid_at: row.payout_paid_at,
     currency: row.currency,
     created_at: row.created_at,
     amount_cents: Number(row[amountColumn] || 0),
@@ -287,7 +287,7 @@ export async function getPartnerBookingEarnings(role: "creator" | "agent"): Prom
   let released = 0;
 
   bookings.forEach((booking) => {
-    if (booking.escrow_status === "RELEASED") {
+    if (booking.payout_status === "completed" || booking.payout_paid_at) {
       released += booking.amount_cents;
     } else {
       pending += booking.amount_cents;
