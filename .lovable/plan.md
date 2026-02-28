@@ -1,16 +1,14 @@
 
 
-## Consolidate Creator Profile Routes: Redirect `/creator/:id` to `/creators/:id`
+## Fix: Make Creator Dashboard Profile Photo Uploadable
 
-The old `/creator/:id` page (`CreatorProfilePage.tsx`) is unstyled, relies on a failing edge function, and shows confusing content (moodboard with stock images, collab form). The newer `/creators/:id` page already has the proper luxury Mr. & Mrs. Smith design.
+The avatar in the Creator Dashboard header (lines 158-163 of `CreatorDashboard.tsx`) is display-only — it has no click handler or upload capability. The `ProfilePhotoUploader` component from `src/pages/traveler/components/ProfilePhotoUploader.tsx` already handles uploads correctly (validates files, uploads to the `avatars` storage bucket, updates the `profiles` table).
 
-### Changes
+### Change — `src/pages/CreatorDashboard.tsx`
 
-1. **`src/routes/AppRoutes.tsx`** — Replace the `CreatorProfilePage` route with a redirect:
-   - Change `<Route path="/creator/:id" element={<CreatorProfilePage />} />` to use a `<Navigate>` component that redirects to `/creators/:id`
-   - Remove the lazy import for `CreatorProfilePage`
+1. **Import `ProfilePhotoUploader`** from `@/pages/traveler/components/ProfilePhotoUploader`.
 
-2. **`src/App.tsx`** — Remove `/creator/:id` from the `HIDE_HEADER_PAGES` / `HIDE_FOOTER_PREFIXES` arrays if present, since the redirect will land on `/creators/:id` which handles its own layout.
+2. **Replace the plain `<Avatar>` block** (lines 158-163) with the `ProfilePhotoUploader` component using `size="sm"` to keep it compact in the header. Wire `onUploadComplete` to update the local profile state so the new photo renders immediately without a page refresh.
 
-3. **Update any internal links** pointing to `/creator/:id` to use `/creators/:id` instead (e.g., in `CreatorCard.tsx` which navigates to `/creators/${creator.id}`).
+3. **Add a local state updater** so when the upload completes, `profile.avatar_url` is refreshed — either by re-fetching or by updating the cached profile object.
 
