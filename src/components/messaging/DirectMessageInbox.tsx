@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
-import { format, formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow, isToday, isYesterday, isSameDay } from "date-fns";
 import {
   MessageCircle,
   Inbox,
@@ -13,6 +13,7 @@ import {
   MoreVertical,
   Ban,
   PenSquare,
+  Loader2,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -36,6 +37,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { MessageSettingsModal } from "./MessageSettingsModal";
 import { RecipientSearchModal } from "./RecipientSearchModal";
 import { NewMessageModal } from "./NewMessageModal";
+import { supabase } from "@/integrations/supabase/client";
 
 export function DirectMessageInbox() {
   const { user } = useAuth();
@@ -44,10 +46,14 @@ export function DirectMessageInbox() {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const [acceptingRequest, setAcceptingRequest] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showRecipientSearch, setShowRecipientSearch] = useState(false);
   const [selectedRecipient, setSelectedRecipient] = useState<{ id: string; name: string } | null>(null);
+  const [otherTyping, setOtherTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const {
     conversations,
@@ -61,6 +67,38 @@ export function DirectMessageInbox() {
   const { messages, loading: messagesLoading } = useConversationMessages(
     selectedConversation?.id || null
   );
+
+  // Typing indicator via broadcast
+  const broadcastTyping = useCallback(() => {
+    if (!selectedConversation || !user) return;
+    const channel = supabase.channel(`typing-${selectedConversation.id}`);
+    channel.send({
+      type: "broadcast",
+      event: "typing",
+      payload: { userId: user.id },
+    });
+  }, [selectedConversation, user]);
+
+  // Listen for typing from other participant
+  useEffect(() => {
+    if (!selectedConversation || !user) return;
+    const channelName = `typing-${selectedConversation.id}`;
+    const channel = supabase
+      .channel(channelName)
+      .on("broadcast", { event: "typing" }, (payload) => {
+        if (payload.payload?.userId !== user.id) {
+          setOtherTyping(true);
+          if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+          typingTimeoutRef.current = setTimeout(() => setOtherTyping(false), 2500);
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+      setOtherTyping(false);
+    };
+  }, [selectedConversation?.id, user]);
 
   // Handle URL param for conversation
   useEffect(() => {
@@ -95,6 +133,13 @@ export function DirectMessageInbox() {
     }
   }, [selectedConversation]);
 
+  // Auto-focus input when conversation selected
+  useEffect(() => {
+    if (selectedConversation && selectedConversation.status !== "request") {
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  }, [selectedConversation]);
+
   const handleSelectConversation = (conv: Conversation) => {
     setSelectedConversation(conv);
     setSearchParams({ conversation: conv.id });
@@ -124,11 +169,25 @@ export function DirectMessageInbox() {
 
   const handleAcceptRequest = async () => {
     if (!selectedConversation) return;
+    setAcceptingRequest(true);
+    
+    // Optimistically update
+    setSelectedConversation((prev) =>
+      prev ? { ...prev, status: "active" } : prev
+    );
+
     try {
       await manageConversation(selectedConversation.id, "accept");
-      toast({ title: "Request accepted" });
+      toast({ title: "Request accepted", description: "You can now message each other." });
+      setTimeout(() => inputRef.current?.focus(), 200);
     } catch (e: any) {
-      toast({ title: "Error", description: e.message, variant: "destructive" });
+      // Revert
+      setSelectedConversation((prev) =>
+        prev ? { ...prev, status: "request" } : prev
+      );
+      toast({ title: "Couldn't accept request", description: e.message, variant: "destructive" });
+    } finally {
+      setAcceptingRequest(false);
     }
   };
 
@@ -179,6 +238,27 @@ export function DirectMessageInbox() {
   const isRequest =
     selectedConversation?.status === "request" && !selectedConversation?.isInitiator;
 
+  // Group messages by date
+  const groupedMessages = messages.reduce<{ date: Date; messages: typeof messages }[]>(
+    (groups, msg) => {
+      const msgDate = new Date(msg.created_at);
+      const lastGroup = groups[groups.length - 1];
+      if (lastGroup && isSameDay(lastGroup.date, msgDate)) {
+        lastGroup.messages.push(msg);
+      } else {
+        groups.push({ date: msgDate, messages: [msg] });
+      }
+      return groups;
+    },
+    []
+  );
+
+  const formatDateLabel = (date: Date) => {
+    if (isToday(date)) return "Today";
+    if (isYesterday(date)) return "Yesterday";
+    return format(date, "MMMM d, yyyy");
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[600px]">
@@ -188,10 +268,10 @@ export function DirectMessageInbox() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-200px)] min-h-[500px] border border-[#E5DFC6] rounded-2xl overflow-hidden bg-white shadow-sm">
+    <div className="flex h-[calc(100vh-200px)] min-h-[500px] border border-[#E5DFC6]/60 rounded-2xl overflow-hidden bg-white shadow-sm">
       {/* Left Panel - Conversation List */}
-      <div className="w-80 border-r border-[#E5DFC6] flex flex-col bg-[#FDFBF7]">
-        <div className="p-4 border-b border-[#E5DFC6] flex items-center justify-between">
+      <div className="w-80 border-r border-[#E5DFC6]/50 flex flex-col bg-[#FDFBF7]">
+        <div className="p-4 border-b border-[#E5DFC6]/50 flex items-center justify-between">
           <h2 className="font-secondary text-lg font-semibold text-[#0a2225]">Inbox</h2>
           <div className="flex items-center gap-1">
             <Button 
@@ -252,21 +332,20 @@ export function DirectMessageInbox() {
           <ScrollArea className="flex-1 mt-3">
             <div className="px-3">
               {getConversationList().length === 0 ? (
-                <div className="text-center py-12">
-                  <MessageCircle className="h-10 w-10 mx-auto mb-3 text-[#C7A962] opacity-50" />
-                  <p className="font-secondary text-[#0a2225] text-sm">
+                <div className="text-center py-16">
+                  <p className="font-secondary text-[#0a2225] text-base">
                     {activeTab === "requests"
                       ? "No message requests"
                       : activeTab === "archived"
                       ? "No archived conversations"
                       : "No conversations yet"}
                   </p>
-                  <p className="text-xs text-[#5a6c6e] mt-1">
+                  <p className="text-sm text-[#5a6c6e] mt-2 max-w-[220px] mx-auto leading-relaxed">
                     {activeTab === "primary" 
-                      ? "Click 'New' above to start a conversation"
+                      ? "Start a conversation with a creator or travel agent"
                       : activeTab === "requests"
-                      ? "Message requests will appear here"
-                      : "Archived messages will appear here"}
+                      ? "When someone new reaches out, you'll see it here"
+                      : "Archived conversations will appear here"}
                   </p>
                 </div>
               ) : (
@@ -289,7 +368,7 @@ export function DirectMessageInbox() {
         {selectedConversation ? (
           <>
             {/* Header */}
-            <div className="p-4 border-b border-[#E5DFC6] flex items-center justify-between bg-white">
+            <div className="p-4 border-b border-[#E5DFC6]/50 flex items-center justify-between bg-white">
               <div className="flex items-center gap-3">
                 <Avatar className="h-10 w-10 border-2 border-[#E5DFC6]">
                   <AvatarImage src={selectedConversation.otherParticipant.avatarUrl || undefined} />
@@ -299,17 +378,19 @@ export function DirectMessageInbox() {
                 </Avatar>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-secondary font-medium text-[#0a2225]">
+                    <span className="font-secondary font-semibold text-[#0a2225]">
                       {selectedConversation.otherParticipant.displayName}
                     </span>
                     {selectedConversation.otherParticipant.isVerified && (
-                      <Badge className="text-[10px] h-4 bg-[#C7A962]/10 text-[#C7A962] border-0">
-                        Verified
-                      </Badge>
+                      <Shield className="h-3.5 w-3.5 text-[#C7A962]" />
                     )}
                   </div>
                   <span className="text-xs text-[#5a6c6e] capitalize">
-                    {selectedConversation.otherParticipant.accountType || "User"}
+                    {selectedConversation.otherParticipant.accountType === "travel_agent"
+                      ? "Certified Travel Agent"
+                      : selectedConversation.otherParticipant.accountType === "creator"
+                      ? "Creator"
+                      : selectedConversation.otherParticipant.accountType || "Member"}
                   </span>
                 </div>
               </div>
@@ -335,25 +416,31 @@ export function DirectMessageInbox() {
 
             {/* Request Banner */}
             {isRequest && (
-              <div className="p-4 bg-[#F6F0E4] border-b border-[#E5DFC6]">
-                <div className="flex items-center gap-2 text-sm mb-3">
-                  <Shield className="h-4 w-4 text-[#C7A962]" />
-                  <span className="text-[#5a6c6e]">
-                    This is a message request. Accept to continue the conversation.
+              <div className="p-5 bg-[#F6F0E4]/60 border-b border-[#E5DFC6]/40 transition-all duration-200">
+                <div className="flex items-center gap-2.5 text-sm mb-4">
+                  <Shield className="h-4 w-4 text-[#C7A962] flex-shrink-0" />
+                  <span className="text-[#0a2225]">
+                    This member would like to connect with you. Accept to begin the conversation.
                   </span>
                 </div>
                 <div className="flex gap-2">
                   <Button 
                     size="sm" 
                     onClick={handleAcceptRequest}
-                    className="bg-[#0a2225] hover:bg-[#0a2225]/90 text-white rounded-full"
+                    disabled={acceptingRequest}
+                    className="bg-[#0a2225] hover:bg-[#0a2225]/90 text-white rounded-full min-w-[90px]"
                   >
-                    Accept
+                    {acceptingRequest ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      "Accept"
+                    )}
                   </Button>
                   <Button 
                     size="sm" 
                     variant="outline" 
                     onClick={handleDeclineRequest}
+                    disabled={acceptingRequest}
                     className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#F6F0E4] rounded-full"
                   >
                     Decline
@@ -362,6 +449,7 @@ export function DirectMessageInbox() {
                     size="sm" 
                     variant="ghost" 
                     onClick={handleBlock}
+                    disabled={acceptingRequest}
                     className="text-[#5a6c6e] hover:text-red-600 hover:bg-red-50 rounded-full"
                   >
                     Block
@@ -371,34 +459,54 @@ export function DirectMessageInbox() {
             )}
 
             {/* Messages */}
-            <ScrollArea className="flex-1 p-4 bg-[#FDFBF7]">
+            <ScrollArea className="flex-1 p-5 bg-[#FDFBF7]">
               {messagesLoading ? (
                 <div className="flex items-center justify-center h-full">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#C7A962]" />
                 </div>
               ) : messages.length === 0 ? (
-                <div className="text-center py-12">
-                  <MessageCircle className="h-10 w-10 mx-auto mb-3 text-[#C7A962] opacity-50" />
-                  <p className="font-secondary text-[#0a2225] text-sm">No messages yet</p>
-                  <p className="text-xs text-[#5a6c6e] mt-1">Start the conversation!</p>
+                <div className="text-center py-16">
+                  <p className="font-secondary text-[#0a2225] text-base">No messages yet</p>
+                  <p className="text-sm text-[#5a6c6e] mt-2">
+                    Say hello to start the conversation
+                  </p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {messages.map((msg) => (
-                    <MessageBubble
-                      key={msg.id}
-                      message={msg}
-                      isSelf={msg.sender_id === user?.id}
-                    />
+                <div className="space-y-1">
+                  {groupedMessages.map((group, gi) => (
+                    <div key={gi}>
+                      {/* Date separator */}
+                      <div className="flex items-center justify-center my-5">
+                        <span className="text-[11px] text-[#9CA3AF] bg-[#FDFBF7] px-3 font-medium tracking-wide uppercase">
+                          {formatDateLabel(group.date)}
+                        </span>
+                      </div>
+                      <div className="space-y-3">
+                        {group.messages.map((msg) => (
+                          <MessageBubble
+                            key={msg.id}
+                            message={msg}
+                            isSelf={msg.sender_id === user?.id}
+                          />
+                        ))}
+                      </div>
+                    </div>
                   ))}
+                  {otherTyping && (
+                    <div className="flex justify-start">
+                      <div className="bg-[#F6F0E4] rounded-[1.25rem] px-4 py-3 text-sm text-[#5a6c6e] italic">
+                        typing…
+                      </div>
+                    </div>
+                  )}
                   <div ref={messagesEndRef} />
                 </div>
               )}
             </ScrollArea>
 
-            {/* Input */}
+            {/* Input bar */}
             {!isRequest && (
-              <div className="p-4 border-t border-[#E5DFC6] bg-white">
+              <div className="p-4 border-t border-[#E5DFC6]/40 bg-white shadow-[0_-2px_8px_rgba(0,0,0,0.03)]">
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -407,16 +515,20 @@ export function DirectMessageInbox() {
                   className="flex gap-2"
                 >
                   <Input
-                    placeholder="Type a message..."
+                    ref={inputRef}
+                    placeholder="Type a message…"
                     value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    className="flex-1 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20 rounded-full bg-[#FDFBF7]"
+                    onChange={(e) => {
+                      setNewMessage(e.target.value);
+                      broadcastTyping();
+                    }}
+                    className="flex-1 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20 rounded-full bg-[#FDFBF7] h-11"
                     disabled={sending}
                   />
                   <Button 
                     type="submit" 
                     disabled={!newMessage.trim() || sending}
-                    className="bg-[#0a2225] hover:bg-[#0a2225]/90 text-white rounded-full px-6"
+                    className="bg-[#0a2225] hover:bg-[#0a2225]/90 text-white rounded-full px-6 h-11"
                   >
                     <Send className="h-4 w-4" />
                   </Button>
@@ -426,10 +538,11 @@ export function DirectMessageInbox() {
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center bg-[#FDFBF7]">
-            <div className="text-center">
-              <MessageCircle className="h-12 w-12 mx-auto mb-4 text-[#C7A962] opacity-50" />
-              <p className="font-secondary text-[#0a2225]">Select a conversation</p>
-              <p className="text-sm text-[#5a6c6e] mt-1">Choose from your messages on the left, or start a new one</p>
+            <div className="text-center max-w-xs">
+              <h3 className="font-secondary text-xl text-[#0a2225] mb-2">Select a conversation</h3>
+              <p className="text-sm text-[#5a6c6e] leading-relaxed">
+                Choose from your messages on the left, or start a new conversation with a creator or travel agent.
+              </p>
             </div>
           </div>
         )}
@@ -472,7 +585,7 @@ function ConversationItem({
   return (
     <button
       onClick={onClick}
-      className={`w-full p-3 rounded-xl text-left transition-all mb-2 ${
+      className={`w-full p-3 rounded-xl text-left transition-all mb-1.5 ${
         isActive 
           ? "bg-white border border-[#C7A962]/30 shadow-sm" 
           : "hover:bg-white/80 border border-transparent"
@@ -491,7 +604,7 @@ function ConversationItem({
               {conversation.otherParticipant.displayName}
             </span>
             {conversation.lastMessageAt && (
-              <span className="text-[10px] text-[#5a6c6e] whitespace-nowrap">
+              <span className="text-[10px] text-[#9CA3AF] whitespace-nowrap">
                 {formatDistanceToNow(new Date(conversation.lastMessageAt), { addSuffix: true })}
               </span>
             )}
@@ -501,7 +614,7 @@ function ConversationItem({
           </p>
         </div>
         {conversation.unreadCount > 0 && (
-          <Badge className="h-5 w-5 p-0 flex items-center justify-center text-[10px] bg-[#0a2225] text-white">
+          <Badge className="h-5 w-5 p-0 flex items-center justify-center text-[10px] bg-[#C7A962] text-white rounded-full">
             {conversation.unreadCount}
           </Badge>
         )}
@@ -520,24 +633,24 @@ function MessageBubble({
   return (
     <div className={`flex ${isSelf ? "justify-end" : "justify-start"}`}>
       <div
-        className={`max-w-[70%] rounded-2xl px-4 py-2.5 ${
+        className={`max-w-[70%] rounded-[1.25rem] px-4 py-3 ${
           isSelf
             ? "bg-[#0a2225] text-white"
-            : "bg-white border border-[#E5DFC6]"
+            : "bg-[#F6F0E4] text-[#0a2225]"
         }`}
       >
-        <p className={`text-sm whitespace-pre-wrap ${isSelf ? "text-white" : "text-[#0a2225]"}`}>
+        <p className={`text-sm whitespace-pre-wrap leading-relaxed ${isSelf ? "text-white" : "text-[#0a2225]"}`}>
           {message.body}
         </p>
-        <div className={`flex items-center gap-1 mt-1 ${isSelf ? "justify-end" : "justify-start"}`}>
-          <span className={`text-[10px] ${isSelf ? "text-white/70" : "text-[#5a6c6e]"}`}>
+        <div className={`flex items-center gap-1 mt-1.5 ${isSelf ? "justify-end" : "justify-start"}`}>
+          <span className={`text-[10px] ${isSelf ? "text-white/60" : "text-[#9CA3AF]"}`}>
             {format(new Date(message.created_at), "HH:mm")}
           </span>
           {isSelf && (
             message.is_read ? (
-              <CheckCheck className="h-3 w-3 text-white/70" />
+              <CheckCheck className="h-3 w-3 text-[#C7A962]" />
             ) : (
-              <Check className="h-3 w-3 text-white/70" />
+              <Check className="h-3 w-3 text-white/50" />
             )
           )}
         </div>
