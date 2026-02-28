@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Settings, Info, Sparkles, PlaneTakeoff, Car, MessageCircle } from "lucide-react";
 import { NotificationBell } from '@/components/notifications/NotificationBell';
-import { MessageBubbleIcon } from '@/components/notifications/MessageBubbleIcon';
+
 import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
 import { CreateMomentModal } from "@/components/CreateMomentModal";
 import { Button } from "@/components/ui/button";
@@ -191,8 +191,7 @@ export const Header = () => {
                 <div className="flex items-center gap-2">
                   {user && (
                     <>
-                      <MessageBubbleIcon />
-                      <NotificationBell />
+                       <NotificationBell />
                     </>
                   )}
                   
@@ -419,8 +418,7 @@ export const Header = () => {
               <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
                 {user && (
                   <>
-                    <MessageBubbleIcon />
-                    <NotificationBell />
+                     <NotificationBell />
                   </>
                 )}
                 
