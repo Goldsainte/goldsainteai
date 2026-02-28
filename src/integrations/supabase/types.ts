@@ -10929,6 +10929,7 @@ export type Database = {
       }
       trip_proposals: {
         Row: {
+          accepted_at: string | null
           agent_commission_pct: number | null
           agent_id: string | null
           cancellation_policy_id: string | null
@@ -10937,6 +10938,7 @@ export type Database = {
           creator_id: string | null
           currency: string | null
           custom_cancellation_terms: string | null
+          declined_at: string | null
           deposit_due_days: number | null
           deposit_percentage: number | null
           end_date: string | null
@@ -10962,8 +10964,10 @@ export type Database = {
           updated_at: string | null
           valid_until: string | null
           viewed_at: string | null
+          withdrawn_at: string | null
         }
         Insert: {
+          accepted_at?: string | null
           agent_commission_pct?: number | null
           agent_id?: string | null
           cancellation_policy_id?: string | null
@@ -10972,6 +10976,7 @@ export type Database = {
           creator_id?: string | null
           currency?: string | null
           custom_cancellation_terms?: string | null
+          declined_at?: string | null
           deposit_due_days?: number | null
           deposit_percentage?: number | null
           end_date?: string | null
@@ -10997,8 +11002,10 @@ export type Database = {
           updated_at?: string | null
           valid_until?: string | null
           viewed_at?: string | null
+          withdrawn_at?: string | null
         }
         Update: {
+          accepted_at?: string | null
           agent_commission_pct?: number | null
           agent_id?: string | null
           cancellation_policy_id?: string | null
@@ -11007,6 +11014,7 @@ export type Database = {
           creator_id?: string | null
           currency?: string | null
           custom_cancellation_terms?: string | null
+          declined_at?: string | null
           deposit_due_days?: number | null
           deposit_percentage?: number | null
           end_date?: string | null
@@ -11032,6 +11040,7 @@ export type Database = {
           updated_at?: string | null
           valid_until?: string | null
           viewed_at?: string | null
+          withdrawn_at?: string | null
         }
         Relationships: [
           {
