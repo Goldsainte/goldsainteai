@@ -1,46 +1,42 @@
 
 
-## Fix Global Layout Spacing: Footer Placement + Consistent Page Padding
+## Fix Footer Not Sticking to Bottom
 
 ### Root cause
 
-`src/App.css` contains `#root { max-width: 1280px; margin: 0 auto; padding: 2rem; }` which conflicts with the full-viewport flex layout defined in `index.css`. This constrains the root element and adds 2rem of padding around the entire app, breaking the footer-push-down behavior.
+The flex height chain relies on `@layer base` CSS rules which have lower cascade priority. The `#root` flex rules are in `@layer base` but lack `min-height: 100vh`, and the AppContent wrapper in `App.tsx` uses only `flex-1` without `min-h-screen`. This means the height chain from html → body → #root → content isn't guaranteed to fill the viewport.
 
 ### Changes
 
-#### 1. Clean up App.css (remove conflicting #root styles)
+#### 1. Add `min-h-screen` to AppContent wrapper (`src/App.tsx`)
 
-**File:** `src/App.css`
+Change the wrapper div from:
+```tsx
+<div className="flex-1 flex flex-col w-full max-w-full">
+```
+to:
+```tsx
+<div className="min-h-screen flex-1 flex flex-col w-full max-w-full">
+```
 
-Remove or zero out the `#root` block — specifically `max-width: 1280px`, `margin: 0 auto`, and `padding: 2rem`. These override the flex layout in `index.css` that correctly handles footer placement. The rest of App.css (logo animations, card styles) can stay since they're unused but harmless.
+This makes the layout explicitly fill the viewport regardless of CSS cascade issues with `@layer base`.
 
-#### 2. Ensure footer has `margin-top: auto`
+#### 2. Add `min-height: 100vh` to `#root` in `src/index.css`
 
-**File:** `src/components/Footer.tsx`
+In the `#root` rule at line 177-181, add `min-height: 100vh` to ensure the root element itself fills the viewport:
 
-Add `mt-auto` to the `<footer>` element so it's explicitly pushed to the bottom of the flex column on short pages.
+```css
+#root {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+```
 
-#### 3. Standardize page-level top padding
+These two changes make the height chain bulletproof — the footer's existing `mt-auto` will then work correctly to push it to the bottom on short pages.
 
-Multiple pages use different top padding values. Normalize to a consistent system:
-
-- **Standard inner page** (has BackButton + heading): `pt-8 md:pt-10` — enough breathing room below header without excess whitespace
-- **Landing/hero pages**: keep their own hero spacing
-
-Pages to update:
-- `src/pages/NotificationsPage.tsx` — change `pt-14 md:pt-16` → `pt-8 md:pt-10` (too much top space currently)
-- Spot-check other pages like `MyTripRequestsPage`, `PartnerBookingsPage`, `TripRequestDetailPage` which use `py-10 md:py-12` — these are fine as they include top+bottom together
-
-#### 4. Remove nested `<main>` tags from pages
-
-Pages like NotificationsPage render `<main>` inside App.tsx's `<main>`. Change page-level `<main>` to `<div>` to avoid nested landmarks and ensure the flex chain works cleanly. Apply to NotificationsPage and any other pages using `<main className="flex-1">`.
-
-### Files to change
-1. `src/App.css` — remove conflicting `#root` styles
-2. `src/components/Footer.tsx` — add `mt-auto`
-3. `src/pages/NotificationsPage.tsx` — fix padding + change `<main>` to `<div>`
-4. `src/pages/PartnerBookingsPage.tsx` — change `<main>` to `<div>`
-5. `src/pages/MyTripRequestsPage.tsx` — change `<main>` to `<div>`
-6. `src/pages/TripRequestDetailPage.tsx` — change `<main>` to `<div>`
-7. `src/pages/trips/PostTripPage.tsx` — change `<main>` to `<div>`
+### Files
+1. `src/App.tsx` — add `min-h-screen` to AppContent wrapper
+2. `src/index.css` — add `min-height: 100vh` to `#root`
 
