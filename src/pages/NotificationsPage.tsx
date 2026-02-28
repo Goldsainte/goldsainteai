@@ -45,8 +45,8 @@ export default function NotificationsPage() {
   };
 
   return (
-    <main className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
-      <section className="mx-auto max-w-6xl px-4 md:px-6 pt-14 pb-6 md:pt-16 md:pb-8">
+    <div className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
+      <section className="mx-auto max-w-6xl px-4 md:px-6 pt-8 pb-6 md:pt-10 md:pb-8">
         <div className="mb-6">
           <BackButton />
         </div>
@@ -108,6 +108,6 @@ export default function NotificationsPage() {
           )}
         </div>
       </section>
-    </main>
+    </div>
   );
 }

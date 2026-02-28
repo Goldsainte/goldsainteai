@@ -11,7 +11,7 @@ export const Footer = () => {
   const linkClasses = "text-[#4A4A4A] hover:text-[#C7B892] transition-colors";
 
   return (
-    <footer className="bg-[#FDF9F0] border-t border-[#E5DFC6]">
+    <footer className="mt-auto bg-[#FDF9F0] border-t border-[#E5DFC6]">
       {/* Navigation Links Section */}
       <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* MOBILE: Accordion Layout */}

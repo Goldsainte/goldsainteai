@@ -371,7 +371,7 @@ export default function PostTripPage() {
   const roleLabels: [WantsRole, string][] = [["creator", "Creators only"], ["agent", "Travel agents only"], ["both", "Creators & agents"]];
 
   return (
-    <main className="flex-1 bg-[#f7f3ea] text-[#0a2225] min-h-screen">
+    <div className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
       {/* Progress dots */}
       <div className="mx-auto max-w-2xl px-6 pt-10 pb-2">
         <div className="flex items-center justify-center gap-2 mb-1">
@@ -740,7 +740,7 @@ export default function PostTripPage() {
       </form>
 
       <TrustSafetyModal open={showSafetyModal} onClose={() => setShowSafetyModal(false)} context="trip" />
-    </main>
+    </div>
   );
 }
 

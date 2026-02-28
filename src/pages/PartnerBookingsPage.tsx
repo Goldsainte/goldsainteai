@@ -85,7 +85,7 @@ export default function PartnerBookingsPage() {
         <title>My Bookings · Goldsainte</title>
       </Helmet>
 
-      <main className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
+      <div className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
         <div className="mx-auto max-w-6xl px-4 md:px-6 py-10 md:py-12">
           <header className="space-y-2">
             <p className="text-xs uppercase tracking-[0.18em] text-[#C7A962]">
@@ -122,7 +122,7 @@ export default function PartnerBookingsPage() {
             )}
           </section>
         </div>
-      </main>
+      </div>
     </>
   );
 }
