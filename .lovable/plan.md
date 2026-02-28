@@ -1,24 +1,46 @@
 
 
-## Compact Instagram-Style Notification Rows
+## Fix Global Layout Spacing: Footer Placement + Consistent Page Padding
 
-Right now each notification takes up too much vertical space — title on one line, message on the next, timestamp on a third, with generous padding (`py-4 md:py-5`, `space-y-1.5`). Instagram fits everything into a single dense row.
+### Root cause
 
-### Changes to `src/pages/NotificationsPage.tsx`
+`src/App.css` contains `#root { max-width: 1280px; margin: 0 auto; padding: 2rem; }` which conflicts with the full-viewport flex layout defined in `index.css`. This constrains the root element and adds 2rem of padding around the entire app, breaking the footer-push-down behavior.
 
-1. **Flatten to single-line layout** — combine title + message into one inline `<p>` with the title bold and message as regular weight, separated by a space (like Instagram: "**greg_weeks_** liked your photo.")
-2. **Inline the timestamp** — append the relative time on the same line in lighter text, no line break
-3. **Reduce vertical padding** — drop from `py-4 md:py-5` to `py-2.5 md:py-3`
-4. **Remove `space-y-1.5`** — no stacked spacing needed since everything is inline
-5. **Shrink the unread dot** — keep it but move it to vertically centered (`items-center` instead of `items-start`)
-6. **Reduce card inner padding** — from `p-6 md:p-8` to `p-4 md:p-5`
+### Changes
 
-### Result per row
-```text
-• New message · You have a new message · 13 minutes ago
-```
-One line, dense, scannable — like Instagram's notification feed.
+#### 1. Clean up App.css (remove conflicting #root styles)
 
-### File
-`src/pages/NotificationsPage.tsx`
+**File:** `src/App.css`
+
+Remove or zero out the `#root` block — specifically `max-width: 1280px`, `margin: 0 auto`, and `padding: 2rem`. These override the flex layout in `index.css` that correctly handles footer placement. The rest of App.css (logo animations, card styles) can stay since they're unused but harmless.
+
+#### 2. Ensure footer has `margin-top: auto`
+
+**File:** `src/components/Footer.tsx`
+
+Add `mt-auto` to the `<footer>` element so it's explicitly pushed to the bottom of the flex column on short pages.
+
+#### 3. Standardize page-level top padding
+
+Multiple pages use different top padding values. Normalize to a consistent system:
+
+- **Standard inner page** (has BackButton + heading): `pt-8 md:pt-10` — enough breathing room below header without excess whitespace
+- **Landing/hero pages**: keep their own hero spacing
+
+Pages to update:
+- `src/pages/NotificationsPage.tsx` — change `pt-14 md:pt-16` → `pt-8 md:pt-10` (too much top space currently)
+- Spot-check other pages like `MyTripRequestsPage`, `PartnerBookingsPage`, `TripRequestDetailPage` which use `py-10 md:py-12` — these are fine as they include top+bottom together
+
+#### 4. Remove nested `<main>` tags from pages
+
+Pages like NotificationsPage render `<main>` inside App.tsx's `<main>`. Change page-level `<main>` to `<div>` to avoid nested landmarks and ensure the flex chain works cleanly. Apply to NotificationsPage and any other pages using `<main className="flex-1">`.
+
+### Files to change
+1. `src/App.css` — remove conflicting `#root` styles
+2. `src/components/Footer.tsx` — add `mt-auto`
+3. `src/pages/NotificationsPage.tsx` — fix padding + change `<main>` to `<div>`
+4. `src/pages/PartnerBookingsPage.tsx` — change `<main>` to `<div>`
+5. `src/pages/MyTripRequestsPage.tsx` — change `<main>` to `<div>`
+6. `src/pages/TripRequestDetailPage.tsx` — change `<main>` to `<div>`
+7. `src/pages/trips/PostTripPage.tsx` — change `<main>` to `<div>`
 
