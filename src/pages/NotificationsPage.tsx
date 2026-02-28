@@ -62,7 +62,7 @@ export default function NotificationsPage() {
       </section>
 
       <section className="mx-auto max-w-4xl px-4 pb-16 md:pb-20">
-        <div className="rounded-2xl bg-white/95 border border-[#E5DFC6] p-6 md:p-8">
+        <div className="rounded-2xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5">
           {loading && (
             <p className="text-sm text-[#6B7280] py-8 text-center">Loading…</p>
           )}
@@ -85,21 +85,21 @@ export default function NotificationsPage() {
                   <button
                     type="button"
                     onClick={() => handleClick(n)}
-                    className={`w-full text-left px-4 md:px-6 py-4 md:py-5 rounded-xl transition-colors hover:bg-[#f7f3ea]/60 flex items-start justify-between gap-3 ${
+                    className={`w-full text-left px-4 md:px-5 py-2.5 md:py-3 rounded-xl transition-colors hover:bg-[#f7f3ea]/60 flex items-center justify-between gap-3 ${
                       !n.is_read ? "border-l-2 border-[#C7A962]" : ""
                     }`}
                   >
-                    <div className="space-y-1.5">
-                      <p className="text-sm md:text-base font-medium">{n.title}</p>
+                    <p className="text-sm leading-snug">
+                      <span className="font-medium">{n.title}</span>
                       {n.message && (
-                        <p className="text-sm text-[#6B7280]">{n.message}</p>
+                        <span className="text-[#6B7280]"> {n.message}</span>
                       )}
-                      <p className="text-xs text-[#9CA3AF]">
+                      <span className="text-[#9CA3AF] ml-1.5">
                         {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
-                      </p>
-                    </div>
+                      </span>
+                    </p>
                     {!n.is_read && (
-                      <span className="mt-1.5 inline-flex h-2 w-2 rounded-full bg-[#C7A962] flex-shrink-0" />
+                      <span className="inline-flex h-2 w-2 rounded-full bg-[#C7A962] flex-shrink-0" />
                     )}
                   </button>
                 </li>
