@@ -1,8 +1,7 @@
-// src/pages/NotificationsPage.tsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Sparkles } from "lucide-react";
 import { BackButton } from "@/components/ui/BackButton";
+import { formatDistanceToNow } from "date-fns";
 import {
   fetchNotifications,
   markNotificationRead,
@@ -28,9 +27,7 @@ export default function NotificationsPage() {
       }
     }
     load();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
   const handleClick = async (n: Notification) => {
@@ -41,10 +38,7 @@ export default function NotificationsPage() {
           prev.map((x) => (x.id === n.id ? { ...x, is_read: true } : x))
         );
       }
-
-      if (n.link) {
-        navigate(n.link);
-      }
+      if (n.link) navigate(n.link);
     } catch {
       // ignore
     }
@@ -53,39 +47,35 @@ export default function NotificationsPage() {
   return (
     <main className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
       <section className="mx-auto max-w-6xl px-4 md:px-6 pt-14 pb-6 md:pt-16 md:pb-8">
-        <div className="mb-4">
+        <div className="mb-6">
           <BackButton />
         </div>
-        <div className="flex items-center gap-2 mb-2">
-          <div className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#0c4d47]">
-            <Sparkles className="h-3 w-3 text-[#E5DFC6]" />
-          </div>
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
-              Notifications
-            </p>
-            <h1 className="font-display text-[20px] leading-tight">
-              What's happening in your Goldsainte world
-            </h1>
-          </div>
-        </div>
-        <p className="text-sm text-[#4a4a4a]">
+        <p className="text-xs tracking-[0.2em] uppercase text-[#C7A962] font-medium mb-2">
+          Notifications
+        </p>
+        <h1 className="font-secondary text-2xl md:text-3xl leading-tight mb-3">
+          What's happening in your Goldsainte world
+        </h1>
+        <p className="text-base md:text-lg text-[#6B7280] max-w-2xl">
           New trip invites, proposal updates and booking changes appear here — so you can stay on top of opportunities without leaving the platform.
         </p>
       </section>
 
       <section className="mx-auto max-w-4xl px-4 pb-16 md:pb-20">
-        <div className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 text-[11px] space-y-2">
-          {loading && <p className="text-[10px] text-[#8D8D8D]">Loading…</p>}
+        <div className="rounded-2xl bg-white/95 border border-[#E5DFC6] p-6 md:p-8">
+          {loading && (
+            <p className="text-sm text-[#6B7280] py-8 text-center">Loading…</p>
+          )}
           {error && (
-            <p className="text-[10px] text-red-600">
-              {error}
-            </p>
+            <p className="text-sm text-red-600 py-4">{error}</p>
           )}
           {!loading && !error && notifications.length === 0 && (
-            <p className="text-sm text-[#8D8D8D] py-4">
-              You don't have any notifications yet. As travelers post briefs and respond to your proposals, updates will appear here.
-            </p>
+            <div className="text-center py-16">
+              <h2 className="font-secondary text-xl md:text-2xl mb-2">Nothing new yet</h2>
+              <p className="text-sm md:text-base text-[#6B7280] max-w-md mx-auto">
+                As travelers post briefs and respond to your proposals, updates will appear here.
+              </p>
+            </div>
           )}
 
           {!loading && !error && notifications.length > 0 && (
@@ -95,21 +85,21 @@ export default function NotificationsPage() {
                   <button
                     type="button"
                     onClick={() => handleClick(n)}
-                    className={`w-full text-left py-2.5 flex items-start justify-between gap-3 ${
-                      !n.is_read ? "bg-[#f7f3ea]" : "bg-transparent"
+                    className={`w-full text-left px-4 md:px-6 py-4 md:py-5 rounded-xl transition-colors hover:bg-[#f7f3ea]/60 flex items-start justify-between gap-3 ${
+                      !n.is_read ? "border-l-2 border-[#C7A962]" : ""
                     }`}
                   >
-                    <div className="space-y-1">
-                      <p className="text-[11px] font-semibold">{n.title}</p>
+                    <div className="space-y-1.5">
+                      <p className="text-sm md:text-base font-medium">{n.title}</p>
                       {n.message && (
-                        <p className="text-[10px] text-[#4a4a4a]">{n.message}</p>
+                        <p className="text-sm text-[#6B7280]">{n.message}</p>
                       )}
-                      <p className="text-[9px] text-[#8D8D8D]">
-                        {new Date(n.created_at).toLocaleString()}
+                      <p className="text-xs text-[#9CA3AF]">
+                        {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
                       </p>
                     </div>
                     {!n.is_read && (
-                      <span className="mt-1 inline-flex h-2 w-2 rounded-full bg-[#0c4d47]" />
+                      <span className="mt-1.5 inline-flex h-2 w-2 rounded-full bg-[#C7A962] flex-shrink-0" />
                     )}
                   </button>
                 </li>
