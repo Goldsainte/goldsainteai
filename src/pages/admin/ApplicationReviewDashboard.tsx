@@ -588,7 +588,7 @@ const AgentApplicationDetail: React.FC<{
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between pr-8">
         <div>
           {showCloseButton && (
             <Button
@@ -634,9 +634,9 @@ const AgentApplicationDetail: React.FC<{
         )}
         {application.status === 'pending_verification' && (
           <>
-            <Alert className="w-full bg-[#fef3cd] border-[#856404]/20 rounded-xl">
+            <Alert className="w-full bg-[#fef3cd] border-[#856404]/20 rounded-xl overflow-hidden">
               <Clock className="h-4 w-4 text-[#856404]" />
-              <AlertDescription className="text-[#856404]">
+              <AlertDescription className="text-[#856404] break-words">
                 Waiting for applicant to complete identity verification via Stripe Identity.
               </AlertDescription>
             </Alert>
@@ -737,7 +737,7 @@ const AgentApplicationDetail: React.FC<{
           <LuxuryCardTitle icon={Building}>Business Information</LuxuryCardTitle>
         </LuxuryCardHeader>
         <LuxuryCardContent>
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div>
               <p className="text-xs text-[#6B7280] uppercase tracking-wide">Business Type</p>
               <p className="mt-1 text-[#0a2225] capitalize">{application.business_type?.replace('_', ' ') || 'N/A'}</p>
@@ -795,7 +795,7 @@ const AgentApplicationDetail: React.FC<{
           <LuxuryCardTitle icon={Shield}>Licensing & Insurance</LuxuryCardTitle>
         </LuxuryCardHeader>
         <LuxuryCardContent>
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div>
               <p className="text-xs text-[#6B7280] uppercase tracking-wide">License Number</p>
               <p className="mt-1 text-[#0a2225]">{application.license_number || 'N/A'}</p>
@@ -859,7 +859,7 @@ const AgentApplicationDetail: React.FC<{
           <LuxuryCardTitle icon={Shield}>Identity Verification</LuxuryCardTitle>
         </LuxuryCardHeader>
         <LuxuryCardContent className="space-y-3">
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div>
               <p className="text-xs text-[#6B7280] uppercase tracking-wide">Status</p>
               <div className="mt-2">
@@ -948,7 +948,7 @@ const BrandApplicationDetail: React.FC<{
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between pr-8">
         <div>
           {showCloseButton && (
             <Button
@@ -992,9 +992,9 @@ const BrandApplicationDetail: React.FC<{
         )}
         {application.status === 'pending_verification' && (
           <>
-            <Alert className="w-full bg-[#fef3cd] border-[#856404]/20 rounded-xl">
+            <Alert className="w-full bg-[#fef3cd] border-[#856404]/20 rounded-xl overflow-hidden">
               <Clock className="h-4 w-4 text-[#856404]" />
-              <AlertDescription className="text-[#856404]">
+              <AlertDescription className="text-[#856404] break-words">
                 Waiting for applicant to complete identity verification via Stripe Identity.
               </AlertDescription>
             </Alert>
@@ -1052,7 +1052,7 @@ const BrandApplicationDetail: React.FC<{
           <img
             src={application.cover_image_url}
             alt={application.brand_name}
-            className="w-full h-64 object-cover"
+            className="w-full h-48 sm:h-64 object-cover"
           />
         </div>
       )}
@@ -1140,7 +1140,7 @@ const BrandApplicationDetail: React.FC<{
             <LuxuryCardTitle>Gallery</LuxuryCardTitle>
           </LuxuryCardHeader>
           <LuxuryCardContent>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
               {application.gallery_urls.map((url, index) => (
                 <img
                   key={index}
@@ -1757,9 +1757,9 @@ export default function AdminApplicationsPage() {
 
       {/* Mobile Detail Sheet */}
       <Sheet open={mobileSheetOpen} onOpenChange={setMobileSheetOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-xl p-0 bg-[#FDF9F0]">
+        <SheetContent side="right" className="w-full max-w-full sm:max-w-xl p-0 bg-[#FDF9F0] overflow-hidden">
           <ScrollArea className="h-full">
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               {selectedApplication && (
                 activeTab === 'agents' ? (
                   <AgentApplicationDetail
