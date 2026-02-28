@@ -1,42 +1,33 @@
 
 
-## Fix Footer Not Sticking to Bottom
+## Add Permanent Delete for Archived Conversations
 
-### Root cause
-
-The flex height chain relies on `@layer base` CSS rules which have lower cascade priority. The `#root` flex rules are in `@layer base` but lack `min-height: 100vh`, and the AppContent wrapper in `App.tsx` uses only `flex-1` without `min-h-screen`. This means the height chain from html → body → #root → content isn't guaranteed to fill the viewport.
+### Problem
+The UI sends a `"delete"` action to the `manage-conversation` edge function, but the function's switch statement has no `case "delete"` — it falls through to `default` returning "Invalid action". Archived messages can never be permanently removed.
 
 ### Changes
 
-#### 1. Add `min-h-screen` to AppContent wrapper (`src/App.tsx`)
+#### 1. Add `"delete"` case to the edge function (`supabase/functions/manage-conversation/index.ts`)
 
-Change the wrapper div from:
-```tsx
-<div className="flex-1 flex flex-col w-full max-w-full">
+Add a new case in the switch block that:
+- Deletes all `direct_messages` rows where `conversation_id` matches
+- Deletes the `dm_conversations` row itself
+- Returns early (no `update` call needed since the row is deleted)
+
 ```
-to:
-```tsx
-<div className="min-h-screen flex-1 flex flex-col w-full max-w-full">
-```
-
-This makes the layout explicitly fill the viewport regardless of CSS cascade issues with `@layer base`.
-
-#### 2. Add `min-height: 100vh` to `#root` in `src/index.css`
-
-In the `#root` rule at line 177-181, add `min-height: 100vh` to ensure the root element itself fills the viewport:
-
-```css
-#root {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
+case "delete":
+  // Delete all messages in the conversation
+  await supabase.from("direct_messages").delete().eq("conversation_id", conversationId);
+  // Delete the conversation itself
+  await supabase.from("dm_conversations").delete().eq("id", conversationId);
+  return success response
 ```
 
-These two changes make the height chain bulletproof — the footer's existing `mt-auto` will then work correctly to push it to the bottom on short pages.
+#### 2. Add a visible "Delete" option in the archived conversations list (`src/components/messaging/DirectMessageInbox.tsx`)
+
+Currently the delete option only appears in the conversation detail dropdown (line 454). Add a delete button/option visible when browsing the archived tab's conversation list, so users can delete archived conversations without opening them first. This could be a swipe action or a trash icon on each archived row.
 
 ### Files
-1. `src/App.tsx` — add `min-h-screen` to AppContent wrapper
-2. `src/index.css` — add `min-height: 100vh` to `#root`
+1. `supabase/functions/manage-conversation/index.ts` — add `delete` case
+2. `src/components/messaging/DirectMessageInbox.tsx` — add delete option to archived conversation list items
 
