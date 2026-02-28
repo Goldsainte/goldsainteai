@@ -1,18 +1,20 @@
 
 
-## Fix: Remove Redundant "Back to Dashboard" from Earnings Tab
+## Three Issues to Fix
 
-The `PartnerEarningsView` component renders as a full standalone page with its own `<main>`, back button, and header — but when used inside the Creator Dashboard's Earnings tab, it's already nested within the dashboard layout. This creates a redundant "Back to Dashboard" link and duplicated header elements mid-page.
+### 1. CreatorSettingsTab links to nonexistent `/settings` route
+**File:** `src/pages/creator/components/CreatorSettingsTab.tsx`
+- Change `to="/settings"` to `to="/travel-settings"` (the actual settings route)
 
-### Solution
+### 2. Remove all "Creator Studio" references
+**Files to update:**
+- `src/pages/CreatorDashboard.tsx` (line 160): Change "Creator Studio" label to "Creator Dashboard"
+- `src/pages/onboarding/CreatorOnboardingPage.tsx` (lines 477, 480): Change "Creator Studio" to "Creator Dashboard" / "Creator Dashboard by Goldsainte AI"
+- `src/pages/TikTokLab/StoryboardsPage.tsx` (line 100): Change "Back to Creator Studio" to "Back to Dashboard"
+- `src/i18n/locales/en.json` (lines 14, 360): Update "Goldsainte Creator Studio" references
 
-**Refactor `CreatorEarningsTab.tsx`** to render the earnings content inline (summary cards + booking payouts) directly, instead of embedding the full `PartnerEarningsView` standalone page wrapper.
+### 3. Traveler seeing Creator Dashboard — 404 on screenshot
+The user's screenshot shows a Traveler account navigating to `/creator-dashboard` and getting a 404. The Header already gates the Creator Dashboard link behind `{isCreator && ...}`, so the conditional rendering is correct. The 404 is likely because the user navigated directly to `/creator-dashboard` as a Traveler. 
 
-**Changes:**
-
-1. **`src/pages/creator/components/CreatorEarningsTab.tsx`** — Rewrite to call `getPartnerBookingEarnings("creator")` directly and render the summary cards + booking list inline, without the `<main>`, `BackButton`, or redundant header. Reuse the same `formatMoney` helper and `SummaryCard` pattern but strip the page-level wrapper.
-
-2. **`src/components/earnings/PartnerEarningsView.tsx`** — No changes needed (it's still used as a standalone page for agents or direct navigation).
-
-The earnings tab content will just show the three summary cards, the booking payouts list, and the footnote — matching the dashboard's existing tab content pattern without any standalone page chrome.
+**Fix:** Add role guard in `src/pages/CreatorDashboard.tsx` — if user is not a creator (check `account_type` from profile), redirect to `/traveler` instead of showing the page. This prevents direct URL access by non-creators.
 
