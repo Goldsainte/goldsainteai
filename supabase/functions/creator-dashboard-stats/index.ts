@@ -2,7 +2,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
 Deno.serve(async (req) => {
@@ -13,9 +13,8 @@ Deno.serve(async (req) => {
   try {
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      console.error('Missing Authorization header');
       return new Response(
-        JSON.stringify({ error: 'Unauthorized - missing auth header' }),
+        JSON.stringify({ error: 'Unauthorized' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -23,114 +22,95 @@ Deno.serve(async (req) => {
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: authHeader },
-        },
-      }
+      { global: { headers: { Authorization: authHeader } } }
     );
 
-    // Get current user
-    const {
-      data: { user },
-      error: userError,
-    } = await supabaseClient.auth.getUser();
-
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
     if (userError || !user) {
-      console.error('Auth error:', userError);
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log(`Loading stats for creator: ${user.id}`);
+    console.log(`Loading dashboard stats for creator: ${user.id}`);
 
-    // Check TikTok connection status
-    const { data: tiktokToken } = await supabaseClient
-      .from('tiktok_tokens')
-      .select('access_token')
-      .eq('user_id', user.id)
-      .single();
-
-    const tiktokConnected = !!tiktokToken?.access_token;
-
-    // Get trip stories count and recent stories
-    const { data: tripStories, error: storiesError } = await supabaseClient
-      .from('trip_stories')
-      .select('id, title, created_at, tiktok_post_id, tiktok_published_at, status')
-      .eq('user_id', user.id)
+    // --- Proposal stats ---
+    const { data: proposals, error: proposalsError } = await supabaseClient
+      .from('trip_proposals')
+      .select('id, status, created_at, trip_request_id')
+      .eq('proposer_id', user.id)
       .order('created_at', { ascending: false });
 
-    if (storiesError) {
-      console.error('Error fetching trip stories:', storiesError);
+    if (proposalsError) {
+      console.error('Error fetching proposals:', proposalsError);
     }
 
-    const totalTripStories = tripStories?.length || 0;
+    const allProposals = proposals || [];
+    const activeStatuses = ['draft', 'sent', 'traveler_review'];
+    const activeProposals = allProposals.filter(p => activeStatuses.includes(p.status)).length;
+    const acceptedProposals = allProposals.filter(p => p.status === 'accepted').length;
+    const totalProposalsSent = allProposals.length;
+    const respondedCount = allProposals.filter(p => ['accepted', 'declined'].includes(p.status)).length;
+    const responseRate = totalProposalsSent > 0 ? Math.round((respondedCount / totalProposalsSent) * 100) : 0;
 
-    // Count trips that have a TikTok story linked
-    const totalTripsLinked = tripStories?.filter((story) => !!story.tiktok_post_id).length || 0;
+    // --- Recent proposals with trip request info ---
+    const recentRaw = allProposals.slice(0, 10);
+    const tripRequestIds = [...new Set(recentRaw.map(p => p.trip_request_id).filter(Boolean))];
 
-    // Get recent stories (up to 10)
-    const recentStories = (tripStories || []).slice(0, 10).map((story) => ({
-      id: story.id,
-      title: story.title || 'Untitled Story',
-      createdAt: story.created_at,
-      postedToTikTok: !!story.tiktok_published_at,
-      tiktokVideoId: story.tiktok_post_id,
+    let tripRequestMap: Record<string, { destination: string; title: string }> = {};
+    if (tripRequestIds.length > 0) {
+      const { data: tripRequests } = await supabaseClient
+        .from('trip_requests')
+        .select('id, destination, title')
+        .in('id', tripRequestIds);
+
+      (tripRequests || []).forEach(tr => {
+        tripRequestMap[tr.id] = { destination: tr.destination || '', title: tr.title || '' };
+      });
+    }
+
+    const recentProposals = recentRaw.map(p => ({
+      id: p.id,
+      tripRequestId: p.trip_request_id,
+      status: p.status,
+      createdAt: p.created_at,
+      destination: tripRequestMap[p.trip_request_id]?.destination || 'Unknown',
+      tripTitle: tripRequestMap[p.trip_request_id]?.title || 'Untitled Trip',
     }));
 
-    // Calculate real earnings from creator_earnings table
-    const { data: earningsData, error: earningsError } = await supabaseClient
+    // --- Earnings ---
+    const { data: earningsData } = await supabaseClient
       .from('creator_earnings')
       .select('amount, status')
-      .eq('user_id', user.id)
-      .in('status', ['completed', 'paid']);
+      .eq('user_id', user.id);
 
-    if (earningsError) {
-      console.error('Error fetching earnings:', earningsError);
-    }
+    const earnings = earningsData || [];
+    const totalEarnings = earnings
+      .filter(e => ['completed', 'paid'].includes(e.status))
+      .reduce((sum, e) => sum + (parseFloat(String(e.amount)) || 0), 0);
+    const pendingEarnings = earnings
+      .filter(e => e.status === 'pending')
+      .reduce((sum, e) => sum + (parseFloat(String(e.amount)) || 0), 0);
 
-    // Sum up all completed/paid earnings
-    const totalRealEarnings = (earningsData || []).reduce((sum, earning) => {
-      return sum + (parseFloat(String(earning.amount)) || 0);
-    }, 0);
+    // --- Open trip requests count ---
+    const { count: openTripRequests } = await supabaseClient
+      .from('trip_requests')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'open');
 
-    // Calculate bookings-based revenue
-    const { data: creatorPackages } = await supabaseClient
-      .from('package_marketing_materials')
-      .select('id')
-      .eq('creator_id', user.id);
-
-    const packageIds = (creatorPackages || []).map(p => p.id);
-
-    let bookingsRevenue = 0;
-    if (packageIds.length > 0) {
-      const { data: bookingsData } = await supabaseClient
-        .from('package_bookings')
-        .select('total_price')
-        .in('package_id', packageIds)
-        .in('payment_status', ['paid', 'completed']);
-      
-      // Apply 40% commission rate for bookings
-      const BOOKING_COMMISSION_RATE = 0.4;
-      bookingsRevenue = (bookingsData || []).reduce((sum, booking) => {
-        return sum + (parseFloat(String(booking.total_price)) || 0) * BOOKING_COMMISSION_RATE;
-      }, 0);
-    }
-
-    // Combined total earnings
-    const totalEstimatedEarnings = totalRealEarnings + bookingsRevenue;
-
-    console.log(`Stats calculated - Stories: ${totalTripStories}, Linked: ${totalTripsLinked}, Earnings: $${totalEstimatedEarnings}`);
+    console.log(`Stats: active=${activeProposals}, accepted=${acceptedProposals}, total=${totalProposalsSent}, rate=${responseRate}%, earnings=$${totalEarnings}`);
 
     return new Response(
       JSON.stringify({
-        tiktokConnected,
-        totalTripStories,
-        totalTripsLinked,
-        totalEstimatedEarnings,
-        recentStories,
+        activeProposals,
+        acceptedProposals,
+        totalProposalsSent,
+        responseRate,
+        totalEarnings,
+        pendingEarnings,
+        recentProposals,
+        openTripRequests: openTripRequests || 0,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
