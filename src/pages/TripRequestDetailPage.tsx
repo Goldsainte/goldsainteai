@@ -443,21 +443,21 @@ export default function TripRequestDetailPage() {
 
   if (loading) {
     return (
-      <main className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
+      <div className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
         <div className="mx-auto max-w-6xl px-4 md:px-6 py-10 text-sm">
           Loading trip request…
         </div>
-      </main>
+      </div>
     );
   }
 
   if (!trip) {
     return (
-      <main className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
+      <div className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
         <div className="mx-auto max-w-6xl px-4 md:px-6 py-10 text-sm">
           Trip request not found or no longer available.
         </div>
-      </main>
+      </div>
     );
   }
 
@@ -474,7 +474,7 @@ export default function TripRequestDetailPage() {
         <title>Trip Request · Goldsainte</title>
       </Helmet>
 
-      <main className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
+      <div className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
         <div className="mx-auto max-w-6xl px-4 md:px-6 py-10 md:py-12">
           <div className="grid gap-6 md:grid-cols-[1.5fr,1.1fr] md:items-start">
             {/* LEFT: Trip brief (same for traveler & responders) */}
@@ -577,7 +577,7 @@ export default function TripRequestDetailPage() {
             )}
           </div>
         </div>
-      </main>
+      </div>
     </>
   );
 }

@@ -85,7 +85,7 @@ export default function MyTripRequestsPage() {
         />
       </Helmet>
 
-      <main className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
+      <div className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
         <div className="mx-auto max-w-6xl px-4 md:px-6 py-10 md:py-12">
           {/* Header */}
           <header className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
@@ -141,7 +141,7 @@ export default function MyTripRequestsPage() {
             )}
           </section>
         </div>
-      </main>
+      </div>
     </>
   );
 }

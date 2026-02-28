@@ -127,8 +127,8 @@ export default function TripRequestDetailPage() {
   const canSendProposal = isPartner && trip?.status === "open";
 
   return (
-    <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
-      <section className="mx-auto max-w-5xl px-4 pt-14 pb-6 md:pt-16 md:pb-8">
+    <div className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
+      <section className="mx-auto max-w-5xl px-4 pt-8 pb-6 md:pt-10 md:pb-8">
         <div className="flex items-center justify-between mb-4">
           <Link
             to={isTraveler ? "/my-trips" : "/marketplace"}
@@ -418,6 +418,6 @@ export default function TripRequestDetailPage() {
           </div>
         </section>
       )}
-    </main>
+    </div>
   );
 }
