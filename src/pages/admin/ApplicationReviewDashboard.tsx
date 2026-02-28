@@ -537,13 +537,13 @@ const RejectionDialog: React.FC<RejectionDialogProps> = ({
 // ============================================================================
 
 const LuxuryCard: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
-  <div className={`bg-white rounded-2xl border border-[#E5DFC6] shadow-sm ${className}`}>
+  <div className={`bg-white rounded-2xl border border-[#E5DFC6] shadow-sm overflow-hidden ${className}`}>
     {children}
   </div>
 );
 
 const LuxuryCardHeader: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
-  <div className={`p-6 pb-4 ${className}`}>{children}</div>
+  <div className={`p-4 pb-3 sm:p-6 sm:pb-4 ${className}`}>{children}</div>
 );
 
 const LuxuryCardTitle: React.FC<{ children: React.ReactNode; icon?: any; className?: string }> = ({ children, icon: Icon, className = '' }) => (
@@ -554,7 +554,7 @@ const LuxuryCardTitle: React.FC<{ children: React.ReactNode; icon?: any; classNa
 );
 
 const LuxuryCardContent: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
-  <div className={`p-6 pt-0 ${className}`}>{children}</div>
+  <div className={`p-4 pt-0 sm:p-6 sm:pt-0 ${className}`}>{children}</div>
 );
 
 // ============================================================================
@@ -946,7 +946,7 @@ const BrandApplicationDetail: React.FC<{
   showCloseButton?: boolean;
 }> = ({ application, onApprove, onReject, onSkipVerification, onClose, showCloseButton }) => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-hidden">
       {/* Header */}
       <div className="flex items-start justify-between pr-8">
         <div>
@@ -1067,11 +1067,11 @@ const BrandApplicationDetail: React.FC<{
             <p className="text-xs text-[#6B7280] uppercase tracking-wide">Name</p>
             <p className="mt-1 text-[#0a2225]">{application.primary_contact_name}</p>
           </div>
-          <div className="flex items-center gap-3">
-            <Mail className="h-4 w-4 text-[#C7A962]" />
+          <div className="flex items-center gap-3 min-w-0">
+            <Mail className="h-4 w-4 text-[#C7A962] shrink-0" />
             <a
               href={`mailto:${application.primary_contact_email}`}
-              className="text-sm text-[#0c4d47] hover:underline"
+              className="text-sm text-[#0c4d47] hover:underline break-all min-w-0"
             >
               {application.primary_contact_email}
             </a>
@@ -1215,13 +1215,13 @@ const BrandApplicationDetail: React.FC<{
               {application.documents.map((doc: any, index: number) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 border border-[#E5DFC6] rounded-xl hover:bg-[#F5EFE1] transition-colors"
+                  className="flex items-center justify-between p-3 border border-[#E5DFC6] rounded-xl hover:bg-[#F5EFE1] transition-colors min-w-0"
                 >
-                  <div className="flex items-center gap-3">
-                    <FileText className="h-5 w-5 text-[#C7A962]" />
-                    <div>
-                      <p className="font-medium text-sm text-[#0a2225]">{doc.type}</p>
-                      <p className="text-xs text-[#6B7280]">{doc.fileName}</p>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <FileText className="h-5 w-5 text-[#C7A962] shrink-0" />
+                    <div className="min-w-0">
+                      <p className="font-medium text-sm text-[#0a2225] truncate">{doc.type}</p>
+                      <p className="text-xs text-[#6B7280] truncate">{doc.fileName}</p>
                     </div>
                   </div>
                   <Button
@@ -1247,26 +1247,26 @@ const BrandApplicationDetail: React.FC<{
           <LuxuryCardTitle icon={Calendar}>Timeline</LuxuryCardTitle>
         </LuxuryCardHeader>
         <LuxuryCardContent className="space-y-2">
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-[#6B7280] w-24">Submitted:</span>
-            <span className="text-[#0a2225]">{format(new Date(application.submitted_at), 'PPp')}</span>
+          <div className="flex items-center gap-2 text-sm min-w-0">
+            <span className="text-[#6B7280] w-20 sm:w-24 shrink-0">Submitted:</span>
+            <span className="text-[#0a2225] min-w-0 break-words">{format(new Date(application.submitted_at), 'PPp')}</span>
           </div>
           {application.stripe_verified_at && (
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-[#6B7280] w-24">Verified:</span>
-              <span className="text-[#0a2225]">{format(new Date(application.stripe_verified_at), 'PPp')}</span>
+            <div className="flex items-center gap-2 text-sm min-w-0">
+              <span className="text-[#6B7280] w-20 sm:w-24 shrink-0">Verified:</span>
+              <span className="text-[#0a2225] min-w-0 break-words">{format(new Date(application.stripe_verified_at), 'PPp')}</span>
             </div>
           )}
           {application.approved_at && (
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-[#6B7280] w-24">Approved:</span>
-              <span className="text-[#0c4d47]">{format(new Date(application.approved_at), 'PPp')}</span>
+            <div className="flex items-center gap-2 text-sm min-w-0">
+              <span className="text-[#6B7280] w-20 sm:w-24 shrink-0">Approved:</span>
+              <span className="text-[#0c4d47] min-w-0 break-words">{format(new Date(application.approved_at), 'PPp')}</span>
             </div>
           )}
           {application.rejected_at && (
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-[#6B7280] w-24">Rejected:</span>
-              <span className="text-[#5b2c2c]">{format(new Date(application.rejected_at), 'PPp')}</span>
+            <div className="flex items-center gap-2 text-sm min-w-0">
+              <span className="text-[#6B7280] w-20 sm:w-24 shrink-0">Rejected:</span>
+              <span className="text-[#5b2c2c] min-w-0 break-words">{format(new Date(application.rejected_at), 'PPp')}</span>
             </div>
           )}
         </LuxuryCardContent>
