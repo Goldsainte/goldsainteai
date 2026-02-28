@@ -109,7 +109,8 @@ const CreatorDashboard = lazy(() => import('@/pages/CreatorDashboard'));
 const CreatorTripPage = lazy(() => import('@/pages/CreatorTripPage'));
 const TripDetailPageNew = lazy(() => import('@/pages/trips/TripDetailPage'));
 const TripBuilderPage = lazy(() => import('@/pages/TripBuilderPage'));
-const CreatorProfilePage = lazy(() => import('@/pages/CreatorProfilePage'));
+// CreatorProfilePage removed — /creator/:id now redirects to /creators/:id
+const CreatorRedirect = lazy(() => import('@/pages/redirects/CreatorRedirect'));
 const NewCollabRequestPage = lazy(() => import('@/pages/NewCollabRequestPage'));
 const Messages = lazy(() => import('@/pages/Messages'));
 const MessagesPage = lazy(() => import('@/pages/MessagesPage'));
@@ -234,7 +235,7 @@ export const AppRoutes = () => (
         <Route path="/explore" element={<ExplorePage />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/travel-profile" element={<TravelProfileRedirect />} />
-        <Route path="/travel-profile/:userId" element={<Navigate to="/creator/:userId" replace />} />
+        <Route path="/travel-profile/:userId" element={<TravelProfileRedirect />} />
       </Route>
 
       <Route
@@ -486,7 +487,7 @@ export const AppRoutes = () => (
       {/* New TikTok Creator Ecosystem Routes */}
       <Route path="/trip/:id" element={<CreatorTripPage />} />
       <Route path="/trip/:tripId/storyboard" element={<StoryboardEditorPage />} />
-      <Route path="/creator/:id" element={<CreatorProfilePage />} />
+      <Route path="/creator/:id" element={<CreatorRedirect />} />
       <Route path="/collabs/new" element={<NewCollabRequestPage />} />
       <Route
         path="/messages"
