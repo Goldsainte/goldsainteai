@@ -128,6 +128,39 @@ serve(async (req) => {
         message = "User blocked";
         break;
 
+      case "delete":
+        // Delete all messages in the conversation
+        const { error: delMsgError } = await supabase
+          .from("direct_messages")
+          .delete()
+          .eq("conversation_id", conversationId);
+
+        if (delMsgError) {
+          console.error("Error deleting messages:", delMsgError);
+          return new Response(
+            JSON.stringify({ error: "Failed to delete messages" }),
+            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        const { error: delConvError } = await supabase
+          .from("dm_conversations")
+          .delete()
+          .eq("id", conversationId);
+
+        if (delConvError) {
+          console.error("Error deleting conversation:", delConvError);
+          return new Response(
+            JSON.stringify({ error: "Failed to delete conversation" }),
+            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        return new Response(
+          JSON.stringify({ success: true, message: "Conversation permanently deleted" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+
       case "mark_read":
         const isP1 = conversation.participant_1 === user.id;
         updateData = isP1 ? { unread_count_p1: 0 } : { unread_count_p2: 0 };
