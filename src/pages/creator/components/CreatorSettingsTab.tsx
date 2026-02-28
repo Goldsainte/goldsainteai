@@ -9,7 +9,7 @@ export function CreatorSettingsTab() {
           Manage your creator profile, payout preferences, and account settings.
         </p>
         <Link
-          to="/settings"
+          to="/travel-settings"
           className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-white px-6 py-3 text-sm font-medium text-[#0a2225] hover:bg-[#F6F0E4] transition-colors"
         >
           Go to Settings
