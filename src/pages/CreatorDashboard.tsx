@@ -73,7 +73,7 @@ export default function CreatorDashboard() {
   const { hasCreatorAccess, loading: roleLoading } = useUserRole();
   const [stats, setStats] = useState<CreatorStats>(EMPTY_STATS);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  
   const [profile, setProfile] = useState<Profile | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -96,15 +96,15 @@ export default function CreatorDashboard() {
     let isMounted = true;
     async function loadStats() {
       setLoading(true);
-      setError(null);
+      
       try {
         const { data, error: fnError } = await invokeWithAuth<CreatorStats>(
           "creator-dashboard-stats",
           { body: {} }
         );
         if (fnError) {
+          console.error('Creator dashboard stats error:', fnError);
           if (!isMounted) return;
-          setError(fnError || "Unable to load creator stats at the moment.");
           setStats(EMPTY_STATS);
           return;
         }
@@ -119,9 +119,9 @@ export default function CreatorDashboard() {
           recentProposals: data?.recentProposals ?? [],
           openTripRequests: data?.openTripRequests ?? 0,
         });
-      } catch {
+      } catch (err) {
+        console.error('Creator dashboard stats error:', err);
         if (!isMounted) return;
-        setError("Unexpected error while loading stats.");
         setStats(EMPTY_STATS);
       } finally {
         if (isMounted) setLoading(false);
@@ -210,11 +210,6 @@ export default function CreatorDashboard() {
           </div>
         )}
 
-        {error && (
-          <div className="mb-8 rounded-2xl border border-red-200 bg-red-50 px-6 py-4 text-sm text-red-700">
-            {error}
-          </div>
-        )}
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
