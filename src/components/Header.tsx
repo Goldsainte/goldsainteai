@@ -641,20 +641,20 @@ export const Header = () => {
             </button>
 
             <button
-              onClick={() => (user ? navigate('/collections') : navigate('/auth'))}
+              onClick={() => navigate('/post-trip')}
               className="flex flex-col items-center justify-center gap-0.5 hover:bg-muted transition-colors min-h-[44px]"
-              aria-label="Collections"
+              aria-label="Post a Trip"
             >
-              <Sparkles className="h-5 w-5" />
-              <span className="text-[10px]">Collections</span>
+              <PlaneTakeoff className="h-5 w-5" />
+              <span className="text-[10px]">Post a Trip</span>
             </button>
 
             <button
-              onClick={() => navigate('/storyboards')}
+              onClick={() => navigate('/travel-feed')}
               className="flex flex-col items-center justify-center gap-0.5 hover:bg-muted transition-colors min-h-[44px]"
               aria-label="Storyboards"
             >
-              <Plane className="h-5 w-5" />
+              <Sparkles className="h-5 w-5" />
               <span className="text-[10px]">Storyboards</span>
             </button>
 
