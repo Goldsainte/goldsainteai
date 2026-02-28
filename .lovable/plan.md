@@ -1,19 +1,44 @@
 
 
-## Remove TikTok Connection from Creator Dashboard
+## Rework Creator Dashboard with Relevant Stats
 
-### Changes to `src/pages/CreatorDashboard.tsx`
+The current dashboard shows "Trip Stories" and "Estimated Earnings" from the edge function, plus a "Recent Stories" section. These are largely irrelevant to the creator's actual marketplace activity (bidding on trips, proposal responses, bookings). Here's the reworked plan.
 
-1. **Remove the "TikTok Linked" stat card** (lines 178-183) — replace with a more relevant stat or remove entirely, leaving 2 stat cards (Trip Stories + Estimated Earnings)
+### New Stats to Display
 
-2. **Remove the entire "TikTok Connection Card" section** (lines 198-237) — the full card with connection status and manage/connect button
+1. **Active Proposals** — count of `trip_proposals` where `proposer_id = user.id` and `status` in ('pending', 'sent', 'traveler_review')
+2. **Accepted Proposals** — count where `status = 'accepted'`
+3. **Total Proposals Sent** — lifetime count of all proposals submitted
+4. **Response Rate** — percentage of proposals that received a response (accepted + declined) vs total sent
+5. **Estimated Earnings** — keep this, sourced from `creator_earnings` table
+6. **Pending Earnings** — earnings with `status = 'pending'`
 
-3. **Remove TikTok-related fields from the `CreatorStats` type** — remove `tiktokConnected`, `totalTripsLinked`, and TikTok-related story fields (`postedToTikTok`, `tiktokVideoId`)
+### New Sections
 
-4. **Remove TikTok references in Recent Stories** — remove the "Published"/"Draft" badge based on `postedToTikTok` and the TikTok video link (lines 301-319)
+- **Recent Proposals** — replace "Recent Stories" with the last 10 proposals showing headline, destination (from trip_request), status badge, and date
+- **Open Trip Requests** — quick count/link to marketplace showing how many open requests match their profile
 
-5. **Clean up unused imports** — remove `Video` from lucide if no longer used, and the TikTok SVG icon
+### Implementation
 
-### Result
-The dashboard will show 2 stat cards (Trip Stories, Estimated Earnings) and the Recent Stories list without TikTok-specific status indicators.
+**1. Update the edge function `creator-dashboard-stats/index.ts`**
+- Query `trip_proposals` where `proposer_id = user.id` for proposal counts by status
+- Join `trip_requests` for destination info on recent proposals
+- Keep earnings queries from `creator_earnings`
+- Remove `trip_stories` and TikTok-related queries entirely
+
+**2. Update `src/pages/CreatorDashboard.tsx`**
+- Update `CreatorStats` type with new fields: `activeProposals`, `acceptedProposals`, `totalProposalsSent`, `responseRate`, `totalEarnings`, `pendingEarnings`, `recentProposals[]`
+- Expand stat grid to 3x2 (6 cards): Active Proposals, Accepted, Total Sent, Response Rate, Total Earnings, Pending Earnings
+- Replace "Recent Stories" section with "Recent Proposals" showing proposal headline, trip destination, status badge, and created date
+- Each proposal links to `/proposals/{id}` or `/marketplace/request/{trip_request_id}`
+- Update empty state to link to `/marketplace` instead of `/storyboards`
+
+**3. Update header quick actions**
+- Keep "View Marketplace" link
+- Replace "Open Creator Lab" with "Browse Trip Requests" linking to collab opportunities
+- Keep "Create Trip Package"
+
+### Files to Change
+1. `supabase/functions/creator-dashboard-stats/index.ts` — rewrite queries
+2. `src/pages/CreatorDashboard.tsx` — new stat cards, proposal list, updated actions
 
