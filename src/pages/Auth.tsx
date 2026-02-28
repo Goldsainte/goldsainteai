@@ -696,7 +696,7 @@ const Auth = () => {
                 type="button"
                 variant="outline"
                 onClick={() => setStep('account-type')}
-                className="flex-1 rounded-xl"
+                className="flex-1 h-12 rounded-xl"
                 style={{ borderColor: '#E8E2D0', color: '#0a2225' }}
                 disabled={isLoading}
               >
@@ -704,7 +704,7 @@ const Auth = () => {
               </Button>
               <Button
                 type="submit" 
-                className="flex-1 h-12 rounded-full"
+                className="flex-1 h-12 rounded-xl"
                 style={{ backgroundColor: '#0c4d47', color: '#E5DFC6' }}
                 disabled={isLoading}
               >
@@ -717,6 +717,21 @@ const Auth = () => {
                 )}
               </Button>
             </div>
+
+            {(selectedAccountType === 'agent' || selectedAccountType === 'brand') && (
+              <div className="text-center pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedAccountType('traveler');
+                    toast({ title: "Switched to Traveler", description: "You can always apply as an agent or brand later from your profile." });
+                  }}
+                  className="text-sm text-muted-foreground hover:text-foreground hover:underline transition-colors"
+                >
+                  Skip for now
+                </button>
+              </div>
+            )}
           </form>
         )}
 
