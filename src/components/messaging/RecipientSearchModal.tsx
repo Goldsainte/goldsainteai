@@ -14,6 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
 interface Recipient {
   id: string;
   display_name: string;
+  username: string | null;
   avatar_url: string | null;
   account_type: string | null;
   is_verified: boolean | null;
@@ -53,9 +54,9 @@ export function RecipientSearchModal({
       try {
         const { data, error } = await supabase
           .from("profiles")
-          .select("id, display_name, full_name, avatar_url, account_type, is_verified")
+          .select("id, display_name, full_name, username, avatar_url, account_type, is_verified")
           .neq("id", user?.id || "")
-          .or(`display_name.ilike.%${search}%,full_name.ilike.%${search}%`)
+          .or(`display_name.ilike.%${search}%,full_name.ilike.%${search}%,username.ilike.%${search}%,email.ilike.%${search}%`)
           .limit(10);
 
         if (error) throw error;
@@ -106,7 +107,7 @@ export function RecipientSearchModal({
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8a9a9c]" />
             <Input
-              placeholder="Search by name..."
+              placeholder="Search by name, username, or email..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10 bg-white border-[#E5DFC6] focus:border-[#C7A962] rounded-full"
@@ -164,9 +165,12 @@ export function RecipientSearchModal({
                         <CheckCircle2 className="h-4 w-4 text-[#C7A962] flex-shrink-0" />
                       )}
                     </div>
-                    <span className="text-xs text-[#8a9a9c]">
-                      {getAccountTypeLabel(recipient.account_type)}
-                    </span>
+                    <div className="flex items-center gap-2 text-xs text-[#8a9a9c]">
+                      {recipient.username && (
+                        <span className="text-[#C7A962]">@{recipient.username}</span>
+                      )}
+                      <span>{getAccountTypeLabel(recipient.account_type)}</span>
+                    </div>
                   </div>
                 </button>
               ))}
