@@ -42,8 +42,8 @@ export function MarketplaceTabs({ activeTab, onTabChange }: MarketplaceTabsProps
                   <button
                     onClick={() => onTabChange(tab.id as "trips" | "trip-requests")}
                     className={`
-                      flex flex-col items-center gap-0.5 rounded-full px-2.5 py-1.5 sm:flex-row sm:gap-1.5 sm:px-4 sm:py-2.5 
-                      text-[10px] sm:text-sm font-semibold transition-all whitespace-nowrap touch-manipulation min-h-[44px] min-w-[44px]
+                      flex flex-row items-center gap-1.5 rounded-full px-4 py-2 sm:py-2.5 
+                      text-xs sm:text-sm font-semibold transition-all whitespace-nowrap touch-manipulation min-h-[44px] min-w-[44px]
                       ${
                         isActive
                           ? "bg-[#BFAD72] text-white shadow-sm"
@@ -52,8 +52,7 @@ export function MarketplaceTabs({ activeTab, onTabChange }: MarketplaceTabsProps
                     `}
                   >
                     <Icon className="h-4 w-4 flex-shrink-0" />
-                    <span className="sm:hidden">{tab.shortLabel}</span>
-                    <span className="hidden sm:inline">{tab.label}</span>
+                    <span>{tab.label}</span>
                   </button>
                 </TooltipTrigger>
                 <TooltipContent 
