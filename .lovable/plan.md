@@ -1,17 +1,16 @@
 
 
-## Update Mobile Bottom Nav Items
+## Fix: Update the actual mobile bottom nav in Header.tsx
 
-### File: `src/components/navigation/MobileBottomNav.tsx`
+The labels didn't change because the mobile bottom nav the user sees is **not** `MobileBottomNav.tsx` — it's an inline nav rendered directly inside `src/components/Header.tsx` (lines 629-687). That's the one currently showing "Collections".
 
-**Changes:**
-1. Update imports: replace `Home, MessageCircle, Bell` with `PlaneTakeoff, Sparkles` (keep `Store, User`)
-2. Replace `navItems` array from 5 items to 4:
-   - Marketplace (`/marketplace`, `Store` icon)
-   - Post a Trip (`/post-trip`, `PlaneTakeoff` icon)
-   - Storyboards (`/travel-feed`, `Sparkles` icon)
-   - Profile (role-based route, `User` icon)
-3. Update grid from `grid-cols-5` to `grid-cols-4`
-4. Remove `requireAuth` logic since none of these 4 items need it
-5. Use hardcoded labels ("Marketplace", "Post a Trip", "Storyboards", "Profile") instead of translation keys to match the screenshot's style
+### Changes in `src/components/Header.tsx`
+
+**Lines 643-650** — Replace the "Collections" button:
+- Label: `"Collections"` → `"Post a Trip"`
+- Route: `/collections` → `/post-trip`
+- Icon: `Sparkles` → `PlaneTakeoff`
+- Remove auth gate (no need to check `user` for this route)
+
+**Additionally**, update the Storyboards button icon (line 657) from `Plane` to `Sparkles` to match the intended icon set, and ensure `PlaneTakeoff` is imported.
 
