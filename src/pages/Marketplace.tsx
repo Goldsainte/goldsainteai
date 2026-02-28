@@ -11,8 +11,10 @@ import { TripRequestGrid } from "@/components/marketplace/TripRequestGrid";
 import { EmptyState } from "@/components/marketplace/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { BackButton } from "@/components/ui/BackButton";
+import { useUserRole } from "@/hooks/useUserRole";
+import { toast } from "sonner";
 
 type Tab = "trips" | "trip-requests";
 
@@ -43,6 +45,8 @@ export default function Marketplace() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const queryClient = useQueryClient();
+  const { isAdmin } = useUserRole();
 
   const validTabs: Tab[] = ["trips", "trip-requests"];
   const rawTab = (searchParams.get("tab") as string) || "trips";
@@ -185,6 +189,16 @@ export default function Marketplace() {
     enabled: activeTab === "trip-requests",
   });
 
+  const handleDeleteRequest = async (id: string) => {
+    const { error } = await supabase.from("trip_requests").delete().eq("id", id);
+    if (error) {
+      toast.error("Failed to delete trip request");
+      return;
+    }
+    toast.success("Trip request deleted");
+    queryClient.invalidateQueries({ queryKey: ["trip-requests-unified"] });
+  };
+
   const handleSearch = (newFilters: SearchFilters) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
   };
@@ -237,7 +251,7 @@ export default function Marketplace() {
           />
         );
       }
-      return <TripRequestGrid requests={tripRequests} />;
+      return <TripRequestGrid requests={tripRequests} isAdmin={isAdmin} onDelete={handleDeleteRequest} />;
     }
 
     return null;

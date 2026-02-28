@@ -1,9 +1,20 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, Users, FileText } from "lucide-react";
+import { MapPin, Users, FileText, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { getTripRequestImageUrl } from "@/utils/tripImages";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface TripRequest {
   id: string;
@@ -27,6 +38,8 @@ interface TripRequest {
 
 interface TripRequestGridProps {
   requests: TripRequest[];
+  isAdmin?: boolean;
+  onDelete?: (id: string) => Promise<void>;
 }
 
 function getTravelerCount(req: TripRequest): number {
@@ -45,10 +58,42 @@ function getTripLength(req: TripRequest): number | null {
   return req.source_metadata?.trip_length_days || null;
 }
 
-export function TripRequestGrid({ requests }: TripRequestGridProps) {
+export function TripRequestGrid({ requests, isAdmin, onDelete }: TripRequestGridProps) {
   const navigate = useNavigate();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+
+  const handleDelete = async (id: string) => {
+    if (!onDelete) return;
+    setDeletingId(id);
+    await onDelete(id);
+    setDeletingId(null);
+    setConfirmId(null);
+  };
 
   return (
+    <>
+    <AlertDialog open={!!confirmId} onOpenChange={(open) => !open && setConfirmId(null)}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete this trip request?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This will permanently delete the trip request and all associated messages. This action cannot be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => confirmId && handleDelete(confirmId)}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            disabled={!!deletingId}
+          >
+            {deletingId ? "Deleting…" : "Delete"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+
     <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {requests.map((request) => {
         const travelerCount = getTravelerCount(request);
@@ -77,6 +122,21 @@ export function TripRequestGrid({ requests }: TripRequestGridProps) {
                   Seeking proposals
                 </span>
               </div>
+
+              {isAdmin && onDelete && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setConfirmId(request.id);
+                  }}
+                  disabled={deletingId === request.id}
+                  className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-red-600 opacity-0 shadow-sm backdrop-blur-sm transition-opacity group-hover:opacity-100 hover:bg-red-50 disabled:opacity-50"
+                  aria-label="Delete trip request"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              )}
             </div>
 
             <div className="space-y-1.5 px-0.5">
@@ -154,5 +214,6 @@ export function TripRequestGrid({ requests }: TripRequestGridProps) {
         );
       })}
     </div>
+    </>
   );
 }
