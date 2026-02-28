@@ -1,22 +1,27 @@
 
 
-## Fix Mobile Responsiveness on Application Review Detail View
+## Fix Brand Application Mobile Overflow
 
-The screenshot shows the Brand application detail view inside the mobile Sheet with text overflow and layout issues.
+The brand application detail still overflows on mobile. The root issue is that the `LuxuryCard` component and its children lack overflow containment, and several elements (emails, long text, document rows) can push content beyond the viewport.
 
 ### Changes in `src/pages/admin/ApplicationReviewDashboard.tsx`:
 
-1. **Mobile Sheet width** (line 1760): Change `w-full sm:max-w-xl` to `w-full max-w-full sm:max-w-xl` and add `overflow-hidden` to prevent horizontal overflow
+1. **LuxuryCard component (line 540)**: Add `overflow-hidden` to the base class so all cards constrain their children:
+   - Change: `bg-white rounded-2xl border border-[#E5DFC6] shadow-sm` → add `overflow-hidden`
 
-2. **Alert text truncation** (lines 637-641, 995-999): The "Waiting for applicant..." alert text is cut off. Add `break-words` or ensure the Alert has proper `overflow-hidden` and text wrapping
+2. **LuxuryCardHeader padding (line 546)**: Reduce padding on mobile:
+   - `p-6 pb-4` → `p-4 pb-3 sm:p-6 sm:pb-4`
 
-3. **Grid layouts on mobile** (line 740): Change `grid grid-cols-2 gap-6` to `grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6` for agent Business Information section
+3. **LuxuryCardContent padding (line 557)**: Reduce padding on mobile:
+   - `p-6 pt-0` → `p-4 pt-0 sm:p-6 sm:pt-0`
 
-4. **Brand detail grid layouts** — same pattern: find any `grid-cols-2` in brand detail and make them `grid-cols-1 sm:grid-cols-2`
+4. **Email link overflow (line 1072-1077)**: Add `break-all min-w-0` to the email anchor and `min-w-0` to the flex parent so long emails wrap instead of overflowing
 
-5. **Header close button + X overlap** (line 591-612, 951-970): On mobile Sheet, both "Back to list" button and the Sheet's built-in X close button show. Add `pr-8` to the header div to prevent overlap with the Sheet X button
+5. **Document row (line 1218)**: Add `min-w-0` to the flex container and `truncate` to the file name text so long file names don't push the row wider
 
-6. **Cover image height** (line 1055): Change `h-64` to `h-48 sm:h-64` for mobile
+6. **Timeline rows (lines 1250-1270)**: The `w-24` fixed width on labels is fine, but the date text beside it needs `break-words min-w-0` to prevent overflow on narrow screens. Wrap in a `min-w-0` flex container.
 
-7. **SheetContent padding** (line 1762): Change `p-6` to `p-4 sm:p-6` for tighter mobile spacing
+7. **Brand detail wrapper (line 949)**: Add `overflow-hidden` to the root `div` of `BrandApplicationDetail` to catch any remaining overflow
+
+8. **Cover image with gallery (line 1050-1057)**: The screenshot shows images side-by-side overflowing — ensure the cover image container has `overflow-hidden` and `max-w-full`
 
