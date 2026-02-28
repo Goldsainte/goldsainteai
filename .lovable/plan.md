@@ -1,17 +1,26 @@
 
 
-## Fix: "Could not withdraw proposal" Error
+## Add Account Type Badge + Dashboard Links to Dropdown Menu
 
-### Root Cause
-The `withdrawProposal` function tries to update a column called `withdrawn_at` on the `trip_proposals` table, but **that column does not exist** in the database. This causes Supabase to return an error on every withdraw attempt.
+### Changes to `src/components/Header.tsx`
 
-### Plan
+**1. Add account type label in greeting area (both mobile and desktop)**
+- Below "Hello, [Name]", add a subtle text line showing account type: "Creator Account", "Traveler Account", "Agent Account", or "Brand Account"
+- Derived from existing `accountType` variable — no new queries needed
 
-**1. Add missing column via database migration**
-- Add `withdrawn_at TIMESTAMPTZ` to `trip_proposals` (nullable, no default)
+**2. Add Creator Dashboard link (conditionally for creators only)**
+- In the "Account" section (after My Profile), add a `DropdownMenuItem` linking to `/creator-dashboard` with `BarChart3` icon
+- Wrapped in `{isCreator && (...)}`
 
-**2. Also add other missing timestamp columns referenced in `proposalService.ts`**
-- Check if `accepted_at` and `declined_at` also exist — if not, add them in the same migration to prevent similar bugs in accept/decline flows
+**3. Add Agent Dashboard link (conditionally for agents only)**
+- Same section, add a `DropdownMenuItem` linking to `/agent-dashboard` with `LayoutDashboard` icon
+- Wrapped in `{isAgentAccount && (...)}`
 
-**3. No code changes needed** — the service functions are already correctly written, they just need the columns to exist
+**4. Add import**
+- Add `BarChart3` to the lucide-react import (line 2) — `LayoutDashboard` is already imported
+
+**5. Apply to both mobile and desktop dropdown menus** (duplicate structure exists for both)
+
+### Files to Change
+- `src/components/Header.tsx` only
 
