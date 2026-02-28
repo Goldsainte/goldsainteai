@@ -8,6 +8,7 @@ import {
   Calendar,
   Users,
   Sparkles,
+  Trash2,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -15,6 +16,19 @@ import {
   type TripRequestDetail,
 } from "@/services/tripRequestsService";
 import { TrustSafetyInline } from "@/components/trust/TrustSafetyInline";
+import { useUserRole } from "@/hooks/useUserRole";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 type AccountType = "traveler" | "creator" | "agent" | "admin" | null;
 
@@ -61,8 +75,10 @@ export default function TripRequestDetailPage() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const navigate = useNavigate();
+  const { isAdmin } = useUserRole();
 
   useEffect(() => {
     let cancelled = false;
@@ -105,7 +121,25 @@ export default function TripRequestDetailPage() {
 
   const isTraveler = trip && currentUserId === trip.user_id;
   const isPartner = !isTraveler && (accountType === "creator" || accountType === "agent");
+  const canDelete = isTraveler || isAdmin;
 
+  const handleDelete = async () => {
+    if (!trip) return;
+    setDeleting(true);
+    const { error: deleteError } = await supabase
+      .from("trip_requests")
+      .delete()
+      .eq("id", trip.id);
+    
+    if (deleteError) {
+      toast.error("Failed to delete trip request");
+      setDeleting(false);
+      return;
+    }
+    
+    toast.success("Trip request deleted");
+    navigate(isTraveler ? "/my-trips" : "/marketplace");
+  };
   const budgetSummary =
     trip &&
     (trip.budget_min || trip.budget_max || trip.budget_level
@@ -137,6 +171,38 @@ export default function TripRequestDetailPage() {
             <ArrowLeft className="h-3 w-3" />
             {isTraveler ? "Back to My Trips" : "Back to Marketplace"}
           </Link>
+
+          {canDelete && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button
+                  type="button"
+                  disabled={deleting}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-white px-3 py-1.5 text-[10px] font-medium text-red-600 hover:bg-red-50 hover:border-red-300 transition-colors disabled:opacity-50"
+                >
+                  <Trash2 className="h-3 w-3" />
+                  {deleting ? "Deleting…" : "Delete trip"}
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete this trip request?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete the trip request and all associated messages. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDelete}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
 
         {loading && (
