@@ -2,8 +2,6 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { format, formatDistanceToNow, isToday, isYesterday, isSameDay } from "date-fns";
 import {
-  MessageCircle,
-  Inbox,
   Archive,
   Settings,
   Send,
@@ -14,6 +12,7 @@ import {
   Ban,
   PenSquare,
   Loader2,
+  Trash2,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -224,6 +223,20 @@ export function DirectMessageInbox() {
     }
   };
 
+  const handleDeleteMessage = async (messageId: string) => {
+    try {
+      const { error } = await supabase
+        .from("direct_messages")
+        .update({ is_deleted: true })
+        .eq("id", messageId)
+        .eq("sender_id", user?.id);
+      if (error) throw error;
+      toast({ title: "Message deleted" });
+    } catch (e: any) {
+      toast({ title: "Couldn't delete message", description: e.message, variant: "destructive" });
+    }
+  };
+
   const getConversationList = () => {
     switch (activeTab) {
       case "requests":
@@ -295,39 +308,48 @@ export function DirectMessageInbox() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-          <TabsList className="grid grid-cols-3 mx-4 mt-3 bg-[#F6F0E4] p-1 rounded-full">
-            <TabsTrigger 
-              value="primary" 
-              className="text-xs rounded-full data-[state=active]:bg-white data-[state=active]:text-[#0a2225] data-[state=active]:shadow-sm text-[#5a6c6e]"
+          <div className="flex border-b border-[#E5DFC6]/40 mx-4 mt-2">
+            <button
+              onClick={() => setActiveTab("primary")}
+              className={`flex-1 pb-2.5 text-xs font-medium tracking-wide transition-all border-b-2 ${
+                activeTab === "primary"
+                  ? "border-[#0a2225] text-[#0a2225]"
+                  : "border-transparent text-[#9CA3AF] hover:text-[#5a6c6e]"
+              }`}
             >
-              <Inbox className="h-3 w-3 mr-1" />
-              Primary
+              Inbox
               {totalUnread > 0 && (
-                <Badge className="ml-1 h-4 px-1 text-[10px] bg-[#0a2225] text-white">
+                <Badge className="ml-1.5 h-4 px-1.5 text-[10px] bg-[#C7A962] text-white rounded-full">
                   {totalUnread}
                 </Badge>
               )}
-            </TabsTrigger>
-            <TabsTrigger 
-              value="requests" 
-              className="text-xs rounded-full data-[state=active]:bg-white data-[state=active]:text-[#0a2225] data-[state=active]:shadow-sm text-[#5a6c6e]"
+            </button>
+            <button
+              onClick={() => setActiveTab("requests")}
+              className={`flex-1 pb-2.5 text-xs font-medium tracking-wide transition-all border-b-2 ${
+                activeTab === "requests"
+                  ? "border-[#0a2225] text-[#0a2225]"
+                  : "border-transparent text-[#9CA3AF] hover:text-[#5a6c6e]"
+              }`}
             >
-              <MessageCircle className="h-3 w-3 mr-1" />
               Requests
               {requestCount > 0 && (
-                <Badge className="ml-1 h-4 px-1 text-[10px] bg-[#C7A962] text-white">
+                <Badge className="ml-1.5 h-4 px-1.5 text-[10px] bg-[#C7A962] text-white rounded-full">
                   {requestCount}
                 </Badge>
               )}
-            </TabsTrigger>
-            <TabsTrigger 
-              value="archived" 
-              className="text-xs rounded-full data-[state=active]:bg-white data-[state=active]:text-[#0a2225] data-[state=active]:shadow-sm text-[#5a6c6e]"
+            </button>
+            <button
+              onClick={() => setActiveTab("archived")}
+              className={`flex-1 pb-2.5 text-xs font-medium tracking-wide transition-all border-b-2 ${
+                activeTab === "archived"
+                  ? "border-[#0a2225] text-[#0a2225]"
+                  : "border-transparent text-[#9CA3AF] hover:text-[#5a6c6e]"
+              }`}
             >
-              <Archive className="h-3 w-3 mr-1" />
-              Archived
-            </TabsTrigger>
-          </TabsList>
+              Archive
+            </button>
+          </div>
 
           <ScrollArea className="flex-1 mt-3">
             <div className="px-3">
@@ -395,23 +417,53 @@ export function DirectMessageInbox() {
                 </div>
               </div>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="text-[#5a6c6e] hover:text-[#0a2225] hover:bg-[#F6F0E4]">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="border-[#E5DFC6]">
-                  <DropdownMenuItem onClick={handleArchive} className="text-[#0a2225]">
-                    <Archive className="h-4 w-4 mr-2" />
-                    Archive
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleBlock} className="text-red-600">
-                    <Ban className="h-4 w-4 mr-2" />
-                    Block User
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  onClick={handleArchive}
+                  className="text-[#9CA3AF] hover:text-[#0a2225] hover:bg-[#F6F0E4]"
+                  title="Archive"
+                >
+                  <Archive className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  onClick={handleBlock}
+                  className="text-[#9CA3AF] hover:text-red-600 hover:bg-red-50"
+                  title="Block"
+                >
+                  <Ban className="h-4 w-4" />
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="xs" className="text-[#9CA3AF] hover:text-[#0a2225] hover:bg-[#F6F0E4]">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="border-[#E5DFC6]">
+                    <DropdownMenuItem onClick={handleArchive} className="text-[#0a2225]">
+                      <Archive className="h-4 w-4 mr-2" />
+                      Archive conversation
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleBlock} className="text-red-600">
+                      <Ban className="h-4 w-4 mr-2" />
+                      Block user
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => {
+                      if (selectedConversation) {
+                        manageConversation(selectedConversation.id, "delete");
+                        setSelectedConversation(null);
+                        toast({ title: "Conversation deleted" });
+                      }
+                    }} className="text-red-600">
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete conversation
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
 
             {/* Request Banner */}
@@ -459,7 +511,7 @@ export function DirectMessageInbox() {
             )}
 
             {/* Messages */}
-            <ScrollArea className="flex-1 p-5 bg-[#FDFBF7]">
+            <ScrollArea className="flex-1 p-5 bg-white">
               {messagesLoading ? (
                 <div className="flex items-center justify-center h-full">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#C7A962]" />
@@ -477,7 +529,7 @@ export function DirectMessageInbox() {
                     <div key={gi}>
                       {/* Date separator */}
                       <div className="flex items-center justify-center my-5">
-                        <span className="text-[11px] text-[#9CA3AF] bg-[#FDFBF7] px-3 font-medium tracking-wide uppercase">
+                        <span className="text-[11px] text-[#9CA3AF] bg-white px-3 font-medium tracking-wide uppercase">
                           {formatDateLabel(group.date)}
                         </span>
                       </div>
@@ -487,6 +539,7 @@ export function DirectMessageInbox() {
                             key={msg.id}
                             message={msg}
                             isSelf={msg.sender_id === user?.id}
+                            onDelete={handleDeleteMessage}
                           />
                         ))}
                       </div>
@@ -516,7 +569,7 @@ export function DirectMessageInbox() {
                 >
                   <Input
                     ref={inputRef}
-                    placeholder="Type a message…"
+                    placeholder="Write something…"
                     value={newMessage}
                     onChange={(e) => {
                       setNewMessage(e.target.value);
@@ -537,11 +590,11 @@ export function DirectMessageInbox() {
             )}
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center bg-[#FDFBF7]">
+          <div className="flex-1 flex items-center justify-center bg-white">
             <div className="text-center max-w-xs">
-              <h3 className="font-secondary text-xl text-[#0a2225] mb-2">Select a conversation</h3>
+              <h3 className="font-secondary text-xl text-[#0a2225] mb-2">Your conversations</h3>
               <p className="text-sm text-[#5a6c6e] leading-relaxed">
-                Choose from your messages on the left, or start a new conversation with a creator or travel agent.
+                Pick up where you left off, or start something new.
               </p>
             </div>
           </div>
@@ -626,31 +679,48 @@ function ConversationItem({
 function MessageBubble({
   message,
   isSelf,
+  onDelete,
 }: {
   message: { id: string; body: string; created_at: string; is_read: boolean };
   isSelf: boolean;
+  onDelete?: (id: string) => void;
 }) {
+  const [hovered, setHovered] = useState(false);
+
   return (
-    <div className={`flex ${isSelf ? "justify-end" : "justify-start"}`}>
+    <div
+      className={`flex items-center gap-1.5 ${isSelf ? "justify-end" : "justify-start"}`}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {isSelf && hovered && onDelete && (
+        <button
+          onClick={() => onDelete(message.id)}
+          className="p-1.5 rounded-full text-[#9CA3AF] hover:text-red-500 hover:bg-red-50 transition-colors"
+          title="Delete message"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
+      )}
       <div
         className={`max-w-[70%] rounded-[1.25rem] px-4 py-3 ${
           isSelf
-            ? "bg-[#0a2225] text-white"
-            : "bg-[#F6F0E4] text-[#0a2225]"
+            ? "bg-[#E8DCC8] text-[#0a2225]"
+            : "bg-[#F6F0E4] text-[#0a2225] border border-[#E5DFC6]/40"
         }`}
       >
-        <p className={`text-sm whitespace-pre-wrap leading-relaxed ${isSelf ? "text-white" : "text-[#0a2225]"}`}>
+        <p className="text-sm whitespace-pre-wrap leading-relaxed text-[#0a2225]">
           {message.body}
         </p>
         <div className={`flex items-center gap-1 mt-1.5 ${isSelf ? "justify-end" : "justify-start"}`}>
-          <span className={`text-[10px] ${isSelf ? "text-white/60" : "text-[#9CA3AF]"}`}>
+          <span className="text-[10px] text-[#9CA3AF]">
             {format(new Date(message.created_at), "HH:mm")}
           </span>
           {isSelf && (
             message.is_read ? (
               <CheckCheck className="h-3 w-3 text-[#C7A962]" />
             ) : (
-              <Check className="h-3 w-3 text-white/50" />
+              <Check className="h-3 w-3 text-[#9CA3AF]" />
             )
           )}
         </div>
