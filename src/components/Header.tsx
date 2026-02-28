@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Settings, Info, Sparkles, PlaneTakeoff, Car, MessageCircle } from "lucide-react";
 import { NotificationBell } from '@/components/notifications/NotificationBell';
+import { MessageBubbleIcon } from '@/components/notifications/MessageBubbleIcon';
 import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
 import { CreateMomentModal } from "@/components/CreateMomentModal";
 import { Button } from "@/components/ui/button";
@@ -188,7 +189,12 @@ export const Header = () => {
                 </a>
                 
                 <div className="flex items-center gap-2">
-                  {user && <NotificationBell />}
+                  {user && (
+                    <>
+                      <MessageBubbleIcon />
+                      <NotificationBell />
+                    </>
+                  )}
                   
                   {/* Unified Profile Menu - Mobile */}
                   <DropdownMenu>
@@ -411,7 +417,12 @@ export const Header = () => {
 
               {/* Right side actions - Single Profile Menu */}
               <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-                {user && <NotificationBell />}
+                {user && (
+                  <>
+                    <MessageBubbleIcon />
+                    <NotificationBell />
+                  </>
+                )}
                 
                 {/* Unified Profile Menu - Desktop */}
                 <DropdownMenu>
