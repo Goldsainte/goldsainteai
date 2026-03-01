@@ -85,6 +85,7 @@ export const CreatorStripeOnboarding = () => {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
+        body: { origin: window.location.origin },
       });
 
       if (error) {
