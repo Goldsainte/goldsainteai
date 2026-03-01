@@ -26,8 +26,8 @@ export function TripImageUploader({ currentUrl, onUpload, label, compact }: Trip
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image must be smaller than 5MB");
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Image must be smaller than 10MB");
       return;
     }
 
@@ -147,7 +147,7 @@ export function TripImageUploader({ currentUrl, onUpload, label, compact }: Trip
                 <ImagePlus className="h-8 w-8" />
               </div>
               <span className="text-sm font-medium">{label || "Upload Cover Image"}</span>
-              <span className="text-xs text-[#6B7280]">JPEG, PNG, WebP or GIF (max 5MB)</span>
+              <span className="text-xs text-[#6B7280]">JPEG, PNG, WebP or GIF (max 10MB)</span>
             </>
           )}
         </button>
