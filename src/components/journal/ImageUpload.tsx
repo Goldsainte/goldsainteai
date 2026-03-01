@@ -35,10 +35,10 @@ export function ImageUpload({
     }
 
     // Validate file size (5MB limit)
-    if (file.size > 5 * 1024 * 1024) {
+    if (file.size > 10 * 1024 * 1024) {
       toast({
         title: "File too large",
-        description: "Please upload an image smaller than 5MB",
+        description: "Please upload an image smaller than 10MB",
         variant: "destructive",
       });
       return;
@@ -138,7 +138,7 @@ export function ImageUpload({
                 Click to upload image
               </p>
               <p className="text-xs text-muted-foreground">
-                JPG, PNG or WebP (max 5MB)
+                JPG, PNG or WebP (max 10MB)
               </p>
             </>
           )}
