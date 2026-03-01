@@ -12,15 +12,20 @@ const cors = {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY")!;
-const RETURN_URL = Deno.env.get("STRIPE_RETURN_URL") || "https://goldsainte.ai/creator-dashboard?stripe=success";
-const REFRESH_URL = Deno.env.get("STRIPE_REFRESH_URL") || "https://goldsainte.ai/creator-dashboard?stripe=refresh";
+const DEFAULT_SITE_URL = Deno.env.get("SITE_URL") || "https://goldsainteai.lovable.app";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
 
   try {
-    console.log("[STRIPE-CONNECT-LINK] Request started");
-    
+    // Determine return origin from request body or fallback
+    let body: any = {};
+    try { body = await req.json(); } catch { /* no body is fine */ }
+    const origin = body?.origin || req.headers.get("origin") || DEFAULT_SITE_URL;
+    const RETURN_URL = `${origin}/creator-dashboard?stripe=success`;
+    const REFRESH_URL = `${origin}/creator-dashboard?stripe=refresh`;
+
+    console.log("[STRIPE-CONNECT-LINK] Request started, origin:", origin);
     // Auth: require a logged-in user
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     
