@@ -9,19 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, CheckCircle2, Shield, ArrowRight, ArrowLeft } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Step2BusinessCompliance } from "@/components/applications/steps/Step2BusinessCompliance";
-import { Step3ProfessionalCredentials } from "@/components/applications/steps/Step3ProfessionalCredentials";
-import { Step4ExperienceExpertise } from "@/components/applications/steps/Step4ExperienceExpertise";
-import { Step5ClientSales } from "@/components/applications/steps/Step5ClientSales";
-import { Step6OnlinePresence } from "@/components/applications/steps/Step6OnlinePresence";
-import { Step7Technology } from "@/components/applications/steps/Step7Technology";
-import { Step8EmergencyLegal } from "@/components/applications/steps/Step8EmergencyLegal";
-import { Step9Financial } from "@/components/applications/steps/Step9Financial";
-import { Step10Documents } from "@/components/applications/steps/Step10Documents";
+import { Card, CardContent } from "@/components/ui/card";
 
 type AgentApplicationData = {
-  // Existing fields
   firstName: string;
   lastName: string;
   email: string;
@@ -36,134 +26,42 @@ type AgentApplicationData = {
   businessCountry: string;
   yearEstablished: string;
   website: string;
+  businessLicenseNumber: string;
+  yearsExperience: string;
+  // Step 2: Credentials
   iataNumber: string;
   arcNumber: string;
   cliaNumber: string;
-  otherCertifications: string;
-  yearsExperience: string;
+  hostAgencyName: string;
   specializations: string[];
-  sellerOfTravelLicense: string;
-  sellerOfTravelState: string;
-  businessLicenseNumber: string;
-  taxIdEIN: string;
-  annualRevenue: string;
+  preferredDestinations: string;
+  otherCertifications: string;
+  // Step 3: Sales & Presence
+  annualSalesVolume: string;
+  averageTripValue: string;
+  monthlyBookings: string;
+  primaryFocus: string[];
+  instagramHandle: string;
+  tiktokHandle: string;
+  linkedinProfileUrl: string;
+  whyGoldsainte: string;
+  // Step 4: Insurance & Legal
   errorsOmissionsInsurance: boolean;
   insuranceProvider: string;
   insurancePolicyNumber: string;
   insuranceCoverage: string;
-  reference1Name: string;
-  reference1Company: string;
-  reference1Email: string;
-  reference1Phone: string;
-  reference2Name: string;
-  reference2Company: string;
-  reference2Email: string;
-  reference2Phone: string;
-  primaryFocus: string[];
-  averageTripValue: string;
-  monthlyBookings: string;
-  preferredDestinations: string;
-  whyGoldsainte: string;
+  taxIdEIN: string;
   businessLicenseFile: File | null;
   insuranceCertificateFile: File | null;
   governmentIdFile: File | null;
   professionalHeadshotFile: File | null;
-
-  // Section 2: Business Compliance (NEW)
-  dbaNames?: string;
-  operatingStates?: string[];
-  sellerOfTravelStates?: string[];
-  floridaRegistrationNumber?: string;
-  californiaRegistrationNumber?: string;
-  hawaiiRegistrationNumber?: string;
-  washingtonRegistrationNumber?: string;
-  suretyBondAmount?: string;
-  suretyBondProvider?: string;
-  suretyBondExpiration?: string;
-  backgroundCheckConsent?: boolean;
-  criminalHistoryDisclosure?: string;
-
-  // Section 3: Professional Credentials (NEW)
-  iatanIdNumber?: string;
-  astaVerifiedTravelAdvisor?: boolean;
-  astaMembershipNumber?: string;
-  travelInstituteCta?: boolean;
-  travelInstituteCtc?: boolean;
-  cliaCertificationLevel?: string;
-  hostAgencyName?: string;
-  hostAgencyAffiliation?: string;
-  yearsWithHostAgency?: string;
-
-  // Section 4: Experience & Expertise (NEW)
-  countriesVisitedCount?: string;
-  famTripsTakenLastYear?: string;
-  continentsVisited?: string[];
-  destinationExpertCertifications?: string[];
-  cruiseExperienceLevel?: string;
-  allInclusiveExperience?: string;
-  accessibilityTravelExperience?: boolean;
-  multigenerationalTravelExperience?: boolean;
-  soloTravelBookingExperience?: boolean;
-  languagesSpoken?: string[];
-
-  // Section 5: Client Sales (NEW)
-  annualSalesVolume?: string;
-  numberOfActiveClients?: string;
-  percentageRepeatClients?: string;
-  percentageReferralBusiness?: string;
-  bookingVolumeLast12Months?: string;
-  averageCommissionPercentage?: string;
-  clientDemographics?: string[];
-  averageClientAgeRange?: string;
-  gdsAccess?: string[];
-  preferredBookingPlatforms?: string[];
-  preferredSuppliers?: string[];
-  consortiumMemberships?: string[];
-
-  // Section 6: Online Presence (NEW)
-  instagramHandle?: string;
-  tiktokHandle?: string;
-  facebookPageUrl?: string;
-  linkedinProfileUrl?: string;
-  youtubeChannelUrl?: string;
-  blogUrl?: string;
-  googleBusinessProfile?: string;
-  socialMediaFollowersTotal?: string;
-  onlineReviewsCount?: string;
-  averageReviewRating?: string;
-  contentCreationExperience?: boolean;
-  videoContentCreation?: boolean;
-  influencerPartnerships?: boolean;
-  emailMarketingPlatform?: string;
-  emailListSize?: string;
-
-  // Section 7: Technology (NEW)
-  crmSoftware?: string;
-  bookingPlatform?: string;
-  accountingSoftware?: string;
-  websitePlatform?: string;
-  hasOwnBookingEngine?: boolean;
-  comfortableWithTechnology?: number;
-  videoConferencingTools?: string[];
-  aiToolsExperience?: string[];
-
-  // Section 8: Emergency & Legal (NEW)
-  support24_7?: boolean;
-  travelCrisisManagementTraining?: boolean;
-  travelInsuranceLicensed?: boolean;
-  emergencyContactPhone?: string;
-  afterHoursAvailability?: string;
-  crisisResponseExamples?: string;
-  privacyPolicyUrl?: string;
-  termsAndConditionsUrl?: string;
-  gdprCompliant?: boolean;
-  ccpaCompliant?: boolean;
-  clientDataProtectionMeasures?: string;
-  contractsWithClients?: boolean;
-  legalCounselOnRetainer?: boolean;
-  previousLegalIssues?: string;
-  regulatoryViolations?: string;
+  acceptedTerms: boolean;
+  acceptedPrivacy: boolean;
+  acceptedVendor: boolean;
 };
+
+const luxuryInputClasses = "min-h-[48px] w-full max-w-full border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 focus:ring-offset-0 rounded-lg placeholder:text-sm box-border";
+const luxurySelectClasses = "min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg";
 
 export default function AgentApplicationForm() {
   const location = useLocation();
@@ -175,7 +73,6 @@ export default function AgentApplicationForm() {
   } | null;
 
   const [step, setStep] = useState(1);
-  const [stripeVerificationComplete, setStripeVerificationComplete] = useState(false);
   const [draftApplicationId, setDraftApplicationId] = useState<string | null>(null);
   const [formData, setFormData] = useState<AgentApplicationData>({
     firstName: prefillData?.firstName || "",
@@ -192,68 +89,55 @@ export default function AgentApplicationForm() {
     businessCountry: "US",
     yearEstablished: "",
     website: "",
+    businessLicenseNumber: "",
+    yearsExperience: "",
     iataNumber: "",
     arcNumber: "",
     cliaNumber: "",
-    otherCertifications: "",
-    yearsExperience: "",
+    hostAgencyName: "",
     specializations: [],
-    sellerOfTravelLicense: "",
-    sellerOfTravelState: "",
-    businessLicenseNumber: "",
-    taxIdEIN: "",
-    annualRevenue: "",
+    preferredDestinations: "",
+    otherCertifications: "",
+    annualSalesVolume: "",
+    averageTripValue: "",
+    monthlyBookings: "",
+    primaryFocus: [],
+    instagramHandle: "",
+    tiktokHandle: "",
+    linkedinProfileUrl: "",
+    whyGoldsainte: "",
     errorsOmissionsInsurance: false,
     insuranceProvider: "",
     insurancePolicyNumber: "",
     insuranceCoverage: "",
-    reference1Name: "",
-    reference1Company: "",
-    reference1Email: "",
-    reference1Phone: "",
-    reference2Name: "",
-    reference2Company: "",
-    reference2Email: "",
-    reference2Phone: "",
-    primaryFocus: [],
-    averageTripValue: "",
-    monthlyBookings: "",
-    preferredDestinations: "",
-    whyGoldsainte: "",
+    taxIdEIN: "",
     businessLicenseFile: null,
     insuranceCertificateFile: null,
     governmentIdFile: null,
     professionalHeadshotFile: null,
+    acceptedTerms: false,
+    acceptedPrivacy: false,
+    acceptedVendor: false,
   });
-  
+
   const [isLoading, setIsLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
   const [applicationId, setApplicationId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const totalSteps = 5;
+  const stepLabels = ["You & Your Business", "Credentials", "Sales & Presence", "Insurance & Legal", "Verification"];
+
   const specializationOptions = [
-    "Luxury Travel",
-    "Adventure Travel",
-    "Honeymoons & Romance",
-    "Family Travel",
-    "Group Travel",
-    "Corporate Travel",
-    "Destination Weddings",
-    "Cruises",
-    "All-Inclusive Resorts",
-    "Wellness & Spa",
-    "Culinary Travel",
-    "Safari & Wildlife",
+    "Luxury Travel", "Adventure Travel", "Honeymoons & Romance", "Family Travel",
+    "Group Travel", "Corporate Travel", "Destination Weddings", "Cruises",
+    "All-Inclusive Resorts", "Wellness & Spa", "Culinary Travel", "Safari & Wildlife",
   ];
 
   const primaryFocusOptions = [
-    "High-Net-Worth Clients ($50k+ trips)",
-    "Luxury Leisure Travel",
-    "Destination Weddings",
-    "Group Bookings",
-    "Corporate Incentive Travel",
-    "Milestone Celebrations",
+    "High-Net-Worth Clients ($50k+ trips)", "Luxury Leisure Travel",
+    "Destination Weddings", "Group Bookings",
+    "Corporate Incentive Travel", "Milestone Celebrations",
   ];
 
   const handleFileUpload = async (file: File, fieldName: string) => {
@@ -261,248 +145,59 @@ export default function AgentApplicationForm() {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}_${fieldName}.${fileExt}`;
       const filePath = `agent-applications/${formData.email}/${fileName}`;
-
       const { error: uploadError } = await supabase.storage
         .from('application-documents')
         .upload(filePath, file);
-
       if (uploadError) throw uploadError;
       return filePath;
     } catch (error: any) {
       console.error('File upload error:', error);
-      toast({
-        title: "Upload failed",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast({ title: "Upload failed", description: error.message, variant: "destructive" });
       return null;
     }
   };
 
   const saveDraftApplication = async () => {
-    console.log('=== 🚀 Starting saveDraftApplication ===');
-    
-    // Initial diagnostics
-    console.log('🔧 Supabase client check:', {
-      clientExists: !!supabase,
-      hasFrom: typeof supabase?.from === 'function',
-      hasStorage: typeof supabase?.storage === 'object',
-    });
-    
     setIsLoading(true);
-
     try {
-      // STEP 0: Pre-flight storage check
-      console.log('Step 0: 🏥 Testing storage connectivity...');
-      try {
-        const { data: buckets, error: bucketError } = await supabase.storage.listBuckets();
-        if (bucketError) {
-          console.error('❌ Storage bucket list error:', bucketError);
-          throw new Error(`Storage not accessible: ${bucketError.message}`);
-        }
-        console.log('Step 0: ✅ Storage accessible, buckets:', buckets?.map(b => b.name));
-      } catch (storageCheckError: any) {
-        console.error('Step 0: ❌ STORAGE CONNECTIVITY FAILED:', storageCheckError);
-        throw new Error(`Cannot connect to storage: ${storageCheckError.message}`);
-      }
-
-      // STEP 1: Validation
-      console.log('Step 1: 🔍 Validating required fields...');
       if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone) {
         throw new Error("Please fill in all required personal information fields");
       }
-
-      if (!formData.agencyName || !formData.businessType || !formData.businessLicenseNumber) {
+      if (!formData.agencyName || !formData.businessType) {
         throw new Error("Please fill in all required business information fields");
       }
-      console.log('Step 1: ✅ Validation passed');
 
-      // STEP 2: File uploads (with individual try-catch for isolation)
-      console.log('Step 2: 📤 Starting file uploads...');
+      // File uploads
       let businessLicensePath = null;
       let insuranceCertPath = null;
       let govIdPath = null;
       let headshotPath = null;
 
-      // OPTIONAL: Set to true to skip file uploads as test
-      const SKIP_FILE_UPLOADS = false;
-
-      if (!SKIP_FILE_UPLOADS) {
-        // Upload business license
-        if (formData.businessLicenseFile) {
-          try {
-            console.log('  📄 Uploading business license...');
-            businessLicensePath = await handleFileUpload(formData.businessLicenseFile, 'business_license');
-            console.log('  ✅ Business license uploaded:', businessLicensePath);
-          } catch (fileError: any) {
-            console.error('  ❌ Business license upload FAILED:', fileError);
-            throw new Error(`Business license upload failed: ${fileError.message}`);
-          }
-        }
-        
-        // Upload insurance certificate
-        if (formData.insuranceCertificateFile) {
-          try {
-            console.log('  📄 Uploading insurance certificate...');
-            insuranceCertPath = await handleFileUpload(formData.insuranceCertificateFile, 'insurance_certificate');
-            console.log('  ✅ Insurance cert uploaded:', insuranceCertPath);
-          } catch (fileError: any) {
-            console.error('  ❌ Insurance cert upload FAILED:', fileError);
-            throw new Error(`Insurance certificate upload failed: ${fileError.message}`);
-          }
-        }
-        
-        // Upload government ID
-        if (formData.governmentIdFile) {
-          try {
-            console.log('  📄 Uploading government ID...');
-            govIdPath = await handleFileUpload(formData.governmentIdFile, 'government_id');
-            console.log('  ✅ Government ID uploaded:', govIdPath);
-          } catch (fileError: any) {
-            console.error('  ❌ Government ID upload FAILED:', fileError);
-            throw new Error(`Government ID upload failed: ${fileError.message}`);
-          }
-        }
-        
-        // Upload headshot
-        if (formData.professionalHeadshotFile) {
-          try {
-            console.log('  📄 Uploading headshot...');
-            headshotPath = await handleFileUpload(formData.professionalHeadshotFile, 'headshot');
-            console.log('  ✅ Headshot uploaded:', headshotPath);
-          } catch (fileError: any) {
-            console.error('  ❌ Headshot upload FAILED:', fileError);
-            throw new Error(`Headshot upload failed: ${fileError.message}`);
-          }
-        }
-        console.log('Step 2: ✅ All files uploaded successfully');
-      } else {
-        console.log('Step 2: ⏭️ SKIPPING file uploads (testing mode)');
+      if (formData.businessLicenseFile) {
+        businessLicensePath = await handleFileUpload(formData.businessLicenseFile, 'business_license');
+      }
+      if (formData.insuranceCertificateFile) {
+        insuranceCertPath = await handleFileUpload(formData.insuranceCertificateFile, 'insurance_certificate');
+      }
+      if (formData.governmentIdFile) {
+        govIdPath = await handleFileUpload(formData.governmentIdFile, 'government_id');
+      }
+      if (formData.professionalHeadshotFile) {
+        headshotPath = await handleFileUpload(formData.professionalHeadshotFile, 'headshot');
       }
 
-      // STEP 3: Build extended_data object
-      console.log('Step 3: 🔨 Building extended_data object...');
       const extendedData = {
-        // Business Compliance extras
-        dbaNames: formData.dbaNames,
-        operatingStates: formData.operatingStates,
-        sellerOfTravelStates: formData.sellerOfTravelStates,
-        floridaRegistrationNumber: formData.floridaRegistrationNumber,
-        californiaRegistrationNumber: formData.californiaRegistrationNumber,
-        hawaiiRegistrationNumber: formData.hawaiiRegistrationNumber,
-        washingtonRegistrationNumber: formData.washingtonRegistrationNumber,
-        suretyBondAmount: formData.suretyBondAmount,
-        suretyBondProvider: formData.suretyBondProvider,
-        suretyBondExpiration: formData.suretyBondExpiration,
-        backgroundCheckConsent: formData.backgroundCheckConsent,
-        criminalHistoryDisclosure: formData.criminalHistoryDisclosure,
-        
-        // Professional Credentials
-        iatanIdNumber: formData.iatanIdNumber,
-        astaVerifiedTravelAdvisor: formData.astaVerifiedTravelAdvisor,
-        astaMembershipNumber: formData.astaMembershipNumber,
-        travelInstituteCta: formData.travelInstituteCta,
-        travelInstituteCtc: formData.travelInstituteCtc,
-        cliaCertificationLevel: formData.cliaCertificationLevel,
-        hostAgencyAffiliation: formData.hostAgencyAffiliation,
-        yearsWithHostAgency: formData.yearsWithHostAgency,
-        
-        // Travel Experience
-        countriesVisitedCount: formData.countriesVisitedCount,
-        famTripsTakenLastYear: formData.famTripsTakenLastYear,
-        continentsVisited: formData.continentsVisited,
-        destinationExpertCertifications: formData.destinationExpertCertifications,
-        cruiseExperienceLevel: formData.cruiseExperienceLevel,
-        allInclusiveExperience: formData.allInclusiveExperience,
-        accessibilityTravelExperience: formData.accessibilityTravelExperience,
-        multigenerationalTravelExperience: formData.multigenerationalTravelExperience,
-        soloTravelBookingExperience: formData.soloTravelBookingExperience,
-        languagesSpoken: formData.languagesSpoken,
-        
-        // Client & Sales metrics
-        numberOfActiveClients: formData.numberOfActiveClients,
-        percentageReferralBusiness: formData.percentageReferralBusiness,
-        bookingVolumeLast12Months: formData.bookingVolumeLast12Months,
-        averageCommissionPercentage: formData.averageCommissionPercentage,
-        clientDemographics: formData.clientDemographics,
-        averageClientAgeRange: formData.averageClientAgeRange,
-        gdsAccess: formData.gdsAccess,
-        preferredBookingPlatforms: formData.preferredBookingPlatforms,
-        preferredSuppliers: formData.preferredSuppliers,
-        consortiumMemberships: formData.consortiumMemberships,
-        
-        // Online Presence
+        arcNumber: formData.arcNumber,
+        cliaNumber: formData.cliaNumber,
+        otherCertifications: formData.otherCertifications,
         instagramHandle: formData.instagramHandle,
         tiktokHandle: formData.tiktokHandle,
-        facebookPageUrl: formData.facebookPageUrl,
         linkedinProfileUrl: formData.linkedinProfileUrl,
-        youtubeChannelUrl: formData.youtubeChannelUrl,
-        blogUrl: formData.blogUrl,
-        googleBusinessProfile: formData.googleBusinessProfile,
-        onlineReviewsCount: formData.onlineReviewsCount,
-        averageReviewRating: formData.averageReviewRating,
-        influencerPartnerships: formData.influencerPartnerships,
-        emailMarketingPlatform: formData.emailMarketingPlatform,
-        emailListSize: formData.emailListSize,
-        
-        // Technology
-        crmSoftware: formData.crmSoftware,
-        bookingPlatform: formData.bookingPlatform,
-        accountingSoftware: formData.accountingSoftware,
-        websitePlatform: formData.websitePlatform,
-        hasOwnBookingEngine: formData.hasOwnBookingEngine,
-        comfortableWithTechnology: formData.comfortableWithTechnology,
-        videoConferencingTools: formData.videoConferencingTools,
-        aiToolsExperience: formData.aiToolsExperience,
-        
-        // Emergency & Legal
-        support24_7: formData.support24_7,
-        travelCrisisManagementTraining: formData.travelCrisisManagementTraining,
-        travelInsuranceLicensed: formData.travelInsuranceLicensed,
-        emergencyContactPhone: formData.emergencyContactPhone,
-        afterHoursAvailability: formData.afterHoursAvailability,
-        crisisResponseExamples: formData.crisisResponseExamples,
-        privacyPolicyUrl: formData.privacyPolicyUrl,
-        termsAndConditionsUrl: formData.termsAndConditionsUrl,
-        gdprCompliant: formData.gdprCompliant,
-        ccpaCompliant: formData.ccpaCompliant,
-        clientDataProtectionMeasures: formData.clientDataProtectionMeasures,
-        contractsWithClients: formData.contractsWithClients,
-        legalCounselOnRetainer: formData.legalCounselOnRetainer,
-        previousLegalIssues: formData.previousLegalIssues,
-        regulatoryViolations: formData.regulatoryViolations,
-        
-        // Professional References
-        reference1Name: formData.reference1Name,
-        reference1Company: formData.reference1Company,
-        reference1Email: formData.reference1Email,
-        reference1Phone: formData.reference1Phone,
-        reference2Name: formData.reference2Name,
-        reference2Company: formData.reference2Company,
-        reference2Email: formData.reference2Email,
-        reference2Phone: formData.reference2Phone,
       };
-      console.log('Step 3: ✅ Extended data built successfully');
 
-      // STEP 4: Database insert (with try-catch for isolation)
-      console.log('Step 4: 💾 Inserting application into database...');
-      console.log('  📊 Insert payload summary:', {
-        email: formData.email,
-        agency_name: formData.agencyName,
-        business_type: formData.businessType,
-        hasBusinessLicense: !!businessLicensePath,
-        hasInsuranceCert: !!insuranceCertPath,
-        hasGovId: !!govIdPath,
-        hasHeadshot: !!headshotPath,
-        extendedDataKeys: Object.keys(extendedData).length,
-      });
-      
-      let applicationData;
-      try {
-        const { data, error: applicationError } = await supabase
+      const { data, error: applicationError } = await supabase
         .from('agent_applications')
         .insert({
-          // Core fields - mapped to dedicated columns
           first_name: formData.firstName,
           last_name: formData.lastName,
           email: formData.email,
@@ -517,7 +212,7 @@ export default function AgentApplicationForm() {
           business_country: formData.businessCountry,
           year_established: formData.yearEstablished ? parseInt(formData.yearEstablished) : null,
           website: formData.website || null,
-          business_registration_number: formData.businessLicenseNumber,
+          business_registration_number: formData.businessLicenseNumber || null,
           tax_id: formData.taxIdEIN || null,
           years_experience: formData.yearsExperience ? parseInt(formData.yearsExperience) : 0,
           specialties: formData.specializations,
@@ -526,112 +221,39 @@ export default function AgentApplicationForm() {
           monthly_bookings: formData.monthlyBookings || null,
           destinations: formData.preferredDestinations ? [formData.preferredDestinations] : [],
           why_goldsainte: formData.whyGoldsainte || null,
-          
-          // Professional credentials
           license_number: formData.iataNumber || null,
-          
-          // Sales metrics - mapped to new dedicated columns
           annual_sales_volume: formData.annualSalesVolume || null,
-          active_clients_count: formData.numberOfActiveClients ? parseInt(formData.numberOfActiveClients) : null,
-          repeat_clients_percentage: formData.percentageRepeatClients ? parseInt(formData.percentageRepeatClients) : null,
-          
-          // Host agency - mapped to new dedicated column
           host_agency_name: formData.hostAgencyName || null,
-          
-          // Content creation - mapped to new dedicated columns
-          content_creation_experience: formData.contentCreationExperience || false,
-          video_content_creation: formData.videoContentCreation || false,
-          social_media_followers_total: formData.socialMediaFollowersTotal ? parseInt(formData.socialMediaFollowersTotal) : null,
-          
-          // Languages (existing column)
-          languages: formData.languagesSpoken || [],
-          
-          // Insurance (existing columns)
           insurance_provider: formData.insuranceProvider || null,
           insurance_policy_number: formData.insurancePolicyNumber || null,
           insurance_coverage_amount: formData.insuranceCoverage ? parseFloat(formData.insuranceCoverage) : null,
-          
-          // Documents - mapped to new dedicated columns
           document_business_license: businessLicensePath,
           document_insurance_cert: insuranceCertPath,
           document_government_id: govIdPath,
           document_headshot: headshotPath,
-          
-          // All other fields stored in extended_data JSONB
+          accepted_terms: formData.acceptedTerms,
+          accepted_privacy: formData.acceptedPrivacy,
+          accepted_vendor: formData.acceptedVendor,
           extended_data: extendedData,
-          
-          // Status fields
           status: 'pending_verification',
         })
         .select()
         .single();
 
-        if (applicationError) {
-          console.error('Step 4: ❌ Database insert failed:', {
-            message: applicationError.message,
-            code: applicationError.code,
-            details: applicationError.details,
-            hint: applicationError.hint,
-          });
-          throw new Error(applicationError.message || 'Failed to save application');
-        }
+      if (applicationError) throw new Error(applicationError.message || 'Failed to save application');
 
-        applicationData = data;
-        console.log('Step 4: ✅ Application inserted successfully:', {
-          id: applicationData.id,
-          email: applicationData.email,
-          status: applicationData.status,
-        });
-      } catch (dbError: any) {
-        console.error('Step 4: ❌ DATABASE INSERT OPERATION FAILED:', dbError);
-        throw new Error(`Database operation failed: ${dbError.message}`);
-      }
-
-      setDraftApplicationId(applicationData.id);
-      setApplicationId(applicationData.id);
-      
-      // Store email in localStorage for verification return flow
-      console.log('Step 5: 💾 Storing application data in localStorage...');
+      setDraftApplicationId(data.id);
+      setApplicationId(data.id);
       localStorage.setItem('agent_application_email', formData.email);
-      localStorage.setItem('agent_application_id', applicationData.id);
-      console.log('Step 5: ✅ LocalStorage updated');
-      
-      // Move to step 11 (Identity Verification)
-      console.log('Step 6: 🎯 Moving to step 11 (Identity Verification)');
-      setStep(11);
-      
-      console.log('=== ✅ saveDraftApplication completed successfully ===');
-      
+      localStorage.setItem('agent_application_id', data.id);
+      setStep(5);
+
       toast({
         title: "Application saved",
         description: "Now complete identity verification to submit your application.",
       });
     } catch (error: any) {
-      console.error('=== ❌ ERROR in saveDraftApplication ===');
-      console.error('Error type:', error.constructor.name);
-      console.error('Error message:', error.message);
-      
-      // Detailed error information
-      const errorDetails = {
-        message: error.message,
-        code: error.code,
-        details: error.details,
-        hint: error.hint,
-        status: error.status,
-        stack: error.stack,
-      };
-      console.error('Full error details:', errorDetails);
-      
-      // Check if it's a network error
-      if (error.message?.includes('fetch') || error.message?.includes('Failed to fetch')) {
-        console.error('🚨 NETWORK ERROR DETECTED - this is likely a connectivity issue');
-        console.error('Possible causes:');
-        console.error('  1. Supabase client not initialized');
-        console.error('  2. Network connection lost');
-        console.error('  3. Supabase project URL incorrect');
-        console.error('  4. CORS issue (check Network tab)');
-      }
-      
+      console.error('Error in saveDraftApplication:', error);
       toast({
         title: "Submission failed",
         description: error.message || "Please check all required fields and try again.",
@@ -644,413 +266,443 @@ export default function AgentApplicationForm() {
 
   const startStripeVerification = async () => {
     if (!draftApplicationId) {
-      toast({
-        title: "Error",
-        description: "Please complete all previous steps first",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Please complete all previous steps first", variant: "destructive" });
       return;
     }
-
     setIsLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('create-identity-verification', {
         body: {
           email: formData.email,
           applicationType: 'agent',
-          metadata: {
-            applicationId: draftApplicationId,
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-          },
+          metadata: { applicationId: draftApplicationId, firstName: formData.firstName, lastName: formData.lastName },
         },
       });
-
       if (error) throw error;
-
-      if (data.url) {
-        // Redirect to Stripe Identity
-        window.location.href = data.url;
-      }
+      if (data.url) window.location.href = data.url;
     } catch (error: any) {
       console.error('Stripe verification error:', error);
-      toast({
-        title: "Verification setup failed",
-        description: error.message || "Please try again.",
-        variant: "destructive",
-      });
+      toast({ title: "Verification setup failed", description: error.message || "Please try again.", variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
   };
 
+  const SectionHeader = ({ title }: { title: string }) => (
+    <div className="flex items-center gap-3 mb-6">
+      <div className="h-8 w-1 bg-[#C7A962] rounded-full" />
+      <h3 className="font-secondary text-xl md:text-2xl text-[#0a2225]">{title}</h3>
+    </div>
+  );
 
-  const renderStep1 = () => (
-    <div className="space-y-8">
-      {/* Personal Information Section */}
-      <div>
-        <div className="flex items-center gap-3 mb-6">
-          <div className="h-8 w-1 bg-[#C7A962] rounded-full" />
-          <h3 className="font-secondary text-xl md:text-2xl text-[#0a2225]">Personal Information</h3>
-        </div>
-        <div className="grid gap-5 md:grid-cols-2">
-          <div>
-            <Label htmlFor="firstName" className="text-sm font-medium text-[#0a2225]">First Name *</Label>
-            <Input
-              id="firstName"
-              value={formData.firstName}
-              onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-              required
-              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
-            />
-          </div>
-          <div>
-            <Label htmlFor="lastName" className="text-sm font-medium text-[#0a2225]">Last Name *</Label>
-            <Input
-              id="lastName"
-              value={formData.lastName}
-              onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-              required
-              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
-            />
-          </div>
-          <div>
-            <Label htmlFor="email" className="text-sm font-medium text-[#0a2225]">Email *</Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              required
-              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
-            />
-          </div>
-          <div>
-            <Label htmlFor="phone" className="text-sm font-medium text-[#0a2225]">Phone *</Label>
-            <Input
-              id="phone"
-              type="tel"
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              required
-              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
-            />
-          </div>
-          <div>
-            <Label htmlFor="dateOfBirth" className="text-sm font-medium text-[#0a2225]">Date of Birth</Label>
-            <Input
-              id="dateOfBirth"
-              type="date"
-              value={formData.dateOfBirth}
-              onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Business Information Section */}
-      <div>
-        <div className="flex items-center gap-3 mb-6">
-          <div className="h-8 w-1 bg-[#C7A962] rounded-full" />
-          <h3 className="font-secondary text-xl md:text-2xl text-[#0a2225]">Business Information</h3>
-        </div>
-        <div className="grid gap-5 md:grid-cols-2">
-          <div>
-            <Label htmlFor="agencyName" className="text-sm font-medium text-[#0a2225]">Agency Name *</Label>
-            <Input
-              id="agencyName"
-              value={formData.agencyName}
-              onChange={(e) => setFormData({ ...formData, agencyName: e.target.value })}
-              required
-              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
-            />
-          </div>
-          <div>
-            <Label htmlFor="businessType" className="text-sm font-medium text-[#0a2225]">Business Type *</Label>
-            <Select
-              value={formData.businessType}
-              onValueChange={(value: any) => setFormData({ ...formData, businessType: value })}
-            >
-              <SelectTrigger className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg">
-                <SelectValue placeholder="Select business type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="sole_proprietor">Sole Proprietor</SelectItem>
-                <SelectItem value="partnership">Partnership</SelectItem>
-                <SelectItem value="llc">LLC</SelectItem>
-                <SelectItem value="corporation">Corporation</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="md:col-span-2">
-            <Label htmlFor="businessAddress" className="text-sm font-medium text-[#0a2225]">Business Address</Label>
-            <Input
-              id="businessAddress"
-              value={formData.businessAddress}
-              onChange={(e) => setFormData({ ...formData, businessAddress: e.target.value })}
-              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
-            />
-          </div>
-          <div>
-            <Label htmlFor="businessCity" className="text-sm font-medium text-[#0a2225]">City</Label>
-            <Input
-              id="businessCity"
-              value={formData.businessCity}
-              onChange={(e) => setFormData({ ...formData, businessCity: e.target.value })}
-              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
-            />
-          </div>
-          <div>
-            <Label htmlFor="businessState" className="text-sm font-medium text-[#0a2225]">State</Label>
-            <Input
-              id="businessState"
-              value={formData.businessState}
-              onChange={(e) => setFormData({ ...formData, businessState: e.target.value })}
-              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
-            />
-          </div>
-          <div>
-            <Label htmlFor="yearEstablished" className="text-sm font-medium text-[#0a2225]">Year Established</Label>
-            <Input
-              id="yearEstablished"
-              type="number"
-              value={formData.yearEstablished}
-              onChange={(e) => setFormData({ ...formData, yearEstablished: e.target.value })}
-              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
-            />
-          </div>
-          <div>
-            <Label htmlFor="website" className="text-sm font-medium text-[#0a2225]">Website</Label>
-            <Input
-              id="website"
-              type="url"
-              value={formData.website}
-              onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
-            />
-          </div>
-          <div>
-            <Label htmlFor="businessLicenseNumber" className="text-sm font-medium text-[#0a2225]">Business License Number *</Label>
-            <Input
-              id="businessLicenseNumber"
-              value={formData.businessLicenseNumber}
-              onChange={(e) => setFormData({ ...formData, businessLicenseNumber: e.target.value })}
-              required
-              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
-            />
-          </div>
-          <div>
-            <Label htmlFor="yearsExperience" className="text-sm font-medium text-[#0a2225]">Years of Experience</Label>
-            <Input
-              id="yearsExperience"
-              type="number"
-              value={formData.yearsExperience}
-              onChange={(e) => setFormData({ ...formData, yearsExperience: e.target.value })}
-              className="mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="flex justify-end pt-4">
-        <Button 
-          onClick={() => setStep(2)}
-          className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8"
-        >
-          Next <ArrowRight className="ml-2 h-4 w-4" />
+  const NavButtons = ({ onBack, onNext, nextLabel, nextDisabled }: { onBack?: () => void; onNext: () => void; nextLabel?: string; nextDisabled?: boolean }) => (
+    <div className="flex justify-between mt-8 pt-4 border-t border-[#E5DFC6]">
+      {onBack ? (
+        <Button variant="outline" onClick={onBack} className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full px-6">
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back
         </Button>
-      </div>
-    </div>
-  );
-
-  const renderStep11 = () => (
-    <div className="space-y-8">
-      <div className="text-center">
-        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#FDF9F0] border border-[#C7A962]/30">
-          <Shield className="h-10 w-10 text-[#C7A962]" />
-        </div>
-        <h3 className="mb-3 font-secondary text-2xl text-[#0a2225]">Identity Verification Required</h3>
-        <p className="text-base text-[#6B7280] max-w-md mx-auto">
-          All travel agents must complete identity verification through Stripe Identity.
-          This is required under <em className="font-secondary">Goldsainte's</em> trust & safety policy and typically takes 2-3 minutes.
-        </p>
-      </div>
-
-      <div className="rounded-xl border border-[#E5DFC6] bg-[#FDF9F0]/50 p-6">
-        <h4 className="mb-3 text-sm font-semibold text-[#0a2225]">What you'll need:</h4>
-        <ul className="space-y-2 text-sm text-[#6B7280]">
-          <li className="flex items-center gap-2">
-            <div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />
-            Government-issued photo ID (passport, driver's license, or ID card)
-          </li>
-          <li className="flex items-center gap-2">
-            <div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />
-            Device with camera for selfie verification
-          </li>
-          <li className="flex items-center gap-2">
-            <div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />
-            2-3 minutes to complete the process
-          </li>
-        </ul>
-      </div>
-
-      <Button
-        type="button"
-        onClick={startStripeVerification}
-        disabled={isLoading}
-        className="w-full bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full min-h-[52px] text-base"
-        size="lg"
-      >
-        {isLoading ? (
-          <>
-            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-            Setting up verification...
-          </>
-        ) : (
-          <>
-            <Shield className="mr-2 h-5 w-5" />
-            Start Identity Verification
-          </>
-        )}
+      ) : <div />}
+      <Button onClick={onNext} disabled={nextDisabled || isLoading} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8">
+        {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</> : <>{nextLabel || "Next"} <ArrowRight className="ml-2 h-4 w-4" /></>}
       </Button>
-
-      <p className="text-center text-xs text-[#9A9079]">
-        Your information is secure and encrypted. <em className="font-secondary">Goldsainte</em> uses Stripe Identity
-        for verification and does not store your government ID.
-      </p>
     </div>
   );
 
-  // Luxury input styling
-  const luxuryInputClasses = "min-h-[48px] w-full max-w-full border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 focus:ring-offset-0 rounded-lg placeholder:text-sm box-border";
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return (
+          <div className="space-y-8">
+            <SectionHeader title="You & Your Business" />
+            <p className="text-sm text-[#6B7280] -mt-4">Tell us about yourself and your agency.</p>
+            <div className="grid gap-5 md:grid-cols-2">
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">First Name *</Label>
+                <Input value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} className={luxuryInputClasses} />
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">Last Name *</Label>
+                <Input value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} className={luxuryInputClasses} />
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">Email *</Label>
+                <Input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className={luxuryInputClasses} />
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">Phone *</Label>
+                <Input type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className={luxuryInputClasses} />
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">Agency Name *</Label>
+                <Input value={formData.agencyName} onChange={(e) => setFormData({ ...formData, agencyName: e.target.value })} className={luxuryInputClasses} />
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">Business Type *</Label>
+                <Select value={formData.businessType} onValueChange={(value: any) => setFormData({ ...formData, businessType: value })}>
+                  <SelectTrigger className={luxurySelectClasses}><SelectValue placeholder="Select type" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="sole_proprietor">Sole Proprietor</SelectItem>
+                    <SelectItem value="partnership">Partnership</SelectItem>
+                    <SelectItem value="llc">LLC</SelectItem>
+                    <SelectItem value="corporation">Corporation</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="md:col-span-2">
+                <Label className="text-sm font-medium text-[#0a2225]">Business Address</Label>
+                <Input value={formData.businessAddress} onChange={(e) => setFormData({ ...formData, businessAddress: e.target.value })} className={luxuryInputClasses} />
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">City</Label>
+                <Input value={formData.businessCity} onChange={(e) => setFormData({ ...formData, businessCity: e.target.value })} className={luxuryInputClasses} />
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">State</Label>
+                <Input value={formData.businessState} onChange={(e) => setFormData({ ...formData, businessState: e.target.value })} className={luxuryInputClasses} />
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">Years of Experience</Label>
+                <Input type="number" value={formData.yearsExperience} onChange={(e) => setFormData({ ...formData, yearsExperience: e.target.value })} className={luxuryInputClasses} />
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">Website</Label>
+                <Input type="url" value={formData.website} onChange={(e) => setFormData({ ...formData, website: e.target.value })} className={luxuryInputClasses} placeholder="https://" />
+              </div>
+            </div>
+            <NavButtons onNext={() => setStep(2)} />
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="space-y-8">
+            <SectionHeader title="Credentials & Expertise" />
+            <p className="text-sm text-[#6B7280] -mt-4">Share your professional credentials and areas of expertise.</p>
+            <div className="grid gap-5 md:grid-cols-2">
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">IATA Number</Label>
+                <Input value={formData.iataNumber} onChange={(e) => setFormData({ ...formData, iataNumber: e.target.value })} className={luxuryInputClasses} placeholder="Optional" />
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">ARC Number</Label>
+                <Input value={formData.arcNumber} onChange={(e) => setFormData({ ...formData, arcNumber: e.target.value })} className={luxuryInputClasses} placeholder="Optional" />
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">CLIA Number</Label>
+                <Input value={formData.cliaNumber} onChange={(e) => setFormData({ ...formData, cliaNumber: e.target.value })} className={luxuryInputClasses} placeholder="Optional" />
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">Host Agency</Label>
+                <Input value={formData.hostAgencyName} onChange={(e) => setFormData({ ...formData, hostAgencyName: e.target.value })} className={luxuryInputClasses} placeholder="If applicable" />
+              </div>
+              <div className="md:col-span-2">
+                <Label className="text-sm font-medium text-[#0a2225]">Other Certifications</Label>
+                <Input value={formData.otherCertifications} onChange={(e) => setFormData({ ...formData, otherCertifications: e.target.value })} className={luxuryInputClasses} placeholder="CTA, CTC, etc." />
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-sm font-medium text-[#0a2225]">Specializations</Label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
+                {specializationOptions.map((spec) => (
+                  <div key={spec} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`spec-${spec}`}
+                      checked={formData.specializations.includes(spec)}
+                      onCheckedChange={(checked) => {
+                        setFormData({
+                          ...formData,
+                          specializations: checked
+                            ? [...formData.specializations, spec]
+                            : formData.specializations.filter(s => s !== spec)
+                        });
+                      }}
+                      className="data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47]"
+                    />
+                    <label htmlFor={`spec-${spec}`} className="text-sm cursor-pointer text-[#0a2225]">{spec}</label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-sm font-medium text-[#0a2225]">Preferred Destinations</Label>
+              <Input value={formData.preferredDestinations} onChange={(e) => setFormData({ ...formData, preferredDestinations: e.target.value })} className={luxuryInputClasses} placeholder="e.g. Maldives, Italy, Japan" />
+            </div>
+
+            <NavButtons onBack={() => setStep(1)} onNext={() => setStep(3)} />
+          </div>
+        );
+
+      case 3:
+        return (
+          <div className="space-y-8">
+            <SectionHeader title="Sales & Presence" />
+            <p className="text-sm text-[#6B7280] -mt-4">Help us understand your business volume and online presence.</p>
+            <div className="grid gap-5 md:grid-cols-2">
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">Annual Sales Volume</Label>
+                <Select value={formData.annualSalesVolume} onValueChange={(value) => setFormData({ ...formData, annualSalesVolume: value })}>
+                  <SelectTrigger className={luxurySelectClasses}><SelectValue placeholder="Select range" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="under_250k">Under $250K</SelectItem>
+                    <SelectItem value="250k_500k">$250K - $500K</SelectItem>
+                    <SelectItem value="500k_1m">$500K - $1M</SelectItem>
+                    <SelectItem value="1m_5m">$1M - $5M</SelectItem>
+                    <SelectItem value="over_5m">Over $5M</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">Average Trip Value</Label>
+                <Select value={formData.averageTripValue} onValueChange={(value) => setFormData({ ...formData, averageTripValue: value })}>
+                  <SelectTrigger className={luxurySelectClasses}><SelectValue placeholder="Select range" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="under_5k">Under $5,000</SelectItem>
+                    <SelectItem value="5k_10k">$5,000 - $10,000</SelectItem>
+                    <SelectItem value="10k_25k">$10,000 - $25,000</SelectItem>
+                    <SelectItem value="25k_50k">$25,000 - $50,000</SelectItem>
+                    <SelectItem value="over_50k">Over $50,000</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">Monthly Bookings</Label>
+                <Input value={formData.monthlyBookings} onChange={(e) => setFormData({ ...formData, monthlyBookings: e.target.value })} className={luxuryInputClasses} placeholder="e.g. 10-20" />
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-sm font-medium text-[#0a2225]">Primary Focus</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
+                {primaryFocusOptions.map((focus) => (
+                  <div key={focus} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`focus-${focus}`}
+                      checked={formData.primaryFocus.includes(focus)}
+                      onCheckedChange={(checked) => {
+                        setFormData({
+                          ...formData,
+                          primaryFocus: checked
+                            ? [...formData.primaryFocus, focus]
+                            : formData.primaryFocus.filter(f => f !== focus)
+                        });
+                      }}
+                      className="data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47]"
+                    />
+                    <label htmlFor={`focus-${focus}`} className="text-sm cursor-pointer text-[#0a2225]">{focus}</label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid gap-5 md:grid-cols-3">
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">Instagram</Label>
+                <Input value={formData.instagramHandle} onChange={(e) => setFormData({ ...formData, instagramHandle: e.target.value })} className={luxuryInputClasses} placeholder="@handle" />
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">TikTok</Label>
+                <Input value={formData.tiktokHandle} onChange={(e) => setFormData({ ...formData, tiktokHandle: e.target.value })} className={luxuryInputClasses} placeholder="@handle" />
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">LinkedIn</Label>
+                <Input value={formData.linkedinProfileUrl} onChange={(e) => setFormData({ ...formData, linkedinProfileUrl: e.target.value })} className={luxuryInputClasses} placeholder="URL" />
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-sm font-medium text-[#0a2225]">Why Goldsainte?</Label>
+              <Textarea value={formData.whyGoldsainte} onChange={(e) => setFormData({ ...formData, whyGoldsainte: e.target.value })} className={`${luxuryInputClasses} min-h-[100px]`} placeholder="What excites you about partnering with Goldsainte?" />
+            </div>
+
+            <NavButtons onBack={() => setStep(2)} onNext={() => setStep(4)} />
+          </div>
+        );
+
+      case 4:
+        return (
+          <div className="space-y-8">
+            <SectionHeader title="Insurance & Legal" />
+            <p className="text-sm text-[#6B7280] -mt-4">Provide insurance details, upload documents, and accept our terms.</p>
+
+            {/* Insurance */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3">
+                <Checkbox
+                  checked={formData.errorsOmissionsInsurance}
+                  onCheckedChange={(checked) => setFormData({ ...formData, errorsOmissionsInsurance: checked as boolean })}
+                  className="data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47]"
+                />
+                <Label className="text-sm text-[#0a2225] cursor-pointer">I carry Errors & Omissions (E&O) Insurance</Label>
+              </div>
+              {formData.errorsOmissionsInsurance && (
+                <div className="grid gap-4 md:grid-cols-3 pl-7">
+                  <div>
+                    <Label className="text-sm text-[#0a2225]">Insurance Provider</Label>
+                    <Input value={formData.insuranceProvider} onChange={(e) => setFormData({ ...formData, insuranceProvider: e.target.value })} className={luxuryInputClasses} />
+                  </div>
+                  <div>
+                    <Label className="text-sm text-[#0a2225]">Policy Number</Label>
+                    <Input value={formData.insurancePolicyNumber} onChange={(e) => setFormData({ ...formData, insurancePolicyNumber: e.target.value })} className={luxuryInputClasses} />
+                  </div>
+                  <div>
+                    <Label className="text-sm text-[#0a2225]">Coverage Amount ($)</Label>
+                    <Input type="number" value={formData.insuranceCoverage} onChange={(e) => setFormData({ ...formData, insuranceCoverage: e.target.value })} className={luxuryInputClasses} />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <Label className="text-sm font-medium text-[#0a2225]">Tax ID / EIN</Label>
+              <Input value={formData.taxIdEIN} onChange={(e) => setFormData({ ...formData, taxIdEIN: e.target.value })} className={luxuryInputClasses} placeholder="XX-XXXXXXX" />
+            </div>
+
+            {/* Document Uploads */}
+            <div className="space-y-4">
+              <h4 className="font-medium text-[#0a2225]">Document Uploads</h4>
+              <div className="grid gap-4 md:grid-cols-2">
+                {[
+                  { label: "Business License", key: "businessLicenseFile" as const },
+                  { label: "Insurance Certificate", key: "insuranceCertificateFile" as const },
+                  { label: "Government ID", key: "governmentIdFile" as const },
+                  { label: "Professional Headshot", key: "professionalHeadshotFile" as const },
+                ].map(({ label, key }) => (
+                  <div key={key}>
+                    <Label className="text-sm text-[#0a2225]">{label}</Label>
+                    <label className="mt-1 flex items-center justify-center w-full px-4 py-4 border-2 border-dashed border-[#E5DFC6] rounded-xl cursor-pointer hover:bg-[#F5EFE1]/50 transition-colors">
+                      <div className="text-center">
+                        {formData[key] ? (
+                          <p className="text-sm text-[#0c4d47] font-medium flex items-center gap-2"><CheckCircle2 className="h-4 w-4" />{formData[key]!.name}</p>
+                        ) : (
+                          <><Upload className="mx-auto h-6 w-6 text-[#C7A962]" /><p className="mt-1 text-xs text-[#6B7280]">Click to upload</p></>
+                        )}
+                      </div>
+                      <input type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) setFormData({ ...formData, [key]: file });
+                      }} />
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Legal Acceptance */}
+            <div className="space-y-4 border-t border-[#E5DFC6] pt-6">
+              <h4 className="font-medium text-[#0a2225]">Legal Agreements</h4>
+              {[
+                { key: "acceptedTerms" as const, label: "Terms of Service", link: "/terms" },
+                { key: "acceptedPrivacy" as const, label: "Privacy Policy", link: "/privacy" },
+                { key: "acceptedVendor" as const, label: "Agent Partnership Agreement", link: "/vendor-agreement" },
+              ].map(({ key, label, link }) => (
+                <div key={key} className="flex items-start space-x-3">
+                  <Checkbox
+                    checked={formData[key]}
+                    onCheckedChange={(checked) => setFormData({ ...formData, [key]: checked as boolean })}
+                    className="data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47] mt-0.5"
+                  />
+                  <label className="text-sm text-[#0a2225]">
+                    I accept the <a href={link} target="_blank" className="text-[#C7A962] hover:underline">{label}</a> *
+                  </label>
+                </div>
+              ))}
+            </div>
+
+            <NavButtons
+              onBack={() => setStep(3)}
+              onNext={saveDraftApplication}
+              nextLabel="Continue to Verification"
+              nextDisabled={!formData.acceptedTerms || !formData.acceptedPrivacy || !formData.acceptedVendor}
+            />
+          </div>
+        );
+
+      case 5:
+        return (
+          <div className="space-y-8">
+            <div className="text-center">
+              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#FDF9F0] border border-[#C7A962]/30">
+                <Shield className="h-10 w-10 text-[#C7A962]" />
+              </div>
+              <h3 className="mb-3 font-secondary text-2xl text-[#0a2225]">Identity Verification Required</h3>
+              <p className="text-base text-[#6B7280] max-w-md mx-auto">
+                All travel agents must complete identity verification through Stripe Identity.
+                This typically takes 2-3 minutes.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#E5DFC6] bg-[#FDF9F0]/50 p-6">
+              <h4 className="mb-3 text-sm font-semibold text-[#0a2225]">What you'll need:</h4>
+              <ul className="space-y-2 text-sm text-[#6B7280]">
+                <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />Government-issued photo ID</li>
+                <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />Device with camera for selfie verification</li>
+                <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />2-3 minutes to complete</li>
+              </ul>
+            </div>
+
+            <Button
+              type="button"
+              onClick={startStripeVerification}
+              disabled={isLoading}
+              className="w-full bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full min-h-[52px] text-base"
+              size="lg"
+            >
+              {isLoading ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" />Setting up verification...</> : <><Shield className="mr-2 h-5 w-5" />Start Identity Verification</>}
+            </Button>
+
+            <p className="text-center text-xs text-[#9A9079]">
+              Your information is secure and encrypted. <em className="font-secondary">Goldsainte</em> uses Stripe Identity for verification and does not store your government ID.
+            </p>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#FDF9F0] px-3 sm:px-4 py-8 md:py-16 overflow-x-hidden">
       <div className="mx-auto max-w-4xl w-full">
-        {/* Luxury Header */}
         <div className="mb-10 text-center">
           <h1 className="mb-4 font-secondary text-[26px] md:text-[31px] lg:text-[36px] text-[#0a2225]">
             Grow Your Luxury Travel Business With <em>Goldsainte</em>
           </h1>
           <p className="text-base text-[#6B7280] max-w-2xl mx-auto leading-relaxed">
-            Become part of an exclusive advisor network where you can collaborate with creators, turn ideas into immersive AI-crafted storyboards, publish and promote your signature trips, and connect directly with travelers who value elevated, design-led experiences.
+            Become part of an exclusive advisor network where you can collaborate with creators, publish signature trips, and connect with travelers who value elevated experiences.
           </p>
-          
-          {/* Gold Progress Bar */}
+
           <div className="flex items-center justify-center gap-2 mt-8">
             <div className="flex gap-1.5">
-              {[...Array(11)].map((_, i) => (
-                <div 
-                  key={i}
-                  className={`h-1.5 w-6 rounded-full transition-colors ${
-                    i + 1 <= step ? 'bg-[#C7A962]' : 'bg-[#E5DFC6]'
-                  }`}
-                />
+              {[...Array(totalSteps)].map((_, i) => (
+                <div key={i} className={`h-1.5 w-6 rounded-full transition-colors ${i + 1 <= step ? 'bg-[#C7A962]' : 'bg-[#E5DFC6]'}`} />
               ))}
             </div>
-            <span className="text-xs text-[#6B7280] ml-3">Step {step} of 11</span>
+            <span className="text-xs text-[#6B7280] ml-3">Step {step} of {totalSteps}</span>
+          </div>
+
+          <div className="mt-6 flex flex-wrap justify-center gap-2">
+            {stepLabels.map((label, index) => (
+              <div
+                key={label}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  index + 1 < step ? 'bg-[#0c4d47] text-[#E5DFC6]'
+                    : index + 1 === step ? 'bg-[#C7A962] text-white'
+                    : 'bg-[#E5DFC6] text-[#6B7280]'
+                }`}
+              >
+                {index + 1 < step && <CheckCircle2 className="h-3 w-3 inline mr-1" />}
+                {label}
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Luxury Card Container */}
         <Card className="bg-white border border-[#E5DFC6] rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
           <CardContent className="p-4 sm:p-6 md:p-10">
-            {step === 1 && renderStep1()}
-            {step === 2 && (
-              <>
-                <Step2BusinessCompliance formData={formData} setFormData={setFormData} />
-                <div className="flex justify-between mt-8 pt-4 border-t border-[#E5DFC6]">
-                  <Button variant="outline" onClick={() => setStep(1)} className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full px-6"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={() => setStep(3)} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
-                </div>
-              </>
-            )}
-            {step === 3 && (
-              <>
-                <Step3ProfessionalCredentials formData={formData} setFormData={setFormData} />
-                <div className="flex justify-between mt-8 pt-4 border-t border-[#E5DFC6]">
-                  <Button variant="outline" onClick={() => setStep(2)} className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full px-6"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={() => setStep(4)} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
-                </div>
-              </>
-            )}
-            {step === 4 && (
-              <>
-                <Step4ExperienceExpertise formData={formData} setFormData={setFormData} />
-                <div className="flex justify-between mt-8 pt-4 border-t border-[#E5DFC6]">
-                  <Button variant="outline" onClick={() => setStep(3)} className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full px-6"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={() => setStep(5)} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
-                </div>
-              </>
-            )}
-            {step === 5 && (
-              <>
-                <Step5ClientSales formData={formData} setFormData={setFormData} />
-                <div className="flex justify-between mt-8 pt-4 border-t border-[#E5DFC6]">
-                  <Button variant="outline" onClick={() => setStep(4)} className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full px-6"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={() => setStep(6)} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
-                </div>
-              </>
-            )}
-            {step === 6 && (
-              <>
-                <Step6OnlinePresence formData={formData} setFormData={setFormData} />
-                <div className="flex justify-between mt-8 pt-4 border-t border-[#E5DFC6]">
-                  <Button variant="outline" onClick={() => setStep(5)} className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full px-6"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={() => setStep(7)} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
-                </div>
-              </>
-            )}
-            {step === 7 && (
-              <>
-                <Step7Technology formData={formData} setFormData={setFormData} />
-                <div className="flex justify-between mt-8 pt-4 border-t border-[#E5DFC6]">
-                  <Button variant="outline" onClick={() => setStep(6)} className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full px-6"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={() => setStep(8)} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
-                </div>
-              </>
-            )}
-            {step === 8 && (
-              <>
-                <Step8EmergencyLegal formData={formData} setFormData={setFormData} />
-                <div className="flex justify-between mt-8 pt-4 border-t border-[#E5DFC6]">
-                  <Button variant="outline" onClick={() => setStep(7)} className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full px-6"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={() => setStep(9)} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
-                </div>
-              </>
-            )}
-            {step === 9 && (
-              <>
-                <Step9Financial formData={formData} setFormData={setFormData} />
-                <div className="flex justify-between mt-8 pt-4 border-t border-[#E5DFC6]">
-                  <Button variant="outline" onClick={() => setStep(8)} className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full px-6"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={() => setStep(10)} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
-                </div>
-              </>
-            )}
-            {step === 10 && (
-              <>
-                <Step10Documents formData={formData} setFormData={setFormData} />
-                <div className="flex justify-between mt-8 pt-4 border-t border-[#E5DFC6]">
-                  <Button variant="outline" onClick={() => setStep(9)} className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full px-6"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={saveDraftApplication} disabled={isLoading} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8">
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        Continue to Verification
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </>
-            )}
-            {step === 11 && renderStep11()}
+            {renderStep()}
           </CardContent>
         </Card>
       </div>
