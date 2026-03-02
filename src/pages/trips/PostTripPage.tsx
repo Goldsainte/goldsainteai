@@ -414,7 +414,7 @@ export default function PostTripPage() {
   );
 
   // Input helper
-  const inputCls = "w-full rounded-xl border border-[#E5DFC6] bg-[#f7f3ea] px-4 py-3 text-sm outline-none focus:border-[#BFAD72] transition-colors";
+  const inputCls = "w-full rounded-xl border border-[#0c4d47] bg-[#f7f3ea] px-4 py-3 text-sm outline-none focus:border-[#BFAD72] transition-colors";
 
   // Budget & pace labels
   const budgetLabels: [BudgetLevel, string][] = [["accessible", "Thoughtful"], ["elevated", "Elevated"], ["ultra_luxury", "Ultra-luxury"]];
