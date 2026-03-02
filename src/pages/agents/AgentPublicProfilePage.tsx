@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, PenLine } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileHero } from "@/components/profile/ProfileHero";
 import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
 import { ProfileTripsGrid } from "@/components/profile/ProfileTripsGrid";
+import { ReviewsList } from "@/components/profile/ReviewsList";
+import { WriteReviewModal } from "@/components/profile/WriteReviewModal";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 interface AgentProfile {
@@ -33,9 +37,11 @@ interface AgentDetails {
 export default function AgentPublicProfilePage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [agent, setAgent] = useState<AgentProfile | null>(null);
   const [details, setDetails] = useState<AgentDetails | null>(null);
   const [loading, setLoading] = useState(true);
+  const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
 
   useEffect(() => {
     if (!id) return;
@@ -233,12 +239,35 @@ export default function AgentPublicProfilePage() {
 
               {/* Trips */}
               <ProfileTripsGrid creatorId={agent.id} creatorType="agent" />
+
+              {/* Reviews */}
+              <section>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151]">
+                    Reviews
+                  </h2>
+                  {user && user.id !== agent.id && (
+                    <WriteReviewModal
+                      revieweeId={agent.id}
+                      revieweeName={displayName}
+                      onSuccess={() => setReviewRefreshKey((k) => k + 1)}
+                    >
+                      <Button variant="outline" size="sm" className="border-[#E5DFC6] text-[#0a2225]">
+                        <PenLine className="mr-1.5 h-3.5 w-3.5" />
+                        Write a Review
+                      </Button>
+                    </WriteReviewModal>
+                  )}
+                </div>
+                <ReviewsList revieweeId={agent.id} refreshKey={reviewRefreshKey} />
+              </section>
             </div>
 
             {/* Right column — sticky sidebar */}
             <div className="lg:sticky lg:top-20 lg:self-start">
               <ProfileSidebar
                 name={displayName}
+                targetUserId={agent.id}
                 rating={details?.rating}
                 reviewCount={details?.total_reviews}
                 website={details?.website}
