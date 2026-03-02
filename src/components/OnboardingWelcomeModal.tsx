@@ -29,14 +29,15 @@ export function OnboardingWelcomeModal() {
     ];
     primaryCta = { label: "Begin Your Journey", href: "/traveler" };
   } else if (accountType === "creator") {
-    title = "Welcome to the creator side of Goldsainte";
+    title = "Welcome to the Creator Side of Goldsainte";
+    subtitle = "Goldsainte is where vision becomes a bookable experience.";
     bullets = [
-      "Browse traveler briefs and raise your hand for trips that match your audience.",
-      "Use Goldsainte Creator Lab & storyboards to design the journey like a shot list.",
-      "Partner with agents to make trips actually bookable — and track your earnings.",
-      "All bookings stay on-platform so your commissions are protected and your work is credited.",
+      "Curate and design journeys that reflect your aesthetic and audience.",
+      "Transform inspiration into structured, sellable travel experiences.",
+      "Collaborate seamlessly to bring elevated trips to life.",
+      "Earn from your taste, your influence, and your creative direction.",
     ];
-    primaryCta = { label: "Open your Partner Console", href: "/partner" };
+    primaryCta = { label: "Open Your Creator Dashboard", href: "/partner" };
   } else if (accountType === "agent") {
     title = "Welcome to the agent desk at Goldsainte";
     bullets = [
