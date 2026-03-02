@@ -68,6 +68,31 @@ export default function PostTripPage() {
   const [showSafetyModal, setShowSafetyModal] = useState(false);
   const [storyboardId, setStoryboardId] = useState<string | null>(null);
   const storyboardSaveRef = useRef<(() => Promise<void>) | null>(null);
+
+  // Direct-request: read fromCreator / agentId from URL or sessionStorage
+  const [preferredCreatorId, setPreferredCreatorId] = useState<string | null>(null);
+  const [preferredAgentId, setPreferredAgentId] = useState<string | null>(null);
+  const [preferredName, setPreferredName] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fromCreator = searchParams.get("fromCreator") || sessionStorage.getItem("goldsainte:fromCreator");
+    const agentId = searchParams.get("agentId") || sessionStorage.getItem("goldsainte:agentId");
+    if (fromCreator) {
+      setPreferredCreatorId(fromCreator);
+      setWantsRole("creator");
+      sessionStorage.setItem("goldsainte:fromCreator", fromCreator);
+      supabase.from("profiles").select("display_name").eq("id", fromCreator).maybeSingle().then(({ data }) => {
+        if (data?.display_name) setPreferredName(data.display_name);
+      });
+    } else if (agentId) {
+      setPreferredAgentId(agentId);
+      setWantsRole("agent");
+      sessionStorage.setItem("goldsainte:agentId", agentId);
+      supabase.from("profiles").select("display_name").eq("id", agentId).maybeSingle().then(({ data }) => {
+        if (data?.display_name) setPreferredName(data.display_name);
+      });
+    }
+  }, [searchParams]);
   const storyboardAddItemRef = useRef<((item: any) => void) | null>(null);
   const interestOptions = [
     "Food & wine", "Design hotels", "Adventure", "Wellness",
@@ -300,9 +325,7 @@ export default function PostTripPage() {
         sourceMetadata.source_storyboard_id = storyboardId;
       }
 
-      const { data: insertedTrip, error: insertError } = await supabase
-        .from("trip_requests")
-        .insert({
+      const insertPayload: any = {
           user_id: user.id,
           title: title || null,
           destination,
@@ -323,7 +346,14 @@ export default function PostTripPage() {
           wants_role: wantsRole,
           status: "open",
           source_metadata: Object.keys(sourceMetadata).length > 0 ? sourceMetadata : null,
-        } as any)
+      };
+
+      if (preferredCreatorId) insertPayload.preferred_creator_id = preferredCreatorId;
+      if (preferredAgentId) insertPayload.preferred_agent_id = preferredAgentId;
+
+      const { data: insertedTrip, error: insertError } = await supabase
+        .from("trip_requests")
+        .insert(insertPayload)
         .select("id")
         .single();
       if (insertError) throw insertError;
@@ -336,7 +366,28 @@ export default function PostTripPage() {
           .eq("id", storyboardId);
       }
 
-      toast.success("Your trip has been posted. Creators and agents will respond here.");
+      // Send notification to preferred creator/agent
+      const notifyUserId = preferredCreatorId || preferredAgentId;
+      if (notifyUserId && insertedTrip?.id) {
+        await supabase.from("notifications").insert({
+          user_id: notifyUserId,
+          type: "direct_trip_request",
+          title: "New Direct Trip Request",
+          message: `You received a direct trip request for ${destination}`,
+          action_url: `/marketplace/request/${insertedTrip.id}`,
+          entity_type: "trip_request",
+          entity_id: insertedTrip.id,
+          is_read: false,
+        });
+      }
+
+      // Clean up sessionStorage for direct-request params
+      sessionStorage.removeItem("goldsainte:fromCreator");
+      sessionStorage.removeItem("goldsainte:agentId");
+
+      toast.success(notifyUserId
+        ? `Your trip has been sent directly to ${preferredName || "the selected planner"}.`
+        : "Your trip has been posted. Creators and agents will respond here.");
       navigate("/my-trip-requests");
     } catch (err: any) {
       console.error(err);
@@ -396,6 +447,20 @@ export default function PostTripPage() {
       {/* Prefill banners (only on step 0) */}
       {currentStep === 0 && (
         <div className="mx-auto max-w-2xl px-6">
+          {/* Direct request banner */}
+          {preferredName && (
+            <div className="mb-4 rounded-2xl bg-gradient-to-r from-[#FDFBF5] to-[#F6F0E4] border border-[#C7A962]/30 px-4 py-3">
+              <div className="flex items-start gap-3">
+                <Sparkles className="h-5 w-5 text-[#C7A962] flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-[#0a2225]">Direct Request</p>
+                  <p className="text-xs text-[#4a4a4a] mt-0.5">
+                    This trip will be sent directly to <span className="font-semibold">{preferredName}</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
           {hasItineraryPrefill && itineraryPrefill && (
             <div className="mb-4 rounded-2xl bg-gradient-to-r from-[#FDFBF5] to-[#F6F0E4] border border-[#C7A962]/30 px-4 py-3">
               <div className="flex items-start gap-3">
