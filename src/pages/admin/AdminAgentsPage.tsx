@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ShieldCheck, CheckCircle2, XCircle } from "lucide-react";
+import AdminAccountActions from "@/components/admin/AdminAccountActions";
 
 interface AgentRow {
   id: string;
@@ -14,6 +15,7 @@ interface AgentRow {
   avgRating: number | null;
   ratingCount: number | null;
   totalBookings: number;
+  accountStatus: string | null;
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -38,7 +40,7 @@ export default function AdminAgentsPage() {
       try {
         const { data, error: profileError } = await supabase
           .from("profiles")
-          .select("id, full_name, username")
+          .select("id, full_name, username, account_status")
           .eq("role", "agent")
           .order("created_at", { ascending: false });
 
@@ -77,6 +79,7 @@ export default function AdminAgentsPage() {
             avgRating: 0,
             ratingCount: 0,
             totalBookings: bookingCounts.get(row.id) || 0,
+            accountStatus: row.account_status,
           }))
         );
       } catch (err: any) {
@@ -185,28 +188,37 @@ export default function AdminAgentsPage() {
                         {agent.avgRating ? `${agent.avgRating.toFixed(1)} (${agent.ratingCount || 0})` : "—"}
                       </p>
                     </td>
-                    <td className="px-4 py-4 text-right">
-                      <div className="inline-flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => handleStatusChange(agent.id, "verified")}
-                          disabled={updatingId === agent.id}
-                          className="inline-flex items-center gap-1 rounded-full border border-[#0c4d47] px-3 py-1 text-[12px] font-semibold text-[#0c4d47] hover:bg-[#0c4d47]/10"
-                        >
-                          <CheckCircle2 className="h-3 w-3" />
-                          Approve
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleStatusChange(agent.id, "rejected")}
-                          disabled={updatingId === agent.id}
-                          className="inline-flex items-center gap-1 rounded-full border border-red-200 px-3 py-1 text-[12px] font-semibold text-red-600 hover:bg-red-50"
-                        >
-                          <XCircle className="h-3 w-3" />
-                          Reject
-                        </button>
-                      </div>
-                    </td>
+                     <td className="px-4 py-4 text-right">
+                       <div className="inline-flex items-center gap-2">
+                         <button
+                           type="button"
+                           onClick={() => handleStatusChange(agent.id, "verified")}
+                           disabled={updatingId === agent.id}
+                           className="inline-flex items-center gap-1 rounded-full border border-[#0c4d47] px-3 py-1 text-[12px] font-semibold text-[#0c4d47] hover:bg-[#0c4d47]/10"
+                         >
+                           <CheckCircle2 className="h-3 w-3" />
+                           Approve
+                         </button>
+                         <button
+                           type="button"
+                           onClick={() => handleStatusChange(agent.id, "rejected")}
+                           disabled={updatingId === agent.id}
+                           className="inline-flex items-center gap-1 rounded-full border border-red-200 px-3 py-1 text-[12px] font-semibold text-red-600 hover:bg-red-50"
+                         >
+                           <XCircle className="h-3 w-3" />
+                           Reject
+                         </button>
+                         <AdminAccountActions
+                           userId={agent.id}
+                           userName={agent.name}
+                           currentStatus={agent.accountStatus}
+                           onStatusChange={(id, newStatus) =>
+                             setAgents((prev) => prev.map((a) => (a.id === id ? { ...a, accountStatus: newStatus } : a)))
+                           }
+                           onDeleted={(id) => setAgents((prev) => prev.filter((a) => a.id !== id))}
+                         />
+                       </div>
+                     </td>
                   </tr>
                 ))}
               </tbody>

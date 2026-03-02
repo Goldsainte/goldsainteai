@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Sparkles } from "lucide-react";
+import AdminAccountActions from "@/components/admin/AdminAccountActions";
 
 interface CreatorRow {
   id: string;
@@ -10,6 +11,7 @@ interface CreatorRow {
   ratingCount: number | null;
   totalBookings: number;
   totalEarningsCents: number;
+  accountStatus: string | null;
 }
 
 export default function AdminCreatorsPage() {
@@ -26,7 +28,7 @@ export default function AdminCreatorsPage() {
       try {
         const { data, error: profileError } = await supabase
           .from("profiles")
-          .select("id, full_name, username")
+          .select("id, full_name, username, account_status")
           .eq("account_type", "creator")
           .order("created_at", { ascending: false });
 
@@ -63,6 +65,7 @@ export default function AdminCreatorsPage() {
               ratingCount: 0,
               totalBookings: stats.count,
               totalEarningsCents: stats.earnings,
+              accountStatus: row.account_status,
             };
           })
         );
@@ -107,22 +110,27 @@ export default function AdminCreatorsPage() {
           <div className="overflow-x-auto rounded-3xl border border-[#E5DFC6] bg-white/95">
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="text-left text-[12px] text-[#4a4a4a] uppercase tracking-[0.12em]">
-                  <th className="px-4 py-3">Creator</th>
-                  <th className="px-4 py-3">Bookings</th>
-                  <th className="px-4 py-3">Earnings</th>
-                  <th className="px-4 py-3">Ratings</th>
-                </tr>
+                 <tr className="text-left text-[12px] text-[#4a4a4a] uppercase tracking-[0.12em]">
+                   <th className="px-4 py-3">Creator</th>
+                   <th className="px-4 py-3">Status</th>
+                   <th className="px-4 py-3">Bookings</th>
+                   <th className="px-4 py-3">Earnings</th>
+                   <th className="px-4 py-3">Ratings</th>
+                   <th className="px-4 py-3 text-right">Actions</th>
+                 </tr>
               </thead>
               <tbody>
                 {creators.map((creator) => (
                   <tr key={creator.id} className="border-t border-[#F1EBDA]">
                     <td className="px-4 py-4">
-                      <p className="font-semibold">{creator.name}</p>
-                      <p className="text-[12px] text-[#4a4a4a]">{creator.handle ? `@${creator.handle}` : "No handle"}</p>
-                    </td>
-                    <td className="px-4 py-4">
-                      <p className="font-semibold">{creator.totalBookings}</p>
+                       <p className="font-semibold">{creator.name}</p>
+                       <p className="text-[12px] text-[#4a4a4a]">{creator.handle ? `@${creator.handle}` : "No handle"}</p>
+                     </td>
+                     <td className="px-4 py-4">
+                       <AccountStatusBadge status={creator.accountStatus} />
+                     </td>
+                     <td className="px-4 py-4">
+                       <p className="font-semibold">{creator.totalBookings}</p>
                       <p className="text-[12px] text-[#4a4a4a]">Bookings they influenced</p>
                     </td>
                     <td className="px-4 py-4">
@@ -141,14 +149,39 @@ export default function AdminCreatorsPage() {
                       ) : (
                         <p className="text-[12px] text-[#4a4a4a]">No reviews yet</p>
                       )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
-    </main>
+                     </td>
+                     <td className="px-4 py-4 text-right">
+                       <AdminAccountActions
+                         userId={creator.id}
+                         userName={creator.name}
+                         currentStatus={creator.accountStatus}
+                         onStatusChange={(id, newStatus) =>
+                           setCreators((prev) => prev.map((c) => (c.id === id ? { ...c, accountStatus: newStatus } : c)))
+                         }
+                         onDeleted={(id) => setCreators((prev) => prev.filter((c) => c.id !== id))}
+                       />
+                     </td>
+                   </tr>
+                 ))}
+               </tbody>
+             </table>
+           </div>
+         )}
+       </section>
+     </main>
+   );
+ }
+
+function AccountStatusBadge({ status }: { status: string | null }) {
+  const s = status?.toLowerCase() || "active";
+  const styles: Record<string, string> = {
+    active: "bg-[#E3F2EF] text-[#0c4d47]",
+    suspended: "bg-amber-100 text-amber-800",
+    banned: "bg-red-100 text-red-700",
+  };
+  return (
+    <span className={`inline-flex rounded-full px-3 py-1 text-[12px] font-semibold ${styles[s] || styles.active}`}>
+      {s.charAt(0).toUpperCase() + s.slice(1)}
+    </span>
   );
 }
