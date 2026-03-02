@@ -1,20 +1,21 @@
 
 
-## Update Creator Welcome Modal Copy
+## Increase Profile Photo Max File Size to 50MB
 
-**File:** `src/components/OnboardingWelcomeModal.tsx`
+Update all file upload validation checks across the codebase from 10MB to 50MB. There are 10 files with this limit:
 
-Update the `accountType === "creator"` block with the new verbiage:
+### Files to Update
 
-- **Title:** "Welcome to the Creator Side of Goldsainte"
-- **Subtitle (new):** "Goldsainte is where vision becomes a bookable experience."
-- **Bullets:**
-  1. "Curate and design journeys that reflect your aesthetic and audience."
-  2. "Transform inspiration into structured, sellable travel experiences."
-  3. "Collaborate seamlessly to bring elevated trips to life."
-  4. "Earn from your taste, your influence, and your creative direction."
-- **CTA label:** "Open Your Creator Dashboard" (href stays `/partner`)
-- **Footer line:** "A space reserved for your next idea."
+1. **`src/components/ProfilePhotoModal.tsx`** — line 37: `10 * 1024 * 1024` → `50 * 1024 * 1024`, error message to "50MB"
+2. **`src/pages/traveler/components/ProfilePhotoUploader.tsx`** — line 60: same change
+3. **`src/components/ContentUploadModal.tsx`** — line 212: same change
+4. **`src/pages/apply/BrandOnboarding.tsx`** — line 234: same change
+5. **`src/components/BusinessVerificationUpload.tsx`** — line 37: same change
+6. **`src/components/trips/TripImageUploader.tsx`** — line 29: same change
+7. **`src/components/group-trips/TripChat.tsx`** — line 41: same change
+8. **`src/components/journal/ImageUpload.tsx`** — line 38: same change
+9. **`src/components/onboarding/FeaturedPhotosUploader.tsx`** — line 44: same change
+10. **`src/pages/proposals/NewProposalPage.tsx`** — line 215: same change
 
-Single file change, lines ~34-43 in the creator conditional block.
+Each change is a simple find-replace of `10 * 1024 * 1024` → `50 * 1024 * 1024` and updating the corresponding error message string from "10MB" to "50MB".
 
