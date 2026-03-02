@@ -37,11 +37,11 @@ export const TripChat = ({ tripId, members }: TripChatProps) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Check file size (10MB limit)
-    if (file.size > 10 * 1024 * 1024) {
+    // Check file size (50MB limit)
+    if (file.size > 50 * 1024 * 1024) {
       toast({
         title: 'File too large',
-        description: 'Maximum file size is 10MB',
+        description: 'Maximum file size is 50MB',
         variant: 'destructive',
       });
       return;

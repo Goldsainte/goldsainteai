@@ -34,8 +34,8 @@ export const BusinessVerificationUpload = ({ onSuccess }: BusinessVerificationUp
   });
 
   const handleFileChange = (type: 'registration' | 'license', file: File | null) => {
-    if (file && file.size > 10 * 1024 * 1024) {
-      toast.error('File must be less than 10MB');
+    if (file && file.size > 50 * 1024 * 1024) {
+      toast.error('File must be less than 50MB');
       return;
     }
     setDocuments(prev => ({ ...prev, [type]: file }));

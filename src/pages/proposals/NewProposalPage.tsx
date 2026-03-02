@@ -212,8 +212,8 @@ export default function NewProposalPage() {
     }
     setUploading(true);
     for (const file of files) {
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error(`${file.name} exceeds 10MB limit`);
+      if (file.size > 50 * 1024 * 1024) {
+        toast.error(`${file.name} exceeds 50MB limit`);
         continue;
       }
       const path = `${user.id}/${tripId}/${Date.now()}_${file.name}`;

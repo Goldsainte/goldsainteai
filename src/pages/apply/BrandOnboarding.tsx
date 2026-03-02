@@ -231,7 +231,7 @@ export default function BrandOnboarding() {
   const handleDocumentUpload = async (event: React.ChangeEvent<HTMLInputElement>, documentType: string) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    if (file.size > 10 * 1024 * 1024) { toast.error('File must be < 10MB'); return; }
+    if (file.size > 50 * 1024 * 1024) { toast.error('File must be < 50MB'); return; }
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${crypto.randomUUID()}.${fileExt}`;
