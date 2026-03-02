@@ -6,11 +6,11 @@ import {
   MessageCircle,
   CreditCard,
   CheckCircle,
-  Users,
-  PlayCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
+import FollowButton from "@/components/FollowButton";
 
 interface SocialLink {
   platform: string;
@@ -34,6 +34,7 @@ interface ProfileSidebarProps {
   onSaveToStoryboard?: () => void;
   showHowItWorks?: boolean;
   showTrustBadges?: boolean;
+  targetUserId?: string;
   className?: string;
 }
 
@@ -48,6 +49,7 @@ export function ProfileSidebar({
   onSaveToStoryboard,
   showHowItWorks = true,
   showTrustBadges = true,
+  targetUserId,
   className,
 }: ProfileSidebarProps) {
   return (
@@ -106,6 +108,10 @@ export function ProfileSidebar({
 
         {/* CTAs */}
         <div className="mt-5 space-y-2.5">
+          {targetUserId && (
+            <FollowButton targetUserId={targetUserId} />
+          )}
+
           <Button
             onClick={onRequestTrip}
             className="w-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-xl h-11 font-medium"
@@ -196,13 +202,21 @@ export function ProfileSidebar({
               { icon: ShieldCheck, text: "Verified partner" },
               { icon: CreditCard, text: "Secure, escrowed payments" },
               { icon: MessageCircle, text: "On-platform messaging" },
-              { icon: CheckCircle, text: "Dispute resolution support" },
             ].map(({ icon: Icon, text }) => (
               <li key={text} className="flex items-center gap-2.5">
                 <Icon className="h-4 w-4 text-[#0c4d47]" />
                 <span className="text-sm text-[#0a2225]">{text}</span>
               </li>
             ))}
+            <li>
+              <Link
+                to="/dispute-resolution"
+                className="flex items-center gap-2.5 hover:underline"
+              >
+                <CheckCircle className="h-4 w-4 text-[#0c4d47]" />
+                <span className="text-sm text-[#0a2225]">Dispute resolution support</span>
+              </Link>
+            </li>
           </ul>
         </div>
       )}

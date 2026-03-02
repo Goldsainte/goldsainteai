@@ -86,6 +86,14 @@ const DisputeResolution = () => {
         <p className="text-muted-foreground text-lg">
           We are committed to resolving any disputes fairly and efficiently. Please use the form below to submit your dispute.
         </p>
+        <div className="mt-4 rounded-xl border border-[#E5DFC6] bg-[#F5F0E0]/50 p-4 flex items-center justify-between gap-4">
+          <p className="text-sm text-[#0a2225]">
+            <strong>Have an existing booking issue?</strong> You can file a dispute directly from your booking details page for faster resolution.
+          </p>
+          <Button variant="outline" size="sm" asChild className="shrink-0">
+            <a href="/my-bookings">My Bookings</a>
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-3">
