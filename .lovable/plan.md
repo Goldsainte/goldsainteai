@@ -1,16 +1,14 @@
 
 
-## Problem
+## Change Input Border Color to Goldsainte Green
 
-The "Legal" section on the About page shows raw translation keys (`about.sections.legal.p1`, `about.sections.legal.p2`, `about.sections.legal.p3`) because the **English translation file** (`src/i18n/locales/en.json`) is missing these keys. Other languages (French, Spanish, Chinese, Arabic, Japanese) all have them populated.
+The Post Trip page defines a shared input class on **line 417** of `PostTripPage.tsx`:
 
-## Fix
+```
+border-[#E5DFC6]  →  border-[#0c4d47]
+```
 
-**`src/i18n/locales/en.json`** — Add the missing `p1`, `p2`, and `p3` keys to the `about.sections.legal` object, matching the content from the other language files (translated back to English):
+### Change
 
-- **p1**: Goldsainte Inc. corporate registration info (Delaware, USA), relationship to Support Companies
-- **p2**: Contact instructions for questions about the Service or Website
-- **p3**: Disclaimer that Support Companies are not responsible parties
-
-This is a one-file fix — no component or structural changes needed.
+**`src/pages/trips/PostTripPage.tsx`** — Update the `inputCls` constant to use Goldsainte green (`#0c4d47`) for the border color instead of the current cream/gold (`#E5DFC6`). This single change applies to all text inputs, date inputs, textareas, and select fields across all 6 steps of the form.
 
