@@ -195,9 +195,12 @@ export default function AgentApplicationForm() {
         linkedinProfileUrl: formData.linkedinProfileUrl,
       };
 
-      const { data, error: applicationError } = await supabase
+      const clientId = crypto.randomUUID();
+
+      const { error: applicationError } = await supabase
         .from('agent_applications')
         .insert({
+          id: clientId,
           first_name: formData.firstName,
           last_name: formData.lastName,
           email: formData.email,
@@ -236,16 +239,14 @@ export default function AgentApplicationForm() {
           accepted_vendor: formData.acceptedVendor,
           extended_data: extendedData,
           status: 'pending_verification',
-        })
-        .select()
-        .single();
+        });
 
       if (applicationError) throw new Error(applicationError.message || 'Failed to save application');
 
-      setDraftApplicationId(data.id);
-      setApplicationId(data.id);
+      setDraftApplicationId(clientId);
+      setApplicationId(clientId);
       localStorage.setItem('agent_application_email', formData.email);
-      localStorage.setItem('agent_application_id', data.id);
+      localStorage.setItem('agent_application_id', clientId);
       setStep(5);
 
       toast({
