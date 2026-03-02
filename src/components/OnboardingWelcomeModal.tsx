@@ -18,6 +18,7 @@ export function OnboardingWelcomeModal() {
   };
 
   let subtitle = "";
+  let footerLine = "Your studio remains here whenever you return.";
 
   if (accountType === "traveler") {
     title = "Welcome to your private Goldsainte studio.";
@@ -38,6 +39,7 @@ export function OnboardingWelcomeModal() {
       "Earn from your taste, your influence, and your creative direction.",
     ];
     primaryCta = { label: "Open Your Creator Dashboard", href: "/partner" };
+    footerLine = "A space reserved for your next idea.";
   } else if (accountType === "agent") {
     title = "Welcome to the agent desk at Goldsainte";
     bullets = [
@@ -114,7 +116,7 @@ export function OnboardingWelcomeModal() {
                 <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </Link>
               <p className="text-[10px] sm:text-[11px] text-[#7A7151] leading-relaxed">
-                Your studio remains here whenever you return.
+                {footerLine}
               </p>
             </div>
           </div>
