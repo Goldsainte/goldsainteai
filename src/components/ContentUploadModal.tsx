@@ -209,8 +209,8 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
         toast.error(`${file.name} is not an image`);
         return false;
       }
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error(`${file.name} is too large (max 10MB)`);
+      if (file.size > 50 * 1024 * 1024) {
+        toast.error(`${file.name} is too large (max 50MB)`);
         return false;
       }
       return true;
