@@ -11327,6 +11327,8 @@ export type Database = {
           interests: string[] | null
           occasion: string | null
           pace: string | null
+          preferred_agent_id: string | null
+          preferred_creator_id: string | null
           selected_proposal_id: string | null
           source_brand_profile_id: string | null
           source_collection_id: string | null
@@ -11370,6 +11372,8 @@ export type Database = {
           interests?: string[] | null
           occasion?: string | null
           pace?: string | null
+          preferred_agent_id?: string | null
+          preferred_creator_id?: string | null
           selected_proposal_id?: string | null
           source_brand_profile_id?: string | null
           source_collection_id?: string | null
@@ -11413,6 +11417,8 @@ export type Database = {
           interests?: string[] | null
           occasion?: string | null
           pace?: string | null
+          preferred_agent_id?: string | null
+          preferred_creator_id?: string | null
           selected_proposal_id?: string | null
           source_brand_profile_id?: string | null
           source_collection_id?: string | null
@@ -13590,6 +13596,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      refresh_creator_stats: { Args: { p_user_id: string }; Returns: undefined }
       search_marketplace_jobs: {
         Args: {
           booking_type_filter?: string
