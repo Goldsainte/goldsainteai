@@ -1,28 +1,38 @@
 
 
-## Fix: Align Image Stack with Headline
+## Align Image Card with Pill Badge
 
-The pill badge sits above the two-column flex container (line 16–26), so both columns already share the same vertical start. The issue is the image wrapper's `relative` container with the decorative offset border (`translate-x-4 translate-y-4`) — this doesn't affect flow, so it's not the cause.
+The pill badge (line 16) sits *outside* the two-column flex container (line 29), with `mb-8 md:mb-10` spacing below it. The two columns then start together via `md:items-start`. The problem is the image card's visual top is pushed down by:
 
-The real culprit: the `mx-auto max-w-md` wrapper (line 60) centers the image block horizontally but doesn't push it up. However, the `p-3` padding and the decorative border's `translate-y-4` create visual offset. The left column's `space-y-5` starts directly with the `h1`, while the right column has a `relative` wrapper adding visual weight above.
+1. The decorative absolute border (`translate-y-4` = 16px visual offset, but doesn't affect flow)
+2. The `md:-mt-1` on the right column is only -4px — not enough
 
-**Fix in `src/components/home/HomeHero.tsx`:**
+To align the image card's top with the pill, the simplest fix is to **move the pill badge inside the two-column flex** so it spans both columns, or **pull the right column up** so the image card visually aligns with the pill.
 
-1. **Line 31** — Remove the left column's top slack so it truly starts at the same point. Currently fine since `space-y-5` only adds gaps *between* children.
+The cleanest approach: restructure so the pill sits in the same row as the two columns. Move the pill outside the flex container is already done — but the `mb-8 md:mb-10` creates a gap that only the left column's headline respects. The right column needs to start at the same point as the pill.
 
-2. **Line 59** — The right column wrapper needs no extra top margin. But the decorative border offset (`translate-y-4`) visually pushes the card down by 16px while the border itself appears shifted. To compensate and align the *visible* top edge of the image card with the headline, add a small negative top margin to the right column:
+**Actual fix — pull the right column up by the pill's margin:**
 
-```tsx
-// Line 59: add -mt-1 on md to nudge the image container up slightly
-<div className="w-full md:w-[48%] md:-mt-1">
-```
+In `src/components/home/HomeHero.tsx`, line 59:
 
-Alternatively, a cleaner approach — remove `mx-auto` from the inner wrapper since it's already constrained by the 48% column, which may be adding subtle centering offset:
+Change `md:-mt-1` to `md:-mt-[72px]` (approximately the pill height ~32px + mb-10 = 40px = 72px) to pull the image card up to align with the pill. But this is fragile.
 
-```tsx
-// Line 60: remove mx-auto, keep max-w-md
-<div className="relative max-w-md">
-```
+**Better approach — move the image column to start at the pill level:**
 
-Both are minor nudges. The `md:items-start` from the last edit is correct and should stay.
+Restructure lines 16–29 so the pill and columns share a single flex layout:
+
+1. Remove the pill from its standalone wrapper (lines 16–26)
+2. Wrap the pill + left column content together in the left column
+3. Start the right column at the same level as the pill
+
+This means the left column contains: pill → headline → description → CTAs. The right column contains: image card. Both start at the same vertical point via `md:items-start`.
+
+**File: `src/components/home/HomeHero.tsx`**
+
+- Move the pill badge (lines 16–26) inside the left column div (after line 31), making it the first child of the left column
+- Remove the standalone pill wrapper and its `mb-8 md:mb-10` margin
+- Add `mb-5` to the pill inside the left column to preserve spacing before the headline
+- Change right column from `md:-mt-1` back to no negative margin — both columns now naturally align at the top
+
+This way `md:items-start` on the parent flex aligns the pill's top edge with the image card's top edge.
 
