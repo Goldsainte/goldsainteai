@@ -34,6 +34,15 @@ export default function PostTripPage() {
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
 
+  // Determine if we should skip the intro (prefill flows)
+  const hasPrefillParams = !!(
+    searchParams.get("fromStoryboard") ||
+    searchParams.get("fromCreator") ||
+    searchParams.get("agentId") ||
+    searchParams.get("from")
+  );
+  const [showIntro, setShowIntro] = useState(!hasPrefillParams);
+
   const storyboardIdFromQuery =
     searchParams.get("fromStoryboard") ||
     (searchParams.get("from") === "storyboard" ? searchParams.get("storyboardId") : null);
@@ -420,6 +429,83 @@ export default function PostTripPage() {
   const budgetLabels: [BudgetLevel, string][] = [["accessible", "Thoughtful"], ["elevated", "Elevated"], ["ultra_luxury", "Ultra-luxury"]];
   const paceLabels: [Pace, string][] = [["slow", "Slow & leisurely"], ["balanced", "Balanced"], ["packed", "See everything"]];
   const roleLabels: [WantsRole, string][] = [["creator", "Creators only"], ["agent", "Travel agents only"], ["both", "Creators & agents"]];
+
+  const introSteps = [
+    { num: 1, title: "Where you're going", desc: "Destination & dates" },
+    { num: 2, title: "Who's coming along", desc: "Travelers & budget" },
+    { num: 3, title: "Set the mood", desc: "Style & pace" },
+    { num: 4, title: "Build your brief", desc: "Photos & inspiration" },
+    { num: 5, title: "Final details", desc: "Notes & preferences" },
+    { num: 6, title: "Review & post", desc: "Confirm & submit" },
+  ];
+
+  if (showIntro) {
+    return (
+      <div className="flex-1 bg-[#f7f3ea] text-[#0a2225] min-h-screen">
+        {/* Back button */}
+        <div className="mx-auto max-w-4xl px-6 pt-8">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#0a2225] transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </button>
+        </div>
+
+        {/* Two-column layout */}
+        <div className="mx-auto max-w-4xl px-6 pt-12 pb-20 flex flex-col md:flex-row gap-12 md:gap-20 items-start">
+          {/* Left: Heading */}
+          <div className="flex-1 md:sticky md:top-24">
+            <h1 className="font-secondary text-4xl md:text-5xl leading-tight text-[#0a2225]">
+              Six easy steps
+              <br />
+              to posting your
+              <br />
+              dream trip on
+              <br />
+              <span className="text-[#0c4d47]">Goldsainte AI</span>
+            </h1>
+          </div>
+
+          {/* Right: Steps list */}
+          <div className="flex-1 w-full">
+            <div className="space-y-0">
+              {introSteps.map((step, idx) => (
+                <div key={step.num}>
+                  <div className="flex items-start gap-5 py-5">
+                    <span className="font-secondary text-2xl font-semibold text-[#0c4d47] w-8 shrink-0">
+                      {step.num}
+                    </span>
+                    <div>
+                      <p className="font-secondary text-lg font-semibold text-[#0a2225]">
+                        {step.title}
+                      </p>
+                      <p className="text-sm text-[#6B7280] mt-0.5">
+                        {step.desc}
+                      </p>
+                    </div>
+                  </div>
+                  {idx < introSteps.length - 1 && (
+                    <div className="border-b border-[#E5DFC6]" />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* CTA */}
+            <button
+              onClick={() => setShowIntro(false)}
+              className="mt-10 w-full md:w-auto px-10 py-3.5 rounded-full bg-[#C7A962] text-white font-semibold text-base hover:bg-[#BFAD72] transition-colors flex items-center justify-center gap-2"
+            >
+              Get Started
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
