@@ -12,23 +12,23 @@ export function HomeHero() {
   return (
     <section className="bg-[#f7f3ea] text-[#0a2225]">
       <div className="mx-auto max-w-6xl px-4 pb-8 pt-12 md:pt-16 lg:pt-20 md:pb-12">
-        {/* Centered Pill Badge */}
-        <div className="flex justify-center md:justify-start mb-8 md:mb-10">
-          <div className="inline-flex items-center gap-1 md:gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-2.5 md:px-3 py-1.5 text-[11px] md:text-sm font-medium uppercase tracking-[0.08em] md:tracking-[0.12em] text-[#073331] whitespace-nowrap">
-            <span>{t('common.travelers')}</span>
-            <span className="h-[1px] w-2 md:w-4 bg-[#073331]/30" />
-            <span>{t('common.creators')}</span>
-            <span className="h-[1px] w-2 md:w-4 bg-[#073331]/30" />
-            <span>{t('common.agents')}</span>
-            <span className="h-[1px] w-2 md:w-4 bg-[#073331]/30" />
-            <span>{t('common.brands')}</span>
-          </div>
-        </div>
-
         {/* Two Column Layout */}
         <div className="flex flex-col gap-10 md:flex-row md:items-start">
           {/* LEFT: Copy & CTAs */}
           <div className="w-full md:w-[52%] space-y-5">
+            {/* Pill Badge */}
+            <div className="flex justify-center md:justify-start mb-0">
+              <div className="inline-flex items-center gap-1 md:gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-2.5 md:px-3 py-1.5 text-[11px] md:text-sm font-medium uppercase tracking-[0.08em] md:tracking-[0.12em] text-[#073331] whitespace-nowrap">
+                <span>{t('common.travelers')}</span>
+                <span className="h-[1px] w-2 md:w-4 bg-[#073331]/30" />
+                <span>{t('common.creators')}</span>
+                <span className="h-[1px] w-2 md:w-4 bg-[#073331]/30" />
+                <span>{t('common.agents')}</span>
+                <span className="h-[1px] w-2 md:w-4 bg-[#073331]/30" />
+                <span>{t('common.brands')}</span>
+              </div>
+            </div>
+
             <h1 className="font-display text-3xl leading-snug md:text-4xl lg:text-[42px]">
             Turn Your Travel Vision Into a <em>Storyboard</em> — Then Let{" "}
             <em>Creators & Agents</em> Compete to Bring It to Life.
@@ -56,7 +56,7 @@ export function HomeHero() {
         </div>
 
         {/* RIGHT: Luxury visual stack */}
-        <div className="w-full md:w-[48%] md:-mt-1">
+        <div className="w-full md:w-[48%]">
           <div className="relative max-w-md">
             {/* soft frame */}
             <div className="absolute inset-0 translate-x-4 translate-y-4 rounded-[32px] border border-[#E5DFC6]/80" />
