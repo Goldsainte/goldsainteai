@@ -1,36 +1,31 @@
 
 
-## Above-the-Fold Hero: Viewport-Constrained Layout
+## Tighten Copy-to-CTA Spacing
 
-Header is `h-16 md:h-14` (56px on desktop). The hero needs to fill exactly the remaining viewport.
+In `src/components/home/HomeHero.tsx`:
 
-### Changes in `src/components/home/HomeHero.tsx`
+- Change CTA wrapper from `mt-8` (32px) → `mt-8` is already 32px, which matches the request. Looking at the current code, the CTA block uses `mt-8` but it's outside the top `<div>` group (it's a sibling via `justify-between`), so the `mt-8` only applies on mobile when flex doesn't stretch.
 
-**1. Section: viewport height constraint**
-- Add `md:min-h-[calc(100vh-56px)] md:max-h-[calc(100vh-56px)]` to the `<section>`
-- Change padding from `py-16 md:py-24` → `py-10 md:py-12` (48px top/bottom)
+The real issue: the CTAs are pushed to the bottom by `justify-between`, creating a large gap. To get exactly 32px between paragraph and CTAs, move the CTA block **inside** the top content group and remove `justify-between`:
 
-**2. Inner container: fill available height**
-- Add `md:h-full` to the `max-w-6xl` wrapper so the grid can stretch vertically within the viewport
+1. Move the CTA `<div>` inside the top `<div>` wrapper (after the paragraph)
+2. Change left column from `justify-between` to `justify-start` (or just remove `justify-between`)
+3. Set CTA wrapper to `mt-8` (32px) — already set, just confirm
 
-**3. Grid: fill height**
-- Add `md:h-full` to the grid container so both columns stretch to fill
+Wait — this would break the bottom-alignment with the image card. The user specifically wants 32px gap but also wants the buttons anchored to the bottom from the previous plan.
 
-**4. Headline: tighter line-height**
-- Change `leading-snug` → `leading-tight` (~1.1 line-height)
-- Reduce desktop size: `lg:text-[42px]` → `lg:text-[38px]`
+Better approach: keep `justify-between` but wrap paragraph + CTAs together so they stay connected, while the pill stays at top and the paragraph+CTA group anchors to bottom.
 
-**5. CTA block: tighter spacing**
-- Change `gap-4 mt-12` → `gap-3 mt-8` (12px between buttons, 32px above block)
-- Reduce button padding: `py-3` → `py-2.5` on both buttons
+**Changes in `src/components/home/HomeHero.tsx`:**
 
-**6. Right image card: max-height constraint**
-- Add `md:max-h-[calc(100vh-56px-96px)]` to the right column wrapper so the card never pushes below fold
-- Images already use `h-full w-full object-cover` — no change needed
+1. Restructure left column into two groups inside the `justify-between` flex:
+   - **Top group**: pill badge only
+   - **Bottom group**: headline + paragraph + CTAs (connected as one block)
+2. Move headline and paragraph out of the current top `<div>` into a bottom `<div>` along with CTAs
+3. Headline: `mt-0` (spacing from pill handled by `justify-between`)
+4. Paragraph: `mt-8` (32px below headline)  
+5. CTA block: `mt-8` (32px below paragraph — the "handoff")
+6. Keep `gap-3` (12px) between the two buttons
 
-**7. Caption card: slightly tighter**
-- Change `mt-3 py-3` → `mt-2 py-2` to save ~8px
-
-### Result
-The entire hero — pill, headline, copy, both CTAs, full image card with caption — fits within the viewport on standard laptops (1366×768, 1440×900, 1920×1080) without scrolling.
+This way `justify-between` pushes pill to top and the headline+copy+CTA block to bottom, but within that bottom block, spacing is tight and connected.
 
