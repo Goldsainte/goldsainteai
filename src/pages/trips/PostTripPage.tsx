@@ -570,7 +570,7 @@ export default function PostTripPage() {
               Create my trip
               <ArrowRight className="h-4 w-4" />
             </button>
-            <p className="text-xs text-[#6B7280] mt-3 text-center" style={fadeUp(1200)}>
+            <p className="text-xs text-[#6B7280] mt-3 text-center md:text-left" style={fadeUp(1200)}>
               Free to submit. No commitment until you choose a proposal.
             </p>
           </div>
