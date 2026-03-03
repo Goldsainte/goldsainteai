@@ -1,31 +1,29 @@
 
 
-## Tighten Copy-to-CTA Spacing
+## Fix Left Column: Remove space-between, Use mt-auto for CTAs
 
-In `src/components/home/HomeHero.tsx`:
+### Problem
+`justify-between` on the left column distributes space evenly, creating an oversized gap between the pill and headline. The user wants fixed spacing at the top and `margin-top: auto` on the CTA group to push it to the bottom.
 
-- Change CTA wrapper from `mt-8` (32px) → `mt-8` is already 32px, which matches the request. Looking at the current code, the CTA block uses `mt-8` but it's outside the top `<div>` group (it's a sibling via `justify-between`), so the `mt-8` only applies on mobile when flex doesn't stretch.
+### Changes in `src/components/home/HomeHero.tsx`
 
-The real issue: the CTAs are pushed to the bottom by `justify-between`, creating a large gap. To get exactly 32px between paragraph and CTAs, move the CTA block **inside** the top content group and remove `justify-between`:
+**Left column container (currently line 18):**
+- Change `flex flex-col justify-between` → `flex flex-col`
 
-1. Move the CTA `<div>` inside the top `<div>` wrapper (after the paragraph)
-2. Change left column from `justify-between` to `justify-start` (or just remove `justify-between`)
-3. Set CTA wrapper to `mt-8` (32px) — already set, just confirm
+**Top group: pill + headline + copy (lines 20–42):**
+- Wrap pill, headline, and paragraph in a single `<div>`
+- Pill: no extra margin
+- Headline: `mt-6` (24px below pill)
+- Paragraph: `mt-6` (24px below headline)
 
-Wait — this would break the bottom-alignment with the image card. The user specifically wants 32px gap but also wants the buttons anchored to the bottom from the previous plan.
+**Bottom group: CTA buttons (lines 44–55):**
+- Add `mt-auto` to the CTA wrapper (pushes to bottom without stretching the top)
+- Keep `mt-8` as fallback spacing on mobile (when column doesn't stretch)
+- Keep `gap-3` between buttons
 
-Better approach: keep `justify-between` but wrap paragraph + CTAs together so they stay connected, while the pill stays at top and the paragraph+CTA group anchors to bottom.
-
-**Changes in `src/components/home/HomeHero.tsx`:**
-
-1. Restructure left column into two groups inside the `justify-between` flex:
-   - **Top group**: pill badge only
-   - **Bottom group**: headline + paragraph + CTAs (connected as one block)
-2. Move headline and paragraph out of the current top `<div>` into a bottom `<div>` along with CTAs
-3. Headline: `mt-0` (spacing from pill handled by `justify-between`)
-4. Paragraph: `mt-8` (32px below headline)  
-5. CTA block: `mt-8` (32px below paragraph — the "handoff")
-6. Keep `gap-3` (12px) between the two buttons
-
-This way `justify-between` pushes pill to top and the headline+copy+CTA block to bottom, but within that bottom block, spacing is tight and connected.
+### Result
+- Pill→headline: fixed 24px (never stretches)
+- Headline→copy: fixed 24px
+- Copy→CTAs: flexible — CTAs pushed to bottom via `mt-auto`
+- Pill aligns with image card top, CTAs align with image card bottom
 
