@@ -15,10 +15,8 @@ export function HomeHero() {
         {/* Two Column Grid — stretch forces equal height */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-stretch md:h-full">
           {/* LEFT: Copy & CTAs — space-between anchors pill top, CTA bottom */}
-          <div className="flex flex-col justify-between">
-            {/* Top group */}
-            <div>
-              {/* Pill Badge — anchors to top */}
+          <div className="flex flex-col">
+              {/* Pill Badge */}
               <div className="flex justify-center md:justify-start">
                 <div className="inline-flex items-center gap-1 md:gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-2.5 md:px-3 py-1.5 text-[11px] md:text-sm font-medium uppercase tracking-[0.08em] md:tracking-[0.12em] text-[#073331] whitespace-nowrap">
                   <span>{t('common.travelers')}</span>
@@ -41,9 +39,8 @@ export function HomeHero() {
               <p className="mt-8 max-w-xl text-sm md:text-base leading-relaxed text-[#4a4a4a] whitespace-pre-line">
                 {t('home.hero.mainDescription')}
               </p>
-            </div>
 
-            {/* CTAs — 48px above, anchors to bottom via space-between */}
+            {/* CTAs — fixed 32px below copy */}
             <div className="flex flex-col gap-3 mt-8 max-w-sm">
               <Link
                 to="/post-trip"
