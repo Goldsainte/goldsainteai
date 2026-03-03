@@ -75,7 +75,7 @@ export function useWelcomeModal() {
         const localStorageSeen = localStorage.getItem(WELCOME_MODAL_STORAGE_KEY);
         const hasSeenWelcome = profile.welcome_shown || localStorageSeen === "true";
 
-        if (!hasSeenWelcome) {
+        if (!hasSeenWelcome && profile.account_type === 'creator') {
           setOpen(true);
         }
         setLoading(false);
