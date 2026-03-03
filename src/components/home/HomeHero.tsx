@@ -15,9 +15,10 @@ export function HomeHero() {
         {/* Two Column Grid — stretch forces equal height */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-stretch md:h-full">
           {/* LEFT: Copy & CTAs — space-between anchors pill top, CTA bottom */}
-          <div className="flex flex-col">
-            {/* Top group: pill + headline + copy — fixed spacing */}
+          <div className="flex flex-col justify-between">
+            {/* Top group */}
             <div>
+              {/* Pill Badge — anchors to top */}
               <div className="flex justify-center md:justify-start">
                 <div className="inline-flex items-center gap-1 md:gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-2.5 md:px-3 py-1.5 text-[11px] md:text-sm font-medium uppercase tracking-[0.08em] md:tracking-[0.12em] text-[#073331] whitespace-nowrap">
                   <span>{t('common.travelers')}</span>
@@ -30,18 +31,20 @@ export function HomeHero() {
                 </div>
               </div>
 
-              <h1 className="mt-6 font-display text-3xl leading-[1.08] md:text-5xl lg:text-[66px]">
+              {/* Headline — 40px below pill */}
+              <h1 className="mt-10 font-display text-3xl leading-tight md:text-4xl lg:text-[38px]">
                 Turn Your Travel Vision Into a <em>Storyboard</em> — Then Let{" "}
                 <em>Creators & Agents</em> Compete to Bring It to Life.
               </h1>
 
-              <p className="mt-6 max-w-xl text-sm md:text-base leading-relaxed text-[#4a4a4a] whitespace-pre-line">
+              {/* Description — 32px below headline */}
+              <p className="mt-8 max-w-xl text-sm md:text-base leading-relaxed text-[#4a4a4a] whitespace-pre-line">
                 {t('home.hero.mainDescription')}
               </p>
             </div>
 
-            {/* Bottom group: CTAs — pushed to bottom via mt-auto */}
-            <div className="flex flex-col gap-3 mt-auto pt-8 max-w-sm">
+            {/* CTAs — 48px above, anchors to bottom via space-between */}
+            <div className="flex flex-col gap-3 mt-8 max-w-sm">
               <Link
                 to="/post-trip"
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-6 py-2.5 text-sm font-semibold text-[#E5DFC6] shadow-sm hover:bg-[#073331] w-full"
