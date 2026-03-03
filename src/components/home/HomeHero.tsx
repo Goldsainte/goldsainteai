@@ -10,10 +10,10 @@ export function HomeHero() {
   const { t } = useTranslation();
 
   return (
-    <section className="bg-[#f7f3ea] text-[#0a2225]">
-      <div className="mx-auto max-w-6xl px-4 py-16 md:py-24">
+    <section className="bg-[#f7f3ea] text-[#0a2225] md:min-h-[calc(100vh-56px)] md:max-h-[calc(100vh-56px)]">
+      <div className="mx-auto max-w-6xl px-4 py-10 md:py-12 md:h-full">
         {/* Two Column Grid — stretch forces equal height */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-stretch md:h-full">
           {/* LEFT: Copy & CTAs — space-between anchors pill top, CTA bottom */}
           <div className="flex flex-col justify-between">
             {/* Top group */}
@@ -32,7 +32,7 @@ export function HomeHero() {
               </div>
 
               {/* Headline — 40px below pill */}
-              <h1 className="mt-10 font-display text-3xl leading-snug md:text-4xl lg:text-[42px]">
+              <h1 className="mt-10 font-display text-3xl leading-tight md:text-4xl lg:text-[38px]">
                 Turn Your Travel Vision Into a <em>Storyboard</em> — Then Let{" "}
                 <em>Creators & Agents</em> Compete to Bring It to Life.
               </h1>
@@ -44,16 +44,16 @@ export function HomeHero() {
             </div>
 
             {/* CTAs — 48px above, anchors to bottom via space-between */}
-            <div className="flex flex-col gap-4 mt-12 max-w-sm">
+            <div className="flex flex-col gap-3 mt-8 max-w-sm">
               <Link
                 to="/post-trip"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-6 py-3 text-sm font-semibold text-[#E5DFC6] shadow-sm hover:bg-[#073331] w-full"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-6 py-2.5 text-sm font-semibold text-[#E5DFC6] shadow-sm hover:bg-[#073331] w-full"
               >
                 {t('home.hero.postDreamTrip')}
               </Link>
               <a
                 href="#how-it-works"
-                className="inline-flex items-center justify-center rounded-full border border-[#BFAD72] bg-white px-6 py-3 text-sm font-semibold text-[#0a2225] transition-all hover:bg-[#BFAD72] hover:text-white w-full"
+                className="inline-flex items-center justify-center rounded-full border border-[#BFAD72] bg-white px-6 py-2.5 text-sm font-semibold text-[#0a2225] transition-all hover:bg-[#BFAD72] hover:text-white w-full"
               >
                 {t('home.hero.seeHowItWorks')}
               </a>
@@ -61,7 +61,7 @@ export function HomeHero() {
           </div>
 
           {/* RIGHT: Luxury visual stack — h-full stretches to match left */}
-          <div className="h-full">
+          <div className="h-full md:max-h-[calc(100vh-56px-96px)]">
             <div className="relative h-full">
               {/* soft frame */}
               <div className="absolute inset-0 translate-x-4 translate-y-4 rounded-[32px] border border-[#E5DFC6]/80" />
@@ -103,7 +103,7 @@ export function HomeHero() {
                 </div>
 
                 {/* Caption card */}
-                <div className="mt-3 rounded-2xl bg-[#0c4d47] px-4 py-3 text-sm text-[#E5DFC6]">
+                <div className="mt-2 rounded-2xl bg-[#0c4d47] px-4 py-2 text-sm text-[#E5DFC6]">
                   <p className="font-semibold mb-1">
                     {t('home.hero.storyboardCaption')}
                   </p>
