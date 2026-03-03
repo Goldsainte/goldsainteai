@@ -30,7 +30,7 @@ export function HomeHero() {
                 </div>
               </div>
 
-              <h1 className="mt-6 font-display text-3xl leading-tight md:text-4xl lg:text-[38px]">
+              <h1 className="mt-6 font-display text-3xl leading-[1.08] md:text-5xl lg:text-[66px]">
                 Turn Your Travel Vision Into a <em>Storyboard</em> — Then Let{" "}
                 <em>Creators & Agents</em> Compete to Bring It to Life.
               </h1>
