@@ -1,44 +1,36 @@
 
 
-## Hero Layout: Grid + Stretch + Space-Between
+## Above-the-Fold Hero: Viewport-Constrained Layout
 
-### Problem
-The left column is auto-height with inconsistent spacing. The right image card is taller, creating visual imbalance. Random margin tweaks can't fix structural misalignment.
+Header is `h-16 md:h-14` (56px on desktop). The hero needs to fill exactly the remaining viewport.
 
 ### Changes in `src/components/home/HomeHero.tsx`
 
-**1. Section container padding** (line 14)
-- Change `pb-8 pt-12 md:pt-16 lg:pt-20 md:pb-12` → `py-16 md:py-24` (96px top/bottom on desktop)
+**1. Section: viewport height constraint**
+- Add `md:min-h-[calc(100vh-56px)] md:max-h-[calc(100vh-56px)]` to the `<section>`
+- Change padding from `py-16 md:py-24` → `py-10 md:py-12` (48px top/bottom)
 
-**2. Two-column layout → CSS Grid with stretch** (line 16)
-- Replace `flex flex-col gap-10 md:flex-row md:items-start`
-- With `grid grid-cols-1 md:grid-cols-2 gap-10 items-stretch`
-- This forces both columns to equal height
+**2. Inner container: fill available height**
+- Add `md:h-full` to the `max-w-6xl` wrapper so the grid can stretch vertically within the viewport
 
-**3. Left column → flex column with space-between** (line 18)
-- Replace `w-full md:w-[52%] space-y-6`
-- With `flex flex-col justify-between`
-- Remove all `space-y-*`, `mb-*`, `pt-*` from children — use explicit spacing instead
+**3. Grid: fill height**
+- Add `md:h-full` to the grid container so both columns stretch to fill
 
-**4. Explicit spacing on left column children:**
-- Pill badge wrapper: no extra margin (anchors to top)
-- Below pill → headline: `mt-10` (40px)
-- Below headline → paragraph: `mt-8` (32px)
-- Below paragraph → CTA wrapper: `mt-12` (48px)
-- Between CTAs: `gap-4` (16px) — already close, change from `gap-3`
+**4. Headline: tighter line-height**
+- Change `leading-snug` → `leading-tight` (~1.1 line-height)
+- Reduce desktop size: `lg:text-[42px]` → `lg:text-[38px]`
 
-**5. Right column** (line 59)
-- Remove `w-full md:w-[48%]` (grid handles width now)
-- The image card naturally fills the column height via stretch
-- Remove the decorative offset border's `translate-y-4` influence by keeping it as-is (absolute positioned, doesn't affect flow)
+**5. CTA block: tighter spacing**
+- Change `gap-4 mt-12` → `gap-3 mt-8` (12px between buttons, 32px above block)
+- Reduce button padding: `py-3` → `py-2.5` on both buttons
 
-**6. Image card container**
-- Add `h-full` to the right column wrapper so it stretches
-- Add `h-full flex flex-col` to the inner card wrapper so the image grid fills available space
+**6. Right image card: max-height constraint**
+- Add `md:max-h-[calc(100vh-56px-96px)]` to the right column wrapper so the card never pushes below fold
+- Images already use `h-full w-full object-cover` — no change needed
+
+**7. Caption card: slightly tighter**
+- Change `mt-3 py-3` → `mt-2 py-2` to save ~8px
 
 ### Result
-- Pill top-aligns with image card top (both anchored to grid row top)
-- CTA bottom-aligns with image card bottom (space-between + stretch)
-- Consistent 8pt spacing scale throughout
-- Mobile: stacks vertically as before (single column grid)
+The entire hero — pill, headline, copy, both CTAs, full image card with caption — fits within the viewport on standard laptops (1366×768, 1440×900, 1920×1080) without scrolling.
 
