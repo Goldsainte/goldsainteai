@@ -26,7 +26,7 @@ export function HomeHero() {
         </div>
 
         {/* Two Column Layout */}
-        <div className="flex flex-col gap-10 md:flex-row md:items-center">
+        <div className="flex flex-col gap-10 md:flex-row md:items-start">
           {/* LEFT: Copy & CTAs */}
           <div className="w-full md:w-[52%] space-y-5">
             <h1 className="font-display text-3xl leading-snug md:text-4xl lg:text-[42px]">
