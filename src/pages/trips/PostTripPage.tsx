@@ -1,4 +1,12 @@
 // src/pages/trips/PostTripPage.tsx
+import {
+  DestinationVignette,
+  TravelersVignette,
+  StyleVignette,
+  StoryboardVignette,
+  PricingVignette,
+  ReviewVignette,
+} from "@/components/trips/StepVignettes";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { ArrowLeft, ArrowRight, X, Sparkles, ChevronDown, ChevronUp, Check } from "lucide-react";
@@ -439,6 +447,17 @@ export default function PostTripPage() {
     { num: 6, title: "Review & post" },
   ];
 
+  const [hoveredStep, setHoveredStep] = useState<number | null>(null);
+
+  const stepVignettes: Record<number, React.ReactNode> = {
+    1: <DestinationVignette />,
+    2: <TravelersVignette />,
+    3: <StyleVignette />,
+    4: <StoryboardVignette />,
+    5: <PricingVignette />,
+    6: <ReviewVignette />,
+  };
+
   if (showIntro) {
     const fadeUp = (delayMs: number) => ({
       opacity: 0 as number,
@@ -501,14 +520,30 @@ export default function PostTripPage() {
           <div className="flex-1 w-full">
             <div className="space-y-0">
               {introSteps.map((step, idx) => (
-                <div key={step.num} style={fadeUp(300 + idx * 100)}>
+                <div
+                  key={step.num}
+                  style={fadeUp(300 + idx * 100)}
+                  onMouseEnter={() => setHoveredStep(step.num)}
+                  onMouseLeave={() => setHoveredStep(null)}
+                  className="group cursor-default"
+                >
                   <div className="flex items-center gap-5 py-6">
                     <span className="font-secondary text-2xl text-[#0c4d47] w-8 shrink-0">
                       {step.num}
                     </span>
-                    <p className="font-secondary text-lg font-semibold text-[#0a2225]">
+                    <p className="font-secondary text-lg font-semibold text-[#0a2225] flex-1">
                       {step.title}
                     </p>
+                    {/* Vignette slot */}
+                    <div
+                      className="hidden md:flex w-20 justify-center transition-all duration-200"
+                      style={{
+                        opacity: hoveredStep === step.num ? 1 : 0,
+                        transform: hoveredStep === step.num ? 'scale(1)' : 'scale(0.8)',
+                      }}
+                    >
+                      {hoveredStep === step.num && stepVignettes[step.num]}
+                    </div>
                   </div>
                   {idx < introSteps.length - 1 && (
                     <div className="border-b border-[#E5DFC6]" />
