@@ -504,9 +504,9 @@ export default function PostTripPage() {
               className="font-secondary text-4xl md:text-5xl leading-tight text-[#0a2225]"
               style={fadeUp(0)}
             >
-              Turn your idea into a
+              Tell us about your dream trip —
               <br />
-              <span className="text-[#0c4d47]">bookable experience.</span>
+              <span className="text-[#0c4d47]">creators and agents will build it for you.</span>
             </h1>
             <p
               className="mt-4 text-base text-[#6B7280] leading-relaxed"
