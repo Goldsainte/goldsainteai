@@ -1,20 +1,26 @@
 
 
-## Update Headline & Subline Copy
+## Fix: Restrict Welcome Modal to Creator Accounts Only
 
-**File: `src/pages/trips/PostTripPage.tsx`**
+**Problem**: `useWelcomeModal` triggers for all authenticated users (traveler, creator, agent) who haven't dismissed it yet. It should only appear for **creator** accounts after they first create their account.
 
-**1. Headline (lines 507–509)** — Update to:
-```
-Tell us about your dream trip —
-our marketplace of verified creators and travel agents will build it for you.
-```
-The green accent span wraps "our marketplace of verified creators and travel agents will build it for you."
+**File: `src/hooks/useWelcomeModal.ts`** — line 78
 
-**2. Subline (line 515)** — Replace current guide copy with:
-```
-Once you submit your trip, verified creators and travel agents will review it and send proposals.
+Add an account type guard so the modal only opens for creators:
+
+```typescript
+// Current (shows for everyone):
+if (!hasSeenWelcome) {
+  setOpen(true);
+}
+
+// Fixed (creators only):
+if (!hasSeenWelcome && profile.account_type === 'creator') {
+  setOpen(true);
+}
 ```
 
-Two copy-only edits, no layout or animation changes.
+This is a single-line change. The `OnboardingWelcomeModal` component already has role-specific content branches, but the hook itself never filters by role — that's the root cause.
+
+Travelers and agents will no longer see any version of this modal.
 
