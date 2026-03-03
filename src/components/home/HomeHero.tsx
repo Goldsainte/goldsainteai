@@ -56,8 +56,8 @@ export function HomeHero() {
         </div>
 
         {/* RIGHT: Luxury visual stack */}
-        <div className="w-full md:w-[48%]">
-          <div className="relative mx-auto max-w-md">
+        <div className="w-full md:w-[48%] md:-mt-1">
+          <div className="relative max-w-md">
             {/* soft frame */}
             <div className="absolute inset-0 translate-x-4 translate-y-4 rounded-[32px] border border-[#E5DFC6]/80" />
             <div className="relative overflow-hidden rounded-[32px] bg-white/90 p-3 shadow-[0_18px_40px_rgba(10,34,37,0.18)]">
