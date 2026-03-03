@@ -506,13 +506,13 @@ export default function PostTripPage() {
             >
               Tell us about your dream trip —
               <br />
-              <span className="text-[#0c4d47]">creators and agents will build it for you.</span>
+              <span className="text-[#0c4d47]">our marketplace of verified creators and travel agents will build it for you.</span>
             </h1>
             <p
               className="mt-4 text-base text-[#6B7280] leading-relaxed"
               style={fadeUp(200)}
             >
-              We'll guide you through it — most trips go live in under 10 minutes.
+              Once you submit your trip, verified creators and travel agents will review it and send proposals.
             </p>
           </div>
 
