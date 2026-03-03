@@ -1,22 +1,16 @@
 
 
-## Update Intro Screen Headline Copy
+## Add Reassurance Line Near CTA
 
-**File: `src/pages/trips/PostTripPage.tsx`** — lines 507–509
+**File: `src/pages/trips/PostTripPage.tsx`** — after line 574 (after the CTA button closing tag)
 
-Replace the current headline:
-```
-Turn your idea into a
-bookable experience.
-```
+Insert a new `<p>` element with the reassurance copy:
 
-With:
 ```
-Tell us about your dream trip —
-creators and agents will build it for you.
+Free to submit. No commitment until you choose a proposal.
 ```
 
-The green accent span moves to wrap "creators and agents will build it for you."
+Style: `text-xs text-[#6B7280] mt-3 text-center`, with `fadeUp(1200)` to animate in after the CTA.
 
-Single edit, copy-only change.
+Single addition, no other changes.
 
