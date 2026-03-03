@@ -15,9 +15,9 @@ export function HomeHero() {
         {/* Two Column Layout */}
         <div className="flex flex-col gap-10 md:flex-row md:items-start">
           {/* LEFT: Copy & CTAs */}
-          <div className="w-full md:w-[52%] space-y-5">
+          <div className="w-full md:w-[52%] space-y-6">
             {/* Pill Badge */}
-            <div className="flex justify-center md:justify-start mb-0">
+            <div className="flex justify-center md:justify-start mb-3">
               <div className="inline-flex items-center gap-1 md:gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-2.5 md:px-3 py-1.5 text-[11px] md:text-sm font-medium uppercase tracking-[0.08em] md:tracking-[0.12em] text-[#073331] whitespace-nowrap">
                 <span>{t('common.travelers')}</span>
                 <span className="h-[1px] w-2 md:w-4 bg-[#073331]/30" />
@@ -39,7 +39,7 @@ export function HomeHero() {
           </p>
 
           {/* Primary CTAs */}
-          <div className="flex flex-col gap-3 pt-1 max-w-sm">
+          <div className="flex flex-col gap-3 pt-3 max-w-sm">
             <Link
               to="/post-trip"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-6 py-3 text-sm font-semibold text-[#E5DFC6] shadow-sm hover:bg-[#073331] w-full"
