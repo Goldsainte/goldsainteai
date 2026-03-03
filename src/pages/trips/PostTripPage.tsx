@@ -440,10 +440,34 @@ export default function PostTripPage() {
   ];
 
   if (showIntro) {
+    const fadeUp = (delayMs: number) => ({
+      opacity: 0 as number,
+      animation: `fade-up 0.6s ease-out ${delayMs}ms forwards`,
+    });
+
     return (
-      <div className="flex-1 bg-[#f7f3ea] text-[#0a2225] min-h-screen">
+      <div className="flex-1 bg-[#f7f3ea] text-[#0a2225] min-h-screen relative overflow-hidden">
+        {/* Soft background shimmer */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse 80% 60% at 30% 40%, rgba(199,169,98,0.06) 0%, transparent 70%)',
+            animation: 'shimmer-bg 8s ease-in-out infinite alternate',
+          }}
+        />
+        <style>{`
+          @keyframes shimmer-bg {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(5%, 3%) scale(1.05); }
+          }
+          @keyframes glow-cta {
+            0%, 100% { box-shadow: 0 0 12px rgba(199,169,98,0.25); }
+            50% { box-shadow: 0 0 24px rgba(199,169,98,0.45); }
+          }
+        `}</style>
+
         {/* Back button */}
-        <div className="mx-auto max-w-4xl px-6 pt-8">
+        <div className="relative mx-auto max-w-4xl px-6 pt-8">
           <button
             onClick={() => navigate(-1)}
             className="flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#0a2225] transition-colors"
@@ -454,15 +478,21 @@ export default function PostTripPage() {
         </div>
 
         {/* Two-column layout */}
-        <div className="mx-auto max-w-4xl px-6 pt-12 pb-20 flex flex-col md:flex-row gap-12 md:gap-20 items-center">
+        <div className="relative mx-auto max-w-4xl px-6 pt-12 pb-20 flex flex-col md:flex-row gap-12 md:gap-20 items-center">
           {/* Left: Heading */}
           <div className="flex-1 md:sticky md:top-24">
-            <h1 className="font-secondary text-4xl md:text-5xl leading-tight text-[#0a2225]">
+            <h1
+              className="font-secondary text-4xl md:text-5xl leading-tight text-[#0a2225]"
+              style={fadeUp(0)}
+            >
               Turn your idea into a
               <br />
               <span className="text-[#0c4d47]">bookable experience.</span>
             </h1>
-            <p className="mt-4 text-base text-[#6B7280] leading-relaxed">
+            <p
+              className="mt-4 text-base text-[#6B7280] leading-relaxed"
+              style={fadeUp(200)}
+            >
               We'll guide you through it — most trips go live in under 10 minutes.
             </p>
           </div>
@@ -471,7 +501,7 @@ export default function PostTripPage() {
           <div className="flex-1 w-full">
             <div className="space-y-0">
               {introSteps.map((step, idx) => (
-                <div key={step.num}>
+                <div key={step.num} style={fadeUp(300 + idx * 100)}>
                   <div className="flex items-center gap-5 py-6">
                     <span className="font-secondary text-2xl text-[#0c4d47] w-8 shrink-0">
                       {step.num}
@@ -488,7 +518,10 @@ export default function PostTripPage() {
             </div>
 
             {/* Reassurance */}
-            <p className="mt-6 text-sm text-[#6B7280] italic">
+            <p
+              className="mt-6 text-sm text-[#6B7280] italic"
+              style={fadeUp(1000)}
+            >
               You can edit everything later — nothing is final until you say so.
             </p>
 
@@ -496,6 +529,10 @@ export default function PostTripPage() {
             <button
               onClick={() => setShowIntro(false)}
               className="mt-8 w-full md:w-auto px-10 py-3.5 rounded-full bg-[#C7A962] text-white font-semibold text-base hover:bg-[#BFAD72] transition-colors flex items-center justify-center gap-2"
+              style={{
+                opacity: 0,
+                animation: 'fade-up 0.6s ease-out 1100ms forwards, glow-cta 2.5s ease-in-out 1700ms infinite',
+              }}
             >
               Create my trip
               <ArrowRight className="h-4 w-4" />
