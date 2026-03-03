@@ -1,37 +1,40 @@
 
 
-## Add Micro-Motion to Intro Screen
+## Animated Progress Tease — Hover Previews for Each Step
 
-**File: `src/pages/trips/PostTripPage.tsx`** — lines 442–506
+This is a strong idea. Each step reveals a small visual vignette on hover, turning the list from static text into an interactive preview of what's coming. It creates curiosity and makes the screen feel like a product, not a form.
 
-### Animations to add (all CSS-driven via inline styles, no new dependencies)
+### Proposed visual for each step
 
-**1. Headline slides up + fades in** (0ms delay)
-- `opacity: 0 → 1`, `translateY(20px) → 0` over 600ms ease-out
+| Step | Hover Visual | Implementation |
+|------|-------------|----------------|
+| 1. Choose your destination | Animated globe/pin icon that pulses + a subtle dotted arc path | SVG with CSS animation |
+| 2. Add traveler details | Two-three small avatar circles that slide in and overlap | Styled divs with staggered slide-in |
+| 3. Set the style & pace | Color palette swatches that fan out like cards | Small colored rectangles with rotate transform |
+| 4. Create your storyboard | Mini polaroid-style image stack that shuffles | 3 layered divs with rotation + shadow |
+| 5. Set pricing & dates | Mini calendar grid with a price tag that fades in | Simple CSS grid + badge |
+| 6. Review & post | Miniature trip card that scales up from nothing | Scaled-down version of trip card shape |
 
-**2. Subline fades in** (200ms delay)
-- Same upward fade, slightly delayed
+### Technical approach
 
-**3. Step rows stagger in sequentially** (300ms base + 100ms × index)
-- Each step fades up from `translateY(12px)` with increasing delay
-- Creates a cascading "reveal" effect — momentum, not static
+**In `src/pages/trips/PostTripPage.tsx`:**
 
-**4. Reassurance line fades in** (after last step, ~1000ms delay)
+- Add a `hoveredStep` state (`number | null`)
+- Each step row gets `onMouseEnter` / `onMouseLeave` handlers
+- To the right of each step title (or in a dedicated column), render a small (80×60px) animated vignette component that appears on hover with a scale+fade transition
+- All visuals are pure CSS/SVG — no images, no external assets
+- Each vignette is a small self-contained component (inline or extracted) using Tailwind classes and minimal inline SVG
+- On mobile (touch), the vignettes could show briefly on tap or be hidden entirely to keep the screen clean
 
-**5. CTA pulses with subtle gold glow**
-- Add `shadow-[0_0_20px_rgba(199,169,98,0.4)]` on load after steps finish (~1100ms delay)
-- Fade-up entrance + a gentle repeating glow animation via inline keyframes or tailwind `animate-gold-pulse` (already exists in config)
+### Layout adjustment
 
-**6. Soft background shimmer** (optional, lightweight)
-- A very subtle radial gradient that shifts position slowly — adds depth without distraction
-- Implemented as a pseudo-element or a positioned div with CSS animation
+The current step rows are single-column text. Add a fixed-width slot (w-20) at the end of each row for the vignette. On hover, the vignette scales from 0.8 to 1 with opacity 0→1 over 200ms. On mouse leave, it fades out.
 
-### Implementation approach
-- Use inline `style` props with `animation` and `animationDelay` for staggered timing — no state management needed
-- Wrap each animated element in a style that starts `opacity: 0` and uses `animation-fill-mode: forwards`
-- Reuse existing `fade-up` keyframe from tailwind config, add a new `glow-pulse` keyframe for the CTA
-- Add the `glow-pulse` keyframe to `tailwind.config.ts` if needed, or use inline style
+```text
+[ 1  Choose your destination          [🌍 vignette] ]
+[ 2  Add traveler details             [👥 vignette] ]
+```
 
-### No structural changes
-Same layout, same copy, same logic. Only motion added.
+### No new dependencies
+Pure CSS animations + inline SVG. Reuses existing `fade-up` and transition utilities.
 
