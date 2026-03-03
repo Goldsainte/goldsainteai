@@ -431,12 +431,12 @@ export default function PostTripPage() {
   const roleLabels: [WantsRole, string][] = [["creator", "Creators only"], ["agent", "Travel agents only"], ["both", "Creators & agents"]];
 
   const introSteps = [
-    { num: 1, title: "Where you're going", desc: "Destination & dates" },
-    { num: 2, title: "Who's coming along", desc: "Travelers & budget" },
-    { num: 3, title: "Set the mood", desc: "Style & pace" },
-    { num: 4, title: "Build your brief", desc: "Photos & inspiration" },
-    { num: 5, title: "Final details", desc: "Notes & preferences" },
-    { num: 6, title: "Review & post", desc: "Confirm & submit" },
+    { num: 1, title: "Choose your destination" },
+    { num: 2, title: "Add traveler details" },
+    { num: 3, title: "Set the style & pace" },
+    { num: 4, title: "Create your storyboard" },
+    { num: 5, title: "Set pricing & dates" },
+    { num: 6, title: "Review & post" },
   ];
 
   if (showIntro) {
@@ -454,18 +454,17 @@ export default function PostTripPage() {
         </div>
 
         {/* Two-column layout */}
-        <div className="mx-auto max-w-4xl px-6 pt-12 pb-20 flex flex-col md:flex-row gap-12 md:gap-20 items-start">
+        <div className="mx-auto max-w-4xl px-6 pt-12 pb-20 flex flex-col md:flex-row gap-12 md:gap-20 items-center">
           {/* Left: Heading */}
           <div className="flex-1 md:sticky md:top-24">
             <h1 className="font-secondary text-4xl md:text-5xl leading-tight text-[#0a2225]">
-              Six easy steps
+              Turn your idea into a
               <br />
-              to posting your
-              <br />
-              dream trip on
-              <br />
-              <span className="text-[#0c4d47]">Goldsainte AI</span>
+              <span className="text-[#0c4d47]">bookable experience.</span>
             </h1>
+            <p className="mt-4 text-base text-[#6B7280] leading-relaxed">
+              We'll guide you through it — most trips go live in under 10 minutes.
+            </p>
           </div>
 
           {/* Right: Steps list */}
@@ -473,18 +472,13 @@ export default function PostTripPage() {
             <div className="space-y-0">
               {introSteps.map((step, idx) => (
                 <div key={step.num}>
-                  <div className="flex items-start gap-5 py-5">
-                    <span className="font-secondary text-2xl font-semibold text-[#0c4d47] w-8 shrink-0">
+                  <div className="flex items-center gap-5 py-6">
+                    <span className="font-secondary text-2xl text-[#0c4d47] w-8 shrink-0">
                       {step.num}
                     </span>
-                    <div>
-                      <p className="font-secondary text-lg font-semibold text-[#0a2225]">
-                        {step.title}
-                      </p>
-                      <p className="text-sm text-[#6B7280] mt-0.5">
-                        {step.desc}
-                      </p>
-                    </div>
+                    <p className="font-secondary text-lg font-semibold text-[#0a2225]">
+                      {step.title}
+                    </p>
                   </div>
                   {idx < introSteps.length - 1 && (
                     <div className="border-b border-[#E5DFC6]" />
@@ -493,12 +487,17 @@ export default function PostTripPage() {
               ))}
             </div>
 
+            {/* Reassurance */}
+            <p className="mt-6 text-sm text-[#6B7280] italic">
+              You can edit everything later — nothing is final until you say so.
+            </p>
+
             {/* CTA */}
             <button
               onClick={() => setShowIntro(false)}
-              className="mt-10 w-full md:w-auto px-10 py-3.5 rounded-full bg-[#C7A962] text-white font-semibold text-base hover:bg-[#BFAD72] transition-colors flex items-center justify-center gap-2"
+              className="mt-8 w-full md:w-auto px-10 py-3.5 rounded-full bg-[#C7A962] text-white font-semibold text-base hover:bg-[#BFAD72] transition-colors flex items-center justify-center gap-2"
             >
-              Get Started
+              Create my trip
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
