@@ -1,32 +1,37 @@
 
 
-## Update Intro Screen Copy & Tone
+## Add Micro-Motion to Intro Screen
 
-**File: `src/pages/trips/PostTripPage.tsx`** — edit the intro screen block (lines ~432–512):
+**File: `src/pages/trips/PostTripPage.tsx`** — lines 442–506
 
-### Changes
+### Animations to add (all CSS-driven via inline styles, no new dependencies)
 
-**1. Headline** → outcome-driven:
-```
-"Turn your idea into a
-bookable experience."
-```
-Subline: *"We'll guide you through it — most trips go live in under 10 minutes."*
+**1. Headline slides up + fades in** (0ms delay)
+- `opacity: 0 → 1`, `translateY(20px) → 0` over 600ms ease-out
 
-**2. Step labels** → concrete, action-based, no descriptions (remove `desc` field):
-| # | Current | New |
-|---|---------|-----|
-| 1 | Where you're going | Choose your destination |
-| 2 | Who's coming along | Add traveler details |
-| 3 | Set the mood | Set the style & pace |
-| 4 | Build your brief | Create your storyboard |
-| 5 | Final details | Set pricing & dates |
-| 6 | Review & post | Review & post |
+**2. Subline fades in** (200ms delay)
+- Same upward fade, slightly delayed
 
-**3. Reassurance line** below steps:
-*"You can edit everything later — nothing is final until you say so."*
+**3. Step rows stagger in sequentially** (300ms base + 100ms × index)
+- Each step fades up from `translateY(12px)` with increasing delay
+- Creates a cascading "reveal" effect — momentum, not static
 
-**4. CTA** → `"Create my trip"` (with arrow icon)
+**4. Reassurance line fades in** (after last step, ~1000ms delay)
 
-**5. Visual lightness** — remove `desc` lines entirely, increase step row padding (`py-5` → `py-6`), remove `font-semibold` from step numbers, vertically center the two-column flex (`items-start` → `items-center`).
+**5. CTA pulses with subtle gold glow**
+- Add `shadow-[0_0_20px_rgba(199,169,98,0.4)]` on load after steps finish (~1100ms delay)
+- Fade-up entrance + a gentle repeating glow animation via inline keyframes or tailwind `animate-gold-pulse` (already exists in config)
+
+**6. Soft background shimmer** (optional, lightweight)
+- A very subtle radial gradient that shifts position slowly — adds depth without distraction
+- Implemented as a pseudo-element or a positioned div with CSS animation
+
+### Implementation approach
+- Use inline `style` props with `animation` and `animationDelay` for staggered timing — no state management needed
+- Wrap each animated element in a style that starts `opacity: 0` and uses `animation-fill-mode: forwards`
+- Reuse existing `fade-up` keyframe from tailwind config, add a new `glow-pulse` keyframe for the CTA
+- Add the `glow-pulse` keyframe to `tailwind.config.ts` if needed, or use inline style
+
+### No structural changes
+Same layout, same copy, same logic. Only motion added.
 
