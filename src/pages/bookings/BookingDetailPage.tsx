@@ -149,7 +149,7 @@ export default function BookingDetailPage() {
       <section className="mx-auto max-w-5xl px-4 pt-14 pb-6 md:pt-16 md:pb-8">
         <div className="flex items-center justify-between mb-4">
           <Link
-            to="/tiktok-lab"
+            to="/storyboards"
             className="inline-flex items-center gap-1 text-[10px] text-[#8D8D8D]"
           >
             <ArrowLeft className="h-3 w-3" />

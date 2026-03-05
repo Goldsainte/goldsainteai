@@ -144,14 +144,13 @@ test.describe('Critical Production Flows - P0 Validation', () => {
 
   });
 
-  test.describe('P0-4: TikTok Lab Storyboard Navigation', () => {
+  test.describe('P0-4: Storyboard Navigation', () => {
     test('should render the storyboard list shell with CTA', async ({ page }) => {
-      await page.goto('/tiktok-lab/storyboards');
+      await page.goto('/storyboards');
 
       await expect(page.getByRole('heading', { name: /My Storyboards/i })).toBeVisible();
       await expect(page.getByRole('link', { name: /New storyboard/i })).toBeVisible();
 
-      // Ensure no blocking console errors fire while loading Supabase data
       const consoleErrors: string[] = [];
       page.on('console', msg => {
         if (msg.type() === 'error') {
@@ -165,16 +164,16 @@ test.describe('Critical Production Flows - P0 Validation', () => {
 
     test('should gracefully handle deep-linking to a storyboard detail', async ({ page }) => {
       const fakeId = '11111111-1111-1111-1111-111111111111';
-      await page.goto(`/tiktok-lab/storyboards/${fakeId}`);
+      await page.goto(`/storyboards/${fakeId}`);
 
-      await expect(page).toHaveURL(/\/tiktok-lab\/storyboards\//);
+      await expect(page).toHaveURL(/\/storyboards\//);
       await expect(page.getByRole('button', { name: /Back/i })).toBeVisible();
     });
   });
 
   test.describe('Critical Navigation & Error-Free Basics', () => {
     test('should navigate main routes without errors', async ({ page }) => {
-      const routes = ['/', '/explore', '/creators', '/agents', '/post-trip', '/trip-requests', '/tiktok-lab/storyboards'];
+      const routes = ['/', '/explore', '/creators', '/agents', '/post-trip', '/trip-requests', '/storyboards'];
       
       for (const route of routes) {
         await page.goto(route);

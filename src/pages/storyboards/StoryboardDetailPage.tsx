@@ -341,7 +341,7 @@ export default function StoryboardDetailPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => navigate("/tiktok-lab")}
+                      onClick={() => navigate("/storyboards")}
                     >
                       <Plus className="mr-1 h-3.5 w-3.5" />
                       Add from Lab
@@ -373,7 +373,7 @@ export default function StoryboardDetailPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => navigate("/tiktok-lab")}
+                      onClick={() => navigate("/storyboards")}
                     >
                       Open Creator Lab
                     </Button>

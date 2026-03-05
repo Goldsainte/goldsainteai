@@ -20,7 +20,7 @@ import {
   Check,
   X,
 } from "lucide-react";
-import { createBookingFromProposal } from "@/utils/createBooking";
+import { createBookingFromProposal } from "@/services/bookingService";
 
 type TripRequest = {
   id: string;
