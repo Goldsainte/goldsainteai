@@ -140,6 +140,7 @@ const UploadAppleSignInKey = lazy(() => import('@/pages/UploadAppleSignInKey'));
 const AdminTransportVendorVetting = lazy(() => import('@/pages/AdminTransportVendorVetting'));
 const PlatformAnalyticsDashboard = lazy(() => import('@/components/PlatformAnalyticsDashboard'));
 const SystemHealth = lazy(() => import('@/pages/SystemHealth'));
+const ArchitectureDiagramPage = lazy(() => import('@/pages/ArchitectureDiagramPage'));
 const Redirect = lazy(() => import('@/pages/Redirect'));
 const About = lazy(() => import('@/pages/About'));
 const BrandProfilePage = lazy(() => import('@/pages/BrandProfilePage'));
@@ -523,6 +524,7 @@ export const AppRoutes = () => (
       <Route path="/admin/platform-analytics" element={<PlatformAnalyticsDashboard />} />
       <Route path="/admin/trust-safety" element={<TrustSafety />} />
       <Route path="/system-health" element={<SystemHealth />} />
+      <Route path="/architecture" element={<ArchitectureDiagramPage />} />
     </Route>
 
     <Route path="/r" element={<Redirect />} />
