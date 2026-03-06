@@ -524,6 +524,7 @@ export const AppRoutes = () => (
       <Route path="/admin/platform-analytics" element={<PlatformAnalyticsDashboard />} />
       <Route path="/admin/trust-safety" element={<TrustSafety />} />
       <Route path="/system-health" element={<SystemHealth />} />
+      <Route path="/architecture" element={<ArchitectureDiagramPage />} />
     </Route>
 
     <Route path="/r" element={<Redirect />} />
