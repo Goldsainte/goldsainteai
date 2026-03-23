@@ -21,8 +21,8 @@ const DESTINATION_IMAGES: Record<string, string> = {
   florence: "https://images.unsplash.com/photo-1543429258-14ba520cdee8?auto=format&fit=crop&w=1600&q=80",
   monaco: "https://images.unsplash.com/photo-1507608869274-d3177c8bb4c7?auto=format&fit=crop&w=1600&q=80",
   mykonos: "https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?auto=format&fit=crop&w=1600&q=80",
-  "amalfi coast": "https://images.unsplash.com/photo-1533606688076-b6683a5f59f1?auto=format&fit=crop&w=1600&q=80",
-  amalfi: "https://images.unsplash.com/photo-1533606688076-b6683a5f59f1?auto=format&fit=crop&w=1600&q=80",
+  "amalfi coast": "https://images.unsplash.com/photo-1455587734955-081b22074882?auto=format&fit=crop&w=1600&q=80",
+  amalfi: "https://images.unsplash.com/photo-1455587734955-081b22074882?auto=format&fit=crop&w=1600&q=80",
   iceland: "https://images.unsplash.com/photo-1504829857797-ddff29c27927?auto=format&fit=crop&w=1600&q=80",
   croatia: "https://images.unsplash.com/photo-1555990538-1a8d4a0dbca8?auto=format&fit=crop&w=1600&q=80",
   dubrovnik: "https://images.unsplash.com/photo-1555990538-1a8d4a0dbca8?auto=format&fit=crop&w=1600&q=80",
@@ -33,7 +33,7 @@ const DESTINATION_IMAGES: Record<string, string> = {
   switzerland: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=1600&q=80",
 
   // Asia
-  tokyo: "https://images.unsplash.com/photo-1505067228394-439b67a8100f?auto=format&fit=crop&w=1600&q=80",
+  tokyo: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1600&q=80",
   bali: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1600&q=80",
   dubai: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1600&q=80",
   thailand: "https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=1600&q=80",
