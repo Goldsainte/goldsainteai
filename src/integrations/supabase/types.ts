@@ -3511,6 +3511,48 @@ export type Database = {
           },
         ]
       }
+      creator_media: {
+        Row: {
+          caption: string | null
+          created_at: string | null
+          external_id: string | null
+          external_url: string | null
+          id: string
+          media_type: string
+          sort_order: number | null
+          source: string
+          thumbnail_url: string | null
+          url: string
+          user_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string | null
+          external_id?: string | null
+          external_url?: string | null
+          id?: string
+          media_type: string
+          sort_order?: number | null
+          source?: string
+          thumbnail_url?: string | null
+          url: string
+          user_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string | null
+          external_id?: string | null
+          external_url?: string | null
+          id?: string
+          media_type?: string
+          sort_order?: number | null
+          source?: string
+          thumbnail_url?: string | null
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       creator_profiles: {
         Row: {
           avatar_url: string | null
