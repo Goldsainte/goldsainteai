@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, Link, Navigate } from "react-router-dom";
+import { useNavigate, Link, Navigate, useSearchParams } from "react-router-dom";
 import { invokeWithAuth } from "@/lib/supabaseHelpers";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,6 +13,7 @@ import {
   Map,
   DollarSign,
   Settings,
+  ImageIcon,
 } from "lucide-react";
 import { BackButton } from "@/components/ui/BackButton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -24,6 +25,7 @@ import { CreatorOverviewTab } from "./creator/components/CreatorOverviewTab";
 import { CreatorProposalsTab } from "./creator/components/CreatorProposalsTab";
 import { CreatorTripsTab } from "./creator/components/CreatorTripsTab";
 import { CreatorEarningsTab } from "./creator/components/CreatorEarningsTab";
+import { CreatorPortfolioTab } from "./creator/components/CreatorPortfolioTab";
 import { CreatorSettingsTab } from "./creator/components/CreatorSettingsTab";
 import type { TripProposalStatus } from "@/services/proposalService";
 
@@ -69,13 +71,14 @@ interface Profile {
 export default function CreatorDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const isMobile = useIsMobile();
   const { hasCreatorAccess, loading: roleLoading } = useUserRole();
   const [stats, setStats] = useState<CreatorStats>(EMPTY_STATS);
   const [loading, setLoading] = useState(true);
   
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "overview");
 
   const onboardingIncomplete = profile && !profile.has_completed_creator_onboarding;
 
@@ -224,6 +227,7 @@ export default function CreatorDashboard() {
                     {activeTab === "overview" && <><Sparkles className="h-4 w-4 text-[#C7A962]" /> Overview</>}
                     {activeTab === "proposals" && <><FileText className="h-4 w-4 text-[#C7A962]" /> Proposals</>}
                     {activeTab === "trips" && <><Map className="h-4 w-4 text-[#C7A962]" /> My Trips</>}
+                    {activeTab === "portfolio" && <><ImageIcon className="h-4 w-4 text-[#C7A962]" /> Portfolio</>}
                     {activeTab === "earnings" && <><DollarSign className="h-4 w-4 text-[#C7A962]" /> Earnings</>}
                     {activeTab === "settings" && <><Settings className="h-4 w-4 text-[#C7A962]" /> Settings</>}
                   </span>
@@ -238,6 +242,9 @@ export default function CreatorDashboard() {
                 </SelectItem>
                 <SelectItem value="trips" className="py-3">
                   <span className="flex items-center gap-2"><Map className="h-4 w-4" /> My Trips</span>
+                </SelectItem>
+                <SelectItem value="portfolio" className="py-3">
+                  <span className="flex items-center gap-2"><ImageIcon className="h-4 w-4" /> Portfolio</span>
                 </SelectItem>
                 <SelectItem value="earnings" className="py-3">
                   <span className="flex items-center gap-2"><DollarSign className="h-4 w-4" /> Earnings</span>
@@ -258,6 +265,9 @@ export default function CreatorDashboard() {
               <TabsTrigger value="trips" className={tabTriggerClass}>
                 <Map className="h-3.5 w-3.5 mr-1.5" /> My Trips
               </TabsTrigger>
+              <TabsTrigger value="portfolio" className={tabTriggerClass}>
+                <ImageIcon className="h-3.5 w-3.5 mr-1.5" /> Portfolio
+              </TabsTrigger>
               <TabsTrigger value="earnings" className={tabTriggerClass}>
                 <DollarSign className="h-3.5 w-3.5 mr-1.5" /> Earnings
               </TabsTrigger>
@@ -277,6 +287,10 @@ export default function CreatorDashboard() {
 
           <TabsContent value="trips" className="mt-0">
             <CreatorTripsTab />
+          </TabsContent>
+
+          <TabsContent value="portfolio" className="mt-0">
+            <CreatorPortfolioTab />
           </TabsContent>
 
           <TabsContent value="earnings" className="mt-0">

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { ArrowLeft, PenLine, LogIn } from "lucide-react";
+import { ArrowLeft, PenLine, LogIn, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileHero } from "@/components/profile/ProfileHero";
 import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
@@ -36,6 +36,8 @@ export default function CreatorPublicProfilePage() {
   const [creator, setCreator] = useState<CreatorProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
+  const [avgRating, setAvgRating] = useState<number | null>(null);
+  const [reviewCount, setReviewCount] = useState<number>(0);
 
   useEffect(() => {
     if (!id) return;
@@ -48,9 +50,21 @@ export default function CreatorPublicProfilePage() {
         .eq("id", id)
         .maybeSingle();
       setCreator(data as CreatorProfile | null);
+
+      // Fetch average rating + count
+      const { data: reviews } = await supabase
+        .from("profile_reviews")
+        .select("rating")
+        .eq("reviewee_id", id);
+      if (reviews && reviews.length > 0) {
+        const sum = reviews.reduce((acc, r) => acc + (r.rating || 0), 0);
+        setAvgRating(sum / reviews.length);
+        setReviewCount(reviews.length);
+      }
+
       setLoading(false);
     })();
-  }, [id]);
+  }, [id, reviewRefreshKey]);
 
   const fmt = (n: number | null | undefined) =>
     n != null && n > 0
@@ -125,7 +139,7 @@ export default function CreatorPublicProfilePage() {
       <div className="min-h-screen bg-[#FDF9F0]">
         {/* Back bar */}
         <div className="sticky top-0 z-10 bg-[#FDF9F0]/80 backdrop-blur-sm border-b border-[#E5DFC6]/40">
-          <div className="mx-auto max-w-6xl px-4 py-3">
+          <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
             <button
               onClick={() => navigate(-1)}
               className="inline-flex items-center gap-2 text-sm text-[#4a4a4a] hover:text-[#0a2225] transition-colors"
@@ -133,6 +147,17 @@ export default function CreatorPublicProfilePage() {
               <ArrowLeft className="h-4 w-4" />
               Back
             </button>
+            {isOwnProfile && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate("/creator-dashboard?tab=portfolio")}
+                className="border-[#E5DFC6] text-[#0a2225] rounded-full"
+              >
+                <Settings className="h-3.5 w-3.5 mr-1.5" />
+                Edit Profile
+              </Button>
+            )}
           </div>
         </div>
 
@@ -145,6 +170,8 @@ export default function CreatorPublicProfilePage() {
           verifiedLabel="Goldsainte Creator"
           location={creator.location}
           pills={creator.creator_niches?.slice(0, 4) || []}
+          rating={avgRating}
+          reviewCount={reviewCount}
           stats={[
             { label: "Followers", value: fmt(creator.creator_followers) },
             { label: "Avg Views", value: fmt(creator.creator_avg_views) },
@@ -230,6 +257,8 @@ export default function CreatorPublicProfilePage() {
             <div className="lg:sticky lg:top-20 lg:self-start">
               <ProfileSidebar
                 name={creator.display_name || creator.full_name || "Creator"}
+                rating={avgRating}
+                reviewCount={reviewCount}
                 targetUserId={isOwnProfile ? undefined : creator.id}
                 stats={[
                   {
