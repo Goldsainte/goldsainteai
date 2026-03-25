@@ -85,7 +85,9 @@ export function CreatorMediaUploader({
     }
   };
 
-  const handleAddLink = () => {
+  const [isAddingLink, setIsAddingLink] = useState(false);
+
+  const handleAddLink = async () => {
     if (!linkUrl.trim()) return;
     const url = linkUrl.trim();
     const isInstagram = url.includes("instagram.com");
@@ -101,16 +103,29 @@ export function CreatorMediaUploader({
       return;
     }
 
+    setIsAddingLink(true);
+    let thumbnail_url: string | null = null;
+    try {
+      const { data } = await supabase.functions.invoke("fetch-social-thumbnail", {
+        body: { url },
+      });
+      thumbnail_url = data?.thumbnail_url || null;
+    } catch {
+      // graceful fallback
+    }
+
     const entry: MediaEntry = {
       media_type: "video",
       source: isInstagram ? "instagram" : "tiktok",
       url: url,
       external_url: url,
+      thumbnail_url,
     };
 
     onMediaChange([...media, entry]);
     setLinkUrl("");
     setShowLinkInput(false);
+    setIsAddingLink(false);
     toast.success(`${isInstagram ? "Instagram" : "TikTok"} link added`);
   };
 
@@ -133,6 +148,8 @@ export function CreatorMediaUploader({
                 <video src={item.url} className="w-full h-full object-cover" muted />
                 <Film className="absolute w-6 h-6 text-white drop-shadow-lg" />
               </div>
+            ) : item.thumbnail_url ? (
+              <img src={item.thumbnail_url} alt={item.source} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center gap-2 p-2">
                 <Film className="w-8 h-8 text-[#C7A962]" />
@@ -205,6 +222,7 @@ export function CreatorMediaUploader({
             type="button"
             size="sm"
             onClick={handleAddLink}
+            disabled={isAddingLink}
             className="bg-[#0a2225] hover:bg-[#0a2225]/90 text-white rounded-xl shrink-0"
           >
             Add

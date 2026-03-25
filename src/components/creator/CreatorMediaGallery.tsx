@@ -85,8 +85,14 @@ export function CreatorMediaGallery({ creatorId, fallbackPhotos }: CreatorMediaG
                   </div>
                 </div>
               )
+            ) : item.thumbnail_url ? (
+              <div className="w-full h-full relative">
+                <img src={item.thumbnail_url} alt={item.source} className="w-full h-full object-cover" loading="lazy" />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <ExternalLink className="w-6 h-6 text-white drop-shadow-lg" />
+                </div>
+              </div>
             ) : (
-              // External (Instagram/TikTok) link
               <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-[#FDF9F0]">
                 <Film className="w-10 h-10 text-[#C7A962]" />
                 <span className="text-xs font-medium uppercase tracking-wide text-[#7A7151]">
