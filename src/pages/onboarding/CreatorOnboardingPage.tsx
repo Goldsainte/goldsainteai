@@ -169,16 +169,23 @@ export default function CreatorOnboardingPage() {
   const handleSkip = async () => {
     try {
       if (!user) return;
+      const updateData: Record<string, any> = {
+        account_type: "creator",
+        role: "creator",
+      };
+      if (displayName) {
+        updateData.display_name = displayName;
+        updateData.full_name = displayName;
+      }
+      if (avatarUrl) updateData.avatar_url = avatarUrl;
+      if (bio) updateData.bio = bio;
+      if (homeBase) updateData.home_base = homeBase;
+      if (selectedNiches.length) updateData.creator_niches = selectedNiches;
+      if (selectedBudgets.length) updateData.creator_budget_levels = selectedBudgets;
+      
       await supabase
         .from("profiles")
-        .update({
-          account_type: "creator",
-          role: "creator",
-          display_name: displayName || undefined,
-          full_name: displayName || undefined,
-          avatar_url: avatarUrl || undefined,
-          bio: bio || undefined,
-        })
+        .update(updateData)
         .eq("id", user.id);
       toast.success("Progress saved! You can finish onboarding anytime from your dashboard.");
       navigate("/creator-dashboard");
