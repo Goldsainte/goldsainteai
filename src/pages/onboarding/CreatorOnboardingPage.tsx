@@ -578,6 +578,48 @@ export default function CreatorOnboardingPage() {
                   <p className="text-[#6B7280]">Showcase your work — everything here is optional</p>
                 </div>
 
+                {/* Cover Image */}
+                <div>
+                  <Label className="text-[#0a2225] font-medium mb-3 block">Cover / Hero Image</Label>
+                  <p className="text-xs text-[#6B7280] mb-3">This appears as the banner at the top of your public profile.</p>
+                  {coverImageUrl ? (
+                    <div className="relative rounded-xl overflow-hidden border border-[#E5DFC6] aspect-[3/1]">
+                      <img src={coverImageUrl} alt="Cover" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setCoverImageUrl("")}
+                        className="absolute top-2 right-2 w-7 h-7 bg-black/50 rounded-full flex items-center justify-center hover:bg-black/70 transition-colors"
+                      >
+                        <span className="text-white text-sm">✕</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="block aspect-[3/1] rounded-xl border-2 border-dashed border-[#E5DFC6] hover:border-[#C7A962] transition-colors cursor-pointer flex items-center justify-center">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file || !user) return;
+                          if (file.size > 50 * 1024 * 1024) { toast.error("Max 50MB"); return; }
+                          const ext = file.name.split(".").pop();
+                          const path = `${user.id}/cover/${Date.now()}.${ext}`;
+                          const { error } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+                          if (error) { toast.error("Upload failed"); return; }
+                          const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(path);
+                          setCoverImageUrl(publicUrl);
+                          toast.success("Cover image uploaded!");
+                        }}
+                      />
+                      <div className="text-center">
+                        <Image className="w-8 h-8 text-[#C7A962] mx-auto mb-2" />
+                        <span className="text-sm text-[#6B7280]">Upload cover image</span>
+                      </div>
+                    </label>
+                  )}
+                </div>
+
                 {/* Featured Photos */}
                 <div>
                   <Label className="text-[#0a2225] font-medium mb-3 block">Featured Photos</Label>
