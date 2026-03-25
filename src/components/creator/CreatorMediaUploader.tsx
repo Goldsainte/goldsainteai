@@ -225,6 +225,7 @@ export function CreatorMediaUploader({
             disabled={isAddingLink}
             className="bg-[#0a2225] hover:bg-[#0a2225]/90 text-white rounded-xl shrink-0"
           >
+            {isAddingLink ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
             Add
           </Button>
           <Button
