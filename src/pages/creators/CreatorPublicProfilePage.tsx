@@ -191,7 +191,7 @@ export default function CreatorPublicProfilePage() {
     { label: "Avg Views", value: fmt(creator.creator_avg_views) },
   ];
 
-  const handleRequestTrip = () => navigate(`/post-trip?creatorId=${creator.id}&creatorName=${encodeURIComponent(displayName)}`);
+  const handleRequestTrip = () => navigate(`/post-trip?fromCreator=${creator.id}`);
 
   return (
     <>
@@ -374,7 +374,6 @@ export default function CreatorPublicProfilePage() {
               <ProfileTripsGrid
                 creatorId={creator.id}
                 creatorType="creator"
-                onRequestTrip={handleRequestTrip}
               />
 
               {/* Reviews */}

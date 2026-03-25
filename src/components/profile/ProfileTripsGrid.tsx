@@ -18,13 +18,11 @@ interface Trip {
 interface ProfileTripsGridProps {
   creatorId: string;
   creatorType?: "creator" | "agent";
-  onRequestTrip?: () => void;
 }
 
 export function ProfileTripsGrid({
   creatorId,
   creatorType,
-  onRequestTrip,
 }: ProfileTripsGridProps) {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
@@ -87,17 +85,9 @@ export function ProfileTripsGrid({
           <p className="font-secondary text-lg text-[#0a2225]">
             Trips coming soon
           </p>
-          <p className="mt-1 text-sm text-[#6B7280] mb-4">
-            This creator is building their trip collection. Request a custom trip in the meantime.
+          <p className="mt-1 text-sm text-[#6B7280]">
+            This creator is building their trip collection.
           </p>
-          {onRequestTrip && (
-            <Button
-              onClick={onRequestTrip}
-              className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-xl"
-            >
-               Request a Trip
-            </Button>
-          )}
         </div>
       </section>
     );
