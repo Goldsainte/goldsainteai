@@ -3556,42 +3556,69 @@ export type Database = {
       creator_profiles: {
         Row: {
           avatar_url: string | null
+          best_for: string[] | null
           bio: string | null
+          certifications: string[] | null
+          clients_served: number | null
           created_at: string
           display_name: string | null
           handle: string | null
+          not_ideal_for: string[] | null
           primary_niches: string[] | null
           primary_regions: string[] | null
+          response_time_hours: number | null
+          specialties: string[] | null
           tiktok_handle: string | null
           tiktok_url: string | null
+          travel_styles: string[] | null
+          trips_completed: number | null
           updated_at: string
           user_id: string
+          years_experience: number | null
         }
         Insert: {
           avatar_url?: string | null
+          best_for?: string[] | null
           bio?: string | null
+          certifications?: string[] | null
+          clients_served?: number | null
           created_at?: string
           display_name?: string | null
           handle?: string | null
+          not_ideal_for?: string[] | null
           primary_niches?: string[] | null
           primary_regions?: string[] | null
+          response_time_hours?: number | null
+          specialties?: string[] | null
           tiktok_handle?: string | null
           tiktok_url?: string | null
+          travel_styles?: string[] | null
+          trips_completed?: number | null
           updated_at?: string
           user_id: string
+          years_experience?: number | null
         }
         Update: {
           avatar_url?: string | null
+          best_for?: string[] | null
           bio?: string | null
+          certifications?: string[] | null
+          clients_served?: number | null
           created_at?: string
           display_name?: string | null
           handle?: string | null
+          not_ideal_for?: string[] | null
           primary_niches?: string[] | null
           primary_regions?: string[] | null
+          response_time_hours?: number | null
+          specialties?: string[] | null
           tiktok_handle?: string | null
           tiktok_url?: string | null
+          travel_styles?: string[] | null
+          trips_completed?: number | null
           updated_at?: string
           user_id?: string
+          years_experience?: number | null
         }
         Relationships: []
       }

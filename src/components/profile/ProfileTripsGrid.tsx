@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { MapPin, Calendar, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 
 interface Trip {
   id: string;
@@ -17,11 +18,13 @@ interface Trip {
 interface ProfileTripsGridProps {
   creatorId: string;
   creatorType?: "creator" | "agent";
+  onRequestTrip?: () => void;
 }
 
 export function ProfileTripsGrid({
   creatorId,
   creatorType,
+  onRequestTrip,
 }: ProfileTripsGridProps) {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
@@ -80,13 +83,21 @@ export function ProfileTripsGrid({
         <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-4">
           Marketplace Trips
         </h2>
-        <div className="rounded-2xl border border-[#E5DFC6] bg-white p-8 text-center">
+        <div className="rounded-2xl border border-[#E5DFC6] bg-gradient-to-br from-white to-[#F5F0E0]/50 p-8 text-center">
           <p className="font-secondary text-lg text-[#0a2225]">
-            No trips yet
+            Trips coming soon
           </p>
-          <p className="mt-1 text-sm text-[#6B7280]">
-            This partner hasn't published any trips to the marketplace yet.
+          <p className="mt-1 text-sm text-[#6B7280] mb-4">
+            This creator is building their trip collection. Request a custom trip in the meantime.
           </p>
+          {onRequestTrip && (
+            <Button
+              onClick={onRequestTrip}
+              className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-xl"
+            >
+              Request a custom trip
+            </Button>
+          )}
         </div>
       </section>
     );

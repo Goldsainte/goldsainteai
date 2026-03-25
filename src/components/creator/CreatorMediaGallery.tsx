@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Film, ExternalLink } from "lucide-react";
+import { Film, ExternalLink, Instagram } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface MediaItem {
   id: string;
@@ -15,9 +16,16 @@ interface MediaItem {
 interface CreatorMediaGalleryProps {
   creatorId: string;
   fallbackPhotos?: string[] | null;
+  instagramHandle?: string | null;
+  isOwnProfile?: boolean;
 }
 
-export function CreatorMediaGallery({ creatorId, fallbackPhotos }: CreatorMediaGalleryProps) {
+export function CreatorMediaGallery({
+  creatorId,
+  fallbackPhotos,
+  instagramHandle,
+  isOwnProfile,
+}: CreatorMediaGalleryProps) {
   const [items, setItems] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
@@ -52,7 +60,60 @@ export function CreatorMediaGallery({ creatorId, fallbackPhotos }: CreatorMediaG
     );
   }
 
-  if (items.length === 0) return null;
+  // Empty state with CTA
+  if (items.length === 0) {
+    if (isOwnProfile) {
+      return (
+        <section>
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-4">
+            Content Gallery
+          </h2>
+          <div className="rounded-2xl border border-dashed border-[#E5DFC6] bg-[#F5F0E0]/30 p-8 text-center">
+            <Instagram className="h-8 w-8 text-[#C7A962] mx-auto mb-3" />
+            <p className="text-sm font-medium text-[#0a2225] mb-1">
+              Add your content
+            </p>
+            <p className="text-xs text-[#6B7280] mb-4">
+              Upload photos, videos, or link your Instagram and TikTok reels.
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.location.href = "/creator-dashboard?tab=portfolio"}
+              className="border-[#E5DFC6] text-[#0a2225]"
+            >
+              Go to Portfolio
+            </Button>
+          </div>
+        </section>
+      );
+    }
+
+    if (!instagramHandle) return null;
+
+    return (
+      <section>
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-4">
+          Content Gallery
+        </h2>
+        <div className="rounded-2xl border border-[#E5DFC6] bg-white p-6 text-center">
+          <Instagram className="h-8 w-8 text-[#C7A962] mx-auto mb-3" />
+          <p className="text-sm text-[#6B7280]">
+            Follow{" "}
+            <a
+              href={`https://instagram.com/${instagramHandle}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-[#0c4d47] hover:underline"
+            >
+              @{instagramHandle}
+            </a>{" "}
+            on Instagram
+          </p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section>
