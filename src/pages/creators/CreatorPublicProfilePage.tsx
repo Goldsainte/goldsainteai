@@ -366,19 +366,23 @@ export default function CreatorPublicProfilePage() {
 
               {/* Reviews */}
               <section>
-                <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-4">
-                  Reviews
-                </h2>
-                <ReviewsList
-                  revieweeId={creator.id}
-                  refreshKey={reviewRefreshKey}
-                  avgRating={avgRating}
-                  reviewCount={reviewCount}
-                  showWriteReviewCTA={!authLoading && !!user && user.id !== creator.id}
-                  onWriteReview={() => setShowWriteReview(true)}
-                />
-                {!authLoading && !user && (
-                  <div className="mt-3 text-center">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151]">
+                    Reviews
+                  </h2>
+                  {!authLoading && user && user.id !== creator.id && (
+                    <WriteReviewModal
+                      revieweeId={creator.id}
+                      revieweeName={displayName}
+                      onSuccess={() => setReviewRefreshKey((k) => k + 1)}
+                    >
+                      <Button variant="outline" size="sm" className="border-[#E5DFC6] text-[#0a2225]">
+                        <PenLine className="mr-1.5 h-3.5 w-3.5" />
+                        Write a Review
+                      </Button>
+                    </WriteReviewModal>
+                  )}
+                  {!authLoading && !user && (
                     <Button
                       variant="outline"
                       size="sm"
@@ -388,8 +392,14 @@ export default function CreatorPublicProfilePage() {
                       <LogIn className="mr-1.5 h-3.5 w-3.5" />
                       Sign in to review
                     </Button>
-                  </div>
-                )}
+                  )}
+                </div>
+                <ReviewsList
+                  revieweeId={creator.id}
+                  refreshKey={reviewRefreshKey}
+                  avgRating={avgRating}
+                  reviewCount={reviewCount}
+                />
               </section>
             </div>
 
