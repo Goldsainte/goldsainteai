@@ -32,7 +32,7 @@ interface CreatorProfile {
 export default function CreatorPublicProfilePage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [creator, setCreator] = useState<CreatorProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
@@ -186,26 +186,8 @@ export default function CreatorPublicProfilePage() {
                 </section>
               )}
 
-              {/* Gallery */}
-              {creator.featured_photos &&
-                creator.featured_photos.length > 0 && (
-                  <section>
-                    <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-4">
-                      Storyboard Preview
-                    </h2>
-                    <div className="columns-2 md:columns-3 gap-3 space-y-3">
-                      {creator.featured_photos.map((src) => (
-                        <img
-                          key={src}
-                          src={src}
-                          alt="Storyboard"
-                          className="w-full rounded-2xl object-cover"
-                          loading="lazy"
-                        />
-                      ))}
-                    </div>
-                  </section>
-                )}
+              {/* Gallery — uses creator_media table with featured_photos fallback */}
+              <CreatorMediaGallery creatorId={creator.id} fallbackPhotos={creator.featured_photos} />
 
               {/* Trips */}
               <ProfileTripsGrid creatorId={creator.id} creatorType="creator" />
@@ -216,7 +198,7 @@ export default function CreatorPublicProfilePage() {
                   <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151]">
                     Reviews
                   </h2>
-                  {user && user.id !== creator.id && (
+                  {!authLoading && user && user.id !== creator.id && (
                     <WriteReviewModal
                       revieweeId={creator.id}
                       revieweeName={creator.full_name || "Creator"}
@@ -227,6 +209,17 @@ export default function CreatorPublicProfilePage() {
                         Write a Review
                       </Button>
                     </WriteReviewModal>
+                  )}
+                  {!authLoading && !user && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-[#E5DFC6] text-[#6B7280]"
+                      onClick={() => navigate("/auth")}
+                    >
+                      <LogIn className="mr-1.5 h-3.5 w-3.5" />
+                      Sign in to review
+                    </Button>
                   )}
                 </div>
                 <ReviewsList revieweeId={creator.id} refreshKey={reviewRefreshKey} />
