@@ -10,6 +10,7 @@ import { LuxurySelectionCard } from "@/components/onboarding/LuxurySelectionCard
 import { ProfilePhotoUploader } from "@/pages/traveler/components/ProfilePhotoUploader";
 import { DestinationAutocompleteNominatim } from "@/components/preferences/DestinationAutocompleteNominatim";
 import { FeaturedPhotosUploader } from "@/components/onboarding/FeaturedPhotosUploader";
+import { CreatorMediaUploader, type MediaEntry } from "@/components/creator/CreatorMediaUploader";
 import { BrandAlignmentSelector } from "@/components/onboarding/BrandAlignmentSelector";
 import { LegalComplianceAcceptance } from "@/components/onboarding/LegalComplianceAcceptance";
 import { supabase } from "@/integrations/supabase/client";
@@ -106,6 +107,7 @@ export default function CreatorOnboardingPage() {
   // Step 3: Portfolio (all optional)
   const [coverImageUrl, setCoverImageUrl] = useState("");
   const [featuredPhotos, setFeaturedPhotos] = useState<string[]>([]);
+  const [creatorMedia, setCreatorMedia] = useState<MediaEntry[]>([]);
   const [preferredBrandTiers, setPreferredBrandTiers] = useState<string[]>([]);
   const [preferredHotelBrands, setPreferredHotelBrands] = useState<string[]>([]);
   const [aestheticAlignment, setAestheticAlignment] = useState<string[]>([]);
@@ -633,6 +635,18 @@ export default function CreatorOnboardingPage() {
                   <p className="text-xs text-[#6B7280] mt-2">
                     <span className="text-[#C7A962] font-medium">Tip:</span> Upload your most stunning travel photos.
                   </p>
+                </div>
+
+                {/* Media Gallery — videos, reels, social links */}
+                <div>
+                  <Label className="text-[#0a2225] font-medium mb-1 block">Content Gallery</Label>
+                  <p className="text-xs text-[#6B7280] mb-3">Upload videos, reels, or paste Instagram / TikTok links to showcase your content.</p>
+                  <CreatorMediaUploader
+                    userId={user?.id || ""}
+                    media={creatorMedia}
+                    onMediaChange={setCreatorMedia}
+                    maxItems={12}
+                  />
                 </div>
 
                 {/* Brand Alignment */}
