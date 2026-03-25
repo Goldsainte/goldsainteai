@@ -158,7 +158,7 @@ export default function CreatorPublicProfilePage() {
               {/* About */}
               <section>
                 <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151]">
-                  About {creator.full_name}
+                  About {creator.display_name || creator.full_name}
                 </h2>
                 <p className="mt-3 text-[#0a2225] leading-relaxed whitespace-pre-line">
                   {creator.bio ||
