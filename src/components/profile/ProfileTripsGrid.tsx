@@ -95,7 +95,7 @@ export function ProfileTripsGrid({
               onClick={onRequestTrip}
               className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-xl"
             >
-               Get a custom itinerary
+               Request a Trip
             </Button>
           )}
         </div>

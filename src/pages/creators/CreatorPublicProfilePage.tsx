@@ -11,7 +11,7 @@ import { WriteReviewModal } from "@/components/profile/WriteReviewModal";
 import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
 import { CreatorTrustSection } from "@/components/creator/CreatorTrustSection";
 import { HowCreatorWorks } from "@/components/creator/HowCreatorWorks";
-import { RequestTripModal } from "@/components/creator/RequestTripModal";
+
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -61,7 +61,7 @@ export default function CreatorPublicProfilePage() {
   const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
   const [avgRating, setAvgRating] = useState<number | null>(null);
   const [reviewCount, setReviewCount] = useState<number>(0);
-  const [requestModalOpen, setRequestModalOpen] = useState(false);
+  
   
 
   useEffect(() => {
@@ -191,7 +191,7 @@ export default function CreatorPublicProfilePage() {
     { label: "Avg Views", value: fmt(creator.creator_avg_views) },
   ];
 
-  const handleRequestTrip = () => setRequestModalOpen(true);
+  const handleRequestTrip = () => navigate(`/post-trip?creatorId=${creator.id}&creatorName=${encodeURIComponent(displayName)}`);
 
   return (
     <>
@@ -441,7 +441,7 @@ export default function CreatorPublicProfilePage() {
                 website={creator.website}
                 lastActiveAt={lastActive}
                 responseTimeHours={creatorData?.response_time_hours}
-                requestTripMicrocopy="Tell us your preferences → get a custom itinerary"
+                requestTripMicrocopy="Post your trip details → get matched instantly"
                 onRequestTrip={handleRequestTrip}
                 onSaveToStoryboard={() =>
                   toast.info("Save to storyboard", {
@@ -455,13 +455,6 @@ export default function CreatorPublicProfilePage() {
         </div>
       </div>
 
-      {/* Request Trip Modal */}
-      <RequestTripModal
-        open={requestModalOpen}
-        onOpenChange={setRequestModalOpen}
-        creatorId={creator.id}
-        creatorName={displayName}
-      />
 
     </>
   );

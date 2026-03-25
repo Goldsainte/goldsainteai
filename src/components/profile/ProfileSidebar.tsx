@@ -155,7 +155,7 @@ export function ProfileSidebar({
             onClick={onRequestTrip}
             className="w-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-xl h-11 font-medium"
           >
-            Get a custom itinerary
+            Request a Trip
           </Button>
           {requestTripMicrocopy && (
             <p className="text-[10px] text-center text-[#6B7280]">
