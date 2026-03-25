@@ -226,6 +226,7 @@ export default function CreatorDashboard() {
                     {activeTab === "overview" && <><Sparkles className="h-4 w-4 text-[#C7A962]" /> Overview</>}
                     {activeTab === "proposals" && <><FileText className="h-4 w-4 text-[#C7A962]" /> Proposals</>}
                     {activeTab === "trips" && <><Map className="h-4 w-4 text-[#C7A962]" /> My Trips</>}
+                    {activeTab === "portfolio" && <><ImageIcon className="h-4 w-4 text-[#C7A962]" /> Portfolio</>}
                     {activeTab === "earnings" && <><DollarSign className="h-4 w-4 text-[#C7A962]" /> Earnings</>}
                     {activeTab === "settings" && <><Settings className="h-4 w-4 text-[#C7A962]" /> Settings</>}
                   </span>
@@ -240,6 +241,9 @@ export default function CreatorDashboard() {
                 </SelectItem>
                 <SelectItem value="trips" className="py-3">
                   <span className="flex items-center gap-2"><Map className="h-4 w-4" /> My Trips</span>
+                </SelectItem>
+                <SelectItem value="portfolio" className="py-3">
+                  <span className="flex items-center gap-2"><ImageIcon className="h-4 w-4" /> Portfolio</span>
                 </SelectItem>
                 <SelectItem value="earnings" className="py-3">
                   <span className="flex items-center gap-2"><DollarSign className="h-4 w-4" /> Earnings</span>
@@ -260,6 +264,9 @@ export default function CreatorDashboard() {
               <TabsTrigger value="trips" className={tabTriggerClass}>
                 <Map className="h-3.5 w-3.5 mr-1.5" /> My Trips
               </TabsTrigger>
+              <TabsTrigger value="portfolio" className={tabTriggerClass}>
+                <ImageIcon className="h-3.5 w-3.5 mr-1.5" /> Portfolio
+              </TabsTrigger>
               <TabsTrigger value="earnings" className={tabTriggerClass}>
                 <DollarSign className="h-3.5 w-3.5 mr-1.5" /> Earnings
               </TabsTrigger>
@@ -279,6 +286,10 @@ export default function CreatorDashboard() {
 
           <TabsContent value="trips" className="mt-0">
             <CreatorTripsTab />
+          </TabsContent>
+
+          <TabsContent value="portfolio" className="mt-0">
+            <CreatorPortfolioTab />
           </TabsContent>
 
           <TabsContent value="earnings" className="mt-0">
