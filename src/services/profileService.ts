@@ -19,6 +19,7 @@ export async function saveCreatorOnboarding(
 
   const update = {
     display_name: payload.display_name,
+    full_name: payload.display_name,
     tiktok_handle: payload.tiktok_handle || null,
     home_base: payload.home_base || null,
     creator_niches: payload.creator_niches,

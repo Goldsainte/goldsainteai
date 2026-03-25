@@ -51,6 +51,11 @@ const FollowButton = ({ targetUserId, onFollowSuccess }: FollowButtonProps) => {
       return;
     }
 
+    if (user.id === targetUserId) {
+      toast.error("You can't follow yourself");
+      return;
+    }
+
     // Check fraud prevention before following (not for unfollows)
     if (!isFollowing) {
       const allowed = await checkEngagement('follow');
