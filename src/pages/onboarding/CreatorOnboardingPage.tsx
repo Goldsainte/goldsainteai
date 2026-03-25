@@ -296,6 +296,22 @@ export default function CreatorOnboardingPage() {
         .eq("id", user.id);
 
       if (error) throw error;
+
+      // Save creator media items
+      if (creatorMedia.length > 0) {
+        const mediaRows = creatorMedia.map((item, idx) => ({
+          user_id: user.id,
+          media_type: item.media_type,
+          source: item.source,
+          url: item.url,
+          thumbnail_url: item.thumbnail_url || null,
+          external_url: item.external_url || null,
+          caption: item.caption || null,
+          sort_order: idx,
+        }));
+        await supabase.from("creator_media").upsert(mediaRows, { onConflict: "id" });
+      }
+
       setShowWelcomeCard(true);
     } catch (error: any) {
       console.error("Error saving creator profile:", error);
