@@ -8,13 +8,13 @@ export function HowCreatorWorks({ creatorName = "Your creator" }: HowCreatorWork
   const steps = [
     {
       icon: Send,
-      title: "Submit your trip details",
+      title: "Post your trip request",
       description: "Tell us your destination, dates, and budget.",
     },
     {
       icon: PenTool,
-      title: "Get a custom itinerary",
-      description: `${creatorName} builds a personalized trip within 24–48 hours.`,
+      title: "Get a personalized plan",
+      description: `${creatorName} reviews your request and crafts a trip within 24–48 hours.`,
     },
     {
       icon: CreditCard,
