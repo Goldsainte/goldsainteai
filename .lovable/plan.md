@@ -1,53 +1,47 @@
 
 
-## Add Media Management to Creator Dashboard + Profile Page Gaps
+## Fix: Instagram/TikTok Reel Links Show Generic Icon Instead of Thumbnail
 
 ### Problem
-The `CreatorMediaUploader` only exists in the onboarding flow. Once a creator has completed onboarding (e.g., Radu Diaconesa), there is no way to add/edit photos, videos, or Instagram/TikTok reels from the Creator Dashboard or the public profile page.
+When a creator adds an Instagram or TikTok Reel URL, both the uploader grid and the public gallery show a plain icon placeholder (Film icon + "Instagram Reel" text) instead of an actual thumbnail image from the post.
+
+### Solution
+Create a backend function that fetches thumbnail images from Instagram/TikTok oEmbed APIs when a link is added, and store the `thumbnail_url` alongside the entry.
 
 ### Plan
 
-**1. Add a "Portfolio" tab to the Creator Dashboard**
+**1. New edge function: `fetch-social-thumbnail`**
+- Accepts a social media URL
+- Calls the free oEmbed proxy (`noembed.com/embed?url=...`) which supports both Instagram and TikTok without API keys
+- Returns the thumbnail URL from the oEmbed response
+- Fallback: if oEmbed fails, return `null` (keeps the current icon placeholder as a graceful degradation)
 
-Add a new tab between "My Trips" and "Earnings" in `CreatorDashboard.tsx`:
-- New component: `CreatorPortfolioTab.tsx`
-- Renders the existing `CreatorMediaUploader` with the user's current `creator_media` items pre-loaded from the database
-- On save, upserts items to `creator_media` (same logic as onboarding)
-- Also allows editing cover image and featured photos from this tab
+**2. Update `CreatorMediaUploader.tsx` — call edge function on link add**
+- When the user clicks "Add" for an Instagram/TikTok link, call `fetch-social-thumbnail` before creating the entry
+- Set the returned thumbnail as `thumbnail_url` on the `MediaEntry`
+- Show a brief loading state on the Add button while fetching
 
-**2. Add "Edit Profile" button on public profile for own profile**
+**3. Update `CreatorMediaUploader.tsx` grid — render thumbnails**
+- For external items with a `thumbnail_url`, render an `<img>` with the thumbnail instead of the generic Film icon
+- Keep the source badge (Instagram/TikTok) overlaid on the thumbnail
+- Fall back to the current icon placeholder if no thumbnail exists
 
-In `CreatorPublicProfilePage.tsx`, when `isOwnProfile` is true:
-- Show an "Edit Profile" button in the hero or top bar that links to `/creator-dashboard` (portfolio tab)
-- This gives returning creators a clear path to manage their media
-
-**3. Critical missing items on the profile page**
-
-After auditing the profile, these gaps should also be addressed:
-
-- **No average rating display**: The `ProfileHero` and `ProfileSidebar` support `rating` and `reviewCount` props but the public profile page never fetches or passes them. Need to query `profile_reviews` for average rating + count and wire it through.
-- **No "Edit Profile" affordance for own profile**: Creators viewing their own page have no way to edit bio, avatar, niches, or media without going back to onboarding.
-- **No messaging/contact CTA**: The sidebar has "Request a trip" but no direct message option (the `MessageCircle` icon appears in trust badges but isn't actionable).
+**4. Update `CreatorMediaGallery.tsx` — render thumbnails on public profile**
+- Same rendering logic: if `thumbnail_url` exists, show the image; otherwise show the icon placeholder
+- Keep the click-to-open-external-link behavior
 
 ### Files
-
-- **New**: `src/pages/creator/components/CreatorPortfolioTab.tsx` — media management tab with `CreatorMediaUploader`, loads existing `creator_media` on mount, saves on submit
-- **Edit**: `src/pages/CreatorDashboard.tsx` — add Portfolio tab (icon: `ImageIcon`) to the tab list and mobile select
-- **Edit**: `src/pages/creators/CreatorPublicProfilePage.tsx` — add "Edit Profile" button for own profile, fetch and pass `rating`/`reviewCount` to `ProfileHero` and `ProfileSidebar`
+- **New**: `supabase/functions/fetch-social-thumbnail/index.ts`
+- **Edit**: `src/components/creator/CreatorMediaUploader.tsx` — fetch thumbnail on add, render in grid
+- **Edit**: `src/components/creator/CreatorMediaGallery.tsx` — render thumbnail images
 
 ### Technical Detail
-
 ```text
-CreatorPortfolioTab
-├── Loads creator_media from DB on mount
-├── Renders CreatorMediaUploader (existing component)
-├── Cover image uploader (reuse pattern from onboarding)
-├── Save button → upsert to creator_media table
-└── Delete removed items from DB
-
-CreatorPublicProfilePage additions
-├── Query: SELECT AVG(rating), COUNT(*) FROM profile_reviews WHERE reviewee_id = :id
-├── Pass rating + reviewCount to ProfileHero and ProfileSidebar
-└── isOwnProfile → render "Edit Profile" link to /creator-dashboard?tab=portfolio
+User pastes Instagram URL → clicks Add
+  → POST /functions/v1/fetch-social-thumbnail { url }
+  → Edge function calls https://noembed.com/embed?url=<encoded_url>
+  → Returns { thumbnail_url: "https://..." }
+  → MediaEntry created with thumbnail_url set
+  → Grid renders <img> instead of icon placeholder
 ```
 
