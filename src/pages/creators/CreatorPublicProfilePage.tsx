@@ -62,7 +62,7 @@ export default function CreatorPublicProfilePage() {
   const [avgRating, setAvgRating] = useState<number | null>(null);
   const [reviewCount, setReviewCount] = useState<number>(0);
   const [requestModalOpen, setRequestModalOpen] = useState(false);
-  const [showWriteReview, setShowWriteReview] = useState(false);
+  
 
   useEffect(() => {
     if (!id) return;
@@ -450,19 +450,6 @@ export default function CreatorPublicProfilePage() {
         creatorName={displayName}
       />
 
-      {/* Write Review Modal */}
-      {showWriteReview && user && (
-        <WriteReviewModal
-          revieweeId={creator.id}
-          revieweeName={displayName}
-          onSuccess={() => {
-            setReviewRefreshKey((k) => k + 1);
-            setShowWriteReview(false);
-          }}
-        >
-          <span ref={(el) => { if (el) el.click(); }} />
-        </WriteReviewModal>
-      )}
     </>
   );
 }
