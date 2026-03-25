@@ -20,6 +20,7 @@ interface ProfileHeroProps {
   verifiedLabel?: string;
   location?: string | null;
   tagline?: string | null;
+  serviceLine?: string | null;
   pills?: string[];
   stats?: ProfileHeroStat[];
   rating?: number | null;
@@ -35,6 +36,7 @@ export function ProfileHero({
   verifiedLabel = "Verified",
   location,
   tagline,
+  serviceLine,
   pills = [],
   stats = [],
   rating,
@@ -124,6 +126,11 @@ export function ProfileHero({
                     </TooltipProvider>
                   )}
                 </div>
+                {serviceLine && (
+                  <p className="text-xs md:text-sm text-white/70 tracking-wide truncate mb-0.5">
+                    {serviceLine}
+                  </p>
+                )}
                 {tagline && (
                   <p className="text-sm md:text-base text-white/80 italic truncate mb-1">
                     {tagline}
