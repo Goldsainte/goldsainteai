@@ -31,7 +31,16 @@ export function getPostAuthDestination(
     return "/marketplace";
   }
 
-  // Creators, Agents, Brands check profile completion
+  // Creators, Agents, Brands — route to role-specific onboarding if incomplete
+  if (accountType === "creator" && !isProfileComplete) {
+    return "/onboarding/creator";
+  }
+  if (accountType === "agent" && !isProfileComplete) {
+    return "/apply/agent";
+  }
+  if (accountType === "brand" && !isProfileComplete) {
+    return "/apply/brand";
+  }
   if (!isProfileComplete) {
     return "/auth/complete-profile";
   }
