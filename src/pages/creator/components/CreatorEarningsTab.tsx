@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, AlertCircle } from "lucide-react";
 import {
   getPartnerBookingEarnings,
   type PartnerEarningSnapshot,
 } from "@/services/earningsService";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { CreatorStripeOnboarding } from "@/components/CreatorStripeOnboarding";
 
 function formatMoney(amountCents: number, currency: string) {
   return new Intl.NumberFormat("en-US", {
@@ -15,9 +18,24 @@ function formatMoney(amountCents: number, currency: string) {
 }
 
 export function CreatorEarningsTab() {
+  const { user } = useAuth();
   const [snapshot, setSnapshot] = useState<PartnerEarningSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasStripeAccount, setHasStripeAccount] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    async function checkStripe() {
+      if (!user) return;
+      const { data } = await supabase
+        .from("profiles")
+        .select("stripe_account_id")
+        .eq("id", user.id)
+        .maybeSingle();
+      setHasStripeAccount(!!data?.stripe_account_id);
+    }
+    checkStripe();
+  }, [user]);
 
   useEffect(() => {
     let cancelled = false;
@@ -42,6 +60,11 @@ export function CreatorEarningsTab() {
 
   return (
     <div className="space-y-6">
+      {/* Stripe Connect setup banner */}
+      {hasStripeAccount === false && (
+        <CreatorStripeOnboarding />
+      )}
+
       {/* Summary cards */}
       <div className="grid gap-4 md:grid-cols-3">
         <SummaryCard

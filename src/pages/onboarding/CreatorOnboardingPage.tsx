@@ -16,10 +16,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  User, Globe, MapPin, Sparkles, CreditCard,
+  User, Globe, MapPin, Sparkles,
   TrendingUp, Instagram, Youtube, Video, Shield,
   MessageCircle, Clock, Wallet, Heart,
-  CheckCircle, DollarSign, FileText, Star, Building2, Image,
+  DollarSign, FileText, Star, Building2, Image,
   ArrowRight
 } from "lucide-react";
 
@@ -28,7 +28,6 @@ const STEPS = [
   { title: "Your Niche", icon: Sparkles },
   { title: "Portfolio", icon: Image },
   { title: "Standards", icon: Shield },
-  { title: "Get Paid", icon: CreditCard },
 ];
 
 const TRAVEL_NICHES = [
@@ -123,8 +122,6 @@ export default function CreatorOnboardingPage() {
   const [creatorAgreementAccepted, setCreatorAgreementAccepted] = useState(false);
   const [transparencyAccepted, setTransparencyAccepted] = useState(false);
 
-  // Step 5: Stripe
-  const [stripeSetupStarted, setStripeSetupStarted] = useState(false);
 
   const [searchParams] = useSearchParams();
 
@@ -161,7 +158,7 @@ export default function CreatorOnboardingPage() {
       if (data.planning_fee_amount) setPlanningFee(String(data.planning_fee_amount / 100));
       if (data.itinerary_fee_amount) setItineraryFee(String(data.itinerary_fee_amount / 100));
       if (data.response_commitment_hours) setResponseTime(data.response_commitment_hours);
-      if (data.stripe_account_id) setStripeSetupStarted(true);
+      
     }
     loadExistingProfile();
   }, [user]);
@@ -218,8 +215,6 @@ export default function CreatorOnboardingPage() {
         return true; // All optional
       case 3:
         return acceptsTransparency && acceptsSafetyPolicy && tosAccepted && privacyAccepted && creatorAgreementAccepted;
-      case 4:
-        return stripeSetupStarted;
       default:
         return true;
     }
@@ -308,30 +303,6 @@ export default function CreatorOnboardingPage() {
     }
   };
 
-  const handleStripeSetup = async () => {
-    try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session) {
-        toast.error("Please sign in first");
-        return;
-      }
-
-      const { data, error } = await supabase.functions.invoke("stripe-connect-link", {
-        headers: { Authorization: `Bearer ${session.access_token}` },
-      });
-
-      if (error) throw error;
-      if (data?.url) {
-        setStripeSetupStarted(true);
-        window.location.href = data.url;
-      }
-    } catch (error: any) {
-      console.error("Error starting Stripe setup:", error);
-      toast.error("Failed to start payment setup. Please try again.");
-    }
-  };
 
   // Welcome Card Screen
   if (showWelcomeCard) {
@@ -808,67 +779,6 @@ export default function CreatorOnboardingPage() {
               </div>
             )}
 
-            {/* ── Step 5: Get Paid ── */}
-            {currentStep === 4 && (
-              <div className="space-y-6">
-                <div className="text-center mb-8">
-                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Get Paid</h2>
-                  <p className="text-[#6B7280]">How you'll receive commissions</p>
-                </div>
-
-                <div className="bg-[#FDF9F0] rounded-2xl p-6 border border-[#E5DFC6]">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-[#C7A962] rounded-full flex items-center justify-center">
-                      <CreditCard className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-[#0a2225] mb-1">Secure Payouts via Stripe</h3>
-                      <p className="text-sm text-[#6B7280]">
-                        We use Stripe Connect for fast, secure payouts. Complete verification to receive commissions.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 text-sm text-[#6B7280]">
-                    <CheckCircle className="w-5 h-5 text-[#C7A962]" />
-                    <span>Bank account or debit card for payouts</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-sm text-[#6B7280]">
-                    <CheckCircle className="w-5 h-5 text-[#C7A962]" />
-                    <span>Tax information (W9 for US creators)</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-sm text-[#6B7280]">
-                    <CheckCircle className="w-5 h-5 text-[#C7A962]" />
-                    <span>Identity verification for security</span>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-2xl p-6 border border-[#E5DFC6]">
-                  <h3 className="font-medium text-[#0a2225] mb-4">Payout Schedule</h3>
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-[#6B7280]">Commission Release</span>
-                      <span className="text-[#0a2225]">After trip completion</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#6B7280]">Payout Frequency</span>
-                      <span className="text-[#0a2225]">Daily (minimum delay)</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#6B7280]">Processing Time</span>
-                      <span className="text-[#0a2225]">1-2 business days</span>
-                    </div>
-                  </div>
-                </div>
-
-                <p className="text-sm text-[#6B7280] text-center">
-                  Complete Stripe Connect setup to launch your profile.
-                </p>
-              </div>
-            )}
-
             {/* Navigation */}
             <div className="flex justify-between mt-10 pt-6 border-t border-[#E5DFC6]">
               <div className="flex items-center gap-3">
@@ -890,17 +800,6 @@ export default function CreatorOnboardingPage() {
               </div>
 
               <div className="flex gap-3">
-                {currentStep === 4 && (
-                  <Button
-                    variant="outline"
-                    onClick={handleStripeSetup}
-                    className="border-[#C7A962] text-[#C7A962] hover:bg-[#C7A962] hover:text-white"
-                  >
-                    <CreditCard className="w-4 h-4 mr-2" />
-                    {stripeSetupStarted ? "Stripe Connected ✓" : "Set Up Stripe Now"}
-                  </Button>
-                )}
-
                 {currentStep < STEPS.length - 1 ? (
                   <Button
                     onClick={handleNext}

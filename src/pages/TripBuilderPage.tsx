@@ -80,6 +80,21 @@ export default function TripBuilderPage() {
 
     try {
       setSaving(true);
+
+      // Gate publishing on Stripe account for creators
+      if (status === "published" && isCreator) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("stripe_account_id")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        if (!profile?.stripe_account_id) {
+          toast.error("Please set up your payment account in the Earnings tab before publishing a trip.");
+          setSaving(false);
+          return;
+        }
+      }
       
       const slug = formData.slug || generateSlug(formData.title);
       
