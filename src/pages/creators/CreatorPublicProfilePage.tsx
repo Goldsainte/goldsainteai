@@ -137,8 +137,8 @@ export default function CreatorPublicProfilePage() {
 
         {/* Hero */}
         <ProfileHero
-          name={creator.full_name || "Goldsainte Creator"}
-          coverImage={creator.featured_photos?.[0]}
+          name={creator.display_name || creator.full_name || "Goldsainte Creator"}
+          coverImage={creator.cover_image_url || creator.featured_photos?.[0]}
           avatarUrl={creator.avatar_url}
           isVerified
           verifiedLabel="Goldsainte Creator"

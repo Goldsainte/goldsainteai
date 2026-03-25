@@ -105,6 +105,7 @@ export default function CreatorOnboardingPage() {
   const [destinations, setDestinations] = useState<string[]>([]);
 
   // Step 3: Portfolio (all optional)
+  const [coverImageUrl, setCoverImageUrl] = useState("");
   const [featuredPhotos, setFeaturedPhotos] = useState<string[]>([]);
   const [preferredBrandTiers, setPreferredBrandTiers] = useState<string[]>([]);
   const [preferredHotelBrands, setPreferredHotelBrands] = useState<string[]>([]);
@@ -151,6 +152,7 @@ export default function CreatorOnboardingPage() {
           account_type: "creator",
           role: "creator",
           display_name: displayName || undefined,
+          full_name: displayName || undefined,
           avatar_url: avatarUrl || undefined,
           bio: bio || undefined,
         })
@@ -215,9 +217,11 @@ export default function CreatorOnboardingPage() {
         .from("profiles")
         .update({
           display_name: displayName,
+          full_name: displayName,
           avatar_url: avatarUrl || null,
           bio: bio || null,
           home_base: homeBase || null,
+          cover_image_url: coverImageUrl || null,
           primary_platform: primaryPlatform || null,
           tiktok_handle: tiktokHandle || null,
           instagram_handle: instagramHandle || null,
