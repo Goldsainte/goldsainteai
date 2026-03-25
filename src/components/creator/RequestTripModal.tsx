@@ -108,7 +108,7 @@ export function RequestTripModal({
       <DialogContent className="sm:max-w-md bg-white">
         <DialogHeader>
           <DialogTitle className="font-secondary text-xl text-[#0a2225]">
-            Request a Trip from {creatorName}
+            Get a Custom Itinerary from {creatorName}
           </DialogTitle>
           <DialogDescription className="text-[#6B7280]">
             Tell us your preferences and get a custom itinerary.

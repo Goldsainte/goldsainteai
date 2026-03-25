@@ -1,28 +1,32 @@
-import { Send, PenTool, CreditCard } from "lucide-react";
+import { Send, PenTool, CreditCard, Clock, ShieldCheck } from "lucide-react";
 
-export function HowCreatorWorks() {
+interface HowCreatorWorksProps {
+  creatorName?: string;
+}
+
+export function HowCreatorWorks({ creatorName = "Your creator" }: HowCreatorWorksProps) {
   const steps = [
     {
       icon: Send,
-      title: "Submit your request",
-      description: "Share your destination, dates, budget, and travel preferences.",
+      title: "Submit your trip details",
+      description: "Tell us your destination, dates, and budget.",
     },
     {
       icon: PenTool,
-      title: "Custom itinerary",
-      description: "Your creator builds a personalized trip just for you.",
+      title: "Get a custom itinerary",
+      description: `${creatorName} builds a personalized trip within 24–48 hours.`,
     },
     {
       icon: CreditCard,
       title: "Review & book",
-      description: "Refine the plan and book securely through Goldsainte.",
+      description: "Refine your plan and book securely through Goldsainte.",
     },
   ];
 
   return (
     <section>
       <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-4">
-        How It Works
+        How to Book With This Creator
       </h2>
       <div className="grid gap-4 sm:grid-cols-3">
         {steps.map((step, i) => (
@@ -44,6 +48,18 @@ export function HowCreatorWorks() {
             </p>
           </div>
         ))}
+      </div>
+
+      {/* Urgency microcopy */}
+      <div className="mt-3 flex flex-wrap items-center justify-center gap-4 text-xs text-[#6B7280]">
+        <span className="inline-flex items-center gap-1.5">
+          <Clock className="h-3.5 w-3.5 text-[#C7A962]" />
+          Takes 2 minutes · No commitment
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <ShieldCheck className="h-3.5 w-3.5 text-[#0c4d47]" />
+          Response within 24 hours
+        </span>
       </div>
     </section>
   );

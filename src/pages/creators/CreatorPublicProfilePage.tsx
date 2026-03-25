@@ -149,6 +149,16 @@ export default function CreatorPublicProfilePage() {
   }
 
   const displayName = creator.display_name || creator.full_name || "Goldsainte Creator";
+
+  // Build service line from niches + destinations
+  const nichePart = creator.creator_niches?.length
+    ? `Custom ${creator.creator_niches.slice(0, 2).join(" & ").toLowerCase()} travel planning`
+    : "Custom travel planning";
+  const destPart = creator.destinations_focus_tags?.length
+    ? creator.destinations_focus_tags.slice(0, 2).join(" & ")
+    : null;
+  const serviceLine = destPart ? `${nichePart} · ${destPart}` : nichePart;
+
   const specialties = creatorData?.specialties || creator.content_style_tags || creator.creator_niches || [];
   const travelStyles = creatorData?.travel_styles || [];
   const bestFor = creatorData?.best_for || [];
@@ -229,11 +239,17 @@ export default function CreatorPublicProfilePage() {
           verifiedLabel="Goldsainte Creator"
           location={creator.location}
           tagline={tagline}
+          serviceLine={serviceLine}
           pills={creator.creator_niches?.slice(0, 4) || []}
           rating={avgRating}
           reviewCount={reviewCount}
           stats={heroStats}
         />
+
+        {/* How to Book — directly under hero */}
+        <div className="mx-auto max-w-6xl px-4 pt-8 pb-0">
+          <HowCreatorWorks creatorName={displayName} />
+        </div>
 
         {/* Two-column layout */}
         <div className="mx-auto max-w-6xl px-4 py-8">
@@ -353,9 +369,6 @@ export default function CreatorPublicProfilePage() {
                 instagramHandle={creator.instagram_handle}
                 isOwnProfile={isOwnProfile}
               />
-
-              {/* How It Works */}
-              <HowCreatorWorks />
 
               {/* Trips */}
               <ProfileTripsGrid
