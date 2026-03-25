@@ -1,38 +1,41 @@
 
 
-## Fix Creator Profile Issues
+## Fix: Creator Login Loop — Returning Users Sent Back to Onboarding
 
-Five bugs identified on the creator public profile page. Here is the plan to resolve each:
+### Root Cause
 
-### 1. Name Not Updating ("Test Creator" persists)
-**Root cause**: Onboarding saves to `display_name` but the public profile page (`CreatorPublicProfilePage.tsx`) reads `full_name`. These are two different columns.
-**Fix**: Update onboarding's `handleSubmit` to also write the display name into `full_name`. Update `handleSkip` similarly.
+The user `creator@goldsainte.com` has `account_type: "creator"` but `is_profile_complete: false` and `onboarding_completed: false`. This happens because the "Skip for now" button in creator onboarding sets `account_type` but does NOT set the completion flags.
 
-### 2. No Hero/Cover Image Upload
-**Root cause**: There is no `cover_image_url` column on `profiles` and no uploader for it during onboarding. The hero uses `featured_photos[0]` as a fallback, but there's no dedicated cover image field.
-**Fix**:
-- Add a `cover_image_url` column to `profiles` via migration
-- Add a cover image uploader to the onboarding Portfolio step (Step 3), reusing the existing storage upload pattern
-- Update the public profile page to use `cover_image_url` for the hero, falling back to `featured_photos[0]`
+On next login, `getPostAuthDestination()` sees `is_profile_complete = false` → sends user to `/auth/complete-profile` → which sees `account_type = "creator"` → redirects to `/onboarding` → which redirects to `/onboarding/creator`. The user ends up in a loop, back at creator setup as if they never registered.
 
-### 3. Follow Button Error ("violates check constraint user_follows_check")
-**Root cause**: The `user_follows` table has a CHECK constraint `follower_id <> following_id` — users cannot follow themselves. The Follow button currently shows even when viewing your own profile.
-**Fix**: In `CreatorPublicProfilePage.tsx`, hide the Follow button (and pass a prop to `ProfileSidebar`) when the logged-in user is viewing their own profile. Also add a guard in `FollowButton.tsx` to prevent self-follows.
+Additionally, `full_name` still reads "Test Creator" because the skip handler wrote `displayName || undefined` (which was empty, so it didn't overwrite).
 
-### 4. Review Button Not Visible
-**Root cause**: The "Write a Review" button already exists in the code (line 214-224) but only renders when `user && user.id !== creator.id`. If the user was viewing their own profile, or wasn't logged in, it won't show. For logged-in users viewing someone else's profile, it should be visible. Need to verify this is actually broken or if the user was testing on their own profile.
-**Fix**: Ensure the review section and WriteReviewModal render correctly for logged-in users viewing other profiles. Add a login prompt for unauthenticated users who want to review.
+### Fix (3 changes)
 
-### 5. Follower Count and Avg Views Not Wired
-**Root cause**: The database has triggers that auto-calculate `creator_followers` and `creator_avg_views`, but these show "—" because the values are likely `null` or `0` for new creators with no followers/posts yet. The display uses `fmt()` which returns "—" for zero/null.
-**Fix**: Change the display to show `0` instead of `—` when the value is zero or null, so the stats look wired up. The triggers already handle real data.
+**1. `src/lib/auth/postAuthRouting.ts` — Route incomplete creators directly to onboarding**
 
-### Technical Summary
-- **Migration**: Add `cover_image_url TEXT` column to `profiles`
-- **Files modified**:
-  - `src/pages/onboarding/CreatorOnboardingPage.tsx` — save `full_name`, add cover image uploader
-  - `src/pages/creators/CreatorPublicProfilePage.tsx` — use `cover_image_url`, hide self-follow, fix stat display
-  - `src/components/FollowButton.tsx` — guard against self-follow
-  - `src/components/profile/ProfileSidebar.tsx` — accept `isOwnProfile` prop to hide follow
-- **New component**: Cover image uploader (or reuse `FeaturedPhotosUploader` pattern for a single image)
+Instead of sending all incomplete profiles to `/auth/complete-profile`, add creator-specific routing:
+
+```
+if (accountType === "creator" && !isProfileComplete) {
+  return "/onboarding/creator";
+}
+if (accountType === "agent" && !isProfileComplete) {
+  return "/onboarding/agent";  // or /apply/agent
+}
+```
+
+This skips the redundant `/auth/complete-profile` → `/onboarding` → `/onboarding/creator` redirect chain.
+
+**2. `src/pages/onboarding/CreatorOnboardingPage.tsx` — Pre-populate from existing profile data**
+
+Add a `useEffect` that loads the user's existing profile on mount and pre-fills `displayName`, `avatarUrl`, `bio`, etc. so returning users see their previously saved data instead of blank fields.
+
+**3. `src/pages/onboarding/CreatorOnboardingPage.tsx` — Fix `handleSkip` to update `full_name`**
+
+Change `full_name: displayName || undefined` to always write the display name if available, and also sync it from the fetched profile data if the user hasn't typed anything new.
+
+### Files Modified
+- `src/lib/auth/postAuthRouting.ts` — role-specific incomplete routing
+- `src/pages/onboarding/CreatorOnboardingPage.tsx` — pre-populate fields on mount, fix skip handler
 
