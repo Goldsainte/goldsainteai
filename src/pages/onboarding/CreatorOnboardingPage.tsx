@@ -128,34 +128,64 @@ export default function CreatorOnboardingPage() {
 
   const [searchParams] = useSearchParams();
 
+  // Pre-populate from existing profile data for returning users
   useEffect(() => {
-    async function checkStripe() {
+    async function loadExistingProfile() {
       if (!user) return;
       const { data } = await supabase
         .from("profiles")
-        .select("stripe_account_id")
+        .select("display_name, full_name, avatar_url, bio, home_base, primary_platform, tiktok_handle, instagram_handle, website, creator_niches, content_style_tags, creator_budget_levels, destinations_focus_tags, cover_image_url, featured_photos, preferred_brand_tiers, preferred_hotel_brands, aesthetic_alignment, pricing_model, planning_fee_amount, itinerary_fee_amount, response_commitment_hours, stripe_account_id")
         .eq("id", user.id)
         .maybeSingle();
-      if (data?.stripe_account_id) {
-        setStripeSetupStarted(true);
-      }
+      if (!data) return;
+
+      if (data.display_name) setDisplayName(data.display_name);
+      else if (data.full_name) setDisplayName(data.full_name);
+      if (data.avatar_url) setAvatarUrl(data.avatar_url);
+      if (data.bio) setBio(data.bio);
+      if (data.home_base) setHomeBase(data.home_base);
+      if (data.primary_platform) setPrimaryPlatform(data.primary_platform);
+      if (data.tiktok_handle) setTiktokHandle(data.tiktok_handle);
+      if (data.instagram_handle) setInstagramHandle(data.instagram_handle);
+      if (data.website) setWebsite(data.website);
+      if (data.creator_niches?.length) setSelectedNiches(data.creator_niches);
+      if (data.content_style_tags?.length) setSelectedStyles(data.content_style_tags);
+      if (data.creator_budget_levels?.length) setSelectedBudgets(data.creator_budget_levels);
+      if (data.destinations_focus_tags?.length) setDestinations(data.destinations_focus_tags);
+      if (data.cover_image_url) setCoverImageUrl(data.cover_image_url);
+      if (data.featured_photos?.length) setFeaturedPhotos(data.featured_photos as string[]);
+      if (data.preferred_brand_tiers?.length) setPreferredBrandTiers(data.preferred_brand_tiers);
+      if (data.preferred_hotel_brands?.length) setPreferredHotelBrands(data.preferred_hotel_brands);
+      if (data.aesthetic_alignment?.length) setAestheticAlignment(data.aesthetic_alignment);
+      if (data.pricing_model) setPricingModel(data.pricing_model);
+      if (data.planning_fee_amount) setPlanningFee(String(data.planning_fee_amount / 100));
+      if (data.itinerary_fee_amount) setItineraryFee(String(data.itinerary_fee_amount / 100));
+      if (data.response_commitment_hours) setResponseTime(data.response_commitment_hours);
+      if (data.stripe_account_id) setStripeSetupStarted(true);
     }
-    checkStripe();
+    loadExistingProfile();
   }, [user]);
 
   const handleSkip = async () => {
     try {
       if (!user) return;
+      const updateData: Record<string, any> = {
+        account_type: "creator",
+        role: "creator",
+      };
+      if (displayName) {
+        updateData.display_name = displayName;
+        updateData.full_name = displayName;
+      }
+      if (avatarUrl) updateData.avatar_url = avatarUrl;
+      if (bio) updateData.bio = bio;
+      if (homeBase) updateData.home_base = homeBase;
+      if (selectedNiches.length) updateData.creator_niches = selectedNiches;
+      if (selectedBudgets.length) updateData.creator_budget_levels = selectedBudgets;
+      
       await supabase
         .from("profiles")
-        .update({
-          account_type: "creator",
-          role: "creator",
-          display_name: displayName || undefined,
-          full_name: displayName || undefined,
-          avatar_url: avatarUrl || undefined,
-          bio: bio || undefined,
-        })
+        .update(updateData)
         .eq("id", user.id);
       toast.success("Progress saved! You can finish onboarding anytime from your dashboard.");
       navigate("/creator-dashboard");
