@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { ArrowLeft, PenLine, LogIn, Settings } from "lucide-react";
+import { ArrowLeft, PenLine, LogIn, Settings, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileHero } from "@/components/profile/ProfileHero";
 import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
@@ -9,6 +9,9 @@ import { ProfileTripsGrid } from "@/components/profile/ProfileTripsGrid";
 import { ReviewsList } from "@/components/profile/ReviewsList";
 import { WriteReviewModal } from "@/components/profile/WriteReviewModal";
 import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
+import { CreatorTrustSection } from "@/components/creator/CreatorTrustSection";
+import { HowCreatorWorks } from "@/components/creator/HowCreatorWorks";
+import { RequestTripModal } from "@/components/creator/RequestTripModal";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -27,6 +30,25 @@ interface CreatorProfile {
   creator_followers: number | null;
   featured_photos: string[] | null;
   cover_image_url: string | null;
+  content_style_tags: string[] | null;
+  destinations_focus_tags: string[] | null;
+  travel_philosophy: string | null;
+  last_seen_at: string | null;
+  website: string | null;
+}
+
+interface CreatorProfileData {
+  years_experience: number | null;
+  trips_completed: number | null;
+  clients_served: number | null;
+  certifications: string[] | null;
+  travel_styles: string[] | null;
+  best_for: string[] | null;
+  not_ideal_for: string[] | null;
+  response_time_hours: number | null;
+  specialties: string[] | null;
+  bio: string | null;
+  updated_at: string;
 }
 
 export default function CreatorPublicProfilePage() {
@@ -34,32 +56,50 @@ export default function CreatorPublicProfilePage() {
   const navigate = useNavigate();
   const { user, isLoading: authLoading } = useAuth();
   const [creator, setCreator] = useState<CreatorProfile | null>(null);
+  const [creatorData, setCreatorData] = useState<CreatorProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
   const [avgRating, setAvgRating] = useState<number | null>(null);
   const [reviewCount, setReviewCount] = useState<number>(0);
+  const [requestModalOpen, setRequestModalOpen] = useState(false);
+  const [showWriteReview, setShowWriteReview] = useState(false);
 
   useEffect(() => {
     if (!id) return;
     (async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select(
-          "id, full_name, display_name, avatar_url, bio, location, tiktok_handle, instagram_handle, creator_niches, creator_avg_views, creator_followers, featured_photos, cover_image_url"
-        )
-        .eq("id", id)
-        .maybeSingle();
-      setCreator(data as CreatorProfile | null);
+      // Fetch profile + creator_profiles + reviews in parallel
+      const [profileRes, creatorProfileRes, reviewsRes] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select(
+            "id, full_name, display_name, avatar_url, bio, location, tiktok_handle, instagram_handle, creator_niches, creator_avg_views, creator_followers, featured_photos, cover_image_url, content_style_tags, destinations_focus_tags, travel_philosophy, last_seen_at, website"
+          )
+          .eq("id", id)
+          .maybeSingle(),
+        supabase
+          .from("creator_profiles")
+          .select(
+            "years_experience, trips_completed, clients_served, certifications, travel_styles, best_for, not_ideal_for, response_time_hours, specialties, bio, updated_at"
+          )
+          .eq("user_id", id)
+          .maybeSingle(),
+        supabase
+          .from("profile_reviews")
+          .select("rating")
+          .eq("reviewee_id", id),
+      ]);
 
-      // Fetch average rating + count
-      const { data: reviews } = await supabase
-        .from("profile_reviews")
-        .select("rating")
-        .eq("reviewee_id", id);
+      setCreator(profileRes.data as CreatorProfile | null);
+      setCreatorData(creatorProfileRes.data as CreatorProfileData | null);
+
+      const reviews = reviewsRes.data;
       if (reviews && reviews.length > 0) {
         const sum = reviews.reduce((acc, r) => acc + (r.rating || 0), 0);
         setAvgRating(sum / reviews.length);
         setReviewCount(reviews.length);
+      } else {
+        setAvgRating(null);
+        setReviewCount(0);
       }
 
       setLoading(false);
@@ -108,6 +148,15 @@ export default function CreatorPublicProfilePage() {
     );
   }
 
+  const displayName = creator.display_name || creator.full_name || "Goldsainte Creator";
+  const specialties = creatorData?.specialties || creator.content_style_tags || creator.creator_niches || [];
+  const travelStyles = creatorData?.travel_styles || [];
+  const bestFor = creatorData?.best_for || [];
+  const notIdealFor = creatorData?.not_ideal_for || [];
+  const bio = creator.bio || creatorData?.bio;
+  const tagline = creator.travel_philosophy;
+  const lastActive = creator.last_seen_at || creatorData?.updated_at;
+
   const socialLinks = [
     creator.tiktok_handle && {
       platform: "TikTok",
@@ -121,17 +170,27 @@ export default function CreatorPublicProfilePage() {
     },
   ].filter(Boolean) as { platform: string; handle: string; url: string }[];
 
+  const followerDisplay = (creator.creator_followers ?? 0) > 0
+    ? fmt(creator.creator_followers)
+    : null;
+
+  const heroStats = [
+    followerDisplay
+      ? { label: "Followers", value: followerDisplay }
+      : { label: "Status", value: "New Creator" },
+    { label: "Avg Views", value: fmt(creator.creator_avg_views) },
+  ];
+
+  const handleRequestTrip = () => setRequestModalOpen(true);
+
   return (
     <>
       <Helmet>
-        <title>
-          {creator.full_name || "Creator"} · Goldsainte Creators
-        </title>
+        <title>{displayName} · Goldsainte Creators</title>
         <meta
           name="description"
           content={
-            creator.bio ||
-            `Discover ${creator.full_name || "this creator"} on Goldsainte`
+            tagline || bio || `Discover ${displayName} on Goldsainte`
           }
         />
       </Helmet>
@@ -163,19 +222,17 @@ export default function CreatorPublicProfilePage() {
 
         {/* Hero */}
         <ProfileHero
-          name={creator.display_name || creator.full_name || "Goldsainte Creator"}
+          name={displayName}
           coverImage={creator.cover_image_url || creator.featured_photos?.[0]}
           avatarUrl={creator.avatar_url}
           isVerified
           verifiedLabel="Goldsainte Creator"
           location={creator.location}
+          tagline={tagline}
           pills={creator.creator_niches?.slice(0, 4) || []}
           rating={avgRating}
           reviewCount={reviewCount}
-          stats={[
-            { label: "Followers", value: fmt(creator.creator_followers) },
-            { label: "Avg Views", value: fmt(creator.creator_avg_views) },
-          ]}
+          stats={heroStats}
         />
 
         {/* Two-column layout */}
@@ -183,61 +240,145 @@ export default function CreatorPublicProfilePage() {
           <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
             {/* Left column */}
             <div className="space-y-8">
-              {/* About */}
+              {/* Structured About */}
               <section>
                 <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151]">
-                  About {creator.display_name || creator.full_name}
+                  About {displayName}
                 </h2>
                 <p className="mt-3 text-[#0a2225] leading-relaxed whitespace-pre-line">
-                  {creator.bio ||
-                    "This creator hasn't added a bio yet, but their trips speak for themselves."}
+                  {bio || "This creator hasn't added a bio yet, but their trips speak for themselves."}
                 </p>
+
+                {/* Specialties */}
+                {specialties.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-xs font-medium text-[#6B7280] uppercase tracking-wide mb-2">
+                      What I Specialize In
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {specialties.map((s) => (
+                        <span
+                          key={s}
+                          className="rounded-full bg-[#C7B892]/20 border border-[#C7B892]/30 px-3 py-1.5 text-xs text-[#0a2225]"
+                        >
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Travel Styles */}
+                {travelStyles.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-xs font-medium text-[#6B7280] uppercase tracking-wide mb-2">
+                      Travel Style
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {travelStyles.map((s) => (
+                        <span
+                          key={s}
+                          className="rounded-full bg-[#0c4d47]/10 border border-[#0c4d47]/20 px-3 py-1.5 text-xs text-[#0c4d47]"
+                        >
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Empty state placeholder */}
+                {specialties.length === 0 && travelStyles.length === 0 && !bio && (
+                  <div className="mt-4 rounded-xl border border-dashed border-[#E5DFC6] bg-[#F5F0E0]/30 p-4 text-center">
+                    <Sparkles className="h-5 w-5 text-[#C7A962] mx-auto mb-2" />
+                    <p className="text-xs text-[#6B7280]">
+                      This creator is building their profile — stay tuned!
+                    </p>
+                  </div>
+                )}
               </section>
 
-              {/* Niches */}
-              {creator.creator_niches && creator.creator_niches.length > 0 && (
+              {/* Trust & Credibility */}
+              <CreatorTrustSection
+                yearsExperience={creatorData?.years_experience}
+                tripsCompleted={creatorData?.trips_completed}
+                clientsServed={creatorData?.clients_served}
+                certifications={creatorData?.certifications}
+                isVerified
+              />
+
+              {/* Audience / Fit */}
+              {(bestFor.length > 0 || notIdealFor.length > 0) && (
                 <section>
-                  <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-3">
-                    Niches
+                  <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-4">
+                    Who This Is For
                   </h2>
-                  <div className="flex flex-wrap gap-2">
-                    {creator.creator_niches.map((niche) => (
-                      <span
-                        key={niche}
-                        className="rounded-full bg-[#C7B892]/20 border border-[#C7B892]/30 px-4 py-1.5 text-sm text-[#0a2225]"
-                      >
-                        {niche}
-                      </span>
-                    ))}
-                  </div>
+                  {bestFor.length > 0 && (
+                    <div className="mb-3">
+                      <p className="text-xs font-medium text-[#6B7280] mb-2">Best For</p>
+                      <div className="flex flex-wrap gap-2">
+                        {bestFor.map((b) => (
+                          <span
+                            key={b}
+                            className="rounded-full bg-green-50 border border-green-200 px-3 py-1.5 text-xs text-green-800"
+                          >
+                            {b}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {notIdealFor.length > 0 && (
+                    <div>
+                      <p className="text-xs font-medium text-[#6B7280] mb-2">Not Ideal For</p>
+                      <div className="flex flex-wrap gap-2">
+                        {notIdealFor.map((n) => (
+                          <span
+                            key={n}
+                            className="rounded-full bg-orange-50 border border-orange-200 px-3 py-1.5 text-xs text-orange-800"
+                          >
+                            {n}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </section>
               )}
 
-              {/* Gallery — uses creator_media table with featured_photos fallback */}
-              <CreatorMediaGallery creatorId={creator.id} fallbackPhotos={creator.featured_photos} />
+              {/* Gallery */}
+              <CreatorMediaGallery
+                creatorId={creator.id}
+                fallbackPhotos={creator.featured_photos}
+                instagramHandle={creator.instagram_handle}
+                isOwnProfile={isOwnProfile}
+              />
+
+              {/* How It Works */}
+              <HowCreatorWorks />
 
               {/* Trips */}
-              <ProfileTripsGrid creatorId={creator.id} creatorType="creator" />
+              <ProfileTripsGrid
+                creatorId={creator.id}
+                creatorType="creator"
+                onRequestTrip={handleRequestTrip}
+              />
 
               {/* Reviews */}
               <section>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151]">
-                    Reviews
-                  </h2>
-                  {!authLoading && user && user.id !== creator.id && (
-                    <WriteReviewModal
-                      revieweeId={creator.id}
-                      revieweeName={creator.full_name || "Creator"}
-                      onSuccess={() => setReviewRefreshKey((k) => k + 1)}
-                    >
-                      <Button variant="outline" size="sm" className="border-[#E5DFC6] text-[#0a2225]">
-                        <PenLine className="mr-1.5 h-3.5 w-3.5" />
-                        Write a Review
-                      </Button>
-                    </WriteReviewModal>
-                  )}
-                  {!authLoading && !user && (
+                <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-4">
+                  Reviews
+                </h2>
+                <ReviewsList
+                  revieweeId={creator.id}
+                  refreshKey={reviewRefreshKey}
+                  avgRating={avgRating}
+                  reviewCount={reviewCount}
+                  showWriteReviewCTA={!authLoading && !!user && user.id !== creator.id}
+                  onWriteReview={() => setShowWriteReview(true)}
+                />
+                {!authLoading && !user && (
+                  <div className="mt-3 text-center">
                     <Button
                       variant="outline"
                       size="sm"
@@ -247,23 +388,22 @@ export default function CreatorPublicProfilePage() {
                       <LogIn className="mr-1.5 h-3.5 w-3.5" />
                       Sign in to review
                     </Button>
-                  )}
-                </div>
-                <ReviewsList revieweeId={creator.id} refreshKey={reviewRefreshKey} />
+                  </div>
+                )}
               </section>
             </div>
 
             {/* Right column — sticky sidebar */}
             <div className="lg:sticky lg:top-20 lg:self-start">
               <ProfileSidebar
-                name={creator.display_name || creator.full_name || "Creator"}
+                name={displayName}
                 rating={avgRating}
                 reviewCount={reviewCount}
                 targetUserId={isOwnProfile ? undefined : creator.id}
                 stats={[
                   {
                     label: "Followers",
-                    value: fmt(creator.creator_followers),
+                    value: followerDisplay || "New",
                   },
                   {
                     label: "Avg Views",
@@ -275,19 +415,44 @@ export default function CreatorPublicProfilePage() {
                   },
                 ]}
                 socialLinks={socialLinks}
-                onRequestTrip={() =>
-                  navigate(`/post-trip?fromCreator=${creator.id}`)
-                }
+                website={creator.website}
+                lastActiveAt={lastActive}
+                responseTimeHours={creatorData?.response_time_hours}
+                requestTripMicrocopy="Tell us your preferences → get a custom itinerary"
+                onRequestTrip={handleRequestTrip}
                 onSaveToStoryboard={() =>
                   toast.info("Save to storyboard", {
                     description: "Coming soon!",
                   })
                 }
+                showHowItWorks={false}
               />
             </div>
           </div>
         </div>
       </div>
+
+      {/* Request Trip Modal */}
+      <RequestTripModal
+        open={requestModalOpen}
+        onOpenChange={setRequestModalOpen}
+        creatorId={creator.id}
+        creatorName={displayName}
+      />
+
+      {/* Write Review Modal */}
+      {showWriteReview && user && (
+        <WriteReviewModal
+          revieweeId={creator.id}
+          revieweeName={displayName}
+          onSuccess={() => {
+            setReviewRefreshKey((k) => k + 1);
+            setShowWriteReview(false);
+          }}
+        >
+          <span ref={(el) => { if (el) el.click(); }} />
+        </WriteReviewModal>
+      )}
     </>
   );
 }
