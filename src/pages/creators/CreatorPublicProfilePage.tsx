@@ -15,6 +15,7 @@ import { toast } from "sonner";
 interface CreatorProfile {
   id: string;
   full_name: string | null;
+  display_name: string | null;
   avatar_url: string | null;
   bio: string | null;
   location: string | null;
@@ -24,6 +25,7 @@ interface CreatorProfile {
   creator_avg_views: number | null;
   creator_followers: number | null;
   featured_photos: string[] | null;
+  cover_image_url: string | null;
 }
 
 export default function CreatorPublicProfilePage() {
@@ -40,7 +42,7 @@ export default function CreatorPublicProfilePage() {
       const { data } = await supabase
         .from("profiles")
         .select(
-          "id, full_name, avatar_url, bio, location, tiktok_handle, instagram_handle, creator_niches, creator_avg_views, creator_followers, featured_photos"
+          "id, full_name, display_name, avatar_url, bio, location, tiktok_handle, instagram_handle, creator_niches, creator_avg_views, creator_followers, featured_photos, cover_image_url"
         )
         .eq("id", id)
         .maybeSingle();
@@ -50,9 +52,11 @@ export default function CreatorPublicProfilePage() {
   }, [id]);
 
   const fmt = (n: number | null | undefined) =>
-    n && n > 0
+    n != null && n > 0
       ? Intl.NumberFormat(undefined, { notation: "compact" }).format(n)
-      : "—";
+      : "0";
+
+  const isOwnProfile = user?.id === creator?.id;
 
   if (loading) {
     return (
@@ -231,8 +235,8 @@ export default function CreatorPublicProfilePage() {
             {/* Right column — sticky sidebar */}
             <div className="lg:sticky lg:top-20 lg:self-start">
               <ProfileSidebar
-                name={creator.full_name || "Creator"}
-                targetUserId={creator.id}
+                name={creator.display_name || creator.full_name || "Creator"}
+                targetUserId={isOwnProfile ? undefined : creator.id}
                 stats={[
                   {
                     label: "Followers",
