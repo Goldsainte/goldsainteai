@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Star } from "lucide-react";
+import { Star, PenLine } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 
 interface Review {
   id: string;
@@ -18,9 +19,20 @@ interface Review {
 interface ReviewsListProps {
   revieweeId: string;
   refreshKey?: number;
+  avgRating?: number | null;
+  reviewCount?: number;
+  onWriteReview?: () => void;
+  showWriteReviewCTA?: boolean;
 }
 
-export function ReviewsList({ revieweeId, refreshKey }: ReviewsListProps) {
+export function ReviewsList({
+  revieweeId,
+  refreshKey,
+  avgRating,
+  reviewCount = 0,
+  onWriteReview,
+  showWriteReviewCTA = false,
+}: ReviewsListProps) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -46,7 +58,6 @@ export function ReviewsList({ revieweeId, refreshKey }: ReviewsListProps) {
         return;
       }
 
-      // Fetch reviewer profiles
       const reviewerIds = data.map((r) => r.reviewer_id);
       const { data: profiles } = await supabase
         .from("profiles")
@@ -78,14 +89,47 @@ export function ReviewsList({ revieweeId, refreshKey }: ReviewsListProps) {
     );
   }
 
-  if (reviews.length === 0) {
-    return (
-      <p className="text-sm text-[#6B7280]">No reviews yet. Be the first to leave one!</p>
-    );
-  }
-
   return (
     <div className="space-y-4">
+      {/* Rating summary bar */}
+      <div className="rounded-xl border border-[#E5DFC6] bg-white p-4 flex items-center gap-4">
+        <div className="flex items-center gap-1">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <Star
+              key={star}
+              className={cn(
+                "h-5 w-5",
+                avgRating && star <= Math.round(avgRating)
+                  ? "fill-[#C7A962] text-[#C7A962]"
+                  : "fill-[#E5DFC6] text-[#E5DFC6]"
+              )}
+            />
+          ))}
+        </div>
+        <div className="flex-1">
+          {reviewCount > 0 ? (
+            <p className="text-sm text-[#0a2225]">
+              <span className="font-semibold">{avgRating?.toFixed(1)}</span>
+              <span className="text-[#6B7280]"> · {reviewCount} {reviewCount === 1 ? "review" : "reviews"}</span>
+            </p>
+          ) : (
+            <p className="text-sm text-[#6B7280]">No reviews yet</p>
+          )}
+        </div>
+        {showWriteReviewCTA && onWriteReview && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onWriteReview}
+            className="border-[#E5DFC6] text-[#0a2225] shrink-0"
+          >
+            <PenLine className="mr-1.5 h-3.5 w-3.5" />
+            {reviewCount === 0 ? "Be the first" : "Write a review"}
+          </Button>
+        )}
+      </div>
+
+      {/* Reviews list */}
       {reviews.map((review) => (
         <div
           key={review.id}

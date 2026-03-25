@@ -6,11 +6,14 @@ import {
   MessageCircle,
   CreditCard,
   CheckCircle,
+  Clock,
+  Activity,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import FollowButton from "@/components/FollowButton";
+import { formatDistanceToNow } from "date-fns";
 
 interface SocialLink {
   platform: string;
@@ -35,6 +38,9 @@ interface ProfileSidebarProps {
   showHowItWorks?: boolean;
   showTrustBadges?: boolean;
   targetUserId?: string;
+  lastActiveAt?: string | null;
+  responseTimeHours?: number | null;
+  requestTripMicrocopy?: string;
   className?: string;
 }
 
@@ -50,8 +56,23 @@ export function ProfileSidebar({
   showHowItWorks = true,
   showTrustBadges = true,
   targetUserId,
+  lastActiveAt,
+  responseTimeHours,
+  requestTripMicrocopy,
   className,
 }: ProfileSidebarProps) {
+  const lastActiveText = lastActiveAt
+    ? `Active ${formatDistanceToNow(new Date(lastActiveAt), { addSuffix: false })} ago`
+    : null;
+
+  const responseTimeText = responseTimeHours
+    ? responseTimeHours <= 1
+      ? "Responds within 1 hour"
+      : responseTimeHours <= 24
+      ? `Responds within ${responseTimeHours} hours`
+      : `Responds within ${Math.ceil(responseTimeHours / 24)} days`
+    : null;
+
   return (
     <div className={cn("space-y-4", className)}>
       {/* Rating or Stats card */}
@@ -106,6 +127,24 @@ export function ProfileSidebar({
           </div>
         )}
 
+        {/* Activity & Response indicators */}
+        {(lastActiveText || responseTimeText) && (
+          <div className="mt-4 pt-4 border-t border-[#E5DFC6] space-y-2">
+            {lastActiveText && (
+              <div className="flex items-center gap-2 text-xs text-[#6B7280]">
+                <Activity className="h-3.5 w-3.5 text-green-500" />
+                {lastActiveText}
+              </div>
+            )}
+            {responseTimeText && (
+              <div className="flex items-center gap-2 text-xs text-[#6B7280]">
+                <Clock className="h-3.5 w-3.5 text-[#C7A962]" />
+                {responseTimeText}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* CTAs */}
         <div className="mt-5 space-y-2.5">
           {targetUserId && (
@@ -118,6 +157,11 @@ export function ProfileSidebar({
           >
             Request a trip
           </Button>
+          {requestTripMicrocopy && (
+            <p className="text-[10px] text-center text-[#6B7280]">
+              {requestTripMicrocopy}
+            </p>
+          )}
 
           {website && (
             <Button
@@ -166,31 +210,6 @@ export function ProfileSidebar({
         </div>
       )}
 
-      {/* How it works */}
-      {showHowItWorks && (
-        <div className="rounded-2xl border border-[#E5DFC6] bg-white p-5">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-4">
-            How it works
-          </h3>
-          <ol className="space-y-3">
-            {[
-              { step: 1, text: "Share your trip details and preferences" },
-              { step: 2, text: "Get matched with this verified partner" },
-              { step: 3, text: "Book securely through Goldsainte" },
-            ].map(({ step, text }) => (
-              <li key={step} className="flex items-start gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#F5F0E0] text-xs font-semibold text-[#0a2225]">
-                  {step}
-                </span>
-                <span className="text-sm text-[#4a4a4a] leading-relaxed">
-                  {text}
-                </span>
-              </li>
-            ))}
-          </ol>
-        </div>
-      )}
-
       {/* Trust & Safety */}
       {showTrustBadges && (
         <div className="rounded-2xl border border-[#E5DFC6] bg-[#F5F0E0]/50 p-5">
@@ -200,7 +219,7 @@ export function ProfileSidebar({
           <ul className="space-y-3">
             {[
               { icon: ShieldCheck, text: "Verified partner" },
-              { icon: CreditCard, text: "Secure, escrowed payments" },
+              { icon: CreditCard, text: "Secure booking through Goldsainte" },
               { icon: MessageCircle, text: "On-platform messaging" },
             ].map(({ icon: Icon, text }) => (
               <li key={text} className="flex items-center gap-2.5">

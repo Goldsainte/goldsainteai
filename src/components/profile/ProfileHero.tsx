@@ -1,5 +1,11 @@
 import { Star, MapPin, BadgeCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ProfileHeroStat {
   label: string;
@@ -13,6 +19,7 @@ interface ProfileHeroProps {
   isVerified?: boolean;
   verifiedLabel?: string;
   location?: string | null;
+  tagline?: string | null;
   pills?: string[];
   stats?: ProfileHeroStat[];
   rating?: number | null;
@@ -27,6 +34,7 @@ export function ProfileHero({
   isVerified,
   verifiedLabel = "Verified",
   location,
+  tagline,
   pills = [],
   stats = [],
   rating,
@@ -97,16 +105,30 @@ export function ProfileHero({
                 )}
               </div>
 
-              {/* Name and badge */}
+              {/* Name, badge, tagline */}
               <div className="flex-1 min-w-0 pb-1">
                 <div className="flex items-center gap-2 mb-1">
                   <h1 className="font-secondary text-2xl md:text-4xl font-bold text-white truncate">
                     {name}
                   </h1>
                   {isVerified && (
-                    <BadgeCheck className="h-5 w-5 md:h-6 md:w-6 text-[#C7B892] shrink-0" />
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <BadgeCheck className="h-5 w-5 md:h-6 md:w-6 text-[#C7B892] shrink-0 cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-[#0a2225] text-white text-xs">
+                          Verified by Goldsainte
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   )}
                 </div>
+                {tagline && (
+                  <p className="text-sm md:text-base text-white/80 italic truncate mb-1">
+                    {tagline}
+                  </p>
+                )}
                 {isVerified && verifiedLabel && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-[#C7B892]/90 px-3 py-1 text-xs font-medium text-[#0a2225] uppercase tracking-wide">
                     {verifiedLabel}
