@@ -13,6 +13,7 @@ import {
   Map,
   DollarSign,
   Settings,
+  ImageIcon,
 } from "lucide-react";
 import { BackButton } from "@/components/ui/BackButton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -24,6 +25,7 @@ import { CreatorOverviewTab } from "./creator/components/CreatorOverviewTab";
 import { CreatorProposalsTab } from "./creator/components/CreatorProposalsTab";
 import { CreatorTripsTab } from "./creator/components/CreatorTripsTab";
 import { CreatorEarningsTab } from "./creator/components/CreatorEarningsTab";
+import { CreatorPortfolioTab } from "./creator/components/CreatorPortfolioTab";
 import { CreatorSettingsTab } from "./creator/components/CreatorSettingsTab";
 import type { TripProposalStatus } from "@/services/proposalService";
 
