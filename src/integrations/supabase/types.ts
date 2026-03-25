@@ -7868,6 +7868,7 @@ export type Database = {
           brand_verification_status: string | null
           content_style_tags: string[] | null
           country: string | null
+          cover_image_url: string | null
           created_at: string
           creator_agreement_accepted_at: string | null
           creator_agreement_version: string | null
@@ -7986,6 +7987,7 @@ export type Database = {
           brand_verification_status?: string | null
           content_style_tags?: string[] | null
           country?: string | null
+          cover_image_url?: string | null
           created_at?: string
           creator_agreement_accepted_at?: string | null
           creator_agreement_version?: string | null
@@ -8104,6 +8106,7 @@ export type Database = {
           brand_verification_status?: string | null
           content_style_tags?: string[] | null
           country?: string | null
+          cover_image_url?: string | null
           created_at?: string
           creator_agreement_accepted_at?: string | null
           creator_agreement_version?: string | null
