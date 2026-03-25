@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { ArrowLeft, PenLine, LogIn } from "lucide-react";
+import { ArrowLeft, PenLine, LogIn, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileHero } from "@/components/profile/ProfileHero";
 import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
@@ -36,6 +36,8 @@ export default function CreatorPublicProfilePage() {
   const [creator, setCreator] = useState<CreatorProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
+  const [avgRating, setAvgRating] = useState<number | null>(null);
+  const [reviewCount, setReviewCount] = useState<number>(0);
 
   useEffect(() => {
     if (!id) return;
@@ -48,9 +50,21 @@ export default function CreatorPublicProfilePage() {
         .eq("id", id)
         .maybeSingle();
       setCreator(data as CreatorProfile | null);
+
+      // Fetch average rating + count
+      const { data: reviews } = await supabase
+        .from("profile_reviews")
+        .select("rating")
+        .eq("reviewee_id", id);
+      if (reviews && reviews.length > 0) {
+        const sum = reviews.reduce((acc, r) => acc + (r.rating || 0), 0);
+        setAvgRating(sum / reviews.length);
+        setReviewCount(reviews.length);
+      }
+
       setLoading(false);
     })();
-  }, [id]);
+  }, [id, reviewRefreshKey]);
 
   const fmt = (n: number | null | undefined) =>
     n != null && n > 0
