@@ -1,62 +1,89 @@
 
 
-## Creator Profile — Clean Up Duplicates, Fix Hierarchy & Single CTA Path
+## Creator Profile — Instagram/TikTok Style Rebuild
 
-### Problem
-The page has duplicate CTAs (hero, sidebar, conversion section, storyboard grid), redundant content between left column and sidebar, inconsistent spacing, and no visual rhythm between sections. This creates cognitive overload and dilutes conversion.
+### Overview
+Strip the page down to a compact identity header with inline stats, then make content the entire page. Two tabs (Storyboards / Moments) replace all the separate sections. Remove About, Social Presence, Trust, and How It Works as standalone sections — fold key info into the header or inline badges.
 
-### Changes
-
-**1. `src/pages/creators/CreatorPublicProfilePage.tsx` — Layout & section cleanup**
-- **Remove the inline "Conversion Section"** (lines 308-329 — "Start Your Journey With {Name}"). This duplicates the sidebar CTA and hero CTA. Two CTA touchpoints are enough (header + sticky sidebar).
-- **Remove "How It Works" inline section** (lines 277-301). This info is already in the sidebar microcopy ("Share your vision → Receive plan → Book securely"). Keeps the page leaner.
-- **Add alternating section backgrounds** for visual rhythm:
-  - Storyboards: `bg-[#FDF9F0]` (cream, default)
-  - Social Presence: `bg-white` with top/bottom border
-  - Gallery: `bg-[#FDF9F0]`
-  - Meet Your Creator: `bg-white` with border
-  - Trust: `bg-[#FDF9F0]`
-  - Reviews: `bg-white`
-- **Wrap each section in full-width divs** that break out of the two-column grid, then contain content in `max-w-6xl` — this enables alternating backgrounds across the full viewport width.
-- **Increase section spacing** from `space-y-14` to `py-16 md:py-20` per section for proper breathing room.
-- **Move Social Presence** to after Storyboards (keep current order).
-- **Final section order**: Storyboards → Social → Gallery ("From My Travels") → Meet Creator → Trust → Trips → Reviews.
-- **Remove duplicate rating/follower display** — rating already shown in header center column and sidebar; don't repeat in left content.
-
-**2. `src/components/profile/ProfileSidebar.tsx` — Simplify to essentials only**
-- **Remove the Storyboards list** from sidebar (lines 148-200). Storyboards are now prominently displayed in the main content area — showing them again in sidebar is redundant.
-- **Remove "Secondary actions" card** (website link, save to storyboard) — these are low-priority actions that add clutter. Keep only Follow button inside the CTA card.
-- **Sidebar contains ONLY**:
-  1. CTA card: "Plan Your Journey" heading + 3-step microcopy + "Get Custom Itinerary" button + "Takes 2 minutes · No commitment" + response time + activity indicator
-  2. Trust & Safety text block
-- **Move FollowButton** into the CTA card (below the button, as a secondary action).
-
-**3. `src/components/profile/ProfileHero.tsx` — Remove Follow button duplication**
-- Remove `FollowButton` from the hero right column (line 156-158). Follow is in the sidebar now. Hero right column keeps: CTA button + followers count + response time only.
-- Add microcopy under hero CTA: "Takes 2 minutes · No commitment"
-
-**4. `src/components/creator/CreatorStoryboardGrid.tsx` — No changes needed**
-- Already has "Get Custom Itinerary" CTA in empty state and "Plan a trip like this" per card. This is correct — it's contextual, not duplicate.
-
-### Section Background Pattern
+### New Page Structure
 ```text
-┌─────────────────────────────────┐ cream bg
-│  Two-col: Storyboards + Sidebar │
-├─────────────────────────────────┤ white bg
-│  Social Presence (full-width)   │
-├─────────────────────────────────┤ cream bg
-│  From My Travels (gallery)      │
-├─────────────────────────────────┤ white bg
-│  Meet Your Creator              │
-├─────────────────────────────────┤ cream bg
-│  Trust & Credentials            │
-├─────────────────────────────────┤ white bg
-│  Reviews                        │
-└─────────────────────────────────┘
+┌──────────────────────────────────────┐
+│ Back bar                             │
+├──────────────────────────────────────┤
+│ COMPACT HEADER                       │
+│ [Avatar]  Name ✓        [CTA] [Follow]│
+│           Bio (2 lines max)          │
+│ 12.4K followers · 18 storyboards · 92 posts │
+│ ─── how it works strip (1 line) ─── │
+├──────────────────────────────────────┤
+│ [🔲 Storyboards] [📷 Moments]  ← tabs│
+├──────────────────────────────────────┤
+│                                      │
+│  CONTENT GRID (3-col / 2-col mobile) │
+│  (storyboards OR media based on tab) │
+│                                      │
+├──────────────────────────────────────┤
+│ Reviews (minimal)                    │
+└──────────────────────────────────────┘
 ```
 
+No sidebar. No alternating backgrounds. No separate sections for Social, Trust, About, How It Works.
+
+### Changes by File
+
+**1. `src/components/profile/ProfileHero.tsx` — Compact IG-style header (full rewrite)**
+- Remove cover image entirely (or make it a thin banner, ~120px)
+- Layout: single row — avatar (80px) left, name+bio+stats right, CTA+Follow far right
+- Name row: `{name}` + verified badge inline
+- Bio: 2-line max, `line-clamp-2`, uses `serviceLine` or `tagline`
+- Stats row below name: `{followers} followers · {storyboardCount} storyboards · {postCount} posts` — all inline, separated by middots, bold numbers
+- Right side: "Get Custom Itinerary" button + Follow button side by side
+- Below header: subtle 1-line "how it works" strip: `"Share your travel style → Get a custom itinerary → Book your trip"` in small muted text
+- Inline trust badges under CTA: `✓ Verified · 🔒 Secure · ⏱ Responds in 24h` — tiny text, no separate section
+- Remove: cover image overlay, 3-column grid, center column (pills, location, rating), mobile-only section
+- New props: `storyboardCount`, `postCount`, `onFollow` (or keep FollowButton component)
+
+**2. `src/pages/creators/CreatorPublicProfilePage.tsx` — Flatten to tabs + grid**
+- Remove ALL standalone sections: Social Presence, Meet Your Creator, Trust & Credentials, How It Works, Conversion
+- Remove sidebar entirely (no `ProfileSidebar`, no 2-column grid)
+- Remove `CreatorSocialCards`, `CreatorTrustSection` imports and usage
+- Add state: `activeTab: "storyboards" | "moments"` (default "storyboards")
+- Count media items (from `creator_media` query) and storyboards for stats
+- Pass `storyboardCount` and `postCount` to `ProfileHero`
+- After header, render tab bar: two tabs with underline indicator, IG-style
+- When "Storyboards" tab active: render `CreatorStoryboardGrid` (but without its own section title — just the grid)
+- When "Moments" tab active: render `CreatorMediaGallery` (without section title)
+- Keep Reviews at bottom, minimal
+- Single `max-w-5xl` container, no sidebar column
+- Background: flat `bg-white` or `bg-[#FDF9F0]`, no alternating
+
+**3. `src/components/creator/CreatorStoryboardGrid.tsx` — Remove section title**
+- Add optional prop `hideTitle?: boolean` (default false for backward compat)
+- When `hideTitle` is true, skip the `<h2>` section title — just render the grid
+- Keep empty state as-is
+
+**4. `src/components/creator/CreatorMediaGallery.tsx` — Remove section title**
+- Add optional prop `hideTitle?: boolean`
+- When `hideTitle` is true, skip the `<h2>` "From My Travels" header
+- Change grid to 3-column fixed grid (`grid grid-cols-3 gap-1`) like IG, instead of masonry
+- Square aspect ratio for all items (`aspect-square object-cover`)
+
+**5. `src/components/profile/ProfileSidebar.tsx` — No changes needed**
+- Still used by AgentPublicProfilePage, keep as-is
+- Just remove its usage from CreatorPublicProfilePage
+
+### Technical Details
+
+- Tab state managed with `useState<"storyboards" | "moments">("storyboards")`
+- Tab bar styled with bottom border indicator, similar to IG tabs
+- Media count fetched alongside existing queries — count from `creator_media` table
+- FollowButton rendered inline in header right column
+- "How it works" strip is a single `<p>` with arrows, not a component
+- Trust signals compressed to inline text badges: `"✓ Verified · Secure booking · Direct messaging"`
+
 ### Files
-- **Edit**: `src/pages/creators/CreatorPublicProfilePage.tsx` — remove duplicate sections, add alternating backgrounds, increase spacing
-- **Edit**: `src/components/profile/ProfileSidebar.tsx` — strip to CTA + trust only
-- **Edit**: `src/components/profile/ProfileHero.tsx` — remove Follow button, add CTA microcopy
+- **Edit**: `src/components/profile/ProfileHero.tsx` — compact IG-style header
+- **Edit**: `src/pages/creators/CreatorPublicProfilePage.tsx` — remove sections, add tabs, flatten layout
+- **Edit**: `src/components/creator/CreatorStoryboardGrid.tsx` — add `hideTitle` prop
+- **Edit**: `src/components/creator/CreatorMediaGallery.tsx` — add `hideTitle` prop, IG grid option
 
