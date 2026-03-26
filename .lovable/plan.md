@@ -1,77 +1,62 @@
 
 
-## Creator Profile Page — Layout, Header & Flow Redesign
+## Creator Profile — Clean Up Duplicates, Fix Hierarchy & Single CTA Path
 
-### Overview
-Comprehensive restructure of the creator profile into a premium travel creator landing page with a structured header, reordered sections, new conversion block, and updated CTA copy throughout.
+### Problem
+The page has duplicate CTAs (hero, sidebar, conversion section, storyboard grid), redundant content between left column and sidebar, inconsistent spacing, and no visual rhythm between sections. This creates cognitive overload and dilutes conversion.
 
-### New Page Flow (top to bottom)
+### Changes
+
+**1. `src/pages/creators/CreatorPublicProfilePage.tsx` — Layout & section cleanup**
+- **Remove the inline "Conversion Section"** (lines 308-329 — "Start Your Journey With {Name}"). This duplicates the sidebar CTA and hero CTA. Two CTA touchpoints are enough (header + sticky sidebar).
+- **Remove "How It Works" inline section** (lines 277-301). This info is already in the sidebar microcopy ("Share your vision → Receive plan → Book securely"). Keeps the page leaner.
+- **Add alternating section backgrounds** for visual rhythm:
+  - Storyboards: `bg-[#FDF9F0]` (cream, default)
+  - Social Presence: `bg-white` with top/bottom border
+  - Gallery: `bg-[#FDF9F0]`
+  - Meet Your Creator: `bg-white` with border
+  - Trust: `bg-[#FDF9F0]`
+  - Reviews: `bg-white`
+- **Wrap each section in full-width divs** that break out of the two-column grid, then contain content in `max-w-6xl` — this enables alternating backgrounds across the full viewport width.
+- **Increase section spacing** from `space-y-14` to `py-16 md:py-20` per section for proper breathing room.
+- **Move Social Presence** to after Storyboards (keep current order).
+- **Final section order**: Storyboards → Social → Gallery ("From My Travels") → Meet Creator → Trust → Trips → Reviews.
+- **Remove duplicate rating/follower display** — rating already shown in header center column and sidebar; don't repeat in left content.
+
+**2. `src/components/profile/ProfileSidebar.tsx` — Simplify to essentials only**
+- **Remove the Storyboards list** from sidebar (lines 148-200). Storyboards are now prominently displayed in the main content area — showing them again in sidebar is redundant.
+- **Remove "Secondary actions" card** (website link, save to storyboard) — these are low-priority actions that add clutter. Keep only Follow button inside the CTA card.
+- **Sidebar contains ONLY**:
+  1. CTA card: "Plan Your Journey" heading + 3-step microcopy + "Get Custom Itinerary" button + "Takes 2 minutes · No commitment" + response time + activity indicator
+  2. Trust & Safety text block
+- **Move FollowButton** into the CTA card (below the button, as a secondary action).
+
+**3. `src/components/profile/ProfileHero.tsx` — Remove Follow button duplication**
+- Remove `FollowButton` from the hero right column (line 156-158). Follow is in the sidebar now. Hero right column keeps: CTA button + followers count + response time only.
+- Add microcopy under hero CTA: "Takes 2 minutes · No commitment"
+
+**4. `src/components/creator/CreatorStoryboardGrid.tsx` — No changes needed**
+- Already has "Get Custom Itinerary" CTA in empty state and "Plan a trip like this" per card. This is correct — it's contextual, not duplicate.
+
+### Section Background Pattern
 ```text
-1. Back bar (keep)
-2. Hero Header (REDESIGNED — structured 3-column)
-3. Storyboards ("Explore Travel Ideas")
-4. How It Works (3-step inline, not cards)
-5. Social Presence (upgraded cards)
-6. Conversion Section ("Start Your Journey With {Name}")
-7. From My Travels (gallery)
-8. Meet Your Creator (renamed About)
-9. Trust & Safety (keep)
-10. Reviews
+┌─────────────────────────────────┐ cream bg
+│  Two-col: Storyboards + Sidebar │
+├─────────────────────────────────┤ white bg
+│  Social Presence (full-width)   │
+├─────────────────────────────────┤ cream bg
+│  From My Travels (gallery)      │
+├─────────────────────────────────┤ white bg
+│  Meet Your Creator              │
+├─────────────────────────────────┤ cream bg
+│  Trust & Credentials            │
+├─────────────────────────────────┤ white bg
+│  Reviews                        │
+└─────────────────────────────────┘
 ```
 
-### Changes by File
-
-**1. `src/components/profile/ProfileHero.tsx` — 3-Column Header**
-- Replace current overlay layout with a structured 3-column grid below the cover image
-- **Left**: Avatar, name, verified badge, tagline (1 line)
-- **Center**: Location, specialty pills, credibility line ("Designing personalized travel experiences worldwide")
-- **Right**: Primary CTA "Get Custom Itinerary" + "Follow" button + formatted followers count + response time
-- Remove floating stat badges from cover image
-- Remove inline social icons and duplicate follower counts
-- On mobile: stack into a single column
-
-**2. `src/pages/creators/CreatorPublicProfilePage.tsx` — Layout Restructure**
-- Reorder sections to match new flow: Header → Storyboards → How It Works → Social → Conversion → Gallery → Meet Creator → Trust → Reviews
-- Remove the "Editorial Intro" section (merged into header + new "Meet Your Creator")
-- Add new inline "How It Works" section (3 steps with gold numbers, not card component)
-- Add new "Start Your Journey With {Name}" conversion section with CTA, subtext ("Takes 2 minutes", "No commitment", "Delivered in 24–48 hours")
-- Move `CreatorSocialCards` (upgraded) to after How It Works
-- Rename About section title to "Meet {firstName}"
-- Add "Trips I Love Planning" subsection (from specialties/niches)
-- Add "Best For Travelers Who…" subsection (from `best_for` data)
-- Replace ALL "Request a Trip" text with "Get Custom Itinerary"
-- Add microcopy under every CTA: "Takes 2 minutes · No commitment · Response within 24 hours"
-
-**3. `src/components/creator/CreatorSocialCards.tsx` — Upgrade (not simplify)**
-- Restore as a proper section with title "Social Presence"
-- Add total reach header line: "Total reach: {X}+ followers"
-- Each card: platform icon, name, handle, formatted follower count, entire card clickable
-- Clean styling matching luxury aesthetic (white cards, subtle borders, no heavy colored backgrounds)
-
-**4. `src/components/profile/ProfileSidebar.tsx` — CTA Updates**
-- Change "Request a Trip" → "Get Custom Itinerary"
-- Change "Plan Your Journey" heading → keep or update
-- Add microcopy under CTA button: "Takes 2 minutes · No commitment"
-
-**5. `src/components/creator/CreatorStoryboardGrid.tsx` — Minor Updates**
-- Update empty state CTA text: "Get Custom Itinerary" (replacing "Get a custom itinerary")
-
-**6. `src/components/creator/CreatorMediaGallery.tsx` — Already renamed to "From My Travels" (no changes needed)
-
-**7. `src/components/creator/CreatorSocialInline.tsx` — Remove usage from page**
-- No longer rendered on the page (replaced by upgraded CreatorSocialCards section)
-
-### New Component: Conversion Section
-Inline in the page file — a full-width cream card with:
-- Serif headline: "Start Your Journey With {Name}"
-- Body: "Not sure where to go? {Name} will design a personalized trip based on your style, budget, and preferences."
-- CTA button: "Get Your Custom Itinerary"
-- Three trust lines below: "Takes 2 minutes" · "No commitment" · "Delivered in 24–48 hours"
-
 ### Files
-- **Edit**: `src/components/profile/ProfileHero.tsx` — 3-column structured header
-- **Edit**: `src/pages/creators/CreatorPublicProfilePage.tsx` — reorder, add sections, update copy
-- **Edit**: `src/components/creator/CreatorSocialCards.tsx` — upgrade to proper section
-- **Edit**: `src/components/profile/ProfileSidebar.tsx` — update CTA copy
-- **Edit**: `src/components/creator/CreatorStoryboardGrid.tsx` — update CTA copy
+- **Edit**: `src/pages/creators/CreatorPublicProfilePage.tsx` — remove duplicate sections, add alternating backgrounds, increase spacing
+- **Edit**: `src/components/profile/ProfileSidebar.tsx` — strip to CTA + trust only
+- **Edit**: `src/components/profile/ProfileHero.tsx` — remove Follow button, add CTA microcopy
 
