@@ -270,18 +270,9 @@ export default function AgentPublicProfilePage() {
                 targetUserId={agent.id}
                 rating={details?.rating}
                 reviewCount={details?.total_reviews}
-                website={details?.website}
-                socialLinks={socialLinks}
                 onRequestTrip={() =>
                   navigate(`/post-trip?agentId=${agent.id}`)
                 }
-                onSaveToStoryboard={() =>
-                  toast.info("Save to storyboard", {
-                    description: "Coming soon!",
-                  })
-                }
-                showHowItWorks
-                showTrustBadges
               />
             </div>
           </div>

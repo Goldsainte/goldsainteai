@@ -1,7 +1,6 @@
 import { Star, MapPin, BadgeCheck, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import FollowButton from "@/components/FollowButton";
 import {
   Tooltip,
   TooltipContent,
@@ -23,7 +22,7 @@ interface ProfileHeroProps {
   reviewCount?: number | null;
   followerDisplay?: string | null;
   responseTimeText?: string | null;
-  targetUserId?: string;
+  
   onRequestTrip?: () => void;
   className?: string;
 }
@@ -42,7 +41,7 @@ export function ProfileHero({
   reviewCount,
   followerDisplay,
   responseTimeText,
-  targetUserId,
+  
   onRequestTrip,
   className,
 }: ProfileHeroProps) {
@@ -153,9 +152,9 @@ export function ProfileHero({
                 Get Custom Itinerary
               </Button>
 
-              {targetUserId && (
-                <FollowButton targetUserId={targetUserId} />
-              )}
+              <p className="text-center text-xs text-[#6B7280]">
+                Takes 2 minutes · No commitment
+              </p>
 
               <div className="flex flex-col gap-1.5 mt-1">
                 {followerDisplay && (
