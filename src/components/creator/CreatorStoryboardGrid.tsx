@@ -24,7 +24,6 @@ export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onR
 
   const sectionTitle = `Travel Inspiration by ${displayName}`;
 
-  // Empty state
   if (storyboards.length === 0) {
     return (
       <section>
@@ -42,7 +41,7 @@ export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onR
             onClick={onRequestTrip}
             className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-6"
           >
-            Get a custom itinerary
+            Get Custom Itinerary
           </Button>
         </div>
       </section>
@@ -55,10 +54,8 @@ export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onR
         {sectionTitle}
       </h2>
 
-      {/* Pinterest-style masonry */}
       <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
         {storyboards.map((sb, idx) => {
-          // Vary aspect ratios for visual interest
           const aspectClass = idx % 3 === 0 ? "aspect-[3/4]" : idx % 3 === 1 ? "aspect-square" : "aspect-[4/5]";
 
           return (
@@ -67,7 +64,6 @@ export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onR
               className="break-inside-avoid rounded-xl overflow-hidden bg-white border border-[#E5DFC6] group cursor-pointer transition-all hover:shadow-lg hover:border-[#C7A962]/50"
               onClick={() => navigate(`/storyboards/${sb.id}`)}
             >
-              {/* Image area */}
               <div className={`relative ${aspectClass} overflow-hidden bg-[#E5DFC6]`}>
                 {sb.cover_image_url ? (
                   <img
@@ -82,28 +78,21 @@ export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onR
                   </div>
                 )}
 
-                {/* Gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
-                {/* Bookmark icon — visible on hover */}
                 <button
                   className="absolute top-3 right-3 p-1.5 rounded-full bg-white/20 backdrop-blur-sm text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/40"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // TODO: save/bookmark functionality
-                  }}
+                  onClick={(e) => { e.stopPropagation(); }}
                 >
                   <Bookmark className="h-4 w-4" />
                 </button>
 
-                {/* Items count badge */}
                 {sb.items_count != null && sb.items_count > 0 && (
                   <span className="absolute top-3 left-3 bg-black/30 backdrop-blur-sm text-white text-[10px] font-medium px-2.5 py-1 rounded-full">
                     {sb.items_count} items
                   </span>
                 )}
 
-                {/* Title overlay at bottom */}
                 <div className="absolute bottom-0 left-0 right-0 p-4">
                   <h3 className="font-secondary text-base md:text-lg text-white leading-tight">
                     {sb.title}
@@ -114,7 +103,6 @@ export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onR
                 </div>
               </div>
 
-              {/* Hover CTA bar */}
               <div
                 className="px-4 py-3 flex items-center justify-between bg-white border-t border-[#E5DFC6]/50 opacity-0 group-hover:opacity-100 transition-opacity"
                 onClick={(e) => {

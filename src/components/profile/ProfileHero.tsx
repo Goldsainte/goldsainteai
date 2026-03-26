@@ -1,16 +1,13 @@
-import { Star, MapPin, BadgeCheck } from "lucide-react";
+import { Star, MapPin, BadgeCheck, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import FollowButton from "@/components/FollowButton";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
-interface ProfileHeroStat {
-  label: string;
-  value: string;
-}
 
 interface ProfileHeroProps {
   name: string;
@@ -22,9 +19,12 @@ interface ProfileHeroProps {
   tagline?: string | null;
   serviceLine?: string | null;
   pills?: string[];
-  stats?: ProfileHeroStat[];
   rating?: number | null;
   reviewCount?: number | null;
+  followerDisplay?: string | null;
+  responseTimeText?: string | null;
+  targetUserId?: string;
+  onRequestTrip?: () => void;
   className?: string;
 }
 
@@ -38,9 +38,12 @@ export function ProfileHero({
   tagline,
   serviceLine,
   pills = [],
-  stats = [],
   rating,
   reviewCount,
+  followerDisplay,
+  responseTimeText,
+  targetUserId,
+  onRequestTrip,
   className,
 }: ProfileHeroProps) {
   const defaultCover =
@@ -48,52 +51,24 @@ export function ProfileHero({
 
   return (
     <div className={cn("relative w-full", className)}>
-      <div className="relative aspect-[16/9] md:aspect-[21/9] w-full overflow-hidden rounded-none md:rounded-b-3xl">
+      {/* Cover image */}
+      <div className="relative aspect-[16/9] md:aspect-[21/9] w-full overflow-hidden">
         <img
           src={coverImage || defaultCover}
           alt={name}
           className="h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+      </div>
 
-        {/* Rating badge — top right */}
-        {rating != null && rating > 0 && (
-          <div className="absolute top-4 right-4 md:top-6 md:right-6 flex items-center gap-1.5 rounded-full bg-white/95 backdrop-blur-sm px-3 py-1.5 shadow-lg">
-            <Star className="h-4 w-4 fill-[#C7A962] text-[#C7A962]" />
-            <span className="font-semibold text-[#0a2225]">
-              {rating.toFixed(1)}
-            </span>
-            {reviewCount != null && (
-              <span className="text-xs text-[#6B7280]">({reviewCount})</span>
-            )}
-          </div>
-        )}
-
-        {/* Stat badges — top right (used for creators) */}
-        {stats.length > 0 && !rating && (
-          <div className="absolute top-4 right-4 md:top-6 md:right-6 flex gap-2">
-            {stats.map((s) => (
-              <div
-                key={s.label}
-                className="flex flex-col items-center rounded-xl bg-white/95 backdrop-blur-sm px-3 py-1.5 shadow-lg"
-              >
-                <span className="text-sm font-semibold text-[#0a2225]">
-                  {s.value}
-                </span>
-                <span className="text-[10px] text-[#6B7280] uppercase tracking-wide">
-                  {s.label}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Content overlay — bottom */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8">
-          <div className="mx-auto max-w-6xl">
-            <div className="flex items-end gap-4 md:gap-6">
-              {/* Avatar */}
-              <div className="h-16 w-16 md:h-24 md:w-24 shrink-0 overflow-hidden rounded-full border-2 border-white bg-white shadow-xl">
+      {/* Structured 3-column header below cover */}
+      <div className="bg-white border-b border-[#E5DFC6]">
+        <div className="mx-auto max-w-6xl px-4 py-6 md:py-8">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-6 md:gap-8 items-start">
+            {/* LEFT — Identity */}
+            <div className="flex items-start gap-4">
+              {/* Avatar — overlapping cover */}
+              <div className="-mt-16 md:-mt-20 h-20 w-20 md:h-28 md:w-28 shrink-0 overflow-hidden rounded-full border-4 border-white bg-white shadow-xl">
                 {avatarUrl ? (
                   <img
                     src={avatarUrl}
@@ -107,17 +82,16 @@ export function ProfileHero({
                 )}
               </div>
 
-              {/* Name, badge, tagline */}
-              <div className="flex-1 min-w-0 pb-1">
+              <div className="min-w-0 pt-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <h1 className="font-secondary text-2xl md:text-4xl font-bold text-white truncate">
+                  <h1 className="font-secondary text-2xl md:text-3xl font-bold text-[#0a2225] truncate">
                     {name}
                   </h1>
                   {isVerified && (
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <BadgeCheck className="h-5 w-5 md:h-6 md:w-6 text-[#C7B892] shrink-0 cursor-help" />
+                          <BadgeCheck className="h-5 w-5 md:h-6 md:w-6 text-[#C7A962] shrink-0 cursor-help" />
                         </TooltipTrigger>
                         <TooltipContent className="bg-[#0a2225] text-white text-xs">
                           Verified by Goldsainte
@@ -127,40 +101,100 @@ export function ProfileHero({
                   )}
                 </div>
                 {serviceLine && (
-                  <p className="text-xs md:text-sm text-white/70 tracking-wide truncate mb-0.5">
+                  <p className="text-sm text-[#6B7280] truncate max-w-md">
                     {serviceLine}
                   </p>
                 )}
                 {tagline && (
-                  <p className="text-sm md:text-base text-white/80 italic truncate mb-1">
-                    {tagline}
+                  <p className="text-sm text-[#0a2225]/70 italic mt-1 truncate max-w-lg">
+                    "{tagline}"
                   </p>
-                )}
-                {isVerified && verifiedLabel && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-[#C7B892]/90 px-3 py-1 text-xs font-medium text-[#0a2225] uppercase tracking-wide">
-                    {verifiedLabel}
-                  </span>
                 )}
               </div>
             </div>
 
-            {/* Pills row */}
-            <div className="mt-4 flex flex-wrap items-center gap-2">
+            {/* CENTER — Positioning */}
+            <div className="hidden md:flex flex-col items-start gap-3 min-w-[200px]">
               {location && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-white/90 backdrop-blur-sm border border-white/20 px-3 py-1.5 text-xs text-[#0a2225]">
-                  <MapPin className="h-3 w-3" />
+                <span className="inline-flex items-center gap-1.5 text-sm text-[#6B7280]">
+                  <MapPin className="h-3.5 w-3.5 text-[#C7A962]" />
                   {location}
                 </span>
               )}
-              {pills.slice(0, 5).map((pill) => (
-                <span
-                  key={pill}
-                  className="rounded-full bg-white/20 backdrop-blur-sm border border-white/30 px-3 py-1.5 text-xs text-white"
-                >
-                  {pill}
-                </span>
-              ))}
+              {pills.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {pills.slice(0, 5).map((pill) => (
+                    <span
+                      key={pill}
+                      className="rounded-full border border-[#E5DFC6] bg-[#F5F0E0]/50 px-3 py-1 text-xs font-medium text-[#0a2225]"
+                    >
+                      {pill}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {rating != null && rating > 0 && (
+                <div className="flex items-center gap-1.5 text-sm">
+                  <Star className="h-3.5 w-3.5 fill-[#C7A962] text-[#C7A962]" />
+                  <span className="font-semibold text-[#0a2225]">{rating.toFixed(1)}</span>
+                  {reviewCount != null && (
+                    <span className="text-[#6B7280]">({reviewCount} reviews)</span>
+                  )}
+                </div>
+              )}
             </div>
+
+            {/* RIGHT — Actions + Trust */}
+            <div className="flex flex-col items-stretch gap-3 min-w-[200px]">
+              <Button
+                onClick={onRequestTrip}
+                className="w-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-xl h-11 font-medium"
+              >
+                Get Custom Itinerary
+              </Button>
+
+              {targetUserId && (
+                <FollowButton targetUserId={targetUserId} />
+              )}
+
+              <div className="flex flex-col gap-1.5 mt-1">
+                {followerDisplay && (
+                  <span className="text-xs text-[#6B7280]">
+                    <span className="font-semibold text-[#0a2225]">{followerDisplay}</span> followers
+                  </span>
+                )}
+                {responseTimeText && (
+                  <span className="inline-flex items-center gap-1.5 text-xs text-[#6B7280]">
+                    <Clock className="h-3 w-3 text-[#C7A962]" />
+                    {responseTimeText}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile-only: location, pills, rating */}
+          <div className="md:hidden mt-4 flex flex-wrap items-center gap-2">
+            {location && (
+              <span className="inline-flex items-center gap-1 text-xs text-[#6B7280]">
+                <MapPin className="h-3 w-3 text-[#C7A962]" />
+                {location}
+              </span>
+            )}
+            {pills.slice(0, 4).map((pill) => (
+              <span
+                key={pill}
+                className="rounded-full border border-[#E5DFC6] bg-[#F5F0E0]/50 px-2.5 py-1 text-[11px] text-[#0a2225]"
+              >
+                {pill}
+              </span>
+            ))}
+            {rating != null && rating > 0 && (
+              <span className="inline-flex items-center gap-1 text-xs">
+                <Star className="h-3 w-3 fill-[#C7A962] text-[#C7A962]" />
+                <span className="font-semibold text-[#0a2225]">{rating.toFixed(1)}</span>
+              </span>
+            )}
           </div>
         </div>
       </div>
