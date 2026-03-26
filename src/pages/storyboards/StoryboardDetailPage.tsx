@@ -193,6 +193,20 @@ export default function StoryboardDetailPage() {
     }
   };
 
+  const handleDeleteStoryboard = async () => {
+    if (!id || !window.confirm("Delete this entire storyboard? This cannot be undone.")) return;
+    setDeleting(true);
+    try {
+      await deleteStoryboard(id);
+      toast.success("Storyboard deleted");
+      navigate("/storyboards", { replace: true });
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete storyboard");
+      setDeleting(false);
+    }
+  };
+
   const handleConvertToTrip = () => {
     if (!id) return;
     navigate(`/post-trip?fromStoryboard=${id}${
