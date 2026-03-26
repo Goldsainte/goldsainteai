@@ -39,10 +39,25 @@ export function CreatorPinterestFeed({
 }: Props) {
   const navigate = useNavigate();
   const [activeBoard, setActiveBoard] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState("All");
 
-  const filteredItems = activeBoard
-    ? items.filter((i) => i.storyboard_id === activeBoard)
-    : items;
+  const filteredItems = items.filter((item) => {
+    if (activeBoard && item.storyboard_id !== activeBoard) return false;
+    if (activeCategory !== "All") {
+      const keywords = CATEGORY_KEYWORDS[activeCategory] || [];
+      const haystack = [
+        item.title,
+        item.subtitle,
+        item.storyboard_title,
+        item.storyboard_destination,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      if (!keywords.some((kw) => haystack.includes(kw))) return false;
+    }
+    return true;
+  });
 
   if (items.length === 0) {
     return (
@@ -70,6 +85,13 @@ export function CreatorPinterestFeed({
 
   return (
     <div>
+      {/* Category discovery chips */}
+      <CategoryChips
+        activeCategory={activeCategory}
+        onCategoryChange={setActiveCategory}
+        className="mb-2"
+      />
+
       {/* Board filter pills */}
       <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 scrollbar-hide">
         <button

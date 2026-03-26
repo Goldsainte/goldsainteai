@@ -15,6 +15,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { BackButton } from "@/components/ui/BackButton";
 import { useUserRole } from "@/hooks/useUserRole";
 import { toast } from "sonner";
+import { CategoryChips } from "@/components/ui/CategoryChips";
 
 type Tab = "trips" | "trip-requests";
 
@@ -275,6 +276,26 @@ export default function Marketplace() {
         <MarketplaceSearch onSearch={handleSearch} filters={filters} onClearFilters={handleClearFilters} />
 
         <div className="mx-auto max-w-6xl px-4 py-4 md:py-8">
+          {/* Category discovery chips */}
+          <CategoryChips
+            activeCategory={filters.category || "All"}
+            onCategoryChange={(cat) => {
+              const CATEGORY_TO_FILTER: Record<string, string> = {
+                "Luxury Escapes": "Luxury",
+                "Solo Travel": "Solo Travel",
+                "City Energy": "City breaks",
+                "Nature & Adventure": "Adventure",
+                "Wellness & Reset": "Wellness",
+                "Group Trips": "Family",
+                "Food & Culture": "Design-led",
+              };
+              setFilters((prev) => ({
+                ...prev,
+                category: cat === "All" ? undefined : (CATEGORY_TO_FILTER[cat] || cat),
+              }));
+            }}
+            className="mb-4"
+          />
           <div className="mb-6 md:mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <MarketplaceTabs activeTab={activeTab} onTabChange={handleTabChange} />
             <MarketplaceFilters filters={filters} onFilterChange={setFilters} />
