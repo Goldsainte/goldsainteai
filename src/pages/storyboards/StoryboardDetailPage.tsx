@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { invokeWithAuth } from "@/lib/supabaseHelpers";
 import { Header } from "@/components/Header";
 import { SaveToStoryboardModal } from "@/components/discovery/SaveToStoryboardModal";
 import { useDiscoveryFeed, type UnsplashImage } from "@/hooks/useDiscoveryFeed";
@@ -37,6 +38,7 @@ export default function StoryboardDetailPage() {
   const [isPublic, setIsPublic] = useState(false);
   const [copied, setCopied] = useState(false);
   const [relatedBoards, setRelatedBoards] = useState<Storyboard[]>([]);
+  const [sellingExperience, setSellingExperience] = useState(false);
 
   const [saveModal, setSaveModal] = useState<{
     open: boolean;
@@ -300,6 +302,38 @@ export default function StoryboardDetailPage() {
                     {storyboard.is_public && (
                       <Button size="sm" variant="outline" onClick={handleShareLink}>
                         {copied ? <><Check className="mr-1 h-3.5 w-3.5" /> Copied!</> : <><Copy className="mr-1 h-3.5 w-3.5" /> Share Link</>}
+                      </Button>
+                    )}
+                    {isOwner && (
+                      <Button
+                        size="sm"
+                        disabled={sellingExperience}
+                        className="bg-gradient-to-r from-[#C7A962] to-[#b89a55] text-white rounded-full px-5 hover:opacity-90"
+                        onClick={async () => {
+                          setSellingExperience(true);
+                          try {
+                            const { data, error } = await invokeWithAuth<{ tripId: string; slug: string }>(
+                              "storyboard-to-trip",
+                              { body: { storyboardId: id } }
+                            );
+                            if (error || !data) {
+                              toast.error(error || "Failed to generate trip listing");
+                              return;
+                            }
+                            toast.success("Trip listing drafted! Review and publish.");
+                            navigate(`/trip-builder?edit=${data.tripId}`);
+                          } catch {
+                            toast.error("Something went wrong");
+                          } finally {
+                            setSellingExperience(false);
+                          }
+                        }}
+                      >
+                        {sellingExperience ? (
+                          <><Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> AI is designing your trip...</>
+                        ) : (
+                          <><Sparkles className="mr-1.5 h-3.5 w-3.5" /> Sell This Experience</>
+                        )}
                       </Button>
                     )}
                     <Button size="sm" className="bg-[#C7A962] hover:bg-[#b89a55] text-white" onClick={handleConvertToTrip}>
