@@ -1,151 +1,86 @@
 
 
-## Pinterest-Style Discovery Engine — Phase 1 Implementation
+## Infinite Refinement Discovery — Replace Fixed Hierarchy with Dynamic Path
 
-This is a large system. To ship something tangible and valuable, this plan covers the **core discovery loop** — the parts that transform the experience from "a profile page" into "a visual discovery engine." Later phases can add recommendation learning, re-pin attribution tracking, and advanced personalization.
+### Problem
+The current system has a rigid 2-level hierarchy: top category → fixed subcategory. The user wants unlimited depth where every click appends to a refinement path and the system generates contextual next-step pills dynamically.
 
-### What Gets Built
+### Design
 
-**Phase 1 delivers:**
-1. Subcategory drill-down chips with Unsplash-powered dynamic image feed
-2. Save/Pin to storyboard flow from discovery images
-3. Re-pin from other creators' storyboards
-4. "More Like This" refinement
-5. Storyboard detail page upgrade with pin grid + re-pin + trip CTA
-
----
-
-### 1. Subcategory Drill-Down System
-
-**File: `src/components/ui/CategoryChips.tsx`** — extend with subcategory data
-
-Add a `SUBCATEGORIES` map keyed by top-level category. When a top category is selected, expose the subcategories via a new `SubcategoryChips` component rendered as a second row.
+Replace the fixed `CategoryChips` → `SubcategoryChips` pattern with a **refinement path** model:
 
 ```text
-SUBCATEGORIES = {
-  "Luxury Escapes": ["Beach Villas", "Private Islands", "Safari Lodges", "Desert Resorts", "Yacht Travel", "Spa Retreats"],
-  "Food & Culture": ["Street Food", "Fine Dining", "Wine Regions", "Local Markets", "Cooking Classes"],
-  "Romantic Getaways": ["Honeymoon", "Overwater Villas", "Sunset Dinners", "Couples Spa"],
-  ...all 10 categories
-}
+Row 1: Top categories (always visible, resets path on change)
+Row 2: Contextual refinement pills (generated from current path)
+Row 3: Active path breadcrumb chips (removable, shows current refinement)
 ```
 
-Each subcategory also maps to Unsplash search terms for query building.
+Each pill click appends to a `refinementPath: string[]` array. The Unsplash query is built by joining the entire path. Contextual pills for row 2 are generated based on what the user has selected so far — not from a fixed map.
 
----
+**Example flow:**
+- Click "Luxury Escapes" → path: `["luxury escapes"]`
+- Row 2 shows: Beach Villas, Private Islands, Safari Lodges, Desert Resorts...
+- Click "Beach Villas" → path: `["luxury escapes", "beach villas"]`
+- Row 2 evolves to: Maldives, Bali, Amalfi Coast, Sunset, Overwater...
+- Click "Maldives" → path: `["luxury escapes", "beach villas", "maldives"]`
+- Row 2 evolves to: Sunset, Private Dining, Underwater, Honeymoon...
+- Query: `"luxury escapes beach villas maldives travel"`
 
-### 2. Unsplash-Powered Discovery Feed
+### Changes
 
-**New file: `src/components/discovery/DiscoveryFeed.tsx`**
+**1. `src/components/ui/CategoryChips.tsx`** — Add refinement pill data
 
-This is the core engine. It:
-- Takes the active category + subcategory path and builds an Unsplash query (e.g. "luxury beach villa travel")
-- Calls the existing `unsplash-search` edge function
-- Renders results in the existing masonry layout
-- Supports infinite scroll (page increment on scroll)
-- Mixes Unsplash results with existing storyboard pins (creator's own pins appear first, then Unsplash fills the rest)
+Add a `REFINEMENT_SUGGESTIONS` map that provides contextual next-step pills based on the current path depth and content. Structure:
+- Level 0 (after top category): use existing `SUBCATEGORIES` map
+- Level 1+ (after subcategory): a new `DEEP_REFINEMENTS` map keyed by subcategory, providing location/mood/style pills like `"Maldives"`, `"Sunset"`, `"Private"`, `"Overwater"`
+- Level 2+: generic travel mood/style pills like `"Golden Hour"`, `"Secluded"`, `"Romantic"`, `"Aerial View"`, `"Local Culture"`
 
-**New file: `src/hooks/useDiscoveryFeed.ts`**
+Export a `getRefinementSuggestions(path: string[]): string[]` function that returns the next set of contextual pills based on the current refinement path.
 
-Hook managing:
-- `discoveryPath`: `{ category, subcategory, tags[] }`
-- Query builder: concatenates path segments into Unsplash search string
-- Pagination state with `useInfiniteQuery`
-- Debounced query updates on path change
+**2. `src/components/discovery/RefinementChips.tsx`** — New component
 
----
+A single component replacing the fixed subcategory row:
+- Takes `refinementPath: string[]` and `onAddRefinement / onRemoveLast / onReset`
+- **Row 1**: Always shows top-level category pills (same as current `CategoryChips`)
+- **Row 2**: Shows contextual refinement suggestions from `getRefinementSuggestions(path)` — these evolve with each click
+- **Row 3**: Shows the active refinement path as removable breadcrumb chips (click × to pop back to that point)
+- Max 2-3 visible rows; row 2 replaces itself on each click
 
-### 3. Save to Storyboard Modal
+**3. `src/hooks/useDiscoveryFeed.ts`** — Update query builder
 
-**New file: `src/components/discovery/SaveToStoryboardModal.tsx`**
+Change `buildQuery` to accept a flat `refinementPath: string[]` instead of separate category/subcategory. Query = path segments joined with spaces + "travel". The `useDiscoveryFeed` hook signature changes to `useDiscoveryFeed(refinementPath: string[], tags: string[], enabled: boolean)`.
 
-When user hovers/taps a discovery image and clicks "Save":
-- Modal opens showing user's storyboards
-- User picks an existing board or creates a new one
-- Saves the image as a `storyboard_item` with `source_type: "unsplash"`, `source_id` (Unsplash photo ID), category path in metadata
-- Toast confirmation
+**4. `src/components/creator/CreatorPinterestFeed.tsx`** — Wire up refinement
 
-This reuses `addStoryboardItem` from `storyboardsService.ts`. The modal fetches boards via `getMyStoryboards`.
+Replace `activeCategory` + `activeSubcategory` state with a single `refinementPath: string[]`. Wire the new `RefinementChips` component. The "More Like This" action appends image-derived tags to the path. Board filter pills remain unchanged below the refinement rows.
 
----
+**5. `src/components/discovery/DiscoveryFeed.tsx`** — Update props
 
-### 4. Re-Pin from Other Storyboards
+Change `category` + `subcategory` props to accept `refinementPath: string[]`. Pass through to `useDiscoveryFeed`. The rest of the component (masonry grid, save modal, infinite scroll) stays the same.
 
-**Database migration** — add columns to `storyboard_items`:
-```sql
-ALTER TABLE public.storyboard_items
-  ADD COLUMN IF NOT EXISTS repinned_from_item_id uuid REFERENCES public.storyboard_items(id) ON DELETE SET NULL,
-  ADD COLUMN IF NOT EXISTS repinned_from_user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL;
-```
+### Refinement Data Structure
 
-**RLS**: existing policies already allow insert into own storyboards. The re-pin just copies data with attribution.
-
-**UI**: On the storyboard detail page and creator feed, each pin's hover overlay gets a "Save" button. Clicking opens the same `SaveToStoryboardModal`, but pre-fills `repinned_from_item_id` and `repinned_from_user_id`.
-
----
-
-### 5. Discovery Feed on Creator Profile
-
-**Edit: `src/components/creator/CreatorPinterestFeed.tsx`**
-
-Major upgrade:
-- Import `CategoryChips` + new `SubcategoryChips`
-- Add `useDiscoveryFeed` hook alongside existing pins
-- When category/subcategory selected: show creator's matching pins first, then Unsplash discovery images below a subtle divider
-- Each image card gets hover actions: "Save to Storyboard", "More Like This", "Plan a trip"
-- "More Like This" click: refines the discovery path by adding the image's tags as search terms, triggering a feed refresh
-- Infinite scroll loads more Unsplash results
-
----
-
-### 6. Storyboard Detail Page Upgrade
-
-**Edit: `src/pages/storyboards/StoryboardDetailPage.tsx`**
-
-- Add masonry pin grid (same layout as creator feed)
-- Each pin shows "Save / Re-pin" on hover for non-owners
-- Add "Start a trip from this storyboard" CTA button at the top
-- Add "More Like This" section at the bottom: query Unsplash using the storyboard's tags/title to show related inspiration
-- Add "Related Storyboards" section: query public storyboards with similar destinations/tags
-
----
-
-### 7. Discovery Session State
-
-**New file: `src/hooks/useDiscoverySession.ts`**
-
-Client-side session state (no DB table needed for Phase 1):
 ```ts
-{
-  topCategory: string | null,
-  subcategory: string | null,
-  activeTags: string[],
-  lastQuery: string,
-}
+// After subcategory selection, suggest locations/moods
+const DEEP_REFINEMENTS: Record<string, string[]> = {
+  "Beach Villas": ["Maldives", "Bali", "Amalfi Coast", "Caribbean", "Sunset", "Overwater", "Private Pool"],
+  "Private Islands": ["Fiji", "Seychelles", "Caribbean", "Tropical", "Barefoot Luxury"],
+  "Street Food": ["Bangkok", "Tokyo", "Mexico City", "Istanbul", "Night Market"],
+  "Honeymoon": ["Maldives", "Santorini", "Bora Bora", "Tuscany", "Sunset", "Private"],
+  // ... for each subcategory
+};
+
+// Generic mood/style pills for depth 2+
+const MOOD_REFINEMENTS = ["Golden Hour", "Secluded", "Romantic", "Aerial View", "Vibrant", "Minimalist", "Dramatic", "Cozy", "Wild", "Serene"];
 ```
 
-Stored in React context. Every category/subcategory/tag click updates the session. The feed hook reads from this to build queries. This keeps the progressive refinement feeling without needing a database table yet.
-
----
-
-### Files Summary
+### Files
 
 | Action | File | Purpose |
 |--------|------|---------|
-| Edit | `src/components/ui/CategoryChips.tsx` | Add subcategory data map + `SubcategoryChips` component |
-| Create | `src/components/discovery/DiscoveryFeed.tsx` | Masonry feed with Unsplash + pin mixing |
-| Create | `src/components/discovery/SaveToStoryboardModal.tsx` | Save/re-pin modal with board selector |
-| Create | `src/hooks/useDiscoveryFeed.ts` | Infinite query hook for Unsplash + path building |
-| Create | `src/hooks/useDiscoverySession.ts` | Client-side discovery path state |
-| Edit | `src/components/creator/CreatorPinterestFeed.tsx` | Integrate discovery feed, subcategory drill-down, save actions |
-| Edit | `src/pages/storyboards/StoryboardDetailPage.tsx` | Masonry layout, re-pin, trip CTA, related content |
-| Migration | Add `repinned_from_item_id`, `repinned_from_user_id` to `storyboard_items` | Re-pin attribution |
-
-### What's Deferred to Phase 2
-- Server-side `discovery_sessions` table with persistent learning
-- Recommendation engine based on save/repin behavior
-- "Similar Creators" suggestions
-- Separate `/discover` page (standalone discovery outside creator profiles)
-- Like/follow actions on pins
-- Pin-level analytics (clicks, saves, repins)
+| Edit | `src/components/ui/CategoryChips.tsx` | Add `DEEP_REFINEMENTS`, `MOOD_REFINEMENTS`, export `getRefinementSuggestions()` |
+| Create | `src/components/discovery/RefinementChips.tsx` | Dynamic refinement pill rows with path breadcrumbs |
+| Edit | `src/hooks/useDiscoveryFeed.ts` | Accept `refinementPath[]` instead of category+subcategory |
+| Edit | `src/components/creator/CreatorPinterestFeed.tsx` | Replace fixed category/subcategory with refinement path |
+| Edit | `src/components/discovery/DiscoveryFeed.tsx` | Update props to use refinement path |
 
