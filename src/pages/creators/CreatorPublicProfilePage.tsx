@@ -7,7 +7,7 @@ import { ProfileHero } from "@/components/profile/ProfileHero";
 import { ReviewsList } from "@/components/profile/ReviewsList";
 import { WriteReviewModal } from "@/components/profile/WriteReviewModal";
 import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
-import { CreatorStoryboardGrid } from "@/components/creator/CreatorStoryboardGrid";
+import { CreatorPinterestFeed, type PinItem, type BoardSummary } from "@/components/creator/CreatorPinterestFeed";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
