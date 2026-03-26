@@ -1,71 +1,77 @@
 
 
-## Add Prominent Storyboards Section + Rename Gallery to "From My Travels"
+## Creator Profile Page — Layout, Header & Flow Redesign
 
-### What
-Elevate Storyboards to the **primary content section** on the creator profile — placed directly after the Hero/Editorial Intro, before everything else. Transform the current "Featured Storyboards" cards into a Pinterest-style masonry grid with richer cards (cover image, title, subtitle, item count, bookmark icon, "Plan a trip like this" CTA). Rename "Gallery" to "From My Travels". Add proper empty state with conversion CTA.
+### Overview
+Comprehensive restructure of the creator profile into a premium travel creator landing page with a structured header, reordered sections, new conversion block, and updated CTA copy throughout.
 
-### New Page Flow
+### New Page Flow (top to bottom)
 ```text
-1. Hero
-2. Editorial Intro (bio, specialties, social)
-3. ── Storyboards by {Name} ── (MAIN SECTION, Pinterest masonry)
-4. From My Travels (renamed Gallery)
-5. Credentials
-6. Trips
-7. Reviews
+1. Back bar (keep)
+2. Hero Header (REDESIGNED — structured 3-column)
+3. Storyboards ("Explore Travel Ideas")
+4. How It Works (3-step inline, not cards)
+5. Social Presence (upgraded cards)
+6. Conversion Section ("Start Your Journey With {Name}")
+7. From My Travels (gallery)
+8. Meet Your Creator (renamed About)
+9. Trust & Safety (keep)
+10. Reviews
 ```
 
-### Changes
+### Changes by File
 
-**1. `src/pages/creators/CreatorPublicProfilePage.tsx`**
-- Move storyboards section to be the **first item** in the left column (already is, but enhance)
-- Change section title to `"Travel Inspiration by {displayName}"` or `"Storyboards by {displayName}"`
-- Replace the simple 2-col grid with a Pinterest-style masonry layout (2 cols mobile, 3 cols md, 4 cols lg)
-- **Empty state**: When no storyboards exist, show: "No storyboards yet — start a custom trip with this creator" + "Get a custom itinerary" CTA button linking to `handleRequestTrip`
-- Fetch more storyboards (increase limit from 5 to 8) and also fetch `description` and item count via `storyboard_items(count)`
+**1. `src/components/profile/ProfileHero.tsx` — 3-Column Header**
+- Replace current overlay layout with a structured 3-column grid below the cover image
+- **Left**: Avatar, name, verified badge, tagline (1 line)
+- **Center**: Location, specialty pills, credibility line ("Designing personalized travel experiences worldwide")
+- **Right**: Primary CTA "Get Custom Itinerary" + "Follow" button + formatted followers count + response time
+- Remove floating stat badges from cover image
+- Remove inline social icons and duplicate follower counts
+- On mobile: stack into a single column
 
-**2. New component: `src/components/creator/CreatorStoryboardGrid.tsx`**
-- Pinterest/masonry grid component
-- Each card:
-  - Large cover image with aspect ratio variation for visual interest
-  - Gradient overlay at bottom
-  - Title (serif, white over image)
-  - Subtitle/destination (smaller, beneath title)
-  - Item count badge (e.g., "12 items")
-  - Bookmark/save icon (top-right corner, on hover)
-  - On hover: reveal "Plan a trip like this →" CTA overlay
-- On card click: navigate to `/storyboards/{id}`
-- "Plan a trip like this" CTA: navigate to `/post-trip?fromCreator={creatorId}&storyboard={storyboardId}&destination={destination}`
-- Empty state card with dashed border and CTA
+**2. `src/pages/creators/CreatorPublicProfilePage.tsx` — Layout Restructure**
+- Reorder sections to match new flow: Header → Storyboards → How It Works → Social → Conversion → Gallery → Meet Creator → Trust → Reviews
+- Remove the "Editorial Intro" section (merged into header + new "Meet Your Creator")
+- Add new inline "How It Works" section (3 steps with gold numbers, not card component)
+- Add new "Start Your Journey With {Name}" conversion section with CTA, subtext ("Takes 2 minutes", "No commitment", "Delivered in 24–48 hours")
+- Move `CreatorSocialCards` (upgraded) to after How It Works
+- Rename About section title to "Meet {firstName}"
+- Add "Trips I Love Planning" subsection (from specialties/niches)
+- Add "Best For Travelers Who…" subsection (from `best_for` data)
+- Replace ALL "Request a Trip" text with "Get Custom Itinerary"
+- Add microcopy under every CTA: "Takes 2 minutes · No commitment · Response within 24 hours"
 
-**3. `src/components/creator/CreatorMediaGallery.tsx`**
-- Rename section header from "Gallery" to "From My Travels"
-- No other changes needed
+**3. `src/components/creator/CreatorSocialCards.tsx` — Upgrade (not simplify)**
+- Restore as a proper section with title "Social Presence"
+- Add total reach header line: "Total reach: {X}+ followers"
+- Each card: platform icon, name, handle, formatted follower count, entire card clickable
+- Clean styling matching luxury aesthetic (white cards, subtle borders, no heavy colored backgrounds)
 
-**4. `src/pages/creators/CreatorPublicProfilePage.tsx` — data fetch update**
-- Update storyboard query to include `description` field and item count:
-  ```
-  .select("id, title, description, cover_image_url, destination, tags, view_count, created_at, storyboard_items(count)")
-  .limit(8)
-  ```
+**4. `src/components/profile/ProfileSidebar.tsx` — CTA Updates**
+- Change "Request a Trip" → "Get Custom Itinerary"
+- Change "Plan Your Journey" heading → keep or update
+- Add microcopy under CTA button: "Takes 2 minutes · No commitment"
 
-### Storyboard Card Design
-```text
-┌──────────────────────┐
-│                  [♡] │  ← bookmark on hover
-│   [cover image]      │
-│                      │
-│ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ │  ← gradient
-│ Luxury Morocco       │  ← serif title
-│ Desert · 12 items    │  ← meta line
-├──────────────────────┤
-│ Plan a trip like → │  ← hover CTA
-└──────────────────────┘
-```
+**5. `src/components/creator/CreatorStoryboardGrid.tsx` — Minor Updates**
+- Update empty state CTA text: "Get Custom Itinerary" (replacing "Get a custom itinerary")
+
+**6. `src/components/creator/CreatorMediaGallery.tsx` — Already renamed to "From My Travels" (no changes needed)
+
+**7. `src/components/creator/CreatorSocialInline.tsx` — Remove usage from page**
+- No longer rendered on the page (replaced by upgraded CreatorSocialCards section)
+
+### New Component: Conversion Section
+Inline in the page file — a full-width cream card with:
+- Serif headline: "Start Your Journey With {Name}"
+- Body: "Not sure where to go? {Name} will design a personalized trip based on your style, budget, and preferences."
+- CTA button: "Get Your Custom Itinerary"
+- Three trust lines below: "Takes 2 minutes" · "No commitment" · "Delivered in 24–48 hours"
 
 ### Files
-- **Create**: `src/components/creator/CreatorStoryboardGrid.tsx` — masonry grid with rich cards
-- **Edit**: `src/pages/creators/CreatorPublicProfilePage.tsx` — use new grid, update query, reorder sections
-- **Edit**: `src/components/creator/CreatorMediaGallery.tsx` — rename "Gallery" → "From My Travels"
+- **Edit**: `src/components/profile/ProfileHero.tsx` — 3-column structured header
+- **Edit**: `src/pages/creators/CreatorPublicProfilePage.tsx` — reorder, add sections, update copy
+- **Edit**: `src/components/creator/CreatorSocialCards.tsx` — upgrade to proper section
+- **Edit**: `src/components/profile/ProfileSidebar.tsx` — update CTA copy
+- **Edit**: `src/components/creator/CreatorStoryboardGrid.tsx` — update CTA copy
 
