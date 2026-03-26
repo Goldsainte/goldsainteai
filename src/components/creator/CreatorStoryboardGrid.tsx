@@ -59,20 +59,22 @@ export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onR
         </h2>
       )}
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
         {storyboards.map((sb, idx) => {
-          // Editorial sizing: first card large (2-col span), next 2 medium, rest standard
           const isLarge = idx === 0;
           const isMedium = idx === 1 || idx === 2;
 
           return (
             <div
               key={sb.id}
-              className={`rounded-2xl overflow-hidden bg-white border border-[#E5DFC6] group cursor-pointer transition-all duration-300 hover:shadow-xl hover:border-[#C7A962]/40 hover:-translate-y-0.5 ${
+              className={`rounded-xl overflow-hidden bg-white border border-[#E5DFC6] group cursor-pointer transition-all duration-300 hover:shadow-2xl hover:border-[#C7A962]/30 hover:-translate-y-0.5 relative ${
                 isLarge ? "col-span-2 row-span-2" : ""
               }`}
               onClick={() => navigate(`/storyboards/${sb.id}`)}
             >
+              {/* Gold accent strip */}
+              <div className="h-[2px] bg-gradient-to-r from-[#C7A962]/60 via-[#C7A962] to-[#C7A962]/60" />
+
               <div className={`relative overflow-hidden bg-[#E5DFC6] ${
                 isLarge ? "aspect-[4/3]" : isMedium ? "aspect-[3/4]" : "aspect-[4/5]"
               }`}>
@@ -126,8 +128,8 @@ export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onR
                   navigate(`/post-trip?fromCreator=${creatorId}&storyboard=${sb.id}${sb.destination ? `&destination=${encodeURIComponent(sb.destination)}` : ""}`);
                 }}
               >
-                <span className="text-xs font-medium text-[#0c4d47]">Plan a trip like this</span>
-                <ArrowRight className="h-3.5 w-3.5 text-[#0c4d47]" />
+                <span className="text-xs font-primary font-medium text-[#0c4d47]">Plan a trip like this</span>
+                <ArrowRight className="h-3.5 w-3.5 text-[#C7A962]" />
               </div>
             </div>
           );

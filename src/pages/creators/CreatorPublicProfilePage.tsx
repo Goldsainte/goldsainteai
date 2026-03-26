@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { ArrowLeft, PenLine, LogIn, Settings, Grid3X3, BookOpen, ArrowRight, MapPin } from "lucide-react";
+import { ArrowLeft, PenLine, LogIn, Settings, ArrowRight, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileHero } from "@/components/profile/ProfileHero";
 import { ReviewsList } from "@/components/profile/ReviewsList";
@@ -10,6 +10,29 @@ import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
 import { CreatorStoryboardGrid } from "@/components/creator/CreatorStoryboardGrid";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+
+// -- Gold section divider component --
+function GoldDivider() {
+  return (
+    <div className="flex items-center justify-center gap-3 py-2">
+      <div className="h-px flex-1 max-w-[120px] bg-gradient-to-r from-transparent to-[#C7A962]/40" />
+      <div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]/60" />
+      <div className="h-px flex-1 max-w-[120px] bg-gradient-to-l from-transparent to-[#C7A962]/40" />
+    </div>
+  );
+}
+
+// -- Section label component --
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-4 mb-8">
+      <span className="font-primary text-sm uppercase tracking-[0.25em] text-[#C7A962] shrink-0">
+        {children}
+      </span>
+      <div className="h-px flex-1 bg-gradient-to-r from-[#C7A962]/30 to-transparent" />
+    </div>
+  );
+}
 
 interface CreatorProfile {
   id: string;
@@ -58,7 +81,6 @@ export default function CreatorPublicProfilePage() {
   const [reviewCount, setReviewCount] = useState<number>(0);
   const [creatorStoryboards, setCreatorStoryboards] = useState<any[]>([]);
   const [mediaCount, setMediaCount] = useState(0);
-  const [activeTab, setActiveTab] = useState<"storyboards" | "moments">("storyboards");
 
   useEffect(() => {
     if (!id) return;
@@ -184,11 +206,6 @@ export default function CreatorPublicProfilePage() {
     ? creatorStoryboards.filter((sb) => sb.id !== featuredStoryboard.id)
     : creatorStoryboards;
 
-  const tabs = [
-    { key: "storyboards" as const, label: "Storyboards", icon: BookOpen, count: remainingStoryboards.length },
-    { key: "moments" as const, label: "Moments", icon: Grid3X3, count: mediaCount },
-  ];
-
   const specialties = creatorData?.specialties || creator.creator_niches || [];
 
   return (
@@ -240,10 +257,8 @@ export default function CreatorPublicProfilePage() {
         {/* Featured Storyboard */}
         {featuredStoryboard && (
           <div className="bg-[#FDF9F0]">
-            <div className="mx-auto max-w-5xl px-4 py-12 md:py-16">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6B7280] mb-5">
-                Featured Experience
-              </p>
+            <div className="mx-auto max-w-5xl px-4 py-16 md:py-24">
+              <SectionLabel>Featured Experience</SectionLabel>
               <div
                 className="relative rounded-2xl overflow-hidden cursor-pointer group"
                 onClick={() => navigate(`/storyboards/${featuredStoryboard.id}`)}
@@ -268,7 +283,7 @@ export default function CreatorPublicProfilePage() {
                       {featuredStoryboard.title}
                     </h3>
                     {featuredStoryboard.description && (
-                      <p className="text-white/70 text-sm mt-2 max-w-lg line-clamp-2">
+                      <p className="text-white/70 text-sm mt-2 max-w-lg line-clamp-2 font-primary">
                         {featuredStoryboard.description}
                       </p>
                     )}
@@ -289,45 +304,11 @@ export default function CreatorPublicProfilePage() {
           </div>
         )}
 
-        {/* How it works strip */}
-        <div className="bg-white border-y border-[#E5DFC6]/40">
-          <div className="mx-auto max-w-5xl px-4 py-3">
-            <p className="text-xs text-[#9CA3AF] text-center tracking-wide">
-              Share your travel style → Get a custom itinerary → Book your trip
-            </p>
-          </div>
-        </div>
-
-        {/* Tab bar */}
-        <div className="bg-white border-b border-[#E5DFC6]">
-          <div className="mx-auto max-w-5xl px-4">
-            <div className="flex">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
-                  className={`flex-1 flex items-center justify-center gap-2 py-3.5 text-xs font-semibold uppercase tracking-wider border-b-2 transition-colors ${
-                    activeTab === tab.key
-                      ? "border-[#0a2225] text-[#0a2225]"
-                      : "border-transparent text-[#6B7280] hover:text-[#0a2225]"
-                  }`}
-                >
-                  <tab.icon className="h-4 w-4" />
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Section label + Content grid */}
-        <div className="bg-white">
-          <div className="mx-auto max-w-5xl px-4 py-12 md:py-16">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6B7280] mb-6">
-              {activeTab === "storyboards" ? "Explore Travel Ideas" : "From My Travels"}
-            </p>
-
-            {activeTab === "storyboards" && (
+        {/* Curated Experiences — Storyboard grid */}
+        {remainingStoryboards.length > 0 && (
+          <div className="bg-white">
+            <div className="mx-auto max-w-5xl px-4 py-16 md:py-24">
+              <SectionLabel>Curated Experiences</SectionLabel>
               <CreatorStoryboardGrid
                 storyboards={remainingStoryboards}
                 displayName={displayName}
@@ -335,55 +316,60 @@ export default function CreatorPublicProfilePage() {
                 onRequestTrip={handleRequestTrip}
                 hideTitle
               />
-            )}
-            {activeTab === "moments" && (
-              <CreatorMediaGallery
-                creatorId={creator.id}
-                fallbackPhotos={creator.featured_photos}
-                instagramHandle={creator.instagram_handle}
-                isOwnProfile={isOwnProfile}
-                hideTitle
-                useIgGrid
-              />
-            )}
+            </div>
+          </div>
+        )}
+
+        {/* From My Travels — Media gallery */}
+        <div className="bg-[#FDF9F0]">
+          <div className="mx-auto max-w-5xl px-4 py-16 md:py-24">
+            <SectionLabel>From My Travels</SectionLabel>
+            <CreatorMediaGallery
+              creatorId={creator.id}
+              fallbackPhotos={creator.featured_photos}
+              instagramHandle={creator.instagram_handle}
+              isOwnProfile={isOwnProfile}
+              hideTitle
+            />
           </div>
         </div>
 
         {/* Meet the Creator */}
         {bio && (
-          <div className="bg-[#FDF9F0]">
-            <div className="mx-auto max-w-5xl px-4 py-12 md:py-16">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6B7280] mb-4">
-                About
-              </p>
-              <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-4">
-                Meet {firstName}
-              </h2>
-              <p className="text-sm text-[#6B7280] leading-relaxed max-w-2xl line-clamp-4">
-                {bio}
-              </p>
-              {specialties.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-5">
-                  {specialties.slice(0, 6).map((s) => (
-                    <span
-                      key={s}
-                      className="text-[10px] font-medium uppercase tracking-wider text-[#6B7280] border border-[#E5DFC6] rounded-full px-3 py-1"
-                    >
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              )}
+          <div className="bg-white">
+            <div className="mx-auto max-w-5xl px-4 py-16 md:py-24">
+              <GoldDivider />
+              <div className="mt-10 text-center max-w-2xl mx-auto">
+                <p className="font-primary text-sm uppercase tracking-[0.25em] text-[#C7A962] mb-4">About</p>
+                <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-5">
+                  Meet {firstName}
+                </h2>
+                <p className="font-primary text-base text-[#6B7280] leading-relaxed line-clamp-4">
+                  {bio}
+                </p>
+                {specialties.length > 0 && (
+                  <div className="flex flex-wrap justify-center gap-2 mt-6">
+                    {specialties.slice(0, 6).map((s) => (
+                      <span
+                        key={s}
+                        className="text-[10px] font-medium uppercase tracking-wider text-[#6B7280] border border-[#E5DFC6] rounded-full px-3 py-1"
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
 
         {/* Reviews */}
         {reviewCount > 0 && (
-          <div className="bg-white border-t border-[#E5DFC6]/40">
-            <div className="mx-auto max-w-5xl px-4 py-12 md:py-16">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="font-secondary text-xl text-[#0a2225]">Reviews</h2>
+          <div className="bg-[#FDF9F0]">
+            <div className="mx-auto max-w-5xl px-4 py-16 md:py-24">
+              <div className="flex items-center justify-between mb-8">
+                <SectionLabel>Reviews</SectionLabel>
                 {!authLoading && user && user.id !== creator.id && (
                   <WriteReviewModal
                     revieweeId={creator.id}
@@ -419,23 +405,26 @@ export default function CreatorPublicProfilePage() {
         )}
 
         {/* Final CTA block */}
-        <div className="bg-[#FDF9F0] border-t border-[#E5DFC6]/40">
-          <div className="mx-auto max-w-5xl px-4 py-14 md:py-20 text-center">
-            <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-3">
-              Start Your Journey With {firstName}
-            </h2>
-            <p className="text-sm text-[#6B7280] mb-8 max-w-md mx-auto">
-              Share your travel style and get a personalized itinerary crafted just for you.
-            </p>
-            <Button
-              onClick={handleRequestTrip}
-              className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-10 h-12 text-sm font-medium shadow-sm"
-            >
-              Get Custom Itinerary
-            </Button>
-            <p className="text-[10px] text-[#9CA3AF] mt-3">
-              Designed for you · No commitment · Delivered in 24–48 hours
-            </p>
+        <div className="bg-white">
+          <div className="mx-auto max-w-5xl px-4 py-16 md:py-24 text-center">
+            <GoldDivider />
+            <div className="mt-10">
+              <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-3">
+                Start Your Journey With {firstName}
+              </h2>
+              <p className="font-primary text-sm text-[#6B7280] mb-8 max-w-md mx-auto">
+                Share your travel style and get a personalized itinerary crafted just for you.
+              </p>
+              <Button
+                onClick={handleRequestTrip}
+                className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-10 h-12 text-sm font-medium shadow-sm"
+              >
+                Get Custom Itinerary
+              </Button>
+              <p className="text-[10px] text-[#9CA3AF] mt-3">
+                Designed for you · No commitment · Delivered in 24–48 hours
+              </p>
+            </div>
           </div>
         </div>
       </div>
