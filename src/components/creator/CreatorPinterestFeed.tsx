@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, X, ArrowRight, Layers } from "lucide-react";
+import { Plus, X, ArrowRight, Layers, MoreVertical, Edit2, Trash2, Sparkles } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { CATEGORY_KEYWORDS } from "@/components/ui/CategoryChips";
 import { RefinementChips } from "@/components/discovery/RefinementChips";
@@ -8,6 +9,9 @@ import { DiscoveryFeed } from "@/components/discovery/DiscoveryFeed";
 import { DiscoveryWelcomeModal } from "@/components/discovery/DiscoveryWelcomeModal";
 import { DiscoveryTooltipTour } from "@/components/discovery/DiscoveryTooltipTour";
 import { useDiscoveryMilestone } from "@/hooks/useDiscoveryMilestone";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { deleteStoryboard } from "@/services/storyboardsService";
+import { toast } from "sonner";
 
 const ONBOARDED_KEY = "goldsainte_discovery_onboarded";
 const INSTRUCTION_DISMISSED_KEY = "goldsainte_instruction_dismissed";
@@ -37,6 +41,7 @@ interface Props {
   isOwnProfile?: boolean;
   onCreateNew?: () => void;
   onDeleteItem?: (itemId: string) => void;
+  onBoardDeleted?: () => void;
 }
 
 export function CreatorPinterestFeed({
@@ -46,6 +51,7 @@ export function CreatorPinterestFeed({
   isOwnProfile,
   onCreateNew,
   onDeleteItem,
+  onBoardDeleted,
 }: Props) {
   const navigate = useNavigate();
   const [activeBoard, setActiveBoard] = useState<string | null>(null);
@@ -220,19 +226,57 @@ export function CreatorPinterestFeed({
             All
           </button>
           {storyboards.map((sb) => (
-            <button
-              key={sb.id}
-              onClick={() => setActiveBoard(sb.id)}
-              className={`shrink-0 px-4 py-1.5 rounded-lg text-sm font-medium tracking-wide transition-all flex items-center gap-1.5 ${
-                activeBoard === sb.id
-                  ? "bg-foreground text-background shadow-sm"
-                  : "bg-muted/50 border border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground"
-              }`}
-            >
-              <span className={`w-1.5 h-1.5 rounded-full ${activeBoard === sb.id ? "bg-primary" : "bg-primary/40"}`} />
-              {sb.title}
-              {isOwnProfile && !sb.is_public && <span className="ml-1 opacity-60">· Draft</span>}
-            </button>
+            <div key={sb.id} className="shrink-0 flex items-center gap-0">
+              <button
+                onClick={() => setActiveBoard(sb.id)}
+                className={`px-4 py-1.5 rounded-lg text-sm font-medium tracking-wide transition-all flex items-center gap-1.5 ${
+                  activeBoard === sb.id
+                    ? "bg-foreground text-background shadow-sm"
+                    : "bg-muted/50 border border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground"
+                } ${isOwnProfile ? "rounded-r-none" : ""}`}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${activeBoard === sb.id ? "bg-primary" : "bg-primary/40"}`} />
+                {sb.title}
+                {isOwnProfile && !sb.is_public && <span className="ml-1 opacity-60">· Draft</span>}
+              </button>
+              {isOwnProfile && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className={`px-1.5 py-1.5 rounded-r-lg text-sm transition-all ${
+                        activeBoard === sb.id
+                          ? "bg-foreground text-background"
+                          : "bg-muted/50 border border-l-0 border-border text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <MoreVertical className="h-3.5 w-3.5" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => navigate(`/storyboards/${sb.id}`)}>
+                      <Edit2 className="mr-2 h-3.5 w-3.5" /> Edit Board
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="text-red-400 focus:text-red-300"
+                      onClick={async () => {
+                        if (!window.confirm(`Delete "${sb.title}"? This cannot be undone.`)) return;
+                        try {
+                          await deleteStoryboard(sb.id);
+                          toast.success("Storyboard deleted");
+                          if (activeBoard === sb.id) setActiveBoard(null);
+                          onBoardDeleted?.();
+                        } catch (err) {
+                          console.error(err);
+                          toast.error("Failed to delete storyboard");
+                        }
+                      }}
+                    >
+                      <Trash2 className="mr-2 h-3.5 w-3.5" /> Delete Board
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
           ))}
           {isOwnProfile && onCreateNew && (
             <button

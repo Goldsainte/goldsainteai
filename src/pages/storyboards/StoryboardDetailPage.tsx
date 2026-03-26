@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { 
   ArrowLeft, Plus, Trash2, Globe, Lock, Edit2, 
-  Copy, Check, Bookmark, ArrowRight, Sparkles, Loader2
+  Copy, Check, Bookmark, ArrowRight, Sparkles, Loader2, MoreVertical
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -22,6 +22,8 @@ import { invokeWithAuth } from "@/lib/supabaseHelpers";
 import { Header } from "@/components/Header";
 import { SaveToStoryboardModal } from "@/components/discovery/SaveToStoryboardModal";
 import { useDiscoveryFeed, type UnsplashImage } from "@/hooks/useDiscoveryFeed";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { deleteStoryboard } from "@/services/storyboardsService";
 import { toast } from "sonner";
 
 export default function StoryboardDetailPage() {
@@ -51,6 +53,7 @@ export default function StoryboardDetailPage() {
   }>({ open: false, imageUrl: "" });
 
   const isOwner = user?.id === storyboard?.owner_id;
+  const [deleting, setDeleting] = useState(false);
 
   // "More like this" query based on storyboard title
   const moreLikeQuery = storyboard?.title
@@ -190,6 +193,20 @@ export default function StoryboardDetailPage() {
     }
   };
 
+  const handleDeleteStoryboard = async () => {
+    if (!id || !window.confirm("Delete this entire storyboard? This cannot be undone.")) return;
+    setDeleting(true);
+    try {
+      await deleteStoryboard(id);
+      toast.success("Storyboard deleted");
+      navigate("/storyboards", { replace: true });
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete storyboard");
+      setDeleting(false);
+    }
+  };
+
   const handleConvertToTrip = () => {
     if (!id) return;
     navigate(`/post-trip?fromStoryboard=${id}${
@@ -295,9 +312,25 @@ export default function StoryboardDetailPage() {
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     {isOwner && (
-                      <Button size="sm" variant="outline" onClick={() => setEditing(true)}>
-                        <Edit2 className="mr-1 h-3.5 w-3.5" /> Edit Details
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="sm" variant="outline">
+                            <MoreVertical className="h-3.5 w-3.5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => setEditing(true)}>
+                            <Edit2 className="mr-2 h-3.5 w-3.5" /> Edit Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={handleDeleteStoryboard}
+                            disabled={deleting}
+                            className="text-red-400 focus:text-red-300"
+                          >
+                            <Trash2 className="mr-2 h-3.5 w-3.5" /> {deleting ? "Deleting…" : "Delete Storyboard"}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     )}
                     {storyboard.is_public && (
                       <Button size="sm" variant="outline" onClick={handleShareLink}>
