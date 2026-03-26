@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { ArrowLeft, PenLine, LogIn, Settings, ArrowRight, MapPin, Plus } from "lucide-react";
+import { ArrowLeft, PenLine, LogIn, Settings, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileHero } from "@/components/profile/ProfileHero";
 import { ReviewsList } from "@/components/profile/ReviewsList";
