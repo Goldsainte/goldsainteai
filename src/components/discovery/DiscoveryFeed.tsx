@@ -7,9 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 interface DiscoveryFeedProps {
-  category: string;
-  subcategory: string | null;
-  tags?: string[];
+  refinementPath: string[];
   /** Existing creator pins to show first */
   creatorPins?: {
     id: string;
@@ -26,9 +24,7 @@ interface DiscoveryFeedProps {
 }
 
 export function DiscoveryFeed({
-  category,
-  subcategory,
-  tags = [],
+  refinementPath,
   creatorPins = [],
   onMoreLikeThis,
   creatorId,
@@ -47,14 +43,14 @@ export function DiscoveryFeed({
     repinnedFromUserId?: string;
   }>({ open: false, imageUrl: "" });
 
-  const showDiscovery = category !== "All";
+  const showDiscovery = refinementPath.length > 0;
   const {
     data,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
     isLoading,
-  } = useDiscoveryFeed(category, subcategory, tags, showDiscovery);
+  } = useDiscoveryFeed(refinementPath, showDiscovery);
 
   const discoveryImages =
     data?.pages.flatMap((p) => p.images) || [];
@@ -115,10 +111,7 @@ export function DiscoveryFeed({
     onMoreLikeThis?.(newTags);
   }
 
-  const categoryPath = [
-    category !== "All" ? category : null,
-    subcategory,
-  ].filter(Boolean) as string[];
+  const categoryPath = refinementPath;
 
   return (
     <>
@@ -277,7 +270,7 @@ export function DiscoveryFeed({
         sourceType={saveModal.sourceType}
         sourceId={saveModal.sourceId}
         categoryPath={categoryPath}
-        tags={tags}
+        tags={refinementPath}
         repinnedFromItemId={saveModal.repinnedFromItemId}
         repinnedFromUserId={saveModal.repinnedFromUserId}
       />

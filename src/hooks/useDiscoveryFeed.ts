@@ -1,6 +1,5 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { SUBCATEGORY_SEARCH_TERMS, CATEGORY_KEYWORDS } from "@/components/ui/CategoryChips";
 
 export interface UnsplashImage {
   id: string;
@@ -12,43 +11,16 @@ export interface UnsplashImage {
   height: number;
 }
 
-function buildQuery(
-  category: string,
-  subcategory: string | null,
-  tags: string[]
-): string {
-  if (category === "All" && !subcategory && tags.length === 0) {
-    return "luxury travel inspiration";
-  }
-
-  // If subcategory has a specific search term, use it
-  if (subcategory && SUBCATEGORY_SEARCH_TERMS[subcategory]) {
-    const extra = tags.length > 0 ? " " + tags.join(" ") : "";
-    return SUBCATEGORY_SEARCH_TERMS[subcategory] + extra;
-  }
-
-  // Build from category keywords + subcategory + tags
-  const parts: string[] = [];
-  if (category !== "All") {
-    // Use the category name itself as primary term
-    parts.push(category.toLowerCase().replace(/&/g, "and"));
-  }
-  if (subcategory) {
-    parts.push(subcategory.toLowerCase());
-  }
-  parts.push(...tags);
-  parts.push("travel");
-
-  return parts.join(" ");
+function buildQueryFromPath(path: string[]): string {
+  if (path.length === 0) return "luxury travel inspiration";
+  return [...path.map((p) => p.toLowerCase().replace(/&/g, "and")), "travel"].join(" ");
 }
 
 export function useDiscoveryFeed(
-  category: string,
-  subcategory: string | null,
-  tags: string[] = [],
+  refinementPath: string[],
   enabled: boolean = true
 ) {
-  const query = buildQuery(category, subcategory, tags);
+  const query = buildQueryFromPath(refinementPath);
 
   return useInfiniteQuery({
     queryKey: ["discovery-feed", query],
@@ -72,9 +44,10 @@ export function useDiscoveryFeed(
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
       lastPage.hasMore ? lastPage.nextPage : undefined,
-    enabled: enabled && category !== "All",
+    enabled: enabled && refinementPath.length > 0,
     staleTime: 5 * 60 * 1000,
   });
 }
 
-export { buildQuery };
+export { buildQueryFromPath };
+
