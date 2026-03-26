@@ -1,80 +1,44 @@
 
 
-## Add Creator Social Accounts — Manual Entry + Public Display
+## Redesign Social Cards as Premium Influence Badges + Reposition Section
 
 ### Overview
-Create a new `creator_social_accounts` table for storing per-platform social data (handle, URL, follower count). Add a management UI in the Creator Dashboard Portfolio tab. Display social cards with formatted follower counts on the public profile, replacing the current basic social links.
-
-### Database Migration
-
-```sql
-CREATE TABLE public.creator_social_accounts (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  platform TEXT NOT NULL,
-  handle TEXT NOT NULL,
-  profile_url TEXT NOT NULL,
-  followers_count INTEGER NOT NULL DEFAULT 0,
-  sort_order INTEGER DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now(),
-  UNIQUE(user_id, platform)
-);
-
-ALTER TABLE public.creator_social_accounts ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Anyone can view social accounts"
-  ON public.creator_social_accounts FOR SELECT USING (true);
-
-CREATE POLICY "Users can manage own social accounts"
-  ON public.creator_social_accounts FOR ALL USING (auth.uid() = user_id);
-```
+Transform the flat, centered social cards into left-aligned, platform-branded influence badges with depth, hover animations, and a prominent total reach stat. Reposition the social section higher on the page (right after "How to Book") for maximum conversion impact.
 
 ### Changes
 
-**1. New component: `src/components/creator/CreatorSocialAccountsEditor.tsx`**
-- Platform dropdown (Instagram, TikTok, LinkedIn, Pinterest, YouTube, Twitter/X)
-- Inputs: Profile URL, Handle, Follower Count
-- Add/Edit/Delete per social entry
-- Platform icons using lucide or inline SVGs
-- Data stored as array of objects, managed in local state, saved via parent
+**1. `src/components/creator/CreatorSocialCards.tsx` — Full redesign**
 
-**2. `src/pages/creator/components/CreatorPortfolioTab.tsx`**
-- Add a "Social Accounts" section below the media gallery
-- Load social accounts from `creator_social_accounts` on mount
-- Save social accounts (upsert + delete removed) alongside media save
+**Layout**: Switch from centered grid to left-aligned horizontal card layout.
+- Icon circle (left) with platform-specific accent color
+- Platform name + handle (top-right of icon)
+- Follower count in larger bold text + social proof cue below
+- Chevron/arrow (far right), appears/animates on hover
 
-**3. New component: `src/components/creator/CreatorSocialCards.tsx`**
-- Public-facing display component
-- Grid of cards: platform icon, platform name, handle, formatted follower count (1.2K, 24.8K, 112K, 1.4M)
-- Each card clickable → opens profile URL in new tab
-- "Total social reach: XXK+ followers" header when ≥1 social exists
-- Empty state: "No social profiles added yet"
+**Platform-specific accents** (subtle, GS-safe):
+- Instagram: `bg-gradient-to-br from-[#f9ce34]/10 via-[#ee2a7b]/10 to-[#6228d7]/10`
+- TikTok: `bg-[#010101]/5` with slight contrast
+- LinkedIn: `bg-[#0077b5]/8`
+- Pinterest: `bg-[#e60023]/8`
+- YouTube: `bg-[#ff0000]/8`
+- Twitter: `bg-[#1da1f2]/8`
 
-**4. `src/pages/creators/CreatorPublicProfilePage.tsx`**
-- Fetch `creator_social_accounts` for the creator in the initial parallel query
-- Replace the current `socialLinks` array (built from `tiktok_handle`/`instagram_handle`) with data from the new table
-- Render `<CreatorSocialCards>` between the media gallery and trust section (high on page for credibility)
-- Still pass social data to `ProfileSidebar` for the sidebar social links
+**Depth & hover**:
+- Default: `shadow-sm` + `border-[#E5DFC6]`
+- Hover: `shadow-lg`, `scale-[1.02]`, border glow `border-[#C7A962]`, arrow slides in
+- Cursor pointer on entire card (already an `<a>` tag)
 
-**5. `src/components/profile/ProfileSidebar.tsx`**
-- Update `SocialLink` interface to include optional `followersCount`
-- Show formatted follower count next to handle in sidebar
+**Follower count**: Bump to `text-base font-bold` with formatted numbers. Add subtle social proof label below ("Highly active" for 10K+, "Growing audience" for 1K+).
 
-### Formatting Helper
-```typescript
-function formatFollowers(count: number): string {
-  if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1).replace(/\.0$/, '')}M`;
-  if (count >= 1_000) return `${(count / 1_000).toFixed(1).replace(/\.0$/, '')}K`;
-  return count.toString();
-}
-```
+**Total Reach header**: Redesign as a prominent stat bar above the cards with Users icon, larger text, gold accent background strip.
+
+**Grid**: Switch to `grid-cols-1 sm:grid-cols-2` for more breathing room, increase padding to `p-5`, gap to `gap-4`.
+
+**2. `src/pages/creators/CreatorPublicProfilePage.tsx` — Reposition social section**
+
+Move `<CreatorSocialCards>` from after About/Specialties (line 334) to directly after the "How to Book" section (after line 268), before the two-column layout begins. This places social proof right after the hero and booking guide — the highest-trust position.
 
 ### Files
-- **Migration**: Create `creator_social_accounts` table
-- **New**: `src/components/creator/CreatorSocialAccountsEditor.tsx` — dashboard editor
-- **New**: `src/components/creator/CreatorSocialCards.tsx` — public display cards
-- **Edit**: `src/pages/creator/components/CreatorPortfolioTab.tsx` — load/save socials
-- **Edit**: `src/pages/creators/CreatorPublicProfilePage.tsx` — fetch + render social cards
-- **Edit**: `src/components/profile/ProfileSidebar.tsx` — show follower counts
+- **Edit**: `src/components/creator/CreatorSocialCards.tsx` — full visual redesign
+- **Edit**: `src/pages/creators/CreatorPublicProfilePage.tsx` — move social cards above two-column layout
 
