@@ -1,27 +1,69 @@
 
 
-## Fix: Creator Storyboard Creation from Profile Page
+## Rethink Storyboards on Creator Profile — True Pinterest Masonry
 
 ### Problem
-Two issues causing the disconnect:
-1. **No creation UI on profile page** — creators can't create storyboards directly from their own profile
-2. **Visibility filter** — the profile page query filters `is_public = true`, but new storyboards default to `is_public: false`, so they never appear even after creation
+The current "Explore Travel Ideas" section shows storyboards as small board-cover cards (3-up grid with collage thumbnails). This is a **directory of boards**, not the Pinterest experience the user wants. On Pinterest, when you visit a creator's profile, you see a **waterfall of all their pinned images** — large, beautiful, varied-height photos flowing in a masonry layout. Each pin is clickable and belongs to a board, but the visual experience is image-first, not board-first.
+
+### Design Direction
+Instead of showing storyboard cards, **flatten all storyboard items into one unified masonry feed** on the creator profile — like Pinterest's "All Pins" view. Each image is a pin; hovering shows the board name and a save/trip CTA. Above the feed, show a horizontal row of board filters (like Pinterest's board tabs) so visitors can filter by storyboard.
 
 ### Changes
 
 **1. `src/pages/creators/CreatorPublicProfilePage.tsx`**
-- When `isOwnProfile` is true, add a **"+ New Storyboard"** button next to the "Explore Travel Ideas" section label
-- Clicking opens a dialog to enter title, description, and destination — creates the storyboard as `is_public: true` with `role: "creator"`
-- After creation, refresh the storyboards list (re-fetch or append to local state)
-- Also show the storyboard section even when `remainingStoryboards` is empty (if own profile) — display an empty state with the create CTA
-- Update the storyboards query: when viewing own profile, remove the `.eq("is_public", true)` filter so drafts are also visible to the creator (with a small "Draft" badge on private ones)
+- Fetch ALL storyboard items (not just 3 per board) across the creator's public storyboards — query `storyboard_items` joined through `storyboards` where `owner_id = id` and `is_public = true` (or all if own profile)
+- Remove the "Featured Experience" hero card (fold it into the feed)
+- Replace the `CreatorStoryboardGrid` with a new `CreatorPinterestFeed` component
+- Add a horizontal board filter row above the feed: pills showing each storyboard title + "All" default — clicking filters the masonry to that board's items
+- Keep the "+ New Storyboard" button for own profile
+- Keep "From My Travels" media gallery below as a separate section
 
-**2. `src/components/creator/CreatorStoryboardGrid.tsx`**
-- Add optional `isOwnProfile` prop
-- When `isOwnProfile`, show a subtle "Draft" badge on cards where `is_public` is false
-- Add an optional `onCreateNew` prop — when provided, render a dashed-border "+" card at the end of the grid as an additional creation entry point
+**2. New `src/components/creator/CreatorPinterestFeed.tsx`**
+- **Board filter bar**: horizontal scroll of pill buttons — "All" + each storyboard title. Active pill gets gold highlight
+- **Masonry grid**: `columns-2 md:columns-3 lg:columns-4 gap-4` with `break-inside-avoid` on each pin
+- Each **pin card**:
+  - Image at natural aspect ratio (no cropping), `rounded-xl`
+  - On hover: dark overlay with board name, pin title/caption, and a "Plan a trip like this →" CTA
+  - If `isOwnProfile`, show a small delete/manage icon on hover
+  - Clicking the image navigates to the storyboard detail page
+- Empty state when no items: editorial CTA to create first storyboard (own profile) or "No inspiration yet" (visitor)
+- Props: `items` (flattened pin data), `storyboards` (for filter bar), `isOwnProfile`, `creatorId`, `onCreateNew`
+
+**3. Data shape for pins**
+Each pin in the feed will carry:
+```
+{
+  id: string           // storyboard_item id
+  image_url: string
+  title: string | null
+  subtitle: string | null
+  storyboard_id: string
+  storyboard_title: string
+  storyboard_destination: string | null
+}
+```
+Fetched via: `storyboard_items(*, storyboards!inner(id, title, destination, is_public))` filtered by `storyboards.owner_id = id`.
+
+**4. `src/components/creator/CreatorStoryboardGrid.tsx`**
+- Keep the file but it will no longer be used on the creator profile page (still used elsewhere like My Storyboards). No changes needed.
+
+### Visual Result
+```text
+  ┌─ ALL ─┬─ Amalfi ─┬─ Morocco ─┬─ Bali ─┐   ← board filter pills
+  
+  ┌────────┐ ┌──────┐ ┌────────┐ ┌──────────┐
+  │        │ │      │ │        │ │          │
+  │  tall  │ │short │ │ medium │ │          │
+  │  pin   │ │ pin  │ │  pin   │ │  tall    │
+  │        │ └──────┘ │        │ │  pin     │
+  │        │ ┌──────┐ └────────┘ │          │
+  └────────┘ │      │ ┌────────┐ └──────────┘
+  ┌────────┐ │ med  │ │        │ ┌──────────┐
+  │  pin   │ │ pin  │ │  pin   │ │   pin    │
+  └────────┘ └──────┘ └────────┘ └──────────┘
+```
 
 ### Files
-- **Edit**: `src/pages/creators/CreatorPublicProfilePage.tsx` — add create dialog, update query filter for own profile, show section when empty
-- **Edit**: `src/components/creator/CreatorStoryboardGrid.tsx` — add Draft badge and "+" card for own profile
+- **Edit**: `src/pages/creators/CreatorPublicProfilePage.tsx` — new query for all items, board filter state, replace grid with feed
+- **Create**: `src/components/creator/CreatorPinterestFeed.tsx` — masonry feed with board filters, hover overlays, pin cards
 
