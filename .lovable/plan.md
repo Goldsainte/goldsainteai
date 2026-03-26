@@ -1,86 +1,82 @@
 
 
-## Infinite Refinement Discovery — Replace Fixed Hierarchy with Dynamic Path
+## First-Time User Onboarding for Discovery Pages
 
-### Problem
-The current system has a rigid 2-level hierarchy: top category → fixed subcategory. The user wants unlimited depth where every click appends to a refinement path and the system generates contextual next-step pills dynamically.
+### What Gets Built
 
-### Design
+1. **Welcome modal** for first-time visitors to the discovery/creator pages
+2. **3-step guided tooltips** after modal dismissal (category pills → image grid → save button)
+3. **Persistent inline instruction bar** ("Browse → Save → Build your trip")
+4. **Empty storyboard state** with CTA
+5. **Save feedback animation** + toast
+6. **Milestone nudge** after saving 2-3 images
 
-Replace the fixed `CategoryChips` → `SubcategoryChips` pattern with a **refinement path** model:
+---
 
+### 1. Discovery Welcome Modal — `src/components/discovery/DiscoveryWelcomeModal.tsx` (New)
+
+First-time-only modal (keyed on `localStorage: goldsainte_discovery_onboarded`). Shows:
+- Title: "Plan your next trip visually"
+- Subtitle explaining the loop
+- 3 visual steps with icons (Compass/Explore, Bookmark/Save, Map/Plan)
+- CTA: "Start Exploring" → dismisses modal, triggers tooltip tour
+- Styled in the existing Goldsainte cream/gold palette
+
+### 2. Discovery Tooltip Tour — `src/components/discovery/DiscoveryTooltipTour.tsx` (New)
+
+Lightweight 3-step tooltip sequence using `react-joyride` (already installed). Targets:
+- `[data-tour="category-pills"]` → "Start here: choose a travel vibe"
+- `[data-tour="discovery-grid"]` → "Click any image to explore more like this"
+- `[data-tour="save-button"]` → "Save images to build your trip"
+
+Triggered after welcome modal dismisses. Sets `localStorage: goldsainte_discovery_toured`.
+
+### 3. Inline Instruction Bar
+
+Add a subtle bar inside `CreatorPinterestFeed.tsx` below the refinement chips:
 ```text
-Row 1: Top categories (always visible, resets path on change)
-Row 2: Contextual refinement pills (generated from current path)
-Row 3: Active path breadcrumb chips (removable, shows current refinement)
+Browse → Save → Build your trip
 ```
+Small text, cream background, dismissible via × button (persisted to localStorage).
 
-Each pill click appends to a `refinementPath: string[]` array. The Unsplash query is built by joining the entire path. Contextual pills for row 2 are generated based on what the user has selected so far — not from a fixed map.
+### 4. Empty Storyboard State
 
-**Example flow:**
-- Click "Luxury Escapes" → path: `["luxury escapes"]`
-- Row 2 shows: Beach Villas, Private Islands, Safari Lodges, Desert Resorts...
-- Click "Beach Villas" → path: `["luxury escapes", "beach villas"]`
-- Row 2 evolves to: Maldives, Bali, Amalfi Coast, Sunset, Overwater...
-- Click "Maldives" → path: `["luxury escapes", "beach villas", "maldives"]`
-- Row 2 evolves to: Sunset, Private Dining, Underwater, Honeymoon...
-- Query: `"luxury escapes beach villas maldives travel"`
+In `DiscoveryFeed.tsx`, when user has no storyboards and no saved pins, show an empty state card:
+- "You haven't created a trip yet"
+- "Save images to start building your travel storyboard"
+- CTA: "Create Your First Storyboard" → opens `SaveToStoryboardModal` in create-new mode
 
-### Changes
+### 5. Save Feedback Animation
 
-**1. `src/components/ui/CategoryChips.tsx`** — Add refinement pill data
+In `SaveToStoryboardModal.tsx`, after successful save:
+- Add a brief scale+check animation on the saved board row
+- The existing `toast.success("Saved to storyboard!")` stays
+- Add a subtle bookmark fill animation on the save button in `DiscoveryFeed.tsx` (button briefly turns gold with a scale pulse)
 
-Add a `REFINEMENT_SUGGESTIONS` map that provides contextual next-step pills based on the current path depth and content. Structure:
-- Level 0 (after top category): use existing `SUBCATEGORIES` map
-- Level 1+ (after subcategory): a new `DEEP_REFINEMENTS` map keyed by subcategory, providing location/mood/style pills like `"Maldives"`, `"Sunset"`, `"Private"`, `"Overwater"`
-- Level 2+: generic travel mood/style pills like `"Golden Hour"`, `"Secluded"`, `"Romantic"`, `"Aerial View"`, `"Local Culture"`
+### 6. Milestone Nudge — `src/hooks/useDiscoveryMilestone.ts` (New)
 
-Export a `getRefinementSuggestions(path: string[]): string[]` function that returns the next set of contextual pills based on the current refinement path.
+Track saves in session via a simple counter in React state/context. After 3 saves, show a toast/banner:
+- "You're building your trip — Keep going or start planning now"
+- CTA: "Start Your Trip" → navigates to `/post-trip`
+- Only shown once per session
 
-**2. `src/components/discovery/RefinementChips.tsx`** — New component
+### 7. Data Tour Attributes
 
-A single component replacing the fixed subcategory row:
-- Takes `refinementPath: string[]` and `onAddRefinement / onRemoveLast / onReset`
-- **Row 1**: Always shows top-level category pills (same as current `CategoryChips`)
-- **Row 2**: Shows contextual refinement suggestions from `getRefinementSuggestions(path)` — these evolve with each click
-- **Row 3**: Shows the active refinement path as removable breadcrumb chips (click × to pop back to that point)
-- Max 2-3 visible rows; row 2 replaces itself on each click
+Add `data-tour` attributes to existing elements:
+- `RefinementChips.tsx`: `data-tour="category-pills"` on the category row
+- `DiscoveryFeed.tsx`: `data-tour="discovery-grid"` on the masonry container, `data-tour="save-button"` on the first visible save button
 
-**3. `src/hooks/useDiscoveryFeed.ts`** — Update query builder
-
-Change `buildQuery` to accept a flat `refinementPath: string[]` instead of separate category/subcategory. Query = path segments joined with spaces + "travel". The `useDiscoveryFeed` hook signature changes to `useDiscoveryFeed(refinementPath: string[], tags: string[], enabled: boolean)`.
-
-**4. `src/components/creator/CreatorPinterestFeed.tsx`** — Wire up refinement
-
-Replace `activeCategory` + `activeSubcategory` state with a single `refinementPath: string[]`. Wire the new `RefinementChips` component. The "More Like This" action appends image-derived tags to the path. Board filter pills remain unchanged below the refinement rows.
-
-**5. `src/components/discovery/DiscoveryFeed.tsx`** — Update props
-
-Change `category` + `subcategory` props to accept `refinementPath: string[]`. Pass through to `useDiscoveryFeed`. The rest of the component (masonry grid, save modal, infinite scroll) stays the same.
-
-### Refinement Data Structure
-
-```ts
-// After subcategory selection, suggest locations/moods
-const DEEP_REFINEMENTS: Record<string, string[]> = {
-  "Beach Villas": ["Maldives", "Bali", "Amalfi Coast", "Caribbean", "Sunset", "Overwater", "Private Pool"],
-  "Private Islands": ["Fiji", "Seychelles", "Caribbean", "Tropical", "Barefoot Luxury"],
-  "Street Food": ["Bangkok", "Tokyo", "Mexico City", "Istanbul", "Night Market"],
-  "Honeymoon": ["Maldives", "Santorini", "Bora Bora", "Tuscany", "Sunset", "Private"],
-  // ... for each subcategory
-};
-
-// Generic mood/style pills for depth 2+
-const MOOD_REFINEMENTS = ["Golden Hour", "Secluded", "Romantic", "Aerial View", "Vibrant", "Minimalist", "Dramatic", "Cozy", "Wild", "Serene"];
-```
+---
 
 ### Files
 
 | Action | File | Purpose |
 |--------|------|---------|
-| Edit | `src/components/ui/CategoryChips.tsx` | Add `DEEP_REFINEMENTS`, `MOOD_REFINEMENTS`, export `getRefinementSuggestions()` |
-| Create | `src/components/discovery/RefinementChips.tsx` | Dynamic refinement pill rows with path breadcrumbs |
-| Edit | `src/hooks/useDiscoveryFeed.ts` | Accept `refinementPath[]` instead of category+subcategory |
-| Edit | `src/components/creator/CreatorPinterestFeed.tsx` | Replace fixed category/subcategory with refinement path |
-| Edit | `src/components/discovery/DiscoveryFeed.tsx` | Update props to use refinement path |
+| Create | `src/components/discovery/DiscoveryWelcomeModal.tsx` | First-time welcome modal with 3-step visual |
+| Create | `src/components/discovery/DiscoveryTooltipTour.tsx` | 3-step Joyride tooltip tour |
+| Create | `src/hooks/useDiscoveryMilestone.ts` | Session save counter + milestone nudge |
+| Edit | `src/components/creator/CreatorPinterestFeed.tsx` | Add welcome modal, tooltip tour, inline instruction bar |
+| Edit | `src/components/discovery/DiscoveryFeed.tsx` | Add data-tour attrs, empty state, save animation |
+| Edit | `src/components/discovery/RefinementChips.tsx` | Add data-tour attr on category row |
+| Edit | `src/components/discovery/SaveToStoryboardModal.tsx` | Add save animation feedback, milestone counter |
 
