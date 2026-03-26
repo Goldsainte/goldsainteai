@@ -252,7 +252,7 @@ export function SubcategoryChips({
       <button
         onClick={() => onSubcategoryChange(null)}
         className={cn(
-          "whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium tracking-wide transition-all duration-200 ease-out shrink-0",
+          "whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium tracking-wide transition-all duration-200 ease-out shrink-0",
           activeSubcategory === null
             ? "bg-[#0a2225] text-white shadow-sm"
             : "bg-white border border-[#E5DFC6] text-[#6B7280] hover:border-[#C7A962] hover:text-[#0a2225]"
@@ -265,7 +265,7 @@ export function SubcategoryChips({
           key={sub}
           onClick={() => onSubcategoryChange(sub)}
           className={cn(
-            "whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium tracking-wide transition-all duration-200 ease-out shrink-0",
+            "whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium tracking-wide transition-all duration-200 ease-out shrink-0",
             activeSubcategory === sub
               ? "bg-[#0a2225] text-white shadow-sm"
               : "bg-white border border-[#E5DFC6] text-[#6B7280] hover:border-[#C7A962] hover:text-[#0a2225]"
