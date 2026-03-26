@@ -317,83 +317,18 @@ export default function CreatorPublicProfilePage() {
           onRequestTrip={handleRequestTrip}
         />
 
-        {/* Featured Storyboard */}
-        {featuredStoryboard && (
-          <div className="bg-[#FDF9F0]">
-            <div className="mx-auto max-w-5xl px-4 py-16 md:py-24">
-              <SectionLabel>Featured Experience</SectionLabel>
-              <div
-                className="relative rounded-2xl overflow-hidden cursor-pointer group"
-                onClick={() => navigate(`/storyboards/${featuredStoryboard.id}`)}
-              >
-                <div className="aspect-[2/1] md:aspect-[16/7] overflow-hidden">
-                  <img
-                    src={featuredStoryboard.cover_image_url}
-                    alt={featuredStoryboard.title}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10 flex items-end justify-between">
-                  <div>
-                    {featuredStoryboard.destination && (
-                      <p className="text-white/60 text-xs uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                        <MapPin className="h-3 w-3" />
-                        {featuredStoryboard.destination}
-                      </p>
-                    )}
-                    <h3 className="font-secondary text-2xl md:text-3xl text-white leading-tight">
-                      {featuredStoryboard.title}
-                    </h3>
-                    {featuredStoryboard.description && (
-                      <p className="text-white/70 text-sm mt-2 max-w-lg line-clamp-2 font-primary">
-                        {featuredStoryboard.description}
-                      </p>
-                    )}
-                  </div>
-                  <button
-                    className="hidden md:inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white text-sm font-medium px-5 py-2.5 rounded-full hover:bg-white/30 transition-colors shrink-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/post-trip?fromCreator=${creator.id}&storyboard=${featuredStoryboard.id}${featuredStoryboard.destination ? `&destination=${encodeURIComponent(featuredStoryboard.destination)}` : ""}`);
-                    }}
-                  >
-                    Plan a trip like this
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Curated Experiences — Storyboard grid */}
-        {(remainingStoryboards.length > 0 || isOwnProfile) && (
+        {/* Pinterest-Style Storyboard Feed */}
+        {(pinItems.length > 0 || isOwnProfile) && (
           <div className="bg-white">
             <div className="mx-auto max-w-5xl px-4 py-16 md:py-24">
-              <div className="flex items-center justify-between mb-8">
-                <SectionLabel>Explore Travel Ideas</SectionLabel>
-                {isOwnProfile && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowCreateDialog(true)}
-                    className="border-[#C7A962] text-[#0a2225] rounded-full shrink-0"
-                  >
-                    <Plus className="h-3.5 w-3.5 mr-1.5" />
-                    New Storyboard
-                  </Button>
-                )}
-              </div>
+              <SectionLabel>Explore Travel Ideas</SectionLabel>
               <p className="font-primary text-sm text-[#6B7280] -mt-4 mb-8 max-w-lg">
-                Curated travel storyboards by {firstName} — visual collections of destinations, experiences, and moments that inspire your next journey.
+                Curated travel pins by {firstName} — destinations, experiences, and moments that inspire your next journey.
               </p>
-              <CreatorStoryboardGrid
-                storyboards={remainingStoryboards}
-                displayName={displayName}
+              <CreatorPinterestFeed
+                items={pinItems}
+                storyboards={creatorStoryboards}
                 creatorId={creator.id}
-                onRequestTrip={handleRequestTrip}
-                hideTitle
                 isOwnProfile={isOwnProfile}
                 onCreateNew={() => setShowCreateDialog(true)}
               />
