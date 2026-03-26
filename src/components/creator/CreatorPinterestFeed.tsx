@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, X, ArrowRight } from "lucide-react";
+import { Plus, X, ArrowRight, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CATEGORY_KEYWORDS } from "@/components/ui/CategoryChips";
 import { RefinementChips } from "@/components/discovery/RefinementChips";
@@ -200,41 +200,50 @@ export function CreatorPinterestFeed({
         </div>
       )}
 
-      {/* Board filter pills */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 scrollbar-hide">
-        <button
-          onClick={() => setActiveBoard(null)}
-          className={`shrink-0 px-4 py-1.5 rounded-full text-xs font-medium tracking-wide transition-all ${
-            activeBoard === null
-              ? "bg-primary text-primary-foreground shadow-sm"
-              : "bg-background border border-border text-muted-foreground hover:border-primary hover:text-foreground"
-          }`}
-        >
-          All
-        </button>
-        {storyboards.map((sb) => (
+      {/* Board filter section — visually distinct from discovery categories */}
+      <div className="border-t border-border/50 pt-4 mt-2 mb-6">
+        <div className="flex items-center gap-1.5 mb-2">
+          <Layers className="h-3.5 w-3.5 text-muted-foreground" />
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            {isOwnProfile ? "Your Boards" : "Boards"}
+          </span>
+        </div>
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
           <button
-            key={sb.id}
-            onClick={() => setActiveBoard(sb.id)}
-            className={`shrink-0 px-4 py-1.5 rounded-full text-xs font-medium tracking-wide transition-all ${
-              activeBoard === sb.id
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "bg-background border border-border text-muted-foreground hover:border-primary hover:text-foreground"
+            onClick={() => setActiveBoard(null)}
+            className={`shrink-0 px-4 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all ${
+              activeBoard === null
+                ? "bg-foreground text-background shadow-sm"
+                : "bg-muted/50 border border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground"
             }`}
           >
-            {sb.title}
-            {isOwnProfile && !sb.is_public && <span className="ml-1 opacity-60">· Draft</span>}
+            All
           </button>
-        ))}
-        {isOwnProfile && onCreateNew && (
-          <button
-            onClick={onCreateNew}
-            className="shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border-2 border-dashed border-border text-primary hover:border-primary transition-all flex items-center gap-1"
-          >
-            <Plus className="h-3 w-3" />
-            New Board
-          </button>
-        )}
+          {storyboards.map((sb) => (
+            <button
+              key={sb.id}
+              onClick={() => setActiveBoard(sb.id)}
+              className={`shrink-0 px-4 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all flex items-center gap-1.5 ${
+                activeBoard === sb.id
+                  ? "bg-foreground text-background shadow-sm"
+                  : "bg-muted/50 border border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground"
+              }`}
+            >
+              <span className={`w-1.5 h-1.5 rounded-full ${activeBoard === sb.id ? "bg-primary" : "bg-primary/40"}`} />
+              {sb.title}
+              {isOwnProfile && !sb.is_public && <span className="ml-1 opacity-60">· Draft</span>}
+            </button>
+          ))}
+          {isOwnProfile && onCreateNew && (
+            <button
+              onClick={onCreateNew}
+              className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium border-2 border-dashed border-border text-primary hover:border-primary transition-all flex items-center gap-1"
+            >
+              <Plus className="h-3 w-3" />
+              New Board
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Discovery feed with creator pins mixed in */}
