@@ -91,6 +91,7 @@ export async function createStoryboard(params: {
   originalStoryboardId?: string | null;
   sourceCreatorId?: string | null;
   isPublic?: boolean;
+  status?: string;
 }): Promise<StoryboardRow> {
   const { data, error } = await supabase
     .from("storyboards")
@@ -102,6 +103,7 @@ export async function createStoryboard(params: {
       original_storyboard_id: params.originalStoryboardId || null,
       source_creator_id: params.sourceCreatorId || null,
       is_public: params.isPublic || false,
+      status: params.status || "draft",
     })
     .select("*")
     .single();
