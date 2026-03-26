@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Film, ExternalLink, Instagram, Star } from "lucide-react";
+import { Film, ExternalLink, Instagram, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface MediaItem {
@@ -52,12 +52,12 @@ export function CreatorMediaGallery({
   if (items.length === 0 && fallbackPhotos && fallbackPhotos.length > 0) {
     return (
       <section>
-        {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">From My Travels</h2>}
-        <div className="columns-2 md:columns-3 gap-4 space-y-4">
+        {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">My Top Trip Highlights</h2>}
+        <ScrollCarousel>
           {fallbackPhotos.map((src) => (
-            <img key={src} src={src} alt="Content" className="w-full object-cover rounded-xl break-inside-avoid" loading="lazy" />
+            <img key={src} src={src} alt="Content" className="h-80 md:h-96 w-auto object-cover rounded-2xl flex-shrink-0" loading="lazy" />
           ))}
-        </div>
+        </ScrollCarousel>
       </section>
     );
   }
@@ -67,7 +67,7 @@ export function CreatorMediaGallery({
     if (isOwnProfile) {
       return (
         <section>
-          {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">From My Travels</h2>}
+          {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">My Top Trip Highlights</h2>}
           <div className="rounded-xl border border-dashed border-[#E5DFC6] bg-white/50 p-8 text-center">
             <Instagram className="h-6 w-6 text-[#C7A962] mx-auto mb-3" />
             <p className="text-sm text-[#0a2225] mb-1">Add your content</p>
@@ -91,7 +91,7 @@ export function CreatorMediaGallery({
 
     return (
       <section>
-        {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">From My Travels</h2>}
+        {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">My Top Trip Highlights</h2>}
         <div className="rounded-xl border border-[#E5DFC6] bg-white p-6 text-center">
           <p className="text-sm text-[#6B7280]">
             Follow{" "}
@@ -110,15 +110,15 @@ export function CreatorMediaGallery({
     );
   }
 
-  // Editorial masonry grid — natural aspect ratios
+  // Horizontal auto-scroll carousel
   return (
     <section>
-      {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">From My Travels</h2>}
-      <div className="columns-2 md:columns-3 gap-4 space-y-4">
+      {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">My Top Trip Highlights</h2>}
+      <ScrollCarousel>
         {items.map((item) => (
           <div
             key={item.id}
-            className="relative overflow-hidden bg-[#E5DFC6]/30 cursor-pointer group rounded-xl break-inside-avoid"
+            className="relative overflow-hidden bg-[#E5DFC6]/30 cursor-pointer group rounded-2xl flex-shrink-0 h-80 md:h-96"
             onClick={() => {
               if (item.media_type === "video") {
                 if (item.external_url) {
@@ -135,7 +135,7 @@ export function CreatorMediaGallery({
                 <img
                   src={item.url}
                   alt={item.caption || "Photo"}
-                  className="w-full object-cover"
+                  className="h-full w-auto object-cover"
                   loading="lazy"
                 />
                 {item.is_cover && (
@@ -143,7 +143,6 @@ export function CreatorMediaGallery({
                     <Star className="w-3 h-3" /> Cover
                   </span>
                 )}
-                {/* Hover caption overlay */}
                 {item.caption && (
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
                     <p className="text-white text-xs line-clamp-2">{item.caption}</p>
@@ -154,25 +153,24 @@ export function CreatorMediaGallery({
 
             {/* Video — playing */}
             {item.media_type === "video" && item.source === "upload" && playingVideo === item.id && (
-              <video src={item.url} className="w-full object-cover" controls autoPlay playsInline />
+              <video src={item.url} className="h-full w-auto object-cover" controls autoPlay playsInline />
             )}
 
             {/* Video — thumbnail */}
             {item.media_type === "video" && !(item.source === "upload" && playingVideo === item.id) && (
               <>
                 {item.thumbnail_url ? (
-                  <img src={item.thumbnail_url} alt={item.source} className="w-full object-cover" loading="lazy" />
+                  <img src={item.thumbnail_url} alt={item.source} className="h-full w-auto object-cover" loading="lazy" />
                 ) : item.source === "upload" ? (
-                  <video src={item.url} className="w-full object-cover" muted preload="metadata" />
+                  <video src={item.url} className="h-full w-auto object-cover" muted preload="metadata" />
                 ) : (
-                  <div className="aspect-square flex flex-col items-center justify-center gap-2 bg-[#FDF9F0]">
+                  <div className="h-full aspect-square flex flex-col items-center justify-center gap-2 bg-[#FDF9F0]">
                     <Film className="w-8 h-8 text-[#C7A962]" />
                     <span className="text-xs font-medium text-[#7A7151] uppercase tracking-wide">
                       {item.source === "instagram" ? "Instagram" : "TikTok"} Reel
                     </span>
                   </div>
                 )}
-                {/* Play overlay */}
                 <div className="absolute inset-0 flex items-center justify-center bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity">
                   {item.external_url ? (
                     <ExternalLink className="w-5 h-5 text-white drop-shadow-lg" />
@@ -191,7 +189,31 @@ export function CreatorMediaGallery({
             )}
           </div>
         ))}
-      </div>
+      </ScrollCarousel>
     </section>
+  );
+}
+
+/* Reusable horizontal auto-scroll carousel wrapper */
+function ScrollCarousel({ children }: { children: React.ReactNode }) {
+  const speed = 40; // seconds for one full cycle
+
+  return (
+    <div className="relative group/carousel">
+      {/* Edge fade masks */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 z-10 bg-gradient-to-r from-[#FDF9F0] to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 z-10 bg-gradient-to-l from-[#FDF9F0] to-transparent" />
+
+      {/* Scrolling track */}
+      <div className="overflow-hidden">
+        <div
+          className="flex gap-4 w-max animate-scroll-left hover:[animation-play-state:paused]"
+          style={{ animationDuration: `${speed}s` }}
+        >
+          {children}
+          {children}
+        </div>
+      </div>
+    </div>
   );
 }
