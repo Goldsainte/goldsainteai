@@ -1,78 +1,30 @@
 
 
-## Make Storyboards Publicly Shareable & Independently Discoverable
+## Fix: Infinite Recursion in Storyboards RLS Policies
 
-### Problem
-Currently, `/storyboards/:id` is wrapped in `<RequireAuth>`, so no one can view a storyboard without logging in. There's no slug for clean URLs, no Open Graph metadata for social previews, and no public-facing view page.
+### Root Cause
 
-### Changes
+The `storyboards` table has a SELECT policy ("Collaborators can view storyboards") that queries `storyboard_collaborators`. But `storyboard_collaborators` has RLS policies that query back into `storyboards` (checking `owner_id = auth.uid()`). Postgres detects this circular dependency and raises the infinite recursion error.
 
-**1. Database: Add `slug` column + public read RLS**
-- Migration: `ALTER TABLE storyboards ADD COLUMN slug TEXT UNIQUE;`
-- Create a trigger function that auto-generates a slug from `title` on insert/update (e.g., `maldives-honeymoon-abc123` — title kebab-cased + short random suffix for uniqueness)
-- Add RLS policy: `SELECT` for `anon` and `authenticated` roles `WHERE is_public = true`
-- Add RLS policy for `storyboard_items`: `SELECT` where parent storyboard `is_public = true`
+This blocks **all** operations on the `storyboards` table, including INSERT.
 
-**2. New public page: `src/pages/public/PublicStoryboardPage.tsx`**
-- Route: `/s/:slug` (clean, shareable URL) — update existing `StoryboardSharePage` redirect to render this instead
-- No auth required — fetches storyboard by slug (falls back to ID) using a service function
-- Displays: cover image hero, title, description, destination, creator info (avatar + name with link to profile), pin count
-- Masonry grid of all items (same layout as current detail page but read-only)
-- CTA buttons: "Design My Trip" (links to trip request flow), "Save to My Boards" (requires auth, opens save modal), "Fork This Board" (requires auth, clones storyboard)
-- Increment `view_count` on load via an RPC or direct update
-- Creator attribution card at bottom with link to their public profile
+### Fix
 
-**3. Open Graph / social meta for link previews**
-- Add `react-helmet-async` meta tags in `PublicStoryboardPage`: `og:title`, `og:description`, `og:image` (cover_image_url or first item image), `og:url`, plus Twitter card tags
-- This ensures TikTok, IG link-in-bio, X, iMessage etc. show a rich preview
+Create a `SECURITY DEFINER` helper function that checks collaborator membership without triggering RLS, then update the recursive policy to use it.
 
-**4. Update share flow**
-- In `StoryboardDetailPage`, update `handleShareLink` to use `/s/{slug}` URL instead of current page URL
-- Add share buttons for specific platforms: Copy Link, Share to X, Share to WhatsApp/Telegram (using `navigator.share` on mobile, explicit URLs on desktop)
-- Show the public URL prominently when `is_public` is toggled on
+**Database migration:**
 
-**5. Update storyboardsService.ts**
-- Add `getStoryboardBySlug(slug)` function — queries by slug first, falls back to ID
-- Add `incrementViewCount(id)` function
-- Update `createStoryboard` and `updateStoryboard` to handle slug generation (server-side via trigger)
+1. Create function `is_storyboard_collaborator(storyboard_uuid, user_uuid)` — `SECURITY DEFINER` with `SET search_path = 'public'` — does a direct lookup on `storyboard_collaborators` bypassing RLS.
 
-**6. Route changes in `AppRoutes.tsx`**
-- Change `/s/:slugOrId` from redirect to rendering `PublicStoryboardPage` directly (no auth wrapper)
-- Keep `/storyboards/:id` as the authenticated editor view
+2. Drop the problematic policy `"Collaborators can view storyboards"` on `storyboards`.
 
-### Public Page Layout
-```text
-┌─────────────────────────────────────────────┐
-│  Cover Image (full-width, h-72, gradient)   │
-│  ┌─────────────────────────────────────┐    │
-│  │ STORYBOARD · 12 pins · Maldives    │    │
-│  │ "Maldives Overwater Paradise"       │    │
-│  │ by @RaduTravels · 1.2K views       │    │
-│  └─────────────────────────────────────┘    │
-├─────────────────────────────────────────────┤
-│  [Design My Trip]  [Save Board]  [Share]    │
-├─────────────────────────────────────────────┤
-│  Masonry pin grid (read-only)               │
-│  ┌──┐ ┌────┐ ┌──┐ ┌────┐                   │
-│  │  │ │    │ │  │ │    │                   │
-│  └──┘ │    │ └──┘ └────┘                   │
-│       └────┘                                │
-├─────────────────────────────────────────────┤
-│  Creator Card: avatar + "Curated by Radu"  │
-│  [View Profile] [Design My Trip]            │
-├─────────────────────────────────────────────┤
-│  Related Public Storyboards (carousel)      │
-└─────────────────────────────────────────────┘
-```
+3. Re-create it using the new function instead of a subquery:
+   ```sql
+   CREATE POLICY "Collaborators can view storyboards"
+     ON public.storyboards FOR SELECT
+     TO authenticated
+     USING (public.is_storyboard_collaborator(id, auth.uid()));
+   ```
 
-### Files
-
-| Action | File |
-|--------|------|
-| Migration | Add `slug` column, trigger, public RLS policies |
-| Create | `src/pages/public/PublicStoryboardPage.tsx` |
-| Edit | `src/pages/public/StoryboardSharePage.tsx` → remove redirect, render public page |
-| Edit | `src/routes/AppRoutes.tsx` — update `/s/:slugOrId` route |
-| Edit | `src/services/storyboardsService.ts` — add `getBySlug`, `incrementViews` |
-| Edit | `src/pages/storyboards/StoryboardDetailPage.tsx` — update share URL to use slug |
+No frontend code changes needed — this is purely a database policy fix.
 
