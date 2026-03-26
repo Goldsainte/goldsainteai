@@ -90,6 +90,106 @@ export const SUBCATEGORY_SEARCH_TERMS: Record<string, string> = {
   "Wildlife Safari": "wildlife safari animals",
 };
 
+// Deep refinement suggestions keyed by subcategory
+export const DEEP_REFINEMENTS: Record<string, string[]> = {
+  "Beach Villas": ["Maldives", "Bali", "Amalfi Coast", "Caribbean", "Sunset", "Overwater", "Private Pool"],
+  "Private Islands": ["Fiji", "Seychelles", "Caribbean", "Tropical", "Barefoot Luxury"],
+  "Safari Lodges": ["Kenya", "Tanzania", "Botswana", "Big Five", "Bush Camp", "Sunset"],
+  "Desert Resorts": ["Dubai", "Sahara", "Atacama", "Wadi Rum", "Stargazing", "Oasis"],
+  "Yacht Travel": ["Mediterranean", "Greek Islands", "Caribbean", "Sunset Cruise", "Catamaran"],
+  "Spa Retreats": ["Bali", "Thailand", "Swiss Alps", "Hot Stone", "Infinity Pool"],
+  "City Luxury": ["Paris", "Dubai", "Tokyo", "New York", "Penthouse", "Rooftop"],
+  "Street Food": ["Bangkok", "Tokyo", "Mexico City", "Istanbul", "Night Market", "Hawker"],
+  "Fine Dining": ["Paris", "Tokyo", "Copenhagen", "Michelin Star", "Tasting Menu"],
+  "Wine Regions": ["Tuscany", "Napa Valley", "Bordeaux", "Mendoza", "Vineyard Tour"],
+  "Local Markets": ["Marrakech", "Istanbul", "Bangkok", "Oaxaca", "Spice Market"],
+  "Cooking Classes": ["Italy", "Thailand", "Japan", "Peru", "Farm to Table"],
+  "Cultural Hotels": ["Kyoto", "Rajasthan", "Havana", "Fez", "Heritage"],
+  "Yoga Retreats": ["Bali", "India", "Costa Rica", "Sunrise", "Beachfront"],
+  "Detox Resorts": ["Thailand", "Bali", "Austria", "Juice Cleanse", "Digital Free"],
+  "Meditation Centers": ["Tibet", "Japan", "India", "Silent Retreat", "Mountain"],
+  "Hot Springs": ["Iceland", "Japan", "New Zealand", "Volcanic", "Natural Pool"],
+  "Forest Bathing": ["Japan", "Scandinavia", "Pacific Northwest", "Redwood", "Misty"],
+  "Digital Detox": ["Remote Island", "Mountain Cabin", "Treehouse", "Off Grid"],
+  "Honeymoon": ["Maldives", "Santorini", "Bora Bora", "Tuscany", "Sunset", "Private"],
+  "Overwater Villas": ["Maldives", "Tahiti", "Bora Bora", "Fiji", "Glass Floor"],
+  "Sunset Dinners": ["Santorini", "Amalfi", "Bali", "Maldives", "Cliffside"],
+  "Couples Spa": ["Bali", "Maldives", "Swiss Alps", "Candlelit", "Outdoor"],
+  "Private Excursions": ["Yacht Charter", "Helicopter", "Wine Tour", "Island Hop"],
+  "Festival Travel": ["Coachella", "Tomorrowland", "Rio Carnival", "Holi", "Burning Man"],
+  "Bachelor/Bachelorette": ["Las Vegas", "Ibiza", "Miami", "Cancun", "Yacht Party"],
+  "Family Reunion": ["Beach Resort", "Mountain Lodge", "Villa Rental", "All Inclusive"],
+  "Friends Getaway": ["Road Trip", "Beach House", "Ski Lodge", "City Break"],
+  "Team Retreat": ["Countryside", "Mountain", "Coastal", "Workshop Space"],
+  "Backpacking": ["Southeast Asia", "South America", "Europe", "Budget", "Hostel"],
+  "Spiritual Journey": ["India", "Nepal", "Bali", "Camino de Santiago", "Temple"],
+  "City Solo": ["Tokyo", "Lisbon", "Copenhagen", "Melbourne", "Café Culture"],
+  "Hostel Culture": ["Berlin", "Bangkok", "Barcelona", "Social", "Rooftop"],
+  "Volunteer Travel": ["Africa", "Southeast Asia", "Central America", "Conservation"],
+  "Wonders of the World": ["Petra", "Taj Mahal", "Colosseum", "Chichen Itza", "Christ the Redeemer"],
+  "Northern Lights": ["Iceland", "Norway", "Finland", "Lapland", "Glass Igloo"],
+  "Great Barrier Reef": ["Snorkeling", "Diving", "Coral", "Marine Life", "Boat Tour"],
+  "Machu Picchu": ["Inca Trail", "Sacred Valley", "Cusco", "Sunrise", "Llamas"],
+  "African Safari": ["Serengeti", "Masai Mara", "Kruger", "Big Five", "Migration"],
+  "Antarctic Expedition": ["Penguin Colony", "Iceberg", "Drake Passage", "Research Station"],
+  "Film Locations": ["New Zealand", "Iceland", "Croatia", "Morocco", "Scotland"],
+  "Dramatic Landscapes": ["Patagonia", "Iceland", "Norway Fjords", "Grand Canyon", "Dolomites"],
+  "Golden Hour Spots": ["Santorini", "Bagan", "Angkor Wat", "Sahara", "Cappadocia"],
+  "Aerial Views": ["Drone", "Helicopter", "Hot Air Balloon", "Cliffside", "Panoramic"],
+  "Hidden Gems": ["Faroe Islands", "Azores", "Slovenia", "Georgia", "Oman"],
+  "Nightlife": ["Berlin", "Tokyo", "Ibiza", "New York", "Bangkok"],
+  "Rooftop Bars": ["Bangkok", "New York", "Singapore", "Barcelona", "Skyline"],
+  "Street Art": ["Berlin", "Melbourne", "Lisbon", "Bogotá", "Bushwick"],
+  "Shopping Districts": ["Paris", "Milan", "Tokyo", "Dubai", "London"],
+  "Live Music": ["Nashville", "Havana", "New Orleans", "Austin", "Jazz"],
+  "Architecture": ["Barcelona", "Dubai", "Chicago", "Tokyo", "Brutalist"],
+  "Hiking Trails": ["Patagonia", "Dolomites", "Appalachian", "Camino", "Alpine"],
+  "Jungle Treks": ["Borneo", "Amazon", "Costa Rica", "Congo", "Canopy Walk"],
+  "Mountain Peaks": ["Himalayas", "Alps", "Andes", "Kilimanjaro", "Summit"],
+  "Diving & Snorkeling": ["Maldives", "Red Sea", "Cenotes", "Palau", "Wreck Dive"],
+  "Camping": ["Yosemite", "Patagonia", "Outback", "Glamping", "Stargazing"],
+  "Wildlife Safari": ["Galápagos", "Borneo", "Madagascar", "Costa Rica", "Whale Watching"],
+};
+
+// Generic mood/style refinements for depth 2+
+export const MOOD_REFINEMENTS = [
+  "Golden Hour", "Secluded", "Romantic", "Aerial View", "Vibrant",
+  "Minimalist", "Dramatic", "Cozy", "Wild", "Serene",
+  "Misty", "Tropical", "Rustic", "Modern", "Ancient",
+];
+
+/**
+ * Returns contextual refinement suggestions based on the current path.
+ * Level 0 (just top category) → subcategories
+ * Level 1 (subcategory selected) → deep refinements for that subcategory
+ * Level 2+ → mood/style pills filtered to exclude already-selected terms
+ */
+export function getRefinementSuggestions(path: string[]): string[] {
+  if (path.length === 0) return [];
+
+  const topCategory = path[0];
+  // Level 0: show subcategories
+  if (path.length === 1) {
+    return SUBCATEGORIES[topCategory] || [];
+  }
+
+  const lastStep = path[path.length - 1];
+  const selectedSet = new Set(path.map((p) => p.toLowerCase()));
+
+  // Level 1: show deep refinements for the subcategory
+  if (path.length === 2) {
+    const deep = DEEP_REFINEMENTS[lastStep] || DEEP_REFINEMENTS[path[1]] || [];
+    const filtered = deep.filter((r) => !selectedSet.has(r.toLowerCase()));
+    if (filtered.length > 0) return filtered;
+  }
+
+  // Level 2+: show mood refinements + remaining deep refinements
+  const subcategory = path[1];
+  const deepPool = DEEP_REFINEMENTS[subcategory] || [];
+  const combined = [...deepPool, ...MOOD_REFINEMENTS];
+  return combined.filter((r) => !selectedSet.has(r.toLowerCase())).slice(0, 10);
+}
+
 interface CategoryChipsProps {
   activeCategory: string;
   onCategoryChange: (category: string) => void;
