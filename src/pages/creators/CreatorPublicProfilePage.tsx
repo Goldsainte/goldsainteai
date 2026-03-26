@@ -11,6 +11,7 @@ import { WriteReviewModal } from "@/components/profile/WriteReviewModal";
 import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
 import { CreatorTrustSection } from "@/components/creator/CreatorTrustSection";
 import { HowCreatorWorks } from "@/components/creator/HowCreatorWorks";
+import { CreatorSocialCards } from "@/components/creator/CreatorSocialCards";
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -61,6 +62,7 @@ export default function CreatorPublicProfilePage() {
   const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
   const [avgRating, setAvgRating] = useState<number | null>(null);
   const [reviewCount, setReviewCount] = useState<number>(0);
+  const [socialAccounts, setSocialAccounts] = useState<any[]>([]);
   
   
 
@@ -68,7 +70,7 @@ export default function CreatorPublicProfilePage() {
     if (!id) return;
     (async () => {
       // Fetch profile + creator_profiles + reviews in parallel
-      const [profileRes, creatorProfileRes, reviewsRes] = await Promise.all([
+      const [profileRes, creatorProfileRes, reviewsRes, socialsRes] = await Promise.all([
         supabase
           .from("profiles")
           .select(
@@ -87,10 +89,16 @@ export default function CreatorPublicProfilePage() {
           .from("profile_reviews")
           .select("rating")
           .eq("reviewee_id", id),
+        supabase
+          .from("creator_social_accounts")
+          .select("*")
+          .eq("user_id", id)
+          .order("sort_order", { ascending: true }),
       ]);
 
       setCreator(profileRes.data as CreatorProfile | null);
       setCreatorData(creatorProfileRes.data as CreatorProfileData | null);
+      setSocialAccounts(socialsRes.data || []);
 
       const reviews = reviewsRes.data;
       if (reviews && reviews.length > 0) {
@@ -313,6 +321,9 @@ export default function CreatorPublicProfilePage() {
                   </div>
                 )}
               </section>
+
+              {/* Social Presence — high for credibility */}
+              <CreatorSocialCards accounts={socialAccounts} />
 
               {/* Gallery — high on page for trust */}
               <CreatorMediaGallery
