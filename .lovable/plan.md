@@ -1,47 +1,78 @@
 
 
-## "Sell My Storyboard Experience" — AI-Powered Trip Listing from Storyboard
+## Make Storyboards Publicly Shareable & Independently Discoverable
 
-### What This Does
-Adds a "Sell This Experience" CTA to the storyboard detail page. When a creator clicks it, an edge function reads the storyboard's items (titles, descriptions, images, destination, tags) and uses OpenAI to generate a full `packaged_trips` draft — title, description, highlights, inclusions, pricing suggestion, duration, tags, and cover image. The creator reviews, tweaks, and publishes.
-
-### Flow
-```text
-Storyboard Detail Page
-  └─ Creator clicks "Sell This Experience" (gold CTA)
-      └─ Loading state with "AI is designing your trip..."
-      └─ Edge function: storyboard-to-trip
-          ├─ Reads storyboard + items from DB
-          ├─ Sends to OpenAI (gpt-4o) with structured output
-          └─ Returns trip draft JSON
-      └─ Inserts draft into packaged_trips (status: "draft")
-      └─ Redirects to /trip-builder?edit={newTripId}
-          └─ Creator reviews AI-generated fields, adjusts pricing, publishes
-```
+### Problem
+Currently, `/storyboards/:id` is wrapped in `<RequireAuth>`, so no one can view a storyboard without logging in. There's no slug for clean URLs, no Open Graph metadata for social previews, and no public-facing view page.
 
 ### Changes
 
-**1. New edge function: `supabase/functions/storyboard-to-trip/index.ts`**
-- Accepts `{ storyboardId }` + auth header
-- Loads storyboard row (title, destination, description, tags, interests) and all storyboard_items (titles, subtitles, descriptions, image_urls)
-- Calls OpenAI gpt-4o with tool-calling to extract structured trip data:
-  - `title`, `description`, `destination`, `duration_days`, `duration_nights`, `highlights` (array), `included` (array), `not_included` (array), `tags`, `price_per_person` (suggested), `activity_level`, `cover_image_url` (first storyboard image)
-- Inserts into `packaged_trips` with `status: "draft"`, `creator_id: userId`
-- Returns `{ tripId, slug }`
+**1. Database: Add `slug` column + public read RLS**
+- Migration: `ALTER TABLE storyboards ADD COLUMN slug TEXT UNIQUE;`
+- Create a trigger function that auto-generates a slug from `title` on insert/update (e.g., `maldives-honeymoon-abc123` — title kebab-cased + short random suffix for uniqueness)
+- Add RLS policy: `SELECT` for `anon` and `authenticated` roles `WHERE is_public = true`
+- Add RLS policy for `storyboard_items`: `SELECT` where parent storyboard `is_public = true`
 
-**2. Edit `src/pages/storyboards/StoryboardDetailPage.tsx`**
-- Add a "Sell This Experience" button (gold, with Sparkles icon) in the owner action bar, next to "Edit Details" and "Start a trip from this"
-- On click: call the edge function, show loading spinner, then redirect to `/trip-builder?edit={tripId}`
-- Only visible when `isOwner` is true
+**2. New public page: `src/pages/public/PublicStoryboardPage.tsx`**
+- Route: `/s/:slug` (clean, shareable URL) — update existing `StoryboardSharePage` redirect to render this instead
+- No auth required — fetches storyboard by slug (falls back to ID) using a service function
+- Displays: cover image hero, title, description, destination, creator info (avatar + name with link to profile), pin count
+- Masonry grid of all items (same layout as current detail page but read-only)
+- CTA buttons: "Design My Trip" (links to trip request flow), "Save to My Boards" (requires auth, opens save modal), "Fork This Board" (requires auth, clones storyboard)
+- Increment `view_count` on load via an RPC or direct update
+- Creator attribution card at bottom with link to their public profile
 
-**3. Add to `src/pages/storyboards/MyStoryboardsPage.tsx`**
-- Add a subtle "Sell" icon/link on each storyboard card for quick access (secondary, not blocking)
+**3. Open Graph / social meta for link previews**
+- Add `react-helmet-async` meta tags in `PublicStoryboardPage`: `og:title`, `og:description`, `og:image` (cover_image_url or first item image), `og:url`, plus Twitter card tags
+- This ensures TikTok, IG link-in-bio, X, iMessage etc. show a rich preview
 
-### Design Details
-- CTA style: `bg-gradient-to-r from-[#C7A962] to-[#b89a55] text-white rounded-full px-6` with Sparkles icon
-- Loading overlay: centered spinner with "AI is designing your marketplace listing..." text
-- The generated trip pre-fills everything so the creator just needs to confirm pricing and publish
+**4. Update share flow**
+- In `StoryboardDetailPage`, update `handleShareLink` to use `/s/{slug}` URL instead of current page URL
+- Add share buttons for specific platforms: Copy Link, Share to X, Share to WhatsApp/Telegram (using `navigator.share` on mobile, explicit URLs on desktop)
+- Show the public URL prominently when `is_public` is toggled on
 
-### Edge Function AI Prompt Strategy
-Uses OpenAI (per project mandate) with tool-calling for structured output. The prompt instructs the model to act as a luxury travel product designer, converting visual inspiration (pin titles/descriptions) into a bookable trip listing with luxury-tier language matching the Goldsainte brand voice.
+**5. Update storyboardsService.ts**
+- Add `getStoryboardBySlug(slug)` function — queries by slug first, falls back to ID
+- Add `incrementViewCount(id)` function
+- Update `createStoryboard` and `updateStoryboard` to handle slug generation (server-side via trigger)
+
+**6. Route changes in `AppRoutes.tsx`**
+- Change `/s/:slugOrId` from redirect to rendering `PublicStoryboardPage` directly (no auth wrapper)
+- Keep `/storyboards/:id` as the authenticated editor view
+
+### Public Page Layout
+```text
+┌─────────────────────────────────────────────┐
+│  Cover Image (full-width, h-72, gradient)   │
+│  ┌─────────────────────────────────────┐    │
+│  │ STORYBOARD · 12 pins · Maldives    │    │
+│  │ "Maldives Overwater Paradise"       │    │
+│  │ by @RaduTravels · 1.2K views       │    │
+│  └─────────────────────────────────────┘    │
+├─────────────────────────────────────────────┤
+│  [Design My Trip]  [Save Board]  [Share]    │
+├─────────────────────────────────────────────┤
+│  Masonry pin grid (read-only)               │
+│  ┌──┐ ┌────┐ ┌──┐ ┌────┐                   │
+│  │  │ │    │ │  │ │    │                   │
+│  └──┘ │    │ └──┘ └────┘                   │
+│       └────┘                                │
+├─────────────────────────────────────────────┤
+│  Creator Card: avatar + "Curated by Radu"  │
+│  [View Profile] [Design My Trip]            │
+├─────────────────────────────────────────────┤
+│  Related Public Storyboards (carousel)      │
+└─────────────────────────────────────────────┘
+```
+
+### Files
+
+| Action | File |
+|--------|------|
+| Migration | Add `slug` column, trigger, public RLS policies |
+| Create | `src/pages/public/PublicStoryboardPage.tsx` |
+| Edit | `src/pages/public/StoryboardSharePage.tsx` → remove redirect, render public page |
+| Edit | `src/routes/AppRoutes.tsx` — update `/s/:slugOrId` route |
+| Edit | `src/services/storyboardsService.ts` — add `getBySlug`, `incrementViews` |
+| Edit | `src/pages/storyboards/StoryboardDetailPage.tsx` — update share URL to use slug |
 
