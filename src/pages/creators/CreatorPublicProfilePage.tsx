@@ -314,6 +314,14 @@ export default function CreatorPublicProfilePage() {
                 )}
               </section>
 
+              {/* Gallery — high on page for trust */}
+              <CreatorMediaGallery
+                creatorId={creator.id}
+                fallbackPhotos={creator.featured_photos}
+                instagramHandle={creator.instagram_handle}
+                isOwnProfile={isOwnProfile}
+              />
+
               {/* Trust & Credibility */}
               <CreatorTrustSection
                 yearsExperience={creatorData?.years_experience}
