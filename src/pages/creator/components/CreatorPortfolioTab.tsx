@@ -57,7 +57,7 @@ export function CreatorPortfolioTab() {
       // Upsert current items
       if (media.length > 0) {
         const rows = media.map((item, idx) => ({
-          ...(item.id ? { id: item.id } : {}),
+          id: item.id || crypto.randomUUID(),
           user_id: user.id,
           media_type: item.media_type,
           source: item.source,
