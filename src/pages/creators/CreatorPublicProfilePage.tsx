@@ -118,11 +118,9 @@ export default function CreatorPublicProfilePage() {
         (() => {
           let q = supabase
             .from("storyboards")
-            .select("id, title, description, cover_image_url, destination, tags, view_count, created_at, is_public, storyboard_items(image_url, position)")
+            .select("id, title, destination, is_public, storyboard_items(id, image_url, title, subtitle, position)")
             .eq("owner_id", id)
-            .order("updated_at", { ascending: false })
-            .limit(12);
-          // Only filter to public if NOT the owner viewing their own profile
+            .order("updated_at", { ascending: false });
           if (!user || user.id !== id) {
             q = q.eq("is_public", true);
           }
@@ -136,18 +134,35 @@ export default function CreatorPublicProfilePage() {
 
       setCreator(profileRes.data as CreatorProfile | null);
       setCreatorData(creatorProfileRes.data as CreatorProfileData | null);
+
+      const boards = (storyboardsRes.data || []) as any[];
       setCreatorStoryboards(
-        (storyboardsRes.data || []).map((sb: any) => ({
-          ...sb,
+        boards.map((sb) => ({
+          id: sb.id,
+          title: sb.title,
+          destination: sb.destination,
           is_public: sb.is_public ?? true,
-          items_count: sb.storyboard_items?.length || 0,
-          item_images: (sb.storyboard_items || [])
-            .filter((item: any) => item.image_url)
-            .sort((a: any, b: any) => (a.position ?? 0) - (b.position ?? 0))
-            .slice(0, 3)
-            .map((item: any) => item.image_url),
         }))
       );
+
+      // Flatten all items into pins
+      const allPins: PinItem[] = [];
+      for (const sb of boards) {
+        for (const item of sb.storyboard_items || []) {
+          if (item.image_url) {
+            allPins.push({
+              id: item.id,
+              image_url: item.image_url,
+              title: item.title,
+              subtitle: item.subtitle,
+              storyboard_id: sb.id,
+              storyboard_title: sb.title,
+              storyboard_destination: sb.destination,
+            });
+          }
+        }
+      }
+      setPinItems(allPins);
       setMediaCount(mediaCountRes.count || 0);
 
       const reviews = reviewsRes.data;
@@ -253,12 +268,6 @@ export default function CreatorPublicProfilePage() {
     : null;
 
   const handleRequestTrip = () => navigate(`/post-trip?fromCreator=${creator.id}`);
-
-  // Featured storyboard = first one with a cover image
-  const featuredStoryboard = creatorStoryboards.find((sb) => sb.cover_image_url);
-  const remainingStoryboards = featuredStoryboard
-    ? creatorStoryboards.filter((sb) => sb.id !== featuredStoryboard.id)
-    : creatorStoryboards;
 
   const specialties = creatorData?.specialties || creator.creator_niches || [];
 
