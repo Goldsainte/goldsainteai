@@ -28,6 +28,8 @@ export function CreatorMediaGallery({
   fallbackPhotos,
   instagramHandle,
   isOwnProfile,
+  hideTitle,
+  useIgGrid,
 }: CreatorMediaGalleryProps) {
   const [items, setItems] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
