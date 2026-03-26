@@ -1,89 +1,58 @@
 
 
-## Creator Profile — Instagram/TikTok Style Rebuild
+## Creator Profile — Luxury Editorial Upgrade (Content-First)
 
 ### Overview
-Strip the page down to a compact identity header with inline stats, then make content the entire page. Two tabs (Storyboards / Moments) replace all the separate sections. Remove About, Social Presence, Trust, and How It Works as standalone sections — fold key info into the header or inline badges.
-
-### New Page Structure
-```text
-┌──────────────────────────────────────┐
-│ Back bar                             │
-├──────────────────────────────────────┤
-│ COMPACT HEADER                       │
-│ [Avatar]  Name ✓        [CTA] [Follow]│
-│           Bio (2 lines max)          │
-│ 12.4K followers · 18 storyboards · 92 posts │
-│ ─── how it works strip (1 line) ─── │
-├──────────────────────────────────────┤
-│ [🔲 Storyboards] [📷 Moments]  ← tabs│
-├──────────────────────────────────────┤
-│                                      │
-│  CONTENT GRID (3-col / 2-col mobile) │
-│  (storyboards OR media based on tab) │
-│                                      │
-├──────────────────────────────────────┤
-│ Reviews (minimal)                    │
-└──────────────────────────────────────┘
-```
-
-No sidebar. No alternating backgrounds. No separate sections for Social, Trust, About, How It Works.
+Elevate the IG-style profile into a luxury travel magazine experience. Keep the content-first scrolling behavior but add editorial polish: a premium header, featured storyboard hero, mixed-size grid, section labels, a refined "Meet" block, and generous white space with alternating backgrounds.
 
 ### Changes by File
 
-**1. `src/components/profile/ProfileHero.tsx` — Compact IG-style header (full rewrite)**
-- Remove cover image entirely (or make it a thin banner, ~120px)
-- Layout: single row — avatar (80px) left, name+bio+stats right, CTA+Follow far right
-- Name row: `{name}` + verified badge inline
-- Bio: 2-line max, `line-clamp-2`, uses `serviceLine` or `tagline`
-- Stats row below name: `{followers} followers · {storyboardCount} storyboards · {postCount} posts` — all inline, separated by middots, bold numbers
-- Right side: "Get Custom Itinerary" button + Follow button side by side
-- Below header: subtle 1-line "how it works" strip: `"Share your travel style → Get a custom itinerary → Book your trip"` in small muted text
-- Inline trust badges under CTA: `✓ Verified · 🔒 Secure · ⏱ Responds in 24h` — tiny text, no separate section
-- Remove: cover image overlay, 3-column grid, center column (pills, location, rating), mobile-only section
-- New props: `storyboardCount`, `postCount`, `onFollow` (or keep FollowButton component)
+**1. `src/components/profile/ProfileHero.tsx` — Premium header**
+- Increase avatar to 96px mobile / 112px desktop with gold ring border (`border-[#C7A962]`)
+- Enlarge name to `text-2xl md:text-3xl` with Playfair Display (font-secondary)
+- Add more vertical padding (`py-8 md:py-10`) for breathing room
+- Style CTA as larger button with rounded-full, `h-11`, and refined microcopy below: "Designed for you · Delivered in 24–48 hours"
+- Remove icon-based trust badges (BadgeCheck/Shield/Clock icons) — replace with text-only: "Verified · Secure · Responds in 24h" in small muted text
+- Add subtle bottom divider: thin gold line or gradient fade instead of plain border
+- Remove "How it works" strip (will be placed subtly in the page below)
 
-**2. `src/pages/creators/CreatorPublicProfilePage.tsx` — Flatten to tabs + grid**
-- Remove ALL standalone sections: Social Presence, Meet Your Creator, Trust & Credentials, How It Works, Conversion
-- Remove sidebar entirely (no `ProfileSidebar`, no 2-column grid)
-- Remove `CreatorSocialCards`, `CreatorTrustSection` imports and usage
-- Add state: `activeTab: "storyboards" | "moments"` (default "storyboards")
-- Count media items (from `creator_media` query) and storyboards for stats
-- Pass `storyboardCount` and `postCount` to `ProfileHero`
-- After header, render tab bar: two tabs with underline indicator, IG-style
-- When "Storyboards" tab active: render `CreatorStoryboardGrid` (but without its own section title — just the grid)
-- When "Moments" tab active: render `CreatorMediaGallery` (without section title)
-- Keep Reviews at bottom, minimal
-- Single `max-w-5xl` container, no sidebar column
-- Background: flat `bg-white` or `bg-[#FDF9F0]`, no alternating
+**2. `src/pages/creators/CreatorPublicProfilePage.tsx` — Layout restructure**
+- After header, before tab bar: add **Featured Storyboard** hero card (first storyboard with a cover image, rendered as a full-width card with large image, title overlay, description, and "Plan a trip like this" CTA)
+- Add section label above featured: `"FEATURED EXPERIENCE"` in small-caps, letter-spaced, light weight
+- Add section label above tab content: `"EXPLORE TRAVEL IDEAS"` for storyboards tab, `"FROM MY TRAVELS"` for moments tab
+- Add "How it works" as a single-line strip between featured and tabs (subtle, muted)
+- After content grid + reviews, add **"Meet {firstName}"** section: serif heading, 3-4 line bio paragraph, specialties as minimal tags — placed at bottom, white background section
+- Add **final CTA block** at very bottom: "Start Your Journey With {Name}" with refined button and microcopy
+- Alternate section backgrounds: header (white), featured (cream `#FDF9F0`), tabs+grid (white), meet creator (cream), CTA (white), reviews (cream)
+- Increase spacing between all sections to `py-12 md:py-16`
 
-**3. `src/components/creator/CreatorStoryboardGrid.tsx` — Remove section title**
-- Add optional prop `hideTitle?: boolean` (default false for backward compat)
-- When `hideTitle` is true, skip the `<h2>` section title — just render the grid
-- Keep empty state as-is
+**3. `src/components/creator/CreatorStoryboardGrid.tsx` — Mixed-size editorial grid**
+- Replace uniform masonry with editorial hybrid layout:
+  - First card: large, spanning 2 columns, `aspect-[4/3]`
+  - Next 2 cards: medium, `aspect-[3/4]`
+  - Remaining: standard masonry with varied aspects
+- Upgrade card styling: stronger gradient overlay (`from-black/70`), larger title typography (`text-lg md:text-xl`), add description line below title on larger cards
+- Enhanced hover: scale-105 zoom + shadow-xl lift + subtle border glow
+- Keep `hideTitle` prop behavior
 
-**4. `src/components/creator/CreatorMediaGallery.tsx` — Remove section title**
-- Add optional prop `hideTitle?: boolean`
-- When `hideTitle` is true, skip the `<h2>` "From My Travels" header
-- Change grid to 3-column fixed grid (`grid grid-cols-3 gap-1`) like IG, instead of masonry
-- Square aspect ratio for all items (`aspect-square object-cover`)
+**4. `src/components/creator/CreatorMediaGallery.tsx` — No structural changes**
+- Already has `hideTitle` and `useIgGrid` — keep as-is
 
-**5. `src/components/profile/ProfileSidebar.tsx` — No changes needed**
-- Still used by AgentPublicProfilePage, keep as-is
-- Just remove its usage from CreatorPublicProfilePage
+### New: Featured Storyboard Component (inline in page file)
+Renders the first storyboard with a cover image as a full-width hero card:
+- Large image (`aspect-[16/9]` or `aspect-[2/1]`), rounded-2xl, overflow-hidden
+- Gradient overlay from bottom
+- Title in serif (`text-2xl md:text-3xl`), description below, destination tag
+- "Plan a trip like this →" CTA overlaid at bottom-right
+- Entire card clickable → navigates to storyboard detail
 
-### Technical Details
-
-- Tab state managed with `useState<"storyboards" | "moments">("storyboards")`
-- Tab bar styled with bottom border indicator, similar to IG tabs
-- Media count fetched alongside existing queries — count from `creator_media` table
-- FollowButton rendered inline in header right column
-- "How it works" strip is a single `<p>` with arrows, not a component
-- Trust signals compressed to inline text badges: `"✓ Verified · Secure booking · Direct messaging"`
+### Section Label Style (reused)
+```
+text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6B7280]
+```
 
 ### Files
-- **Edit**: `src/components/profile/ProfileHero.tsx` — compact IG-style header
-- **Edit**: `src/pages/creators/CreatorPublicProfilePage.tsx` — remove sections, add tabs, flatten layout
-- **Edit**: `src/components/creator/CreatorStoryboardGrid.tsx` — add `hideTitle` prop
-- **Edit**: `src/components/creator/CreatorMediaGallery.tsx` — add `hideTitle` prop, IG grid option
+- **Edit**: `src/components/profile/ProfileHero.tsx` — premium sizing, remove icons, gold divider
+- **Edit**: `src/pages/creators/CreatorPublicProfilePage.tsx` — featured hero, section labels, meet section, CTA block, alternating backgrounds
+- **Edit**: `src/components/creator/CreatorStoryboardGrid.tsx` — mixed-size editorial grid
 
