@@ -29,7 +29,6 @@ export function CreatorMediaGallery({
   instagramHandle,
   isOwnProfile,
   hideTitle,
-  useIgGrid,
 }: CreatorMediaGalleryProps) {
   const [items, setItems] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,9 +53,9 @@ export function CreatorMediaGallery({
     return (
       <section>
         {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">From My Travels</h2>}
-        <div className={useIgGrid ? "grid grid-cols-3 gap-1" : "columns-2 md:columns-3 gap-3 space-y-3"}>
+        <div className="columns-2 md:columns-3 gap-4 space-y-4">
           {fallbackPhotos.map((src) => (
-            <img key={src} src={src} alt="Content" className={`w-full object-cover ${useIgGrid ? "aspect-square" : "rounded-xl"}`} loading="lazy" />
+            <img key={src} src={src} alt="Content" className="w-full object-cover rounded-xl break-inside-avoid" loading="lazy" />
           ))}
         </div>
       </section>
@@ -92,7 +91,7 @@ export function CreatorMediaGallery({
 
     return (
       <section>
-          {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">From My Travels</h2>}
+        {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">From My Travels</h2>}
         <div className="rounded-xl border border-[#E5DFC6] bg-white p-6 text-center">
           <p className="text-sm text-[#6B7280]">
             Follow{" "}
@@ -111,15 +110,15 @@ export function CreatorMediaGallery({
     );
   }
 
-  // Unified masonry grid — all media combined
+  // Editorial masonry grid — natural aspect ratios
   return (
     <section>
       {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">From My Travels</h2>}
-      <div className={useIgGrid ? "grid grid-cols-3 gap-1" : "columns-2 md:columns-3 gap-3 space-y-3"}>
+      <div className="columns-2 md:columns-3 gap-4 space-y-4">
         {items.map((item) => (
           <div
             key={item.id}
-            className={`relative overflow-hidden bg-[#E5DFC6]/30 cursor-pointer group ${useIgGrid ? "aspect-square" : "rounded-xl break-inside-avoid"}`}
+            className="relative overflow-hidden bg-[#E5DFC6]/30 cursor-pointer group rounded-xl break-inside-avoid"
             onClick={() => {
               if (item.media_type === "video") {
                 if (item.external_url) {
@@ -136,13 +135,19 @@ export function CreatorMediaGallery({
                 <img
                   src={item.url}
                   alt={item.caption || "Photo"}
-                  className={`w-full object-cover ${useIgGrid ? "h-full" : ""}`}
+                  className="w-full object-cover"
                   loading="lazy"
                 />
                 {item.is_cover && (
                   <span className="absolute top-2 left-2 flex items-center gap-1 bg-[#C7A962] text-white text-[9px] font-semibold px-2 py-0.5 rounded-full uppercase">
                     <Star className="w-3 h-3" /> Cover
                   </span>
+                )}
+                {/* Hover caption overlay */}
+                {item.caption && (
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                    <p className="text-white text-xs line-clamp-2">{item.caption}</p>
+                  </div>
                 )}
               </>
             )}
