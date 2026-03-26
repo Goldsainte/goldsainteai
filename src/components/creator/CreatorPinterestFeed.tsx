@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Plus, MapPin, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CategoryChips, CATEGORY_KEYWORDS } from "@/components/ui/CategoryChips";
+import { CategoryChips, SubcategoryChips, CATEGORY_KEYWORDS } from "@/components/ui/CategoryChips";
+import { DiscoveryFeed } from "@/components/discovery/DiscoveryFeed";
 
 export interface PinItem {
   id: string;
@@ -12,6 +13,7 @@ export interface PinItem {
   storyboard_id: string;
   storyboard_title: string;
   storyboard_destination: string | null;
+  owner_id?: string;
 }
 
 export interface BoardSummary {
@@ -41,6 +43,8 @@ export function CreatorPinterestFeed({
   const navigate = useNavigate();
   const [activeBoard, setActiveBoard] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState("All");
+  const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
+  const [discoveryTags, setDiscoveryTags] = useState<string[]>([]);
 
   const filteredItems = items.filter((item) => {
     if (activeBoard && item.storyboard_id !== activeBoard) return false;
@@ -60,25 +64,69 @@ export function CreatorPinterestFeed({
     return true;
   });
 
-  if (items.length === 0) {
+  function handleCategoryChange(cat: string) {
+    setActiveCategory(cat);
+    setActiveSubcategory(null);
+    setDiscoveryTags([]);
+  }
+
+  function handleSubcategoryChange(sub: string | null) {
+    setActiveSubcategory(sub);
+    setDiscoveryTags([]);
+  }
+
+  function handleMoreLikeThis(tags: string[]) {
+    setDiscoveryTags((prev) => {
+      const combined = [...new Set([...prev, ...tags])];
+      return combined.slice(0, 6);
+    });
+  }
+
+  if (items.length === 0 && activeCategory === "All") {
     return (
-      <div className="rounded-2xl border border-dashed border-[#E5DFC6] bg-white/60 p-12 text-center">
-        <p className="font-secondary text-lg text-[#0a2225] mb-2">
-          {isOwnProfile ? "Create your first storyboard" : "No inspiration yet"}
-        </p>
-        <p className="text-sm text-[#6B7280] mb-6 max-w-md mx-auto">
-          {isOwnProfile
-            ? "Pin photos, places, and experiences to build visual travel collections that inspire your audience."
-            : "This creator hasn't published any travel pins yet — check back soon."}
-        </p>
-        {isOwnProfile && onCreateNew && (
-          <Button
-            onClick={onCreateNew}
-            className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-8 h-11"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            New Storyboard
-          </Button>
+      <div>
+        <CategoryChips
+          activeCategory={activeCategory}
+          onCategoryChange={handleCategoryChange}
+          className="mb-2"
+        />
+        {activeCategory !== "All" && (
+          <SubcategoryChips
+            parentCategory={activeCategory}
+            activeSubcategory={activeSubcategory}
+            onSubcategoryChange={handleSubcategoryChange}
+            className="mb-4"
+          />
+        )}
+
+        {activeCategory === "All" ? (
+          <div className="rounded-2xl border border-dashed border-[#E5DFC6] bg-white/60 p-12 text-center">
+            <p className="font-secondary text-lg text-[#0a2225] mb-2">
+              {isOwnProfile ? "Create your first storyboard" : "No inspiration yet"}
+            </p>
+            <p className="text-sm text-[#6B7280] mb-6 max-w-md mx-auto">
+              {isOwnProfile
+                ? "Pin photos, places, and experiences to build visual travel collections that inspire your audience."
+                : "This creator hasn't published any travel pins yet — check back soon."}
+            </p>
+            {isOwnProfile && onCreateNew && (
+              <Button
+                onClick={onCreateNew}
+                className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-8 h-11"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                New Storyboard
+              </Button>
+            )}
+          </div>
+        ) : (
+          <DiscoveryFeed
+            category={activeCategory}
+            subcategory={activeSubcategory}
+            tags={discoveryTags}
+            onMoreLikeThis={handleMoreLikeThis}
+            creatorId={creatorId}
+          />
         )}
       </div>
     );
@@ -89,9 +137,39 @@ export function CreatorPinterestFeed({
       {/* Category discovery chips */}
       <CategoryChips
         activeCategory={activeCategory}
-        onCategoryChange={setActiveCategory}
+        onCategoryChange={handleCategoryChange}
         className="mb-2"
       />
+
+      {/* Subcategory drill-down */}
+      {activeCategory !== "All" && (
+        <SubcategoryChips
+          parentCategory={activeCategory}
+          activeSubcategory={activeSubcategory}
+          onSubcategoryChange={handleSubcategoryChange}
+          className="mb-4"
+        />
+      )}
+
+      {/* Active refinement tags */}
+      {discoveryTags.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {discoveryTags.map((tag) => (
+            <span
+              key={tag}
+              className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#0a2225]/5 text-[#0a2225] text-xs font-medium"
+            >
+              {tag}
+              <button
+                onClick={() => setDiscoveryTags((t) => t.filter((x) => x !== tag))}
+                className="ml-0.5 opacity-50 hover:opacity-100"
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
 
       {/* Board filter pills */}
       <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 scrollbar-hide">
@@ -132,73 +210,18 @@ export function CreatorPinterestFeed({
         )}
       </div>
 
-      {/* Masonry grid */}
-      <div className="columns-2 md:columns-3 lg:columns-4 gap-4 [column-fill:_balance]">
-        {filteredItems.map((item) => (
-          <div
-            key={item.id}
-            className="break-inside-avoid mb-4 group relative cursor-pointer"
-            onClick={() => navigate(`/storyboards/${item.storyboard_id}`)}
-          >
-            <img
-              src={item.image_url}
-              alt={item.title || "Travel inspiration"}
-              className="w-full rounded-2xl object-cover"
-              loading="lazy"
-            />
-
-            {/* Hover overlay */}
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl flex flex-col justify-between p-4">
-              <div className="flex justify-between items-start">
-                <span className="text-white/70 text-[10px] uppercase tracking-wider font-medium flex items-center gap-1">
-                  <MapPin className="h-2.5 w-2.5" />
-                  {item.storyboard_destination || item.storyboard_title}
-                </span>
-                {isOwnProfile && onDeleteItem && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDeleteItem(item.id);
-                    }}
-                    className="h-7 w-7 rounded-full bg-white/20 flex items-center justify-center hover:bg-red-500/80 transition-colors"
-                  >
-                    <Trash2 className="h-3 w-3 text-white" />
-                  </button>
-                )}
-              </div>
-
-              <div>
-                {item.title && (
-                  <p className="font-secondary text-white text-base leading-snug mb-1">
-                    {item.title}
-                  </p>
-                )}
-                {item.subtitle && (
-                  <p className="text-white/70 text-xs line-clamp-2 mb-3">
-                    {item.subtitle}
-                  </p>
-                )}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(
-                      `/post-trip?fromCreator=${creatorId}&storyboard=${item.storyboard_id}${
-                        item.storyboard_destination
-                          ? `&destination=${encodeURIComponent(item.storyboard_destination)}`
-                          : ""
-                      }`
-                    );
-                  }}
-                  className="inline-flex items-center gap-1.5 text-white text-xs font-medium bg-white/20 backdrop-blur-sm rounded-full px-3 py-1.5 hover:bg-white/30 transition-colors"
-                >
-                  Plan a trip like this
-                  <ArrowRight className="h-3 w-3" />
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* Discovery feed with creator pins mixed in */}
+      <DiscoveryFeed
+        category={activeCategory}
+        subcategory={activeSubcategory}
+        tags={discoveryTags}
+        creatorPins={filteredItems.map((item) => ({
+          ...item,
+          owner_id: creatorId,
+        }))}
+        onMoreLikeThis={handleMoreLikeThis}
+        creatorId={creatorId}
+      />
     </div>
   );
 }

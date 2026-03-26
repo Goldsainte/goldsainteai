@@ -9132,6 +9132,8 @@ export type Database = {
           item_type: string
           metadata: Json | null
           position: number
+          repinned_from_item_id: string | null
+          repinned_from_user_id: string | null
           source_id: string | null
           source_type: string | null
           storyboard_id: string
@@ -9147,6 +9149,8 @@ export type Database = {
           item_type: string
           metadata?: Json | null
           position?: number
+          repinned_from_item_id?: string | null
+          repinned_from_user_id?: string | null
           source_id?: string | null
           source_type?: string | null
           storyboard_id: string
@@ -9162,6 +9166,8 @@ export type Database = {
           item_type?: string
           metadata?: Json | null
           position?: number
+          repinned_from_item_id?: string | null
+          repinned_from_user_id?: string | null
           source_id?: string | null
           source_type?: string | null
           storyboard_id?: string
@@ -9170,6 +9176,13 @@ export type Database = {
           video_url?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "storyboard_items_repinned_from_item_id_fkey"
+            columns: ["repinned_from_item_id"]
+            isOneToOne: false
+            referencedRelation: "storyboard_items"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "storyboard_items_storyboard_id_fkey"
             columns: ["storyboard_id"]
