@@ -467,7 +467,7 @@ export default function CreatorPublicProfilePage() {
                 onClick={handleRequestTrip}
                 className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-10 h-12 text-sm font-medium shadow-sm"
               >
-                Get Custom Itinerary
+                Design My Trip
               </Button>
               <p className="text-[10px] text-[#9CA3AF] mt-3">
                 Designed for you · No commitment · Delivered in 24–48 hours

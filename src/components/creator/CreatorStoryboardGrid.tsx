@@ -83,7 +83,7 @@ export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onR
             onClick={isOwnProfile && onCreateNew ? onCreateNew : onRequestTrip}
             className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-8 h-11"
           >
-            {isOwnProfile ? "+ New Storyboard" : "Get Custom Itinerary"}
+            {isOwnProfile ? "+ New Storyboard" : "Design My Trip"}
           </Button>
         </div>
       </section>
@@ -143,7 +143,7 @@ export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onR
                 navigate(`/post-trip?fromCreator=${creatorId}&storyboard=${sb.id}${sb.destination ? `&destination=${encodeURIComponent(sb.destination)}` : ""}`);
               }}
             >
-              <span className="text-xs font-primary font-medium text-[#0c4d47]">Plan a trip like this</span>
+              <span className="text-xs font-primary font-medium text-[#0c4d47]">Design a trip like this</span>
               <ArrowRight className="h-3.5 w-3.5 text-[#C7A962]" />
             </div>
           </div>

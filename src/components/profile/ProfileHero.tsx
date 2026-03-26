@@ -190,10 +190,10 @@ export function ProfileHero({
               onClick={onRequestTrip}
               className="w-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full h-12 font-medium text-sm shadow-sm"
             >
-              Get Custom Itinerary
+              Design My Trip
             </Button>
             <p className="text-[10px] text-[#9CA3AF] leading-relaxed">
-              Designed for you · Delivered in 24–48 hours
+              Your dream trip, designed by a local expert
             </p>
             {targetUserId && (
               <div className="w-full">
