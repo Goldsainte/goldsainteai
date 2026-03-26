@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { ArrowLeft, PenLine, LogIn, Settings, Sparkles, Clock, ShieldCheck } from "lucide-react";
+import { ArrowLeft, PenLine, LogIn, Settings, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileHero } from "@/components/profile/ProfileHero";
 import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
@@ -260,221 +260,156 @@ export default function CreatorPublicProfilePage() {
           onRequestTrip={handleRequestTrip}
         />
 
-        {/* Two-column layout */}
-        <div className="mx-auto max-w-6xl px-4 py-10">
-          <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
-            {/* Left column */}
-            <div className="space-y-14">
-
-              {/* 1. Storyboards — primary content */}
+        {/* Two-column: Storyboards + Sidebar */}
+        <div className="bg-[#FDF9F0]">
+          <div className="mx-auto max-w-6xl px-4 py-16 md:py-20">
+            <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
               <CreatorStoryboardGrid
                 storyboards={creatorStoryboards}
                 displayName={displayName}
                 creatorId={creator.id}
                 onRequestTrip={handleRequestTrip}
               />
+              {/* Sticky sidebar */}
+              <div className="lg:sticky lg:top-20 lg:self-start">
+                <ProfileSidebar
+                  name={displayName}
+                  rating={avgRating}
+                  reviewCount={reviewCount}
+                  targetUserId={isOwnProfile ? undefined : creator.id}
+                  lastActiveAt={creator.last_seen_at || creatorData?.updated_at}
+                  responseTimeHours={creatorData?.response_time_hours}
+                  onRequestTrip={handleRequestTrip}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
 
-              {/* 2. How It Works — inline, not card component */}
-              <section>
-                <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-6">
-                  How It Works
-                </h2>
-                <div className="grid gap-6 sm:grid-cols-3">
-                  {howItWorksSteps.map((step) => (
-                    <div key={step.num}>
-                      <span className="font-secondary text-2xl font-bold text-[#C7A962]">{step.num}</span>
-                      <h3 className="text-sm font-semibold text-[#0a2225] mt-2 mb-1">{step.title}</h3>
-                      <p className="text-xs text-[#6B7280] leading-relaxed">{step.desc}</p>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-[#6B7280]">
-                  <span className="inline-flex items-center gap-1.5">
-                    <Clock className="h-3.5 w-3.5 text-[#C7A962]" />
-                    Takes 2 minutes · No commitment
-                  </span>
-                  <span className="inline-flex items-center gap-1.5">
-                    <ShieldCheck className="h-3.5 w-3.5 text-[#0c4d47]" />
-                    Response within 24 hours
-                  </span>
-                </div>
-              </section>
+        {/* Social Presence */}
+        {socialAccounts.length > 0 && (
+          <div className="bg-white border-y border-[#E5DFC6]/40">
+            <div className="mx-auto max-w-6xl px-4 py-16 md:py-20">
+              <CreatorSocialCards accounts={socialAccounts} />
+            </div>
+          </div>
+        )}
 
-              {/* 3. Social Presence */}
-              {socialAccounts.length > 0 && (
-                <CreatorSocialCards accounts={socialAccounts} />
+        {/* From My Travels (Gallery) */}
+        <div className="bg-[#FDF9F0]">
+          <div className="mx-auto max-w-6xl px-4 py-16 md:py-20">
+            <CreatorMediaGallery
+              creatorId={creator.id}
+              fallbackPhotos={creator.featured_photos}
+              instagramHandle={creator.instagram_handle}
+              isOwnProfile={isOwnProfile}
+            />
+          </div>
+        </div>
+
+        {/* Meet Your Creator */}
+        <div className="bg-white border-y border-[#E5DFC6]/40">
+          <div className="mx-auto max-w-6xl px-4 py-16 md:py-20">
+            <section>
+              <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-4">
+                Meet {firstName}
+              </h2>
+              <p className="text-[#0a2225] leading-relaxed max-w-3xl whitespace-pre-line">
+                {bio || "This creator hasn't added a bio yet, but their trips speak for themselves."}
+              </p>
+
+              {specialties.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-3">
+                    Trips I Love Planning
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {specialties.map((s) => (
+                      <span key={s} className="rounded-full border border-[#E5DFC6] bg-[#FDF9F0] px-3.5 py-1.5 text-xs font-medium text-[#0a2225]">{s}</span>
+                    ))}
+                    {travelStyles.map((s) => (
+                      <span key={s} className="rounded-full border border-[#C7A962]/30 bg-[#C7A962]/10 px-3.5 py-1.5 text-xs font-medium text-[#0a2225]">{s}</span>
+                    ))}
+                  </div>
+                </div>
               )}
 
-              {/* 4. Conversion Section */}
-              <section className="rounded-2xl border border-[#E5DFC6] bg-white p-8 md:p-10 text-center">
-                <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-3">
-                  Start Your Journey With {firstName}
-                </h2>
-                <p className="text-sm text-[#6B7280] max-w-lg mx-auto mb-6 leading-relaxed">
-                  Not sure where to go? {firstName} will design a personalized trip based on your style, budget, and preferences.
-                </p>
-                <Button
-                  onClick={handleRequestTrip}
-                  className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-xl px-8 h-12 text-base font-medium"
-                >
-                  Get Your Custom Itinerary
-                </Button>
-                <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-xs text-[#6B7280]">
-                  <span>Takes 2 minutes</span>
-                  <span className="text-[#E5DFC6]">·</span>
-                  <span>No commitment</span>
-                  <span className="text-[#E5DFC6]">·</span>
-                  <span>Delivered in 24–48 hours</span>
+              {bestFor.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-3">
+                    Best For Travelers Who…
+                  </h3>
+                  <ul className="space-y-2">
+                    {bestFor.map((item) => (
+                      <li key={item} className="flex items-start gap-2.5">
+                        <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-[#C7A962] flex-shrink-0" />
+                        <span className="text-sm text-[#0a2225]">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              </section>
+              )}
 
-              {/* 5. From My Travels (Gallery) */}
-              <CreatorMediaGallery
-                creatorId={creator.id}
-                fallbackPhotos={creator.featured_photos}
-                instagramHandle={creator.instagram_handle}
-                isOwnProfile={isOwnProfile}
-              />
+              {specialties.length === 0 && travelStyles.length === 0 && !bio && (
+                <div className="mt-6 rounded-xl border border-dashed border-[#E5DFC6] bg-[#FDF9F0]/50 p-6 text-center">
+                  <Sparkles className="h-5 w-5 text-[#C7A962] mx-auto mb-2" />
+                  <p className="text-sm text-[#6B7280]">This creator is building their profile — stay tuned.</p>
+                </div>
+              )}
+            </section>
+          </div>
+        </div>
 
-              {/* 6. Meet Your Creator */}
-              <section>
-                <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-4">
-                  Meet {firstName}
-                </h2>
-                <p className="text-[#0a2225] leading-relaxed max-w-3xl whitespace-pre-line">
-                  {bio || "This creator hasn't added a bio yet, but their trips speak for themselves."}
-                </p>
+        {/* Trust & Credentials */}
+        <div className="bg-[#FDF9F0]">
+          <div className="mx-auto max-w-6xl px-4 py-16 md:py-20">
+            <CreatorTrustSection
+              yearsExperience={creatorData?.years_experience}
+              tripsCompleted={creatorData?.trips_completed}
+              clientsServed={creatorData?.clients_served}
+              certifications={creatorData?.certifications}
+              isVerified
+            />
+          </div>
+        </div>
 
-                {/* Trips I Love Planning */}
-                {specialties.length > 0 && (
-                  <div className="mt-6">
-                    <h3 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-3">
-                      Trips I Love Planning
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {specialties.map((s) => (
-                        <span
-                          key={s}
-                          className="rounded-full border border-[#E5DFC6] bg-white px-3.5 py-1.5 text-xs font-medium text-[#0a2225]"
-                        >
-                          {s}
-                        </span>
-                      ))}
-                      {travelStyles.map((s) => (
-                        <span
-                          key={s}
-                          className="rounded-full border border-[#C7A962]/30 bg-[#C7A962]/10 px-3.5 py-1.5 text-xs font-medium text-[#0a2225]"
-                        >
-                          {s}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Best For Travelers Who… */}
-                {bestFor.length > 0 && (
-                  <div className="mt-6">
-                    <h3 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-3">
-                      Best For Travelers Who…
-                    </h3>
-                    <ul className="space-y-2">
-                      {bestFor.map((item) => (
-                        <li key={item} className="flex items-start gap-2.5">
-                          <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-[#C7A962] flex-shrink-0" />
-                          <span className="text-sm text-[#0a2225]">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Empty state */}
-                {specialties.length === 0 && travelStyles.length === 0 && !bio && (
-                  <div className="mt-6 rounded-xl border border-dashed border-[#E5DFC6] bg-white/50 p-6 text-center">
-                    <Sparkles className="h-5 w-5 text-[#C7A962] mx-auto mb-2" />
-                    <p className="text-sm text-[#6B7280]">
-                      This creator is building their profile — stay tuned.
-                    </p>
-                  </div>
-                )}
-              </section>
-
-              {/* 7. Trust & Credentials */}
-              <CreatorTrustSection
-                yearsExperience={creatorData?.years_experience}
-                tripsCompleted={creatorData?.trips_completed}
-                clientsServed={creatorData?.clients_served}
-                certifications={creatorData?.certifications}
-                isVerified
-              />
-
-              {/* 8. Trips */}
-              <ProfileTripsGrid
-                creatorId={creator.id}
-                creatorType="creator"
-              />
-
-              {/* 9. Reviews */}
-              <section>
-                <div className="flex items-center justify-between mb-5">
-                  <h2 className="font-secondary text-xl text-[#0a2225]">
-                    Reviews
-                  </h2>
-                  {!authLoading && user && user.id !== creator.id && (
-                    <WriteReviewModal
-                      revieweeId={creator.id}
-                      revieweeName={displayName}
-                      onSuccess={() => setReviewRefreshKey((k) => k + 1)}
-                    >
-                      <Button variant="outline" size="sm" className="border-[#E5DFC6] text-[#0a2225]">
-                        <PenLine className="mr-1.5 h-3.5 w-3.5" />
-                        Write a Review
-                      </Button>
-                    </WriteReviewModal>
-                  )}
-                  {!authLoading && !user && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="border-[#E5DFC6] text-[#6B7280]"
-                      onClick={() => navigate("/auth")}
-                    >
-                      <LogIn className="mr-1.5 h-3.5 w-3.5" />
-                      Sign in to review
+        {/* Reviews */}
+        <div className="bg-white border-t border-[#E5DFC6]/40">
+          <div className="mx-auto max-w-6xl px-4 py-16 md:py-20">
+            <section>
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="font-secondary text-xl text-[#0a2225]">Reviews</h2>
+                {!authLoading && user && user.id !== creator.id && (
+                  <WriteReviewModal
+                    revieweeId={creator.id}
+                    revieweeName={displayName}
+                    onSuccess={() => setReviewRefreshKey((k) => k + 1)}
+                  >
+                    <Button variant="outline" size="sm" className="border-[#E5DFC6] text-[#0a2225]">
+                      <PenLine className="mr-1.5 h-3.5 w-3.5" />
+                      Write a Review
                     </Button>
-                  )}
-                </div>
-                <ReviewsList
-                  revieweeId={creator.id}
-                  refreshKey={reviewRefreshKey}
-                  avgRating={avgRating}
-                  reviewCount={reviewCount}
-                />
-              </section>
-            </div>
-
-            {/* Right column — sticky sidebar */}
-            <div className="lg:sticky lg:top-20 lg:self-start">
-              <ProfileSidebar
-                name={displayName}
-                rating={avgRating}
+                  </WriteReviewModal>
+                )}
+                {!authLoading && !user && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-[#E5DFC6] text-[#6B7280]"
+                    onClick={() => navigate("/auth")}
+                  >
+                    <LogIn className="mr-1.5 h-3.5 w-3.5" />
+                    Sign in to review
+                  </Button>
+                )}
+              </div>
+              <ReviewsList
+                revieweeId={creator.id}
+                refreshKey={reviewRefreshKey}
+                avgRating={avgRating}
                 reviewCount={reviewCount}
-                targetUserId={isOwnProfile ? undefined : creator.id}
-                storyboards={creatorStoryboards}
-                socialLinks={[]}
-                website={creator.website}
-                lastActiveAt={creator.last_seen_at || creatorData?.updated_at}
-                responseTimeHours={creatorData?.response_time_hours}
-                onRequestTrip={handleRequestTrip}
-                onSaveToStoryboard={() =>
-                  toast.info("Save to storyboard", {
-                    description: "Coming soon!",
-                  })
-                }
-                showHowItWorks={false}
               />
-            </div>
+            </section>
           </div>
         </div>
       </div>
