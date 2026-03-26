@@ -131,6 +131,11 @@ export default function CreatorPublicProfilePage() {
           .from("creator_media")
           .select("id", { count: "exact", head: true })
           .eq("user_id", id),
+        supabase
+          .from("creator_social_accounts")
+          .select("platform, handle, profile_url, followers_count")
+          .eq("user_id", id)
+          .order("sort_order", { ascending: true }),
       ]);
 
       setCreator(profileRes.data as CreatorProfile | null);
