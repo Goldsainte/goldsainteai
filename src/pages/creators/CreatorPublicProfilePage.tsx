@@ -5,7 +5,7 @@ import { ArrowLeft, PenLine, LogIn, Settings, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileHero } from "@/components/profile/ProfileHero";
 import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
-import { ProfileTripsGrid } from "@/components/profile/ProfileTripsGrid";
+
 import { ReviewsList } from "@/components/profile/ReviewsList";
 import { WriteReviewModal } from "@/components/profile/WriteReviewModal";
 import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
@@ -15,7 +15,7 @@ import { CreatorStoryboardGrid } from "@/components/creator/CreatorStoryboardGri
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
+
 
 interface CreatorProfile {
   id: string;
