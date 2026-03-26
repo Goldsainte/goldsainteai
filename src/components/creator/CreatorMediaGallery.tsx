@@ -49,7 +49,7 @@ export function CreatorMediaGallery({
   if (items.length === 0 && fallbackPhotos && fallbackPhotos.length > 0) {
     return (
       <section>
-        <h2 className="font-secondary text-xl text-[#0a2225] mb-5">Gallery</h2>
+        <h2 className="font-secondary text-xl text-[#0a2225] mb-5">From My Travels</h2>
         <div className="columns-2 md:columns-3 gap-3 space-y-3">
           {fallbackPhotos.map((src) => (
             <img key={src} src={src} alt="Content" className="w-full rounded-xl object-cover" loading="lazy" />
@@ -64,7 +64,7 @@ export function CreatorMediaGallery({
     if (isOwnProfile) {
       return (
         <section>
-          <h2 className="font-secondary text-xl text-[#0a2225] mb-5">Gallery</h2>
+          <h2 className="font-secondary text-xl text-[#0a2225] mb-5">From My Travels</h2>
           <div className="rounded-xl border border-dashed border-[#E5DFC6] bg-white/50 p-8 text-center">
             <Instagram className="h-6 w-6 text-[#C7A962] mx-auto mb-3" />
             <p className="text-sm text-[#0a2225] mb-1">Add your content</p>
@@ -88,7 +88,7 @@ export function CreatorMediaGallery({
 
     return (
       <section>
-        <h2 className="font-secondary text-xl text-[#0a2225] mb-5">Gallery</h2>
+          <h2 className="font-secondary text-xl text-[#0a2225] mb-5">From My Travels</h2>
         <div className="rounded-xl border border-[#E5DFC6] bg-white p-6 text-center">
           <p className="text-sm text-[#6B7280]">
             Follow{" "}
@@ -110,7 +110,7 @@ export function CreatorMediaGallery({
   // Unified masonry grid — all media combined
   return (
     <section>
-      <h2 className="font-secondary text-xl text-[#0a2225] mb-5">Gallery</h2>
+      <h2 className="font-secondary text-xl text-[#0a2225] mb-5">From My Travels</h2>
       <div className="columns-2 md:columns-3 gap-3 space-y-3">
         {items.map((item) => (
           <div
