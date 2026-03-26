@@ -10,8 +10,7 @@ import { ReviewsList } from "@/components/profile/ReviewsList";
 import { WriteReviewModal } from "@/components/profile/WriteReviewModal";
 import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
 import { CreatorTrustSection } from "@/components/creator/CreatorTrustSection";
-import { HowCreatorWorks } from "@/components/creator/HowCreatorWorks";
-import { CreatorSocialCards } from "@/components/creator/CreatorSocialCards";
+import { CreatorSocialInline } from "@/components/creator/CreatorSocialInline";
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -68,7 +67,6 @@ export default function CreatorPublicProfilePage() {
   useEffect(() => {
     if (!id) return;
     (async () => {
-      // Fetch profile + creator_profiles + reviews + socials + storyboards in parallel
       const [profileRes, creatorProfileRes, reviewsRes, socialsRes, storyboardsRes] = await Promise.all([
         supabase
           .from("profiles")
@@ -165,7 +163,6 @@ export default function CreatorPublicProfilePage() {
 
   const displayName = creator.display_name || creator.full_name || "Goldsainte Creator";
 
-  // Build service line from niches + destinations
   const nichePart = creator.creator_niches?.length
     ? `Custom ${creator.creator_niches.slice(0, 2).join(" & ").toLowerCase()} travel planning`
     : "Custom travel planning";
@@ -176,13 +173,10 @@ export default function CreatorPublicProfilePage() {
 
   const specialties = creatorData?.specialties || creator.content_style_tags || creator.creator_niches || [];
   const travelStyles = creatorData?.travel_styles || [];
-  const bestFor = creatorData?.best_for || [];
-  const notIdealFor = creatorData?.not_ideal_for || [];
   const bio = creator.bio || creatorData?.bio;
   const tagline = creator.travel_philosophy;
   const lastActive = creator.last_seen_at || creatorData?.updated_at;
 
-  // Build social links from new social accounts table, falling back to legacy profile fields
   const socialLinks = socialAccounts.length > 0
     ? socialAccounts.map((s: any) => ({
         platform: s.platform.charAt(0).toUpperCase() + s.platform.slice(1),
@@ -222,9 +216,7 @@ export default function CreatorPublicProfilePage() {
         <title>{displayName} · Goldsainte Creators</title>
         <meta
           name="description"
-          content={
-            tagline || bio || `Discover ${displayName} on Goldsainte`
-          }
+          content={tagline || bio || `Discover ${displayName} on Goldsainte`}
         />
       </Helmet>
 
@@ -269,82 +261,104 @@ export default function CreatorPublicProfilePage() {
           stats={heroStats}
         />
 
-        {/* How to Book — directly under hero */}
-        <div className="mx-auto max-w-6xl px-4 pt-8 pb-0">
-          <HowCreatorWorks creatorName={displayName} />
-        </div>
+        {/* Editorial Intro — full-width above two-column */}
+        <div className="mx-auto max-w-6xl px-4 pt-12 pb-2">
+          <section>
+            <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-4">
+              About {displayName}
+            </h2>
 
-        {/* Social Proof — high on page for credibility & conversion */}
-        <div className="mx-auto max-w-6xl px-4 pt-8 pb-0">
-          <CreatorSocialCards accounts={socialAccounts} />
+            <p className="text-[#0a2225] leading-relaxed max-w-3xl whitespace-pre-line">
+              {bio || "This creator hasn't added a bio yet, but their trips speak for themselves."}
+            </p>
+
+            {/* Specialties + Travel Styles as refined pills */}
+            {(specialties.length > 0 || travelStyles.length > 0) && (
+              <div className="mt-6 flex flex-wrap gap-2">
+                {specialties.map((s) => (
+                  <span
+                    key={s}
+                    className="rounded-full border border-[#E5DFC6] bg-white px-3.5 py-1.5 text-xs font-medium text-[#0a2225]"
+                  >
+                    {s}
+                  </span>
+                ))}
+                {travelStyles.map((s) => (
+                  <span
+                    key={s}
+                    className="rounded-full border border-[#C7A962]/30 bg-[#C7A962]/10 px-3.5 py-1.5 text-xs font-medium text-[#0a2225]"
+                  >
+                    {s}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Social reach — subtle inline */}
+            <CreatorSocialInline accounts={socialAccounts} />
+
+            {/* Empty state */}
+            {specialties.length === 0 && travelStyles.length === 0 && !bio && (
+              <div className="mt-6 rounded-xl border border-dashed border-[#E5DFC6] bg-white/50 p-6 text-center">
+                <Sparkles className="h-5 w-5 text-[#C7A962] mx-auto mb-2" />
+                <p className="text-sm text-[#6B7280]">
+                  This creator is building their profile — stay tuned.
+                </p>
+              </div>
+            )}
+
+            {/* Gold divider */}
+            <div className="mt-8 border-t border-[#E5DFC6]" />
+          </section>
         </div>
 
         {/* Two-column layout */}
         <div className="mx-auto max-w-6xl px-4 py-8">
           <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
             {/* Left column */}
-            <div className="space-y-8">
-              {/* Structured About */}
-              <section>
-                <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151]">
-                  About {displayName}
-                </h2>
-                <p className="mt-3 text-[#0a2225] leading-relaxed whitespace-pre-line">
-                  {bio || "This creator hasn't added a bio yet, but their trips speak for themselves."}
-                </p>
-
-                {/* Specialties */}
-                {specialties.length > 0 && (
-                  <div className="mt-4">
-                    <p className="text-xs font-medium text-[#6B7280] uppercase tracking-wide mb-2">
-                      What I Specialize In
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {specialties.map((s) => (
-                        <span
-                          key={s}
-                          className="rounded-full bg-[#C7B892]/20 border border-[#C7B892]/30 px-3 py-1.5 text-xs text-[#0a2225]"
-                        >
-                          {s}
-                        </span>
-                      ))}
-                    </div>
+            <div className="space-y-12">
+              {/* Featured Storyboards — large cards */}
+              {creatorStoryboards.length > 0 && (
+                <section>
+                  <h2 className="font-secondary text-xl text-[#0a2225] mb-5">
+                    Featured Storyboards
+                  </h2>
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    {creatorStoryboards.slice(0, 4).map((sb) => (
+                      <a
+                        key={sb.id}
+                        href={`/storyboards/${sb.id}`}
+                        className="group block rounded-xl border border-[#E5DFC6] bg-white overflow-hidden transition-all hover:shadow-md hover:border-[#C7A962]/40"
+                      >
+                        <div className="aspect-[4/3] bg-[#E5DFC6] overflow-hidden">
+                          {sb.cover_image_url ? (
+                            <img
+                              src={sb.cover_image_url}
+                              alt={sb.title}
+                              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="h-full w-full flex items-center justify-center">
+                              <span className="text-[#7A7151] text-sm">No cover</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-4">
+                          <h3 className="font-secondary text-base text-[#0a2225] group-hover:text-[#0c4d47] transition-colors">
+                            {sb.title}
+                          </h3>
+                          {sb.destination && (
+                            <p className="text-xs text-[#6B7280] mt-1">{sb.destination}</p>
+                          )}
+                        </div>
+                      </a>
+                    ))}
                   </div>
-                )}
+                </section>
+              )}
 
-                {/* Travel Styles */}
-                {travelStyles.length > 0 && (
-                  <div className="mt-4">
-                    <p className="text-xs font-medium text-[#6B7280] uppercase tracking-wide mb-2">
-                      Travel Style
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {travelStyles.map((s) => (
-                        <span
-                          key={s}
-                          className="rounded-full bg-[#0c4d47]/10 border border-[#0c4d47]/20 px-3 py-1.5 text-xs text-[#0c4d47]"
-                        >
-                          {s}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Empty state placeholder */}
-                {specialties.length === 0 && travelStyles.length === 0 && !bio && (
-                  <div className="mt-4 rounded-xl border border-dashed border-[#E5DFC6] bg-[#F5F0E0]/30 p-4 text-center">
-                    <Sparkles className="h-5 w-5 text-[#C7A962] mx-auto mb-2" />
-                    <p className="text-xs text-[#6B7280]">
-                      This creator is building their profile — stay tuned!
-                    </p>
-                  </div>
-                )}
-              </section>
-
-              {/* Social cards moved above two-column layout */}
-
-              {/* Gallery — high on page for trust */}
+              {/* Gallery */}
               <CreatorMediaGallery
                 creatorId={creator.id}
                 fallbackPhotos={creator.featured_photos}
@@ -352,7 +366,7 @@ export default function CreatorPublicProfilePage() {
                 isOwnProfile={isOwnProfile}
               />
 
-              {/* Trust & Credibility */}
+              {/* Credentials */}
               <CreatorTrustSection
                 yearsExperience={creatorData?.years_experience}
                 tripsCompleted={creatorData?.trips_completed}
@@ -360,48 +374,6 @@ export default function CreatorPublicProfilePage() {
                 certifications={creatorData?.certifications}
                 isVerified
               />
-
-              {/* Audience / Fit */}
-              {(bestFor.length > 0 || notIdealFor.length > 0) && (
-                <section>
-                  <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-4">
-                    Who This Is For
-                  </h2>
-                  {bestFor.length > 0 && (
-                    <div className="mb-3">
-                      <p className="text-xs font-medium text-[#6B7280] mb-2">Best For</p>
-                      <div className="flex flex-wrap gap-2">
-                        {bestFor.map((b) => (
-                          <span
-                            key={b}
-                            className="rounded-full bg-green-50 border border-green-200 px-3 py-1.5 text-xs text-green-800"
-                          >
-                            {b}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {notIdealFor.length > 0 && (
-                    <div>
-                      <p className="text-xs font-medium text-[#6B7280] mb-2">Not Ideal For</p>
-                      <div className="flex flex-wrap gap-2">
-                        {notIdealFor.map((n) => (
-                          <span
-                            key={n}
-                            className="rounded-full bg-orange-50 border border-orange-200 px-3 py-1.5 text-xs text-orange-800"
-                          >
-                            {n}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </section>
-              )}
-
-
-
 
               {/* Trips */}
               <ProfileTripsGrid
@@ -411,8 +383,8 @@ export default function CreatorPublicProfilePage() {
 
               {/* Reviews */}
               <section>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151]">
+                <div className="flex items-center justify-between mb-5">
+                  <h2 className="font-secondary text-xl text-[#0a2225]">
                     Reviews
                   </h2>
                   {!authLoading && user && user.id !== creator.id && (
@@ -460,7 +432,6 @@ export default function CreatorPublicProfilePage() {
                 website={creator.website}
                 lastActiveAt={lastActive}
                 responseTimeHours={creatorData?.response_time_hours}
-                requestTripMicrocopy="Post your trip details → get matched instantly"
                 onRequestTrip={handleRequestTrip}
                 onSaveToStoryboard={() =>
                   toast.info("Save to storyboard", {
@@ -473,8 +444,6 @@ export default function CreatorPublicProfilePage() {
           </div>
         </div>
       </div>
-
-
     </>
   );
 }
