@@ -63,14 +63,13 @@ export default function CreatorPublicProfilePage() {
   const [avgRating, setAvgRating] = useState<number | null>(null);
   const [reviewCount, setReviewCount] = useState<number>(0);
   const [socialAccounts, setSocialAccounts] = useState<any[]>([]);
-  
-  
+  const [creatorStoryboards, setCreatorStoryboards] = useState<any[]>([]);
 
   useEffect(() => {
     if (!id) return;
     (async () => {
-      // Fetch profile + creator_profiles + reviews in parallel
-      const [profileRes, creatorProfileRes, reviewsRes, socialsRes] = await Promise.all([
+      // Fetch profile + creator_profiles + reviews + socials + storyboards in parallel
+      const [profileRes, creatorProfileRes, reviewsRes, socialsRes, storyboardsRes] = await Promise.all([
         supabase
           .from("profiles")
           .select(
@@ -94,11 +93,19 @@ export default function CreatorPublicProfilePage() {
           .select("*")
           .eq("user_id", id)
           .order("sort_order", { ascending: true }),
+        supabase
+          .from("storyboards")
+          .select("id, title, cover_image_url, destination, tags, view_count, created_at")
+          .eq("owner_id", id)
+          .eq("is_public", true)
+          .order("updated_at", { ascending: false })
+          .limit(5),
       ]);
 
       setCreator(profileRes.data as CreatorProfile | null);
       setCreatorData(creatorProfileRes.data as CreatorProfileData | null);
       setSocialAccounts(socialsRes.data || []);
+      setCreatorStoryboards(storyboardsRes.data || []);
 
       const reviews = reviewsRes.data;
       if (reviews && reviews.length > 0) {
@@ -448,20 +455,7 @@ export default function CreatorPublicProfilePage() {
                 rating={avgRating}
                 reviewCount={reviewCount}
                 targetUserId={isOwnProfile ? undefined : creator.id}
-                stats={[
-                  {
-                    label: "Followers",
-                    value: followerDisplay || "New",
-                  },
-                  {
-                    label: "Avg Views",
-                    value: fmt(creator.creator_avg_views),
-                  },
-                  {
-                    label: "Niches",
-                    value: creator.creator_niches?.length ?? 0,
-                  },
-                ]}
+                storyboards={creatorStoryboards}
                 socialLinks={socialLinks}
                 website={creator.website}
                 lastActiveAt={lastActive}
