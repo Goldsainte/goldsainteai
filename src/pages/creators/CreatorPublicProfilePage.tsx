@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { ArrowLeft, PenLine, LogIn, Settings, ArrowRight, MapPin } from "lucide-react";
+import { ArrowLeft, PenLine, LogIn, Settings, ArrowRight, MapPin, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileHero } from "@/components/profile/ProfileHero";
 import { ReviewsList } from "@/components/profile/ReviewsList";
@@ -10,6 +10,11 @@ import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
 import { CreatorStoryboardGrid } from "@/components/creator/CreatorStoryboardGrid";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { createStoryboard } from "@/services/storyboardsService";
+import { toast } from "sonner";
 
 // -- Gold section divider component --
 function GoldDivider() {
@@ -81,6 +86,11 @@ export default function CreatorPublicProfilePage() {
   const [reviewCount, setReviewCount] = useState<number>(0);
   const [creatorStoryboards, setCreatorStoryboards] = useState<any[]>([]);
   const [mediaCount, setMediaCount] = useState(0);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [newBoardTitle, setNewBoardTitle] = useState("");
+  const [newBoardDescription, setNewBoardDescription] = useState("");
+  const [newBoardDestination, setNewBoardDestination] = useState("");
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -104,13 +114,19 @@ export default function CreatorPublicProfilePage() {
           .from("profile_reviews")
           .select("rating")
           .eq("reviewee_id", id),
-        supabase
-          .from("storyboards")
-          .select("id, title, description, cover_image_url, destination, tags, view_count, created_at, storyboard_items(image_url, position)")
-          .eq("owner_id", id)
-          .eq("is_public", true)
-          .order("updated_at", { ascending: false })
-          .limit(12),
+        (() => {
+          let q = supabase
+            .from("storyboards")
+            .select("id, title, description, cover_image_url, destination, tags, view_count, created_at, is_public, storyboard_items(image_url, position)")
+            .eq("owner_id", id)
+            .order("updated_at", { ascending: false })
+            .limit(12);
+          // Only filter to public if NOT the owner viewing their own profile
+          if (!user || user.id !== id) {
+            q = q.eq("is_public", true);
+          }
+          return q;
+        })(),
         supabase
           .from("creator_media")
           .select("id", { count: "exact", head: true })
@@ -122,6 +138,7 @@ export default function CreatorPublicProfilePage() {
       setCreatorStoryboards(
         (storyboardsRes.data || []).map((sb: any) => ({
           ...sb,
+          is_public: sb.is_public ?? true,
           items_count: sb.storyboard_items?.length || 0,
           item_images: (sb.storyboard_items || [])
             .filter((item: any) => item.image_url)
@@ -144,7 +161,38 @@ export default function CreatorPublicProfilePage() {
 
       setLoading(false);
     })();
-  }, [id, reviewRefreshKey]);
+  }, [id, user, reviewRefreshKey]);
+
+  const handleCreateStoryboard = async () => {
+    if (!user || !newBoardTitle.trim()) return;
+    setCreating(true);
+    try {
+      const board = await createStoryboard({
+        ownerId: user.id,
+        role: "creator",
+        title: newBoardTitle.trim(),
+        description: newBoardDescription.trim() || undefined,
+        isPublic: true,
+      });
+      // Add destination if provided
+      if (newBoardDestination.trim()) {
+        await supabase
+          .from("storyboards")
+          .update({ destination: newBoardDestination.trim() })
+          .eq("id", board.id);
+      }
+      toast.success("Storyboard created!");
+      setShowCreateDialog(false);
+      setNewBoardTitle("");
+      setNewBoardDescription("");
+      setNewBoardDestination("");
+      setReviewRefreshKey((k) => k + 1); // triggers re-fetch
+    } catch (err: any) {
+      toast.error(err.message || "Failed to create storyboard");
+    } finally {
+      setCreating(false);
+    }
+  };
 
   const fmt = (n: number | null | undefined) =>
     n != null && n > 0
@@ -310,10 +358,23 @@ export default function CreatorPublicProfilePage() {
         )}
 
         {/* Curated Experiences — Storyboard grid */}
-        {remainingStoryboards.length > 0 && (
+        {(remainingStoryboards.length > 0 || isOwnProfile) && (
           <div className="bg-white">
             <div className="mx-auto max-w-5xl px-4 py-16 md:py-24">
-              <SectionLabel>Explore Travel Ideas</SectionLabel>
+              <div className="flex items-center justify-between mb-8">
+                <SectionLabel>Explore Travel Ideas</SectionLabel>
+                {isOwnProfile && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowCreateDialog(true)}
+                    className="border-[#C7A962] text-[#0a2225] rounded-full shrink-0"
+                  >
+                    <Plus className="h-3.5 w-3.5 mr-1.5" />
+                    New Storyboard
+                  </Button>
+                )}
+              </div>
               <p className="font-primary text-sm text-[#6B7280] -mt-4 mb-8 max-w-lg">
                 Curated travel storyboards by {firstName} — visual collections of destinations, experiences, and moments that inspire your next journey.
               </p>
@@ -323,10 +384,57 @@ export default function CreatorPublicProfilePage() {
                 creatorId={creator.id}
                 onRequestTrip={handleRequestTrip}
                 hideTitle
+                isOwnProfile={isOwnProfile}
+                onCreateNew={() => setShowCreateDialog(true)}
               />
             </div>
           </div>
         )}
+
+        {/* Create Storyboard Dialog */}
+        <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+          <DialogContent className="sm:max-w-md bg-[#FDF9F0]">
+            <DialogHeader>
+              <DialogTitle className="font-secondary text-xl text-[#0a2225]">New Storyboard</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 mt-2">
+              <div>
+                <label className="text-xs font-medium text-[#6B7280] uppercase tracking-wider">Title *</label>
+                <Input
+                  placeholder="e.g. Amalfi Coast Dream Trip"
+                  value={newBoardTitle}
+                  onChange={(e) => setNewBoardTitle(e.target.value)}
+                  className="mt-1 border-[#E5DFC6]"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-[#6B7280] uppercase tracking-wider">Destination</label>
+                <Input
+                  placeholder="e.g. Italy, Amalfi Coast"
+                  value={newBoardDestination}
+                  onChange={(e) => setNewBoardDestination(e.target.value)}
+                  className="mt-1 border-[#E5DFC6]"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-[#6B7280] uppercase tracking-wider">Description</label>
+                <Textarea
+                  placeholder="What's this storyboard about?"
+                  value={newBoardDescription}
+                  onChange={(e) => setNewBoardDescription(e.target.value)}
+                  className="mt-1 border-[#E5DFC6] min-h-[80px]"
+                />
+              </div>
+              <Button
+                onClick={handleCreateStoryboard}
+                disabled={!newBoardTitle.trim() || creating}
+                className="w-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full h-11"
+              >
+                {creating ? "Creating…" : "Create Storyboard"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* From My Travels — Media gallery */}
         <div className="bg-[#FDF9F0]">

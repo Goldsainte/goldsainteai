@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, MapPin } from "lucide-react";
+import { ArrowRight, MapPin, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface StoryboardCard {
   id: string;
@@ -11,6 +12,7 @@ interface StoryboardCard {
   tags?: string[] | null;
   items_count?: number;
   item_images?: string[];
+  is_public?: boolean;
 }
 
 interface Props {
@@ -19,6 +21,8 @@ interface Props {
   creatorId: string;
   onRequestTrip: () => void;
   hideTitle?: boolean;
+  isOwnProfile?: boolean;
+  onCreateNew?: () => void;
 }
 
 function BoardCollage({ coverImage, itemImages }: { coverImage?: string | null; itemImages?: string[] }) {
@@ -55,7 +59,7 @@ function BoardCollage({ coverImage, itemImages }: { coverImage?: string | null; 
   );
 }
 
-export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onRequestTrip, hideTitle }: Props) {
+export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onRequestTrip, hideTitle, isOwnProfile, onCreateNew }: Props) {
   const navigate = useNavigate();
 
   if (storyboards.length === 0) {
@@ -67,15 +71,19 @@ export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onR
           </h2>
         )}
         <div className="rounded-2xl border border-dashed border-[#E5DFC6] bg-white/60 p-12 text-center">
-          <p className="font-secondary text-lg text-[#0a2225] mb-2">No storyboards yet</p>
+          <p className="font-secondary text-lg text-[#0a2225] mb-2">
+            {isOwnProfile ? "Create your first storyboard" : "No storyboards yet"}
+          </p>
           <p className="text-sm text-[#6B7280] mb-6 max-w-md mx-auto">
-            {displayName} hasn't published any travel storyboards yet — but you can still start a custom trip.
+            {isOwnProfile
+              ? "Curate visual travel collections to inspire your audience and earn commissions on bookings."
+              : `${displayName} hasn't published any travel storyboards yet — but you can still start a custom trip.`}
           </p>
           <Button
-            onClick={onRequestTrip}
+            onClick={isOwnProfile && onCreateNew ? onCreateNew : onRequestTrip}
             className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-8 h-11"
           >
-            Get Custom Itinerary
+            {isOwnProfile ? "+ New Storyboard" : "Get Custom Itinerary"}
           </Button>
         </div>
       </section>
@@ -94,9 +102,16 @@ export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onR
         {storyboards.map((sb) => (
           <div
             key={sb.id}
-            className="rounded-2xl overflow-hidden bg-white border border-[#E5DFC6] group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5"
+            className="rounded-2xl overflow-hidden bg-white border border-[#E5DFC6] group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 relative"
             onClick={() => navigate(`/storyboards/${sb.id}`)}
           >
+            {/* Draft badge for own profile */}
+            {isOwnProfile && sb.is_public === false && (
+              <Badge className="absolute top-3 left-3 z-10 bg-[#0a2225]/70 text-white text-[10px] border-0">
+                Draft
+              </Badge>
+            )}
+
             <BoardCollage coverImage={sb.cover_image_url} itemImages={sb.item_images} />
 
             {/* Board metadata */}
@@ -133,6 +148,19 @@ export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onR
             </div>
           </div>
         ))}
+
+        {/* + New Storyboard card for own profile */}
+        {isOwnProfile && onCreateNew && (
+          <div
+            className="rounded-2xl border-2 border-dashed border-[#E5DFC6] bg-white/40 aspect-[4/5] flex flex-col items-center justify-center cursor-pointer hover:border-[#C7A962] hover:bg-white/70 transition-all duration-300"
+            onClick={onCreateNew}
+          >
+            <div className="h-12 w-12 rounded-full bg-[#E5DFC6]/40 flex items-center justify-center mb-3">
+              <Plus className="h-6 w-6 text-[#C7A962]" />
+            </div>
+            <span className="font-secondary text-sm text-[#6B7280]">New Storyboard</span>
+          </div>
+        )}
       </div>
     </section>
   );
