@@ -51,6 +51,7 @@ export default function StoryboardDetailPage() {
   }>({ open: false, imageUrl: "" });
 
   const isOwner = user?.id === storyboard?.owner_id;
+  const [deleting, setDeleting] = useState(false);
 
   // "More like this" query based on storyboard title
   const moreLikeQuery = storyboard?.title
