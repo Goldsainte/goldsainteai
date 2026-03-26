@@ -1,31 +1,47 @@
 
 
-## Rename "From My Travels" to "My Top Trip Highlights" + Convert to Horizontal Auto-Scroll Carousel
+## "Sell My Storyboard Experience" — AI-Powered Trip Listing from Storyboard
 
-### What Changes
+### What This Does
+Adds a "Sell This Experience" CTA to the storyboard detail page. When a creator clicks it, an edge function reads the storyboard's items (titles, descriptions, images, destination, tags) and uses OpenAI to generate a full `packaged_trips` draft — title, description, highlights, inclusions, pricing suggestion, duration, tags, and cover image. The creator reviews, tweaks, and publishes.
 
-**1. Update section label on creator profile page**
-In `CreatorPublicProfilePage.tsx` (line 403), change `SectionLabel` text from "From My Travels" to "My Top Trip Highlights". Add a secondary heading "TRIPS GALLERY" in gold below the section label, matching the screenshot's editorial style.
+### Flow
+```text
+Storyboard Detail Page
+  └─ Creator clicks "Sell This Experience" (gold CTA)
+      └─ Loading state with "AI is designing your trip..."
+      └─ Edge function: storyboard-to-trip
+          ├─ Reads storyboard + items from DB
+          ├─ Sends to OpenAI (gpt-4o) with structured output
+          └─ Returns trip draft JSON
+      └─ Inserts draft into packaged_trips (status: "draft")
+      └─ Redirects to /trip-builder?edit={newTripId}
+          └─ Creator reviews AI-generated fields, adjusts pricing, publishes
+```
 
-**2. Update all title references in `CreatorMediaGallery.tsx`**
-Change every "From My Travels" string (lines 55, 70, 94, 116) to "My Top Trip Highlights".
+### Changes
 
-**3. Convert masonry grid to horizontal auto-scrolling carousel**
-Replace the `columns-2 md:columns-3` masonry layout in `CreatorMediaGallery.tsx` with a horizontal scroll strip that auto-scrolls continuously (CSS `@keyframes` marquee animation). Structure:
-- Container: `overflow-hidden` with left/right edge fade masks (gradient overlays)
-- Inner track: `flex gap-4` with `animation: scroll Xs linear infinite` (speed based on item count)
-- Images: fixed height (`h-80 md:h-96`), natural width, `rounded-2xl object-cover`
-- Pause animation on hover (`hover:pause` via `animation-play-state: paused`)
-- Duplicate the image set to create seamless infinite loop
-- Left/right navigation arrows (semi-transparent circles) positioned at edges, like the screenshot
+**1. New edge function: `supabase/functions/storyboard-to-trip/index.ts`**
+- Accepts `{ storyboardId }` + auth header
+- Loads storyboard row (title, destination, description, tags, interests) and all storyboard_items (titles, subtitles, descriptions, image_urls)
+- Calls OpenAI gpt-4o with tool-calling to extract structured trip data:
+  - `title`, `description`, `destination`, `duration_days`, `duration_nights`, `highlights` (array), `included` (array), `not_included` (array), `tags`, `price_per_person` (suggested), `activity_level`, `cover_image_url` (first storyboard image)
+- Inserts into `packaged_trips` with `status: "draft"`, `creator_id: userId`
+- Returns `{ tripId, slug }`
 
-**4. Add the keyframe animation**
-Add a `marquee` keyframe in a style tag or Tailwind arbitrary animation that translates the track from `0` to `-50%` (since items are duplicated).
+**2. Edit `src/pages/storyboards/StoryboardDetailPage.tsx`**
+- Add a "Sell This Experience" button (gold, with Sparkles icon) in the owner action bar, next to "Edit Details" and "Start a trip from this"
+- On click: call the edge function, show loading spinner, then redirect to `/trip-builder?edit={tripId}`
+- Only visible when `isOwner` is true
 
-### Files
+**3. Add to `src/pages/storyboards/MyStoryboardsPage.tsx`**
+- Add a subtle "Sell" icon/link on each storyboard card for quick access (secondary, not blocking)
 
-| Action | File | Change |
-|--------|------|--------|
-| Edit | `src/pages/creators/CreatorPublicProfilePage.tsx` | Update section label + add "TRIPS GALLERY" subheading |
-| Edit | `src/components/creator/CreatorMediaGallery.tsx` | Rename titles, replace masonry with horizontal auto-scroll carousel |
+### Design Details
+- CTA style: `bg-gradient-to-r from-[#C7A962] to-[#b89a55] text-white rounded-full px-6` with Sparkles icon
+- Loading overlay: centered spinner with "AI is designing your marketplace listing..." text
+- The generated trip pre-fills everything so the creator just needs to confirm pricing and publish
+
+### Edge Function AI Prompt Strategy
+Uses OpenAI (per project mandate) with tool-calling for structured output. The prompt instructs the model to act as a luxury travel product designer, converting visual inspiration (pin titles/descriptions) into a bookable trip listing with luxury-tier language matching the Goldsainte brand voice.
 
