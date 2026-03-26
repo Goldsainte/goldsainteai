@@ -33,16 +33,16 @@ export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onR
             {sectionTitle}
           </h2>
         )}
-        <div className="rounded-xl border border-dashed border-[#E5DFC6] bg-white/60 p-10 text-center">
+        <div className="rounded-2xl border border-dashed border-[#E5DFC6] bg-white/60 p-12 text-center">
           <p className="font-secondary text-lg text-[#0a2225] mb-2">
             No storyboards yet
           </p>
-          <p className="text-sm text-[#6B7280] mb-5 max-w-md mx-auto">
+          <p className="text-sm text-[#6B7280] mb-6 max-w-md mx-auto">
             {displayName} hasn't published any travel storyboards yet — but you can still start a custom trip.
           </p>
           <Button
             onClick={onRequestTrip}
-            className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-6"
+            className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-8 h-11"
           >
             Get Custom Itinerary
           </Button>
@@ -59,22 +59,28 @@ export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onR
         </h2>
       )}
 
-      <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {storyboards.map((sb, idx) => {
-          const aspectClass = idx % 3 === 0 ? "aspect-[3/4]" : idx % 3 === 1 ? "aspect-square" : "aspect-[4/5]";
+          // Editorial sizing: first card large (2-col span), next 2 medium, rest standard
+          const isLarge = idx === 0;
+          const isMedium = idx === 1 || idx === 2;
 
           return (
             <div
               key={sb.id}
-              className="break-inside-avoid rounded-xl overflow-hidden bg-white border border-[#E5DFC6] group cursor-pointer transition-all hover:shadow-lg hover:border-[#C7A962]/50"
+              className={`rounded-2xl overflow-hidden bg-white border border-[#E5DFC6] group cursor-pointer transition-all duration-300 hover:shadow-xl hover:border-[#C7A962]/40 hover:-translate-y-0.5 ${
+                isLarge ? "col-span-2 row-span-2" : ""
+              }`}
               onClick={() => navigate(`/storyboards/${sb.id}`)}
             >
-              <div className={`relative ${aspectClass} overflow-hidden bg-[#E5DFC6]`}>
+              <div className={`relative overflow-hidden bg-[#E5DFC6] ${
+                isLarge ? "aspect-[4/3]" : isMedium ? "aspect-[3/4]" : "aspect-[4/5]"
+              }`}>
                 {sb.cover_image_url ? (
                   <img
                     src={sb.cover_image_url}
                     alt={sb.title}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                     loading="lazy"
                   />
                 ) : (
@@ -83,7 +89,7 @@ export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onR
                   </div>
                 )}
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
                 <button
                   className="absolute top-3 right-3 p-1.5 rounded-full bg-white/20 backdrop-blur-sm text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/40"
@@ -98,12 +104,17 @@ export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onR
                   </span>
                 )}
 
-                <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <h3 className="font-secondary text-base md:text-lg text-white leading-tight">
+                <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5">
+                  <h3 className={`font-secondary text-white leading-tight ${
+                    isLarge ? "text-xl md:text-2xl" : "text-base md:text-lg"
+                  }`}>
                     {sb.title}
                   </h3>
                   {sb.destination && (
                     <p className="text-white/70 text-xs mt-1">{sb.destination}</p>
+                  )}
+                  {isLarge && sb.description && (
+                    <p className="text-white/60 text-xs mt-1.5 line-clamp-2">{sb.description}</p>
                   )}
                 </div>
               </div>
