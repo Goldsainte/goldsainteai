@@ -335,8 +335,7 @@ export default function CreatorPublicProfilePage() {
                 )}
               </section>
 
-              {/* Social Presence — high for credibility */}
-              <CreatorSocialCards accounts={socialAccounts} />
+              {/* Social cards moved above two-column layout */}
 
               {/* Gallery — high on page for trust */}
               <CreatorMediaGallery
