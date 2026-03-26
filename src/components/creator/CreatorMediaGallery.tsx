@@ -19,6 +19,8 @@ interface CreatorMediaGalleryProps {
   fallbackPhotos?: string[] | null;
   instagramHandle?: string | null;
   isOwnProfile?: boolean;
+  hideTitle?: boolean;
+  useIgGrid?: boolean;
 }
 
 export function CreatorMediaGallery({
