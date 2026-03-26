@@ -370,13 +370,8 @@ export default function CreatorPublicProfilePage() {
                 </section>
               )}
 
-              {/* Gallery */}
-              <CreatorMediaGallery
-                creatorId={creator.id}
-                fallbackPhotos={creator.featured_photos}
-                instagramHandle={creator.instagram_handle}
-                isOwnProfile={isOwnProfile}
-              />
+
+
 
               {/* Trips */}
               <ProfileTripsGrid
