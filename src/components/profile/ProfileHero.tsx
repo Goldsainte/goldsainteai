@@ -1,4 +1,4 @@
-import { BadgeCheck } from "lucide-react";
+import { BadgeCheck, Instagram, Linkedin, Youtube, Twitter } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import FollowButton from "@/components/FollowButton";
@@ -9,11 +9,37 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+interface SocialAccount {
+  platform: string;
+  handle: string;
+  profile_url: string;
+  followers_count: number;
+}
+
+function formatFollowers(count: number): string {
+  if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`;
+  if (count >= 1_000) return `${(count / 1_000).toFixed(1).replace(/\.0$/, "")}K`;
+  return count.toString();
+}
+
+function PlatformIcon({ platform, className }: { platform: string; className?: string }) {
+  switch (platform) {
+    case "instagram": return <Instagram className={className} />;
+    case "linkedin": return <Linkedin className={className} />;
+    case "youtube": return <Youtube className={className} />;
+    case "twitter": return <Twitter className={className} />;
+    case "tiktok": return <span className={cn("inline-flex items-center justify-center font-bold", className)} style={{ fontSize: "0.65em" }}>Tk</span>;
+    default: return <span className={cn("inline-flex items-center justify-center font-bold uppercase", className)} style={{ fontSize: "0.6em" }}>{platform.slice(0, 2)}</span>;
+  }
+}
+
 interface ProfileHeroProps {
   name: string;
   avatarUrl?: string | null;
   isVerified?: boolean;
   bio?: string | null;
+  specialties?: string[];
+  socialAccounts?: SocialAccount[];
   followerDisplay?: string | null;
   storyboardCount?: number;
   postCount?: number;
@@ -28,6 +54,8 @@ export function ProfileHero({
   avatarUrl,
   isVerified,
   bio,
+  specialties = [],
+  socialAccounts = [],
   followerDisplay,
   storyboardCount = 0,
   postCount = 0,
@@ -36,6 +64,8 @@ export function ProfileHero({
   onRequestTrip,
   className,
 }: ProfileHeroProps) {
+  const totalReach = socialAccounts.reduce((sum, a) => sum + a.followers_count, 0);
+
   return (
     <div className={cn("bg-gradient-to-b from-[#FDF9F0] to-white", className)}>
       <div className="mx-auto max-w-5xl px-4 py-10 md:py-14">
@@ -71,19 +101,66 @@ export function ProfileHero({
             )}
           </div>
 
-          {/* Bio — italic serif tagline */}
+          {/* Bio — italic serif, up to 4 lines */}
           {bio && (
-            <p className="font-primary italic text-base text-[#6B7280] line-clamp-2 max-w-lg mb-6">
+            <p className="font-primary italic text-base text-[#6B7280] line-clamp-4 max-w-lg mb-4">
               {bio}
             </p>
           )}
 
+          {/* Specialty pills */}
+          {specialties.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-2 mb-6">
+              {specialties.slice(0, 6).map((s) => (
+                <span
+                  key={s}
+                  className="text-xs font-medium uppercase tracking-wider text-[#6B7280] border border-[#E5DFC6] rounded-full px-3 py-1"
+                >
+                  {s}
+                </span>
+              ))}
+            </div>
+          )}
+
           {/* Gold flourish divider */}
-          <div className="flex items-center gap-3 mb-6">
+          <div className="flex items-center gap-3 mb-5">
             <div className="h-px w-12 bg-gradient-to-r from-transparent to-[#C7A962]/50" />
             <div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />
             <div className="h-px w-12 bg-gradient-to-l from-transparent to-[#C7A962]/50" />
           </div>
+
+          {/* Social icons row */}
+          {socialAccounts.length > 0 && (
+            <div className="flex items-center gap-4 mb-6 text-sm text-[#6B7280]">
+              <div className="flex items-center gap-3">
+                {socialAccounts.map((acc) => (
+                  <TooltipProvider key={acc.platform}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <a
+                          href={acc.profile_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#6B7280] hover:text-[#0a2225] transition-colors"
+                        >
+                          <PlatformIcon platform={acc.platform} className="h-[18px] w-[18px]" />
+                        </a>
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-[#0a2225] text-white text-xs">
+                        {acc.handle} · {formatFollowers(acc.followers_count)} followers
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ))}
+              </div>
+              {totalReach > 0 && (
+                <>
+                  <span className="text-[#E5DFC6]">·</span>
+                  <span className="text-sm text-[#6B7280]">{formatFollowers(totalReach)}+ followers</span>
+                </>
+              )}
+            </div>
+          )}
 
           {/* Stats — spaced out with gold dividers */}
           <div className="flex items-center justify-center gap-6 md:gap-10 mb-8">

@@ -92,11 +92,12 @@ export default function CreatorPublicProfilePage() {
   const [newBoardDescription, setNewBoardDescription] = useState("");
   const [newBoardDestination, setNewBoardDestination] = useState("");
   const [creating, setCreating] = useState(false);
+  const [socialAccounts, setSocialAccounts] = useState<{ platform: string; handle: string; profile_url: string; followers_count: number }[]>([]);
 
   useEffect(() => {
     if (!id) return;
     (async () => {
-      const [profileRes, creatorProfileRes, reviewsRes, storyboardsRes, mediaCountRes] = await Promise.all([
+      const [profileRes, creatorProfileRes, reviewsRes, storyboardsRes, mediaCountRes, socialRes] = await Promise.all([
         supabase
           .from("profiles")
           .select(
