@@ -256,7 +256,6 @@ export default function CreatorPublicProfilePage() {
           reviewCount={reviewCount}
           followerDisplay={followerDisplay}
           responseTimeText={responseTimeText}
-          targetUserId={isOwnProfile ? undefined : creator.id}
           onRequestTrip={handleRequestTrip}
         />
 
