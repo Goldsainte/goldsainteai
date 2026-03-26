@@ -86,6 +86,7 @@ export default function CreatorPublicProfilePage() {
   const [reviewCount, setReviewCount] = useState<number>(0);
   const [creatorStoryboards, setCreatorStoryboards] = useState<BoardSummary[]>([]);
   const [pinItems, setPinItems] = useState<PinItem[]>([]);
+  const [mediaCount, setMediaCount] = useState(0);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [newBoardTitle, setNewBoardTitle] = useState("");
   const [newBoardDescription, setNewBoardDescription] = useState("");
