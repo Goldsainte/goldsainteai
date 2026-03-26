@@ -1,53 +1,27 @@
 
 
-## Add Pinterest-Style Storyboard Section to Creator Profile
+## Fix: Creator Storyboard Creation from Profile Page
 
 ### Problem
-The current "Curated Experiences" storyboard grid uses editorial magazine-style cards, but it doesn't convey the **Pinterest board** feel — where each storyboard is a visual collection/board with multiple preview thumbnails, item counts, and a clear "board" metaphor. The section also lacks context about what storyboards are and why they matter (creators as the supply-side engine).
+Two issues causing the disconnect:
+1. **No creation UI on profile page** — creators can't create storyboards directly from their own profile
+2. **Visibility filter** — the profile page query filters `is_public = true`, but new storyboards default to `is_public: false`, so they never appear even after creation
 
-### What Changes
+### Changes
 
-**1. `src/pages/creators/CreatorPublicProfilePage.tsx` — Rename and reposition storyboard section**
-- Rename "Curated Experiences" label to **"Explore Travel Ideas"**
-- Add a short editorial subtitle below the section label: *"Curated travel storyboards by {firstName} — visual collections of destinations, experiences, and moments that inspire your next journey."*
-- Ensure this section sits between the Featured Experience and "From My Travels" (already does, just making it more prominent)
-- Pass full storyboard data (including items if available) to enable Pinterest-style previews
+**1. `src/pages/creators/CreatorPublicProfilePage.tsx`**
+- When `isOwnProfile` is true, add a **"+ New Storyboard"** button next to the "Explore Travel Ideas" section label
+- Clicking opens a dialog to enter title, description, and destination — creates the storyboard as `is_public: true` with `role: "creator"`
+- After creation, refresh the storyboards list (re-fetch or append to local state)
+- Also show the storyboard section even when `remainingStoryboards` is empty (if own profile) — display an empty state with the create CTA
+- Update the storyboards query: when viewing own profile, remove the `.eq("is_public", true)` filter so drafts are also visible to the creator (with a small "Draft" badge on private ones)
 
-**2. `src/components/creator/CreatorStoryboardGrid.tsx` — Pinterest board-style cards**
-- Redesign cards to look like **Pinterest boards** rather than single-image editorial cards:
-  - Each card shows a **multi-image collage** when the storyboard has items: 1 large image + 2-3 smaller thumbnails in a grid arrangement (like Pinterest board covers)
-  - If no items, fall back to single cover image as today
-- Add **board metadata** below the image: title (serif), item count ("12 pins"), destination tag
-- Remove the gold accent strip at top (too editorial, not Pinterest)
-- Keep the hover "Plan a trip like this" CTA bar
-- Adjust grid to `grid-cols-2 md:grid-cols-3 gap-6` (fewer columns, more breathing room — Pinterest uses 2-3 cols)
-- Cards get `rounded-2xl` with softer shadows
-- Remove the large/medium/small size variation — make all cards uniform height with `aspect-[4/5]` (tall, like Pinterest)
-
-**3. Storyboard items query update in `CreatorPublicProfilePage.tsx`**
-- Fetch a few item image URLs per storyboard (up to 3) to enable the collage preview
-- Update the storyboards query to include: `storyboard_items(image_url, position)` limited to 3 items per board
-- Pass item images to the grid component
-
-### Visual Result
-```text
-┌─────────────────────────────────────┐
-│ EXPLORE TRAVEL IDEAS                │
-│ Curated storyboards by Radu...      │
-├─────────────────────────────────────┤
-│ ┌──────────┐ ┌──────────┐ ┌──────────┐
-│ │ ┌──┬──┐  │ │ ┌──┬──┐  │ │          │
-│ │ │  │  │  │ │ │  │  │  │ │  [cover] │
-│ │ │big│sm│  │ │ │big│sm│  │ │          │
-│ │ │  ├──┤  │ │ │  ├──┤  │ │          │
-│ │ │  │sm│  │ │ │  │sm│  │ │          │
-│ │ └──┴──┘  │ │ └──┴──┘  │ │          │
-│ │ Morocco  │ │ Amalfi   │ │ Bali     │
-│ │ 12 pins  │ │ 8 pins   │ │ 5 pins   │
-│ └──────────┘ └──────────┘ └──────────┘
-```
+**2. `src/components/creator/CreatorStoryboardGrid.tsx`**
+- Add optional `isOwnProfile` prop
+- When `isOwnProfile`, show a subtle "Draft" badge on cards where `is_public` is false
+- Add an optional `onCreateNew` prop — when provided, render a dashed-border "+" card at the end of the grid as an additional creation entry point
 
 ### Files
-- **Edit**: `src/pages/creators/CreatorPublicProfilePage.tsx` — rename section, add subtitle, update storyboard query to include item images
-- **Edit**: `src/components/creator/CreatorStoryboardGrid.tsx` — Pinterest board-style cards with collage previews, uniform grid, metadata row
+- **Edit**: `src/pages/creators/CreatorPublicProfilePage.tsx` — add create dialog, update query filter for own profile, show section when empty
+- **Edit**: `src/components/creator/CreatorStoryboardGrid.tsx` — add Draft badge and "+" card for own profile
 
