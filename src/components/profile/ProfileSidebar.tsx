@@ -62,7 +62,7 @@ export function ProfileSidebar({
           onClick={onRequestTrip}
           className="w-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-xl h-11 font-medium"
         >
-          Get Custom Itinerary
+          Design My Trip
         </Button>
         <p className="text-center text-xs text-[#6B7280] mt-2">
           Takes 2 minutes · No commitment
