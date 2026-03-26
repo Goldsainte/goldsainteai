@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, X, ArrowRight } from "lucide-react";
+import { Plus, X, ArrowRight, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CATEGORY_KEYWORDS } from "@/components/ui/CategoryChips";
 import { RefinementChips } from "@/components/discovery/RefinementChips";
