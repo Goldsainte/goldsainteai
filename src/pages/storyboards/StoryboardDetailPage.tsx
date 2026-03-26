@@ -212,7 +212,7 @@ export default function StoryboardDetailPage() {
   };
 
   const handleShareLink = async () => {
-    const url = window.location.href;
+    const url = storyboard?.slug ? `${window.location.origin}/s/${storyboard.slug}` : window.location.href;
     const shareData = {
       title: storyboard?.title || "My Goldsainte Storyboard",
       text: storyboard?.description || "Check out my travel storyboard on Goldsainte!",

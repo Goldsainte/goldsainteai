@@ -9348,6 +9348,7 @@ export type Database = {
           owner_id: string
           pace: string | null
           role: string
+          slug: string | null
           source_creator_id: string | null
           special_notes: string | null
           start_date: string | null
@@ -9385,6 +9386,7 @@ export type Database = {
           owner_id: string
           pace?: string | null
           role: string
+          slug?: string | null
           source_creator_id?: string | null
           special_notes?: string | null
           start_date?: string | null
@@ -9422,6 +9424,7 @@ export type Database = {
           owner_id?: string
           pace?: string | null
           role?: string
+          slug?: string | null
           source_creator_id?: string | null
           special_notes?: string | null
           start_date?: string | null
