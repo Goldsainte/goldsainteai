@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Plus, MapPin, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CategoryChips, CATEGORY_KEYWORDS } from "@/components/ui/CategoryChips";
 
 export interface PinItem {
   id: string;
