@@ -175,18 +175,26 @@ export default function CreatorPublicProfilePage() {
   const tagline = creator.travel_philosophy;
   const lastActive = creator.last_seen_at || creatorData?.updated_at;
 
-  const socialLinks = [
-    creator.tiktok_handle && {
-      platform: "TikTok",
-      handle: creator.tiktok_handle,
-      url: `https://www.tiktok.com/@${creator.tiktok_handle}`,
-    },
-    creator.instagram_handle && {
-      platform: "Instagram",
-      handle: creator.instagram_handle,
-      url: `https://www.instagram.com/${creator.instagram_handle}`,
-    },
-  ].filter(Boolean) as { platform: string; handle: string; url: string }[];
+  // Build social links from new social accounts table, falling back to legacy profile fields
+  const socialLinks = socialAccounts.length > 0
+    ? socialAccounts.map((s: any) => ({
+        platform: s.platform.charAt(0).toUpperCase() + s.platform.slice(1),
+        handle: s.handle,
+        url: s.profile_url,
+        followersCount: s.followers_count,
+      }))
+    : [
+        creator.tiktok_handle && {
+          platform: "TikTok",
+          handle: creator.tiktok_handle,
+          url: `https://www.tiktok.com/@${creator.tiktok_handle}`,
+        },
+        creator.instagram_handle && {
+          platform: "Instagram",
+          handle: creator.instagram_handle,
+          url: `https://www.instagram.com/${creator.instagram_handle}`,
+        },
+      ].filter(Boolean) as { platform: string; handle: string; url: string; followersCount?: number }[];
 
   const followerDisplay = (creator.creator_followers ?? 0) > 0
     ? fmt(creator.creator_followers)
