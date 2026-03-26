@@ -106,7 +106,7 @@ export default function CreatorPublicProfilePage() {
           .eq("reviewee_id", id),
         supabase
           .from("storyboards")
-          .select("id, title, description, cover_image_url, destination, tags, view_count, created_at, storyboard_items(count)")
+          .select("id, title, description, cover_image_url, destination, tags, view_count, created_at, storyboard_items(image_url, position)")
           .eq("owner_id", id)
           .eq("is_public", true)
           .order("updated_at", { ascending: false })
@@ -122,7 +122,12 @@ export default function CreatorPublicProfilePage() {
       setCreatorStoryboards(
         (storyboardsRes.data || []).map((sb: any) => ({
           ...sb,
-          items_count: sb.storyboard_items?.[0]?.count || 0,
+          items_count: sb.storyboard_items?.length || 0,
+          item_images: (sb.storyboard_items || [])
+            .filter((item: any) => item.image_url)
+            .sort((a: any, b: any) => (a.position ?? 0) - (b.position ?? 0))
+            .slice(0, 3)
+            .map((item: any) => item.image_url),
         }))
       );
       setMediaCount(mediaCountRes.count || 0);
@@ -308,7 +313,10 @@ export default function CreatorPublicProfilePage() {
         {remainingStoryboards.length > 0 && (
           <div className="bg-white">
             <div className="mx-auto max-w-5xl px-4 py-16 md:py-24">
-              <SectionLabel>Curated Experiences</SectionLabel>
+              <SectionLabel>Explore Travel Ideas</SectionLabel>
+              <p className="font-primary text-sm text-[#6B7280] -mt-4 mb-8 max-w-lg">
+                Curated travel storyboards by {firstName} — visual collections of destinations, experiences, and moments that inspire your next journey.
+              </p>
               <CreatorStoryboardGrid
                 storyboards={remainingStoryboards}
                 displayName={displayName}
