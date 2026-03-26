@@ -347,6 +347,7 @@ export default function CreatorPublicProfilePage() {
                 creatorId={creator.id}
                 isOwnProfile={isOwnProfile}
                 onCreateNew={() => setShowCreateDialog(true)}
+                onBoardDeleted={() => setReviewRefreshKey((k) => k + 1)}
               />
             </div>
           </div>
