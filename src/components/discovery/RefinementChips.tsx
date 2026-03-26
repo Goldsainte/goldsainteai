@@ -26,6 +26,7 @@ export function RefinementChips({
     <div className={cn("space-y-1", className)}>
       {/* Row 1: Top-level categories */}
       <CategoryChips
+        data-tour="category-pills"
         activeCategory={topCategory}
         onCategoryChange={(cat) => {
           if (cat === "All") {

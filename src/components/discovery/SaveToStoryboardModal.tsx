@@ -28,6 +28,7 @@ interface SaveToStoryboardModalProps {
   tags?: string[];
   repinnedFromItemId?: string;
   repinnedFromUserId?: string;
+  onSaveComplete?: () => void;
 }
 
 interface BoardOption {
@@ -49,6 +50,7 @@ export function SaveToStoryboardModal({
   tags = [],
   repinnedFromItemId,
   repinnedFromUserId,
+  onSaveComplete,
 }: SaveToStoryboardModalProps) {
   const [boards, setBoards] = useState<BoardOption[]>([]);
   const [loading, setLoading] = useState(false);
@@ -106,6 +108,7 @@ export function SaveToStoryboardModal({
         },
       });
       toast.success("Saved to storyboard!");
+      onSaveComplete?.();
       onOpenChange(false);
     } catch {
       toast.error("Failed to save");
