@@ -267,6 +267,11 @@ export default function CreatorPublicProfilePage() {
           <HowCreatorWorks creatorName={displayName} />
         </div>
 
+        {/* Social Proof — high on page for credibility & conversion */}
+        <div className="mx-auto max-w-6xl px-4 pt-8 pb-0">
+          <CreatorSocialCards accounts={socialAccounts} />
+        </div>
+
         {/* Two-column layout */}
         <div className="mx-auto max-w-6xl px-4 py-8">
           <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
