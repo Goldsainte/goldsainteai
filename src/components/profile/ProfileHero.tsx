@@ -1,7 +1,6 @@
 import { Star, MapPin, BadgeCheck, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import FollowButton from "@/components/FollowButton";
 import {
   Tooltip,
   TooltipContent,
