@@ -1,75 +1,53 @@
 
 
-## Creator Profile — Luxury Editorial Refinement (Away from IG, Toward Mr & Mrs Smith)
+## Add Pinterest-Style Storyboard Section to Creator Profile
 
 ### Problem
-The current layout reads like an Instagram clone: compact identity bar, flat tabs with icons, `grid-cols-3 gap-1` square grid, minimal typography. It lacks the editorial warmth, generous spacing, serif-forward elegance, and visual storytelling that defines the Goldsainte / Mr & Mrs Smith aesthetic.
+The current "Curated Experiences" storyboard grid uses editorial magazine-style cards, but it doesn't convey the **Pinterest board** feel — where each storyboard is a visual collection/board with multiple preview thumbnails, item counts, and a clear "board" metaphor. The section also lacks context about what storyboards are and why they matter (creators as the supply-side engine).
 
-### Design Direction
-Think **Mr & Mrs Smith hotel profile** or **Farfetch editorial**: large serif headlines, generous whitespace, warm cream backgrounds, landscape imagery with overlaid typography, gold accent dividers, and content that breathes. No tab icons, no square grids, no tight spacing.
+### What Changes
 
-### Changes
+**1. `src/pages/creators/CreatorPublicProfilePage.tsx` — Rename and reposition storyboard section**
+- Rename "Curated Experiences" label to **"Explore Travel Ideas"**
+- Add a short editorial subtitle below the section label: *"Curated travel storyboards by {firstName} — visual collections of destinations, experiences, and moments that inspire your next journey."*
+- Ensure this section sits between the Featured Experience and "From My Travels" (already does, just making it more prominent)
+- Pass full storyboard data (including items if available) to enable Pinterest-style previews
 
-**1. `src/components/profile/ProfileHero.tsx` — Magazine-style header**
-- Add a subtle cream-to-white gradient background instead of flat white
-- Increase vertical padding to `py-10 md:py-14` for breathing room
-- Enlarge avatar to `h-28 w-28 md:h-32 md:w-32` with a slightly thicker gold ring
-- Upgrade name typography to `text-3xl md:text-4xl` with Playfair Display
-- Style bio in `font-primary` (Cormorant Garamond) italic, `text-base`, warmer tone — feels like a magazine tagline
-- Replace the compact stats row with a spaced-out treatment: each stat in its own block with the number large (`text-lg font-secondary`) and label small below — separated by thin gold dividers (like a hotel fact sheet)
-- Move CTA to its own row below stats on desktop (full-width, centered) — removes the cramped 3-column feel
-- Add a decorative gold flourish or thin rule between bio and stats
-- Remove "How it works" strip from the page entirely — it's too utilitarian
+**2. `src/components/creator/CreatorStoryboardGrid.tsx` — Pinterest board-style cards**
+- Redesign cards to look like **Pinterest boards** rather than single-image editorial cards:
+  - Each card shows a **multi-image collage** when the storyboard has items: 1 large image + 2-3 smaller thumbnails in a grid arrangement (like Pinterest board covers)
+  - If no items, fall back to single cover image as today
+- Add **board metadata** below the image: title (serif), item count ("12 pins"), destination tag
+- Remove the gold accent strip at top (too editorial, not Pinterest)
+- Keep the hover "Plan a trip like this" CTA bar
+- Adjust grid to `grid-cols-2 md:grid-cols-3 gap-6` (fewer columns, more breathing room — Pinterest uses 2-3 cols)
+- Cards get `rounded-2xl` with softer shadows
+- Remove the large/medium/small size variation — make all cards uniform height with `aspect-[4/5]` (tall, like Pinterest)
 
-**2. `src/pages/creators/CreatorPublicProfilePage.tsx` — Editorial page flow**
-- Remove the IG-style tab bar (icons + underline tabs). Replace with elegant section labels inline with content — the page scrolls as one editorial story, not a tabbed app
-- Page flow becomes a continuous editorial scroll:
-  1. Header (cream gradient)
-  2. Featured Experience (full-width hero card — keep as-is, it's great)
-  3. "Curated Experiences" section label → Storyboard grid
-  4. "From My Travels" section label → Media gallery
-  5. "Meet {Name}" section (keep)
-  6. Reviews
-  7. Final CTA
-- Section labels styled as: `font-primary text-sm uppercase tracking-[0.25em] text-[#C7A962]` with a thin gold line extending to the right (like editorial magazine section breaks)
-- Alternate backgrounds: cream / white / cream between major sections
-- Increase section spacing to `py-16 md:py-24`
-- Remove the "How it works" strip entirely
+**3. Storyboard items query update in `CreatorPublicProfilePage.tsx`**
+- Fetch a few item image URLs per storyboard (up to 3) to enable the collage preview
+- Update the storyboards query to include: `storyboard_items(image_url, position)` limited to 3 items per board
+- Pass item images to the grid component
 
-**3. `src/components/creator/CreatorStoryboardGrid.tsx` — Editorial card refinement**
-- Keep the mixed-size editorial grid (large first card, medium next two, standard rest) — this is good
-- Upgrade card hover: add `shadow-2xl` on hover + subtle gold border glow (`hover:border-[#C7A962]/30`)
-- Add a thin gold accent line at top of each card (2px gold strip) for magazine feel
-- Increase card border-radius to `rounded-xl` (softer)
-- Improve "Plan a trip like this" reveal bar: use serif font, slightly larger text, gold arrow icon
-
-**4. `src/components/creator/CreatorMediaGallery.tsx` — Lifestyle editorial grid**
-- Replace `grid-cols-3 gap-1` IG grid with `columns-2 md:columns-3 gap-4 space-y-4` masonry layout (the non-IG path already exists, just stop passing `useIgGrid`)
-- Add `rounded-xl` to all images
-- Add subtle hover overlay with caption text (if available)
-- Remove square aspect ratio constraint — let images show at natural proportions for editorial feel
-
-**5. Section divider pattern (reused)**
+### Visual Result
 ```text
-── ✦ ──  or  thin gold gradient line
-```
-Implemented as a small component: gold dot centered with fading lines on each side, placed between major sections.
-
-### Visual Identity Shift
-```text
-BEFORE (IG):                    AFTER (Mr & Mrs Smith):
-─────────────────              ─────────────────
-Compact bar header             Generous serif header
-[Tab1] [Tab2]                  Editorial scroll
-grid-cols-3 gap-1              Masonry with rounded cards  
-Square crops                   Natural aspect ratios
-text-xs labels                 Cormorant Garamond accents
-Flat white bg                  Cream/white alternating
+┌─────────────────────────────────────┐
+│ EXPLORE TRAVEL IDEAS                │
+│ Curated storyboards by Radu...      │
+├─────────────────────────────────────┤
+│ ┌──────────┐ ┌──────────┐ ┌──────────┐
+│ │ ┌──┬──┐  │ │ ┌──┬──┐  │ │          │
+│ │ │  │  │  │ │ │  │  │  │ │  [cover] │
+│ │ │big│sm│  │ │ │big│sm│  │ │          │
+│ │ │  ├──┤  │ │ │  ├──┤  │ │          │
+│ │ │  │sm│  │ │ │  │sm│  │ │          │
+│ │ └──┴──┘  │ │ └──┴──┘  │ │          │
+│ │ Morocco  │ │ Amalfi   │ │ Bali     │
+│ │ 12 pins  │ │ 8 pins   │ │ 5 pins   │
+│ └──────────┘ └──────────┘ └──────────┘
 ```
 
 ### Files
-- **Edit**: `src/components/profile/ProfileHero.tsx` — magazine header with serif typography, spaced stats, centered CTA
-- **Edit**: `src/pages/creators/CreatorPublicProfilePage.tsx` — remove tabs, continuous editorial scroll, gold section dividers, increased spacing
-- **Edit**: `src/components/creator/CreatorStoryboardGrid.tsx` — gold accents, refined hover, serif CTA bar
-- **Edit**: `src/components/creator/CreatorMediaGallery.tsx` — masonry layout (remove IG grid), rounded cards
+- **Edit**: `src/pages/creators/CreatorPublicProfilePage.tsx` — rename section, add subtitle, update storyboard query to include item images
+- **Edit**: `src/components/creator/CreatorStoryboardGrid.tsx` — Pinterest board-style cards with collage previews, uniform grid, metadata row
 
