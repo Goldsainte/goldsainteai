@@ -17,9 +17,10 @@ interface Props {
   displayName: string;
   creatorId: string;
   onRequestTrip: () => void;
+  hideTitle?: boolean;
 }
 
-export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onRequestTrip }: Props) {
+export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onRequestTrip, hideTitle }: Props) {
   const navigate = useNavigate();
 
   const sectionTitle = `Travel Inspiration by ${displayName}`;
