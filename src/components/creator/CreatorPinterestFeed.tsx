@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Plus, X, ArrowRight, Layers, MoreVertical, Edit2, Trash2, Sparkles } from "lucide-react";
 import { Plus, X, ArrowRight, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CATEGORY_KEYWORDS } from "@/components/ui/CategoryChips";
@@ -7,6 +8,10 @@ import { RefinementChips } from "@/components/discovery/RefinementChips";
 import { DiscoveryFeed } from "@/components/discovery/DiscoveryFeed";
 import { DiscoveryWelcomeModal } from "@/components/discovery/DiscoveryWelcomeModal";
 import { DiscoveryTooltipTour } from "@/components/discovery/DiscoveryTooltipTour";
+import { useDiscoveryMilestone } from "@/hooks/useDiscoveryMilestone";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { deleteStoryboard } from "@/services/storyboardsService";
+import { toast } from "sonner";
 import { useDiscoveryMilestone } from "@/hooks/useDiscoveryMilestone";
 
 const ONBOARDED_KEY = "goldsainte_discovery_onboarded";
