@@ -26,16 +26,17 @@ export function RefinementChips({
     <div className={cn("space-y-1", className)}>
       {/* Row 1: Top-level categories */}
       <div data-tour="category-pills">
-      <CategoryChips
-        activeCategory={topCategory}
-        onCategoryChange={(cat) => {
-          if (cat === "All") {
-            onReset();
-          } else {
-            onSetTopCategory(cat);
-          }
-        }}
-      />
+        <CategoryChips
+          activeCategory={topCategory}
+          onCategoryChange={(cat) => {
+            if (cat === "All") {
+              onReset();
+            } else {
+              onSetTopCategory(cat);
+            }
+          }}
+        />
+      </div>
 
       {/* Row 2: Contextual refinement suggestions */}
       {suggestions.length > 0 && (
