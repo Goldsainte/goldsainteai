@@ -33,7 +33,6 @@ export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onR
             {sectionTitle}
           </h2>
         )}
-        </h2>
         <div className="rounded-xl border border-dashed border-[#E5DFC6] bg-white/60 p-10 text-center">
           <p className="font-secondary text-lg text-[#0a2225] mb-2">
             No storyboards yet
