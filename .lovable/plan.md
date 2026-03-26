@@ -1,47 +1,97 @@
 
 
-## Replace Sidebar Stats with Creator Storyboards Section
+## Comprehensive Creator Profile Page — Luxury Editorial Redesign
 
-### What
-Replace the Followers/Avg Views/Niches stats block in the sidebar with a compact list of the creator's public storyboards. The Storyboard is the core object of Goldsainte — showcasing them on the profile elevates trust and gives visitors actionable entry points into the creator's work.
+### Problem
+The creator profile has drifted from the established Mr. & Mrs. Smith / Farfetch editorial aesthetic. It currently feels like a SaaS dashboard with numbered step cards, platform-branded social blocks, icon-heavy trust badges, and fragmented small sections. The LuxeTribes reference shows how a creator profile should flow: editorial, immersive, content-led, with clear conversion moments woven in naturally.
 
-### Changes
+### Design Principles (from established brand system)
+- Serif headlines (Playfair Display / `font-secondary`), sans-serif body
+- Text-forward — remove decorative icon circles, emoji badges
+- Gold dividers and accent borders instead of heavy cards
+- Cream (#FDF9F0) background, white cards with subtle `#E5DFC6` borders
+- Minimal, refined — fewer sections, more breathing room
 
-**1. `src/pages/creators/CreatorPublicProfilePage.tsx`**
-- Fetch the creator's public storyboards: `supabase.from("storyboards").select("id, title, cover_image_url, destination, tags, view_count, created_at").eq("owner_id", id).eq("is_public", true).order("updated_at", { ascending: false }).limit(5)`
-- Add this to the existing parallel `Promise.all` query
-- Remove the `stats` prop from `ProfileSidebar` (Followers/Avg Views/Niches array)
-- Pass new `storyboards` prop to `ProfileSidebar`
+### New Page Flow
 
-**2. `src/components/profile/ProfileSidebar.tsx`**
-- Replace the `stats` prop with an optional `storyboards` array prop
-- Replace the stats/rating block (lines 80-129) with:
-  - If storyboards exist: render compact storyboard cards (cover image thumbnail, title, destination, view count) — each linking to `/storyboards/{id}`
-  - If no storyboards: show "New Creator" with empty state messaging
-- Keep rating display if `rating` exists (show above storyboards)
-- Each storyboard card: small horizontal layout with thumbnail (48x48 rounded), title, destination tag, clickable
-
-### Storyboard Card Design (in sidebar)
 ```text
-┌─────────────────────────────────┐
-│ STORYBOARDS                     │
-│                                 │
-│ [img] Maldives Honeymoon        │
-│       Maldives · 1.2K views     │
-│                                 │
-│ [img] Santorini Summer          │
-│       Greece · 800 views        │
-│                                 │
-│ View all storyboards →          │
-└─────────────────────────────────┘
+┌──────────────────────────────────────────┐
+│ HERO (full-bleed, keep as-is — good)     │
+├──────────────────────────────────────────┤
+│ EDITORIAL INTRO                          │
+│  Serif headline + bio + specialties      │
+│  (merge About + Specialties + Styles)    │
+├──────────────────────────────────────────┤
+│ TWO-COLUMN LAYOUT                        │
+│ ┌─────────────────┐ ┌─────────────────┐  │
+│ │ LEFT COLUMN      │ │ STICKY SIDEBAR  │  │
+│ │                  │ │                 │  │
+│ │ Featured         │ │ Request a Trip  │  │
+│ │ Storyboards      │ │ (primary CTA)   │  │
+│ │ (large cards)    │ │                 │  │
+│ │                  │ │ Storyboards     │  │
+│ │ Content Gallery  │ │ (compact list)  │  │
+│ │                  │ │                 │  │
+│ │ Credentials      │ │ Follow / Save   │  │
+│ │ (text-forward)   │ │                 │  │
+│ │                  │ │ Trust lines     │  │
+│ │ Trips            │ │ (text only)     │  │
+│ │                  │ │                 │  │
+│ │ Reviews          │ └─────────────────┘  │
+│ └─────────────────┘                      │
+└──────────────────────────────────────────┘
 ```
 
-- Goldsainte aesthetic: `border-[#E5DFC6]`, warm backgrounds, gold accents
-- Hover: subtle lift, border glow
-- "View all storyboards →" links to `/storyboards` (or a filtered view)
-- Activity indicators (lastActiveText) and CTAs remain unchanged
+### Changes by File
+
+**1. `src/pages/creators/CreatorPublicProfilePage.tsx` — Layout restructure**
+- Remove standalone `<HowCreatorWorks>` section (the 3-step numbered cards). Replace with a single elegant microcopy line near the CTA in the sidebar ("Share your vision → Receive a plan → Book securely")
+- Remove standalone `<CreatorSocialCards>` section from before two-column layout. Social presence becomes a subtle inline element within the editorial intro (follower count as a single line, not colored cards)
+- Merge About, Specialties, and Travel Styles into a single "Editorial Intro" section with serif headline, flowing prose, and pills — placed full-width above the two-column layout
+- Move `<CreatorTrustSection>` content inline as text-forward credentials (no icon circles)
+- Remove "Who This Is For" section (Best For / Not Ideal For) — merge into About prose or drop for now (too granular, breaks editorial flow)
+
+**2. `src/components/creator/HowCreatorWorks.tsx` — Deprecate from profile**
+- Keep the component (used elsewhere) but stop rendering it on the creator profile
+- Add a refined 3-line microcopy version to the sidebar CTA area instead:
+  ```
+  Share your travel vision
+  Receive a personalized plan within 48h
+  Book securely through Goldsainte
+  ```
+
+**3. `src/components/profile/ProfileSidebar.tsx` — Editorial refinement**
+- Convert "Request a Trip" CTA block to a more prominent card with serif headline "Plan Your Journey" and the 3-step microcopy above the button
+- Remove Lucide icons from Trust & Safety list — use gold bullet dots or em-dashes instead, per editorial typography standard
+- Keep Storyboards section as-is (already good)
+- Remove `FollowButton` from above CTA — move below as secondary action
+- Restyle rating display: use serif number, remove star icons, use text "★ 4.8 · 12 reviews" inline
+
+**4. `src/components/creator/CreatorSocialCards.tsx` — Simplify to inline element**
+- Replace the grid of platform-branded cards with a single subtle line or compact row: platform icons (small, monochrome) + total reach number
+- No colored backgrounds, no "Highly active" labels, no large follower counts per platform
+- Render as a simple `<div>` that fits within the editorial intro section
+
+**5. `src/components/creator/CreatorTrustSection.tsx` — Text-forward redesign**
+- Remove icon circles from stat cards — use serif numbers with text labels below
+- Remove the expandable "Verified Partner" accordion — replace with a simple gold-accented text line
+- Certification pills: keep but use more refined styling (no Award icons)
+
+**6. `src/components/creator/CreatorMediaGallery.tsx` — Masonry editorial feel**
+- Change section header from uppercase sans-serif to serif: "Gallery" in Playfair Display
+- Keep masonry layout but use `rounded-xl` (not `rounded-2xl`) for subtler corners
+- Remove the tab UI (Photos / Videos) — show all media in a single masonry grid with video play indicators
+
+### What stays unchanged
+- `ProfileHero` — already strong, matches the aesthetic
+- Data fetching logic — no changes
+- Storyboard cards in sidebar — already editorial
+- Back bar — clean, keep as-is
 
 ### Files
-- **Edit**: `src/pages/creators/CreatorPublicProfilePage.tsx` — fetch storyboards, pass to sidebar
-- **Edit**: `src/components/profile/ProfileSidebar.tsx` — replace stats block with storyboard cards
+- **Edit**: `src/pages/creators/CreatorPublicProfilePage.tsx` — restructure layout and section order
+- **Edit**: `src/components/profile/ProfileSidebar.tsx` — editorial CTA card, text-only trust, refined rating
+- **Edit**: `src/components/creator/CreatorSocialCards.tsx` — simplify to inline compact display
+- **Edit**: `src/components/creator/CreatorTrustSection.tsx` — text-forward, no icon circles
+- **Edit**: `src/components/creator/CreatorMediaGallery.tsx` — serif header, unified grid
 
