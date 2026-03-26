@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Search } from "lucide-react";
+import { Search, BookOpen, Plus } from "lucide-react";
 import { ProposalStatusBadge } from "@/components/proposals/ProposalStatusBadge";
 import type { TripProposalStatus } from "@/services/proposalService";
 
@@ -56,6 +56,34 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
             </p>
           </div>
         ))}
+      </div>
+
+      {/* Storyboard Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Link
+          to="/storyboards/new"
+          className="group flex items-center gap-4 rounded-2xl border border-[#E5DFC6] bg-white px-6 py-5 hover:border-[#C7A962]/50 hover:shadow-sm transition-all"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0c4d47]/10 text-[#0c4d47] group-hover:bg-[#0c4d47] group-hover:text-white transition-colors">
+            <Plus className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-[#0a2225]">Create Storyboard</p>
+            <p className="text-xs text-[#6B7280] mt-0.5">Build an itinerary to showcase or share</p>
+          </div>
+        </Link>
+        <Link
+          to="/storyboards"
+          className="group flex items-center gap-4 rounded-2xl border border-[#E5DFC6] bg-white px-6 py-5 hover:border-[#C7A962]/50 hover:shadow-sm transition-all"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#C7A962]/10 text-[#C7A962] group-hover:bg-[#C7A962] group-hover:text-white transition-colors">
+            <BookOpen className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-[#0a2225]">My Storyboards</p>
+            <p className="text-xs text-[#6B7280] mt-0.5">Manage and publish your trip boards</p>
+          </div>
+        </Link>
       </div>
 
       {/* Open Trip Requests Banner */}
