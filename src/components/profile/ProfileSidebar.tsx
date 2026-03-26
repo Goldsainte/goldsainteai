@@ -188,37 +188,8 @@ export function ProfileSidebar({
         </div>
       </div>
 
-      {/* Social links */}
-      {socialLinks.length > 0 && (
-        <div className="rounded-2xl border border-[#E5DFC6] bg-white p-5">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-3">
-            Social
-          </h3>
-          <div className="space-y-2">
-            {socialLinks.map((link) => (
-              <a
-                key={link.platform}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm text-[#0a2225] hover:text-[#0c4d47] transition-colors"
-              >
-                <span className="text-[#6B7280]">{link.platform}</span>
-                <span className="font-medium">@{link.handle}</span>
-                {link.followersCount != null && link.followersCount > 0 && (
-                  <span className="text-[#C7A962] text-xs ml-auto">
-                    {link.followersCount >= 1_000_000
-                      ? `${(link.followersCount / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`
-                      : link.followersCount >= 1_000
-                      ? `${(link.followersCount / 1_000).toFixed(1).replace(/\.0$/, "")}K`
-                      : link.followersCount}
-                  </span>
-                )}
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
+
+
 
       {/* Trust & Safety */}
       {showTrustBadges && (
