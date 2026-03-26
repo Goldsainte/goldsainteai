@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { ArrowLeft, PenLine, LogIn, Settings, Sparkles } from "lucide-react";
+import { ArrowLeft, PenLine, LogIn, Settings, Sparkles, Clock, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileHero } from "@/components/profile/ProfileHero";
 import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
@@ -10,7 +10,7 @@ import { ReviewsList } from "@/components/profile/ReviewsList";
 import { WriteReviewModal } from "@/components/profile/WriteReviewModal";
 import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
 import { CreatorTrustSection } from "@/components/creator/CreatorTrustSection";
-import { CreatorSocialInline } from "@/components/creator/CreatorSocialInline";
+import { CreatorSocialCards } from "@/components/creator/CreatorSocialCards";
 import { CreatorStoryboardGrid } from "@/components/creator/CreatorStoryboardGrid";
 
 import { Button } from "@/components/ui/button";
@@ -168,6 +168,7 @@ export default function CreatorPublicProfilePage() {
   }
 
   const displayName = creator.display_name || creator.full_name || "Goldsainte Creator";
+  const firstName = (creator.display_name || creator.full_name || "").split(" ")[0] || displayName;
 
   const nichePart = creator.creator_niches?.length
     ? `Custom ${creator.creator_niches.slice(0, 2).join(" & ").toLowerCase()} travel planning`
@@ -179,42 +180,31 @@ export default function CreatorPublicProfilePage() {
 
   const specialties = creatorData?.specialties || creator.content_style_tags || creator.creator_niches || [];
   const travelStyles = creatorData?.travel_styles || [];
+  const bestFor = creatorData?.best_for || [];
   const bio = creator.bio || creatorData?.bio;
   const tagline = creator.travel_philosophy;
-  const lastActive = creator.last_seen_at || creatorData?.updated_at;
-
-  const socialLinks = socialAccounts.length > 0
-    ? socialAccounts.map((s: any) => ({
-        platform: s.platform.charAt(0).toUpperCase() + s.platform.slice(1),
-        handle: s.handle,
-        url: s.profile_url,
-        followersCount: s.followers_count,
-      }))
-    : [
-        creator.tiktok_handle && {
-          platform: "TikTok",
-          handle: creator.tiktok_handle,
-          url: `https://www.tiktok.com/@${creator.tiktok_handle}`,
-        },
-        creator.instagram_handle && {
-          platform: "Instagram",
-          handle: creator.instagram_handle,
-          url: `https://www.instagram.com/${creator.instagram_handle}`,
-        },
-      ].filter(Boolean) as { platform: string; handle: string; url: string; followersCount?: number }[];
 
   const followerDisplay = (creator.creator_followers ?? 0) > 0
     ? fmt(creator.creator_followers)
     : null;
 
-  const heroStats = [
-    followerDisplay
-      ? { label: "Followers", value: followerDisplay }
-      : { label: "Status", value: "New Creator" },
-    { label: "Avg Views", value: fmt(creator.creator_avg_views) },
-  ];
+  const responseTimeHours = creatorData?.response_time_hours;
+  const responseTimeText = responseTimeHours
+    ? responseTimeHours <= 1
+      ? "Responds within 1 hour"
+      : responseTimeHours <= 24
+      ? `Responds within ${responseTimeHours} hours`
+      : `Responds within ${Math.ceil(responseTimeHours / 24)} days`
+    : null;
 
   const handleRequestTrip = () => navigate(`/post-trip?fromCreator=${creator.id}`);
+
+  // How it works steps
+  const howItWorksSteps = [
+    { num: "01", title: "Share your vision", desc: "Tell us your destination, dates, and budget." },
+    { num: "02", title: "Get a personalized plan", desc: `${displayName} crafts your trip within 24–48 hours.` },
+    { num: "03", title: "Review & book", desc: "Refine your plan and book securely through Goldsainte." },
+  ];
 
   return (
     <>
@@ -251,7 +241,7 @@ export default function CreatorPublicProfilePage() {
           </div>
         </div>
 
-        {/* Hero */}
+        {/* Hero — 3-column structured header */}
         <ProfileHero
           name={displayName}
           coverImage={creator.cover_image_url || creator.featured_photos?.[0]}
@@ -261,69 +251,22 @@ export default function CreatorPublicProfilePage() {
           location={creator.location}
           tagline={tagline}
           serviceLine={serviceLine}
-          pills={creator.creator_niches?.slice(0, 4) || []}
+          pills={creator.creator_niches?.slice(0, 5) || []}
           rating={avgRating}
           reviewCount={reviewCount}
-          stats={heroStats}
+          followerDisplay={followerDisplay}
+          responseTimeText={responseTimeText}
+          targetUserId={isOwnProfile ? undefined : creator.id}
+          onRequestTrip={handleRequestTrip}
         />
 
-        {/* Editorial Intro — full-width above two-column */}
-        <div className="mx-auto max-w-6xl px-4 pt-12 pb-2">
-          <section>
-            <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-4">
-              About {displayName}
-            </h2>
-
-            <p className="text-[#0a2225] leading-relaxed max-w-3xl whitespace-pre-line">
-              {bio || "This creator hasn't added a bio yet, but their trips speak for themselves."}
-            </p>
-
-            {/* Specialties + Travel Styles as refined pills */}
-            {(specialties.length > 0 || travelStyles.length > 0) && (
-              <div className="mt-6 flex flex-wrap gap-2">
-                {specialties.map((s) => (
-                  <span
-                    key={s}
-                    className="rounded-full border border-[#E5DFC6] bg-white px-3.5 py-1.5 text-xs font-medium text-[#0a2225]"
-                  >
-                    {s}
-                  </span>
-                ))}
-                {travelStyles.map((s) => (
-                  <span
-                    key={s}
-                    className="rounded-full border border-[#C7A962]/30 bg-[#C7A962]/10 px-3.5 py-1.5 text-xs font-medium text-[#0a2225]"
-                  >
-                    {s}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {/* Social reach — subtle inline */}
-            <CreatorSocialInline accounts={socialAccounts} />
-
-            {/* Empty state */}
-            {specialties.length === 0 && travelStyles.length === 0 && !bio && (
-              <div className="mt-6 rounded-xl border border-dashed border-[#E5DFC6] bg-white/50 p-6 text-center">
-                <Sparkles className="h-5 w-5 text-[#C7A962] mx-auto mb-2" />
-                <p className="text-sm text-[#6B7280]">
-                  This creator is building their profile — stay tuned.
-                </p>
-              </div>
-            )}
-
-            {/* Gold divider */}
-            <div className="mt-8 border-t border-[#E5DFC6]" />
-          </section>
-        </div>
-
         {/* Two-column layout */}
-        <div className="mx-auto max-w-6xl px-4 py-8">
+        <div className="mx-auto max-w-6xl px-4 py-10">
           <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
             {/* Left column */}
-            <div className="space-y-12">
-              {/* Storyboards — primary content section */}
+            <div className="space-y-14">
+
+              {/* 1. Storyboards — primary content */}
               <CreatorStoryboardGrid
                 storyboards={creatorStoryboards}
                 displayName={displayName}
@@ -331,7 +274,61 @@ export default function CreatorPublicProfilePage() {
                 onRequestTrip={handleRequestTrip}
               />
 
-              {/* Gallery */}
+              {/* 2. How It Works — inline, not card component */}
+              <section>
+                <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-6">
+                  How It Works
+                </h2>
+                <div className="grid gap-6 sm:grid-cols-3">
+                  {howItWorksSteps.map((step) => (
+                    <div key={step.num}>
+                      <span className="font-secondary text-2xl font-bold text-[#C7A962]">{step.num}</span>
+                      <h3 className="text-sm font-semibold text-[#0a2225] mt-2 mb-1">{step.title}</h3>
+                      <p className="text-xs text-[#6B7280] leading-relaxed">{step.desc}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-[#6B7280]">
+                  <span className="inline-flex items-center gap-1.5">
+                    <Clock className="h-3.5 w-3.5 text-[#C7A962]" />
+                    Takes 2 minutes · No commitment
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <ShieldCheck className="h-3.5 w-3.5 text-[#0c4d47]" />
+                    Response within 24 hours
+                  </span>
+                </div>
+              </section>
+
+              {/* 3. Social Presence */}
+              {socialAccounts.length > 0 && (
+                <CreatorSocialCards accounts={socialAccounts} />
+              )}
+
+              {/* 4. Conversion Section */}
+              <section className="rounded-2xl border border-[#E5DFC6] bg-white p-8 md:p-10 text-center">
+                <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-3">
+                  Start Your Journey With {firstName}
+                </h2>
+                <p className="text-sm text-[#6B7280] max-w-lg mx-auto mb-6 leading-relaxed">
+                  Not sure where to go? {firstName} will design a personalized trip based on your style, budget, and preferences.
+                </p>
+                <Button
+                  onClick={handleRequestTrip}
+                  className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-xl px-8 h-12 text-base font-medium"
+                >
+                  Get Your Custom Itinerary
+                </Button>
+                <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-xs text-[#6B7280]">
+                  <span>Takes 2 minutes</span>
+                  <span className="text-[#E5DFC6]">·</span>
+                  <span>No commitment</span>
+                  <span className="text-[#E5DFC6]">·</span>
+                  <span>Delivered in 24–48 hours</span>
+                </div>
+              </section>
+
+              {/* 5. From My Travels (Gallery) */}
               <CreatorMediaGallery
                 creatorId={creator.id}
                 fallbackPhotos={creator.featured_photos}
@@ -339,7 +336,71 @@ export default function CreatorPublicProfilePage() {
                 isOwnProfile={isOwnProfile}
               />
 
-              {/* Credentials */}
+              {/* 6. Meet Your Creator */}
+              <section>
+                <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-4">
+                  Meet {firstName}
+                </h2>
+                <p className="text-[#0a2225] leading-relaxed max-w-3xl whitespace-pre-line">
+                  {bio || "This creator hasn't added a bio yet, but their trips speak for themselves."}
+                </p>
+
+                {/* Trips I Love Planning */}
+                {specialties.length > 0 && (
+                  <div className="mt-6">
+                    <h3 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-3">
+                      Trips I Love Planning
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {specialties.map((s) => (
+                        <span
+                          key={s}
+                          className="rounded-full border border-[#E5DFC6] bg-white px-3.5 py-1.5 text-xs font-medium text-[#0a2225]"
+                        >
+                          {s}
+                        </span>
+                      ))}
+                      {travelStyles.map((s) => (
+                        <span
+                          key={s}
+                          className="rounded-full border border-[#C7A962]/30 bg-[#C7A962]/10 px-3.5 py-1.5 text-xs font-medium text-[#0a2225]"
+                        >
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Best For Travelers Who… */}
+                {bestFor.length > 0 && (
+                  <div className="mt-6">
+                    <h3 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-3">
+                      Best For Travelers Who…
+                    </h3>
+                    <ul className="space-y-2">
+                      {bestFor.map((item) => (
+                        <li key={item} className="flex items-start gap-2.5">
+                          <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-[#C7A962] flex-shrink-0" />
+                          <span className="text-sm text-[#0a2225]">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Empty state */}
+                {specialties.length === 0 && travelStyles.length === 0 && !bio && (
+                  <div className="mt-6 rounded-xl border border-dashed border-[#E5DFC6] bg-white/50 p-6 text-center">
+                    <Sparkles className="h-5 w-5 text-[#C7A962] mx-auto mb-2" />
+                    <p className="text-sm text-[#6B7280]">
+                      This creator is building their profile — stay tuned.
+                    </p>
+                  </div>
+                )}
+              </section>
+
+              {/* 7. Trust & Credentials */}
               <CreatorTrustSection
                 yearsExperience={creatorData?.years_experience}
                 tripsCompleted={creatorData?.trips_completed}
@@ -348,13 +409,13 @@ export default function CreatorPublicProfilePage() {
                 isVerified
               />
 
-              {/* Trips */}
+              {/* 8. Trips */}
               <ProfileTripsGrid
                 creatorId={creator.id}
                 creatorType="creator"
               />
 
-              {/* Reviews */}
+              {/* 9. Reviews */}
               <section>
                 <div className="flex items-center justify-between mb-5">
                   <h2 className="font-secondary text-xl text-[#0a2225]">
@@ -401,9 +462,9 @@ export default function CreatorPublicProfilePage() {
                 reviewCount={reviewCount}
                 targetUserId={isOwnProfile ? undefined : creator.id}
                 storyboards={creatorStoryboards}
-                socialLinks={socialLinks}
+                socialLinks={[]}
                 website={creator.website}
-                lastActiveAt={lastActive}
+                lastActiveAt={creator.last_seen_at || creatorData?.updated_at}
                 responseTimeHours={creatorData?.response_time_hours}
                 onRequestTrip={handleRequestTrip}
                 onSaveToStoryboard={() =>
