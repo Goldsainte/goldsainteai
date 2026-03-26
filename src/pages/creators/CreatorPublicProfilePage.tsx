@@ -11,6 +11,7 @@ import { WriteReviewModal } from "@/components/profile/WriteReviewModal";
 import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
 import { CreatorTrustSection } from "@/components/creator/CreatorTrustSection";
 import { CreatorSocialInline } from "@/components/creator/CreatorSocialInline";
+import { CreatorStoryboardGrid } from "@/components/creator/CreatorStoryboardGrid";
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -93,17 +94,22 @@ export default function CreatorPublicProfilePage() {
           .order("sort_order", { ascending: true }),
         supabase
           .from("storyboards")
-          .select("id, title, cover_image_url, destination, tags, view_count, created_at")
+          .select("id, title, description, cover_image_url, destination, tags, view_count, created_at, storyboard_items(count)")
           .eq("owner_id", id)
           .eq("is_public", true)
           .order("updated_at", { ascending: false })
-          .limit(5),
+          .limit(8),
       ]);
 
       setCreator(profileRes.data as CreatorProfile | null);
       setCreatorData(creatorProfileRes.data as CreatorProfileData | null);
       setSocialAccounts(socialsRes.data || []);
-      setCreatorStoryboards(storyboardsRes.data || []);
+      setCreatorStoryboards(
+        (storyboardsRes.data || []).map((sb: any) => ({
+          ...sb,
+          items_count: sb.storyboard_items?.[0]?.count || 0,
+        }))
+      );
 
       const reviews = reviewsRes.data;
       if (reviews && reviews.length > 0) {
@@ -317,46 +323,13 @@ export default function CreatorPublicProfilePage() {
           <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
             {/* Left column */}
             <div className="space-y-12">
-              {/* Featured Storyboards — large cards */}
-              {creatorStoryboards.length > 0 && (
-                <section>
-                  <h2 className="font-secondary text-xl text-[#0a2225] mb-5">
-                    Featured Storyboards
-                  </h2>
-                  <div className="grid gap-5 sm:grid-cols-2">
-                    {creatorStoryboards.slice(0, 4).map((sb) => (
-                      <a
-                        key={sb.id}
-                        href={`/storyboards/${sb.id}`}
-                        className="group block rounded-xl border border-[#E5DFC6] bg-white overflow-hidden transition-all hover:shadow-md hover:border-[#C7A962]/40"
-                      >
-                        <div className="aspect-[4/3] bg-[#E5DFC6] overflow-hidden">
-                          {sb.cover_image_url ? (
-                            <img
-                              src={sb.cover_image_url}
-                              alt={sb.title}
-                              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                              loading="lazy"
-                            />
-                          ) : (
-                            <div className="h-full w-full flex items-center justify-center">
-                              <span className="text-[#7A7151] text-sm">No cover</span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="p-4">
-                          <h3 className="font-secondary text-base text-[#0a2225] group-hover:text-[#0c4d47] transition-colors">
-                            {sb.title}
-                          </h3>
-                          {sb.destination && (
-                            <p className="text-xs text-[#6B7280] mt-1">{sb.destination}</p>
-                          )}
-                        </div>
-                      </a>
-                    ))}
-                  </div>
-                </section>
-              )}
+              {/* Storyboards — primary content section */}
+              <CreatorStoryboardGrid
+                storyboards={creatorStoryboards}
+                displayName={displayName}
+                creatorId={creator.id}
+                onRequestTrip={handleRequestTrip}
+              />
 
               {/* Gallery */}
               <CreatorMediaGallery
