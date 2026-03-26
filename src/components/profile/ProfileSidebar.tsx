@@ -112,6 +112,9 @@ export function ProfileSidebar({
         >
           Get Custom Itinerary
         </Button>
+        <p className="text-center text-xs text-[#6B7280] mt-2">
+          Takes 2 minutes · No commitment
+        </p>
 
         {/* Rating inline */}
         {rating != null && rating > 0 && (
