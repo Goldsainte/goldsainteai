@@ -53,6 +53,7 @@ export function SaveToStoryboardModal({
   repinnedFromUserId,
   onSaveComplete,
 }: SaveToStoryboardModalProps) {
+  const queryClient = useQueryClient();
   const [boards, setBoards] = useState<BoardOption[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState<string | null>(null);
@@ -109,6 +110,8 @@ export function SaveToStoryboardModal({
         },
       });
       toast.success("Saved to storyboard!");
+      queryClient.invalidateQueries({ queryKey: ["storyboards"] });
+      queryClient.invalidateQueries({ queryKey: ["storyboard-items"] });
       onSaveComplete?.();
       onOpenChange(false);
     } catch {
