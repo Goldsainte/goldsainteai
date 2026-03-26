@@ -92,11 +92,12 @@ export default function CreatorPublicProfilePage() {
   const [newBoardDescription, setNewBoardDescription] = useState("");
   const [newBoardDestination, setNewBoardDestination] = useState("");
   const [creating, setCreating] = useState(false);
+  const [socialAccounts, setSocialAccounts] = useState<{ platform: string; handle: string; profile_url: string; followers_count: number }[]>([]);
 
   useEffect(() => {
     if (!id) return;
     (async () => {
-      const [profileRes, creatorProfileRes, reviewsRes, storyboardsRes, mediaCountRes] = await Promise.all([
+      const [profileRes, creatorProfileRes, reviewsRes, storyboardsRes, mediaCountRes, socialRes] = await Promise.all([
         supabase
           .from("profiles")
           .select(
@@ -130,6 +131,11 @@ export default function CreatorPublicProfilePage() {
           .from("creator_media")
           .select("id", { count: "exact", head: true })
           .eq("user_id", id),
+        supabase
+          .from("creator_social_accounts")
+          .select("platform, handle, profile_url, followers_count")
+          .eq("user_id", id)
+          .order("sort_order", { ascending: true }),
       ]);
 
       setCreator(profileRes.data as CreatorProfile | null);
@@ -164,6 +170,7 @@ export default function CreatorPublicProfilePage() {
       }
       setPinItems(allPins);
       setMediaCount(mediaCountRes.count || 0);
+      setSocialAccounts((socialRes.data || []) as { platform: string; handle: string; profile_url: string; followers_count: number }[]);
 
       const reviews = reviewsRes.data;
       if (reviews && reviews.length > 0) {
@@ -316,6 +323,8 @@ export default function CreatorPublicProfilePage() {
           avatarUrl={creator.avatar_url}
           isVerified
           bio={bio}
+          specialties={specialties}
+          socialAccounts={socialAccounts}
           followerDisplay={followerDisplay}
           storyboardCount={creatorStoryboards.length}
           postCount={mediaCount}
@@ -402,35 +411,6 @@ export default function CreatorPublicProfilePage() {
           </div>
         </div>
 
-        {/* Meet the Creator */}
-        {bio && (
-          <div className="bg-white">
-            <div className="mx-auto max-w-5xl px-4 py-16 md:py-24">
-              <GoldDivider />
-              <div className="mt-10 text-center max-w-2xl mx-auto">
-                <p className="font-primary text-sm uppercase tracking-[0.25em] text-[#C7A962] mb-4">About</p>
-                <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-5">
-                  Meet {firstName}
-                </h2>
-                <p className="font-primary text-base text-[#6B7280] leading-relaxed line-clamp-4">
-                  {bio}
-                </p>
-                {specialties.length > 0 && (
-                  <div className="flex flex-wrap justify-center gap-2 mt-6">
-                    {specialties.slice(0, 6).map((s) => (
-                      <span
-                        key={s}
-                        className="text-[10px] font-medium uppercase tracking-wider text-[#6B7280] border border-[#E5DFC6] rounded-full px-3 py-1"
-                      >
-                        {s}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Reviews */}
         {reviewCount > 0 && (
