@@ -335,15 +335,7 @@ export async function getStoryboardBySlug(slugOrId: string): Promise<Storyboard 
 
 // Increment view count
 export async function incrementStoryboardViewCount(id: string): Promise<void> {
-  await supabase.rpc("increment_counter", { row_id: id, table_name: "storyboards", column_name: "view_count" }).catch(() => {
-    // Fallback: direct update
-    supabase
-      .from("storyboards")
-      .update({ view_count: undefined as any }) // use raw SQL via rpc instead
-      .eq("id", id);
-  });
-
-  // Simple direct increment via raw approach
+  // Simple direct increment
   const { data } = await supabase
     .from("storyboards")
     .select("view_count")

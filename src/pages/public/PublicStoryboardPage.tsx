@@ -360,7 +360,7 @@ export default function PublicStoryboardPage() {
       {saveModal.open && (
         <SaveToStoryboardModal
           open={saveModal.open}
-          onClose={() => setSaveModal({ open: false, imageUrl: "" })}
+          onOpenChange={(open) => { if (!open) setSaveModal({ open: false, imageUrl: "" }); }}
           imageUrl={saveModal.imageUrl}
           title={saveModal.title}
           sourceType={saveModal.sourceType}
