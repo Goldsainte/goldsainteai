@@ -313,7 +313,10 @@ export default function CreatorPublicProfilePage() {
         {remainingStoryboards.length > 0 && (
           <div className="bg-white">
             <div className="mx-auto max-w-5xl px-4 py-16 md:py-24">
-              <SectionLabel>Curated Experiences</SectionLabel>
+              <SectionLabel>Explore Travel Ideas</SectionLabel>
+              <p className="font-primary text-sm text-[#6B7280] -mt-4 mb-8 max-w-lg">
+                Curated travel storyboards by {firstName} — visual collections of destinations, experiences, and moments that inspire your next journey.
+              </p>
               <CreatorStoryboardGrid
                 storyboards={remainingStoryboards}
                 displayName={displayName}
