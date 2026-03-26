@@ -400,7 +400,8 @@ export default function CreatorPublicProfilePage() {
         {/* From My Travels — Media gallery */}
         <div className="bg-[#FDF9F0]">
           <div className="mx-auto max-w-5xl px-4 py-16 md:py-24">
-            <SectionLabel>From My Travels</SectionLabel>
+            <SectionLabel>My Top Trip Highlights</SectionLabel>
+            <p className="text-xs font-semibold tracking-[0.25em] uppercase text-[#C7A962] mt-2 mb-6">Trips Gallery</p>
             <CreatorMediaGallery
               creatorId={creator.id}
               fallbackPhotos={creator.featured_photos}
