@@ -177,7 +177,14 @@ export default function CreatorPublicProfilePage() {
 
       setLoading(false);
     })();
-  }, [id, user, reviewRefreshKey]);
+   }, [id, user, reviewRefreshKey]);
+
+  // Listen for storyboard-updated events from SaveToStoryboardModal
+  useEffect(() => {
+    const handler = () => setReviewRefreshKey((k) => k + 1);
+    window.addEventListener("storyboard-updated", handler);
+    return () => window.removeEventListener("storyboard-updated", handler);
+  }, []);
 
   const handleCreateStoryboard = async () => {
     if (!user || !newBoardTitle.trim()) return;

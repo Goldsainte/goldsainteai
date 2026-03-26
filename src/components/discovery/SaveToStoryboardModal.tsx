@@ -112,6 +112,7 @@ export function SaveToStoryboardModal({
       toast.success("Saved to storyboard!");
       queryClient.invalidateQueries({ queryKey: ["storyboards"] });
       queryClient.invalidateQueries({ queryKey: ["storyboard-items"] });
+      window.dispatchEvent(new Event("storyboard-updated"));
       onSaveComplete?.();
       onOpenChange(false);
     } catch {

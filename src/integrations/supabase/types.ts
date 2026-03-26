@@ -9123,8 +9123,45 @@ export type Database = {
           },
         ]
       }
+      storyboard_collaborators: {
+        Row: {
+          accepted_at: string | null
+          id: string
+          invited_at: string
+          role: string
+          storyboard_id: string
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          id?: string
+          invited_at?: string
+          role?: string
+          storyboard_id: string
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string | null
+          id?: string
+          invited_at?: string
+          role?: string
+          storyboard_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "storyboard_collaborators_storyboard_id_fkey"
+            columns: ["storyboard_id"]
+            isOneToOne: false
+            referencedRelation: "storyboards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       storyboard_items: {
         Row: {
+          bookable_product_id: string | null
+          bookable_product_type: string | null
           created_at: string
           description: string | null
           id: string
@@ -9134,6 +9171,7 @@ export type Database = {
           position: number
           repinned_from_item_id: string | null
           repinned_from_user_id: string | null
+          section_id: string | null
           source_id: string | null
           source_type: string | null
           storyboard_id: string
@@ -9142,6 +9180,8 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          bookable_product_id?: string | null
+          bookable_product_type?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -9151,6 +9191,7 @@ export type Database = {
           position?: number
           repinned_from_item_id?: string | null
           repinned_from_user_id?: string | null
+          section_id?: string | null
           source_id?: string | null
           source_type?: string | null
           storyboard_id: string
@@ -9159,6 +9200,8 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          bookable_product_id?: string | null
+          bookable_product_type?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -9168,6 +9211,7 @@ export type Database = {
           position?: number
           repinned_from_item_id?: string | null
           repinned_from_user_id?: string | null
+          section_id?: string | null
           source_id?: string | null
           source_type?: string | null
           storyboard_id?: string
@@ -9181,6 +9225,13 @@ export type Database = {
             columns: ["repinned_from_item_id"]
             isOneToOne: false
             referencedRelation: "storyboard_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "storyboard_items_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "storyboard_sections"
             referencedColumns: ["id"]
           },
           {
@@ -9231,6 +9282,47 @@ export type Database = {
         }
         Relationships: []
       }
+      storyboard_sections: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          position: number
+          section_type: string
+          storyboard_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          position?: number
+          section_type?: string
+          storyboard_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          position?: number
+          section_type?: string
+          storyboard_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "storyboard_sections_storyboard_id_fkey"
+            columns: ["storyboard_id"]
+            isOneToOne: false
+            referencedRelation: "storyboards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       storyboards: {
         Row: {
           accommodation_style: string | null
@@ -9246,6 +9338,7 @@ export type Database = {
           destination: string | null
           end_date: string | null
           flexibility: string | null
+          forked_count: number
           id: string
           interests: string[] | null
           is_public: boolean
@@ -9282,6 +9375,7 @@ export type Database = {
           destination?: string | null
           end_date?: string | null
           flexibility?: string | null
+          forked_count?: number
           id?: string
           interests?: string[] | null
           is_public?: boolean
@@ -9318,6 +9412,7 @@ export type Database = {
           destination?: string | null
           end_date?: string | null
           flexibility?: string | null
+          forked_count?: number
           id?: string
           interests?: string[] | null
           is_public?: boolean
