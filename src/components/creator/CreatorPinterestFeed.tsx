@@ -1,10 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { Plus, X, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CATEGORY_KEYWORDS } from "@/components/ui/CategoryChips";
 import { RefinementChips } from "@/components/discovery/RefinementChips";
 import { DiscoveryFeed } from "@/components/discovery/DiscoveryFeed";
+import { DiscoveryWelcomeModal } from "@/components/discovery/DiscoveryWelcomeModal";
+import { DiscoveryTooltipTour } from "@/components/discovery/DiscoveryTooltipTour";
+import { useDiscoveryMilestone } from "@/hooks/useDiscoveryMilestone";
+
+const ONBOARDED_KEY = "goldsainte_discovery_onboarded";
+const INSTRUCTION_DISMISSED_KEY = "goldsainte_instruction_dismissed";
 
 export interface PinItem {
   id: string;
@@ -44,6 +50,16 @@ export function CreatorPinterestFeed({
   const navigate = useNavigate();
   const [activeBoard, setActiveBoard] = useState<string | null>(null);
   const [refinementPath, setRefinementPath] = useState<string[]>([]);
+  const { recordSave } = useDiscoveryMilestone();
+
+  // Onboarding state
+  const [showWelcome, setShowWelcome] = useState(
+    () => localStorage.getItem(ONBOARDED_KEY) !== "true"
+  );
+  const [tourReady, setTourReady] = useState(false);
+  const [instructionDismissed, setInstructionDismissed] = useState(
+    () => localStorage.getItem(INSTRUCTION_DISMISSED_KEY) === "true"
+  );
 
   const activeCategory = refinementPath[0] || "All";
 
@@ -51,12 +67,7 @@ export function CreatorPinterestFeed({
     if (activeBoard && item.storyboard_id !== activeBoard) return false;
     if (activeCategory !== "All") {
       const keywords = CATEGORY_KEYWORDS[activeCategory] || [];
-      const haystack = [
-        item.title,
-        item.subtitle,
-        item.storyboard_title,
-        item.storyboard_destination,
-      ]
+      const haystack = [item.title, item.subtitle, item.storyboard_title, item.storyboard_destination]
         .filter(Boolean)
         .join(" ")
         .toLowerCase();
@@ -65,22 +76,29 @@ export function CreatorPinterestFeed({
     return true;
   });
 
+  function handleWelcomeDismiss() {
+    setShowWelcome(false);
+    localStorage.setItem(ONBOARDED_KEY, "true");
+    setTourReady(true);
+  }
+
+  function handleDismissInstruction() {
+    setInstructionDismissed(true);
+    localStorage.setItem(INSTRUCTION_DISMISSED_KEY, "true");
+  }
+
   function handleSetTopCategory(cat: string) {
     setRefinementPath([cat]);
   }
-
   function handleAddRefinement(term: string) {
     setRefinementPath((prev) => [...prev, term]);
   }
-
   function handlePopToIndex(index: number) {
     setRefinementPath((prev) => prev.slice(0, index));
   }
-
   function handleReset() {
     setRefinementPath([]);
   }
-
   function handleMoreLikeThis(tags: string[]) {
     setRefinementPath((prev) => {
       const combined = [...prev, ...tags.filter((t) => !prev.some((p) => p.toLowerCase() === t.toLowerCase()))];
@@ -91,6 +109,9 @@ export function CreatorPinterestFeed({
   if (items.length === 0 && refinementPath.length === 0) {
     return (
       <div>
+        <DiscoveryWelcomeModal open={showWelcome} onDismiss={handleWelcomeDismiss} />
+        <DiscoveryTooltipTour run={tourReady} onFinish={() => setTourReady(false)} />
+
         <RefinementChips
           refinementPath={refinementPath}
           onSetTopCategory={handleSetTopCategory}
@@ -100,12 +121,28 @@ export function CreatorPinterestFeed({
           className="mb-2"
         />
 
+        {/* Inline instruction bar */}
+        {!instructionDismissed && (
+          <div className="flex items-center justify-between bg-accent/50 rounded-full px-4 py-2 mb-4">
+            <p className="text-xs text-muted-foreground flex items-center gap-2">
+              <span className="font-medium text-foreground">Browse</span>
+              <ArrowRight className="h-3 w-3" />
+              <span className="font-medium text-foreground">Save</span>
+              <ArrowRight className="h-3 w-3" />
+              <span className="font-medium text-foreground">Build your trip</span>
+            </p>
+            <button onClick={handleDismissInstruction} className="text-muted-foreground hover:text-foreground transition-colors">
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
+
         {refinementPath.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-[#E5DFC6] bg-white/60 p-12 text-center">
-            <p className="font-secondary text-lg text-[#0a2225] mb-2">
+          <div className="rounded-2xl border border-dashed border-border bg-background/60 p-12 text-center">
+            <p className="font-secondary text-lg text-foreground mb-2">
               {isOwnProfile ? "Create your first storyboard" : "No inspiration yet"}
             </p>
-            <p className="text-sm text-[#6B7280] mb-6 max-w-md mx-auto">
+            <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
               {isOwnProfile
                 ? "Pin photos, places, and experiences to build visual travel collections that inspire your audience."
                 : "This creator hasn't published any travel pins yet — check back soon."}
@@ -113,7 +150,7 @@ export function CreatorPinterestFeed({
             {isOwnProfile && onCreateNew && (
               <Button
                 onClick={onCreateNew}
-                className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-8 h-11"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-8 h-11"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 New Storyboard
@@ -125,6 +162,7 @@ export function CreatorPinterestFeed({
             refinementPath={refinementPath}
             onMoreLikeThis={handleMoreLikeThis}
             creatorId={creatorId}
+            onSaveComplete={recordSave}
           />
         )}
       </div>
@@ -133,6 +171,9 @@ export function CreatorPinterestFeed({
 
   return (
     <div>
+      <DiscoveryWelcomeModal open={showWelcome} onDismiss={handleWelcomeDismiss} />
+      <DiscoveryTooltipTour run={tourReady} onFinish={() => setTourReady(false)} />
+
       {/* Refinement discovery chips */}
       <RefinementChips
         refinementPath={refinementPath}
@@ -143,14 +184,30 @@ export function CreatorPinterestFeed({
         className="mb-2"
       />
 
+      {/* Inline instruction bar */}
+      {!instructionDismissed && (
+        <div className="flex items-center justify-between bg-accent/50 rounded-full px-4 py-2 mb-4">
+          <p className="text-xs text-muted-foreground flex items-center gap-2">
+            <span className="font-medium text-foreground">Browse</span>
+            <ArrowRight className="h-3 w-3" />
+            <span className="font-medium text-foreground">Save</span>
+            <ArrowRight className="h-3 w-3" />
+            <span className="font-medium text-foreground">Build your trip</span>
+          </p>
+          <button onClick={handleDismissInstruction} className="text-muted-foreground hover:text-foreground transition-colors">
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
+
       {/* Board filter pills */}
       <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 scrollbar-hide">
         <button
           onClick={() => setActiveBoard(null)}
           className={`shrink-0 px-4 py-1.5 rounded-full text-xs font-medium tracking-wide transition-all ${
             activeBoard === null
-              ? "bg-[#C7A962] text-white shadow-sm"
-              : "bg-white border border-[#E5DFC6] text-[#6B7280] hover:border-[#C7A962] hover:text-[#0a2225]"
+              ? "bg-primary text-primary-foreground shadow-sm"
+              : "bg-background border border-border text-muted-foreground hover:border-primary hover:text-foreground"
           }`}
         >
           All
@@ -161,20 +218,18 @@ export function CreatorPinterestFeed({
             onClick={() => setActiveBoard(sb.id)}
             className={`shrink-0 px-4 py-1.5 rounded-full text-xs font-medium tracking-wide transition-all ${
               activeBoard === sb.id
-                ? "bg-[#C7A962] text-white shadow-sm"
-                : "bg-white border border-[#E5DFC6] text-[#6B7280] hover:border-[#C7A962] hover:text-[#0a2225]"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "bg-background border border-border text-muted-foreground hover:border-primary hover:text-foreground"
             }`}
           >
             {sb.title}
-            {isOwnProfile && !sb.is_public && (
-              <span className="ml-1 opacity-60">· Draft</span>
-            )}
+            {isOwnProfile && !sb.is_public && <span className="ml-1 opacity-60">· Draft</span>}
           </button>
         ))}
         {isOwnProfile && onCreateNew && (
           <button
             onClick={onCreateNew}
-            className="shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border-2 border-dashed border-[#E5DFC6] text-[#C7A962] hover:border-[#C7A962] transition-all flex items-center gap-1"
+            className="shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border-2 border-dashed border-border text-primary hover:border-primary transition-all flex items-center gap-1"
           >
             <Plus className="h-3 w-3" />
             New Board
@@ -185,12 +240,10 @@ export function CreatorPinterestFeed({
       {/* Discovery feed with creator pins mixed in */}
       <DiscoveryFeed
         refinementPath={refinementPath}
-        creatorPins={filteredItems.map((item) => ({
-          ...item,
-          owner_id: creatorId,
-        }))}
+        creatorPins={filteredItems.map((item) => ({ ...item, owner_id: creatorId }))}
         onMoreLikeThis={handleMoreLikeThis}
         creatorId={creatorId}
+        onSaveComplete={recordSave}
       />
     </div>
   );
