@@ -1,0 +1,1 @@
+ALTER TABLE public.creator_media ADD COLUMN is_cover BOOLEAN DEFAULT false;
