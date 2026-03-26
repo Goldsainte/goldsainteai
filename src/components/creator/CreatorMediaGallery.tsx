@@ -119,7 +119,7 @@ export function CreatorMediaGallery({
         {items.map((item) => (
           <div
             key={item.id}
-            className="relative rounded-xl overflow-hidden bg-[#E5DFC6]/30 break-inside-avoid cursor-pointer group"
+            className={`relative overflow-hidden bg-[#E5DFC6]/30 cursor-pointer group ${useIgGrid ? "aspect-square" : "rounded-xl break-inside-avoid"}`}
             onClick={() => {
               if (item.media_type === "video") {
                 if (item.external_url) {
@@ -136,7 +136,7 @@ export function CreatorMediaGallery({
                 <img
                   src={item.url}
                   alt={item.caption || "Photo"}
-                  className="w-full object-cover"
+                  className={`w-full object-cover ${useIgGrid ? "h-full" : ""}`}
                   loading="lazy"
                 />
                 {item.is_cover && (
