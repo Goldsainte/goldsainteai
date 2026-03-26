@@ -13770,6 +13770,10 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      is_storyboard_collaborator: {
+        Args: { storyboard_uuid: string; user_uuid: string }
+        Returns: boolean
+      }
       is_super_admin: { Args: { p_user_id?: string }; Returns: boolean }
       is_trip_member: {
         Args: { p_status?: string; p_trip_id: string; p_user_id: string }
