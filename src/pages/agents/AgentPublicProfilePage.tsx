@@ -153,14 +153,9 @@ export default function AgentPublicProfilePage() {
         {/* Hero */}
         <ProfileHero
           name={displayName}
-          coverImage={agent.featured_photos?.[0]}
           avatarUrl={agent.avatar_url}
           isVerified={isVerified}
-          verifiedLabel="Verified Agent"
-          location={agent.location}
-          pills={allSpecialties.slice(0, 4)}
-          rating={details?.rating}
-          reviewCount={details?.total_reviews}
+          bio={agent.location}
         />
 
         {/* Two-column layout */}

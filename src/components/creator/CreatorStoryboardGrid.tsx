@@ -17,9 +17,10 @@ interface Props {
   displayName: string;
   creatorId: string;
   onRequestTrip: () => void;
+  hideTitle?: boolean;
 }
 
-export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onRequestTrip }: Props) {
+export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onRequestTrip, hideTitle }: Props) {
   const navigate = useNavigate();
 
   const sectionTitle = `Travel Inspiration by ${displayName}`;
@@ -27,9 +28,11 @@ export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onR
   if (storyboards.length === 0) {
     return (
       <section>
-        <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-6">
-          {sectionTitle}
-        </h2>
+        {!hideTitle && (
+          <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-6">
+            {sectionTitle}
+          </h2>
+        )}
         <div className="rounded-xl border border-dashed border-[#E5DFC6] bg-white/60 p-10 text-center">
           <p className="font-secondary text-lg text-[#0a2225] mb-2">
             No storyboards yet
@@ -50,9 +53,11 @@ export function CreatorStoryboardGrid({ storyboards, displayName, creatorId, onR
 
   return (
     <section>
-      <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-6">
-        {sectionTitle}
-      </h2>
+      {!hideTitle && (
+        <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-6">
+          {sectionTitle}
+        </h2>
+      )}
 
       <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
         {storyboards.map((sb, idx) => {

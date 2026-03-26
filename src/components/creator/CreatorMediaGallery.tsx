@@ -19,6 +19,8 @@ interface CreatorMediaGalleryProps {
   fallbackPhotos?: string[] | null;
   instagramHandle?: string | null;
   isOwnProfile?: boolean;
+  hideTitle?: boolean;
+  useIgGrid?: boolean;
 }
 
 export function CreatorMediaGallery({
@@ -26,6 +28,8 @@ export function CreatorMediaGallery({
   fallbackPhotos,
   instagramHandle,
   isOwnProfile,
+  hideTitle,
+  useIgGrid,
 }: CreatorMediaGalleryProps) {
   const [items, setItems] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,10 +53,10 @@ export function CreatorMediaGallery({
   if (items.length === 0 && fallbackPhotos && fallbackPhotos.length > 0) {
     return (
       <section>
-        <h2 className="font-secondary text-xl text-[#0a2225] mb-5">From My Travels</h2>
-        <div className="columns-2 md:columns-3 gap-3 space-y-3">
+        {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">From My Travels</h2>}
+        <div className={useIgGrid ? "grid grid-cols-3 gap-1" : "columns-2 md:columns-3 gap-3 space-y-3"}>
           {fallbackPhotos.map((src) => (
-            <img key={src} src={src} alt="Content" className="w-full rounded-xl object-cover" loading="lazy" />
+            <img key={src} src={src} alt="Content" className={`w-full object-cover ${useIgGrid ? "aspect-square" : "rounded-xl"}`} loading="lazy" />
           ))}
         </div>
       </section>
@@ -64,7 +68,7 @@ export function CreatorMediaGallery({
     if (isOwnProfile) {
       return (
         <section>
-          <h2 className="font-secondary text-xl text-[#0a2225] mb-5">From My Travels</h2>
+          {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">From My Travels</h2>}
           <div className="rounded-xl border border-dashed border-[#E5DFC6] bg-white/50 p-8 text-center">
             <Instagram className="h-6 w-6 text-[#C7A962] mx-auto mb-3" />
             <p className="text-sm text-[#0a2225] mb-1">Add your content</p>
@@ -88,7 +92,7 @@ export function CreatorMediaGallery({
 
     return (
       <section>
-          <h2 className="font-secondary text-xl text-[#0a2225] mb-5">From My Travels</h2>
+          {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">From My Travels</h2>}
         <div className="rounded-xl border border-[#E5DFC6] bg-white p-6 text-center">
           <p className="text-sm text-[#6B7280]">
             Follow{" "}
@@ -110,12 +114,12 @@ export function CreatorMediaGallery({
   // Unified masonry grid — all media combined
   return (
     <section>
-      <h2 className="font-secondary text-xl text-[#0a2225] mb-5">From My Travels</h2>
-      <div className="columns-2 md:columns-3 gap-3 space-y-3">
+      {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">From My Travels</h2>}
+      <div className={useIgGrid ? "grid grid-cols-3 gap-1" : "columns-2 md:columns-3 gap-3 space-y-3"}>
         {items.map((item) => (
           <div
             key={item.id}
-            className="relative rounded-xl overflow-hidden bg-[#E5DFC6]/30 break-inside-avoid cursor-pointer group"
+            className={`relative overflow-hidden bg-[#E5DFC6]/30 cursor-pointer group ${useIgGrid ? "aspect-square" : "rounded-xl break-inside-avoid"}`}
             onClick={() => {
               if (item.media_type === "video") {
                 if (item.external_url) {
@@ -132,7 +136,7 @@ export function CreatorMediaGallery({
                 <img
                   src={item.url}
                   alt={item.caption || "Photo"}
-                  className="w-full object-cover"
+                  className={`w-full object-cover ${useIgGrid ? "h-full" : ""}`}
                   loading="lazy"
                 />
                 {item.is_cover && (
