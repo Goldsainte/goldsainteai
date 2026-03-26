@@ -45,7 +45,7 @@ export function RefinementChips({
             <button
               key={suggestion}
               onClick={() => onAddRefinement(suggestion)}
-              className="whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium tracking-wide transition-all duration-200 ease-out shrink-0 bg-white border border-[#E5DFC6] text-[#6B7280] hover:border-[#C7A962] hover:text-[#0a2225] hover:shadow-sm hover:-translate-y-px"
+              className="whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium tracking-wide transition-all duration-200 ease-out shrink-0 bg-white border border-[#E5DFC6] text-[#6B7280] hover:border-[#C7A962] hover:text-[#0a2225] hover:shadow-sm hover:-translate-y-px"
             >
               {suggestion}
             </button>
@@ -59,7 +59,7 @@ export function RefinementChips({
           {refinementPath.slice(1).map((term, i) => (
             <span
               key={`${term}-${i}`}
-              className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#0a2225] text-white text-xs font-medium animate-in fade-in slide-in-from-left-2 duration-200"
+              className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#0a2225] text-white text-sm font-medium animate-in fade-in slide-in-from-left-2 duration-200"
             >
               {term}
               <button
@@ -73,7 +73,7 @@ export function RefinementChips({
           {refinementPath.length > 2 && (
             <button
               onClick={() => onPopToIndex(1)}
-              className="px-3 py-1 rounded-full text-xs font-medium text-[#6B7280] hover:text-[#0a2225] transition-colors"
+              className="px-3 py-1 rounded-full text-sm font-medium text-[#6B7280] hover:text-[#0a2225] transition-colors"
             >
               Clear all
             </button>

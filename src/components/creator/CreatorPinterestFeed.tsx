@@ -187,11 +187,11 @@ export function CreatorPinterestFeed({
       {/* Inline instruction bar */}
       {!instructionDismissed && (
         <div className="flex items-center justify-between bg-accent/50 rounded-full px-4 py-2 mb-4">
-          <p className="text-xs text-muted-foreground flex items-center gap-2">
+          <p className="text-sm text-muted-foreground flex items-center gap-2">
             <span className="font-medium text-foreground">Browse</span>
-            <ArrowRight className="h-3 w-3" />
+            <ArrowRight className="h-3.5 w-3.5" />
             <span className="font-medium text-foreground">Save</span>
-            <ArrowRight className="h-3 w-3" />
+            <ArrowRight className="h-3.5 w-3.5" />
             <span className="font-medium text-foreground">Build your trip</span>
           </p>
           <button onClick={handleDismissInstruction} className="text-muted-foreground hover:text-foreground transition-colors">
@@ -204,14 +204,14 @@ export function CreatorPinterestFeed({
       <div className="border-t border-border/50 pt-4 mt-2 mb-6">
         <div className="flex items-center gap-1.5 mb-2">
           <Layers className="h-3.5 w-3.5 text-muted-foreground" />
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+          <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
             {isOwnProfile ? "Your Boards" : "Boards"}
           </span>
         </div>
         <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
           <button
             onClick={() => setActiveBoard(null)}
-            className={`shrink-0 px-4 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all ${
+            className={`shrink-0 px-4 py-1.5 rounded-lg text-sm font-medium tracking-wide transition-all ${
               activeBoard === null
                 ? "bg-foreground text-background shadow-sm"
                 : "bg-muted/50 border border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground"
@@ -223,7 +223,7 @@ export function CreatorPinterestFeed({
             <button
               key={sb.id}
               onClick={() => setActiveBoard(sb.id)}
-              className={`shrink-0 px-4 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all flex items-center gap-1.5 ${
+              className={`shrink-0 px-4 py-1.5 rounded-lg text-sm font-medium tracking-wide transition-all flex items-center gap-1.5 ${
                 activeBoard === sb.id
                   ? "bg-foreground text-background shadow-sm"
                   : "bg-muted/50 border border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground"
@@ -237,7 +237,7 @@ export function CreatorPinterestFeed({
           {isOwnProfile && onCreateNew && (
             <button
               onClick={onCreateNew}
-              className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium border-2 border-dashed border-border text-primary hover:border-primary transition-all flex items-center gap-1"
+              className="shrink-0 px-3 py-1.5 rounded-lg text-sm font-medium border-2 border-dashed border-border text-primary hover:border-primary transition-all flex items-center gap-1"
             >
               <Plus className="h-3 w-3" />
               New Board
