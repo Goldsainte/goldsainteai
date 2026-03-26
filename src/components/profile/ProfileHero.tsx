@@ -22,7 +22,7 @@ interface ProfileHeroProps {
   reviewCount?: number | null;
   followerDisplay?: string | null;
   responseTimeText?: string | null;
-  targetUserId?: string;
+  
   onRequestTrip?: () => void;
   className?: string;
 }
@@ -41,7 +41,7 @@ export function ProfileHero({
   reviewCount,
   followerDisplay,
   responseTimeText,
-  targetUserId,
+  
   onRequestTrip,
   className,
 }: ProfileHeroProps) {
