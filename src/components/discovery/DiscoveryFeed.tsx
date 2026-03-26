@@ -111,10 +111,7 @@ export function DiscoveryFeed({
     onMoreLikeThis?.(newTags);
   }
 
-  const categoryPath = [
-    category !== "All" ? category : null,
-    subcategory,
-  ].filter(Boolean) as string[];
+  const categoryPath = refinementPath;
 
   return (
     <>
@@ -273,7 +270,7 @@ export function DiscoveryFeed({
         sourceType={saveModal.sourceType}
         sourceId={saveModal.sourceId}
         categoryPath={categoryPath}
-        tags={tags}
+        tags={refinementPath}
         repinnedFromItemId={saveModal.repinnedFromItemId}
         repinnedFromUserId={saveModal.repinnedFromUserId}
       />

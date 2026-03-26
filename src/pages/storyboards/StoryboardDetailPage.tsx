@@ -54,11 +54,10 @@ export default function StoryboardDetailPage() {
   const moreLikeQuery = storyboard?.title
     ? `${storyboard.title} ${storyboard.destination || ""} travel inspiration`
     : "";
+  const moreLikePath = moreLikeQuery ? moreLikeQuery.split(" ").filter(Boolean) : [];
   const { data: moreLikeData } = useDiscoveryFeed(
-    moreLikeQuery ? "custom" : "All",
-    null,
-    [],
-    !!moreLikeQuery && !loading
+    moreLikePath,
+    moreLikePath.length > 0 && !loading
   );
 
   useEffect(() => {

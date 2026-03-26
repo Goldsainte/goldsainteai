@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CategoryChips, SubcategoryChips, CATEGORY_KEYWORDS } from "@/components/ui/CategoryChips";
+import { CATEGORY_KEYWORDS } from "@/components/ui/CategoryChips";
+import { RefinementChips } from "@/components/discovery/RefinementChips";
 import { DiscoveryFeed } from "@/components/discovery/DiscoveryFeed";
 
 export interface PinItem {
@@ -42,9 +43,9 @@ export function CreatorPinterestFeed({
 }: Props) {
   const navigate = useNavigate();
   const [activeBoard, setActiveBoard] = useState<string | null>(null);
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
-  const [discoveryTags, setDiscoveryTags] = useState<string[]>([]);
+  const [refinementPath, setRefinementPath] = useState<string[]>([]);
+
+  const activeCategory = refinementPath[0] || "All";
 
   const filteredItems = items.filter((item) => {
     if (activeBoard && item.storyboard_id !== activeBoard) return false;
@@ -64,42 +65,42 @@ export function CreatorPinterestFeed({
     return true;
   });
 
-  function handleCategoryChange(cat: string) {
-    setActiveCategory(cat);
-    setActiveSubcategory(null);
-    setDiscoveryTags([]);
+  function handleSetTopCategory(cat: string) {
+    setRefinementPath([cat]);
   }
 
-  function handleSubcategoryChange(sub: string | null) {
-    setActiveSubcategory(sub);
-    setDiscoveryTags([]);
+  function handleAddRefinement(term: string) {
+    setRefinementPath((prev) => [...prev, term]);
+  }
+
+  function handlePopToIndex(index: number) {
+    setRefinementPath((prev) => prev.slice(0, index));
+  }
+
+  function handleReset() {
+    setRefinementPath([]);
   }
 
   function handleMoreLikeThis(tags: string[]) {
-    setDiscoveryTags((prev) => {
-      const combined = [...new Set([...prev, ...tags])];
-      return combined.slice(0, 6);
+    setRefinementPath((prev) => {
+      const combined = [...prev, ...tags.filter((t) => !prev.some((p) => p.toLowerCase() === t.toLowerCase()))];
+      return combined.slice(0, 8);
     });
   }
 
-  if (items.length === 0 && activeCategory === "All") {
+  if (items.length === 0 && refinementPath.length === 0) {
     return (
       <div>
-        <CategoryChips
-          activeCategory={activeCategory}
-          onCategoryChange={handleCategoryChange}
+        <RefinementChips
+          refinementPath={refinementPath}
+          onSetTopCategory={handleSetTopCategory}
+          onAddRefinement={handleAddRefinement}
+          onPopToIndex={handlePopToIndex}
+          onReset={handleReset}
           className="mb-2"
         />
-        {activeCategory !== "All" && (
-          <SubcategoryChips
-            parentCategory={activeCategory}
-            activeSubcategory={activeSubcategory}
-            onSubcategoryChange={handleSubcategoryChange}
-            className="mb-4"
-          />
-        )}
 
-        {activeCategory === "All" ? (
+        {refinementPath.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-[#E5DFC6] bg-white/60 p-12 text-center">
             <p className="font-secondary text-lg text-[#0a2225] mb-2">
               {isOwnProfile ? "Create your first storyboard" : "No inspiration yet"}
@@ -121,9 +122,7 @@ export function CreatorPinterestFeed({
           </div>
         ) : (
           <DiscoveryFeed
-            category={activeCategory}
-            subcategory={activeSubcategory}
-            tags={discoveryTags}
+            refinementPath={refinementPath}
             onMoreLikeThis={handleMoreLikeThis}
             creatorId={creatorId}
           />
@@ -134,42 +133,15 @@ export function CreatorPinterestFeed({
 
   return (
     <div>
-      {/* Category discovery chips */}
-      <CategoryChips
-        activeCategory={activeCategory}
-        onCategoryChange={handleCategoryChange}
+      {/* Refinement discovery chips */}
+      <RefinementChips
+        refinementPath={refinementPath}
+        onSetTopCategory={handleSetTopCategory}
+        onAddRefinement={handleAddRefinement}
+        onPopToIndex={handlePopToIndex}
+        onReset={handleReset}
         className="mb-2"
       />
-
-      {/* Subcategory drill-down */}
-      {activeCategory !== "All" && (
-        <SubcategoryChips
-          parentCategory={activeCategory}
-          activeSubcategory={activeSubcategory}
-          onSubcategoryChange={handleSubcategoryChange}
-          className="mb-4"
-        />
-      )}
-
-      {/* Active refinement tags */}
-      {discoveryTags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mb-4">
-          {discoveryTags.map((tag) => (
-            <span
-              key={tag}
-              className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#0a2225]/5 text-[#0a2225] text-xs font-medium"
-            >
-              {tag}
-              <button
-                onClick={() => setDiscoveryTags((t) => t.filter((x) => x !== tag))}
-                className="ml-0.5 opacity-50 hover:opacity-100"
-              >
-                ×
-              </button>
-            </span>
-          ))}
-        </div>
-      )}
 
       {/* Board filter pills */}
       <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 scrollbar-hide">
@@ -212,9 +184,7 @@ export function CreatorPinterestFeed({
 
       {/* Discovery feed with creator pins mixed in */}
       <DiscoveryFeed
-        category={activeCategory}
-        subcategory={activeSubcategory}
-        tags={discoveryTags}
+        refinementPath={refinementPath}
         creatorPins={filteredItems.map((item) => ({
           ...item,
           owner_id: creatorId,
