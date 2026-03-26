@@ -312,9 +312,25 @@ export default function StoryboardDetailPage() {
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     {isOwner && (
-                      <Button size="sm" variant="outline" onClick={() => setEditing(true)}>
-                        <Edit2 className="mr-1 h-3.5 w-3.5" /> Edit Details
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="sm" variant="outline">
+                            <MoreVertical className="h-3.5 w-3.5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => setEditing(true)}>
+                            <Edit2 className="mr-2 h-3.5 w-3.5" /> Edit Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={handleDeleteStoryboard}
+                            disabled={deleting}
+                            className="text-red-400 focus:text-red-300"
+                          >
+                            <Trash2 className="mr-2 h-3.5 w-3.5" /> {deleting ? "Deleting…" : "Delete Storyboard"}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     )}
                     {storyboard.is_public && (
                       <Button size="sm" variant="outline" onClick={handleShareLink}>
