@@ -3518,6 +3518,7 @@ export type Database = {
           external_id: string | null
           external_url: string | null
           id: string
+          is_cover: boolean | null
           media_type: string
           sort_order: number | null
           source: string
@@ -3531,6 +3532,7 @@ export type Database = {
           external_id?: string | null
           external_url?: string | null
           id?: string
+          is_cover?: boolean | null
           media_type: string
           sort_order?: number | null
           source?: string
@@ -3544,6 +3546,7 @@ export type Database = {
           external_id?: string | null
           external_url?: string | null
           id?: string
+          is_cover?: boolean | null
           media_type?: string
           sort_order?: number | null
           source?: string
