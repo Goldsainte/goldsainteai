@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { 
   ArrowLeft, Plus, Trash2, Globe, Lock, Edit2, 
-  Copy, Check, Bookmark, ArrowRight, Sparkles, Loader2
+  Copy, Check, Bookmark, ArrowRight, Sparkles, Loader2, MoreVertical
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -22,6 +22,8 @@ import { invokeWithAuth } from "@/lib/supabaseHelpers";
 import { Header } from "@/components/Header";
 import { SaveToStoryboardModal } from "@/components/discovery/SaveToStoryboardModal";
 import { useDiscoveryFeed, type UnsplashImage } from "@/hooks/useDiscoveryFeed";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { deleteStoryboard } from "@/services/storyboardsService";
 import { toast } from "sonner";
 
 export default function StoryboardDetailPage() {
