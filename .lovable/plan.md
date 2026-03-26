@@ -1,30 +1,26 @@
 
 
-## Fix: Infinite Recursion in Storyboards RLS Policies
+## Fix: Cannot Delete Storyboard Items (RLS Infinite Recursion)
 
 ### Root Cause
 
-The `storyboards` table has a SELECT policy ("Collaborators can view storyboards") that queries `storyboard_collaborators`. But `storyboard_collaborators` has RLS policies that query back into `storyboards` (checking `owner_id = auth.uid()`). Postgres detects this circular dependency and raises the infinite recursion error.
-
-This blocks **all** operations on the `storyboards` table, including INSERT.
+Same infinite recursion issue we fixed for storyboard creation. The DELETE policy on `storyboard_items` does `EXISTS (SELECT 1 FROM storyboards WHERE owner_id = auth.uid())`, which triggers the collaborator SELECT policies on `storyboards`, creating a circular loop.
 
 ### Fix
 
-Create a `SECURITY DEFINER` helper function that checks collaborator membership without triggering RLS, then update the recursive policy to use it.
+Create a `SECURITY DEFINER` helper function `is_storyboard_owner(storyboard_uuid, user_uuid)` that checks ownership without triggering RLS, then update ALL `storyboard_items` policies (SELECT, INSERT, UPDATE, DELETE) to use it instead of subquerying `storyboards` directly.
 
 **Database migration:**
 
-1. Create function `is_storyboard_collaborator(storyboard_uuid, user_uuid)` — `SECURITY DEFINER` with `SET search_path = 'public'` — does a direct lookup on `storyboard_collaborators` bypassing RLS.
+1. Create function `public.is_storyboard_owner(storyboard_uuid UUID, user_uuid UUID)` — `SECURITY DEFINER`, does a direct lookup on `storyboards` bypassing RLS.
 
-2. Drop the problematic policy `"Collaborators can view storyboards"` on `storyboards`.
+2. Drop and re-create these policies on `storyboard_items` using the new function:
+   - "Users can view items in accessible storyboards" (SELECT)
+   - "Users can create items in their own storyboards" (INSERT)
+   - "Users can update items in their own storyboards" (UPDATE)
+   - "Users can delete items in their own storyboards" (DELETE)
 
-3. Re-create it using the new function instead of a subquery:
-   ```sql
-   CREATE POLICY "Collaborators can view storyboards"
-     ON public.storyboards FOR SELECT
-     TO authenticated
-     USING (public.is_storyboard_collaborator(id, auth.uid()));
-   ```
+3. Also update the `storyboards` table's own DELETE/UPDATE policies if they have similar subquery patterns causing recursion.
 
-No frontend code changes needed — this is purely a database policy fix.
+No frontend changes needed — purely a database policy fix.
 
