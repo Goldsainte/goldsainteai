@@ -5,27 +5,36 @@ import { toast } from "sonner";
 import { Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CreatorMediaUploader, type MediaEntry } from "@/components/creator/CreatorMediaUploader";
+import { CreatorSocialAccountsEditor, type SocialAccount } from "@/components/creator/CreatorSocialAccountsEditor";
 
 export function CreatorPortfolioTab() {
   const { user } = useAuth();
   const [media, setMedia] = useState<MediaEntry[]>([]);
+  const [socials, setSocials] = useState<SocialAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // Track original IDs to detect deletions
-  const [originalIds, setOriginalIds] = useState<string[]>([]);
+  const [originalMediaIds, setOriginalMediaIds] = useState<string[]>([]);
+  const [originalSocialIds, setOriginalSocialIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const { data: mediaData } = await supabase
-        .from("creator_media")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("sort_order", { ascending: true });
+      const [mediaRes, socialsRes] = await Promise.all([
+        supabase
+          .from("creator_media")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("sort_order", { ascending: true }),
+        supabase
+          .from("creator_social_accounts")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("sort_order", { ascending: true }),
+      ]);
 
-      if (mediaData) {
-        const entries: MediaEntry[] = mediaData.map((m: any) => ({
+      if (mediaRes.data) {
+        const entries: MediaEntry[] = mediaRes.data.map((m: any) => ({
           id: m.id,
           media_type: m.media_type as "image" | "video",
           source: m.source as "upload" | "instagram" | "tiktok",
@@ -36,7 +45,20 @@ export function CreatorPortfolioTab() {
           is_cover: m.is_cover || false,
         }));
         setMedia(entries);
-        setOriginalIds(entries.map((e) => e.id!).filter(Boolean));
+        setOriginalMediaIds(entries.map((e) => e.id!).filter(Boolean));
+      }
+
+      if (socialsRes.data) {
+        const entries: SocialAccount[] = socialsRes.data.map((s: any) => ({
+          id: s.id,
+          platform: s.platform,
+          handle: s.handle,
+          profile_url: s.profile_url,
+          followers_count: s.followers_count,
+          sort_order: s.sort_order,
+        }));
+        setSocials(entries);
+        setOriginalSocialIds(entries.map((e) => e.id!).filter(Boolean));
       }
 
       setLoading(false);
@@ -47,14 +69,12 @@ export function CreatorPortfolioTab() {
     if (!user) return;
     setSaving(true);
     try {
-      // Delete removed items
-      const currentIds = media.map((m) => m.id).filter(Boolean) as string[];
-      const deletedIds = originalIds.filter((id) => !currentIds.includes(id));
-      if (deletedIds.length > 0) {
-        await supabase.from("creator_media").delete().in("id", deletedIds);
+      // --- Media save ---
+      const currentMediaIds = media.map((m) => m.id).filter(Boolean) as string[];
+      const deletedMediaIds = originalMediaIds.filter((id) => !currentMediaIds.includes(id));
+      if (deletedMediaIds.length > 0) {
+        await supabase.from("creator_media").delete().in("id", deletedMediaIds);
       }
-
-      // Upsert current items
       if (media.length > 0) {
         const rows = media.map((item, idx) => ({
           id: item.id || crypto.randomUUID(),
@@ -72,18 +92,41 @@ export function CreatorPortfolioTab() {
         if (error) throw error;
       }
 
-      // Update cover image on profile from cover photo
+      // Cover image sync
       const coverPhoto = media.find((m) => m.media_type === "image" && m.is_cover);
       if (coverPhoto) {
         await supabase.from("profiles").update({ cover_image_url: coverPhoto.url }).eq("id", user.id);
       }
 
+      // --- Social accounts save ---
+      const currentSocialIds = socials.map((s) => s.id).filter(Boolean) as string[];
+      const deletedSocialIds = originalSocialIds.filter((id) => !currentSocialIds.includes(id));
+      if (deletedSocialIds.length > 0) {
+        await supabase.from("creator_social_accounts").delete().in("id", deletedSocialIds);
+      }
+      if (socials.length > 0) {
+        const socialRows = socials.map((item, idx) => ({
+          id: item.id || crypto.randomUUID(),
+          user_id: user.id,
+          platform: item.platform,
+          handle: item.handle,
+          profile_url: item.profile_url,
+          followers_count: item.followers_count,
+          sort_order: idx,
+        }));
+        const { error } = await supabase
+          .from("creator_social_accounts")
+          .upsert(socialRows, { onConflict: "id" });
+        if (error) throw error;
+      }
+
       // Refresh IDs
-      const { data: refreshed } = await supabase
-        .from("creator_media")
-        .select("id")
-        .eq("user_id", user.id);
-      setOriginalIds((refreshed || []).map((r: any) => r.id));
+      const [mediaRefresh, socialRefresh] = await Promise.all([
+        supabase.from("creator_media").select("id").eq("user_id", user.id),
+        supabase.from("creator_social_accounts").select("id").eq("user_id", user.id),
+      ]);
+      setOriginalMediaIds((mediaRefresh.data || []).map((r: any) => r.id));
+      setOriginalSocialIds((socialRefresh.data || []).map((r: any) => r.id));
 
       toast.success("Portfolio saved");
     } catch (err) {
@@ -116,6 +159,15 @@ export function CreatorPortfolioTab() {
           onMediaChange={setMedia}
           maxItems={12}
         />
+      </div>
+
+      {/* Social Accounts */}
+      <div className="rounded-2xl border border-[#E5DFC6] bg-white p-6">
+        <h3 className="text-sm font-semibold text-[#0a2225] mb-1">Social Accounts</h3>
+        <p className="text-xs text-[#6B7280] mb-4">
+          Add your social profiles and follower counts. This builds credibility and helps travelers trust your expertise.
+        </p>
+        <CreatorSocialAccountsEditor accounts={socials} onChange={setSocials} />
       </div>
 
       {/* Save */}

@@ -19,6 +19,7 @@ interface SocialLink {
   platform: string;
   handle: string;
   url: string;
+  followersCount?: number;
 }
 
 interface StatItem {
@@ -204,6 +205,15 @@ export function ProfileSidebar({
               >
                 <span className="text-[#6B7280]">{link.platform}</span>
                 <span className="font-medium">@{link.handle}</span>
+                {link.followersCount != null && link.followersCount > 0 && (
+                  <span className="text-[#C7A962] text-xs ml-auto">
+                    {link.followersCount >= 1_000_000
+                      ? `${(link.followersCount / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`
+                      : link.followersCount >= 1_000
+                      ? `${(link.followersCount / 1_000).toFixed(1).replace(/\.0$/, "")}K`
+                      : link.followersCount}
+                  </span>
+                )}
               </a>
             ))}
           </div>

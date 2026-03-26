@@ -3663,6 +3663,42 @@ export type Database = {
           },
         ]
       }
+      creator_social_accounts: {
+        Row: {
+          created_at: string | null
+          followers_count: number
+          handle: string
+          id: string
+          platform: string
+          profile_url: string
+          sort_order: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          followers_count?: number
+          handle: string
+          id?: string
+          platform: string
+          profile_url: string
+          sort_order?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          followers_count?: number
+          handle?: string
+          id?: string
+          platform?: string
+          profile_url?: string
+          sort_order?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       creator_tier_memberships: {
         Row: {
           auto_upgrade_enabled: boolean | null
