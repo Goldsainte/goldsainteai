@@ -1,27 +1,42 @@
 
 
-## Improve Text Readability Across Discovery Section
+## Merge "Meet the Creator" into Header + Add Social Presence
 
-### Problem
-Multiple elements use `text-xs` (12px) which is too small for comfortable reading, especially the section headers ("EXPLORE TRAVEL IDEAS", "FROM MY TRAVELS"), description text, refinement chips, board filter labels, and the instruction bar. The screenshots confirm these are hard to read.
+### What Changes
 
-### Changes
+**1. Combine bio + specialties into ProfileHero**
+The separate "Meet the Creator" section (lines 405-433 of CreatorPublicProfilePage) gets removed. Its content moves into `ProfileHero`:
+- Bio text already renders in the hero — just remove the `line-clamp-2` restriction and allow full display (up to ~4 lines)
+- Specialty pills move directly below the bio in the hero, styled as small gold-outlined capsules
 
-**1. `src/components/discovery/RefinementChips.tsx`**
-- Refinement suggestion pills: `text-xs` → `text-sm` (line 48)
-- Active path breadcrumb pills: `text-xs` → `text-sm` (line 62)
-- "Clear all" button: `text-xs` → `text-sm` (line 76)
+**2. Add social accounts to ProfileHero**
+Fetch `creator_social_accounts` in `CreatorPublicProfilePage` and pass them to `ProfileHero`. Display as a compact inline row of platform icons (Instagram, TikTok, LinkedIn, YouTube, X) with individual follower counts on hover, plus a total reach figure — positioned between the bio and the stats row.
 
-**2. `src/components/ui/CategoryChips.tsx`**
-- Subcategory pills: `text-xs` → `text-sm` (lines 255, 268)
-- Top category pills already use `text-sm` — no change needed
+Layout order inside the hero becomes:
+```text
+Avatar (gold ring)
+Name + Verified badge
+Bio (italic serif, up to 4 lines)
+Specialty pills (gold-outlined capsules)
+Gold flourish divider
+Social icons row (monochrome icons · total reach)
+Stats row (Followers | Storyboards | Posts)
+CTA + Follow
+```
 
-**3. `src/components/creator/CreatorPinterestFeed.tsx`**
-- "Your Boards" label: `text-xs` → `text-sm` (line 207)
-- Board filter pills: `text-xs` → `text-sm` (lines 214, 226, 240)
-- Instruction bar text: `text-xs` → `text-sm` (line 190)
-- Instruction bar arrows: `h-3 w-3` → `h-3.5 w-3.5`
+**3. Fetch social data on page load**
+Add `creator_social_accounts` to the existing `Promise.all` in the page's data-fetching `useEffect`, querying by `user_id = id`.
 
-### Summary
-Bump all `text-xs` instances in the discovery/refinement/board UI to `text-sm` (14px) for better readability while keeping the design compact and elegant. No layout or structural changes.
+### Files
+
+| Action | File | Purpose |
+|--------|------|---------|
+| Edit | `src/pages/creators/CreatorPublicProfilePage.tsx` | Fetch social accounts, pass to hero, remove "Meet the Creator" section |
+| Edit | `src/components/profile/ProfileHero.tsx` | Add `specialties`, `socialAccounts` props; render pills + social icon row inside hero |
+
+### Design Details
+- Social icons: monochrome `#6B7280`, hover to `#0a2225`, `h-4.5 w-4.5`, spaced with `gap-3`
+- TikTok icon: custom SVG (lucide doesn't have one) or use a small "Tk" text icon
+- Total reach: `formatFollowers(total)+ followers` in `text-sm text-[#6B7280]` separated by a gold dot
+- Specialty pills: `text-xs uppercase tracking-wider text-[#6B7280] border border-[#E5DFC6] rounded-full px-3 py-1` (same style currently used, just relocated)
 
