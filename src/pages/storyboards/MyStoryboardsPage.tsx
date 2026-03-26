@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, ImageIcon, Globe, Lock, Trash2, MoreVertical, Sparkles } from "lucide-react";
+import { Plus, ImageIcon, Globe, Lock, Trash2, MoreVertical, Sparkles, ShoppingBag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { 
   getMyStoryboards, 
@@ -270,6 +270,16 @@ export default function MyStoryboardsPage() {
                           Convert to Trip Request
                         </DropdownMenuItem>
                       )}
+                      <DropdownMenuItem 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/storyboards/${board.id}`);
+                        }}
+                        className="text-[#C7A962] font-medium"
+                      >
+                        <ShoppingBag className="mr-2 h-3.5 w-3.5" />
+                        Sell This Experience
+                      </DropdownMenuItem>
                       <DropdownMenuItem 
                         className="text-destructive"
                         onClick={(e) => {
