@@ -313,12 +313,57 @@ export async function convertStoryboardToTripRequest(params: {
   return { tripRequestId: trip.id };
 }
 
-// Get public storyboard by ID (for sharing)
-export async function getStoryboardPublicBySlugOrId(id: string): Promise<Storyboard | null> {
-  return getStoryboardById(id);
+// Get storyboard by slug (falls back to ID)
+export async function getStoryboardBySlug(slugOrId: string): Promise<Storyboard | null> {
+  // Try slug first
+  const { data: bySlug, error: slugError } = await supabase
+    .from("storyboards")
+    .select(`*, storyboard_items(*)`)
+    .eq("slug", slugOrId)
+    .maybeSingle();
+
+  if (bySlug) {
+    if (bySlug.storyboard_items) {
+      bySlug.storyboard_items.sort((a: any, b: any) => a.position - b.position);
+    }
+    return { ...bySlug, items: bySlug.storyboard_items } as Storyboard;
+  }
+
+  // Fallback to ID lookup
+  return getStoryboardById(slugOrId);
+}
+
+// Increment view count
+export async function incrementStoryboardViewCount(id: string): Promise<void> {
+  await supabase.rpc("increment_counter", { row_id: id, table_name: "storyboards", column_name: "view_count" }).catch(() => {
+    // Fallback: direct update
+    supabase
+      .from("storyboards")
+      .update({ view_count: undefined as any }) // use raw SQL via rpc instead
+      .eq("id", id);
+  });
+
+  // Simple direct increment via raw approach
+  const { data } = await supabase
+    .from("storyboards")
+    .select("view_count")
+    .eq("id", id)
+    .single();
+
+  if (data) {
+    await supabase
+      .from("storyboards")
+      .update({ view_count: (data.view_count || 0) + 1 })
+      .eq("id", id);
+  }
 }
 
 export type StoryboardPublic = Storyboard;
+
+// Get public storyboard by ID (for sharing) - legacy alias
+export async function getStoryboardPublicBySlugOrId(id: string): Promise<Storyboard | null> {
+  return getStoryboardBySlug(id);
+}
 
 // Get or create default storyboard for a user
 export async function getOrCreateDefaultStoryboard(userId: string): Promise<StoryboardRow> {
