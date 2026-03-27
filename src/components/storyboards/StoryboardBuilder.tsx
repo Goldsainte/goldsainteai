@@ -279,6 +279,50 @@ export function StoryboardBuilder({
         </div>
       )}
 
+      {/* Upload tab */}
+      {activeTab === "upload" && (
+        <div className="mb-4">
+          <StoryboardPhotoUploader
+            onPhotosUploaded={(urls) => {
+              const newItems: Item[] = urls.map((url) => ({
+                kind: "photo",
+                source: "manual",
+                data: { thumb_url: url, full_url: url, alt: "Uploaded photo" },
+              }));
+              setItems((prev) => [...prev, ...newItems]);
+            }}
+          />
+        </div>
+      )}
+
+      {/* Design tab */}
+      {activeTab === "design" && (
+        <div className="mb-4">
+          <button
+            onClick={() => setDesignEditorOpen(true)}
+            className="w-full border-2 border-dashed border-border rounded-2xl p-6 flex flex-col items-center justify-center gap-2 text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 transition-all"
+          >
+            <Paintbrush className="h-8 w-8" />
+            <span className="text-sm font-medium">Open Design Editor</span>
+            <span className="text-xs">Create custom covers, caption cards & visual blocks</span>
+          </button>
+          <DesignEditorModal
+            open={designEditorOpen}
+            onOpenChange={setDesignEditorOpen}
+            onExport={(url) => {
+              setItems((prev) => [
+                ...prev,
+                {
+                  kind: "photo",
+                  source: "manual",
+                  data: { thumb_url: url, full_url: url, alt: "Designed block" },
+                },
+              ]);
+            }}
+          />
+        </div>
+      )
+
       {/* Current items preview */}
       <div className="mt-4 border-t border-[#E5DFC6] pt-3">
         <p className="mb-2 text-xs uppercase tracking-[0.18em] text-[#8D8D8D]">Storyboard preview</p>
