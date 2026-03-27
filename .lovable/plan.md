@@ -1,48 +1,32 @@
 
 
-## Fix: Template-Styled Editor with Live Preview & Customization
+## Fix: Design Editor Canvas Not Interactive
 
-### Problems Identified
+### Root Cause
 
-1. **Preview hidden by default** — `showPreview` starts `false`, button is `hidden md:flex`, so most users never see it
-2. **No font/color customization** — template is locked, no way to tweak fonts or colors after selection
-3. **Editor doesn't feel "styled"** — it's still a generic form with template colors on inputs, but no visual differentiation between templates
-4. **"Add photos" button jumps straight to upload** — should show all 3 source options (Upload/Unsplash/Design) as equal choices
-5. **Publish button styling** — the accent-colored button may have poor contrast on some templates (e.g., Midnight's yellow on dark)
-6. **Mobile preview** — no way to toggle preview on mobile
+Two issues prevent the Fabric.js canvas from receiving mouse/touch events:
 
-### Changes (1 file: `StoryboardNewPage.tsx`)
+1. **`contain-paint` on DialogContent** — Fabric.js v6 creates a wrapper `<div>` containing two stacked `<canvas>` elements (a render canvas and an "upper canvas" for mouse interaction). The CSS `contain-paint` property on the dialog creates a containment context that interferes with Fabric's absolutely-positioned upper canvas layer, blocking pointer events.
 
-**1. Preview on by default, toggleable everywhere**
-- Set `showPreview` default to `true`
-- Show the toggle button on mobile too (remove `hidden md:flex`)
-- On mobile, show preview as a full-width section below the editor instead of a side column
-- Add a floating "Preview" FAB on mobile
+2. **`overflow-hidden` on DialogContent** — Combined with `contain-paint`, this clips Fabric's interaction layer, making the canvas appear present but completely unresponsive.
 
-**2. Add font & color customization popover**
-- Add a `<Popover>` triggered by a `<Palette>` icon button in the top bar
-- Inside: font selector (switch between available Google Font pairings) and color override swatches
-- Store overrides in state: `fontOverride` and `colorOverride`
-- Apply overrides on top of template defaults throughout the editor and preview
+### Fix
 
-**3. Better template-styled editor**
-- Cover area: use template's `coverStyle` to actually shape the cover (framed = padding + rounded, split = overlay text, full-bleed = edge-to-edge)
-- Content blocks: render using template's `cardStyle` more distinctly (polaroid gets white border + shadow + slight rotation, sharp = no radius, rounded = large radius)
-- Add subtle template-specific decorative elements (accent-colored dividers, styled section headers)
+**Edit `src/components/storyboards/DesignEditorModal.tsx`** (1 file):
 
-**4. "Add photos" shows all sources by default**
-- Replace the single "Add photos" dashed button with a 3-button row (Upload, Unsplash, Design) directly visible — no extra click needed
-- Remove the intermediate "addMode" step for cleaner flow
+1. **Canvas container needs `relative` positioning and explicit size** — Wrap the `<canvas>` in a container with `position: relative` and explicit `width`/`height` matching the Fabric canvas dimensions, so Fabric's absolutely-positioned upper canvas stays properly stacked.
 
-**5. Bottom publish section**
-- Always show the publish button at the bottom (not conditionally)
-- Add a summary line: "X photos · Template: {name}"
+2. **Override dialog's restrictive CSS on the canvas area** — Add `overflow-visible` and remove containment on the canvas wrapper so Fabric's event layer isn't clipped.
 
-### Files
+3. **Pass `className` override to DialogContent** — Add `!overflow-visible` to the DialogContent className to prevent the dialog's default `overflow-hidden` and `contain-paint` from eating pointer events on the canvas. Alternatively, use inline style `{{ contain: 'none' }}`.
+
+4. **Increase init delay** — Bump the `setTimeout` from 100ms to 200ms for more reliable DOM readiness inside the dialog animation.
+
+No changes to `dialog.tsx` needed — the fix is scoped to the Design Editor modal only.
+
+### Summary
 
 | Action | File |
 |--------|------|
-| Rewrite | `src/pages/storyboards/StoryboardNewPage.tsx` |
-
-No new files or database changes needed. The existing `StoryboardLivePreview`, `TemplatePicker`, and template definitions are fine.
+| Edit | `src/components/storyboards/DesignEditorModal.tsx` |
 
