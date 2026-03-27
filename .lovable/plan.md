@@ -1,73 +1,22 @@
 
 
-## Storyboard Creation: Add Photo Upload + React Design Editor
+## Fix: "New Storyboard" Button Should Navigate to Editor, Not Show a Form Dialog
 
-### What Changes
+### The Problem
 
-Add two new content sources to the storyboard builder alongside the existing Unsplash search and link tabs:
+Clicking "New Storyboard" on the creator profile opens a basic form dialog (Title, Destination, Description) that feels disconnected. After submitting, nothing visibly happens — the page just silently refreshes data without navigating anywhere. The creator has no way to actually add content to the storyboard they just created.
 
-1. **Upload Photos** — creators upload their own travel photos directly from their device
-2. **Design Editor** — embedded `react-design-editor` (Fabric.js-based) canvas for creating visual content blocks
+### The Fix
 
----
+Replace the dialog with direct navigation to the storyboard editor at `/storyboards/new`. This is where the full creation experience lives (upload photos, design, add blocks). The title/destination/description can be set inside the editor — no need for a separate dialog.
 
-### 1. Install `react-design-editor`
+### Changes
 
-Add the npm package (MIT, free, Fabric.js + React). This provides a Canva-like canvas editor for creating cover images, caption cards, and styled visual blocks.
+**Edit `src/pages/creators/CreatorPublicProfilePage.tsx`:**
+- Remove the `showCreateDialog` state, `newBoardTitle`, `newBoardDescription`, `newBoardDestination`, `creating` state variables
+- Remove the `handleCreateStoryboard` function
+- Remove the `<Dialog>` block at the bottom (lines 427-470)
+- Change the `onCreateNew` callback passed to `CreatorStorefrontFeed` to simply `navigate("/storyboards/new")`
 
----
-
-### 2. Add "Upload" Tab to `StoryboardBuilder.tsx`
-
-Add a third tab alongside "Photos" and "TikTok/Reels/YouTube":
-
-- **Upload** tab with a file input (multi-file, accepts image/*)
-- On file select: upload each file to `trip-assets` storage bucket under `storyboard-uploads/{timestamp}-{random}.{ext}`
-- Get public URL and add as a storyboard item (kind: "photo", source: "manual")
-- Show upload progress with a spinner per file
-- Reuse the same 50MB limit and JPEG/PNG/WebP/GIF validation from `TripImageUploader`
-
----
-
-### 3. Add "Design" Tab to `StoryboardBuilder.tsx`
-
-Add a fourth tab:
-
-- **Design** tab that opens a modal/dialog containing the `react-design-editor` workspace
-- Creator can add text, images, shapes, and layers on a canvas
-- "Add to Storyboard" button exports the canvas as a PNG, uploads to storage, and adds as an item
-- Keep it as a modal overlay so the builder flow isn't disrupted
-
----
-
-### 4. New Component: `DesignEditorModal.tsx`
-
-A dialog wrapping the react-design-editor:
-
-- Full canvas workspace with toolbar (text, images, shapes, layers)
-- "Export & Add" button: renders canvas to PNG blob → uploads to `trip-assets` bucket → returns URL → closes modal and adds item to storyboard
-- Cancel button to dismiss without saving
-
----
-
-### 5. Update `StoryboardDetailPage.tsx` — Owner Upload + Design
-
-For the owner view, add two actions alongside the existing "Browse Creators" empty state:
-
-- "Upload Photos" button (same upload flow)
-- "Design" button (opens design editor modal)
-- These also appear as floating action buttons when the storyboard has items
-
----
-
-### Technical Summary
-
-| Action | File |
-|--------|------|
-| Install | `react-design-editor` npm package |
-| Create | `src/components/storyboards/DesignEditorModal.tsx` |
-| Edit | `src/components/storyboards/StoryboardBuilder.tsx` — add Upload + Design tabs |
-| Edit | `src/pages/storyboards/StoryboardDetailPage.tsx` — add upload/design actions for owners |
-
-No database migration needed — uses existing `trip-assets` storage bucket and `storyboard_items` table.
+That's it — one file, removing ~50 lines of unnecessary dialog code and replacing with a single navigation call.
 
