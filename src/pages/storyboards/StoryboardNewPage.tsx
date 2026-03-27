@@ -172,6 +172,7 @@ export default function StoryboardNewPage() {
   }, []);
 
   const handlePublish = async () => {
+    console.log("handlePublish called", { title, blocks: blocks.length });
     if (!title.trim()) {
       toast.error("Give your storyboard a name");
       return;
@@ -179,7 +180,11 @@ export default function StoryboardNewPage() {
     setPublishing(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) {
+        toast.error("Please sign in to publish");
+        navigate("/auth");
+        return;
+      }
 
       const { data: storyboard, error: sbError } = await supabase
         .from("storyboards")
@@ -459,21 +464,27 @@ export default function StoryboardNewPage() {
             </Button>
 
             {/* Publish */}
-            <Button
-              onClick={handlePublish}
-              disabled={publishing || !title.trim()}
-              size="sm"
-              className="gap-1.5"
-              style={{ backgroundColor: t.colors.accent, color: t.colors.bg }}
-            >
-              {publishing ? (
-                <>
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> Publishing...
-                </>
-              ) : (
-                "Publish"
+            <div className="flex items-center gap-2">
+              {!title.trim() && (
+                <span className="text-[10px] text-muted-foreground">Add a title first</span>
               )}
-            </Button>
+              <Button
+                type="button"
+                onClick={handlePublish}
+                disabled={publishing || !title.trim()}
+                size="sm"
+                className="gap-1.5"
+                style={{ backgroundColor: t.colors.accent, color: t.colors.bg }}
+              >
+                {publishing ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" /> Publishing...
+                  </>
+                ) : (
+                  "Publish"
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -612,6 +623,7 @@ export default function StoryboardNewPage() {
                 {blocks.length} photo{blocks.length !== 1 ? "s" : ""} · {t.name} template
               </span>
               <Button
+                type="button"
                 onClick={handlePublish}
                 disabled={publishing || !title.trim()}
                 size="lg"
