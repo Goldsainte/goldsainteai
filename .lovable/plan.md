@@ -1,22 +1,27 @@
 
 
-## Fix: "New Storyboard" Button Should Navigate to Editor, Not Show a Form Dialog
+## Delete Old Accordion Storyboard Editor, Replace with New Visual Creator
 
 ### The Problem
-
-Clicking "New Storyboard" on the creator profile opens a basic form dialog (Title, Destination, Description) that feels disconnected. After submitting, nothing visibly happens — the page just silently refreshes data without navigating anywhere. The creator has no way to actually add content to the storyboard they just created.
-
-### The Fix
-
-Replace the dialog with direct navigation to the storyboard editor at `/storyboards/new`. This is where the full creation experience lives (upload photos, design, add blocks). The title/destination/description can be set inside the editor — no need for a separate dialog.
+`/storyboards/new`, `/storyboards/:id`, and `/storyboards/:id/edit` all load the old 837-line accordion form (`src/pages/TikTokLab/StoryboardEditorPage.tsx`). This needs to be deleted and replaced with the new visual creation page.
 
 ### Changes
 
-**Edit `src/pages/creators/CreatorPublicProfilePage.tsx`:**
-- Remove the `showCreateDialog` state, `newBoardTitle`, `newBoardDescription`, `newBoardDestination`, `creating` state variables
-- Remove the `handleCreateStoryboard` function
-- Remove the `<Dialog>` block at the bottom (lines 427-470)
-- Change the `onCreateNew` callback passed to `CreatorStorefrontFeed` to simply `navigate("/storyboards/new")`
+**1. Create `src/pages/storyboards/StoryboardNewPage.tsx`** — New visual creator page:
+- Cover image upload area (click to upload or open Design Editor)
+- Large inline title + destination inputs (no form labels)
+- Vertical content blocks list (image + caption per block)
+- "+" button to add blocks via Upload, Design, or Unsplash
+- Publish button creates storyboard + items, navigates to detail page
+- Reuses existing `StoryboardPhotoUploader` and `DesignEditorModal` components
 
-That's it — one file, removing ~50 lines of unnecessary dialog code and replacing with a single navigation call.
+**2. Delete `src/pages/TikTokLab/StoryboardEditorPage.tsx`** — Remove the entire 837-line accordion form.
+
+**3. Edit `src/routes/AppRoutes.tsx`:**
+- Remove the `TikTokLabStoryboardEditorPage` lazy import
+- `/storyboards/new` → new `StoryboardNewPage`
+- `/storyboards/:id` → existing `StoryboardDetailPage` (view mode)
+- `/storyboards/:id/edit` → new `StoryboardNewPage` (edit mode, loads existing data)
+
+No database changes needed.
 
