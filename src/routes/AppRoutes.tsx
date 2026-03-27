@@ -403,9 +403,9 @@ export const AppRoutes = () => (
         )}
       />
       <Route path="/storyboards" element={<RequireAuth><TikTokLabStoryboardsPage /></RequireAuth>} />
-      <Route path="/storyboards/new" element={<RequireAuth><TikTokLabStoryboardEditorPage /></RequireAuth>} />
-      <Route path="/storyboards/:id" element={<RequireAuth><TikTokLabStoryboardEditorPage /></RequireAuth>} />
-      <Route path="/storyboards/:id/edit" element={<RequireAuth><TikTokLabStoryboardEditorPage /></RequireAuth>} />
+      <Route path="/storyboards/new" element={<RequireAuth><StoryboardNewPage /></RequireAuth>} />
+      <Route path="/storyboards/:id" element={<RequireAuth><StoryboardDetailPage /></RequireAuth>} />
+      <Route path="/storyboards/:id/edit" element={<RequireAuth><StoryboardNewPage /></RequireAuth>} />
       <Route path="/notifications" element={<NotificationsPage />} />
       <Route path="/messages" element={<RequireAuth><MessagesPage /></RequireAuth>} />
       <Route path="/marketplace-guidelines" element={<MarketplaceGuidelinesPage />} />
