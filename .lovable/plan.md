@@ -1,44 +1,120 @@
 
-Fix storyboard management in two places: backend permissions and the creator-facing UI.
 
-1. Break the remaining RLS recursion for storyboard deletion/editing
-- Review the current `storyboard_collaborators` policies and replace the recursive owner check:
-  - current problematic policy: `Owner can manage collaborators` queries `storyboards` directly
-- Rebuild that policy to use the existing `is_storyboard_owner(storyboard_id, auth.uid())` helper instead of a subquery.
-- Verify `storyboards`, `storyboard_items`, and `storyboard_collaborators` policies no longer reference each other in a loop.
-- This is the likely reason deleting full boards still fails even though item deletion was fixed.
+## Creator Profile Redesign — Luxury Storefront (Airbnb x Fiverr x Pinterest)
 
-2. Make edit/delete obvious from the creator profile
-- Add creator-only management actions to the storyboard cards shown on the creator profile flow so you can manage boards like “Miami Adventure” and “Northern Lights” directly from that page.
-- Reuse the existing dropdown pattern from `MyStoryboardsPage.tsx`:
-  - Edit storyboard
-  - Delete storyboard
-  - Sell This Experience
-- Only show these controls when `isOwnProfile` is true.
+### What Changes
 
-3. Add full-board delete from the storyboard detail/editor page
-- In `StoryboardDetailPage.tsx`, add a creator-owner “Delete Storyboard” action in the header area.
-- Confirm before deleting.
-- On success, redirect back to the storyboard list or creator profile and remove the deleted board from UI state.
+A complete restructure of `CreatorPublicProfilePage.tsx` and supporting components to follow the hierarchy: **Hero (trust) → Storyboards (desire) → Services (clarity) → Reviews (proof) → About (positioning)**.
 
-4. Tighten the service/UI flow
-- Keep `deleteStoryboard()` in `storyboardsService.ts` as the shared delete path.
-- Improve error messaging so permission/RLS failures surface clearly instead of a generic “Failed to delete storyboard”.
-- Refresh the relevant list after delete so removed boards disappear immediately.
+---
 
-5. Verify the exact boards you named
-- Test deleting “Miami Adventure” and “Northern Lights” from the creator-owned storyboard surface.
-- Test editing a storyboard title/description/public toggle from the detail page.
-- Confirm public/shareable storyboards still work after the policy cleanup.
+### 1. Hero Section — Full-Width Destination Hero with Profile Overlay
 
-Technical details
-- Files likely involved:
-  - `supabase/migrations/...` for collaborator policy fix
-  - `src/pages/creators/CreatorPublicProfilePage.tsx`
-  - `src/components/creator/CreatorStoryboardGrid.tsx` or the creator storyboard surface actually rendering those cards
-  - `src/pages/storyboards/StoryboardDetailPage.tsx`
-  - `src/services/storyboardsService.ts`
-- Root issue found:
-  - `storyboard_collaborators` still has `Owner can manage collaborators` using:
-    `EXISTS (SELECT 1 FROM storyboards WHERE storyboards.id = storyboard_collaborators.storyboard_id AND storyboards.owner_id = auth.uid())`
-  - That can recurse against storyboard policies during full-board delete/update operations.
+**Replace** the current centered `ProfileHero` with a cinematic full-width cover image (using existing `cover_image_url` from profiles) and a floating profile card overlay.
+
+- Full-width hero image (destination photo, not headshot) — uses `cover_image_url` or first storyboard image as fallback
+- Floating profile card (bottom-left overlay on desktop, stacked on mobile):
+  - Avatar with gold ring
+  - Name + positioning title (e.g. "Luxury Europe Travel Designer") — uses `specialties[0]` or `creator_niches[0]`
+  - Location
+  - Star rating + review count
+  - Trips completed / clients served (from `creator_profiles`)
+  - Verified badge
+- Single dominant CTA: **"Request a Trip"** (GS green, rounded-full)
+- Follow button (secondary)
+- Remove the current centered layout, stats row, and "Design My Trip" copy
+
+**Files**: New `src/components/creator/CreatorHeroSection.tsx`, edit `CreatorPublicProfilePage.tsx`
+
+---
+
+### 2. Storyboards Section — Pinterest Layer (keep existing, elevate)
+
+- Keep existing `CreatorPinterestFeed` masonry layout
+- Remove the discovery/refinement chips and onboarding modals from the creator profile context (those belong on the Discover page, not a creator storefront)
+- Simplify to: board filter chips + masonry grid of pins
+- Each pin: large image, subtle title on hover, "Save" / "Re-pin" interaction
+- Clicking a storyboard chip opens that board's pins; clicking a pin navigates to the storyboard detail page
+- Section label: "Travel Collections" with gold divider
+
+**Files**: New `src/components/creator/CreatorStorefrontFeed.tsx` (simplified version of `CreatorPinterestFeed` without discovery features), edit `CreatorPublicProfilePage.tsx`
+
+---
+
+### 3. Travel Services Section — Fiverr-Style Packages (NEW)
+
+**Database**: Create `creator_services` table:
+- `id`, `creator_id` (references profiles), `title`, `description`, `starting_price_cents`, `currency`, `delivery_days`, `includes` (jsonb array of strings), `revisions` (int), `is_active`, `sort_order`, `cover_image_url`, `created_at`, `updated_at`
+- RLS: public read for active, creator CRUD on own rows
+
+**UI**: Horizontal scrolling row of 3-6 service cards (Fiverr-style but luxury aesthetic):
+- Each card: cover image (4/3 ratio), title, starting price ("From $X"), delivery timeline, included items (3-4 bullet points), "View Details" CTA
+- Cards use white bg, `border-[#E5DFC6]`, serif title, clean sans-serif body
+- No cluttered icons — text-forward, editorial feel
+- Owner view: "Add Service" card with dashed border, edit/delete dropdown on existing cards
+
+**Files**: New `src/components/creator/CreatorServicesSection.tsx`, migration SQL, edit `CreatorPublicProfilePage.tsx`
+
+---
+
+### 4. Reviews Section (keep, reposition)
+
+- Move reviews below Services
+- Keep existing `ReviewsList` and `WriteReviewModal`
+- Add summary stats inline: average rating, total count, response time
+
+---
+
+### 5. About Section — Short & Sharp (NEW)
+
+- Below reviews, a brief "About" card with:
+  - Travel philosophy (italic serif, 2-3 lines max)
+  - Specialties pills
+  - Certifications (from `CreatorTrustSection` data)
+  - "Member since" date
+- Not a long bio — sharp positioning statement
+
+**Files**: New `src/components/creator/CreatorAboutSection.tsx`
+
+---
+
+### 6. Final CTA Block (keep, refine)
+
+- Keep the existing bottom CTA but update copy to match "Request a Trip" language
+- Remove redundant "Design My Trip" — single CTA verb across the page
+
+---
+
+### Page Section Order
+
+```text
+[ Full-Width Hero Image ]
+[ Profile Card Overlay: Name, Title, Stats, "Request a Trip" CTA ]
+────────────────────────────────────────
+[ Travel Collections — Storyboard masonry grid ]
+────────────────────────────────────────
+[ Travel Services — Fiverr-style package cards ]
+────────────────────────────────────────
+[ Reviews — Social proof ]
+────────────────────────────────────────
+[ About — Short positioning + credentials ]
+────────────────────────────────────────
+[ Final CTA — "Start Your Journey" ]
+```
+
+---
+
+### Technical Summary
+
+| Action | File |
+|--------|------|
+| Migration | Create `creator_services` table with RLS |
+| Create | `src/components/creator/CreatorHeroSection.tsx` |
+| Create | `src/components/creator/CreatorStorefrontFeed.tsx` |
+| Create | `src/components/creator/CreatorServicesSection.tsx` |
+| Create | `src/components/creator/CreatorAboutSection.tsx` |
+| Edit | `src/pages/creators/CreatorPublicProfilePage.tsx` — full restructure |
+| Edit | Remove `ProfileHero` usage from this page (keep component for other contexts) |
+
+Design tokens remain consistent: cream (#FDF9F0), white cards, gold accents (#C7A962), GS green CTAs (#0c4d47), Playfair Display headers, editorial typography throughout.
+
