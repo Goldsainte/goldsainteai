@@ -510,7 +510,7 @@ export default function StoryboardDetailPage() {
                   }}
                 />
               </div>
-            )
+            )}
 
             {/* Related storyboards */}
             {relatedBoards.length > 0 && (
