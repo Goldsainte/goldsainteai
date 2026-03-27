@@ -198,7 +198,15 @@ export function DesignEditorModal({ open, onOpenChange, onExport }: DesignEditor
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="!max-w-[700px] max-h-[95vh] overflow-y-auto overflow-visible" style={{ contain: 'none' }}>
+      <DialogContent
+        className="!max-w-[700px] max-h-[95vh] overflow-y-auto overflow-visible"
+        style={{ contain: 'none' }}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        onInteractOutside={(e) => {
+          const active = fabricRef.current?.getActiveObject();
+          if (active && (active as any).isEditing) e.preventDefault();
+        }}
+      >
         <DialogHeader>
           <DialogTitle className="font-display">Design Editor</DialogTitle>
           <DialogDescription>Add text, shapes, and images to create your design.</DialogDescription>
