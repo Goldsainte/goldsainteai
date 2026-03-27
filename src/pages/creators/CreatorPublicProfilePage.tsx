@@ -3,11 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { ArrowLeft, PenLine, LogIn, Settings, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { ProfileHero } from "@/components/profile/ProfileHero";
 import { ReviewsList } from "@/components/profile/ReviewsList";
 import { WriteReviewModal } from "@/components/profile/WriteReviewModal";
-import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
-import { CreatorPinterestFeed, type PinItem, type BoardSummary } from "@/components/creator/CreatorPinterestFeed";
+import { CreatorHeroSection } from "@/components/creator/CreatorHeroSection";
+import { CreatorStorefrontFeed, type PinItem, type BoardSummary } from "@/components/creator/CreatorStorefrontFeed";
+import { CreatorServicesSection } from "@/components/creator/CreatorServicesSection";
+import { CreatorAboutSection } from "@/components/creator/CreatorAboutSection";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -58,6 +59,7 @@ interface CreatorProfile {
   travel_philosophy: string | null;
   last_seen_at: string | null;
   website: string | null;
+  created_at?: string | null;
 }
 
 interface CreatorProfileData {
@@ -86,22 +88,20 @@ export default function CreatorPublicProfilePage() {
   const [reviewCount, setReviewCount] = useState<number>(0);
   const [creatorStoryboards, setCreatorStoryboards] = useState<BoardSummary[]>([]);
   const [pinItems, setPinItems] = useState<PinItem[]>([]);
-  const [mediaCount, setMediaCount] = useState(0);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [newBoardTitle, setNewBoardTitle] = useState("");
   const [newBoardDescription, setNewBoardDescription] = useState("");
   const [newBoardDestination, setNewBoardDestination] = useState("");
   const [creating, setCreating] = useState(false);
-  const [socialAccounts, setSocialAccounts] = useState<{ platform: string; handle: string; profile_url: string; followers_count: number }[]>([]);
 
   useEffect(() => {
     if (!id) return;
     (async () => {
-      const [profileRes, creatorProfileRes, reviewsRes, storyboardsRes, mediaCountRes, socialRes] = await Promise.all([
+      const [profileRes, creatorProfileRes, reviewsRes, storyboardsRes] = await Promise.all([
         supabase
           .from("profiles")
           .select(
-            "id, full_name, display_name, avatar_url, bio, location, tiktok_handle, instagram_handle, creator_niches, creator_avg_views, creator_followers, featured_photos, cover_image_url, content_style_tags, destinations_focus_tags, travel_philosophy, last_seen_at, website"
+            "id, full_name, display_name, avatar_url, bio, location, tiktok_handle, instagram_handle, creator_niches, creator_avg_views, creator_followers, featured_photos, cover_image_url, content_style_tags, destinations_focus_tags, travel_philosophy, last_seen_at, website, created_at"
           )
           .eq("id", id)
           .maybeSingle(),
@@ -127,15 +127,6 @@ export default function CreatorPublicProfilePage() {
           }
           return q;
         })(),
-        supabase
-          .from("creator_media")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", id),
-        supabase
-          .from("creator_social_accounts")
-          .select("platform, handle, profile_url, followers_count")
-          .eq("user_id", id)
-          .order("sort_order", { ascending: true }),
       ]);
 
       setCreator(profileRes.data as CreatorProfile | null);
@@ -169,8 +160,6 @@ export default function CreatorPublicProfilePage() {
         }
       }
       setPinItems(allPins);
-      setMediaCount(mediaCountRes.count || 0);
-      setSocialAccounts((socialRes.data || []) as { platform: string; handle: string; profile_url: string; followers_count: number }[]);
 
       const reviews = reviewsRes.data;
       if (reviews && reviews.length > 0) {
@@ -184,9 +173,9 @@ export default function CreatorPublicProfilePage() {
 
       setLoading(false);
     })();
-   }, [id, user, reviewRefreshKey]);
+  }, [id, user, reviewRefreshKey]);
 
-  // Listen for storyboard-updated events from SaveToStoryboardModal
+  // Listen for storyboard-updated events
   useEffect(() => {
     const handler = () => setReviewRefreshKey((k) => k + 1);
     window.addEventListener("storyboard-updated", handler);
@@ -204,7 +193,6 @@ export default function CreatorPublicProfilePage() {
         description: newBoardDescription.trim() || undefined,
         isPublic: true,
       });
-      // Add destination if provided
       if (newBoardDestination.trim()) {
         await supabase
           .from("storyboards")
@@ -216,7 +204,7 @@ export default function CreatorPublicProfilePage() {
       setNewBoardTitle("");
       setNewBoardDescription("");
       setNewBoardDestination("");
-      setReviewRefreshKey((k) => k + 1); // triggers re-fetch
+      setReviewRefreshKey((k) => k + 1);
     } catch (err: any) {
       toast.error(err.message || "Failed to create storyboard");
     } finally {
@@ -224,18 +212,13 @@ export default function CreatorPublicProfilePage() {
     }
   };
 
-  const fmt = (n: number | null | undefined) =>
-    n != null && n > 0
-      ? Intl.NumberFormat(undefined, { notation: "compact" }).format(n)
-      : "0";
-
   const isOwnProfile = user?.id === creator?.id;
 
   if (loading) {
     return (
       <div className="min-h-screen bg-[#FDF9F0]">
         <div className="animate-pulse">
-          <div className="h-32 bg-[#E5DFC6]" />
+          <div className="h-[420px] bg-[#E5DFC6]" />
           <div className="mx-auto max-w-5xl px-4 py-8">
             <div className="h-6 w-48 rounded bg-[#E5DFC6]" />
             <div className="mt-3 h-4 w-72 rounded bg-[#E5DFC6]" />
@@ -250,9 +233,7 @@ export default function CreatorPublicProfilePage() {
       <div className="min-h-screen bg-[#FDF9F0]">
         <div className="mx-auto max-w-5xl px-4 py-16 text-center">
           <h1 className="font-secondary text-2xl text-[#0a2225]">Creator not found</h1>
-          <p className="mt-2 text-sm text-[#6B7280]">
-            We couldn't find this creator.
-          </p>
+          <p className="mt-2 text-sm text-[#6B7280]">We couldn't find this creator.</p>
           <button
             onClick={() => navigate("/creators")}
             className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#0c4d47] px-5 py-2.5 text-sm text-white hover:bg-[#0a3d39]"
@@ -267,10 +248,8 @@ export default function CreatorPublicProfilePage() {
   const displayName = creator.display_name || creator.full_name || "Goldsainte Creator";
   const firstName = (creator.display_name || creator.full_name || "").split(" ")[0] || displayName;
   const bio = creator.travel_philosophy || creator.bio || creatorData?.bio;
-
-  const followerDisplay = (creator.creator_followers ?? 0) > 0
-    ? fmt(creator.creator_followers)
-    : null;
+  const specialties = creatorData?.specialties || creator.creator_niches || [];
+  const positioningTitle = specialties[0] || "Travel Designer";
 
   const responseTimeHours = creatorData?.response_time_hours;
   const responseTimeText = responseTimeHours
@@ -283,7 +262,8 @@ export default function CreatorPublicProfilePage() {
 
   const handleRequestTrip = () => navigate(`/post-trip?fromCreator=${creator.id}`);
 
-  const specialties = creatorData?.specialties || creator.creator_niches || [];
+  // Get a fallback cover image from first storyboard pin
+  const fallbackCover = pinItems.length > 0 ? pinItems[0].image_url : null;
 
   return (
     <>
@@ -294,7 +274,7 @@ export default function CreatorPublicProfilePage() {
 
       <div className="min-h-screen bg-[#FDF9F0]">
         {/* Back bar */}
-        <div className="sticky top-0 z-10 bg-[#FDF9F0]/80 backdrop-blur-sm border-b border-[#E5DFC6]/40">
+        <div className="sticky top-0 z-20 bg-[#FDF9F0]/80 backdrop-blur-sm border-b border-[#E5DFC6]/40">
           <div className="mx-auto max-w-5xl px-4 py-3 flex items-center justify-between">
             <button
               onClick={() => navigate(-1)}
@@ -317,31 +297,33 @@ export default function CreatorPublicProfilePage() {
           </div>
         </div>
 
-        {/* Premium header */}
-        <ProfileHero
+        {/* ─── 1. HERO — Trust Layer ─── */}
+        <CreatorHeroSection
           name={displayName}
           avatarUrl={creator.avatar_url}
+          coverImageUrl={creator.cover_image_url}
+          title={positioningTitle}
+          location={creator.location}
+          avgRating={avgRating}
+          reviewCount={reviewCount}
+          tripsCompleted={creatorData?.trips_completed ?? null}
+          clientsServed={creatorData?.clients_served ?? null}
           isVerified
-          bio={bio}
-          specialties={specialties}
-          socialAccounts={socialAccounts}
-          followerDisplay={followerDisplay}
-          storyboardCount={creatorStoryboards.length}
-          postCount={mediaCount}
-          responseTimeText={responseTimeText}
+          isOwnProfile={isOwnProfile}
           targetUserId={isOwnProfile ? undefined : creator.id}
           onRequestTrip={handleRequestTrip}
+          fallbackCoverUrl={fallbackCover}
         />
 
-        {/* Pinterest-Style Storyboard Feed */}
+        {/* Spacer after hero card overlap */}
+        <div className="h-8 md:h-12" />
+
+        {/* ─── 2. STORYBOARDS — Desire Layer (Pinterest) ─── */}
         {(pinItems.length > 0 || isOwnProfile) && (
           <div className="bg-white">
-            <div className="mx-auto max-w-5xl px-4 py-16 md:py-24">
-              <SectionLabel>Explore Travel Ideas</SectionLabel>
-              <p className="font-primary text-sm text-[#6B7280] -mt-4 mb-8 max-w-lg">
-                Curated travel pins by {firstName} — destinations, experiences, and moments that inspire your next journey.
-              </p>
-              <CreatorPinterestFeed
+            <div className="mx-auto max-w-5xl px-4 py-16 md:py-20">
+              <SectionLabel>Travel Collections</SectionLabel>
+              <CreatorStorefrontFeed
                 items={pinItems}
                 storyboards={creatorStoryboards}
                 creatorId={creator.id}
@@ -352,6 +334,95 @@ export default function CreatorPublicProfilePage() {
             </div>
           </div>
         )}
+
+        {/* ─── 3. SERVICES — Clarity Layer (Fiverr) ─── */}
+        <div className="bg-[#FDF9F0]">
+          <div className="mx-auto max-w-5xl px-4 py-16 md:py-20">
+            <SectionLabel>Travel Services</SectionLabel>
+            <CreatorServicesSection
+              creatorId={creator.id}
+              isOwnProfile={isOwnProfile}
+            />
+          </div>
+        </div>
+
+        {/* ─── 4. REVIEWS — Proof Layer ─── */}
+        {(reviewCount > 0 || (!authLoading && user && user.id !== creator.id)) && (
+          <div className="bg-white">
+            <div className="mx-auto max-w-5xl px-4 py-16 md:py-20">
+              <div className="flex items-center justify-between mb-8">
+                <SectionLabel>Reviews</SectionLabel>
+                {!authLoading && user && user.id !== creator.id && (
+                  <WriteReviewModal
+                    revieweeId={creator.id}
+                    revieweeName={displayName}
+                    onSuccess={() => setReviewRefreshKey((k) => k + 1)}
+                  >
+                    <Button variant="outline" size="sm" className="border-[#E5DFC6] text-[#0a2225] rounded-full">
+                      <PenLine className="mr-1.5 h-3.5 w-3.5" />
+                      Write a Review
+                    </Button>
+                  </WriteReviewModal>
+                )}
+                {!authLoading && !user && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-[#E5DFC6] text-[#6B7280] rounded-full"
+                    onClick={() => navigate("/auth")}
+                  >
+                    <LogIn className="mr-1.5 h-3.5 w-3.5" />
+                    Sign in to review
+                  </Button>
+                )}
+              </div>
+              <ReviewsList
+                revieweeId={creator.id}
+                refreshKey={reviewRefreshKey}
+                avgRating={avgRating}
+                reviewCount={reviewCount}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* ─── 5. ABOUT — Positioning Layer ─── */}
+        <div className="bg-[#FDF9F0]">
+          <div className="mx-auto max-w-5xl px-4 py-16 md:py-20">
+            <SectionLabel>About</SectionLabel>
+            <CreatorAboutSection
+              bio={bio}
+              specialties={specialties}
+              certifications={creatorData?.certifications ?? null}
+              memberSince={creator.created_at ?? null}
+              responseTimeText={responseTimeText}
+            />
+          </div>
+        </div>
+
+        {/* ─── 6. FINAL CTA ─── */}
+        <div className="bg-white">
+          <div className="mx-auto max-w-5xl px-4 py-16 md:py-24 text-center">
+            <GoldDivider />
+            <div className="mt-10">
+              <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-3">
+                Start Your Journey With {firstName}
+              </h2>
+              <p className="font-primary text-sm text-[#6B7280] mb-8 max-w-md mx-auto">
+                Share your travel style and get a personalized itinerary crafted just for you.
+              </p>
+              <Button
+                onClick={handleRequestTrip}
+                className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-10 h-12 text-sm font-medium shadow-sm"
+              >
+                Request a Trip
+              </Button>
+              <p className="text-[10px] text-[#9CA3AF] mt-3">
+                No commitment · Delivered in 24–48 hours
+              </p>
+            </div>
+          </div>
+        </div>
 
         {/* Create Storyboard Dialog */}
         <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
@@ -397,86 +468,6 @@ export default function CreatorPublicProfilePage() {
             </div>
           </DialogContent>
         </Dialog>
-
-        {/* From My Travels — Media gallery */}
-        <div className="bg-[#FDF9F0]">
-          <div className="mx-auto max-w-5xl px-4 py-16 md:py-24">
-            <SectionLabel>My Top Trip Highlights</SectionLabel>
-            <p className="text-xs font-semibold tracking-[0.25em] uppercase text-[#C7A962] mt-2 mb-6">Trips Gallery</p>
-            <CreatorMediaGallery
-              creatorId={creator.id}
-              fallbackPhotos={creator.featured_photos}
-              instagramHandle={creator.instagram_handle}
-              isOwnProfile={isOwnProfile}
-              hideTitle
-            />
-          </div>
-        </div>
-
-
-        {/* Reviews */}
-        {reviewCount > 0 && (
-          <div className="bg-[#FDF9F0]">
-            <div className="mx-auto max-w-5xl px-4 py-16 md:py-24">
-              <div className="flex items-center justify-between mb-8">
-                <SectionLabel>Reviews</SectionLabel>
-                {!authLoading && user && user.id !== creator.id && (
-                  <WriteReviewModal
-                    revieweeId={creator.id}
-                    revieweeName={displayName}
-                    onSuccess={() => setReviewRefreshKey((k) => k + 1)}
-                  >
-                    <Button variant="outline" size="sm" className="border-[#E5DFC6] text-[#0a2225] rounded-full">
-                      <PenLine className="mr-1.5 h-3.5 w-3.5" />
-                      Write a Review
-                    </Button>
-                  </WriteReviewModal>
-                )}
-                {!authLoading && !user && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-[#E5DFC6] text-[#6B7280] rounded-full"
-                    onClick={() => navigate("/auth")}
-                  >
-                    <LogIn className="mr-1.5 h-3.5 w-3.5" />
-                    Sign in to review
-                  </Button>
-                )}
-              </div>
-              <ReviewsList
-                revieweeId={creator.id}
-                refreshKey={reviewRefreshKey}
-                avgRating={avgRating}
-                reviewCount={reviewCount}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Final CTA block */}
-        <div className="bg-white">
-          <div className="mx-auto max-w-5xl px-4 py-16 md:py-24 text-center">
-            <GoldDivider />
-            <div className="mt-10">
-              <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-3">
-                Start Your Journey With {firstName}
-              </h2>
-              <p className="font-primary text-sm text-[#6B7280] mb-8 max-w-md mx-auto">
-                Share your travel style and get a personalized itinerary crafted just for you.
-              </p>
-              <Button
-                onClick={handleRequestTrip}
-                className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-10 h-12 text-sm font-medium shadow-sm"
-              >
-                Design My Trip
-              </Button>
-              <p className="text-[10px] text-[#9CA3AF] mt-3">
-                Designed for you · No commitment · Delivered in 24–48 hours
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </>
   );

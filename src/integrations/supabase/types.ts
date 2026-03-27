@@ -3663,6 +3663,72 @@ export type Database = {
           },
         ]
       }
+      creator_services: {
+        Row: {
+          cover_image_url: string | null
+          created_at: string
+          creator_id: string
+          currency: string
+          delivery_days: number | null
+          description: string | null
+          id: string
+          includes: Json | null
+          is_active: boolean | null
+          revisions: number | null
+          sort_order: number | null
+          starting_price_cents: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          cover_image_url?: string | null
+          created_at?: string
+          creator_id: string
+          currency?: string
+          delivery_days?: number | null
+          description?: string | null
+          id?: string
+          includes?: Json | null
+          is_active?: boolean | null
+          revisions?: number | null
+          sort_order?: number | null
+          starting_price_cents?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          cover_image_url?: string | null
+          created_at?: string
+          creator_id?: string
+          currency?: string
+          delivery_days?: number | null
+          description?: string | null
+          id?: string
+          includes?: Json | null
+          is_active?: boolean | null
+          revisions?: number | null
+          sort_order?: number | null
+          starting_price_cents?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_services_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_services_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       creator_social_accounts: {
         Row: {
           created_at: string | null
