@@ -321,7 +321,7 @@ export function StoryboardBuilder({
             }}
           />
         </div>
-      )
+      )}
 
       {/* Current items preview */}
       <div className="mt-4 border-t border-[#E5DFC6] pt-3">
