@@ -1,68 +1,62 @@
 
 
-## Structured 4-Tier Services System for Creator Storefronts
+## Storyboard Creation: Add Photo Upload + React Design Editor
 
 ### What Changes
 
-Replace the current generic `creator_services` table and flat card UI with a structured 4-tier service system where each tier has specific fields, deliverables, and UI treatment.
+Add two new content sources to the storyboard builder alongside the existing Unsplash search and link tabs:
+
+1. **Upload Photos** — creators upload their own travel photos directly from their device
+2. **Design Editor** — embedded `react-design-editor` (Fabric.js-based) canvas for creating visual content blocks
 
 ---
 
-### 1. Database: Add `service_tier` column + tier-specific fields
+### 1. Install `react-design-editor`
 
-Migrate the existing `creator_services` table to support tiers:
-
-- Add `service_tier` enum column: `digital_guide`, `custom_itinerary`, `full_trip_design`, `add_on`
-- Add new columns: `trip_days` (int), `has_priority_support` (bool), `duration_minutes` (int for add-ons), `revisions` already exists
-- Add `file_url` (text) for digital guide file/link uploads
-- Add `delivery_time_option` (text) for standardized dropdown values ("2 days", "3 days", "5 days", "7 days")
-- Keep existing columns: title, description, starting_price_cents, currency, delivery_days, includes, cover_image_url, is_active, sort_order
-
-No new table needed — extend the current one with the tier column and tier-specific nullable fields.
+Add the npm package (MIT, free, Fabric.js + React). This provides a Canva-like canvas editor for creating cover images, caption cards, and styled visual blocks.
 
 ---
 
-### 2. Service Card UI — Tier-Aware Display
+### 2. Add "Upload" Tab to `StoryboardBuilder.tsx`
 
-Rebuild `CreatorServicesSection.tsx` to:
+Add a third tab alongside "Photos" and "TikTok/Reels/YouTube":
 
-- Group services by tier with tier labels and color-coded badges (green/yellow/blue/purple matching the spec)
-- Each tier section shows its cards in a horizontal scroll row
-- Card content adapts per tier:
-  - **Digital Guide** (green badge): Price, description, inclusions, "Download" or "Purchase" CTA
-  - **Custom Itinerary** (yellow badge): Price, delivery time, days covered, revisions, inclusions, "Request This" CTA
-  - **Full Trip Design** (blue badge): Price, delivery time, trip length, priority support indicator, inclusions, "Request This" CTA
-  - **Add-On** (purple badge): Name, price, duration, description, "Add" CTA
-- Luxury styling preserved: white cards, `border-[#E5DFC6]`, serif titles, gold accents
+- **Upload** tab with a file input (multi-file, accepts image/*)
+- On file select: upload each file to `trip-assets` storage bucket under `storyboard-uploads/{timestamp}-{random}.{ext}`
+- Get public URL and add as a storyboard item (kind: "photo", source: "manual")
+- Show upload progress with a spinner per file
+- Reuse the same 50MB limit and JPEG/PNG/WebP/GIF validation from `TripImageUploader`
 
 ---
 
-### 3. Creator Service Management — Add/Edit Dialog
+### 3. Add "Design" Tab to `StoryboardBuilder.tsx`
 
-Build an inline dialog for creators to add/edit services from their profile (when `isOwnProfile`):
+Add a fourth tab:
 
-- Step 1: Select tier (4 visual tier cards with icons and descriptions)
-- Step 2: Tier-specific form fields (only show relevant fields per tier)
-- "Includes" field: dynamic bullet-point list (add/remove items)
-- Keep it lightweight — no multi-page wizard, just a clean modal form
-- Edit and delete via dropdown on existing service cards
-
----
-
-### 4. Profile Page Integration
-
-- Keep the current page structure (Hero → Storyboards → Services → Reviews → About)
-- Update the Services section to render tiered groups instead of a flat row
-- Empty state for owners: show the 4 tier options as dashed cards to guide first-time setup
-- Non-owners see only active services grouped by tier
+- **Design** tab that opens a modal/dialog containing the `react-design-editor` workspace
+- Creator can add text, images, shapes, and layers on a canvas
+- "Add to Storyboard" button exports the canvas as a PNG, uploads to storage, and adds as an item
+- Keep it as a modal overlay so the builder flow isn't disrupted
 
 ---
 
-### 5. Microcopy Updates
+### 4. New Component: `DesignEditorModal.tsx`
 
-- "Packages" → "Services" everywhere
-- Card CTAs: "Request This" for itinerary/trip design tiers, "Purchase" for digital guides, "Add" for add-ons
-- No "Book Now" language
+A dialog wrapping the react-design-editor:
+
+- Full canvas workspace with toolbar (text, images, shapes, layers)
+- "Export & Add" button: renders canvas to PNG blob → uploads to `trip-assets` bucket → returns URL → closes modal and adds item to storyboard
+- Cancel button to dismiss without saving
+
+---
+
+### 5. Update `StoryboardDetailPage.tsx` — Owner Upload + Design
+
+For the owner view, add two actions alongside the existing "Browse Creators" empty state:
+
+- "Upload Photos" button (same upload flow)
+- "Design" button (opens design editor modal)
+- These also appear as floating action buttons when the storyboard has items
 
 ---
 
@@ -70,8 +64,10 @@ Build an inline dialog for creators to add/edit services from their profile (whe
 
 | Action | File |
 |--------|------|
-| Migration | Add `service_tier`, `trip_days`, `has_priority_support`, `duration_minutes`, `file_url`, `delivery_time_option` to `creator_services` |
-| Rewrite | `src/components/creator/CreatorServicesSection.tsx` — tier-grouped display + management |
-| Create | `src/components/creator/AddServiceDialog.tsx` — tier-aware add/edit modal |
-| Edit | `src/pages/creators/CreatorPublicProfilePage.tsx` — minor wiring updates |
+| Install | `react-design-editor` npm package |
+| Create | `src/components/storyboards/DesignEditorModal.tsx` |
+| Edit | `src/components/storyboards/StoryboardBuilder.tsx` — add Upload + Design tabs |
+| Edit | `src/pages/storyboards/StoryboardDetailPage.tsx` — add upload/design actions for owners |
+
+No database migration needed — uses existing `trip-assets` storage bucket and `storyboard_items` table.
 
