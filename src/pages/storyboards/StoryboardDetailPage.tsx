@@ -57,6 +57,9 @@ export default function StoryboardDetailPage() {
 
   const isOwner = user?.id === storyboard?.owner_id;
   const [deleting, setDeleting] = useState(false);
+  const [showUploader, setShowUploader] = useState(false);
+  const [designEditorOpen, setDesignEditorOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // "More like this" query based on storyboard title
   const moreLikeQuery = storyboard?.title
