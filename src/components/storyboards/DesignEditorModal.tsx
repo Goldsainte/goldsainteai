@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Canvas as FabricCanvas, FabricText, Rect, Circle, FabricImage } from "fabric";
+import { Canvas as FabricCanvas, IText, Rect, Circle, FabricImage } from "fabric";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
@@ -71,7 +71,7 @@ export function DesignEditorModal({ open, onOpenChange, onExport }: DesignEditor
 
   const addText = useCallback(() => {
     if (!fabricRef.current) return;
-    const text = new FabricText("Your text here", {
+    const text = new IText("Your text here", {
       left: 100,
       top: 100,
       fontSize: 32,
@@ -81,6 +81,8 @@ export function DesignEditorModal({ open, onOpenChange, onExport }: DesignEditor
     fabricRef.current.add(text);
     fabricRef.current.setActiveObject(text);
     fabricRef.current.renderAll();
+    text.enterEditing();
+    text.hiddenTextarea?.focus();
   }, [activeColor]);
 
   const addRect = useCallback(() => {
