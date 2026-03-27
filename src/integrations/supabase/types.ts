@@ -3670,14 +3670,20 @@ export type Database = {
           creator_id: string
           currency: string
           delivery_days: number | null
+          delivery_time_option: string | null
           description: string | null
+          duration_minutes: number | null
+          file_url: string | null
+          has_priority_support: boolean | null
           id: string
           includes: Json | null
           is_active: boolean | null
           revisions: number | null
+          service_tier: string | null
           sort_order: number | null
           starting_price_cents: number | null
           title: string
+          trip_days: number | null
           updated_at: string
         }
         Insert: {
@@ -3686,14 +3692,20 @@ export type Database = {
           creator_id: string
           currency?: string
           delivery_days?: number | null
+          delivery_time_option?: string | null
           description?: string | null
+          duration_minutes?: number | null
+          file_url?: string | null
+          has_priority_support?: boolean | null
           id?: string
           includes?: Json | null
           is_active?: boolean | null
           revisions?: number | null
+          service_tier?: string | null
           sort_order?: number | null
           starting_price_cents?: number | null
           title: string
+          trip_days?: number | null
           updated_at?: string
         }
         Update: {
@@ -3702,14 +3714,20 @@ export type Database = {
           creator_id?: string
           currency?: string
           delivery_days?: number | null
+          delivery_time_option?: string | null
           description?: string | null
+          duration_minutes?: number | null
+          file_url?: string | null
+          has_priority_support?: boolean | null
           id?: string
           includes?: Json | null
           is_active?: boolean | null
           revisions?: number | null
+          service_tier?: string | null
           sort_order?: number | null
           starting_price_cents?: number | null
           title?: string
+          trip_days?: number | null
           updated_at?: string
         }
         Relationships: [
