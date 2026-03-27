@@ -479,6 +479,39 @@ export default function StoryboardDetailPage() {
               </div>
             )}
 
+            {/* Owner floating actions */}
+            {isOwner && (storyboard.items || []).length > 0 && (
+              <div className="flex gap-2 flex-wrap">
+                <Button size="sm" variant="outline" onClick={() => setShowUploader(!showUploader)} className="gap-1.5">
+                  <Upload className="h-3.5 w-3.5" /> Upload Photos
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => setDesignEditorOpen(true)} className="gap-1.5">
+                  <Paintbrush className="h-3.5 w-3.5" /> Design
+                </Button>
+              </div>
+            )}
+
+            {/* Inline uploader for owner */}
+            {isOwner && showUploader && (
+              <div className="max-w-lg">
+                <StoryboardPhotoUploader
+                  onPhotosUploaded={async (urls) => {
+                    for (const url of urls) {
+                      await addStoryboardItem({
+                        storyboardId: id!,
+                        itemType: "image",
+                        title: "Uploaded photo",
+                        imageUrl: url,
+                        sourceType: "manual",
+                      });
+                    }
+                    await loadStoryboard();
+                    setShowUploader(false);
+                  }}
+                />
+              </div>
+            )
+
             {/* Related storyboards */}
             {relatedBoards.length > 0 && (
               <div className="mt-12">
