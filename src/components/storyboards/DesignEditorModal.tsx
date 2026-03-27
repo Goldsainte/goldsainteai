@@ -56,7 +56,7 @@ export function DesignEditorModal({ open, onOpenChange, onExport }: DesignEditor
         backgroundColor: "#ffffff",
       });
       fabricRef.current = canvas;
-    }, 100);
+    }, 200);
 
     return () => {
       clearTimeout(timer);
@@ -194,7 +194,7 @@ export function DesignEditorModal({ open, onOpenChange, onExport }: DesignEditor
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[900px] max-h-[95vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[900px] max-h-[95vh] overflow-y-auto !overflow-visible" style={{ contain: 'none' }}>
         <DialogHeader>
           <DialogTitle className="font-display">Design Editor</DialogTitle>
         </DialogHeader>
@@ -243,8 +243,10 @@ export function DesignEditorModal({ open, onOpenChange, onExport }: DesignEditor
         </div>
 
         {/* Canvas */}
-        <div className="border border-border rounded-lg overflow-hidden bg-muted/30 flex items-center justify-center">
-          <canvas ref={canvasRef} />
+        <div className="border border-border rounded-lg bg-muted/30 flex items-center justify-center overflow-auto">
+          <div className="relative" style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT, minWidth: CANVAS_WIDTH, minHeight: CANVAS_HEIGHT }}>
+            <canvas ref={canvasRef} />
+          </div>
         </div>
 
         {/* Export */}
