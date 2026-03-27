@@ -1,27 +1,34 @@
 
 
-## Delete Old Accordion Storyboard Editor, Replace with New Visual Creator
+## Fix: Create Missing `trip-assets` Storage Bucket
 
-### The Problem
-`/storyboards/new`, `/storyboards/:id`, and `/storyboards/:id/edit` all load the old 837-line accordion form (`src/pages/TikTokLab/StoryboardEditorPage.tsx`). This needs to be deleted and replaced with the new visual creation page.
+### Problem
+Uploads fail with "Bucket not found" because the `trip-assets` storage bucket doesn't exist. The `StoryboardPhotoUploader` component references it.
 
-### Changes
+### Fix
 
-**1. Create `src/pages/storyboards/StoryboardNewPage.tsx`** — New visual creator page:
-- Cover image upload area (click to upload or open Design Editor)
-- Large inline title + destination inputs (no form labels)
-- Vertical content blocks list (image + caption per block)
-- "+" button to add blocks via Upload, Design, or Unsplash
-- Publish button creates storyboard + items, navigates to detail page
-- Reuses existing `StoryboardPhotoUploader` and `DesignEditorModal` components
+**Database migration** — Create the bucket + RLS policies:
 
-**2. Delete `src/pages/TikTokLab/StoryboardEditorPage.tsx`** — Remove the entire 837-line accordion form.
+```sql
+-- Create the bucket
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('trip-assets', 'trip-assets', true);
 
-**3. Edit `src/routes/AppRoutes.tsx`:**
-- Remove the `TikTokLabStoryboardEditorPage` lazy import
-- `/storyboards/new` → new `StoryboardNewPage`
-- `/storyboards/:id` → existing `StoryboardDetailPage` (view mode)
-- `/storyboards/:id/edit` → new `StoryboardNewPage` (edit mode, loads existing data)
+-- Allow authenticated users to upload
+CREATE POLICY "Authenticated users can upload trip assets"
+ON storage.objects FOR INSERT TO authenticated
+WITH CHECK (bucket_id = 'trip-assets');
 
-No database changes needed.
+-- Allow public read access
+CREATE POLICY "Public read access for trip assets"
+ON storage.objects FOR SELECT TO public
+USING (bucket_id = 'trip-assets');
+
+-- Allow users to delete their own uploads
+CREATE POLICY "Users can delete own trip assets"
+ON storage.objects FOR DELETE TO authenticated
+USING (bucket_id = 'trip-assets');
+```
+
+No code changes needed — just the missing bucket.
 
