@@ -623,6 +623,7 @@ export default function StoryboardNewPage() {
                 {blocks.length} photo{blocks.length !== 1 ? "s" : ""} · {t.name} template
               </span>
               <Button
+                type="button"
                 onClick={handlePublish}
                 disabled={publishing || !title.trim()}
                 size="lg"
