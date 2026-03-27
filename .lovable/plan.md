@@ -1,106 +1,68 @@
 
 
-## Creator Profile Redesign — Luxury Storefront (Airbnb x Fiverr x Pinterest)
+## Structured 4-Tier Services System for Creator Storefronts
 
 ### What Changes
 
-A complete restructure of `CreatorPublicProfilePage.tsx` and supporting components to follow the hierarchy: **Hero (trust) → Storyboards (desire) → Services (clarity) → Reviews (proof) → About (positioning)**.
+Replace the current generic `creator_services` table and flat card UI with a structured 4-tier service system where each tier has specific fields, deliverables, and UI treatment.
 
 ---
 
-### 1. Hero Section — Full-Width Destination Hero with Profile Overlay
+### 1. Database: Add `service_tier` column + tier-specific fields
 
-**Replace** the current centered `ProfileHero` with a cinematic full-width cover image (using existing `cover_image_url` from profiles) and a floating profile card overlay.
+Migrate the existing `creator_services` table to support tiers:
 
-- Full-width hero image (destination photo, not headshot) — uses `cover_image_url` or first storyboard image as fallback
-- Floating profile card (bottom-left overlay on desktop, stacked on mobile):
-  - Avatar with gold ring
-  - Name + positioning title (e.g. "Luxury Europe Travel Designer") — uses `specialties[0]` or `creator_niches[0]`
-  - Location
-  - Star rating + review count
-  - Trips completed / clients served (from `creator_profiles`)
-  - Verified badge
-- Single dominant CTA: **"Request a Trip"** (GS green, rounded-full)
-- Follow button (secondary)
-- Remove the current centered layout, stats row, and "Design My Trip" copy
+- Add `service_tier` enum column: `digital_guide`, `custom_itinerary`, `full_trip_design`, `add_on`
+- Add new columns: `trip_days` (int), `has_priority_support` (bool), `duration_minutes` (int for add-ons), `revisions` already exists
+- Add `file_url` (text) for digital guide file/link uploads
+- Add `delivery_time_option` (text) for standardized dropdown values ("2 days", "3 days", "5 days", "7 days")
+- Keep existing columns: title, description, starting_price_cents, currency, delivery_days, includes, cover_image_url, is_active, sort_order
 
-**Files**: New `src/components/creator/CreatorHeroSection.tsx`, edit `CreatorPublicProfilePage.tsx`
+No new table needed — extend the current one with the tier column and tier-specific nullable fields.
 
 ---
 
-### 2. Storyboards Section — Pinterest Layer (keep existing, elevate)
+### 2. Service Card UI — Tier-Aware Display
 
-- Keep existing `CreatorPinterestFeed` masonry layout
-- Remove the discovery/refinement chips and onboarding modals from the creator profile context (those belong on the Discover page, not a creator storefront)
-- Simplify to: board filter chips + masonry grid of pins
-- Each pin: large image, subtle title on hover, "Save" / "Re-pin" interaction
-- Clicking a storyboard chip opens that board's pins; clicking a pin navigates to the storyboard detail page
-- Section label: "Travel Collections" with gold divider
+Rebuild `CreatorServicesSection.tsx` to:
 
-**Files**: New `src/components/creator/CreatorStorefrontFeed.tsx` (simplified version of `CreatorPinterestFeed` without discovery features), edit `CreatorPublicProfilePage.tsx`
-
----
-
-### 3. Travel Services Section — Fiverr-Style Packages (NEW)
-
-**Database**: Create `creator_services` table:
-- `id`, `creator_id` (references profiles), `title`, `description`, `starting_price_cents`, `currency`, `delivery_days`, `includes` (jsonb array of strings), `revisions` (int), `is_active`, `sort_order`, `cover_image_url`, `created_at`, `updated_at`
-- RLS: public read for active, creator CRUD on own rows
-
-**UI**: Horizontal scrolling row of 3-6 service cards (Fiverr-style but luxury aesthetic):
-- Each card: cover image (4/3 ratio), title, starting price ("From $X"), delivery timeline, included items (3-4 bullet points), "View Details" CTA
-- Cards use white bg, `border-[#E5DFC6]`, serif title, clean sans-serif body
-- No cluttered icons — text-forward, editorial feel
-- Owner view: "Add Service" card with dashed border, edit/delete dropdown on existing cards
-
-**Files**: New `src/components/creator/CreatorServicesSection.tsx`, migration SQL, edit `CreatorPublicProfilePage.tsx`
+- Group services by tier with tier labels and color-coded badges (green/yellow/blue/purple matching the spec)
+- Each tier section shows its cards in a horizontal scroll row
+- Card content adapts per tier:
+  - **Digital Guide** (green badge): Price, description, inclusions, "Download" or "Purchase" CTA
+  - **Custom Itinerary** (yellow badge): Price, delivery time, days covered, revisions, inclusions, "Request This" CTA
+  - **Full Trip Design** (blue badge): Price, delivery time, trip length, priority support indicator, inclusions, "Request This" CTA
+  - **Add-On** (purple badge): Name, price, duration, description, "Add" CTA
+- Luxury styling preserved: white cards, `border-[#E5DFC6]`, serif titles, gold accents
 
 ---
 
-### 4. Reviews Section (keep, reposition)
+### 3. Creator Service Management — Add/Edit Dialog
 
-- Move reviews below Services
-- Keep existing `ReviewsList` and `WriteReviewModal`
-- Add summary stats inline: average rating, total count, response time
+Build an inline dialog for creators to add/edit services from their profile (when `isOwnProfile`):
 
----
-
-### 5. About Section — Short & Sharp (NEW)
-
-- Below reviews, a brief "About" card with:
-  - Travel philosophy (italic serif, 2-3 lines max)
-  - Specialties pills
-  - Certifications (from `CreatorTrustSection` data)
-  - "Member since" date
-- Not a long bio — sharp positioning statement
-
-**Files**: New `src/components/creator/CreatorAboutSection.tsx`
+- Step 1: Select tier (4 visual tier cards with icons and descriptions)
+- Step 2: Tier-specific form fields (only show relevant fields per tier)
+- "Includes" field: dynamic bullet-point list (add/remove items)
+- Keep it lightweight — no multi-page wizard, just a clean modal form
+- Edit and delete via dropdown on existing service cards
 
 ---
 
-### 6. Final CTA Block (keep, refine)
+### 4. Profile Page Integration
 
-- Keep the existing bottom CTA but update copy to match "Request a Trip" language
-- Remove redundant "Design My Trip" — single CTA verb across the page
+- Keep the current page structure (Hero → Storyboards → Services → Reviews → About)
+- Update the Services section to render tiered groups instead of a flat row
+- Empty state for owners: show the 4 tier options as dashed cards to guide first-time setup
+- Non-owners see only active services grouped by tier
 
 ---
 
-### Page Section Order
+### 5. Microcopy Updates
 
-```text
-[ Full-Width Hero Image ]
-[ Profile Card Overlay: Name, Title, Stats, "Request a Trip" CTA ]
-────────────────────────────────────────
-[ Travel Collections — Storyboard masonry grid ]
-────────────────────────────────────────
-[ Travel Services — Fiverr-style package cards ]
-────────────────────────────────────────
-[ Reviews — Social proof ]
-────────────────────────────────────────
-[ About — Short positioning + credentials ]
-────────────────────────────────────────
-[ Final CTA — "Start Your Journey" ]
-```
+- "Packages" → "Services" everywhere
+- Card CTAs: "Request This" for itinerary/trip design tiers, "Purchase" for digital guides, "Add" for add-ons
+- No "Book Now" language
 
 ---
 
@@ -108,13 +70,8 @@ A complete restructure of `CreatorPublicProfilePage.tsx` and supporting componen
 
 | Action | File |
 |--------|------|
-| Migration | Create `creator_services` table with RLS |
-| Create | `src/components/creator/CreatorHeroSection.tsx` |
-| Create | `src/components/creator/CreatorStorefrontFeed.tsx` |
-| Create | `src/components/creator/CreatorServicesSection.tsx` |
-| Create | `src/components/creator/CreatorAboutSection.tsx` |
-| Edit | `src/pages/creators/CreatorPublicProfilePage.tsx` — full restructure |
-| Edit | Remove `ProfileHero` usage from this page (keep component for other contexts) |
-
-Design tokens remain consistent: cream (#FDF9F0), white cards, gold accents (#C7A962), GS green CTAs (#0c4d47), Playfair Display headers, editorial typography throughout.
+| Migration | Add `service_tier`, `trip_days`, `has_priority_support`, `duration_minutes`, `file_url`, `delivery_time_option` to `creator_services` |
+| Rewrite | `src/components/creator/CreatorServicesSection.tsx` — tier-grouped display + management |
+| Create | `src/components/creator/AddServiceDialog.tsx` — tier-aware add/edit modal |
+| Edit | `src/pages/creators/CreatorPublicProfilePage.tsx` — minor wiring updates |
 
