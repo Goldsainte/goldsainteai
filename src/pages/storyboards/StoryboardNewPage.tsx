@@ -478,12 +478,13 @@ export default function StoryboardNewPage() {
               >
                 {publishing ? (
                   <>
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> Publishing...
-                </>
-              ) : (
-                "Publish"
-              )}
-            </Button>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" /> Publishing...
+                  </>
+                ) : (
+                  "Publish"
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
