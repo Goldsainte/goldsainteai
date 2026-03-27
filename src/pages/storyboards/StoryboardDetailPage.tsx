@@ -389,11 +389,39 @@ export default function StoryboardDetailPage() {
               <div className="rounded-xl border border-dashed border-border bg-muted/20 p-8 text-center">
                 <p className="text-sm font-medium text-foreground mb-2">Your storyboard is empty</p>
                 <p className="text-xs text-muted-foreground mb-4 max-w-md mx-auto">
-                  Start building your dream trip! Browse discovery feeds to pin inspiration.
+                  Start building your dream trip! Upload photos, design visuals, or browse creators for inspiration.
                 </p>
-                <div className="flex gap-2 justify-center">
+                <div className="flex gap-2 justify-center flex-wrap">
+                  {isOwner && (
+                    <>
+                      <Button size="sm" variant="outline" onClick={() => setShowUploader(true)} className="gap-1.5">
+                        <Upload className="h-3.5 w-3.5" /> Upload Photos
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => setDesignEditorOpen(true)} className="gap-1.5">
+                        <Paintbrush className="h-3.5 w-3.5" /> Design
+                      </Button>
+                    </>
+                  )}
                   <Button size="sm" variant="outline" onClick={() => navigate("/creators")}>Browse Creators</Button>
                 </div>
+                {isOwner && showUploader && (
+                  <div className="mt-4 max-w-md mx-auto">
+                    <StoryboardPhotoUploader
+                      onPhotosUploaded={async (urls) => {
+                        for (const url of urls) {
+                          await addStoryboardItem({
+                            storyboardId: id!,
+                            itemType: "image",
+                            title: "Uploaded photo",
+                            imageUrl: url,
+                            sourceType: "manual",
+                          });
+                        }
+                        await loadStoryboard();
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             ) : (
               <div className="columns-2 md:columns-3 lg:columns-4 gap-4 [column-fill:_balance]">
