@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Plus, Link as LinkIcon, Image, X } from "lucide-react";
+import { Loader2, Plus, Link as LinkIcon, Image, X, Upload, Paintbrush } from "lucide-react";
+import { StoryboardPhotoUploader } from "./StoryboardPhotoUploader";
+import { DesignEditorModal } from "./DesignEditorModal";
 
 type TripFieldsForInsert = {
   destination?: string;
