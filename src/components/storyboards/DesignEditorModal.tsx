@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,8 +27,8 @@ interface DesignEditorModalProps {
   onExport: (imageUrl: string) => void;
 }
 
-const CANVAS_WIDTH = 800;
-const CANVAS_HEIGHT = 600;
+const CANVAS_WIDTH = 600;
+const CANVAS_HEIGHT = 400;
 
 const PRESET_COLORS = [
   "#0a2225", "#0c4d47", "#C7A962", "#E5DFC6", "#ffffff",
@@ -56,6 +57,7 @@ export function DesignEditorModal({ open, onOpenChange, onExport }: DesignEditor
         backgroundColor: "#ffffff",
       });
       fabricRef.current = canvas;
+      console.log("[DesignEditor] Fabric canvas initialized", canvas);
     }, 200);
 
     return () => {
@@ -194,9 +196,10 @@ export function DesignEditorModal({ open, onOpenChange, onExport }: DesignEditor
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[900px] max-h-[95vh] overflow-y-auto !overflow-visible" style={{ contain: 'none' }}>
+      <DialogContent className="!max-w-[700px] max-h-[95vh] overflow-y-auto overflow-visible" style={{ contain: 'none' }}>
         <DialogHeader>
           <DialogTitle className="font-display">Design Editor</DialogTitle>
+          <DialogDescription>Add text, shapes, and images to create your design.</DialogDescription>
         </DialogHeader>
 
         <input
@@ -243,8 +246,8 @@ export function DesignEditorModal({ open, onOpenChange, onExport }: DesignEditor
         </div>
 
         {/* Canvas */}
-        <div className="border border-border rounded-lg bg-muted/30 flex items-center justify-center overflow-auto">
-          <div className="relative" style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT, minWidth: CANVAS_WIDTH, minHeight: CANVAS_HEIGHT }}>
+        <div className="border border-border rounded-lg bg-muted/30 flex items-center justify-center overflow-visible">
+          <div className="relative" style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT, overflow: 'visible', pointerEvents: 'auto' }}>
             <canvas ref={canvasRef} />
           </div>
         </div>
