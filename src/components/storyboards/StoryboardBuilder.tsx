@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Plus, Link as LinkIcon, Image, X } from "lucide-react";
+import { Loader2, Plus, Link as LinkIcon, Image, X, Upload, Paintbrush } from "lucide-react";
+import { StoryboardPhotoUploader } from "./StoryboardPhotoUploader";
+import { DesignEditorModal } from "./DesignEditorModal";
 
 type TripFieldsForInsert = {
   destination?: string;
@@ -61,7 +63,8 @@ export function StoryboardBuilder({
 }: StoryboardBuilderProps) {
   const [title, setTitle] = useState(initialTitle || "");
   const [items, setItems] = useState<Item[]>([]);
-  const [activeTab, setActiveTab] = useState<"photos" | "links">("photos");
+  const [activeTab, setActiveTab] = useState<"photos" | "links" | "upload" | "design">("photos");
+  const [designEditorOpen, setDesignEditorOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [photoResults, setPhotoResults] = useState<UnsplashPhoto[]>([]);
@@ -227,9 +230,11 @@ export function StoryboardBuilder({
       </div>
 
       {/* Tabs */}
-      <div className="mb-3 flex gap-2 text-xs">
+      <div className="mb-3 flex gap-2 text-xs flex-wrap">
         <TabButton active={activeTab === "photos"} onClick={() => setActiveTab("photos")}><Image className="h-3 w-3" /> Photos</TabButton>
         <TabButton active={activeTab === "links"} onClick={() => setActiveTab("links")}><LinkIcon className="h-3 w-3" /> TikTok / Reels / YouTube</TabButton>
+        <TabButton active={activeTab === "upload"} onClick={() => setActiveTab("upload")}><Upload className="h-3 w-3" /> Upload</TabButton>
+        <TabButton active={activeTab === "design"} onClick={() => setActiveTab("design")}><Paintbrush className="h-3 w-3" /> Design</TabButton>
       </div>
 
       {/* Search bar */}
@@ -271,6 +276,50 @@ export function StoryboardBuilder({
               placeholder="https://www.tiktok.com/…" className="flex-1 rounded-full border border-[#E5DFC6] bg-[#f7f3ea] px-3 py-2 text-xs outline-none placeholder:text-[#8D8D8D]" />
             <button onClick={addLink} disabled={!linkInput.trim()} className="inline-flex items-center gap-1 rounded-full bg-[#0c4d47] px-4 py-2 text-xs text-[#E5DFC6] disabled:opacity-60">Add</button>
           </div>
+        </div>
+      )}
+
+      {/* Upload tab */}
+      {activeTab === "upload" && (
+        <div className="mb-4">
+          <StoryboardPhotoUploader
+            onPhotosUploaded={(urls) => {
+              const newItems: Item[] = urls.map((url) => ({
+                kind: "photo",
+                source: "manual",
+                data: { thumb_url: url, full_url: url, alt: "Uploaded photo" },
+              }));
+              setItems((prev) => [...prev, ...newItems]);
+            }}
+          />
+        </div>
+      )}
+
+      {/* Design tab */}
+      {activeTab === "design" && (
+        <div className="mb-4">
+          <button
+            onClick={() => setDesignEditorOpen(true)}
+            className="w-full border-2 border-dashed border-border rounded-2xl p-6 flex flex-col items-center justify-center gap-2 text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 transition-all"
+          >
+            <Paintbrush className="h-8 w-8" />
+            <span className="text-sm font-medium">Open Design Editor</span>
+            <span className="text-xs">Create custom covers, caption cards & visual blocks</span>
+          </button>
+          <DesignEditorModal
+            open={designEditorOpen}
+            onOpenChange={setDesignEditorOpen}
+            onExport={(url) => {
+              setItems((prev) => [
+                ...prev,
+                {
+                  kind: "photo",
+                  source: "manual",
+                  data: { thumb_url: url, full_url: url, alt: "Designed block" },
+                },
+              ]);
+            }}
+          />
         </div>
       )}
 

@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { 
   ArrowLeft, Plus, Trash2, Globe, Lock, Edit2, 
-  Copy, Check, Bookmark, ArrowRight, Sparkles, Loader2, MoreVertical
+  Copy, Check, Bookmark, ArrowRight, Sparkles, Loader2, MoreVertical,
+  Upload, Paintbrush
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -25,6 +26,8 @@ import { useDiscoveryFeed, type UnsplashImage } from "@/hooks/useDiscoveryFeed";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { deleteStoryboard } from "@/services/storyboardsService";
 import { toast } from "sonner";
+import { StoryboardPhotoUploader } from "@/components/storyboards/StoryboardPhotoUploader";
+import { DesignEditorModal } from "@/components/storyboards/DesignEditorModal";
 
 export default function StoryboardDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -54,6 +57,9 @@ export default function StoryboardDetailPage() {
 
   const isOwner = user?.id === storyboard?.owner_id;
   const [deleting, setDeleting] = useState(false);
+  const [showUploader, setShowUploader] = useState(false);
+  const [designEditorOpen, setDesignEditorOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // "More like this" query based on storyboard title
   const moreLikeQuery = storyboard?.title
@@ -383,11 +389,39 @@ export default function StoryboardDetailPage() {
               <div className="rounded-xl border border-dashed border-border bg-muted/20 p-8 text-center">
                 <p className="text-sm font-medium text-foreground mb-2">Your storyboard is empty</p>
                 <p className="text-xs text-muted-foreground mb-4 max-w-md mx-auto">
-                  Start building your dream trip! Browse discovery feeds to pin inspiration.
+                  Start building your dream trip! Upload photos, design visuals, or browse creators for inspiration.
                 </p>
-                <div className="flex gap-2 justify-center">
+                <div className="flex gap-2 justify-center flex-wrap">
+                  {isOwner && (
+                    <>
+                      <Button size="sm" variant="outline" onClick={() => setShowUploader(true)} className="gap-1.5">
+                        <Upload className="h-3.5 w-3.5" /> Upload Photos
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => setDesignEditorOpen(true)} className="gap-1.5">
+                        <Paintbrush className="h-3.5 w-3.5" /> Design
+                      </Button>
+                    </>
+                  )}
                   <Button size="sm" variant="outline" onClick={() => navigate("/creators")}>Browse Creators</Button>
                 </div>
+                {isOwner && showUploader && (
+                  <div className="mt-4 max-w-md mx-auto">
+                    <StoryboardPhotoUploader
+                      onPhotosUploaded={async (urls) => {
+                        for (const url of urls) {
+                          await addStoryboardItem({
+                            storyboardId: id!,
+                            itemType: "image",
+                            title: "Uploaded photo",
+                            imageUrl: url,
+                            sourceType: "manual",
+                          });
+                        }
+                        await loadStoryboard();
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             ) : (
               <div className="columns-2 md:columns-3 lg:columns-4 gap-4 [column-fill:_balance]">
@@ -445,6 +479,39 @@ export default function StoryboardDetailPage() {
               </div>
             )}
 
+            {/* Owner floating actions */}
+            {isOwner && (storyboard.items || []).length > 0 && (
+              <div className="flex gap-2 flex-wrap">
+                <Button size="sm" variant="outline" onClick={() => setShowUploader(!showUploader)} className="gap-1.5">
+                  <Upload className="h-3.5 w-3.5" /> Upload Photos
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => setDesignEditorOpen(true)} className="gap-1.5">
+                  <Paintbrush className="h-3.5 w-3.5" /> Design
+                </Button>
+              </div>
+            )}
+
+            {/* Inline uploader for owner */}
+            {isOwner && showUploader && (
+              <div className="max-w-lg">
+                <StoryboardPhotoUploader
+                  onPhotosUploaded={async (urls) => {
+                    for (const url of urls) {
+                      await addStoryboardItem({
+                        storyboardId: id!,
+                        itemType: "image",
+                        title: "Uploaded photo",
+                        imageUrl: url,
+                        sourceType: "manual",
+                      });
+                    }
+                    await loadStoryboard();
+                    setShowUploader(false);
+                  }}
+                />
+              </div>
+            )}
+
             {/* Related storyboards */}
             {relatedBoards.length > 0 && (
               <div className="mt-12">
@@ -480,6 +547,21 @@ export default function StoryboardDetailPage() {
         sourceId={saveModal.sourceId}
         repinnedFromItemId={saveModal.repinnedFromItemId}
         repinnedFromUserId={saveModal.repinnedFromUserId}
+      />
+
+      <DesignEditorModal
+        open={designEditorOpen}
+        onOpenChange={setDesignEditorOpen}
+        onExport={async (url) => {
+          await addStoryboardItem({
+            storyboardId: id!,
+            itemType: "image",
+            title: "Designed block",
+            imageUrl: url,
+            sourceType: "design_editor",
+          });
+          await loadStoryboard();
+        }}
       />
     </div>
   );
