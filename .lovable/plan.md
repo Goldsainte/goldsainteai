@@ -1,22 +1,32 @@
 
 
-## Fix: Text Editing in Design Editor
+## Fix: Publish Storyboard Button Not Working
 
 ### Problem
-Radix Dialog has a built-in focus trap that steals focus from Fabric.js's hidden `<textarea>`. When you click "Text," Fabric creates an `IText` and enters edit mode, but the dialog immediately yanks focus back — so keystrokes never reach the canvas.
 
-### Fix (1 file)
+The "Publish Storyboard" button has two likely failure modes:
 
-**`src/components/storyboards/DesignEditorModal.tsx`**
+1. **Button is disabled (greyed out)** — It's disabled when `!title.trim()`, meaning if the title input is empty, clicking does nothing with no explanation to the user.
+2. **User not authenticated** — `handlePublish` calls `supabase.auth.getUser()`. If the user isn't logged in, it throws "Not authenticated" which shows a toast, but if the toast isn't visible (e.g., positioned off-screen or styled to blend in), it seems like nothing happened.
 
-Add two props to `DialogContent`:
+### Fix (1 file: `StoryboardNewPage.tsx`)
 
-1. **`onOpenAutoFocus={(e) => e.preventDefault()}`** — Stop the dialog from grabbing focus on open, letting Fabric keep control.
-2. **`onInteractOutside={(e) => { if (fabricRef.current?.getActiveObject()?.isEditing) e.preventDefault(); }`** — Prevent the dialog from closing/stealing focus when clicking inside the canvas while editing text.
+1. **Add visual feedback when disabled** — Show a tooltip or inline message below the button explaining "Enter a title to publish" when the title is empty.
 
-That's it — two event handler props on the existing `DialogContent` element.
+2. **Add auth check before publish** — Instead of silently failing, redirect to login if not authenticated, or show a clear modal/alert.
+
+3. **Add console logging** — Temporary `console.log` at the start of `handlePublish` to confirm the click handler fires at all (to rule out event propagation issues).
+
+4. **Check button `type` attribute** — The button is inside a form-like structure. If it's inside a `<form>`, it may be submitting the form instead of calling `onClick`. Add `type="button"` explicitly to both Publish buttons.
+
+### Changes
 
 | Action | File |
 |--------|------|
-| Edit | `src/components/storyboards/DesignEditorModal.tsx` |
+| Edit | `src/pages/storyboards/StoryboardNewPage.tsx` |
+
+- Add `type="button"` to both publish `<Button>` elements (lines 462 and 614)
+- Add a disabled-state message: when `!title.trim()`, show helper text "Add a title first"
+- Add `console.log("handlePublish called")` at top of `handlePublish` for debugging
+- If user is not authenticated, navigate to `/auth` instead of just showing a toast
 
