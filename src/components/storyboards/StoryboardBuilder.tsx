@@ -63,7 +63,8 @@ export function StoryboardBuilder({
 }: StoryboardBuilderProps) {
   const [title, setTitle] = useState(initialTitle || "");
   const [items, setItems] = useState<Item[]>([]);
-  const [activeTab, setActiveTab] = useState<"photos" | "links">("photos");
+  const [activeTab, setActiveTab] = useState<"photos" | "links" | "upload" | "design">("photos");
+  const [designEditorOpen, setDesignEditorOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [photoResults, setPhotoResults] = useState<UnsplashPhoto[]>([]);
