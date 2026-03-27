@@ -74,7 +74,7 @@ const PublicStoryboardPage = lazy(() => import('@/pages/public/PublicStoryboardP
 const AgentTripsPage = lazy(() => import('@/pages/AgentTripsPage'));
 const CreatorTripsPage = lazy(() => import('@/pages/CreatorTripsPage'));
 
-const TikTokLabStoryboardEditorPage = lazy(() => import('@/pages/TikTokLab/StoryboardEditorPage'));
+const StoryboardNewPage = lazy(() => import('@/pages/storyboards/StoryboardNewPage'));
 
 const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
 const MarketplaceGuidelinesPage = lazy(() => import('@/pages/MarketplaceGuidelinesPage'));
