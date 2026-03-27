@@ -548,6 +548,21 @@ export default function StoryboardDetailPage() {
         repinnedFromItemId={saveModal.repinnedFromItemId}
         repinnedFromUserId={saveModal.repinnedFromUserId}
       />
+
+      <DesignEditorModal
+        open={designEditorOpen}
+        onOpenChange={setDesignEditorOpen}
+        onExport={async (url) => {
+          await addStoryboardItem({
+            storyboardId: id!,
+            itemType: "image",
+            title: "Designed block",
+            imageUrl: url,
+            sourceType: "design_editor",
+          });
+          await loadStoryboard();
+        }}
+      />
     </div>
   );
 }
