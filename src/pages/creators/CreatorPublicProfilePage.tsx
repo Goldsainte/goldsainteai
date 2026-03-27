@@ -11,10 +11,6 @@ import { CreatorServicesSection } from "@/components/creator/CreatorServicesSect
 import { CreatorAboutSection } from "@/components/creator/CreatorAboutSection";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { createStoryboard } from "@/services/storyboardsService";
 import { toast } from "sonner";
 
 // -- Gold section divider component --
@@ -88,11 +84,6 @@ export default function CreatorPublicProfilePage() {
   const [reviewCount, setReviewCount] = useState<number>(0);
   const [creatorStoryboards, setCreatorStoryboards] = useState<BoardSummary[]>([]);
   const [pinItems, setPinItems] = useState<PinItem[]>([]);
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [newBoardTitle, setNewBoardTitle] = useState("");
-  const [newBoardDescription, setNewBoardDescription] = useState("");
-  const [newBoardDestination, setNewBoardDestination] = useState("");
-  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -182,35 +173,6 @@ export default function CreatorPublicProfilePage() {
     return () => window.removeEventListener("storyboard-updated", handler);
   }, []);
 
-  const handleCreateStoryboard = async () => {
-    if (!user || !newBoardTitle.trim()) return;
-    setCreating(true);
-    try {
-      const board = await createStoryboard({
-        ownerId: user.id,
-        role: "creator",
-        title: newBoardTitle.trim(),
-        description: newBoardDescription.trim() || undefined,
-        isPublic: true,
-      });
-      if (newBoardDestination.trim()) {
-        await supabase
-          .from("storyboards")
-          .update({ destination: newBoardDestination.trim() })
-          .eq("id", board.id);
-      }
-      toast.success("Storyboard created!");
-      setShowCreateDialog(false);
-      setNewBoardTitle("");
-      setNewBoardDescription("");
-      setNewBoardDestination("");
-      setReviewRefreshKey((k) => k + 1);
-    } catch (err: any) {
-      toast.error(err.message || "Failed to create storyboard");
-    } finally {
-      setCreating(false);
-    }
-  };
 
   const isOwnProfile = user?.id === creator?.id;
 
@@ -328,7 +290,7 @@ export default function CreatorPublicProfilePage() {
                 storyboards={creatorStoryboards}
                 creatorId={creator.id}
                 isOwnProfile={isOwnProfile}
-                onCreateNew={() => setShowCreateDialog(true)}
+                onCreateNew={() => navigate("/storyboards/new")}
                 onBoardDeleted={() => setReviewRefreshKey((k) => k + 1)}
               />
             </div>
@@ -424,50 +386,6 @@ export default function CreatorPublicProfilePage() {
           </div>
         </div>
 
-        {/* Create Storyboard Dialog */}
-        <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-          <DialogContent className="sm:max-w-md bg-[#FDF9F0]">
-            <DialogHeader>
-              <DialogTitle className="font-secondary text-xl text-[#0a2225]">New Storyboard</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 mt-2">
-              <div>
-                <label className="text-xs font-medium text-[#6B7280] uppercase tracking-wider">Title *</label>
-                <Input
-                  placeholder="e.g. Amalfi Coast Dream Trip"
-                  value={newBoardTitle}
-                  onChange={(e) => setNewBoardTitle(e.target.value)}
-                  className="mt-1 border-[#E5DFC6]"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-medium text-[#6B7280] uppercase tracking-wider">Destination</label>
-                <Input
-                  placeholder="e.g. Italy, Amalfi Coast"
-                  value={newBoardDestination}
-                  onChange={(e) => setNewBoardDestination(e.target.value)}
-                  className="mt-1 border-[#E5DFC6]"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-medium text-[#6B7280] uppercase tracking-wider">Description</label>
-                <Textarea
-                  placeholder="What's this storyboard about?"
-                  value={newBoardDescription}
-                  onChange={(e) => setNewBoardDescription(e.target.value)}
-                  className="mt-1 border-[#E5DFC6] min-h-[80px]"
-                />
-              </div>
-              <Button
-                onClick={handleCreateStoryboard}
-                disabled={!newBoardTitle.trim() || creating}
-                className="w-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full h-11"
-              >
-                {creating ? "Creating…" : "Create Storyboard"}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
       </div>
     </>
   );
