@@ -230,9 +230,11 @@ export function StoryboardBuilder({
       </div>
 
       {/* Tabs */}
-      <div className="mb-3 flex gap-2 text-xs">
+      <div className="mb-3 flex gap-2 text-xs flex-wrap">
         <TabButton active={activeTab === "photos"} onClick={() => setActiveTab("photos")}><Image className="h-3 w-3" /> Photos</TabButton>
         <TabButton active={activeTab === "links"} onClick={() => setActiveTab("links")}><LinkIcon className="h-3 w-3" /> TikTok / Reels / YouTube</TabButton>
+        <TabButton active={activeTab === "upload"} onClick={() => setActiveTab("upload")}><Upload className="h-3 w-3" /> Upload</TabButton>
+        <TabButton active={activeTab === "design"} onClick={() => setActiveTab("design")}><Paintbrush className="h-3 w-3" /> Design</TabButton>
       </div>
 
       {/* Search bar */}
