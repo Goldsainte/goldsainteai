@@ -1,32 +1,35 @@
 
 
-## Fix: Design Editor Canvas Not Interactive
+## Fix: Design Editor Canvas — Fabric.js Not Initializing Properly
 
 ### Root Cause
 
-Two issues prevent the Fabric.js canvas from receiving mouse/touch events:
+The Fabric.js canvas is likely failing to initialize because the dialog's base `DialogContent` has `sm:max-w-lg` (32rem = 512px) baked in, but the Design Editor passes `sm:max-w-[900px]`. The problem is the base class `sm:max-w-lg` is applied *before* the override class, and Tailwind doesn't guarantee the override wins in a class conflict — both classes exist in the stylesheet, and whichever appears later in the CSS file wins, not whichever appears later in the `className` string.
 
-1. **`contain-paint` on DialogContent** — Fabric.js v6 creates a wrapper `<div>` containing two stacked `<canvas>` elements (a render canvas and an "upper canvas" for mouse interaction). The CSS `contain-paint` property on the dialog creates a containment context that interferes with Fabric's absolutely-positioned upper canvas layer, blocking pointer events.
+This means the canvas container (800px wide) is being squeezed into a ~512px dialog. Fabric.js creates its wrapper div to match the canvas dimensions, but the overflow is hidden/clipped. The "upper-canvas" (Fabric's interaction layer) is positioned absolutely and gets clipped or pushed outside the visible area — so clicks never reach it.
 
-2. **`overflow-hidden` on DialogContent** — Combined with `contain-paint`, this clips Fabric's interaction layer, making the canvas appear present but completely unresponsive.
+Additionally, `contain-paint` in the base dialog creates a paint containment context that clips Fabric's absolutely-positioned layers.
 
-### Fix
+### The Fix (2 files)
 
-**Edit `src/components/storyboards/DesignEditorModal.tsx`** (1 file):
+**1. `src/components/storyboards/DesignEditorModal.tsx`**
+- Reduce canvas to 600x400 so it fits comfortably in the dialog without requiring a wider override
+- Add explicit `pointer-events: auto` and `position: relative` on the canvas wrapper
+- Add a `DialogDescription` to fix the accessibility warning in console
+- Add console.log in the `useEffect` to confirm Fabric actually initializes (for debugging, remove later)
+- Ensure the canvas wrapper has `overflow: visible` with an inline style
 
-1. **Canvas container needs `relative` positioning and explicit size** — Wrap the `<canvas>` in a container with `position: relative` and explicit `width`/`height` matching the Fabric canvas dimensions, so Fabric's absolutely-positioned upper canvas stays properly stacked.
+**2. `src/components/ui/dialog.tsx`**
+- Remove `contain-paint` from the base DialogContent class — it breaks any component that uses absolutely-positioned layers (Fabric.js, drag-and-drop, etc.). Replace with nothing or a less restrictive containment.
 
-2. **Override dialog's restrictive CSS on the canvas area** — Add `overflow-visible` and remove containment on the canvas wrapper so Fabric's event layer isn't clipped.
+### Why buttons "do nothing"
 
-3. **Pass `className` override to DialogContent** — Add `!overflow-visible` to the DialogContent className to prevent the dialog's default `overflow-hidden` and `contain-paint` from eating pointer events on the canvas. Alternatively, use inline style `{{ contain: 'none' }}`.
+When you click "Text," "Rectangle," etc., the code calls `fabricRef.current.add(...)`. If Fabric never initialized (because the canvas was clipped or the DOM element was in a broken state), `fabricRef.current` is `null` and the function silently returns on line 71: `if (!fabricRef.current) return;`. No error, no feedback — it just does nothing.
 
-4. **Increase init delay** — Bump the `setTimeout` from 100ms to 200ms for more reliable DOM readiness inside the dialog animation.
+### Changes
 
-No changes to `dialog.tsx` needed — the fix is scoped to the Design Editor modal only.
-
-### Summary
-
-| Action | File |
-|--------|------|
-| Edit | `src/components/storyboards/DesignEditorModal.tsx` |
+| Action | File | What |
+|--------|------|------|
+| Edit | `src/components/ui/dialog.tsx` | Remove `contain-paint` from base classes |
+| Edit | `src/components/storyboards/DesignEditorModal.tsx` | Reduce canvas size to fit dialog, add accessibility description, add debugging log |
 
