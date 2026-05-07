@@ -137,14 +137,14 @@ export const CreatorAIMagic: React.FC = () => {
 
           {/* Soft AI label at top */}
           <div
-            className="absolute top-9 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 rounded-full bg-white/90 backdrop-blur border border-[#C7A962]/50 px-2.5 py-0.5 text-[10px] uppercase tracking-[0.18em] text-[#0a2225] shadow-sm opacity-0 animate-[gs-fade-in_500ms_ease-out_forwards]"
+            className="absolute top-9 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-white/90 backdrop-blur border border-[#C7A962]/50 px-2.5 py-0.5 text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-[#0a2225] shadow-sm opacity-0 animate-[gs-fade-in_500ms_ease-out_forwards]"
           >
             <Sparkles className="w-2.5 h-2.5 text-[#C7A962] animate-pulse" />
             Reconstructing your journey
           </div>
 
           {/* Day chronology chips that fade in mid-sequence */}
-          <div className="absolute top-[62px] left-0 right-0 flex items-center justify-center gap-2">
+          <div className="absolute top-[68px] sm:top-[70px] left-0 right-0 flex items-center justify-center gap-2">
             {["01", "02", "03"].map((d, i) => (
               <span
                 key={d}
@@ -200,14 +200,14 @@ export const CreatorAIMagic: React.FC = () => {
             // Use 3 visual rows to read as chronology.
             const positions = [
               // Day 01 — Oia + Ammoudi
-              { t: "30%", l: "8%", r: "-3deg", label: "above" as const },
-              { t: "30%", l: "58%", r: "2deg", label: "above" as const },
+              { t: "28%", l: "8%", r: "-3deg", label: "above" as const },
+              { t: "28%", l: "58%", r: "2deg", label: "above" as const },
               // Day 02 — Caldera + Canaves + Catamaran
-              { t: "53%", l: "4%", r: "1deg", label: "below" as const },
-              { t: "53%", l: "36%", r: "-2deg", label: "below" as const },
-              { t: "53%", l: "66%", r: "3deg", label: "below" as const },
+              { t: "50%", l: "4%", r: "1deg", label: "below" as const },
+              { t: "50%", l: "36%", r: "-2deg", label: "below" as const },
+              { t: "50%", l: "66%", r: "3deg", label: "below" as const },
               // Day 03 — Megalochori
-              { t: "76%", l: "36%", r: "-1deg", label: "below" as const },
+              { t: "70%", l: "36%", r: "-1deg", label: "below" as const },
             ][i];
             return (
               <div
@@ -265,7 +265,7 @@ export const CreatorAIMagic: React.FC = () => {
           })}
 
           {/* Classifier tag strip */}
-          <div className="absolute bottom-10 sm:bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-1 sm:gap-1.5 px-2 flex-wrap justify-center max-w-[92%]">
+          <div className="absolute bottom-5 sm:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1 sm:gap-1.5 px-2 flex-wrap justify-center max-w-[92%]">
             {["Stay", "Dining", "Sunset", "Cruise", "Tasting"].map((tag, i) => (
               <span
                 key={tag}
