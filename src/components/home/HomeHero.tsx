@@ -31,8 +31,7 @@ export function HomeHero() {
 
               {/* Headline — 40px below pill */}
               <h1 className="mt-10 font-display text-3xl leading-tight md:text-4xl lg:text-[38px]">
-                Turn Your Travel Vision Into a <em>Storyboard</em> — Then Let{" "}
-                <em>Creators & Agents</em> Compete to Bring It to Life.
+                The marketplace for curated travel experiences
               </h1>
 
               {/* Description — 32px below headline */}
