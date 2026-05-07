@@ -22,6 +22,8 @@ import veniceGondolaImg from "@/assets/venice-gondola.jpg";
 import hotAirBalloonsImg from "@/assets/hot-air-balloons.jpg";
 import mountainBridgeImg from "@/assets/mountain-bridge-adventure.jpg";
 import { CreatorAIMagic } from "@/components/home/CreatorAIMagic";
+import { TravelerDiscoveryMagic } from "@/components/home/TravelerDiscoveryMagic";
+import { AgentProposalMagic } from "@/components/home/AgentProposalMagic";
 
 /* -------------------------------------------------------------------------- */
 /*  Built for every side of luxury travel - Horizontal Scroll Carousel        */
@@ -335,11 +337,11 @@ const tabsData: TabData[] = [
   },
 ];
 
-// Tab-specific hero images mapping
-const tabImages: Record<string, string> = {
-  travelers: santoriniStepsImg,
-  creators: creatorCanyonImg,
-  agents: agentPlanningImg,
+// Tab-specific signature animations
+const tabAnimations: Record<string, React.FC> = {
+  travelers: TravelerDiscoveryMagic,
+  creators: CreatorAIMagic,
+  agents: AgentProposalMagic,
 };
 
 export const HowGoldsainteWorksSection: React.FC = () => {
