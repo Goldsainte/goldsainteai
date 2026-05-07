@@ -87,10 +87,10 @@ export function RoleSpecificCTAs() {
 
               {/* Top eyebrow */}
               <div className="absolute left-6 top-6 md:left-7 md:top-7">
-                <span className="block text-[10px] uppercase tracking-[0.22em] text-[#C7A962]">
+                <span className="inline-block rounded-full bg-[#0a2225]/70 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.22em] text-[#E8C977] backdrop-blur-sm shadow-[0_2px_10px_rgba(0,0,0,0.25)]">
                   {p.eyebrow}
                 </span>
-                <span className="mt-1.5 block h-px w-10 origin-left scale-x-0 bg-[#C7A962] transition-transform duration-500 ease-out group-hover:scale-x-100" />
+                <span className="mt-2 block h-px w-10 origin-left scale-x-0 bg-[#E8C977] transition-transform duration-500 ease-out group-hover:scale-x-100" />
               </div>
 
               {/* Bottom content */}
