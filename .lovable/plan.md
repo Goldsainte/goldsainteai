@@ -1,124 +1,46 @@
-## Vision
+# Add real imagery to Traveler & Agent home animations
 
-Evolve `/marketplace` from a beautifully designed static catalog into a living, creator-powered, AI-personalized luxury commerce ecosystem — without breaking the editorial Goldsainte aesthetic (cream bg, dark green CTA, gold accents, serif headers, 4/3 image cards).
+## Problem
 
-The work is grouped into 6 phases. Each phase ships independently and is visually subtle.
+`TravelerDiscoveryMagic.tsx` and `AgentProposalMagic.tsx` currently render every "card" with only a colored gradient (`from-[#…] to-[#…]`). Unlike `CreatorAIMagic.tsx`, neither file references any `img` URLs or `<img>` tags. To viewers this reads as "the images are not showing"—it's actually that no images were ever wired in.
 
----
+## Goal
 
-## Phase 1 — Creator-First Trip Cards
+Bring the Traveler and Agent vignettes up to parity with the Creator scene: every trip card, swap card, day tile, and "AI suggestion" chip should sit on a real luxury travel photograph (Santorini, Positano, Capri, Tanzania, Japan, etc.), with the existing gradient now used as a soft top-down overlay for legibility. Layout, motion, timing, and copy stay exactly as they are.
 
-Make `LiveTripCard` lead with the human, not just the trip.
+## Changes
 
-Add below the image, above the title:
-- Small circular creator avatar (24px) + creator name in serif italic
-- "Curated by {name} · {home_base}" microcopy in muted gold
-- One travel-style chip pulled from `creator.style_tags` (e.g. "Quiet Luxury")
+### 1. `src/components/home/TravelerDiscoveryMagic.tsx`
 
-Add a tiny bottom-row metadata strip:
-- Save count ("Saved 2.3k times") — subtle, no icon flood
-- One soft social-proof line when applicable ("120 travelers booked")
+- Extend the existing data arrays with an `img` field (curated Unsplash URLs, `w=400&q=70`, lazy-loaded):
+  - `dayTimeline` (Cliffside Dinner / Caldera Sunset / Winery Tasting) → Santorini photos.
+  - `swaps` (Canaves Oia, Selene, Private Sailboat) → matching luxury stay/dining/sailing photos.
+  - `aiSuggestions` (Sommelier Tasting, Akrotiri, Vlychada) → matching photos.
+  - Add a `heroImg` + 4 grid `img`s for Scene 1's "Trending in Summer" marketplace cards.
+- In every card that currently has only `bg-gradient-to-br from-… to-…`, render an `<img class="absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async" />` underneath, then keep the existing gradient as a tinted overlay (`from-[#0a2225]/55 via-[#0a2225]/15 to-transparent`) so text/icons stay readable.
 
-New file: `src/components/marketplace/CreatorAttribution.tsx` — reusable inline attribution block used on cards and trip detail.
+### 2. `src/components/home/AgentProposalMagic.tsx`
 
-Extend the `LiveTripCard` `trip` prop to accept `creator { id, full_name, avatar_url, home_base, style_tags }` and `save_count`, `booking_count`. Update the `Marketplace.tsx` query select to fetch `home_base, style_tags` from `profiles` and aggregate counts.
+Same approach:
+- Add `img` to `days` (Positano cliffside, Capri yacht, Ravello belvedere) and to `aiTips` (Da Adolfo, Caruso suite, helicopter transfer).
+- Add request-thumbnail images for Scene 1 (Tanzania safari, Japan family journey, plus the highlighted "new request" card).
+- Add proposal preview images for the final scene.
+- Wrap each gradient block with an `<img>` underneath + softened gradient overlay.
 
----
+### 3. Image sourcing
 
-## Phase 2 — Living Marketplace Signals
+Use the same pattern that already works in `CreatorAIMagic.tsx` (direct `images.unsplash.com/photo-…?auto=format&fit=crop&w=400&q=70` URLs). All images:
+- `loading="lazy"`, `decoding="async"`.
+- `object-cover` with a darkening gradient overlay so the existing white serif copy and gold hairlines remain legible.
+- No new dependencies; no changes to Tailwind config or design tokens.
 
-Introduce subtle "alive" indicators across the grid:
-- New component `LiveSignalRow` shown above the trip grid: a soft horizontal scroll of capsules — "Trending This Week", "Recently Booked", "New Creator Collection", "Saved 2.3k times this month" — sourced from real DB aggregates (booking counts, recent saves, recent published trips).
-- Per-card overlay tag (top-left, only when truthy): `Trending`, `New`, `Almost Booked`, `Recently Booked` — small cream pill with thin dark-green border, no neon urgency.
-- Add a "Quietly Active" footer line under the grid: "12 travelers are exploring this collection right now" using Supabase Realtime presence on the marketplace channel.
+### 4. Out of scope
 
-These tags must feel editorial (serif label, lots of whitespace) — never red badges or countdowns.
+- No layout/animation/timing changes.
+- No copy changes.
+- No backend / data / RLS / edge function changes.
+- `CreatorAIMagic.tsx` already has imagery and is left untouched.
 
----
+## Verification
 
-## Phase 3 — Invisible AI Personalization Layer
-
-Surface AI without chatbot UI.
-
-- New row `ForYouRow` rendered above the main grid (only for authenticated travelers): horizontally scrolling 4/3 cards with floating tag — "Matches your travel style", "Because you explored Japan", "Inspired by your saved retreats". Powered by an existing matching/embedding service (`src/services/matchingService.ts` + `src/lib/matching/types.ts`) extended with a `recommendForUser(userId)` method.
-- Floating "Why this?" affordance on each personalized card → opens a soft popover with the matched signals (tag overlap, region, vibe).
-- Adaptive sort: when user is signed-in, default sort becomes "Personalized" with an unobtrusive sort dropdown (Personalized / Newest / Editor's Picks).
-- New dynamic collection rows below grid: "Slow Luxury", "Quiet Wellness", "Hidden Cities" — generated from creator `style_tags` clusters; cached server-side, refreshed daily.
-
-All copy is whisper-soft. No "AI" branding visible in UI; behave like editorial intuition.
-
----
-
-## Phase 4 — Signature "Make It Mine" Interaction
-
-The unforgettable Goldsainte moment, lives on `TripDetailPage`.
-
-Add a `MakeItMinePanel` directly under the hero:
-- Five elegant chips: Slower Pace · Wellness Focus · Luxury Upgrade · Food & Wine · Adventure
-- Selecting chips triggers a cinematic transformation (300–500ms cross-fade) of:
-  - Hotel images and names in the itinerary
-  - Daily activity blocks
-  - Dining suggestions
-  - Map waypoints
-  - Estimated price recalculated softly
-- Powered by an edge function `personalize-trip` that calls Lovable AI (per project memory, project uses direct OpenAI gpt-4o, so use that) with the base itinerary + selected modifiers and returns a structured JSON variant.
-- When a variant is active, a small serif strip appears: "Your version of {trip.title}" with a "Save my version" CTA that persists to a new `trip_variants` table.
-
-The animation is the centerpiece — must feel cinematic, not jumpy. Use `framer-motion` `AnimatePresence` with staggered children, soft blur cross-fades, gold underline sweep on the active chip.
-
----
-
-## Phase 5 — Editorial Itinerary Upgrade
-
-Enhance the existing `TripItinerary` component on detail pages:
-- Vertical gold timeline rail with serif day labels ("Day 01 · Arrival in Oia")
-- Layered hero image per day (image left, story-driven copy right on desktop; stacked on mobile)
-- Inline mini-map (Mapbox static image) per day showing the day's waypoints
-- Pull-quotes from creator: "Sofia says: skip the cable car at sunset — walk it."
-- Replace bullet inclusions with a tasteful two-column editorial layout
-
-Keep typography: Cormorant/serif for section heads, current body font for prose. No icons-as-decoration.
-
----
-
-## Phase 6 — Soft Trust & Ecosystem Proof
-
-Add an understated trust bar to cards and detail pages:
-- "Verified Creator" thin badge (gold hairline border, no fill)
-- "Certified Travel Expert" where applicable
-- Small "★ 4.9 · 38 reviews" line (no big star ratings)
-- "Featured in The Edit · May" when curated
-
-On the marketplace page, add a serif footer block: "This week on Goldsainte" — counts of new creators, new collections, recent bookings — rendered as editorial stat lines, not dashboard tiles.
-
----
-
-## Technical Notes
-
-Files to add:
-- `src/components/marketplace/CreatorAttribution.tsx`
-- `src/components/marketplace/LiveSignalRow.tsx`
-- `src/components/marketplace/ForYouRow.tsx`
-- `src/components/marketplace/AdaptiveCollectionRow.tsx`
-- `src/components/trips/MakeItMinePanel.tsx`
-- `src/components/trips/EditorialDayBlock.tsx`
-- `src/components/marketplace/TrustHairline.tsx`
-- `src/components/marketplace/ThisWeekFooter.tsx`
-
-Files to modify:
-- `src/pages/Marketplace.tsx` — orchestrate new rows, extend query, adaptive sort
-- `src/components/marketplace/LiveTripCard.tsx` — creator attribution + signal pill
-- `src/components/marketplace/LiveTripGrid.tsx` — accept signal metadata
-- `src/pages/trips/TripDetailPage.tsx` — mount `MakeItMinePanel` + editorial itinerary
-- `src/components/trips/TripItinerary.tsx` — editorial day layout
-- `src/services/matchingService.ts` — add `recommendForUser`
-
-Backend:
-- Migration: `trip_variants` table (user_id, trip_id, modifiers jsonb, generated_itinerary jsonb) with RLS (user owns their variants).
-- Migration: materialized view or RPC for `marketplace_signals` (trending, recently_booked, save_counts) refreshed hourly.
-- Edge function: `personalize-trip` calling OpenAI gpt-4o per project mandate.
-- Realtime presence channel `marketplace-presence` for the "quietly active" footer.
-
-Order of execution: Phase 1 → 2 → 4 → 3 → 5 → 6. Phase 4 is the signature moment and ships before broader AI rows so it grounds the AI narrative.
-
-Design guardrails enforced in every phase: cream bg, dark green CTAs only, gold hairlines (not fills), serif headers, 4/3 image cards, no urgency/discount styling, animations stay sub-500ms with soft easing.
+After the edit, open `/` in the preview, scroll to the three "How it works" animations, and confirm Traveler and Agent scenes now show real photographs behind every card (matching the Creator scene's feel) with no layout shift or text-legibility regression on mobile (375px) and desktop.
