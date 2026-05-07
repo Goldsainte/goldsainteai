@@ -45,7 +45,7 @@ export function HomeHero() {
             {/* CTAs — fixed 32px below copy */}
             <div className="flex flex-col gap-3 mt-8 max-w-sm">
               <Link
-                to="/post-trip"
+                to="/marketplace"
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-6 py-2.5 text-sm font-semibold text-[#E5DFC6] shadow-sm hover:bg-[#073331] w-full"
               >
                 {t('home.hero.postDreamTrip')}
