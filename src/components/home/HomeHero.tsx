@@ -9,6 +9,12 @@ import heroTertiaryImg from "@/assets/felix-rostig-UmV2wr-Vbq8-unsplash.jpeg"; /
 export function HomeHero() {
   const { t } = useTranslation();
 
+  const popularTrips = [
+    { title: "Bali Wellness Retreat", price: "From $2,199", image: heroMainImg },
+    { title: "Kyoto Cultural Immersion", price: "From $3,799", image: heroSecondaryImg },
+    { title: "Amalfi Coast Weekend", price: "From $2,499", image: heroTertiaryImg },
+  ];
+
   return (
     <section className="bg-[#f7f3ea] text-[#0a2225] md:min-h-[calc(100vh-56px)] md:max-h-[calc(100vh-56px)]">
       <div className="mx-auto max-w-6xl px-4 py-10 md:py-12 md:h-full">
@@ -56,6 +62,41 @@ export function HomeHero() {
               >
                 {t('home.hero.seeHowItWorks')}
               </a>
+            </div>
+
+            {/* Popular Trips strip */}
+            <div className="mt-8">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#0a2225]/60">
+                  Popular Trips
+                </span>
+                <span className="h-px flex-1 bg-[#E5DFC6]" />
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                {popularTrips.map((trip) => (
+                  <Link
+                    key={trip.title}
+                    to="/marketplace"
+                    className="group block"
+                  >
+                    <div className="overflow-hidden rounded-xl aspect-square">
+                      <img
+                        src={trip.image}
+                        alt={trip.title}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
+                    <p className="mt-2 font-secondary text-[12px] md:text-[13px] leading-snug text-[#0a2225] line-clamp-1 transition-colors group-hover:text-[#0c4d47]">
+                      {trip.title}
+                    </p>
+                    <p className="text-[11px] md:text-[12px] text-[#0a2225]/70">
+                      {trip.price}
+                    </p>
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
 

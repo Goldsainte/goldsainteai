@@ -1,32 +1,58 @@
 
+## Goal
+Introduce a small, elegant "Popular Trips" strip directly under the hero CTA buttons in `HomeHero` to signal that Goldsainte is a shoppable marketplace—without disrupting the editorial luxury feel.
 
-## Fix: Publish Storyboard Button Not Working
+## Where it goes
+Inside `src/components/home/HomeHero.tsx`, in the LEFT column, immediately below the existing CTA button stack (the `<Link to="/marketplace">` and `<a href="#how-it-works">` block). It will live within the same flex column so the right-side image stack still aligns.
 
-### Problem
+## What it looks like
 
-The "Publish Storyboard" button has two likely failure modes:
+```text
+[ Explore Travel Marketplace ]
+[ See How It Works           ]
 
-1. **Button is disabled (greyed out)** — It's disabled when `!title.trim()`, meaning if the title input is empty, clicking does nothing with no explanation to the user.
-2. **User not authenticated** — `handlePublish` calls `supabase.auth.getUser()`. If the user isn't logged in, it throws "Not authenticated" which shows a toast, but if the toast isn't visible (e.g., positioned off-screen or styled to blend in), it seems like nothing happened.
+POPULAR TRIPS  ───────────────
 
-### Fix (1 file: `StoryboardNewPage.tsx`)
+[img] Bali Wellness Retreat       [img] Kyoto Cultural Immersion   [img] Amalfi Coast Weekend
+      From $2,199                        From $3,799                      From $2,499
+```
 
-1. **Add visual feedback when disabled** — Show a tooltip or inline message below the button explaining "Enter a title to publish" when the title is empty.
+- Small uppercase label "Popular Trips" in `#0a2225/60`, tracking-wide, `text-[11px]`, with a thin `#E5DFC6` divider line beside it.
+- 3 horizontal cards in a `grid grid-cols-3 gap-3`.
+- Each card:
+  - Square-ish rounded thumbnail (`aspect-square`, `rounded-xl`, `object-cover`, ~64–72px tall on desktop).
+  - Trip title: `font-display` or existing serif, `text-[13px]`, `text-[#0a2225]`, `line-clamp-1`.
+  - Starting price: `text-[12px]`, `text-[#0a2225]/70`, format `From $2,199`.
+  - Whole card is a `<Link to="/marketplace">` (static for now—no detail routing since these are illustrative).
+- Hover animation: subtle `transition-transform duration-300 group-hover:scale-[1.03]` on the image, and `group-hover:text-[#0c4d47]` on title. No shadows, no borders—keeps it integrated.
 
-2. **Add auth check before publish** — Instead of silently failing, redirect to login if not authenticated, or show a clear modal/alert.
+## Spacing
+- `mt-8` above the strip (matches existing rhythm of the hero copy spacing).
+- Internal: label `mb-3`, cards `gap-3`.
+- On mobile (`<md`): keep 3 columns but shrink thumbnail and font; or fall back to a horizontal scroll row (`flex overflow-x-auto snap-x`) if cramped. Plan: keep `grid grid-cols-3` with smaller text; the existing hero is already tight on mobile and 3 small cards still fit.
 
-3. **Add console logging** — Temporary `console.log` at the start of `handlePublish` to confirm the click handler fires at all (to rule out event propagation issues).
+## Data
+Hard-coded inline array of 3 items in `HomeHero.tsx`:
+```ts
+const popularTrips = [
+  { title: "Bali Wellness Retreat", price: "From $2,199", image: heroMainImg },
+  { title: "Kyoto Cultural Immersion", price: "From $3,799", image: heroSecondaryImg },
+  { title: "Amalfi Coast Weekend", price: "From $2,499", image: heroTertiaryImg },
+];
+```
+Reuses the three existing hero image imports so no new assets are needed and the visual palette stays cohesive. (If you'd prefer destination-accurate imagery, we can swap to fetched/Unsplash images in a follow-up.)
 
-4. **Check button `type` attribute** — The button is inside a form-like structure. If it's inside a `<form>`, it may be submitting the form instead of calling `onClick`. Add `type="button"` explicitly to both Publish buttons.
+## Aesthetic alignment
+- Cream `#f7f3ea` background inherited from hero—no card backgrounds needed.
+- Rounded corners `rounded-xl` on thumbnails to match existing `rounded-3xl` image stack vocabulary, scaled down.
+- Serif title via existing `font-display`/`font-secondary` class already used in the hero `<h1>`.
+- Gold accent line beside label uses `#BFAD72`/`#E5DFC6` from the pill badge.
 
-### Changes
+## Files touched
+- `src/components/home/HomeHero.tsx` — add the strip JSX + small inline `popularTrips` array.
+- `src/i18n/locales/en.json` — add `home.hero.popularTripsLabel` ("Popular Trips") and `home.hero.from` ("From") so copy stays translatable. Trip titles can be inlined (English-only for now) since they're illustrative.
 
-| Action | File |
-|--------|------|
-| Edit | `src/pages/storyboards/StoryboardNewPage.tsx` |
-
-- Add `type="button"` to both publish `<Button>` elements (lines 462 and 614)
-- Add a disabled-state message: when `!title.trim()`, show helper text "Add a title first"
-- Add `console.log("handlePublish called")` at top of `handlePublish` for debugging
-- If user is not authenticated, navigate to `/auth` instead of just showing a toast
-
+## Out of scope
+- Wiring to real marketplace data / live pricing.
+- Per-trip detail page links (cards link to `/marketplace`).
+- Mobile carousel behavior beyond a 3-up shrink (can revisit if cramped).
