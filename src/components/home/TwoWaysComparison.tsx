@@ -2,21 +2,21 @@ import { Check, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const marketplaceFeatures = [
-  "Receive custom trip concepts tailored to your style",
-  "Collaborate with vetted creators & certified travel advisors",
-  "Compare personalized proposals side-by-side",
-  "Transparent pricing and secure booking",
-  "Built-in messaging for effortless collaboration",
-  "From vision to confirmed booking — all in one place",
+  "Browse premium travel experiences from around the world",
+  "Book complete itineraries instantly",
+  "Compare personalized travel proposals side-by-side",
+  "Collaborate directly with creators and travel experts",
+  "Transparent pricing and seamless booking",
+  "AI-powered recommendations tailored to your travel style",
 ];
 
 const storyboardingFeatures = [
-  "Save hotels, experiences, and inspiration in one place",
-  "Shape your aesthetic with visual planning",
-  "Turn ideas into a structured travel brief",
-  "Guide creators and agents with clear direction",
-  "Refine and edit before sharing",
-  "Designed specifically for travel — not generic boards",
+  "Save travel inspiration visually in one place",
+  "Upload content and generate itineraries with AI",
+  "Customize destinations, pacing, and experiences",
+  "Submit dream trips for creator and agent proposals",
+  "Collaborate and refine every detail before booking",
+  "Designed specifically for travel—not generic planning boards",
 ];
 
 function FeatureCard({
@@ -100,10 +100,10 @@ export function TwoWaysComparison() {
         </span>
         <div className="mx-auto w-14 h-px bg-[#C7A962] mb-5" />
         <h2 className="font-secondary text-2xl md:text-4xl text-[#0a2225] mb-3">
-          Two Distinct Ways to Design Your Journey
+          Why Goldsainte Feels Different
         </h2>
         <p className="text-sm md:text-base text-[#4a4a4a] max-w-2xl mx-auto mb-10 leading-relaxed">
-          Whether you want expert-crafted precision or prefer to shape your vision first, Goldsainte gives you a seamless path forward.
+          Discover, book, or create curated travel experiences with creators and certified travel experts—all in one AI-powered marketplace.
         </p>
 
         {/* Cards with "or" divider */}
@@ -119,25 +119,25 @@ export function TwoWaysComparison() {
 
           <FeatureCard
             number="01"
-            title="Travel Marketplace"
-            subtitle="For travelers who want experts to design the experience."
+            title="Discover & Book"
+            subtitle="Explore curated trips designed by creators and certified travel experts."
             features={marketplaceFeatures}
             linkTo="/marketplace"
-            linkLabel="Explore Expert-Designed Trips"
+            linkLabel="Explore Curated Trips"
           />
           <FeatureCard
             number="02"
-            title="Storyboarding"
-            subtitle="For travelers who want to define the vibe before committing."
+            title="Create & Personalize"
+            subtitle="Turn inspiration into fully customized travel experiences."
             features={storyboardingFeatures}
             linkTo="/storyboards"
-            linkLabel="Start Your Storyboard"
+            linkLabel="Start Planning Your Journey"
           />
         </div>
 
         {/* Cross-sell tagline */}
         <p className="mt-10 text-sm text-[#6B7280] italic max-w-lg mx-auto leading-relaxed">
-          Not sure which path is right? Start with a storyboard — you can always post to the marketplace later.
+          Not sure where to begin? Start with inspiration — your ideas can become a fully booked journey.
         </p>
       </div>
     </section>
