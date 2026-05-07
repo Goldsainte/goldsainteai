@@ -63,7 +63,7 @@ export const TravelerDiscoveryMagic: React.FC = () => {
 
       {/* Scene 1 — Living marketplace */}
       <Scene visible={step === 0}>
-        <div className="absolute inset-0 px-5 pt-10 pb-12 flex flex-col">
+        <div className="absolute inset-0 px-5 pt-10 pb-10 flex flex-col">
           <div className="flex items-center gap-2 mb-2.5 opacity-0 animate-[gs-fade-in_500ms_ease-out_forwards]">
             <span className="font-secondary italic text-[12px] text-[#0a2225]">Trending in Summer</span>
             <span className="block h-px bg-[#C7A962] origin-left animate-[gs-grow-x_700ms_ease-out_400ms_forwards] scale-x-0 w-12" />
@@ -242,7 +242,7 @@ export const TravelerDiscoveryMagic: React.FC = () => {
 
       {/* Scene 4 — Cinematic booking payoff */}
       <Scene visible={step === 3}>
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-5 gap-2.5 pt-2">
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-5 gap-2 pt-2 pb-9 pb-9">
           <div className="w-full max-w-[300px] rounded-2xl bg-white border border-[#E5DFC6] shadow-[0_22px_50px_rgba(10,34,37,0.14)] overflow-hidden opacity-0 animate-[gs-rise_600ms_ease-out_forwards]">
             <div className="relative h-24 bg-gradient-to-br from-[#bcd3d0] via-[#7fa8a3] to-[#0c4d47] overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/60 to-transparent" />
