@@ -357,7 +357,7 @@ export const HowGoldsainteWorksSection: React.FC = () => {
           </span>
           <div className="mx-auto w-14 h-px bg-[#C7A962] mb-5" />
           <h2 className="font-secondary text-2xl md:text-4xl text-[#0a2225] mb-3">
-            How <span className="italic">Goldsainte</span> Works
+            How Goldsainte Works
           </h2>
           <p className="text-sm md:text-base text-[#4a4a4a] max-w-2xl mx-auto leading-relaxed">
             A curated travel marketplace where travelers discover experiences, creators monetize itineraries, and certified travel agents sell or customize travel packages.
