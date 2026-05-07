@@ -203,7 +203,7 @@ export const BuiltForEverySideSection: React.FC = () => {
 /*  How Goldsainte AI works - 4 Tabbed Categories                             */
 /* -------------------------------------------------------------------------- */
 
-import { Sparkles, Palette, Users, CreditCard, Heart, Brain, Rss, Star, Wand2, Layers, ArrowRightLeft, Bookmark, Target, MessageSquare, Building2, UserCheck, Mic, Shield, Bell, MessagesSquare, ShieldCheck, Lock, Scale, Fingerprint, BadgeCheck, Eye, Wallet, RefreshCw, MessageCircle, FileText, Ban, Gavel, Clock, FileCheck, Compass, Camera, Briefcase, ClipboardList, Calendar, TrendingUp, Map, Handshake } from "lucide-react";
+import { Sparkles, Palette, Users, CreditCard, Heart, Brain, Rss, Star, Wand2, Layers, ArrowRightLeft, Bookmark, Target, MessageSquare, Building2, UserCheck, Mic, Shield, Bell, MessagesSquare, ShieldCheck, Lock, Scale, Fingerprint, BadgeCheck, Eye, Wallet, RefreshCw, MessageCircle, FileText, Ban, Gavel, Clock, FileCheck, Compass, Camera, Briefcase, ClipboardList, Calendar, TrendingUp, Map, Handshake, Zap } from "lucide-react";
 
 type AIFeature = {
   icon: React.ElementType;
@@ -266,32 +266,32 @@ const tabsData: TabData[] = [
     intro: {
       title: "Turn your trips into income.",
       description:
-        "Upload travel photos, videos, or past trip content and let Goldsainte AI transform them into structured itineraries others can discover, purchase, and personalize.",
+        "Upload travel photos, videos, or trip content and let Goldsainte AI automatically identify locations, activities, landmarks, and experiences to generate structured itineraries you can refine, publish, and monetize in minutes.",
     },
     features: [
       {
         icon: Wand2,
-        title: "AI Itinerary Creation",
+        title: "AI Trip Reconstruction",
         description:
-          "Upload travel content and let AI generate structured travel itineraries automatically.",
+          "Upload photos and videos and let AI identify destinations, activities, timestamps, and experiences automatically.",
+      },
+      {
+        icon: Zap,
+        title: "Instant Itinerary Generation",
+        description:
+          "Transform past trips into structured travel itineraries in minutes—not hours of manual planning.",
       },
       {
         icon: Wallet,
         title: "Monetize Your Experiences",
         description:
-          "Sell curated travel guides and itineraries directly through the Goldsainte marketplace.",
+          "Publish and sell curated itineraries directly through the Goldsainte marketplace.",
       },
       {
         icon: Users,
         title: "Build Your Travel Brand",
         description:
-          "Grow an audience around your travel style, recommendations, and curated experiences.",
-      },
-      {
-        icon: TrendingUp,
-        title: "Passive Income Potential",
-        description:
-          "Earn from past trips and travel content long after your journey ends.",
+          "Turn your travel style, recommendations, and experiences into a scalable audience and income stream.",
       },
     ],
   },
