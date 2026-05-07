@@ -92,8 +92,15 @@ export const CreatorAIMagic: React.FC = () => {
                 )}
                 style={{ animationDelay: `${i * 110}ms` }}
               >
+                <img
+                  src={m.img}
+                  alt={m.place}
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/30 to-transparent" />
                 {i % 4 === 0 && (
-                  <Video className="absolute bottom-1 right-1 w-2.5 h-2.5 text-white/90" />
+                  <Video className="absolute bottom-1 right-1 w-2.5 h-2.5 text-white/95 drop-shadow" />
                 )}
                 {i !== 5 && (
                   <div
@@ -224,8 +231,14 @@ export const CreatorAIMagic: React.FC = () => {
                     m.c
                   )}
                 >
+                  <img
+                    src={m.img}
+                    alt={m.place}
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
                   {i % 4 === 0 && (
-                    <Video className="absolute bottom-1 right-1 w-2.5 h-2.5 text-white/90" />
+                    <Video className="absolute bottom-1 right-1 w-2.5 h-2.5 text-white/95 drop-shadow" />
                   )}
                 </div>
 
@@ -326,10 +339,17 @@ export const CreatorAIMagic: React.FC = () => {
                     <div className="relative shrink-0">
                       <div
                         className={cn(
-                          "w-9 h-9 rounded-md bg-gradient-to-br shadow-sm",
+                          "relative w-9 h-9 rounded-md bg-gradient-to-br shadow-sm overflow-hidden",
                           memories[i].c
                         )}
-                      />
+                      >
+                        <img
+                          src={memories[i].img}
+                          alt={memories[i].place}
+                          loading="lazy"
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                      </div>
                       {/* pin node on the route */}
                       <span className="absolute -right-[6px] top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#C7A962] ring-2 ring-white" />
                     </div>
