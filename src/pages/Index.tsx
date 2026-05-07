@@ -26,11 +26,11 @@ export default function Index() {
         {/* Hero with Expedia search + brand positioning */}
         <HomeHero />
 
-        {/* Two ways comparison - immediately after hero */}
-        <TwoWaysComparison />
-
-        {/* How Goldsainte AI works */}
+        {/* How Goldsainte Works - audience-defined, immediately after hero */}
         <HowGoldsainteWorksSection />
+
+        {/* Two ways comparison */}
+        <TwoWaysComparison />
 
         {/* Storyboards highlight - core differentiator */}
         <StoryboardsHighlight />

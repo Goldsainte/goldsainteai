@@ -1,58 +1,89 @@
 
 ## Goal
-Introduce a small, elegant "Popular Trips" strip directly under the hero CTA buttons in `HomeHero` to signal that Goldsainte is a shoppable marketplace—without disrupting the editorial luxury feel.
+Replace the 4-tab "How Goldsainte AI works" accordion with a 3-tab audience-based "How Goldsainte Works" section — same layout, spacing, typography, accordion mechanics, image panel, and luxury aesthetic.
 
-## Where it goes
-Inside `src/components/home/HomeHero.tsx`, in the LEFT column, immediately below the existing CTA button stack (the `<Link to="/marketplace">` and `<a href="#how-it-works">` block). It will live within the same flex column so the right-side image stack still aligns.
+## File touched
+- `src/sections/HomeLuxurySections.tsx` — only the `HowGoldsainteWorksSection` component and its `tabsData` / `tabImages` constants. Keep all other sections, imports, and styling untouched.
 
-## What it looks like
+## Position
+Already correct: in `src/pages/Index.tsx` and `src/pages/HomePage.tsx`, `<HowGoldsainteWorksSection />` renders directly after `<HomeHero />` (and after `<TwoWaysComparison />`). Per the request to sit "immediately after the hero, before the larger marketplace grid", we'll move it to render directly after `<HomeHero />` and before `<TwoWaysComparison />` in both `Index.tsx` and `HomePage.tsx`.
 
-```text
-[ Explore Travel Marketplace ]
-[ See How It Works           ]
+## Content changes
 
-POPULAR TRIPS  ───────────────
+Replace `tabsData` (4 items: Personalizes / Creates / Matches / Books) with 3 audience tabs. Each tab keeps the same `id / label / icon / features[]` shape so the existing accordion + animation code keeps working unchanged.
 
-[img] Bali Wellness Retreat       [img] Kyoto Cultural Immersion   [img] Amalfi Coast Weekend
-      From $2,199                        From $3,799                      From $2,499
-```
-
-- Small uppercase label "Popular Trips" in `#0a2225/60`, tracking-wide, `text-[11px]`, with a thin `#E5DFC6` divider line beside it.
-- 3 horizontal cards in a `grid grid-cols-3 gap-3`.
-- Each card:
-  - Square-ish rounded thumbnail (`aspect-square`, `rounded-xl`, `object-cover`, ~64–72px tall on desktop).
-  - Trip title: `font-display` or existing serif, `text-[13px]`, `text-[#0a2225]`, `line-clamp-1`.
-  - Starting price: `text-[12px]`, `text-[#0a2225]/70`, format `From $2,199`.
-  - Whole card is a `<Link to="/marketplace">` (static for now—no detail routing since these are illustrative).
-- Hover animation: subtle `transition-transform duration-300 group-hover:scale-[1.03]` on the image, and `group-hover:text-[#0c4d47]` on title. No shadows, no borders—keeps it integrated.
-
-## Spacing
-- `mt-8` above the strip (matches existing rhythm of the hero copy spacing).
-- Internal: label `mb-3`, cards `gap-3`.
-- On mobile (`<md`): keep 3 columns but shrink thumbnail and font; or fall back to a horizontal scroll row (`flex overflow-x-auto snap-x`) if cramped. Plan: keep `grid grid-cols-3` with smaller text; the existing hero is already tight on mobile and 3 small cards still fit.
-
-## Data
-Hard-coded inline array of 3 items in `HomeHero.tsx`:
 ```ts
-const popularTrips = [
-  { title: "Bali Wellness Retreat", price: "From $2,199", image: heroMainImg },
-  { title: "Kyoto Cultural Immersion", price: "From $3,799", image: heroSecondaryImg },
-  { title: "Amalfi Coast Weekend", price: "From $2,499", image: heroTertiaryImg },
-];
+[
+  {
+    id: "travelers",
+    label: "For Travelers",
+    icon: Compass,            // from lucide-react
+    captionLabel: "Discover & Book",
+    features: [
+      {
+        icon: Sparkles,
+        title: "Book curated trips instantly.",
+        description:
+          "Explore ready-made itineraries and travel packages created by trusted creators and certified travel agents. Personalize your trip or book one in minutes.",
+      },
+    ],
+  },
+  {
+    id: "creators",
+    label: "For Creators",
+    icon: Camera,             // from lucide-react
+    captionLabel: "Create & Monetize",
+    features: [
+      {
+        icon: Wand2,
+        title: "Turn your trips into income.",
+        description:
+          "Upload travel photos, videos, or past trip content and let Goldsainte AI help transform it into a sellable itinerary others can discover, purchase, and personalize.",
+      },
+    ],
+  },
+  {
+    id: "agents",
+    label: "For Travel Agents",
+    icon: Briefcase,          // from lucide-react
+    captionLabel: "Sell & Customize",
+    features: [
+      {
+        icon: ClipboardList,
+        title: "Sell packages or bid on custom trips.",
+        description:
+          "List curated travel packages, customize experiences for travelers, and respond to custom trip requests from users looking for expert planning.",
+      },
+    ],
+  },
+]
 ```
-Reuses the three existing hero image imports so no new assets are needed and the visual palette stays cohesive. (If you'd prefer destination-accurate imagery, we can swap to fetched/Unsplash images in a follow-up.)
 
-## Aesthetic alignment
-- Cream `#f7f3ea` background inherited from hero—no card backgrounds needed.
-- Rounded corners `rounded-xl` on thumbnails to match existing `rounded-3xl` image stack vocabulary, scaled down.
-- Serif title via existing `font-display`/`font-secondary` class already used in the hero `<h1>`.
-- Gold accent line beside label uses `#BFAD72`/`#E5DFC6` from the pill badge.
+Add a `captionLabel?: string` field to the `TabData` type. The existing image overlay currently shows `{activeTabData.label}` ("Personalizes" etc.); switch it to render `activeTabData.captionLabel ?? activeTabData.label` so the right-side caption changes per audience:
+- Travelers → "Discover & Book"
+- Creators → "Create & Monetize"
+- Travel Agents → "Sell & Customize"
 
-## Files touched
-- `src/components/home/HomeHero.tsx` — add the strip JSX + small inline `popularTrips` array.
-- `src/i18n/locales/en.json` — add `home.hero.popularTripsLabel` ("Popular Trips") and `home.hero.from` ("From") so copy stays translatable. Trip titles can be inlined (English-only for now) since they're illustrative.
+The accordion content grid currently uses `md:grid-cols-2`. Since each audience has a single feature, change to `grid-cols-1` so the body card sits flush and elegant rather than orphaned in a 2-col grid. Keep the icon + title + description layout exactly as is.
+
+## Header copy
+- Eyebrow pill: keep the existing "Powered by AI" (still true and visually anchors the section). Skip removing it to preserve the visual treatment.
+- Title: change `How <span className="italic">Goldsainte AI</span> works` → `How <span className="italic">Goldsainte</span> Works`.
+- Subtitle: replace with: *"A curated travel marketplace where travelers discover experiences, creators monetize itineraries, and certified agents sell or customize travel packages."*
+- Footer note (about on-platform comms/payments): keep as-is — aligns with the brand's on-platform-only rule.
+
+## Image mapping
+Reuse existing imports already at the top of the file — no new assets:
+- `travelers` → `santoriniStepsImg`
+- `creators` → `creatorCanyonImg`
+- `agents` → `agentPlanningImg`
+
+Set `useState("travelers")` as the initial open tab.
+
+## Icons
+Add `Compass`, `Camera`, `Briefcase`, `ClipboardList` to the existing `lucide-react` import line in `HomeLuxurySections.tsx`. Leave the other icons in place — they're used elsewhere in the file (Trust & Safety section).
 
 ## Out of scope
-- Wiring to real marketplace data / live pricing.
-- Per-trip detail page links (cards link to `/marketplace`).
-- Mobile carousel behavior beyond a 3-up shrink (can revisit if cramped).
+- Visual redesign of the section (explicitly disallowed).
+- Translation keys: copy is hard-coded inline today (English strings live in the component), so we'll follow the existing pattern and inline the new strings rather than introducing partial i18n.
+- Changes to `HomeHero`, `TwoWaysComparison`, `StoryboardsHighlight`, or any marketplace grid component.
