@@ -1,37 +1,54 @@
+## Goal
+Optimize `src/components/home/HomeHero.tsx` for mobile (≤768px) while preserving the desktop layout, spacing, and luxury aesthetic.
 
-## Issue
+## Issues on mobile today
+- Section uses `md:min-h-[calc(100vh-56px)]` only — mobile has no height control, but the right-side image stack uses `h-full` which collapses awkwardly on small screens.
+- Pill badge has tight `gap-1`, may still wrap or feel cramped at 360–390px.
+- Headline `text-3xl` is large but margins (`mt-10`, `mt-8`) feel desktop-tuned; mobile needs tighter rhythm.
+- Three-up "Popular Trips" grid stays `grid-cols-3` on mobile — squares get tiny (~95px) and titles truncate aggressively.
+- Right column image stack: `col-span-2 row-span-2` + two thumbs is designed for landscape; on a narrow phone it becomes a thin sliver.
+- Caption card text can overflow inside the dark green pill on small widths.
+- CTAs `max-w-sm` is fine but vertical spacing (`mt-8`) is heavy on mobile.
 
-The new "Luxury Intelligence" section header is left-aligned and uses different sizing than the canonical "The Goldsainte Ecosystem / Experience Goldsainte Your Way" header. The pillar body copy also renders larger than the rest of the homepage body text.
+## Changes (presentation only, single file)
 
-## Reference (canonical header from `RoleSpecificCTAs.tsx`)
+1. **Section sizing**
+   - Drop forced `md:max-h-[calc(100vh-56px)]` constraint on mobile (already md-only, keep). Add comfortable mobile padding: `py-8 md:py-12`.
 
-- Container: `mx-auto max-w-3xl text-center`
-- Pill: `inline-flex rounded-full bg-[#0c4d47] px-3 py-1 text-[10px] md:text-xs font-medium uppercase tracking-[0.18em] text-[#D4C07A]`
-- Divider: `mx-auto mt-4 block h-px w-12 bg-[#C7A962]`
-- H2: `mt-5 font-secondary text-[28px] leading-[1.1] tracking-tight text-[#0a2225] md:text-[44px]`
-- Subhead: `mx-auto mt-5 max-w-2xl text-[15px] md:text-base leading-relaxed text-[#5A5A5A]`
+2. **Pill badge**
+   - Reduce mobile px and tracking: `px-3 py-1 text-[10px] tracking-[0.06em]`.
+   - Use shorter dividers on mobile (`w-1.5`).
+   - Ensure it stays one line via existing `whitespace-nowrap`.
 
-## Changes (single file: `src/sections/HomeLuxurySections.tsx`, in `TrustSafetyPaymentsSection`)
+3. **Typography rhythm**
+   - Headline: `text-[26px] sm:text-3xl md:text-4xl lg:text-[38px]`, `mt-6 md:mt-10`.
+   - Description paragraphs: `mt-5 md:mt-8` for first, tighten subsequent `mt-2`/`mt-3`.
 
-1. **Header alignment + sizing — match the Ecosystem block exactly.**
-   - Wrap the header in `mx-auto max-w-3xl text-center` (centered, not left-aligned).
-   - Pill: replace current eyebrow with the canonical `bg-[#0c4d47] ... text-[#D4C07A]` (drop the gold border + bfad72 variant).
-   - Divider: `mx-auto mt-4 block h-px w-12 bg-[#C7A962]` (centered, narrower w-12).
-   - H2: `mt-5 font-secondary text-[28px] leading-[1.1] tracking-tight text-[#0a2225] md:text-[44px]` (no `mb-4`).
-   - Subhead: `mx-auto mt-5 max-w-2xl text-[15px] md:text-base leading-relaxed text-[#5A5A5A]`.
+4. **CTAs**
+   - Full-width on mobile (`max-w-none md:max-w-sm`), `mt-6 md:mt-8`, slightly larger tap target (`py-3`).
 
-2. **Layout adjustment to support centered header.**
-   - Move the header block above the two-column row so it spans full width and reads as the section header (mirroring the Ecosystem section's structure: centered header → grid of items below).
-   - Below the centered header, keep the two-column row: left = pillars list, right = editorial image.
+5. **Popular Trips strip**
+   - Keep 3-up but switch from `aspect-square` to `aspect-[4/3]` to match brand standard and give titles more breathing room.
+   - Tighten gap on mobile (`gap-2 md:gap-3`).
+   - Allow 2-line title on mobile (`line-clamp-2 md:line-clamp-1`).
 
-3. **Pillar body type — bring down to standard body size.**
-   - Pillar body currently `text-sm md:text-[15px]`. Change to `text-sm md:text-[15px] leading-relaxed text-[#5A5A5A]` — same scale as the rest of the homepage. (Matches values used elsewhere; current `md:text-[15px]` is fine but the perceived size issue stems from line-height and the lack of muted color contrast — verify final weight matches other sections like Why Goldsainte cards which use `text-sm leading-relaxed text-[#5A5A5A]`. If still too large, drop md to `md:text-sm`.)
-   - Pillar title kept at `font-secondary text-lg md:text-xl text-[#0a2225]`.
+6. **Right-side visual stack (the big mobile fix)**
+   - Remove `h-full` dependency on mobile. Wrap in a fixed mobile aspect ratio (e.g. `aspect-[4/5]`) and switch to `md:h-full md:aspect-auto`.
+   - Reduce decorative offset frame on mobile (`translate-x-2 translate-y-2 md:translate-x-4 md:translate-y-4`) and reduce outer radius (`rounded-3xl md:rounded-[32px]`).
+   - Keep grid layout but ensure thumbs don't squish: gaps `gap-2`, padding `p-2 md:p-3`.
+   - Caption card: smaller text on mobile (`text-[11px]`), tighter padding.
 
-4. **No other changes** — image panel, motion, padding, and copy stay as-is.
+7. **Column order on mobile**
+   - Currently copy renders first, image second. Consider keeping that order (copy first reads better on phones); confirm by leaving grid default. No change needed unless user wants image-first.
 
-## Acceptance
+## Out of scope
+- No content/copy changes.
+- No business logic, query, or routing changes.
+- No global CSS / token changes.
 
-- Header pill, divider, H2, and subhead are visually identical to the "The Goldsainte Ecosystem / Experience Goldsainte Your Way" block (centered, same fonts, same sizes, same gold divider width).
-- Pillar body text matches the rest of the homepage body type (no longer reads as oversized).
-- Section still has the editorial image on the right with the gold sparkle caption.
+## Files
+- `src/components/home/HomeHero.tsx` (only)
+
+## Verification
+- Resize preview to 375px, 414px, 768px, 1280px.
+- Confirm pill stays one line, no horizontal scroll, image stack has proper height, CTAs are tappable, popular trips legible.
