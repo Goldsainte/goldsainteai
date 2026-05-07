@@ -118,13 +118,13 @@ export const TravelerDiscoveryMagic: React.FC = () => {
             </div>
           </div>
           <div
-            className="absolute bottom-12 right-4 inline-flex items-center gap-1.5 rounded-full bg-white/95 border border-[#C7A962]/50 px-2 py-1 text-[10px] text-[#0a2225] shadow-[0_8px_20px_rgba(199,169,98,0.18)] opacity-0 animate-[gs-rise_500ms_ease-out_1100ms_forwards]"
+            className="absolute bottom-3 sm:bottom-12 right-3 sm:right-4 inline-flex items-center gap-1.5 rounded-full bg-white/95 border border-[#C7A962]/50 px-2 py-1 text-[10px] text-[#0a2225] shadow-[0_8px_20px_rgba(199,169,98,0.18)] opacity-0 animate-[gs-rise_500ms_ease-out_1100ms_forwards]"
           >
             <Sparkles className="w-2.5 h-2.5 text-[#C7A962]" />
             Recommended for you
           </div>
           <div
-            className="absolute bottom-12 left-4 inline-flex items-center gap-1 rounded-full bg-white/90 border border-[#E5DFC6] px-2 py-0.5 text-[10px] text-[#0a2225]/75 opacity-0 animate-[gs-rise_500ms_ease-out_1400ms_forwards]"
+            className="absolute bottom-3 sm:bottom-12 left-3 sm:left-4 inline-flex items-center gap-1 rounded-full bg-white/90 border border-[#E5DFC6] px-2 py-0.5 text-[10px] text-[#0a2225]/75 opacity-0 animate-[gs-rise_500ms_ease-out_1400ms_forwards]"
           >
             <span className="w-1 h-1 rounded-full bg-[#0c4d47] animate-pulse" />
             +18 viewing now
@@ -154,7 +154,7 @@ export const TravelerDiscoveryMagic: React.FC = () => {
             </div>
             <div className="relative px-3 py-2.5">
               {/* Right tailoring line */}
-              <svg className="absolute right-2 top-3 bottom-3 w-px pointer-events-none" viewBox="0 0 1 100" preserveAspectRatio="none">
+              <svg className="absolute right-2 top-3 bottom-3 w-px pointer-events-none" viewBox="0 0 1 100" preserveAspectRatio="xMidYMid meet">
                 <line
                   x1="0.5" y1="0" x2="0.5" y2="100"
                   stroke="#C7A962" strokeWidth="0.6" strokeDasharray="2 3"
@@ -206,7 +206,7 @@ export const TravelerDiscoveryMagic: React.FC = () => {
           </div>
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-44 h-44 rounded-full bg-[#C7A962]/15 blur-2xl animate-pulse" />
 
-          <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 400 460" preserveAspectRatio="none">
+          <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 400 460" preserveAspectRatio="xMidYMid meet">
             {[
               "M 70 80 Q 150 140 195 200",
               "M 330 80 Q 270 140 215 200",
@@ -257,7 +257,7 @@ export const TravelerDiscoveryMagic: React.FC = () => {
             </div>
             <div className="px-4 py-3">
               <div className="relative flex items-center gap-2">
-                <svg className="absolute inset-x-2 top-1/2 -translate-y-1/2 h-px w-[calc(100%-16px)] pointer-events-none" viewBox="0 0 100 1" preserveAspectRatio="none">
+                <svg className="absolute inset-x-2 top-1/2 -translate-y-1/2 h-px w-[calc(100%-16px)] pointer-events-none" viewBox="0 0 100 1" preserveAspectRatio="xMidYMid meet">
                   <line
                     x1="0" y1="0.5" x2="100" y2="0.5"
                     stroke="#C7A962" strokeWidth="0.4" strokeDasharray="2 3"
@@ -365,7 +365,7 @@ const Scene: React.FC<{ visible: boolean; children: React.ReactNode }> = ({ visi
 );
 
 const Caption: React.FC<{ text: string }> = ({ text }) => (
-  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 rounded-full bg-white/85 backdrop-blur border border-[#E5DFC6] px-3 py-1 text-[10px] tracking-wide text-[#0a2225] shadow-sm z-20">
+  <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 rounded-full bg-white/85 backdrop-blur border border-[#E5DFC6] px-3 py-1 text-[10px] tracking-wide text-[#0a2225] shadow-sm z-20">
     <Sparkles className="w-3 h-3 text-[#C7A962]" />
     {text}
   </div>

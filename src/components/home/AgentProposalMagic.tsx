@@ -121,7 +121,7 @@ export const AgentProposalMagic: React.FC = () => {
             <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 rounded-full bg-[#C7A962]/15 blur-3xl" />
 
             {/* Vertical gold connector */}
-            <svg className="absolute right-3 top-2 bottom-2 w-px pointer-events-none" viewBox="0 0 1 100" preserveAspectRatio="none">
+            <svg className="absolute right-3 top-2 bottom-2 w-px pointer-events-none" viewBox="0 0 1 100" preserveAspectRatio="xMidYMid meet">
               <line
                 x1="0.5" y1="0" x2="0.5" y2="100"
                 stroke="#C7A962" strokeWidth="0.6" strokeDasharray="2 3"
@@ -181,7 +181,7 @@ export const AgentProposalMagic: React.FC = () => {
           </div>
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-44 h-44 rounded-full bg-[#C7A962]/15 blur-2xl animate-pulse pointer-events-none" />
 
-          <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 400 460" preserveAspectRatio="none">
+          <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 400 460" preserveAspectRatio="xMidYMid meet">
             {[
               "M 70 110 Q 140 170 180 220",
               "M 70 320 Q 140 280 180 250",
@@ -329,7 +329,7 @@ const Scene: React.FC<{ visible: boolean; children: React.ReactNode }> = ({ visi
 );
 
 const Caption: React.FC<{ text: string }> = ({ text }) => (
-  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 rounded-full bg-white/85 backdrop-blur border border-[#E5DFC6] px-3 py-1 text-[10px] tracking-wide text-[#0a2225] shadow-sm z-20">
+  <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 rounded-full bg-white/85 backdrop-blur border border-[#E5DFC6] px-3 py-1 text-[10px] tracking-wide text-[#0a2225] shadow-sm z-20">
     <Sparkles className="w-3 h-3 text-[#C7A962]" />
     {text}
   </div>

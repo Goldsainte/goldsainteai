@@ -153,7 +153,7 @@ export const CreatorAIMagic: React.FC = () => {
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none"
             viewBox="0 0 400 460"
-            preserveAspectRatio="none"
+            preserveAspectRatio="xMidYMid meet"
           >
             <path
               d="M 70 175 Q 150 215 200 215 T 330 175 Q 280 280 200 305 Q 130 330 200 410"
@@ -293,7 +293,7 @@ export const CreatorAIMagic: React.FC = () => {
               <svg
                 className="absolute right-[26px] top-3 bottom-3 w-px h-[calc(100%-24px)] pointer-events-none"
                 viewBox="0 0 1 100"
-                preserveAspectRatio="none"
+                preserveAspectRatio="xMidYMid meet"
               >
                 <line
                   x1="0.5" y1="0" x2="0.5" y2="100"
@@ -511,7 +511,7 @@ const Scene: React.FC<{ visible: boolean; children: React.ReactNode }> = ({
 );
 
 const Caption: React.FC<{ text: string }> = ({ text }) => (
-  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 rounded-full bg-white/85 backdrop-blur border border-[#E5DFC6] px-3 py-1 text-[10px] tracking-wide text-[#0a2225] shadow-sm z-20">
+  <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 rounded-full bg-white/85 backdrop-blur border border-[#E5DFC6] px-3 py-1 text-[10px] tracking-wide text-[#0a2225] shadow-sm z-20">
     <Sparkles className="w-3 h-3 text-[#C7A962]" />
     {text}
   </div>
