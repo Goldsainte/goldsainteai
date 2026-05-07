@@ -463,7 +463,7 @@ export const HowGoldsainteWorksSection: React.FC = () => {
                   const isActive = activeTab === tabId;
                   return (
                     <div
-                      key={tabId}
+                      key={`${tabId}-${isActive ? activeTab : "idle"}`}
                       className={cn(
                         "w-full transition-opacity duration-500",
                         isActive
