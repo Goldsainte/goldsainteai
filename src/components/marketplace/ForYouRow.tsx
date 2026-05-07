@@ -14,14 +14,16 @@ export function ForYouRow() {
     queryKey: ["for-you-row", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const [{ data: prefs }, { data: profile }] = await Promise.all([
-        supabase.from("user_preferences").select("*").eq("user_id", user!.id).maybeSingle(),
-        supabase.from("profiles").select("content_style_tags, location").eq("id", user!.id).maybeSingle(),
-      ]);
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("content_style_tags, location, agent_specialties")
+        .eq("id", user!.id)
+        .maybeSingle();
 
-      const interestTags: string[] = (prefs as any)?.travel_interests || [];
-      const styleTags: string[] = profile?.content_style_tags || [];
-      const tags = [...new Set([...interestTags, ...styleTags])].filter(Boolean).slice(0, 6);
+      const tags = [
+        ...((profile?.content_style_tags as string[]) || []),
+        ...((profile?.agent_specialties as string[]) || []),
+      ].filter(Boolean).slice(0, 6);
 
       let q = supabase
         .from("packaged_trips")
