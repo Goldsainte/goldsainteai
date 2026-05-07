@@ -72,18 +72,18 @@ export function HomeHero() {
 
               {/* Headline — 40px below pill */}
               <h1 className="mt-10 font-display text-3xl leading-tight md:text-4xl lg:text-[38px]">
-                <em>The Marketplace for Curated Travel Experiences</em>
+                <em>Discover, Create, and Book Extraordinary Travel.</em>
               </h1>
 
               {/* Description — 32px below headline */}
               <p className="mt-8 max-w-xl text-sm md:text-base leading-relaxed text-[#0a2225] font-semibold">
-                {t('home.hero.mainDescription')}
+                Curated by creators, crafted by experts, and powered by intelligent design.
               </p>
               <p className="mt-2 max-w-xl text-sm md:text-base leading-relaxed text-[#4a4a4a] italic">
-                {t('home.hero.mainDescriptionSub')}
+                Explore personalized itineraries, custom travel packages, and AI-generated journeys designed around how you want to experience the world.
               </p>
               <p className="mt-4 max-w-xl text-sm md:text-base leading-relaxed text-[#4a4a4a]">
-                {t('home.hero.subHeading')}
+                Turn travel memories into income—or discover your next journey in minutes.
               </p>
 
             {/* CTAs — fixed 32px below copy */}
