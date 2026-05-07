@@ -1,10 +1,4 @@
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Utensils, Home, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 interface ItineraryDay {
   id: string;
@@ -23,81 +17,85 @@ interface TripItineraryProps {
 
 export function TripItinerary({ itinerary }: TripItineraryProps) {
   return (
-    <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6">
-      <h2 className="font-secondary text-xl font-semibold text-[#0a2225]">
-        Day-by-Day Itinerary
-      </h2>
+    <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6 md:p-8">
+      <p className="font-secondary text-[11px] uppercase tracking-widest text-[#C7B892]">
+        The Journey
+      </p>
+      <h2 className="mt-1 font-secondary text-2xl text-[#0a2225]">Day by day</h2>
 
-      <Accordion type="single" collapsible className="mt-4 space-y-3">
-        {itinerary.map((day) => (
-          <AccordionItem
-            key={day.id}
-            value={day.id}
-            className="overflow-hidden rounded-xl border border-[#E5DFC6]/60 bg-[#FDF9F0]/50 px-0"
-          >
-            <AccordionTrigger className="px-4 py-3 hover:no-underline [&[data-state=open]]:border-b [&[data-state=open]]:border-[#E5DFC6]/40">
-              <div className="flex items-center gap-3">
-                <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-[#C7B892] text-[12px] font-semibold text-[#7A7151]">
-                  {day.day_number}
+      <div className="relative mt-8">
+        {/* Gold timeline rail */}
+        <div className="pointer-events-none absolute left-3 top-2 bottom-2 w-px bg-gradient-to-b from-[#C7B892]/0 via-[#C7B892] to-[#C7B892]/0 md:left-4" />
+
+        <div className="space-y-10">
+          {itinerary.map((day) => {
+            const acts = Array.isArray(day.activities)
+              ? (day.activities as any[])
+                  .map((a) => (typeof a === "string" ? a : a?.name || a?.title))
+                  .filter(Boolean)
+              : [];
+            return (
+              <article key={day.id} className="relative pl-10 md:pl-14">
+                <span className="absolute left-1.5 top-1.5 flex h-3 w-3 items-center justify-center rounded-full border border-[#C7B892] bg-[#FDF9F0] md:left-2.5">
+                  <span className="h-1 w-1 rounded-full bg-[#C7B892]" />
                 </span>
-                <div className="flex items-center gap-2">
-                  <span className="text-left text-[15px] font-medium text-[#0a2225]">
-                    {day.title}
-                  </span>
-                  {day.is_featured_day && (
-                    <Sparkles className="h-4 w-4 text-[#C7B892]" />
-                  )}
-                </div>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-4 pb-4 pt-3">
-              {day.description && (
-                <p className="text-[14px] leading-relaxed text-[#4a4a4a]">
-                  {day.description}
+                <p className="font-secondary text-[11px] uppercase tracking-widest text-[#C7B892]">
+                  Day {String(day.day_number).padStart(2, "0")}
                 </p>
-              )}
+                <h3 className="mt-1 flex items-center gap-2 font-secondary text-[20px] leading-tight text-[#0a2225]">
+                  {day.title}
+                  {day.is_featured_day && <Sparkles className="h-4 w-4 text-[#C7B892]" />}
+                </h3>
+                {day.description && (
+                  <p className="mt-3 max-w-prose text-[14px] leading-relaxed text-[#4a4a4a]">
+                    {day.description}
+                  </p>
+                )}
 
-              {/* Activities */}
-              {Array.isArray(day.activities) && day.activities.length > 0 && (
-                <div className="mt-4">
-                  <h4 className="text-[12px] font-semibold uppercase tracking-wide text-[#7A7151]">
-                    Activities
-                  </h4>
-                  <ul className="mt-2 space-y-1.5">
-                    {day.activities.map((activity, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-[13px] text-[#4a4a4a]">
-                        <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#C7B892]" />
-                        {typeof activity === "string" ? activity : activity.name || activity.title}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Meals & Accommodation */}
-              <div className="mt-4 flex flex-wrap gap-4">
-                {day.meals_included && day.meals_included.length > 0 && (
-                  <div className="flex items-center gap-2 text-[13px] text-[#4a4a4a]">
-                    <Utensils className="h-4 w-4 text-[#818181]" />
-                    <span>
-                      <span className="font-medium">Meals:</span>{" "}
-                      {day.meals_included.join(", ")}
-                    </span>
+                {(acts.length > 0 ||
+                  day.accommodation ||
+                  (day.meals_included && day.meals_included.length > 0)) && (
+                  <div className="mt-4 grid gap-4 border-t border-[#E5DFC6]/60 pt-4 md:grid-cols-2">
+                    {acts.length > 0 && (
+                      <div>
+                        <p className="font-secondary text-[11px] uppercase tracking-widest text-[#7A7151]">
+                          Today
+                        </p>
+                        <ul className="mt-2 space-y-1">
+                          {acts.map((a, i) => (
+                            <li key={i} className="text-[13px] text-[#4a4a4a]">
+                              <span className="text-[#C7B892]">— </span>
+                              {a}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    <div className="space-y-2">
+                      {day.accommodation && (
+                        <p className="text-[13px] text-[#4a4a4a]">
+                          <span className="font-secondary text-[11px] uppercase tracking-widest text-[#7A7151]">
+                            Stay
+                          </span>
+                          <span className="ml-2">{day.accommodation}</span>
+                        </p>
+                      )}
+                      {day.meals_included && day.meals_included.length > 0 && (
+                        <p className="text-[13px] text-[#4a4a4a]">
+                          <span className="font-secondary text-[11px] uppercase tracking-widest text-[#7A7151]">
+                            Table
+                          </span>
+                          <span className="ml-2">{day.meals_included.join(" · ")}</span>
+                        </p>
+                      )}
+                    </div>
                   </div>
                 )}
-                {day.accommodation && (
-                  <div className="flex items-center gap-2 text-[13px] text-[#4a4a4a]">
-                    <Home className="h-4 w-4 text-[#818181]" />
-                    <span>
-                      <span className="font-medium">Stay:</span> {day.accommodation}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
+              </article>
+            );
+          })}
+        </div>
+      </div>
     </section>
   );
 }
