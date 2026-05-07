@@ -1,58 +1,48 @@
 ## Goal
-Clean up the mobile layout of all three homepage animations so every card, chip, and caption sits flush inside the frame without overlapping.
+Make the Creator homepage animation sit flush on mobile by rebalancing the remaining crowded scene so labels, image tiles, chips, and caption spacing all fit cleanly inside the frame.
 
 ## What I found
-All three animation components share the same structural issue on mobile:
-- The floating caption sits at the very bottom of the canvas.
-- Other chips / callouts are also anchored to the bottom.
-- On 390px viewports, those elements collapse into the same visual space.
-- Some inner card rows are still too tight, so text and badges crowd each other.
+The remaining issue is isolated to `CreatorAIMagic`, especially scene 2 on mobile:
+- The itinerary reconstruction layout still uses fixed absolute positions tuned for larger sizes.
+- The right-side and bottom metadata labels can clip or crowd each other at phone widths.
+- The bottom tag strip sits too close to the reserved caption area.
+- The lower-right memory tile and label pair feel visually off-grid instead of flush.
 
 ## Files
-- `src/components/home/TravelerDiscoveryMagic.tsx`
 - `src/components/home/CreatorAIMagic.tsx`
-- `src/components/home/AgentProposalMagic.tsx`
 
 ## Plan
 
-### 1. Create a safe bottom zone in every animation
-- Replace the current floating pill caption treatment with a dedicated bottom-safe caption area.
-- Keep the caption visually consistent with the luxury editorial style, but make it reserve space instead of floating over content.
-- Update each scene container’s bottom padding so content clears that reserved strip.
+### 1. Retune the scene 2 mobile composition
+- Adjust the absolute tile positions specifically for mobile so the six memories read as a clean three-row chronology.
+- Pull edge tiles slightly inward and rebalance vertical spacing so labels do not sit on top of each other.
 
-### 2. Reposition all bottom-anchored chips above the caption zone
-- Move all “recommended”, “viewing now”, “protected”, “itinerary sent”, and similar pills upward on mobile.
-- Use mobile-specific offsets so they remain inside the composition and don’t collide with the caption.
-- Keep wider desktop spacing unchanged where possible.
+### 2. Resize and constrain tile metadata for small widths
+- Reduce mobile tile and label footprint where needed.
+- Let labels use tighter width, padding, and type so long place names stay inside the frame.
+- Prevent the lower-right label from clipping against the phone edge.
 
-### 3. Tighten the traveler scene layouts
-- In `TravelerDiscoveryMagic`, fix the recurring crowding in:
-  - the “Trending in Summer” scene
-  - the “Trip Confirmed” scene
-- Reduce collision between the save badge and heart button.
-- Give the day cards more deterministic width and slightly tighter internal spacing so text stays inside the boxes.
+### 3. Move the taxonomy chip row into a safer mobile zone
+- Raise or tighten the “Stay / Dining / Sunset / Cruise / Tasting” strip on mobile.
+- Keep it visually centered while preserving a clean gap above the caption band.
 
-### 4. Tighten the creator scene layouts
-- In `CreatorAIMagic`, adjust the final monetization scene so the confirmation chips and CTA state changes no longer fight for the same bottom area.
-- Keep the phone frame readable while ensuring the caption and lower meta elements have their own space.
+### 4. Keep desktop composition intact
+- Scope the adjustments to mobile-first classes and inline position values.
+- Preserve the current desktop spacing, art direction, imagery, and animation timing.
 
-### 5. Tighten the agent scene layouts
-- In `AgentProposalMagic`, rebalance the inbox/request card stack and the bottom caption spacing.
-- Ensure the larger request card and any lower chips remain visually centered without touching the caption band.
-
-### 6. Preserve visual style while improving fit
-- Keep the existing palette, animation language, and typography.
-- Only adjust spacing, sizing, anchoring, and layout structure where needed to prevent overlap.
+### 5. Validate at phone width after the fix
+- Recheck the Creator animation around 390px width.
+- Confirm no labels clip, no tiles touch the frame awkwardly, and the caption strip has breathing room.
 
 ## Technical details
 - Likely changes will focus on:
-  - `bottom-*`, `pb-*`, `gap-*`, `max-w-*`, and width utilities
-  - converting a few fragile flex rows into more predictable grid/fixed-width arrangements
-  - standardizing the shared `Caption` component pattern across all three files
+  - scene-2 `top` / `left` positioning values
+  - mobile-specific `w-*`, `h-*`, `max-w-*`, `px-*`, and `text-*` utilities
+  - tag strip `bottom-*` spacing and label anchoring
 
 ## Verification
-I’ll verify the updated animations at mobile-first widths, especially around 390px, and check that:
-- no chips overlap captions
-- no text spills outside cards
-- no boxes touch the frame edges
-- all three animations remain visually balanced on mobile and desktop
+I’ll verify the updated Creator animation at mobile-first widths, especially around 390px, and check that:
+- no metadata labels clip or overlap
+- no tile touches the phone frame awkwardly
+- the chip row clears the caption strip
+- the full composition still feels balanced on desktop
