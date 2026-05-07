@@ -16,6 +16,8 @@ import { BackButton } from "@/components/ui/BackButton";
 import { useUserRole } from "@/hooks/useUserRole";
 import { toast } from "sonner";
 import { CategoryChips } from "@/components/ui/CategoryChips";
+import { LiveSignalRow } from "@/components/marketplace/LiveSignalRow";
+import { QuietlyActiveFooter } from "@/components/marketplace/QuietlyActiveFooter";
 
 type Tab = "trips" | "trip-requests";
 
@@ -297,12 +299,14 @@ export default function Marketplace() {
             }}
             className="mb-4"
           />
+          {activeTab === "trips" && <LiveSignalRow />}
           <div className="mb-6 md:mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <MarketplaceTabs activeTab={activeTab} onTabChange={handleTabChange} />
             <MarketplaceFilters filters={filters} onFilterChange={setFilters} />
           </div>
 
           {renderContent()}
+          {activeTab === "trips" && <QuietlyActiveFooter />}
         </div>
       </div>
     </>
