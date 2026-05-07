@@ -230,9 +230,9 @@ const tabsData: TabData[] = [
     icon: Compass,
     captionLabel: "Discover & Book",
     intro: {
-      title: "Book curated trips instantly.",
+      title: "Discover trips you'll fall in love with.",
       description:
-        "Explore ready-made itineraries and travel packages created by trusted creators and certified travel experts. Personalize your experience or book in minutes.",
+        "Browse curated itineraries from trusted creators and certified experts, personalized in real time to your taste — and booked entirely on-platform.",
     },
     features: [
       {
@@ -267,9 +267,9 @@ const tabsData: TabData[] = [
     icon: Camera,
     captionLabel: "Create & Monetize",
     intro: {
-      title: "Turn your trips into income.",
+      title: "Upload your camera roll. Watch Goldsainte rebuild your journey.",
       description:
-        "Upload travel photos, videos, or trip content and let Goldsainte AI automatically identify locations, activities, landmarks, and experiences to generate structured itineraries you can refine, publish, and monetize in minutes.",
+        "AI identifies destinations, restaurants, timestamps and experiences — then assembles them into a bookable itinerary you can publish and monetize in minutes.",
     },
     features: [
       {
@@ -304,9 +304,9 @@ const tabsData: TabData[] = [
     icon: Briefcase,
     captionLabel: "Sell & Customize",
     intro: {
-      title: "Sell packages or customize trips.",
+      title: "Design bespoke proposals like a luxury magazine.",
       description:
-        "List premium travel experiences, customize itineraries for travelers, and respond to personalized trip requests.",
+        "Curate hotels, restaurants, and experiences into elegant, white-glove proposals — delivered to verified travelers and protected on-platform.",
     },
     features: [
       {
