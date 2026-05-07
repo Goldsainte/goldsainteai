@@ -60,6 +60,7 @@
     "dompurify": "^3.3.0",
     "embla-carousel-react": "^8.6.0",
     "fabric": "^6.7.1",
+    "framer-motion": "^12.38.0",
     "i18next": "^25.6.1",
     "input-otp": "^1.4.2",
     "jspdf": "^3.0.3",
