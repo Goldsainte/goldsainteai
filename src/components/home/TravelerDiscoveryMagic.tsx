@@ -55,7 +55,7 @@ export const TravelerDiscoveryMagic: React.FC = () => {
   return (
     <div
       ref={ref}
-      className="relative w-full h-[300px] md:h-[460px] overflow-hidden bg-gradient-to-br from-[#FDFBF7] via-[#F8F1E0] to-[#F5EFE1]"
+      className="relative w-full h-[340px] sm:h-[400px] md:h-[460px] overflow-hidden bg-gradient-to-br from-[#FDFBF7] via-[#F8F1E0] to-[#F5EFE1]"
       aria-label="How travelers discover, personalize, and book curated trips on Goldsainte"
     >
       <div className="pointer-events-none absolute -top-24 -right-20 w-72 h-72 rounded-full bg-[#C7A962]/20 blur-3xl" />
@@ -76,7 +76,7 @@ export const TravelerDiscoveryMagic: React.FC = () => {
             >
               <div className="absolute inset-0 bg-gradient-to-br from-[#bcd3d0] via-[#7fa8a3] to-[#0c4d47]" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/70 via-[#0a2225]/10 to-transparent" />
-              <div className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-white/85 backdrop-blur px-1.5 py-0.5 text-[8px] text-[#0a2225]">
+              <div className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-white/85 backdrop-blur px-1.5 py-0.5 text-[10px] text-[#0a2225]">
                 <Star className="w-2.5 h-2.5 text-[#C7A962] fill-[#C7A962]" /> 4.9
               </div>
               <button
@@ -87,13 +87,13 @@ export const TravelerDiscoveryMagic: React.FC = () => {
                 <Heart className="absolute w-3 h-3 text-[#0a2225]/60 animate-[gs-fade-out_400ms_ease-out_1400ms_forwards]" />
               </button>
               <span
-                className="absolute top-9 right-2 text-[9px] font-secondary text-[#C7A962] opacity-0 animate-[gs-rise_500ms_ease-out_1600ms_forwards]"
+                className="absolute top-9 right-2 text-[10px] font-secondary text-[#C7A962] opacity-0 animate-[gs-rise_500ms_ease-out_1600ms_forwards]"
               >
                 +1 saved
               </span>
               <div className="absolute bottom-2 left-3 right-3">
                 <p className="font-secondary italic text-[14px] text-white leading-tight">Santorini Escape</p>
-                <p className="text-[8px] text-white/80 mt-0.5">Curated with @elenaroams · from $249</p>
+                <p className="text-[10px] text-white/80 mt-0.5">Curated with @elenaroams · from $249</p>
               </div>
             </div>
 
@@ -118,13 +118,13 @@ export const TravelerDiscoveryMagic: React.FC = () => {
             </div>
           </div>
           <div
-            className="absolute bottom-12 right-4 inline-flex items-center gap-1.5 rounded-full bg-white/95 border border-[#C7A962]/50 px-2 py-1 text-[9px] text-[#0a2225] shadow-[0_8px_20px_rgba(199,169,98,0.18)] opacity-0 animate-[gs-rise_500ms_ease-out_1100ms_forwards]"
+            className="absolute bottom-12 right-4 inline-flex items-center gap-1.5 rounded-full bg-white/95 border border-[#C7A962]/50 px-2 py-1 text-[10px] text-[#0a2225] shadow-[0_8px_20px_rgba(199,169,98,0.18)] opacity-0 animate-[gs-rise_500ms_ease-out_1100ms_forwards]"
           >
             <Sparkles className="w-2.5 h-2.5 text-[#C7A962]" />
             Recommended for you
           </div>
           <div
-            className="absolute bottom-12 left-4 inline-flex items-center gap-1 rounded-full bg-white/90 border border-[#E5DFC6] px-2 py-0.5 text-[8.5px] text-[#0a2225]/75 opacity-0 animate-[gs-rise_500ms_ease-out_1400ms_forwards]"
+            className="absolute bottom-12 left-4 inline-flex items-center gap-1 rounded-full bg-white/90 border border-[#E5DFC6] px-2 py-0.5 text-[10px] text-[#0a2225]/75 opacity-0 animate-[gs-rise_500ms_ease-out_1400ms_forwards]"
           >
             <span className="w-1 h-1 rounded-full bg-[#0c4d47] animate-pulse" />
             +18 viewing now
@@ -139,12 +139,12 @@ export const TravelerDiscoveryMagic: React.FC = () => {
           <div className="w-full max-w-[300px] rounded-2xl bg-white border border-[#E5DFC6] shadow-[0_22px_50px_rgba(10,34,37,0.14)] overflow-hidden opacity-0 animate-[gs-rise_500ms_ease-out_forwards]">
             <div className="px-3 py-2.5 border-b border-[#F0E8D2]">
               <p className="font-secondary italic text-[13px] text-[#0a2225] leading-tight">Santorini Escape</p>
-              <p className="text-[8px] uppercase tracking-[0.2em] text-[#0a2225]/55 mt-0.5">Tailoring your taste</p>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[#0a2225]/55 mt-0.5">Tailoring your taste</p>
               <div className="mt-1.5 flex flex-wrap gap-1">
                 {tastes.map((t, i) => (
                   <span
                     key={t}
-                    className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[8px] border border-[#E5DFC6] bg-white text-[#0a2225]/55 opacity-0 animate-[gs-taste-on_500ms_ease-out_forwards]"
+                    className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] border border-[#E5DFC6] bg-white text-[#0a2225]/55 opacity-0 animate-[gs-taste-on_500ms_ease-out_forwards]"
                     style={{ animationDelay: `${250 + i * 160}ms` }}
                   >
                     {t}
@@ -163,7 +163,7 @@ export const TravelerDiscoveryMagic: React.FC = () => {
               </svg>
               {swaps.map((row, i) => (
                 <div key={row.tag} className="relative flex items-center gap-2 py-1.5">
-                  <span className="font-secondary italic text-[9px] text-[#C7A962] w-12 shrink-0">{row.tag}</span>
+                  <span className="font-secondary italic text-[10px] text-[#C7A962] w-12 shrink-0">{row.tag}</span>
                   <div className="relative flex-1 h-4">
                     <span
                       className="absolute inset-0 font-secondary text-[10px] text-[#0a2225]/45 animate-[gs-fade-out_400ms_ease-out_forwards]"
@@ -198,7 +198,7 @@ export const TravelerDiscoveryMagic: React.FC = () => {
             <div className="h-14 bg-gradient-to-br from-[#bcd3d0] via-[#7fa8a3] to-[#0c4d47]" />
             <div className="px-3 py-2">
               <p className="font-secondary italic text-[12px] text-[#0a2225] leading-tight">Santorini Escape</p>
-              <div className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-[#0c4d47] px-2 py-0.5 text-[8px] text-[#C7A962]">
+              <div className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-[#0c4d47] px-2 py-0.5 text-[10px] text-[#C7A962]">
                 <Sparkles className="w-2.5 h-2.5" />
                 Tailored by Goldsainte AI
               </div>
@@ -232,7 +232,7 @@ export const TravelerDiscoveryMagic: React.FC = () => {
             >
               <div className="rounded-lg bg-white/95 backdrop-blur border border-[#C7A962]/60 px-2 py-1.5 shadow-[0_8px_20px_rgba(199,169,98,0.18)] flex items-center gap-1.5">
                 <div className={cn("w-5 h-5 rounded-md bg-gradient-to-br shrink-0", s.c)} />
-                <span className="font-secondary italic text-[9px] text-[#0a2225] leading-tight">{s.label}</span>
+                <span className="font-secondary italic text-[10px] text-[#0a2225] leading-tight">{s.label}</span>
               </div>
             </div>
           ))}
@@ -247,7 +247,7 @@ export const TravelerDiscoveryMagic: React.FC = () => {
             <div className="relative h-24 bg-gradient-to-br from-[#bcd3d0] via-[#7fa8a3] to-[#0c4d47] overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/60 to-transparent" />
               <div className="absolute inset-y-0 -left-1/2 w-1/2 bg-gradient-to-r from-transparent via-white/25 to-transparent animate-[gs-shimmer_1.6s_ease-out_300ms_forwards]" />
-              <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-[#C7A962]/85 backdrop-blur px-2 py-0.5 text-[8px] uppercase tracking-wider text-[#0a2225]">
+              <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-[#C7A962]/85 backdrop-blur px-2 py-0.5 text-[10px] uppercase tracking-wider text-[#0a2225]">
                 <Check className="w-2.5 h-2.5" strokeWidth={3} />
                 Trip Confirmed
               </span>
@@ -271,12 +271,12 @@ export const TravelerDiscoveryMagic: React.FC = () => {
                     style={{ animationDelay: `${300 + i * 150}ms` }}
                   >
                     <div className={cn("h-7 rounded bg-gradient-to-br", d.c)} />
-                    <p className="text-[7px] uppercase tracking-widest text-[#0a2225]/70 mt-1">Day {d.day}</p>
-                    <p className="font-secondary italic text-[8.5px] text-[#0a2225] leading-tight truncate">{d.title}</p>
+                    <p className="text-[10px] uppercase tracking-widest text-[#0a2225]/70 mt-1">Day {d.day}</p>
+                    <p className="font-secondary italic text-[10px] text-[#0a2225] leading-tight truncate">{d.title}</p>
                   </div>
                 ))}
               </div>
-              <div className="mt-2.5 flex items-center justify-between text-[9px] text-[#0a2225]/70">
+              <div className="mt-2.5 flex items-center justify-between text-[10px] text-[#0a2225]/70">
                 <span className="inline-flex items-center gap-1">
                   <div className="w-3 h-3 rounded-full bg-gradient-to-br from-[#C7A962] to-[#8a6a2e]" />
                   Curated with @elenaroams
@@ -290,14 +290,14 @@ export const TravelerDiscoveryMagic: React.FC = () => {
           </div>
           <div className="flex flex-col items-center gap-1">
             <div
-              className="inline-flex items-center gap-1.5 rounded-full bg-white/85 border border-[#E5DFC6] px-2.5 py-0.5 text-[9px] text-[#0a2225] opacity-0 animate-[gs-rise_500ms_ease-out_forwards]"
+              className="inline-flex items-center gap-1.5 rounded-full bg-white/85 border border-[#E5DFC6] px-2.5 py-0.5 text-[10px] text-[#0a2225] opacity-0 animate-[gs-rise_500ms_ease-out_forwards]"
               style={{ animationDelay: "1000ms" }}
             >
               <ShieldCheck className="w-2.5 h-2.5 text-[#0c4d47]" />
               On-platform booking · Fully protected
             </div>
             <div
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#0c4d47] px-2.5 py-0.5 text-[9px] text-[#C7A962] opacity-0 animate-[gs-rise_500ms_ease-out_forwards]"
+              className="inline-flex items-center gap-1.5 rounded-full bg-[#0c4d47] px-2.5 py-0.5 text-[10px] text-[#C7A962] opacity-0 animate-[gs-rise_500ms_ease-out_forwards]"
               style={{ animationDelay: "1300ms" }}
             >
               <Mail className="w-2.5 h-2.5" />
@@ -348,12 +348,12 @@ const SmallCard: React.FC<{ gradient: string; title: string; chip: string; price
   >
     <div className={cn("absolute inset-0 bg-gradient-to-br", gradient)} />
     <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/65 to-transparent" />
-    <span className="absolute top-1.5 left-1.5 inline-flex items-center rounded-full bg-white/90 px-1.5 py-0.5 text-[7.5px] font-secondary italic text-[#0a2225]">
+    <span className="absolute top-1.5 left-1.5 inline-flex items-center rounded-full bg-white/90 px-1.5 py-0.5 text-[10px] font-secondary italic text-[#0a2225]">
       {chip}
     </span>
     <div className="absolute bottom-1.5 left-2 right-2">
       <p className="font-secondary italic text-[10px] text-white leading-tight truncate">{title}</p>
-      <p className="text-[8px] text-white/80">from ${price}</p>
+      <p className="text-[10px] text-white/80">from ${price}</p>
     </div>
   </div>
 );
