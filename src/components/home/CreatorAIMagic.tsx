@@ -73,7 +73,7 @@ export const CreatorAIMagic: React.FC = () => {
   return (
     <div
       ref={ref}
-      className="relative w-full h-[300px] md:h-[460px] overflow-hidden bg-gradient-to-br from-[#FDFBF7] via-[#F8F1E0] to-[#F5EFE1]"
+      className="relative w-full h-[340px] sm:h-[400px] md:h-[460px] overflow-hidden bg-gradient-to-br from-[#FDFBF7] via-[#F8F1E0] to-[#F5EFE1]"
       aria-label="Goldsainte AI turning travel media into a curated, sellable itinerary"
     >
       <div className="pointer-events-none absolute -top-24 -right-20 w-72 h-72 rounded-full bg-[#C7A962]/20 blur-3xl" />
@@ -107,7 +107,7 @@ export const CreatorAIMagic: React.FC = () => {
             ))}
           </div>
           <div className="px-3 pt-2">
-            <div className="inline-flex items-center gap-1 rounded-full bg-white/80 border border-[#E5DFC6] px-2 py-0.5 text-[8px] text-[#0a2225]">
+            <div className="inline-flex items-center gap-1 rounded-full bg-white/80 border border-[#E5DFC6] px-2 py-0.5 text-[10px] text-[#0a2225]">
               <MapPin className="w-2 h-2 text-[#C7A962]" />
               Captured in Santorini · Jun 12–14
             </div>
@@ -130,7 +130,7 @@ export const CreatorAIMagic: React.FC = () => {
 
           {/* Soft AI label at top */}
           <div
-            className="absolute top-9 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 rounded-full bg-white/90 backdrop-blur border border-[#C7A962]/50 px-2.5 py-0.5 text-[9px] uppercase tracking-[0.18em] text-[#0a2225] shadow-sm opacity-0 animate-[gs-fade-in_500ms_ease-out_forwards]"
+            className="absolute top-9 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 rounded-full bg-white/90 backdrop-blur border border-[#C7A962]/50 px-2.5 py-0.5 text-[10px] uppercase tracking-[0.18em] text-[#0a2225] shadow-sm opacity-0 animate-[gs-fade-in_500ms_ease-out_forwards]"
           >
             <Sparkles className="w-2.5 h-2.5 text-[#C7A962] animate-pulse" />
             Reconstructing your journey
@@ -141,7 +141,7 @@ export const CreatorAIMagic: React.FC = () => {
             {["01", "02", "03"].map((d, i) => (
               <span
                 key={d}
-                className="inline-flex items-center gap-1 rounded-full border border-[#C7A962]/50 bg-white/85 px-2 py-0.5 text-[8px] font-secondary italic text-[#0a2225] opacity-0 animate-[gs-rise_500ms_ease-out_forwards]"
+                className="inline-flex items-center gap-1 rounded-full border border-[#C7A962]/50 bg-white/85 px-2 py-0.5 text-[10px] font-secondary italic text-[#0a2225] opacity-0 animate-[gs-rise_500ms_ease-out_forwards]"
                 style={{ animationDelay: `${1500 + i * 180}ms` }}
               >
                 <span className="text-[#C7A962]">Day {d}</span>
@@ -153,7 +153,7 @@ export const CreatorAIMagic: React.FC = () => {
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none"
             viewBox="0 0 400 460"
-            preserveAspectRatio="none"
+            preserveAspectRatio="xMidYMid meet"
           >
             <path
               d="M 70 175 Q 150 215 200 215 T 330 175 Q 280 280 200 305 Q 130 330 200 410"
@@ -239,11 +239,11 @@ export const CreatorAIMagic: React.FC = () => {
                 >
                   <div className="flex items-center gap-1">
                     <Icon className="w-2 h-2 text-[#C7A962] shrink-0" />
-                    <span className="font-secondary italic text-[9px] md:text-[10px] text-[#0a2225] leading-tight">
+                    <span className="font-secondary italic text-[10px] md:text-[10px] text-[#0a2225] leading-tight">
                       {m.place}
                     </span>
                   </div>
-                  <div className="text-[7px] uppercase tracking-[0.12em] text-[#6B7280] mt-0.5">
+                  <div className="text-[10px] uppercase tracking-[0.12em] text-[#6B7280] mt-0.5">
                     {m.meta}
                   </div>
                 </div>
@@ -256,7 +256,7 @@ export const CreatorAIMagic: React.FC = () => {
             {["Stay", "Dining", "Sunset", "Cruise", "Tasting"].map((tag, i) => (
               <span
                 key={tag}
-                className="inline-flex items-center rounded-full border border-[#0c4d47]/15 bg-[#0c4d47]/5 px-1.5 py-0.5 text-[8px] font-secondary italic text-[#0c4d47] opacity-0 animate-[gs-rise_400ms_ease-out_forwards]"
+                className="inline-flex items-center rounded-full border border-[#0c4d47]/15 bg-[#0c4d47]/5 px-1.5 py-0.5 text-[10px] font-secondary italic text-[#0c4d47] opacity-0 animate-[gs-rise_400ms_ease-out_forwards]"
                 style={{ animationDelay: `${2000 + i * 90}ms` }}
               >
                 {tag}
@@ -278,11 +278,11 @@ export const CreatorAIMagic: React.FC = () => {
                 <p className="font-secondary italic text-[15px] text-white leading-tight">
                   Santorini, in 3 Days
                 </p>
-                <p className="text-[8px] uppercase tracking-[0.2em] text-[#C7A962] mt-0.5">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-[#C7A962] mt-0.5">
                   Curated by AI · Reviewed by Elena
                 </p>
               </div>
-              <span className="absolute top-2 right-2 inline-flex items-center gap-1 rounded-full bg-white/90 px-1.5 py-0.5 text-[8px] uppercase tracking-wider text-[#0c4d47]">
+              <span className="absolute top-2 right-2 inline-flex items-center gap-1 rounded-full bg-white/90 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-[#0c4d47]">
                 <Wand2 className="w-2.5 h-2.5 text-[#C7A962]" /> Itinerary
               </span>
             </div>
@@ -293,7 +293,7 @@ export const CreatorAIMagic: React.FC = () => {
               <svg
                 className="absolute right-[26px] top-3 bottom-3 w-px h-[calc(100%-24px)] pointer-events-none"
                 viewBox="0 0 1 100"
-                preserveAspectRatio="none"
+                preserveAspectRatio="xMidYMid meet"
               >
                 <line
                   x1="0.5" y1="0" x2="0.5" y2="100"
@@ -313,13 +313,13 @@ export const CreatorAIMagic: React.FC = () => {
                       <span className="font-secondary italic text-[18px] text-[#C7A962] leading-none">
                         {d.day}
                       </span>
-                      <span className="text-[7px] uppercase tracking-widest text-[#6B7280] mt-0.5">Day</span>
+                      <span className="text-[10px] uppercase tracking-widest text-[#6B7280] mt-0.5">Day</span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-secondary text-[12px] text-[#0a2225] leading-tight truncate">
                         {d.title}
                       </p>
-                      <p className="font-secondary italic text-[9px] text-[#6B7280] mt-0.5 truncate">
+                      <p className="font-secondary italic text-[10px] text-[#6B7280] mt-0.5 truncate">
                         {d.sub}
                       </p>
                     </div>
@@ -343,7 +343,7 @@ export const CreatorAIMagic: React.FC = () => {
               {["Private Cruise", "Cliffside Dining", "Winery Tasting"].map((h, i) => (
                 <span
                   key={h}
-                  className="inline-flex items-center rounded-full border border-[#E5DFC6] bg-[#FBF7EC] px-2 py-0.5 text-[8px] text-[#0a2225] opacity-0 animate-[gs-rise_500ms_ease-out_forwards]"
+                  className="inline-flex items-center rounded-full border border-[#E5DFC6] bg-[#FBF7EC] px-2 py-0.5 text-[10px] text-[#0a2225] opacity-0 animate-[gs-rise_500ms_ease-out_forwards]"
                   style={{ animationDelay: `${1300 + i * 130}ms` }}
                 >
                   {h}
@@ -368,15 +368,15 @@ export const CreatorAIMagic: React.FC = () => {
         <div className="absolute inset-0 flex flex-col items-center justify-center px-5 gap-2.5 pt-2">
           <div className="w-full max-w-[300px] rounded-2xl bg-white border border-[#E5DFC6] shadow-[0_22px_50px_rgba(10,34,37,0.14)] overflow-hidden opacity-0 animate-[gs-rise_600ms_ease-out_forwards]">
             <div className="relative h-24 bg-gradient-to-br from-[#bcd3d0] via-[#7fa8a3] to-[#0c4d47]">
-              <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-[#0c4d47] px-2 py-0.5 text-[8px] uppercase tracking-wider text-[#C7A962]">
+              <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-[#0c4d47] px-2 py-0.5 text-[10px] uppercase tracking-wider text-[#C7A962]">
                 <span className="w-1 h-1 rounded-full bg-[#C7A962] animate-pulse" />
                 Now Live · Available for Booking
               </span>
-              <span className="absolute top-2 right-2 inline-flex items-center gap-0.5 rounded-full bg-white/95 px-1.5 py-0.5 text-[9px] text-[#0a2225]">
+              <span className="absolute top-2 right-2 inline-flex items-center gap-0.5 rounded-full bg-white/95 px-1.5 py-0.5 text-[10px] text-[#0a2225]">
                 <Star className="w-2.5 h-2.5 text-[#C7A962] fill-[#C7A962]" />
                 4.9
               </span>
-              <span className="absolute bottom-2 left-2 inline-flex items-center gap-1 rounded-full bg-black/40 backdrop-blur px-1.5 py-0.5 text-[9px] text-white opacity-0 animate-[gs-rise_500ms_ease-out_forwards]" style={{ animationDelay: "500ms" }}>
+              <span className="absolute bottom-2 left-2 inline-flex items-center gap-1 rounded-full bg-black/40 backdrop-blur px-1.5 py-0.5 text-[10px] text-white opacity-0 animate-[gs-rise_500ms_ease-out_forwards]" style={{ animationDelay: "500ms" }}>
                 <Heart className="w-2.5 h-2.5 text-[#C7A962] fill-[#C7A962]" />
                 243 saves
               </span>
@@ -387,13 +387,13 @@ export const CreatorAIMagic: React.FC = () => {
               </p>
               <div className="mt-1.5 flex items-center gap-1.5">
                 <div className="w-4 h-4 rounded-full bg-gradient-to-br from-[#C7A962] to-[#8a6a2e]" />
-                <span className="text-[9px] text-[#6B7280]">by @elenaroams · Creator</span>
+                <span className="text-[10px] text-[#6B7280]">by @elenaroams · Creator</span>
               </div>
               <div className="mt-3 flex items-center justify-between">
                 <div className="flex items-baseline gap-1.5">
-                  <span className="text-[9px] text-[#6B7280]">from</span>
+                  <span className="text-[10px] text-[#6B7280]">from</span>
                   <span className="font-secondary text-[16px] text-[#0a2225]">$249</span>
-                  <span className="text-[9px] text-[#6B7280] line-through">$299</span>
+                  <span className="text-[10px] text-[#6B7280] line-through">$299</span>
                 </div>
                 {/* Publish → Published swap */}
                 <div className="relative h-[26px] w-[112px]">
@@ -426,7 +426,7 @@ export const CreatorAIMagic: React.FC = () => {
               + $249 earned
             </div>
             <div
-              className="inline-flex items-center gap-1.5 rounded-full bg-white/85 border border-[#E5DFC6] px-2.5 py-0.5 text-[9px] text-[#0a2225] opacity-0 animate-[gs-rise_500ms_ease-out_forwards]"
+              className="inline-flex items-center gap-1.5 rounded-full bg-white/85 border border-[#E5DFC6] px-2.5 py-0.5 text-[10px] text-[#0a2225] opacity-0 animate-[gs-rise_500ms_ease-out_forwards]"
               style={{ animationDelay: "1700ms" }}
             >
               <MapPin className="w-2.5 h-2.5 text-[#C7A962]" />
@@ -511,7 +511,7 @@ const Scene: React.FC<{ visible: boolean; children: React.ReactNode }> = ({
 );
 
 const Caption: React.FC<{ text: string }> = ({ text }) => (
-  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 rounded-full bg-white/85 backdrop-blur border border-[#E5DFC6] px-3 py-1 text-[10px] tracking-wide text-[#0a2225] shadow-sm z-20">
+  <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 rounded-full bg-white/85 backdrop-blur border border-[#E5DFC6] px-3 py-1 text-[10px] tracking-wide text-[#0a2225] shadow-sm z-20">
     <Sparkles className="w-3 h-3 text-[#C7A962]" />
     {text}
   </div>
@@ -521,7 +521,7 @@ const Meta: React.FC<{ icon: React.ComponentType<{ className?: string }>; label:
   icon: Icon,
   label,
 }) => (
-  <span className="inline-flex items-center justify-center gap-1 text-[9px] text-[#0a2225]/70">
+  <span className="inline-flex items-center justify-center gap-1 text-[10px] text-[#0a2225]/70">
     <Icon className="w-2.5 h-2.5 text-[#0c4d47]" />
     {label}
   </span>
@@ -533,12 +533,12 @@ const PhoneFrame: React.FC<{
   status: string;
 }> = ({ children, label, status }) => (
   <div className="absolute inset-0 flex items-center justify-center">
-    <div className="relative w-[180px] md:w-[200px] h-[280px] md:h-[340px] rounded-[32px] bg-[#0a2225] p-1.5 shadow-[0_24px_60px_rgba(10,34,37,0.28)]">
+    <div className="relative w-[160px] sm:w-[180px] md:w-[200px] h-[250px] sm:h-[300px] md:h-[340px] rounded-[32px] bg-[#0a2225] p-1.5 shadow-[0_24px_60px_rgba(10,34,37,0.28)]">
       <div className="relative w-full h-full rounded-[26px] bg-gradient-to-b from-[#FDFBF7] to-[#F5EFE1] overflow-hidden">
         <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-14 h-3.5 rounded-full bg-[#0a2225]" />
         <div className="pt-6 px-3 pb-2 flex items-center justify-between">
-          <span className="text-[9px] uppercase tracking-[0.2em] text-[#0a2225]/70">{label}</span>
-          <span className="flex items-center gap-1 text-[9px] text-[#0c4d47]">
+          <span className="text-[10px] uppercase tracking-[0.2em] text-[#0a2225]/70">{label}</span>
+          <span className="flex items-center gap-1 text-[10px] text-[#0c4d47]">
             <span className="w-1.5 h-1.5 rounded-full bg-[#C7A962] animate-pulse" />
             {status}
           </span>
