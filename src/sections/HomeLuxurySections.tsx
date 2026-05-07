@@ -203,7 +203,7 @@ export const BuiltForEverySideSection: React.FC = () => {
 /*  How Goldsainte AI works - 4 Tabbed Categories                             */
 /* -------------------------------------------------------------------------- */
 
-import { Sparkles, Palette, Users, CreditCard, Heart, Brain, Rss, Star, Wand2, Layers, ArrowRightLeft, Bookmark, Target, MessageSquare, Building2, UserCheck, Mic, Shield, Bell, MessagesSquare, ShieldCheck, Lock, Scale, Fingerprint, BadgeCheck, Eye, Wallet, RefreshCw, MessageCircle, FileText, Ban, Gavel, Clock, FileCheck } from "lucide-react";
+import { Sparkles, Palette, Users, CreditCard, Heart, Brain, Rss, Star, Wand2, Layers, ArrowRightLeft, Bookmark, Target, MessageSquare, Building2, UserCheck, Mic, Shield, Bell, MessagesSquare, ShieldCheck, Lock, Scale, Fingerprint, BadgeCheck, Eye, Wallet, RefreshCw, MessageCircle, FileText, Ban, Gavel, Clock, FileCheck, Compass, Camera, Briefcase, ClipboardList } from "lucide-react";
 
 type AIFeature = {
   icon: React.ElementType;
@@ -215,115 +215,50 @@ type TabData = {
   id: string;
   label: string;
   icon: React.ElementType;
+  captionLabel?: string;
   features: AIFeature[];
 };
 
 const tabsData: TabData[] = [
   {
-    id: "personalizes",
-    label: "Personalizes",
-    icon: Sparkles,
+    id: "travelers",
+    label: "For Travelers",
+    icon: Compass,
+    captionLabel: "Discover & Book",
     features: [
       {
-        icon: Heart,
-        title: "AI-Curated Collections",
-        description: "Curated itineraries built around your style — where you want to go, how you like to travel, and what makes you feel at home.",
-      },
-      {
-        icon: Brain,
-        title: "Behavioral Learning",
-        description: "The more you explore, the smarter Goldsainte gets. It learns from your searches, saves, and bookings to recommend trips that feel like you.",
-      },
-      {
-        icon: Rss,
-        title: "Personalized Feed",
-        description: "Your social feed ranks content based on accounts you follow, destinations you've liked, and what's trending in your travel world.",
-      },
-      {
-        icon: Star,
-        title: "Smart Recommendations",
-        description: "AI analyzes your booking history, preferences, and favorites to surface destinations and experiences you'll love — before you even search.",
+        icon: Sparkles,
+        title: "Book curated trips instantly.",
+        description:
+          "Explore ready-made itineraries and travel packages created by trusted creators and certified travel agents. Personalize your trip or book one in minutes.",
       },
     ],
   },
   {
-    id: "creates",
-    label: "Creates",
-    icon: Palette,
+    id: "creators",
+    label: "For Creators",
+    icon: Camera,
+    captionLabel: "Create & Monetize",
     features: [
-      {
-        icon: Layers,
-        title: "Storyboard Creation",
-        description: "Turn TikToks, Pins, and daydreams into visual mood boards. Build a storyboard that captures exactly what you want your trip to feel like.",
-      },
       {
         icon: Wand2,
-        title: "AI Scene Suggestions",
-        description: "Starting from scratch? AI auto-generates scene placeholders — arrival, golden hour, sunset dining, farewells — so your storyboard tells a story.",
-      },
-      {
-        icon: ArrowRightLeft,
-        title: "Storyboard → Trip Request",
-        description: "One click converts your visual inspiration into an actionable trip request, ready for creators and agents to bring to life.",
-      },
-      {
-        icon: Bookmark,
-        title: "Save-to-Storyboard",
-        description: "See something inspiring? Save it to your storyboard from anywhere on the platform — a hotel, a creator's reel, a destination card.",
+        title: "Turn your trips into income.",
+        description:
+          "Upload travel photos, videos, or past trip content and let Goldsainte AI help transform it into a sellable itinerary others can discover, purchase, and personalize.",
       },
     ],
   },
   {
-    id: "matches",
-    label: "Matches",
-    icon: Users,
+    id: "agents",
+    label: "For Travel Agents",
+    icon: Briefcase,
+    captionLabel: "Sell & Customize",
     features: [
       {
-        icon: Target,
-        title: "AI Trip Matching",
-        description: "Share your trip request and AI scores thousands of creators and agents in seconds — matching your vibe, budget, and destination with professionals who get it.",
-      },
-      {
-        icon: MessageSquare,
-        title: "Receive Proposals",
-        description: "Verified creators and agents compete for your trip with custom proposals, pricing, and storyboards — you pick the one that feels right.",
-      },
-      {
-        icon: UserCheck,
-        title: "AI Agent Matching",
-        description: "Find travel agents who specialize in exactly where you want to go and how you like to travel — no endless scrolling, just perfect fits.",
-      },
-      {
-        icon: Building2,
-        title: "AI Brand Discovery",
-        description: "Looking for the perfect hotel or resort? AI matches you with properties based on your taste, style tags, and reviews from travelers like you.",
-      },
-    ],
-  },
-  {
-    id: "books",
-    label: "Books",
-    icon: CreditCard,
-    features: [
-      {
-        icon: Mic,
-        title: "Voice Activation",
-        description: "Use voice commands to search trips, refine your storyboard, or get matched with a creator — all hands-free.",
-      },
-      {
-        icon: Shield,
-        title: "Protected Payments",
-        description: "Pay securely through Stripe with commission-protected escrow. Your money is held safely until your trip is confirmed — no side deals, no risk.",
-      },
-      {
-        icon: Bell,
-        title: "AI Match Notifications",
-        description: "Get notified instantly when a creator or agent matches your trip request — so you never miss the perfect opportunity.",
-      },
-      {
-        icon: MessagesSquare,
-        title: "All-in-One Booking",
-        description: "Chat, review proposals, sign contracts, and book — all inside Goldsainte. No phone numbers, no emails, no off-platform chaos.",
+        icon: ClipboardList,
+        title: "Sell packages or bid on custom trips.",
+        description:
+          "List curated travel packages, customize experiences for travelers, and respond to custom trip requests from users looking for expert planning.",
       },
     ],
   },
@@ -331,15 +266,14 @@ const tabsData: TabData[] = [
 
 // Tab-specific hero images mapping
 const tabImages: Record<string, string> = {
-  personalizes: santoriniStepsImg,
-  creates: mountainBridgeImg,
-  matches: veniceGondolaImg,
-  books: hotAirBalloonsImg,
+  travelers: santoriniStepsImg,
+  creators: creatorCanyonImg,
+  agents: agentPlanningImg,
 };
 
 export const HowGoldsainteWorksSection: React.FC = () => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState("personalizes");
+  const [activeTab, setActiveTab] = useState("travelers");
 
   const activeTabData = tabsData.find((tab) => tab.id === activeTab) || tabsData[0];
 
@@ -352,10 +286,10 @@ export const HowGoldsainteWorksSection: React.FC = () => {
             Powered by AI
           </p>
           <h2 className="font-secondary text-[26px] leading-[1.15] text-[#0a2225] md:text-[40px] mb-3">
-            How <span className="italic">Goldsainte AI</span> works
+            How <span className="italic">Goldsainte</span> Works
           </h2>
           <p className="max-w-2xl text-sm md:text-base text-[#5A5A5A] leading-relaxed">
-            Goldsainte transforms your travel ideas into a structured storyboard, then intelligently matches it within our curated marketplace of expert agents and creators. They compete to design and price your journey — while our AI streamlines the process from inspiration to booking.
+            A curated travel marketplace where travelers discover experiences, creators monetize itineraries, and certified agents sell or customize travel packages.
           </p>
         </div>
 
@@ -399,7 +333,7 @@ export const HowGoldsainteWorksSection: React.FC = () => {
                       </span>
                     </AccordionTrigger>
                     <AccordionContent className="pt-6 pb-3 px-2">
-                      <div className="grid gap-5 md:grid-cols-2">
+                      <div className="grid gap-5 grid-cols-1">
                         {tab.features.map((feature, index) => {
                           const FeatureIcon = feature.icon;
                           return (
@@ -461,7 +395,7 @@ export const HowGoldsainteWorksSection: React.FC = () => {
                       return <TabIcon className="w-4 h-4 text-[#D4C07A]" />;
                     })()}
                     <span className="text-white/90 text-sm font-medium tracking-wide">
-                      {activeTabData.label}
+                      {activeTabData.captionLabel ?? activeTabData.label}
                     </span>
                   </div>
                 </div>
