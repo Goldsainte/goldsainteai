@@ -8,22 +8,26 @@ const SCENES = 4;
 const tastes = ["Luxury", "Food & Wine", "Slow Travel", "Wellness", "Adventure"];
 
 const swaps = [
-  { from: "Boutique Inn", to: "Canaves Oia · Cliffside Suite", tag: "Stay" },
-  { from: "Casual taverna", to: "Selene · Tasting Menu", tag: "Dining" },
-  { from: "City walk", to: "Private Sailboat · Caldera Sunset", tag: "Experience" },
+  { from: "Boutique Inn", to: "Canaves Oia · Cliffside Suite", tag: "Stay", img: "https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?auto=format&fit=crop&w=400&q=70" },
+  { from: "Casual taverna", to: "Selene · Tasting Menu", tag: "Dining", img: "https://images.unsplash.com/photo-1504672281656-e4981d70414b?auto=format&fit=crop&w=400&q=70" },
+  { from: "City walk", to: "Private Sailboat · Caldera Sunset", tag: "Experience", img: "https://images.unsplash.com/photo-1530541930197-ff16ac917b0e?auto=format&fit=crop&w=400&q=70" },
 ];
 
 const aiSuggestions = [
-  { label: "Add: Private Sommelier Tasting", c: "from-[#7a2438] to-[#3d101c]", t: "8%", l: "4%" },
-  { label: "Nearby: Akrotiri at Golden Hour", c: "from-[#f3b87a] to-[#b85c3a]", t: "10%", l: "60%" },
-  { label: "Hidden gem: Vlychada Black Beach", c: "from-[#7a7466] to-[#2d2a24]", t: "70%", l: "30%" },
+  { label: "Add: Private Sommelier Tasting", c: "from-[#7a2438] to-[#3d101c]", t: "8%", l: "4%", img: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=200&q=70" },
+  { label: "Nearby: Akrotiri at Golden Hour", c: "from-[#f3b87a] to-[#b85c3a]", t: "10%", l: "60%", img: "https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?auto=format&fit=crop&w=200&q=70" },
+  { label: "Hidden gem: Vlychada Black Beach", c: "from-[#7a7466] to-[#2d2a24]", t: "70%", l: "30%", img: "https://images.unsplash.com/photo-1571406761758-9a3eed5338ef?auto=format&fit=crop&w=200&q=70" },
 ];
 
 const dayTimeline = [
-  { day: "01", title: "Cliffside Dinner", c: "from-[#bcd3d0] to-[#0c4d47]" },
-  { day: "02", title: "Caldera Sunset", c: "from-[#f3d9b1] to-[#c08457]" },
-  { day: "03", title: "Winery Tasting", c: "from-[#dcc89a] to-[#8a6a2e]" },
+  { day: "01", title: "Cliffside Dinner", c: "from-[#bcd3d0] to-[#0c4d47]", img: "https://images.unsplash.com/photo-1504672281656-e4981d70414b?auto=format&fit=crop&w=200&q=70" },
+  { day: "02", title: "Caldera Sunset", c: "from-[#f3d9b1] to-[#c08457]", img: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=200&q=70" },
+  { day: "03", title: "Winery Tasting", c: "from-[#dcc89a] to-[#8a6a2e]", img: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=200&q=70" },
 ];
+
+const HERO_IMG = "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=600&q=70";
+const KYOTO_IMG = "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=400&q=70";
+const AMALFI_IMG = "https://images.unsplash.com/photo-1533104816931-20fa691ff6ca?auto=format&fit=crop&w=400&q=70";
 
 export const TravelerDiscoveryMagic: React.FC = () => {
   const [step, setStep] = useState(0);
@@ -74,7 +78,7 @@ export const TravelerDiscoveryMagic: React.FC = () => {
               className="col-span-3 relative rounded-2xl overflow-hidden bg-white border border-[#E5DFC6] shadow-[0_18px_40px_rgba(10,34,37,0.12)] opacity-0 animate-[gs-card-in_700ms_ease-out_forwards]"
               style={{ ["--rot" as any]: "-0.4deg", animationDelay: "180ms" }}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-[#bcd3d0] via-[#7fa8a3] to-[#0c4d47]" />
+              <img src={HERO_IMG} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/70 via-[#0a2225]/10 to-transparent" />
               <div className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-white/85 backdrop-blur px-1.5 py-0.5 text-[10px] text-[#0a2225]">
                 <Star className="w-2.5 h-2.5 text-[#C7A962] fill-[#C7A962]" /> 4.9
@@ -100,7 +104,7 @@ export const TravelerDiscoveryMagic: React.FC = () => {
             {/* Right column */}
             <div className="col-span-2 flex flex-col gap-2.5">
               <SmallCard
-                gradient="from-[#e9c9b8] via-[#b56a6a] to-[#4a2330]"
+                img={KYOTO_IMG}
                 title="Kyoto Cultural Journey"
                 chip="Curated by Local Experts"
                 price={389}
@@ -108,7 +112,7 @@ export const TravelerDiscoveryMagic: React.FC = () => {
                 rot="0.6deg"
               />
               <SmallCard
-                gradient="from-[#f3d9b1] via-[#d18a59] to-[#6b3a2a]"
+                img={AMALFI_IMG}
                 title="Amalfi Coast Villas"
                 chip="Hidden Gem"
                 price={429}
@@ -163,7 +167,10 @@ export const TravelerDiscoveryMagic: React.FC = () => {
               </svg>
               {swaps.map((row, i) => (
                 <div key={row.tag} className="relative flex items-center gap-2 py-1.5">
-                  <span className="font-secondary italic text-[10px] text-[#C7A962] w-12 shrink-0">{row.tag}</span>
+                  <span className="relative w-8 h-8 shrink-0 rounded-md overflow-hidden border border-[#E5DFC6]">
+                    <img src={row.img} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+                  </span>
+                  <span className="font-secondary italic text-[10px] text-[#C7A962] w-10 shrink-0">{row.tag}</span>
                   <div className="relative flex-1 h-4">
                     <span
                       className="absolute inset-0 font-secondary text-[10px] text-[#0a2225]/45 animate-[gs-fade-out_400ms_ease-out_forwards]"
@@ -195,7 +202,10 @@ export const TravelerDiscoveryMagic: React.FC = () => {
       <Scene visible={step === 2}>
         <div className="absolute inset-0">
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[160px] sm:w-[180px] rounded-2xl bg-white border border-[#E5DFC6] shadow-[0_18px_40px_rgba(10,34,37,0.12)] overflow-hidden">
-            <div className="h-14 bg-gradient-to-br from-[#bcd3d0] via-[#7fa8a3] to-[#0c4d47]" />
+            <div className="relative h-14 overflow-hidden">
+              <img src={HERO_IMG} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/40 to-transparent" />
+            </div>
             <div className="px-3 py-2">
               <p className="font-secondary italic text-[12px] text-[#0a2225] leading-tight">Santorini Escape</p>
               <div className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-[#0c4d47] px-2 py-0.5 text-[10px] text-[#C7A962]">
@@ -231,7 +241,9 @@ export const TravelerDiscoveryMagic: React.FC = () => {
               style={{ top: s.t, left: s.l, animationDelay: `${500 + i * 220}ms` }}
             >
               <div className="rounded-lg bg-white/95 backdrop-blur border border-[#C7A962]/60 px-2 py-1.5 shadow-[0_8px_20px_rgba(199,169,98,0.18)] flex items-center gap-1.5">
-                <div className={cn("w-5 h-5 rounded-md bg-gradient-to-br shrink-0", s.c)} />
+                <div className="relative w-5 h-5 rounded-md overflow-hidden shrink-0">
+                  <img src={s.img} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+                </div>
                 <span className="font-secondary italic text-[10px] text-[#0a2225] leading-tight">{s.label}</span>
               </div>
             </div>
@@ -244,7 +256,8 @@ export const TravelerDiscoveryMagic: React.FC = () => {
       <Scene visible={step === 3}>
         <div className="absolute inset-0 flex flex-col items-center justify-center px-5 gap-2 pt-2 pb-9">
           <div className="w-full max-w-[300px] rounded-2xl bg-white border border-[#E5DFC6] shadow-[0_22px_50px_rgba(10,34,37,0.14)] overflow-hidden opacity-0 animate-[gs-rise_600ms_ease-out_forwards]">
-            <div className="relative h-24 bg-gradient-to-br from-[#bcd3d0] via-[#7fa8a3] to-[#0c4d47] overflow-hidden">
+            <div className="relative h-24 overflow-hidden">
+              <img src={HERO_IMG} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/60 to-transparent" />
               <div className="absolute inset-y-0 -left-1/2 w-1/2 bg-gradient-to-r from-transparent via-white/25 to-transparent animate-[gs-shimmer_1.6s_ease-out_300ms_forwards]" />
               <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-[#C7A962]/85 backdrop-blur px-2 py-0.5 text-[10px] uppercase tracking-wider text-[#0a2225]">
@@ -270,7 +283,9 @@ export const TravelerDiscoveryMagic: React.FC = () => {
                     className="relative z-10 flex-1 min-w-0 rounded-md p-1 bg-gradient-to-br border border-white/60 opacity-0 animate-[gs-rise_500ms_ease-out_forwards]"
                     style={{ animationDelay: `${300 + i * 150}ms` }}
                   >
-                    <div className={cn("h-6 rounded bg-gradient-to-br", d.c)} />
+                    <div className="relative h-6 rounded overflow-hidden">
+                      <img src={d.img} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+                    </div>
                     <p className="text-[9px] uppercase tracking-wider text-[#0a2225]/70 mt-1">Day {d.day}</p>
                     <p className="font-secondary italic text-[10px] text-[#0a2225] leading-tight truncate">{d.title}</p>
                   </div>
@@ -339,14 +354,14 @@ export const TravelerDiscoveryMagic: React.FC = () => {
   );
 };
 
-const SmallCard: React.FC<{ gradient: string; title: string; chip: string; price: number; delay: number; rot: string }> = ({
-  gradient, title, chip, price, delay, rot,
+const SmallCard: React.FC<{ img: string; title: string; chip: string; price: number; delay: number; rot: string }> = ({
+  img, title, chip, price, delay, rot,
 }) => (
   <div
     className="relative flex-1 rounded-2xl overflow-hidden bg-white border border-[#E5DFC6] shadow-[0_14px_30px_rgba(10,34,37,0.10)] opacity-0 animate-[gs-card-in_700ms_ease-out_forwards]"
     style={{ ["--rot" as any]: rot, animationDelay: `${delay}ms` }}
   >
-    <div className={cn("absolute inset-0 bg-gradient-to-br", gradient)} />
+    <img src={img} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
     <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/65 to-transparent" />
     <span className="absolute top-1.5 left-1.5 inline-flex items-center rounded-full bg-white/90 px-1.5 py-0.5 text-[10px] font-secondary italic text-[#0a2225]">
       {chip}

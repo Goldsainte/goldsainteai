@@ -6,16 +6,18 @@ const SCENE_MS = 3600;
 const SCENES = 4;
 
 const days = [
-  { day: "01", title: "Positano · Cliffside Arrival", sub: "Le Sirenuse · Champagne welcome", c: "from-[#f6c9a8] to-[#b85c3a]", tags: ["Stay", "Dining"] },
-  { day: "02", title: "Capri by Private Yacht", sub: "Da Paolino · Lemon-grove dinner", c: "from-[#bcd3d0] to-[#0c4d47]", tags: ["Yacht", "Dining"] },
-  { day: "03", title: "Ravello · Belvedere Suite", sub: "Caruso · Cliffside terrace", c: "from-[#dcc89a] to-[#8a6a2e]", tags: ["Stay", "Experience"] },
+  { day: "01", title: "Positano · Cliffside Arrival", sub: "Le Sirenuse · Champagne welcome", c: "from-[#f6c9a8] to-[#b85c3a]", tags: ["Stay", "Dining"], img: "https://images.unsplash.com/photo-1533104816931-20fa691ff6ca?auto=format&fit=crop&w=300&q=70" },
+  { day: "02", title: "Capri by Private Yacht", sub: "Da Paolino · Lemon-grove dinner", c: "from-[#bcd3d0] to-[#0c4d47]", tags: ["Yacht", "Dining"], img: "https://images.unsplash.com/photo-1530541930197-ff16ac917b0e?auto=format&fit=crop&w=300&q=70" },
+  { day: "03", title: "Ravello · Belvedere Suite", sub: "Caruso · Cliffside terrace", c: "from-[#dcc89a] to-[#8a6a2e]", tags: ["Stay", "Experience"], img: "https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?auto=format&fit=crop&w=300&q=70" },
 ];
 
 const aiTips = [
-  { label: "Pair Day 02 with: Da Adolfo by water taxi", c: "from-[#bcd3d0] to-[#0c4d47]", t: "12%", l: "4%" },
-  { label: "Upgrade Day 03: Caruso Belvedere Suite", c: "from-[#dcc89a] to-[#8a6a2e]", t: "62%", l: "2%" },
-  { label: "Add: Helicopter transfer Naples → Positano", c: "from-[#cfd9d6] to-[#384e4b]", t: "70%", l: "55%" },
+  { label: "Pair Day 02 with: Da Adolfo by water taxi", c: "from-[#bcd3d0] to-[#0c4d47]", t: "12%", l: "4%", img: "https://images.unsplash.com/photo-1504672281656-e4981d70414b?auto=format&fit=crop&w=200&q=70" },
+  { label: "Upgrade Day 03: Caruso Belvedere Suite", c: "from-[#dcc89a] to-[#8a6a2e]", t: "62%", l: "2%", img: "https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?auto=format&fit=crop&w=200&q=70" },
+  { label: "Add: Helicopter transfer Naples → Positano", c: "from-[#cfd9d6] to-[#384e4b]", t: "70%", l: "55%", img: "https://images.unsplash.com/photo-1533104816931-20fa691ff6ca?auto=format&fit=crop&w=200&q=70" },
 ];
+
+const AMALFI_HERO = "https://images.unsplash.com/photo-1533104816931-20fa691ff6ca?auto=format&fit=crop&w=600&q=70";
 
 export const AgentProposalMagic: React.FC = () => {
   const [step, setStep] = useState(0);
@@ -136,7 +138,9 @@ export const AgentProposalMagic: React.FC = () => {
                   className="flex items-center gap-2.5 rounded-xl bg-white border border-[#E5DFC6] shadow-[0_10px_24px_rgba(10,34,37,0.08)] p-2 opacity-0 animate-[gs-card-in_650ms_ease-out_forwards]"
                   style={{ ["--rot" as any]: i % 2 === 0 ? "-0.3deg" : "0.3deg", animationDelay: `${i * 220}ms` }}
                 >
-                  <div className={cn("w-12 h-12 rounded-md bg-gradient-to-br shrink-0 shadow-sm", d.c)} />
+                  <div className="relative w-12 h-12 rounded-md overflow-hidden shrink-0 shadow-sm">
+                    <img src={d.img} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+                  </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] uppercase tracking-[0.2em] text-[#C7A962]">Day {d.day}</p>
                     <p className="font-secondary italic text-[12px] text-[#0a2225] leading-tight truncate">{d.title}</p>
@@ -175,7 +179,9 @@ export const AgentProposalMagic: React.FC = () => {
               <div key={d.day} className="flex items-center gap-2 py-1 border-b last:border-b-0 border-[#F0E8D2]">
                 <span className="font-secondary italic text-[11px] text-[#C7A962] w-5 text-center">{d.day}</span>
                 <span className="font-secondary italic text-[10px] text-[#0a2225] truncate flex-1">{d.title}</span>
-                <div className={cn("w-5 h-5 rounded-md bg-gradient-to-br", d.c)} />
+                <div className="relative w-5 h-5 rounded-md overflow-hidden">
+                  <img src={d.img} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+                </div>
               </div>
             ))}
           </div>
@@ -206,7 +212,9 @@ export const AgentProposalMagic: React.FC = () => {
               style={{ top: s.t, left: s.l, animationDelay: `${500 + i * 220}ms` }}
             >
               <div className="rounded-lg bg-white/95 backdrop-blur border border-[#C7A962]/60 px-2 py-1.5 shadow-[0_8px_20px_rgba(199,169,98,0.18)] flex items-center gap-1.5">
-                <div className={cn("w-5 h-5 rounded-md bg-gradient-to-br shrink-0", s.c)} />
+                <div className="relative w-5 h-5 rounded-md overflow-hidden shrink-0">
+                  <img src={s.img} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+                </div>
                 <span className="font-secondary italic text-[10px] text-[#0a2225] leading-tight">{s.label}</span>
               </div>
             </div>
@@ -219,7 +227,8 @@ export const AgentProposalMagic: React.FC = () => {
       <Scene visible={step === 3}>
         <div className="absolute inset-0 flex flex-col items-center justify-center px-5 gap-2 pt-2 pb-9">
           <div className="relative w-full max-w-[300px] rounded-2xl bg-white border border-[#E5DFC6] shadow-[0_22px_50px_rgba(10,34,37,0.14)] overflow-hidden opacity-0 animate-[gs-rise_600ms_ease-out_forwards]">
-            <div className="relative h-20 bg-gradient-to-br from-[#bcd3d0] via-[#7fa8a3] to-[#0c4d47] overflow-hidden">
+            <div className="relative h-20 overflow-hidden">
+              <img src={AMALFI_HERO} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/55 to-transparent" />
               <div className="absolute inset-y-0 -left-1/2 w-1/2 bg-gradient-to-r from-transparent via-white/25 to-transparent animate-[gs-shimmer_1.6s_ease-out_300ms_forwards]" />
               <div className="absolute bottom-2 left-3 right-3">
