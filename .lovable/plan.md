@@ -1,94 +1,124 @@
-## Add signature animations for Travelers and Travel Agents tabs
+## Refine Traveler & Travel Agent animations to match the Creator "magic moment"
 
-Bring the same cinematic, marketplace-driven product feel from `CreatorAIMagic` to the other two tabs in the "How Goldsainte Works" section so the entire experience reads as one ecosystem story. Each tab gets its own self-contained 4-scene loop in the same canvas dimensions (`h-[300px] md:h-[460px]`) and visual language (cream/dark green/gold, serif italic headers, rounded cards, soft shadows, IntersectionObserver loop, reduced-motion fallback).
+Goal: elevate `TravelerDiscoveryMagic` and `AgentProposalMagic` from informational/workflow demos into emotionally immersive cinematic product moments at the same fidelity as `CreatorAIMagic`. No changes to copy microcopy rules, tab order, or surrounding sections.
 
-### New components
+Both components keep the existing canvas (`h-[300px] md:h-[460px]`), palette (cream/dark green/gold), serif italic typography, IntersectionObserver loop, reduced-motion fallback, step dots, caption pill, and ambient gold/green glows. Only the inner scenes are rebuilt.
 
-1. `src/components/home/TravelerDiscoveryMagic.tsx`
-2. `src/components/home/AgentProposalMagic.tsx`
+---
 
-Both follow the same architecture as `CreatorAIMagic`: `SCENE_MS` interval, `Scene` cross-fade wrapper, `Caption` pill, ambient gold/green glows, top step dots, inline `<style>` keyframes (`gs-pop`, `gs-rise`, `gs-card-in`, `gs-fade-in/out`, `gs-shimmer`, `gs-glow`, `gs-draw`).
+### TravelerDiscoveryMagic — discovery, personalization, payoff
 
-### Traveler — Discovery & Booking (4 scenes)
+Reposition emotionally as: *"I discovered an incredible trip, personalized it instantly, and booked it effortlessly."*
 
-1. **Explore the marketplace** — A 3-card stagger of curated trips on a soft cream stage:
-   - "Santorini Escape · from $249 · @elenaroams · ★ 4.9 · ♥ 243"
-   - "Kyoto Cultural Journey · from $389 · @hiroyuki · ★ 4.8 · ♥ 412"
-   - "Bali Wellness Retreat · from $329 · Concierge · ★ 4.9 · ♥ 187"
-   - Each card has a destination gradient hero, serif title, host row with avatar, price + saves, and a tiny "Available" pill. Cards drift in with `gs-card-in` and a slight rotation. Caption: "Discover curated trips".
-2. **Personalize your trip** — One Santorini card scales up center; a small overlay panel slides in from the right with elegant toggle rows that animate ON in sequence:
-   - Pace · `Slow · Balanced · Active` (Balanced becomes selected)
-   - Dining · `Local · Fine Dining` (Fine Dining selected)
-   - Stays · `Boutique · Luxury` (Luxury selected)
-   - Budget slider gold dot slides from $249 → $349
-   - Subtle gold check appears next to each row as it confirms. Caption: "Tailor it to your taste".
-3. **AI recommendations** — Three floating gold-bordered "suggestion" chips rise around the personalized card with a gentle pulse, connected by faint dotted lines:
-   - "Add: Private Sommelier Tasting · +$45"
-   - "Nearby: Akrotiri Excavation Tour"
-   - "Hidden gem: Vlychada Black Beach"
-   - Center card shows "+ 3 AI suggestions added" pill with `Sparkles`. Caption: "Goldsainte tailors it further".
-4. **Booking confirmed** — Card morphs into a polished confirmation card:
-   - Gradient hero with "✓ Trip Confirmed" pill
-   - Title "Santorini Escape · Jun 12–14"
-   - Three mini day chips (Day 1/2/3 thumbnails)
-   - Bottom row: "Booked with Elena · Saved to your trips" + "Itinerary sent to inbox" gold underline
-   - Stacked pill below: "On-platform booking · Fully protected"
-   - Caption: "Booked. Saved. Ready to travel".
+**Scene 1 — Living marketplace ("Discover something extraordinary")**
+- Replace the centered 3-card stack with an editorial discovery surface:
+  - Top thin section header chip: serif italic *"Trending in Summer"* with a small gold underline that draws in.
+  - Left column: one tall hero card "Santorini Escape" with a luxury destination gradient hero, serif italic title, host row, ★ rating, and a heart icon that animates from outline → filled gold ("saved") with a tiny "+1" rising.
+  - Right column: two stacked smaller cards staggered in — "Kyoto Cultural Journey" (chip: *Curated by Local Experts*) and "Amalfi Coast Villas" (chip: *Hidden Gem*).
+  - A floating soft pill drifts in bottom-right: *"Recommended for you"* with `Sparkles` icon.
+- Motion: cards `gs-card-in` staggered 180/360/540ms, heart fill at 1.4s, "saved" micro-toast at 1.6s. One ambient pulse only.
+- Caption: *"Discover trips made for you"*.
 
-### Travel Agent — Concierge Proposal (4 scenes)
+**Scene 2 — Transformational personalization ("This trip is becoming uniquely mine")**
+- Replace the side-by-side toggle panel with a single centered itinerary card that visibly *re-curates* itself. Layout:
+  - Top: serif italic *"Santorini Escape"* + a row of 5 elegant taste chips that animate to "selected" one by one: `Luxury · Food & Wine · Slow Travel · Wellness · Adventure` (selected = dark green pill with gold text, deselected = cream outline).
+  - Middle: a 3-row mini-itinerary timeline where each row visibly **swaps** as taste chips activate:
+    - Row 1: "Boutique Inn" → swap to *"Canaves Oia · Cliffside Suite"* (small gold "upgraded" chip flashes).
+    - Row 2: "Casual taverna" → swap to *"Selene · Tasting Menu"*.
+    - Row 3: "City walk" → swap to *"Private Sailboat · Caldera Sunset"*.
+  - Each swap uses a quick cross-fade + 4px upward slide, with a tiny gold check appearing on the right of the row.
+  - Right edge: a subtle vertical gold "tailoring" line draws from top to bottom (`gs-draw`) tying the rows together.
+- Caption: *"Tailored to your taste in real time"*.
 
-1. **Incoming request** — A "New Request" card slides in from top-left with a soft notification dot:
-   - Avatar + "Sophia & Marc · Couple"
-   - Serif italic title "Luxury honeymoon in Greece"
-   - Meta chips: "10 days · Sept · 2 travelers · Budget $12k"
-   - Tag chips: `Privacy · Cliffside Suites · Sailing`
-   - Below the card, two more faded request cards stack to imply a pipeline ("Family safari · Tanzania", "10-day Japan cultural"). Action pill: "Accept & Build". Caption: "A new client request lands".
-2. **Build the proposal** — A workspace surface appears with a left "Trip Blocks" rail and a right itinerary canvas:
-   - Left rail items animate in: `Stays`, `Flights`, `Experiences`, `Dining`, `Transfers` (with lucide icons)
-   - Right canvas builds 3 day blocks bottom-up with thumbnails:
-     - Day 1 — Mykonos Arrival · Cali Mykonos
-     - Day 2 — Private Yacht to Delos
-     - Day 3 — Santorini · Cliffside Dinner
-   - A small gold connector line draws between day pins on the right edge (`gs-draw`).
-   - Caption: "Compose a concierge itinerary".
-3. **AI-assisted refinements** — Floating gold chip suggestions appear near specific blocks with thin dotted connectors back to the relevant day:
-   - "Suggested: Helicopter transfer Mykonos → Santorini"
-   - "Pair Day 3 with: Domaine Sigalas private tasting"
-   - "Optimize: Move yacht to Day 2 sunset"
-   - A small "Goldsainte AI · Concierge" pill pulses at the top of the canvas. Caption: "AI refines the details with you".
-4. **Send to client** — The workspace collapses into a polished proposal preview card:
-   - Hero strip "Honeymoon · Cyclades, 10 Days" with serif italic + gold "Prepared for Sophia & Marc"
-   - Three highlight chips: `Private Yacht`, `Helicopter`, `Cliffside Suites`
-   - Pricing block: "Total $11,840 · 50/50 schedule"
-   - Primary CTA `Send Proposal` does the same `Publish → ✓ Sent` swap as the Creator scene
-   - Stacked pills below: "Locked & on-platform" and "Fee covered: 7% split (3.5/3.5)"
-   - Caption: "Delivered. Trackable. On-platform".
+**Scene 3 — AI inspiration layer ("Goldsainte tailors it further")**
+- Keep the floating gold suggestion chips concept but make it feel like editorial inspiration, not ops:
+  - Center: the personalized itinerary card stays, slightly smaller, with a tiny pill *"Tailored by Goldsainte AI"*.
+  - Three floating chips with serif italic copy and small luxury thumbnails:
+    - *"Add: Private Sommelier Tasting"* with a tiny wine-gradient swatch.
+    - *"Nearby: Akrotiri at Golden Hour"* with a sunset gradient swatch.
+    - *"Hidden gem: Vlychada Black Beach"* with a dark sand gradient swatch.
+  - Dotted gold connectors `gs-draw` from each chip to the card. Soft gold ambient pulse behind the card.
+- Caption: *"Goldsainte curates the rest"*.
 
-The fee-split pill respects the canonical core memory rule.
+**Scene 4 — Cinematic booking payoff**
+- Upgrade the confirmation card into an aspirational "your trip is ready" moment:
+  - Hero strip taller (96px) with destination gradient, semi-translucent gold pill *"Trip Confirmed"*, serif italic *"Santorini Escape · Jun 12–14"*, and a subtle horizontal shimmer sweep on mount.
+  - Below the hero: a 3-segment **day-by-day mini-timeline** with thumbnail gradients, each labeled with serif italic micro-titles (Day 1 *Cliffside Dinner*, Day 2 *Caldera Sunset*, Day 3 *Winery Tasting*). Tiny gold dots connect them with a `gs-draw` line.
+  - Footer row: avatar + *"Curated with @elenaroams"* on the left, *"Saved to your trips"* with a heart on the right.
+  - Below the card: stacked pills — *"On-platform booking · Fully protected"* and a soft *"Itinerary sent to your inbox"*.
+- Caption: *"Booked. Saved. Ready to travel."*.
 
-### Wire-up in `src/sections/HomeLuxurySections.tsx`
+---
 
-Replace the `tabImages` static-image conditional with a per-tab component map. The right panel becomes:
+### AgentProposalMagic — concierge, curation, delivery
 
-```text
-travelers → <TravelerDiscoveryMagic />
-creators  → <CreatorAIMagic />
-agents    → <AgentProposalMagic />
-```
+Reposition emotionally as: *"Luxury travel concierge creation powered by AI."*
 
-Render all three as absolutely-positioned siblings inside the existing rounded `[32px]` frame (same shadow + cream backdrop frame), cross-fading on `activeTab` change. Drop the dark gradient + caption overlay (`activeTab !== "creators"` block) entirely since each animation now carries its own caption pill — keeps the three tabs visually consistent. Remove the now-unused `santoriniStepsImg` and `agentPlanningImg` imports if nothing else uses them; leave `creatorCanyonImg` only if referenced elsewhere (verify with a grep before removing).
+**Scene 1 — Aspirational client requests**
+- Reframe the inbox as a curated concierge desk, not a ticket queue:
+  - Top header: serif italic *"Concierge Inbox"* + small gold underline.
+  - Active hero request card (foreground), enriched copy:
+    - Avatar + *"Sophia & Marc · Anniversary"*.
+    - Serif italic title: *"Luxury honeymoon along the Amalfi Coast"*.
+    - Meta chips: `10 days · September · 2 travelers · $12k`.
+    - Tag chips: `Cliffside Suites · Private Sailing · Michelin Dining`.
+    - Primary pill: *"Accept & Curate"*.
+  - Two faded background cards with aspirational titles:
+    - *"Private safari · Anniversary · Tanzania"*.
+    - *"10-day Japan cultural journey · Family of 4"*.
+  - One drifts down from top with a soft notification dot pulse (single pulse, then settles).
+- Caption: *"Luxury requests, curated by you"*.
 
-### Visual & motion guardrails
+**Scene 2 — Crafting a concierge itinerary (replace block-rail "editor")**
+- Remove the dashboard-style left rail entirely. Replace with a magazine-style assembly canvas:
+  - Background: cream "page" with a thin serif italic header *"Amalfi · 10 Days · Prepared for Sophia & Marc"* and a small gold rule.
+  - Three day cards stack/cascade in (`gs-card-in` 0/220/440ms), each is a horizontal editorial card:
+    - Left: square destination gradient thumbnail (Positano → Capri → Ravello).
+    - Middle: serif italic day title + sub (e.g., *"Day 02 · Capri by Private Yacht"* / *"Da Paolino · Lemon-grove dinner"*).
+    - Right: a small stack of micro-tags `Stay · Dining · Experience` that fade in.
+  - Vertical gold dotted connector `gs-draw` along the right edge linking the three days at small gold pin dots.
+  - One ambient gold glow behind the stack.
+- Caption: *"Crafted like a luxury travel magazine"*.
 
-- Reuse the exact palette and typography tokens already in `CreatorAIMagic` — no new colors.
-- Cap motion: max one ambient pulse + staggered card entries per scene. No spinning, no parallax, no full-canvas scans.
-- Each scene must read as a single product surface (a card, a workspace, a confirmation), not a diagram. No arrows, no boxes-and-lines pipelines, no enterprise dashboard chrome.
-- All three components reduce to scene 3 under `prefers-reduced-motion` (the strongest single frame for that audience).
-- Mobile: components keep the existing `h-[300px]` mobile height and reflow inner cards/widths via `max-w-[…]` and `text-[…]px` like the Creator component.
+**Scene 3 — AI concierge assistance (refined)**
+- Keep the floating gold suggestion chips but make them feel like a sophisticated assistant whispering, not a workflow optimizer:
+  - Top center pill stays: *"Goldsainte AI · Concierge"* with `Sparkles`.
+  - Center: the same three-day stack from Scene 2 collapses into a compact preview card.
+  - Three floating chips with serif italic suggestions and tiny gradient swatches:
+    - *"Pair Day 02 with: Da Adolfo by water taxi"*.
+    - *"Upgrade Day 03 stay: Caruso Belvedere Suite"*.
+    - *"Add: Helicopter transfer Naples → Positano"*.
+  - Dotted gold `gs-draw` connectors from each chip to the relevant day row of the preview card.
+  - One ambient pulse behind the AI pill.
+- Caption: *"AI quietly elevates every detail"*.
+
+**Scene 4 — Marketplace payoff (delivery + acceptance)**
+- Expand the existing send-proposal card into a stronger two-beat payoff:
+  - Beat A (0–1.2s): polished proposal card mounts (`gs-rise`):
+    - Hero strip with luxury gradient + serif italic *"Honeymoon · Amalfi Coast, 10 Days"* and gold caption *"Prepared for Sophia & Marc"*.
+    - Highlight chips: `Private Yacht · Helicopter · Cliffside Suites`.
+    - Pricing block: *"Total $11,840 · 50/50 schedule"*.
+    - Primary CTA does the existing `Send Proposal → ✓ Sent` swap.
+  - Beat B (1.4s+): a small overlay slides up from the bottom of the card showing the client response:
+    - Pill: *"Sophia accepted · Booking activated"* in dark green with gold check.
+    - Sub-row: tiny avatar + *"Live trip · Day-of concierge enabled"*.
+  - Stacked pills below the card stay: *"Locked & on-platform"* and the canonical *"Fee covered: 7% split (3.5 / 3.5)"*.
+- Caption: *"Delivered. Accepted. Live."*.
+
+---
+
+### Technical notes
+
+- Both components stay self-contained — no changes to `HomeLuxurySections.tsx` wiring, no new dependencies, no new images, no new icons outside `lucide-react` (reuse `Sparkles, MapPin, Heart, Star, Check, ShieldCheck, Mail, Send, Sailboat?` — only icons that already exist; otherwise reuse generic ones like `Compass`, `Wand2`, `Wine`, `Hotel`, `Camera`).
+- Reuse the existing inline `<style>` keyframe set; add a small `gs-shimmer` keyframe in `TravelerDiscoveryMagic` Scene 4 hero strip and a `gs-cross-fade` (or just stagger two absolutely-positioned rows with `gs-fade-in` / `gs-fade-out`) for Scene 2 row swaps. No new global CSS.
+- Preserve `SCENE_MS = 3600`, 4 scenes, reduced-motion fallback (still snaps to scene index 2 — update Traveler scene 3 and Agent scene 3 to remain the strongest single frames for that audience).
+- Mobile (`h-[300px]`): keep card max widths around 280–300px, font sizes 8–13px as currently used. Test that swapping rows in Traveler Scene 2 doesn't push the card past `max-w-[300px]`.
+- Respect canonical microcopy memory: no "Listings" / "Packages" / "Book Now". Use *"Curated with"*, *"Curate"*, *"On-platform booking"*. Keep the canonical fee-split pill exactly: *"Fee covered: 7% split (3.5 / 3.5)"*.
+- Cap motion: ≤ one ambient pulse per scene + staggered entries; no spinning, no parallax, no full-canvas scans.
 
 ### Out of scope
 
-- No changes to the accordion content, tab order, copy in the left rail, or "How Goldsainte Works" intro.
-- No changes to other home sections, routes, or backend.
-- No new icons outside `lucide-react`, no new images, no animation libraries.
-- No copy that violates the standardized microcopy memory ("Services" not "Packages", "Request a Trip" not "Book Now", "Storyboards" not "Listings").
+- No changes to `HomeLuxurySections.tsx`, accordion content, tab order, intro copy, or any other home section.
+- No changes to `CreatorAIMagic`.
+- No new images, icons outside `lucide-react`, or animation libraries.
+- No backend, route, or schema changes.
