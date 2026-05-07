@@ -496,176 +496,92 @@ export const HowGoldsainteWorksSection: React.FC = () => {
 
 export const TrustSafetyPaymentsSection: React.FC = () => {
   const { t } = useTranslation();
-  const [openItem, setOpenItem] = useState<string>("");
 
-  const items: { id: string; icon: LucideIcon; title: string; body: string; subFeatures: { icon: LucideIcon; title: string; description: string }[] }[] = [
+  const pillars: { icon: LucideIcon; title: string; body: string }[] = [
     {
-      id: "identity",
-      icon: ShieldCheck,
+      icon: Sparkles,
       title: t('home.trustSafety.item1.title'),
       body: t('home.trustSafety.item1.body'),
-      subFeatures: [
-        { icon: UserCheck, title: "Verified professionals", description: "Every agent and creator is identity-verified before joining." },
-        { icon: Fingerprint, title: "Stripe Identity", description: "Government ID + selfie matching for all marketplace participants." },
-        { icon: BadgeCheck, title: "Background checks", description: "Enhanced screening for travel professionals handling your trips." },
-        { icon: Eye, title: "Continuous monitoring", description: "Ongoing compliance and performance tracking." },
-      ],
     },
     {
-      id: "escrow",
-      icon: Lock,
+      icon: Handshake,
       title: t('home.trustSafety.item2.title'),
       body: t('home.trustSafety.item2.body'),
-      subFeatures: [
-        { icon: Wallet, title: "Secure escrow", description: "Funds held safely until trip milestones are completed." },
-        { icon: CreditCard, title: "Milestone releases", description: "Payments released in stages as your trip progresses." },
-        { icon: ShieldCheck, title: "Fraud protection", description: "Stripe-powered payment processing with chargeback protection." },
-        { icon: RefreshCw, title: "Easy refunds", description: "Clear refund policies with automated processing." },
-      ],
     },
     {
-      id: "safe",
-      icon: MessageSquare,
+      icon: Compass,
       title: t('home.trustSafety.item3.title'),
       body: t('home.trustSafety.item3.body'),
-      subFeatures: [
-        { icon: MessageCircle, title: "On-platform messaging", description: "All conversations stay inside Goldsainte for your protection." },
-        { icon: FileText, title: "Full audit trail", description: "Every message and decision is documented and accessible." },
-        { icon: Ban, title: "No side deals", description: "Payments and bookings must stay on-platform." },
-        { icon: Bell, title: "Real-time alerts", description: "Instant notifications for important trip updates." },
-      ],
     },
     {
-      id: "dispute",
-      icon: Scale,
+      icon: Map,
       title: t('home.trustSafety.item4.title'),
       body: t('home.trustSafety.item4.body'),
-      subFeatures: [
-        { icon: Gavel, title: "Fair mediation", description: "Impartial dispute resolution by our trust team." },
-        { icon: Clock, title: "Quick turnaround", description: "Most disputes resolved within 48-72 hours." },
-        { icon: FileCheck, title: "Clear policies", description: "Transparent terms govern all marketplace transactions." },
-        { icon: Users, title: "Human support", description: "Real people review and resolve complex issues." },
-      ],
     },
   ];
 
   return (
-    <section className="bg-[#FDF9F0] px-4 py-16 md:py-24">
+    <section className="bg-[#FDF9F0] px-4 py-20 md:py-28">
       <div className="mx-auto max-w-6xl">
-        {/* Two-Column Layout */}
-        <div className="flex flex-col lg:flex-row gap-10 lg:gap-14">
-          {/* Left Column: Header + Accordion */}
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-center">
+          {/* Left: Editorial header + pillars */}
           <div className="lg:w-[55%]">
-            {/* Section Header - Left Aligned */}
-            <div className="mb-8 md:mb-10">
-              <p className="inline-flex rounded-full bg-[#C7A962]/10 border border-[#C7A962]/30 px-4 py-1.5 text-[10px] md:text-xs font-medium uppercase tracking-[0.15em] text-[#8B7355] mb-5">
+            <div className="mb-10 md:mb-12">
+              <p className="inline-flex rounded-full border border-[#0c4d47] bg-[#0c4d47] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#bfad72] mb-5">
                 {t('home.trustSafety.badge')}
               </p>
-              <h2 className="font-secondary text-[26px] leading-[1.15] text-[#0a2225] md:text-[40px] mb-3">
+              <div className="w-14 h-px bg-[#C7A962] mb-6" />
+              <h2 className="font-secondary text-[28px] leading-[1.15] text-[#0a2225] md:text-[44px] mb-4">
                 {t('home.trustSafety.title')}
               </h2>
-              <p className="max-w-xl text-sm md:text-base text-[#5A5A5A] leading-relaxed">
+              <p className="max-w-xl text-base md:text-[17px] text-[#5A5A5A] leading-relaxed">
                 {t('home.trustSafety.description')}
               </p>
             </div>
 
-            {/* Accordion */}
-            <Accordion
-              type="single"
-              collapsible
-              value={openItem}
-              onValueChange={(value) => value && setOpenItem(value)}
-              className="space-y-4"
-            >
-              {items.map((item) => {
-                const Icon = item.icon;
-                const isActive = openItem === item.id;
+            <ul className="divide-y divide-[#E5DFC6]">
+              {pillars.map((p, index) => {
+                const Icon = p.icon;
                 return (
-                  <AccordionItem
-                    key={item.id}
-                    value={item.id}
-                    className="border-0"
+                  <li
+                    key={p.title}
+                    className="flex items-start gap-5 py-7 animate-in fade-in slide-in-from-bottom-3 duration-700"
+                    style={{ animationDelay: `${index * 90}ms`, animationFillMode: "both" }}
                   >
-                    <AccordionTrigger
-                      className={cn(
-                        "flex items-center gap-3 md:gap-4 px-4 md:px-6 py-4 md:py-5 rounded-xl transition-all duration-500 hover:no-underline",
-                        "[&>svg]:transition-all [&>svg]:duration-500 [&>svg]:text-[#C7A962]",
-                        isActive
-                          ? "bg-[#FDFBF7] border-l-4 border-l-[#C7A962] shadow-[0_4px_20px_rgba(199,169,98,0.08)]"
-                          : "bg-white border-l-4 border-l-transparent hover:bg-[#FDFBF7] hover:border-l-[#C7A962]/50"
-                      )}
-                    >
-                      <div className={cn(
-                        "w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-all duration-500",
-                        isActive ? "bg-[#C7A962]/15" : "bg-[#F5EFE1]"
-                      )}>
-                        <Icon className="w-4 h-4 md:w-5 md:h-5 text-[#C7A962]" />
-                      </div>
-                      <span className="font-secondary text-base md:text-lg text-[#0a2225] flex-1 text-left">
-                        {item.title}
-                      </span>
-                    </AccordionTrigger>
-                    <AccordionContent className="pt-6 pb-3 px-2">
-                      <div className="grid gap-5 md:grid-cols-2">
-                        {item.subFeatures.map((feature, index) => {
-                          const FeatureIcon = feature.icon;
-                          return (
-                            <div
-                              key={feature.title}
-                              className={cn(
-                                "flex items-start gap-4 group",
-                                "animate-in fade-in slide-in-from-bottom-3 duration-500"
-                              )}
-                              style={{ animationDelay: `${index * 80}ms`, animationFillMode: "both" }}
-                            >
-                              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#F5EFE1] flex items-center justify-center group-hover:bg-[#C7A962]/15 transition-colors duration-300">
-                                <FeatureIcon className="w-5 h-5 text-[#C7A962]" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h4 className="font-secondary text-base text-[#0a2225] mb-1.5">
-                                  {feature.title}
-                                </h4>
-                                <p className="text-sm leading-relaxed text-[#6B7280]">
-                                  {feature.description}
-                                </p>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
+                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#C7A962]/10 flex items-center justify-center">
+                      <Icon className="w-5 h-5 text-[#C7A962]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-secondary text-lg md:text-xl text-[#0a2225] mb-1.5">
+                        {p.title}
+                      </h3>
+                      <p className="text-sm md:text-[15px] leading-relaxed text-[#5A5A5A]">
+                        {p.body}
+                      </p>
+                    </div>
+                  </li>
                 );
               })}
-            </Accordion>
+            </ul>
           </div>
 
-          {/* Right Column: Editorial Image Panel */}
-          <div className="lg:w-[45%] flex items-center justify-center">
+          {/* Right: Aspirational editorial image */}
+          <div className="lg:w-[45%] flex items-center justify-center w-full">
             <div className="relative w-full max-w-md">
-              {/* Subtle background frame */}
               <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-[32px] border border-[#E5DFC6]/70 bg-[#F5EFE1]/30" />
-              
-              {/* Image container */}
               <div className="relative overflow-hidden rounded-[32px] shadow-[0_24px_60px_rgba(10,34,37,0.12)]">
-                <img
-                  src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80"
-                  alt="Luxury resort trust & safety"
-                  className="w-full h-[280px] md:h-[420px] object-cover"
-                  loading="lazy"
+                <OptimizedImage
+                  src={tropicalHideawayImg}
+                  alt="A serene luxury escape, quietly orchestrated"
+                  className="w-full h-[320px] md:h-[480px] object-cover"
                 />
-                
-                {/* Gradient overlay with trust message */}
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-5 md:p-6">
-                  <div className="flex items-center gap-2 mb-2">
-                    <ShieldCheck className="w-4 h-4 text-[#D4C07A]" />
-                    <span className="text-white/90 text-sm font-medium tracking-wide">
-                      Protected Journeys
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 via-black/15 to-transparent p-6 md:p-7">
+                  <div className="inline-flex items-center gap-2 rounded-full bg-white/12 backdrop-blur-md border border-white/20 px-3.5 py-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-[#D4C07A]" />
+                    <span className="font-secondary italic text-white/95 text-sm tracking-wide">
+                      Quietly orchestrated by Goldsainte intelligence
                     </span>
                   </div>
-                  <p className="text-white/80 text-xs leading-relaxed max-w-xs">
-                    All communication and payments stay inside Goldsainte — no phone numbers, no side deals.
-                  </p>
                 </div>
               </div>
             </div>

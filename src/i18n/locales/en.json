@@ -152,24 +152,24 @@
       "subtitle": "Luxury travel, reinvented."
     },
     "trustSafety": {
-      "badge": "Trust, safety & payments",
-      "title": "Built for trips where the details matter.",
-      "description": "For trips that carry meaning, trust isn't a feature — it's the foundation. Goldsainte is designed with discreet identity checks, secure payments and human oversight at every step.",
+      "badge": "Luxury Intelligence",
+      "title": "Where Extraordinary Travel Feels Effortless",
+      "description": "Goldsainte combines intelligent planning, seamless collaboration, and curated personalization to make complex travel feel beautifully simple.",
       "item1": {
-        "title": "Identity verification, done quietly",
-        "body": "Agents complete Stripe Identity and license checks before taking bookings, so you're working with real, vetted professionals."
+        "title": "Intelligent Personalization",
+        "body": "AI adapts every journey around your preferences, pace, travel style, and the experiences you love most."
       },
       "item2": {
-        "title": "Escrowed payments for peace of mind",
-        "body": "Your funds sit safely in escrow and are released in clear stages, with a post-trip protection window built in."
+        "title": "Seamless Collaboration",
+        "body": "Travelers, creators, and travel experts coordinate effortlessly inside one beautifully organized space."
       },
       "item3": {
-        "title": "A safe place to plan",
-        "body": "All messaging, proposals and approvals stay inside Goldsainte, keeping your details where they belong."
+        "title": "Curated Travel Intelligence",
+        "body": "From hidden gems to luxury upgrades, Goldsainte surfaces recommendations tailored specifically to your journey."
       },
       "item4": {
-        "title": "Structured dispute resolution",
-        "body": "If something doesn't feel right, our team steps in. Every trip includes a clear, well-documented path for review and resolution."
+        "title": "Effortless Coordination",
+        "body": "Flights, stays, experiences, and timelines stay seamlessly connected from inspiration through arrival."
       }
     },
     "storyboards": {

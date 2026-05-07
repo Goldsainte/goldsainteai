@@ -1,138 +1,96 @@
 
 ## Goal
 
-Lift the homepage from "beautiful marketplace" to "emotionally unforgettable luxury travel ecosystem" by reworking the three animated panels inside the **How Goldsainte Works** section. No new sections, no routing changes — only the in-section animations and their supporting copy. Visual identity stays exactly as-is (cream `#f7f3ea`, dark green `#0c4d47`, gold `#C7A962/#E8C977`, serif display, rounded UI, soft shadows, cinematic motion).
+Reposition the section currently titled **"Built for trips where the details matter"** (the `TrustSafetyPaymentsSection` block in `src/sections/HomeLuxurySections.tsx`, rendered just before the mobile trust footer on `Index.tsx`) so it stops reading as a trust/safety/payments feature panel and instead becomes the homepage's **luxury intelligence layer**.
+
+Visual identity unchanged: cream `#FDF9F0`, dark green `#0c4d47`, gold `#C7A962`, serif headers, rounded UI, soft shadows, generous whitespace, subtle motion.
+
+> Note: Trust, safety, escrow, identity, and dispute messaging already lives in dedicated pages (`/trust-safety`, `TrustSafety.tsx`, `TrustSafetyPage.tsx`) and the mobile `TrustFooterMobile`. Removing it from this homepage slot does not erase it from the product.
 
 ## Scope (files touched)
 
-1. `src/components/home/TravelerDiscoveryMagic.tsx` — rebuild scenes
-2. `src/components/home/AgentProposalMagic.tsx` — rebuild scenes
-3. `src/components/home/CreatorAIMagic.tsx` — enhance Scene 2 (the AI reconstruction moment)
-4. `src/sections/HomeLuxurySections.tsx` — only minor copy/eyebrow tweaks for the three audience tabs if the new scene narrative needs it
+1. `src/sections/HomeLuxurySections.tsx` — rewrite the `TrustSafetyPaymentsSection` body (rename the export to `LuxuryIntelligenceSection`, keep a backward-compatible re-export so `Index.tsx` keeps working without churn — or update `Index.tsx` to use the new name).
+2. `src/pages/Index.tsx` — swap the import/usage to `LuxuryIntelligenceSection`.
+3. `src/i18n/locales/en.json` — replace the `home.trustSafety.*` keys' English copy with the new luxury intelligence content (keep the same key shape so other locales / fallback don't break; non-English locales can stay until translated).
+4. `src/pages/HomePage.tsx` — only if it also renders this section under the old name; update import accordingly.
 
-Out of scope: hero, marketplace grid, role CTAs, trust section, any backend, any routing. No changes to global tokens or fonts.
+Out of scope: the dedicated `/trust-safety` pages, mobile trust footer, and any other home section.
 
----
+## New section content
 
-## 1. Traveler — "Discovery Magic"
+**Eyebrow pill (dark green, gold text — match the rest of the homepage):**
+`Luxury Intelligence`
 
-Reframe from itinerary/preference panel into **aspirational discovery → personalization → cinematic payoff**.
+**Gold divider:** `w-14 h-px bg-[#C7A962]` centered (or left-aligned to match the section's existing left-aligned header — keep current alignment).
 
-New 4-scene loop (≈3.6s each, same timing as today):
+**Headline:**
+*Where Extraordinary Travel Feels Effortless*
 
-**Scene 1 — Living marketplace feed**
-- Cream canvas with a soft 2-column masonry of trip cards drifting in.
-- Each card carries an editorial overline ribbon that animates between: `Trending This Summer`, `Saved 1.2k times`, `Curated by Local Experts`, `Popular in Tokyo`, `Hidden Gem`, `Recommended for You`.
-- Tiny floating chips ("32 just saved", "+18 viewing now") fade in/out as subtle social activity.
-- Top-left pill: `For You · Curated Daily`.
+**Subhead:**
+Goldsainte combines intelligent planning, seamless collaboration, and curated personalization to make complex travel feel beautifully simple.
 
-**Scene 2 — Personalization that visibly transforms**
-- A single highlighted trip card centers; preference chips (`Wellness`, `Food & Wine`, `Slow Travel`, `Luxury`, `Adventure`) cycle through being "selected" with a gold underline.
-- As each chip activates, the card's **hotel, restaurant, and experience swap in place** with a soft cross-fade and a tiny "Updated" gold tick — showing "Boutique Inn → Canaves Oia · Cliffside Suite", "Casual taverna → Selene Tasting Menu", etc.
-- A faint AI sparkle pulse on each swap; copy floats: *"Tuned to your taste in 0.4s."*
+**Four pillars (replacing the four trust items):**
 
-**Scene 3 — Cinematic itinerary payoff**
-- The card expands into a magazine-style spread: full-bleed hero image area (gradient placeholder, no new assets), a 3-day timeline with elegant day pills, and a soft route line connecting map dots.
-- Curated experience cards stack with subtle layered shadows.
-- Wishlist heart fills with gold; toast: *"Saved to your wishlist."*
+| Icon | Title | Body |
+|---|---|---|
+| `Sparkles` | Intelligent Personalization | AI adapts every journey around your preferences, pace, travel style, and the experiences you love most. |
+| `Users` (or `Handshake`) | Seamless Collaboration | Travelers, creators, and travel experts coordinate effortlessly inside one beautifully organized space. |
+| `Compass` (or `Wand2`) | Curated Travel Intelligence | From hidden gems to luxury upgrades, Goldsainte surfaces recommendations tailored specifically to your journey. |
+| `Map` (or `Calendar`) | Effortless Coordination | Flights, stays, experiences, and timelines stay seamlessly connected from inspiration through arrival. |
 
-**Scene 4 — "Booked. Curated. Yours."**
-- Confirmation card slides up with check, dates, host avatar, and `On-platform protected` shield.
-- Gold confetti is **not** used — instead, a single soft gold ring expands once behind the check (premium, restrained).
-- Caption: *"Travel planning, effortless and unforgettable."*
+Each pillar drops the existing 4-item `subFeatures` grid — that grid is exactly the SaaS density the user wants to remove. Pillars become a clean editorial accordion: tap a pillar → it expands to a single elegant paragraph (one short emotional line, not a feature grid). Or, alternative, render as a quiet 4-card editorial set (no accordion). See "Layout choice" below.
 
-Motion rules: fade + 6–10px translate, 400–600ms easings; no parallax, no spinning, no bouncing. Reduced-motion: jump to Scene 3.
+## Layout choice
 
----
+The current implementation is a 2-column layout: left = accordion of 4 items with 4-feature sub-grids; right = an editorial image card with "Protected Journeys" overlay.
 
-## 2. Agent — "Concierge Craftsmanship"
+**Replace with a calmer editorial composition (still 2-column on desktop, stacked on mobile):**
 
-Reposition from workflow/inbox into **bespoke luxury studio**.
+- **Left column (55%):** Eyebrow pill → divider → headline → subhead → a vertical list of the 4 pillars rendered as static editorial rows (icon in soft gold circle, serif title, single-line body). No accordion, no sub-feature grid. 28–32px vertical spacing between pillars; thin `#E5DFC6` hairline dividers between them. Subtle fade-in-on-scroll for each row (already-defined `animate-in fade-in slide-in-from-bottom-3` is fine).
+- **Right column (45%):** Replace the "Protected Journeys" image and overlay with a more aspirational, less security-themed luxury travel image (e.g. a serene infinity pool, Amalfi terrace, or Kyoto morning — pick one already in `src/assets`, no new uploads). Replace the on-image overlay with a refined caption pill: gold sparkle + serif italic line *"Quietly orchestrated by Goldsainte intelligence."* Keep the soft offset frame and 32px radius for continuity with the rest of the homepage.
 
-New 4-scene loop:
+This removes ~40% of the in-section content density — directly addressing the "feature-grid energy" critique — while staying on-brand and using existing components/tokens.
 
-**Scene 1 — The Concierge Inbox (aspirational requests)**
-- Eyebrow: `Concierge Inbox · 4 new requests`.
-- Three stacked request cards with serif italic briefs:
-  - *"Luxury honeymoon along the Amalfi Coast — 10 nights, late June."*
-  - *"Private safari anniversary journey — Kenya & Tanzania."*
-  - *"Wellness retreat in Bali — slow pace, plant-based."*
-- Each card has a discrete gold `★ Verified Traveler` chip and budget range; one card highlights with a soft gold border to signal selection.
+## Copy updates in `en.json`
 
-**Scene 2 — Designing the proposal (craftsmanship)**
-- Layout becomes a "designer's table": a left rail of curated assets (hotel chip, restaurant chip, yacht chip, helicopter transfer chip) animates being **dragged** onto a 3-day storyboard on the right.
-- Each drop snaps with a soft scale + gold underline and a micro-label (`Stay`, `Dining`, `Yacht`, `Transfer`).
-- AI assist whisper appears once: *"Pair Day 02 with Da Adolfo by water taxi"* — accepted with a single tap animation.
-- Feels like designing a luxury magazine spread, not editing a form.
+Replace the values for these keys (keys themselves stay the same to avoid touching other locales / templates):
 
-**Scene 3 — Elegant proposal presentation**
-- Storyboard reflows into a tall "proposal sheet": cover image area, "Prepared for the Bianchi Family" italic line, day cards with serif headers and subtitles ("Positano · Cliffside Arrival — Le Sirenuse · Champagne welcome"), and a discreet investment summary card at the bottom right.
-- Subtle page-turn shadow gives a printed-magazine feel.
+- `home.trustSafety.badge` → `Luxury Intelligence`
+- `home.trustSafety.title` → `Where Extraordinary Travel Feels Effortless`
+- `home.trustSafety.description` → `Goldsainte combines intelligent planning, seamless collaboration, and curated personalization to make complex travel feel beautifully simple.`
+- `home.trustSafety.item1.title` → `Intelligent Personalization`
+- `home.trustSafety.item1.body` → `AI adapts every journey around your preferences, pace, travel style, and the experiences you love most.`
+- `home.trustSafety.item2.title` → `Seamless Collaboration`
+- `home.trustSafety.item2.body` → `Travelers, creators, and travel experts coordinate effortlessly inside one beautifully organized space.`
+- `home.trustSafety.item3.title` → `Curated Travel Intelligence`
+- `home.trustSafety.item3.body` → `From hidden gems to luxury upgrades, Goldsainte surfaces recommendations tailored specifically to your journey.`
+- `home.trustSafety.item4.title` → `Effortless Coordination`
+- `home.trustSafety.item4.body` → `Flights, stays, experiences, and timelines stay seamlessly connected from inspiration through arrival.`
 
-**Scene 4 — Acceptance moment**
-- Traveler avatar reviews → green check pulses → banner slides in: **"Proposal Accepted · Itinerary Confirmed"**.
-- Below, a thin progress strip transitions `Proposal → Booked → On-platform escrow secured`.
-- Caption: *"White-glove expertise, delivered."*
+If you'd prefer cleaner key names (e.g. `home.luxuryIntelligence.*`), I can do that in the implementation pass too — flag if you want a rename, otherwise I'll keep keys stable to avoid translation churn.
 
-Motion rules: same as Traveler; no enterprise-y progress bars or kanban columns.
+## Visual / motion rules
 
----
+- Generous whitespace: `py-20 md:py-28` (up from current `py-16 md:py-24`).
+- One H2 only; serif `font-secondary`, sized `text-[28px] md:text-[44px]`.
+- Pillar titles in `font-secondary` `text-lg md:text-xl`, body in `text-sm md:text-[15px] text-[#5A5A5A]`.
+- Soft gold icon circles (`bg-[#C7A962]/10`, `text-[#C7A962]`), 40px diameter — no hard-edged feature tiles.
+- Subtle stagger: each pillar fades in 80ms after the previous on scroll.
+- No badges, no "Protected" overlays, no 8-icon sub-grids.
 
-## 3. Creator — The signature AI "holy shit" moment
+## Out of scope
 
-Keep Scenes 1, 3, 4 essentially as-is but **dramatically upgrade Scene 2 (AI reconstruction)** so it becomes the homepage's most memorable beat.
-
-**Enhanced Scene 2 — "Goldsainte understands your journey."**
-
-Choreography (single ~3.6s sequence, layered):
-
-1. The 6 selected memory thumbnails settle into a loose grid.
-2. **Floating metadata labels** materialize one-by-one above each tile with a soft gold pulse:
-   - `Oia, Santorini` · `5:42 PM · Sunset Viewpoint`
-   - `Ammoudi Taverna` · `Day 1 · Beachfront Dinner`
-   - `Caldera Viewpoint` · `Day 2 · Morning`
-   - `Canaves Oia · Cliffside Suite` · `Day 2 · Stay`
-   - `Sunset Catamaran Cruise` · `Day 2 · Afternoon`
-   - `Megalochori Winery` · `Day 3 · Tasting`
-3. Soft AI pulse rings briefly emanate from each label as it lands.
-4. A faint **route line** draws between tiles in geographic order (Oia → Ammoudi → Caldera → Canaves → Catamaran → Megalochori) with a tiny moving gold dot tracing the path.
-5. Tiles **reorder by chronology** with a smooth FLIP-style motion (translate + fade), grouping into Day 01 / Day 02 / Day 03 chips that fade in above the rows.
-6. A small classifier strip pulses through tags (`Stay`, `Dining`, `Sunset`, `Cruise`, `Tasting`) attaching to the relevant tiles.
-7. End-state caption (replacing the current static line): *"6 moments → 3 days, 5 experiences, 1 itinerary — reconstructed automatically."*
-
-Constraints: pure CSS/SVG/Framer-style transitions already in the file's idiom — no new dependencies, no canvas, no 3D. Everything stays inside the existing 300/460px stage. Reduced-motion: render the final reconstructed state immediately (no movement, just labels visible and tiles already grouped by day).
-
-Scenes 3 and 4 keep their current Condé-Nast itinerary card and monetization payoff, with a one-line copy nudge in Scene 4: *"Your story, now bookable."*
-
----
-
-## Section copy alignment (`HomeLuxurySections.tsx`)
-
-Tiny tweaks only, to match the new emotional framing of each tab:
-
-- Travelers eyebrow → keep, body line → *"Discover trips you'll fall in love with — personalized in real time, booked on-platform."*
-- Creators eyebrow → keep, body line → *"Upload your camera roll. Watch Goldsainte rebuild your journey into a bookable itinerary."*
-- Agents eyebrow → keep, body line → *"Design bespoke proposals like a luxury magazine — curated, elegant, white-glove."*
-
-No structural changes to the section, tabs, or surrounding layout.
-
----
-
-## Technical notes
-
-- All animations use the existing `gs-fade-in` / Tailwind `animate-*` patterns already defined in these files; add small local `@keyframes` blocks inside each component when needed (route-draw, ring-pulse, label-pop) — same approach the files already use.
-- Maintain the current `SCENE_MS = 3600` cadence and IntersectionObserver gating so off-screen sections don't burn CPU.
-- Honor `prefers-reduced-motion` in every component (Traveler → Scene 3, Agent → Scene 3, Creator → reconstructed Scene 2 end-state).
-- No new images, no new packages, no new routes, no DB changes.
-
----
+- No new routes, no DB changes, no edge functions.
+- No changes to `/trust-safety` pages.
+- No new imagery assets (reuse what's in `src/assets`).
+- Non-English locale files left as-is for translation in a follow-up.
 
 ## Acceptance check
 
-After implementation, the three tabs in **How Goldsainte Works** should each tell a distinct emotional story:
-
-- Traveler → *"I just discovered a trip I love."*
-- Agent → *"This feels like luxury concierge craftsmanship."*
-- Creator → *"Wait… the AI figured all of that out automatically?"*
-
-Verification: load `/#how-it-works`, cycle through the three tabs, confirm each loop runs cleanly at desktop 1000px and mobile widths, and that reduced-motion produces a static, on-brand frame.
+After implementation:
+- The section title reads *"Where Extraordinary Travel Feels Effortless."*
+- No accordion, no sub-feature grid, no security icons in the section.
+- Four short editorial pillars about personalization, collaboration, intelligence, coordination.
+- Right column shows an aspirational luxury travel image with a single elegant italic caption — no shield/lock messaging.
+- Section reads in under 5 seconds and feels like editorial storytelling, not a feature panel.
+- Mobile (≤640px) stacks pillars vertically with the same calm spacing.
