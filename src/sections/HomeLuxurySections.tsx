@@ -459,48 +459,23 @@ export const HowGoldsainteWorksSection: React.FC = () => {
               
               {/* Image container with smooth transitions */}
               <div className="relative overflow-hidden rounded-[32px] shadow-[0_24px_60px_rgba(10,34,37,0.12)]">
-                {Object.entries(tabImages).map(([tabId, imageSrc]) => {
+                {Object.entries(tabAnimations).map(([tabId, Anim], idx) => {
                   const isActive = activeTab === tabId;
-                  if (tabId === "creators") {
-                    return (
-                      <div
-                        key={tabId}
-                        className={cn(
-                          "w-full transition-opacity duration-500",
-                          isActive ? "opacity-100" : "opacity-0 absolute inset-0 pointer-events-none"
-                        )}
-                      >
-                        <CreatorAIMagic />
-                      </div>
-                    );
-                  }
                   return (
-                    <img
+                    <div
                       key={tabId}
-                      src={imageSrc}
-                      alt={`${tabId} travel inspiration`}
                       className={cn(
-                        "w-full h-[280px] md:h-[420px] object-cover transition-opacity duration-500",
-                        isActive ? "opacity-100" : "opacity-0 absolute inset-0"
+                        "w-full transition-opacity duration-500",
+                        isActive
+                          ? "opacity-100 relative"
+                          : "opacity-0 absolute inset-0 pointer-events-none",
+                        idx > 0 && isActive ? "" : ""
                       )}
-                    />
+                    >
+                      <Anim />
+                    </div>
                   );
                 })}
-                
-                {/* Gradient overlay with tab label */}
-                {activeTab !== "creators" && (
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent p-5 md:p-6">
-                  <div className="flex items-center gap-2">
-                    {(() => {
-                      const TabIcon = activeTabData.icon;
-                      return <TabIcon className="w-4 h-4 text-[#D4C07A]" />;
-                    })()}
-                    <span className="text-white/90 text-sm font-medium tracking-wide">
-                      {activeTabData.captionLabel ?? activeTabData.label}
-                    </span>
-                  </div>
-                </div>
-                )}
               </div>
             </div>
           </div>
