@@ -1,54 +1,48 @@
 ## Goal
-Optimize `src/components/home/HomeHero.tsx` for mobile (≤768px) while preserving the desktop layout, spacing, and luxury aesthetic.
-
-## Issues on mobile today
-- Section uses `md:min-h-[calc(100vh-56px)]` only — mobile has no height control, but the right-side image stack uses `h-full` which collapses awkwardly on small screens.
-- Pill badge has tight `gap-1`, may still wrap or feel cramped at 360–390px.
-- Headline `text-3xl` is large but margins (`mt-10`, `mt-8`) feel desktop-tuned; mobile needs tighter rhythm.
-- Three-up "Popular Trips" grid stays `grid-cols-3` on mobile — squares get tiny (~95px) and titles truncate aggressively.
-- Right column image stack: `col-span-2 row-span-2` + two thumbs is designed for landscape; on a narrow phone it becomes a thin sliver.
-- Caption card text can overflow inside the dark green pill on small widths.
-- CTAs `max-w-sm` is fine but vertical spacing (`mt-8`) is heavy on mobile.
-
-## Changes (presentation only, single file)
-
-1. **Section sizing**
-   - Drop forced `md:max-h-[calc(100vh-56px)]` constraint on mobile (already md-only, keep). Add comfortable mobile padding: `py-8 md:py-12`.
-
-2. **Pill badge**
-   - Reduce mobile px and tracking: `px-3 py-1 text-[10px] tracking-[0.06em]`.
-   - Use shorter dividers on mobile (`w-1.5`).
-   - Ensure it stays one line via existing `whitespace-nowrap`.
-
-3. **Typography rhythm**
-   - Headline: `text-[26px] sm:text-3xl md:text-4xl lg:text-[38px]`, `mt-6 md:mt-10`.
-   - Description paragraphs: `mt-5 md:mt-8` for first, tighten subsequent `mt-2`/`mt-3`.
-
-4. **CTAs**
-   - Full-width on mobile (`max-w-none md:max-w-sm`), `mt-6 md:mt-8`, slightly larger tap target (`py-3`).
-
-5. **Popular Trips strip**
-   - Keep 3-up but switch from `aspect-square` to `aspect-[4/3]` to match brand standard and give titles more breathing room.
-   - Tighten gap on mobile (`gap-2 md:gap-3`).
-   - Allow 2-line title on mobile (`line-clamp-2 md:line-clamp-1`).
-
-6. **Right-side visual stack (the big mobile fix)**
-   - Remove `h-full` dependency on mobile. Wrap in a fixed mobile aspect ratio (e.g. `aspect-[4/5]`) and switch to `md:h-full md:aspect-auto`.
-   - Reduce decorative offset frame on mobile (`translate-x-2 translate-y-2 md:translate-x-4 md:translate-y-4`) and reduce outer radius (`rounded-3xl md:rounded-[32px]`).
-   - Keep grid layout but ensure thumbs don't squish: gaps `gap-2`, padding `p-2 md:p-3`.
-   - Caption card: smaller text on mobile (`text-[11px]`), tighter padding.
-
-7. **Column order on mobile**
-   - Currently copy renders first, image second. Consider keeping that order (copy first reads better on phones); confirm by leaving grid default. No change needed unless user wants image-first.
-
-## Out of scope
-- No content/copy changes.
-- No business logic, query, or routing changes.
-- No global CSS / token changes.
+Make the three signature animations on the "How Goldsainte Works" section truly mobile-optimized: legible at 360–414px, no edge clipping, no SVG distortion, performant (paused off-screen, respects reduced-motion).
 
 ## Files
-- `src/components/home/HomeHero.tsx` (only)
+- `src/components/home/TravelerDiscoveryMagic.tsx`
+- `src/components/home/CreatorAIMagic.tsx`
+- `src/components/home/AgentProposalMagic.tsx`
+- `src/sections/HomeLuxurySections.tsx` (right panel wrapper, optional padding tweaks)
+
+## Changes
+
+### 1. Canvas sizing (all three)
+- Replace `h-[300px] md:h-[460px]` with `h-[340px] sm:h-[400px] md:h-[460px]`.
+- Add internal safe-area padding on mobile (`px-4 sm:px-5`) so cards don't kiss the edges.
+
+### 2. Inner card widths
+- Convert fixed `w-[180px]`, `w-[200px]`, `max-w-[300px]`, `max-w-[320px]` to fluid + cap:
+  - `w-full max-w-[260px] sm:max-w-[300px] md:max-w-[320px]`.
+- Keep phone mockup in CreatorAIMagic at `w-[170px] sm:w-[190px] md:w-[200px]`.
+
+### 3. Typography legibility
+- Bump all `text-[8px]` / `text-[8.5px]` / `text-[9px]` to `text-[10px] md:text-[9px]` (slightly larger on mobile, same on desktop) — minimum readable size on phones is ~10px.
+- Headline cards (`text-[12–14px]`) gain `sm:` upscale where they currently don't.
+
+### 4. SVG connectors
+- Change `preserveAspectRatio="none"` to `preserveAspectRatio="xMidYMid meet"` on connector SVGs in TravelerDiscoveryMagic and AgentProposalMagic so curves don't distort when canvas height shrinks.
+- Where lines are decorative-only and stretching is acceptable, keep `none` but verify visually.
+
+### 5. Floating chip positions
+- Re-anchor absolute chips that overlap on the 340px canvas:
+  - Use `bottom-3 sm:bottom-12` style breakpoint pairs so chips sit inside the shorter mobile frame.
+
+### 6. Performance / motion guards
+- Add a small shared hook `useInViewAndMotion` (or inline) in each component:
+  - Use `IntersectionObserver` to add a `data-paused="true"` attr when off-screen; pause CSS animations via `[data-paused="true"]_*:!animate-none` utility, OR conditionally render scenes only when in view.
+  - Respect `prefers-reduced-motion: reduce` — if true, render the final frame statically (skip looped scene cycling).
+
+### 7. Wrapper panel (HomeLuxurySections)
+- Right panel wrapper (`max-w-md`) — add `mx-auto px-2 sm:px-0` to prevent edge contact on small phones.
+- Reduce decorative offset frame on mobile: `translate-x-2 translate-y-2 sm:translate-x-3 sm:translate-y-3`.
+
+## Out of scope
+- No copy changes, no animation choreography rewrites, no new visuals.
+- No changes to the accordion behavior or tab data.
 
 ## Verification
-- Resize preview to 375px, 414px, 768px, 1280px.
-- Confirm pill stays one line, no horizontal scroll, image stack has proper height, CTAs are tappable, popular trips legible.
+- Test viewports: 360, 390, 414, 768, 1280.
+- For each tab (Travelers, Creators, Agents): confirm no horizontal overflow, all text readable, chips inside frame, SVG curves smooth, animations pause when scrolled away, static final frame when reduced-motion is enabled.
