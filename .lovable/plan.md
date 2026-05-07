@@ -1,89 +1,43 @@
+# Expand How Goldsainte Works — 4 Cards per Audience
 
-## Goal
-Replace the 4-tab "How Goldsainte AI works" accordion with a 3-tab audience-based "How Goldsainte Works" section — same layout, spacing, typography, accordion mechanics, image panel, and luxury aesthetic.
+Single file edit: `src/sections/HomeLuxurySections.tsx`. Layout, header, image panel, accordion behavior, and gold styling are preserved exactly. Only the `tabsData` content and the accordion grid wrapper change.
 
-## File touched
-- `src/sections/HomeLuxurySections.tsx` — only the `HowGoldsainteWorksSection` component and its `tabsData` / `tabImages` constants. Keep all other sections, imports, and styling untouched.
+## Changes
 
-## Position
-Already correct: in `src/pages/Index.tsx` and `src/pages/HomePage.tsx`, `<HowGoldsainteWorksSection />` renders directly after `<HomeHero />` (and after `<TwoWaysComparison />`). Per the request to sit "immediately after the hero, before the larger marketplace grid", we'll move it to render directly after `<HomeHero />` and before `<TwoWaysComparison />` in both `Index.tsx` and `HomePage.tsx`.
+### 1. `tabsData` (lines ~222-265)
+Each tab keeps `id / label / icon / captionLabel`, but `features[]` becomes the headline + description (rendered as intro) PLUS 4 differentiator cards. To avoid restructuring the render loop, model it as:
 
-## Content changes
+- Add an optional `intro?: { title: string; description: string }` to `TabData`.
+- `features[]` becomes the 4 differentiator cards.
 
-Replace `tabsData` (4 items: Personalizes / Creates / Matches / Books) with 3 audience tabs. Each tab keeps the same `id / label / icon / features[]` shape so the existing accordion + animation code keeps working unchanged.
+#### For Travelers (icon: Compass, caption: "Discover & Book")
+- intro: "Book curated trips instantly." / "Explore ready-made itineraries and travel packages created by trusted creators and certified travel experts. Personalize your experience or book in minutes."
+- features:
+  - Heart — Curated Experiences — "Discover trips designed by creators and certified travel experts—not generic travel templates."
+  - Calendar — Instant Booking — "Book complete itineraries and travel packages in minutes with streamlined planning and checkout."
+  - Sparkles — Personalized Travel — "Customize experiences around your interests, travel style, budget, and preferred pace."
+  - Star — AI-Powered Discovery — "Goldsainte learns your preferences to recommend destinations and experiences tailored to you."
 
-```ts
-[
-  {
-    id: "travelers",
-    label: "For Travelers",
-    icon: Compass,            // from lucide-react
-    captionLabel: "Discover & Book",
-    features: [
-      {
-        icon: Sparkles,
-        title: "Book curated trips instantly.",
-        description:
-          "Explore ready-made itineraries and travel packages created by trusted creators and certified travel agents. Personalize your trip or book one in minutes.",
-      },
-    ],
-  },
-  {
-    id: "creators",
-    label: "For Creators",
-    icon: Camera,             // from lucide-react
-    captionLabel: "Create & Monetize",
-    features: [
-      {
-        icon: Wand2,
-        title: "Turn your trips into income.",
-        description:
-          "Upload travel photos, videos, or past trip content and let Goldsainte AI help transform it into a sellable itinerary others can discover, purchase, and personalize.",
-      },
-    ],
-  },
-  {
-    id: "agents",
-    label: "For Travel Agents",
-    icon: Briefcase,          // from lucide-react
-    captionLabel: "Sell & Customize",
-    features: [
-      {
-        icon: ClipboardList,
-        title: "Sell packages or bid on custom trips.",
-        description:
-          "List curated travel packages, customize experiences for travelers, and respond to custom trip requests from users looking for expert planning.",
-      },
-    ],
-  },
-]
-```
+#### For Creators (icon: Camera, caption: "Create & Monetize")
+- intro: "Turn your trips into income." / "Upload travel photos, videos, or past trip content and let Goldsainte AI transform them into structured itineraries others can discover, purchase, and personalize."
+- features:
+  - Wand2 — AI Itinerary Creation — "Upload travel content and let AI generate structured travel itineraries automatically."
+  - Wallet — Monetize Your Experiences — "Sell curated travel guides and itineraries directly through the Goldsainte marketplace."
+  - Users — Build Your Travel Brand — "Grow an audience around your travel style, recommendations, and curated experiences."
+  - TrendingUp — Passive Income Potential — "Earn from past trips and travel content long after your journey ends."
 
-Add a `captionLabel?: string` field to the `TabData` type. The existing image overlay currently shows `{activeTabData.label}` ("Personalizes" etc.); switch it to render `activeTabData.captionLabel ?? activeTabData.label` so the right-side caption changes per audience:
-- Travelers → "Discover & Book"
-- Creators → "Create & Monetize"
-- Travel Agents → "Sell & Customize"
+#### For Travel Agents (icon: Briefcase, caption: "Sell & Customize")
+- intro: "Sell packages or customize trips." / "List premium travel experiences, customize itineraries for travelers, and respond to personalized trip requests."
+- features:
+  - Briefcase — Curated Travel Packages — "List premium travel experiences travelers can browse and book instantly."
+  - Map — Custom Trip Planning — "Personalize itineraries around traveler preferences, budgets, and goals."
+  - Handshake — Bid Marketplace Access — "Respond to custom traveler requests and compete to build dream itineraries."
+  - Brain — AI-Enhanced Workflow — "Use AI-assisted tools to streamline itinerary building and trip customization."
 
-The accordion content grid currently uses `md:grid-cols-2`. Since each audience has a single feature, change to `grid-cols-1` so the body card sits flush and elegant rather than orphaned in a 2-col grid. Keep the icon + title + description layout exactly as is.
+### 2. Accordion content (lines ~335-362)
+- Add `Calendar, TrendingUp, Map, Handshake` to the lucide-react import on line 206. (Heart, Sparkles, Star, Wand2, Wallet, Users, Briefcase, Brain already imported.)
+- Inside `AccordionContent`, render the optional `intro` block above the features grid using the same typography (font-secondary headline + muted description).
+- Change features grid from `grid-cols-1` back to `grid gap-5 grid-cols-1 sm:grid-cols-2` so 4 cards display as a 2×2 grid on desktop, single column on mobile. Keep the existing soft-gold circular icon container and hover treatment unchanged.
 
-## Header copy
-- Eyebrow pill: keep the existing "Powered by AI" (still true and visually anchors the section). Skip removing it to preserve the visual treatment.
-- Title: change `How <span className="italic">Goldsainte AI</span> works` → `How <span className="italic">Goldsainte</span> Works`.
-- Subtitle: replace with: *"A curated travel marketplace where travelers discover experiences, creators monetize itineraries, and certified agents sell or customize travel packages."*
-- Footer note (about on-platform comms/payments): keep as-is — aligns with the brand's on-platform-only rule.
-
-## Image mapping
-Reuse existing imports already at the top of the file — no new assets:
-- `travelers` → `santoriniStepsImg`
-- `creators` → `creatorCanyonImg`
-- `agents` → `agentPlanningImg`
-
-Set `useState("travelers")` as the initial open tab.
-
-## Icons
-Add `Compass`, `Camera`, `Briefcase`, `ClipboardList` to the existing `lucide-react` import line in `HomeLuxurySections.tsx`. Leave the other icons in place — they're used elsewhere in the file (Trust & Safety section).
-
-## Out of scope
-- Visual redesign of the section (explicitly disallowed).
-- Translation keys: copy is hard-coded inline today (English strings live in the component), so we'll follow the existing pattern and inline the new strings rather than introducing partial i18n.
-- Changes to `HomeHero`, `TwoWaysComparison`, `StoryboardsHighlight`, or any marketplace grid component.
+### 3. Untouched
+- Section header, subtitle, image panel, caption overlay, footer note, page placement (already directly below hero in `Index.tsx` / `HomePage.tsx`), and all colors/spacing/animations.

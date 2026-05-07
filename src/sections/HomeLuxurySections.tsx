@@ -203,7 +203,7 @@ export const BuiltForEverySideSection: React.FC = () => {
 /*  How Goldsainte AI works - 4 Tabbed Categories                             */
 /* -------------------------------------------------------------------------- */
 
-import { Sparkles, Palette, Users, CreditCard, Heart, Brain, Rss, Star, Wand2, Layers, ArrowRightLeft, Bookmark, Target, MessageSquare, Building2, UserCheck, Mic, Shield, Bell, MessagesSquare, ShieldCheck, Lock, Scale, Fingerprint, BadgeCheck, Eye, Wallet, RefreshCw, MessageCircle, FileText, Ban, Gavel, Clock, FileCheck, Compass, Camera, Briefcase, ClipboardList } from "lucide-react";
+import { Sparkles, Palette, Users, CreditCard, Heart, Brain, Rss, Star, Wand2, Layers, ArrowRightLeft, Bookmark, Target, MessageSquare, Building2, UserCheck, Mic, Shield, Bell, MessagesSquare, ShieldCheck, Lock, Scale, Fingerprint, BadgeCheck, Eye, Wallet, RefreshCw, MessageCircle, FileText, Ban, Gavel, Clock, FileCheck, Compass, Camera, Briefcase, ClipboardList, Calendar, TrendingUp, Map, Handshake } from "lucide-react";
 
 type AIFeature = {
   icon: React.ElementType;
@@ -216,6 +216,7 @@ type TabData = {
   label: string;
   icon: React.ElementType;
   captionLabel?: string;
+  intro?: { title: string; description: string };
   features: AIFeature[];
 };
 
@@ -225,12 +226,35 @@ const tabsData: TabData[] = [
     label: "For Travelers",
     icon: Compass,
     captionLabel: "Discover & Book",
+    intro: {
+      title: "Book curated trips instantly.",
+      description:
+        "Explore ready-made itineraries and travel packages created by trusted creators and certified travel experts. Personalize your experience or book in minutes.",
+    },
     features: [
       {
-        icon: Sparkles,
-        title: "Book curated trips instantly.",
+        icon: Heart,
+        title: "Curated Experiences",
         description:
-          "Explore ready-made itineraries and travel packages created by trusted creators and certified travel agents. Personalize your trip or book one in minutes.",
+          "Discover trips designed by creators and certified travel experts—not generic travel templates.",
+      },
+      {
+        icon: Calendar,
+        title: "Instant Booking",
+        description:
+          "Book complete itineraries and travel packages in minutes with streamlined planning and checkout.",
+      },
+      {
+        icon: Sparkles,
+        title: "Personalized Travel",
+        description:
+          "Customize experiences around your interests, travel style, budget, and preferred pace.",
+      },
+      {
+        icon: Star,
+        title: "AI-Powered Discovery",
+        description:
+          "Goldsainte learns your preferences to recommend destinations and experiences tailored to you.",
       },
     ],
   },
@@ -239,12 +263,35 @@ const tabsData: TabData[] = [
     label: "For Creators",
     icon: Camera,
     captionLabel: "Create & Monetize",
+    intro: {
+      title: "Turn your trips into income.",
+      description:
+        "Upload travel photos, videos, or past trip content and let Goldsainte AI transform them into structured itineraries others can discover, purchase, and personalize.",
+    },
     features: [
       {
         icon: Wand2,
-        title: "Turn your trips into income.",
+        title: "AI Itinerary Creation",
         description:
-          "Upload travel photos, videos, or past trip content and let Goldsainte AI help transform it into a sellable itinerary others can discover, purchase, and personalize.",
+          "Upload travel content and let AI generate structured travel itineraries automatically.",
+      },
+      {
+        icon: Wallet,
+        title: "Monetize Your Experiences",
+        description:
+          "Sell curated travel guides and itineraries directly through the Goldsainte marketplace.",
+      },
+      {
+        icon: Users,
+        title: "Build Your Travel Brand",
+        description:
+          "Grow an audience around your travel style, recommendations, and curated experiences.",
+      },
+      {
+        icon: TrendingUp,
+        title: "Passive Income Potential",
+        description:
+          "Earn from past trips and travel content long after your journey ends.",
       },
     ],
   },
@@ -253,12 +300,35 @@ const tabsData: TabData[] = [
     label: "For Travel Agents",
     icon: Briefcase,
     captionLabel: "Sell & Customize",
+    intro: {
+      title: "Sell packages or customize trips.",
+      description:
+        "List premium travel experiences, customize itineraries for travelers, and respond to personalized trip requests.",
+    },
     features: [
       {
-        icon: ClipboardList,
-        title: "Sell packages or bid on custom trips.",
+        icon: Briefcase,
+        title: "Curated Travel Packages",
         description:
-          "List curated travel packages, customize experiences for travelers, and respond to custom trip requests from users looking for expert planning.",
+          "List premium travel experiences travelers can browse and book instantly.",
+      },
+      {
+        icon: Map,
+        title: "Custom Trip Planning",
+        description:
+          "Personalize itineraries around traveler preferences, budgets, and goals.",
+      },
+      {
+        icon: Handshake,
+        title: "Bid Marketplace Access",
+        description:
+          "Respond to custom traveler requests and compete to build dream itineraries.",
+      },
+      {
+        icon: Brain,
+        title: "AI-Enhanced Workflow",
+        description:
+          "Use AI-assisted tools to streamline itinerary building and trip customization.",
       },
     ],
   },
@@ -333,7 +403,17 @@ export const HowGoldsainteWorksSection: React.FC = () => {
                       </span>
                     </AccordionTrigger>
                     <AccordionContent className="pt-6 pb-3 px-2">
-                      <div className="grid gap-5 grid-cols-1">
+                      {tab.intro && (
+                        <div className="mb-6 px-1">
+                          <h3 className="font-secondary text-lg md:text-xl text-[#0a2225] mb-2">
+                            {tab.intro.title}
+                          </h3>
+                          <p className="text-sm md:text-[15px] leading-relaxed text-[#5A5A5A]">
+                            {tab.intro.description}
+                          </p>
+                        </div>
+                      )}
+                      <div className="grid gap-5 grid-cols-1 sm:grid-cols-2">
                         {tab.features.map((feature, index) => {
                           const FeatureIcon = feature.icon;
                           return (
