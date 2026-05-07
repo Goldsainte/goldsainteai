@@ -26,12 +26,12 @@ const SCENE_MS = 3600;
 const SCENES = 4;
 
 const memories = [
-  { c: "from-[#bcd3d0] to-[#0c4d47]", place: "Oia, Santorini", meta: "5:42 PM · Sunset", icon: MapPin },
-  { c: "from-[#f3d9b1] to-[#c08457]", place: "Ammoudi Taverna", meta: "Day 1 · Dinner", icon: Utensils },
-  { c: "from-[#dcc89a] to-[#8a6a2e]", place: "Caldera Viewpoint", meta: "Day 2 · Morning", icon: MapPin },
-  { c: "from-[#cfd9d6] to-[#384e4b]", place: "Canaves Suite", meta: "Day 2 · Stay", icon: MapPin },
-  { c: "from-[#f6c9a8] to-[#b85c3a]", place: "Sunset Catamaran", meta: "Day 2 · Cruise", icon: Video },
-  { c: "from-[#d6e0d6] to-[#5b7a6a]", place: "Megalochori", meta: "Day 3 · Tasting", icon: MapPin },
+  { c: "from-[#bcd3d0] to-[#0c4d47]", img: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=400&q=70", place: "Oia, Santorini", meta: "5:42 PM · Sunset", icon: MapPin },
+  { c: "from-[#f3d9b1] to-[#c08457]", img: "https://images.unsplash.com/photo-1504672281656-e4981d70414b?auto=format&fit=crop&w=400&q=70", place: "Ammoudi Taverna", meta: "Day 1 · Dinner", icon: Utensils },
+  { c: "from-[#dcc89a] to-[#8a6a2e]", img: "https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?auto=format&fit=crop&w=400&q=70", place: "Caldera Viewpoint", meta: "Day 2 · Morning", icon: MapPin },
+  { c: "from-[#cfd9d6] to-[#384e4b]", img: "https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?auto=format&fit=crop&w=400&q=70", place: "Canaves Suite", meta: "Day 2 · Stay", icon: MapPin },
+  { c: "from-[#f6c9a8] to-[#b85c3a]", img: "https://images.unsplash.com/photo-1530541930197-ff16ac917b0e?auto=format&fit=crop&w=400&q=70", place: "Sunset Catamaran", meta: "Day 2 · Cruise", icon: Video },
+  { c: "from-[#d6e0d6] to-[#5b7a6a]", img: "https://images.unsplash.com/photo-1571406761758-9a3eed5338ef?auto=format&fit=crop&w=400&q=70", place: "Megalochori", meta: "Day 3 · Tasting", icon: MapPin },
 ];
 
 const itinerary = [
@@ -92,8 +92,15 @@ export const CreatorAIMagic: React.FC = () => {
                 )}
                 style={{ animationDelay: `${i * 110}ms` }}
               >
+                <img
+                  src={m.img}
+                  alt={m.place}
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/30 to-transparent" />
                 {i % 4 === 0 && (
-                  <Video className="absolute bottom-1 right-1 w-2.5 h-2.5 text-white/90" />
+                  <Video className="absolute bottom-1 right-1 w-2.5 h-2.5 text-white/95 drop-shadow" />
                 )}
                 {i !== 5 && (
                   <div
@@ -224,8 +231,14 @@ export const CreatorAIMagic: React.FC = () => {
                     m.c
                   )}
                 >
+                  <img
+                    src={m.img}
+                    alt={m.place}
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
                   {i % 4 === 0 && (
-                    <Video className="absolute bottom-1 right-1 w-2.5 h-2.5 text-white/90" />
+                    <Video className="absolute bottom-1 right-1 w-2.5 h-2.5 text-white/95 drop-shadow" />
                   )}
                 </div>
 
@@ -273,6 +286,12 @@ export const CreatorAIMagic: React.FC = () => {
           <div className="w-full max-w-[320px] rounded-2xl bg-white border border-[#E5DFC6] shadow-[0_24px_56px_rgba(10,34,37,0.14)] overflow-hidden opacity-0 animate-[gs-rise_600ms_ease-out_forwards]">
             {/* Hero strip */}
             <div className="relative h-20 bg-gradient-to-br from-[#bcd3d0] via-[#7fa8a3] to-[#0c4d47] overflow-hidden">
+              <img
+                src={memories[0].img}
+                alt="Santorini"
+                loading="lazy"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/55 to-transparent" />
               <div className="absolute bottom-2 left-3 right-3">
                 <p className="font-secondary italic text-[15px] text-white leading-tight">
@@ -326,10 +345,17 @@ export const CreatorAIMagic: React.FC = () => {
                     <div className="relative shrink-0">
                       <div
                         className={cn(
-                          "w-9 h-9 rounded-md bg-gradient-to-br shadow-sm",
+                          "relative w-9 h-9 rounded-md bg-gradient-to-br shadow-sm overflow-hidden",
                           memories[i].c
                         )}
-                      />
+                      >
+                        <img
+                          src={memories[i].img}
+                          alt={memories[i].place}
+                          loading="lazy"
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                      </div>
                       {/* pin node on the route */}
                       <span className="absolute -right-[6px] top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#C7A962] ring-2 ring-white" />
                     </div>
@@ -367,7 +393,14 @@ export const CreatorAIMagic: React.FC = () => {
       <Scene visible={step === 3}>
         <div className="absolute inset-0 flex flex-col items-center justify-center px-5 gap-2 pt-2 pb-9">
           <div className="w-full max-w-[300px] rounded-2xl bg-white border border-[#E5DFC6] shadow-[0_22px_50px_rgba(10,34,37,0.14)] overflow-hidden opacity-0 animate-[gs-rise_600ms_ease-out_forwards]">
-            <div className="relative h-24 bg-gradient-to-br from-[#bcd3d0] via-[#7fa8a3] to-[#0c4d47]">
+            <div className="relative h-24 bg-gradient-to-br from-[#bcd3d0] via-[#7fa8a3] to-[#0c4d47] overflow-hidden">
+              <img
+                src={memories[0].img}
+                alt="Santorini"
+                loading="lazy"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/40 to-transparent" />
               <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-[#0c4d47] px-2 py-0.5 text-[10px] uppercase tracking-wider text-[#C7A962]">
                 <span className="w-1 h-1 rounded-full bg-[#C7A962] animate-pulse" />
                 Now Live · Available for Booking
