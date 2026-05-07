@@ -65,8 +65,6 @@ export function HomeHero() {
                   <span>{t('common.creators')}</span>
                   <span className="h-[1px] w-2 md:w-4 bg-[#073331]/30" />
                   <span>{t('common.agents')}</span>
-                  <span className="h-[1px] w-2 md:w-4 bg-[#073331]/30" />
-                  <span>{t('common.brands')}</span>
                 </div>
               </div>
 
