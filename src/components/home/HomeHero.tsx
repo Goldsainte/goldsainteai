@@ -1,6 +1,8 @@
 // src/components/home/HomeHero.tsx
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 import heroMainImg from "@/assets/maximilien-t-scharner-FD0Ga_KJTwM-unsplash.jpeg"; // infinity pool
 import heroSecondaryImg from "@/assets/austin-distel-riQNJpiaGgE-unsplash.jpeg"; // treehouse / hammock
@@ -9,11 +11,44 @@ import heroTertiaryImg from "@/assets/felix-rostig-UmV2wr-Vbq8-unsplash.jpeg"; /
 export function HomeHero() {
   const { t } = useTranslation();
 
-  const popularTrips = [
-    { title: "Bali Wellness Retreat", price: "From $2,199", image: heroMainImg },
-    { title: "Kyoto Cultural Immersion", price: "From $3,799", image: heroSecondaryImg },
-    { title: "Amalfi Coast Weekend", price: "From $2,499", image: heroTertiaryImg },
+  const fallbackTrips = [
+    { slug: null, title: "Bali Wellness Retreat", price: 2199, currency: "USD", image: heroMainImg },
+    { slug: null, title: "Kyoto Cultural Immersion", price: 3799, currency: "USD", image: heroSecondaryImg },
+    { slug: null, title: "Amalfi Coast Weekend", price: 2499, currency: "USD", image: heroTertiaryImg },
   ];
+
+  const { data: featured } = useQuery({
+    queryKey: ["hero-popular-trips"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("packaged_trips")
+        .select("slug, title, cover_image_url, price_per_person, currency")
+        .eq("is_featured", true)
+        .eq("status", "published")
+        .limit(3);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const popularTrips =
+    featured && featured.length >= 3
+      ? featured.slice(0, 3).map((t) => ({
+          slug: t.slug,
+          title: t.title,
+          price: t.price_per_person,
+          currency: t.currency || "USD",
+          image: t.cover_image_url,
+        }))
+      : fallbackTrips;
+
+  const formatPrice = (price: number, currency: string) =>
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(price);
 
   return (
     <section className="bg-[#f7f3ea] text-[#0a2225] md:min-h-[calc(100vh-56px)] md:max-h-[calc(100vh-56px)]">
@@ -76,7 +111,7 @@ export function HomeHero() {
                 {popularTrips.map((trip) => (
                   <Link
                     key={trip.title}
-                    to="/marketplace"
+                    to={trip.slug ? `/marketplace/trip/${trip.slug}` : "/marketplace"}
                     className="group block"
                   >
                     <div className="overflow-hidden rounded-xl aspect-square">
@@ -92,7 +127,7 @@ export function HomeHero() {
                       {trip.title}
                     </p>
                     <p className="text-[11px] md:text-[12px] text-[#0a2225]/70">
-                      {trip.price}
+                      From {formatPrice(trip.price, trip.currency)}
                     </p>
                   </Link>
                 ))}
