@@ -29,11 +29,11 @@ export default function Index() {
         {/* How Goldsainte Works - audience-defined, immediately after hero */}
         <HowGoldsainteWorksSection />
 
-        {/* Two ways comparison */}
-        <TwoWaysComparison />
-
         {/* Storyboards highlight - core differentiator */}
         <StoryboardsHighlight />
+
+        {/* Two ways comparison */}
+        <TwoWaysComparison />
 
         {/* Role-specific CTAs - three-way sign up */}
         <RoleSpecificCTAs />
