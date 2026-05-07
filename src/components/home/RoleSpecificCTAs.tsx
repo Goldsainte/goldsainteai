@@ -1,125 +1,117 @@
 // src/components/home/RoleSpecificCTAs.tsx
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { User, Video, Briefcase, Building2 } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { ArrowUpRight } from "lucide-react";
 
 import travelerImage from "@/assets/home/hero-overwater-villa.jpg";
 import creatorImage from "@/assets/creator-canyon-views.jpg";
 import agentImage from "@/assets/agent-travel-planning.jpg";
-import brandImage from "@/assets/luxury-infinity-pool.jpg";
+
+type Pathway = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  cta: string;
+  link: string;
+  image: string;
+  alt: string;
+};
+
+const pathways: Pathway[] = [
+  {
+    eyebrow: "For Travelers",
+    title: "Discover Extraordinary Journeys",
+    description:
+      "Explore curated experiences personalized around your travel style, destinations, and preferences.",
+    cta: "Explore Experiences",
+    link: "/explore",
+    image: travelerImage,
+    alt: "Cinematic overwater villa at sunset reflecting a luxury traveler's perspective.",
+  },
+  {
+    eyebrow: "For Creators",
+    title: "Transform Travel Into Influence",
+    description:
+      "Turn your travel memories, recommendations, and experiences into sellable curated journeys powered by AI.",
+    cta: "Start Creating",
+    link: "/auth?mode=signup&role=creator",
+    image: creatorImage,
+    alt: "Creator framing a sweeping canyon landscape, capturing travel moments to monetize.",
+  },
+  {
+    eyebrow: "For Travel Experts",
+    title: "Design Exceptional Experiences",
+    description:
+      "Craft personalized luxury itineraries and deliver concierge-level travel planning at scale.",
+    cta: "Join as a Travel Expert",
+    link: "/apply/agent",
+    image: agentImage,
+    alt: "Travel expert composing a refined itinerary at an editorial planning desk.",
+  },
+];
 
 export function RoleSpecificCTAs() {
-  const { t } = useTranslation();
-
-  const roles = [
-    {
-      icon: User,
-      title: t('home.rolesCTA.traveler.title'),
-      body: t('home.rolesCTA.traveler.body'),
-      buttonText: t('home.rolesCTA.traveler.button'),
-      link: "/auth?mode=signup&role=traveler",
-      backgroundImage: travelerImage,
-    },
-    {
-      icon: Video,
-      title: t('home.rolesCTA.joinAsCreator.title'),
-      body: t('home.rolesCTA.joinAsCreator.body'),
-      buttonText: t('home.rolesCTA.joinAsCreator.button'),
-      link: "/auth?mode=signup&role=creator",
-      backgroundImage: creatorImage,
-      browseLink: "/creators",
-      browseLabel: "Browse creators",
-    },
-    {
-      icon: Briefcase,
-      title: t('home.rolesCTA.applyAsAgent.title'),
-      body: t('home.rolesCTA.applyAsAgent.body'),
-      buttonText: t('home.rolesCTA.applyAsAgent.button'),
-      link: "/apply/agent",
-      backgroundImage: agentImage,
-      browseLink: "/agents",
-      browseLabel: "Browse agents",
-    },
-    {
-      icon: Building2,
-      title: t('home.rolesCTA.applyAsBrand.title'),
-      body: t('home.rolesCTA.applyAsBrand.body'),
-      buttonText: t('home.rolesCTA.applyAsBrand.button'),
-      link: "/apply/brand",
-      backgroundImage: brandImage,
-    },
-  ];
-
   return (
-    <section className="bg-[#FDF9F0] py-20 md:py-24">
-      <div className="mx-auto max-w-6xl px-4 text-left">
-        <p className="inline-flex rounded-full bg-[#0c4d47] px-3 py-1 text-[10px] md:text-xs font-medium uppercase tracking-[0.12em] text-[#D4C07A] mb-4">
-          The Goldsainte Experience Awaits
-        </p>
-        <h2 className="font-secondary text-[26px] leading-snug text-[#0a2225] md:text-4xl lg:text-[42px] mb-3">
-          Choose how you join <em>Goldsainte AI</em>
-        </h2>
-        <p className="max-w-xl text-sm md:text-base text-[#5A5A5A] mb-14">
-          Whether you're planning your next journey, sharing your adventures, or crafting unforgettable itineraries — there's a place for you here.
-        </p>
-
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {roles.map((role, index) => {
-            const Icon = role.icon;
-            return (
-              <div
-                key={index}
-                className="group cursor-pointer space-y-2.5"
-              >
-                {/* Clean image — no overlay */}
-                <div className="relative aspect-[4/3] overflow-hidden rounded-xl md:rounded-2xl">
-                  <img
-                    src={role.backgroundImage}
-                    alt=""
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                </div>
-
-                {/* Content below image */}
-                <div className="space-y-2 px-0.5">
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0c4d47]/10">
-                      <Icon className="h-4 w-4 text-[#0c4d47]" />
-                    </div>
-                    <h3 className="font-secondary text-sm md:text-[15px] text-[#0a2225] font-medium leading-snug">
-                      {role.title}
-                    </h3>
-                  </div>
-                  
-                  <p className="text-[13px] leading-relaxed text-[#6B7280]">
-                    {role.body}
-                  </p>
-
-                  <Button
-                    asChild
-                    size="sm"
-                    className="w-full rounded-full bg-[#0c4d47] text-[#E5DFC6] hover:bg-[#073331] transition-colors duration-300"
-                  >
-                    <Link to={role.link}>
-                      {role.buttonText}
-                    </Link>
-                  </Button>
-
-                  {role.browseLink && (
-                    <Link
-                      to={role.browseLink}
-                      className="block text-center text-[13px] font-medium text-[#0c4d47] hover:underline transition-colors duration-200"
-                    >
-                      {role.browseLabel}
-                    </Link>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+    <section className="bg-[#FDF9F0] py-24 md:py-32">
+      <div className="mx-auto max-w-6xl px-4 md:px-6">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="inline-flex rounded-full bg-[#0c4d47] px-3 py-1 text-[10px] md:text-xs font-medium uppercase tracking-[0.18em] text-[#D4C07A]">
+            The Goldsainte Ecosystem
+          </p>
+          <h2 className="mt-5 font-secondary italic text-[28px] leading-[1.1] tracking-tight text-[#0a2225] md:text-[44px]">
+            Experience Goldsainte Your Way
+          </h2>
+          <p className="mx-auto mt-5 max-w-2xl text-[15px] md:text-base leading-relaxed text-[#5A5A5A]">
+            Whether you're discovering your next journey, transforming travel memories into income, or designing personalized luxury experiences, Goldsainte connects every part of modern travel in one curated marketplace.
+          </p>
         </div>
+
+        <div className="mt-14 md:mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+          {pathways.map((p) => (
+            <Link
+              key={p.title}
+              to={p.link}
+              aria-label={p.title}
+              className="group relative block aspect-[3/4] overflow-hidden rounded-[28px] bg-[#0a2225] shadow-[0_24px_60px_rgba(10,34,37,0.12)] transition-all duration-500 ease-out motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-[0_36px_80px_rgba(10,34,37,0.22)]"
+            >
+              <img
+                src={p.image}
+                alt={p.alt}
+                loading="lazy"
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-out motion-safe:group-hover:scale-[1.06]"
+              />
+              {/* Bottom darkening gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/85 via-[#0a2225]/35 to-transparent" />
+              {/* Top gold sheen */}
+              <div className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-[#C7A962]/10 to-transparent" />
+
+              {/* Top eyebrow */}
+              <div className="absolute left-6 top-6 md:left-7 md:top-7">
+                <span className="block text-[10px] uppercase tracking-[0.22em] text-[#C7A962]">
+                  {p.eyebrow}
+                </span>
+                <span className="mt-1.5 block h-px w-10 origin-left scale-x-0 bg-[#C7A962] transition-transform duration-500 ease-out group-hover:scale-x-100" />
+              </div>
+
+              {/* Bottom content */}
+              <div className="absolute inset-x-0 bottom-0 p-6 md:p-7 text-white">
+                <h3 className="font-secondary italic text-[22px] md:text-[26px] leading-[1.15] text-white">
+                  {p.title}
+                </h3>
+                <p className="mt-3 max-w-[34ch] text-[13px] md:text-[14px] leading-relaxed text-white/80 line-clamp-2 md:line-clamp-2 transition-all duration-500 md:group-hover:line-clamp-none">
+                  {p.description}
+                </p>
+                <span className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#C7A962] px-4 py-2 text-[12px] font-medium text-[#0a2225]">
+                  {p.cta}
+                  <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-500 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        <p className="mt-12 text-center font-secondary italic text-[12px] text-[#0a2225]/55">
+          One ecosystem · Three ways to belong
+        </p>
       </div>
     </section>
   );
