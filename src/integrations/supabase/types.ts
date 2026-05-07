@@ -11879,6 +11879,44 @@ export type Database = {
           },
         ]
       }
+      trip_variants: {
+        Row: {
+          created_at: string
+          generated_itinerary: Json
+          id: string
+          modifiers: Json
+          trip_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          generated_itinerary?: Json
+          id?: string
+          modifiers?: Json
+          trip_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          generated_itinerary?: Json
+          id?: string
+          modifiers?: Json
+          trip_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_variants_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "packaged_trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trip_videos: {
         Row: {
           agent_id: string | null
@@ -13831,6 +13869,16 @@ export type Database = {
       get_creator_tiktok_lab_metrics: {
         Args: { creator_id_input: string }
         Returns: Json
+      }
+      get_marketplace_signals: {
+        Args: never
+        Returns: {
+          active_trips: number
+          new_creators_count: number
+          recently_booked_count: number
+          total_saves_this_month: number
+          trending_count: number
+        }[]
       }
       get_total_users_count: { Args: never; Returns: number }
       get_user_active_alerts_count: {

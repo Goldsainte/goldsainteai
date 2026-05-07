@@ -10,6 +10,7 @@ import { TripInclusions } from "@/components/trips/TripInclusions";
 import { TripHostSection } from "@/components/trips/TripHostSection";
 import { TripFAQAccordion } from "@/components/trips/TripFAQAccordion";
 import { TripTrustFooter } from "@/components/trips/TripTrustFooter";
+import { MakeItMinePanel } from "@/components/trips/MakeItMinePanel";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function TripDetailPage() {
@@ -123,6 +124,25 @@ export default function TripDetailPage() {
           <div className="grid gap-8 lg:grid-cols-3">
             {/* Left Column - Trip Details */}
             <div className="lg:col-span-2 space-y-8">
+              {/* Signature Goldsainte interaction */}
+              {itinerary && itinerary.length > 0 && (
+                <MakeItMinePanel
+                  trip={{
+                    id: trip.id,
+                    title: trip.title,
+                    destination: trip.destination,
+                    duration_days: trip.duration_days,
+                    description: trip.description,
+                  }}
+                  baseItinerary={itinerary.map((d: any) => ({
+                    day_number: d.day_number,
+                    title: d.title,
+                    description: d.description,
+                    accommodation: d.accommodation,
+                  }))}
+                />
+              )}
+
               {/* About Section */}
               <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6">
                 <h2 className="font-secondary text-xl font-semibold text-[#0a2225]">About This Trip</h2>

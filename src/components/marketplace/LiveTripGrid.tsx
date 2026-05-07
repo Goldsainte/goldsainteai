@@ -30,7 +30,7 @@ export function LiveTripGrid({ trips }: LiveTripGridProps) {
   return (
     <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {trips.map((trip) => (
-        <LiveTripCard key={trip.id} trip={trip} />
+        <LiveTripCard key={trip.id} trip={trip as any} />
       ))}
     </div>
   );

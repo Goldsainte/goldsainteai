@@ -16,6 +16,11 @@ import { BackButton } from "@/components/ui/BackButton";
 import { useUserRole } from "@/hooks/useUserRole";
 import { toast } from "sonner";
 import { CategoryChips } from "@/components/ui/CategoryChips";
+import { LiveSignalRow } from "@/components/marketplace/LiveSignalRow";
+import { QuietlyActiveFooter } from "@/components/marketplace/QuietlyActiveFooter";
+import { ForYouRow } from "@/components/marketplace/ForYouRow";
+import { AdaptiveCollectionRow } from "@/components/marketplace/AdaptiveCollectionRow";
+import { ThisWeekFooter } from "@/components/marketplace/ThisWeekFooter";
 
 type Tab = "trips" | "trip-requests";
 
@@ -94,7 +99,8 @@ export default function Marketplace() {
           duration_nights, highlights, creator_type,
           duration_days, max_participants, current_bookings, difficulty_level,
           rating, review_count, available_from, available_until, tags,
-          creator:profiles!packaged_trips_creator_id_fkey(id, full_name, avatar_url)
+          wishlist_count, booking_count, view_count, is_verified, created_at,
+          creator:profiles!packaged_trips_creator_id_fkey(id, full_name, avatar_url, home_base, content_style_tags, is_verified)
         `)
         .eq("status", "published");
 
@@ -296,12 +302,38 @@ export default function Marketplace() {
             }}
             className="mb-4"
           />
+          {activeTab === "trips" && <LiveSignalRow />}
           <div className="mb-6 md:mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <MarketplaceTabs activeTab={activeTab} onTabChange={handleTabChange} />
             <MarketplaceFilters filters={filters} onFilterChange={setFilters} />
           </div>
 
+          {activeTab === "trips" && <ForYouRow />}
+
           {renderContent()}
+
+          {activeTab === "trips" && (
+            <>
+              <AdaptiveCollectionRow
+                title="Slow Luxury"
+                kicker="A quieter way"
+                tags={["wellness", "Wellness", "luxury", "Luxury", "spa"]}
+              />
+              <AdaptiveCollectionRow
+                title="Hidden Cities"
+                kicker="Off the obvious"
+                tags={["city", "City breaks", "design-led", "Design-led", "boutique"]}
+              />
+              <AdaptiveCollectionRow
+                title="Quiet Adventure"
+                kicker="Earned solitude"
+                tags={["adventure", "Adventure", "nature", "eco-conscious"]}
+              />
+              <ThisWeekFooter />
+            </>
+          )}
+
+          {activeTab === "trips" && <QuietlyActiveFooter />}
         </div>
       </div>
     </>

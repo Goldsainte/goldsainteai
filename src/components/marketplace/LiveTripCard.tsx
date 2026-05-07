@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { MapPin, Calendar } from "lucide-react";
+import { CreatorAttribution } from "./CreatorAttribution";
 
 interface LiveTripCardProps {
   trip: {
@@ -15,6 +16,19 @@ interface LiveTripCardProps {
     highlights?: string[] | null;
     tags?: string[] | null;
     creator_type?: string | null;
+    wishlist_count?: number | null;
+    booking_count?: number | null;
+    view_count?: number | null;
+    is_verified?: boolean | null;
+    created_at?: string | null;
+    creator?: {
+      id: string;
+      full_name: string | null;
+      avatar_url: string | null;
+      home_base?: string | null;
+      content_style_tags?: string[] | null;
+    } | null;
+    signal?: "trending" | "new" | "recently-booked" | null;
   };
 }
 
@@ -34,12 +48,33 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
     return trip.duration_nights ?? trip.duration_days ?? 0;
   };
 
+  // Derive a soft signal automatically if not provided
+  const derivedSignal = (() => {
+    if (trip.signal) return trip.signal;
+    if (trip.created_at && Date.now() - new Date(trip.created_at).getTime() < 14 * 24 * 60 * 60 * 1000) return "new";
+    if ((trip.view_count ?? 0) > 80) return "trending";
+    if ((trip.booking_count ?? 0) > 0) return "recently-booked";
+    return null;
+  })();
+
+  const signalLabel = derivedSignal === "trending"
+    ? "Trending"
+    : derivedSignal === "new"
+      ? "New"
+      : derivedSignal === "recently-booked"
+        ? "Recently Booked"
+        : null;
+
+  const styleTag = trip.creator?.content_style_tags?.[0];
+  const saveCount = trip.wishlist_count ?? 0;
+  const bookingCount = trip.booking_count ?? 0;
+
   return (
     <article
       onClick={() => navigate(`/marketplace/trip/${trip.slug || trip.id}`)}
       className="group cursor-pointer space-y-2.5"
     >
-      {/* Clean image — no overlay, no badges on image */}
+      {/* Image with optional editorial signal pill */}
       <div className="relative aspect-[4/3] overflow-hidden rounded-xl md:rounded-2xl">
         {trip.cover_image_url ? (
           <img
@@ -53,10 +88,23 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
             <MapPin className="h-8 w-8 text-[#C7A962]/40" />
           </div>
         )}
+        {signalLabel && (
+          <span className="absolute left-3 top-3 rounded-full bg-[#FDF9F0]/95 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-[#0c4d47] ring-1 ring-[#0c4d47]/20 backdrop-blur-sm">
+            {signalLabel}
+          </span>
+        )}
+        {styleTag && (
+          <span className="absolute right-3 bottom-3 rounded-full bg-[#0a2225]/70 px-2.5 py-1 text-[10px] font-secondary italic text-[#FDF9F0] backdrop-blur-sm">
+            {styleTag}
+          </span>
+        )}
       </div>
 
       {/* Content below image */}
       <div className="space-y-1 px-0.5">
+        {trip.creator && (
+          <CreatorAttribution creator={trip.creator} className="mb-1" />
+        )}
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-secondary text-sm md:text-[15px] text-[#0a2225] font-medium leading-snug line-clamp-1">
             {trip.title}
@@ -75,6 +123,18 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
           <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
           <span>{getDuration()} nights</span>
         </p>
+
+        {(saveCount > 0 || bookingCount > 0) && (
+          <p className="pt-0.5 text-[11px] text-[#7A7151]/80">
+            {bookingCount > 0 && (
+              <span>{bookingCount} traveler{bookingCount === 1 ? "" : "s"} booked</span>
+            )}
+            {bookingCount > 0 && saveCount > 0 && <span className="text-[#C7B892]"> · </span>}
+            {saveCount > 0 && (
+              <span>Saved {saveCount >= 1000 ? `${(saveCount / 1000).toFixed(1)}k` : saveCount} times</span>
+            )}
+          </p>
+        )}
       </div>
     </article>
   );
