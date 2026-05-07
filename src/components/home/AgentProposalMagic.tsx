@@ -170,7 +170,7 @@ export const AgentProposalMagic: React.FC = () => {
             Goldsainte AI · Concierge
           </div>
 
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] rounded-2xl bg-white border border-[#E5DFC6] shadow-[0_18px_40px_rgba(10,34,37,0.12)] p-2">
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[170px] sm:w-[200px] rounded-2xl bg-white border border-[#E5DFC6] shadow-[0_18px_40px_rgba(10,34,37,0.12)] p-2">
             {days.map((d) => (
               <div key={d.day} className="flex items-center gap-2 py-1 border-b last:border-b-0 border-[#F0E8D2]">
                 <span className="font-secondary italic text-[11px] text-[#C7A962] w-5 text-center">{d.day}</span>

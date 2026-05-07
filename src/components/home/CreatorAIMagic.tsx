@@ -533,7 +533,7 @@ const PhoneFrame: React.FC<{
   status: string;
 }> = ({ children, label, status }) => (
   <div className="absolute inset-0 flex items-center justify-center">
-    <div className="relative w-[180px] md:w-[200px] h-[280px] md:h-[340px] rounded-[32px] bg-[#0a2225] p-1.5 shadow-[0_24px_60px_rgba(10,34,37,0.28)]">
+    <div className="relative w-[160px] sm:w-[180px] md:w-[200px] h-[250px] sm:h-[300px] md:h-[340px] rounded-[32px] bg-[#0a2225] p-1.5 shadow-[0_24px_60px_rgba(10,34,37,0.28)]">
       <div className="relative w-full h-full rounded-[26px] bg-gradient-to-b from-[#FDFBF7] to-[#F5EFE1] overflow-hidden">
         <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-14 h-3.5 rounded-full bg-[#0a2225]" />
         <div className="pt-6 px-3 pb-2 flex items-center justify-between">

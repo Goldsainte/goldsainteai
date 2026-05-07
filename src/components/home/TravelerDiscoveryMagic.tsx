@@ -194,7 +194,7 @@ export const TravelerDiscoveryMagic: React.FC = () => {
       {/* Scene 3 — AI inspiration layer */}
       <Scene visible={step === 2}>
         <div className="absolute inset-0">
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[180px] rounded-2xl bg-white border border-[#E5DFC6] shadow-[0_18px_40px_rgba(10,34,37,0.12)] overflow-hidden">
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[160px] sm:w-[180px] rounded-2xl bg-white border border-[#E5DFC6] shadow-[0_18px_40px_rgba(10,34,37,0.12)] overflow-hidden">
             <div className="h-14 bg-gradient-to-br from-[#bcd3d0] via-[#7fa8a3] to-[#0c4d47]" />
             <div className="px-3 py-2">
               <p className="font-secondary italic text-[12px] text-[#0a2225] leading-tight">Santorini Escape</p>
