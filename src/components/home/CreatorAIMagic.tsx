@@ -365,7 +365,7 @@ export const CreatorAIMagic: React.FC = () => {
 
       {/* Scene 4 — Marketplace Monetization */}
       <Scene visible={step === 3}>
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-5 gap-2 pt-2 pb-9 pb-9">
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-5 gap-2 pt-2 pb-9">
           <div className="w-full max-w-[300px] rounded-2xl bg-white border border-[#E5DFC6] shadow-[0_22px_50px_rgba(10,34,37,0.14)] overflow-hidden opacity-0 animate-[gs-rise_600ms_ease-out_forwards]">
             <div className="relative h-24 bg-gradient-to-br from-[#bcd3d0] via-[#7fa8a3] to-[#0c4d47]">
               <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-[#0c4d47] px-2 py-0.5 text-[10px] uppercase tracking-wider text-[#C7A962]">

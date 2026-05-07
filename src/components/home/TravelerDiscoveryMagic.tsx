@@ -242,7 +242,7 @@ export const TravelerDiscoveryMagic: React.FC = () => {
 
       {/* Scene 4 — Cinematic booking payoff */}
       <Scene visible={step === 3}>
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-5 gap-2 pt-2 pb-9 pb-9">
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-5 gap-2 pt-2 pb-9">
           <div className="w-full max-w-[300px] rounded-2xl bg-white border border-[#E5DFC6] shadow-[0_22px_50px_rgba(10,34,37,0.14)] overflow-hidden opacity-0 animate-[gs-rise_600ms_ease-out_forwards]">
             <div className="relative h-24 bg-gradient-to-br from-[#bcd3d0] via-[#7fa8a3] to-[#0c4d47] overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/60 to-transparent" />
