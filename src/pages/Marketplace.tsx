@@ -18,6 +18,9 @@ import { toast } from "sonner";
 import { CategoryChips } from "@/components/ui/CategoryChips";
 import { LiveSignalRow } from "@/components/marketplace/LiveSignalRow";
 import { QuietlyActiveFooter } from "@/components/marketplace/QuietlyActiveFooter";
+import { ForYouRow } from "@/components/marketplace/ForYouRow";
+import { AdaptiveCollectionRow } from "@/components/marketplace/AdaptiveCollectionRow";
+import { ThisWeekFooter } from "@/components/marketplace/ThisWeekFooter";
 
 type Tab = "trips" | "trip-requests";
 
@@ -305,7 +308,31 @@ export default function Marketplace() {
             <MarketplaceFilters filters={filters} onFilterChange={setFilters} />
           </div>
 
+          {activeTab === "trips" && <ForYouRow />}
+
           {renderContent()}
+
+          {activeTab === "trips" && (
+            <>
+              <AdaptiveCollectionRow
+                title="Slow Luxury"
+                kicker="A quieter way"
+                tags={["wellness", "Wellness", "luxury", "Luxury", "spa"]}
+              />
+              <AdaptiveCollectionRow
+                title="Hidden Cities"
+                kicker="Off the obvious"
+                tags={["city", "City breaks", "design-led", "Design-led", "boutique"]}
+              />
+              <AdaptiveCollectionRow
+                title="Quiet Adventure"
+                kicker="Earned solitude"
+                tags={["adventure", "Adventure", "nature", "eco-conscious"]}
+              />
+              <ThisWeekFooter />
+            </>
+          )}
+
           {activeTab === "trips" && <QuietlyActiveFooter />}
         </div>
       </div>
