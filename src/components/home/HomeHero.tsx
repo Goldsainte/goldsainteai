@@ -76,8 +76,11 @@ export function HomeHero() {
               </h1>
 
               {/* Description — 32px below headline */}
-              <p className="mt-8 max-w-xl text-sm md:text-base leading-relaxed text-[#4a4a4a] whitespace-pre-line">
+              <p className="mt-8 max-w-xl text-sm md:text-base leading-relaxed text-[#0a2225] font-semibold">
                 {t('home.hero.mainDescription')}
+              </p>
+              <p className="mt-2 max-w-xl text-sm md:text-base leading-relaxed text-[#4a4a4a] italic">
+                {t('home.hero.mainDescriptionSub')}
               </p>
               <p className="mt-4 max-w-xl text-sm md:text-base leading-relaxed text-[#4a4a4a]">
                 {t('home.hero.subHeading')}
