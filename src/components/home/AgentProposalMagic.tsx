@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Sparkles, Check, ShieldCheck, Send, Heart } from "lucide-react";
+import { Sparkles, Check, ShieldCheck, Send, Heart, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const SCENE_MS = 3600;
@@ -81,6 +81,10 @@ export const AgentProposalMagic: React.FC = () => {
                 <div className="flex items-center gap-1.5">
                   <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#C7A962] to-[#8a6a2e]" />
                   <span className="text-[9px] text-[#6B7280]">Sophia &amp; Marc · Anniversary</span>
+                  <span className="ml-auto inline-flex items-center gap-0.5 rounded-full bg-[#0c4d47]/5 border border-[#0c4d47]/15 px-1.5 py-0.5 text-[7.5px] font-secondary italic text-[#0c4d47]">
+                    <Star className="w-2 h-2 text-[#C7A962] fill-[#C7A962]" />
+                    Verified Traveler
+                  </span>
                 </div>
                 <p className="font-secondary italic text-[14px] text-[#0a2225] mt-1.5 leading-tight">
                   Luxury honeymoon along the Amalfi Coast

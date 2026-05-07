@@ -127,44 +127,80 @@ export const CreatorAIMagic: React.FC = () => {
         <div className="absolute inset-0">
           {/* Ambient AI glow */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 rounded-full bg-[radial-gradient(circle,rgba(199,169,98,0.25)_0%,rgba(199,169,98,0)_70%)] animate-[gs-glow_3.6s_ease-in-out_infinite]" />
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
-            <span className="absolute w-24 h-24 rounded-full border border-[#C7A962]/30 animate-[gs-ring_3s_ease-out_infinite]" />
-            <span
-              className="absolute w-24 h-24 rounded-full border border-[#C7A962]/30 animate-[gs-ring_3s_ease-out_infinite]"
-              style={{ animationDelay: "1.2s" }}
-            />
-            <Sparkles className="w-5 h-5 text-[#C7A962]/60" />
+
+          {/* Soft AI label at top */}
+          <div
+            className="absolute top-9 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 rounded-full bg-white/90 backdrop-blur border border-[#C7A962]/50 px-2.5 py-0.5 text-[9px] uppercase tracking-[0.18em] text-[#0a2225] shadow-sm opacity-0 animate-[gs-fade-in_500ms_ease-out_forwards]"
+          >
+            <Sparkles className="w-2.5 h-2.5 text-[#C7A962] animate-pulse" />
+            Reconstructing your journey
           </div>
 
-          {/* Chronology line connecting 3 cards */}
+          {/* Day chronology chips that fade in mid-sequence */}
+          <div className="absolute top-[62px] left-0 right-0 flex items-center justify-center gap-2">
+            {["01", "02", "03"].map((d, i) => (
+              <span
+                key={d}
+                className="inline-flex items-center gap-1 rounded-full border border-[#C7A962]/50 bg-white/85 px-2 py-0.5 text-[8px] font-secondary italic text-[#0a2225] opacity-0 animate-[gs-rise_500ms_ease-out_forwards]"
+                style={{ animationDelay: `${1500 + i * 180}ms` }}
+              >
+                <span className="text-[#C7A962]">Day {d}</span>
+              </span>
+            ))}
+          </div>
+
+          {/* Geographic route line connecting tiles in chronological order */}
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none"
             viewBox="0 0 400 460"
             preserveAspectRatio="none"
           >
             <path
-              d="M 80 110 Q 200 200 320 130 T 200 360"
+              d="M 70 175 Q 150 215 200 215 T 330 175 Q 280 280 200 305 Q 130 330 200 410"
               fill="none"
               stroke="#C7A962"
-              strokeWidth="1"
-              strokeDasharray="3 4"
+              strokeWidth="1.1"
+              strokeDasharray="3 5"
               style={{
-                strokeDashoffset: 600,
-                animation: "gs-draw 2.4s ease-out forwards",
-                animationDelay: "0.6s",
+                strokeDashoffset: 800,
+                animation: "gs-draw 2.2s ease-out forwards",
+                animationDelay: "1.0s",
+                opacity: 0.7,
               }}
             />
+            {/* Traveling gold dot */}
+            <circle r="2.5" fill="#C7A962" style={{ opacity: 0 }}>
+              <animate
+                attributeName="opacity"
+                values="0;1;1;0"
+                dur="2.2s"
+                begin="1.0s"
+                fill="freeze"
+              />
+              <animateMotion
+                dur="2.2s"
+                begin="1.0s"
+                fill="freeze"
+                path="M 70 175 Q 150 215 200 215 T 330 175 Q 280 280 200 305 Q 130 330 200 410"
+              />
+            </circle>
           </svg>
 
-          {/* Floating photo cards with rich captions */}
-          {memories.slice(0, 5).map((m, i) => {
+          {/* 6 memory tiles with floating metadata labels — grouped Day 01 / 02 / 03 */}
+          {memories.map((m, i) => {
             const Icon = m.icon;
+            // Two rows of 3 — Day 01 (top row, 1 tile centered-left), Day 02 (middle, 4 tiles), Day 03 (bottom, 1 tile)
+            // Use 3 visual rows to read as chronology.
             const positions = [
-              { t: "8%", l: "6%", r: "-6deg" },
-              { t: "14%", l: "60%", r: "5deg" },
-              { t: "46%", l: "20%", r: "3deg" },
-              { t: "42%", l: "62%", r: "-4deg" },
-              { t: "66%", l: "38%", r: "-2deg" },
+              // Day 01 — Oia + Ammoudi
+              { t: "32%", l: "10%", r: "-3deg", label: "above" as const },
+              { t: "32%", l: "62%", r: "2deg", label: "above" as const },
+              // Day 02 — Caldera + Canaves + Catamaran
+              { t: "55%", l: "6%", r: "1deg", label: "below" as const },
+              { t: "55%", l: "38%", r: "-2deg", label: "below" as const },
+              { t: "55%", l: "70%", r: "3deg", label: "below" as const },
+              // Day 03 — Megalochori
+              { t: "78%", l: "62%", r: "-1deg", label: "below" as const },
             ][i];
             return (
               <div
@@ -174,22 +210,36 @@ export const CreatorAIMagic: React.FC = () => {
                   top: positions.t,
                   left: positions.l,
                   ["--rot" as any]: positions.r,
-                  animationDelay: `${i * 160}ms`,
+                  animationDelay: `${i * 110}ms`,
                 }}
               >
-                <div
-                  className={cn(
-                    "w-[88px] h-[64px] md:w-[108px] md:h-[78px] rounded-lg bg-gradient-to-br shadow-[0_10px_24px_rgba(10,34,37,0.18)] border border-white/60 overflow-hidden",
-                    m.c
-                  )}
+                {/* AI pulse ring behind tile */}
+                <span
+                  className="absolute -inset-1 rounded-xl border border-[#C7A962]/40 opacity-0 animate-[gs-tile-pulse_900ms_ease-out_forwards]"
+                  style={{ animationDelay: `${500 + i * 110}ms` }}
                 />
                 <div
-                  className="mt-1.5 max-w-[120px] rounded-md bg-white/95 backdrop-blur border border-[#E5DFC6] px-1.5 py-1 shadow-sm opacity-0 animate-[gs-rise_500ms_ease-out_forwards]"
-                  style={{ animationDelay: `${550 + i * 160}ms` }}
+                  className={cn(
+                    "relative w-[72px] h-[54px] md:w-[88px] md:h-[64px] rounded-lg bg-gradient-to-br shadow-[0_10px_24px_rgba(10,34,37,0.18)] border border-white/60 overflow-hidden",
+                    m.c
+                  )}
+                >
+                  {i % 4 === 0 && (
+                    <Video className="absolute bottom-1 right-1 w-2.5 h-2.5 text-white/90" />
+                  )}
+                </div>
+
+                {/* Floating metadata label */}
+                <div
+                  className={cn(
+                    "absolute left-1/2 -translate-x-1/2 max-w-[120px] rounded-md bg-white/95 backdrop-blur border border-[#E5DFC6] px-1.5 py-1 shadow-[0_6px_16px_rgba(10,34,37,0.12)] opacity-0 animate-[gs-rise_500ms_ease-out_forwards] whitespace-nowrap",
+                    positions.label === "above" ? "-top-[42px]" : "-bottom-[42px]"
+                  )}
+                  style={{ animationDelay: `${600 + i * 110}ms` }}
                 >
                   <div className="flex items-center gap-1">
                     <Icon className="w-2 h-2 text-[#C7A962] shrink-0" />
-                    <span className="font-secondary italic text-[9px] md:text-[10px] text-[#0a2225] leading-tight truncate">
+                    <span className="font-secondary italic text-[9px] md:text-[10px] text-[#0a2225] leading-tight">
                       {m.place}
                     </span>
                   </div>
@@ -200,8 +250,21 @@ export const CreatorAIMagic: React.FC = () => {
               </div>
             );
           })}
+
+          {/* Classifier tag strip */}
+          <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-1.5">
+            {["Stay", "Dining", "Sunset", "Cruise", "Tasting"].map((tag, i) => (
+              <span
+                key={tag}
+                className="inline-flex items-center rounded-full border border-[#0c4d47]/15 bg-[#0c4d47]/5 px-1.5 py-0.5 text-[8px] font-secondary italic text-[#0c4d47] opacity-0 animate-[gs-rise_400ms_ease-out_forwards]"
+                style={{ animationDelay: `${2000 + i * 90}ms` }}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
         </div>
-        <Caption text="Goldsainte recognizes your journey" />
+        <Caption text="6 moments → 3 days, 5 experiences, 1 itinerary" />
       </Scene>
 
       {/* Scene 3 — Premium Itinerary Output */}
@@ -422,6 +485,11 @@ export const CreatorAIMagic: React.FC = () => {
         @keyframes gs-shimmer {
           0% { transform: translateX(-100%); }
           60%, 100% { transform: translateX(100%); }
+        }
+        @keyframes gs-tile-pulse {
+          0% { opacity: 0; transform: scale(0.9); }
+          50% { opacity: 0.9; transform: scale(1.05); }
+          100% { opacity: 0; transform: scale(1.15); }
         }
       `}</style>
     </div>
