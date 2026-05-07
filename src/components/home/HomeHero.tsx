@@ -38,6 +38,9 @@ export function HomeHero() {
               <p className="mt-8 max-w-xl text-sm md:text-base leading-relaxed text-[#4a4a4a] whitespace-pre-line">
                 {t('home.hero.mainDescription')}
               </p>
+              <p className="mt-4 max-w-xl text-sm md:text-base leading-relaxed text-[#4a4a4a]">
+                {t('home.hero.subHeading')}
+              </p>
 
             {/* CTAs — fixed 32px below copy */}
             <div className="flex flex-col gap-3 mt-8 max-w-sm">
