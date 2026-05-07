@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Sparkles, Check, ShieldCheck, Send, Heart } from "lucide-react";
+import { Sparkles, Check, ShieldCheck, Send, Heart, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const SCENE_MS = 3600;
