@@ -200,14 +200,14 @@ export const CreatorAIMagic: React.FC = () => {
             // Use 3 visual rows to read as chronology.
             const positions = [
               // Day 01 — Oia + Ammoudi
-              { t: "32%", l: "10%", r: "-3deg", label: "above" as const },
-              { t: "32%", l: "62%", r: "2deg", label: "above" as const },
+              { t: "30%", l: "8%", r: "-3deg", label: "above" as const },
+              { t: "30%", l: "58%", r: "2deg", label: "above" as const },
               // Day 02 — Caldera + Canaves + Catamaran
-              { t: "55%", l: "6%", r: "1deg", label: "below" as const },
-              { t: "55%", l: "38%", r: "-2deg", label: "below" as const },
-              { t: "55%", l: "70%", r: "3deg", label: "below" as const },
+              { t: "53%", l: "4%", r: "1deg", label: "below" as const },
+              { t: "53%", l: "36%", r: "-2deg", label: "below" as const },
+              { t: "53%", l: "66%", r: "3deg", label: "below" as const },
               // Day 03 — Megalochori
-              { t: "78%", l: "62%", r: "-1deg", label: "below" as const },
+              { t: "76%", l: "36%", r: "-1deg", label: "below" as const },
             ][i];
             return (
               <div
@@ -227,7 +227,7 @@ export const CreatorAIMagic: React.FC = () => {
                 />
                 <div
                   className={cn(
-                    "relative w-[72px] h-[54px] md:w-[88px] md:h-[64px] rounded-lg bg-gradient-to-br shadow-[0_10px_24px_rgba(10,34,37,0.18)] border border-white/60 overflow-hidden",
+                    "relative w-[64px] h-[48px] sm:w-[72px] sm:h-[54px] md:w-[88px] md:h-[64px] rounded-lg bg-gradient-to-br shadow-[0_10px_24px_rgba(10,34,37,0.18)] border border-white/60 overflow-hidden",
                     m.c
                   )}
                 >
@@ -245,18 +245,18 @@ export const CreatorAIMagic: React.FC = () => {
                 {/* Floating metadata label */}
                 <div
                   className={cn(
-                    "absolute left-1/2 -translate-x-1/2 max-w-[120px] rounded-md bg-white/95 backdrop-blur border border-[#E5DFC6] px-1.5 py-1 shadow-[0_6px_16px_rgba(10,34,37,0.12)] opacity-0 animate-[gs-rise_500ms_ease-out_forwards] whitespace-nowrap",
-                    positions.label === "above" ? "-top-[42px]" : "-bottom-[42px]"
+                    "absolute left-1/2 -translate-x-1/2 max-w-[96px] sm:max-w-[120px] rounded-md bg-white/95 backdrop-blur border border-[#E5DFC6] px-1 py-0.5 sm:px-1.5 sm:py-1 shadow-[0_6px_16px_rgba(10,34,37,0.12)] opacity-0 animate-[gs-rise_500ms_ease-out_forwards] whitespace-nowrap",
+                    positions.label === "above" ? "-top-[36px] sm:-top-[42px]" : "-bottom-[36px] sm:-bottom-[42px]"
                   )}
                   style={{ animationDelay: `${600 + i * 110}ms` }}
                 >
                   <div className="flex items-center gap-1">
                     <Icon className="w-2 h-2 text-[#C7A962] shrink-0" />
-                    <span className="font-secondary italic text-[10px] md:text-[10px] text-[#0a2225] leading-tight">
+                    <span className="font-secondary italic text-[9px] sm:text-[10px] text-[#0a2225] leading-tight">
                       {m.place}
                     </span>
                   </div>
-                  <div className="text-[10px] uppercase tracking-[0.12em] text-[#6B7280] mt-0.5">
+                  <div className="text-[8px] sm:text-[10px] uppercase tracking-[0.12em] text-[#6B7280] mt-0.5">
                     {m.meta}
                   </div>
                 </div>
@@ -265,11 +265,11 @@ export const CreatorAIMagic: React.FC = () => {
           })}
 
           {/* Classifier tag strip */}
-          <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-1.5">
+          <div className="absolute bottom-10 sm:bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-1 sm:gap-1.5 px-2 flex-wrap justify-center max-w-[92%]">
             {["Stay", "Dining", "Sunset", "Cruise", "Tasting"].map((tag, i) => (
               <span
                 key={tag}
-                className="inline-flex items-center rounded-full border border-[#0c4d47]/15 bg-[#0c4d47]/5 px-1.5 py-0.5 text-[10px] font-secondary italic text-[#0c4d47] opacity-0 animate-[gs-rise_400ms_ease-out_forwards]"
+                className="inline-flex items-center rounded-full border border-[#0c4d47]/15 bg-[#0c4d47]/5 px-1.5 py-0.5 text-[9px] sm:text-[10px] font-secondary italic text-[#0c4d47] opacity-0 animate-[gs-rise_400ms_ease-out_forwards]"
                 style={{ animationDelay: `${2000 + i * 90}ms` }}
               >
                 {tag}
