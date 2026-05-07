@@ -286,6 +286,12 @@ export const CreatorAIMagic: React.FC = () => {
           <div className="w-full max-w-[320px] rounded-2xl bg-white border border-[#E5DFC6] shadow-[0_24px_56px_rgba(10,34,37,0.14)] overflow-hidden opacity-0 animate-[gs-rise_600ms_ease-out_forwards]">
             {/* Hero strip */}
             <div className="relative h-20 bg-gradient-to-br from-[#bcd3d0] via-[#7fa8a3] to-[#0c4d47] overflow-hidden">
+              <img
+                src={memories[0].img}
+                alt="Santorini"
+                loading="lazy"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/55 to-transparent" />
               <div className="absolute bottom-2 left-3 right-3">
                 <p className="font-secondary italic text-[15px] text-white leading-tight">
@@ -387,7 +393,14 @@ export const CreatorAIMagic: React.FC = () => {
       <Scene visible={step === 3}>
         <div className="absolute inset-0 flex flex-col items-center justify-center px-5 gap-2 pt-2 pb-9">
           <div className="w-full max-w-[300px] rounded-2xl bg-white border border-[#E5DFC6] shadow-[0_22px_50px_rgba(10,34,37,0.14)] overflow-hidden opacity-0 animate-[gs-rise_600ms_ease-out_forwards]">
-            <div className="relative h-24 bg-gradient-to-br from-[#bcd3d0] via-[#7fa8a3] to-[#0c4d47]">
+            <div className="relative h-24 bg-gradient-to-br from-[#bcd3d0] via-[#7fa8a3] to-[#0c4d47] overflow-hidden">
+              <img
+                src={memories[0].img}
+                alt="Santorini"
+                loading="lazy"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/40 to-transparent" />
               <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-[#0c4d47] px-2 py-0.5 text-[10px] uppercase tracking-wider text-[#C7A962]">
                 <span className="w-1 h-1 rounded-full bg-[#C7A962] animate-pulse" />
                 Now Live · Available for Booking
