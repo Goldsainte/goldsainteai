@@ -350,16 +350,17 @@ export const HowGoldsainteWorksSection: React.FC = () => {
   return (
     <section id="how-it-works" className="bg-[#FDF9F0] px-4 pt-10 pb-16 md:pt-14 md:pb-24 scroll-mt-16">
       <div className="mx-auto max-w-6xl">
-        {/* Section Header */}
-        <div className="mb-12 md:mb-16 text-left">
-          <p className="inline-flex rounded-full bg-[#C7A962]/10 border border-[#C7A962]/30 px-4 py-1.5 text-[10px] md:text-xs font-medium uppercase tracking-[0.15em] text-[#8B7355] mb-5">
-            Powered by AI
-          </p>
-          <h2 className="font-secondary text-[26px] leading-[1.15] text-[#0a2225] md:text-[40px] mb-3">
+        {/* Section Header — mirrors TwoWaysComparison */}
+        <div className="mb-12 md:mb-16 text-center">
+          <span className="inline-block rounded-full border border-[#0c4d47] bg-[#0c4d47] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#bfad72] mb-4">
+            How It Works
+          </span>
+          <div className="mx-auto w-14 h-px bg-[#C7A962] mb-5" />
+          <h2 className="font-secondary text-2xl md:text-4xl text-[#0a2225] mb-3">
             How <span className="italic">Goldsainte</span> Works
           </h2>
-          <p className="max-w-2xl text-sm md:text-base text-[#5A5A5A] leading-relaxed">
-            A curated travel marketplace where travelers discover experiences, creators monetize itineraries, and certified agents sell or customize travel packages.
+          <p className="text-sm md:text-base text-[#4a4a4a] max-w-2xl mx-auto leading-relaxed">
+            A curated travel marketplace where travelers discover experiences, creators monetize itineraries, and certified travel agents sell or customize travel packages.
           </p>
         </div>
 
