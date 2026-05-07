@@ -72,15 +72,16 @@ export function StoryboardsHighlight() {
   return (
     <section className="bg-white border-y border-[#E5DFC6]/30 py-16 md:py-20">
       <div className="mx-auto max-w-6xl px-4">
-        <div className="text-left mb-10 md:mb-12">
-          <h2 className="font-secondary text-[26px] leading-snug text-[#0a2225] md:text-[31px] lg:text-[36px] mb-2">
+        <div className="text-center mb-10 md:mb-12 max-w-3xl mx-auto">
+          <span className="inline-block rounded-full border border-[#0c4d47] bg-[#0c4d47] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#bfad72] mb-4">
+            Curated Journeys
+          </span>
+          <div className="mx-auto w-14 h-px bg-[#C7A962] mb-5" />
+          <h2 className="font-secondary text-2xl md:text-4xl text-[#0a2225] mb-3">
             Curated Journeys by Creators &amp; Certified Agents
           </h2>
-          <p className="text-base md:text-lg text-[#4a4a4a] italic mb-4">
-            Book instantly. Personalize effortlessly.
-          </p>
-          <p className="max-w-3xl text-sm leading-relaxed text-[#4a4a4a] md:text-base">
-            {t('home.storyboards.description')}
+          <p className="text-sm md:text-base text-[#4a4a4a] max-w-2xl mx-auto mb-10 leading-relaxed">
+            Book instantly or personalize effortlessly — explore expertly designed trips you can book on the spot, or customize with a creator or certified travel expert to make them your own.
           </p>
         </div>
 
