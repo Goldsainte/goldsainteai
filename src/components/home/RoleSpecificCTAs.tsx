@@ -57,7 +57,8 @@ export function RoleSpecificCTAs() {
           <p className="inline-flex rounded-full bg-[#0c4d47] px-3 py-1 text-[10px] md:text-xs font-medium uppercase tracking-[0.18em] text-[#D4C07A]">
             The Goldsainte Ecosystem
           </p>
-          <h2 className="mt-5 font-secondary italic text-[28px] leading-[1.1] tracking-tight text-[#0a2225] md:text-[44px]">
+          <span aria-hidden="true" className="mx-auto mt-4 block h-px w-12 bg-[#C7A962]" />
+          <h2 className="mt-5 font-secondary text-[28px] leading-[1.1] tracking-tight text-[#0a2225] md:text-[44px]">
             Experience Goldsainte Your Way
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-[15px] md:text-base leading-relaxed text-[#5A5A5A]">
