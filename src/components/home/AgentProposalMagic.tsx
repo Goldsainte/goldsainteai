@@ -329,9 +329,9 @@ const Scene: React.FC<{ visible: boolean; children: React.ReactNode }> = ({ visi
 );
 
 const Caption: React.FC<{ text: string }> = ({ text }) => (
-  <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 rounded-full bg-white/85 backdrop-blur border border-[#E5DFC6] px-3 py-1 text-[10px] tracking-wide text-[#0a2225] shadow-sm z-20">
+  <div className="absolute bottom-0 left-0 right-0 h-8 flex items-center justify-center gap-1.5 bg-gradient-to-t from-[#FDFBF7] via-[#FDFBF7]/95 to-[#FDFBF7]/0 text-[10px] tracking-wide text-[#0a2225] z-20 pointer-events-none">
     <Sparkles className="w-3 h-3 text-[#C7A962]" />
-    {text}
+    <span className="font-secondary italic">{text}</span>
   </div>
 );
 
