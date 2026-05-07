@@ -1,46 +1,36 @@
-# Add real imagery to Traveler & Agent home animations
-
 ## Problem
 
-`TravelerDiscoveryMagic.tsx` and `AgentProposalMagic.tsx` currently render every "card" with only a colored gradient (`from-[#…] to-[#…]`). Unlike `CreatorAIMagic.tsx`, neither file references any `img` URLs or `<img>` tags. To viewers this reads as "the images are not showing"—it's actually that no images were ever wired in.
+In Scene 2 ("Reconstructing your journey") of `src/components/home/CreatorAIMagic.tsx`, on desktop (≥md, viewport ~1000px) several floating elements collide:
 
-## Goal
+1. The header pill "Reconstructing your journey" wraps to two lines and the Day 01 / 02 / 03 chips (positioned at `top-[62px]`) sit on top of the pill's second line.
+2. The bottom Megalochori tile (positioned at `top: 76%`) plus its "below" metadata label collides with the classifier tag strip ("Stay / Dining / Sunset / Cruise / Tasting") sitting at `bottom-10 sm:bottom-12`.
+3. The Megalochori label itself is partially clipped behind the tag pills.
 
-Bring the Traveler and Agent vignettes up to parity with the Creator scene: every trip card, swap card, day tile, and "AI suggestion" chip should sit on a real luxury travel photograph (Santorini, Positano, Capri, Tanzania, Japan, etc.), with the existing gradient now used as a soft top-down overlay for legibility. Layout, motion, timing, and copy stay exactly as they are.
+This is purely a layout/spacing issue inside one component — no data, copy, or animation logic changes needed.
 
-## Changes
+## Fix
 
-### 1. `src/components/home/TravelerDiscoveryMagic.tsx`
+Edit only `src/components/home/CreatorAIMagic.tsx`, Scene 2 block:
 
-- Extend the existing data arrays with an `img` field (curated Unsplash URLs, `w=400&q=70`, lazy-loaded):
-  - `dayTimeline` (Cliffside Dinner / Caldera Sunset / Winery Tasting) → Santorini photos.
-  - `swaps` (Canaves Oia, Selene, Private Sailboat) → matching luxury stay/dining/sailing photos.
-  - `aiSuggestions` (Sommelier Tasting, Akrotiri, Vlychada) → matching photos.
-  - Add a `heroImg` + 4 grid `img`s for Scene 1's "Trending in Summer" marketplace cards.
-- In every card that currently has only `bg-gradient-to-br from-… to-…`, render an `<img class="absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async" />` underneath, then keep the existing gradient as a tinted overlay (`from-[#0a2225]/55 via-[#0a2225]/15 to-transparent`) so text/icons stay readable.
+1. Header pill: keep the pill on a single line on md+ by adding `whitespace-nowrap` and tightening padding, so it no longer wraps and intrudes into the Day chips row.
+2. Day chips row: move from `top-[62px]` to a md-aware offset (`top-[58px] md:top-[64px]`) and add a small `mt` so chips clear the (now single-line) pill at all breakpoints.
+3. Tile vertical positions: shift the three rows slightly tighter and lift Day 03 (Megalochori) up so its "below" label clears the bottom tag strip:
+   - Day 01 row: `top: 28%` (was 30%)
+   - Day 02 row: `top: 50%` (was 53%)
+   - Day 03 row: `top: 70%` (was 76%) — this is the key fix; combined with the existing `-bottom-[42px]` label offset it ends ~84% instead of ~92%.
+4. Bottom classifier tags: move from `bottom-10 sm:bottom-12` to `bottom-6 sm:bottom-8 md:bottom-6`, so they sit closer to the caption strip and out of the Megalochori label zone.
+5. Optional: add `pointer-events-none` is already not needed; just verify z-index so labels render above the SVG route (already true via DOM order).
 
-### 2. `src/components/home/AgentProposalMagic.tsx`
+## Out of scope
 
-Same approach:
-- Add `img` to `days` (Positano cliffside, Capri yacht, Ravello belvedere) and to `aiTips` (Da Adolfo, Caruso suite, helicopter transfer).
-- Add request-thumbnail images for Scene 1 (Tanzania safari, Japan family journey, plus the highlighted "new request" card).
-- Add proposal preview images for the final scene.
-- Wrap each gradient block with an `<img>` underneath + softened gradient overlay.
-
-### 3. Image sourcing
-
-Use the same pattern that already works in `CreatorAIMagic.tsx` (direct `images.unsplash.com/photo-…?auto=format&fit=crop&w=400&q=70` URLs). All images:
-- `loading="lazy"`, `decoding="async"`.
-- `object-cover` with a darkening gradient overlay so the existing white serif copy and gold hairlines remain legible.
-- No new dependencies; no changes to Tailwind config or design tokens.
-
-### 4. Out of scope
-
-- No layout/animation/timing changes.
-- No copy changes.
-- No backend / data / RLS / edge function changes.
-- `CreatorAIMagic.tsx` already has imagery and is left untouched.
+- No changes to Scenes 1, 3, 4.
+- No copy, animation timing, color, or font changes.
+- No changes to `TravelerDiscoveryMagic.tsx` or `AgentProposalMagic.tsx`.
+- No backend / data changes.
 
 ## Verification
 
-After the edit, open `/` in the preview, scroll to the three "How it works" animations, and confirm Traveler and Agent scenes now show real photographs behind every card (matching the Creator scene's feel) with no layout shift or text-legibility regression on mobile (375px) and desktop.
+Open `/` at viewport widths 1000px, 1280px, 1440px and 768px. During Scene 2:
+- The "Reconstructing your journey" pill stays on one line and does not touch the Day chips.
+- The Megalochori tile + label sits clearly above the "Stay / Dining / Sunset / Cruise / Tasting" strip with visible breathing room.
+- No regression on mobile (375px) — the existing `sm:` offsets remain the fallback.
