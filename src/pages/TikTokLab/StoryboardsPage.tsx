@@ -201,7 +201,7 @@ export default function TikTokLabStoryboardsPage() {
                     to="/post-trip"
                     className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#0c4d47] hover:text-[#073331] transition-colors"
                   >
-                    Ready to go? Create &amp; Post Your Trip
+                    Explore Travel Marketplace
                     <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
