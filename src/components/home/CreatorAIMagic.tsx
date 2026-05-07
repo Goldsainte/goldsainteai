@@ -365,7 +365,7 @@ export const CreatorAIMagic: React.FC = () => {
 
       {/* Scene 4 — Marketplace Monetization */}
       <Scene visible={step === 3}>
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-5 gap-2.5 pt-2">
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-5 gap-2 pt-2 pb-9">
           <div className="w-full max-w-[300px] rounded-2xl bg-white border border-[#E5DFC6] shadow-[0_22px_50px_rgba(10,34,37,0.14)] overflow-hidden opacity-0 animate-[gs-rise_600ms_ease-out_forwards]">
             <div className="relative h-24 bg-gradient-to-br from-[#bcd3d0] via-[#7fa8a3] to-[#0c4d47]">
               <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-[#0c4d47] px-2 py-0.5 text-[10px] uppercase tracking-wider text-[#C7A962]">
@@ -511,9 +511,9 @@ const Scene: React.FC<{ visible: boolean; children: React.ReactNode }> = ({
 );
 
 const Caption: React.FC<{ text: string }> = ({ text }) => (
-  <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 rounded-full bg-white/85 backdrop-blur border border-[#E5DFC6] px-3 py-1 text-[10px] tracking-wide text-[#0a2225] shadow-sm z-20">
+  <div className="absolute bottom-0 left-0 right-0 h-8 flex items-center justify-center gap-1.5 bg-gradient-to-t from-[#FDFBF7] via-[#FDFBF7]/95 to-[#FDFBF7]/0 text-[10px] tracking-wide text-[#0a2225] z-20 pointer-events-none">
     <Sparkles className="w-3 h-3 text-[#C7A962]" />
-    {text}
+    <span className="font-secondary italic">{text}</span>
   </div>
 );
 
