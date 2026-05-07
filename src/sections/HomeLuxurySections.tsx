@@ -523,22 +523,23 @@ export const TrustSafetyPaymentsSection: React.FC = () => {
   return (
     <section className="bg-[#FDF9F0] px-4 py-20 md:py-28">
       <div className="mx-auto max-w-6xl">
-        <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-center">
-          {/* Left: Editorial header + pillars */}
-          <div className="lg:w-[55%]">
-            <div className="mb-10 md:mb-12">
-              <p className="inline-flex rounded-full border border-[#0c4d47] bg-[#0c4d47] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#bfad72] mb-5">
-                {t('home.trustSafety.badge')}
-              </p>
-              <div className="w-14 h-px bg-[#C7A962] mb-6" />
-              <h2 className="font-secondary text-[28px] leading-[1.15] text-[#0a2225] md:text-[44px] mb-4">
-                {t('home.trustSafety.title')}
-              </h2>
-              <p className="max-w-xl text-base md:text-[17px] text-[#5A5A5A] leading-relaxed">
-                {t('home.trustSafety.description')}
-              </p>
-            </div>
+        {/* Centered editorial header — matches "The Goldsainte Ecosystem" pattern */}
+        <div className="mx-auto max-w-3xl text-center mb-14 md:mb-20">
+          <p className="inline-flex rounded-full bg-[#0c4d47] px-3 py-1 text-[10px] md:text-xs font-medium uppercase tracking-[0.18em] text-[#D4C07A]">
+            {t('home.trustSafety.badge')}
+          </p>
+          <span aria-hidden="true" className="mx-auto mt-4 block h-px w-12 bg-[#C7A962]" />
+          <h2 className="mt-5 font-secondary text-[28px] leading-[1.1] tracking-tight text-[#0a2225] md:text-[44px]">
+            {t('home.trustSafety.title')}
+          </h2>
+          <p className="mx-auto mt-5 max-w-2xl text-[15px] md:text-base leading-relaxed text-[#5A5A5A]">
+            {t('home.trustSafety.description')}
+          </p>
+        </div>
 
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-center">
+          {/* Left: Pillars */}
+          <div className="lg:w-[55%] w-full">
             <ul className="divide-y divide-[#E5DFC6]">
               {pillars.map((p, index) => {
                 const Icon = p.icon;
@@ -552,10 +553,10 @@ export const TrustSafetyPaymentsSection: React.FC = () => {
                       <Icon className="w-5 h-5 text-[#C7A962]" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-secondary text-lg md:text-xl text-[#0a2225] mb-1.5">
+                      <h3 className="font-secondary text-base md:text-lg text-[#0a2225] mb-1.5">
                         {p.title}
                       </h3>
-                      <p className="text-sm md:text-[15px] leading-relaxed text-[#5A5A5A]">
+                      <p className="text-sm leading-relaxed text-[#5A5A5A]">
                         {p.body}
                       </p>
                     </div>
