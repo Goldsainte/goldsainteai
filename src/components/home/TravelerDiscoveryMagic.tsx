@@ -123,6 +123,12 @@ export const TravelerDiscoveryMagic: React.FC = () => {
             <Sparkles className="w-2.5 h-2.5 text-[#C7A962]" />
             Recommended for you
           </div>
+          <div
+            className="absolute bottom-12 left-4 inline-flex items-center gap-1 rounded-full bg-white/90 border border-[#E5DFC6] px-2 py-0.5 text-[8.5px] text-[#0a2225]/75 opacity-0 animate-[gs-rise_500ms_ease-out_1400ms_forwards]"
+          >
+            <span className="w-1 h-1 rounded-full bg-[#0c4d47] animate-pulse" />
+            +18 viewing now
+          </div>
         </div>
         <Caption text="Discover trips made for you" />
       </Scene>
