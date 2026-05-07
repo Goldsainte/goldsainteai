@@ -1,43 +1,27 @@
-# Expand How Goldsainte Works — 4 Cards per Audience
+# Match "How Goldsainte Works" header to "Why Goldsainte" style
 
-Single file edit: `src/sections/HomeLuxurySections.tsx`. Layout, header, image panel, accordion behavior, and gold styling are preserved exactly. Only the `tabsData` content and the accordion grid wrapper change.
+Single edit: `src/sections/HomeLuxurySections.tsx`, header block of `HowGoldsainteWorksSection` (lines ~283-294).
 
-## Changes
+## Replace current left-aligned header
+Currently uses a soft-gold "POWERED BY AI" pill and left-aligned heading/subtitle.
 
-### 1. `tabsData` (lines ~222-265)
-Each tab keeps `id / label / icon / captionLabel`, but `features[]` becomes the headline + description (rendered as intro) PLUS 4 differentiator cards. To avoid restructuring the render loop, model it as:
+## With the exact pattern from `TwoWaysComparison` (lines 97-107)
 
-- Add an optional `intro?: { title: string; description: string }` to `TabData`.
-- `features[]` becomes the 4 differentiator cards.
+```tsx
+<div className="mx-auto max-w-6xl px-4 text-center mb-12 md:mb-16">
+  <span className="inline-block rounded-full border border-[#0c4d47] bg-[#0c4d47] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#bfad72] mb-4">
+    How It Works
+  </span>
+  <div className="mx-auto w-14 h-px bg-[#C7A962] mb-5" />
+  <h2 className="font-secondary text-2xl md:text-4xl text-[#0a2225] mb-3">
+    How <span className="italic">Goldsainte</span> Works
+  </h2>
+  <p className="text-sm md:text-base text-[#4a4a4a] max-w-2xl mx-auto leading-relaxed">
+    A curated travel marketplace where travelers discover experiences, creators monetize itineraries, and certified travel agents sell or customize travel packages.
+  </p>
+</div>
+```
 
-#### For Travelers (icon: Compass, caption: "Discover & Book")
-- intro: "Book curated trips instantly." / "Explore ready-made itineraries and travel packages created by trusted creators and certified travel experts. Personalize your experience or book in minutes."
-- features:
-  - Heart — Curated Experiences — "Discover trips designed by creators and certified travel experts—not generic travel templates."
-  - Calendar — Instant Booking — "Book complete itineraries and travel packages in minutes with streamlined planning and checkout."
-  - Sparkles — Personalized Travel — "Customize experiences around your interests, travel style, budget, and preferred pace."
-  - Star — AI-Powered Discovery — "Goldsainte learns your preferences to recommend destinations and experiences tailored to you."
+Mirrors 1:1: dark-green pill (centered), gold hairline divider, same h2 font/size/color, same subtitle font/size/color, centered with `max-w-2xl mx-auto`. Section background, padding, accordion, image panel, and footer note remain unchanged.
 
-#### For Creators (icon: Camera, caption: "Create & Monetize")
-- intro: "Turn your trips into income." / "Upload travel photos, videos, or past trip content and let Goldsainte AI transform them into structured itineraries others can discover, purchase, and personalize."
-- features:
-  - Wand2 — AI Itinerary Creation — "Upload travel content and let AI generate structured travel itineraries automatically."
-  - Wallet — Monetize Your Experiences — "Sell curated travel guides and itineraries directly through the Goldsainte marketplace."
-  - Users — Build Your Travel Brand — "Grow an audience around your travel style, recommendations, and curated experiences."
-  - TrendingUp — Passive Income Potential — "Earn from past trips and travel content long after your journey ends."
-
-#### For Travel Agents (icon: Briefcase, caption: "Sell & Customize")
-- intro: "Sell packages or customize trips." / "List premium travel experiences, customize itineraries for travelers, and respond to personalized trip requests."
-- features:
-  - Briefcase — Curated Travel Packages — "List premium travel experiences travelers can browse and book instantly."
-  - Map — Custom Trip Planning — "Personalize itineraries around traveler preferences, budgets, and goals."
-  - Handshake — Bid Marketplace Access — "Respond to custom traveler requests and compete to build dream itineraries."
-  - Brain — AI-Enhanced Workflow — "Use AI-assisted tools to streamline itinerary building and trip customization."
-
-### 2. Accordion content (lines ~335-362)
-- Add `Calendar, TrendingUp, Map, Handshake` to the lucide-react import on line 206. (Heart, Sparkles, Star, Wand2, Wallet, Users, Briefcase, Brain already imported.)
-- Inside `AccordionContent`, render the optional `intro` block above the features grid using the same typography (font-secondary headline + muted description).
-- Change features grid from `grid-cols-1` back to `grid gap-5 grid-cols-1 sm:grid-cols-2` so 4 cards display as a 2×2 grid on desktop, single column on mobile. Keep the existing soft-gold circular icon container and hover treatment unchanged.
-
-### 3. Untouched
-- Section header, subtitle, image panel, caption overlay, footer note, page placement (already directly below hero in `Index.tsx` / `HomePage.tsx`), and all colors/spacing/animations.
+Pill text: "How It Works" (parallel to "Why Goldsainte"). Confirm if you'd prefer different pill copy.
