@@ -26,12 +26,12 @@ const SCENE_MS = 3600;
 const SCENES = 4;
 
 const memories = [
-  { c: "from-[#bcd3d0] to-[#0c4d47]", place: "Oia, Santorini", meta: "5:42 PM · Sunset", icon: MapPin },
-  { c: "from-[#f3d9b1] to-[#c08457]", place: "Ammoudi Taverna", meta: "Day 1 · Dinner", icon: Utensils },
-  { c: "from-[#dcc89a] to-[#8a6a2e]", place: "Caldera Viewpoint", meta: "Day 2 · Morning", icon: MapPin },
-  { c: "from-[#cfd9d6] to-[#384e4b]", place: "Canaves Suite", meta: "Day 2 · Stay", icon: MapPin },
-  { c: "from-[#f6c9a8] to-[#b85c3a]", place: "Sunset Catamaran", meta: "Day 2 · Cruise", icon: Video },
-  { c: "from-[#d6e0d6] to-[#5b7a6a]", place: "Megalochori", meta: "Day 3 · Tasting", icon: MapPin },
+  { c: "from-[#bcd3d0] to-[#0c4d47]", img: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=400&q=70", place: "Oia, Santorini", meta: "5:42 PM · Sunset", icon: MapPin },
+  { c: "from-[#f3d9b1] to-[#c08457]", img: "https://images.unsplash.com/photo-1504672281656-e4981d70414b?auto=format&fit=crop&w=400&q=70", place: "Ammoudi Taverna", meta: "Day 1 · Dinner", icon: Utensils },
+  { c: "from-[#dcc89a] to-[#8a6a2e]", img: "https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?auto=format&fit=crop&w=400&q=70", place: "Caldera Viewpoint", meta: "Day 2 · Morning", icon: MapPin },
+  { c: "from-[#cfd9d6] to-[#384e4b]", img: "https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?auto=format&fit=crop&w=400&q=70", place: "Canaves Suite", meta: "Day 2 · Stay", icon: MapPin },
+  { c: "from-[#f6c9a8] to-[#b85c3a]", img: "https://images.unsplash.com/photo-1530541930197-ff16ac917b0e?auto=format&fit=crop&w=400&q=70", place: "Sunset Catamaran", meta: "Day 2 · Cruise", icon: Video },
+  { c: "from-[#d6e0d6] to-[#5b7a6a]", img: "https://images.unsplash.com/photo-1571406761758-9a3eed5338ef?auto=format&fit=crop&w=400&q=70", place: "Megalochori", meta: "Day 3 · Tasting", icon: MapPin },
 ];
 
 const itinerary = [
