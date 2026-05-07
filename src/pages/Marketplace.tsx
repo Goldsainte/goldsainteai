@@ -94,7 +94,8 @@ export default function Marketplace() {
           duration_nights, highlights, creator_type,
           duration_days, max_participants, current_bookings, difficulty_level,
           rating, review_count, available_from, available_until, tags,
-          creator:profiles!packaged_trips_creator_id_fkey(id, full_name, avatar_url)
+          wishlist_count, booking_count, view_count, is_verified, created_at,
+          creator:profiles!packaged_trips_creator_id_fkey(id, full_name, avatar_url, home_base, content_style_tags, is_verified)
         `)
         .eq("status", "published");
 
