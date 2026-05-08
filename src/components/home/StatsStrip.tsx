@@ -2,7 +2,7 @@ export function StatsStrip() {
   const stats = [
     { value: "50+", label: "Countries" },
     { value: "500+", label: "Certified Travel Specialists" },
-    { value: "Minutes", label: "Trips Planned in Minutes" },
+    { value: "12 sec", label: "Average Time to Build an Itinerary" },
   ];
 
   return (
