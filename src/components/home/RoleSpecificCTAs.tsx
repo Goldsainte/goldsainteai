@@ -21,7 +21,7 @@ const pathways: Pathway[] = [
     eyebrow: "For Travelers",
     title: "Discover Extraordinary Journeys",
     description:
-      "Explore curated experiences personalized around your travel style, destinations, and preferences.",
+      "Explore handpicked experiences personalized around your travel style, destinations, and preferences.",
     cta: "Explore Experiences",
     link: "/explore",
     image: travelerImage,
@@ -31,7 +31,7 @@ const pathways: Pathway[] = [
     eyebrow: "For Travel Creators",
     title: "Turn Your Journey Into Income",
     description:
-      "Turn your travel memories, recommendations, and experiences into sellable curated journeys powered by AI.",
+      "Turn your travel memories, recommendations, and experiences into bookable journeys you can share and sell — powered by AI.",
     cta: "Start Creating",
     link: "/auth?mode=signup&role=creator",
     image: creatorImage,
@@ -51,7 +51,7 @@ const pathways: Pathway[] = [
 
 export function RoleSpecificCTAs() {
   return (
-    <section className="bg-[#FDF9F0] py-16 md:py-20">
+    <section className="bg-[#FDF9F0] py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         <div className="mx-auto max-w-3xl text-center">
           <p className="inline-flex rounded-full bg-[#0c4d47] px-3 py-1 text-[10px] md:text-xs font-medium uppercase tracking-[0.18em] text-[#D4C07A]">

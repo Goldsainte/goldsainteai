@@ -70,7 +70,7 @@ export function StoryboardsHighlight() {
   };
 
   return (
-    <section className="bg-white border-y border-[#E5DFC6]/30 py-16 md:py-20">
+    <section className="bg-white border-y border-[#E5DFC6]/30 py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-4">
         <div className="text-center mb-10 md:mb-12 max-w-3xl mx-auto">
           <span className="inline-block rounded-full border border-[#0c4d47] bg-[#0c4d47] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#bfad72] mb-4">
