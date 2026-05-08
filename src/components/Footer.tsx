@@ -16,8 +16,6 @@ export const Footer = () => {
       heading: "EXPLORE",
       links: [
         { to: "/marketplace", label: "Browse Trips" },
-        { to: "/browse-agents", label: "Travel Specialists" },
-        { to: "/creators", label: "Travel Creators" },
         { to: "/what-we-do", label: "How It Works" },
       ],
     },
@@ -25,7 +23,6 @@ export const Footer = () => {
       heading: "JOIN GOLDSAINTE",
       links: [
         { to: "/auth?mode=signup&role=traveler", label: "Sign Up as a Traveler" },
-        { to: "/auth?mode=signup&role=creator", label: "Join as a Travel Creator" },
         { to: "/apply/agent", label: "Apply as a Travel Agent" },
         { to: "/apply/brand", label: "Partner as a Brand" },
       ],
