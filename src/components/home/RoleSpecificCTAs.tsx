@@ -51,7 +51,7 @@ const pathways: Pathway[] = [
 
 export function RoleSpecificCTAs() {
   return (
-    <section className="bg-[#FDF9F0] py-20 md:py-28">
+    <section className="bg-[#FDF9F0] py-16 md:py-20">
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         <div className="mx-auto max-w-3xl text-center">
           <p className="inline-flex rounded-full bg-[#0c4d47] px-3 py-1 text-[10px] md:text-xs font-medium uppercase tracking-[0.18em] text-[#D4C07A]">
