@@ -78,10 +78,10 @@ export function StoryboardsHighlight() {
           </span>
           <div className="mx-auto w-14 h-px bg-[#C7A962] mb-5" />
           <h2 className="font-secondary text-2xl md:text-4xl text-[#0a2225] mb-3">
-            Curated Journeys by Creators &amp; Certified Agents
+            Handpicked Journeys by Travel Specialists &amp; Certified Agents
           </h2>
           <p className="text-sm md:text-base text-[#4a4a4a] max-w-2xl mx-auto mb-10 leading-relaxed">
-            Book instantly or personalize effortlessly — explore expertly designed trips you can book on the spot, or customize with a creator or certified travel expert to make them your own.
+            Browse expertly designed trips and book instantly — or work with a certified specialist to make it entirely your own.
           </p>
         </div>
 
@@ -154,7 +154,7 @@ export function StoryboardsHighlight() {
                   <div className="flex items-center gap-1.5 pt-1">
                     <Sparkles className="h-3.5 w-3.5 text-[#C7A962]" />
                     <span className="text-[10px] md:text-[11px] font-medium text-[#7A7151]">
-                      Goldsainte Curated
+                      Goldsainte Select
                     </span>
                   </div>
                 ) : trip.profiles?.full_name ? (

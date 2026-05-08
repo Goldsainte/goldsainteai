@@ -269,7 +269,7 @@ export function TripBookingSidebar({
         </p>
         <div className="mt-3 space-y-2">
           {[
-            { icon: Shield, text: isPlatformTrip ? "Goldsainte Curated" : "Verified host" },
+            { icon: Shield, text: isPlatformTrip ? "Goldsainte Select" : "Verified host" },
             { icon: CreditCard, text: "Secure payments" },
             { icon: MessageCircle, text: "24/7 support" },
           ].map((item, idx) => (
