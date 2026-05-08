@@ -47,6 +47,7 @@ export interface SearchFilters {
   category?: string;
   minPrice?: number;
   maxPrice?: number;
+  sortBy?: "newest" | "top-rated" | "price-low" | "price-high";
 }
 
 export default function Marketplace() {
@@ -92,7 +93,7 @@ export default function Marketplace() {
 
   // Live Trips query — wired with search filters
   const { data: liveTrips, isLoading: isLoadingTrips } = useQuery({
-    queryKey: ["marketplace-live-trips", filters.category, filters.destination, filters.startDate, filters.endDate, filters.travelers],
+    queryKey: ["marketplace-live-trips", filters.category, filters.destination, filters.startDate, filters.endDate, filters.travelers, filters.sortBy],
     queryFn: async () => {
       let query = supabase
         .from("packaged_trips")
@@ -131,8 +132,12 @@ export default function Marketplace() {
       }
 
       // Sort
-      if (filters.category === "Top Rated") {
+      if (filters.sortBy === "top-rated" || filters.category === "Top Rated") {
         query = query.order("rating", { ascending: false, nullsFirst: false });
+      } else if (filters.sortBy === "price-low") {
+        query = query.order("price_per_person", { ascending: true, nullsFirst: false });
+      } else if (filters.sortBy === "price-high") {
+        query = query.order("price_per_person", { ascending: false, nullsFirst: false });
       } else {
         query = query.order("created_at", { ascending: false });
       }
@@ -283,7 +288,7 @@ export default function Marketplace() {
         <title>Travel Marketplace — Goldsainte</title>
         <meta
           name="description"
-          content="Browse handpicked trips from certified travel specialists and creators across 50+ countries. Book instantly or post your dream trip and receive custom proposals."
+          content="Browse handpicked trips from certified travel specialists and travel creators across 50+ countries. Book instantly or post your dream trip and receive custom proposals."
         />
       </Helmet>
 

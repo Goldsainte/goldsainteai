@@ -37,6 +37,14 @@ export function MarketplaceFilters({ filters, onFilterChange }: MarketplaceFilte
     filters.maxPrice ?? 10000,
   ]);
 
+  const sortOptions: { value: NonNullable<SearchFilters["sortBy"]>; label: string }[] = [
+    { value: "newest", label: "Newest" },
+    { value: "top-rated", label: "Top Rated" },
+    { value: "price-low", label: "Price: Low" },
+    { value: "price-high", label: "Price: High" },
+  ];
+  const activeSort = filters.sortBy ?? "newest";
+
   const handleQuickFilter = (filter: string) => {
     const newFilter = selectedFilter === filter ? null : filter;
     setSelectedFilter(newFilter);
@@ -102,6 +110,31 @@ export function MarketplaceFilters({ filters, onFilterChange }: MarketplaceFilte
               )}
 
               <div className="pt-4 space-y-3">
+                <div>
+                  <p className="mb-2 text-xs font-medium uppercase tracking-wider text-[#8D8D8D]">
+                    Sort by
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {sortOptions.map((opt) => {
+                      const isActive = activeSort === opt.value;
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => onFilterChange({ ...filters, sortBy: opt.value })}
+                          className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                            isActive
+                              ? "bg-[#0c4d47] text-white"
+                              : "border border-[#E5DFC6] bg-white text-[#4a4a4a] hover:bg-[#FBF9F0]"
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-medium uppercase tracking-wider text-[#8D8D8D]">
                     Price range
