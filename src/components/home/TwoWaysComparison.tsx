@@ -5,17 +5,17 @@ const marketplaceFeatures = [
   "Browse premium travel experiences from around the world",
   "Book complete itineraries instantly",
   "Compare personalized travel proposals side-by-side",
-  "Collaborate directly with creators and travel experts",
+  "Collaborate directly with certified specialists and travel experts",
   "Transparent pricing and seamless booking",
-  "AI-powered recommendations tailored to your travel style",
+  "Smart recommendations tailored to your travel style and preferences",
 ];
 
 const storyboardingFeatures = [
   "Save travel inspiration visually in one place",
   "Upload content and generate itineraries with AI",
   "Customize destinations, pacing, and experiences",
-  "Submit dream trips for creator and agent proposals",
-  "Collaborate and refine every detail before booking",
+  "Request custom proposals from specialists and travel experts",
+  "Refine every detail with your specialist before you book",
   "Designed specifically for travel—not generic planning boards",
 ];
 
@@ -103,7 +103,7 @@ export function TwoWaysComparison() {
           Why Goldsainte Feels Different
         </h2>
         <p className="text-sm md:text-base text-[#4a4a4a] max-w-2xl mx-auto mb-10 leading-relaxed">
-          Discover, book, or create curated travel experiences with creators and certified travel experts—all in one AI-powered marketplace.
+          Two ways to experience Goldsainte — browse and book trips crafted by specialists, or build and personalize your own journey from scratch.
         </p>
 
         {/* Cards with "or" divider */}
@@ -120,7 +120,7 @@ export function TwoWaysComparison() {
           <FeatureCard
             number="01"
             title="Discover & Book"
-            subtitle="Explore curated trips designed by creators and certified travel experts."
+            subtitle="Browse trips planned by certified travel specialists and explorers from around the world."
             features={marketplaceFeatures}
             linkTo="/marketplace"
             linkLabel="Explore Curated Trips"
