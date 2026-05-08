@@ -199,15 +199,15 @@ export const CreatorAIMagic: React.FC = () => {
             // Two rows of 3 — Day 01 (top row, 1 tile centered-left), Day 02 (middle, 4 tiles), Day 03 (bottom, 1 tile)
             // Use 3 visual rows to read as chronology.
             const positions = [
-              // Day 01 — Oia + Ammoudi
-              { t: "28%", l: "8%", r: "-3deg", label: "above" as const },
-              { t: "28%", l: "58%", r: "2deg", label: "above" as const },
-              // Day 02 — Caldera + Canaves + Catamaran
-              { t: "50%", l: "4%", r: "1deg", label: "below" as const },
-              { t: "50%", l: "36%", r: "-2deg", label: "below" as const },
-              { t: "50%", l: "66%", r: "3deg", label: "below" as const },
-              // Day 03 — Megalochori
-              { t: "70%", l: "36%", r: "-1deg", label: "below" as const },
+              // Day 01 — Oia + Ammoudi (top row, labels above)
+              { t: "22%", l: "14%", r: "0deg", label: "above" as const },
+              { t: "22%", l: "62%", r: "0deg", label: "above" as const },
+              // Day 02 — Caldera + Canaves + Catamaran (middle row, labels below)
+              { t: "46%", l: "4%", r: "0deg", label: "below" as const },
+              { t: "46%", l: "38%", r: "0deg", label: "below" as const },
+              { t: "46%", l: "72%", r: "0deg", label: "below" as const },
+              // Day 03 — Megalochori (bottom centered, label above to avoid tag strip)
+              { t: "72%", l: "38%", r: "0deg", label: "above" as const },
             ][i];
             return (
               <div
