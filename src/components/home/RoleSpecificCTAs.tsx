@@ -21,7 +21,7 @@ const pathways: Pathway[] = [
     eyebrow: "For Travelers",
     title: "Discover Extraordinary Journeys",
     description:
-      "Explore curated experiences personalized around your travel style, destinations, and preferences.",
+      "Explore handpicked experiences personalized around your travel style, destinations, and preferences.",
     cta: "Explore Experiences",
     link: "/explore",
     image: travelerImage,
@@ -31,7 +31,7 @@ const pathways: Pathway[] = [
     eyebrow: "For Travel Creators",
     title: "Turn Your Journey Into Income",
     description:
-      "Turn your travel memories, recommendations, and experiences into sellable curated journeys powered by AI.",
+      "Turn your travel memories, recommendations, and experiences into bookable journeys you can share and sell — powered by AI.",
     cta: "Start Creating",
     link: "/auth?mode=signup&role=creator",
     image: creatorImage,
