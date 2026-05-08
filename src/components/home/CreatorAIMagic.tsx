@@ -245,7 +245,7 @@ export const CreatorAIMagic: React.FC = () => {
                 {/* Floating metadata label */}
                 <div
                   className={cn(
-                    "absolute left-1/2 -translate-x-1/2 max-w-[96px] sm:max-w-[120px] rounded-md bg-white/95 backdrop-blur border border-[#E5DFC6] px-1 py-0.5 sm:px-1.5 sm:py-1 shadow-[0_6px_16px_rgba(10,34,37,0.12)] opacity-0 animate-[gs-rise_500ms_ease-out_forwards] whitespace-nowrap",
+                    "absolute left-1/2 -translate-x-1/2 w-[88px] sm:w-[100px] rounded-md bg-white/95 backdrop-blur border border-[#E5DFC6] px-1 py-0.5 sm:px-1.5 sm:py-1 shadow-[0_6px_16px_rgba(10,34,37,0.12)] opacity-0 animate-[gs-rise_500ms_ease-out_forwards] text-center",
                     positions.label === "above" ? "-top-[36px] sm:-top-[42px]" : "-bottom-[36px] sm:-bottom-[42px]"
                   )}
                   style={{ animationDelay: `${600 + i * 110}ms` }}
