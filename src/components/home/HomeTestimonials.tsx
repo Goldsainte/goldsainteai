@@ -104,7 +104,7 @@ export function HomeTestimonials() {
         {/* Aggregate rating block */}
         <div className="flex flex-col items-center gap-3 mb-12">
           <div className="flex items-center gap-3">
-            <span className="font-secondary text-5xl font-bold text-[#0c4d47]">4.9</span>
+            <span className="font-secondary text-5xl md:text-6xl text-[#0c4d47]">4.9</span>
             <div className="flex gap-1">
               {Array.from({ length: 5 }).map((_, i) => (
                 <Star key={i} className="w-5 h-5 fill-[#C7A962] text-[#C7A962]" />
@@ -114,8 +114,8 @@ export function HomeTestimonials() {
           <p className="text-xs text-[#0a2225]/60">
             Based on 243 verified traveler reviews
           </p>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#0c4d47] text-white px-3 py-1 text-[11px] font-medium">
-            <BadgeCheck className="w-3.5 h-3.5" />
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#0c4d47] px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-[#C7A962]">
+            <BadgeCheck className="w-3 h-3" />
             Goldsainte Verified Reviews
           </span>
         </div>
@@ -124,7 +124,7 @@ export function HomeTestimonials() {
           {visible.map((t) => (
             <figure
               key={t.name}
-              className="flex flex-col rounded-2xl bg-white border border-[#E5DFC6] p-5 shadow-sm hover:shadow-md transition-shadow"
+              className="flex flex-col rounded-2xl bg-white border border-[#E5DFC6] p-6 shadow-sm hover:shadow-md transition-shadow"
             >
               {/* Top row */}
               <div className="flex items-center gap-3">
@@ -135,13 +135,13 @@ export function HomeTestimonials() {
                   {t.initials}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-secondary text-sm text-[#0a2225] font-semibold truncate">{t.name}</p>
+                  <p className="font-secondary font-semibold text-sm text-[#0a2225] truncate">{t.name}</p>
                   <p className="text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/60">
                     {t.country}
                   </p>
                 </div>
-                <span className="inline-flex items-center gap-1 rounded-full bg-[#0c4d47]/10 text-[#0c4d47] px-2 py-0.5 text-[10px] font-medium">
-                  <ShieldCheck className="w-3 h-3" />
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#0c4d47] px-2 py-0.5 text-[10px] uppercase tracking-[0.14em] text-[#C7A962]">
+                  <ShieldCheck className="w-2.5 h-2.5" />
                   Verified
                 </span>
               </div>
@@ -162,19 +162,19 @@ export function HomeTestimonials() {
 
               {/* Trip tag */}
               <div className="mt-2.5">
-                <span className="inline-flex items-center gap-1 rounded-full bg-[#f0ead8] border border-[#E5DFC6] text-[10px] text-[#0a2225] px-2 py-0.5">
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#f7f3ea] border border-[#E5DFC6] font-secondary italic text-[10px] text-[#0a2225] px-2 py-0.5">
                   <MapPin className="w-2.5 h-2.5" />
                   {t.trip}
                 </span>
               </div>
 
               {/* Quote */}
-              <blockquote className="mt-3 text-sm leading-relaxed text-[#0a2225] flex-1">
+              <blockquote className="mt-3 font-secondary italic text-sm leading-relaxed text-[#0a2225] flex-1">
                 {t.quote}
               </blockquote>
 
               {/* Date */}
-              <div className="mt-3 text-right text-[11px] text-[#0a2225]/50">
+              <div className="mt-3 text-right font-secondary italic text-[11px] text-[#0a2225]/45">
                 {t.date}
               </div>
             </figure>
