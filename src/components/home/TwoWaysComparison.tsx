@@ -103,7 +103,7 @@ export function TwoWaysComparison() {
           Two Ways to Experience Goldsainte
         </h2>
         <p className="text-sm md:text-base text-[#4a4a4a] max-w-2xl mx-auto mb-10 leading-relaxed">
-          Two ways to experience Goldsainte — browse and book trips crafted by specialists, or build and personalize your own journey from scratch.
+          Browse trips built by certified specialists and book instantly — or upload your inspiration and let our technology build your perfect itinerary from scratch.
         </p>
 
         {/* Cards with "or" divider */}
