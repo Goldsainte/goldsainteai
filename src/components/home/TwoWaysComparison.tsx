@@ -100,7 +100,7 @@ export function TwoWaysComparison() {
         </span>
         <div className="mx-auto w-14 h-px bg-[#C7A962] mb-5" />
         <h2 className="font-secondary text-2xl md:text-4xl text-[#0a2225] mb-3">
-          Why Goldsainte Feels Different
+          Two Ways to Experience Goldsainte
         </h2>
         <p className="text-sm md:text-base text-[#4a4a4a] max-w-2xl mx-auto mb-10 leading-relaxed">
           Two ways to experience Goldsainte — browse and book trips crafted by specialists, or build and personalize your own journey from scratch.
