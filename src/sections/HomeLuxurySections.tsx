@@ -232,12 +232,12 @@ const tabsData: TabData[] = [
     intro: {
       title: "Discover trips you'll fall in love with.",
       description:
-        "Browse curated itineraries from trusted creators and certified experts, personalized in real time to your taste — and booked entirely on-platform.",
+        "Browse itineraries from trusted travel specialists and explorers, personalized in real time to your taste — and booked entirely on-platform.",
     },
     features: [
       {
         icon: Heart,
-        title: "Curated Experiences",
+        title: "Handpicked Experiences",
         description:
           "Discover trips designed by creators and certified travel experts—not generic travel templates.",
       },
@@ -263,13 +263,13 @@ const tabsData: TabData[] = [
   },
   {
     id: "creators",
-    label: "For Creators",
+    label: "For Travel Creators",
     icon: Camera,
     captionLabel: "Create & Monetize",
     intro: {
       title: "Upload your camera roll. Watch Goldsainte rebuild your journey.",
       description:
-        "AI identifies destinations, restaurants, timestamps and experiences — then assembles them into a bookable itinerary you can publish and monetize in minutes.",
+        "AI identifies destinations, restaurants, travel dates, and experiences — then assembles them into a bookable itinerary you can publish and monetize in minutes.",
     },
     features: [
       {
@@ -323,9 +323,9 @@ const tabsData: TabData[] = [
       },
       {
         icon: Handshake,
-        title: "Bid Marketplace Access",
+        title: "Custom Trip Requests",
         description:
-          "Respond to custom traveler requests and compete to build dream itineraries.",
+          "Receive custom traveler requests and craft tailored proposals to win their business.",
       },
       {
         icon: Brain,
@@ -363,7 +363,7 @@ export const HowGoldsainteWorksSection: React.FC = () => {
             How Goldsainte Works
           </h2>
           <p className="text-sm md:text-base text-[#4a4a4a] max-w-2xl mx-auto leading-relaxed">
-            A curated travel marketplace where travelers discover experiences, creators monetize itineraries, and certified travel agents sell or customize travel packages.
+            A curated travel marketplace where travelers discover experiences, travel storytellers share and earn from their journeys, and certified travel agents sell or customize travel packages.
           </p>
         </div>
 
