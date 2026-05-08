@@ -11,11 +11,11 @@ export function CameraRollHighlight() {
             <span className="inline-block rounded-full border border-[#C7A962] bg-transparent px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-[#0c4d47] mb-5">
               Camera Roll → Itinerary
             </span>
-            <h2 className="font-display text-3xl md:text-5xl leading-tight text-[#0a2225]">
+            <h2 className="font-secondary text-2xl md:text-4xl leading-tight text-[#0a2225]">
               <em>From Inspiration to Itinerary in Minutes.</em>
             </h2>
             <div className="mt-5 w-12 h-px bg-[#C7A962]" />
-            <p className="mt-6 text-base md:text-lg leading-relaxed text-[#4a4a4a] max-w-xl">
+            <p className="mt-6 text-sm md:text-base leading-relaxed text-[#4a4a4a] max-w-xl">
               Upload photos of places that inspire you, and Goldsainte builds a complete, bookable trip around them — instantly. Share it, sell it, or make it your own.
             </p>
             <div className="mt-8">
