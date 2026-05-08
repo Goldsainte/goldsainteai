@@ -76,7 +76,7 @@
       "mainDescription": "Browse trips planned by certified travel specialists and explorers in over 50 countries.",
       "mainDescriptionSub": "Or let our technology build your perfect itinerary in minutes.",
       "subHeading": "Turn your trips into income—or book your next one in minutes.",
-      "postDreamTrip": "Explore Travel Marketplace",
+      "postDreamTrip": "Start Exploring",
       "seeHowItWorks": "See How It Works",
       "browseCreators": "Browse creators",
       "browseAgents": "Browse agents",
@@ -173,11 +173,11 @@
       }
     },
     "storyboards": {
-      "title": "Curated Journeys, Ready to Book or Personalize",
+      "title": "Handpicked Journeys, Ready to Book or Personalize",
       "description": "Explore expertly designed trips you can book instantly — or customize with a certified specialist to make them your own.",
       "startWithMadison": "Start a storyboard with Madison",
       "exploreStoryboards": "Explore the Creator & Travel Agent Marketplace Collection",
-      "exploreAll": "Explore All Curated Journeys",
+      "exploreAll": "Explore All Journeys",
       "creatorAgentCollab": "Creator + Agent collab",
       "agentCurated": "Agent-curated journey"
     },
