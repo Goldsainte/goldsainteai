@@ -1,14 +1,9 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { MapPin, Search, ChevronDown, Users, Minus, Plus, X, Calendar as CalendarIcon } from "lucide-react";
+import { MapPin, Search, Users, Minus, Plus, X, Calendar as CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import { MobileDatePicker } from "@/components/MobileDatePicker";
 import { useDestinationSuggestions } from "@/hooks/useDestinationSuggestions";
 import type { SearchFilters } from "@/pages/Marketplace";
@@ -31,7 +26,6 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters }: Marketp
     return undefined;
   });
   const [travelers, setTravelers] = useState(filters.travelers || 1);
-  const [isOpen, setIsOpen] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -90,7 +84,6 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters }: Marketp
       endDate: dateRange?.to ? format(dateRange.to, "yyyy-MM-dd") : undefined,
       travelers,
     });
-    setIsOpen(false);
   };
 
   const handleDateRangeChange = (range: DateRange | undefined) => {
@@ -265,24 +258,9 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters }: Marketp
           </div>
         </div>
 
-        {/* Mobile: Collapsible search pill */}
+        {/* Mobile: always-open stacked search */}
         <div className="md:hidden">
-          <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-            <CollapsibleTrigger asChild>
-              <button className="w-full flex items-center justify-between gap-3 rounded-full border border-[#E5DFC6] bg-white px-4 py-3 shadow-sm transition hover:border-[#BFAD72] active:scale-[0.99]">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#BFAD72]">
-                    <Search className="h-5 w-5 text-white" />
-                  </div>
-                  <span className="text-sm font-medium text-[#0a2225] truncate">
-                    {getSummaryText()}
-                  </span>
-                </div>
-                <ChevronDown className={`h-5 w-5 text-[#8D8D8D] transition-transform ${isOpen ? "rotate-180" : ""}`} />
-              </button>
-            </CollapsibleTrigger>
-
-            <CollapsibleContent className="mt-3 rounded-2xl border border-[#E5DFC6] bg-white p-4 shadow-sm space-y-4">
+          <div className="rounded-2xl border border-[#E5DFC6] bg-white p-4 shadow-sm space-y-4">
               {/* Where */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-semibold uppercase tracking-wider text-[#8D8D8D]">
@@ -359,8 +337,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters }: Marketp
                 <Search className="mr-2 h-4 w-4" />
                 Search
               </Button>
-            </CollapsibleContent>
-          </Collapsible>
+          </div>
         </div>
 
         {/* Active filter chips */}

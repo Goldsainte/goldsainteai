@@ -15,8 +15,8 @@ export function MarketplaceTabs({ activeTab, onTabChange }: MarketplaceTabsProps
   const tabs = [
     { 
       id: "trips", 
-      label: "Curated Trips", 
-      shortLabel: "Curated", 
+      label: "Handpicked Trips", 
+      shortLabel: "Handpicked", 
       icon: Plane,
       description: "Pre-packaged trips from verified creators & agents, ready to book instantly"
     },

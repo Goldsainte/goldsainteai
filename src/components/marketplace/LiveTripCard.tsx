@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { MapPin, Calendar } from "lucide-react";
+import { useState } from "react";
+import { MapPin, Calendar, Heart, Star } from "lucide-react";
 import { CreatorAttribution } from "./CreatorAttribution";
 
 interface LiveTripCardProps {
@@ -21,6 +22,10 @@ interface LiveTripCardProps {
     view_count?: number | null;
     is_verified?: boolean | null;
     created_at?: string | null;
+    rating?: number | null;
+    review_count?: number | null;
+    max_participants?: number | null;
+    current_bookings?: number | null;
     creator?: {
       id: string;
       full_name: string | null;
@@ -34,6 +39,12 @@ interface LiveTripCardProps {
 
 export function LiveTripCard({ trip }: LiveTripCardProps) {
   const navigate = useNavigate();
+  const [isSaved, setIsSaved] = useState(false);
+
+  const handleSave = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsSaved((v) => !v);
+  };
 
   const formatPrice = (price: number, currency: string) => {
     return new Intl.NumberFormat("en-US", {
@@ -98,12 +109,31 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
             {styleTag}
           </span>
         )}
+        <button
+          type="button"
+          onClick={handleSave}
+          aria-label={isSaved ? "Remove from saved" : "Save trip"}
+          className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/85 backdrop-blur shadow-sm ring-1 ring-black/5 transition hover:bg-white"
+        >
+          <Heart
+            className={`h-4 w-4 transition ${isSaved ? "text-[#C7A962] fill-[#C7A962]" : "text-[#0a2225]"}`}
+          />
+        </button>
       </div>
 
       {/* Content below image */}
       <div className="space-y-1 px-0.5">
         {trip.creator && (
           <CreatorAttribution creator={trip.creator} className="mb-1" />
+        )}
+        {typeof trip.rating === "number" && trip.rating > 0 && (
+          <p className="flex items-center gap-1 text-[12px] text-[#0a2225]">
+            <Star className="h-3 w-3 fill-[#C7A962] text-[#C7A962]" />
+            <span className="font-medium">{trip.rating.toFixed(1)}</span>
+            {typeof trip.review_count === "number" && trip.review_count > 0 && (
+              <span className="text-[#6B7280]">({trip.review_count})</span>
+            )}
+          </p>
         )}
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-secondary text-sm md:text-[15px] text-[#0a2225] font-medium leading-snug line-clamp-1">
@@ -123,6 +153,16 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
           <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
           <span>{getDuration()} nights</span>
         </p>
+
+        {typeof trip.max_participants === "number" &&
+          typeof trip.current_bookings === "number" &&
+          trip.max_participants - trip.current_bookings > 0 &&
+          trip.max_participants - trip.current_bookings <= 3 && (
+            <span className="inline-block rounded-full bg-[#b85c3a]/10 px-2 py-0.5 text-[11px] font-medium text-[#b85c3a]">
+              Only {trip.max_participants - trip.current_bookings} spot
+              {trip.max_participants - trip.current_bookings === 1 ? "" : "s"} left
+            </span>
+          )}
 
         {(saveCount > 0 || bookingCount > 0) && (
           <p className="pt-0.5 text-[11px] text-[#7A7151]/80">

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
+import * as SliderPrimitive from "@radix-ui/react-slider";
 import {
   Accordion,
   AccordionContent,
@@ -31,6 +32,10 @@ const quickFilters = [
 
 export function MarketplaceFilters({ filters, onFilterChange }: MarketplaceFiltersProps) {
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
+  const [priceRange, setPriceRange] = useState<[number, number]>([
+    filters.minPrice ?? 0,
+    filters.maxPrice ?? 10000,
+  ]);
 
   const handleQuickFilter = (filter: string) => {
     const newFilter = selectedFilter === filter ? null : filter;
@@ -41,7 +46,8 @@ export function MarketplaceFilters({ filters, onFilterChange }: MarketplaceFilte
     });
   };
 
-  const activeCount = selectedFilter ? 1 : 0;
+  const priceActive = (filters.minPrice ?? 0) > 0 || (filters.maxPrice ?? 10000) < 10000;
+  const activeCount = (selectedFilter ? 1 : 0) + (priceActive ? 1 : 0);
 
   return (
     <div className="w-full">
@@ -94,6 +100,46 @@ export function MarketplaceFilters({ filters, onFilterChange }: MarketplaceFilte
                   Clear filters
                 </button>
               )}
+
+              <div className="pt-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-medium uppercase tracking-wider text-[#8D8D8D]">
+                    Price range
+                  </p>
+                  <span className="text-xs text-[#0a2225] tabular-nums">
+                    ${priceRange[0].toLocaleString()} – ${priceRange[1].toLocaleString()}
+                    {priceRange[1] >= 10000 ? "+" : ""}
+                  </span>
+                </div>
+                <SliderPrimitive.Root
+                  min={0}
+                  max={10000}
+                  step={100}
+                  value={priceRange}
+                  onValueChange={(v) => setPriceRange([v[0], v[1]] as [number, number])}
+                  onValueCommit={(v) =>
+                    onFilterChange({ ...filters, minPrice: v[0], maxPrice: v[1] })
+                  }
+                  className="relative flex w-full touch-none select-none items-center"
+                >
+                  <SliderPrimitive.Track className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-[#E5DFC6]">
+                    <SliderPrimitive.Range className="absolute h-full bg-[#BFAD72]" />
+                  </SliderPrimitive.Track>
+                  <SliderPrimitive.Thumb className="block h-4 w-4 rounded-full border-2 border-[#BFAD72] bg-white shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#BFAD72]" />
+                  <SliderPrimitive.Thumb className="block h-4 w-4 rounded-full border-2 border-[#BFAD72] bg-white shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#BFAD72]" />
+                </SliderPrimitive.Root>
+                {priceActive && (
+                  <button
+                    onClick={() => {
+                      setPriceRange([0, 10000]);
+                      onFilterChange({ ...filters, minPrice: undefined, maxPrice: undefined });
+                    }}
+                    className="text-xs font-medium text-[#BFAD72] hover:underline"
+                  >
+                    Reset price
+                  </button>
+                )}
+              </div>
             </div>
           </AccordionContent>
         </AccordionItem>

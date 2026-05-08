@@ -45,6 +45,8 @@ export interface SearchFilters {
   endDate?: string;
   travelers?: number;
   category?: string;
+  minPrice?: number;
+  maxPrice?: number;
 }
 
 export default function Marketplace() {
@@ -142,6 +144,17 @@ export default function Marketplace() {
     enabled: activeTab === "trips",
   });
 
+  // Client-side price filter on liveTrips
+  const filteredLiveTrips = useMemo(() => {
+    if (!liveTrips) return liveTrips;
+    const min = filters.minPrice ?? 0;
+    const max = filters.maxPrice ?? 10000;
+    return (liveTrips as any[]).filter((t) => {
+      const p = t.price_per_person ?? 0;
+      return p >= min && p <= max;
+    });
+  }, [liveTrips, filters.minPrice, filters.maxPrice]);
+
   // Trip Requests query — wired with search filters
   const { data: tripRequests, isLoading: isLoadingRequests } = useQuery({
     queryKey: ["trip-requests-unified", filters.destination, filters.startDate, filters.endDate, filters.travelers],
@@ -225,7 +238,7 @@ export default function Marketplace() {
           </div>
         );
       }
-      if (!liveTrips?.length) {
+      if (!filteredLiveTrips?.length) {
         return (
           <EmptyState
             type="trips"
@@ -235,7 +248,7 @@ export default function Marketplace() {
           />
         );
       }
-      return <LiveTripGrid trips={liveTrips as any} />;
+      return <LiveTripGrid trips={filteredLiveTrips as any} />;
     }
 
     if (activeTab === "trip-requests") {
@@ -267,10 +280,10 @@ export default function Marketplace() {
   return (
     <>
       <Helmet>
-        <title>The Collection · Goldsainte</title>
+        <title>Travel Marketplace — Goldsainte</title>
         <meta
           name="description"
-          content="Browse curated trips, verified creators, certified agents, and traveler briefs. Book luxury experiences or post your dream trip."
+          content="Browse handpicked trips from certified travel specialists and creators across 50+ countries. Book instantly or post your dream trip and receive custom proposals."
         />
       </Helmet>
 
