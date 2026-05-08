@@ -131,142 +131,77 @@ export const CreatorAIMagic: React.FC = () => {
 
       {/* Scene 2 — AI Understanding */}
       <Scene visible={step === 1}>
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 flex flex-col px-4 pt-10 pb-6">
           {/* Ambient AI glow */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 rounded-full bg-[radial-gradient(circle,rgba(199,169,98,0.25)_0%,rgba(199,169,98,0)_70%)] animate-[gs-glow_3.6s_ease-in-out_infinite]" />
+          <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 rounded-full bg-[radial-gradient(circle,rgba(199,169,98,0.25)_0%,rgba(199,169,98,0)_70%)] animate-[gs-glow_3.6s_ease-in-out_infinite]" />
 
-          {/* Soft AI label at top */}
-          <div
-            className="absolute top-9 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-white/90 backdrop-blur border border-[#C7A962]/50 px-2.5 py-0.5 text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-[#0a2225] shadow-sm opacity-0 animate-[gs-fade-in_500ms_ease-out_forwards]"
-          >
-            <Sparkles className="w-2.5 h-2.5 text-[#C7A962] animate-pulse" />
-            Reconstructing your journey
+          {/* Reconstructing badge */}
+          <div className="relative flex justify-center">
+            <div className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-white/90 backdrop-blur border border-[#C7A962]/50 px-2.5 py-0.5 text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-[#0a2225] shadow-sm opacity-0 animate-[gs-fade-in_500ms_ease-out_forwards]">
+              <Sparkles className="w-2.5 h-2.5 text-[#C7A962] animate-pulse" />
+              Reconstructing your journey
+            </div>
           </div>
 
-          {/* Day chronology chips that fade in mid-sequence */}
-          <div className="absolute top-[100px] sm:top-[72px] left-0 right-0 flex items-center justify-center gap-2">
-            {["01", "02", "03"].map((d, i) => (
-              <span
-                key={d}
-                className="inline-flex items-center gap-1 rounded-full border border-[#C7A962]/50 bg-white/85 px-2 py-0.5 text-[10px] font-secondary italic text-[#0a2225] opacity-0 animate-[gs-rise_500ms_ease-out_forwards]"
-                style={{ animationDelay: `${1500 + i * 180}ms` }}
-              >
-                <span className="text-[#C7A962]">Day {d}</span>
-              </span>
-            ))}
-          </div>
-
-          {/* Geographic route line connecting tiles in chronological order */}
-          <svg
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            viewBox="0 0 400 460"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            <path
-              d="M 100 165 Q 196 142 292 165 Q 176 218 60 272 Q 128 272 196 272 Q 264 272 332 272 Q 264 335 196 392"
-              fill="none"
-              stroke="#C7A962"
-              strokeWidth="1.1"
-              strokeDasharray="3 5"
-              style={{
-                strokeDashoffset: 800,
-                animation: "gs-draw 2.2s ease-out forwards",
-                animationDelay: "1.0s",
-                opacity: 0.7,
-              }}
-            />
-            {/* Traveling gold dot */}
-            <circle r="2.5" fill="#C7A962" style={{ opacity: 0 }}>
-              <animate
-                attributeName="opacity"
-                values="0;1;1;0"
-                dur="2.2s"
-                begin="1.0s"
-                fill="freeze"
-              />
-              <animateMotion
-                dur="2.2s"
-                begin="1.0s"
-                fill="freeze"
-                path="M 100 165 Q 196 142 292 165 Q 176 218 60 272 Q 128 272 196 272 Q 264 272 332 272 Q 264 335 196 392"
-              />
-            </circle>
-          </svg>
-
-          {/* 6 memory tiles with floating metadata labels — grouped Day 01 / 02 / 03 */}
-          {memories.map((m, i) => {
-            const Icon = m.icon;
-            // Two rows of 3 — Day 01 (top row, 1 tile centered-left), Day 02 (middle, 4 tiles), Day 03 (bottom, 1 tile)
-            // Use 3 visual rows to read as chronology.
-            const positions = [
-              // Day 01 — Oia + Ammoudi (top row, labels above)
-              { t: "36%", l: "14%", r: "0deg", label: "above" as const, anchor: "center" as const },
-              { t: "36%", l: "62%", r: "0deg", label: "above" as const, anchor: "center" as const },
-              // Day 02 — Caldera + Canaves + Catamaran (middle row, labels below)
-              { t: "56%", l: "4%", r: "0deg", label: "below" as const, anchor: "center" as const },
-              { t: "56%", l: "38%", r: "0deg", label: "below" as const, anchor: "center" as const },
-              { t: "56%", l: "72%", r: "0deg", label: "below" as const, anchor: "right" as const },
-              // Day 03 — Megalochori (bottom centered, label above to avoid tag strip)
-              { t: "76%", l: "38%", r: "0deg", label: "above" as const, anchor: "center" as const },
-            ][i];
-            return (
-              <div
-                key={i}
-                className="absolute opacity-0 animate-[gs-card-in_700ms_ease-out_forwards]"
-                style={{
-                  top: positions.t,
-                  left: positions.l,
-                  ["--rot" as any]: positions.r,
-                  animationDelay: `${i * 110}ms`,
-                }}
-              >
-                {/* AI pulse ring behind tile */}
-                <span
-                  className="absolute -inset-1 rounded-xl border border-[#C7A962]/40 opacity-0 animate-[gs-tile-pulse_900ms_ease-out_forwards]"
-                  style={{ animationDelay: `${500 + i * 110}ms` }}
-                />
-                <div
-                  className={cn(
-                    "relative w-[64px] h-[48px] sm:w-[72px] sm:h-[54px] md:w-[88px] md:h-[64px] rounded-lg bg-gradient-to-br shadow-[0_10px_24px_rgba(10,34,37,0.18)] border border-white/60 overflow-hidden",
-                    m.c
-                  )}
-                >
-                  <img
-                    src={m.img}
-                    alt={m.place}
-                    loading="lazy"
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                  {i % 4 === 0 && (
-                    <Video className="absolute bottom-1 right-1 w-2.5 h-2.5 text-white/95 drop-shadow" />
-                  )}
-                </div>
-
-                {/* Floating metadata label */}
-                <div
-                  className={cn(
-                    "absolute w-[68px] sm:w-[100px] rounded-md bg-white/95 backdrop-blur border border-[#E5DFC6] px-1 py-0.5 shadow-[0_6px_16px_rgba(10,34,37,0.12)] opacity-0 animate-[gs-rise_500ms_ease-out_forwards] text-center overflow-hidden",
-                    positions.anchor === "right" ? "right-0 translate-x-0" : "left-1/2 -translate-x-1/2",
-                    positions.label === "above" ? "-top-[32px] sm:-top-[42px]" : "-bottom-[32px] sm:-bottom-[42px]"
-                  )}
-                  style={{ animationDelay: `${600 + i * 110}ms` }}
-                >
-                  <div className="flex items-center gap-1">
-                    <Icon className="w-2 h-2 text-[#C7A962] shrink-0" />
-                    <span className="font-secondary italic text-[8px] sm:text-[10px] text-[#0a2225] leading-tight truncate">
-                      {m.place}
-                    </span>
-                  </div>
-                  <div className="text-[8px] sm:text-[10px] uppercase tracking-[0.12em] text-[#6B7280] mt-0.5 truncate">
-                    {m.meta}
-                  </div>
-                </div>
+          {/* Two-column structured layout */}
+          <div className="relative flex-1 flex items-center gap-2 mt-4">
+            {/* LEFT: Camera Roll grid (45%) */}
+            <div className="w-[45%] flex flex-col items-center">
+              <div className="text-[9px] uppercase tracking-[0.18em] text-[#6B7280] mb-1.5">
+                Camera Roll
               </div>
-            );
-          })}
+              <div className="grid grid-cols-2 gap-1">
+                {memories.map((m, i) => (
+                  <div
+                    key={i}
+                    className={cn(
+                      "relative w-[60px] h-[45px] rounded-md bg-gradient-to-br shadow-sm border border-white/60 overflow-hidden opacity-0 animate-[gs-pop_500ms_ease-out_forwards]",
+                      m.c
+                    )}
+                    style={{ animationDelay: `${i * 90}ms` }}
+                  >
+                    <img
+                      src={m.img}
+                      alt={m.place}
+                      loading="lazy"
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
 
-          {/* Classifier tag strip */}
-          <div className="absolute bottom-5 sm:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1 sm:gap-1.5 px-2 flex-wrap justify-center max-w-[92%]">
+            {/* CENTER: AI processing indicator (10%) */}
+            <div className="w-[10%] flex flex-col items-center justify-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-[#C7A962] animate-pulse" />
+              <div className="w-px h-16 bg-gradient-to-b from-[#C7A962]/60 via-[#C7A962]/30 to-[#C7A962]/60 animate-pulse" />
+              <Sparkles className="w-3 h-3 text-[#C7A962]/70 animate-pulse" />
+            </div>
+
+            {/* RIGHT: Day cards (45%) */}
+            <div className="w-[45%] flex flex-col gap-1.5">
+              {itinerary.map((d, i) => (
+                <div
+                  key={d.day}
+                  className="rounded-lg bg-white/90 border border-[#E5DFC6] px-3 py-2 shadow-sm opacity-0 animate-[gs-rise_500ms_ease-out_forwards]"
+                  style={{ animationDelay: `${600 + i * 400}ms` }}
+                >
+                  <div className="text-[9px] uppercase tracking-[0.18em] text-[#C7A962] font-medium">
+                    Day {d.day}
+                  </div>
+                  <div className="font-secondary text-[11px] text-[#0a2225] leading-tight mt-0.5 truncate">
+                    {d.title}
+                  </div>
+                  <div className="font-secondary italic text-[9px] text-[#6B7280] mt-0.5 truncate">
+                    {d.sub}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Classifier tags */}
+          <div className="relative mt-4 flex items-center justify-center gap-1 sm:gap-1.5 flex-wrap">
             {["Stay", "Dining", "Sunset", "Cruise", "Tasting"].map((tag, i) => (
               <span
                 key={tag}
