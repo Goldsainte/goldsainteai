@@ -7,7 +7,9 @@
    ============================================ */
 
 /* Prevent horizontal scroll globally */
-html,
+html {
+  max-width: 100vw;
+}
 body {
   overflow-x: hidden;
   max-width: 100vw;
@@ -148,7 +150,12 @@ All colors MUST be HSL.
 @layer base {
 /* Mobile responsiveness - prevent horizontal overflow on iPhone */
 /* Viewport guard - prevent horizontal overflow globally */
-html, body {
+html {
+  width: 100%;
+  max-width: 100svw;
+  box-sizing: border-box;
+}
+body {
   width: 100%;
   max-width: 100svw;
   overflow-x: hidden;
@@ -321,7 +328,11 @@ body {
   }
   
   /* Global overflow prevention for mobile */
-  html, body {
+  html {
+    width: 100%;
+    max-width: 100svw;
+  }
+  body {
     width: 100%;
     max-width: 100svw;
     overflow-x: hidden;
