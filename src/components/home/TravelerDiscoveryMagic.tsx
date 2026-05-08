@@ -59,7 +59,7 @@ export const TravelerDiscoveryMagic: React.FC = () => {
   return (
     <div
       ref={ref}
-      className="relative w-full h-[340px] sm:h-[400px] md:h-[460px] overflow-hidden bg-gradient-to-br from-[#FDFBF7] via-[#F8F1E0] to-[#F5EFE1]"
+      className="relative w-full h-[420px] sm:h-[420px] md:h-[460px] overflow-hidden bg-gradient-to-br from-[#FDFBF7] via-[#F8F1E0] to-[#F5EFE1]"
       aria-label="How travelers discover, personalize, and book curated trips on Goldsainte"
     >
       <div className="pointer-events-none absolute -top-24 -right-20 w-72 h-72 rounded-full bg-[#C7A962]/20 blur-3xl" />
