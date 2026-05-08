@@ -37,23 +37,6 @@ export function MarketplaceHeader() {
               Post a Trip Request
             </Link>
 
-            {/* Secondary CTAs - 50/50 split on mobile (matching homepage) */}
-            <div className="flex gap-2 w-full sm:w-auto">
-              <Link
-                to="/creators"
-                className="flex-1 sm:flex-none text-center rounded-full border border-[#BFAD72] bg-white px-4 py-2.5 text-sm font-medium text-[#0a2225] transition hover:bg-[#BFAD72] hover:text-white"
-              >
-                Browse Travel Creators
-              </Link>
-
-              <Link
-                to="/agents"
-                className="flex-1 sm:flex-none text-center rounded-full border border-[#E5DFC6] bg-white px-4 py-2.5 text-sm font-medium text-[#0a2225] transition hover:bg-[#BFAD72] hover:text-white"
-              >
-                Browse Agents
-              </Link>
-            </div>
-
           </div>
 
           {/* Marketplace Legal Disclaimer - Condensed on mobile */}
