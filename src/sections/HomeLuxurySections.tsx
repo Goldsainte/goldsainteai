@@ -521,10 +521,10 @@ export const TrustSafetyPaymentsSection: React.FC = () => {
   ];
 
   return (
-    <section className="bg-[#FDF9F0] px-4 py-20 md:py-28">
+    <section className="bg-[#FDF9F0] px-4 py-20 md:py-24">
       <div className="mx-auto max-w-6xl">
         {/* Centered editorial header — matches "The Goldsainte Ecosystem" pattern */}
-        <div className="mx-auto max-w-3xl text-center mb-14 md:mb-20">
+        <div className="mx-auto max-w-3xl text-center mb-10 md:mb-12">
           <p className="inline-flex rounded-full bg-[#0c4d47] px-3 py-1 text-[10px] md:text-xs font-medium uppercase tracking-[0.18em] text-[#D4C07A]">
             {t('home.trustSafety.badge')}
           </p>

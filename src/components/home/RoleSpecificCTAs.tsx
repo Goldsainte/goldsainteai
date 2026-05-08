@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 
 import travelerImage from "@/assets/home/hero-overwater-villa.jpg";
-import creatorImage from "@/assets/creator-canyon-views.jpg";
-import agentImage from "@/assets/agent-travel-planning.jpg";
+import creatorImage from "@/assets/home/hero-amalfi-coast.jpg";
+import agentImage from "@/assets/fine-dining-hero.jpg";
 
 type Pathway = {
   eyebrow: string;
@@ -28,14 +28,14 @@ const pathways: Pathway[] = [
     alt: "Cinematic overwater villa at sunset reflecting a luxury traveler's perspective.",
   },
   {
-    eyebrow: "For Creators",
-    title: "Transform Travel Into Influence",
+    eyebrow: "For Travel Creators",
+    title: "Turn Your Journey Into Income",
     description:
       "Turn your travel memories, recommendations, and experiences into sellable curated journeys powered by AI.",
     cta: "Start Creating",
     link: "/auth?mode=signup&role=creator",
     image: creatorImage,
-    alt: "Creator framing a sweeping canyon landscape, capturing travel moments to monetize.",
+    alt: "Warm coastal vista along the Amalfi coastline, capturing aspirational travel moments to monetize.",
   },
   {
     eyebrow: "For Travel Experts",
@@ -45,13 +45,13 @@ const pathways: Pathway[] = [
     cta: "Join as a Travel Expert",
     link: "/apply/agent",
     image: agentImage,
-    alt: "Travel expert composing a refined itinerary at an editorial planning desk.",
+    alt: "Refined fine dining setting representing the bespoke luxury experiences travel experts design.",
   },
 ];
 
 export function RoleSpecificCTAs() {
   return (
-    <section className="bg-[#FDF9F0] py-24 md:py-32">
+    <section className="bg-[#FDF9F0] py-16 md:py-20">
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         <div className="mx-auto max-w-3xl text-center">
           <p className="inline-flex rounded-full bg-[#0c4d47] px-3 py-1 text-[10px] md:text-xs font-medium uppercase tracking-[0.18em] text-[#D4C07A]">
@@ -62,7 +62,7 @@ export function RoleSpecificCTAs() {
             Experience Goldsainte Your Way
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-[15px] md:text-base leading-relaxed text-[#5A5A5A]">
-            Whether you're discovering your next journey, transforming travel memories into income, or designing personalized luxury experiences, Goldsainte connects every part of modern travel in one curated marketplace.
+            Whether you're planning your next adventure, sharing your travel expertise, or crafting bespoke itineraries for clients — Goldsainte connects every part of modern travel in one place.
           </p>
         </div>
 
@@ -98,10 +98,10 @@ export function RoleSpecificCTAs() {
                 <h3 className="font-secondary italic text-[22px] md:text-[26px] leading-[1.15] text-white">
                   {p.title}
                 </h3>
-                <p className="mt-3 max-w-[34ch] text-[13px] md:text-[14px] leading-relaxed text-white/80 line-clamp-2 md:line-clamp-2 transition-all duration-500 md:group-hover:line-clamp-none">
+                <p className="mt-3 max-w-[34ch] text-[13px] md:text-[14px] leading-relaxed text-white/85">
                   {p.description}
                 </p>
-                <span className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#C7A962] px-4 py-2 text-[12px] font-medium text-[#0a2225]">
+                <span className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-4 py-2 text-[12px] font-medium text-[#E5DFC6]">
                   {p.cta}
                   <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-500 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </span>
