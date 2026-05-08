@@ -13,7 +13,7 @@ export const Footer = () => {
 
   const columns = [
     {
-      heading: "Explore",
+      heading: "EXPLORE",
       links: [
         { to: "/marketplace", label: "Browse Trips" },
         { to: "/browse-agents", label: "Travel Specialists" },
@@ -22,7 +22,7 @@ export const Footer = () => {
       ],
     },
     {
-      heading: "Join Goldsainte",
+      heading: "JOIN GOLDSAINTE",
       links: [
         { to: "/auth?mode=signup&role=traveler", label: "Sign Up as a Traveler" },
         { to: "/auth?mode=signup&role=creator", label: "Join as a Travel Creator" },
@@ -31,7 +31,7 @@ export const Footer = () => {
       ],
     },
     {
-      heading: "Company",
+      heading: "COMPANY",
       links: [
         { to: "/about", label: "About Goldsainte" },
         { to: "/about#investor-relations", label: "Investor Relations" },
@@ -40,7 +40,7 @@ export const Footer = () => {
       ],
     },
     {
-      heading: "Support",
+      heading: "SUPPORT",
       links: [
         { to: "/help", label: "Help Center" },
         { to: "/trust-safety", label: "Safety & Trust" },
@@ -101,13 +101,13 @@ export const Footer = () => {
         </div>
 
         {/* Social Media */}
-        <div className="flex justify-center items-center gap-4 pb-6 sm:pb-8 border-b border-[#E5DFC6]">
+        <div className="flex justify-center items-center gap-3 pb-6 sm:pb-8 border-b border-[#E5DFC6]">
           <span className="text-xs sm:text-sm font-secondary uppercase tracking-[0.12em] text-[#0a2225]">{t('footer.followUs')}</span>
           <a 
             href="https://www.linkedin.com/company/goldsainte/" 
             target="_blank" 
             rel="noopener noreferrer" 
-            className="text-[#4A4A4A] hover:text-[#C7B892] transition-colors" 
+            className="inline-flex items-center justify-center h-8 w-8 rounded-full text-[#4A4A4A] hover:text-[#C7B892] transition-colors" 
             aria-label="LinkedIn"
           >
             <Linkedin className="h-5 w-5" />
@@ -116,15 +116,27 @@ export const Footer = () => {
             href="https://www.instagram.com/goldsainteai/" 
             target="_blank" 
             rel="noopener noreferrer" 
-            className="text-[#4A4A4A] hover:text-[#C7B892] transition-colors" 
+            className="inline-flex items-center justify-center h-8 w-8 rounded-full text-[#4A4A4A] hover:text-[#C7B892] transition-colors" 
             aria-label="Instagram"
           >
             <Instagram className="h-5 w-5" />
           </a>
         </div>
 
+        {/* Logo */}
+        <div className="pt-8 pb-4 flex justify-center">
+          <img src={verticalLogo} alt="Goldsainte" className="h-14 sm:h-16 w-auto" />
+        </div>
+
+        {/* Description */}
+        <div className="text-center max-w-3xl mx-auto px-4 pb-6">
+          <p className="text-xs sm:text-sm text-[#6E6650]">
+            {t('footer.description')}
+          </p>
+        </div>
+
         {/* Legal Bottom Bar */}
-        <div className="pt-6 flex flex-wrap justify-center items-center gap-x-2 gap-y-1 text-center">
+        <div className="pt-2 flex flex-wrap justify-center items-center gap-x-2 gap-y-1 text-center">
           {legalLinks.map((l, i) => (
             <span key={l.label} className="flex items-center gap-2">
               <Link to={l.to} className={legalLinkClasses}>{l.label}</Link>
@@ -133,21 +145,6 @@ export const Footer = () => {
           ))}
           <span className="text-[#9A9079]">·</span>
           <span className="text-xs text-[#9A9079]">© 2026 Goldsainte AI Inc. All rights reserved.</span>
-        </div>
-
-        {/* Logo & Copyright */}
-        <div className="pt-6 sm:pt-8">
-          <div className="flex flex-col items-center gap-4 sm:gap-6">
-            <img src={verticalLogo} alt="Goldsainte" className="h-16 sm:h-20 w-auto" />
-            <div className="text-center max-w-3xl px-4">
-              <p className="text-xs sm:text-sm text-[#6E6650] mb-2">
-                {t('footer.description')}
-              </p>
-              <p className="text-xs text-[#9A9079]">
-                {t('footer.copyright')}
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </footer>
