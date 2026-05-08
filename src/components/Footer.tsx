@@ -136,7 +136,7 @@ export const Footer = () => {
         </div>
 
         {/* Legal Bottom Bar */}
-        <div className="pt-6 flex flex-wrap justify-center items-center gap-x-2 gap-y-1 text-center border-t border-[#E5DFC6]">
+        <div className="pt-2 flex flex-wrap justify-center items-center gap-x-2 gap-y-1 text-center">
           {legalLinks.map((l, i) => (
             <span key={l.label} className="flex items-center gap-2">
               <Link to={l.to} className={legalLinkClasses}>{l.label}</Link>
