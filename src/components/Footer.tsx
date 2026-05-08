@@ -13,7 +13,7 @@ export const Footer = () => {
 
   const columns = [
     {
-      heading: "Explore",
+      heading: "EXPLORE",
       links: [
         { to: "/marketplace", label: "Browse Trips" },
         { to: "/browse-agents", label: "Travel Specialists" },
@@ -22,7 +22,7 @@ export const Footer = () => {
       ],
     },
     {
-      heading: "Join Goldsainte",
+      heading: "JOIN GOLDSAINTE",
       links: [
         { to: "/auth?mode=signup&role=traveler", label: "Sign Up as a Traveler" },
         { to: "/auth?mode=signup&role=creator", label: "Join as a Travel Creator" },
@@ -31,7 +31,7 @@ export const Footer = () => {
       ],
     },
     {
-      heading: "Company",
+      heading: "COMPANY",
       links: [
         { to: "/about", label: "About Goldsainte" },
         { to: "/about#investor-relations", label: "Investor Relations" },
@@ -40,7 +40,7 @@ export const Footer = () => {
       ],
     },
     {
-      heading: "Support",
+      heading: "SUPPORT",
       links: [
         { to: "/help", label: "Help Center" },
         { to: "/trust-safety", label: "Safety & Trust" },
