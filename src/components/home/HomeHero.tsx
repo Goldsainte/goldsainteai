@@ -70,7 +70,7 @@ export function HomeHero() {
 
               {/* Headline — 40px below pill */}
               <h1 className="mt-6 md:mt-10 font-display text-[26px] sm:text-3xl leading-tight md:text-4xl lg:text-[38px]">
-                <em>The Global Travel Marketplace</em>
+                <em>Plan, Discover & Book — The Smarter Travel Marketplace</em>
               </h1>
 
               {/* Description — 32px below headline */}
