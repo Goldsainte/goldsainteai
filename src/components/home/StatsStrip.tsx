@@ -16,10 +16,10 @@ export function StatsStrip() {
                 i > 0 ? "md:border-l md:border-[#C7A962]/40" : ""
               }`}
             >
-              <span className="font-display text-3xl md:text-5xl text-[#0c4d47] leading-none">
+              <span className="font-secondary text-2xl md:text-4xl text-[#0c4d47] leading-none">
                 {s.value}
               </span>
-              <span className="mt-3 text-[11px] md:text-xs uppercase tracking-[0.18em] text-[#0a2225]/70">
+              <span className="mt-3 text-[10px] md:text-[11px] uppercase tracking-[0.18em] text-[#0a2225]/70">
                 {s.label}
               </span>
             </div>

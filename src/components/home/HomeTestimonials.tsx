@@ -25,7 +25,7 @@ export function HomeTestimonials() {
             Travelers
           </span>
           <div className="mx-auto w-14 h-px bg-[#C7A962] mb-5" />
-          <h2 className="font-display text-3xl md:text-5xl text-[#0c4d47]">
+          <h2 className="font-secondary text-2xl md:text-4xl text-[#0c4d47]">
             <em>What Travelers Are Saying</em>
           </h2>
         </div>
@@ -42,7 +42,7 @@ export function HomeTestimonials() {
               >
                 &ldquo;
               </span>
-              <blockquote className="mt-4 font-display text-lg md:text-xl leading-relaxed text-[#0c4d47] italic">
+              <blockquote className="mt-4 font-secondary text-sm md:text-base leading-relaxed text-[#0c4d47] italic">
                 {t.quote}
               </blockquote>
               <div className="mt-6 w-8 h-px bg-[#C7A962]" />
