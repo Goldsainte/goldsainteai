@@ -112,9 +112,23 @@ export const lockScroll = () => {
  * Unlock scroll
  */
 export const unlockScroll = () => {
-  document.body.style.overflow = '';
-  document.body.style.paddingRight = '';
+  try {
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.width = '';
+  } catch (e) {
+    console.warn('unlockScroll failed', e);
+  }
 };
+
+// Safety: ensure body is never left locked across navigation/unload
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeunload', () => {
+    unlockScroll();
+  });
+}
 
 /**
  * Get safe area insets for iOS notch/Dynamic Island
