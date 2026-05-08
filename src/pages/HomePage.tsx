@@ -14,8 +14,8 @@ export default function HomePage() {
       <StatsStrip />
       <HowGoldsainteWorksSection />
       <CameraRollHighlight />
-      <TwoWaysComparison />
       <StoryboardsHighlight />
+      <TwoWaysComparison />
       <RoleSpecificCTAs />
       {/* <BuiltForEverySideSection /> */}
       <TrustSafetyPaymentsSection />
