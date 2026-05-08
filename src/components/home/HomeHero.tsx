@@ -75,7 +75,7 @@ export function HomeHero() {
 
               {/* Description — 32px below headline */}
               <p className="mt-5 md:mt-8 max-w-xl text-sm md:text-base leading-relaxed text-[#0a2225] font-semibold">
-                Curated by creators, crafted by experts, and powered by intelligent design within a global travel marketplace built around personalization.
+                Curated by travelers who've been there. Crafted by certified specialists. Powered by technology built around you. One global marketplace.
               </p>
               <p className="mt-2 max-w-xl text-sm md:text-base leading-relaxed text-[#4a4a4a] italic">
                 Discover personalized itineraries, curated travel packages, and AI-generated journeys from creators and travel experts around the world.
