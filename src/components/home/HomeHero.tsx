@@ -80,9 +80,6 @@ export function HomeHero() {
               <p className="mt-2 max-w-xl text-sm md:text-base leading-relaxed text-[#4a4a4a]">
                 Browse trips planned by travel specialists and explorers in over 50 countries — or let our technology build your perfect itinerary in minutes.
               </p>
-              <p className="mt-3 md:mt-4 max-w-xl text-sm md:text-base leading-relaxed text-[#4a4a4a]">
-                Planning your next journey or ready to turn your travel expertise into income? Goldsainte is where both begin.
-              </p>
 
             {/* CTAs — fixed 32px below copy */}
             <div className="flex flex-col gap-3 mt-6 md:mt-8 w-full max-w-none md:max-w-sm">
