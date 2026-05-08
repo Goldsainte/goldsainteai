@@ -1,36 +1,63 @@
-## Problem
+## Homepage credibility & conversion upgrades
 
-In Scene 2 ("Reconstructing your journey") of `src/components/home/CreatorAIMagic.tsx`, on desktop (≥md, viewport ~1000px) several floating elements collide:
+Six focused changes across the homepage, all preserving the existing luxury aesthetic (cream `#f7f3ea` background, dark green `#0c4d47` CTAs, gold `#C7A962` accents, serif headers, Cormorant/Playfair display + body sans).
 
-1. The header pill "Reconstructing your journey" wraps to two lines and the Day 01 / 02 / 03 chips (positioned at `top-[62px]`) sit on top of the pill's second line.
-2. The bottom Megalochori tile (positioned at `top: 76%`) plus its "below" metadata label collides with the classifier tag strip ("Stay / Dining / Sunset / Cruise / Tasting") sitting at `bottom-10 sm:bottom-12`.
-3. The Megalochori label itself is partially clipped behind the tag pills.
+### 1. Meta title & description (`index.html`)
+- `<title>` → `Goldsainte — The Smarter Travel Marketplace`
+- `<meta name="description">` → `Plan, discover, and book extraordinary trips with certified travel specialists and explorers across 50+ countries. Powered by AI, built around you.`
+- Mirror the same values into the OG and Twitter meta tags so social shares stay consistent.
 
-This is purely a layout/spacing issue inside one component — no data, copy, or animation logic changes needed.
+### 2. Stats trust strip (new component)
+- Create `src/components/home/StatsStrip.tsx`: cream background, three centered stats separated by hairline gold dividers on desktop / stacked on mobile.
+  - `50+` — Countries
+  - `500+` — Certified Travel Specialists
+  - `Minutes` — From Inspiration to Itinerary (label "Trips Planned in Minutes")
+- Numbers in serif display, dark green; labels uppercase tracking, muted.
+- Mount in `src/pages/HomePage.tsx` between `<HomeHero />` and `<HowGoldsainteWorksSection />`.
 
-## Fix
+### 3. Camera-roll feature highlight (new component)
+- Create `src/components/home/CameraRollHighlight.tsx`: full-width cream section, two-column grid (text left / visual right, stacked on mobile).
+  - Headline (serif): "From Inspiration to Itinerary in Minutes."
+  - Sub-copy: "Upload photos of places that inspire you, and Goldsainte builds a complete, bookable trip around them — instantly. Share it, sell it, or make it your own."
+  - CTA: dark green pill button "Try It Free" → routes to `/auth?mode=signup`.
+  - Right side reuses the existing `CreatorAIMagic` phone/camera-roll mockup already shown in the For Creators accordion (`src/components/home/CreatorAIMagic.tsx`), wrapped in a soft cream/gold frame matching the hero visual treatment.
+- Mount in `HomePage.tsx` between `<HowGoldsainteWorksSection />` and `<TwoWaysComparison />`.
 
-Edit only `src/components/home/CreatorAIMagic.tsx`, Scene 2 block:
+### 4. Testimonials section (new component)
+- Create `src/components/home/HomeTestimonials.tsx`: cream background, section heading "What Travelers Are Saying" (serif, dark green) with the gold hairline divider used elsewhere.
+- Three cards (responsive grid): large gold opening quotation mark, dark-green serif quote, traveler name, country.
+  - Sample seed copy (placeholder, easy to swap):
+    1. "Goldsainte planned a Kyoto trip from a single Pinterest board. It felt designed just for me." — Amelia R., United Kingdom
+    2. "My specialist handled everything — I just showed up and lived it." — Daniel K., United States
+    3. "I uploaded my camera roll and had a bookable itinerary in minutes." — Sofia M., Spain
+- Mount in `HomePage.tsx` between `<StoryboardsHighlight />` and `<RoleSpecificCTAs />`.
 
-1. Header pill: keep the pill on a single line on md+ by adding `whitespace-nowrap` and tightening padding, so it no longer wraps and intrudes into the Day chips row.
-2. Day chips row: move from `top-[62px]` to a md-aware offset (`top-[58px] md:top-[64px]`) and add a small `mt` so chips clear the (now single-line) pill at all breakpoints.
-3. Tile vertical positions: shift the three rows slightly tighter and lift Day 03 (Megalochori) up so its "below" label clears the bottom tag strip:
-   - Day 01 row: `top: 28%` (was 30%)
-   - Day 02 row: `top: 50%` (was 53%)
-   - Day 03 row: `top: 70%` (was 76%) — this is the key fix; combined with the existing `-bottom-[42px]` label offset it ends ~84% instead of ~92%.
-4. Bottom classifier tags: move from `bottom-10 sm:bottom-12` to `bottom-6 sm:bottom-8 md:bottom-6`, so they sit closer to the caption strip and out of the Megalochori label zone.
-5. Optional: add `pointer-events-none` is already not needed; just verify z-index so labels render above the SVG route (already true via DOM order).
+### 5. Nav "Get Started" CTA (`src/components/Header.tsx`)
+- Add a dark green rounded pill button labeled "Get Started" in the right-side action cluster (both desktop and mobile menu rows where the user/profile icon currently lives).
+- Hide the button when the user is already authenticated to avoid noise.
+- Click navigates to `/auth?mode=signup`.
 
-## Out of scope
+### 6. Rename "Why Goldsainte Feels Different" (`src/components/home/TwoWaysComparison.tsx`)
+- Change the section H2 from `Why Goldsainte Feels Different` to `Two Ways to Experience Goldsainte`. Eyebrow pill, divider, and existing description copy unchanged.
 
-- No changes to Scenes 1, 3, 4.
-- No copy, animation timing, color, or font changes.
-- No changes to `TravelerDiscoveryMagic.tsx` or `AgentProposalMagic.tsx`.
-- No backend / data changes.
+### Files touched
+- `index.html` — meta tags
+- `src/pages/HomePage.tsx` — section composition
+- `src/components/Header.tsx` — Get Started CTA
+- `src/components/home/TwoWaysComparison.tsx` — H2 rename
+- New: `src/components/home/StatsStrip.tsx`
+- New: `src/components/home/CameraRollHighlight.tsx`
+- New: `src/components/home/HomeTestimonials.tsx`
 
-## Verification
+### Final homepage order
+1. HomeHero
+2. StatsStrip (new)
+3. HowGoldsainteWorksSection
+4. CameraRollHighlight (new)
+5. TwoWaysComparison (renamed)
+6. StoryboardsHighlight
+7. HomeTestimonials (new)
+8. RoleSpecificCTAs
+9. TrustSafetyPaymentsSection
 
-Open `/` at viewport widths 1000px, 1280px, 1440px and 768px. During Scene 2:
-- The "Reconstructing your journey" pill stays on one line and does not touch the Day chips.
-- The Megalochori tile + label sits clearly above the "Stay / Dining / Sunset / Cruise / Tasting" strip with visible breathing room.
-- No regression on mobile (375px) — the existing `sm:` offsets remain the fallback.
+No business-logic, schema, or auth changes — purely presentation.
