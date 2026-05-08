@@ -194,7 +194,15 @@ export const Header = () => {
                        <NotificationBell />
                     </>
                   )}
-                  
+                  {!user && (
+                    <Button
+                      onClick={() => navigate('/auth?mode=signup')}
+                      className="rounded-full bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] h-10 px-4 text-xs font-semibold"
+                    >
+                      Get Started
+                    </Button>
+                  )}
+
                   {/* Unified Profile Menu - Mobile */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -442,7 +450,15 @@ export const Header = () => {
                      <NotificationBell />
                   </>
                 )}
-                
+                {!user && (
+                  <Button
+                    onClick={() => navigate('/auth?mode=signup')}
+                    className="rounded-full bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] h-10 px-5 text-sm font-semibold mr-1"
+                  >
+                    Get Started
+                  </Button>
+                )}
+
                 {/* Unified Profile Menu - Desktop */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
