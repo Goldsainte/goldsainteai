@@ -14,6 +14,31 @@ const testimonials = [
     name: "Sofia M.",
     country: "Spain",
   },
+  {
+    quote: "We planned our entire honeymoon in under an hour. Our specialist suggested destinations we hadn't even considered — and they were perfect.",
+    name: "Priya S.",
+    country: "India",
+  },
+  {
+    quote: "The itinerary didn't feel assembled from a template. Every detail reflected exactly what I asked for, down to the pace of each day.",
+    name: "Luca B.",
+    country: "Italy",
+  },
+  {
+    quote: "I submitted my vision and received three detailed proposals the same day. The level of care was unlike any travel service I've used.",
+    name: "Fatima A.",
+    country: "United Arab Emirates",
+  },
+  {
+    quote: "I've used every major travel platform. Goldsainte is the first one that actually felt like it understood my travel style.",
+    name: "Yuki T.",
+    country: "Japan",
+  },
+  {
+    quote: "I uploaded photos from a trip I loved and used them to build my next one. Nothing else I've tried comes close to this.",
+    name: "Marcus W.",
+    country: "Australia",
+  },
 ];
 
 export function HomeTestimonials() {
@@ -30,7 +55,7 @@ export function HomeTestimonials() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
           {testimonials.map((t) => (
             <figure
               key={t.name}
