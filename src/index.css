@@ -184,7 +184,7 @@ body {
 .viewport-guard {
   width: 100%;
   max-width: 100svw;
-  overflow-x: clip;
+  overflow-x: hidden;
   box-sizing: border-box;
 }
   
@@ -324,14 +324,19 @@ body {
   html, body {
     width: 100%;
     max-width: 100svw;
-    overflow-x: clip;
+    overflow-x: hidden;
+  }
+
+  /* Prevent pull-to-refresh interference */
+  body {
+    overscroll-behavior-y: none;
   }
 
   /* Global viewport guard utility */
   .viewport-guard {
     width: 100%;
     max-width: 100svw;
-    overflow-x: clip;
+    overflow-x: hidden;
   }
 
   /* Strict mobile overflow prevention */
@@ -611,11 +616,6 @@ body {
     outline-offset: 2px;
   }
 
-  /* Improve scrolling on mobile */
-  * {
-    -webkit-overflow-scrolling: touch;
-  }
-  
   /* iOS Safe Area Support */
   .safe-top {
     padding-top: env(safe-area-inset-top);
