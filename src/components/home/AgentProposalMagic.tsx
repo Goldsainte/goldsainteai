@@ -13,8 +13,8 @@ const days = [
 
 const aiTips = [
   { label: "Pair Day 02 with: Da Adolfo by water taxi", c: "from-[#bcd3d0] to-[#0c4d47]", t: "12%", l: "4%", img: "https://images.unsplash.com/photo-1504672281656-e4981d70414b?auto=format&fit=crop&w=200&q=70" },
-  { label: "Upgrade Day 03: Caruso Belvedere Suite", c: "from-[#dcc89a] to-[#8a6a2e]", t: "62%", l: "2%", img: "https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?auto=format&fit=crop&w=200&q=70" },
-  { label: "Add: Helicopter transfer Naples → Positano", c: "from-[#cfd9d6] to-[#384e4b]", t: "70%", l: "55%", img: "https://images.unsplash.com/photo-1533104816931-20fa691ff6ca?auto=format&fit=crop&w=200&q=70" },
+  { label: "Upgrade Day 03: Caruso Belvedere Suite", c: "from-[#dcc89a] to-[#8a6a2e]", t: "58%", l: "2%", img: "https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?auto=format&fit=crop&w=200&q=70" },
+  { label: "Add: Helicopter transfer Naples → Positano", c: "from-[#cfd9d6] to-[#384e4b]", t: "76%", l: "55%", img: "https://images.unsplash.com/photo-1533104816931-20fa691ff6ca?auto=format&fit=crop&w=200&q=70" },
 ];
 
 const AMALFI_HERO = "https://images.unsplash.com/photo-1533104816931-20fa691ff6ca?auto=format&fit=crop&w=600&q=70";
@@ -49,7 +49,7 @@ export const AgentProposalMagic: React.FC = () => {
   return (
     <div
       ref={ref}
-      className="relative w-full h-[340px] sm:h-[400px] md:h-[460px] overflow-hidden bg-gradient-to-br from-[#FDFBF7] via-[#F8F1E0] to-[#F5EFE1]"
+      className="relative w-full h-[420px] sm:h-[420px] md:h-[460px] overflow-hidden bg-gradient-to-br from-[#FDFBF7] via-[#F8F1E0] to-[#F5EFE1]"
       aria-label="How travel agents craft and deliver luxury concierge proposals on Goldsainte"
     >
       <div className="pointer-events-none absolute -top-24 -right-20 w-72 h-72 rounded-full bg-[#C7A962]/20 blur-3xl" />

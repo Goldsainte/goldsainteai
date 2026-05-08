@@ -73,7 +73,7 @@ export const CreatorAIMagic: React.FC = () => {
   return (
     <div
       ref={ref}
-      className="relative w-full h-[340px] sm:h-[400px] md:h-[460px] overflow-hidden bg-gradient-to-br from-[#FDFBF7] via-[#F8F1E0] to-[#F5EFE1]"
+      className="relative w-full h-[420px] sm:h-[420px] md:h-[460px] overflow-hidden bg-gradient-to-br from-[#FDFBF7] via-[#F8F1E0] to-[#F5EFE1]"
       aria-label="Goldsainte AI turning travel media into a curated, sellable itinerary"
     >
       <div className="pointer-events-none absolute -top-24 -right-20 w-72 h-72 rounded-full bg-[#C7A962]/20 blur-3xl" />
@@ -144,7 +144,7 @@ export const CreatorAIMagic: React.FC = () => {
           </div>
 
           {/* Day chronology chips that fade in mid-sequence */}
-          <div className="absolute top-[68px] sm:top-[70px] left-0 right-0 flex items-center justify-center gap-2">
+          <div className="absolute top-[100px] sm:top-[72px] left-0 right-0 flex items-center justify-center gap-2">
             {["01", "02", "03"].map((d, i) => (
               <span
                 key={d}
@@ -163,7 +163,7 @@ export const CreatorAIMagic: React.FC = () => {
             preserveAspectRatio="xMidYMid meet"
           >
             <path
-              d="M 100 133 Q 196 110 292 133 Q 176 188 60 243 Q 128 243 196 243 Q 264 243 332 243 Q 264 303 196 363"
+              d="M 100 165 Q 196 142 292 165 Q 176 218 60 272 Q 128 272 196 272 Q 264 272 332 272 Q 264 335 196 392"
               fill="none"
               stroke="#C7A962"
               strokeWidth="1.1"
@@ -188,7 +188,7 @@ export const CreatorAIMagic: React.FC = () => {
                 dur="2.2s"
                 begin="1.0s"
                 fill="freeze"
-                path="M 100 133 Q 196 110 292 133 Q 176 188 60 243 Q 128 243 196 243 Q 264 243 332 243 Q 264 303 196 363"
+                path="M 100 165 Q 196 142 292 165 Q 176 218 60 272 Q 128 272 196 272 Q 264 272 332 272 Q 264 335 196 392"
               />
             </circle>
           </svg>
@@ -200,14 +200,14 @@ export const CreatorAIMagic: React.FC = () => {
             // Use 3 visual rows to read as chronology.
             const positions = [
               // Day 01 — Oia + Ammoudi (top row, labels above)
-              { t: "22%", l: "14%", r: "0deg", label: "above" as const },
-              { t: "22%", l: "62%", r: "0deg", label: "above" as const },
+              { t: "36%", l: "14%", r: "0deg", label: "above" as const, anchor: "center" as const },
+              { t: "36%", l: "62%", r: "0deg", label: "above" as const, anchor: "center" as const },
               // Day 02 — Caldera + Canaves + Catamaran (middle row, labels below)
-              { t: "46%", l: "4%", r: "0deg", label: "below" as const },
-              { t: "46%", l: "38%", r: "0deg", label: "below" as const },
-              { t: "46%", l: "72%", r: "0deg", label: "below" as const },
+              { t: "56%", l: "4%", r: "0deg", label: "below" as const, anchor: "center" as const },
+              { t: "56%", l: "38%", r: "0deg", label: "below" as const, anchor: "center" as const },
+              { t: "56%", l: "72%", r: "0deg", label: "below" as const, anchor: "right" as const },
               // Day 03 — Megalochori (bottom centered, label above to avoid tag strip)
-              { t: "72%", l: "38%", r: "0deg", label: "above" as const },
+              { t: "76%", l: "38%", r: "0deg", label: "above" as const, anchor: "center" as const },
             ][i];
             return (
               <div
@@ -245,18 +245,19 @@ export const CreatorAIMagic: React.FC = () => {
                 {/* Floating metadata label */}
                 <div
                   className={cn(
-                    "absolute left-1/2 -translate-x-1/2 w-[88px] sm:w-[100px] rounded-md bg-white/95 backdrop-blur border border-[#E5DFC6] px-1 py-0.5 sm:px-1.5 sm:py-1 shadow-[0_6px_16px_rgba(10,34,37,0.12)] opacity-0 animate-[gs-rise_500ms_ease-out_forwards] text-center",
-                    positions.label === "above" ? "-top-[36px] sm:-top-[42px]" : "-bottom-[36px] sm:-bottom-[42px]"
+                    "absolute w-[68px] sm:w-[100px] rounded-md bg-white/95 backdrop-blur border border-[#E5DFC6] px-1 py-0.5 shadow-[0_6px_16px_rgba(10,34,37,0.12)] opacity-0 animate-[gs-rise_500ms_ease-out_forwards] text-center overflow-hidden",
+                    positions.anchor === "right" ? "right-0 translate-x-0" : "left-1/2 -translate-x-1/2",
+                    positions.label === "above" ? "-top-[32px] sm:-top-[42px]" : "-bottom-[32px] sm:-bottom-[42px]"
                   )}
                   style={{ animationDelay: `${600 + i * 110}ms` }}
                 >
                   <div className="flex items-center gap-1">
                     <Icon className="w-2 h-2 text-[#C7A962] shrink-0" />
-                    <span className="font-secondary italic text-[9px] sm:text-[10px] text-[#0a2225] leading-tight">
+                    <span className="font-secondary italic text-[8px] sm:text-[10px] text-[#0a2225] leading-tight truncate">
                       {m.place}
                     </span>
                   </div>
-                  <div className="text-[8px] sm:text-[10px] uppercase tracking-[0.12em] text-[#6B7280] mt-0.5">
+                  <div className="text-[8px] sm:text-[10px] uppercase tracking-[0.12em] text-[#6B7280] mt-0.5 truncate">
                     {m.meta}
                   </div>
                 </div>
