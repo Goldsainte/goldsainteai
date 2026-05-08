@@ -163,7 +163,7 @@ export const CreatorAIMagic: React.FC = () => {
             preserveAspectRatio="xMidYMid meet"
           >
             <path
-              d="M 70 175 Q 150 215 200 215 T 330 175 Q 280 280 200 305 Q 130 330 200 410"
+              d="M 100 133 Q 196 110 292 133 Q 176 188 60 243 Q 128 243 196 243 Q 264 243 332 243 Q 264 303 196 363"
               fill="none"
               stroke="#C7A962"
               strokeWidth="1.1"
@@ -188,7 +188,7 @@ export const CreatorAIMagic: React.FC = () => {
                 dur="2.2s"
                 begin="1.0s"
                 fill="freeze"
-                path="M 70 175 Q 150 215 200 215 T 330 175 Q 280 280 200 305 Q 130 330 200 410"
+                path="M 100 133 Q 196 110 292 133 Q 176 188 60 243 Q 128 243 196 243 Q 264 243 332 243 Q 264 303 196 363"
               />
             </circle>
           </svg>
