@@ -163,7 +163,7 @@ export const CreatorAIMagic: React.FC = () => {
             preserveAspectRatio="xMidYMid meet"
           >
             <path
-              d="M 70 175 Q 150 215 200 215 T 330 175 Q 280 280 200 305 Q 130 330 200 410"
+              d="M 100 133 Q 196 110 292 133 Q 176 188 60 243 Q 128 243 196 243 Q 264 243 332 243 Q 264 303 196 363"
               fill="none"
               stroke="#C7A962"
               strokeWidth="1.1"
@@ -188,7 +188,7 @@ export const CreatorAIMagic: React.FC = () => {
                 dur="2.2s"
                 begin="1.0s"
                 fill="freeze"
-                path="M 70 175 Q 150 215 200 215 T 330 175 Q 280 280 200 305 Q 130 330 200 410"
+                path="M 100 133 Q 196 110 292 133 Q 176 188 60 243 Q 128 243 196 243 Q 264 243 332 243 Q 264 303 196 363"
               />
             </circle>
           </svg>
@@ -199,15 +199,15 @@ export const CreatorAIMagic: React.FC = () => {
             // Two rows of 3 — Day 01 (top row, 1 tile centered-left), Day 02 (middle, 4 tiles), Day 03 (bottom, 1 tile)
             // Use 3 visual rows to read as chronology.
             const positions = [
-              // Day 01 — Oia + Ammoudi
-              { t: "28%", l: "8%", r: "-3deg", label: "above" as const },
-              { t: "28%", l: "58%", r: "2deg", label: "above" as const },
-              // Day 02 — Caldera + Canaves + Catamaran
-              { t: "50%", l: "4%", r: "1deg", label: "below" as const },
-              { t: "50%", l: "36%", r: "-2deg", label: "below" as const },
-              { t: "50%", l: "66%", r: "3deg", label: "below" as const },
-              // Day 03 — Megalochori
-              { t: "70%", l: "36%", r: "-1deg", label: "below" as const },
+              // Day 01 — Oia + Ammoudi (top row, labels above)
+              { t: "22%", l: "14%", r: "0deg", label: "above" as const },
+              { t: "22%", l: "62%", r: "0deg", label: "above" as const },
+              // Day 02 — Caldera + Canaves + Catamaran (middle row, labels below)
+              { t: "46%", l: "4%", r: "0deg", label: "below" as const },
+              { t: "46%", l: "38%", r: "0deg", label: "below" as const },
+              { t: "46%", l: "72%", r: "0deg", label: "below" as const },
+              // Day 03 — Megalochori (bottom centered, label above to avoid tag strip)
+              { t: "72%", l: "38%", r: "0deg", label: "above" as const },
             ][i];
             return (
               <div
@@ -245,7 +245,7 @@ export const CreatorAIMagic: React.FC = () => {
                 {/* Floating metadata label */}
                 <div
                   className={cn(
-                    "absolute left-1/2 -translate-x-1/2 max-w-[96px] sm:max-w-[120px] rounded-md bg-white/95 backdrop-blur border border-[#E5DFC6] px-1 py-0.5 sm:px-1.5 sm:py-1 shadow-[0_6px_16px_rgba(10,34,37,0.12)] opacity-0 animate-[gs-rise_500ms_ease-out_forwards] whitespace-nowrap",
+                    "absolute left-1/2 -translate-x-1/2 w-[88px] sm:w-[100px] rounded-md bg-white/95 backdrop-blur border border-[#E5DFC6] px-1 py-0.5 sm:px-1.5 sm:py-1 shadow-[0_6px_16px_rgba(10,34,37,0.12)] opacity-0 animate-[gs-rise_500ms_ease-out_forwards] text-center",
                     positions.label === "above" ? "-top-[36px] sm:-top-[42px]" : "-bottom-[36px] sm:-bottom-[42px]"
                   )}
                   style={{ animationDelay: `${600 + i * 110}ms` }}

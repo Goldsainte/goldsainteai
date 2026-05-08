@@ -47,7 +47,7 @@ export function HomeTestimonials() {
       <div className="mx-auto max-w-6xl px-4 py-16 md:py-24">
         <div className="text-center mb-12">
           <span className="inline-block rounded-full border border-[#0c4d47] bg-[#0c4d47] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#bfad72] mb-4">
-            Travelers
+            Traveler Stories
           </span>
           <div className="mx-auto w-14 h-px bg-[#C7A962] mb-5" />
           <h2 className="font-secondary text-2xl md:text-4xl text-[#0c4d47]">
