@@ -1,7 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MapPin, Calendar, Heart, Star } from "lucide-react";
 import { CreatorAttribution } from "./CreatorAttribution";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface LiveTripCardProps {
   trip: {
@@ -39,11 +42,64 @@ interface LiveTripCardProps {
 
 export function LiveTripCard({ trip }: LiveTripCardProps) {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [isSaved, setIsSaved] = useState(false);
+  const [savingPending, setSavingPending] = useState(false);
 
-  const handleSave = (e: React.MouseEvent) => {
+  useEffect(() => {
+    let cancelled = false;
+    if (!user?.id) {
+      setIsSaved(false);
+      return;
+    }
+    (async () => {
+      const { data } = await supabase
+        .from("trip_wishlists" as any)
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("trip_id", trip.id)
+        .maybeSingle();
+      if (!cancelled) setIsSaved(!!data);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id, trip.id]);
+
+  const handleSave = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsSaved((v) => !v);
+    if (!user?.id) {
+      toast.message("Sign in to save trips");
+      navigate("/auth?mode=signup");
+      return;
+    }
+    if (savingPending) return;
+    setSavingPending(true);
+    const next = !isSaved;
+    setIsSaved(next);
+    try {
+      if (next) {
+        const { error } = await supabase
+          .from("trip_wishlists" as any)
+          .upsert(
+            { user_id: user.id, trip_id: trip.id },
+            { onConflict: "user_id,trip_id" }
+          );
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from("trip_wishlists" as any)
+          .delete()
+          .eq("user_id", user.id)
+          .eq("trip_id", trip.id);
+        if (error) throw error;
+      }
+    } catch (err) {
+      setIsSaved(!next);
+      toast.error("Could not update saved trips");
+    } finally {
+      setSavingPending(false);
+    }
   };
 
   const formatPrice = (price: number, currency: string) => {
