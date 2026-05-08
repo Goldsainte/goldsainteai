@@ -81,7 +81,7 @@ export function HomeHero() {
                 Browse trips planned by travel specialists and explorers in over 50 countries — or let our technology build your perfect itinerary in minutes.
               </p>
               <p className="mt-3 md:mt-4 max-w-xl text-sm md:text-base leading-relaxed text-[#4a4a4a]">
-                Turn travel memories into income—or discover your next journey in minutes.
+                Planning your next journey or ready to turn your travel expertise into income? Goldsainte is where both begin.
               </p>
 
             {/* CTAs — fixed 32px below copy */}
