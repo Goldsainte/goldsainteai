@@ -16,10 +16,10 @@ export default function HomePage() {
       <CameraRollHighlight />
       <TwoWaysComparison />
       <StoryboardsHighlight />
-      <HomeTestimonials />
       <RoleSpecificCTAs />
       {/* <BuiltForEverySideSection /> */}
       <TrustSafetyPaymentsSection />
+      <HomeTestimonials />
     </main>
   );
 }
