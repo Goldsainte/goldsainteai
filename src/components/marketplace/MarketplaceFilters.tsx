@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
-import { Slider } from "@/components/ui/slider";
+import * as SliderPrimitive from "@radix-ui/react-slider";
 import {
   Accordion,
   AccordionContent,
@@ -111,7 +111,7 @@ export function MarketplaceFilters({ filters, onFilterChange }: MarketplaceFilte
                     {priceRange[1] >= 10000 ? "+" : ""}
                   </span>
                 </div>
-                <Slider
+                <SliderPrimitive.Root
                   min={0}
                   max={10000}
                   step={100}
@@ -120,8 +120,14 @@ export function MarketplaceFilters({ filters, onFilterChange }: MarketplaceFilte
                   onValueCommit={(v) =>
                     onFilterChange({ ...filters, minPrice: v[0], maxPrice: v[1] })
                   }
-                  className="w-full"
-                />
+                  className="relative flex w-full touch-none select-none items-center"
+                >
+                  <SliderPrimitive.Track className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-[#E5DFC6]">
+                    <SliderPrimitive.Range className="absolute h-full bg-[#BFAD72]" />
+                  </SliderPrimitive.Track>
+                  <SliderPrimitive.Thumb className="block h-4 w-4 rounded-full border-2 border-[#BFAD72] bg-white shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#BFAD72]" />
+                  <SliderPrimitive.Thumb className="block h-4 w-4 rounded-full border-2 border-[#BFAD72] bg-white shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#BFAD72]" />
+                </SliderPrimitive.Root>
                 {priceActive && (
                   <button
                     onClick={() => {
