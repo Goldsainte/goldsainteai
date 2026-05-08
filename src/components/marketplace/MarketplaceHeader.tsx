@@ -22,7 +22,7 @@ export function MarketplaceHeader() {
             </h1>
             <p className="text-sm leading-relaxed text-[#4a4a4a] md:text-base max-w-2xl">
               Post a trip request, compare tailored proposals, and build your journey with 
-              world-class creators and travel agents.
+              world-class travel specialists and agents.
             </p>
           </div>
 
@@ -43,7 +43,7 @@ export function MarketplaceHeader() {
                 to="/creators"
                 className="flex-1 sm:flex-none text-center rounded-full border border-[#BFAD72] bg-white px-4 py-2.5 text-sm font-medium text-[#0a2225] transition hover:bg-[#BFAD72] hover:text-white"
               >
-                Browse Creators
+                Browse Travel Creators
               </Link>
 
               <Link
@@ -58,8 +58,8 @@ export function MarketplaceHeader() {
 
           {/* Marketplace Legal Disclaimer - Condensed on mobile */}
           <p className="hidden md:block mt-1 max-w-2xl text-[11px] leading-relaxed text-[#818181]">
-            Goldsainte is a curated travel marketplace. All trips are designed and fulfilled 
-            by independent creators, travel agents, and suppliers. Trip Request proposals 
+            Goldsainte is a travel marketplace. All trips are designed and fulfilled 
+            by independent travel specialists, agents, and suppliers. Trip Request proposals 
             reflect their own cancellation, refund, and deposit terms.
           </p>
           
