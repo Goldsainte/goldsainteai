@@ -153,22 +153,22 @@
     },
     "trustSafety": {
       "badge": "Luxury Intelligence",
-      "title": "Where Extraordinary Travel Feels Effortless",
-      "description": "Goldsainte combines intelligent planning, seamless collaboration, and curated personalization to make complex travel feel beautifully simple.",
+     "title": "Where Complex Travel Feels Beautifully Simple",
+     "description": "Goldsainte combines intelligent planning, seamless collaboration, and deep personalization — so every journey feels effortless from first idea to final arrival.",
       "item1": {
         "title": "Intelligent Personalization",
         "body": "AI adapts every journey around your preferences, pace, travel style, and the experiences you love most."
       },
       "item2": {
         "title": "Seamless Collaboration",
-        "body": "Travelers, creators, and travel experts coordinate effortlessly inside one beautifully organized space."
+        "body": "Travelers, travel storytellers, and certified specialists coordinate effortlessly inside one beautifully organized space."
       },
       "item3": {
-        "title": "Curated Travel Intelligence",
+        "title": "Smart Travel Intelligence",
         "body": "From hidden gems to luxury upgrades, Goldsainte surfaces recommendations tailored specifically to your journey."
       },
       "item4": {
-        "title": "Effortless Coordination",
+        "title": "End-to-End Coordination",
         "body": "Flights, stays, experiences, and timelines stay seamlessly connected from inspiration through arrival."
       }
     },
