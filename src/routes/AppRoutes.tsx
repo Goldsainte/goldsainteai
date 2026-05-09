@@ -31,6 +31,7 @@ const AdminBookingsPage = lazy(() => import('@/pages/admin/AdminBookingsPage'));
 const AdminDisputesPage = lazy(() => import('@/pages/admin/AdminDisputesPage'));
 const AdminHomePage = lazy(() => import('@/pages/admin/AdminHomePage'));
 const AdminTripsPage = lazy(() => import('@/pages/admin/AdminTripsPage'));
+const AdminWaitlistPage = lazy(() => import('@/pages/admin/AdminWaitlistPage'));
 
 const SeedCreators = lazy(() => import('@/pages/admin/SeedCreators'));
 const OpsEscrowDashboardPage = lazy(() => import('@/pages/OpsEscrowDashboardPage'));
@@ -469,6 +470,7 @@ export const AppRoutes = () => (
       <Route path="/admin/bookings" element={<AdminBookingsPage />} />
       <Route path="/admin/disputes" element={<AdminDisputesPage />} />
       <Route path="/admin/trips" element={<AdminTripsPage />} />
+      <Route path="/admin/waitlist" element={<AdminWaitlistPage />} />
       <Route path="/admin/marketplace" element={<Navigate to="/admin" replace />} />
       <Route path="/admin/escrow" element={<OpsEscrowDashboardPage />} />
       <Route path="/admin/cancellations" element={<AdminCancellations />} />
