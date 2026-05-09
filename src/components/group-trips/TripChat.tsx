@@ -136,12 +136,10 @@ export const TripChat = ({ tripId, members }: TripChatProps) => {
             {message.file_url && (
               <div className="mb-2">
                 {message.file_type?.startsWith('image/') ? (
-                  <img 
-                    src={message.file_url} 
+                  <img src={message.file_url} 
                     alt={message.file_name || 'Shared image'}
                     className="max-w-[300px] rounded-lg cursor-pointer"
-                    onClick={() => window.open(message.file_url!, '_blank')}
-                  />
+                    onClick={() => window.open(message.file_url!, '_blank')} loading="lazy" />
                 ) : (
                   <a
                     href={message.file_url}

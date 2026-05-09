@@ -46,8 +46,7 @@ export const PhotoGallery = ({ images, hotelName }: PhotoGalleryProps) => {
             setIsOpen(true);
           }}
         >
-          <img 
-            src={images[0]} 
+          <img src={images[0]} 
             alt={`${hotelName} - Main`}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             onError={(e) => {
@@ -62,8 +61,7 @@ export const PhotoGallery = ({ images, hotelName }: PhotoGalleryProps) => {
                 div.appendChild(p);
                 parent.appendChild(div);
               }
-            }}
-          />
+            }} loading="lazy" />
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
         </div>
         
@@ -77,8 +75,7 @@ export const PhotoGallery = ({ images, hotelName }: PhotoGalleryProps) => {
               setIsOpen(true);
             }}
           >
-            <img 
-              src={img} 
+            <img src={img} 
               alt={`${hotelName} - ${idx + 2}`}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               onError={(e) => {
@@ -89,8 +86,7 @@ export const PhotoGallery = ({ images, hotelName }: PhotoGalleryProps) => {
                 div.className = 'w-full h-full flex items-center justify-center bg-muted';
                 parent.appendChild(div);
                 }
-              }}
-            />
+              }} loading="lazy" />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
             {idx === 3 && images.length > 5 && (
               <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-semibold text-lg">

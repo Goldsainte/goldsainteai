@@ -714,13 +714,11 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
                       </h4>
                       <div className="grid grid-cols-3 gap-2">
                         {allPhotosForGallery.slice(0, 6).map((photo, idx) => (
-                          <img 
-                            key={idx} 
+                          <img key={idx} 
                             src={typeof photo === 'string' ? photo : photo.url_max300 || photo.url || photo} 
                             alt={`Hotel photo ${idx + 1}`}
                             className="aspect-[4/3] object-cover rounded-md cursor-pointer hover:opacity-80 transition-opacity"
-                            onClick={() => setShowGallery(true)}
-                          />
+                            onClick={() => setShowGallery(true)} loading="lazy" />
                         ))}
                       </div>
                       {allPhotosForGallery.length > 6 && (

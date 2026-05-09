@@ -1142,13 +1142,11 @@ const BrandApplicationDetail: React.FC<{
           <LuxuryCardContent>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
               {application.gallery_urls.map((url, index) => (
-                <img
-                  key={index}
+                <img key={index}
                   src={url}
                   alt={`Gallery ${index + 1}`}
                   className="w-full h-40 object-cover rounded-xl cursor-pointer hover:opacity-90 transition-opacity border border-[#E5DFC6]"
-                  onClick={() => window.open(url, '_blank')}
-                />
+                  onClick={() => window.open(url, '_blank')} loading="lazy" />
               ))}
             </div>
           </LuxuryCardContent>
