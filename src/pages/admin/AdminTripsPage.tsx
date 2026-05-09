@@ -158,6 +158,37 @@ export default function AdminTripsPage() {
                         </p>
                       </div>
                       <div className="flex flex-col gap-2 md:flex-row">
+                        <div
+                          className="h-[100px] w-[160px] flex-shrink-0 overflow-hidden rounded-xl border border-[#E5DFC6] bg-[#F6F0E4]"
+                          aria-label="Live preview"
+                        >
+                          {draft ? (
+                            <img
+                              key={draft}
+                              src={draft}
+                              alt="Live preview"
+                              className="h-full w-full object-cover"
+                              onError={(e) => {
+                                const img = e.currentTarget;
+                                img.style.display = "none";
+                                const sib = img.nextElementSibling as HTMLElement | null;
+                                if (sib) sib.style.display = "flex";
+                              }}
+                              onLoad={(e) => {
+                                const img = e.currentTarget;
+                                img.style.display = "block";
+                                const sib = img.nextElementSibling as HTMLElement | null;
+                                if (sib) sib.style.display = "none";
+                              }}
+                            />
+                          ) : null}
+                          <div
+                            className="h-full w-full items-center justify-center text-[10px] uppercase tracking-wider text-[#b34a3a]"
+                            style={{ display: draft ? "none" : "flex" }}
+                          >
+                            {draft ? "Broken image" : "No preview"}
+                          </div>
+                        </div>
                         <Input
                           value={draft}
                           onChange={(e) => updateDraft(trip.id, e.target.value)}
