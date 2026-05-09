@@ -28,7 +28,6 @@ body {
   font-size: var(--fs-body);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  overscroll-behavior-y: none;
   box-sizing: border-box;
 }
 
@@ -404,9 +403,7 @@ All colors MUST be HSL.
     
     /* Prevent viewport shifts when keyboard opens */
     body.keyboard-open {
-      position: fixed;
-      width: 100%;
-      overflow: hidden;
+      height: 100%;
     }
     
     /* Better tap feedback */

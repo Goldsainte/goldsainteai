@@ -89,19 +89,25 @@ export const OnboardingTour = () => {
   };
 
   useEffect(() => {
+    const cleanup = () => {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+      document.body.classList.remove('react-joyride-active');
+    };
+
     if (run) {
       document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
       document.body.classList.add('react-joyride-active');
     } else {
-      document.documentElement.style.overflow = '';
-      document.body.style.overflow = '';
-      document.body.classList.remove('react-joyride-active');
+      cleanup();
     }
+
+    window.addEventListener('popstate', cleanup);
+
     return () => {
-      document.documentElement.style.overflow = '';
-      document.body.style.overflow = '';
-      document.body.classList.remove('react-joyride-active');
+      window.removeEventListener('popstate', cleanup);
+      cleanup();
     };
   }, [run]);
 
