@@ -101,7 +101,6 @@ const TripBuilderPage = lazy(() => import('@/pages/TripBuilderPage'));
 // CreatorProfilePage removed — /creator/:id now redirects to /creators/:id
 const CreatorRedirect = lazy(() => import('@/pages/redirects/CreatorRedirect'));
 const NewCollabRequestPage = lazy(() => import('@/pages/NewCollabRequestPage'));
-const Messages = lazy(() => import('@/pages/Messages'));
 const MessagesPage = lazy(() => import('@/pages/MessagesPage'));
 // TravelerDashboardPage import moved to line 68
 const PartnerConsolePage = lazy(() => import('@/pages/partner/PartnerConsolePage'));
@@ -114,12 +113,6 @@ const JournalArticle = lazy(() => import('@/pages/JournalArticle'));
 const CreatorArticles = lazy(() => import('@/pages/CreatorArticles'));
 const CreatorArticleEditor = lazy(() => import('@/pages/CreatorArticleEditor'));
 const SupplierManagement = lazy(() => import('@/pages/SupplierManagement'));
-const FleetManagementDashboard = lazy(() => import('@/components/FleetManagementDashboard'));
-const DriverManagementPanel = lazy(() => import('@/components/DriverManagementPanel'));
-const VendorPromotionManager = lazy(() => import('@/components/VendorPromotionManager'));
-const VendorPaymentDashboard = lazy(() => import('@/components/VendorPaymentDashboard'));
-const VendorAnalyticsDashboard = lazy(() => import('@/components/VendorAnalyticsDashboard'));
-const VendorBookingCalendar = lazy(() => import('@/components/VendorBookingCalendar'));
 const EscrowTimelineDashboard = lazy(() => import('@/components/EscrowTimelineDashboard'));
 const ActivityLogs = lazy(() => import('@/pages/ActivityLogs'));
 const CustomerVerification = lazy(() => import('@/pages/CustomerVerification'));
@@ -349,7 +342,7 @@ export const AppRoutes = () => (
       />
       <Route
         path="/post-trip"
-        element={<PostTripPage />}
+        element={<RequireAuth><PostTripPage /></RequireAuth>}
       />
       <Route
         path="/trip-requests/:tripRequestId"
@@ -410,9 +403,9 @@ export const AppRoutes = () => (
       <Route path="/messages" element={<RequireAuth><MessagesPage /></RequireAuth>} />
       <Route path="/marketplace-guidelines" element={<MarketplaceGuidelinesPage />} />
       
-      <Route path="/my-bookings" element={<MyBookingsPage />} />
-      <Route path="/partner-bookings" element={<PartnerBookingsPage />} />
-      <Route path="/bookings/:bookingId" element={<BookingDetailPage />} />
+      <Route path="/my-bookings" element={<RequireAuth><MyBookingsPage /></RequireAuth>} />
+      <Route path="/partner-bookings" element={<RequireAuth><PartnerBookingsPage /></RequireAuth>} />
+      <Route path="/bookings/:bookingId" element={<RequireAuth><BookingDetailPage /></RequireAuth>} />
       {/* Duplicate /traveler route removed - consolidated to line 331 */}
       <Route path="/partner" element={<Navigate to="/marketplace" replace />} />
       <Route path="/partner/escrow" element={<Navigate to="/marketplace" replace />} />
@@ -440,8 +433,8 @@ export const AppRoutes = () => (
           </RequireAuth>
         } 
       />
-      <Route path="/email-preview" element={<EmailPreview />} />
-      <Route path="/billing-dashboard" element={<BillingDashboard />} />
+      <Route path="/email-preview" element={<AdminGuard><EmailPreview /></AdminGuard>} />
+      <Route path="/billing-dashboard" element={<RequireAuth><BillingDashboard /></RequireAuth>} />
       <Route path="/travel-settings" element={<CreatorSettingsPage />} />
       <Route path="/travel-settings/general" element={<TravelSettings />} />
       <Route path="/travel-settings/music-volume" element={<MusicVolumeSettings />} />
@@ -460,15 +453,7 @@ export const AppRoutes = () => (
       <Route path="/trip/:tripId/storyboard" element={<Navigate to="/storyboards" replace />} />
       <Route path="/creator/:id" element={<CreatorRedirect />} />
       <Route path="/collabs/new" element={<NewCollabRequestPage />} />
-      <Route
-        path="/messages"
-        element={(
-          <RouteSectionBoundary section="messages">
-            <Messages />
-          </RouteSectionBoundary>
-        )}
-      />
-      <Route path="/my-jobs" element={<MyJobs />} />
+      <Route path="/my-jobs" element={<RequireAuth><MyJobs /></RequireAuth>} />
       {/* Duplicate /my-trips route removed - using MyTripsPage at line 351 */}
       <Route path="/group-trips" element={<GroupTrips />} />
       <Route path="/group-trips/:tripId" element={<GroupTrips />} />
@@ -478,12 +463,6 @@ export const AppRoutes = () => (
       <Route path="/creator-articles/new" element={<CreatorArticleEditor />} />
       <Route path="/creator-articles/edit/:id" element={<CreatorArticleEditor />} />
       <Route path="/supplier-management" element={<SupplierManagement />} />
-      <Route path="/fleet-management" element={<FleetManagementDashboard />} />
-      <Route path="/driver-management" element={<DriverManagementPanel />} />
-      <Route path="/vendor-promotions" element={<VendorPromotionManager />} />
-      <Route path="/vendor-payments" element={<VendorPaymentDashboard />} />
-      <Route path="/vendor-analytics" element={<VendorAnalyticsDashboard />} />
-      <Route path="/vendor-booking-calendar" element={<VendorBookingCalendar />} />
       <Route path="/escrow-timeline" element={<EscrowTimelineDashboard />} />
       <Route path="/activity-logs" element={<ActivityLogs />} />
       <Route path="/customer-verification" element={<CustomerVerification />} />
@@ -526,7 +505,7 @@ export const AppRoutes = () => (
       <Route path="/system-health" element={<SystemHealth />} />
     </Route>
 
-    <Route path="/architecture" element={<ArchitectureDiagramPage />} />
+    <Route path="/architecture" element={<AdminGuard><ArchitectureDiagramPage /></AdminGuard>} />
     <Route path="/r" element={<Redirect />} />
     <Route path="*" element={<NotFound />} />
   </Routes>

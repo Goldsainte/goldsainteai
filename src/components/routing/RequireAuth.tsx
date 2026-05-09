@@ -11,7 +11,11 @@ export function RequireAuth({ children }: RequireAuthProps) {
   const location = useLocation();
 
   if (isLoading) {
-    return null;
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FDF9F0' }}>
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#C7A962] border-t-transparent" />
+      </div>
+    );
   }
 
   if (!user) {
