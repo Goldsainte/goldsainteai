@@ -304,22 +304,6 @@ All colors MUST be HSL.
     @apply border-border;
   }
   
-  /* Global overflow prevention for mobile */
-  html {
-    width: 100%;
-    max-width: 100svw;
-  }
-  body {
-    width: 100%;
-    max-width: 100svw;
-    overflow-x: hidden;
-  }
-
-  /* Prevent pull-to-refresh interference */
-  body {
-    overscroll-behavior-y: none;
-  }
-
   /* Global viewport guard utility */
   .viewport-guard {
     width: 100%;
