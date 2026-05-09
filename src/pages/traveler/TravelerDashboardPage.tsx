@@ -46,7 +46,7 @@ export default function TravelerDashboardPage() {
       const { data: { user: authUser } } = await supabase.auth.getUser();
       if (!authUser) {
         sessionStorage.setItem('returnTo', '/traveler');
-        navigate("/auth?returnTo=/traveler", { replace: true });
+        navigate("/auth?redirect=%2Ftraveler", { replace: true });
         return;
       }
 
