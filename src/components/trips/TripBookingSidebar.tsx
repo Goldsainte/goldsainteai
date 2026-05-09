@@ -101,9 +101,9 @@ export function TripBookingSidebar({
       });
 
       if (error) throw error;
-      if (!data?.url) throw new Error("No checkout URL returned from payment processor");
+      if (!data?.paymentUrl) throw new Error("No checkout URL returned from payment processor");
 
-      window.location.href = data.url;
+      window.location.href = data.paymentUrl;
     } catch (err: any) {
       toast.error(err.message || "Failed to start checkout. Please try again.");
     } finally {

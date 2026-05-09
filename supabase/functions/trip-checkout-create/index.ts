@@ -148,6 +148,7 @@ Deno.serve(async (req) => {
         trip_request_id: tripRequest.id,
         trip_booking_id: booking.id,
         proposal_id: booking.proposal_id || "",
+        type: "trip_booking",
       },
     });
 

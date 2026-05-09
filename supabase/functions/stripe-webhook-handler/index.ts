@@ -103,7 +103,13 @@ async function handleCheckoutCompleted(session: any) {
   const metadata = session.metadata || {};
   
   // Handle different checkout types based on metadata
-  if (metadata.type === 'package_booking') {
+  if (metadata.type === 'trip_booking' && metadata.trip_booking_id) {
+    await supabaseClient
+      .from('trip_bookings')
+      .update({ status: 'confirmed', updated_at: new Date().toISOString() })
+      .eq('id', metadata.trip_booking_id);
+    return;
+  } else if (metadata.type === 'package_booking') {
     await supabaseClient.from('package_bookings').insert({
       package_id: metadata.package_id,
       customer_id: metadata.customer_id,
