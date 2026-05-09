@@ -264,11 +264,7 @@ export const AppRoutes = () => (
       />
       <Route
         path="/trip/:slug"
-        element={(
-          <RouteSectionBoundary section="marketplace">
-            <TripDetailPageNew />
-          </RouteSectionBoundary>
-        )}
+        element={<Navigate to="/marketplace" replace />}
       />
       <Route path="/browse-agents" element={<BrowseAgents />} />
       <Route path="/browse-creators" element={<Navigate to="/creators" replace />} />
@@ -382,8 +378,8 @@ export const AppRoutes = () => (
         )}
       />
       <Route path="/s/:slugOrId" element={<PublicStoryboardPage />} />
-      <Route path="/agent-trips" element={<AgentTripsPage />} />
-      <Route path="/creator-trips" element={<CreatorTripsPage />} />
+      <Route path="/agent-trips" element={<RequireAuth><AgentTripsPage /></RequireAuth>} />
+      <Route path="/creator-trips" element={<RequireAuth><CreatorTripsPage /></RequireAuth>} />
       <Route
         path="/trip-builder"
         element={(
