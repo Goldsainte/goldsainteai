@@ -11,7 +11,6 @@ import { InstagramVerifiedBadge } from "@/components/badges/InstagramVerifiedBad
 import { BusinessVerifiedBadge } from "@/components/badges/BusinessVerifiedBadge";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
-import { CreateMomentModal } from "@/components/CreateMomentModal";
 
 import FollowButton from "@/components/FollowButton";
 import StoryHighlights from "@/components/StoryHighlights";
@@ -25,7 +24,6 @@ import { BuyCoinsModal } from "@/components/BuyCoinsModal";
 import PhotoCarouselModal from "@/components/PhotoCarouselModal";
 import { OptimizedImage } from "@/components/OptimizedImage";
 import { PostGridSkeleton } from "@/components/PostGridSkeleton";
-import { TravelSidebar } from "@/components/TravelSidebar";
 import { MomentsViewer } from "@/components/MomentsViewer";
 import { ProfilePhotoModal } from "@/components/ProfilePhotoModal";
 import { PinnedPosts } from "@/components/PinnedPosts";
