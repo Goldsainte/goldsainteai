@@ -827,7 +827,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                 <div
                   key={post.id}
                   className="relative aspect-[4/5] md:aspect-square bg-muted cursor-pointer group overflow-hidden"
-                  onClick={() => navigate(`/travel-feed?postId=${post.id}`)}
+                  onClick={() => navigate(`/storyboards`)}
                 >
                   {post.thumbnail_url ? (
                     <img
@@ -981,7 +981,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                         setSelectedPost(post);
                         setPhotoModalOpen(true);
                       } else {
-                        navigate(`/travel-feed?postId=${post.id}`);
+                        navigate(`/storyboards`);
                       }
                     }}
                   >
@@ -1138,7 +1138,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate('/travel-feed')}
+            onClick={() => navigate('/marketplace')}
             className="hover:bg-accent h-12 w-12 rounded-lg [&>svg]:text-[#BFAD72]"
             aria-label="Journeys"
           >

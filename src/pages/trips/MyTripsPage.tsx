@@ -110,7 +110,7 @@ export default function MyTripsPage() {
         // MY TRIPS → REQUESTS VIEW: Query the same trip_requests table as Marketplace
         // This is the traveler's personal dashboard view filtered to their own traveler_id
         // The same records appear in the Marketplace when status='open' for creators/agents to bid on
-        console.log("🔍 [MyTripsPage] Fetching trip requests for user:", authUser.id);
+        // The same records appear in the Marketplace when status='open' for creators/agents to bid on
         
         // FIXED: Removed broken nested select `trip_proposals ( status )` that was causing query to fail
         // TODO: Add proper foreign key constraint between trip_proposals and trip_requests
@@ -135,12 +135,6 @@ export default function MyTripsPage() {
           .eq("user_id", authUser.id)
           .order("created_at", { ascending: false });
         
-        console.log("📦 [MyTripsPage] Query result:", {
-          data: result.data,
-          error: result.error,
-          count: result.data?.length ?? 0
-        });
-        
         const requestsData = result.data;
         const requestsError = result.error;
 
@@ -149,7 +143,6 @@ export default function MyTripsPage() {
             console.error("❌ [MyTripsPage] Error loading trip_requests:", requestsError);
             setRequests([]);
           } else {
-            console.log(`✅ [MyTripsPage] Loaded ${requestsData?.length ?? 0} trip requests`);
             setRequests((requestsData ?? []) as any);
           }
         }
