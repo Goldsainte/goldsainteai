@@ -43,8 +43,7 @@ export const ExpediaWidgetCard = ({ payload }: ExpediaWidgetCardProps) => {
       }
     }
     
-    console.log('🧹 Expedia widget destroyed');
-  };
+      };
 
   const initWidget = () => {
     if (initAttemptedRef.current || destroyedRef.current) return;
@@ -66,8 +65,7 @@ export const ExpediaWidgetCard = ({ payload }: ExpediaWidgetCardProps) => {
       return;
     }
 
-    console.log('🎯 Initializing inline Expedia widget with payload:', payload);
-
+    
     // SECURITY: Create widget container using DOM methods (not innerHTML)
     const widgetDiv = document.createElement('div');
     widgetDiv.className = 'eg-widget';
@@ -114,8 +112,7 @@ export const ExpediaWidgetCard = ({ payload }: ExpediaWidgetCardProps) => {
       if (!destroyedRef.current) {
         console.error('⏱️ Widget initialization timeout');
         setWidgetState('error');
-        console.log('🎯 [TELEMETRY] chat_expedia_widget_init_timeout');
-      }
+              }
     }, 20000);
 
     const tryInit = () => {
@@ -126,28 +123,16 @@ export const ExpediaWidgetCard = ({ payload }: ExpediaWidgetCardProps) => {
         try {
           window.EG.initWidgets();
           setWidgetState('ready');
-          console.log('✅ Inline Expedia widget initialized');
-          console.log('🎯 [TELEMETRY] chat_expedia_widget_init_success', {
-            prefilled: {
-              destination: !!payload.destination,
-              checkIn: !!payload.checkIn,
-              checkOut: !!payload.checkOut,
-              adults: !!payload.adults
-            }
-          });
-        } catch (error) {
+                            } catch (error) {
           console.error('❌ Widget init error:', error);
           setWidgetState('error');
-          console.log('🎯 [TELEMETRY] chat_expedia_widget_init_error');
-        }
+                  }
       } else if (window.EG?.init) {
         clearTimeout(initTimeout);
         try {
           window.EG.init();
           setWidgetState('ready');
-          console.log('✅ Inline Expedia widget initialized (legacy)');
-          console.log('🎯 [TELEMETRY] chat_expedia_widget_init_success');
-        } catch (error) {
+                            } catch (error) {
           console.error('❌ Widget init error:', error);
           setWidgetState('error');
         }
@@ -164,8 +149,7 @@ export const ExpediaWidgetCard = ({ payload }: ExpediaWidgetCardProps) => {
       clearTimeout(initTimeout);
       console.error('❌ Failed to load Expedia widget script');
       setWidgetState('error');
-      console.log('🎯 [TELEMETRY] chat_expedia_widget_script_load_failed');
-    };
+          };
   };
 
   // Check for return from Expedia
@@ -175,8 +159,7 @@ export const ExpediaWidgetCard = ({ payload }: ExpediaWidgetCardProps) => {
       sessionStorage.removeItem('expediaRedirect');
       setShowReopen(true);
       setWidgetState('redirect');
-      console.log('🔙 Returned from Expedia, showing reopen option');
-    } else {
+          } else {
       // Initialize widget on mount
       initWidget();
     }
@@ -192,8 +175,7 @@ export const ExpediaWidgetCard = ({ payload }: ExpediaWidgetCardProps) => {
     const handleBeforeUnload = () => {
       if (widgetState === 'ready') {
         sessionStorage.setItem('expediaRedirect', '1');
-        console.log('🎯 [TELEMETRY] expedia_redirect_from_chat');
-      }
+              }
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -219,8 +201,7 @@ export const ExpediaWidgetCard = ({ payload }: ExpediaWidgetCardProps) => {
     sessionStorage.setItem('expediaRedirect', '1');
     const url = `https://www.expedia.com/Hotel-Search?${params.toString()}&camref=1101l5ujJR&pubref=goldsainte+ai+fallback`;
     window.open(url, '_blank');
-    console.log('🎯 [TELEMETRY] chat_expedia_fallback_cta_click');
-  };
+      };
 
   return (
     <div className="w-full max-w-[640px] mx-auto my-3 sm:my-4 rounded-lg border border-border bg-card overflow-hidden" role="region" aria-label="Expedia hotel and flight search widget">

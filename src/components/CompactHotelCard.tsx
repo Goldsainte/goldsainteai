@@ -154,21 +154,13 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
   };
 
   const fetchHotelDetails = async () => {
-    console.log('🔍 [FETCH] Starting fetchHotelDetails');
-    console.log('📋 [FETCH] Current state:', { 
-      hasDetails: !!hotelDetails, 
-      isLoading: loadingDetails,
-      propertyKeys: Object.keys(property)
-    });
-    
+            
     if (hotelDetails) {
-      console.log('⏭️ [FETCH] Already have details, skipping');
-      return;
+            return;
     }
     
     if (loadingDetails) {
-      console.log('⏭️ [FETCH] Already loading, skipping');
-      return;
+            return;
     }
     
     // Try ALL possible ID fields
@@ -184,13 +176,10 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
     
     const hotelId = possibleIds.find(id => id);
     
-    console.log('🏨 [FETCH] Hotel ID candidates:', possibleIds);
-    console.log('🎯 [FETCH] Selected hotel ID:', hotelId);
-    
+            
     if (!hotelId) {
       console.error('❌ [FETCH] NO HOTEL ID FOUND IN ANY FIELD');
-      console.log('📦 [FETCH] Full property object:', property);
-      setDetailsError('Cannot load details: Hotel ID missing');
+            setDetailsError('Cannot load details: Hotel ID missing');
       return;
     }
     
@@ -198,13 +187,7 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
     setDetailsError(null);
     
     try {
-      console.log('📡 [FETCH] Calling edge function with:', {
-        hotelId,
-        arrival_date: searchDates?.checkIn,
-        departure_date: searchDates?.checkOut,
-        currency
-      });
-      
+            
       const { data, error } = await supabase.functions.invoke('get-hotel-details', {
         body: {
           hotelId: hotelId,
@@ -214,29 +197,17 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
         }
       });
       
-      console.log('📥 [FETCH] Edge function response:', { hasData: !!data, hasError: !!error });
-      
+            
       if (error) {
         console.error('❌ [FETCH] Edge function error:', error);
         throw error;
       }
       
-      console.log('✅ [FETCH] Raw data received:', data);
-      console.log('🔍 [FETCH] Data structure:', {
-        keys: Object.keys(data || {}),
-        hasDataField: !!data?.data,
-        dataKeys: data?.data ? Object.keys(data.data) : []
-      });
-      
+                  
       const detailsData = data?.data || data;
-      console.log('💾 [FETCH] Saving to state:', {
-        hasData: !!detailsData,
-        keys: Object.keys(detailsData || {})
-      });
-      
+            
       setHotelDetails(detailsData);
-      console.log('🏁 [FETCH] fetchHotelDetails complete');
-    } catch (error) {
+          } catch (error) {
       console.error('❌ [FETCH] Exception:', error);
       setDetailsError(`Failed to load details: ${error.message || 'Unknown error'}`);
     } finally {
@@ -445,8 +416,7 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
                   size="sm" 
                   className="w-full sm:w-auto"
                   onClick={() => {
-                    console.log('🔄 [RETRY] User clicked retry');
-                    setDetailsError(null);
+                                        setDetailsError(null);
                     fetchHotelDetails();
                   }}
                 >
@@ -574,17 +544,7 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
                     ...(googleReviews || [])
                   ].filter(Boolean);
                   
-                  console.log('📊 [REVIEWS] Found reviews:', {
-                    total: allReviews.length,
-                    sources: {
-                      reviews: hotelDetails?.reviews?.length || 0,
-                      guest_reviews: hotelDetails?.guest_reviews?.length || 0,
-                      property_reviews: hotelDetails?.property?.reviews?.length || 0,
-                      user_reviews: hotelDetails?.user_reviews?.length || 0,
-                      google: googleReviews?.length || 0
-                    }
-                  });
-                  
+                                    
                   return allReviews.length > 0 && (
                     <div className="space-y-2">
                       <h4 className="font-semibold text-sm text-foreground">
@@ -695,18 +655,7 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
                   const detailsPhotos = hotelDetails?.photos || hotelDetails?.images || hotelDetails?.property?.photoUrls || hotelDetails?.photo_urls || [];
                   const allPhotosForGallery = [...allImages, ...detailsPhotos].filter(Boolean);
                   
-                  console.log('📸 [PHOTOS] Found photos:', {
-                    fromProperty: allImages.length,
-                    fromDetails: detailsPhotos.length,
-                    total: allPhotosForGallery.length,
-                    sources: {
-                      photos: !!hotelDetails?.photos,
-                      images: !!hotelDetails?.images,
-                      property_photoUrls: !!hotelDetails?.property?.photoUrls,
-                      photo_urls: !!hotelDetails?.photo_urls
-                    }
-                  });
-                  
+                                    
                   return allPhotosForGallery.length > 0 && (
                     <div className="space-y-3">
                       <h4 className="font-semibold text-sm text-foreground">
