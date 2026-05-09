@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 
 interface TripData {
   id: string;
+  slug?: string | null;
   title: string;
   destination: string;
   description?: string | null;
