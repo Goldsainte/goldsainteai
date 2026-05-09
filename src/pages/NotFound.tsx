@@ -9,12 +9,21 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">404</h1>
-        <p className="mb-4 text-xl text-gray-600">Oops! Page not found</p>
-        <a href="/" className="text-blue-500 underline hover:text-blue-700">
-          Return to Home
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FDF9F0' }}>
+      <div className="text-center space-y-6 px-6">
+        <p className="text-[11px] uppercase tracking-[0.2em]" style={{ color: '#C7A962' }}>404</p>
+        <h1 className="font-secondary text-4xl md:text-5xl" style={{ color: '#0a2225' }}>
+          Page not found
+        </h1>
+        <p className="text-base max-w-sm mx-auto" style={{ color: '#9A9384' }}>
+          The page you're looking for doesn't exist or has been moved.
+        </p>
+        <a
+          href="/"
+          className="inline-flex items-center justify-center h-12 px-8 rounded-full text-sm font-medium"
+          style={{ backgroundColor: '#0c4d47', color: '#E5DFC6' }}
+        >
+          Return to Goldsainte
         </a>
       </div>
     </div>
