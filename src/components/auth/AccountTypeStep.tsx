@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,6 +41,20 @@ export function AccountTypeStep({ onComplete }: Props) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    async function prefillFromSession() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const fullName = user.user_metadata?.full_name || user.user_metadata?.name || '';
+      if (fullName && !firstName) {
+        const parts = fullName.split(' ');
+        setFirstName(parts[0] || '');
+        setLastName(parts.slice(1).join(' ') || '');
+      }
+    }
+    prefillFromSession();
+  }, []);
+
   const handleSave = async () => {
     setError(null);
 
@@ -50,10 +64,6 @@ export function AccountTypeStep({ onComplete }: Props) {
     }
     if (!firstName.trim() || !lastName.trim()) {
       setError("Please enter your first and last name.");
-      return;
-    }
-    if (!phone.trim()) {
-      setError("Please add a mobile number for account security.");
       return;
     }
 
