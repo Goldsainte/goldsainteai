@@ -135,11 +135,7 @@ export default function MyTripsPage() {
           .eq("user_id", authUser.id)
           .order("created_at", { ascending: false });
         
-        console.log("📦 [MyTripsPage] Query result:", {
-          data: result.data,
-          error: result.error,
-          count: result.data?.length ?? 0
-        });
+        const requestsData = result.data;
         
         const requestsData = result.data;
         const requestsError = result.error;
@@ -149,7 +145,7 @@ export default function MyTripsPage() {
             console.error("❌ [MyTripsPage] Error loading trip_requests:", requestsError);
             setRequests([]);
           } else {
-            console.log(`✅ [MyTripsPage] Loaded ${requestsData?.length ?? 0} trip requests`);
+            setRequests((requestsData ?? []) as any);
             setRequests((requestsData ?? []) as any);
           }
         }

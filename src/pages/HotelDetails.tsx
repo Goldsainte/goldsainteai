@@ -87,7 +87,6 @@ export default function HotelDetails() {
 
   const fetchHotelDetails = async () => {
     try {
-      console.log('🔍 [HotelDetails] Fetching details for:', id);
       
       const { data, error } = await supabase.functions.invoke('get-hotel-details', {
         body: {
@@ -103,7 +102,6 @@ export default function HotelDetails() {
       if (error) throw error;
       if (!data.success) throw new Error(data.error?.message || 'Failed to load hotel');
 
-      console.log('✅ [HotelDetails] Details received:', data.data);
       setHotelData(data.data);
       setError(null);
     } catch (error) {
@@ -122,7 +120,6 @@ export default function HotelDetails() {
     }
 
     try {
-      console.log('🛏️ [HotelDetails] Fetching availability');
       
       const { data, error } = await supabase.functions.invoke('get-room-availability', {
         body: {
@@ -138,7 +135,6 @@ export default function HotelDetails() {
 
       if (error) throw error;
 
-      console.log('✅ [HotelDetails] Availability received:', data);
       
       if (data.availabilityNotSupported || data.fallbackMode) {
         setBookingUrl(data.bookingUrl);
