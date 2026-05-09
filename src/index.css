@@ -152,37 +152,10 @@ All colors MUST be HSL.
 */
 
 @layer base {
-/* Mobile responsiveness - prevent horizontal overflow on iPhone */
-/* Viewport guard - prevent horizontal overflow globally */
-html {
-  width: 100%;
-  max-width: 100svw;
-  box-sizing: border-box;
-}
-body {
-  width: 100%;
-  max-width: 100svw;
-  overflow-x: hidden;
-  box-sizing: border-box;
-}
-
 #root, #main-content {
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-}
-
-/* Height chain for footer at bottom with proper scrolling */
-html {
-  height: 100%;
-}
-
-body {
-  min-height: 100%;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
 }
 
 #root {
