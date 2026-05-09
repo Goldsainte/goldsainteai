@@ -14,31 +14,6 @@ const SUPABASE_URL =
 const SUPABASE_PUBLISHABLE_KEY =
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || FALLBACK_SUPABASE_KEY;
 
-const isPlaceholderConfig =
-  !SUPABASE_URL ||
-  !SUPABASE_PUBLISHABLE_KEY ||
-  SUPABASE_URL.includes("your-project.supabase.co") ||
-  SUPABASE_URL.includes("placeholder.supabase.co") ||
-  SUPABASE_PUBLISHABLE_KEY.includes("your-supabase-anon-key") ||
-  SUPABASE_PUBLISHABLE_KEY === "public-anon-key";
-
-// In production (including Lovable preview), DO NOT crash the app.
-// Just log an error so we know Supabase is not really configured.
-if (import.meta.env.PROD && isPlaceholderConfig) {
-  console.error(
-    "[Supabase] Using placeholder configuration in production. " +
-      "Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY for real auth."
-  );
-}
-
-// In dev, log a more gentle warning.
-if (import.meta.env.DEV && isPlaceholderConfig) {
-  console.warn(
-    "[Supabase] Using placeholder configuration. " +
-      "Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY for full functionality."
-  );
-}
-
 // Import the supabase client like this:
 //   import { supabase } from "@/integrations/supabase/client"
 export const supabase = createClient<Database>(
