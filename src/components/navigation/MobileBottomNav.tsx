@@ -1,4 +1,4 @@
-import { Store, PlaneTakeoff, Sparkles, User } from "lucide-react";
+import { Store, PlaneTakeoff, Luggage, User } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -21,7 +21,7 @@ export function MobileBottomNav() {
   const navItems = [
     { to: "/marketplace", icon: Store, label: "Marketplace" },
     { to: "/post-trip", icon: PlaneTakeoff, label: "Post a Trip" },
-    { to: "/storyboards", icon: Sparkles, label: "Storyboards" },
+    { to: "/my-trips", icon: Luggage, label: "My Trips" },
     { to: getProfileRoute(), icon: User, label: "Profile" },
   ];
 
