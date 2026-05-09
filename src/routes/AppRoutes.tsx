@@ -96,7 +96,6 @@ const TikTokCallback = lazy(() => import('@/pages/TikTokCallback'));
 const CreatorDashboard = lazy(() => import('@/pages/CreatorDashboard'));
 // New TikTok creator ecosystem pages
 const CreatorTripPage = lazy(() => import('@/pages/CreatorTripPage'));
-const TripDetailPageNew = lazy(() => import('@/pages/trips/TripDetailPage'));
 const TripBuilderPage = lazy(() => import('@/pages/TripBuilderPage'));
 // CreatorProfilePage removed — /creator/:id now redirects to /creators/:id
 const CreatorRedirect = lazy(() => import('@/pages/redirects/CreatorRedirect'));
