@@ -170,7 +170,7 @@ const Auth = () => {
       if (user) {
         const { data: profile } = await supabase
           .from("profiles")
-          .select("account_type, is_profile_complete")
+          .select("account_type, is_profile_complete, onboarding_completed")
           .eq("id", user.id)
           .maybeSingle();
         if (!profile?.account_type && !profile?.is_profile_complete) {
@@ -178,10 +178,26 @@ const Auth = () => {
           setIsLoading(false);
           return;
         }
+        setIsLoading(false);
+        const storedRedirect = typeof window !== 'undefined'
+          ? sanitizeRedirectPath(sessionStorage.getItem(AUTH_REDIRECT_STORAGE_KEY))
+          : null;
+        const destination = redirectTarget ?? storedRedirect;
+        if (destination) {
+          if (typeof window !== 'undefined') sessionStorage.removeItem(AUTH_REDIRECT_STORAGE_KEY);
+          navigate(destination, { replace: true });
+          return;
+        }
+        const postAuthPath = getPostAuthDestination(
+          profile?.account_type ?? null,
+          profile?.onboarding_completed ?? false,
+          profile?.is_profile_complete ?? false
+        );
+        navigate(postAuthPath, { replace: true });
+        return;
       }
       setIsLoading(false);
-      const destination = redirectTarget ?? '/marketplace';
-      navigate(destination, { replace: true });
+      navigate('/marketplace', { replace: true });
     }
   };
 
