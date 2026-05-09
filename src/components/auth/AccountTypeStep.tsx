@@ -174,7 +174,7 @@ export function AccountTypeStep({ onComplete }: Props) {
           className="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20 rounded-xl h-11"
         />
         <p className="text-xs text-[#6B7280]">
-          Used for security and important updates about your trips and brand activity.
+          You can add this later from your profile settings.
         </p>
       </div>
 
