@@ -104,6 +104,10 @@ export const preventDoubleTapZoom = (element: HTMLElement) => {
  */
 export const lockScroll = () => {
   const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+  const scrollY = window.scrollY;
+  document.body.style.top = `-${scrollY}px`;
+  document.body.style.position = 'fixed';
+  document.body.style.width = '100%';
   document.body.style.overflow = 'hidden';
   document.body.style.paddingRight = `${scrollbarWidth}px`;
 };
@@ -113,11 +117,15 @@ export const lockScroll = () => {
  */
 export const unlockScroll = () => {
   try {
+    const top = document.body.style.top;
     document.body.style.overflow = '';
     document.body.style.paddingRight = '';
     document.body.style.position = '';
     document.body.style.top = '';
     document.body.style.width = '';
+    if (top) {
+      window.scrollTo(0, parseInt(top || '0') * -1);
+    }
   } catch (e) {
     console.warn('unlockScroll failed', e);
   }
