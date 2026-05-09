@@ -179,7 +179,7 @@ export default function MyTripsPage() {
         <title>My Trips · Goldsainte</title>
       </Helmet>
 
-      <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
+      <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225] pb-20 lg:pb-0">
         <section className="mx-auto max-w-5xl px-4 pt-14 pb-6 md:pt-16 md:pb-8">
           <div className="flex items-center justify-between mb-6">
             <BackButton label="Back" />
