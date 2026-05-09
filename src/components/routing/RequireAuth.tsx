@@ -15,8 +15,8 @@ export function RequireAuth({ children }: RequireAuthProps) {
   }
 
   if (!user) {
-    const redirectTarget = encodeURIComponent(`${location.pathname}${location.search}`);
-    return <Navigate to={`/login?redirect=${redirectTarget}`} replace />;
+    const currentPath = encodeURIComponent(`${location.pathname}${location.search}`);
+    return <Navigate to={`/auth?redirect=${currentPath}`} replace />;
   }
 
   return children;
