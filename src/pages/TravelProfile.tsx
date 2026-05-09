@@ -222,7 +222,6 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
 
   const fetchUserPosts = async () => {
     try {
-      console.log('Fetching photo posts for user:', profileUserId);
       // Fetch only photo posts for the Posts tab - limit for faster initial load
       let query: any = supabase
         .from('travel_posts')
@@ -244,7 +243,6 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         throw error;
       }
       
-      console.log('Fetched photo posts:', data?.length || 0, 'posts');
       setUserPosts(data || []);
     } catch (error) {
       console.error('Error fetching photo posts:', error);
@@ -254,7 +252,6 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
 
   const fetchVideoPosts = async () => {
     try {
-      console.log('Fetching video posts for user:', profileUserId);
       // Fetch only video posts for the Journeys tab
       let query: any = supabase
         .from('travel_posts')
