@@ -97,7 +97,7 @@ const TravelProfile = () => {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadInitialTab, setUploadInitialTab] = useState<"photo" | "video">("photo");
   const [buyCoinsOpen, setBuyCoinsOpen] = useState(false);
-  const [createMomentOpen, setCreateMomentOpen] = useState(false);
+
   const { isCloseFriend } = useCloseFriends();
 const { balance, refetch: refetchCoins } = useCoinBalance();
   const [hasActiveMoments, setHasActiveMoments] = useState(false);
@@ -373,9 +373,6 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
       setUploadInitialTab("photo");
       setUploadModalOpen(true);
       setCreateSheetOpen(false);
-    } else if (type === 'moment') {
-      setCreateSheetOpen(false);
-      setCreateMomentOpen(true);
     } else if (type === 'moments-vault') {
       toast.info('Tap the + button in the Moments Vaults section below to create a new vault');
       setCreateSheetOpen(false);
