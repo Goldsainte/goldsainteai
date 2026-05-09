@@ -256,7 +256,6 @@ const Auth = () => {
     }
     
     try {
-      console.log("[Auth] Signing up with email:", normalizedEmail);
       const { data, error } = await supabase.auth.signUp({
         email: normalizedEmail,
         password,
