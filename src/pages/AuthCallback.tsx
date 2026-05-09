@@ -22,7 +22,6 @@ const AuthCallback = () => {
 
         if (!session) {
           navigate('/auth');
-          navigate('/auth');
           return;
         }
 

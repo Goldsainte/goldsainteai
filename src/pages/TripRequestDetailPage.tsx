@@ -428,8 +428,6 @@ export default function TripRequestDetailPage() {
       if (proposalsData) {
         setProposals((proposalsData ?? []) as TripProposal[]);
       }
-
-      } catch (err: any) {
     } catch (err: any) {
       console.error(err);
       const message = typeof err?.message === "string"

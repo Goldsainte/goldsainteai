@@ -153,19 +153,7 @@ export default function HotelDetails() {
     const url = bookingUrl || hotelData?.bookingUrl;
     
     if (url) {
-      console.log('🔗 [HotelDetails] Opening booking:', url);
       window.open(url, '_blank');
-      
-      // Log event
-      console.log('📊 [HotelDetails] Booking click:', {
-        propertyId: id,
-        hotelName: hotelData?.name,
-        roomName: offer?.name,
-        price: offer?.total?.amount,
-        checkIn,
-        checkOut,
-        guests
-      });
     } else {
       toast.error('Booking link not available');
     }
