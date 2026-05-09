@@ -22,7 +22,7 @@ export default function TravelerPreferencesOnboardingPage() {
     if (authLoading) return;
     
     if (!user) {
-      navigate("/auth?returnTo=/onboarding/traveler/preferences");
+      navigate("/auth?redirect=%2Fonboarding%2Ftraveler%2Fpreferences");
       return;
     }
 
