@@ -49,8 +49,7 @@ async function convertAmount(amount: number, from: string, to: string): Promise<
   if (from === to) return amount;
   const rate = await getRate(from, to);
   const converted = amount * rate;
-  console.log(`Converting ${amount} ${from} to ${to}: rate=${rate}, result=${converted}`);
-  return converted;
+    return converted;
 }
 
 interface PackageCardProps {
@@ -103,12 +102,6 @@ const hotelCurrency = cheapestHotel?.offers?.[0]?.price?.currency
   || 'USD';
 const carCurrency = cheapestCar?.price?.currency || 'USD';
 
-console.log('Package prices:', { 
-  flight: { price: flightPrice, currency: flightCurrency },
-  hotel: { price: hotelPrice, currency: hotelCurrency },
-  car: { price: carPrice, currency: carCurrency },
-  targetCurrency: currencyInfo.code
-});
 
 const [converted, setConverted] = useState({ flight: flightPrice, hotel: hotelPrice, car: carPrice });
 
@@ -154,8 +147,7 @@ useEffect(() => {
 // Total is sum of all converted prices (flight is total for all travelers, hotel is total, car is total)
 const total = useMemo(() => {
   const sum = converted.flight + converted.hotel + converted.car;
-  console.log('Total calculation:', { converted, sum });
-  return sum;
+    return sum;
 }, [converted]);
 
 const packageSavings = useMemo(() => Math.floor(total * 0.1), [total]); // 10% package discount
@@ -164,8 +156,7 @@ const finalPrice = useMemo(() => total - packageSavings, [total, packageSavings]
 // Per person price - divide total by number of travelers
 const perPerson = useMemo(() => {
   const pp = travelers > 0 ? finalPrice / travelers : finalPrice;
-  console.log('Per person calculation:', { finalPrice, travelers, perPerson: pp });
-  return pp;
+    return pp;
 }, [finalPrice, travelers]);
 
 const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency].some(c => c && c !== currencyInfo.code), [flightCurrency, hotelCurrency, carCurrency, currencyInfo.code]);

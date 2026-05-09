@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 
 interface TripData {
   id: string;
+  slug?: string | null;
   title: string;
   destination: string;
   description?: string | null;
@@ -193,7 +194,7 @@ export default function TrovaTripDetailPage() {
           <meta property="og:title" content={`${trip.title} — Goldsainte`} />
           <meta property="og:description" content={trip.description?.slice(0, 160) || `Experience ${trip.destination} with Goldsainte`} />
           <meta property="og:image" content={trip.cover_image_url || 'https://goldsainte.ai/og-hero-v3.jpg'} />
-          <meta property="og:url" content={`https://goldsainte.ai/marketplace/trip/${trip.id}`} />
+          <meta property="og:url" content={`https://goldsainte.ai/marketplace/trip/${trip.slug || trip.id}`} />
           <meta property="og:type" content="website" />
           <meta name="twitter:card" content="summary_large_image" />
           <meta name="twitter:title" content={`${trip.title} — Goldsainte`} />

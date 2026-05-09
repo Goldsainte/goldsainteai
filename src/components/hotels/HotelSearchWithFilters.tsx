@@ -64,8 +64,7 @@ export const HotelSearchWithFilters = ({ initialQuery, onQueryChange, hidePriceF
 
     const timeoutId = setTimeout(async () => {
       try {
-        console.log('Fetching hotels with query:', query);
-        
+                
         const { data: hotelData, error: hotelError } = await supabase.functions.invoke('unified-search-hotels', {
           body: {
             location: query.location,
@@ -84,21 +83,18 @@ export const HotelSearchWithFilters = ({ initialQuery, onQueryChange, hidePriceF
 
         // Drop stale responses
         if (id !== reqSeq.current) {
-          console.log('Dropping stale response, request id:', id, 'current:', reqSeq.current);
-          return;
+                    return;
         }
 
         const results = hotelData?.results || [];
-        console.log(`Received ${results.length} hotels (request ${id})`);
-        setData(results);
+                setData(results);
         
         if (results.length === 0) {
           setError(`No hotels found under ${query.currency}${query.maxPrice}/night`);
         }
       } catch (e: any) {
         if (e.name === 'AbortError') {
-          console.log('Request aborted');
-          return;
+                    return;
         }
         
         // Drop stale error responses

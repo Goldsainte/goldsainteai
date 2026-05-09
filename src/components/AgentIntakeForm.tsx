@@ -74,15 +74,13 @@ export const AgentIntakeForm = ({ tripType, initialData, onComplete }: AgentInta
   };
 
   const handleNext = () => {
-    console.log('🎯 [TELEMETRY] agent_intake_field_completed', { step });
-    setStep(prev => Math.min(prev + 1, totalSteps));
+        setStep(prev => Math.min(prev + 1, totalSteps));
   };
 
   const handleBack = () => setStep(prev => Math.max(prev - 1, 1));
 
   const handleSubmit = () => {
-    console.log('🎯 [TELEMETRY] agent_intake_completed', { tripType });
-    
+        
     const payload: any = {
       source: 'goldsainte_ai_chat',
       choice: 'agent',

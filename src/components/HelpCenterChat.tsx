@@ -95,11 +95,7 @@ export const HelpCenterChat = () => {
         );
 
         if (shouldShowChoice) {
-          console.log('🎯 [TELEMETRY] booking_choice_rendered', {
-            tripType: data.meta.search_type,
-            hasParams: !!data.meta.search_params
-          });
-          const assistantMessage: Message = {
+                    const assistantMessage: Message = {
             role: 'assistant',
             content: sanitizeAssistantContent(data.response),
             choicePrompt: {
@@ -112,8 +108,7 @@ export const HelpCenterChat = () => {
         }
         // PRIORITY 2: Check if we should go straight to agent intake
         else if (data.meta?.ui?.showAgentIntake) {
-          console.log('🎯 [TELEMETRY] agent_intake_started (auto)');
-          const assistantMessage: Message = {
+                    const assistantMessage: Message = {
             role: 'assistant',
             content: sanitizeAssistantContent(data.response),
             agentIntake: {
@@ -125,8 +120,7 @@ export const HelpCenterChat = () => {
         }
         // PRIORITY 3: Check if we should show date picker
         else if (data.meta?.ui?.showDatePicker) {
-          console.log('🎯 Rendering inline date picker');
-          const assistantMessage: Message = {
+                    const assistantMessage: Message = {
             role: 'assistant',
             content: sanitizeAssistantContent(data.response),
             datePickerData: {
@@ -139,9 +133,7 @@ export const HelpCenterChat = () => {
         }
         // PRIORITY 4: Check if we should render inline widget (ONLY if explicit self-service)
         else if (FEATURE_FLAGS.USE_EXPEDIA_WIDGET_INLINE && data.meta?.status === 'OK' && data.meta?.search_params && data.meta?.ui?.openWidgetInline === true) {
-          console.log('🎯 Rendering inline Expedia widget with params:', data.meta.search_params);
-          console.log('🎯 [TELEMETRY] chat_expedia_widget_inserted');
-          
+                              
           let widgetPayload;
           if (data.meta.search_type === 'hotels') {
             widgetPayload = {
@@ -207,9 +199,7 @@ export const HelpCenterChat = () => {
 
   const handleBookingChoice = (messageIndex: number, choice: 'self_service' | 'agent', tripType: 'hotels' | 'flights' | 'hotel+flight', prefillData: any) => {
     if (choice === 'self_service') {
-      console.log('🎯 [TELEMETRY] expedia_widget_opened');
-      console.log('🎯 [TELEMETRY] widget_prefill_applied');
-      
+                  
       // Replace the choice prompt with Expedia widget
       setMessages(prev => prev.map((msg, idx) => {
         if (idx === messageIndex) {
@@ -252,8 +242,7 @@ export const HelpCenterChat = () => {
         return msg;
       }));
     } else {
-      console.log('🎯 [TELEMETRY] agent_intake_started');
-      
+            
       // Replace choice prompt with agent intake form
       setMessages(prev => prev.map((msg, idx) => {
         if (idx === messageIndex) {

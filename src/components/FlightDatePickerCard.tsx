@@ -37,10 +37,8 @@ export const FlightDatePickerCard = ({
   const max = maxDate ? new Date(maxDate) : addDays(today, 330);
 
   useEffect(() => {
-    console.log('🎯 [TELEMETRY] flight_datepicker_shown');
-    if (prefill?.depart || prefill?.return) {
-      console.log('🎯 [TELEMETRY] flight_datepicker_prefill_applied');
-    }
+        if (prefill?.depart || prefill?.return) {
+          }
   }, [prefill]);
 
   const handleDepartSelect = (date: Date | undefined) => {
@@ -65,8 +63,7 @@ export const FlightDatePickerCard = ({
     if (newMode === 'oneWay') {
       setReturnDate(undefined);
     }
-    console.log('🎯 [TELEMETRY] flight_datepicker_mode_toggled', { mode: newMode });
-  };
+      };
 
   const handleClear = () => {
     setDepartDate(undefined);
@@ -82,8 +79,7 @@ export const FlightDatePickerCard = ({
       ...(mode === 'roundTrip' && returnDate ? { return: format(returnDate, 'yyyy-MM-dd') } : {}),
     };
 
-    console.log('🎯 [TELEMETRY] flight_datepicker_confirmed', { dates, mode });
-    onConfirm(dates, mode);
+        onConfirm(dates, mode);
     setIsCollapsed(true);
   };
 

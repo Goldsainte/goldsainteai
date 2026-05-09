@@ -72,8 +72,7 @@ export class RealtimeVoiceChat {
   async init(getSessionToken: () => Promise<{ token: string; expiresAt?: number }>) {
     try {
       this.onStatusChange('connecting');
-      console.log("Initializing voice chat…");
-
+      
       // Get ephemeral token (string) - with safety fallback
       const tokenResponse: any = await getSessionToken();
       // Support multiple response formats
@@ -89,8 +88,7 @@ export class RealtimeVoiceChat {
         throw new Error("Voice config error: missing/invalid ephemeral token");
       }
       
-      console.log("✅ Ephemeral token acquired");
-
+      
       // Optional: basic expiry guard (tokens are ~60s)
       if (expiresAt && Date.now() > expiresAt - 10_000) {
         console.warn("⚠️ Ephemeral token close to expiry; consider re-fetching");
@@ -105,19 +103,14 @@ export class RealtimeVoiceChat {
 
       // Connection state logging
       this.pc.onicegatheringstatechange = () =>
-        console.log("ICE gathering:", this.pc?.iceGatheringState);
-      this.pc.oniceconnectionstatechange = () =>
-        console.log("ICE connection:", this.pc?.iceConnectionState);
-      this.pc.onsignalingstatechange = () =>
-        console.log("Signaling:", this.pc?.signalingState);
-      this.pc.onconnectionstatechange = () =>
-        console.log("Peer connection:", this.pc?.connectionState);
-
+              this.pc.oniceconnectionstatechange = () =>
+              this.pc.onsignalingstatechange = () =>
+              this.pc.onconnectionstatechange = () =>
+        
       // Set up remote audio
       this.audioEl.setAttribute('playsInline', 'true');
       this.pc.ontrack = (e) => {
-        console.log("Received remote audio track");
-        this.audioEl.srcObject = e.streams[0];
+                this.audioEl.srcObject = e.streams[0];
         const p = this.audioEl.play();
         if (p && typeof p.catch === 'function') {
           p.catch((err: any) => {
@@ -147,18 +140,15 @@ export class RealtimeVoiceChat {
       
       this.dc.addEventListener("message", (e) => {
         const event = JSON.parse(e.data);
-        console.log("Received event:", event.type);
-        this.onMessage(event);
+                this.onMessage(event);
       });
 
       this.dc.addEventListener("open", () => {
-        console.log("Data channel opened");
-        this.onStatusChange('connected');
+                this.onStatusChange('connected');
       });
 
       this.dc.addEventListener("close", () => {
-        console.log("Data channel closed");
-        this.onStatusChange('disconnected');
+                this.onStatusChange('disconnected');
       });
 
       // Create offer
@@ -194,11 +184,8 @@ export class RealtimeVoiceChat {
         throw new Error("Voice config error: missing/invalid ephemeral token");
       }
 
-      console.log("[VOICE] ===== SDP POST ATTEMPT =====");
-      console.log("[VOICE] relayUrl:", relayUrl);
-      const model = "gpt-4o-realtime-preview-2024-12-17";
-      console.log("Posting SDP via relay…");
-
+                  const model = "gpt-4o-realtime-preview-2024-12-17";
+      
       let relayResponse: Response;
       try {
         relayResponse = await fetch(relayUrl, {
@@ -226,15 +213,12 @@ export class RealtimeVoiceChat {
       }
 
       const answerSdp = await relayResponse.text();
-      console.log("[VOICE] SDP answer first 40:", answerSdp.slice(0, 40));
-      
+            
       if (!answerSdp.startsWith("v=")) {
         console.warn("Relay returned unexpected content:", answerSdp.slice(0, 80));
       }
       await this.pc.setRemoteDescription({ type: "answer", sdp: answerSdp });
-      console.log("[VOICE] ===== SDP POST SUCCESS =====");
-      console.log("✅ WebRTC connected via relay");
-
+            
     } catch (error) {
       console.error("Error initializing voice chat:", error);
       this.onStatusChange('error');
@@ -243,8 +227,7 @@ export class RealtimeVoiceChat {
   }
 
   disconnect() {
-    console.log("Disconnecting voice chat...");
-    this.recorder?.stop();
+        this.recorder?.stop();
     this.dc?.close();
     this.pc?.close();
     this.audioEl.srcObject = null;

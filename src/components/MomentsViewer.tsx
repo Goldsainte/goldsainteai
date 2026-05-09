@@ -178,8 +178,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
 
     // Play new audio if available
     if (currentMoment.music_preview_url) {
-      console.log('🎵 Setting up audio:', currentMoment.music_preview_url);
-      const newAudio = new Audio(currentMoment.music_preview_url);
+            const newAudio = new Audio(currentMoment.music_preview_url);
       newAudio.preload = 'auto';
       newAudio.crossOrigin = 'anonymous';
       newAudio.volume = (musicVolume / 100) * 0.7;
@@ -187,19 +186,16 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
       let stopTimeout: NodeJS.Timeout;
 
       newAudio.addEventListener('loadedmetadata', () => {
-        console.log('🎵 Audio metadata loaded, duration:', newAudio.duration);
-        const startTime = 0; // Apple Music doesn't use start time
+                const startTime = 0; // Apple Music doesn't use start time
         try {
           newAudio.currentTime = startTime;
-          console.log('🎵 Audio start time set to:', startTime);
-        } catch (e) {
+                  } catch (e) {
           console.error('Error setting currentTime:', e);
         }
         // Stop after 30 seconds
         stopTimeout = setTimeout(() => {
           newAudio.pause();
-          console.log('🎵 Audio stopped after 30s');
-        }, 30000);
+                  }, 30000);
       });
 
       newAudio.addEventListener('error', (e) => {
@@ -209,19 +205,16 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
 
       // Autoplay if sound is on
       if (isSoundOn) {
-        console.log('🎵 Attempting to play audio (sound is ON)');
-        newAudio.play()
+                newAudio.play()
           .then(() => {
-            console.log('🎵 Audio playing successfully');
-            setAutoplayBlocked(false);
+                        setAutoplayBlocked(false);
           })
           .catch((error) => {
             console.error('🎵 Audio play failed:', error);
             setAutoplayBlocked(true);
           });
       } else {
-        console.log('🎵 Sound is OFF, not autoplaying');
-        setAutoplayBlocked(true);
+                setAutoplayBlocked(true);
       }
 
       setAudio(newAudio);
@@ -288,8 +281,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
         });
     } catch (error) {
       // Ignore duplicate view errors
-      console.log('View already recorded');
-    }
+          }
   };
 
   // Debounced navigation to prevent setState thrash on rapid swipes
@@ -428,8 +420,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
   };
 
   const handleSaveToVault = async () => {
-    console.log('Save to vault clicked', { selectedHighlightId, highlightsCount: highlights.length });
-    
+        
     if (!selectedHighlightId) {
       toast.error("Please select a vault");
       return;
@@ -438,8 +429,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
     setSaving(true);
     try {
       const currentMoment = moments[currentIndex];
-      console.log('Saving moment to vault:', { momentId: currentMoment.id, highlightId: selectedHighlightId });
-      
+            
       // Check if already saved
       const { data: existing, error: checkError } = await supabase
         .from('moment_highlight_items')
@@ -454,8 +444,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
       }
 
       if (existing) {
-        console.log('Moment already in vault');
-        toast.info("This moment is already in this vault");
+                toast.info("This moment is already in this vault");
         setSaveDialogOpen(false);
         return;
       }
@@ -473,8 +462,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
         throw error;
       }
 
-      console.log('Successfully saved moment to vault');
-      toast.success("Moment saved to vault!");
+            toast.success("Moment saved to vault!");
       setSaveDialogOpen(false);
       setSelectedHighlightId("");
     } catch (error) {

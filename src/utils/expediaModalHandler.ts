@@ -20,12 +20,10 @@ export function initExpediaModalHandler() {
       });
       window.dispatchEvent(event);
       
-      console.log('[ExpediaModal] Card click detected:', destination);
-    }
+          }
   };
   
   document.addEventListener('click', handler);
-  console.log('[ExpediaModal] Global click handler registered');
-  
+    
   return () => document.removeEventListener('click', handler);
 }

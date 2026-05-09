@@ -20,12 +20,7 @@ export async function sendBookingConfirmationEmail(
   recipientEmail: string
 ) {
   // TODO: Call edge function that sends email via SendGrid/Resend
-  console.log("📧 [Email Hook] Booking confirmation:", {
-    bookingId,
-    recipientEmail,
-    template: "booking-confirmation",
-  });
-
+  
   // Placeholder: In production, call edge function
   // const { data, error } = await supabase.functions.invoke("send-email", {
   //   body: {
@@ -45,12 +40,7 @@ export async function sendProposalReceivedEmail(
   proposalId: string,
   recipientEmail: string
 ) {
-  console.log("📧 [Email Hook] Proposal received:", {
-    proposalId,
-    recipientEmail,
-    template: "proposal-received",
-  });
-
+  
   // TODO: Implement edge function call
   return { success: true };
 }
@@ -62,12 +52,7 @@ export async function sendProposalAcceptedEmail(
   proposalId: string,
   recipientEmail: string
 ) {
-  console.log("📧 [Email Hook] Proposal accepted:", {
-    proposalId,
-    recipientEmail,
-    template: "proposal-accepted",
-  });
-
+  
   // TODO: Implement edge function call
   return { success: true };
 }
@@ -80,13 +65,7 @@ export async function sendPaymentReceivedEmail(
   recipientEmail: string,
   amount: number
 ) {
-  console.log("📧 [Email Hook] Payment received:", {
-    bookingId,
-    recipientEmail,
-    amount,
-    template: "payment-received",
-  });
-
+  
   // TODO: Implement edge function call
   return { success: true };
 }
@@ -98,12 +77,7 @@ export async function sendDisputeOpenedEmail(
   disputeId: string,
   recipientEmails: string[]
 ) {
-  console.log("📧 [Email Hook] Dispute opened:", {
-    disputeId,
-    recipientEmails,
-    template: "dispute-opened",
-  });
-
+  
   // TODO: Implement edge function call
   return { success: true };
 }
@@ -116,13 +90,7 @@ export async function sendPayoutInitiatedEmail(
   recipientEmail: string,
   amount: number
 ) {
-  console.log("📧 [Email Hook] Payout initiated:", {
-    payoutId,
-    recipientEmail,
-    amount,
-    template: "payout-initiated",
-  });
-
+  
   // TODO: Implement edge function call
   return { success: true };
 }
@@ -135,13 +103,7 @@ export async function sendPayoutCompletedEmail(
   recipientEmail: string,
   amount: number
 ) {
-  console.log("📧 [Email Hook] Payout completed:", {
-    payoutId,
-    recipientEmail,
-    amount,
-    template: "payout-completed",
-  });
-
+  
   // TODO: Implement edge function call
   return { success: true };
 }
@@ -150,8 +112,7 @@ export async function sendPayoutCompletedEmail(
  * Generic email sender (for custom use cases)
  */
 export async function sendCustomEmail(notification: EmailNotification) {
-  console.log("📧 [Email Hook] Custom email:", notification);
-
+  
   // TODO: Implement edge function call
   // const { data, error } = await supabase.functions.invoke("send-email", {
   //   body: notification,

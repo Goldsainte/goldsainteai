@@ -12,4 +12,9 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /system-health
+Disallow: /architecture
+Disallow: /email-preview
 Sitemap: https://goldsainte.ai/sitemap.xml
