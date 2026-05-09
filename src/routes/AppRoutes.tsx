@@ -199,7 +199,7 @@ export const AppRoutes = () => (
       <Route path="/brand/onboarding" element={<Navigate to="/apply/brand" replace />} />
       <Route path="/apply/brand" element={<BrandApplyPage />} />
       
-      <Route path="/ai-agent-setup" element={<AIAgentOnboarding />} />
+      <Route path="/ai-agent-setup" element={<RequireAuth><AIAgentOnboarding /></RequireAuth>} />
     </Route>
 
     <Route element={<MemberLayout />}>
@@ -421,7 +421,7 @@ export const AppRoutes = () => (
       <Route path="/email-preview" element={<AdminGuard><EmailPreview /></AdminGuard>} />
       <Route path="/billing-dashboard" element={<RequireAuth><BillingDashboard /></RequireAuth>} />
       <Route path="/travel-settings" element={<RequireAuth><CreatorSettingsPage /></RequireAuth>} />
-      <Route path="/travel-settings/general" element={<TravelSettings />} />
+      <Route path="/travel-settings/general" element={<RequireAuth><TravelSettings /></RequireAuth>} />
       <Route
         path="/tiktok-callback"
         element={(
@@ -433,7 +433,7 @@ export const AppRoutes = () => (
       <Route path="/creator-dashboard" element={<RequireAuth><CreatorDashboard /></RequireAuth>} />
       <Route path="/console/brand" element={<RequireAuth><BrandConsolePage /></RequireAuth>} />
       {/* New TikTok Creator Ecosystem Routes */}
-      <Route path="/trip/:id" element={<CreatorTripPage />} />
+      <Route path="/trip/:id" element={<RequireAuth><CreatorTripPage /></RequireAuth>} />
       <Route path="/trip/:tripId/storyboard" element={<Navigate to="/storyboards" replace />} />
       <Route path="/creator/:id" element={<CreatorRedirect />} />
       <Route path="/my-jobs" element={<RequireAuth><MyJobs /></RequireAuth>} />
