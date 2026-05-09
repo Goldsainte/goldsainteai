@@ -15,14 +15,19 @@ export function HomeTestimonials() {
     }
     setSubmitting(true);
     try {
-      // Best-effort: try a waitlist table if present; otherwise just confirm.
-      try {
-        await (supabase as any)
-          .from("waitlist")
-          .insert({ email: email.trim().toLowerCase(), source: "home_hero" });
-      } catch {
-        // ignore — UI should still confirm
+      const { error } = await (supabase as any)
+        .from("waitlist")
+        .insert({ email: email.trim().toLowerCase(), source: "home_hero" });
+
+      if (error) {
+        if (error.code === "23505") {
+          toast.error("You're already on the list.");
+        } else {
+          toast.error("Something went wrong. Please try again.");
+        }
+        return;
       }
+
       setSubmitted(true);
       setEmail("");
       toast.success("You're on the list. We'll be in touch.");
