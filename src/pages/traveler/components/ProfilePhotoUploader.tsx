@@ -69,9 +69,7 @@ export function ProfilePhotoUploader({
       // Use simple path format that matches RLS policy: userId/filename
       const fileName = `${userId}/avatar-${Date.now()}.${fileExt}`;
 
-      console.log("[ProfilePhotoUploader] Uploading to path:", fileName);
-      console.log("[ProfilePhotoUploader] File size:", file.size, "bytes");
-      console.log("[ProfilePhotoUploader] File type:", file.type);
+      const { data: uploadData, error: uploadError } = await supabase.storage
 
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from("avatars")

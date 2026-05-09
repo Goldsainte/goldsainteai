@@ -21,7 +21,7 @@ const AuthCallback = () => {
         }
 
         if (!session) {
-          console.log('No session found, redirecting to auth');
+          navigate('/auth');
           navigate('/auth');
           return;
         }

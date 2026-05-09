@@ -429,7 +429,7 @@ export default function TripRequestDetailPage() {
         setProposals((proposalsData ?? []) as TripProposal[]);
       }
 
-      console.log("Booking created:", booking);
+      } catch (err: any) {
     } catch (err: any) {
       console.error(err);
       const message = typeof err?.message === "string"
