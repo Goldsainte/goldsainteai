@@ -366,10 +366,6 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground font-secondary;
-    /* Mobile-first body text: 15px mobile for better readability */
-    font-size: 15px;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     /* Optimize for touch devices */
     -webkit-tap-highlight-color: transparent;
