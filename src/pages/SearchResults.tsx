@@ -223,8 +223,6 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
 
       try {
         if (searchType === "hotels") {
-          console.log('[Hotels] Searching with unified-search-hotels:', { location, checkIn, checkOut, guests });
-          
           const { data, error } = await invokeEdgeFunction('unified-search-hotels', {
             body: {
               location,
@@ -251,12 +249,9 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
           }
 
           let hotelResults = data?.results || [];
-          
-          console.log(`[Hotels] Found ${hotelResults.length} hotels from unified search`);
-          
+
           // Fallback to HotelBeds if no results from unified search
           if (hotelResults.length === 0) {
-            console.log('[Hotels] No results from unified search, trying HotelBeds fallback');
             const { getHotelBedsDestinationCode } = await import('@/lib/hotelbedsHelpers');
             const destinationCode = getHotelBedsDestinationCode(location);
             
@@ -275,7 +270,6 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
             
             if (!fallbackError && fallbackData?.hotels) {
               hotelResults = fallbackData.hotels;
-              console.log(`[Hotels] Fallback returned ${hotelResults.length} hotels`);
             }
           }
 
@@ -368,7 +362,6 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
             return;
           }
           
-          console.log('Searching restaurants in:', location);
           const { data, error } = await invokeEdgeFunction('tripadvisor-search-restaurants', {
             body: { 
               location: location.trim(),
@@ -384,7 +377,6 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
             setFilteredResults([]);
             return;
           }
-          console.log('Restaurant results:', data?.results?.length || 0, 'restaurants found');
           const restaurantResults = data?.results || [];
           setResults(restaurantResults);
           setFilteredResults(restaurantResults);
@@ -394,13 +386,11 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
           
           if (pickup && pickupDateCar && returnDateCar) {
             // Car rental search - API integration removed
-            console.log('[Car Search] Car rental API integration removed');
             setError('Car rental search is temporarily unavailable. Please check back later.');
             setResults([]);
             setFilteredResults([]);
           } else if (location && !pickup) {
             // Location-only search: show Uber instant rides
-            console.log('[Car Search] Location-only, fetching Uber');
             setResults([]);
             setFilteredResults([]);
             setError(null);

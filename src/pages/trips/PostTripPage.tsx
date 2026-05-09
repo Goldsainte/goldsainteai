@@ -198,7 +198,6 @@ export default function PostTripPage() {
         // Update state with real ID
         setStoryboardId(sb.id);
         sessionStorage.removeItem('goldsainte:pendingStoryboard');
-        console.log(`[PostTripPage] Restored pending storyboard → ${sb.id} with ${sbItems.length} items`);
       } catch (err) {
         console.error('[PostTripPage] Failed to restore pending storyboard:', err);
       }

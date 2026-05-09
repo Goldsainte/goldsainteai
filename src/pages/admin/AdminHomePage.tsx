@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowRight, ShieldCheck, AlertTriangle, CalendarCheck2, Coins } from "lucide-react";
+import { ArrowRight, ShieldCheck, AlertTriangle, CalendarCheck2, Coins, Image as ImageIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 
 type OverviewMetrics = {
@@ -38,6 +38,13 @@ const CARD_CONFIG = [
     icon: Coins,
     href: "/admin/bookings",
     key: "revenueCents" as const,
+  },
+  {
+    title: "Marketplace trip photos",
+    description: "Edit cover photos for all marketplace trips.",
+    icon: ImageIcon,
+    href: "/admin/trips",
+    key: "pendingAgents" as const,
   },
 ];
 

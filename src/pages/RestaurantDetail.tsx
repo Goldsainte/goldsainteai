@@ -13,7 +13,6 @@ export default function RestaurantDetail() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('Restaurant details functionality temporarily unavailable');
     setRestaurant(null);
     setLoading(false);
   }, [restaurantId]);

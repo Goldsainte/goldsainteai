@@ -82,13 +82,9 @@ export function ProfilePhotoUploader({
         throw uploadError;
       }
 
-      console.log("[ProfilePhotoUploader] Upload successful:", uploadData);
-
       const { data: urlData } = supabase.storage
         .from("avatars")
         .getPublicUrl(fileName);
-
-      console.log("[ProfilePhotoUploader] Public URL:", urlData.publicUrl);
 
       // Update profile with new avatar URL
       const { error: updateError } = await supabase

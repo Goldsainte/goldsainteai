@@ -270,7 +270,6 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         throw error;
       }
       
-      console.log('Fetched video posts:', data?.length || 0, 'posts');
       setVideoPosts(data || []);
     } catch (error) {
       console.error('Error fetching video posts:', error);

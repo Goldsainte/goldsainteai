@@ -172,7 +172,6 @@ export default function StoryboardNewPage() {
   }, []);
 
   const handlePublish = async () => {
-    console.log("handlePublish called", { title, blocks: blocks.length });
     if (!title.trim()) {
       toast.error("Give your storyboard a name");
       return;
