@@ -41,7 +41,6 @@ const Marketplace = lazy(() => import('@/pages/Marketplace'));
 const TripRequestDetail = lazy(() => import('@/pages/marketplace/TripRequestDetail'));
 const TripDetail = lazy(() => import('@/pages/marketplace/TripDetail'));
 const TrovaTripDetailPage = lazy(() => import('@/pages/marketplace/TrovaTripDetailPage'));
-const Shop = lazy(() => import('@/pages/Shop'));
 const BrowseAgents = lazy(() => import('@/pages/BrowseAgents'));
 const CreatorsPage = lazy(() => import('@/pages/CreatorsPage'));
 const CreatorOnboardingPage = lazy(() => import('@/pages/onboarding/CreatorOnboardingPage'));
@@ -112,7 +111,7 @@ const CustomerVerification = lazy(() => import('@/pages/CustomerVerification'));
 const EmergencyContacts = lazy(() => import('@/pages/EmergencyContacts'));
 const TourActivityDetail = lazy(() => import('@/pages/TourActivityDetail'));
 const RestaurantDetail = lazy(() => import('@/pages/RestaurantDetail'));
-const YourActivity = lazy(() => import('@/pages/YourActivity'));
+
 const Admin = lazy(() => import('@/pages/Admin'));
 const AdminAgentApprovals = lazy(() => import('@/pages/AdminAgentApprovals'));
 const AdminCancellations = lazy(() => import('@/pages/AdminCancellations'));
@@ -181,7 +180,6 @@ export const AppRoutes = () => (
       <Route path="/cancellation-refund-policy" element={<CancellationRefundPolicy />} />
       <Route path="/transparency-agreement" element={<TransparencyAgreement />} />
       <Route path="/corporate-contact" element={<CorporateContact />} />
-      <Route path="/shop" element={<Shop />} />
     </Route>
 
     <Route element={<AuthLayout />}>
@@ -450,7 +448,6 @@ export const AppRoutes = () => (
       <Route path="/emergency-contacts" element={<RequireAuth><EmergencyContacts /></RequireAuth>} />
       <Route path="/tour/:tourId" element={<RequireAuth><TourActivityDetail /></RequireAuth>} />
       <Route path="/restaurant/:restaurantId" element={<RequireAuth><RestaurantDetail /></RequireAuth>} />
-      <Route path="/your-activity" element={<YourActivity />} />
       <Route path="/earnings" element={<RequireAuth><EarningsDashboard /></RequireAuth>} />
       <Route path="/booking-confirmation" element={<RequireAuth><BookingConfirmation /></RequireAuth>} />
     </Route>

@@ -32,7 +32,6 @@ import { useToast } from "@/hooks/use-toast";
 import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
 import { getUserLocation } from "@/lib/locationMapping";
 import { fetchUberFallback } from "@/lib/simpleCarSearchFallback";
-import VendorPromotionFeed from "@/components/VendorPromotionFeed";
 import { cn } from "@/lib/utils";
 
 const SearchResults = () => {
@@ -987,11 +986,6 @@ if (minRating && searchType !== "restaurants") {
 
               {/* Results List */}
               <main className="lg:col-span-10">
-                {/* Promoted Transportation Vendors */}
-                <div className="mb-6">
-                  <VendorPromotionFeed displayContext="search" limit={2} />
-                </div>
-
                 {/* Map View at Top for restaurants and events (hotels handled in HotelSearchWithFilters) */}
                 {(searchType === "restaurants" || searchType === "events") && (
                   <ResultsMapView 

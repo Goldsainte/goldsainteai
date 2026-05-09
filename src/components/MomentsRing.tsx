@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Plus } from "lucide-react";
 import { MomentsViewer } from "./MomentsViewer";
-import { CreateMomentModal } from "./CreateMomentModal";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 interface UserMoment {
@@ -163,10 +162,6 @@ export const MomentsRing = () => {
         userId={selectedUserId}
       />
 
-      <CreateMomentModal
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-      />
     </>
   );
 };

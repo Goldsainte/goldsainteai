@@ -3,7 +3,6 @@ import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLe
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
-import { CreateMomentModal } from "@/components/CreateMomentModal";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
   
@@ -41,7 +40,6 @@ export const Header = () => {
   const [createSheetOpen, setCreateSheetOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadInitialTab, setUploadInitialTab] = useState<"photo" | "video">("photo");
-  const [createMomentOpen, setCreateMomentOpen] = useState(false);
   const [profileAvatarUrl, setProfileAvatarUrl] = useState<string | null>(null);
   const [profileName, setProfileName] = useState<string | null>(null);
   const { openModal: openExpediaModal } = useExpediaModal();
@@ -125,9 +123,6 @@ export const Header = () => {
       setCreateSheetOpen(false);
       setUploadInitialTab("photo");
       setUploadModalOpen(true);
-    } else if (type === "moment") {
-      setCreateSheetOpen(false);
-      setCreateMomentOpen(true);
     } else if (type === "moments-vault") {
       toast({
         title: "Moments Vault",
@@ -717,7 +712,7 @@ export const Header = () => {
             </button>
 
             <button
-              onClick={() => navigate('/travel-feed')}
+              onClick={() => navigate('/storyboards')}
               className="flex flex-col items-center justify-center gap-0.5 hover:bg-muted transition-colors min-h-[44px]"
               aria-label="Storyboards"
             >
@@ -753,8 +748,6 @@ export const Header = () => {
         </nav>
       )}
 
-      {/* Create Content Modal */}
-      <CreateMomentModal open={createMomentOpen} onOpenChange={setCreateMomentOpen} />
     </>
   );
 };
