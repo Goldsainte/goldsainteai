@@ -12,6 +12,9 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
+        // Wait briefly for detectSessionInUrl to process the URL token
+        await new Promise(resolve => setTimeout(resolve, 100));
+
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
@@ -91,7 +94,17 @@ const AuthCallback = () => {
         // 2. Invalid account type AND user has not completed onboarding/profile
         const needsCompletion = !hasValidAccountType && !hasCompletedOnboarding && !isProfileComplete;
 
-        if (needsCompletion) {
+        // For OAuth users (Google/Facebook), the trigger auto-assigns 'traveler'
+        // but they haven't actually chosen their role. Force role selection.
+        const provider = (session.user.app_metadata as any)?.provider;
+        const isOAuthUser = provider === 'google' || provider === 'facebook';
+        const triggerAssignedRole = isOAuthUser &&
+          !session.user.user_metadata?.account_type &&
+          profile?.account_type === 'traveler' &&
+          !hasCompletedOnboarding &&
+          !isProfileComplete;
+
+        if (triggerAssignedRole || needsCompletion) {
           navigate('/auth/complete-profile', { replace: true });
           return;
         }
