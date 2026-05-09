@@ -111,6 +111,8 @@ export const OnboardingTour = () => {
     };
   }, [run]);
 
+  if (!run) return null;
+
   return (
     <>
       <style>{`

@@ -688,66 +688,6 @@ export const Header = () => {
         </div>
       </header>
 
-      {/* Mobile Bottom Navigation */}
-      {isMobile && (
-        <nav className="fixed bottom-0 left-0 right-0 z-[100] bg-background border-t border-border shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
-          <div className="grid grid-cols-4 h-16">
-            <button
-              onClick={() => navigate('/marketplace')}
-              className="flex flex-col items-center justify-center gap-0.5 hover:bg-muted transition-colors min-h-[44px]"
-              aria-label="Marketplace"
-              data-tour="marketplace"
-            >
-              <Briefcase className="h-5 w-5" />
-              <span className="text-[10px]">Marketplace</span>
-            </button>
-
-            <button
-              onClick={() => navigate('/post-trip')}
-              className="flex flex-col items-center justify-center gap-0.5 hover:bg-muted transition-colors min-h-[44px]"
-              aria-label="Post a Trip"
-            >
-              <PlaneTakeoff className="h-5 w-5" />
-              <span className="text-[10px]">Post a Trip</span>
-            </button>
-
-            <button
-              onClick={() => navigate('/storyboards')}
-              className="flex flex-col items-center justify-center gap-0.5 hover:bg-muted transition-colors min-h-[44px]"
-              aria-label="Storyboards"
-            >
-              <Sparkles className="h-5 w-5" />
-              <span className="text-[10px]">Storyboards</span>
-            </button>
-
-            <button
-              onClick={() => {
-                if (!user) {
-                  navigate('/auth');
-                  return;
-                }
-                // Role-based profile routing (same logic as MobileBottomNav)
-                switch (accountType) {
-                  case "creator":
-                    navigate(`/creator/${user.id}`);
-                    break;
-                  case "agent":
-                    navigate("/agent-dashboard");
-                    break;
-                  default:
-                    navigate("/traveler"); // Travelers and default
-                }
-              }}
-              className="flex flex-col items-center justify-center gap-0.5 hover:bg-muted transition-colors min-h-[44px]"
-              aria-label="Profile"
-            >
-              <User className="h-5 w-5" />
-              <span className="text-[10px]">Profile</span>
-            </button>
-          </div>
-        </nav>
-      )}
-
     </>
   );
 };
