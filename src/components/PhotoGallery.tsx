@@ -53,12 +53,14 @@ export const PhotoGallery = ({ images, hotelName }: PhotoGalleryProps) => {
             onError={(e) => {
               const parent = e.currentTarget.parentElement;
               if (parent) {
-                parent.innerHTML = `
-                  <div class="w-full h-full flex flex-col items-center justify-center text-muted-foreground bg-muted">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-                    <p class="text-sm mt-2">Photo loading...</p>
-                  </div>
-                `;
+                parent.replaceChildren();
+                const div = document.createElement('div');
+                div.className = 'w-full h-full flex flex-col items-center justify-center text-muted-foreground bg-muted';
+                const p = document.createElement('p');
+                p.className = 'text-sm mt-2';
+                p.textContent = 'Photo loading...';
+                div.appendChild(p);
+                parent.appendChild(div);
               }
             }}
           />
@@ -82,11 +84,10 @@ export const PhotoGallery = ({ images, hotelName }: PhotoGalleryProps) => {
               onError={(e) => {
                 const parent = e.currentTarget.parentElement;
                 if (parent) {
-                  parent.innerHTML = `
-                    <div class="w-full h-full flex items-center justify-center bg-muted">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-                    </div>
-                  `;
+                parent.replaceChildren();
+                const div = document.createElement('div');
+                div.className = 'w-full h-full flex items-center justify-center bg-muted';
+                parent.appendChild(div);
                 }
               }}
             />

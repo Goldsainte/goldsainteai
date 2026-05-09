@@ -76,8 +76,6 @@ export class RealtimeVoiceChat {
 
       // Get ephemeral token (string) - with safety fallback
       const tokenResponse: any = await getSessionToken();
-      console.log("[VOICE] Token response:", tokenResponse);
-      
       // Support multiple response formats
       const EPHEMERAL_KEY = 
         tokenResponse.token || 
@@ -86,16 +84,13 @@ export class RealtimeVoiceChat {
       
       const expiresAt = tokenResponse.expiresAt || tokenResponse.client_secret?.expires_at;
       
-      console.log("[VOICE] Extracted token:", EPHEMERAL_KEY?.slice(0, 15));
-      
       if (!EPHEMERAL_KEY || typeof EPHEMERAL_KEY !== 'string' || EPHEMERAL_KEY.length < 20) {
-        console.error("❌ Bad ephemeral token:", EPHEMERAL_KEY);
+        console.error("❌ Bad ephemeral token (redacted)");
         throw new Error("Voice config error: missing/invalid ephemeral token");
       }
       
-      console.log(`✅ Ephemeral token acquired: ${EPHEMERAL_KEY.slice(0, 12)}...${EPHEMERAL_KEY.slice(-4)}`);
-      console.log("[VOICE] Token type:", typeof EPHEMERAL_KEY, "Length:", EPHEMERAL_KEY.length);
-      
+      console.log("✅ Ephemeral token acquired");
+
       // Optional: basic expiry guard (tokens are ~60s)
       if (expiresAt && Date.now() > expiresAt - 10_000) {
         console.warn("⚠️ Ephemeral token close to expiry; consider re-fetching");
@@ -195,15 +190,12 @@ export class RealtimeVoiceChat {
       const relayUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/realtime-sdp-relay`;
       
       if (!EPHEMERAL_KEY || typeof EPHEMERAL_KEY !== "string" || EPHEMERAL_KEY.length < 20) {
-        console.error("❌ Bad ephemeral token before SDP post:", EPHEMERAL_KEY);
+        console.error("❌ Bad ephemeral token before SDP post (redacted)");
         throw new Error("Voice config error: missing/invalid ephemeral token");
       }
 
       console.log("[VOICE] ===== SDP POST ATTEMPT =====");
       console.log("[VOICE] relayUrl:", relayUrl);
-      console.log("[VOICE] token prefix:", EPHEMERAL_KEY.slice(0, 12));
-      console.log("[VOICE] token length:", EPHEMERAL_KEY.length);
-      
       const model = "gpt-4o-realtime-preview-2024-12-17";
       console.log("Posting SDP via relay…");
 

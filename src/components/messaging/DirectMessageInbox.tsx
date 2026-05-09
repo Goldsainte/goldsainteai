@@ -147,11 +147,21 @@ export function DirectMessageInbox() {
   const handleSend = async () => {
     if (!newMessage.trim() || !selectedConversation) return;
 
+    const trimmed = newMessage.trim();
+    if (trimmed.length < 1 || trimmed.length > 2000) {
+      toast({
+        title: "Invalid message",
+        description: "Message must be between 1 and 2000 characters.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setSending(true);
     try {
       await sendMessage(
         selectedConversation.otherParticipant.id,
-        newMessage.trim(),
+        trimmed,
         selectedConversation.id
       );
       setNewMessage("");

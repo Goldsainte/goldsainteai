@@ -153,6 +153,7 @@ export function useDirectMessages() {
           event: "INSERT",
           schema: "public",
           table: "direct_messages",
+          filter: `receiver_id=eq.${user.id}`,
         },
         () => {
           fetchConversations();

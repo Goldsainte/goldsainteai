@@ -66,8 +66,8 @@ export function AgentBidForm({
     const price = parseFloat(agentPrice);
     const days = parseInt(completionDays);
 
-    if (isNaN(price) || price <= 0) {
-      toast.error("Please enter a valid price");
+    if (isNaN(price) || price < 100 || price > 100000) {
+      toast.error("Bid amount must be between 100 and 100,000");
       return;
     }
 
@@ -76,8 +76,9 @@ export function AgentBidForm({
       return;
     }
 
-    if (!proposal.trim()) {
-      toast.error("Please provide a proposal");
+    const trimmedProposal = proposal.trim();
+    if (trimmedProposal.length < 10 || trimmedProposal.length > 5000) {
+      toast.error("Proposal must be between 10 and 5000 characters");
       return;
     }
 
@@ -117,8 +118,8 @@ export function AgentBidForm({
           service_fee_percentage: 3.5,
           success_fee_percentage: 3.5,
           estimated_completion_days: days,
-          proposal_details: proposal,
-          currency: currency,
+          proposal_details: trimmedProposal,
+          currency: currency.trim(),
           status: 'pending',
         })
         .select()
