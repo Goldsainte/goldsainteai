@@ -62,26 +62,50 @@ export function TripBookingSidebar({
       return;
     }
 
+    if (!pricePerPerson || pricePerPerson <= 0) {
+      toast.error("Trip price is not available. Please contact support.");
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
+      const { data: booking, error: bookingError } = await supabase
+        .from("trip_bookings")
+        .insert({
+          traveler_id: user.id,
+          partner_id: agentId || creatorId || null,
+          partner_role: agentId ? "agent" : "creator",
+          total_price: pricePerPerson,
+          currency: currency || "USD",
+          status: "pending_payment",
+          partner_payout: 0,
+          platform_commission: 0,
+          metadata: { trip_id: tripId, source: "marketplace_booking" },
+        } as any)
+        .select("id")
+        .single();
+
+      if (bookingError || !booking?.id) {
+        throw new Error(bookingError?.message || "Failed to create booking record");
+      }
+
+      const amountCents = Math.round(pricePerPerson * 100);
+      const { data, error } = await supabase.functions.invoke("trip-checkout-create", {
         body: {
-          tripId,
-          pricePerPerson,
-          currency: currency || 'USD',
-          quantity: 1,
-          successUrl: `${window.location.origin}/booking-confirmation?trip=${tripId}`,
+          tripBookingId: booking.id,
+          amountTotalCents: amountCents,
+          currency: (currency || "USD").toLowerCase(),
+          successUrl: `${window.location.origin}/booking-confirmation?booking=${booking.id}`,
           cancelUrl: `${window.location.origin}/marketplace/trip/${tripId}`,
         },
       });
 
       if (error) throw error;
-      if (!data?.url) throw new Error('No checkout URL returned');
+      if (!data?.url) throw new Error("No checkout URL returned from payment processor");
 
       window.location.href = data.url;
     } catch (err: any) {
-      console.error('Checkout error:', err);
-      toast.error(err.message || 'Failed to start checkout. Please try again.');
+      toast.error(err.message || "Failed to start checkout. Please try again.");
     } finally {
       setIsLoading(false);
     }
