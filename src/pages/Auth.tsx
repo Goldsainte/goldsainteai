@@ -414,7 +414,7 @@ const Auth = () => {
             <div className="mt-6 text-center">
               <button
                 type="button"
-                onClick={() => { setStep('email'); navigate('/auth', { replace: true }); }}
+                onClick={() => { setSelectedAccountType(null); setStep('email'); navigate('/auth', { replace: true }); }}
                 className="text-sm font-medium hover:underline"
                 style={{ color: '#C7A962' }}
               >
@@ -537,7 +537,7 @@ const Auth = () => {
                 {isSignUpMode ? (
                   <button
                     type="button"
-                    onClick={() => { setStep('email'); navigate('/auth', { replace: true }); }}
+                    onClick={() => { setSelectedAccountType(null); setStep('email'); navigate('/auth', { replace: true }); }}
                     className="block w-full text-sm font-medium hover:underline"
                     style={{ color: '#C7A962' }}
                   >
@@ -695,7 +695,7 @@ const Auth = () => {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setStep('account-type')}
+                onClick={() => { setSelectedAccountType(null); setStep('email'); }}
                 className="flex-1 h-12 rounded-xl"
                 style={{ borderColor: '#E8E2D0', color: '#0a2225' }}
                 disabled={isLoading}
