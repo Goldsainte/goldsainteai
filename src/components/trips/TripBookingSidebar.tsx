@@ -56,54 +56,32 @@ export function TripBookingSidebar({
       return;
     }
 
-    if (isPlatformTrip) {
-      setIsLoading(true);
-      try {
-        const { error } = await supabase.from("booking_interests").insert({
-          user_id: user.id,
-          trip_id: tripId,
-          status: "pending",
-        } as any);
-
-        if (error) throw error;
-
-        toast.success("Your booking interest has been noted! Our concierge team will reach out shortly.");
-        navigate("/messages");
-      } catch (err: any) {
-        console.error("Booking interest error:", err);
-        toast.error("Failed to save your booking interest. Please try again.");
-      } finally {
-        setIsLoading(false);
-      }
-      return;
-    }
-
-    if (!partnerId) {
-      toast.error("Unable to process booking request. Host information is missing.");
+    const spotsLeft = spotsAvailable ?? Infinity;
+    if (spotsLeft <= 0) {
+      toast.error("Sorry, this trip is fully booked.");
       return;
     }
 
     setIsLoading(true);
     try {
-      const { error } = await supabase.from("trip_bookings").insert({
-        traveler_id: user.id,
-        partner_id: partnerId,
-        partner_role: partnerRole,
-        total_price: pricePerPerson,
-        currency,
-        status: "pending",
-        partner_payout: 0,
-        platform_commission: 0,
-        metadata: { trip_id: tripId, source: "direct_booking" },
-      } as any);
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          tripId,
+          pricePerPerson,
+          currency: currency || 'USD',
+          quantity: 1,
+          successUrl: `${window.location.origin}/booking-confirmation?trip=${tripId}`,
+          cancelUrl: `${window.location.origin}/marketplace/trip/${tripId}`,
+        },
+      });
 
       if (error) throw error;
+      if (!data?.url) throw new Error('No checkout URL returned');
 
-      toast.success("Booking request sent! Your host will be in touch.");
-      navigate("/messages");
+      window.location.href = data.url;
     } catch (err: any) {
-      console.error("Booking error:", err);
-      toast.error("Failed to send booking request. Please try again.");
+      console.error('Checkout error:', err);
+      toast.error(err.message || 'Failed to start checkout. Please try again.');
     } finally {
       setIsLoading(false);
     }

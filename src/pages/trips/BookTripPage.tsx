@@ -32,7 +32,7 @@ export default function BookTripPage() {
 
   useEffect(() => {
     if (trip?.id) {
-      navigate(`/trips/${trip.id}?book=true`, { replace: true });
+      navigate(`/marketplace/trip/${trip.id}`, { replace: true });
     }
   }, [trip?.id, navigate]);
 
