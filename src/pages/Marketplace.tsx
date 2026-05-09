@@ -158,9 +158,9 @@ export default function Marketplace() {
         query = query.order("created_at", { ascending: false });
       }
 
-      const { data, error } = await query;
+      const { data, error } = await query.limit(48);
       if (error) throw error;
-      return (data || []).slice(0, 48);
+      return data || [];
     },
     enabled: activeTab === "trips",
   });
