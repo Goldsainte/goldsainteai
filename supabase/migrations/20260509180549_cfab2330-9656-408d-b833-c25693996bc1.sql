@@ -1,0 +1,1 @@
+CREATE POLICY "Admins can update any packaged trip" ON public.packaged_trips FOR UPDATE TO authenticated USING (public.has_role(auth.uid(), 'admin')) WITH CHECK (public.has_role(auth.uid(), 'admin'));
