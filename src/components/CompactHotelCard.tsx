@@ -719,7 +719,7 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
                             src={typeof photo === 'string' ? photo : photo.url_max300 || photo.url || photo} 
                             alt={`Hotel photo ${idx + 1}`}
                             className="aspect-[4/3] object-cover rounded-md cursor-pointer hover:opacity-80 transition-opacity"
-                            onClick={() => setShowGallery(true)}
+                            onClick={() = loading="lazy"> setShowGallery(true)}
                           />
                         ))}
                       </div>

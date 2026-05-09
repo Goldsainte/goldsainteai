@@ -534,7 +534,7 @@ export default function StoryboardNewPage() {
                     src={coverImage}
                     alt="Cover"
                     className={`w-full aspect-[16/9] object-cover ${coverImgClass}`}
-                  />
+                  loading="lazy"/>
                   {t.coverStyle === "split" && title && (
                     <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent p-6">
                       <h2 className="text-white text-xl font-bold" style={{ fontFamily: t.fonts.heading }}>
@@ -586,7 +586,7 @@ export default function StoryboardNewPage() {
                           src={block.imageUrl}
                           alt=""
                           className={`w-full aspect-[4/3] object-cover ${t.cardStyle === "rounded" ? "rounded-xl" : ""}`}
-                        />
+                        loading="lazy"/>
                       </div>
                       <button
                         onClick={() => removeBlock(block.id)}

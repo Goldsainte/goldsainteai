@@ -25,7 +25,7 @@ export default function NotificationsPanel() {
           <ul className="divide-y">
             {items.map((n) => (
               <li key={n.id} className="flex gap-3 p-3 hover:bg-muted/40">
-                <img src={n.actor.avatar} alt="" className="w-9 h-9 rounded-full" />
+                <img src={n.actor.avatar} alt="" className="w-9 h-9 rounded-full" loading="lazy"/>
                 <div className="text-sm">
                   <span className="font-medium">{n.actor.name}</span>{" "}
                   <span className="text-muted-foreground">{n.text}</span>

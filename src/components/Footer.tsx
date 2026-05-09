@@ -122,7 +122,7 @@ export const Footer = () => {
 
         {/* Logo */}
         <div className="pt-8 pb-4 flex justify-center">
-          <img src={verticalLogo} alt="Goldsainte" className="h-14 sm:h-16 w-auto" />
+          <img src={verticalLogo} alt="Goldsainte" className="h-14 sm:h-16 w-auto" loading="lazy"/>
         </div>
 
         {/* Description */}

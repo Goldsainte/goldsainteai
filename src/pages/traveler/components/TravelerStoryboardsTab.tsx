@@ -77,7 +77,7 @@ export function TravelerStoryboardsTab({ userId }: TravelerStoryboardsTabProps) 
               src={storyboard.cover_image_url}
               alt={storyboard.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
+            loading="lazy"/>
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <Bookmark className="h-12 w-12 text-[#C7A962]/40" />

@@ -258,7 +258,7 @@ export function StoryboardBuilder({
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
             {photoResults.map(p => (
               <button key={p.id} type="button" onClick={() => addPhoto(p)} className="relative overflow-hidden rounded-2xl group">
-                <img src={p.urls.small} alt={p.alt_description || "Photo"} className="h-32 w-full object-cover group-hover:opacity-80" />
+                <img src={p.urls.small} alt={p.alt_description || "Photo"} className="h-32 w-full object-cover group-hover:opacity-80" loading="lazy"/>
                 <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/40 to-transparent p-2 opacity-0 group-hover:opacity-100 transition">
                   <span className="rounded-full bg-white/90 px-2 py-0.5 text-[10px]">Add to storyboard</span>
                 </div>
@@ -334,7 +334,7 @@ export function StoryboardBuilder({
               if (item.kind === "photo") {
                 return (
                   <div key={idx} className="relative group break-inside-avoid">
-                    <img src={item.data.thumb_url} alt={item.data.alt || "Photo"} className="w-full rounded-2xl object-cover" />
+                    <img src={item.data.thumb_url} alt={item.data.alt || "Photo"} className="w-full rounded-2xl object-cover" loading="lazy"/>
                     <button type="button" onClick={() => removeItem(idx)}
                       className="absolute top-1.5 right-1.5 rounded-full bg-black/60 p-1 text-white opacity-0 group-hover:opacity-100 transition hover:bg-black/80">
                       <X className="h-3 w-3" />

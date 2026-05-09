@@ -212,10 +212,10 @@ export default function EmailPreview() {
       <body>
         <div class="container">
           <div class="header">
-            <img src="/logo-horizontal-green.png" alt="GoldSainte" class="logo" />
+            <img src="/logo-horizontal-green.png" alt="GoldSainte" class="logo" loading="lazy"/>
           </div>
           
-          <img src="/email-hero-hotel.jpg" alt="Luxury Hotel" class="hero-image" />
+          <img src="/email-hero-hotel.jpg" alt="Luxury Hotel" class="hero-image" loading="lazy"/>
           
           <div class="content">
             <h1>✓ Your reservation is confirmed</h1>
@@ -623,10 +623,10 @@ export default function EmailPreview() {
       <body>
         <div class="container">
           <div class="header">
-            <img src="/logo-horizontal-green.png" alt="GoldSainte" class="logo" />
+            <img src="/logo-horizontal-green.png" alt="GoldSainte" class="logo" loading="lazy"/>
           </div>
           
-          <img src="/email-hero-luxury.jpg?v=5" alt="Luxury Travel" class="hero-image" />
+          <img src="/email-hero-luxury.jpg?v=5" alt="Luxury Travel" class="hero-image" loading="lazy"/>
           
           <div class="content">
             <h1>✓ Your flight is confirmed</h1>

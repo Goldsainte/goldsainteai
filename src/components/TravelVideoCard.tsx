@@ -910,7 +910,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                   src={post.music_album_art}
                   alt={post.music_track_name}
                   className="w-10 h-10 rounded object-cover"
-                />
+                loading="lazy"/>
               )}
               <div className="flex-1 min-w-0">
                 <p className="font-medium truncate">{post.music_track_name}</p>
@@ -1043,7 +1043,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                   src={post.image_urls[currentPhotoIndex]} 
                   alt={`Photo ${currentPhotoIndex + 1}`}
                   className="max-w-full max-h-full object-contain"
-                />
+                loading="lazy"/>
 
                 {post.image_urls.length > 1 && (
                   <>
@@ -1079,7 +1079,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                         src={img} 
                         alt={`Thumbnail ${idx + 1}`}
                         className="w-full h-full object-cover"
-                      />
+                      loading="lazy"/>
                     </div>
                   ))}
                 </div>
@@ -1317,7 +1317,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               src={post.image_urls?.[currentPhotoIndex] || (post.thumbnail_url as string)} 
               alt="Post content"
               className="w-full h-full object-cover bg-black pointer-events-none"
-              onClick={(e) => {
+              onClick={(e) = loading="lazy"> {
                 e.stopPropagation();
                 if (!wasSwipe) {
                   setPhotoGalleryOpen(true);
@@ -1609,7 +1609,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                 src={post.image_urls[currentPhotoIndex]} 
                 alt={`Photo ${currentPhotoIndex + 1}`}
                 className="max-w-full max-h-full object-contain"
-              />
+              loading="lazy"/>
 
               {post.image_urls.length > 1 && (
                 <>
@@ -1645,7 +1645,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                       src={img} 
                       alt={`Thumbnail ${idx + 1}`}
                       className="w-full h-full object-cover"
-                    />
+                    loading="lazy"/>
                   </div>
                 ))}
               </div>

@@ -30,7 +30,7 @@ export const RestaurantSearchHero = ({
           src={fineDiningHero}
           alt="Fine Dining Experience"
           className="w-full h-full object-cover"
-        />
+        loading="lazy"/>
         <div className="absolute inset-0 bg-gradient-to-b from-luxury-emerald/70 via-luxury-emerald/50 to-luxury-emerald/70" />
       </div>
 

@@ -65,7 +65,7 @@ export const SocialProof = () => {
                     src={testimonial.avatar}
                     alt={testimonial.name}
                     className="w-20 h-20 rounded-full object-cover border-4 border-luxury-gold/30"
-                  />
+                  loading="lazy"/>
                 </div>
                 
                 <div className="flex gap-1">

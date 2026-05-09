@@ -114,7 +114,7 @@ export default function CorporateContact() {
             src={primaryLogoGreen} 
             alt="Goldsainte" 
             className="h-4 sm:h-6 md:h-7 w-auto"
-          />
+          loading="lazy"/>
         </div>
 
         {/* Hero Section */}
@@ -159,7 +159,7 @@ export default function CorporateContact() {
                     src={primaryLogoGreen} 
                     alt="Goldsainte" 
                     className="h-4 sm:h-5 md:h-7 w-auto"
-                  />
+                  loading="lazy"/>
                 </div>
                 
                 <p className="text-foreground">{contact.description}</p>

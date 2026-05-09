@@ -10,7 +10,7 @@ export const BrandEmptyState = () => {
           src={emptyImage}
           alt="Luxury travel editorial empty state"
           className="h-56 w-full object-cover"
-        />
+        loading="lazy"/>
       </div>
 
       <h3 className="font-secondary text-lg text-[#0a2225]">

@@ -72,7 +72,7 @@ export const GifSelector = ({ onSelectGif }: GifSelectorProps) => {
                     src={gif.images.fixed_width_small.url}
                     alt={gif.title}
                     className="w-full h-auto"
-                  />
+                  loading="lazy"/>
                 </button>
               ))}
             </div>
@@ -107,7 +107,7 @@ export const GifSelector = ({ onSelectGif }: GifSelectorProps) => {
                       src={gif.images.fixed_width_small.url}
                       alt={gif.title}
                       className="w-full h-auto"
-                    />
+                    loading="lazy"/>
                   </button>
                 ))}
               </div>

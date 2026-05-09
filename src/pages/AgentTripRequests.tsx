@@ -240,7 +240,7 @@ export default function AgentTripRequests() {
                               src={item.image}
                               alt={item.name}
                               className="w-16 h-16 object-cover rounded"
-                            />
+                            loading="lazy"/>
                           )}
                           <div className="flex-1">
                             <p className="font-medium">{item.name}</p>

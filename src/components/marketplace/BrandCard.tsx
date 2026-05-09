@@ -58,7 +58,7 @@ export function BrandCard({ brand }: BrandCardProps) {
             src={brand.cover_image_url}
             alt={`${brand.name} cover`}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
+          loading="lazy"/>
         ) : (
           <div className="flex h-full w-full items-center justify-center">
             <Building2 className="h-10 w-10 text-[#BFAD72]/50" />
@@ -80,7 +80,7 @@ export function BrandCard({ brand }: BrandCardProps) {
               src={brand.avatar_url}
               alt={brand.name}
               className="h-full w-full object-cover"
-            />
+            loading="lazy"/>
           ) : (
             <div className="flex h-full w-full items-center justify-center text-xs font-semibold text-[#0a2225]">
               {brand.name.slice(0, 2).toUpperCase()}

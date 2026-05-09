@@ -67,7 +67,7 @@ export default function CompleteProfile() {
             src={logomark} 
             alt="Goldsainte" 
             className="h-14 w-auto mx-auto mb-6"
-          />
+          loading="lazy"/>
           <h1 className="text-3xl font-secondary text-[#0a2225] mb-2">
             Complete Your Profile
           </h1>

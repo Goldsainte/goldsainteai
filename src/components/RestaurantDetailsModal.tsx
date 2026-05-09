@@ -78,7 +78,7 @@ const reservationHref = (typeof window !== 'undefined' && window.top === window.
                   src={photo.url}
                   alt={photo.caption || restaurant.name}
                   className={`w-full object-cover ${idx === 0 ? 'col-span-2 h-64' : 'h-48'}`}
-                />
+                loading="lazy"/>
               ))}
             </div>
           ) : restaurant.photoUrl ? (
@@ -86,7 +86,7 @@ const reservationHref = (typeof window !== 'undefined' && window.top === window.
               src={restaurant.photoUrl}
               alt={restaurant.name}
               className="w-full h-64 object-cover"
-            />
+            loading="lazy"/>
           ) : null}
 
           <div className="p-6 space-y-6">

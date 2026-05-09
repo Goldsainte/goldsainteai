@@ -69,7 +69,7 @@ export function ItineraryDetailDialog({ itinerary, open, onOpenChange }: Itinera
             src={itinerary.heroImageUrl}
             alt={itinerary.title}
             className="w-full h-full object-cover"
-          />
+          loading="lazy"/>
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
           
           {/* Duration badge */}

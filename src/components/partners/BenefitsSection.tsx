@@ -65,7 +65,7 @@ export const BenefitsSection = () => {
                     src={benefit.image} 
                     alt={benefit.title}
                     className="w-full h-[400px] object-cover"
-                  />
+                  loading="lazy"/>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 </div>
               </div>

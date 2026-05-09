@@ -402,7 +402,7 @@ export default function AgentContractBuilder() {
               <div className="border-2 border-dashed rounded-lg p-4">
                 {agentSignature ? (
                   <div className="space-y-2">
-                    <img src={agentSignature} alt="Signature" className="max-h-32" />
+                    <img src={agentSignature} alt="Signature" className="max-h-32" loading="lazy"/>
                     <Button
                       variant="outline"
                       size="sm"

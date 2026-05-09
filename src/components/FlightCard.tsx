@@ -22,7 +22,7 @@ const AirlineLogo = ({ carrierCode, className }: { carrierCode: string; classNam
         src={`https://images.kiwi.com/airlines/64/${carrierCode}.png`}
         alt={carrierCode}
         className={`${className} ${!imageLoaded ? 'hidden' : ''}`}
-        onLoad={() => setImageLoaded(true)}
+        onLoad={() = loading="lazy"> setImageLoaded(true)}
         onError={() => setImageError(true)}
         loading="eager"
       />

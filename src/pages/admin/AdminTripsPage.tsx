@@ -143,7 +143,7 @@ export default function AdminTripsPage() {
                           src={trip.cover_image_url}
                           alt={trip.title ?? "Trip cover"}
                           className="h-full w-full object-cover"
-                        />
+                        loading="lazy"/>
                       ) : (
                         <div className="flex h-full w-full items-center justify-center text-xs text-[#8D8D8D]">
                           No cover
@@ -168,7 +168,7 @@ export default function AdminTripsPage() {
                               src={draft}
                               alt="Live preview"
                               className="h-full w-full object-cover"
-                              onError={(e) => {
+                              onError={(e) = loading="lazy"> {
                                 const img = e.currentTarget;
                                 img.style.display = "none";
                                 const sib = img.nextElementSibling as HTMLElement | null;

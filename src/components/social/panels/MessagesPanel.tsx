@@ -33,7 +33,7 @@ export default function MessagesPanel() {
                 key={c.id}
                 className="flex items-center gap-3 p-3 hover:bg-muted/40 cursor-pointer"
               >
-                <img src={c.avatar} className="w-10 h-10 rounded-full" alt="" />
+                <img src={c.avatar} className="w-10 h-10 rounded-full" alt="" loading="lazy"/>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-medium truncate">{c.name}</span>

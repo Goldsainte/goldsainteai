@@ -791,7 +791,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
                           src={url}
                           alt={`Preview ${index + 1}`}
                           className="w-full h-full object-cover rounded-lg"
-                        />
+                        loading="lazy"/>
                         <Button
                           size="sm"
                           variant="secondary"
@@ -1186,7 +1186,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
               <>
                 <div className="space-y-2">
                   <Label>Selected GIF Preview</Label>
-                  <img src={selectedGifUrl} alt="Selected GIF" className="w-full rounded-lg" />
+                  <img src={selectedGifUrl} alt="Selected GIF" className="w-full rounded-lg" loading="lazy"/>
                 </div>
 
                 <div className="space-y-2">

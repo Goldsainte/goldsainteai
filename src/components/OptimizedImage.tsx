@@ -108,7 +108,7 @@ export const OptimizedImage = ({
             `object-${mode}`,
             isLoaded ? "opacity-100" : "opacity-0"
           )}
-          onLoad={() => setIsLoaded(true)}
+          onLoad={() = loading="lazy"> setIsLoaded(true)}
           onError={() => setError(true)}
           loading={priority ? "eager" : "lazy"}
           decoding="async"

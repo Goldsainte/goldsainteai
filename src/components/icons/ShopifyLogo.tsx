@@ -6,6 +6,6 @@ export function ShopifyLogo({ className = "h-5 w-5" }: { className?: string }) {
       src={shopifyLogo} 
       alt="Shopify" 
       className={`${className} object-contain`}
-    />
+    loading="lazy"/>
   );
 }

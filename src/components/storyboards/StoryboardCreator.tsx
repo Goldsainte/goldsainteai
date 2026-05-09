@@ -180,7 +180,7 @@ export function StoryboardCreator({ tripId, ownerRole }: StoryboardCreatorProps)
               src={selectedMediaUrl}
               alt="Selected"
               className="w-full h-48 object-cover rounded-lg"
-            />
+            loading="lazy"/>
           )}
           <div className="space-y-4">
             <div>

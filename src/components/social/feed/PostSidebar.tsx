@@ -20,7 +20,7 @@ export default function PostSidebar({ post }: PostSidebarProps) {
     <div className="space-y-4">
       {/* Author */}
       <div className="flex items-center gap-3 pb-4 border-b border-border">
-        <img src={post.author.avatar} className="w-8 h-8 rounded-full" alt={post.author.username} />
+        <img src={post.author.avatar} className="w-8 h-8 rounded-full" alt={post.author.username} loading="lazy"/>
         <div className="text-sm font-medium">{post.author.username}</div>
       </div>
 

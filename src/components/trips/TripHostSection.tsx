@@ -26,7 +26,7 @@ export function TripHostSection({ host, hostTagline }: TripHostSectionProps) {
           src={host.avatar_url || "/placeholder.svg"}
           alt={host.full_name || "Host"}
           className="h-16 w-16 rounded-full object-cover ring-2 ring-[#C7B892]/30"
-        />
+        loading="lazy"/>
         <div className="flex-1">
           <h4 className="font-secondary text-lg font-semibold text-[#0a2225]">
             {host.full_name || "Creator"}

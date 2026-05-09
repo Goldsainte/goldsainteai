@@ -160,7 +160,7 @@ export default function AIAgentOnboarding() {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 py-6 sm:py-12 px-4">
       <div className="container mx-auto max-w-4xl">
         <div className="flex flex-col items-center mb-6 sm:mb-8">
-          <img src={logomark} alt="Logo" className="h-12 w-12 sm:h-16 sm:w-16 mb-3 sm:mb-4" />
+          <img src={logomark} alt="Logo" className="h-12 w-12 sm:h-16 sm:w-16 mb-3 sm:mb-4" loading="lazy"/>
           <h1 className="text-2xl sm:text-4xl font-secondary text-primary mb-2 text-center">Build Your AI Travel Agent</h1>
           <p className="text-sm sm:text-base text-muted-foreground text-center">
             Step {currentStep} of {totalSteps}

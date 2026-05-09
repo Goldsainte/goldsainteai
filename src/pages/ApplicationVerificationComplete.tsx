@@ -81,7 +81,7 @@ export default function ApplicationVerificationComplete() {
             src={logomark} 
             alt="Goldsainte" 
             className="h-12 w-auto mx-auto mb-4"
-          />
+          loading="lazy"/>
           <h1 className="text-2xl font-semibold text-foreground mb-2">
             Verification Complete
           </h1>

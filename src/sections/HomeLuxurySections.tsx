@@ -89,7 +89,7 @@ const PersonaCarouselCard: React.FC<PersonaCarouselCardProps & { index: number }
         src={image}
         alt={headline}
         className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-      />
+      loading="lazy"/>
 
       {/* Inner vignette effect */}
       <div className="absolute inset-0 shadow-[inset_0_0_100px_rgba(0,0,0,0.2)] pointer-events-none" />

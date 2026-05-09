@@ -50,7 +50,7 @@ export const PhotoGallery = ({ images, hotelName }: PhotoGalleryProps) => {
             src={images[0]} 
             alt={`${hotelName} - Main`}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            onError={(e) => {
+            onError={(e) = loading="lazy"> {
               const parent = e.currentTarget.parentElement;
               if (parent) {
                 parent.replaceChildren();
@@ -81,7 +81,7 @@ export const PhotoGallery = ({ images, hotelName }: PhotoGalleryProps) => {
               src={img} 
               alt={`${hotelName} - ${idx + 2}`}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              onError={(e) => {
+              onError={(e) = loading="lazy"> {
                 const parent = e.currentTarget.parentElement;
                 if (parent) {
                 parent.replaceChildren();
@@ -156,7 +156,7 @@ export const PhotoGallery = ({ images, hotelName }: PhotoGalleryProps) => {
                         src={img} 
                         alt={`${hotelName} - ${idx + 1}`}
                         className="w-full h-full object-cover hover:scale-110 transition-transform"
-                      />
+                      loading="lazy"/>
                     </div>
                   ))}
                 </div>
@@ -168,7 +168,7 @@ export const PhotoGallery = ({ images, hotelName }: PhotoGalleryProps) => {
                   src={images[currentIndex]} 
                   alt={`${hotelName} - ${currentIndex + 1}`}
                   className="max-w-full max-h-full object-contain"
-                />
+                loading="lazy"/>
 
                 {/* Navigation Buttons */}
                 {images.length > 1 && (
@@ -207,7 +207,7 @@ export const PhotoGallery = ({ images, hotelName }: PhotoGalleryProps) => {
                         src={img} 
                         alt={`Thumbnail ${idx + 1}`}
                         className="w-full h-full object-cover"
-                      />
+                      loading="lazy"/>
                     </div>
                   ))}
                 </div>

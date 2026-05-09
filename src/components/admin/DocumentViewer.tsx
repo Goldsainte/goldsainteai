@@ -66,7 +66,7 @@ export const DocumentViewer = ({
                 height: 'auto'
               }}
               className="object-contain"
-            />
+            loading="lazy"/>
           </div>
         </div>
       </DialogContent>

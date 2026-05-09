@@ -470,7 +470,7 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
                             src={photoUrl}
                             alt={`${cheapestHotel.hotel?.name || cheapestHotel?.name || 'Hotel'} - Photo ${idx + 1}`}
                             className="w-full h-full object-cover"
-                          />
+                          loading="lazy"/>
                         </div>
                       </CarouselItem>
                     ))}

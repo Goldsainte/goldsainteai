@@ -60,7 +60,7 @@ export function FeedSidebar() {
     <aside className="w-60 h-screen sticky top-0 border-r border-border bg-background flex flex-col px-3 py-8">
       {/* Logo */}
       <div className="mb-8 px-3">
-        <img src={logoWordmark} alt="Goldsainte" className="h-8" />
+        <img src={logoWordmark} alt="Goldsainte" className="h-8" loading="lazy"/>
       </div>
 
       {/* Navigation */}

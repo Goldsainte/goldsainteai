@@ -192,7 +192,7 @@ export default function MyStoryboardsPage() {
                         src={board.cover_image_url}
                         alt={board.title}
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      />
+                      loading="lazy"/>
                     ) : (
                       <div className="flex h-full w-full items-center justify-center">
                         <ImageIcon className="h-12 w-12 text-[#C7A962]/40" />

@@ -42,7 +42,7 @@ export default function ProposalCard({ proposal, showAdminInsights = false }: Pr
               src={proposal.proposer.avatar_url}
               alt={proposal.proposer.full_name || "Proposer"}
               className="h-10 w-10 rounded-full object-cover"
-            />
+            loading="lazy"/>
           ) : (
             <UserCircle className="h-10 w-10 text-muted-foreground" />
           )}

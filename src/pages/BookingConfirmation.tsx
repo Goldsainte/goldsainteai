@@ -39,7 +39,7 @@ export default function BookingConfirmation() {
   return (
     <main className="min-h-screen flex items-center justify-center px-4 py-12" style={{ backgroundColor: "#f7f3ea" }}>
       <div className="w-full max-w-xl">
-        <img src={logomark} alt="Goldsainte" className="h-16 w-16 mx-auto mb-8" />
+        <img src={logomark} alt="Goldsainte" className="h-16 w-16 mx-auto mb-8" loading="lazy"/>
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6" style={{ backgroundColor: "#0c4d47" }}>
             <CheckCircle2 className="h-12 w-12" style={{ color: "#E5DFC6" }} />

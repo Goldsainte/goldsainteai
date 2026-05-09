@@ -113,7 +113,7 @@ export default function CreatorTripPage() {
               src={heroImage}
               alt={journey?.title ?? tripStory.title}
               className="h-64 w-full object-cover md:h-80"
-            />
+            loading="lazy"/>
           )}
         </div>
 
@@ -202,7 +202,7 @@ export default function CreatorTripPage() {
                   src={creator.avatarUrl}
                   alt={creator.name}
                   className="h-9 w-9 overflow-hidden rounded-full bg-neutral-200 object-cover"
-                />
+                loading="lazy"/>
               ) : (
                 <div className="h-9 w-9 overflow-hidden rounded-full bg-neutral-200" />
               )}

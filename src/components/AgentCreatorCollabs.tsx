@@ -288,7 +288,7 @@ export function AgentCreatorCollabs({ collabRequests, agentId, onRefresh }: Agen
                     >
                       <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center overflow-hidden">
                         {creator.avatar_url ? (
-                          <img src={creator.avatar_url} alt={creator.username} className="h-full w-full object-cover" />
+                          <img src={creator.avatar_url} alt={creator.username} className="h-full w-full object-cover" loading="lazy"/>
                         ) : (
                           <Users className="h-5 w-5 text-muted-foreground" />
                         )}
@@ -307,7 +307,7 @@ export function AgentCreatorCollabs({ collabRequests, agentId, onRefresh }: Agen
                 <div className="p-3 border rounded-md bg-muted/50 flex items-center gap-3">
                   <div className="h-10 w-10 rounded-full bg-background flex items-center justify-center overflow-hidden">
                     {selectedCreator.avatar_url ? (
-                      <img src={selectedCreator.avatar_url} alt={selectedCreator.username} className="h-full w-full object-cover" />
+                      <img src={selectedCreator.avatar_url} alt={selectedCreator.username} className="h-full w-full object-cover" loading="lazy"/>
                     ) : (
                       <Users className="h-5 w-5 text-muted-foreground" />
                     )}
@@ -401,7 +401,7 @@ export function AgentCreatorCollabs({ collabRequests, agentId, onRefresh }: Agen
                       <div className="flex items-center gap-2">
                         <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center overflow-hidden">
                           {request.creator?.avatar_url ? (
-                            <img src={request.creator.avatar_url} alt="" className="h-full w-full object-cover" />
+                            <img src={request.creator.avatar_url} alt="" className="h-full w-full object-cover" loading="lazy"/>
                           ) : (
                             <Users className="h-3 w-3 text-muted-foreground" />
                           )}

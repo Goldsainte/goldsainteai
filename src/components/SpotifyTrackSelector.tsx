@@ -161,7 +161,7 @@ export const SpotifyTrackSelector = ({
                 src={selectedTrack.albumArt}
                 alt={selectedTrack.name}
                 className="w-12 h-12 rounded object-cover"
-              />
+              loading="lazy"/>
             )}
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate">{selectedTrack.name}</p>
@@ -258,7 +258,7 @@ export const SpotifyTrackSelector = ({
                             src={track.albumArt}
                             alt={track.name}
                             className="w-10 h-10 rounded object-cover"
-                          />
+                          loading="lazy"/>
                         )}
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium truncate">{track.name}</p>

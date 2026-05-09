@@ -582,7 +582,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
                   src={currentMoment.music_album_art} 
                   alt="Album art"
                   className="w-8 h-8 rounded object-cover flex-shrink-0"
-                />
+                loading="lazy"/>
               )}
               <div className="flex-1 min-w-0">
                 <p className="text-white text-xs font-semibold truncate leading-tight">
@@ -767,7 +767,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
                     src={currentMoment.music_album_art} 
                     alt="Album art" 
                     className="w-10 h-10 rounded"
-                  />
+                  loading="lazy"/>
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="text-white text-xs font-medium truncate">

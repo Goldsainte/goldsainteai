@@ -216,7 +216,7 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
                 src={selectedTrack.albumArt}
                 alt={selectedTrack.name}
                 className="w-12 h-12 rounded object-cover"
-              />
+              loading="lazy"/>
             )}
             <div className="flex-1 min-w-0">
               <p className="font-medium text-sm truncate">{selectedTrack.name}</p>
@@ -249,7 +249,7 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
                     src={track.albumArt}
                     alt={track.album}
                     className="w-12 h-12 rounded object-cover"
-                  />
+                  loading="lazy"/>
                 )}
                 <div className="min-w-0">
                   <p className="font-medium text-sm truncate">{track.name}</p>

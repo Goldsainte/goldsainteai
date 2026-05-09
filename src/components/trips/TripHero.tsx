@@ -58,7 +58,7 @@ export function TripHero({ trip, spotsLeft }: TripHeroProps) {
             src={images[activeImage] || "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200"}
             alt={trip.title}
             className="h-full w-full object-cover"
-          />
+          loading="lazy"/>
           
           {/* Spots Remaining Badge */}
           {spotsLeft > 0 && spotsLeft <= 5 && (
@@ -90,7 +90,7 @@ export function TripHero({ trip, spotsLeft }: TripHeroProps) {
                   src={img}
                   alt={`View ${idx + 1}`}
                   className="h-16 w-24 object-cover"
-                />
+                loading="lazy"/>
               </button>
             ))}
           </div>

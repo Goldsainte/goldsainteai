@@ -272,7 +272,7 @@ export default function TripDetail() {
                       src={creatorAvatar}
                       alt={creatorName}
                       className="h-full w-full object-cover"
-                    />
+                    loading="lazy"/>
                   ) : (
                     <span className="flex h-full w-full items-center justify-center text-xs font-semibold text-muted-foreground">
                       {creatorName.split(" ").map((n) => n[0]).join("")}

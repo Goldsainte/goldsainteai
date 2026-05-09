@@ -94,7 +94,7 @@ export function FeaturedPhotosUploader({
               src={photo}
               alt={`Portfolio ${index + 1}`}
               className="w-full h-full object-cover"
-            />
+            loading="lazy"/>
             <button
               type="button"
               onClick={() => removePhoto(index)}

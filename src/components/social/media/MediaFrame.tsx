@@ -35,7 +35,7 @@ export function MediaFrame({
           src={src} 
           alt={alt} 
           className="absolute inset-0 w-full h-full object-contain bg-black" 
-        />
+        loading="lazy"/>
       )}
     </div>
   );

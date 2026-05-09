@@ -104,7 +104,7 @@ export default function TourActivityDetail() {
                   src={tour.pictures[0]}
                   alt={tour.name}
                   className="w-full h-full object-cover"
-                />
+                loading="lazy"/>
               </div>
             )}
 

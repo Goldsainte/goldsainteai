@@ -326,7 +326,7 @@ export default function VendorPromotionalMediaUpload({
                       src={item.url} 
                       alt={item.caption || 'Fleet photo'}
                       className="w-full h-full object-cover"
-                    />
+                    loading="lazy"/>
                   ) : (
                     <video 
                       src={item.url} 

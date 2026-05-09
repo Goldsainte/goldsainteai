@@ -36,7 +36,7 @@ export function BrandHero({
           src={coverImageUrl || defaultCover}
           alt={name}
           className="h-full w-full object-cover"
-        />
+        loading="lazy"/>
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
@@ -62,7 +62,7 @@ export function BrandHero({
                     src={logoUrl}
                     alt={`${name} logo`}
                     className="h-full w-full object-cover"
-                  />
+                  loading="lazy"/>
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#F5F0E0] to-[#E5DFC6] text-xl md:text-2xl font-bold text-[#0a2225]">
                     {name.slice(0, 2).toUpperCase()}

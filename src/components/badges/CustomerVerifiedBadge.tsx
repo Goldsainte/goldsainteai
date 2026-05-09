@@ -40,7 +40,7 @@ export const CustomerVerifiedBadge = ({
             variant="outline" 
             className={`${sizeClasses[size]} bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 flex items-center gap-1 ${className}`}
           >
-            <img src={verifiedBadgeIcon} alt="Verified" className={iconSizeClasses[size]} />
+            <img src={verifiedBadgeIcon} alt="Verified" className={iconSizeClasses[size]} loading="lazy"/>
             {showText && <span>Verified</span>}
           </Badge>
         </TooltipTrigger>

@@ -37,7 +37,7 @@ export const CompactActivityCard = ({ activity }: CompactActivityCardProps) => {
               src={imageUrl}
               alt={activity.name}
               className="w-full h-full object-cover rounded-lg"
-            />
+            loading="lazy"/>
           </div>
           
           <div className="flex-1 min-w-0">

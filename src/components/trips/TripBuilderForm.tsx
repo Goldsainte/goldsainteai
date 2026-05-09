@@ -523,7 +523,7 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
                       src={url}
                       alt={`Gallery ${idx + 1}`}
                       className="w-full aspect-[4/3] object-cover rounded-xl border border-[#E5DFC6]"
-                    />
+                    loading="lazy"/>
                     <button
                       onClick={() => {
                         const newGallery = [...formData.image_gallery];

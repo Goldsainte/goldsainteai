@@ -53,7 +53,7 @@ export const CreatorCard = ({ creator }: CreatorCardProps) => {
               src={creator.avatar_url}
               alt={creator.full_name || creator.username || "Creator"}
               className="h-full w-full object-cover"
-            />
+            loading="lazy"/>
           ) : (
             <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-[#0a2225]/60">
               {getInitials(creator.full_name || creator.username)}
