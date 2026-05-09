@@ -161,6 +161,7 @@ const AIAgentOnboarding = lazy(() => import('@/pages/AIAgentOnboarding'));
 const AppleCallback = lazy(() => import('@/pages/AppleCallback'));
 const EarningsDashboard = lazy(() => import('@/pages/EarningsDashboard'));
 const HealthCheck = lazy(() => import('@/pages/HealthCheck'));
+const BookTripPage = lazy(() => import('@/pages/trips/BookTripPage'));
 
 export const AppRoutes = () => (
   <Routes>
@@ -298,10 +299,6 @@ export const AppRoutes = () => (
         element={<Navigate to="/my-trips?tab=requests" replace />}
       />
       <Route
-        path="/my-bookings"
-        element={<Navigate to="/my-trips?tab=booked" replace />}
-      />
-      <Route
         path="/dashboard/trips"
         element={(
           <RequireAuth>
@@ -322,7 +319,7 @@ export const AppRoutes = () => (
         )}
       />
       <Route path="/application/status" element={<ApplicationStatusCheck />} />
-      <Route path="/apply/agent" element={<AgentApplicationForm />} />
+      <Route path="/apply/agent" element={<RequireAuth><AgentApplicationForm /></RequireAuth>} />
       <Route path="/agent-onboarding" element={<Navigate to="/apply/agent" replace />} />
       <Route
         path="/trips"
@@ -399,13 +396,14 @@ export const AppRoutes = () => (
       <Route path="/storyboards/new" element={<RequireAuth><StoryboardNewPage /></RequireAuth>} />
       <Route path="/storyboards/:id" element={<RequireAuth><StoryboardDetailPage /></RequireAuth>} />
       <Route path="/storyboards/:id/edit" element={<RequireAuth><StoryboardNewPage /></RequireAuth>} />
-      <Route path="/notifications" element={<NotificationsPage />} />
+      <Route path="/notifications" element={<RequireAuth><NotificationsPage /></RequireAuth>} />
       <Route path="/messages" element={<RequireAuth><MessagesPage /></RequireAuth>} />
       <Route path="/marketplace-guidelines" element={<MarketplaceGuidelinesPage />} />
       
       <Route path="/my-bookings" element={<RequireAuth><MyBookingsPage /></RequireAuth>} />
       <Route path="/partner-bookings" element={<RequireAuth><PartnerBookingsPage /></RequireAuth>} />
       <Route path="/bookings/:bookingId" element={<RequireAuth><BookingDetailPage /></RequireAuth>} />
+      <Route path="/book/:id" element={<RequireAuth><BookTripPage /></RequireAuth>} />
       {/* Duplicate /traveler route removed - consolidated to line 331 */}
       <Route path="/partner" element={<Navigate to="/marketplace" replace />} />
       <Route path="/partner/escrow" element={<Navigate to="/marketplace" replace />} />
@@ -455,22 +453,22 @@ export const AppRoutes = () => (
       <Route path="/collabs/new" element={<NewCollabRequestPage />} />
       <Route path="/my-jobs" element={<RequireAuth><MyJobs /></RequireAuth>} />
       {/* Duplicate /my-trips route removed - using MyTripsPage at line 351 */}
-      <Route path="/group-trips" element={<GroupTrips />} />
-      <Route path="/group-trips/:tripId" element={<GroupTrips />} />
+      <Route path="/group-trips" element={<RequireAuth><GroupTrips /></RequireAuth>} />
+      <Route path="/group-trips/:tripId" element={<RequireAuth><GroupTrips /></RequireAuth>} />
       <Route path="/journal" element={<JournalListing />} />
       <Route path="/journal/:slug" element={<JournalArticle />} />
       <Route path="/creator-articles" element={<CreatorArticles />} />
       <Route path="/creator-articles/new" element={<CreatorArticleEditor />} />
       <Route path="/creator-articles/edit/:id" element={<CreatorArticleEditor />} />
       <Route path="/supplier-management" element={<SupplierManagement />} />
-      <Route path="/escrow-timeline" element={<EscrowTimelineDashboard />} />
+      <Route path="/escrow-timeline" element={<RequireAuth><EscrowTimelineDashboard /></RequireAuth>} />
       <Route path="/activity-logs" element={<ActivityLogs />} />
       <Route path="/customer-verification" element={<CustomerVerification />} />
-      <Route path="/emergency-contacts" element={<EmergencyContacts />} />
-      <Route path="/tour/:tourId" element={<TourActivityDetail />} />
-      <Route path="/restaurant/:restaurantId" element={<RestaurantDetail />} />
+      <Route path="/emergency-contacts" element={<RequireAuth><EmergencyContacts /></RequireAuth>} />
+      <Route path="/tour/:tourId" element={<RequireAuth><TourActivityDetail /></RequireAuth>} />
+      <Route path="/restaurant/:restaurantId" element={<RequireAuth><RestaurantDetail /></RequireAuth>} />
       <Route path="/your-activity" element={<YourActivity />} />
-      <Route path="/earnings" element={<EarningsDashboard />} />
+      <Route path="/earnings" element={<RequireAuth><EarningsDashboard /></RequireAuth>} />
     </Route>
 
     <Route
