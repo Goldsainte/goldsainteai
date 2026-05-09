@@ -1,8 +1,8 @@
 export function StatsStrip() {
   const stats = [
     { value: "50+", label: "Countries" },
-    { value: "500+", label: "Certified Travel Specialists" },
-    { value: "12 sec", label: "Average Time to Build an Itinerary" },
+    { value: "Launching", label: "Spring 2026" },
+    { value: "Minutes", label: "To Your Itinerary" },
   ];
 
   return (
