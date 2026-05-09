@@ -21,6 +21,28 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Verify caller is authenticated
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const supabaseAuth = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!
+    );
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const body = (await req.json()) as RequestBody;
     const { tripBookingId, amountTotalCents, currency = "usd" } = body;
 
@@ -70,6 +92,13 @@ Deno.serve(async (req) => {
 
     if (bookingError || !booking) {
       throw bookingError ?? new Error("Booking not found");
+    }
+
+    if ((booking.trip_requests as any).user_id !== user.id) {
+      return new Response(
+        JSON.stringify({ error: "Forbidden" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     // Build descriptive line item name from trip context
