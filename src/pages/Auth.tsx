@@ -223,11 +223,7 @@ const Auth = () => {
       setIsLoading(false);
       return;
     }
-    if (!phone.trim()) {
-      toast({ title: "Missing information", description: "Please enter your phone number.", variant: "destructive" });
-      setIsLoading(false);
-      return;
-    }
+    // Phone is optional for signup
 
     if (selectedAccountType === 'agent') {
       toast({ title: "Complete Your Application", description: "You'll be redirected to the agent application form." });
@@ -668,8 +664,8 @@ const Auth = () => {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone" className="text-sm font-medium" style={{ color: '#0a2225' }}>Phone Number</Label>
-              <Input id="phone" type="tel" placeholder="+1 (555) 000-0000" value={phone} onChange={(e) => setPhone(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
+              <Label htmlFor="phone" className="text-sm font-medium" style={{ color: '#0a2225' }}>Phone Number <span style={{ color: '#9A9384' }}>(optional)</span></Label>
+              <Input id="phone" type="tel" placeholder="+1 (555) 000-0000" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
             </div>
 
             <div className="flex items-start space-x-3 pt-1">
