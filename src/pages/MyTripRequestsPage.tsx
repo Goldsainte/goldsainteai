@@ -55,8 +55,6 @@ export default function MyTripRequestsPage() {
 
       if (!isMounted) return;
 
-      console.log("[MyTripRequests] Query result:", { data, error, count: data?.length });
-
       if (error) {
         console.error("Error loading my trip_requests:", error);
         setRequests([]);
