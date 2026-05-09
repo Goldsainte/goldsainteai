@@ -164,7 +164,7 @@ export function AccountTypeStep({ onComplete }: Props) {
 
       <div className="space-y-2">
         <Label htmlFor="phone" className="text-sm font-medium text-[#0a2225]">
-          Mobile number
+          Mobile number (optional)
         </Label>
         <Input
           id="phone"
