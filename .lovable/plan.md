@@ -1,33 +1,30 @@
-## Auth Fixes Plan
+## Plan: Routing, Auth Protection, Mobile Padding & SEO Fixes
 
-Five targeted fixes across three files.
+### 1. New Booking Route
+- Create `src/pages/trips/BookTripPage.tsx` — fetches trip by id, redirects unauth users to `/auth?redirect=/book/:id`, then redirects authed users to `/trips/:id?book=true`. Includes loading and not-found states styled with brand tokens (#f7f3ea bg, #C7A962 accent).
+- In `src/routes/AppRoutes.tsx`: add lazy import and `<Route path="/book/:id" element={<RequireAuth><BookTripPage /></RequireAuth>} />`.
 
-### 1. `src/pages/Auth.tsx` — Clear selectedAccountType on sign-in nav
-Locate the three "Already have an account? Sign in" handlers (account-type step footer, email step footer when `isSignUpMode`, signup step back button). Add `setSelectedAccountType(null)` before each `setStep('email')` call.
+### 2. Remove Duplicate `/my-bookings` Route
+- In `src/routes/AppRoutes.tsx`: delete the `<Navigate to="/my-trips?tab=booked" replace />` redirect block (~line 301). Keep only the protected `MyBookings` route.
 
-### 2. `src/pages/Auth.tsx` — Navigation fallback in handleSignIn
-At the end of `handleSignIn`, after `setIsLoading(false)` in the success path, append:
-```js
-const destination = redirectTarget ?? '/marketplace';
-navigate(destination, { replace: true });
-```
+### 3. Wrap Unprotected Routes with `RequireAuth`
+In `src/routes/AppRoutes.tsx`, wrap:
+- `/escrow-timeline`, `/emergency-contacts`, `/tour/:tourId`, `/restaurant/:restaurantId`, `/earnings`, `/notifications`, `/group-trips`, `/group-trips/:tripId`, `/apply/agent`.
 
-### 3. `src/contexts/AuthContext.tsx` — Fix bootstrapSession race
-- Add `const sessionSetByListener = useRef(false)` at top of component.
-- In `onAuthStateChange` callback, after setting user/session: `sessionSetByListener.current = true`.
-- In `bootstrapSession`, before `supabase.auth.getSession()`:
-```js
-if (sessionSetByListener.current) { setIsLoading(false); return; }
-```
+### 4. Fix `returnTo` → `redirect` Param
+- In `src/pages/onboarding/TravelerPreferencesOnboardingPage.tsx`: replace `navigate("/auth?returnTo=/onboarding/traveler/preferences")` with `navigate("/auth?redirect=%2Fonboarding%2Ftraveler%2Fpreferences")`.
 
-### 4. `src/contexts/AuthContext.tsx` — Guard handleSessionSyncFailure
-Wrap the function body's first line:
-```js
-if (!SESSION_SYNC_ENABLED) { setIsLoading(false); return; }
-```
+### 5. Mobile Bottom Nav Padding (`pb-20 lg:pb-0`)
+Add to outermost container in:
+- `src/pages/traveler/TravelerDashboardPage.tsx`
+- `src/pages/AgentDashboard.tsx`
+- `src/pages/trips/PostTripPage.tsx`
+- `src/pages/Marketplace.tsx`
+- `src/pages/trips/MyTripsPage.tsx` (verify — may already be applied from prior pass)
 
-### 5. `src/pages/AuthCallback.tsx` — Use user_metadata.account_type on profile create
-Read `accountType` from `session.user.user_metadata?.account_type` and insert it into the new profile. Update `needsCompletion` logic so travelers (account_type set via metadata) route to `/traveler` instead of `/auth/complete-profile`.
+### 6. SEO — Sitemap & Robots
+- Create `public/sitemap.xml` with the 8 listed URLs.
+- Append `Sitemap: https://goldsainte.ai/sitemap.xml` line to `public/robots.txt`.
 
 ### Verification
-Read each file before patching to confirm exact context. Confirm `SESSION_SYNC_ENABLED` is exported/accessible in AuthContext (import from `session-service` if needed).
+- Re-read modified files; confirm no duplicate routes, all targeted routes wrapped, sitemap reachable at `/sitemap.xml`.
