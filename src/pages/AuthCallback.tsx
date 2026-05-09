@@ -40,13 +40,14 @@ const AuthCallback = () => {
         }
 
         if (!profile) {
+          const accountType = session.user.user_metadata?.account_type || null;
           // Create minimal profile for new users (email signup or OAuth)
           const { error: insertError } = await supabase.from('profiles').insert({
             id: session.user.id,
             username: session.user.user_metadata?.username || session.user.email?.split('@')[0] || `user_${session.user.id.slice(0, 8)}`,
             avatar_url: session.user.user_metadata?.avatar_url || null,
             is_profile_complete: false,
-            account_type: null,
+            account_type: accountType,
             onboarding_completed: false
           });
           
@@ -64,8 +65,18 @@ const AuthCallback = () => {
               return;
             }
           }
-          
-          // New user needs to complete profile
+
+          // If account_type was set from signup metadata, route based on role
+          if (accountType === 'traveler') {
+            navigate('/traveler', { replace: true });
+            return;
+          }
+          if (accountType && ['creator', 'agent', 'brand'].includes(accountType)) {
+            const path = getPostAuthDestination(accountType, false, false);
+            navigate(path, { replace: true });
+            return;
+          }
+          // No account type yet — needs to complete profile
           navigate('/auth/complete-profile', { replace: true });
           return;
         }

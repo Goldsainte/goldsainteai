@@ -12,7 +12,7 @@ const DEFAULT_ENDPOINT = '/api/auth/session';
 // Session sync is only enabled when an explicit endpoint is configured.
 // In Lovable/preview (and other static deployments), this will be disabled.
 const configuredEndpoint = import.meta.env.VITE_AUTH_SESSION_ENDPOINT;
-const SESSION_SYNC_ENABLED = Boolean(configuredEndpoint);
+export const SESSION_SYNC_ENABLED = Boolean(configuredEndpoint);
 const sessionEndpoint = configuredEndpoint || DEFAULT_ENDPOINT;
 
 const RETRY_OPTIONS = {
