@@ -300,7 +300,7 @@ export default function AgentDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col pb-20 lg:pb-0">
       
       <main className="flex-1 container mx-auto px-4 py-8">
         <BackButton className="mb-6" />
