@@ -32,7 +32,6 @@ import { useToast } from "@/hooks/use-toast";
 import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
 import { getUserLocation } from "@/lib/locationMapping";
 import { fetchUberFallback } from "@/lib/simpleCarSearchFallback";
-import VendorPromotionFeed from "@/components/VendorPromotionFeed";
 import { cn } from "@/lib/utils";
 
 const SearchResults = () => {
