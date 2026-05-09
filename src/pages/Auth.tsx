@@ -180,6 +180,8 @@ const Auth = () => {
         }
       }
       setIsLoading(false);
+      const destination = redirectTarget ?? '/marketplace';
+      navigate(destination, { replace: true });
     }
   };
 
