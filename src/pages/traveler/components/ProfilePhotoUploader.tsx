@@ -70,8 +70,6 @@ export function ProfilePhotoUploader({
       const fileName = `${userId}/avatar-${Date.now()}.${fileExt}`;
 
       const { data: uploadData, error: uploadError } = await supabase.storage
-
-      const { data: uploadData, error: uploadError } = await supabase.storage
         .from("avatars")
         .upload(fileName, file, { 
           upsert: true,
