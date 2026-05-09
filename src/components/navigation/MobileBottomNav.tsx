@@ -21,7 +21,7 @@ export function MobileBottomNav() {
   const navItems = [
     { to: "/marketplace", icon: Store, label: "Marketplace" },
     { to: "/post-trip", icon: PlaneTakeoff, label: "Post a Trip" },
-    { to: "/travel-feed", icon: Sparkles, label: "Storyboards" },
+    { to: "/storyboards", icon: Sparkles, label: "Storyboards" },
     { to: getProfileRoute(), icon: User, label: "Profile" },
   ];
 
