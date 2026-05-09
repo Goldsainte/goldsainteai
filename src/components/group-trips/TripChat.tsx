@@ -140,7 +140,7 @@ export const TripChat = ({ tripId, members }: TripChatProps) => {
                     src={message.file_url} 
                     alt={message.file_name || 'Shared image'}
                     className="max-w-[300px] rounded-lg cursor-pointer"
-                    onClick={() = loading="lazy"> window.open(message.file_url!, '_blank')}
+                    onClick={() => window.open(message.file_url!, '_blank')}
                   />
                 ) : (
                   <a

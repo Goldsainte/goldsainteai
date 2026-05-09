@@ -168,7 +168,7 @@ export default function AdminTripsPage() {
                               src={draft}
                               alt="Live preview"
                               className="h-full w-full object-cover"
-                              onError={(e) = loading="lazy"> {
+                              onError={(e) => {
                                 const img = e.currentTarget;
                                 img.style.display = "none";
                                 const sib = img.nextElementSibling as HTMLElement | null;

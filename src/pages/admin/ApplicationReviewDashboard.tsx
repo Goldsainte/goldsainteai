@@ -1147,7 +1147,7 @@ const BrandApplicationDetail: React.FC<{
                   src={url}
                   alt={`Gallery ${index + 1}`}
                   className="w-full h-40 object-cover rounded-xl cursor-pointer hover:opacity-90 transition-opacity border border-[#E5DFC6]"
-                  onClick={() = loading="lazy"> window.open(url, '_blank')}
+                  onClick={() => window.open(url, '_blank')}
                 />
               ))}
             </div>

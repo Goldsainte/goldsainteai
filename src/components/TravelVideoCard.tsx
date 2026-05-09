@@ -1317,7 +1317,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               src={post.image_urls?.[currentPhotoIndex] || (post.thumbnail_url as string)} 
               alt="Post content"
               className="w-full h-full object-cover bg-black pointer-events-none"
-              onClick={(e) = loading="lazy"> {
+              onClick={(e) => {
                 e.stopPropagation();
                 if (!wasSwipe) {
                   setPhotoGalleryOpen(true);
