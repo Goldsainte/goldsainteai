@@ -146,7 +146,7 @@ export default function BrandConsolePage() {
                   src={profile.avatar_url}
                   alt={profile.name}
                   className="h-full w-full object-cover"
-                />
+                loading="lazy"/>
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-[#0a2225]">
                   {profile?.name
@@ -550,7 +550,7 @@ function CollectionsSection({ brandProfileId }: { brandProfileId: string }) {
                           src={c.cover_image_url}
                           alt={c.title}
                           className="h-full w-full object-cover"
-                        />
+                        loading="lazy"/>
                       ) : (
                         <div className="flex h-full w-full flex-col items-center justify-center text-[10px] text-[#0a2225]">
                           <ImageIcon className="mb-1 h-4 w-4" />

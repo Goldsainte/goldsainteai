@@ -128,7 +128,7 @@ export function StoryboardPhotoUploader({ onPhotosUploaded }: StoryboardPhotoUpl
                 src={photo.url}
                 alt={photo.name}
                 className="w-full h-24 object-cover"
-              />
+              loading="lazy"/>
               <div className="absolute top-1 right-1 flex gap-1">
                 <CheckCircle className="h-4 w-4 text-green-400 drop-shadow" />
                 <button

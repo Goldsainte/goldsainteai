@@ -179,7 +179,7 @@ export default function PublicStoryboardPage() {
         {/* Hero */}
         {coverImage && (
           <div className="relative h-72 md:h-80 overflow-hidden">
-            <img src={coverImage} alt={storyboard.title} className="w-full h-full object-cover" />
+            <img src={coverImage} alt={storyboard.title} className="w-full h-full object-cover" loading="lazy"/>
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
             <div className="absolute bottom-6 left-6 right-6">
               <div className="flex items-center gap-2 text-white/70 text-[10px] uppercase tracking-[0.2em] font-medium mb-2">

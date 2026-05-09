@@ -417,7 +417,7 @@ const PhotoCarouselModal = ({
                       src={img} 
                       alt={`Photo ${idx + 1}`} 
                       className="w-full h-full object-contain select-none pointer-events-none"
-                    />
+                    loading="lazy"/>
                   </CarouselItem>
                 ))}
               </CarouselContent>
@@ -519,7 +519,7 @@ const PhotoCarouselModal = ({
                       src={musicAlbumArt} 
                       alt="Album art"
                       className="w-10 h-10 rounded object-cover flex-shrink-0"
-                    />
+                    loading="lazy"/>
                   )}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold truncate">
@@ -585,7 +585,7 @@ const PhotoCarouselModal = ({
                       src={img} 
                       alt={`Photo ${idx + 1}`} 
                       className="max-w-full max-h-full w-auto h-auto object-contain"
-                    />
+                    loading="lazy"/>
                   </CarouselItem>
                 ))}
               </CarouselContent>
@@ -680,7 +680,7 @@ const PhotoCarouselModal = ({
                       src={musicAlbumArt} 
                       alt="Album art"
                       className="w-12 h-12 rounded object-cover flex-shrink-0"
-                    />
+                    loading="lazy"/>
                   )}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold truncate">

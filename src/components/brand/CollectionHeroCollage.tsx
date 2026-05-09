@@ -23,7 +23,7 @@ export function CollectionHeroCollage({
           src={mainImageUrl}
           alt={title}
           className="h-full w-full max-h-[420px] object-cover"
-        />
+        loading="lazy"/>
       </div>
 
       {/* Secondary and tertiary images stacked */}
@@ -34,7 +34,7 @@ export function CollectionHeroCollage({
               src={secondaryImageUrl}
               alt=""
               className="h-40 w-full object-cover"
-            />
+            loading="lazy"/>
           </div>
         ) : (
           <div className="flex h-40 items-center justify-center overflow-hidden rounded-[24px] bg-[#F5F0E0] text-xs text-[#8C8470]">
@@ -48,7 +48,7 @@ export function CollectionHeroCollage({
               src={tertiaryImageUrl}
               alt=""
               className="h-40 w-full object-cover"
-            />
+            loading="lazy"/>
           </div>
         ) : (
           <div className="flex h-40 items-center justify-center overflow-hidden rounded-[24px] bg-[#F5F0E0] text-xs text-[#8C8470]">

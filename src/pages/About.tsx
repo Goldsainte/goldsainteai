@@ -110,7 +110,7 @@ const About = () => {
             src={goldsainteLogo} 
             alt="Goldsainte" 
             className="h-4 sm:h-6 md:h-7 w-auto"
-          />
+          loading="lazy"/>
         </div>
         <p className="text-xs sm:text-sm text-muted-foreground max-w-4xl mx-auto leading-relaxed px-2">
           {t('home.hero.title')}. {t('home.hero.subtitle')}
@@ -131,7 +131,7 @@ const About = () => {
                   src={founderImage}
                   alt="Goldsainte Founder"
                   className="w-full h-full object-cover"
-                />
+                loading="lazy"/>
               </div>
             </div>
             
@@ -181,7 +181,7 @@ const About = () => {
                 src={primaryLogoGreen} 
                 alt="Goldsainte" 
                 className="h-4 sm:h-5 md:h-7 w-auto"
-              />
+              loading="lazy"/>
             </div>
             <p className="text-foreground">
               {t('about.sections.whatIs.p1')}
@@ -206,7 +206,7 @@ const About = () => {
                 src={primaryLogoGreen} 
                 alt="Goldsainte" 
                 className="h-4 sm:h-5 md:h-7 w-auto"
-              />
+              loading="lazy"/>
             </div>
             {featureCategories.map((category, idx) => (
               <div key={category.category}>
@@ -246,7 +246,7 @@ const About = () => {
                 src={primaryLogoGreen} 
                 alt="Goldsainte" 
                 className="h-4 sm:h-5 md:h-7 w-auto"
-              />
+              loading="lazy"/>
             </div>
             <p className="text-foreground">
               {t('about.sections.mission.p1')}
@@ -277,7 +277,7 @@ const About = () => {
                 src={primaryLogoGreen} 
                 alt="Goldsainte" 
                 className="h-5 sm:h-7 w-auto"
-              />
+              loading="lazy"/>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-6">
               {partners.map((partner) => (
@@ -289,7 +289,7 @@ const About = () => {
                     src={partner.logo} 
                     alt={`${partner.name} logo`}
                     className="w-full h-auto max-h-12 object-contain filter dark:invert"
-                  />
+                  loading="lazy"/>
                 </div>
               ))}
             </div>
@@ -310,7 +310,7 @@ const About = () => {
                 src={primaryLogoGreen} 
                 alt="Goldsainte" 
                 className="h-5 sm:h-7 w-auto"
-              />
+              loading="lazy"/>
             </div>
             <p className="text-sm sm:text-base text-foreground">
               {t('about.sections.legal.p1')}
@@ -335,7 +335,7 @@ const About = () => {
                 src={primaryLogoGreen} 
                 alt="Goldsainte" 
                 className="h-5 sm:h-7 w-auto"
-              />
+              loading="lazy"/>
             </div>
             <div>
               <h3 className="font-semibold text-base mb-3 text-foreground">Accessibility Statement for Goldsainte</h3>
@@ -461,7 +461,7 @@ const About = () => {
             src={primaryLogoGreen} 
             alt="Goldsainte" 
             className="h-5 sm:h-7 w-auto"
-          />
+          loading="lazy"/>
         </div>
         <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
           <p className="text-foreground font-semibold mb-2">Complete Terms Available</p>
@@ -546,7 +546,7 @@ const About = () => {
             src={primaryLogoGreen} 
             alt="Goldsainte" 
             className="h-5 sm:h-7 w-auto"
-          />
+          loading="lazy"/>
         </div>
         <p className="text-sm sm:text-base text-foreground">
           Goldsainte AI/Goldsainte Inc. is committed to resolving any disputes fairly and efficiently through a structured process.
@@ -661,7 +661,7 @@ const About = () => {
             src={primaryLogoGreen} 
             alt="Goldsainte" 
             className="h-5 sm:h-7 w-auto"
-          />
+          loading="lazy"/>
         </div>
         <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
           <p className="text-foreground font-semibold mb-2">Complete Service Details Available</p>
@@ -733,7 +733,7 @@ const About = () => {
             src={primaryLogoGreen} 
             alt="Goldsainte" 
             className="h-5 sm:h-7 w-auto"
-          />
+          loading="lazy"/>
         </div>
         <p className="text-sm sm:text-base text-muted-foreground">
           Fiscal Year Ending December 31, 2025
@@ -838,7 +838,7 @@ const About = () => {
             src={primaryLogoGreen} 
             alt="Goldsainte" 
             className="h-5 sm:h-7 w-auto"
-          />
+          loading="lazy"/>
         </div>
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">1. Introduction</h3>
@@ -934,7 +934,7 @@ const About = () => {
             src={primaryLogoGreen} 
             alt="Goldsainte" 
             className="h-5 sm:h-7 w-auto"
-          />
+          loading="lazy"/>
         </div>
 
         <div className="text-center mb-8">

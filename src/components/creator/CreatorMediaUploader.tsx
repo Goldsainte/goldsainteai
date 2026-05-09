@@ -190,7 +190,7 @@ export function CreatorMediaUploader({
         key={gIdx}
         className="relative aspect-square rounded-xl overflow-hidden border border-[#E5DFC6] group bg-[#FDF9F0]"
       >
-        <img src={item.url} alt="Photo" className="w-full h-full object-cover" />
+        <img src={item.url} alt="Photo" className="w-full h-full object-cover" loading="lazy"/>
 
         {/* Cover badge */}
         {item.is_cover && (
@@ -234,7 +234,7 @@ export function CreatorMediaUploader({
       >
         {item.source === "upload" ? (
           item.thumbnail_url ? (
-            <img src={item.thumbnail_url} alt="Video thumbnail" className="w-full h-full object-cover" />
+            <img src={item.thumbnail_url} alt="Video thumbnail" className="w-full h-full object-cover" loading="lazy"/>
           ) : (
             <div className="w-full h-full relative">
               <video src={item.url} className="w-full h-full object-cover" muted preload="metadata" />
@@ -244,7 +244,7 @@ export function CreatorMediaUploader({
             </div>
           )
         ) : item.thumbnail_url ? (
-          <img src={item.thumbnail_url} alt={item.source} className="w-full h-full object-cover" />
+          <img src={item.thumbnail_url} alt={item.source} className="w-full h-full object-cover" loading="lazy"/>
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center gap-2 p-2">
             <Film className="w-8 h-8 text-[#C7A962]" />

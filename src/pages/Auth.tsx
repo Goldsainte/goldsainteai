@@ -379,7 +379,7 @@ const Auth = () => {
       >
         {/* Logo */}
         <div className="flex justify-center mb-8">
-          <img src={logomark} alt="Goldsainte" className="h-14 w-14" />
+          <img src={logomark} alt="Goldsainte" className="h-14 w-14" loading="lazy"/>
         </div>
 
         {/* Account Type Step */}

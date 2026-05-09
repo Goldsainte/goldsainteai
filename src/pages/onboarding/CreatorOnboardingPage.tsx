@@ -353,7 +353,7 @@ export default function CreatorOnboardingPage() {
                 src={avatarUrl}
                 alt={displayName}
                 className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-2 border-[#C7A962]"
-              />
+              loading="lazy"/>
             ) : (
               <div className="w-24 h-24 rounded-full mx-auto mb-4 bg-[#FDF9F0] border-2 border-[#C7A962] flex items-center justify-center">
                 <User className="w-10 h-10 text-[#C7A962]" />
@@ -603,7 +603,7 @@ export default function CreatorOnboardingPage() {
                   <p className="text-xs text-[#6B7280] mb-3">This appears as the banner at the top of your public profile.</p>
                   {coverImageUrl ? (
                     <div className="relative rounded-xl overflow-hidden border border-[#E5DFC6] aspect-[3/1]">
-                      <img src={coverImageUrl} alt="Cover" className="w-full h-full object-cover" />
+                      <img src={coverImageUrl} alt="Cover" className="w-full h-full object-cover" loading="lazy"/>
                       <button
                         type="button"
                         onClick={() => setCoverImageUrl("")}

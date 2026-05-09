@@ -46,7 +46,7 @@ export function CreatorHeroSection({
           src={heroImage}
           alt={`${name}'s destination`}
           className="absolute inset-0 h-full w-full object-cover"
-        />
+        loading="lazy"/>
         {/* Gradient overlay for text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
       </div>
@@ -62,7 +62,7 @@ export function CreatorHeroSection({
                   src={avatarUrl || "/placeholder.svg"}
                   alt={name}
                   className="h-full w-full object-cover"
-                />
+                loading="lazy"/>
               </div>
               {isVerified && (
                 <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5">

@@ -30,7 +30,7 @@ export function PostCard({ post }: PostCardProps) {
       <article className="bg-card border border-border rounded-xl overflow-hidden mb-6">
         {/* Header */}
         <header className="flex items-center gap-3 p-3">
-          <img src={post.author.avatar} className="w-8 h-8 rounded-full" alt={post.author.username} />
+          <img src={post.author.avatar} className="w-8 h-8 rounded-full" alt={post.author.username} loading="lazy"/>
           <div className="text-sm font-medium">{post.author.username}</div>
         </header>
 

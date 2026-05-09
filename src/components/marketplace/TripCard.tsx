@@ -51,7 +51,7 @@ export const TripCard = ({ trip }: TripCardProps) => {
             src={trip.cover_image_url}
             alt={trip.title}
             className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-          />
+          loading="lazy"/>
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-muted">
             <span className="text-4xl">🗺️</span>

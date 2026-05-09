@@ -220,7 +220,7 @@ export const ReviewsSection = ({ hotelId, hotelName, averageRating, totalReviews
                               src={photo} 
                               alt={`Review photo ${idx + 1}`}
                               className="w-full h-full object-cover"
-                            />
+                            loading="lazy"/>
                           </div>
                         ))}
                       </div>

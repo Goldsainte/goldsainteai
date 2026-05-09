@@ -237,7 +237,7 @@ export default function AdminCustomerVerifications() {
                           src={(verification as any).profiles.avatar_url} 
                           alt="User" 
                           className="w-12 h-12 rounded-full object-cover"
-                        />
+                        loading="lazy"/>
                       ) : (
                         <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                           <User className="h-6 w-6 text-primary" />

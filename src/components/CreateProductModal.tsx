@@ -448,7 +448,7 @@ export function CreateProductModal({ open, onOpenChange, defaultTab = "store" }:
               <div className="flex flex-wrap gap-2 mb-2">
                 {productForm.images.filter(url => url && url.trim()).map((url, index) => (
                   <div key={index} className="relative w-20 h-20">
-                    <img src={url} alt="Product image" className="w-full h-full object-cover rounded" />
+                    <img src={url} alt="Product image" className="w-full h-full object-cover rounded" loading="lazy"/>
                     <Button
                       size="icon"
                       variant="destructive"
@@ -936,7 +936,7 @@ export function CreateProductModal({ open, onOpenChange, defaultTab = "store" }:
                     <div className="flex flex-wrap gap-2 mb-2">
                       {packageForm.images.filter(url => url && url.trim()).map((url, index) => (
                         <div key={index} className="relative w-20 h-20">
-                          <img src={url} alt="Package image" className="w-full h-full object-cover rounded" />
+                          <img src={url} alt="Package image" className="w-full h-full object-cover rounded" loading="lazy"/>
                           <Button
                             size="icon"
                             variant="destructive"

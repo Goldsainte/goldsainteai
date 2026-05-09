@@ -36,7 +36,7 @@ export function UberProductCard({ product, onBook }: UberProductCardProps) {
                 src={product.image_url} 
                 alt={product.display_name}
                 className="w-16 h-16 object-contain"
-              />
+              loading="lazy"/>
             )}
             <div>
               <CardTitle className="text-lg">{product.display_name}</CardTitle>

@@ -254,7 +254,7 @@ export default function JournalArticle() {
                 src={article.creator.avatar_url}
                 alt={article.creator.name}
                 className="w-12 h-12 rounded-full object-cover"
-              />
+              loading="lazy"/>
             )}
             <div>
               <p className="font-medium text-primary">{article.creator.name}</p>

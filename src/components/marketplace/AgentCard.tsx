@@ -62,7 +62,7 @@ export const AgentCard = ({ agent }: AgentCardProps) => {
               src={avatarUrl}
               alt={agent.agency_name}
               className="h-full w-full object-cover"
-            />
+            loading="lazy"/>
           ) : (
             <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-[#0a2225]/60">
               {getInitials(agent.agency_name)}

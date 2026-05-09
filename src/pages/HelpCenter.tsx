@@ -54,7 +54,7 @@ export default function HelpCenter() {
             src={primaryLogoGreen} 
             alt="Goldsainte" 
             className="h-4 sm:h-6 md:h-7 w-auto"
-          />
+          loading="lazy"/>
         </div>
 
         {/* Header */}

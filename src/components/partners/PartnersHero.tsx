@@ -14,7 +14,7 @@ export const PartnersHero = () => {
           src={heroImage}
           alt="Premium luxury transportation partnership"
           className="w-full h-full object-cover"
-        />
+        loading="lazy"/>
         <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-black/50" />
       </div>
 

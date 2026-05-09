@@ -501,7 +501,7 @@ export const MomentInteractionDisplay = ({ momentId, interaction }: MomentIntera
               {previewUrl && (
                 <div className="rounded-lg overflow-hidden bg-muted">
                   {selectedFile?.type.startsWith('image/') ? (
-                    <img src={previewUrl} alt="Preview" className="w-full h-auto" />
+                    <img src={previewUrl} alt="Preview" className="w-full h-auto" loading="lazy"/>
                   ) : (
                     <video src={previewUrl} className="w-full h-auto" controls />
                   )}
@@ -548,7 +548,7 @@ export const MomentInteractionDisplay = ({ momentId, interaction }: MomentIntera
                         src={response.response_data.mediaUrl}
                         alt="Response"
                         className="w-full h-full object-cover"
-                      />
+                      loading="lazy"/>
                     ) : (
                       <video
                         src={response.response_data.mediaUrl}
@@ -562,7 +562,7 @@ export const MomentInteractionDisplay = ({ momentId, interaction }: MomentIntera
                       src={response.profiles?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.profiles?.id}`}
                       alt={response.profiles?.username}
                       className="w-6 h-6 rounded-full"
-                    />
+                    loading="lazy"/>
                     <span className="text-sm font-medium">
                       @{response.profiles?.username}
                     </span>

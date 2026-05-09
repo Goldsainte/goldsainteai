@@ -129,7 +129,7 @@ const ResetPassword = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
       <Card className="w-full max-w-md p-6 sm:p-8">
         <div className="flex flex-col items-center mb-8">
-          <img src={logomark} alt="Logo" className="h-16 w-16 mb-4" />
+          <img src={logomark} alt="Logo" className="h-16 w-16 mb-4" loading="lazy"/>
           <h1 className="text-xl sm:text-2xl font-secondary text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
             Reset Your Password
           </h1>

@@ -167,7 +167,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile }: Props) {
                       {/* Cover image */}
                       {service.cover_image_url && (
                         <div className="aspect-[4/3] overflow-hidden">
-                          <img src={service.cover_image_url} alt={service.title} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          <img src={service.cover_image_url} alt={service.title} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy"/>
                         </div>
                       )}
 

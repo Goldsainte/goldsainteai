@@ -345,7 +345,7 @@ export default function BrandCollectionDetailPage() {
                         src={item.cover_image_url}
                         alt={item.title}
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
+                      loading="lazy"/>
                     ) : (
                       <div className="flex h-full items-center justify-center text-xs text-[#8C8470]">
                         Preview coming soon

@@ -6,6 +6,6 @@ export function EtsyLogo({ className = "h-5 w-5" }: { className?: string }) {
       src={etsyLogo} 
       alt="Etsy" 
       className={`${className} object-contain`}
-    />
+    loading="lazy"/>
   );
 }

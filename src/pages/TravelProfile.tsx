@@ -830,7 +830,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                       src={post.thumbnail_url}
                       alt={post.caption || 'Video'}
                       className="w-full h-full object-cover"
-                    />
+                    loading="lazy"/>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-purple-500/20">
                       <Video className="h-8 w-8 text-white" />
@@ -908,13 +908,13 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                       src={post.image_urls[0]}
                       alt={post.caption || 'Photo'}
                       className="w-full h-full object-cover"
-                    />
+                    loading="lazy"/>
                   ) : post.thumbnail_url ? (
                     <img
                       src={post.thumbnail_url}
                       alt={post.caption || 'Photo'}
                       className="w-full h-full object-cover"
-                    />
+                    loading="lazy"/>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-purple-500/20">
                       <Grid3X3 className="h-8 w-8 text-white" />
@@ -986,13 +986,13 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                         src={post.image_urls[0]}
                         alt={post.caption || 'Photo'}
                         className="w-full h-full object-cover"
-                      />
+                      loading="lazy"/>
                     ) : post.thumbnail_url ? (
                       <img
                         src={post.thumbnail_url}
                         alt={post.caption || 'Content'}
                         className="w-full h-full object-cover"
-                      />
+                      loading="lazy"/>
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-purple-500/20">
                         {post.media_type === 'video' ? (

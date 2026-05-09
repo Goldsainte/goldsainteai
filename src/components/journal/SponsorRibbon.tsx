@@ -21,7 +21,7 @@ export function SponsorRibbon({
               src={sponsorLogo}
               alt={sponsorName}
               className="h-8 w-auto object-contain"
-            />
+            loading="lazy"/>
           )}
           <div>
             <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">

@@ -206,7 +206,7 @@ export function TripRequestModal({
                     src={brand.avatar_url}
                     alt={brand.name}
                     className="h-full w-full object-cover"
-                  />
+                  loading="lazy"/>
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-xs font-semibold text-[#0a2225]">
                     {brand.name.slice(0, 2).toUpperCase()}
@@ -229,7 +229,7 @@ export function TripRequestModal({
                   src={collection.cover_image_url}
                   alt={collection.title}
                   className="h-32 w-full object-cover"
-                />
+                loading="lazy"/>
               </div>
             )}
 

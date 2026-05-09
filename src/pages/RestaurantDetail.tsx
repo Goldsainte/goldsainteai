@@ -63,7 +63,7 @@ export default function RestaurantDetail() {
           src={restaurant.photos?.[0] || "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80"}
           alt={restaurant.name}
           className="w-full h-full object-cover"
-        />
+        loading="lazy"/>
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="absolute bottom-8 left-0 right-0 px-4">
           <div className="container mx-auto">

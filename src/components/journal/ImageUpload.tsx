@@ -109,7 +109,7 @@ export function ImageUpload({
             src={imageUrl}
             alt="Uploaded"
             className="w-full h-64 object-cover rounded-xl"
-          />
+          loading="lazy"/>
           <Button
             variant="destructive"
             size="sm"

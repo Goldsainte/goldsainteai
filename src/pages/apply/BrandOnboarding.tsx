@@ -514,7 +514,7 @@ export default function BrandOnboarding() {
               <div className="mt-2">
                 {formData.logoUrl ? (
                   <div className="relative w-32 h-32 border border-[#E5DFC6] rounded-xl overflow-hidden">
-                    <img src={formData.logoUrl} alt="Logo" className="w-full h-full object-contain" />
+                    <img src={formData.logoUrl} alt="Logo" className="w-full h-full object-contain" loading="lazy"/>
                     <button type="button" onClick={() => setFormData({ ...formData, logoUrl: '' })} className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"><X className="h-4 w-4" /></button>
                   </div>
                 ) : (
@@ -532,7 +532,7 @@ export default function BrandOnboarding() {
               <div className="mt-2">
                 {formData.coverImageUrl ? (
                   <div className="relative w-full h-48 border border-[#E5DFC6] rounded-xl overflow-hidden">
-                    <img src={formData.coverImageUrl} alt="Cover" className="w-full h-full object-cover" />
+                    <img src={formData.coverImageUrl} alt="Cover" className="w-full h-full object-cover" loading="lazy"/>
                     <button type="button" onClick={() => setFormData({ ...formData, coverImageUrl: '' })} className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"><X className="h-4 w-4" /></button>
                   </div>
                 ) : (
@@ -550,7 +550,7 @@ export default function BrandOnboarding() {
               <div className="mt-2 grid grid-cols-3 gap-4">
                 {formData.galleryUrls.map((url, index) => (
                   <div key={index} className="relative aspect-square border border-[#E5DFC6] rounded-xl overflow-hidden">
-                    <img src={url} alt={`Gallery ${index + 1}`} className="w-full h-full object-cover" />
+                    <img src={url} alt={`Gallery ${index + 1}`} className="w-full h-full object-cover" loading="lazy"/>
                     <button type="button" onClick={() => setFormData(prev => ({ ...prev, galleryUrls: prev.galleryUrls.filter((_, i) => i !== index) }))} className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"><X className="h-3 w-3" /></button>
                   </div>
                 ))}

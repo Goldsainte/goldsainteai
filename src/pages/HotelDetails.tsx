@@ -223,7 +223,7 @@ export default function HotelDetails() {
                 src={photos[0].url}
                 alt={hotelData.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-              />
+              loading="lazy"/>
             </div>
             {photos.slice(1, 5).map((photo: any, idx: number) => (
               <div 
@@ -235,7 +235,7 @@ export default function HotelDetails() {
                   src={photo.url}
                   alt={`${hotelData.name} ${idx + 2}`}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                />
+                loading="lazy"/>
               </div>
             ))}
             {photos.length > 5 && (

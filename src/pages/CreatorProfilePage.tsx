@@ -115,7 +115,7 @@ export default function CreatorProfilePage() {
                   src={creator.avatarUrl}
                   alt={creator.name}
                   className="h-full w-full object-cover"
-                />
+                loading="lazy"/>
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-lg font-semibold text-muted-foreground">
                   {creator.name
@@ -274,7 +274,7 @@ function TripCard({
             src={trip.heroImageUrl}
             alt={trip.title}
             className="h-full w-full object-cover"
-          />
+          loading="lazy"/>
         ) : (
           <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
             No image

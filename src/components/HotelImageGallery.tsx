@@ -68,7 +68,7 @@ export const HotelImageGallery = ({
               src={images[currentIndex]}
               alt={`${hotelName} - Image ${currentIndex + 1}`}
               className="max-w-full max-h-[calc(90vh-120px)] object-contain rounded-lg"
-            />
+            loading="lazy"/>
             
             {/* Image counter */}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/70 text-white text-sm rounded-full backdrop-blur-sm">
@@ -108,7 +108,7 @@ export const HotelImageGallery = ({
                     src={image}
                     alt={`${hotelName} thumbnail ${index + 1}`}
                     className="w-full h-full object-cover"
-                  />
+                  loading="lazy"/>
                   {currentIndex === index && (
                     <div className="absolute inset-0 bg-primary/20" />
                   )}

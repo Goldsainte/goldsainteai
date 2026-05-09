@@ -407,7 +407,7 @@ export default function CreatorsPage() {
                         src={creator.avatarUrl}
                         alt={creator.displayName}
                         className="h-full w-full object-cover"
-                      />
+                      loading="lazy"/>
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-[#0a2225]/60">
                         {creator.displayName.charAt(0).toUpperCase()}

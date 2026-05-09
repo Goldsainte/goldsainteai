@@ -143,7 +143,7 @@ export default function AdminTripsPage() {
                           src={trip.cover_image_url}
                           alt={trip.title ?? "Trip cover"}
                           className="h-full w-full object-cover"
-                        />
+                        loading="lazy"/>
                       ) : (
                         <div className="flex h-full w-full items-center justify-center text-xs text-[#8D8D8D]">
                           No cover
@@ -163,8 +163,7 @@ export default function AdminTripsPage() {
                           aria-label="Live preview"
                         >
                           {draft ? (
-                            <img
-                              key={draft}
+                            <img key={draft}
                               src={draft}
                               alt="Live preview"
                               className="h-full w-full object-cover"
@@ -179,8 +178,7 @@ export default function AdminTripsPage() {
                                 img.style.display = "block";
                                 const sib = img.nextElementSibling as HTMLElement | null;
                                 if (sib) sib.style.display = "none";
-                              }}
-                            />
+                              }} loading="lazy" />
                           ) : null}
                           <div
                             className="h-full w-full items-center justify-center text-[10px] uppercase tracking-wider text-[#b34a3a]"

@@ -161,7 +161,7 @@ export function SaveToStoryboardModal({
             src={imageUrl}
             alt={title || "Pin"}
             className="w-20 h-20 rounded-xl object-cover shrink-0"
-          />
+          loading="lazy"/>
           <div className="min-w-0">
             {title && (
               <p className="text-sm font-medium text-foreground line-clamp-2">

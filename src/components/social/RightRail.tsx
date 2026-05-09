@@ -8,7 +8,7 @@ export default function RightRail() {
       <div className="mt-3 space-y-3">
         {suggestions.map((s) => (
           <div key={s.id} className="flex items-center gap-3">
-            <img src={s.avatar} className="w-9 h-9 rounded-full" alt="" />
+            <img src={s.avatar} className="w-9 h-9 rounded-full" alt="" loading="lazy"/>
             <div className="min-w-0">
               <div className="font-medium leading-tight truncate">{s.username}</div>
               <div className="text-xs text-muted-foreground truncate">{s.name}</div>

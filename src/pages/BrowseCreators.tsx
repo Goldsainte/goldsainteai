@@ -172,7 +172,7 @@ function CreatorCard({ creator }: { creator: Creator }) {
               src={creator.avatarUrl}
               alt={creator.name}
               className="h-full w-full object-cover"
-            />
+            loading="lazy"/>
           ) : (
             <div className="flex h-full w-full items-center justify-center text-xs font-semibold text-neutral-500">
               {creator.name

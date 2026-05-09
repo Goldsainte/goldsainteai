@@ -180,7 +180,7 @@ export const Header = () => {
               {/* Top row: Logo + Notifications + Profile Menu */}
               <div className="flex items-center justify-between">
                 <a href="/" className="flex items-center hover:opacity-90 transition-opacity">
-                  <img src={logomark} alt="Goldsainte Logo" className="h-8 w-8" />
+                  <img src={logomark} alt="Goldsainte Logo" className="h-8 w-8" loading="lazy"/>
                 </a>
                 
                 <div className="flex items-center gap-2">
@@ -435,7 +435,7 @@ export const Header = () => {
             <div className="flex items-center justify-between gap-2 sm:gap-3 md:gap-4 h-14 sm:h-16 md:h-20">
               {/* Logo - Left */}
               <a href="/" className="flex items-center hover:opacity-90 transition-opacity flex-shrink-0 min-h-[44px]">
-                <img src={logoWordmark} alt="Goldsainte Logo" className="h-6 sm:h-7 md:h-8 w-auto" />
+                <img src={logoWordmark} alt="Goldsainte Logo" className="h-6 sm:h-7 md:h-8 w-auto" loading="lazy"/>
               </a>
 
               {/* Right side actions - Single Profile Menu */}

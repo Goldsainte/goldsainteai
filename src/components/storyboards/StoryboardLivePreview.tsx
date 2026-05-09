@@ -46,7 +46,7 @@ export function StoryboardLivePreview({
                 ? "aspect-[21/9]"
                 : "aspect-[16/9]"
             }`}
-          />
+          loading="lazy"/>
           {t.coverStyle === "split" && title && (
             <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent p-6">
               <h2
@@ -108,7 +108,7 @@ export function StoryboardLivePreview({
                     className={`w-full object-cover ${
                       t.cardStyle === "rounded" ? "rounded-lg" : ""
                     }`}
-                  />
+                  loading="lazy"/>
                   {b.caption && (
                     <p
                       className="text-[10px] mt-1 leading-tight"
@@ -130,7 +130,7 @@ export function StoryboardLivePreview({
                     src={b.imageUrl}
                     alt={b.caption}
                     className="w-full rounded-lg object-cover"
-                  />
+                  loading="lazy"/>
                   {b.caption && (
                     <p
                       className="text-[10px] text-center"
@@ -159,7 +159,7 @@ export function StoryboardLivePreview({
                         className={`w-full object-cover aspect-[16/9] ${
                           t.cardStyle === "rounded" ? "rounded-lg" : ""
                         }`}
-                      />
+                      loading="lazy"/>
                       {b.caption && (
                         <p
                           className="text-[10px] mt-1"
@@ -177,7 +177,7 @@ export function StoryboardLivePreview({
                         className={`w-full object-cover aspect-square ${
                           t.cardStyle === "rounded" ? "rounded-lg" : ""
                         }`}
-                      />
+                      loading="lazy"/>
                     </div>
                   )}
                 </div>
@@ -198,7 +198,7 @@ export function StoryboardLivePreview({
                     src={b.imageUrl}
                     alt={b.caption}
                     className="w-full aspect-square object-cover"
-                  />
+                  loading="lazy"/>
                 </div>
               ))}
             </div>

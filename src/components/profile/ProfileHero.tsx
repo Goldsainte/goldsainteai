@@ -74,7 +74,7 @@ export function ProfileHero({
           {/* Avatar with gold ring */}
           <div className="h-28 w-28 md:h-32 md:w-32 shrink-0 overflow-hidden rounded-full border-[3.5px] border-[#C7A962] bg-white shadow-md mb-5">
             {avatarUrl ? (
-              <img src={avatarUrl} alt={name} className="h-full w-full object-cover" />
+              <img src={avatarUrl} alt={name} className="h-full w-full object-cover" loading="lazy"/>
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#F5F0E0] to-[#E5DFC6] text-2xl font-bold text-[#0a2225]">
                 {name.slice(0, 2).toUpperCase()}

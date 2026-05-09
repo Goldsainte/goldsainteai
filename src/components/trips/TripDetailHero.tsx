@@ -72,7 +72,7 @@ export function TripDetailHero({
           src={allImages[currentImageIndex] || "/placeholder.svg"}
           alt={title}
           className="h-full w-full object-cover"
-        />
+        loading="lazy"/>
         
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
@@ -127,7 +127,7 @@ export function TripDetailHero({
                   : "border-transparent opacity-70 hover:opacity-100"
               )}
             >
-              <img src={img} alt="" className="h-full w-full object-cover" />
+              <img src={img} alt="" className="h-full w-full object-cover" loading="lazy"/>
             </button>
           ))}
         </div>

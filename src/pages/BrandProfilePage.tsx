@@ -239,7 +239,7 @@ export default function BrandProfilePage() {
                               src={c.cover_image_url}
                               alt={c.title}
                               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                            />
+                            loading="lazy"/>
                           ) : (
                             <div className="h-full w-full bg-gradient-to-br from-[#F5F0E0] to-[#E5DFC6]" />
                           )}

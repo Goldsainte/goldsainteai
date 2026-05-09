@@ -10,6 +10,7 @@ import { LiveTripGrid } from "@/components/marketplace/LiveTripGrid";
 import { TripRequestGrid } from "@/components/marketplace/TripRequestGrid";
 import { EmptyState } from "@/components/marketplace/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { BackButton } from "@/components/ui/BackButton";
@@ -89,10 +90,25 @@ export default function Marketplace() {
 
   const handleClearFilters = () => {
     setFilters({ destination: "", travelers: 1 });
+    setOffset(0);
+    setExtraTrips([]);
   };
 
+  // Pagination state for live trips
+  const [offset, setOffset] = useState(0);
+  const [extraTrips, setExtraTrips] = useState<any[]>([]);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [reachedEnd, setReachedEnd] = useState(false);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setOffset(0);
+    setExtraTrips([]);
+    setReachedEnd(false);
+  }, [filters.category, filters.destination, filters.startDate, filters.endDate, filters.travelers, filters.sortBy]);
+
   // Live Trips query — wired with search filters
-  const { data: liveTrips, isLoading: isLoadingTrips } = useQuery({
+  const { data: liveTrips, isLoading: isLoadingTrips, isError: isTripsError, refetch: refetchTrips } = useQuery({
     queryKey: ["marketplace-live-trips", filters.category, filters.destination, filters.startDate, filters.endDate, filters.travelers, filters.sortBy],
     queryFn: async () => {
       let query = supabase
@@ -142,23 +158,75 @@ export default function Marketplace() {
         query = query.order("created_at", { ascending: false });
       }
 
-      const { data, error } = await query;
+      const { data, error } = await query.limit(48);
       if (error) throw error;
       return data || [];
     },
     enabled: activeTab === "trips",
   });
 
+  const buildLiveTripsQuery = () => {
+    let query = supabase
+      .from("packaged_trips")
+      .select(`
+        id, slug, title, destination, cover_image_url, price_per_person, currency,
+        duration_nights, highlights, creator_type,
+        duration_days, max_participants, current_bookings, difficulty_level,
+        rating, review_count, available_from, available_until, tags,
+        wishlist_count, booking_count, view_count, is_verified, created_at,
+        creator:profiles!left(id, full_name, avatar_url, home_base, content_style_tags, is_verified)
+      `)
+      .eq("status", "published");
+    if (filters.destination) query = query.ilike("destination", `%${filters.destination}%`);
+    if (filters.startDate) query = query.gte("available_until", filters.startDate);
+    if (filters.endDate) query = query.lte("available_from", filters.endDate);
+    if (filters.travelers && filters.travelers > 1) query = query.gte("max_participants", filters.travelers);
+    if (filters.category && filters.category !== "Top Rated") {
+      const tagVariants = FILTER_TAG_MAP[filters.category] || [filters.category.toLowerCase()];
+      query = query.overlaps("tags", tagVariants);
+    }
+    if (filters.sortBy === "top-rated" || filters.category === "Top Rated") {
+      query = query.order("rating", { ascending: false, nullsFirst: false });
+    } else if (filters.sortBy === "price-low") {
+      query = query.order("price_per_person", { ascending: true, nullsFirst: false });
+    } else if (filters.sortBy === "price-high") {
+      query = query.order("price_per_person", { ascending: false, nullsFirst: false });
+    } else {
+      query = query.order("created_at", { ascending: false });
+    }
+    return query;
+  };
+
+  const handleLoadMore = async () => {
+    setLoadingMore(true);
+    try {
+      const nextOffset = (offset || 48) + (offset === 0 ? 0 : 48);
+      const start = (liveTrips?.length || 0) + extraTrips.length;
+      const end = start + 47;
+      const { data, error } = await buildLiveTripsQuery().range(start, end);
+      if (error) throw error;
+      const rows = data || [];
+      if (rows.length < 48) setReachedEnd(true);
+      setExtraTrips((prev) => [...prev, ...rows]);
+      setOffset(start + rows.length);
+    } catch (e) {
+      toast.error("Failed to load more trips");
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
   // Client-side price filter on liveTrips
   const filteredLiveTrips = useMemo(() => {
-    if (!liveTrips) return liveTrips;
+    const combined = liveTrips ? [...liveTrips, ...extraTrips] : null;
+    if (!combined) return combined;
     const min = filters.minPrice ?? 0;
     const max = filters.maxPrice ?? 10000;
-    return (liveTrips as any[]).filter((t) => {
+    return (combined as any[]).filter((t) => {
       const p = t.price_per_person ?? 0;
       return p >= min && p <= max;
     });
-  }, [liveTrips, filters.minPrice, filters.maxPrice]);
+  }, [liveTrips, extraTrips, filters.minPrice, filters.maxPrice]);
 
   // Trip Requests query — wired with search filters
   const { data: tripRequests, isLoading: isLoadingRequests } = useQuery({
@@ -243,6 +311,18 @@ export default function Marketplace() {
           </div>
         );
       }
+      if (isTripsError) {
+        return (
+          <div className="py-16 text-center">
+            <p className="text-[#0a2225] mb-4">
+              We had trouble loading trips. Please refresh or try again.
+            </p>
+            <Button onClick={() => refetchTrips()} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6]">
+              Retry
+            </Button>
+          </div>
+        );
+      }
       if (!filteredLiveTrips?.length) {
         return (
           <EmptyState
@@ -253,7 +333,24 @@ export default function Marketplace() {
           />
         );
       }
-      return <LiveTripGrid trips={filteredLiveTrips as any} />;
+      const showLoadMore = !reachedEnd && (liveTrips?.length || 0) + extraTrips.length >= 48;
+      return (
+        <>
+          <LiveTripGrid trips={filteredLiveTrips as any} />
+          {showLoadMore && (
+            <div className="mt-8 flex justify-center">
+              <Button
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                variant="outline"
+                className="rounded-full border-[#0c4d47] text-[#0c4d47] hover:bg-[#0c4d47] hover:text-[#E5DFC6]"
+              >
+                {loadingMore ? "Loading…" : "Load More"}
+              </Button>
+            </div>
+          )}
+        </>
+      );
     }
 
     if (activeTab === "trip-requests") {

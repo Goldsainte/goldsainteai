@@ -170,7 +170,7 @@ export function StoryboardsHighlight() {
                         src={trip.profiles.avatar_url || '/placeholder.svg'}
                         alt={trip.profiles.full_name}
                         className="h-5 w-5 rounded-full object-cover ring-1 ring-[#E5DFC6]"
-                      />
+                      loading="lazy"/>
                       <span className="text-[10px] md:text-[11px] font-medium text-[#0a2225] group-hover/host:underline">
                         By {trip.profiles.full_name}
                       </span>

@@ -1053,7 +1053,7 @@ const BrandApplicationDetail: React.FC<{
             src={application.cover_image_url}
             alt={application.brand_name}
             className="w-full h-48 sm:h-64 object-cover"
-          />
+          loading="lazy"/>
         </div>
       )}
 
@@ -1142,13 +1142,11 @@ const BrandApplicationDetail: React.FC<{
           <LuxuryCardContent>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
               {application.gallery_urls.map((url, index) => (
-                <img
-                  key={index}
+                <img key={index}
                   src={url}
                   alt={`Gallery ${index + 1}`}
                   className="w-full h-40 object-cover rounded-xl cursor-pointer hover:opacity-90 transition-opacity border border-[#E5DFC6]"
-                  onClick={() => window.open(url, '_blank')}
-                />
+                  onClick={() => window.open(url, '_blank')} loading="lazy" />
               ))}
             </div>
           </LuxuryCardContent>
@@ -1696,7 +1694,7 @@ export default function AdminApplicationsPage() {
                                   src={app.logo_url}
                                   alt={app.brand_name}
                                   className="h-10 w-10 rounded-xl object-cover border border-[#E5DFC6]"
-                                />
+                                loading="lazy"/>
                               )}
                               <div>
                                 <h3 className="font-medium text-[#0a2225]">{app.brand_name}</h3>

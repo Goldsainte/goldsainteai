@@ -75,7 +75,7 @@ export function MarketplaceShowcase() {
                   src={trip.image}
                   alt={trip.title}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+                loading="lazy"/>
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 to-transparent" />
               </div>
               <div className="flex flex-1 flex-col justify-between p-3">

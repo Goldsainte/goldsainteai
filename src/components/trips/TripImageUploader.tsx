@@ -112,7 +112,7 @@ export function TripImageUploader({ currentUrl, onUpload, label, compact }: Trip
             src={currentUrl}
             alt="Cover"
             className="w-full aspect-video object-cover rounded-2xl border border-[#E5DFC6]"
-          />
+          loading="lazy"/>
           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl flex items-center justify-center gap-3">
             <Button
               variant="secondary"

@@ -92,7 +92,7 @@ export function BrandGallery({ images, brandName, className }: BrandGalleryProps
                   src={images[selectedIndex]}
                   alt={`${brandName} gallery ${selectedIndex + 1}`}
                   className="max-h-[70vh] max-w-full object-contain rounded-lg"
-                />
+                loading="lazy"/>
               </div>
             )}
 

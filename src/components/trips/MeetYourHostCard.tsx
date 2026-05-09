@@ -38,7 +38,7 @@ export function MeetYourHostCard({
           src={hostAvatar || "/placeholder.svg"}
           alt={hostName}
           className="h-20 w-20 rounded-full object-cover ring-2 ring-[#C7B892]/30"
-        />
+        loading="lazy"/>
 
         {/* Info */}
         <div className="flex-1">

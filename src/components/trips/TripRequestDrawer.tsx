@@ -209,7 +209,7 @@ export function TripRequestDrawer({
                     src={trip.brand_avatar_url}
                     alt={trip.brand_name ?? "Brand"}
                     className="h-full w-full object-cover"
-                  />
+                  loading="lazy"/>
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-[#0a2225]">
                     {(trip.brand_name ?? "GS").slice(0, 2).toUpperCase()}

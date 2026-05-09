@@ -61,7 +61,7 @@ export function OnboardingWelcomeModal() {
               src={welcomeHeroImage}
               alt="Luxury travel destination"
               className="w-full h-32 sm:h-48 md:h-full object-cover"
-            />
+            loading="lazy"/>
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent md:bg-gradient-to-r" />
           </div>
 

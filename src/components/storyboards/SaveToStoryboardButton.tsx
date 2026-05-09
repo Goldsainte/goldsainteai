@@ -162,7 +162,7 @@ export function SaveToStoryboardButton({
                         src={board.cover_image_url}
                         alt={board.title || "Storyboard"}
                         className="w-12 h-12 rounded-lg object-cover"
-                      />
+                      loading="lazy"/>
                     ) : (
                       <div className="w-12 h-12 rounded-lg bg-[#E5DFC6] flex items-center justify-center">
                         <BookmarkPlus className="h-5 w-5 text-[#8D8D8D]" />

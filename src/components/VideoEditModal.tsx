@@ -322,7 +322,7 @@ const VideoEditModal = ({
                   src={previewThumbnail} 
                   alt="Cover preview" 
                   className="w-full h-full object-cover"
-                />
+                loading="lazy"/>
               </div>
             </div>
           )}

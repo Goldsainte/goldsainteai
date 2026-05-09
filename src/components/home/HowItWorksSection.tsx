@@ -110,7 +110,7 @@ export function HowItWorksSection() {
                     src={src}
                     alt="Goldsainte travel inspiration"
                     className="w-full rounded-2xl object-cover"
-                  />
+                  loading="lazy"/>
                 ))}
               </div>
               <div className="mt-4 rounded-2xl bg-[#0c4d47] px-4 py-3 text-sm text-[#E5DFC6]">
