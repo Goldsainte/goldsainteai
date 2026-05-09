@@ -136,8 +136,6 @@ export default function MyTripsPage() {
           .order("created_at", { ascending: false });
         
         const requestsData = result.data;
-        
-        const requestsData = result.data;
         const requestsError = result.error;
 
         if (!cancelled) {
@@ -145,7 +143,6 @@ export default function MyTripsPage() {
             console.error("❌ [MyTripsPage] Error loading trip_requests:", requestsError);
             setRequests([]);
           } else {
-            setRequests((requestsData ?? []) as any);
             setRequests((requestsData ?? []) as any);
           }
         }
