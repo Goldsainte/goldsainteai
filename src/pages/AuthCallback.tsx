@@ -13,7 +13,7 @@ const AuthCallback = () => {
     const handleAuthCallback = async () => {
       try {
         // Wait briefly for detectSessionInUrl to process the URL token
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 300));
 
         const { data: { session }, error } = await supabase.auth.getSession();
         
