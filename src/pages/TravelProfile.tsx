@@ -452,7 +452,6 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
   if (loading) {
     return (
       <>
-        <TravelSidebar />
         <div className="min-h-screen bg-background pb-28 md:pb-0 md:ml-64">
           <div className="max-w-4xl mx-auto px-4 md:px-6 pt-8">
             <div className="flex gap-8 mb-12 items-start">
@@ -478,7 +477,6 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
 
   return (
     <>
-      <TravelSidebar />
       <div className="min-h-screen bg-background pb-28 pb-safe md:pb-0 md:ml-64">
       {/* Header - Mobile Only */}
         <div className="md:hidden sticky top-0 z-20 bg-background/80 backdrop-blur-lg border-b">
@@ -1097,12 +1095,6 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
       />
 
       {/* ContentUploadModal removed - feature consolidated into moment creation */}
-
-      {/* Create Moment Modal */}
-      <CreateMomentModal
-        open={createMomentOpen}
-        onOpenChange={setCreateMomentOpen}
-      />
 
       {/* Buy Coins Modal */}
       <BuyCoinsModal
