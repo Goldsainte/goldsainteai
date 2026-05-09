@@ -986,11 +986,6 @@ if (minRating && searchType !== "restaurants") {
 
               {/* Results List */}
               <main className="lg:col-span-10">
-                {/* Promoted Transportation Vendors */}
-                <div className="mb-6">
-                  <VendorPromotionFeed displayContext="search" limit={2} />
-                </div>
-
                 {/* Map View at Top for restaurants and events (hotels handled in HotelSearchWithFilters) */}
                 {(searchType === "restaurants" || searchType === "events") && (
                   <ResultsMapView 
