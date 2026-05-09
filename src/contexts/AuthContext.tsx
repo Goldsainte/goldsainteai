@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useActivityLogger } from '@/hooks/useActivityLogger';
-import { loadSessionFromServer, pushSessionToServer, SessionSyncError } from '@/lib/auth/session-service';
+import { loadSessionFromServer, pushSessionToServer, SessionSyncError, SESSION_SYNC_ENABLED } from '@/lib/auth/session-service';
 
 interface AuthContextType {
   user: User | null;
@@ -29,8 +29,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const INACTIVITY_LIMIT = 60 * 60 * 1000; // 1 hour in milliseconds
   const sessionBootstrapFailures = useRef(0);
   const MAX_SESSION_FAILURES = 3;
+  const sessionSetByListener = useRef(false);
 
   const handleSessionSyncFailure = async (error: unknown) => {
+    if (!SESSION_SYNC_ENABLED) {
+      setIsLoading(false);
+      return;
+    }
     sessionBootstrapFailures.current += 1;
     Sentry.captureException(error, {
       level: 'warning',
@@ -64,6 +69,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (!isMounted) return;
         setSession(session);
         setUser(session?.user ?? null);
+        sessionSetByListener.current = true;
         setIsLoading(false);
         resetSessionFailureCount();
         void pushSessionToServer(event, session).catch((error: unknown) => {
@@ -77,6 +83,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const bootstrapSession = async () => {
       try {
+        if (sessionSetByListener.current) {
+          setIsLoading(false);
+          return;
+        }
         const serverSession = await loadSessionFromServer();
         if (!isMounted) return;
 
