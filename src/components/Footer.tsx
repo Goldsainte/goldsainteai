@@ -31,8 +31,8 @@ export const Footer = () => {
       heading: "COMPANY",
       links: [
         { to: "/about", label: "About Goldsainte" },
-        { to: "/about#investor-relations", label: "Investor Relations" },
-        { to: "/about", label: "Press" },
+        { to: "/corporate-contact", label: "Investor Relations" },
+        { to: "/corporate-contact", label: "Press" },
         { to: "/corporate-contact", label: "Corporate Contact" },
       ],
     },
@@ -49,10 +49,10 @@ export const Footer = () => {
 
   const legalLinks = [
     { to: "/privacy-cookies", label: "Privacy & Cookies" },
-    { to: "/about#terms", label: "Terms of Service" },
+    { to: "/terms", label: "Terms of Service" },
     { to: "/legal/creator-agreement", label: "Creator Agreement" },
-    { to: "/about#accessibility", label: "Accessibility" },
-    { to: "/about#dispute-resolution", label: "Dispute Resolution" },
+    { to: "/help", label: "Accessibility" },
+    { to: "/dispute-resolution", label: "Dispute Resolution" },
   ];
 
   return (
