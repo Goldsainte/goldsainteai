@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { MapPin, Calendar, Heart, Star } from "lucide-react";
 import { CreatorAttribution } from "./CreatorAttribution";
+import logomark from "@/assets/logomark-gold.png";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -179,9 +180,22 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
 
       {/* Content below image */}
       <div className="space-y-1 px-0.5">
-        {trip.creator && (
+        {trip.creator ? (
           <CreatorAttribution creator={trip.creator} className="mb-1" />
-        )}
+        ) : trip.creator_type === "platform" ? (
+          <div className="mb-1 flex items-center gap-1.5">
+            <img
+              src={logomark}
+              alt="Goldsainte"
+              className="h-5 w-5 rounded-full object-contain ring-1 ring-[#C7B892]/40 bg-[#0c4d47] p-0.5"
+              loading="lazy"
+            />
+            <span className="text-[11px] text-[#7A7151] truncate">
+              <span className="text-[#6B7280]">Curated by </span>
+              <span className="font-secondary italic text-[#0a2225]">Goldsainte</span>
+            </span>
+          </div>
+        ) : null}
         {typeof trip.rating === "number" && trip.rating > 0 && (
           <p className="flex items-center gap-1 text-[12px] text-[#0a2225]">
             <Star className="h-3 w-3 fill-[#C7A962] text-[#C7A962]" />
