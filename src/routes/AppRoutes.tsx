@@ -37,7 +37,6 @@ const AgentPublicProfilePage = lazy(() => import('@/pages/agents/AgentPublicProf
 const CreatorPublicProfilePage = lazy(() => import('@/pages/creators/CreatorPublicProfilePage'));
 const TravelProfileRedirect = lazy(() => import('@/pages/redirects/TravelProfileRedirectPage'));
 const TripRequestRedirect = lazy(() => import('@/pages/redirects/TripRequestRedirect'));
-const ExplorePage = lazy(() => import('@/pages/ExplorePage'));
 const Marketplace = lazy(() => import('@/pages/Marketplace'));
 const TripRequestDetail = lazy(() => import('@/pages/marketplace/TripRequestDetail'));
 const TripDetail = lazy(() => import('@/pages/marketplace/TripDetail'));
@@ -90,7 +89,6 @@ const ApplicationStatusCheck = lazy(() => import('@/pages/ApplicationStatusCheck
 const AgentApplicationForm = lazy(() => import('@/pages/AgentApplicationForm'));
 
 const CreatorSettingsPage = lazy(() => import('@/pages/CreatorSettingsPage'));
-const MusicVolumeSettings = lazy(() => import('@/pages/MusicVolumeSettings'));
 
 const TikTokCallback = lazy(() => import('@/pages/TikTokCallback'));
 const CreatorDashboard = lazy(() => import('@/pages/CreatorDashboard'));
@@ -99,7 +97,6 @@ const CreatorTripPage = lazy(() => import('@/pages/CreatorTripPage'));
 const TripBuilderPage = lazy(() => import('@/pages/TripBuilderPage'));
 // CreatorProfilePage removed — /creator/:id now redirects to /creators/:id
 const CreatorRedirect = lazy(() => import('@/pages/redirects/CreatorRedirect'));
-const NewCollabRequestPage = lazy(() => import('@/pages/NewCollabRequestPage'));
 const MessagesPage = lazy(() => import('@/pages/MessagesPage'));
 // TravelerDashboardPage import moved to line 68
 const PartnerConsolePage = lazy(() => import('@/pages/partner/PartnerConsolePage'));
@@ -109,9 +106,6 @@ const MyJobs = lazy(() => import('@/pages/MyJobs'));
 const GroupTrips = lazy(() => import('@/pages/GroupTrips'));
 const JournalListing = lazy(() => import('@/pages/JournalListing'));
 const JournalArticle = lazy(() => import('@/pages/JournalArticle'));
-const CreatorArticles = lazy(() => import('@/pages/CreatorArticles'));
-const CreatorArticleEditor = lazy(() => import('@/pages/CreatorArticleEditor'));
-const SupplierManagement = lazy(() => import('@/pages/SupplierManagement'));
 const EscrowTimelineDashboard = lazy(() => import('@/components/EscrowTimelineDashboard'));
 const ActivityLogs = lazy(() => import('@/pages/ActivityLogs'));
 const CustomerVerification = lazy(() => import('@/pages/CustomerVerification'));
@@ -161,6 +155,7 @@ const AppleCallback = lazy(() => import('@/pages/AppleCallback'));
 const EarningsDashboard = lazy(() => import('@/pages/EarningsDashboard'));
 const HealthCheck = lazy(() => import('@/pages/HealthCheck'));
 const BookTripPage = lazy(() => import('@/pages/trips/BookTripPage'));
+const BookingConfirmation = lazy(() => import('@/pages/BookingConfirmation'));
 
 export const AppRoutes = () => (
   <Routes>
@@ -202,7 +197,7 @@ export const AppRoutes = () => (
       {/* Smart onboarding router - redirects based on account type */}
       <Route path="/onboarding" element={<OnboardingRouter />} />
       <Route path="/onboarding/traveler/preferences" element={<Navigate to="/traveler" replace />} />
-      <Route path="/onboarding/creator" element={<CreatorOnboardingPage />} />
+      <Route path="/onboarding/creator" element={<RequireAuth><CreatorOnboardingPage /></RequireAuth>} />
       <Route path="/brand/onboarding" element={<Navigate to="/apply/brand" replace />} />
       <Route path="/apply/brand" element={<BrandApplyPage />} />
       
@@ -211,8 +206,7 @@ export const AppRoutes = () => (
 
     <Route element={<MemberLayout />}>
       <Route element={<DesktopShell />}>
-        <Route path="/explore" element={<ExplorePage />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
         <Route path="/travel-profile" element={<TravelProfileRedirect />} />
         <Route path="/travel-profile/:userId" element={<TravelProfileRedirect />} />
       </Route>
@@ -428,9 +422,8 @@ export const AppRoutes = () => (
       />
       <Route path="/email-preview" element={<AdminGuard><EmailPreview /></AdminGuard>} />
       <Route path="/billing-dashboard" element={<RequireAuth><BillingDashboard /></RequireAuth>} />
-      <Route path="/travel-settings" element={<CreatorSettingsPage />} />
+      <Route path="/travel-settings" element={<RequireAuth><CreatorSettingsPage /></RequireAuth>} />
       <Route path="/travel-settings/general" element={<TravelSettings />} />
-      <Route path="/travel-settings/music-volume" element={<MusicVolumeSettings />} />
       <Route
         path="/tiktok-callback"
         element={(
@@ -440,30 +433,26 @@ export const AppRoutes = () => (
         )}
       />
       <Route path="/creator-dashboard" element={<RequireAuth><CreatorDashboard /></RequireAuth>} />
-      <Route path="/console/brand" element={<BrandConsolePage />} />
+      <Route path="/console/brand" element={<RequireAuth><BrandConsolePage /></RequireAuth>} />
       {/* New TikTok Creator Ecosystem Routes */}
       <Route path="/trip/:id" element={<CreatorTripPage />} />
       <Route path="/trip/:tripId/storyboard" element={<Navigate to="/storyboards" replace />} />
       <Route path="/creator/:id" element={<CreatorRedirect />} />
-      <Route path="/collabs/new" element={<NewCollabRequestPage />} />
       <Route path="/my-jobs" element={<RequireAuth><MyJobs /></RequireAuth>} />
       {/* Duplicate /my-trips route removed - using MyTripsPage at line 351 */}
       <Route path="/group-trips" element={<RequireAuth><GroupTrips /></RequireAuth>} />
       <Route path="/group-trips/:tripId" element={<RequireAuth><GroupTrips /></RequireAuth>} />
       <Route path="/journal" element={<JournalListing />} />
       <Route path="/journal/:slug" element={<JournalArticle />} />
-      <Route path="/creator-articles" element={<CreatorArticles />} />
-      <Route path="/creator-articles/new" element={<CreatorArticleEditor />} />
-      <Route path="/creator-articles/edit/:id" element={<CreatorArticleEditor />} />
-      <Route path="/supplier-management" element={<SupplierManagement />} />
       <Route path="/escrow-timeline" element={<RequireAuth><EscrowTimelineDashboard /></RequireAuth>} />
-      <Route path="/activity-logs" element={<ActivityLogs />} />
-      <Route path="/customer-verification" element={<CustomerVerification />} />
+      <Route path="/activity-logs" element={<AdminGuard><ActivityLogs /></AdminGuard>} />
+      <Route path="/customer-verification" element={<RequireAuth><CustomerVerification /></RequireAuth>} />
       <Route path="/emergency-contacts" element={<RequireAuth><EmergencyContacts /></RequireAuth>} />
       <Route path="/tour/:tourId" element={<RequireAuth><TourActivityDetail /></RequireAuth>} />
       <Route path="/restaurant/:restaurantId" element={<RequireAuth><RestaurantDetail /></RequireAuth>} />
       <Route path="/your-activity" element={<YourActivity />} />
       <Route path="/earnings" element={<RequireAuth><EarningsDashboard /></RequireAuth>} />
+      <Route path="/booking-confirmation" element={<RequireAuth><BookingConfirmation /></RequireAuth>} />
     </Route>
 
     <Route
