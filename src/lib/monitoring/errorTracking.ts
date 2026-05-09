@@ -106,8 +106,6 @@ class ErrorTracker {
   setUserContext(userId: string, email?: string): void {
     if (!this.enabled) return;
 
-    console.log("[User Context]", { userId, email });
-
     // In production, set user context in error tracking service
     // Example: Sentry.setUser({ id: userId, email });
   }
