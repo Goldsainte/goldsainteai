@@ -125,8 +125,8 @@ export default function AgentApplicationForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const totalSteps = 5;
-  const stepLabels = ["You & Your Business", "Credentials", "Sales & Presence", "Insurance & Legal", "Verification"];
+  const totalSteps = 6;
+  const stepLabels = ["You & Your Business", "Credentials", "Sales & Presence", "Insurance & Legal", "Documents", "Verification"];
 
   const specializationOptions = [
     "Luxury Travel", "Adventure Travel", "Honeymoons & Romance", "Family Travel",
@@ -247,7 +247,7 @@ export default function AgentApplicationForm() {
       setApplicationId(clientId);
       localStorage.setItem('agent_application_email', formData.email);
       localStorage.setItem('agent_application_id', clientId);
-      setStep(5);
+      setStep(6);
 
       toast({
         title: "Application saved",
