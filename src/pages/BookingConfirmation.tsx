@@ -19,7 +19,7 @@ export default function BookingConfirmation() {
     const fetchBooking = async () => {
       const { data } = await supabase
         .from("trip_bookings")
-        .select("id, total_price, currency, status, metadata, created_at")
+        .select("id, total_price, deposit_amount, deposit_percentage, currency, status, metadata, created_at")
         .eq("id", bookingId)
         .single();
       setBooking(data);
@@ -61,15 +61,35 @@ export default function BookingConfirmation() {
               </span>
             </div>
             {booking.total_price && (
-              <div className="flex items-center justify-between">
-                <span className="text-sm" style={{ color: "#7A7151" }}>Amount Paid</span>
-                <span className="text-sm font-semibold" style={{ color: "#0a2225" }}>
-                  {new Intl.NumberFormat("en-US", {
-                    style: "currency",
-                    currency: booking.currency || "USD",
-                  }).format(booking.total_price)}
-                </span>
-              </div>
+              <>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm" style={{ color: "#7A7151" }}>Trip Total</span>
+                  <span className="text-sm font-semibold" style={{ color: "#0a2225" }}>
+                    {new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: booking.currency || "USD",
+                    }).format(booking.total_price)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm" style={{ color: "#7A7151" }}>Deposit Paid ({booking.deposit_percentage}%)</span>
+                  <span className="text-sm font-semibold" style={{ color: "#0a2225" }}>
+                    {new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: booking.currency || "USD",
+                    }).format(booking.deposit_amount)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm" style={{ color: "#7A7151" }}>Balance Due at Trip</span>
+                  <span className="text-sm font-semibold" style={{ color: "#0a2225" }}>
+                    {new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: booking.currency || "USD",
+                    }).format(booking.total_price - booking.deposit_amount)}
+                  </span>
+                </div>
+              </>
             )}
             <div className="flex items-center justify-between">
               <span className="text-sm" style={{ color: "#7A7151" }}>Status</span>
