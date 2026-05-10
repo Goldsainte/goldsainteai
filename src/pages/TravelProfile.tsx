@@ -368,6 +368,34 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
     }
   };
 
+  const fetchBookingStats = async () => {
+    try {
+      const { data } = await supabase
+        .from('trip_bookings')
+        .select('status')
+        .eq('traveler_id', profileUserId!);
+      const list = (data as any[]) || [];
+      const completed = list.filter((b) => b.status === 'completed').length;
+      const upcoming = list.filter((b) => ['confirmed', 'deposit_pending'].includes(b.status)).length;
+      setBookingStats({ completed, upcoming, countries: completed });
+    } catch (e) {
+      console.error('Error fetching booking stats:', e);
+    }
+  };
+
+  const fetchSavedTrips = async () => {
+    try {
+      const { data } = await supabase
+        .from('trip_wishlists')
+        .select('packaged_trips(id, slug, title, destination, cover_image_url, price_per_person, currency, duration_days, max_participants, current_bookings, difficulty_level, rating, review_count, available_from, available_until, tags)')
+        .eq('user_id', profileUserId!);
+      const trips = ((data as any[]) || []).map((w: any) => w.packaged_trips).filter(Boolean);
+      setSavedTrips(trips);
+    } catch (e) {
+      console.error('Error fetching saved trips:', e);
+    }
+  };
+
   const formatNumber = (num: number) => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
     if (num >= 10000) return `${(num / 1000).toFixed(1)}K`;
