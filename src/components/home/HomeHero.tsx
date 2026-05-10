@@ -84,7 +84,7 @@ export function HomeHero() {
             {/* CTAs — fixed 32px below copy */}
             <div className="flex flex-col gap-3 mt-6 md:mt-8 w-full max-w-none md:max-w-sm">
               <Link
-                to="/auth?mode=signup"
+                to="/auth?mode=signup&redirect=/marketplace"
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-6 py-3 md:py-2.5 text-sm font-semibold text-[#E5DFC6] shadow-sm hover:bg-[#073331] w-full"
               >
                 Get Started Free
