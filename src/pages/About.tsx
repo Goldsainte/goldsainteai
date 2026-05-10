@@ -180,13 +180,7 @@ const About = () => {
               loading="lazy"/>
             </div>
             <p className="text-foreground">
-              {t('about.sections.whatIs.p1')}
-            </p>
-            <p className="text-foreground">
-              {t('about.sections.whatIs.p2')}
-            </p>
-            <p className="text-foreground">
-              {t('about.sections.whatIs.p3')}
+              Goldsainte is a luxury travel marketplace that connects travelers with certified travel agents and travel creators through AI-powered trip planning. Browse curated trips, post a custom trip request, or work directly with a verified specialist to design your perfect journey.
             </p>
           </AccordionContent>
         </AccordionItem>
