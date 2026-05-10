@@ -1115,12 +1115,66 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
 
         {/* POLICIES TAB */}
         <TabsContent value="policies" className="mt-8 space-y-8">
+          {/* Payment & Cancellation Terms */}
+          <Card className="border-none bg-white rounded-2xl shadow-sm">
+            <CardHeader className="pb-4">
+              <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
+              <CardTitle className="font-secondary text-lg text-[#0a2225]">Payment Terms</CardTitle>
+              <p className="text-sm text-[#6B7280] mt-1">
+                Set your deposit and payment schedule. These appear on your trip listing.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className={labelClasses}>Deposit Required (%)</Label>
+                  <Input
+                    type="number"
+                    value={formData.deposit_percentage}
+                    onChange={(e) => updateField("deposit_percentage", e.target.value)}
+                    placeholder="25"
+                    className={inputClasses}
+                  />
+                  <p className="text-xs text-[#9A9384]">
+                    Charged at booking. Remaining balance collected before departure.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label className={labelClasses}>Balance Due (days before trip)</Label>
+                  <Input
+                    type="number"
+                    value={formData.balance_due_days}
+                    onChange={(e) => updateField("balance_due_days", e.target.value)}
+                    placeholder="60"
+                    className={inputClasses}
+                  />
+                  <p className="text-xs text-[#9A9384]">When the remaining balance is collected.</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
             <CardHeader className="pb-4">
               <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
               <CardTitle className="font-secondary text-lg sm:text-xl text-[#0a2225]">Cancellation Policy</CardTitle>
             </CardHeader>
             <CardContent>
+              <button
+                type="button"
+                onClick={() =>
+                  updateField(
+                    "cancellation_policy",
+                    CANCELLATION_TEMPLATE.replace(
+                      "{deposit_percentage}",
+                      formData.deposit_percentage || "30"
+                    )
+                  )
+                }
+                className="text-xs text-[#0c4d47] underline mb-2"
+              >
+                Use template
+              </button>
               <Textarea
                 value={formData.cancellation_policy}
                 onChange={(e) => updateField("cancellation_policy", e.target.value)}
@@ -1137,6 +1191,13 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
               <CardTitle className="font-secondary text-lg sm:text-xl text-[#0a2225]">Refund Policy</CardTitle>
             </CardHeader>
             <CardContent>
+              <button
+                type="button"
+                onClick={() => updateField("refund_policy", REFUND_TEMPLATE)}
+                className="text-xs text-[#0c4d47] underline mb-2"
+              >
+                Use template
+              </button>
               <Textarea
                 value={formData.refund_policy}
                 onChange={(e) => updateField("refund_policy", e.target.value)}
