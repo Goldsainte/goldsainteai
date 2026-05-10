@@ -1,4 +1,4 @@
-import { BadgeCheck, Instagram, Linkedin, Youtube, Twitter, MapPin } from "lucide-react";
+import { BadgeCheck, Instagram, Linkedin, Youtube, Twitter, MapPin, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import FollowButton from "@/components/FollowButton";
@@ -84,22 +84,19 @@ export function ProfileHero({
             )}
           </div>
 
-          {/* Name + verified */}
-          <div className="flex items-center gap-2.5 mb-2">
+          {/* Name */}
+          <div className="flex flex-wrap items-center gap-3 mb-2">
             <h1 className="font-secondary text-3xl md:text-4xl font-bold text-[#0a2225]">
               {name}
             </h1>
             {isVerified && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <BadgeCheck className="h-5 w-5 md:h-6 md:w-6 text-[#C7A962] shrink-0 cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent className="bg-[#0a2225] text-white text-xs">
-                    Verified by Goldsainte
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <span
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#C7A962]/40 bg-[#C7A962]/10 px-3 py-1 text-xs font-medium text-[#7a5d1c]"
+                title="Verified by Goldsainte"
+              >
+                <ShieldCheck className="h-3.5 w-3.5 text-[#C7A962]" />
+                Goldsainte Verified
+              </span>
             )}
           </div>
 
