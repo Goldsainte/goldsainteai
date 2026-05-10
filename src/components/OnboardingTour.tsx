@@ -29,7 +29,7 @@ export const OnboardingTour = () => {
     },
     {
       target: '[data-tour="ai-search"]',
-      content: "Meet your AI Travel Agent! Just type naturally - 'Find me a beach resort in Bali' or 'Romantic dinner in Paris'. Our AI understands and delivers instant results.",
+      content: "Our AI helps you describe your dream trip in plain language and builds a personalised itinerary matched to certified travel specialists.",
       placement: "bottom",
       disableBeacon: true,
     },
@@ -40,27 +40,9 @@ export const OnboardingTour = () => {
       disableBeacon: true,
     },
     {
-      target: '[data-tour="places"]',
-      content: "Goldsainte Journeys! Discover travel content, videos, and inspiration from creators worldwide. Get ideas for your next adventure.",
-      placement: "bottom",
-      disableBeacon: true,
-    },
-    {
       target: '[data-tour="marketplace"]',
       content: "Need expert help? Post your trip request and let verified travel agents compete for your business with custom proposals and pricing.",
       placement: "bottom",
-      disableBeacon: true,
-    },
-    {
-      target: '[data-tour="send-gift-post"]',
-      content: "Support Creators with Gifts! Send virtual gifts using coins to your favorite travel creators. They earn real money, encouraging amazing content.",
-      placement: "top",
-      disableBeacon: true,
-    },
-    {
-      target: '[data-tour="coin-balance"]',
-      content: "Your Coin Balance! Use coins to send gifts to creators and unlock premium content. Purchase more anytime to support the community.",
-      placement: "left",
       disableBeacon: true,
     },
     {
