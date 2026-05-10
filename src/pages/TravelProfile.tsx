@@ -622,7 +622,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         <div className="flex gap-6 pb-6 border-b border-[#E5DFC6]">
           {[
             { label: 'Trips Taken', value: bookingStats.completed },
-            { label: 'Countries', value: bookingStats.countries },
+            { label: 'Destinations', value: bookingStats.completed },
             { label: 'Upcoming', value: bookingStats.upcoming },
           ].map((stat) => (
             <div key={stat.label}>
