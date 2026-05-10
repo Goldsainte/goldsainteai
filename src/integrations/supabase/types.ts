@@ -4313,6 +4313,8 @@ export type Database = {
           participant_1: string
           participant_2: string
           status: string
+          trip_id: string | null
+          trip_title: string | null
           unread_count_p1: number | null
           unread_count_p2: number | null
           updated_at: string | null
@@ -4326,6 +4328,8 @@ export type Database = {
           participant_1: string
           participant_2: string
           status?: string
+          trip_id?: string | null
+          trip_title?: string | null
           unread_count_p1?: number | null
           unread_count_p2?: number | null
           updated_at?: string | null
@@ -4339,6 +4343,8 @@ export type Database = {
           participant_1?: string
           participant_2?: string
           status?: string
+          trip_id?: string | null
+          trip_title?: string | null
           unread_count_p1?: number | null
           unread_count_p2?: number | null
           updated_at?: string | null
@@ -4384,6 +4390,13 @@ export type Database = {
             columns: ["participant_2"]
             isOneToOne: false
             referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dm_conversations_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "packaged_trips"
             referencedColumns: ["id"]
           },
         ]
@@ -5915,6 +5928,52 @@ export type Database = {
           url?: string
         }
         Relationships: []
+      }
+      message_reactions: {
+        Row: {
+          created_at: string
+          emoji: string
+          id: string
+          message_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emoji: string
+          id?: string
+          message_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string
+          id?: string
+          message_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_reactions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "direct_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "message_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "message_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       message_settings: {
         Row: {
@@ -12491,6 +12550,8 @@ export type Database = {
           job_id: string | null
           last_message_at: string | null
           status: string | null
+          trip_id: string | null
+          trip_title: string | null
           updated_at: string
         }
         Insert: {
@@ -12504,6 +12565,8 @@ export type Database = {
           job_id?: string | null
           last_message_at?: string | null
           status?: string | null
+          trip_id?: string | null
+          trip_title?: string | null
           updated_at?: string
         }
         Update: {
@@ -12517,6 +12580,8 @@ export type Database = {
           job_id?: string | null
           last_message_at?: string | null
           status?: string | null
+          trip_id?: string | null
+          trip_title?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -12525,6 +12590,13 @@ export type Database = {
             columns: ["job_id"]
             isOneToOne: false
             referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_conversations_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "packaged_trips"
             referencedColumns: ["id"]
           },
         ]
