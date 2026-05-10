@@ -98,6 +98,43 @@ export default function BookingConfirmation() {
           </div>
         )}
 
+        {booking && (
+          <div className="rounded-2xl border bg-white p-6 mb-8 border-[#E5DFC6]">
+            <h3 className="font-secondary text-xl text-[#0a2225] mb-4">What happens next</h3>
+            <ol className="space-y-4">
+              {[
+                { n: 1, text: "Your specialist will contact you within 24 hours to confirm trip details." },
+                {
+                  n: 2,
+                  text: `Your balance of ${
+                    booking?.total_price && booking?.deposit_amount
+                      ? `$${(booking.total_price - booking.deposit_amount).toLocaleString()}`
+                      : "the remaining amount"
+                  } is due ${
+                    booking?.metadata?.balance_due_days
+                      ? `${booking.metadata.balance_due_days} days before departure`
+                      : "before departure"
+                  }.`,
+                },
+                { n: 3, text: "You can message your specialist directly from your bookings dashboard." },
+              ].map((step) => (
+                <li key={step.n} className="flex gap-3">
+                  <span className="flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-full bg-[#0c4d47] text-xs font-semibold text-[#E5DFC6]">
+                    {step.n}
+                  </span>
+                  <p className="text-sm text-[#0a2225] leading-relaxed pt-0.5">{step.text}</p>
+                </li>
+              ))}
+            </ol>
+            <button
+              onClick={() => navigate(`/my-bookings`)}
+              className="mt-5 text-sm text-[#0c4d47] underline-offset-2 hover:underline"
+            >
+              Message your specialist →
+            </button>
+          </div>
+        )}
+
         {booking?.status === 'completed' && (
           <div className="rounded-2xl border border-[#C7A962]/30 bg-[#FDF9F0] p-6 mb-8">
             <h3 className="font-secondary text-xl text-[#0a2225] mb-1">How was your trip?</h3>
