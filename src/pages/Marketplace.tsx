@@ -22,8 +22,10 @@ import { QuietlyActiveFooter } from "@/components/marketplace/QuietlyActiveFoote
 import { ForYouRow } from "@/components/marketplace/ForYouRow";
 import { AdaptiveCollectionRow } from "@/components/marketplace/AdaptiveCollectionRow";
 import { ThisWeekFooter } from "@/components/marketplace/ThisWeekFooter";
+import { ItineraryGuideCard } from "@/components/marketplace/ItineraryGuideCard";
+import { BookOpen, Search } from "lucide-react";
 
-type Tab = "trips" | "trip-requests";
+type Tab = "trips" | "trip-requests" | "itinerary-guides";
 
 const FILTER_TAG_MAP: Record<string, string[]> = {
   "Bucket List": ["bucket-list", "bucket list", "once-in-a-lifetime", "iconic", "wonder"],
@@ -57,11 +59,12 @@ export default function Marketplace() {
   const queryClient = useQueryClient();
   const { isAdmin } = useUserRole();
 
-  const validTabs: Tab[] = ["trips", "trip-requests"];
+  const validTabs: Tab[] = ["trips", "trip-requests", "itinerary-guides"];
   const rawTab = (searchParams.get("tab") as string) || "trips";
   const initialTab: Tab = validTabs.includes(rawTab as Tab) ? (rawTab as Tab) : "trips";
 
   const [activeTab, setActiveTab] = useState<Tab>(initialTab);
+  const [guideSearch, setGuideSearch] = useState("");
   const [filters, setFilters] = useState<SearchFilters>({
     destination: searchParams.get("destination") || "",
     startDate: searchParams.get("startDate") || undefined,
