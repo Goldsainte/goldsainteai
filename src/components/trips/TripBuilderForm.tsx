@@ -523,6 +523,66 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
               </div>
             </CardContent>
           </Card>
+
+          {/* Languages, minimum age, accommodation type */}
+          <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardHeader className="pb-4">
+              <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
+              <CardTitle className="font-secondary text-lg sm:text-xl text-[#0a2225]">Languages & Audience</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div className="space-y-2">
+                <Label className={labelClasses}>Language of Tour</Label>
+                <div className="flex flex-wrap gap-2">
+                  {LANGUAGE_OPTIONS.map((lang) => {
+                    const active = formData.languages.includes(lang);
+                    return (
+                      <button
+                        key={lang}
+                        type="button"
+                        onClick={() => toggleArrayValue("languages", lang)}
+                        className={cn(
+                          "rounded-full px-4 py-1.5 text-xs border transition-colors",
+                          active
+                            ? "bg-[#0c4d47] text-white border-[#0c4d47]"
+                            : "bg-white text-[#0a2225] border-[#E5DFC6] hover:border-[#C7A962]"
+                        )}
+                      >
+                        {lang}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="space-y-2">
+                  <Label className={labelClasses}>Minimum age requirement (leave blank if none)</Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    value={formData.minimum_age}
+                    onChange={(e) => updateField("minimum_age", e.target.value)}
+                    placeholder="e.g., 18"
+                    className={inputClasses}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className={labelClasses}>Accommodation Type</Label>
+                  <Select value={formData.accommodation_type} onValueChange={(v) => updateField("accommodation_type", v)}>
+                    <SelectTrigger className={selectTriggerClasses}>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border-[#E5DFC6] rounded-xl">
+                      {ACCOMMODATION_TYPES.map((t) => (
+                        <SelectItem key={t} value={t} className="focus:bg-[#FDF9F0]">{t}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* DETAILS TAB */}
@@ -582,6 +642,129 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
               />
             </CardContent>
           </Card>
+
+          <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardHeader className="pb-4">
+              <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
+              <CardTitle className="font-secondary text-xl text-[#0a2225]">Meals Included</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {MEAL_OPTIONS.map((meal) => {
+                  const active = formData.meals_included.includes(meal);
+                  return (
+                    <label
+                      key={meal}
+                      className={cn(
+                        "flex items-center gap-2 rounded-xl border px-3 py-2.5 cursor-pointer transition-colors",
+                        active ? "bg-[#FDF9F0] border-[#C7A962]" : "bg-white border-[#E5DFC6] hover:border-[#C7A962]/50"
+                      )}
+                    >
+                      <Checkbox checked={active} onCheckedChange={() => toggleArrayValue("meals_included", meal)} />
+                      <span className="text-sm text-[#0a2225]">{meal}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* ITINERARY TAB */}
+        <TabsContent value="itinerary" className="mt-8 space-y-6">
+          {itineraryDays.length === 0 ? (
+            <Card className="border-none bg-white rounded-2xl shadow-sm">
+              <CardContent className="py-12 text-center text-sm text-[#6B7280]">
+                Set the trip duration in the Basics tab to start building your day-by-day itinerary.
+              </CardContent>
+            </Card>
+          ) : (
+            itineraryDays.map((day, idx) => (
+              <Card key={idx} className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="w-10 h-0.5 bg-[#C7A962] mb-2" />
+                      <CardTitle className="font-secondary text-xl text-[#0a2225]">Day {day.day_number}</CardTitle>
+                    </div>
+                    <label className="flex items-center gap-2 text-xs text-[#6B7280]">
+                      <span>Featured day</span>
+                      <Switch
+                        checked={day.is_featured_day}
+                        onCheckedChange={(v) => updateDay(idx, { is_featured_day: v })}
+                      />
+                    </label>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-5">
+                  <div className="space-y-2">
+                    <Label className={labelClasses}>Title</Label>
+                    <Input
+                      value={day.title}
+                      onChange={(e) => updateDay(idx, { title: e.target.value })}
+                      placeholder={`e.g., Arrival in ${formData.destination || "destination"}`}
+                      className={inputClasses}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className={labelClasses}>Description</Label>
+                    <Textarea
+                      value={day.description}
+                      onChange={(e) => updateDay(idx, { description: e.target.value })}
+                      placeholder="Describe the day's experience..."
+                      rows={3}
+                      className={textareaClasses}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className={labelClasses}>Activities</Label>
+                    <ArrayFieldEditor
+                      items={day.activities}
+                      onChange={(items) => updateDay(idx, { activities: items })}
+                      placeholder="Add an activity (e.g., Morning game drive)"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className={labelClasses}>Accommodation</Label>
+                      <Input
+                        value={day.accommodation}
+                        onChange={(e) => updateDay(idx, { accommodation: e.target.value })}
+                        placeholder="e.g., Angama Mara Lodge"
+                        className={inputClasses}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className={labelClasses}>Meals Included</Label>
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        {DAY_MEAL_OPTIONS.map((meal) => {
+                          const active = day.meals_included.includes(meal);
+                          return (
+                            <button
+                              key={meal}
+                              type="button"
+                              onClick={() => toggleDayMeal(idx, meal)}
+                              className={cn(
+                                "rounded-full px-3 py-1.5 text-xs border transition-colors",
+                                active
+                                  ? "bg-[#0c4d47] text-white border-[#0c4d47]"
+                                  : "bg-white text-[#0a2225] border-[#E5DFC6] hover:border-[#C7A962]"
+                              )}
+                            >
+                              {meal}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
         </TabsContent>
 
         {/* MEDIA TAB */}
@@ -711,6 +894,83 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
                   className={inputClasses}
                 />
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Departure Dates */}
+          <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardHeader className="pb-4">
+              <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
+              <CardTitle className="font-secondary text-lg sm:text-xl text-[#0a2225]">Departure Dates</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <RadioGroup
+                value={departureMode}
+                onValueChange={(v) => setDepartureMode(v as "flexible" | "fixed")}
+                className="space-y-3"
+              >
+                <label className="flex items-start gap-3 cursor-pointer rounded-xl border border-[#E5DFC6] p-4 hover:border-[#C7A962]/50">
+                  <RadioGroupItem value="flexible" className="mt-1" />
+                  <div>
+                    <p className="text-sm font-medium text-[#0a2225]">Flexible — travelers contact me for dates</p>
+                    <p className="text-xs text-[#6B7280] mt-0.5">Best for bespoke and on-demand trips.</p>
+                  </div>
+                </label>
+                <label className="flex items-start gap-3 cursor-pointer rounded-xl border border-[#E5DFC6] p-4 hover:border-[#C7A962]/50">
+                  <RadioGroupItem value="fixed" className="mt-1" />
+                  <div>
+                    <p className="text-sm font-medium text-[#0a2225]">Fixed departure dates</p>
+                    <p className="text-xs text-[#6B7280] mt-0.5">Add specific departure dates travelers can book.</p>
+                  </div>
+                </label>
+              </RadioGroup>
+
+              {departureMode === "fixed" && (
+                <div className="space-y-3 pt-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="rounded-full border-[#E5DFC6] hover:bg-[#FDF9F0] text-[#0a2225]"
+                      >
+                        <CalendarIcon className="h-4 w-4 mr-2" />
+                        Add a departure date
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 bg-white" align="start">
+                      <Calendar
+                        mode="single"
+                        onSelect={addDepartureDate}
+                        disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+                        initialFocus
+                        className={cn("p-3 pointer-events-auto")}
+                      />
+                    </PopoverContent>
+                  </Popover>
+
+                  {formData.departure_dates.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {formData.departure_dates.map((iso) => (
+                        <span
+                          key={iso}
+                          className="inline-flex items-center gap-2 rounded-full bg-[#FDF9F0] border border-[#E5DFC6] px-3 py-1.5 text-xs text-[#0a2225]"
+                        >
+                          {format(new Date(iso), "MMM d, yyyy")}
+                          <button
+                            type="button"
+                            onClick={() => removeDepartureDate(iso)}
+                            className="text-[#6B7280] hover:text-red-500"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-[#6B7280]">No departure dates added yet.</p>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
 
