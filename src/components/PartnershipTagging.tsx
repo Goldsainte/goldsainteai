@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -77,10 +77,10 @@ export const PartnershipTagging = ({ onPartnershipChange, currentBrandId }: Part
         <Label htmlFor="paid-partnership" className="text-sm font-medium">
           Paid Partnership
         </Label>
-        <Switch
+        <Checkbox
           id="paid-partnership"
           checked={isPaidPartnership}
-          onCheckedChange={handleToggle}
+          onCheckedChange={(checked) => { const v = checked === true; (handleToggle)(v); }}
         />
       </div>
 

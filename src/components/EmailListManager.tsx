@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { X, Plus, Mail } from 'lucide-react';
-import { Switch } from '@/components/ui/switch';
+import { Checkbox } from "@/components/ui/checkbox";
 
 export interface EmailEntry {
   email: string;
@@ -77,10 +77,10 @@ export const EmailListManager = ({
         {onNotifyAllChange && (
           <div className="flex items-center gap-2">
             <Label htmlFor="notify-all" className="text-sm">Notify all emails</Label>
-            <Switch
+            <Checkbox
               id="notify-all"
               checked={notifyAll}
-              onCheckedChange={onNotifyAllChange}
+              onCheckedChange={(checked) => { const v = checked === true; (onNotifyAllChange)(v); }}
             />
           </div>
         )}
@@ -106,9 +106,9 @@ export const EmailListManager = ({
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <Switch
+                <Checkbox
                   checked={entry.notify}
-                  onCheckedChange={() => handleToggleNotify(index)}
+                  onCheckedChange={(checked) => { const v = checked === true; (() => handleToggleNotify(index))(v); }}
                   disabled={!notifyAll}
                 />
                 <Button

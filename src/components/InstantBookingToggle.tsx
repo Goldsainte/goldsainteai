@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -115,11 +115,11 @@ export const InstantBookingToggle = ({ agentId }: { agentId: string }) => {
               Bids within your threshold will be auto-accepted
             </p>
           </div>
-          <Switch
+          <Checkbox
             id="instant-booking"
             checked={settings.enabled}
-            onCheckedChange={(checked) =>
-              setSettings({ ...settings, enabled: checked })
+            onCheckedChange={(checked) => { const v = checked === true; ((checked) =>
+              setSettings({ ...settings, enabled: checked)(v); }})
             }
           />
         </div>
