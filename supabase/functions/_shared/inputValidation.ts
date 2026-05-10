@@ -2,8 +2,6 @@
  * Input validation and sanitization utilities
  */
 
-import DOMPurify from "https://esm.sh/isomorphic-dompurify@2.15.0";
-
 /**
  * Validate email format
  */
@@ -37,10 +35,32 @@ export function isValidURL(url: string): boolean {
  * Sanitize HTML content to prevent XSS
  */
 export function sanitizeHTML(html: string): string {
-  return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: ["b", "i", "em", "strong", "a", "p", "br", "ul", "ol", "li"],
-    ALLOWED_ATTR: ["href", "target"],
-  });
+  // Lightweight allowlist sanitizer (Deno edge runtime — no DOM available).
+  // Avoids isomorphic-dompurify which transitively pulls native `canvas`
+  // and fails to bundle in edge functions.
+  const ALLOWED_TAGS = new Set([
+    "b", "i", "em", "strong", "a", "p", "br", "ul", "ol", "li",
+  ]);
+  const ALLOWED_ATTR = new Set(["href", "target"]);
+
+  return html.replace(
+    /<\/?([a-zA-Z0-9]+)([^>]*)>/g,
+    (_match, tag: string, attrs: string) => {
+      const name = tag.toLowerCase();
+      if (!ALLOWED_TAGS.has(name)) return "";
+
+      const cleanedAttrs = (attrs.match(/([a-zA-Z-]+)\s*=\s*"([^"]*)"/g) || [])
+        .map((a) => {
+          const [, k, v] = a.match(/([a-zA-Z-]+)\s*=\s*"([^"]*)"/) || [];
+          if (!k || !ALLOWED_ATTR.has(k.toLowerCase())) return "";
+          if (k.toLowerCase() === "href" && /^\s*javascript:/i.test(v)) return "";
+          return ` ${k.toLowerCase()}="${v.replace(/"/g, "&quot;")}"`;
+        })
+        .join("");
+
+      return _match.startsWith("</") ? `</${name}>` : `<${name}${cleanedAttrs}>`;
+    },
+  );
 }
 
 /**
