@@ -5016,6 +5016,58 @@ export type Database = {
         }
         Relationships: []
       }
+      itinerary_purchases: {
+        Row: {
+          amount_paid: number
+          buyer_id: string
+          currency: string | null
+          id: string
+          product_id: string
+          purchased_at: string | null
+          stripe_payment_intent_id: string | null
+        }
+        Insert: {
+          amount_paid: number
+          buyer_id: string
+          currency?: string | null
+          id?: string
+          product_id: string
+          purchased_at?: string | null
+          stripe_payment_intent_id?: string | null
+        }
+        Update: {
+          amount_paid?: number
+          buyer_id?: string
+          currency?: string | null
+          id?: string
+          product_id?: string
+          purchased_at?: string | null
+          stripe_payment_intent_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itinerary_purchases_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "itinerary_purchases_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "itinerary_purchases_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "itinerary_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       itinerary_shares: {
         Row: {
           accepted_at: string | null
