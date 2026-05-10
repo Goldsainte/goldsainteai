@@ -633,7 +633,6 @@ export default function PostTripPage() {
                       </span>
                     ))}
                   </div>
-                  <p className="mt-1.5 text-[10px] text-[#9A9079]">Extracted from your storyboard</p>
                 </div>
               )}
             </>
