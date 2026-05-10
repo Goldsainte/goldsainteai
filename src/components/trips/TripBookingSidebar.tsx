@@ -19,6 +19,7 @@ interface TripBookingSidebarProps {
   creatorType?: string;
   agentId?: string;
   tripTitle?: string;
+  instantBooking?: boolean;
 }
 
 export function TripBookingSidebar({
@@ -34,6 +35,7 @@ export function TripBookingSidebar({
   creatorType,
   agentId,
   tripTitle,
+  instantBooking = false,
 }: TripBookingSidebarProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -226,7 +228,7 @@ export function TripBookingSidebar({
           disabled={isLoading}
           className="w-full bg-[#0C4D47] py-6 text-base font-semibold hover:bg-[#0C4D47]/90"
         >
-          {isLoading ? "Sending..." : "Request to Book"}
+          {isLoading ? "Sending..." : (instantBooking ? "Book Instantly" : "Reserve with Deposit")}
         </Button>
         <Button
           variant="outline"
