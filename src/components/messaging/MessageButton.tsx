@@ -11,6 +11,7 @@ interface MessageButtonProps {
   variant?: "default" | "outline" | "ghost";
   size?: "default" | "sm" | "lg" | "icon";
   className?: string;
+  label?: string;
 }
 
 export function MessageButton({
@@ -19,6 +20,7 @@ export function MessageButton({
   variant = "outline",
   size = "default",
   className,
+  label = "Message",
 }: MessageButtonProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -44,7 +46,7 @@ export function MessageButton({
         className={className}
       >
         <MessageCircle className="h-4 w-4 mr-2" />
-        Message
+        {label}
       </Button>
 
       <NewMessageModal
