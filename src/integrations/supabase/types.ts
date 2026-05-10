@@ -14079,6 +14079,10 @@ export type Database = {
         Args: { p_conversation_id: string; p_user_type: string }
         Returns: undefined
       }
+      notify_admins_trip_pending_review: {
+        Args: { _trip_id: string; _trip_title: string }
+        Returns: undefined
+      }
       notify_trip_members: {
         Args: {
           p_data?: Json
