@@ -297,6 +297,10 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
     };
   };
 
+  useImperativeHandle(ref, () => ({
+    getCurrentData: () => preparePayload(),
+  }));
+
   const isValid = formData.title && formData.destination && formData.price_per_person && formData.duration_days;
 
   return (
