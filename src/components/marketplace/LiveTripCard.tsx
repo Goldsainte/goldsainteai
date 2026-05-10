@@ -245,6 +245,15 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
             )}
           </p>
         )}
+
+        {trip.created_at && (() => {
+          const ageMs = Date.now() - new Date(trip.created_at).getTime();
+          const days = Math.floor(ageMs / (1000 * 60 * 60 * 24));
+          const months = Math.floor(days / 30);
+          if (days < 14) return <p className="pt-0.5 text-[11px] text-[#7A7151]/80">New</p>;
+          if (months < 3) return <p className="pt-0.5 text-[11px] text-[#7A7151]/80">{months}mo ago</p>;
+          return null;
+        })()}
       </div>
     </article>
   );
