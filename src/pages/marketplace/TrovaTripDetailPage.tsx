@@ -489,6 +489,7 @@ export default function TrovaTripDetailPage() {
                 creatorId={trip.creator_id || undefined}
                 creatorType={trip.creator_type || "creator"}
                 agentId={trip.agent_id || undefined}
+                instantBooking={(trip as any).instant_booking || false}
               />
             </div>
           </div>
