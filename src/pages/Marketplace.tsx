@@ -108,7 +108,7 @@ export default function Marketplace() {
 
   // Live Trips query — wired with search filters
   const { data: liveTrips, isLoading: isLoadingTrips, isError: isTripsError, refetch: refetchTrips } = useQuery({
-    queryKey: ["marketplace-live-trips", filters.category, filters.destination, filters.startDate, filters.endDate, filters.travelers, filters.sortBy],
+    queryKey: ["marketplace-live-trips", filters.category, filters.destination, filters.startDate, filters.endDate, filters.travelers, filters.sortBy, filters.minPrice, filters.maxPrice],
     queryFn: async () => {
       let query = supabase
         .from("packaged_trips")
