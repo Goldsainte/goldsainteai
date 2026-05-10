@@ -44,17 +44,6 @@ export const Header = () => {
   const isBrand = accountType === "brand";
   const primaryBookingsPath = "/my-bookings";
 
-  const handleLanguageChange = (language: string) => {
-    setCurrentLanguage(language);
-    toast({
-      title: t('language.changed'),
-      description: t('language.setTo', { language: language.toUpperCase() }),
-    });
-  };
-
-  
-
-  // Fetch and subscribe to profile avatar changes
   useEffect(() => {
     if (!user) {
       setProfileAvatarUrl(null);
