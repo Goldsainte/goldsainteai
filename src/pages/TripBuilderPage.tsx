@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Compass, Eye, Loader2 } from "lucide-react";
+import { Compass, Eye, Loader2, Image as ImageIcon, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { TripBuilderForm, type TripBuilderFormHandle } from "@/components/trips/TripBuilderForm";
 import { BackButton } from "@/components/ui/BackButton";
@@ -23,6 +23,16 @@ export default function TripBuilderPage() {
   const formRef = useRef<TripBuilderFormHandle>(null);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const handleSaveRef = useRef<((data: any, status: "draft" | "published") => Promise<string | null>) | null>(null);
+  const [previewData, setPreviewData] = useState<any>(null);
+
+  // Poll the form ref for the latest data so the live preview updates as the user types
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const data = formRef.current?.getCurrentData?.();
+      if (data) setPreviewData(data);
+    }, 600);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (authLoading || roleLoading) return;
