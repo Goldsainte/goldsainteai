@@ -6,11 +6,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, Settings, Heart, Video, MessageCircle, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star, Coins, Briefcase, Sparkles, X, Home, Search as SearchIcon, PlusSquare, User, Music2 } from "lucide-react";
+import { ChevronLeft, Settings, Heart, Video, MessageCircle, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star, Coins, Briefcase, Sparkles, X, Home, Search as SearchIcon, PlusSquare, User, Music2, MapPin, Compass, Lock } from "lucide-react";
 import { InstagramVerifiedBadge } from "@/components/badges/InstagramVerifiedBadge";
 import { BusinessVerifiedBadge } from "@/components/badges/BusinessVerifiedBadge";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
+import { format } from "date-fns";
+import { LiveTripCard } from "@/components/marketplace/LiveTripCard";
+import { TravelerBookingsTab } from "@/pages/traveler/components/TravelerBookingsTab";
 
 import FollowButton from "@/components/FollowButton";
 import StoryHighlights from "@/components/StoryHighlights";
@@ -33,6 +36,9 @@ interface Profile {
   id: string;
   username: string | null;
   avatar_url: string | null;
+  cover_image_url?: string | null;
+  full_name?: string | null;
+  created_at?: string | null;
   first_name: string | null;
   last_name: string | null;
   bio: string | null;
