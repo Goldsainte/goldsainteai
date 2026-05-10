@@ -178,22 +178,13 @@ export default function PostTripPage() {
         return;
       }
     }
-    if (currentStep === 4) {
+    if (currentStep === 3) {
       if (!flexibility || !specialNotes) {
         setError("Please fill in all fields.");
         return;
       }
     }
     setError(null);
-
-    // Auto-save storyboard when leaving step 4 (index 3) if user hasn't saved yet
-    if (currentStep === 3 && !storyboardId && storyboardSaveRef.current) {
-      try {
-        await storyboardSaveRef.current();
-      } catch (err) {
-        console.error('[PostTripPage] Auto-save storyboard failed:', err);
-      }
-    }
 
     if (currentStep < TOTAL_STEPS - 1) setCurrentStep(s => s + 1);
   }
@@ -219,7 +210,7 @@ export default function PostTripPage() {
           destination, title, startsOn, endsOn, budgetMin, budgetMax,
           budgetLevel, adults, children, occasion, accommodationStyle,
           pace, interests, aestheticTags, flexibility, specialNotes,
-          departureCity, wantsRole, storyboardId, currentStep,
+          departureCity, wantsRole, currentStep,
         }));
         navigate(`/auth?returnTo=${encodeURIComponent('/post-trip')}`);
         return;
@@ -230,11 +221,6 @@ export default function PostTripPage() {
         collection_vibes: itineraryPrefill.vibes,
         ai_itinerary: itineraryPrefill.itinerary,
       } : {};
-
-      // Include storyboard reference in metadata
-      if (storyboardId) {
-        sourceMetadata.source_storyboard_id = storyboardId;
-      }
 
       const insertPayload: any = {
           user_id: user.id,
@@ -268,14 +254,6 @@ export default function PostTripPage() {
         .select("id")
         .single();
       if (insertError) throw insertError;
-
-      // Link storyboard to the new trip request
-      if (storyboardId && insertedTrip?.id) {
-        await supabase
-          .from("storyboards")
-          .update({ trip_request_id: insertedTrip.id } as any)
-          .eq("id", storyboardId);
-      }
 
       // Send notification to preferred creator/agent
       const notifyUserId = preferredCreatorId || preferredAgentId;
