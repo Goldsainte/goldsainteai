@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -61,6 +61,7 @@ interface TripData {
   vaccination_required?: boolean | null;
   fitness_level_required?: string | null;
   terms_conditions?: string | null;
+  destination_country?: string;
   creator?: {
     id: string;
     full_name: string | null;
@@ -92,6 +93,20 @@ export default function TrovaTripDetailPage() {
   const [addons, setAddons] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [similarTrips, setSimilarTrips] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!trip) return;
+    const country = trip.destination?.split(",").pop()?.trim() || trip.destination;
+    supabase
+      .from("packaged_trips")
+      .select("id, slug, title, destination, cover_image_url, price_per_person, duration_days, rating, creator_type")
+      .eq("status", "published")
+      .ilike("destination", `%${country}%`)
+      .neq("id", trip.id)
+      .limit(4)
+      .then(({ data }) => setSimilarTrips(data || []));
+  }, [trip?.id, trip?.destination]);
 
   useEffect(() => {
     if (!id) return;
