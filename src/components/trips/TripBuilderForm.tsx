@@ -503,7 +503,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
                   <Label className={labelClasses}>Min Participants</Label>
                   <Input
@@ -521,16 +521,6 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                     value={formData.max_participants}
                     onChange={(e) => updateField("max_participants", e.target.value)}
                     placeholder="12"
-                    className={inputClasses}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className={labelClasses}>Deposit %</Label>
-                  <Input
-                    type="number"
-                    value={formData.deposit_percentage}
-                    onChange={(e) => updateField("deposit_percentage", e.target.value)}
-                    placeholder="30"
                     className={inputClasses}
                   />
                 </div>
