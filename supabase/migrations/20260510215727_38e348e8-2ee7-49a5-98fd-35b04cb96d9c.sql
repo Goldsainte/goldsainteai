@@ -1,0 +1,1 @@
+ALTER TABLE public.packaged_trips ADD COLUMN IF NOT EXISTS instant_booking boolean NOT NULL DEFAULT false;
