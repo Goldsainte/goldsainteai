@@ -735,6 +735,23 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
 
         {/* ITINERARY TAB */}
         <TabsContent value="itinerary" className="mt-8 space-y-6">
+          {formData.title && formData.destination && itineraryDays.length > 0 && (
+            <div className="flex justify-end">
+              <Button
+                variant="outline"
+                onClick={handleAIItinerary}
+                disabled={aiLoading}
+                className="rounded-full border-[#C7A962]/40 text-[#0c4d47] hover:bg-[#FDF9F0]"
+              >
+                {aiLoading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Sparkles className="h-4 w-4 mr-2" />
+                )}
+                {aiLoading ? "Generating..." : "Suggest with AI"}
+              </Button>
+            </div>
+          )}
           {itineraryDays.length === 0 ? (
             <Card className="border-none bg-white rounded-2xl shadow-sm">
               <CardContent className="py-12 text-center text-sm text-[#6B7280]">
