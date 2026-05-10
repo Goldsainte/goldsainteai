@@ -200,6 +200,31 @@ export function CreatorGuidesTab() {
           ))}
         </div>
       )}
+
+      {recentPurchases.length > 0 && (
+        <div className="mt-10">
+          <h3 className="font-secondary text-lg text-[#0a2225] mb-4">Recent Purchases</h3>
+          <Card className="border border-[#E5DFC6] bg-white rounded-2xl divide-y divide-[#F0EAD6]">
+            {recentPurchases.map((p) => (
+              <div key={p.id} className="flex items-center justify-between gap-4 p-4">
+                <div className="min-w-0">
+                  <p className="text-sm text-[#0a2225] truncate">
+                    <span className="font-medium">{p.buyerName}</span>{" "}
+                    <span className="text-[#6B7280]">purchased</span>{" "}
+                    <span className="italic">{p.guideTitle}</span>
+                  </p>
+                  <p className="text-xs text-[#9A9384] mt-0.5">
+                    {new Date(p.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                  </p>
+                </div>
+                <span className="text-sm font-medium text-[#0c4d47] whitespace-nowrap">
+                  ${p.amount_paid.toLocaleString()} {p.currency}
+                </span>
+              </div>
+            ))}
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
