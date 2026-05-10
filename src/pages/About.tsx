@@ -13,12 +13,10 @@ import founderImage from "@/assets/founder.jpg";
 import ticketmasterLogo from "@/assets/TicketMaster_wordmark.svg";
 import openaiLogo from "@/assets/OpenAI_Logo.svg";
 import geminiLogo from "@/assets/Google_Gemini_logo_2025.svg";
-import shopifyLogo from "@/assets/shopify-logo.svg";
-import etsyLogo from "@/assets/etsy-logo.svg";
 import goldsainteLogo from "@/assets/wordmark-green.svg";
 import primaryLogoGreen from "@/assets/primary-horizontal-logo-green.svg";
 import { 
-  Mic, Sparkles, Share2, Briefcase, Package, BarChart3, 
+  Sparkles, Share2, Briefcase, Package, BarChart3, 
   DollarSign, Users, FileCheck, MessageCircle, 
 } from "lucide-react";
 
@@ -27,9 +25,7 @@ const About = () => {
   const partners = [
     { name: "Ticketmaster", logo: ticketmasterLogo },
     { name: "OpenAI", logo: openaiLogo },
-    { name: "Google Gemini", logo: geminiLogo },
-    { name: "Shopify", logo: shopifyLogo },
-    { name: "Etsy", logo: etsyLogo }
+    { name: "Google Gemini", logo: geminiLogo }
   ];
 
   const featureCategories = [
@@ -37,9 +33,9 @@ const About = () => {
       category: "AI-Powered Intelligence",
       features: [
         {
-          icon: Mic,
-          title: "Voice AI Concierge",
-          description: "Just say 'Hey, Goldsainte' anywhere on our site to start a natural conversation about flights, hotels, dining, and more—hands-free."
+          icon: Sparkles,
+          title: "AI Trip Planning",
+          description: "Describe your dream trip in plain language and our AI builds a personalised itinerary, matches you with the right specialist, and structures the full journey."
         },
         {
           icon: Sparkles,
