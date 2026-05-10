@@ -373,7 +373,7 @@ export default function BookingDetailPage() {
           </section>
 
           {actionError && (
-            <p className="text-[11px] text-red-300 bg-red-950/40 border border-red-500/40 rounded-2xl px-3 py-2">
+            <p className="text-[11px] text-red-600 bg-red-50 border border-red-200 rounded-2xl px-3 py-2">
               {actionError}
             </p>
           )}
@@ -494,7 +494,7 @@ export default function BookingDetailPage() {
                     </div>
 
                     {actionError && (
-                      <p className="text-[10px] text-red-400">{actionError}</p>
+                      <p className="text-[10px] text-red-600">{actionError}</p>
                     )}
 
                     <Button

@@ -63,7 +63,7 @@ export default function ApplicationStatusCheck() {
   const getStatusBadge = (adminStatus: string) => {
     switch (adminStatus) {
       case 'pending_review':
-        return <Badge variant="outline" className="bg-yellow-50"><Clock className="mr-1 h-3 w-3" />Pending Review</Badge>;
+        return <Badge variant="outline" className="bg-[#FDF9F0]"><Clock className="mr-1 h-3 w-3" />Pending Review</Badge>;
       case 'approved':
         return <Badge variant="outline" className="bg-green-50"><CheckCircle className="mr-1 h-3 w-3" />Approved</Badge>;
       case 'rejected':
@@ -146,7 +146,7 @@ export default function ApplicationStatusCheck() {
                   )}
 
                   {status.admin_status === 'pending_review' && (
-                    <div className="rounded-lg bg-blue-50 p-3">
+                    <div className="rounded-lg bg-[#F0F7F6] p-3">
                       <p className="text-blue-900">
                         We're reviewing your application. You'll receive an email when there's an update.
                       </p>

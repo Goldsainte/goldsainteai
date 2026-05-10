@@ -61,7 +61,7 @@ export const ExploreArea = ({ cityName, latitude = 40.7128, longitude = -74.0060
 
   const getCategoryColor = (category: string) => {
     const colors: { [key: string]: string } = {
-      "Downtown": "bg-blue-100 text-blue-700",
+      "Downtown": "bg-[#F0F7F6] text-[#0c4d47]",
       "Museum": "bg-purple-100 text-purple-700",
       "Park": "bg-green-100 text-green-700",
       "Shopping": "bg-pink-100 text-pink-700",
@@ -125,7 +125,7 @@ export const ExploreArea = ({ cityName, latitude = 40.7128, longitude = -74.0060
         <h4 className="font-semibold text-sm">Getting around</h4>
         <div className="grid grid-cols-2 gap-2 text-sm">
           <div className="flex items-center gap-2 text-muted-foreground">
-            <div className="w-2 h-2 rounded-full bg-blue-500" />
+            <div className="w-2 h-2 rounded-full bg-[#0c4d47]" />
             <span>Metro: 5 min walk</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">

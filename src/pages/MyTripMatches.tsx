@@ -236,7 +236,7 @@ export default function MyTripMatches() {
               Your matched trips
             </span>
           </div>
-          <h1 className="font-serif text-4xl text-[#0a2225]">
+          <h1 className="font-secondary text-4xl text-[#0a2225]">
             Trips curated for you
           </h1>
           <p className="mt-2 text-sm text-[#4a4a4a]">
@@ -250,7 +250,7 @@ export default function MyTripMatches() {
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#F5F0E0]">
               <MapPin className="h-8 w-8 text-[#7A7151]" />
             </div>
-            <h3 className="mb-2 font-serif text-xl text-[#0a2225]">
+            <h3 className="mb-2 font-secondary text-xl text-[#0a2225]">
               No matches yet
             </h3>
             <p className="text-sm text-[#8C8470]">
@@ -279,7 +279,7 @@ export default function MyTripMatches() {
                     <div className="mb-4 flex items-start justify-between">
                     <div className="flex-1">
                         <div className="mb-1 flex items-center gap-2">
-                          <h3 className="font-serif text-xl text-[#0a2225]">
+                          <h3 className="font-secondary text-xl text-[#0a2225]">
                             {trip.destination || "Trip Request"}
                           </h3>
                           <div className="flex items-center gap-1 rounded-full bg-[#F5F0E0] px-2 py-0.5">

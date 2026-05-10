@@ -401,7 +401,7 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <CardTitle className="text-lg">{suggestion.title}</CardTitle>
-                {isUnanimous && <Badge variant="default" className="bg-yellow-500 text-yellow-950">⭐ Unanimous</Badge>}
+                {isUnanimous && <Badge variant="default" className="bg-[#C7A962] text-white">⭐ Unanimous</Badge>}
                 {isPopular && !isUnanimous && <Badge variant="secondary">🔥 Popular</Badge>}
               </div>
               <CardDescription>{suggestion.description}</CardDescription>

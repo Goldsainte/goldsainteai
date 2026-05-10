@@ -139,7 +139,7 @@ export default function PlatformAnalytics() {
       value: `$${stats.total_service_fees.toFixed(2)}`,
       icon: DollarSign,
       description: "3% of transactions",
-      color: "text-blue-600",
+      color: "text-[#0c4d47]",
     },
     {
       title: "Success Fees",
@@ -327,7 +327,7 @@ export default function PlatformAnalytics() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-blue-600">
+                    <p className="text-2xl font-bold text-[#0c4d47]">
                       ${stats.total_service_fees.toFixed(2)}
                     </p>
                     <p className="text-xs text-muted-foreground">

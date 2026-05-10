@@ -225,7 +225,7 @@ export default function TripDetail() {
             <>
               <span>•</span>
               <span className="flex items-center gap-1">
-                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                <Star className="h-3 w-3 fill-[#C7A962] text-[#C7A962]" />
                 {trip.rating.toFixed(2)}
                 {trip.review_count && (
                   <span className="text-muted-foreground">({trip.review_count})</span>
@@ -385,7 +385,7 @@ export default function TripDetail() {
 
                   {trip.rating && (
                     <div className="flex items-center gap-1 text-xs text-foreground">
-                      <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                      <Star className="h-3 w-3 fill-[#C7A962] text-[#C7A962]" />
                       {trip.rating.toFixed(2)}
                       {trip.review_count && (
                         <span className="text-muted-foreground">({trip.review_count})</span>

@@ -267,7 +267,7 @@ export default function HotelDetails() {
                 {hotelData.starRating && (
                   <div className="flex items-center gap-1">
                     {Array.from({ length: hotelData.starRating }).map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      <Star key={i} className="h-4 w-4 fill-[#C7A962] text-[#C7A962]" />
                     ))}
                   </div>
                 )}

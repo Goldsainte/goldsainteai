@@ -35,7 +35,7 @@ interface Referral {
 const tierConfig = {
   bronze: { next: "silver", threshold: 2000, color: "text-orange-600", benefits: ["5% discount on services"] },
   silver: { next: "gold", threshold: 5000, color: "text-gray-400", benefits: ["10% discount", "Priority support"] },
-  gold: { next: "platinum", threshold: 10000, color: "text-yellow-600", benefits: ["15% discount", "Priority matching", "Free cancellation"] },
+  gold: { next: "platinum", threshold: 10000, color: "text-[#C7A962]", benefits: ["15% discount", "Priority matching", "Free cancellation"] },
   platinum: { next: null, threshold: Infinity, color: "text-purple-600", benefits: ["20% discount", "Dedicated agent", "VIP support", "Exclusive deals"] },
 };
 
@@ -196,7 +196,7 @@ export default function LoyaltyRewards() {
           <div className="grid gap-4 md:grid-cols-3">
             <Card>
               <CardHeader>
-                <Star className="h-8 w-8 text-yellow-600 mb-2" />
+                <Star className="h-8 w-8 text-[#C7A962] mb-2" />
                 <CardTitle>Complete Bookings</CardTitle>
                 <CardDescription>Earn 100 points per booking</CardDescription>
               </CardHeader>
@@ -204,7 +204,7 @@ export default function LoyaltyRewards() {
 
             <Card>
               <CardHeader>
-                <Gift className="h-8 w-8 text-blue-600 mb-2" />
+                <Gift className="h-8 w-8 text-[#0c4d47] mb-2" />
                 <CardTitle>Leave Reviews</CardTitle>
                 <CardDescription>Get 50 points for each review</CardDescription>
               </CardHeader>
