@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -30,7 +30,10 @@ const inputClasses = "rounded-xl h-12 text-sm sm:text-base border-[#E5DFC6] bg-w
 export default function ItineraryBuilderPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get("edit");
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(!!editId);
   const [form, setForm] = useState({
     title: "",
     destination: "",
@@ -43,6 +46,34 @@ export default function ItineraryBuilderPage() {
   const [days, setDays] = useState<Day[]>([
     { day_number: 1, title: "", description: "", activities: [], accommodation: "" },
   ]);
+
+  useEffect(() => {
+    if (!editId) return;
+    (async () => {
+      const { data, error } = await supabase
+        .from("itinerary_products")
+        .select("*")
+        .eq("id", editId)
+        .maybeSingle();
+      if (error || !data) {
+        toast.error("Could not load guide");
+        setLoading(false);
+        return;
+      }
+      setForm({
+        title: data.title ?? "",
+        destination: data.destination ?? "",
+        duration_days: String(data.duration_days ?? 5),
+        price: String(data.price ?? ""),
+        currency: data.currency ?? "USD",
+        cover_image_url: data.cover_image_url ?? "",
+        description: data.description ?? "",
+      });
+      const loaded = Array.isArray(data.days) ? (data.days as any as Day[]) : [];
+      if (loaded.length) setDays(loaded);
+      setLoading(false);
+    })();
+  }, [editId]);
 
   const update = (k: keyof typeof form, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -70,7 +101,7 @@ export default function ItineraryBuilderPage() {
     }
     try {
       setSaving(true);
-      const { error } = await supabase.from("itinerary_products").insert({
+      const payload = {
         creator_id: user.id,
         title: form.title.trim(),
         destination: form.destination.trim(),
@@ -81,8 +112,17 @@ export default function ItineraryBuilderPage() {
         description: form.description || null,
         days: days as any,
         status,
-      });
-      if (error) throw error;
+      };
+      if (editId) {
+        const { error } = await supabase
+          .from("itinerary_products")
+          .update(payload)
+          .eq("id", editId);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("itinerary_products").insert(payload);
+        if (error) throw error;
+      }
       toast.success(status === "published" ? "Guide published" : "Draft saved");
       navigate("/creator-dashboard");
     } catch (e: any) {
@@ -104,7 +144,7 @@ export default function ItineraryBuilderPage() {
           <span className="text-sm font-medium text-[#6B7280] tracking-wide">Itinerary Guide</span>
         </div>
         <h1 className="font-secondary text-2xl sm:text-3xl md:text-4xl text-[#0a2225] tracking-tight">
-          Sell an <em>Itinerary Guide</em>
+          {editId ? <>Edit <em>Guide</em></> : <>Sell an <em>Itinerary Guide</em></>}
         </h1>
         <p className="mt-3 text-[#6B7280] text-base max-w-xl leading-relaxed">
           Package your travel knowledge as a digital product travelers can buy and download instantly.
