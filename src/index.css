@@ -996,3 +996,9 @@ All colors MUST be HSL.
 [dir="rtl"] .pr-4 { padding-right: unset; padding-left: 1rem; }
 [dir="rtl"] .left-0 { left: unset; right: 0; }
 [dir="rtl"] .right-0 { right: unset; left: 0; }
+
+@layer components {
+  .eyebrow {
+    @apply text-[11px] font-medium uppercase tracking-[0.2em] text-[#9A9384];
+  }
+}
