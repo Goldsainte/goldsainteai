@@ -79,8 +79,6 @@ export const CreatorStripeOnboarding = () => {
         return;
       }
 
-      console.log('[STRIPE-ONBOARDING] Starting onboarding with stripe-connect-link...');
-
       const { data, error } = await supabase.functions.invoke('stripe-connect-link', {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
@@ -94,31 +92,25 @@ export const CreatorStripeOnboarding = () => {
         throw error;
       }
       
-      console.log('[STRIPE-ONBOARDING] Received URL:', data?.url);
-      
       if (!data?.url) {
         setOnboarding(false);
         throw new Error('No onboarding URL received from server');
       }
 
       // 🧭 Force navigation outside the router context
-      console.log('[STRIPE-ONBOARDING] Performing full-page redirect to:', data.url);
       
       // Use the simplest, most reliable method first
       if (typeof window !== "undefined") {
         // Try to break out of any iframe/SPA context
         try {
           if (window.top && window.top !== window.self) {
-            console.log('[STRIPE-ONBOARDING] Detected iframe, using window.top');
             window.top.location.assign(data.url);
           } else {
-            console.log('[STRIPE-ONBOARDING] Not in iframe, using window.location');
             window.location.assign(data.url);
           }
         } catch (e) {
           console.error('[STRIPE-ONBOARDING] Redirect failed:', e);
           // Final fallback
-          console.log('[STRIPE-ONBOARDING] Trying fallback: window.location.href');
           window.location.href = data.url;
         }
       }

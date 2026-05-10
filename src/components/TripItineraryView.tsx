@@ -58,7 +58,6 @@ interface TripItineraryViewProps {
 export const TripItineraryView = ({ itinerary, overview, destination }: TripItineraryViewProps) => {
   const handleDownload = () => {
     // TODO: Implement PDF export
-    console.log('Downloading itinerary...');
   };
 
   return (

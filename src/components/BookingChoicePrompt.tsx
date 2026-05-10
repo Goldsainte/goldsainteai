@@ -48,7 +48,6 @@ export const BookingChoicePrompt = ({ tripType, onChoice, prefillData }: Booking
           {/* PRIMARY BUTTON - Agent path (appears FIRST) */}
           <Button
             onClick={() => {
-              console.log('🎯 [TELEMETRY] booking_choice=agent');
               onChoice('agent');
             }}
             className="w-full justify-start min-h-[48px] text-[14px] sm:text-[15px]"
@@ -61,7 +60,6 @@ export const BookingChoicePrompt = ({ tripType, onChoice, prefillData }: Booking
           {/* SECONDARY BUTTON - Self-service */}
           <Button
             onClick={() => {
-              console.log('🎯 [TELEMETRY] booking_choice=self_service');
               onChoice('self_service');
             }}
             className="w-full justify-start min-h-[48px] text-[14px] sm:text-[15px]"
