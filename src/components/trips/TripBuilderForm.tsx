@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -56,7 +56,14 @@ const inputClasses = "rounded-xl h-10 sm:h-12 text-sm sm:text-base border-[#E5DF
 const textareaClasses = "rounded-xl border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20 focus:border-[#C7A962] transition-all";
 const selectTriggerClasses = "rounded-xl h-10 sm:h-12 text-sm sm:text-base border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20";
 
-export function TripBuilderForm({ initialData, onSave, saving, isEditing }: TripBuilderFormProps) {
+export type TripBuilderFormHandle = {
+  getCurrentData: () => any;
+};
+
+export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderFormProps>(function TripBuilderForm(
+  { initialData, onSave, saving, isEditing },
+  ref
+) {
   const [suggestingCover, setSuggestingCover] = useState(false);
   const [coverSuggested, setCoverSuggested] = useState(false);
   const [itineraryDays, setItineraryDays] = useState<ItineraryDay[]>([]);
@@ -289,6 +296,10 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
       itinerary_days: itineraryDays,
     };
   };
+
+  useImperativeHandle(ref, () => ({
+    getCurrentData: () => preparePayload(),
+  }));
 
   const isValid = formData.title && formData.destination && formData.price_per_person && formData.duration_days;
 
@@ -1107,4 +1118,4 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
       </div>
     </div>
   );
-}
+});

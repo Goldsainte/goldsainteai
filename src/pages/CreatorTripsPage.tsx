@@ -1,170 +1,168 @@
 // src/pages/CreatorTripsPage.tsx
 import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Loader2, Plus, Pencil, Eye, ImageIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Link } from "react-router-dom";
-import { Loader2, MapPin, Calendar, Users, Sparkles } from "lucide-react";
 
-interface TripRequest {
+type CreatorTrip = {
   id: string;
   title: string | null;
-  description: string | null;
+  slug: string | null;
   destination: string | null;
-  start_date: string | null;
-  end_date: string | null;
-  travelers_adults: number | null;
-  travelers_children: number | null;
-  budget_min: number | null;
-  budget_max: number | null;
+  cover_image_url: string | null;
+  status: string | null;
+  price_per_person: number | null;
   created_at: string;
-}
+  booking_count: number | null;
+  view_count: number | null;
+};
+
+const statusStyles: Record<string, string> = {
+  draft: "bg-[#E5DFC6] text-[#0a2225]",
+  pending_review: "bg-[#C7A962]/20 text-[#7a5e1f] border border-[#C7A962]/40",
+  published: "bg-[#0c4d47] text-white",
+  archived: "bg-[#6B7280]/20 text-[#6B7280]",
+};
+
+const statusLabel: Record<string, string> = {
+  draft: "Draft",
+  pending_review: "Pending Review",
+  published: "Published",
+  archived: "Archived",
+};
 
 export default function CreatorTripsPage() {
-  const [trips, setTrips] = useState<TripRequest[]>([]);
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [trips, setTrips] = useState<CreatorTrip[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!user) return;
     let cancelled = false;
-    async function load() {
+    (async () => {
       setLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from("trip_requests")
-          .select("id, title, description, destination, start_date, end_date, travelers_adults, travelers_children, budget_min, budget_max, created_at")
-          .eq("status", "open")
-          .order("created_at", { ascending: false });
-        
-        if (error) throw error;
-        if (!cancelled) {
-          setTrips(data || []);
-        }
-      } catch (err) {
-        console.error("Error loading trips:", err);
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    }
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const formatBudget = (min: number | null, max: number | null) => {
-    if (!min && !max) return null;
-    if (min && max) return `$${min.toLocaleString()} – $${max.toLocaleString()}`;
-    if (min) return `From $${min.toLocaleString()}`;
-    if (max) return `Up to $${max.toLocaleString()}`;
-    return null;
-  };
-
-  const getTravelerCount = (adults: number | null, children: number | null) => {
-    const total = (adults || 0) + (children || 0);
-    return total > 0 ? total : null;
-  };
+      const { data, error } = await supabase
+        .from("packaged_trips")
+        .select("id, title, slug, destination, cover_image_url, status, price_per_person, created_at, booking_count, view_count")
+        .eq("creator_id", user.id)
+        .order("created_at", { ascending: false });
+      if (cancelled) return;
+      if (error) console.error("Error loading creator trips:", error);
+      else setTrips((data ?? []) as CreatorTrip[]);
+      setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
 
   return (
-    <main className="min-h-screen bg-[#FDF9F0] text-[#0a2225] px-4 py-10">
-      <div className="mx-auto max-w-5xl space-y-6">
-        {/* Header */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-[#C7A962]" />
-            <h1 className="font-secondary text-2xl md:text-3xl font-semibold">
-              Collab Opportunities
-            </h1>
-          </div>
-          <p className="text-sm text-[#0a2225]/60 max-w-xl">
-            Discover trip requests from travelers looking for TikTok-worthy experiences you can curate.
-          </p>
-        </div>
-
-        {/* Loading State */}
-        {loading && (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 className="h-8 w-8 animate-spin text-[#C7A962]" />
-          </div>
-        )}
-
-        {/* Empty State */}
-        {!loading && trips.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-16 h-16 rounded-full bg-[#C7A962]/10 flex items-center justify-center mb-4">
-              <Sparkles className="h-8 w-8 text-[#C7A962]" />
-            </div>
-            <h3 className="font-secondary text-lg font-medium mb-1">
-              No collab opportunities yet
-            </h3>
-            <p className="text-sm text-[#0a2225]/60 max-w-sm">
-              Check back soon—travelers are posting new trip requests every day.
+    <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225] px-4 sm:px-6 py-8 sm:py-12">
+      <div className="mx-auto max-w-5xl space-y-8">
+        <header className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div>
+            <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
+            <h1 className="font-secondary text-3xl sm:text-4xl tracking-tight">My Trips</h1>
+            <p className="mt-2 text-sm text-[#6B7280] max-w-xl">
+              Manage the trips you've created. Edit drafts, track performance, and publish when ready.
             </p>
           </div>
-        )}
+          <Button
+            onClick={() => navigate("/trip-builder")}
+            className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d38] text-white px-6 py-5 self-start sm:self-auto"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create New Trip
+          </Button>
+        </header>
 
-        {/* Trip Cards Grid */}
-        {!loading && trips.length > 0 && (
-          <div className="grid gap-4 md:grid-cols-2">
-            {trips.map((trip) => {
-              const budget = formatBudget(trip.budget_min, trip.budget_max);
-              const travelerCount = getTravelerCount(trip.travelers_adults, trip.travelers_children);
-              
-              return (
-                <Link
-                  key={trip.id}
-                  to={`/marketplace/request/${trip.id}`}
-                  className="group block rounded-2xl border border-[#E5DFC6] bg-white p-5 shadow-sm hover:shadow-md hover:border-[#C7A962]/50 transition-all duration-200"
-                >
-                  {/* Title & Budget */}
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <h2 className="font-secondary text-lg font-semibold text-[#0a2225] group-hover:text-[#0a2225]/80 transition-colors">
-                      {trip.title || "Untitled trip"}
-                    </h2>
-                    {budget && (
-                      <span className="shrink-0 rounded-full bg-[#C7A962]/10 px-3 py-1 text-xs font-medium text-[#0a2225]">
-                        {budget}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Description */}
-                  {trip.description && (
-                    <p className="text-sm text-[#0a2225]/70 line-clamp-2 mb-4">
-                      {trip.description}
-                    </p>
-                  )}
-
-                  {/* Metadata */}
-                  <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-[#0a2225]/60 mb-4">
-                    {trip.destination && (
-                      <span className="flex items-center gap-1.5">
-                        <MapPin className="h-3.5 w-3.5" />
-                        {trip.destination}
-                      </span>
-                    )}
-                    {trip.start_date && trip.end_date && (
-                      <span className="flex items-center gap-1.5">
-                        <Calendar className="h-3.5 w-3.5" />
-                        {new Date(trip.start_date).toLocaleDateString()} – {new Date(trip.end_date).toLocaleDateString()}
-                      </span>
-                    )}
-                    {travelerCount && (
-                      <span className="flex items-center gap-1.5">
-                        <Users className="h-3.5 w-3.5" />
-                        {travelerCount} traveler{travelerCount > 1 ? "s" : ""}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* CTA */}
-                  <div className="text-sm font-medium text-[#C7A962] group-hover:text-[#B89952] transition-colors">
-                    View details →
-                  </div>
-                </Link>
-              );
-            })}
+        {loading && (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="h-6 w-6 animate-spin text-[#C7A962]" />
           </div>
         )}
+
+        {!loading && trips.length === 0 && (
+          <div className="rounded-3xl border border-dashed border-[#E5DFC6] bg-white/60 p-12 text-center">
+            <p className="text-sm text-[#6B7280]">You haven't created any trips yet.</p>
+            <Button
+              onClick={() => navigate("/trip-builder")}
+              className="mt-4 rounded-full bg-[#0c4d47] hover:bg-[#0a3d38] text-white"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Build your first trip
+            </Button>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {trips.map((trip) => {
+            const status = trip.status || "draft";
+            return (
+              <article
+                key={trip.id}
+                className="rounded-2xl border border-[#E5DFC6] bg-white overflow-hidden flex flex-col"
+              >
+                <div className="aspect-[4/3] bg-[#F6F0E4] overflow-hidden">
+                  {trip.cover_image_url ? (
+                    <img
+                      src={trip.cover_image_url}
+                      alt={trip.title ?? "Trip cover"}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-[#8D8D8D]">
+                      <ImageIcon className="h-8 w-8" />
+                    </div>
+                  )}
+                </div>
+                <div className="p-5 flex-1 flex flex-col gap-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h2 className="font-secondary text-lg truncate">{trip.title || "Untitled trip"}</h2>
+                      <p className="text-xs text-[#6B7280] truncate">{trip.destination || "Destination TBD"}</p>
+                    </div>
+                    <Badge className={`${statusStyles[status] ?? statusStyles.draft} rounded-full text-[10px] uppercase tracking-wider px-2.5 py-0.5`}>
+                      {statusLabel[status] ?? status}
+                    </Badge>
+                  </div>
+
+                  <div className="flex items-center gap-4 text-xs text-[#6B7280]">
+                    <span><strong className="text-[#0a2225]">{trip.booking_count ?? 0}</strong> bookings</span>
+                    <span><strong className="text-[#0a2225]">{trip.view_count ?? 0}</strong> views</span>
+                  </div>
+
+                  <div className="mt-auto flex items-center gap-2 pt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate(`/trip-builder?edit=${trip.id}`)}
+                      className="rounded-full border-[#E5DFC6] hover:bg-[#FDF9F0] text-[#0a2225] flex-1"
+                    >
+                      <Pencil className="h-3.5 w-3.5 mr-1.5" />
+                      Edit
+                    </Button>
+                    {status === "published" && (
+                      <Link to={`/marketplace/trip/${trip.slug ?? trip.id}`} className="flex-1">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full rounded-full border-[#0c4d47] text-[#0c4d47] hover:bg-[#0c4d47]/5"
+                        >
+                          <Eye className="h-3.5 w-3.5 mr-1.5" />
+                          View Listing
+                        </Button>
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
       </div>
     </main>
   );

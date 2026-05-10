@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Compass, Eye, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { TripBuilderForm } from "@/components/trips/TripBuilderForm";
+import { TripBuilderForm, type TripBuilderFormHandle } from "@/components/trips/TripBuilderForm";
 import { BackButton } from "@/components/ui/BackButton";
 
 export default function TripBuilderPage() {
@@ -19,6 +19,7 @@ export default function TripBuilderPage() {
   const [saving, setSaving] = useState(false);
   const [tripData, setTripData] = useState<any>(null);
   const [loading, setLoading] = useState(!!editId);
+  const formRef = useRef<TripBuilderFormHandle>(null);
 
   useEffect(() => {
     if (authLoading || roleLoading) return;
@@ -81,11 +82,10 @@ export default function TripBuilderPage() {
     try {
       setSaving(true);
 
-      // Block re-publish if already submitted or live
-      if (status === "published" && tripData && (tripData.status === "pending_review" || tripData.status === "published")) {
-        toast.error("This trip is already submitted or live. Contact support to make changes.");
-        setSaving(false);
-        return;
+      // Allow editing of pending/live trips — but resubmit goes back to pending_review
+      let resubmitNotice: string | null = null;
+      if (status === "published" && tripData?.status === "pending_review") {
+        resubmitNotice = "Your trip is already in review — we'll update the submission.";
       }
 
       // Gate publishing on Stripe account for creators
@@ -105,8 +105,13 @@ export default function TripBuilderPage() {
       
       const slug = formData.slug || generateSlug(formData.title);
 
-      // Map "published" submissions to "pending_review" — admin approves to go live
-      const persistedStatus = status === "published" ? "pending_review" : "draft";
+      // Map "published" submissions to "pending_review" — admin approves to go live.
+      // Edits to a live trip also re-enter review while the existing listing stays live.
+      let persistedStatus: "draft" | "pending_review" = status === "published" ? "pending_review" : "draft";
+      if (status === "published" && tripData?.status === "published") {
+        persistedStatus = "pending_review";
+        resubmitNotice = "Your updates have been submitted for review. The current listing stays live until approved.";
+      }
 
       // Pull itinerary days off the form payload — they live in their own table
       const { itinerary_days: itineraryDays = [], ...rest } = formData;
@@ -183,7 +188,7 @@ export default function TripBuilderPage() {
       }
 
       if (persistedStatus === "pending_review") {
-        toast.success("Your trip has been submitted for review. We typically review listings within 24 hours and will notify you when it's live.");
+        toast.success(resubmitNotice ?? "Your trip has been submitted for review. We typically review listings within 24 hours and will notify you when it's live.");
       } else {
         toast.success("Draft saved");
       }
@@ -201,9 +206,15 @@ export default function TripBuilderPage() {
   const handlePreview = async () => {
     if (editId && tripData) {
       window.open(`/marketplace/trip/${tripData.slug || editId}`, "_blank");
-    } else {
-      toast.info("Add a title and destination first, then we'll save and open a preview.");
+      return;
     }
+    const currentData = formRef.current?.getCurrentData();
+    if (!currentData?.title || !currentData?.destination) {
+      toast.info("Add a title and destination first, then we can save and preview.");
+      return;
+    }
+    toast.info("Saving draft and opening preview...");
+    await handleSave(currentData, "draft");
   };
 
   if (authLoading || roleLoading || loading) {
@@ -263,6 +274,7 @@ export default function TripBuilderPage() {
       {/* Form */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-12 md:pb-16">
         <TripBuilderForm
+          ref={formRef}
           initialData={tripData}
           onSave={handleSave}
           saving={saving}
