@@ -48,7 +48,7 @@ export default function AgentTripsPage() {
       const { data, error } = await supabase
         .from("packaged_trips")
         .select("id, title, slug, destination, cover_image_url, status, price_per_person, created_at, booking_count, view_count")
-        .eq("agent_id", user.id)
+        .or(`agent_id.eq.${user.id},creator_id.eq.${user.id}`)
         .order("created_at", { ascending: false });
       if (cancelled) return;
       if (error) {
