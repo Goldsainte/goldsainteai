@@ -121,7 +121,7 @@ export default function Marketplace() {
           duration_days, max_participants, current_bookings, difficulty_level,
           rating, review_count, available_from, available_until, tags,
           wishlist_count, booking_count, view_count, is_verified, created_at,
-          creator:profiles!left(id, full_name, avatar_url, home_base, content_style_tags, is_verified)
+          creator:profiles!packaged_trips_creator_id_fkey(id, full_name, avatar_url, home_base, content_style_tags, is_verified)
         `)
         .eq("status", "published");
 
@@ -184,7 +184,7 @@ export default function Marketplace() {
         duration_days, max_participants, current_bookings, difficulty_level,
         rating, review_count, available_from, available_until, tags,
         wishlist_count, booking_count, view_count, is_verified, created_at,
-        creator:profiles!left(id, full_name, avatar_url, home_base, content_style_tags, is_verified)
+        creator:profiles!packaged_trips_creator_id_fkey(id, full_name, avatar_url, home_base, content_style_tags, is_verified)
       `)
       .eq("status", "published");
     if (filters.destination) query = query.ilike("destination", `%${filters.destination}%`);
