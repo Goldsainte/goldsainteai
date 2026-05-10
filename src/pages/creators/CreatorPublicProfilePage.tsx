@@ -89,7 +89,7 @@ export default function CreatorPublicProfilePage() {
   useEffect(() => {
     if (!id) return;
     (async () => {
-      const [profileRes, creatorProfileRes, reviewsRes, storyboardsRes] = await Promise.all([
+      const [profileRes, creatorProfileRes, reviewsRes] = await Promise.all([
         supabase
           .from("profiles")
           .select(
@@ -108,50 +108,10 @@ export default function CreatorPublicProfilePage() {
           .from("profile_reviews")
           .select("rating")
           .eq("reviewee_id", id),
-        (() => {
-          let q = supabase
-            .from("storyboards")
-            .select("id, title, destination, is_public, storyboard_items(id, image_url, title, subtitle, position)")
-            .eq("owner_id", id)
-            .order("updated_at", { ascending: false });
-          if (!user || user.id !== id) {
-            q = q.eq("is_public", true);
-          }
-          return q;
-        })(),
       ]);
 
       setCreator(profileRes.data as CreatorProfile | null);
       setCreatorData(creatorProfileRes.data as CreatorProfileData | null);
-
-      const boards = (storyboardsRes.data || []) as any[];
-      setCreatorStoryboards(
-        boards.map((sb) => ({
-          id: sb.id,
-          title: sb.title,
-          destination: sb.destination,
-          is_public: sb.is_public ?? true,
-        }))
-      );
-
-      // Flatten all items into pins
-      const allPins: PinItem[] = [];
-      for (const sb of boards) {
-        for (const item of sb.storyboard_items || []) {
-          if (item.image_url) {
-            allPins.push({
-              id: item.id,
-              image_url: item.image_url,
-              title: item.title,
-              subtitle: item.subtitle,
-              storyboard_id: sb.id,
-              storyboard_title: sb.title,
-              storyboard_destination: sb.destination,
-            });
-          }
-        }
-      }
-      setPinItems(allPins);
 
       const reviews = reviewsRes.data;
       if (reviews && reviews.length > 0) {
