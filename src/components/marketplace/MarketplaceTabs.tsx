@@ -1,4 +1,4 @@
-import { Plane, FileText } from "lucide-react";
+import { Plane, FileText, BookOpen } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -8,7 +8,7 @@ import {
 
 interface MarketplaceTabsProps {
   activeTab: string;
-  onTabChange: (tab: "trips" | "trip-requests") => void;
+  onTabChange: (tab: "trips" | "trip-requests" | "itinerary-guides") => void;
 }
 
 export function MarketplaceTabs({ activeTab, onTabChange }: MarketplaceTabsProps) {
@@ -27,6 +27,13 @@ export function MarketplaceTabs({ activeTab, onTabChange }: MarketplaceTabsProps
       icon: FileText,
       description: "Real travelers looking for a custom trip — review their request and submit your proposal"
     },
+    {
+      id: "itinerary-guides",
+      label: "Itinerary Guides",
+      shortLabel: "Guides",
+      icon: BookOpen,
+      description: "Downloadable and printable day-by-day guides from verified travel creators and specialists"
+    },
   ] as const;
 
   return (
@@ -40,7 +47,7 @@ export function MarketplaceTabs({ activeTab, onTabChange }: MarketplaceTabsProps
               <Tooltip key={tab.id}>
                 <TooltipTrigger asChild>
                   <button
-                    onClick={() => onTabChange(tab.id as "trips" | "trip-requests")}
+                    onClick={() => onTabChange(tab.id as "trips" | "trip-requests" | "itinerary-guides")}
                     className={`
                       flex flex-row items-center gap-1.5 rounded-full px-4 py-2 sm:py-2.5 
                       text-xs sm:text-sm font-semibold transition-all whitespace-nowrap touch-manipulation min-h-[44px] min-w-[44px]
