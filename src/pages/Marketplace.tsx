@@ -292,6 +292,33 @@ export default function Marketplace() {
     enabled: activeTab === "trip-requests",
   });
 
+  // Itinerary guides query
+  const { data: itineraryGuides, isLoading: isLoadingGuides } = useQuery({
+    queryKey: ["marketplace-itinerary-guides"],
+    enabled: activeTab === "itinerary-guides",
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("itinerary_products")
+        .select(`
+          id, title, destination, duration_days, price, currency,
+          cover_image_url, description, created_at, status,
+          creator:profiles!itinerary_products_creator_id_fkey (
+            id, full_name, avatar_url, username
+          )
+        `)
+        .eq("status", "published")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  const filteredGuides = (itineraryGuides || []).filter((g: any) =>
+    !guideSearch ||
+    g.destination?.toLowerCase().includes(guideSearch.toLowerCase()) ||
+    g.title?.toLowerCase().includes(guideSearch.toLowerCase())
+  );
+
   const handleDeleteRequest = async (id: string) => {
     const { error } = await supabase.from("trip_requests").delete().eq("id", id);
     if (error) {
