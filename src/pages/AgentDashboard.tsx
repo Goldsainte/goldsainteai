@@ -395,7 +395,7 @@ export default function AgentDashboard() {
 
         <StripeConnectOnboarding />
 
-        {pendingTripsCount > 0 && publishedTripsCount === 0 && (
+        {pendingTripsCount > 0 && (
           <div className="mb-6 rounded-2xl border border-[#C7A962]/40 bg-[#FDF9F0] px-6 py-5 flex items-start gap-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#C7A962]/15 flex-shrink-0">
               <Hourglass className="h-5 w-5 text-[#C7A962]" />

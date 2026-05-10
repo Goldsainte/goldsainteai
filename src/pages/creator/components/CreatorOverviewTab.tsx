@@ -22,6 +22,8 @@ interface CreatorOverviewTabProps {
     pendingEarnings: number;
     recentProposals: RecentProposal[];
     openTripRequests: number;
+    guideSales: number;
+    guideRevenue: number;
   };
   loading: boolean;
 }
@@ -37,6 +39,8 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
     { label: "Response Rate", value: loading ? "—" : `${stats.responseRate}%` },
     { label: "Total Earnings", value: loading ? "—" : fmt(stats.totalEarnings) },
     { label: "Pending", value: loading ? "—" : fmt(stats.pendingEarnings) },
+    { label: "Guide Sales", value: loading ? "—" : stats.guideSales.toString() },
+    { label: "Guide Revenue", value: loading ? "—" : fmt(stats.guideRevenue) },
   ];
 
   return (

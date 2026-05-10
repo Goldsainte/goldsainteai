@@ -51,6 +51,8 @@ type CreatorStats = {
   pendingEarnings: number;
   recentProposals: RecentProposal[];
   openTripRequests: number;
+  guideSales: number;
+  guideRevenue: number;
 };
 
 const EMPTY_STATS: CreatorStats = {
@@ -62,6 +64,8 @@ const EMPTY_STATS: CreatorStats = {
   pendingEarnings: 0,
   recentProposals: [],
   openTripRequests: 0,
+  guideSales: 0,
+  guideRevenue: 0,
 };
 
 interface Profile {
@@ -116,6 +120,32 @@ export default function CreatorDashboard() {
           return;
         }
         if (!isMounted) return;
+        let guideSales = 0;
+        let guideRevenue = 0;
+        try {
+          if (!user?.id) throw new Error("no user");
+          const { data: guideIds } = await supabase
+            .from('itinerary_products')
+            .select('id')
+            .eq('creator_id', user.id)
+            .eq('status', 'published');
+          if (guideIds && guideIds.length > 0) {
+            const ids = guideIds.map((g: any) => g.id);
+            const { count } = await supabase
+              .from('itinerary_purchases')
+              .select('id', { count: 'exact', head: true })
+              .in('product_id', ids);
+            guideSales = count || 0;
+            const { data: revenueRows } = await supabase
+              .from('itinerary_purchases')
+              .select('amount_paid')
+              .in('product_id', ids);
+            guideRevenue = (revenueRows || []).reduce((s: number, r: any) => s + (r.amount_paid || 0), 0);
+          }
+        } catch (gErr) {
+          console.error('Guide stats error:', gErr);
+        }
+        if (!isMounted) return;
         setStats({
           activeProposals: data?.activeProposals ?? 0,
           acceptedProposals: data?.acceptedProposals ?? 0,
@@ -125,6 +155,8 @@ export default function CreatorDashboard() {
           pendingEarnings: data?.pendingEarnings ?? 0,
           recentProposals: data?.recentProposals ?? [],
           openTripRequests: data?.openTripRequests ?? 0,
+          guideSales,
+          guideRevenue,
         });
       } catch (err) {
         console.error('Creator dashboard stats error:', err);
@@ -136,7 +168,7 @@ export default function CreatorDashboard() {
     }
     loadStats();
     return () => { isMounted = false; };
-  }, []);
+  }, [user?.id]);
 
   // Redirect non-creators away
   if (!roleLoading && !hasCreatorAccess) {

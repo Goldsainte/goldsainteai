@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { TripDetailHero } from "@/components/trips/TripDetailHero";
 import { TripAboutSection } from "@/components/trips/TripAboutSection";
@@ -18,6 +18,7 @@ import { TripTrustBadges } from "@/components/trips/TripTrustBadges";
 import { TripFAQAccordion } from "@/components/trips/TripFAQAccordion";
 import { TripBookingSidebar } from "@/components/trips/TripBookingSidebar";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface TripData {
   id: string;
@@ -194,8 +195,21 @@ export default function TrovaTripDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#f7f3ea]">
-        <div className="flex h-[60vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-[#0C4D47]" />
+        <div className="container mx-auto max-w-6xl px-4 py-8">
+          <Skeleton className="h-[400px] w-full rounded-2xl mb-8" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="md:col-span-2 space-y-4">
+              <Skeleton className="h-10 w-3/4" />
+              <Skeleton className="h-5 w-1/2" />
+              <Skeleton className="h-32 w-full" />
+              <Skeleton className="h-32 w-full" />
+              <Skeleton className="h-48 w-full" />
+            </div>
+            <div className="space-y-4">
+              <Skeleton className="h-64 w-full rounded-2xl" />
+              <Skeleton className="h-32 w-full rounded-2xl" />
+            </div>
+          </div>
         </div>
       </div>
     );

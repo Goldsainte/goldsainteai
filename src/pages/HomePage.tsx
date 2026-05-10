@@ -31,7 +31,7 @@ function FeaturedTripsSection() {
   });
   if (!trips?.length) return null;
   return (
-    <section className="bg-[#f7f3ea] border-y border-[#E5DFC6]/30 py-16 md:py-24">
+    <section className="bg-[#f7f3ea] border-t border-[#E5DFC6] py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-4">
         <div className="flex items-end justify-between mb-8 md:mb-10">
           <h2 className="font-secondary text-2xl md:text-4xl text-[#0a2225]">Featured Trips</h2>
