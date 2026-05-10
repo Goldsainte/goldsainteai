@@ -470,7 +470,7 @@ export const AppRoutes = () => (
       <Route path="/admin/analytics/cancellations" element={<AdminCancellationAnalytics />} />
       <Route path="/admin/customer-verifications" element={<AdminCustomerVerifications />} />
       <Route path="/admin/inquiries" element={<AdminInquiries />} />
-      <Route path="/admin/platform-analytics" element={<PlatformAnalyticsDashboard />} />
+      <Route path="/admin/platform-analytics" element={<AdminGuard><PlatformAnalyticsDashboard /></AdminGuard>} />
       <Route path="/admin/trust-safety" element={<TrustSafety />} />
       <Route path="/system-health" element={<SystemHealth />} />
     </Route>
