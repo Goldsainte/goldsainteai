@@ -327,6 +327,27 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
     });
 
   const goNext = () => {
+    if (currentStep === 0) {
+      if (!formData.title?.trim()) {
+        toast.error("Please add a trip title before continuing.");
+        return;
+      }
+      if (!formData.destination?.trim()) {
+        toast.error("Please add a destination before continuing.");
+        return;
+      }
+      if (!formData.price_per_person) {
+        toast.error("Please add a price per person before continuing.");
+        return;
+      }
+    }
+    if (currentStep === 2) {
+      const hasContent = itineraryDays.some((d) => d.title?.trim());
+      if (!hasContent) {
+        toast.error("Please add at least one day to your itinerary, or use the AI suggestion button.");
+        return;
+      }
+    }
     markStepComplete(currentStep);
     setCurrentStep((s) => Math.min(steps.length - 1, s + 1));
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
