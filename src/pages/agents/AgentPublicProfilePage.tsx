@@ -53,14 +53,14 @@ export default function AgentPublicProfilePage() {
         supabase
           .from("profiles")
           .select(
-            "id, full_name, avatar_url, bio, agent_verification_status, tiktok_handle, instagram_handle, location, featured_photos, last_active_at"
+            "id, full_name, avatar_url, bio, agent_verification_status, tiktok_handle, instagram_handle, location, featured_photos"
           )
           .eq("id", id)
           .maybeSingle(),
         supabase
           .from("travel_agents")
           .select(
-            "agency_name, rating, total_reviews, specializations, destinations, website, experience_years, response_time_hours"
+            "agency_name, rating, total_reviews, specializations, destinations, website, experience_years"
           )
           .eq("user_id", id)
           .maybeSingle(),
