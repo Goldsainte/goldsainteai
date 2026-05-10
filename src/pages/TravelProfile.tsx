@@ -116,6 +116,9 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
   const [photoStartIndex, setPhotoStartIndex] = useState(0);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
+  const [bookingStats, setBookingStats] = useState({ completed: 0, upcoming: 0, countries: 0 });
+  const [savedTrips, setSavedTrips] = useState<any[]>([]);
+
   const profileUserId = userId || user?.id;
   const isOwnProfile = user?.id === profileUserId;
 
@@ -127,6 +130,8 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
       fetchLikedPosts();
       fetchStats();
       checkActiveMoments();
+      fetchBookingStats();
+      fetchSavedTrips();
       
       // Fetch collaboration invites count only for own profile
       if (isOwnProfile && user) {
