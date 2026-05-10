@@ -180,6 +180,7 @@ export default function TripDetailPage() {
                 <TripHostSection
                   host={trip.creator}
                   hostTagline={trip.host_tagline}
+                  hostType="creator"
                 />
               )}
 
