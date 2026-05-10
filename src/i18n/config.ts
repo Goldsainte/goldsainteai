@@ -41,11 +41,20 @@ const getSavedLanguage = () => {
   }
 };
 
+const applyDirection = (lang: string) => {
+  if (typeof document === 'undefined') return;
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.documentElement.lang = lang;
+};
+
+const initialLang = getSavedLanguage();
+applyDirection(initialLang);
+
 i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: getSavedLanguage(),
+    lng: initialLang,
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false,
@@ -54,5 +63,9 @@ i18n
   .catch((error) => {
     console.error('i18n initialization error:', error);
   });
+
+i18n.on('languageChanged', (newLang) => {
+  applyDirection(newLang);
+});
 
 export default i18n;
