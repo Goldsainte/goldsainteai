@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { ArrowLeft, PenLine, LogIn, Settings, Plus } from "lucide-react";
+import { ArrowLeft, PenLine, LogIn, Settings, Plus, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ReviewsList } from "@/components/profile/ReviewsList";
 import { WriteReviewModal } from "@/components/profile/WriteReviewModal";
@@ -84,6 +84,7 @@ export default function CreatorPublicProfilePage() {
   const [reviewCount, setReviewCount] = useState<number>(0);
   const [creatorStoryboards, setCreatorStoryboards] = useState<BoardSummary[]>([]);
   const [pinItems, setPinItems] = useState<PinItem[]>([]);
+  const [guides, setGuides] = useState<Array<{ id: string; title: string; destination: string; duration_days: number; price: number; currency: string; cover_image_url: string | null }>>([]);
 
   useEffect(() => {
     if (!id) return;
@@ -165,6 +166,20 @@ export default function CreatorPublicProfilePage() {
       setLoading(false);
     })();
   }, [id, user, reviewRefreshKey]);
+
+  // Fetch published itinerary guides for this creator
+  useEffect(() => {
+    if (!id) return;
+    (async () => {
+      const { data } = await supabase
+        .from("itinerary_products")
+        .select("id, title, destination, duration_days, price, currency, cover_image_url")
+        .eq("creator_id", id)
+        .eq("status", "published")
+        .order("created_at", { ascending: false });
+      setGuides((data as any) || []);
+    })();
+  }, [id]);
 
   // Listen for storyboard-updated events
   useEffect(() => {
@@ -293,6 +308,42 @@ export default function CreatorPublicProfilePage() {
                 onCreateNew={() => navigate("/storyboards/new")}
                 onBoardDeleted={() => setReviewRefreshKey((k) => k + 1)}
               />
+            </div>
+          </div>
+        )}
+
+        {/* ─── Itinerary Guides ─── */}
+        {guides.length > 0 && (
+          <div className="bg-[#FDF9F0]">
+            <div className="mx-auto max-w-5xl px-4 py-16 md:py-20">
+              <SectionLabel>Itinerary Guides</SectionLabel>
+              <div className="space-y-3">
+                {guides.map((g) => (
+                  <button
+                    key={g.id}
+                    onClick={() => navigate(`/itinerary-guide/${g.id}`)}
+                    className="w-full text-left rounded-2xl bg-white border border-[#E5DFC6] p-3 flex items-center gap-4 hover:border-[#C7A962]/60 transition"
+                  >
+                    {g.cover_image_url ? (
+                      <img src={g.cover_image_url} alt={g.title} className="h-[80px] w-[120px] object-cover rounded-xl flex-shrink-0" />
+                    ) : (
+                      <div className="h-[80px] w-[120px] rounded-xl bg-[#E5DFC6] flex-shrink-0" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-[#0a2225] truncate">{g.title}</p>
+                      <p className="text-xs text-[#6B7280] mt-0.5 truncate">{g.destination} · {g.duration_days} days</p>
+                    </div>
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <span className="text-sm text-[#0a2225]">
+                        {g.currency === "USD" ? "$" : ""}{Number(g.price).toFixed(0)} {g.currency}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-xs text-[#0c4d47] font-medium">
+                        Get Guide <ArrowRight className="h-3.5 w-3.5" />
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}
