@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BackButton } from "@/components/ui/BackButton";
 import { TripImageUploader } from "@/components/trips/TripImageUploader";
@@ -24,8 +23,10 @@ type Day = {
   accommodation: string;
 };
 
-const labelClasses = "text-[11px] sm:text-xs uppercase tracking-wider text-[#6B7280] font-medium";
-const inputClasses = "rounded-xl h-12 text-sm sm:text-base border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20 focus:border-[#C7A962]";
+const labelClasses = "text-sm font-medium text-[#0a2225]";
+const inputClasses = "rounded-xl h-11 sm:h-12 text-sm sm:text-base border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20 focus:border-[#C7A962]";
+const textareaClasses = "rounded-xl border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20 focus:border-[#C7A962]";
+const helperClasses = "text-xs text-[#9A9384] mt-1";
 
 export default function ItineraryBuilderPage() {
   const { user } = useAuth();
@@ -89,9 +90,8 @@ export default function ItineraryBuilderPage() {
     });
   };
 
-  const patchDay = (idx: number, patch: Partial<Day>) => {
+  const patchDay = (idx: number, patch: Partial<Day>) =>
     setDays((prev) => prev.map((d, i) => (i === idx ? { ...d, ...patch } : d)));
-  };
 
   const handleSave = async (status: "draft" | "published") => {
     if (!user) return;
@@ -150,115 +150,133 @@ export default function ItineraryBuilderPage() {
           Package your travel knowledge as a digital product travelers can buy and download instantly.
         </p>
 
-        <div className="mt-10 space-y-6">
-          <Card className="border-none bg-white rounded-2xl shadow-sm p-6 space-y-5">
-            <h2 className="font-secondary text-lg text-[#0a2225]">Basics</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label className={labelClasses}>Title</Label>
-                <Input className={inputClasses} value={form.title} onChange={(e) => update("title", e.target.value)} placeholder="7 Days in Lisbon — A local's guide" />
-              </div>
-              <div>
-                <Label className={labelClasses}>Destination</Label>
-                <Input className={inputClasses} value={form.destination} onChange={(e) => update("destination", e.target.value)} placeholder="Lisbon, Portugal" />
-              </div>
-              <div>
-                <Label className={labelClasses}>Duration (days)</Label>
-                <Input type="number" min={1} max={60} className={inputClasses} value={form.duration_days} onChange={(e) => setDuration(e.target.value)} />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label className={labelClasses}>Price</Label>
-                  <Input type="number" min={0} step="0.01" className={inputClasses} value={form.price} onChange={(e) => update("price", e.target.value)} placeholder="29" />
-                </div>
-                <div>
-                  <Label className={labelClasses}>Currency</Label>
-                  <Select value={form.currency} onValueChange={(v) => update("currency", v)}>
-                    <SelectTrigger className={inputClasses}><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {CURRENCIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-
+        <div className="mt-12 space-y-12">
+          {/* Basics */}
+          <div className="space-y-8">
             <div>
-              <Label className={labelClasses}>Cover image</Label>
-              <div className="mt-2">
-                <TripImageUploader
-                  currentUrl={form.cover_image_url}
-                  onUpload={(url) => update("cover_image_url", url)}
-                />
+              <h2 className="font-secondary text-2xl sm:text-3xl text-[#0a2225] tracking-tight">About the guide</h2>
+              <p className="text-sm text-[#9A9384] mt-1">The essentials travelers see before buying.</p>
+            </div>
+
+            <div className="space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className={labelClasses}>Title</Label>
+                  <Input className={inputClasses} value={form.title}
+                    onChange={(e) => update("title", e.target.value)}
+                    placeholder="7 Days in Lisbon — A local's guide" />
+                  <p className={helperClasses}>Be specific. "7 Days in Lisbon — Local's Guide" outperforms "Lisbon Guide".</p>
+                </div>
+                <div className="space-y-2">
+                  <Label className={labelClasses}>Destination</Label>
+                  <Input className={inputClasses} value={form.destination}
+                    onChange={(e) => update("destination", e.target.value)} placeholder="Lisbon, Portugal" />
+                </div>
+                <div className="space-y-2">
+                  <Label className={labelClasses}>Duration (days)</Label>
+                  <Input type="number" min={1} max={60} className={inputClasses}
+                    value={form.duration_days} onChange={(e) => setDuration(e.target.value)} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label className={labelClasses}>Price</Label>
+                    <Input type="number" min={0} step="0.01" className={inputClasses}
+                      value={form.price} onChange={(e) => update("price", e.target.value)} placeholder="29" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className={labelClasses}>Currency</Label>
+                    <Select value={form.currency} onValueChange={(v) => update("currency", v)}>
+                      <SelectTrigger className={inputClasses}><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {CURRENCIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className={labelClasses}>Cover image</Label>
+                <TripImageUploader currentUrl={form.cover_image_url}
+                  onUpload={(url) => update("cover_image_url", url)} />
+              </div>
+
+              <div className="space-y-2">
+                <Label className={labelClasses}>Description</Label>
+                <Textarea className={textareaClasses} rows={5} value={form.description}
+                  onChange={(e) => update("description", e.target.value)}
+                  placeholder="What travelers will get inside this guide..." />
+                <p className={helperClasses}>Aim for 100–200 words. Highlight what makes your local knowledge unique.</p>
               </div>
             </div>
+          </div>
 
-            <div>
-              <Label className={labelClasses}>Description</Label>
-              <Textarea
-                className="rounded-xl border-[#E5DFC6] bg-white"
-                rows={4}
-                value={form.description}
-                onChange={(e) => update("description", e.target.value)}
-                placeholder="What travelers will get inside this guide..."
-              />
-            </div>
-          </Card>
-
-          <Card className="border-none bg-white rounded-2xl shadow-sm p-6 space-y-5">
-            <div className="flex items-center justify-between">
-              <h2 className="font-secondary text-lg text-[#0a2225]">Day by day</h2>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
+          {/* Day by day */}
+          <div className="space-y-8 border-t border-[#E5DFC6] pt-12">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <h2 className="font-secondary text-2xl sm:text-3xl text-[#0a2225] tracking-tight">Day by day</h2>
+                <p className="text-sm text-[#9A9384] mt-1">Walk travelers through the journey, day by day.</p>
+              </div>
+              <Button type="button" variant="outline" size="sm"
                 onClick={() => setDays((p) => [...p, { day_number: p.length + 1, title: "", description: "", activities: [], accommodation: "" }])}
-                className="rounded-full"
-              >
+                className="rounded-full border-[#E5DFC6]">
                 <Plus className="h-3.5 w-3.5 mr-1" /> Add day
               </Button>
             </div>
 
-            <div className="space-y-4">
+            <div>
               {days.map((d, idx) => (
-                <div key={idx} className="rounded-xl border border-[#E5DFC6] p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs uppercase tracking-wider text-[#C7A962] font-medium">Day {d.day_number}</p>
-                    {days.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => setDays((p) => p.filter((_, i) => i !== idx).map((x, i) => ({ ...x, day_number: i + 1 })))}
-                        className="text-[#9A9384] hover:text-[#0a2225]"
-                        aria-label="Remove day"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-                  <Input className={inputClasses} value={d.title} onChange={(e) => patchDay(idx, { title: e.target.value })} placeholder="Day title" />
-                  <Textarea className="rounded-xl border-[#E5DFC6] bg-white" rows={3} value={d.description} onChange={(e) => patchDay(idx, { description: e.target.value })} placeholder="What happens this day" />
-                  <div>
-                    <Label className={labelClasses}>Activities</Label>
-                    <div className="mt-2">
-                      <ArrayFieldEditor
-                        items={d.activities}
-                        onChange={(items) => patchDay(idx, { activities: items })}
-                        placeholder="Add an activity"
-                      />
+                <div key={idx} className={idx > 0 ? "border-t border-[#E5DFC6] pt-6 mt-6" : ""}>
+                  <div className="flex items-start gap-5">
+                    <span className="font-secondary text-4xl text-[#E5DFC6] leading-none flex-shrink-0 mt-1">
+                      {String(d.day_number).padStart(2, "0")}
+                    </span>
+                    <div className="flex-1 space-y-4 min-w-0">
+                      <div className="flex items-start justify-between gap-3">
+                        <Input className={inputClasses} value={d.title}
+                          onChange={(e) => patchDay(idx, { title: e.target.value })}
+                          placeholder="Day title" />
+                        {days.length > 1 && (
+                          <button type="button"
+                            onClick={() => setDays((p) => p.filter((_, i) => i !== idx).map((x, i) => ({ ...x, day_number: i + 1 })))}
+                            className="text-[#9A9384] hover:text-[#0a2225] mt-3 flex-shrink-0"
+                            aria-label="Remove day">
+                            <X className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+                      <Textarea className={textareaClasses} rows={3} value={d.description}
+                        onChange={(e) => patchDay(idx, { description: e.target.value })}
+                        placeholder="What happens this day" />
+                      <div className="space-y-2">
+                        <Label className={labelClasses}>Activities</Label>
+                        <ArrayFieldEditor items={d.activities}
+                          onChange={(items) => patchDay(idx, { activities: items })}
+                          placeholder="Add an activity" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className={labelClasses}>Accommodation (optional)</Label>
+                        <Input className={inputClasses} value={d.accommodation}
+                          onChange={(e) => patchDay(idx, { accommodation: e.target.value })}
+                          placeholder="Where to stay" />
+                      </div>
                     </div>
                   </div>
-                  <Input className={inputClasses} value={d.accommodation} onChange={(e) => patchDay(idx, { accommodation: e.target.value })} placeholder="Accommodation (optional)" />
                 </div>
               ))}
             </div>
-          </Card>
+          </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 justify-end">
-            <Button variant="outline" onClick={() => handleSave("draft")} disabled={saving} className="rounded-full">
+          {/* Actions */}
+          <div className="flex flex-col sm:flex-row gap-3 justify-end border-t border-[#E5DFC6] pt-8">
+            <Button variant="outline" onClick={() => handleSave("draft")} disabled={saving}
+              className="rounded-full px-6 border-[#E5DFC6] hover:bg-[#FDF9F0] text-[#0a2225]">
               {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
               Save draft
             </Button>
-            <Button onClick={() => handleSave("published")} disabled={saving} className="rounded-full bg-[#0c4d47] hover:bg-[#0c4d47]/90 text-white">
+            <Button onClick={() => handleSave("published")} disabled={saving}
+              className="rounded-full px-6 bg-[#0c4d47] hover:bg-[#0c4d47]/90 text-white">
               {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
               Publish guide
             </Button>
