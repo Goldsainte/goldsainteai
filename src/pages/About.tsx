@@ -11,7 +11,6 @@ import { useTranslation } from "react-i18next";
 import { BackButton } from "@/components/ui/BackButton";
 import founderImage from "@/assets/founder.jpg";
 import openaiLogo from "@/assets/OpenAI_Logo.svg";
-import openaiLogo from "@/assets/OpenAI_Logo.svg";
 import geminiLogo from "@/assets/Google_Gemini_logo_2025.svg";
 import goldsainteLogo from "@/assets/wordmark-green.svg";
 import primaryLogoGreen from "@/assets/primary-horizontal-logo-green.svg";
