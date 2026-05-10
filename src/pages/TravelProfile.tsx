@@ -650,7 +650,25 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
 
           <TabsContent value="trips" className="mt-6 px-4 md:px-6">
             {isOwnProfile ? (
-              <TravelerBookingsTab userId={profileUserId!} />
+              bookingStats.completed === 0 && bookingStats.upcoming === 0 ? (
+                <div className="text-center py-16">
+                  <Compass className="h-10 w-10 text-[#C7A962] mx-auto mb-4" />
+                  <p className="font-secondary text-lg text-[#0a2225] mb-1">No trips yet</p>
+                  <p className="text-sm text-[#6B7280] mb-5">
+                    Post a trip request or browse the marketplace to find your next adventure.
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-3">
+                    <Button onClick={() => navigate('/post-trip')} className="bg-[#0c4d47] text-white rounded-full px-6 hover:bg-[#0c4d47]/90">
+                      Post a Trip Request
+                    </Button>
+                    <Button onClick={() => navigate('/marketplace')} variant="outline" className="border-[#E5DFC6] text-[#0a2225] rounded-full px-6">
+                      Browse Trips
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <TravelerBookingsTab userId={profileUserId!} />
+              )
             ) : (
               <div className="text-center py-16">
                 <Lock className="h-8 w-8 text-[#9A9384] mx-auto mb-3" />
