@@ -121,7 +121,7 @@ export const RestaurantCard = ({
           {rating && (
             <div className="flex items-center gap-2 mb-2">
               <div className="flex items-center">
-                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />
+                <Star className="h-4 w-4 fill-[#C7A962] text-[#C7A962] mr-1" />
                 <span className="font-semibold">{Number(rating).toFixed(1)}</span>
               </div>
               {userRatingsTotal && (

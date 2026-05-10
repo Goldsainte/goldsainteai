@@ -65,7 +65,7 @@ export const TopToursCarousel = ({ tours }: TopToursCarouselProps) => {
                   
                   {tour.rating && (
                     <div className="flex items-center gap-1 mb-2 text-xs sm:text-sm text-muted-foreground">
-                      <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-yellow-400 text-yellow-400 flex-shrink-0" />
+                      <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-[#C7A962] text-[#C7A962] flex-shrink-0" />
                       <span className="font-semibold">{tour.rating.toFixed(1)}</span>
                       {tour.totalReviews && (
                         <span className="truncate">({tour.totalReviews.toLocaleString()})</span>

@@ -499,7 +499,7 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
                           key={i}
                           className={`h-3 w-3 ${
                             i < (cheapestHotel?.rating || cheapestHotel.hotel?.rating || hotelDetails?.star_rating || 0)
-                              ? 'fill-yellow-400 text-yellow-400'
+                              ? 'fill-[#C7A962] text-[#C7A962]'
                               : 'text-gray-300'
                           }`}
                         />
@@ -550,7 +550,7 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
                                         key={i}
                                         className={`h-3 w-3 ${
                                           i < (review.rating || 0)
-                                            ? 'fill-yellow-400 text-yellow-400'
+                                            ? 'fill-[#C7A962] text-[#C7A962]'
                                             : 'text-gray-300'
                                         }`}
                                       />

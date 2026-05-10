@@ -137,7 +137,7 @@ export const SupplierDirectory = () => {
 
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      <Star className="h-4 w-4 fill-[#C7A962] text-[#C7A962]" />
                       <span className="font-semibold">{supplier.rating.toFixed(1)}</span>
                       <span className="text-xs text-muted-foreground">
                         ({supplier.total_reviews} reviews)

@@ -97,7 +97,7 @@ export const ReviewModal = ({
                   <Star
                     className={`h-8 w-8 ${
                       star <= (hoverRating || rating)
-                        ? 'fill-yellow-400 text-yellow-400'
+                        ? 'fill-[#C7A962] text-[#C7A962]'
                         : 'text-gray-300'
                     }`}
                   />

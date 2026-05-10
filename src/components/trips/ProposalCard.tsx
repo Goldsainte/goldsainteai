@@ -151,7 +151,7 @@ export function ProposalCard({
 
   const statusColors: Record<TripProposalStatus, string> = {
     draft: "bg-[#F5F0E0] text-[#7A7151]",
-    sent: "bg-blue-50 text-blue-700",
+    sent: "bg-[#F0F7F6] text-[#0c4d47]",
     traveler_review: "bg-purple-50 text-purple-700",
     accepted: "bg-emerald-50 text-emerald-700",
     declined: "bg-red-50 text-red-700",

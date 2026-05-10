@@ -101,7 +101,7 @@ export function AIAgentMatching({ jobId, onSelectAgent }: AIAgentMatchingProps) 
   const getConfidenceBadge = (confidence: string) => {
     const variants = {
       high: { variant: "default" as const, color: "text-green-600" },
-      medium: { variant: "secondary" as const, color: "text-yellow-600" },
+      medium: { variant: "secondary" as const, color: "text-[#C7A962]" },
       low: { variant: "outline" as const, color: "text-gray-600" },
     };
     const config = variants[confidence as keyof typeof variants] || variants.low;
@@ -189,7 +189,7 @@ export function AIAgentMatching({ jobId, onSelectAgent }: AIAgentMatchingProps) 
                     </div>
                     <div className="flex items-center gap-3 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
-                        <Star className="h-3 w-3 fill-current text-yellow-500" />
+                        <Star className="h-3 w-3 fill-current text-[#C7A962]" />
                         {match.rating.toFixed(1)} ({match.total_reviews} reviews)
                       </span>
                     </div>

@@ -74,7 +74,7 @@ export const EnhancedAgentCard = ({ agent, metrics, badges, onClick }: EnhancedA
             {/* Rating and reviews */}
             <div className="flex items-center gap-3 mt-1">
               <div className="flex items-center gap-1">
-                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                <Star className="h-4 w-4 fill-[#C7A962] text-[#C7A962]" />
                 <span className="text-sm font-semibold">{agent.rating?.toFixed(1) || '0.0'}</span>
               </div>
               <span className="text-xs text-muted-foreground">
@@ -120,7 +120,7 @@ export const EnhancedAgentCard = ({ agent, metrics, badges, onClick }: EnhancedA
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
-                      <Badge variant="secondary" className="text-xs gap-1 bg-blue-100 text-blue-700 border-blue-200">
+                      <Badge variant="secondary" className="text-xs gap-1 bg-[#F0F7F6] text-[#0c4d47] border-[#0c4d47]/20">
                         <Award className="h-3 w-3" />
                         Certified
                       </Badge>
