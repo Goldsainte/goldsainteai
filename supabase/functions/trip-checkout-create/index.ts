@@ -144,6 +144,14 @@ Deno.serve(async (req) => {
       ],
       success_url: `${successUrl}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl,
+      payment_intent_data: {
+        capture_method: "manual",
+        metadata: {
+          trip_booking_id: booking.id,
+          trip_request_id: tripRequest.id,
+          type: "trip_booking",
+        },
+      },
       metadata: {
         trip_request_id: tripRequest.id,
         trip_booking_id: booking.id,
