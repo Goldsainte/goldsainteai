@@ -1,4 +1,4 @@
-import { BadgeCheck, Instagram, Linkedin, Youtube, Twitter } from "lucide-react";
+import { BadgeCheck, Instagram, Linkedin, Youtube, Twitter, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import FollowButton from "@/components/FollowButton";
@@ -38,6 +38,7 @@ interface ProfileHeroProps {
   avatarUrl?: string | null;
   isVerified?: boolean;
   bio?: string | null;
+  location?: string | null;
   specialties?: string[];
   socialAccounts?: SocialAccount[];
   followerDisplay?: string | null;
@@ -54,6 +55,7 @@ export function ProfileHero({
   avatarUrl,
   isVerified,
   bio,
+  location,
   specialties = [],
   socialAccounts = [],
   followerDisplay,
@@ -100,6 +102,14 @@ export function ProfileHero({
               </TooltipProvider>
             )}
           </div>
+
+          {/* Location — small line under name */}
+          {location && (
+            <p className="flex items-center gap-1.5 text-sm text-[#6B7280] mb-3">
+              <MapPin className="h-3.5 w-3.5 text-[#C7A962]" />
+              {location}
+            </p>
+          )}
 
           {/* Bio — italic serif, up to 4 lines */}
           {bio && (
