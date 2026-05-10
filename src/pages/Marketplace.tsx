@@ -22,8 +22,10 @@ import { QuietlyActiveFooter } from "@/components/marketplace/QuietlyActiveFoote
 import { ForYouRow } from "@/components/marketplace/ForYouRow";
 import { AdaptiveCollectionRow } from "@/components/marketplace/AdaptiveCollectionRow";
 import { ThisWeekFooter } from "@/components/marketplace/ThisWeekFooter";
+import { ItineraryGuideCard } from "@/components/marketplace/ItineraryGuideCard";
+import { BookOpen, Search } from "lucide-react";
 
-type Tab = "trips" | "trip-requests";
+type Tab = "trips" | "trip-requests" | "itinerary-guides";
 
 const FILTER_TAG_MAP: Record<string, string[]> = {
   "Bucket List": ["bucket-list", "bucket list", "once-in-a-lifetime", "iconic", "wonder"],
@@ -57,11 +59,12 @@ export default function Marketplace() {
   const queryClient = useQueryClient();
   const { isAdmin } = useUserRole();
 
-  const validTabs: Tab[] = ["trips", "trip-requests"];
+  const validTabs: Tab[] = ["trips", "trip-requests", "itinerary-guides"];
   const rawTab = (searchParams.get("tab") as string) || "trips";
   const initialTab: Tab = validTabs.includes(rawTab as Tab) ? (rawTab as Tab) : "trips";
 
   const [activeTab, setActiveTab] = useState<Tab>(initialTab);
+  const [guideSearch, setGuideSearch] = useState("");
   const [filters, setFilters] = useState<SearchFilters>({
     destination: searchParams.get("destination") || "",
     startDate: searchParams.get("startDate") || undefined,
@@ -289,6 +292,36 @@ export default function Marketplace() {
     enabled: activeTab === "trip-requests",
   });
 
+  // Itinerary guides query
+  const { data: itineraryGuides, isLoading: isLoadingGuides } = useQuery({
+    queryKey: ["marketplace-itinerary-guides"],
+    enabled: activeTab === "itinerary-guides",
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("itinerary_products")
+        .select(`
+          id, creator_id, title, destination, duration_days, price, currency,
+          cover_image_url, description, created_at, status
+        `)
+        .eq("status", "published")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      const rows = data || [];
+      const creatorIds = [...new Set(rows.map((r: any) => r.creator_id).filter(Boolean))];
+      const { data: profiles } = creatorIds.length
+        ? await supabase.from("profiles").select("id, full_name, avatar_url, username").in("id", creatorIds)
+        : { data: [] as any[] };
+      const map = new Map((profiles || []).map((p: any) => [p.id, p]));
+      return rows.map((r: any) => ({ ...r, creator: map.get(r.creator_id) || null }));
+    },
+  });
+
+  const filteredGuides = (itineraryGuides || []).filter((g: any) =>
+    !guideSearch ||
+    g.destination?.toLowerCase().includes(guideSearch.toLowerCase()) ||
+    g.title?.toLowerCase().includes(guideSearch.toLowerCase())
+  );
+
   const handleDeleteRequest = async (id: string) => {
     const { error } = await supabase.from("trip_requests").delete().eq("id", id);
     if (error) {
@@ -383,6 +416,36 @@ export default function Marketplace() {
       return <TripRequestGrid requests={tripRequests} isAdmin={isAdmin} onDelete={handleDeleteRequest} />;
     }
 
+    if (activeTab === "itinerary-guides") {
+      if (isLoadingGuides) {
+        return (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Skeleton key={i} className="h-[360px] rounded-2xl" />
+            ))}
+          </div>
+        );
+      }
+      if (!filteredGuides.length) {
+        return (
+          <div className="py-16 text-center">
+            <BookOpen className="mx-auto mb-4 h-10 w-10 text-[#C7A962]" />
+            <h3 className="font-secondary text-xl text-[#0a2225]">No guides yet</h3>
+            <p className="mt-2 text-sm text-[#6B7280]">
+              Travel creators and agents are publishing new itinerary guides. Check back soon.
+            </p>
+          </div>
+        );
+      }
+      return (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filteredGuides.map((guide: any) => (
+            <ItineraryGuideCard key={guide.id} guide={guide} />
+          ))}
+        </div>
+      );
+    }
+
     return null;
   };
 
@@ -405,6 +468,7 @@ export default function Marketplace() {
 
         <div className="mx-auto max-w-6xl px-4 py-4 md:py-8">
           {/* Category discovery chips */}
+          {activeTab === "trips" && (
           <CategoryChips
             activeCategory={filters.category || "All"}
             onCategoryChange={(cat) => {
@@ -424,13 +488,31 @@ export default function Marketplace() {
             }}
             className="mb-4"
           />
+          )}
           {activeTab === "trips" && <LiveSignalRow />}
           <div className="mb-6 md:mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <MarketplaceTabs activeTab={activeTab} onTabChange={handleTabChange} />
-            <MarketplaceFilters filters={filters} onFilterChange={setFilters} />
+            {activeTab !== "itinerary-guides" && (
+              <MarketplaceFilters filters={filters} onFilterChange={setFilters} />
+            )}
           </div>
 
           {activeTab === "trips" && <ForYouRow />}
+
+          {activeTab === "itinerary-guides" && (
+            <div className="mb-6 max-w-md">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7A7151]" />
+                <input
+                  type="text"
+                  placeholder="Search by destination or title…"
+                  value={guideSearch}
+                  onChange={(e) => setGuideSearch(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-[#E5DFC6] bg-white text-sm focus:outline-none focus:border-[#C7A962] text-[#0a2225]"
+                />
+              </div>
+            </div>
+          )}
 
           {renderContent()}
 
