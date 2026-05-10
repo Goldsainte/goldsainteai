@@ -147,6 +147,13 @@ Deno.serve(async (req) => {
       return json({ error: `DB update failed: ${updateError.message}` }, 500);
     }
 
+    // Fire-and-forget: ask the traveler to leave a review.
+    try {
+      await sendReviewRequestEmail(admin, booking.id);
+    } catch (e) {
+      console.error("review request email failed", e);
+    }
+
     return json({
       success: true,
       bookingId: booking.id,
@@ -166,4 +173,78 @@ function json(payload: unknown, status = 200) {
     status,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
+}
+
+async function sendReviewRequestEmail(admin: ReturnType<typeof createClient>, bookingId: string) {
+  const resendKey = Deno.env.get("RESEND_API_KEY");
+  if (!resendKey) {
+    console.warn("RESEND_API_KEY not configured; skipping review request email");
+    return;
+  }
+
+  // Pull traveler + agent details
+  const { data: booking } = await admin
+    .from("trip_bookings")
+    .select("id, traveler_id, partner_id")
+    .eq("id", bookingId)
+    .single();
+  if (!booking?.traveler_id) return;
+
+  const [{ data: travelerAuth }, { data: travelerProfile }, { data: agentProfile }] = await Promise.all([
+    admin.auth.admin.getUserById(booking.traveler_id),
+    admin.from("profiles").select("full_name, display_name, first_name").eq("id", booking.traveler_id).maybeSingle(),
+    booking.partner_id
+      ? admin.from("profiles").select("full_name, display_name").eq("id", booking.partner_id).maybeSingle()
+      : Promise.resolve({ data: null } as any),
+  ]);
+
+  const travelerEmail = travelerAuth?.user?.email;
+  if (!travelerEmail) return;
+
+  const travelerName =
+    travelerProfile?.first_name ||
+    travelerProfile?.display_name ||
+    travelerProfile?.full_name ||
+    "there";
+  const agentName = agentProfile?.display_name || agentProfile?.full_name || "your travel specialist";
+  const reviewUrl = `https://goldsainte.ai/reviews/new?booking=${booking.id}`;
+
+  const html = `
+    <div style="font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; background:#f7f3ea; padding:32px;">
+      <div style="max-width:560px; margin:0 auto; background:#ffffff; border:1px solid #E5DFC6; border-radius:16px; padding:32px;">
+        <h1 style="font-family: Georgia, 'Times New Roman', serif; color:#0a2225; font-size:22px; margin:0 0 16px;">How was your trip, ${travelerName}?</h1>
+        <p style="color:#3f3f3f; font-size:15px; line-height:1.6; margin:0 0 20px;">
+          Now that your journey is wrapped, we'd love to hear how it went. Leave a review for
+          <strong>${agentName}</strong> — it helps other travelers and rewards great specialists.
+        </p>
+        <p style="margin:28px 0;">
+          <a href="${reviewUrl}" style="display:inline-block; background:#0c4d47; color:#bfad72; text-decoration:none; padding:12px 22px; border-radius:999px; font-weight:600; font-size:14px;">
+            Leave a review
+          </a>
+        </p>
+        <p style="color:#7a7151; font-size:12px; margin:24px 0 0;">— The Goldsainte team</p>
+      </div>
+    </div>
+  `;
+
+  const subject = `How was your trip? Leave a review for ${agentName}`;
+
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${resendKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "Goldsainte <noreply@goldsainte.com>",
+      to: [travelerEmail],
+      subject,
+      html,
+    }),
+  });
+
+  if (!res.ok) {
+    const txt = await res.text();
+    console.error("resend send failed", res.status, txt);
+  }
 }
