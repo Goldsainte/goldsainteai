@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { ReviewsList } from "@/components/profile/ReviewsList";
 import { WriteReviewModal } from "@/components/profile/WriteReviewModal";
 import { CreatorHeroSection } from "@/components/creator/CreatorHeroSection";
-import type { PinItem, BoardSummary } from "@/components/creator/CreatorStorefrontFeed";
 import { CreatorServicesSection } from "@/components/creator/CreatorServicesSection";
 import { CreatorAboutSection } from "@/components/creator/CreatorAboutSection";
 import { Button } from "@/components/ui/button";
@@ -82,8 +81,6 @@ export default function CreatorPublicProfilePage() {
   const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
   const [avgRating, setAvgRating] = useState<number | null>(null);
   const [reviewCount, setReviewCount] = useState<number>(0);
-  const [creatorStoryboards] = useState<BoardSummary[]>([]);
-  const [pinItems] = useState<PinItem[]>([]);
   const [guides, setGuides] = useState<Array<{ id: string; title: string; destination: string; duration_days: number; price: number; currency: string; cover_image_url: string | null }>>([]);
 
   useEffect(() => {
@@ -141,14 +138,6 @@ export default function CreatorPublicProfilePage() {
     })();
   }, [id]);
 
-  // Listen for storyboard-updated events
-  useEffect(() => {
-    const handler = () => setReviewRefreshKey((k) => k + 1);
-    window.addEventListener("storyboard-updated", handler);
-    return () => window.removeEventListener("storyboard-updated", handler);
-  }, []);
-
-
   const isOwnProfile = user?.id === creator?.id;
 
   if (loading) {
@@ -199,8 +188,7 @@ export default function CreatorPublicProfilePage() {
 
   const handleRequestTrip = () => navigate(`/post-trip?fromCreator=${creator.id}`);
 
-  // Get a fallback cover image from first storyboard pin
-  const fallbackCover = pinItems.length > 0 ? pinItems[0].image_url : null;
+  const coverImageFallback = creator.featured_photos?.[0] || creator.avatar_url || null;
 
   return (
     <>
@@ -249,7 +237,7 @@ export default function CreatorPublicProfilePage() {
           isOwnProfile={isOwnProfile}
           targetUserId={isOwnProfile ? undefined : creator.id}
           onRequestTrip={handleRequestTrip}
-          fallbackCoverUrl={fallbackCover}
+          fallbackCoverUrl={coverImageFallback}
         />
 
         {/* Spacer after hero card overlap */}
