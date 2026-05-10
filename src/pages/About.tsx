@@ -880,7 +880,7 @@ const About = () => {
           <div className="mb-4">
             <h4 className="font-semibold text-sm sm:text-base mb-2 text-foreground">Data & AI Advantage</h4>
             <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
-              <p><strong>Voice AI Concierge:</strong> Personalized, conversational trip planning and booking.</p>
+              <p><strong>AI Itinerary Builder:</strong> Personalised trip planning matched to certified travel specialists.</p>
               <p><strong>Predictive Analytics:</strong> Insights from search, bookings, and user engagement enable demand forecasting, seasonal offers, and upsell opportunities.</p>
               <p><strong>Rich Data Moat:</strong> User behavior, booking history, agent performance, and creator engagement provide unique competitive intelligence.</p>
             </div>
@@ -911,7 +911,7 @@ const About = () => {
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">Vision & Roadmap</h3>
           <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
-            <p><strong>Near-Term (0–6 months):</strong> Full AI concierge rollout, expanded vendor tiers, creator monetization, and dynamic pricing.</p>
+            <p><strong>Near-Term (0–6 months):</strong> AI-powered trip planning and agent matching, expanded agent and creator network, creator monetization, and dynamic pricing.</p>
             <p><strong>Mid-Term (6–12 months):</strong> International expansion, traveler subscription tiers, B2B API launch, and predictive AI for personalized packages.</p>
             <p><strong>Long-Term (12–24 months):</strong> White-label agency solutions, AR/VR trip previews, blockchain loyalty program, and crypto payment integration.</p>
           </div>
@@ -934,9 +934,9 @@ const About = () => {
         </div>
 
         <div>
-          <h3 className="font-semibold text-base mb-3 text-foreground">Modern Slavery & Human Rights Statements</h3>
+          <h3 className="font-semibold text-base mb-3 text-foreground">Human Rights Statement</h3>
           <p className="text-sm sm:text-base text-foreground">
-            For detailed information, please refer to our Modern Slavery Statement and Human Rights Statement above.
+            For detailed information, please refer to our Human Rights Statement above.
           </p>
         </div>
 
