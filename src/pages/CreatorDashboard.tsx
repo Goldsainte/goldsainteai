@@ -168,7 +168,7 @@ export default function CreatorDashboard() {
     }
     loadStats();
     return () => { isMounted = false; };
-  }, []);
+  }, [user?.id]);
 
   // Redirect non-creators away
   if (!roleLoading && !hasCreatorAccess) {
