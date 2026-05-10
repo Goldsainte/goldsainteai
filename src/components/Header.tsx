@@ -232,13 +232,15 @@ export const Header = () => {
                               <PlaneTakeoff className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                               <span className="text-sm font-medium">Post a Trip</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => navigate('/my-purchases')}
-                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                            >
-                              <BookOpen className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                              <span className="text-sm font-medium">My Purchases</span>
-                            </DropdownMenuItem>
+                            {!isAgentAccount && !isCreator && (
+                              <DropdownMenuItem
+                                onClick={() => navigate('/my-purchases')}
+                                className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                              >
+                                <BookOpen className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                <span className="text-sm font-medium">My Purchases</span>
+                              </DropdownMenuItem>
+                            )}
                             {isTraveler && (
                               <DropdownMenuItem 
                                 onClick={() => navigate('/my-trips')} 
@@ -483,13 +485,15 @@ export const Header = () => {
                             <PlaneTakeoff className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                             <span className="text-sm font-medium">Post a Trip</span>
                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => navigate('/my-purchases')}
-                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                          >
-                            <BookOpen className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">My Purchases</span>
-                          </DropdownMenuItem>
+                          {!isAgentAccount && !isCreator && (
+                            <DropdownMenuItem
+                              onClick={() => navigate('/my-purchases')}
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                            >
+                              <BookOpen className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                              <span className="text-sm font-medium">My Purchases</span>
+                            </DropdownMenuItem>
+                          )}
                           {isTraveler && (
                             <DropdownMenuItem 
                               onClick={() => navigate('/my-trips')} 
