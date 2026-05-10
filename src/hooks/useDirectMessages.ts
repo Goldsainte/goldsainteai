@@ -9,6 +9,8 @@ export interface Conversation {
   lastMessagePreview: string | null;
   unreadCount: number;
   isInitiator: boolean;
+  tripId: string | null;
+  tripTitle: string | null;
   otherParticipant: {
     id: string;
     displayName: string;

@@ -73,6 +73,8 @@ serve(async (req) => {
         lastMessagePreview: conv.last_message_preview,
         unreadCount,
         isInitiator,
+        tripId: conv.trip_id ?? null,
+        tripTitle: conv.trip_title ?? null,
         otherParticipant: {
           id: otherParticipant?.id,
           displayName: otherParticipant?.display_name || "Unknown",
