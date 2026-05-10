@@ -195,7 +195,6 @@ export function ArticleBody({ blocks }: ArticleBodyProps) {
               <button
                 onClick={() => {
                   // Will integrate with Expedia modal in future
-                  console.log("CTA clicked:", block.content.destination);
                 }}
                 className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-lg font-medium transition-colors"
               >

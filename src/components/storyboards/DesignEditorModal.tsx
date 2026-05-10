@@ -57,7 +57,6 @@ export function DesignEditorModal({ open, onOpenChange, onExport }: DesignEditor
         backgroundColor: "#ffffff",
       });
       fabricRef.current = canvas;
-      console.log("[DesignEditor] Fabric canvas initialized", canvas);
     }, 200);
 
     return () => {

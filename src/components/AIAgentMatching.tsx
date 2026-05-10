@@ -67,7 +67,6 @@ export function AIAgentMatching({ jobId, onSelectAgent }: AIAgentMatchingProps) 
         
         setMatches(formattedMatches);
         setAnalyzed(true);
-        console.log('✅ Loaded', formattedMatches.length, 'pre-calculated AI matches');
       }
     } catch (error) {
       console.error('Error loading pre-calculated matches:', error);
