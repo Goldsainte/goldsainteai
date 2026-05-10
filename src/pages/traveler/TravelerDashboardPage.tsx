@@ -177,7 +177,7 @@ export default function TravelerDashboardPage() {
               Start Planning
             </button>
           </div>
-          /* Tabbed Navigation */
+          {/* Tabbed Navigation */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
             {/* Mobile: Dropdown Select */}
             {isMobile ? (
@@ -284,6 +284,7 @@ export default function TravelerDashboardPage() {
               {user && <TravelerSettingsTab userId={user.id} />}
             </TabsContent>
           </Tabs>
+          </>
         )}
       </div>
     </main>
