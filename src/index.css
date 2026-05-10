@@ -181,8 +181,8 @@ All colors MUST be HSL.
        Clean whites, soft grays, deep blacks
        ============================================ */
     
-    /* Background colors - Clean, minimal */
-    --background: 0 0% 100%;              /* Pure white #FFFFFF */
+    /* Background colors - Brand cream */
+    --background: 42 47% 96%;             /* Brand cream ~#f7f3ea */
     --foreground: 0 0% 3.9%;              /* Deep black #0A0A0A */
     
     /* Card colors - Subtle elevation */
