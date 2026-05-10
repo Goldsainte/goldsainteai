@@ -47,7 +47,7 @@ export function CreatorSocialCards({ accounts }: Props) {
         <div className="mb-5 flex items-center gap-3">
           <Users className="h-4 w-4 text-[#C7A962]" />
           <p className="text-sm text-[#6B7280]">
-            Total reach: <span className="font-semibold text-[#0a2225]">{formatFollowers(totalReach)}+</span> followers
+            Combined social audience: <span className="font-semibold text-[#0a2225]">{formatFollowers(totalReach)}+</span> followers across platforms
           </p>
         </div>
       )}
