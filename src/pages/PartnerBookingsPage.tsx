@@ -4,6 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { MapPin, HandCoins, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 type BookingRow = {
   id: string;
@@ -116,7 +118,17 @@ export default function PartnerBookingsPage() {
             ) : (
               <div className="space-y-3">
                 {bookings.map((b) => (
-                  <PartnerBookingRowCard key={b.id} booking={b} />
+                  <PartnerBookingRowCard
+                    key={b.id}
+                    booking={b}
+                    onStatusChange={(id, status) => {
+                      setBookings((prev) =>
+                        prev.map((row) =>
+                          row.id === id ? { ...row, status } : row
+                        )
+                      );
+                    }}
+                  />
                 ))}
               </div>
             )}
@@ -127,10 +139,38 @@ export default function PartnerBookingsPage() {
   );
 }
 
-function PartnerBookingRowCard({ booking }: { booking: BookingRow }) {
+function PartnerBookingRowCard({
+  booking,
+  onStatusChange,
+}: {
+  booking: BookingRow;
+  onStatusChange?: (id: string, status: string) => void;
+}) {
   const trip = booking.trip_requests;
   const travelers =
     (trip?.travelers_adults || 0) + (trip?.travelers_children || 0);
+  const [releasing, setReleasing] = useState(false);
+
+  const handleRelease = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!confirm("Release the deposit and mark this trip as completed?")) return;
+    setReleasing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "release-trip-deposit",
+        { body: { tripBookingId: booking.id } }
+      );
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      onStatusChange?.(booking.id, "completed");
+      toast.success("Deposit released. Booking completed.");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to release deposit");
+    } finally {
+      setReleasing(false);
+    }
+  };
 
   const total =
     booking.total_price != null
@@ -187,6 +227,19 @@ function PartnerBookingRowCard({ booking }: { booking: BookingRow }) {
           </span>
         </div>
       </div>
+
+      {booking.status === "confirmed" && (
+        <div className="mt-1 flex justify-end">
+          <Button
+            size="sm"
+            onClick={handleRelease}
+            disabled={releasing}
+            className="bg-[#0c4d47] hover:bg-[#0c4d47]/90 text-white text-xs"
+          >
+            {releasing ? "Releasing…" : "Release Deposit"}
+          </Button>
+        </div>
+      )}
     </Link>
   );
 }

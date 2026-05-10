@@ -108,6 +108,8 @@ async function handleCheckoutCompleted(session: any) {
       .from('trip_bookings')
       .update({ status: 'confirmed', updated_at: new Date().toISOString() })
       .eq('id', metadata.trip_booking_id);
+
+    await notifyAndEmailOnBookingConfirmed(metadata.trip_booking_id, session);
     return;
   } else if (metadata.type === 'package_booking') {
     await supabaseClient.from('package_bookings').insert({
@@ -331,4 +333,79 @@ async function handleAccountUpdated(account: any) {
       stripe_onboarding_complete: account.details_submitted,
     })
     .eq('stripe_account_id', account.id);
+}
+
+async function notifyAndEmailOnBookingConfirmed(tripBookingId: string, session: any) {
+  try {
+    const { data: bookingData } = await supabaseClient
+      .from('trip_bookings')
+      .select('partner_id, traveler_id, total_price, currency')
+      .eq('id', tripBookingId)
+      .single();
+
+    if (!bookingData) return;
+
+    // 1. Partner notification
+    if (bookingData.partner_id) {
+      await supabaseClient.from('notifications').insert({
+        user_id: bookingData.partner_id,
+        type: 'booking_confirmed',
+        title: 'New booking confirmed',
+        message: 'A traveler has paid the deposit for your trip. Check your bookings dashboard.',
+        entity_type: 'trip_booking',
+        entity_id: tripBookingId,
+        action_url: '/partner-bookings',
+        action_label: 'View booking',
+      });
+    }
+
+    // 2. Traveler confirmation email (inline via Resend to keep dependency-free)
+    const resendApiKey = Deno.env.get('RESEND_API_KEY');
+    if (!resendApiKey) {
+      console.log('RESEND_API_KEY not configured, skipping booking confirmation email');
+      return;
+    }
+
+    // Look up traveler email via auth admin
+    const { data: travelerUser } = await supabaseClient.auth.admin.getUserById(
+      bookingData.traveler_id
+    );
+    const travelerEmail = travelerUser?.user?.email;
+    if (!travelerEmail) {
+      console.log('No email for traveler', bookingData.traveler_id);
+      return;
+    }
+
+    const amountFmt = ((session.amount_total ?? 0) / 100).toFixed(2);
+    const currency = (session.currency || bookingData.currency || 'usd').toUpperCase();
+
+    const html = `
+      <div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;background:#f7f3ea;color:#0a2225;padding:32px;">
+        <h1 style="font-size:24px;margin:0 0 16px 0;">Your Goldsainte booking is confirmed</h1>
+        <p>Thank you — your deposit of <strong>${currency} ${amountFmt}</strong> has been received.</p>
+        <p>Booking reference: <code>${tripBookingId}</code></p>
+        <p>Your specialist will be in touch shortly to finalise your trip details.</p>
+        <p style="margin-top:32px;font-size:12px;color:#7A7151;">© ${new Date().getFullYear()} Goldsainte</p>
+      </div>
+    `;
+
+    const resp = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${resendApiKey}`,
+      },
+      body: JSON.stringify({
+        from: 'Goldsainte <booking@goldsainte.com>',
+        to: [travelerEmail],
+        subject: 'Your Goldsainte booking is confirmed',
+        html,
+      }),
+    });
+    if (!resp.ok) {
+      console.error('Booking confirmation email failed', await resp.text());
+    }
+  } catch (e) {
+    console.error('notifyAndEmailOnBookingConfirmed error', e);
+  }
 }

@@ -4164,6 +4164,8 @@ export type Database = {
           id: string
           is_deleted: boolean | null
           is_read: boolean | null
+          message_type: string
+          metadata: Json
           read_at: string | null
           sender_id: string
         }
@@ -4178,6 +4180,8 @@ export type Database = {
           id?: string
           is_deleted?: boolean | null
           is_read?: boolean | null
+          message_type?: string
+          metadata?: Json
           read_at?: string | null
           sender_id: string
         }
@@ -4192,6 +4196,8 @@ export type Database = {
           id?: string
           is_deleted?: boolean | null
           is_read?: boolean | null
+          message_type?: string
+          metadata?: Json
           read_at?: string | null
           sender_id?: string
         }
@@ -10695,13 +10701,16 @@ export type Database = {
         Row: {
           created_at: string
           currency: string
+          deposit_amount: number | null
+          deposit_percentage: number | null
           id: string
           metadata: Json | null
-          partner_id: string
+          partner_id: string | null
           partner_payout: number
           partner_role: string
           payment_client_secret: string | null
           payment_url: string | null
+          payout_paid_at: string | null
           platform_commission: number
           proposal_id: string | null
           status: string
@@ -10716,13 +10725,16 @@ export type Database = {
         Insert: {
           created_at?: string
           currency?: string
+          deposit_amount?: number | null
+          deposit_percentage?: number | null
           id?: string
           metadata?: Json | null
-          partner_id: string
+          partner_id?: string | null
           partner_payout?: number
           partner_role: string
           payment_client_secret?: string | null
           payment_url?: string | null
+          payout_paid_at?: string | null
           platform_commission?: number
           proposal_id?: string | null
           status?: string
@@ -10737,13 +10749,16 @@ export type Database = {
         Update: {
           created_at?: string
           currency?: string
+          deposit_amount?: number | null
+          deposit_percentage?: number | null
           id?: string
           metadata?: Json | null
-          partner_id?: string
+          partner_id?: string | null
           partner_payout?: number
           partner_role?: string
           payment_client_secret?: string | null
           payment_url?: string | null
+          payout_paid_at?: string | null
           platform_commission?: number
           proposal_id?: string | null
           status?: string
