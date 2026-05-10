@@ -218,7 +218,7 @@ function statusChipClass(status: string) {
   const base = "rounded-full px-2 py-0.5 text-[10px] font-semibold";
   switch (status) {
     case "pending":
-      return `${base} bg-yellow-500/10 text-yellow-700 dark:text-yellow-400`;
+      return `${base} bg-[#C7A962]/10 text-[#C7A962] dark:text-yellow-400`;
     case "accepted":
     case "live":
       return `${base} bg-green-500/10 text-green-700 dark:text-green-400`;

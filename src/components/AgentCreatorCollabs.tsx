@@ -161,10 +161,10 @@ export function AgentCreatorCollabs({ collabRequests, agentId, onRefresh }: Agen
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'pending': return 'bg-[#FDF9F0] text-[#C7A962] border-[#C7A962]/30';
       case 'accepted': return 'bg-green-100 text-green-800 border-green-200';
       case 'rejected': return 'bg-red-100 text-red-800 border-red-200';
-      case 'live': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'live': return 'bg-[#F0F7F6] text-[#0c4d47] border-[#0c4d47]/20';
       case 'completed': return 'bg-purple-100 text-purple-800 border-purple-200';
       default: return 'bg-muted text-muted-foreground';
     }
@@ -209,8 +209,8 @@ export function AgentCreatorCollabs({ collabRequests, agentId, onRefresh }: Agen
                   <p className="text-sm text-muted-foreground">Pending</p>
                   <p className="text-3xl font-bold mt-1">{stats.pendingDeals}</p>
                 </div>
-                <div className="h-12 w-12 rounded-full bg-yellow-500/10 flex items-center justify-center">
-                  <Users className="h-6 w-6 text-yellow-500" />
+                <div className="h-12 w-12 rounded-full bg-[#C7A962]/10 flex items-center justify-center">
+                  <Users className="h-6 w-6 text-[#C7A962]" />
                 </div>
               </div>
             </CardContent>
@@ -237,8 +237,8 @@ export function AgentCreatorCollabs({ collabRequests, agentId, onRefresh }: Agen
                   <p className="text-sm text-muted-foreground">Revenue</p>
                   <p className="text-3xl font-bold mt-1">${stats.totalRevenue.toFixed(0)}</p>
                 </div>
-                <div className="h-12 w-12 rounded-full bg-blue-500/10 flex items-center justify-center">
-                  <DollarSign className="h-6 w-6 text-blue-500" />
+                <div className="h-12 w-12 rounded-full bg-[#0c4d47]/10 flex items-center justify-center">
+                  <DollarSign className="h-6 w-6 text-[#0c4d47]" />
                 </div>
               </div>
             </CardContent>

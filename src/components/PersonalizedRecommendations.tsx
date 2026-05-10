@@ -76,7 +76,7 @@ export const PersonalizedRecommendations = () => {
     const colors: Record<string, string> = {
       adventure: 'bg-orange-500',
       culture: 'bg-purple-500',
-      relaxation: 'bg-blue-500',
+      relaxation: 'bg-[#0c4d47]',
       food: 'bg-green-500',
       nightlife: 'bg-pink-500',
       nature: 'bg-emerald-500'

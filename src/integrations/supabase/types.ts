@@ -7063,6 +7063,7 @@ export type Database = {
           id: string
           image_gallery: Json | null
           included: Json | null
+          instant_booking: boolean
           is_featured: boolean | null
           is_verified: boolean | null
           languages: string[] | null
@@ -7124,6 +7125,7 @@ export type Database = {
           id?: string
           image_gallery?: Json | null
           included?: Json | null
+          instant_booking?: boolean
           is_featured?: boolean | null
           is_verified?: boolean | null
           languages?: string[] | null
@@ -7185,6 +7187,7 @@ export type Database = {
           id?: string
           image_gallery?: Json | null
           included?: Json | null
+          instant_booking?: boolean
           is_featured?: boolean | null
           is_verified?: boolean | null
           languages?: string[] | null

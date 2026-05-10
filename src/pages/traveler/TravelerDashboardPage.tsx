@@ -159,7 +159,25 @@ export default function TravelerDashboardPage() {
             <p className="text-sm text-[#6B7280]">Loading your dashboard...</p>
           </div>
         ) : (
-          /* Tabbed Navigation */
+          <>
+          {/* AI Trip Planner CTA */}
+          <div className="mb-6 flex items-start gap-4 rounded-2xl border border-[#C7A962]/30 bg-[#FDF9F0] p-5 md:items-center md:flex-row flex-col">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <Sparkles className="h-4 w-4 text-[#C7A962]" />
+                <span className="text-xs uppercase tracking-wider text-[#C7A962] font-medium">AI Trip Planner</span>
+              </div>
+              <h3 className="font-secondary text-xl text-[#0a2225]">Plan a trip with AI</h3>
+              <p className="text-sm text-[#6B7280] mt-1">Tell us where you want to go and we'll build a day-by-day itinerary in seconds.</p>
+            </div>
+            <button
+              onClick={() => navigate('/post-trip')}
+              className="flex-shrink-0 rounded-full bg-[#C7A962] hover:bg-[#b89852] text-white text-sm px-5 py-2.5"
+            >
+              Start Planning
+            </button>
+          </div>
+          {/* Tabbed Navigation */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
             {/* Mobile: Dropdown Select */}
             {isMobile ? (
@@ -266,6 +284,7 @@ export default function TravelerDashboardPage() {
               {user && <TravelerSettingsTab userId={user.id} />}
             </TabsContent>
           </Tabs>
+          </>
         )}
       </div>
     </main>

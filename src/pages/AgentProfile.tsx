@@ -156,7 +156,7 @@ export default function AgentProfile() {
 
                   <div className="space-y-3 mb-4">
                     <div className="flex items-center gap-2">
-                      <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                      <Star className="h-5 w-5 fill-[#C7A962] text-[#C7A962]" />
                       <span className="text-2xl font-bold">{agent.rating?.toFixed(1) || "N/A"}</span>
                       <span className="text-muted-foreground">({agent.total_reviews || 0} reviews)</span>
                     </div>
@@ -357,7 +357,7 @@ export default function AgentProfile() {
                                 key={i}
                                 className={`h-4 w-4 ${
                                   i < review.rating
-                                    ? 'fill-yellow-400 text-yellow-400'
+                                    ? 'fill-[#C7A962] text-[#C7A962]'
                                     : 'text-gray-300'
                                 }`}
                               />

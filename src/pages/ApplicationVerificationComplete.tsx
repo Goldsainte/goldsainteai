@@ -92,7 +92,7 @@ export default function ApplicationVerificationComplete() {
             <CardTitle className="flex items-center gap-3">
               {status === 'pending' && (
                 <>
-                  <Clock className="h-6 w-6 text-yellow-500 animate-pulse" />
+                  <Clock className="h-6 w-6 text-[#C7A962] animate-pulse" />
                   Processing...
                 </>
               )}

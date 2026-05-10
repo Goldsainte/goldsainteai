@@ -356,13 +356,13 @@ export default function AgentDashboard() {
         </div>
 
         {!agent.is_verified && (
-          <Card className="mb-6 border-yellow-200 bg-yellow-50">
+          <Card className="mb-6 border-[#C7A962]/30 bg-[#FDF9F0]">
             <CardContent className="py-6">
               <div className="flex items-start gap-4">
-                <Clock className="h-6 w-6 text-yellow-600 mt-1" />
+                <Clock className="h-6 w-6 text-[#C7A962] mt-1" />
                 <div>
-                  <h3 className="font-semibold text-yellow-900 mb-1">Application Under Review</h3>
-                  <p className="text-sm text-yellow-800">
+                  <h3 className="font-semibold text-[#0a2225] mb-1">Application Under Review</h3>
+                  <p className="text-sm text-[#5c5c52]">
                     Your agent application is currently being reviewed by our admin team. 
                     You'll be able to access the marketplace and place bids once your application is approved. 
                     This typically takes 2-3 business days.

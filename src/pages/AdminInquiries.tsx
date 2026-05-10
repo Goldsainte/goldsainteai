@@ -183,8 +183,8 @@ export default function AdminInquiries() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return 'bg-yellow-500';
-      case 'contacted': return 'bg-blue-500';
+      case 'pending': return 'bg-[#C7A962]';
+      case 'contacted': return 'bg-[#0c4d47]';
       case 'converted': return 'bg-green-500';
       case 'closed': return 'bg-gray-500';
       default: return 'bg-gray-500';
@@ -216,7 +216,7 @@ export default function AdminInquiries() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-8 mt-20">
-        <h1 className="text-4xl font-serif font-bold mb-8 font-secondary">Admin Dashboard</h1>
+        <h1 className="font-secondary text-4xl text-[#0a2225] mb-8">Admin Dashboard</h1>
 
         <Tabs defaultValue="inquiries" className="space-y-4">
           <TabsList>
