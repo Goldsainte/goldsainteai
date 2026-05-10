@@ -363,6 +363,38 @@ export default function TrovaTripDetailPage() {
               </section>
             )}
 
+            {(trip.passport_required || trip.visa_required || trip.vaccination_required || trip.fitness_level_required) && (
+              <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6 space-y-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7A7151]">Travel Requirements</p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {trip.passport_required && (
+                    <div className="flex items-center gap-2 text-sm text-[#0a2225]">
+                      <span className="h-2 w-2 rounded-full bg-[#C7A962]" />
+                      Passport required
+                    </div>
+                  )}
+                  {trip.visa_required && (
+                    <div className="flex items-center gap-2 text-sm text-[#0a2225]">
+                      <span className="h-2 w-2 rounded-full bg-[#C7A962]" />
+                      Visa required
+                    </div>
+                  )}
+                  {trip.vaccination_required && (
+                    <div className="flex items-center gap-2 text-sm text-[#0a2225]">
+                      <span className="h-2 w-2 rounded-full bg-[#C7A962]" />
+                      Vaccination required
+                    </div>
+                  )}
+                </div>
+                {trip.fitness_level_required && (
+                  <div>
+                    <p className="text-xs text-[#9A9384] mb-1">Fitness requirement</p>
+                    <p className="text-sm text-[#0a2225]">{trip.fitness_level_required}</p>
+                  </div>
+                )}
+              </section>
+            )}
+
             {itineraryDays.length > 0 && (
               <TripItineraryAccordion days={itineraryDays} totalNights={durationNights} />
             )}
@@ -396,6 +428,13 @@ export default function TrovaTripDetailPage() {
               </section>
             ) : (
               <TripCancellationPolicySection />
+            )}
+
+            {trip.terms_conditions && (
+              <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7A7151] mb-4">Terms & Conditions</p>
+                <p className="text-sm text-[#5c5c52] leading-relaxed whitespace-pre-wrap">{trip.terms_conditions}</p>
+              </section>
             )}
 
             <TripTrustBadges />
