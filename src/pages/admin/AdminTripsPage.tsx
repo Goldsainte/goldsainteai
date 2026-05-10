@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { ImageIcon, Loader2, Save } from "lucide-react";
+import { ImageIcon, Loader2, Save, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
 type Trip = {
   id: string;
@@ -20,6 +22,8 @@ export default function AdminTripsPage() {
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [savingId, setSavingId] = useState<string | null>(null);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [approvingId, setApprovingId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -41,6 +45,23 @@ export default function AdminTripsPage() {
       cancelled = true;
     };
   }, []);
+
+  const approveTrip = async (trip: Trip) => {
+    setApprovingId(trip.id);
+    const { error } = await supabase
+      .from("packaged_trips")
+      .update({ status: "published", published_at: new Date().toISOString() })
+      .eq("id", trip.id);
+    setApprovingId(null);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setTrips((prev) => prev.map((t) => (t.id === trip.id ? { ...t, status: "published" } : t)));
+    toast.success("Trip approved and published");
+  };
+
+  const visibleTrips = statusFilter === "all" ? trips : trips.filter((t) => (t.status || "draft") === statusFilter);
 
   const updateDraft = (id: string, url: string) =>
     setDrafts((prev) => ({ ...prev, [id]: url }));
@@ -124,14 +145,31 @@ export default function AdminTripsPage() {
             </p>
           </header>
 
+          <div className="flex items-center gap-3">
+            <span className="text-xs uppercase tracking-wider text-[#6B7280]">Filter by status</span>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[200px] h-9 rounded-full border-[#E5DFC6] bg-white text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-white border-[#E5DFC6] rounded-xl">
+                <SelectItem value="all">All statuses</SelectItem>
+                <SelectItem value="pending_review">Pending Review</SelectItem>
+                <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="published">Published</SelectItem>
+                <SelectItem value="archived">Archived</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {loading ? (
             <p className="text-sm text-[#4a4a4a]">Loading trips…</p>
-          ) : trips.length === 0 ? (
+          ) : visibleTrips.length === 0 ? (
             <p className="text-sm text-[#4a4a4a]">No trips found.</p>
           ) : (
             <ul className="space-y-4">
-              {trips.map((trip) => {
+              {visibleTrips.map((trip) => {
                 const draft = drafts[trip.id] ?? trip.cover_image_url ?? "";
+                const status = trip.status || "draft";
                 return (
                   <li
                     key={trip.id}
@@ -152,11 +190,33 @@ export default function AdminTripsPage() {
                     </div>
                     <div className="flex-1 space-y-2">
                       <div>
-                        <p className="text-sm font-semibold">{trip.title || "Untitled trip"}</p>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="text-sm font-semibold">{trip.title || "Untitled trip"}</p>
+                          {status === "pending_review" && (
+                            <Badge className="bg-[#C7A962]/20 text-[#7a5e1f] border border-[#C7A962]/40 rounded-full text-[10px] uppercase tracking-wider">
+                              Pending Review
+                            </Badge>
+                          )}
+                        </div>
                         <p className="text-xs text-[#8D8D8D]">
-                          {trip.destination || "—"} · {trip.status || "draft"}
+                          {trip.destination || "—"} · {status}
                         </p>
                       </div>
+                      {status === "pending_review" && (
+                        <Button
+                          onClick={() => approveTrip(trip)}
+                          disabled={approvingId === trip.id}
+                          size="sm"
+                          className="bg-[#0c4d47] text-white hover:bg-[#0a3d38] rounded-full"
+                        >
+                          {approvingId === trip.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <CheckCircle2 className="h-4 w-4 mr-2" />
+                          )}
+                          Approve & Publish
+                        </Button>
+                      )}
                       <div className="flex flex-col gap-2 md:flex-row">
                         <div
                           className="h-[100px] w-[160px] flex-shrink-0 overflow-hidden rounded-xl border border-[#E5DFC6] bg-[#F6F0E4]"
