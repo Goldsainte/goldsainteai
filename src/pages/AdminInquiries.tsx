@@ -216,7 +216,7 @@ export default function AdminInquiries() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-8 mt-20">
-        <h1 className="text-4xl font-serif font-bold mb-8 font-secondary">Admin Dashboard</h1>
+        <h1 className="font-secondary text-4xl text-[#0a2225] mb-8">Admin Dashboard</h1>
 
         <Tabs defaultValue="inquiries" className="space-y-4">
           <TabsList>
