@@ -45,6 +45,7 @@ export default function AgentPublicProfilePage() {
   const [details, setDetails] = useState<AgentDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
+  const [completedBookings, setCompletedBookings] = useState<number>(0);
 
   useEffect(() => {
     if (!id) return;
@@ -67,6 +68,12 @@ export default function AgentPublicProfilePage() {
       ]);
       setAgent(profileRes.data as AgentProfile | null);
       setDetails(agentRes.data as AgentDetails | null);
+      const { count } = await supabase
+        .from("trip_bookings")
+        .select("*", { count: "exact", head: true })
+        .eq("partner_id", id)
+        .eq("status", "completed");
+      setCompletedBookings(count || 0);
       setLoading(false);
     })();
   }, [id]);
@@ -193,6 +200,11 @@ export default function AgentPublicProfilePage() {
                     <span className="font-medium text-[#0a2225]">{details.experience_years}</span> years experience
                   </p>
                 ) : null}
+                {completedBookings > 0 && (
+                  <p className="text-sm text-[#6B7280] mt-1">
+                    <span className="font-medium text-[#0a2225]">{completedBookings}</span> trip{completedBookings === 1 ? "" : "s"} completed on Goldsainte
+                  </p>
+                )}
               </section>
 
               {/* Specialties */}
@@ -299,7 +311,7 @@ export default function AgentPublicProfilePage() {
                 responseTimeHours={details?.response_time_hours ?? null}
                 lastActiveAt={agent.last_active_at ?? null}
                 onRequestTrip={() =>
-                  navigate(`/post-trip?agentId=${agent.id}`)
+                  navigate(`/post-trip?agentId=${agent.id}&agentName=${encodeURIComponent(displayName)}`)
                 }
               />
             </div>

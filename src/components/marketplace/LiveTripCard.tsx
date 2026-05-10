@@ -143,7 +143,7 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
       className="group cursor-pointer space-y-2.5"
     >
       {/* Image with optional editorial signal pill */}
-      <div className="relative aspect-[4/3] overflow-hidden rounded-xl md:rounded-2xl">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
         {trip.cover_image_url ? (
           <img
             src={trip.cover_image_url}

@@ -171,7 +171,7 @@ export function BrandGrid({ brands }: BrandGridProps) {
         </div>
 
         {/* Brand Type Accordion Filter */}
-        <div className="rounded-xl border border-[#E5DFC6] bg-white overflow-hidden">
+        <div className="rounded-2xl border border-[#E5DFC6] bg-white overflow-hidden">
           <button
             type="button"
             onClick={() => setIsTypeFilterOpen(!isTypeFilterOpen)}
