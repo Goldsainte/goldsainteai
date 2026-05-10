@@ -226,7 +226,7 @@ export function TripBookingSidebar({
         <Button
           onClick={handleRequestToBook}
           disabled={isLoading}
-          className="w-full bg-[#0C4D47] py-6 text-base font-semibold hover:bg-[#0C4D47]/90"
+          className="w-full rounded-full bg-[#0C4D47] py-6 text-base font-semibold hover:bg-[#0C4D47]/90"
         >
           {isLoading ? "Sending..." : (instantBooking ? "Book Instantly" : "Reserve with Deposit")}
         </Button>
@@ -234,7 +234,7 @@ export function TripBookingSidebar({
           variant="outline"
           onClick={handleAskQuestion}
           disabled={isAskLoading}
-          className="w-full border-[#E5DFC6] py-6 text-base hover:bg-[#FDF9F0]"
+          className="w-full rounded-full border-[#E5DFC6] py-6 text-base hover:bg-[#FDF9F0]"
         >
           <MessageCircle className="mr-2 h-4 w-4" />
           {isAskLoading ? "Opening..." : "Ask a Question"}

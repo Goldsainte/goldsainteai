@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ReviewsList } from "@/components/profile/ReviewsList";
 import { WriteReviewModal } from "@/components/profile/WriteReviewModal";
 import { CreatorHeroSection } from "@/components/creator/CreatorHeroSection";
-import { CreatorStorefrontFeed, type PinItem, type BoardSummary } from "@/components/creator/CreatorStorefrontFeed";
+import type { PinItem, BoardSummary } from "@/components/creator/CreatorStorefrontFeed";
 import { CreatorServicesSection } from "@/components/creator/CreatorServicesSection";
 import { CreatorAboutSection } from "@/components/creator/CreatorAboutSection";
 import { Button } from "@/components/ui/button";
@@ -82,14 +82,14 @@ export default function CreatorPublicProfilePage() {
   const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
   const [avgRating, setAvgRating] = useState<number | null>(null);
   const [reviewCount, setReviewCount] = useState<number>(0);
-  const [creatorStoryboards, setCreatorStoryboards] = useState<BoardSummary[]>([]);
-  const [pinItems, setPinItems] = useState<PinItem[]>([]);
+  const [creatorStoryboards] = useState<BoardSummary[]>([]);
+  const [pinItems] = useState<PinItem[]>([]);
   const [guides, setGuides] = useState<Array<{ id: string; title: string; destination: string; duration_days: number; price: number; currency: string; cover_image_url: string | null }>>([]);
 
   useEffect(() => {
     if (!id) return;
     (async () => {
-      const [profileRes, creatorProfileRes, reviewsRes, storyboardsRes] = await Promise.all([
+      const [profileRes, creatorProfileRes, reviewsRes] = await Promise.all([
         supabase
           .from("profiles")
           .select(
@@ -108,50 +108,10 @@ export default function CreatorPublicProfilePage() {
           .from("profile_reviews")
           .select("rating")
           .eq("reviewee_id", id),
-        (() => {
-          let q = supabase
-            .from("storyboards")
-            .select("id, title, destination, is_public, storyboard_items(id, image_url, title, subtitle, position)")
-            .eq("owner_id", id)
-            .order("updated_at", { ascending: false });
-          if (!user || user.id !== id) {
-            q = q.eq("is_public", true);
-          }
-          return q;
-        })(),
       ]);
 
       setCreator(profileRes.data as CreatorProfile | null);
       setCreatorData(creatorProfileRes.data as CreatorProfileData | null);
-
-      const boards = (storyboardsRes.data || []) as any[];
-      setCreatorStoryboards(
-        boards.map((sb) => ({
-          id: sb.id,
-          title: sb.title,
-          destination: sb.destination,
-          is_public: sb.is_public ?? true,
-        }))
-      );
-
-      // Flatten all items into pins
-      const allPins: PinItem[] = [];
-      for (const sb of boards) {
-        for (const item of sb.storyboard_items || []) {
-          if (item.image_url) {
-            allPins.push({
-              id: item.id,
-              image_url: item.image_url,
-              title: item.title,
-              subtitle: item.subtitle,
-              storyboard_id: sb.id,
-              storyboard_title: sb.title,
-              storyboard_destination: sb.destination,
-            });
-          }
-        }
-      }
-      setPinItems(allPins);
 
       const reviews = reviewsRes.data;
       if (reviews && reviews.length > 0) {
@@ -294,23 +254,6 @@ export default function CreatorPublicProfilePage() {
 
         {/* Spacer after hero card overlap */}
         <div className="h-8 md:h-12" />
-
-        {/* ─── 2. STORYBOARDS — Desire Layer (Pinterest) ─── */}
-        {(pinItems.length > 0 || isOwnProfile) && (
-          <div className="bg-white">
-            <div className="mx-auto max-w-5xl px-4 py-16 md:py-20">
-              <SectionLabel>Travel Collections</SectionLabel>
-              <CreatorStorefrontFeed
-                items={pinItems}
-                storyboards={creatorStoryboards}
-                creatorId={creator.id}
-                isOwnProfile={isOwnProfile}
-                onCreateNew={() => navigate("/storyboards/new")}
-                onBoardDeleted={() => setReviewRefreshKey((k) => k + 1)}
-              />
-            </div>
-          </div>
-        )}
 
         {/* ─── Itinerary Guides ─── */}
         {guides.length > 0 && (

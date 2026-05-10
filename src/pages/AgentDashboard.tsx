@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Briefcase, MapPin, DollarSign, Clock, MessageSquare, CheckCircle, Sparkles, Shield, Plus } from "lucide-react";
+import { Briefcase, MapPin, DollarSign, Clock, MessageSquare, CheckCircle, Sparkles, Shield, Plus, Hourglass } from "lucide-react";
 import { toast } from "sonner";
 import { JobMessaging } from "@/components/JobMessaging";
 import { StripeConnectOnboarding } from "@/components/StripeConnectOnboarding";
@@ -54,6 +54,8 @@ export default function AgentDashboard() {
   });
   const [selectedBidForDetails, setSelectedBidForDetails] = useState<any>(null);
   const [bidDetailsOpen, setBidDetailsOpen] = useState(false);
+  const [pendingTripsCount, setPendingTripsCount] = useState(0);
+  const [publishedTripsCount, setPublishedTripsCount] = useState(0);
 
   useEffect(() => {
     if (authLoading || roleLoading) return;
@@ -194,6 +196,24 @@ export default function AgentDashboard() {
 
       if (collabsError) throw collabsError;
       setCollabRequests(collabsData || []);
+
+      // Fetch agent trip status counts (use auth user id as agent_id on packaged_trips)
+      if (user?.id) {
+        const [{ count: pCount }, { count: pubCount }] = await Promise.all([
+          supabase
+            .from("packaged_trips")
+            .select("*", { count: "exact", head: true })
+            .eq("agent_id", user.id)
+            .eq("status", "pending_review"),
+          supabase
+            .from("packaged_trips")
+            .select("*", { count: "exact", head: true })
+            .eq("agent_id", user.id)
+            .eq("status", "published"),
+        ]);
+        setPendingTripsCount(pCount || 0);
+        setPublishedTripsCount(pubCount || 0);
+      }
 
     } catch (error: any) {
       console.error('Error fetching data:', error);
@@ -374,6 +394,20 @@ export default function AgentDashboard() {
         )}
 
         <StripeConnectOnboarding />
+
+        {pendingTripsCount > 0 && publishedTripsCount === 0 && (
+          <div className="mb-6 rounded-2xl border border-[#C7A962]/40 bg-[#FDF9F0] px-6 py-5 flex items-start gap-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#C7A962]/15 flex-shrink-0">
+              <Hourglass className="h-5 w-5 text-[#C7A962]" />
+            </div>
+            <div>
+              <h3 className="font-secondary text-lg text-[#0a2225]">Your listing is under review</h3>
+              <p className="text-sm text-[#6B7280] mt-1">
+                We typically approve new listings within 24–48 hours. You'll receive an email when it's live.
+              </p>
+            </div>
+          </div>
+        )}
 
         <Tabs defaultValue="available" className="space-y-6">
           <TabsList>

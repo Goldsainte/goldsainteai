@@ -849,7 +849,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
               <SectionHeader title="Cancellation policy" />
               <button type="button"
                 onClick={() => updateField("cancellation_policy",
-                  CANCELLATION_TEMPLATE.replace("{deposit_percentage}", formData.deposit_percentage || "30"))}
+                  CANCELLATION_TEMPLATE.replace(/\{deposit_percentage\}/g, formData.deposit_percentage || "25"))}
                 className="text-xs text-[#0c4d47] underline">Use template</button>
               <Textarea value={formData.cancellation_policy}
                 onChange={(e) => updateField("cancellation_policy", e.target.value)}

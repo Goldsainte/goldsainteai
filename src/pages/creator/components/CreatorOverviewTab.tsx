@@ -124,16 +124,32 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
             </div>
           ) : stats.recentProposals.length === 0 ? (
             <div className="p-12 text-center">
-              <h3 className="font-secondary text-xl text-[#0a2225]">No proposals yet</h3>
-              <p className="text-sm text-[#6B7280] mt-2 max-w-sm mx-auto">
-                Browse open trip requests in the marketplace and submit your first bid.
+              <h3 className="font-secondary text-xl text-[#0a2225]">Your creator journey starts here</h3>
+              <p className="text-sm text-[#6B7280] mt-2 max-w-md mx-auto">
+                Post your first trip package or create a digital itinerary guide to start earning.
               </p>
-              <Link
-                to="/marketplace"
-                className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0a2225]/90 transition-colors mt-4"
-              >
-                Browse Trip Requests
-              </Link>
+              <div className="flex flex-wrap justify-center gap-3 mt-5">
+                <Link
+                  to="/trip-builder"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-white px-5 py-2.5 text-sm font-medium hover:bg-[#0a3d39] transition-colors"
+                >
+                  <Plus className="h-4 w-4" /> Create a Trip
+                </Link>
+                <Link
+                  to="/itinerary-builder"
+                  className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-white text-[#0a2225] px-5 py-2.5 text-sm font-medium hover:bg-[#FDF9F0] transition-colors"
+                >
+                  <BookOpen className="h-4 w-4" /> Sell a Guide
+                </Link>
+                {stats.openTripRequests > 0 && (
+                  <Link
+                    to="/marketplace"
+                    className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0a2225]/90 transition-colors"
+                  >
+                    <Search className="h-4 w-4" /> Browse Trip Requests
+                  </Link>
+                )}
+              </div>
             </div>
           ) : (
             stats.recentProposals.map((proposal) => (

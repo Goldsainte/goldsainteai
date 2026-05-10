@@ -112,8 +112,12 @@ export default function PartnerBookingsPage() {
                 ))}
               </div>
             ) : bookings.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-[#E5DFC6] bg-white/70 px-4 py-8 text-center text-sm text-[#6B7280]">
-                You don't have any active bookings yet.
+              <div className="rounded-3xl border border-dashed border-[#E5DFC6] bg-white/70 px-6 py-12 text-center">
+                <MapPin className="h-8 w-8 text-[#C7A962] mx-auto mb-3" />
+                <h3 className="font-secondary text-xl text-[#0a2225] mb-1">No bookings yet</h3>
+                <p className="text-sm text-[#6B7280]">
+                  When travelers book your trips, they'll appear here.
+                </p>
               </div>
             ) : (
               <div className="space-y-3">
