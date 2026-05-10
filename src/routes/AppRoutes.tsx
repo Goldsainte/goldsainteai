@@ -34,6 +34,7 @@ const AdminTripsPage = lazy(() => import('@/pages/admin/AdminTripsPage'));
 const AdminWaitlistPage = lazy(() => import('@/pages/admin/AdminWaitlistPage'));
 
 const OpsEscrowDashboardPage = lazy(() => import('@/pages/OpsEscrowDashboardPage'));
+const SeedCreators = lazy(() => import('@/pages/admin/SeedCreators'));
 const AgentPublicProfilePage = lazy(() => import('@/pages/agents/AgentPublicProfilePage'));
 const CreatorPublicProfilePage = lazy(() => import('@/pages/creators/CreatorPublicProfilePage'));
 const TravelProfileRedirect = lazy(() => import('@/pages/redirects/TravelProfileRedirectPage'));
