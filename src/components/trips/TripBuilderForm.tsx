@@ -7,11 +7,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Save, Send, Plus, X, ImagePlus, Loader2, Shuffle } from "lucide-react";
+import { Save, Send, Plus, X, ImagePlus, Loader2, Shuffle, CalendarIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrayFieldEditor } from "./ArrayFieldEditor";
 import { TripImageUploader } from "./TripImageUploader";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface TripBuilderFormProps {
   initialData?: any;
@@ -29,6 +35,21 @@ const ACTIVITY_LEVELS = ["Easy", "Moderate", "Active", "Challenging"];
 
 const CURRENCIES = ["USD", "EUR", "GBP", "AUD", "CAD"];
 
+const LANGUAGE_OPTIONS = ["English", "Spanish", "French", "German", "Italian", "Japanese", "Arabic", "Portuguese", "Mandarin", "Other"];
+const ACCOMMODATION_TYPES = ["Boutique Hotel", "Luxury Resort", "Hostel", "Camping", "Mixed", "Villa", "Cruise"];
+const MEAL_OPTIONS = ["Breakfast", "Lunch", "Dinner", "Snacks"];
+const DAY_MEAL_OPTIONS = ["Breakfast", "Lunch", "Dinner"];
+
+export type ItineraryDay = {
+  day_number: number;
+  title: string;
+  description: string;
+  activities: string[];
+  accommodation: string;
+  meals_included: string[];
+  is_featured_day: boolean;
+};
+
 // Luxury form styling classes
 const labelClasses = "text-[11px] sm:text-xs uppercase tracking-wider text-[#6B7280] font-medium";
 const inputClasses = "rounded-xl h-10 sm:h-12 text-sm sm:text-base border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20 focus:border-[#C7A962] transition-all";
@@ -38,6 +59,8 @@ const selectTriggerClasses = "rounded-xl h-10 sm:h-12 text-sm sm:text-base borde
 export function TripBuilderForm({ initialData, onSave, saving, isEditing }: TripBuilderFormProps) {
   const [suggestingCover, setSuggestingCover] = useState(false);
   const [coverSuggested, setCoverSuggested] = useState(false);
+  const [itineraryDays, setItineraryDays] = useState<ItineraryDay[]>([]);
+  const [departureMode, setDepartureMode] = useState<"flexible" | "fixed">("flexible");
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -73,6 +96,11 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
     recommended_arrival_airport: "",
     recommended_departure_airport: "",
     faqs: [] as { question: string; answer: string }[],
+    languages: [] as string[],
+    minimum_age: "",
+    accommodation_type: "",
+    meals_included: [] as string[],
+    departure_dates: [] as string[],
   });
 
   useEffect(() => {
@@ -112,9 +140,76 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
         recommended_arrival_airport: initialData.recommended_arrival_airport || "",
         recommended_departure_airport: initialData.recommended_departure_airport || "",
         faqs: initialData.faqs || [],
+        languages: initialData.languages || [],
+        minimum_age: initialData.minimum_age?.toString() || "",
+        accommodation_type: initialData.accommodation_type || "",
+        meals_included: initialData.meals_included || [],
+        departure_dates: Array.isArray(initialData.departure_dates) ? initialData.departure_dates : [],
       });
+      const incomingDeparture = Array.isArray(initialData.departure_dates) ? initialData.departure_dates : [];
+      setDepartureMode(incomingDeparture.length > 0 ? "fixed" : "flexible");
+      if (Array.isArray(initialData.itinerary_days)) {
+        setItineraryDays(initialData.itinerary_days);
+      }
     }
   }, [initialData]);
+
+  // Auto-resize itinerary days array based on duration_days
+  useEffect(() => {
+    const days = parseInt(formData.duration_days) || 0;
+    if (days <= 0) return;
+    setItineraryDays((prev) => {
+      if (prev.length === days) return prev;
+      if (prev.length < days) {
+        const additions: ItineraryDay[] = [];
+        for (let i = prev.length; i < days; i++) {
+          additions.push({
+            day_number: i + 1,
+            title: "",
+            description: "",
+            activities: [],
+            accommodation: "",
+            meals_included: [],
+            is_featured_day: false,
+          });
+        }
+        return [...prev, ...additions];
+      }
+      return prev.slice(0, days);
+    });
+  }, [formData.duration_days]);
+
+  const updateDay = (idx: number, patch: Partial<ItineraryDay>) => {
+    setItineraryDays((prev) => prev.map((d, i) => (i === idx ? { ...d, ...patch } : d)));
+  };
+
+  const toggleArrayValue = (field: "languages" | "meals_included", value: string) => {
+    setFormData((prev) => {
+      const current = prev[field] as string[];
+      const next = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
+      return { ...prev, [field]: next };
+    });
+  };
+
+  const toggleDayMeal = (idx: number, meal: string) => {
+    setItineraryDays((prev) => prev.map((d, i) => {
+      if (i !== idx) return d;
+      const has = d.meals_included.includes(meal);
+      return { ...d, meals_included: has ? d.meals_included.filter((m) => m !== meal) : [...d.meals_included, meal] };
+    }));
+  };
+
+  const addDepartureDate = (date: Date | undefined) => {
+    if (!date) return;
+    const iso = format(date, "yyyy-MM-dd");
+    setFormData((prev) => prev.departure_dates.includes(iso)
+      ? prev
+      : { ...prev, departure_dates: [...prev.departure_dates, iso].sort() });
+  };
+
+  const removeDepartureDate = (iso: string) => {
+    setFormData((prev) => ({ ...prev, departure_dates: prev.departure_dates.filter((d) => d !== iso) }));
+  };
 
   const updateField = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -186,6 +281,12 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
       recommended_arrival_airport: formData.recommended_arrival_airport || null,
       recommended_departure_airport: formData.recommended_departure_airport || null,
       faqs: formData.faqs,
+      languages: formData.languages,
+      minimum_age: formData.minimum_age ? parseInt(formData.minimum_age) : null,
+      accommodation_type: formData.accommodation_type || null,
+      meals_included: formData.meals_included,
+      departure_dates: departureMode === "fixed" ? formData.departure_dates : [],
+      itinerary_days: itineraryDays,
     };
   };
 
