@@ -130,13 +130,6 @@ export default function TrovaTripDetailPage() {
               username,
               avatar_url,
               bio
-            ),
-            agent:profiles!packaged_trips_agent_id_fkey (
-              id,
-              full_name,
-              username,
-              avatar_url,
-              bio
             )
           `);
         
@@ -151,6 +144,17 @@ export default function TrovaTripDetailPage() {
         if (tripError) throw tripError;
 
         const tripId = tripData.id;
+
+        // Fetch agent profile separately (FK may not be defined in schema cache)
+        let agentProfile = null;
+        if ((tripData as any).agent_id) {
+          const { data: agentData } = await supabase
+            .from("profiles")
+            .select("id, full_name, username, avatar_url, bio")
+            .eq("id", (tripData as any).agent_id)
+            .maybeSingle();
+          agentProfile = agentData;
+        }
 
         // Fetch activities
         const { data: activitiesData } = await supabase
@@ -172,7 +176,7 @@ export default function TrovaTripDetailPage() {
           .select("*")
           .eq("trip_id", tripId);
 
-        setTrip(tripData as unknown as TripData);
+        setTrip({ ...(tripData as any), agent: agentProfile } as unknown as TripData);
         setActivities(activitiesData || []);
         setItineraryDays(daysData || []);
         setAddons(addonsData || []);
@@ -227,7 +231,7 @@ export default function TrovaTripDetailPage() {
     : trip.max_participants;
 
   const isPlatformTrip = trip.creator_type === 'platform' && !trip.creator?.full_name;
-  const hasCreator = !!trip.creator?.full_name;
+  const hasCreator = !!(trip.creator?.full_name || trip.creator?.avatar_url);
   const host = hasCreator ? trip.creator : trip.agent;
   const hostType: "creator" | "agent" = hasCreator ? "creator" : "agent";
 

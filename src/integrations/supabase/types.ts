@@ -7272,6 +7272,20 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "packaged_trips_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "packaged_trips_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "packaged_trips_creator_id_fkey"
             columns: ["creator_id"]
             isOneToOne: false
