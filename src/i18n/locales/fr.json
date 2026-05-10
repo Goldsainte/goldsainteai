@@ -4,7 +4,33 @@
     "signup": "S'inscrire gratuitement",
     "signupShort": "S'inscrire",
     "signout": "Se déconnecter",
-    "dashboard": "Tableau de bord"
+    "dashboard": "Tableau de bord",
+    "discover": "Découvrir",
+    "browseCreators": "Parcourir les Créateurs",
+    "browseAgents": "Parcourir les Agents",
+    "marketplace": "La Collection",
+    "postTrip": "Publier un Voyage",
+    "creatorLab": "Tableau de Bord Créateur",
+    "myAccount": "Mon Compte",
+    "myTrips": "Mes Voyages",
+    "myCollections": "Mes Collections",
+    "messages": "Messages",
+    "availableTrips": "Voyages Disponibles",
+    "collabOpportunities": "Opportunités de Collaboration",
+    "partnerBookings": "Réservations Partenaires",
+    "subscription": "Abonnement",
+    "settings": "Paramètres",
+    "adminPanel": "Panneau d'Administration",
+    "professional": "Professionnel",
+    "becomeAgent": "Devenir Agent de Voyage",
+    "becomeCreator": "Devenir Créateur",
+    "becomeBrand": "Devenir Partenaire de Marque",
+    "signInRequired": "Connexion requise",
+    "signInToCreate": "Veuillez vous connecter pour créer du contenu",
+    "preferencesEnabled": "Préférences activées",
+    "preferencesDisabled": "Préférences désactivées",
+    "preferencesEnabledDesc": "Les résultats de recherche correspondront à vos préférences enregistrées",
+    "preferencesDisabledDesc": "Les résultats de recherche afficheront toutes les options disponibles"
   },
   "common": {
     "loading": "Chargement...",
@@ -19,7 +45,12 @@
     "filter": "Filtrer",
     "sort": "Trier",
     "searching": "Recherche des meilleures options...",
-    "and": "et"
+    "and": "et",
+    "travelers": "Voyageurs",
+    "creators": "Créateurs de Voyages",
+    "agents": "Agents",
+    "brands": "Marques",
+    "step": "Étape"
   },
   "language": {
     "changed": "Langue Modifiée",
@@ -39,7 +70,25 @@
       "whatCanDo": "Ce que Goldsainte.Ai peut faire",
       "terms": "Conditions",
       "privacy": "Politique de confidentialité",
-      "agreement": "En utilisant Goldsainte.Ai, vous acceptez nos"
+      "agreement": "En utilisant Goldsainte.Ai, vous acceptez nos",
+      "mainHeadline": "<em>Planifiez, Découvrez et Réservez — Le Marché du Voyage Plus Intelligent</em>",
+      "mainDescription": "Parcourez des voyages conçus par des spécialistes certifiés et des explorateurs dans plus de 50 pays.",
+      "mainDescriptionSub": "Ou laissez notre technologie créer votre itinéraire idéal en quelques minutes.",
+      "subHeading": "Transformez vos voyages en revenus — ou réservez votre prochaine aventure en quelques minutes.",
+      "postDreamTrip": "Commencer à Explorer",
+      "seeHowItWorks": "Comment Ça Marche",
+      "browseCreators": "Parcourir les créateurs",
+      "browseAgents": "Parcourir les agents",
+      "marketplace": "Le Marché des Collections",
+      "marketplaceDisclaimer": "Toutes les actions se déroulent au sein du marché Goldsainte — nous connectons voyageurs, créateurs et agents, mais nous n'opérons pas les voyages nous-mêmes.",
+      "gentleAssist": "Préférez-vous une assistance discrète ?",
+      "askAI": "Demandez à Goldsainte AI de façonner votre demande.",
+      "trustPromise": "Tous les messages et paiements restent sur la plateforme. Pas de numéros de téléphone, pas d'arrangements à part — uniquement des réservations magnifiquement organisées et protégées.",
+      "storyboardCaption": "Chaque voyage commence par une vision.",
+      "storyboardDescription": "De l'inspiration à l'itinéraire en quelques minutes.\nTéléchargez des photos, générez un voyage et partagez-le ou vendez-le instantanément.",
+      "infinityPool": "Piscine à débordement et horizon",
+      "treehouseHammock": "Hamac dans une cabane",
+      "friendsHiking": "Amis en randonnée"
     },
     "rotatingPlaceholders": {
       "hotels": "Où aller ensuite ? Découvrez des hôtels sélectionnés selon vos goûts.",
@@ -51,8 +100,8 @@
     },
     "winterSun": {
       "title": "Soleil d'Hiver",
-      "subtitle": "Évadez-vous au paradis avec notre collection de resorts de plage de luxe...",
-      "cta": "Découvrir"
+      "subtitle": "Évadez-vous au paradis avec notre sélection de complexes de plage de luxe",
+      "cta": "Explorer les Destinations"
     },
     "gallery": {
       "beachEscapes": "Escapades Plage",
@@ -78,7 +127,26 @@
       "paragraph4": "Réservez instantanément via Goldsainte — vols, hôtels, restaurants et plus. Connectez-vous, partagez et gagnez en devenant créateur.",
       "paragraph5": "Tout se passe sur une plateforme élégante — alimentée par l'IA, propulsée par les créateurs.",
       "tagline": "Découvrir. Planifier. Réserver. Gagner.",
-      "subtitle": "Voyage de luxe, réinventé."
+      "subtitle": "Voyage de luxe, réinventé.",
+      "sectionTitle": "Comment fonctionne Goldsainte AI",
+      "headline": "Comment Goldsainte AI Donne Vie à Votre Voyage",
+      "description": "Goldsainte transforme vos idées de voyage en un storyboard structuré, puis le connecte intelligemment au sein de notre marché curaté d'agents et créateurs experts. Ils rivalisent pour concevoir et tarifer votre voyage — pendant que notre IA simplifie le processus de l'inspiration à la réservation.",
+      "step1": {
+        "title": "Partagez votre inspiration",
+        "body": "Collez des TikToks, Reels, images d'ambiance ou notes. Dites-nous qui voyage, quand, et l'atmosphère que vous voulez pour ce voyage."
+      },
+      "step2": {
+        "title": "Madison rédige votre storyboard",
+        "body": "Notre IA concierge traduit votre inspiration en un storyboard visuel avec destinations, ambiances d'hôtel et expériences curatées qui correspondent à votre esthétique."
+      },
+      "step3": {
+        "title": "Créateurs et agents collaborent",
+        "body": "Les créateurs affinent le style ; les agents certifiés ajoutent vols, hébergements et expériences — le tout dans le même storyboard évolutif."
+      },
+      "step4": {
+        "title": "Vous examinez, échangez et réservez sur Goldsainte",
+        "body": "Comparez les propositions, affinez les détails par chat et confirmez celle qui vous correspond. Les paiements passent par le séquestre Goldsainte pour plus de protection."
+      }
     },
     "features": {
       "voiceAI": {
@@ -119,11 +187,6 @@
       "paragraph1": "Transformez votre passion pour les voyages en profit. Partagez du contenu époustouflant, développez votre audience et débloquez de nouvelles sources de revenus grâce aux récompenses d'engagement, aux collaborations avec les marques et aux forfaits de voyages sélectionnés.",
       "paragraph2": "Gagnez de l'argent réel au fur et à mesure que vos publications obtiennent des likes, des commentaires et des partages — ou créez et vendez des expériences de voyage directement à vos abonnés.",
       "paragraph3": "Collaborez avec les meilleures marques, accédez à des outils de création puissants et inspirez une communauté mondiale d'explorateurs. Que vous soyez un influenceur chevronné ou débutant, c'est ici que votre histoire de voyage devient votre entreprise."
-    },
-    "winterSun": {
-      "title": "Soleil d'Hiver",
-      "subtitle": "Évadez-vous au paradis avec notre sélection de complexes de plage de luxe",
-      "cta": "Explorer les Destinations"
     },
     "journal": {
       "title": "Du Journal",
@@ -176,6 +239,89 @@
       "subtitle": "Rejoignez notre réseau et gagnez des commissions sur les réservations de voyages de luxe",
       "apply": "Postuler Maintenant",
       "browse": "Parcourir les Agents"
+    },
+    "builtForEverySide": {
+      "badge": "Voyageurs — Créateurs — Agents — Marques",
+      "title": "Conçu pour chaque facette du voyage de luxe",
+      "description": "Chaque rôle apporte quelque chose d'essentiel — les voyageurs apportent la vision, les créateurs l'esthétique, les agents affinent les détails, les marques façonnent l'expérience. Goldsainte les réunit dans un voyage cinématographique.",
+      "travelers": {
+        "label": "Voyageurs",
+        "item1": "Sauvegardez vos idées comme vous savourez vos moments — moodboards à partir de TikToks, Reels et images que vous aimez.",
+        "item2": "Soyez mis en relation avec des créateurs et des designers de voyages qui comprennent votre rythme, vos goûts et votre budget.",
+        "item3": "Réservez sur un marché protégé avec séquestre, support et une histoire de voyage à laquelle revenir."
+      },
+      "creators": {
+        "label": "Créateurs",
+        "item1": "Transformez votre esthétique signature en storyboards qui deviennent de vrais voyages.",
+        "item2": "Collaborez avec des agents certifiés qui gèrent tarifs, contrats et logistique.",
+        "item3": "Gagnez sur chaque voyage réservé, sans devenir agent de voyage à plein temps."
+      },
+      "agents": {
+        "label": "Agents de voyages",
+        "item1": "Recevez des demandes à forte intention de voyageurs qui savent déjà quelle ambiance ils veulent pour leur voyage.",
+        "item2": "Co-concevez des itinéraires avec des créateurs sur des storyboards qui pré-vendent vos voyages.",
+        "item3": "Gérez paiements et statuts dans un espace de travail serein, axé sur le luxe."
+      },
+      "brands": {
+        "label": "Marques",
+        "item1": "Présentez votre univers comme des collections curatées, pas des annonces génériques.",
+        "item2": "Atteignez les voyageurs au moment précis de l'inspiration et de la planification.",
+        "item3": "Laissez l'IA révéler des invités dont l'esthétique et les attentes correspondent à votre marque."
+      },
+      "collageCaption": "Chaque rôle apporte quelque chose d'essentiel — les voyageurs cadrent l'histoire, les créateurs affinent l'esthétique, les agents conçoivent le voyage, les marques donnent le ton."
+    },
+    "trustSafety": {
+      "badge": "Intelligence du Luxe",
+      "title": "Là où les Voyages Complexes Deviennent Magnifiquement Simples",
+      "description": "Goldsainte combine planification intelligente, collaboration fluide et personnalisation profonde — pour que chaque voyage semble sans effort, de la première idée à l'arrivée finale.",
+      "item1": {
+        "title": "Personnalisation Intelligente",
+        "body": "L'IA adapte chaque voyage à vos préférences, votre rythme, votre style et les expériences que vous aimez le plus."
+      },
+      "item2": {
+        "title": "Collaboration Fluide",
+        "body": "Voyageurs, conteurs et spécialistes certifiés se coordonnent sans effort dans un espace magnifiquement organisé."
+      },
+      "item3": {
+        "title": "Intelligence du Voyage",
+        "body": "Des trésors cachés aux surclassements de luxe, Goldsainte révèle des recommandations conçues spécifiquement pour votre voyage."
+      },
+      "item4": {
+        "title": "Coordination de Bout en Bout",
+        "body": "Vols, hébergements, expériences et horaires restent connectés de l'inspiration à l'arrivée."
+      }
+    },
+    "storyboards": {
+      "title": "Voyages Sélectionnés, Prêts à Réserver ou Personnaliser",
+      "description": "Explorez des voyages conçus par des experts que vous pouvez réserver instantanément — ou personnalisez-les avec un spécialiste certifié.",
+      "startWithMadison": "Commencez un storyboard avec Madison",
+      "exploreStoryboards": "Explorer la Collection du Marché Créateurs et Agents",
+      "exploreAll": "Explorer Tous les Voyages",
+      "creatorAgentCollab": "Collaboration Créateur + Agent",
+      "agentCurated": "Voyage curaté par un agent"
+    },
+    "rolesCTA": {
+      "title": "Choisissez comment rejoindre Goldsainte",
+      "traveler": {
+        "title": "Inscrivez-vous comme voyageur",
+        "body": "Créez votre profil, sauvegardez votre inspiration et laissez Madison vous aider à planifier vos voyages de rêve.",
+        "button": "Commencer"
+      },
+      "joinAsCreator": {
+        "title": "Rejoignez en tant que créateur",
+        "body": "Configurez votre profil de créateur, connectez TikTok et commencez à transformer votre audience en voyages curatés.",
+        "button": "Inscription créateur"
+      },
+      "applyAsAgent": {
+        "title": "Postulez comme agent de voyages",
+        "body": "Partagez vos références, spécialités et marchés préférés. Une fois vérifié, vous recevrez des demandes curatées.",
+        "button": "Candidature agent"
+      },
+      "applyAsBrand": {
+        "title": "Devenez partenaire de marque",
+        "body": "Hôtels, resorts et marques de style de vie — présentez votre établissement à des voyageurs exigeants.",
+        "button": "Candidature marque"
+      }
     }
   },
   "navigation": {
@@ -233,7 +379,9 @@
     "corporateContact": "Contact Entreprise",
     "followUs": "Suivez-nous :",
     "description": "Goldsainte AI fait partie de Goldsainte Inc., le leader mondial des voyages de luxe alimentés par l'IA et des expériences sélectionnées. Découvrez. Créez. Partagez. Voyagez avec Goldsainte.",
-    "copyright": "Copyright © 2025 Goldsainte.Ai™. Tous droits réservés."
+    "copyright": "Copyright © 2025 Goldsainte.Ai™. Tous droits réservés.",
+    "creatorMarketplace": "Marché des Créateurs",
+    "creatorStudio": "Tableau de Bord Créateur"
   },
   "welcomeModal": {
     "title": "Ce que Goldsainte.Ai peut faire pour vous",

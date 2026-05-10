@@ -987,3 +987,12 @@ All colors MUST be HSL.
 .luxury-input {
   @apply rounded-2xl border border-input bg-muted/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground;
 }
+
+/* RTL support */
+[dir="rtl"] .flex-row { flex-direction: row-reverse; }
+[dir="rtl"] .text-left { text-align: right; }
+[dir="rtl"] .ml-auto { margin-left: unset; margin-right: auto; }
+[dir="rtl"] .pl-4 { padding-left: unset; padding-right: 1rem; }
+[dir="rtl"] .pr-4 { padding-right: unset; padding-left: 1rem; }
+[dir="rtl"] .left-0 { left: unset; right: 0; }
+[dir="rtl"] .right-0 { right: unset; left: 0; }

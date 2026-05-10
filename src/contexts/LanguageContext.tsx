@@ -89,6 +89,10 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
       // Always update localStorage for fast local access
       localStorage.setItem('appLanguage', newLanguage);
       i18n.changeLanguage(newLanguage);
+      if (typeof document !== 'undefined') {
+        document.documentElement.dir = newLanguage === 'ar' ? 'rtl' : 'ltr';
+        document.documentElement.lang = newLanguage;
+      }
 
       // If logged in, also update database
       if (user) {

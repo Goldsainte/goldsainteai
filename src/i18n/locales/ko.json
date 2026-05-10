@@ -4,7 +4,33 @@
     "signup": "무료 가입",
     "signupShort": "가입",
     "signout": "로그아웃",
-    "dashboard": "대시보드"
+    "dashboard": "대시보드",
+    "discover": "탐색",
+    "browseCreators": "크리에이터 둘러보기",
+    "browseAgents": "에이전트 둘러보기",
+    "marketplace": "더 컬렉션",
+    "postTrip": "여행 게시",
+    "creatorLab": "크리에이터 대시보드",
+    "myAccount": "내 계정",
+    "myTrips": "내 여행",
+    "myCollections": "내 컬렉션",
+    "messages": "메시지",
+    "availableTrips": "이용 가능한 여행",
+    "collabOpportunities": "협업 기회",
+    "partnerBookings": "파트너 예약",
+    "subscription": "구독",
+    "settings": "설정",
+    "adminPanel": "관리 패널",
+    "professional": "전문가",
+    "becomeAgent": "여행 에이전트 되기",
+    "becomeCreator": "크리에이터 되기",
+    "becomeBrand": "브랜드 파트너 되기",
+    "signInRequired": "로그인이 필요합니다",
+    "signInToCreate": "콘텐츠를 만들려면 로그인하세요",
+    "preferencesEnabled": "환경설정 활성화됨",
+    "preferencesDisabled": "환경설정 비활성화됨",
+    "preferencesEnabledDesc": "검색 결과가 저장된 환경설정과 일치합니다",
+    "preferencesDisabledDesc": "검색 결과는 모든 사용 가능한 옵션을 표시합니다"
   },
   "common": {
     "loading": "로딩 중...",
@@ -19,7 +45,12 @@
     "filter": "필터",
     "sort": "정렬",
     "searching": "최상의 옵션을 검색 중...",
-    "and": "그리고"
+    "and": "그리고",
+    "travelers": "여행자",
+    "creators": "여행 크리에이터",
+    "agents": "에이전트",
+    "brands": "브랜드",
+    "step": "단계"
   },
   "language": {
     "changed": "언어가 변경되었습니다",
@@ -39,7 +70,25 @@
       "whatCanDo": "Goldsainte.Ai가 할 수 있는 것",
       "terms": "약관",
       "privacy": "개인정보 보호정책",
-      "agreement": "Goldsainte.Ai를 사용함으로써 다음에 동의합니다"
+      "agreement": "Goldsainte.Ai를 사용함으로써 다음에 동의합니다",
+      "mainHeadline": "<em>계획, 발견, 예약 — 더 스마트한 여행 마켓플레이스</em>",
+      "mainDescription": "50개 이상의 국가에서 인증된 여행 전문가와 탐험가가 계획한 여행을 둘러보세요.",
+      "mainDescriptionSub": "또는 저희 기술이 몇 분 안에 완벽한 여행 일정을 만들어드립니다.",
+      "subHeading": "여행을 수입으로 — 또는 다음 여행을 몇 분 안에 예약하세요.",
+      "postDreamTrip": "탐색 시작",
+      "seeHowItWorks": "작동 방식 보기",
+      "browseCreators": "크리에이터 둘러보기",
+      "browseAgents": "에이전트 둘러보기",
+      "marketplace": "컬렉션 마켓플레이스",
+      "marketplaceDisclaimer": "모든 활동은 Goldsainte 마켓플레이스 내에서 이루어집니다 — 저희는 여행자, 크리에이터, 에이전트를 연결하지만 여행을 직접 운영하지는 않습니다.",
+      "gentleAssist": "조용한 도움이 필요하신가요?",
+      "askAI": "Goldsainte AI에게 요청을 다듬어 달라고 하세요.",
+      "trustPromise": "모든 메시지와 결제는 플랫폼 내에서 이루어집니다. 전화번호도, 사적 거래도 없이 — 아름답게 정리되고 보호된 예약만 있습니다.",
+      "storyboardCaption": "모든 여정은 비전에서 시작됩니다.",
+      "storyboardDescription": "영감에서 일정까지 몇 분 안에.\n사진을 업로드하고, 여행을 생성하고, 즉시 공유하거나 판매하세요.",
+      "infinityPool": "인피니티 풀과 스카이라인",
+      "treehouseHammock": "트리하우스 해먹",
+      "friendsHiking": "하이킹하는 친구들"
     },
     "rotatingPlaceholders": {
       "hotels": "다음 목적지는? 당신의 취향에 맞춘 엄선된 호텔 발견.",
@@ -78,7 +127,26 @@
       "paragraph4": "Goldsainte를 통해 즉시 예약 — 항공편, 호텔, 식사 등 — 안전한 체크아웃과 자동 여정 생성 포함. 그런 다음 자신이 크리에이터가 되어 연결하고, 공유하고, 수익을 올리세요. 목적지를 큐레이션하고, 여행자에게 영감을 주고, 다른 사람들이 귀하의 추천에서 예약할 때 돈을 버세요.",
       "paragraph5": "모든 것이 하나의 우아한 플랫폼에서 발생합니다 — AI 구동, 크리에이터 구동, 그리고 잘 여행하는 사람들을 위해 설계되었습니다.",
       "tagline": "발견. 계획. 예약. 수익.",
-      "subtitle": "럭셔리 여행, 재창조."
+      "subtitle": "럭셔리 여행, 재창조.",
+      "sectionTitle": "Goldsainte AI 작동 방식",
+      "headline": "Goldsainte AI가 당신의 여행을 어떻게 실현하는지",
+      "description": "Goldsainte는 당신의 여행 아이디어를 구조화된 스토리보드로 변환한 후, 전문 에이전트와 크리에이터의 큐레이션된 마켓플레이스 내에서 지능적으로 매칭합니다. 그들은 당신의 여행을 설계하고 가격을 매기기 위해 경쟁합니다 — 우리의 AI는 영감에서 예약까지의 프로세스를 간소화합니다.",
+      "step1": {
+        "title": "영감을 공유하세요",
+        "body": "TikTok, Reels, 무드 이미지 또는 노트를 붙여넣으세요. 누가, 언제 여행하는지, 그리고 여행이 어떤 느낌이길 원하는지 알려주세요."
+      },
+      "step2": {
+        "title": "Madison이 스토리보드를 작성합니다",
+        "body": "AI 컨시어지가 당신의 영감을 목적지, 호텔 분위기, 미학에 맞는 큐레이션 경험을 담은 비주얼 스토리보드로 변환합니다."
+      },
+      "step3": {
+        "title": "크리에이터와 에이전트가 협업합니다",
+        "body": "크리에이터는 룩과 느낌을 다듬고, 인증 여행 에이전트는 항공편, 숙박, 경험을 추가합니다 — 모두 같은 진화하는 스토리보드 내에서."
+      },
+      "step4": {
+        "title": "Goldsainte에서 확인, 채팅, 예약",
+        "body": "제안을 비교하고, 채팅에서 디테일을 다듬고, 적합한 것을 확정하세요. 결제는 추가 보호를 위해 Goldsainte의 에스크로를 통해 진행됩니다."
+      }
     },
     "features": {
       "voiceAI": {
@@ -171,6 +239,89 @@
       "subtitle": "네트워크에 가입하고 럭셔리 여행 예약에서 수수료를 받으세요",
       "apply": "지금 신청",
       "browse": "에이전트 탐색"
+    },
+    "builtForEverySide": {
+      "badge": "여행자 — 크리에이터 — 에이전트 — 브랜드",
+      "title": "럭셔리 여행의 모든 면을 위한 설계",
+      "description": "각 역할이 본질적인 무언가를 가져옵니다 — 여행자는 비전을, 크리에이터는 미학을, 에이전트는 디테일을, 브랜드는 경험을 형성합니다. Goldsainte는 그것들을 하나의 영화 같은 여정으로 모읍니다.",
+      "travelers": {
+        "label": "여행자",
+        "item1": "순간을 음미하듯 아이디어를 저장하세요 — 좋아하는 TikTok, Reels, 이미지로 무드보드를.",
+        "item2": "당신의 페이스, 취향, 예산을 이해하는 크리에이터와 여행 디자이너와 매칭됩니다.",
+        "item3": "에스크로, 지원, 돌아갈 수 있는 여행 이야기가 있는 보호된 마켓플레이스에서 예약하세요."
+      },
+      "creators": {
+        "label": "크리에이터",
+        "item1": "당신의 시그니처 미학을 실제 여행이 되는 스토리보드로 바꾸세요.",
+        "item2": "요금, 계약, 물류를 처리하는 인증 에이전트와 협업하세요.",
+        "item3": "전임 여행 에이전트가 되지 않고도 예약된 모든 여행에서 수익을 얻으세요."
+      },
+      "agents": {
+        "label": "여행 에이전트",
+        "item1": "여행이 어떻게 느껴져야 하는지 이미 아는 여행자들로부터 의도가 높은 브리프를 받으세요.",
+        "item2": "당신의 일정을 사전 판매하는 스토리보드에서 크리에이터와 함께 일정을 공동 설계하세요.",
+        "item3": "차분하고 럭셔리 중심의 워크스페이스에서 결제와 상태를 관리하세요."
+      },
+      "brands": {
+        "label": "브랜드",
+        "item1": "당신의 세계를 일반 리스팅이 아닌 큐레이션된 컬렉션으로 제시하세요.",
+        "item2": "영감과 여행 계획의 정확한 순간에 여행자에게 도달하세요.",
+        "item3": "AI가 당신의 브랜드와 미학과 기대가 일치하는 게스트를 발견하게 하세요."
+      },
+      "collageCaption": "각 역할이 본질을 가져옵니다 — 여행자는 이야기를 구성하고, 크리에이터는 미학을 다듬고, 에이전트는 여정을 설계하고, 브랜드는 톤을 설정합니다."
+    },
+    "trustSafety": {
+      "badge": "럭셔리 인텔리전스",
+      "title": "복잡한 여행이 아름답게 단순해지는 곳",
+      "description": "Goldsainte는 지능적인 계획, 원활한 협업, 깊은 개인화를 결합합니다 — 첫 아이디어부터 최종 도착까지 모든 여행이 수월하게 느껴지도록.",
+      "item1": {
+        "title": "지능적인 개인화",
+        "body": "AI는 당신의 선호, 페이스, 여행 스타일, 가장 사랑하는 경험을 중심으로 모든 여정을 조정합니다."
+      },
+      "item2": {
+        "title": "원활한 협업",
+        "body": "여행자, 여행 스토리텔러, 인증 전문가가 아름답게 정리된 하나의 공간 안에서 수월하게 조율합니다."
+      },
+      "item3": {
+        "title": "스마트 여행 인텔리전스",
+        "body": "숨겨진 명소부터 럭셔리 업그레이드까지, Goldsainte는 당신의 여정에 특별히 맞춰진 추천을 제공합니다."
+      },
+      "item4": {
+        "title": "엔드 투 엔드 조정",
+        "body": "항공편, 숙박, 경험, 일정이 영감에서 도착까지 원활하게 연결됩니다."
+      }
+    },
+    "storyboards": {
+      "title": "엄선된 여정, 즉시 예약 또는 개인화 가능",
+      "description": "즉시 예약할 수 있는 전문가 설계 여행을 탐색하세요 — 또는 인증 전문가와 함께 맞춤화하여 당신만의 것으로 만드세요.",
+      "startWithMadison": "Madison과 스토리보드 시작하기",
+      "exploreStoryboards": "크리에이터 & 여행 에이전트 마켓플레이스 컬렉션 탐색",
+      "exploreAll": "모든 여정 탐색",
+      "creatorAgentCollab": "크리에이터 + 에이전트 협업",
+      "agentCurated": "에이전트 큐레이션 여정"
+    },
+    "rolesCTA": {
+      "title": "Goldsainte에 어떻게 합류할지 선택하세요",
+      "traveler": {
+        "title": "여행자로 가입",
+        "body": "프로필을 만들고, 영감을 저장하고, Madison이 꿈의 여행을 계획하도록 도와드립니다.",
+        "button": "시작하기"
+      },
+      "joinAsCreator": {
+        "title": "크리에이터로 합류",
+        "body": "크리에이터 프로필을 설정하고, TikTok을 연결하고, 오디언스를 큐레이션된 여정으로 바꾸기 시작하세요.",
+        "button": "크리에이터 가입"
+      },
+      "applyAsAgent": {
+        "title": "여행 에이전트로 신청",
+        "body": "자격, 전문분야, 선호 시장을 공유하세요. 검증 후 큐레이션된 브리프를 받게 됩니다.",
+        "button": "에이전트 신청"
+      },
+      "applyAsBrand": {
+        "title": "브랜드로 파트너십",
+        "body": "호텔, 리조트, 라이프스타일 브랜드 — 까다로운 여행자에게 당신의 자산을 보여주세요.",
+        "button": "브랜드 신청"
+      }
     }
   },
   "navigation": {
@@ -228,7 +379,9 @@
     "corporateContact": "기업 연락처",
     "followUs": "팔로우하기：",
     "description": "Goldsainte AI는 AI 기반 럭셔리 여행 및 큐레이션된 경험의 세계 리더인 Goldsainte Inc.의 일부입니다. 발견. 창작. 공유. Goldsainte와 함께 여행하세요.",
-    "copyright": "저작권 © 2025 Goldsainte.Ai™. 모든 권리 보유."
+    "copyright": "저작권 © 2025 Goldsainte.Ai™. 모든 권리 보유.",
+    "creatorMarketplace": "크리에이터 마켓플레이스",
+    "creatorStudio": "크리에이터 대시보드"
   },
   "welcomeModal": {
     "title": "Goldsainte.Ai가 당신을 위해 할 수 있는 것",
