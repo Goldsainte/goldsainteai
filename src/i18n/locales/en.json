@@ -6,7 +6,6 @@
     "signout": "Sign out",
     "dashboard": "Dashboard",
     "discover": "Discover",
-    "storyboards": "Storyboards",
     "browseCreators": "Browse Creators",
     "browseAgents": "Browse Agents",
     "marketplace": "The Collection",
@@ -153,8 +152,8 @@
     },
     "trustSafety": {
       "badge": "Luxury Intelligence",
-     "title": "Where Complex Travel Feels Beautifully Simple",
-     "description": "Goldsainte combines intelligent planning, seamless collaboration, and deep personalization — so every journey feels effortless from first idea to final arrival.",
+      "title": "Where Complex Travel Feels Beautifully Simple",
+      "description": "Goldsainte combines intelligent planning, seamless collaboration, and deep personalization — so every journey feels effortless from first idea to final arrival.",
       "item1": {
         "title": "Intelligent Personalization",
         "body": "AI adapts every journey around your preferences, pace, travel style, and the experiences you love most."

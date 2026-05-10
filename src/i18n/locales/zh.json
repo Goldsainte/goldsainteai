@@ -4,7 +4,33 @@
     "signup": "免费注册",
     "signupShort": "注册",
     "signout": "登出",
-    "dashboard": "仪表板"
+    "dashboard": "仪表板",
+    "discover": "发现",
+    "browseCreators": "浏览创作者",
+    "browseAgents": "浏览代理",
+    "marketplace": "精选系列",
+    "postTrip": "发布旅行",
+    "creatorLab": "创作者控制台",
+    "myAccount": "我的账户",
+    "myTrips": "我的旅行",
+    "myCollections": "我的收藏",
+    "messages": "消息",
+    "availableTrips": "可用旅行",
+    "collabOpportunities": "合作机会",
+    "partnerBookings": "合作伙伴预订",
+    "subscription": "订阅",
+    "settings": "设置",
+    "adminPanel": "管理面板",
+    "professional": "专业人士",
+    "becomeAgent": "成为旅行代理",
+    "becomeCreator": "成为创作者",
+    "becomeBrand": "成为品牌合作伙伴",
+    "signInRequired": "需要登录",
+    "signInToCreate": "请登录以创建内容",
+    "preferencesEnabled": "偏好已启用",
+    "preferencesDisabled": "偏好已禁用",
+    "preferencesEnabledDesc": "搜索结果将匹配您保存的偏好",
+    "preferencesDisabledDesc": "搜索结果将显示所有可用选项"
   },
   "common": {
     "loading": "加载中...",
@@ -19,7 +45,12 @@
     "filter": "过滤",
     "sort": "排序",
     "searching": "正在搜索最佳选项...",
-    "and": "和"
+    "and": "和",
+    "travelers": "旅行者",
+    "creators": "旅行创作者",
+    "agents": "代理",
+    "brands": "品牌",
+    "step": "步骤"
   },
   "language": {
     "changed": "语言已更改",
@@ -39,7 +70,25 @@
       "whatCanDo": "Goldsainte.Ai能为您做什么",
       "terms": "条款",
       "privacy": "隐私政策",
-      "agreement": "使用Goldsainte.Ai即表示您同意我们的"
+      "agreement": "使用Goldsainte.Ai即表示您同意我们的",
+      "mainHeadline": "<em>规划、发现与预订 — 更智能的旅行市场</em>",
+      "mainDescription": "浏览由超过50个国家的认证旅行专家和探险家规划的旅行。",
+      "mainDescriptionSub": "或让我们的技术在几分钟内为您打造完美行程。",
+      "subHeading": "将您的旅行变成收入——或在几分钟内预订下一次旅程。",
+      "postDreamTrip": "开始探索",
+      "seeHowItWorks": "了解运作方式",
+      "browseCreators": "浏览创作者",
+      "browseAgents": "浏览代理",
+      "marketplace": "精选市场",
+      "marketplaceDisclaimer": "所有操作都在Goldsainte市场内进行——我们连接旅行者、创作者和代理，但不亲自经营旅行。",
+      "gentleAssist": "需要温和的协助？",
+      "askAI": "请Goldsainte AI帮您整理需求。",
+      "trustPromise": "所有消息和支付均保留在平台上。无电话号码，无场外交易——只有精心组织、受保护的预订。",
+      "storyboardCaption": "每一段旅程都始于一个愿景。",
+      "storyboardDescription": "从灵感到行程，几分钟即可完成。\n上传照片，生成旅行，立即分享或销售。",
+      "infinityPool": "无边泳池与天际线",
+      "treehouseHammock": "树屋吊床",
+      "friendsHiking": "朋友们徒步旅行"
     },
     "rotatingPlaceholders": {
       "hotels": "下一站去哪里？发现为您量身定制的精选酒店。",
@@ -78,7 +127,26 @@
       "paragraph4": "通过Goldsainte即时预订 — 航班、酒店、餐饮等 — 安全结账和自动行程创建。然后，通过成为创作者自己来连接、分享和赚钱。策划目的地，激励旅行者，当其他人从您的推荐预订时赚钱。",
       "paragraph5": "一切都在一个优雅的平台上进行 — AI驱动、创作者驱动，专为那些旅行良好的人设计。",
       "tagline": "发现。计划。预订。赚钱。",
-      "subtitle": "豪华旅行，重新发明。"
+      "subtitle": "豪华旅行，重新发明。",
+      "sectionTitle": "Goldsainte AI如何运作",
+      "headline": "Goldsainte AI如何让您的旅行变为现实",
+      "description": "Goldsainte将您的旅行想法转化为结构化的故事板，然后在我们精选的专家代理和创作者市场中智能匹配。他们竞相设计和定价您的旅行——而我们的AI简化了从灵感到预订的整个流程。",
+      "step1": {
+        "title": "分享您的灵感",
+        "body": "粘贴TikTok、Reels、情绪图片或笔记。告诉我们谁出行、何时，以及您希望旅行带来的感觉。"
+      },
+      "step2": {
+        "title": "Madison起草您的故事板",
+        "body": "我们的AI礼宾将您的灵感翻译成视觉故事板，包含与您美学相符的目的地、酒店氛围和精选体验。"
+      },
+      "step3": {
+        "title": "创作者与代理协作",
+        "body": "创作者完善外观和感觉；认证旅行代理添加航班、住宿和体验——全都在同一不断演进的故事板内。"
+      },
+      "step4": {
+        "title": "在Goldsainte上查看、聊天并预订",
+        "body": "比较提案，在聊天中完善细节，确认最合适的方案。付款通过Goldsainte的托管以增加保障。"
+      }
     },
     "features": {
       "voiceAI": {
@@ -171,6 +239,89 @@
       "subtitle": "加入我们的网络并从豪华旅行预订中赚取佣金",
       "apply": "立即申请",
       "browse": "浏览代理"
+    },
+    "builtForEverySide": {
+      "badge": "旅行者 — 创作者 — 代理 — 品牌",
+      "title": "为奢华旅行的每一面而打造",
+      "description": "每个角色都带来不可或缺的元素——旅行者带来愿景，创作者带来美学，代理完善细节，品牌塑造体验。Goldsainte将它们汇聚成一段电影般的旅程。",
+      "travelers": {
+        "label": "旅行者",
+        "item1": "像品味时刻一样保存灵感——从喜爱的TikTok、Reels和图片创建情绪板。",
+        "item2": "与了解您节奏、品味和预算的创作者及旅行设计师匹配。",
+        "item3": "在受保护的市场中预订，配有托管、支持和可回顾的旅行故事。"
+      },
+      "creators": {
+        "label": "创作者",
+        "item1": "将您的标志性美学转化为成为真实旅行的故事板。",
+        "item2": "与处理价格、合同和物流的认证代理合作。",
+        "item3": "每次预订都获得收入，无需成为全职旅行代理。"
+      },
+      "agents": {
+        "label": "旅行代理",
+        "item1": "接收来自已知道想要何种感觉旅行的旅行者的高意向需求。",
+        "item2": "在预售您行程的故事板上与创作者共同设计行程。",
+        "item3": "在专注于奢华的宁静工作空间中管理付款和状态。"
+      },
+      "brands": {
+        "label": "品牌",
+        "item1": "将您的世界呈现为精选系列，而非通用列表。",
+        "item2": "在灵感和旅行规划的精确时刻触达旅行者。",
+        "item3": "让AI找到美学和期望与您品牌契合的客人。"
+      },
+      "collageCaption": "每个角色都带来本质——旅行者构筑故事，创作者完善美学，代理设计旅程，品牌定下基调。"
+    },
+    "trustSafety": {
+      "badge": "奢华智能",
+      "title": "复杂的旅行变得优美简单",
+      "description": "Goldsainte结合智能规划、无缝协作和深度个性化——让每次旅行从最初的想法到最终抵达都毫不费力。",
+      "item1": {
+        "title": "智能个性化",
+        "body": "AI围绕您的偏好、节奏、旅行风格和最爱的体验调整每段旅程。"
+      },
+      "item2": {
+        "title": "无缝协作",
+        "body": "旅行者、旅行讲述者和认证专家在精心组织的空间内毫不费力地协调。"
+      },
+      "item3": {
+        "title": "智能旅行情报",
+        "body": "从隐藏的宝藏到奢华升级，Goldsainte提供专为您旅程量身定制的推荐。"
+      },
+      "item4": {
+        "title": "端到端协调",
+        "body": "航班、住宿、体验和时间表从灵感到抵达保持无缝连接。"
+      }
+    },
+    "storyboards": {
+      "title": "精选旅程，可立即预订或个性化定制",
+      "description": "探索专家设计的可即时预订的旅行——或与认证专家定制成专属于您的旅程。",
+      "startWithMadison": "与Madison开始一个故事板",
+      "exploreStoryboards": "探索创作者与旅行代理市场系列",
+      "exploreAll": "探索所有旅程",
+      "creatorAgentCollab": "创作者+代理协作",
+      "agentCurated": "代理精选旅程"
+    },
+    "rolesCTA": {
+      "title": "选择您加入Goldsainte的方式",
+      "traveler": {
+        "title": "注册为旅行者",
+        "body": "创建您的个人资料，保存灵感，让Madison帮助规划您的梦想之旅。",
+        "button": "开始"
+      },
+      "joinAsCreator": {
+        "title": "作为创作者加入",
+        "body": "设置您的创作者资料，连接TikTok，开始将您的受众转化为精选旅程。",
+        "button": "创作者注册"
+      },
+      "applyAsAgent": {
+        "title": "申请成为旅行代理",
+        "body": "分享您的资质、专长和优先市场。验证后，您将收到精选需求。",
+        "button": "代理申请"
+      },
+      "applyAsBrand": {
+        "title": "作为品牌合作",
+        "body": "酒店、度假村和生活方式品牌——向挑剔的旅行者展示您的物业。",
+        "button": "品牌申请"
+      }
     }
   },
   "navigation": {
@@ -228,7 +379,9 @@
     "corporateContact": "企业联系",
     "followUs": "关注我们：",
     "description": "Goldsainte AI是Goldsainte Inc.的一部分，是AI驱动的豪华旅行和精选体验的全球领导者。发现。创作。分享。与Goldsainte一起旅行。",
-    "copyright": "版权所有 © 2025 Goldsainte.Ai™。保留所有权利。"
+    "copyright": "版权所有 © 2025 Goldsainte.Ai™。保留所有权利。",
+    "creatorMarketplace": "创作者市场",
+    "creatorStudio": "创作者控制台"
   },
   "welcomeModal": {
     "title": "Goldsainte.Ai能为您做什么",
