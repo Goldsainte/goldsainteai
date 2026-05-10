@@ -12,19 +12,31 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Wait briefly for detectSessionInUrl to process the URL token
-        await new Promise(resolve => setTimeout(resolve, 300));
+        // Wait for Supabase to confirm the session is ready (event-driven, with 5s fallback)
+        const session = await new Promise<any>((resolve) => {
+          const timeout = setTimeout(() => resolve(null), 5000);
 
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('Auth callback error:', error);
-          navigate('/auth');
-          return;
-        }
+          const { data: { subscription } } = supabase.auth.onAuthStateChange(
+            (event, sessionData) => {
+              if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+                clearTimeout(timeout);
+                subscription.unsubscribe();
+                resolve(sessionData);
+              }
+            }
+          );
+
+          supabase.auth.getSession().then(({ data }) => {
+            if (data.session) {
+              clearTimeout(timeout);
+              subscription.unsubscribe();
+              resolve(data.session);
+            }
+          });
+        });
 
         if (!session) {
-          navigate('/auth');
+          navigate('/auth', { replace: true });
           return;
         }
 
