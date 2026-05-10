@@ -231,7 +231,7 @@ export default function TrovaTripDetailPage() {
     : trip.max_participants;
 
   const isPlatformTrip = trip.creator_type === 'platform' && !trip.creator?.full_name;
-  const hasCreator = !!trip.creator?.full_name;
+  const hasCreator = !!(trip.creator?.full_name || trip.creator?.avatar_url);
   const host = hasCreator ? trip.creator : trip.agent;
   const hostType: "creator" | "agent" = hasCreator ? "creator" : "agent";
 
