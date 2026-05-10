@@ -26,18 +26,17 @@ import { ThisWeekFooter } from "@/components/marketplace/ThisWeekFooter";
 type Tab = "trips" | "trip-requests";
 
 const FILTER_TAG_MAP: Record<string, string[]> = {
+  "Bucket List": ["bucket-list", "bucket list", "once-in-a-lifetime", "iconic", "wonder"],
+  "Luxury Escapes": ["luxury", "high-end", "premium", "exclusive", "villa", "five-star"],
+  "Food & Culture": ["food", "culinary", "culture", "gastronomy", "cuisine", "dining", "heritage"],
+  "Wellness & Reset": ["wellness", "spa", "retreat", "yoga", "meditation", "detox"],
+  "Group Trips": ["group", "friends", "team", "party", "family-friendly", "family"],
+  "Romantic Getaways": ["romantic", "honeymoon", "couples", "romance", "intimate"],
+  "Solo Travel": ["solo", "solo-travel", "independent", "backpacking"],
+  "Cinematic Destinations": ["cinematic", "scenic", "photogenic", "dramatic", "views"],
+  "City Energy": ["city", "urban", "nightlife", "metropolitan", "city-break"],
+  "Nature & Adventure": ["nature", "adventure", "hiking", "trek", "safari", "mountain", "wildlife", "outdoor"],
   "Top Rated": [],
-  "Luxury": ["luxury", "high-end", "Luxury"],
-  "Budget Friendly": ["budget", "budget-friendly", "Budget Friendly"],
-  "All-Inclusive": ["all-inclusive", "All-Inclusive"],
-  "Adventure": ["adventure", "Adventure"],
-  "Family": ["family", "family-friendly", "Family"],
-  "Solo Travel": ["solo", "solo-travel", "Solo Travel"],
-  "Wellness": ["wellness", "spa", "retreat", "Wellness"],
-  "Design-led": ["design", "design-led", "boutique", "Design-led"],
-  "Eco-conscious": ["eco", "eco-conscious", "sustainable", "Eco-conscious"],
-  "Adults only": ["adults-only", "adults only", "Adults only"],
-  "City breaks": ["city", "city-break", "urban", "City breaks"],
 };
 
 export interface SearchFilters {
