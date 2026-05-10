@@ -22,7 +22,7 @@ export default function TripBuilderPage() {
   const [loading, setLoading] = useState(!!editId);
   const formRef = useRef<TripBuilderFormHandle>(null);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
-  const handleSaveRef = useRef<typeof handleSave | null>(null);
+  const handleSaveRef = useRef<((data: any, status: "draft" | "published") => Promise<void>) | null>(null);
 
   useEffect(() => {
     if (authLoading || roleLoading) return;
