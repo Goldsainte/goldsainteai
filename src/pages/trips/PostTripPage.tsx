@@ -125,7 +125,6 @@ export default function PostTripPage() {
         if (data.specialNotes) setSpecialNotes(data.specialNotes);
         if (data.departureCity) setDepartureCity(data.departureCity);
         if (data.wantsRole) setWantsRole(data.wantsRole);
-        if (data.storyboardId) setStoryboardId(data.storyboardId);
         if (data.currentStep != null) setCurrentStep(data.currentStep);
       } catch (e) {
         console.error('Failed to restore pending trip data', e);
@@ -133,61 +132,6 @@ export default function PostTripPage() {
       sessionStorage.removeItem('goldsainte:pendingTrip');
     }
   }, []);
-
-  // After auth redirect, restore pending storyboard from sessionStorage into the database
-  useEffect(() => {
-    if (!user || storyboardId !== "pending-auth") return;
-
-    const pendingRaw = sessionStorage.getItem('goldsainte:pendingStoryboard');
-    if (!pendingRaw) return;
-
-    (async () => {
-      try {
-        const pending = JSON.parse(pendingRaw);
-        const sbTitle = pending.title || destination || "My storyboard";
-        const sbMode = pending.mode || "traveler";
-        const sbItems: any[] = pending.items || [];
-
-        // Create storyboard record
-        const { data: sb, error: sbError } = await supabase
-          .from("storyboards")
-          .insert({
-            owner_id: user.id,
-            role: sbMode,
-            title: sbTitle,
-          })
-          .select("id")
-          .single();
-
-        if (sbError) throw sbError;
-
-        // Insert all items
-        if (sbItems.length > 0) {
-          const rows = sbItems.map((item: any, index: number) => ({
-            storyboard_id: sb.id,
-            item_type: item.kind === "photo" ? "image" : item.kind,
-            source_type: item.source,
-            position: item.position ?? index,
-            image_url: item.kind === "photo" ? (item.data?.full_url || item.data?.thumb_url) : null,
-            title: item.data?.title || item.data?.alt || null,
-            metadata: item.data,
-          }));
-
-          const { error: itemsError } = await supabase
-            .from("storyboard_items")
-            .insert(rows);
-
-          if (itemsError) throw itemsError;
-        }
-
-        // Update state with real ID
-        setStoryboardId(sb.id);
-        sessionStorage.removeItem('goldsainte:pendingStoryboard');
-      } catch (err) {
-        console.error('[PostTripPage] Failed to restore pending storyboard:', err);
-      }
-    })();
-  }, [user, storyboardId]);
 
   // Auto-populate from AI Collection prefill
   useEffect(() => {
@@ -204,13 +148,6 @@ export default function PostTripPage() {
       if (itineraryPrefill.vibes.length > 0) setAestheticTags(itineraryPrefill.vibes);
     }
   }, [hasItineraryPrefill, itineraryPrefill]);
-
-  // Set storyboardId from query param so StoryboardBuilder loads existing items
-  useEffect(() => {
-    if (storyboardIdFromQuery && !storyboardId) {
-      setStoryboardId(storyboardIdFromQuery);
-    }
-  }, [storyboardIdFromQuery]);
 
   function removeAestheticTag(tag: string) {
     setAestheticTags(prev => prev.filter(t => t !== tag));
