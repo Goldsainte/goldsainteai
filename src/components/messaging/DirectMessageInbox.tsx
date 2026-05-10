@@ -543,6 +543,16 @@ export function DirectMessageInbox() {
               </div>
             </div>
 
+            {/* Trip context banner */}
+            {(selectedConversation.tripTitle || selectedConversation.tripId) && (
+              <div className="px-4 py-2 bg-[#FDF9F0] border-b border-[#E5DFC6]/40 flex items-center gap-2 text-xs text-[#7A7151]">
+                <Plane className="h-3.5 w-3.5 text-[#C7A962] flex-shrink-0" />
+                <span className="truncate">
+                  Re: <span className="text-[#0a2225] font-medium">{selectedConversation.tripTitle || "Trip inquiry"}</span>
+                </span>
+              </div>
+            )}
+
             {/* Request Banner */}
             {isRequest && (
               <div className="p-5 bg-[#F6F0E4]/60 border-b border-[#E5DFC6]/40 transition-all duration-200">
