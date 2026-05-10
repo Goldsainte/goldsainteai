@@ -6990,6 +6990,7 @@ export type Database = {
           agent_id: string | null
           available_from: string | null
           available_until: string | null
+          balance_due_days: number | null
           booking_count: number | null
           cancellation_policy: string | null
           cover_image_url: string | null
@@ -7050,6 +7051,7 @@ export type Database = {
           agent_id?: string | null
           available_from?: string | null
           available_until?: string | null
+          balance_due_days?: number | null
           booking_count?: number | null
           cancellation_policy?: string | null
           cover_image_url?: string | null
@@ -7110,6 +7112,7 @@ export type Database = {
           agent_id?: string | null
           available_from?: string | null
           available_until?: string | null
+          balance_due_days?: number | null
           booking_count?: number | null
           cancellation_policy?: string | null
           cover_image_url?: string | null
