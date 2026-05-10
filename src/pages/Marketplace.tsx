@@ -360,6 +360,7 @@ export default function Marketplace() {
             <Button onClick={() => refetchTrips()} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6]">
               Retry
             </Button>
+            <p className="text-xs text-[#9A9384] mt-2">If the problem persists, try refreshing the page.</p>
           </div>
         );
       }
