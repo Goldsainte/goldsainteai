@@ -300,16 +300,19 @@ export default function Marketplace() {
       const { data, error } = await supabase
         .from("itinerary_products")
         .select(`
-          id, title, destination, duration_days, price, currency,
-          cover_image_url, description, created_at, status,
-          creator:profiles!itinerary_products_creator_id_fkey (
-            id, full_name, avatar_url, username
-          )
+          id, creator_id, title, destination, duration_days, price, currency,
+          cover_image_url, description, created_at, status
         `)
         .eq("status", "published")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data || [];
+      const rows = data || [];
+      const creatorIds = [...new Set(rows.map((r: any) => r.creator_id).filter(Boolean))];
+      const { data: profiles } = creatorIds.length
+        ? await supabase.from("profiles").select("id, full_name, avatar_url, username").in("id", creatorIds)
+        : { data: [] as any[] };
+      const map = new Map((profiles || []).map((p: any) => [p.id, p]));
+      return rows.map((r: any) => ({ ...r, creator: map.get(r.creator_id) || null }));
     },
   });
 
