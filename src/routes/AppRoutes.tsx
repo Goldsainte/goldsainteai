@@ -89,6 +89,7 @@ const CreatorDashboard = lazy(() => import('@/pages/CreatorDashboard'));
 // New TikTok creator ecosystem pages
 const CreatorTripPage = lazy(() => import('@/pages/CreatorTripPage'));
 const TripBuilderPage = lazy(() => import('@/pages/TripBuilderPage'));
+const ItineraryBuilderPage = lazy(() => import('@/pages/ItineraryBuilderPage'));
 // CreatorProfilePage removed — /creator/:id now redirects to /creators/:id
 const CreatorRedirect = lazy(() => import('@/pages/redirects/CreatorRedirect'));
 const MessagesPage = lazy(() => import('@/pages/MessagesPage'));
@@ -362,6 +363,14 @@ export const AppRoutes = () => (
         element={(
           <RequireAuth>
             <TripBuilderPage />
+          </RequireAuth>
+        )}
+      />
+      <Route
+        path="/itinerary-builder"
+        element={(
+          <RequireAuth>
+            <ItineraryBuilderPage />
           </RequireAuth>
         )}
       />
