@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Save, Send, Plus, X, ImagePlus, Loader2, Shuffle, CalendarIcon } from "lucide-react";
+import { Save, Send, Plus, X, ImagePlus, Loader2, Shuffle, CalendarIcon, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrayFieldEditor } from "./ArrayFieldEditor";
@@ -39,6 +39,16 @@ const LANGUAGE_OPTIONS = ["English", "Spanish", "French", "German", "Italian", "
 const ACCOMMODATION_TYPES = ["Boutique Hotel", "Luxury Resort", "Hostel", "Camping", "Mixed", "Villa", "Cruise"];
 const MEAL_OPTIONS = ["Breakfast", "Lunch", "Dinner", "Snacks"];
 const DAY_MEAL_OPTIONS = ["Breakfast", "Lunch", "Dinner"];
+
+const CANCELLATION_TEMPLATE = `- Deposit ({deposit_percentage}%) is non-refundable after booking confirmation.
+- Cancellations 60+ days before departure: full refund of balance paid beyond deposit.
+- Cancellations 30–60 days before departure: 50% refund of balance.
+- Cancellations under 30 days before departure: no refund.
+- Trip insurance is strongly recommended.`;
+
+const REFUND_TEMPLATE = `- Refunds are processed within 7–10 business days to the original payment method.
+- In the event of a trip cancellation by the operator, 100% refund will be issued including the deposit.
+- Force majeure events are handled case by case with travel credit offered where possible.`;
 
 export type ItineraryDay = {
   day_number: number;
