@@ -123,10 +123,11 @@ export default function CreatorDashboard() {
         let guideSales = 0;
         let guideRevenue = 0;
         try {
+          if (!user?.id) throw new Error("no user");
           const { data: guideIds } = await supabase
             .from('itinerary_products')
             .select('id')
-            .eq('creator_id', user!.id)
+            .eq('creator_id', user.id)
             .eq('status', 'published');
           if (guideIds && guideIds.length > 0) {
             const ids = guideIds.map((g: any) => g.id);
