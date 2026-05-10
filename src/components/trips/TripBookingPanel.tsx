@@ -131,7 +131,7 @@ export function TripBookingPanel({
     draft: "bg-slate-50 text-slate-800 border-slate-200",
     payment_pending: "bg-amber-50 text-amber-800 border-amber-200",
     confirmed: "bg-emerald-50 text-emerald-800 border-emerald-200",
-    in_progress: "bg-blue-50 text-blue-800 border-blue-200",
+    in_progress: "bg-[#F0F7F6] text-[#0c4d47] border-[#0c4d47]/20",
     completed: "bg-green-50 text-green-800 border-green-200",
     cancelled: "bg-red-50 text-red-800 border-red-200",
     disputed: "bg-orange-50 text-orange-800 border-orange-200",

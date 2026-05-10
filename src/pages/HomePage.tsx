@@ -19,12 +19,19 @@ function FeaturedTripsSection() {
         .eq("status", "published")
         .eq("is_featured", true)
         .limit(6);
-      return data || [];
+      if (data && data.length >= 3) return data;
+      const { data: recent } = await supabase
+        .from("packaged_trips")
+        .select("id, slug, title, destination, cover_image_url, price_per_person, duration_days, currency")
+        .eq("status", "published")
+        .order("created_at", { ascending: false })
+        .limit(6);
+      return recent || data || [];
     },
   });
   if (!trips?.length) return null;
   return (
-    <section className="bg-white border-y border-[#E5DFC6]/30 py-16 md:py-24">
+    <section className="bg-[#f7f3ea] border-y border-[#E5DFC6]/30 py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-4">
         <div className="flex items-end justify-between mb-8 md:mb-10">
           <h2 className="font-secondary text-2xl md:text-4xl text-[#0a2225]">Featured Trips</h2>

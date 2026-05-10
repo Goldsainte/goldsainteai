@@ -34,7 +34,7 @@ export function TripStatusControls({
 
   const statusColor: Record<TripRequestStatus, string> = {
     open: "bg-emerald-50 text-emerald-800 border-emerald-200",
-    matched: "bg-blue-50 text-blue-800 border-blue-200",
+    matched: "bg-[#F0F7F6] text-[#0c4d47] border-[#0c4d47]/20",
     in_progress: "bg-amber-50 text-amber-800 border-amber-200",
     completed: "bg-slate-50 text-slate-800 border-slate-200",
     cancelled: "bg-red-50 text-red-800 border-red-200",

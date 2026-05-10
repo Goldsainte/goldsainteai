@@ -47,7 +47,7 @@ export const TrustBadges = ({
         {backgroundCheckStatus === "approved" && (
           <Tooltip>
             <TooltipTrigger>
-              <Badge variant="outline" className={`${badgeSize} bg-blue-50 text-blue-700 border-blue-200`}>
+              <Badge variant="outline" className={`${badgeSize} bg-[#F0F7F6] text-[#0c4d47] border-[#0c4d47]/20`}>
                 <Shield className={`${iconSize} mr-1`} />
                 Background Checked
               </Badge>

@@ -30,33 +30,33 @@ export default function BookingConfirmation() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#f7f3ea" }}>
-        <Loader2 className="h-8 w-8 animate-spin" style={{ color: "#0c4d47" }} />
+      <main className="min-h-screen flex items-center justify-center bg-[#f7f3ea]">
+        <Loader2 className="h-8 w-8 animate-spin text-[#0c4d47]" />
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 py-12" style={{ backgroundColor: "#f7f3ea" }}>
+    <main className="min-h-screen flex items-center justify-center px-4 py-12 bg-[#f7f3ea]">
       <div className="w-full max-w-xl">
         <img src={logomark} alt="Goldsainte" className="h-16 w-16 mx-auto mb-8" loading="lazy"/>
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6" style={{ backgroundColor: "#0c4d47" }}>
-            <CheckCircle2 className="h-12 w-12" style={{ color: "#E5DFC6" }} />
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6 bg-[#0c4d47]">
+            <CheckCircle2 className="h-12 w-12 text-[#E5DFC6]" />
           </div>
-          <h1 className="font-secondary text-4xl mb-3" style={{ color: "#0a2225" }}>
+          <h1 className="font-secondary text-4xl mb-3 text-[#0a2225]">
             Booking Confirmed
           </h1>
-          <p className="text-base" style={{ color: "#4a4a4a" }}>
+          <p className="text-base text-[#4a4a4a]">
             Your booking is confirmed. Your travel specialist will be in touch within 24 hours.
           </p>
         </div>
 
         {booking && (
-          <div className="rounded-2xl border bg-white p-6 mb-8 space-y-4" style={{ borderColor: "#E5DFC6" }}>
+          <div className="rounded-2xl border bg-white p-6 mb-8 space-y-4 border-[#E5DFC6]">
             <div className="flex items-center justify-between">
-              <span className="text-sm" style={{ color: "#7A7151" }}>Booking Reference</span>
-              <span className="font-mono text-sm font-semibold" style={{ color: "#0a2225" }}>
+              <span className="text-sm text-[#7A7151]">Booking Reference</span>
+              <span className="font-mono text-sm font-semibold text-[#0a2225]">
                 {booking.id.slice(0, 8).toUpperCase()}
               </span>
             </div>
@@ -64,7 +64,7 @@ export default function BookingConfirmation() {
               <>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-[#7A7151]">Trip Total</span>
-                  <span className="text-sm font-semibold" style={{ color: "#0a2225" }}>
+                  <span className="text-sm font-semibold text-[#0a2225]">
                     {new Intl.NumberFormat("en-US", {
                       style: "currency",
                       currency: booking.currency || "USD",
@@ -73,7 +73,7 @@ export default function BookingConfirmation() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-[#7A7151]">Deposit Paid ({booking.deposit_percentage}%)</span>
-                  <span className="text-sm font-semibold" style={{ color: "#0a2225" }}>
+                  <span className="text-sm font-semibold text-[#0a2225]">
                     {new Intl.NumberFormat("en-US", {
                       style: "currency",
                       currency: booking.currency || "USD",
@@ -81,8 +81,8 @@ export default function BookingConfirmation() {
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm" style={{ color: "#7A7151" }}>Balance Due at Trip</span>
-                  <span className="text-sm font-semibold" style={{ color: "#0a2225" }}>
+                  <span className="text-sm text-[#7A7151]">Balance Due at Trip</span>
+                  <span className="text-sm font-semibold text-[#0a2225]">
                     {new Intl.NumberFormat("en-US", {
                       style: "currency",
                       currency: booking.currency || "USD",
@@ -92,8 +92,8 @@ export default function BookingConfirmation() {
               </>
             )}
             <div className="flex items-center justify-between">
-              <span className="text-sm" style={{ color: "#7A7151" }}>Status</span>
-              <span className="text-sm font-semibold" style={{ color: "#0c4d47" }}>Confirmed</span>
+              <span className="text-sm text-[#7A7151]">Status</span>
+              <span className="text-sm font-semibold text-[#0c4d47]">Confirmed</span>
             </div>
           </div>
         )}
@@ -114,15 +114,13 @@ export default function BookingConfirmation() {
         <div className="space-y-3">
           <button
             onClick={() => navigate("/my-bookings")}
-            className="w-full h-12 rounded-full text-sm font-medium flex items-center justify-center gap-2"
-            style={{ backgroundColor: "#0c4d47", color: "#E5DFC6" }}
+            className="w-full h-12 rounded-full text-sm font-medium flex items-center justify-center gap-2 bg-[#0c4d47] text-[#E5DFC6]"
           >
             View My Bookings <ArrowRight className="h-4 w-4" />
           </button>
           <button
             onClick={() => navigate("/marketplace")}
-            className="w-full h-12 rounded-full text-sm font-medium border"
-            style={{ borderColor: "#E5DFC6", color: "#0a2225" }}
+            className="w-full h-12 rounded-full text-sm font-medium border border-[#E5DFC6] text-[#0a2225]"
           >
             Continue Exploring
           </button>

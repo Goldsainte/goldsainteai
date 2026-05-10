@@ -11,7 +11,7 @@ const ACTIVITY_LEVELS: Record<string, {
     description: "These trips are designed for those who prefer a leisurely pace. Minimal physical activity is required, making them perfect for travelers who want to relax and enjoy.",
   },
   moderate: {
-    color: "bg-blue-500",
+    color: "bg-[#0c4d47]",
     description: "These trips involve a fair amount of activity. Expect some walking, light hikes, or city exploration. A basic level of fitness is recommended.",
   },
   adventure: {
