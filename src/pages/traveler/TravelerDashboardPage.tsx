@@ -10,7 +10,6 @@ import { TravelerOverviewTab } from "./components/TravelerOverviewTab";
 import { TravelerProfileTab } from "./components/TravelerProfileTab";
 import { TravelerTripsTab } from "./components/TravelerTripsTab";
 import { TravelerBookingsTab } from "./components/TravelerBookingsTab";
-import { TravelerStoryboardsTab } from "./components/TravelerStoryboardsTab";
 import { TravelerSettingsTab } from "./components/TravelerSettingsTab";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -178,7 +177,6 @@ export default function TravelerDashboardPage() {
                       {activeTab === "profile" && <><User className="h-4 w-4 text-[#C7A962]" /> Profile</>}
                       {activeTab === "trips" && <><Calendar className="h-4 w-4 text-[#C7A962]" /> Trips</>}
                       {activeTab === "bookings" && <><Plane className="h-4 w-4 text-[#C7A962]" /> Bookings</>}
-                      {activeTab === "storyboards" && <><Bookmark className="h-4 w-4 text-[#C7A962]" /> Storyboards</>}
                       {activeTab === "settings" && <><Settings className="h-4 w-4 text-[#C7A962]" /> Settings</>}
                     </span>
                   </SelectValue>
@@ -195,9 +193,6 @@ export default function TravelerDashboardPage() {
                   </SelectItem>
                   <SelectItem value="bookings" className="py-3">
                     <span className="flex items-center gap-2"><Plane className="h-4 w-4" /> Bookings</span>
-                  </SelectItem>
-                  <SelectItem value="storyboards" className="py-3">
-                    <span className="flex items-center gap-2"><Bookmark className="h-4 w-4" /> Storyboards</span>
                   </SelectItem>
                   <SelectItem value="settings" className="py-3">
                     <span className="flex items-center gap-2"><Settings className="h-4 w-4" /> Settings</span>
@@ -236,13 +231,6 @@ export default function TravelerDashboardPage() {
                   Bookings
                 </TabsTrigger>
                 <TabsTrigger 
-                  value="storyboards"
-                  className="rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
-                >
-                  <Bookmark className="h-3.5 w-3.5 mr-1.5" />
-                  Storyboards
-                </TabsTrigger>
-                <TabsTrigger 
                   value="settings"
                   className="rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
                 >
@@ -278,10 +266,6 @@ export default function TravelerDashboardPage() {
 
             <TabsContent value="bookings" className="mt-0">
               {user && <TravelerBookingsTab userId={user.id} />}
-            </TabsContent>
-
-            <TabsContent value="storyboards" className="mt-0">
-              {user && <TravelerStoryboardsTab userId={user.id} />}
             </TabsContent>
 
             <TabsContent value="settings" className="mt-0">
