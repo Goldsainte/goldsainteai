@@ -13,12 +13,10 @@ import founderImage from "@/assets/founder.jpg";
 import ticketmasterLogo from "@/assets/TicketMaster_wordmark.svg";
 import openaiLogo from "@/assets/OpenAI_Logo.svg";
 import geminiLogo from "@/assets/Google_Gemini_logo_2025.svg";
-import shopifyLogo from "@/assets/shopify-logo.svg";
-import etsyLogo from "@/assets/etsy-logo.svg";
 import goldsainteLogo from "@/assets/wordmark-green.svg";
 import primaryLogoGreen from "@/assets/primary-horizontal-logo-green.svg";
 import { 
-  Mic, Sparkles, Share2, Briefcase, Package, BarChart3, 
+  Sparkles, Share2, Briefcase, Package, BarChart3, 
   DollarSign, Users, FileCheck, MessageCircle, 
 } from "lucide-react";
 
@@ -27,9 +25,7 @@ const About = () => {
   const partners = [
     { name: "Ticketmaster", logo: ticketmasterLogo },
     { name: "OpenAI", logo: openaiLogo },
-    { name: "Google Gemini", logo: geminiLogo },
-    { name: "Shopify", logo: shopifyLogo },
-    { name: "Etsy", logo: etsyLogo }
+    { name: "Google Gemini", logo: geminiLogo }
   ];
 
   const featureCategories = [
@@ -37,9 +33,9 @@ const About = () => {
       category: "AI-Powered Intelligence",
       features: [
         {
-          icon: Mic,
-          title: "Voice AI Concierge",
-          description: "Just say 'Hey, Goldsainte' anywhere on our site to start a natural conversation about flights, hotels, dining, and more—hands-free."
+          icon: Sparkles,
+          title: "AI Trip Planning",
+          description: "Describe your dream trip in plain language and our AI builds a personalised itinerary, matches you with the right specialist, and structures the full journey."
         },
         {
           icon: Sparkles,
@@ -184,13 +180,7 @@ const About = () => {
               loading="lazy"/>
             </div>
             <p className="text-foreground">
-              {t('about.sections.whatIs.p1')}
-            </p>
-            <p className="text-foreground">
-              {t('about.sections.whatIs.p2')}
-            </p>
-            <p className="text-foreground">
-              {t('about.sections.whatIs.p3')}
+              Goldsainte is a luxury travel marketplace that connects travelers with certified travel agents and travel creators through AI-powered trip planning. Browse curated trips, post a custom trip request, or work directly with a verified specialist to design your perfect journey.
             </p>
           </AccordionContent>
         </AccordionItem>
@@ -518,11 +508,6 @@ const About = () => {
           </div>
 
           <div>
-            <h3 className="font-semibold text-base mb-3 text-foreground">D: Car Rentals</h3>
-            <p className="text-sm sm:text-base text-foreground">Booking may be with Goldsainte Transport Limited or the Service Provider. The Rental Agreement signed at pickup governs the rental and supersedes these Terms if there are discrepancies. Only the Main Driver can manage the booking unless authorized otherwise. Full refund if canceled more than 48 hours before rental; partial refund if canceled less than 48 hours before rental (deduct 3 days cost); no refund after rental start or for no-show. Driver age limits and additional fees (young/elderly driver, one-way, cross-border) may apply.</p>
-          </div>
-
-          <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">E: Flights</h3>
             <p className="text-sm sm:text-base text-foreground">Booking is with the airline (via Third-Party Aggregator); Goldsainte is not a contractual party. You enter into an Intermediation Contract with the Aggregator and a Contract of Carriage with the airline. Your Contract of Carriage governs cancellations, changes, and refunds. You are responsible for all travel documentation (passport, visas) and for compliance with check-in and boarding requirements. Charges may include taxes, service fees, baggage, and seat selection. Prohibited practices (e.g., buying flights you don't intend to use) are not allowed. Code-share flights may be operated by a different airline. US regulations for passengers with reduced mobility may apply.</p>
           </div>
@@ -666,7 +651,7 @@ const About = () => {
         <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
           <p className="text-foreground font-semibold mb-2">Complete Service Details Available</p>
           <p className="text-sm sm:text-base text-muted-foreground mb-3">
-            View the full, detailed information about all Goldsainte services including accommodations, attractions, flights, car rentals, and transportation.
+            View the full, detailed information about all Goldsainte services including curated trip packages, agent-planned itineraries, and creator-led travel experiences.
           </p>
           <Link 
             to="/what-we-do" 
@@ -681,7 +666,7 @@ const About = () => {
           
           <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">How Our Platform Works</h3>
-            <p className="text-sm sm:text-base text-foreground">Goldsainte provides an AI-powered platform that makes it easy to compare and book travel experiences from hotels, attractions, car rentals, flights, and transportation providers worldwide. When you make a booking, you enter into a direct contract with the Service Provider.</p>
+            <p className="text-sm sm:text-base text-foreground">Goldsainte provides an AI-powered marketplace that connects travelers with certified travel agents and travel creators to design curated trip packages, agent-planned itineraries, and creator-led travel experiences. When you book, you enter into a direct contract with the relevant specialist or supplier.</p>
           </div>
 
           <div>
@@ -695,21 +680,6 @@ const About = () => {
           </div>
 
           <div>
-            <h3 className="font-semibold text-base mb-3 text-foreground">3. Car Rentals</h3>
-            <p className="text-sm sm:text-base text-foreground">Compare rental cars from multiple companies with clear pricing and flexible booking options. Our platform helps you find the right vehicle for your needs with detailed specifications and customer reviews.</p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-base mb-3 text-foreground">4. Flights</h3>
-            <p className="text-sm sm:text-base text-foreground">Search and book flights through our Third-Party Aggregator partners. Our recommendation system helps you find the best options based on price, travel time, and your preferences.</p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-base mb-3 text-foreground">5. Private and Public Transportation</h3>
-            <p className="text-sm sm:text-base text-foreground">Book ground transportation including private transfers, taxis, and public transit options. Pre-book with confidence knowing all fees are included upfront.</p>
-          </div>
-
-          <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">How We Make Money</h3>
             <p className="text-sm sm:text-base text-foreground">Goldsainte earns commission from Service Providers after bookings are completed. We don't charge booking fees to customers. Properties with "Preferred Partner" or "Ad" badges pay higher commissions for enhanced visibility.</p>
           </div>
@@ -718,112 +688,6 @@ const About = () => {
             <h3 className="font-semibold text-base mb-3 text-foreground">AI-Powered Recommendations</h3>
             <p className="text-sm sm:text-base text-foreground">Our recommendation systems use your search criteria, past interactions, and property performance metrics to suggest travel options you'll love. You can adjust sorting preferences and disable personalization in your account settings.</p>
           </div>
-        </div>
-      </AccordionContent>
-    </AccordionItem>
-
-    {/* Modern Slavery Statement */}
-    <AccordionItem value="modern-slavery" id="modern-slavery" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
-      <AccordionTrigger className="text-sm sm:text-base font-medium hover:no-underline text-[#0c4d47]">
-        Modern Slavery Statement
-      </AccordionTrigger>
-      <AccordionContent className="pt-4 space-y-6 text-sm sm:text-base leading-relaxed">
-        <div className="flex justify-center mb-6">
-          <img 
-            src={primaryLogoGreen} 
-            alt="Goldsainte" 
-            className="h-5 sm:h-7 w-auto"
-          loading="lazy"/>
-        </div>
-        <p className="text-sm sm:text-base text-muted-foreground">
-          Fiscal Year Ending December 31, 2025
-        </p>
-
-        <div>
-          <h3 className="font-semibold text-base mb-3 text-foreground">1. Introduction</h3>
-          <p className="text-foreground">
-            Goldsainte recognizes that modern slavery in all its forms—including slavery, human trafficking, forced labor, debt bondage, descent-based slavery, servitude, child slavery, and forced or early marriage—is a serious global issue. We are committed to respecting the human rights of all our stakeholders and to taking proactive measures to prevent our business and supply chains from contributing to such practices.
-          </p>
-          <p className="text-foreground mt-3">
-            Our commitment is guided by internationally recognized standards and principles, including the United Nations Guiding Principles on Business and Human Rights. We strive to avoid infringing on the rights of others and actively work to address adverse human rights impacts with which we may be involved, including modern slavery risks.
-          </p>
-        </div>
-
-        <div>
-          <h3 className="font-semibold text-base mb-3 text-foreground">2. About Goldsainte</h3>
-          <p className="text-foreground">
-            Goldsainte is a travel and experiences platform that connects users with accommodations, attractions, flights, car rentals, and other travel services worldwide. While our operations are primarily digital, we engage with a wide range of suppliers, service providers, and contractors. We recognize that certain areas of our supply chain may be at higher risk of modern slavery and remain committed to mitigating these risks wherever they exist.
-          </p>
-        </div>
-
-        <div>
-          <h3 className="font-semibold text-base mb-3 text-foreground">3. Our Policies and Commitments</h3>
-          <p className="text-foreground mb-3">
-            Goldsainte has implemented policies and procedures to address modern slavery risks, including:
-          </p>
-          <ul className="list-disc pl-6 space-y-2 text-foreground">
-            <li>
-              <strong>Code of Conduct:</strong> All employees, contractors, and business partners are required to uphold ethical standards and respect human rights.
-            </li>
-            <li>
-              <strong>Supplier Standards:</strong> Our suppliers must comply with local labor laws and international human rights standards. Suppliers are expected to take steps to ensure that modern slavery does not exist within their own operations or supply chains.
-            </li>
-            <li>
-              <strong>Whistleblower Policy:</strong> Employees, partners, and other stakeholders can report concerns anonymously and without fear of retaliation.
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <h3 className="font-semibold text-base mb-3 text-foreground">4. Risk Assessment and Due Diligence</h3>
-          <p className="text-foreground mb-3">
-            Goldsainte regularly evaluates potential modern slavery risks in our operations and supply chain. We prioritize:
-          </p>
-          <ul className="list-disc pl-6 space-y-2 text-foreground">
-            <li>Suppliers located in regions with higher risk of labor exploitation.</li>
-            <li>Industries where forced labor and human trafficking are more prevalent.</li>
-            <li>Contractors providing labor-intensive services or temporary staffing.</li>
-          </ul>
-          <p className="text-foreground mt-3">
-            Where risks are identified, we implement mitigation measures, including contractual obligations, audits, and monitoring practices.
-          </p>
-        </div>
-
-        <div>
-          <h3 className="font-semibold text-base mb-3 text-foreground">5. Training and Awareness</h3>
-          <p className="text-foreground">
-            We provide training and awareness programs for our employees, procurement teams, and key suppliers. These programs focus on recognizing modern slavery risks, understanding reporting mechanisms, and ensuring compliance with Goldsainte's policies.
-          </p>
-        </div>
-
-        <div>
-          <h3 className="font-semibold text-base mb-3 text-foreground">6. Reporting and Accountability</h3>
-          <p className="text-foreground">
-            Goldsainte maintains a transparent reporting framework. Any suspected incidents of modern slavery are investigated promptly. We are committed to continuous improvement and regularly review our policies and procedures to strengthen our efforts to prevent modern slavery.
-          </p>
-        </div>
-
-        <div>
-          <h3 className="font-semibold text-base mb-3 text-foreground">7. Future Commitments</h3>
-          <p className="text-foreground mb-3">
-            Goldsainte will continue to:
-          </p>
-          <ul className="list-disc pl-6 space-y-2 text-foreground">
-            <li>Enhance supplier engagement to ensure compliance with human rights standards.</li>
-            <li>Monitor, assess, and mitigate risks across our supply chain.</li>
-            <li>Collaborate with industry partners and stakeholders to promote responsible and ethical business practices.</li>
-          </ul>
-        </div>
-
-        <div>
-          <h3 className="font-semibold text-base mb-3 text-foreground">8. Approval</h3>
-          <p className="text-foreground mb-3">
-            This statement has been approved by the Board of Directors of Goldsainte and is signed on behalf of the company by:
-          </p>
-              <div className="bg-muted p-4 rounded-lg leading-tight space-y-0">
-                <p className="font-semibold">Andre C. Powell Jr.</p>
-                <p className="text-muted-foreground">CEO & Founder, Goldsainte Inc.</p>
-              </div>
         </div>
       </AccordionContent>
     </AccordionItem>
@@ -1010,7 +874,7 @@ const About = () => {
           <div className="mb-4">
             <h4 className="font-semibold text-sm sm:text-base mb-2 text-foreground">Data & AI Advantage</h4>
             <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
-              <p><strong>Voice AI Concierge:</strong> Personalized, conversational trip planning and booking.</p>
+              <p><strong>AI Itinerary Builder:</strong> Personalised trip planning matched to certified travel specialists.</p>
               <p><strong>Predictive Analytics:</strong> Insights from search, bookings, and user engagement enable demand forecasting, seasonal offers, and upsell opportunities.</p>
               <p><strong>Rich Data Moat:</strong> User behavior, booking history, agent performance, and creator engagement provide unique competitive intelligence.</p>
             </div>
@@ -1041,7 +905,7 @@ const About = () => {
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">Vision & Roadmap</h3>
           <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
-            <p><strong>Near-Term (0–6 months):</strong> Full AI concierge rollout, expanded vendor tiers, creator monetization, and dynamic pricing.</p>
+            <p><strong>Near-Term (0–6 months):</strong> AI-powered trip planning and agent matching, expanded agent and creator network, creator monetization, and dynamic pricing.</p>
             <p><strong>Mid-Term (6–12 months):</strong> International expansion, traveler subscription tiers, B2B API launch, and predictive AI for personalized packages.</p>
             <p><strong>Long-Term (12–24 months):</strong> White-label agency solutions, AR/VR trip previews, blockchain loyalty program, and crypto payment integration.</p>
           </div>
@@ -1064,9 +928,9 @@ const About = () => {
         </div>
 
         <div>
-          <h3 className="font-semibold text-base mb-3 text-foreground">Modern Slavery & Human Rights Statements</h3>
+          <h3 className="font-semibold text-base mb-3 text-foreground">Human Rights Statement</h3>
           <p className="text-sm sm:text-base text-foreground">
-            For detailed information, please refer to our Modern Slavery Statement and Human Rights Statement above.
+            For detailed information, please refer to our Human Rights Statement above.
           </p>
         </div>
 
