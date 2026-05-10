@@ -45,12 +45,6 @@ export const OnboardingTour = () => {
       placement: "bottom",
       disableBeacon: true,
     },
-    {
-      target: '[data-tour="creator-dashboard"]',
-      content: "Creator Dashboard - Your Revenue Command Center! Track views, engagement, package bookings, and earnings all in one place. Level up through Bronze to Platinum tiers for bigger commission bonuses. Time to monetize your wanderlust!",
-      placement: "left",
-      disableBeacon: true,
-    },
   ];
 
   const handleJoyrideCallback = (data: CallBackProps) => {
