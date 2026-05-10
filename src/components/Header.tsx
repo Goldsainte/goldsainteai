@@ -626,20 +626,7 @@ export const Header = () => {
                         
                         
                         
-                        <DropdownMenuSeparator className="bg-border/50" />
-                        
-                        {/* Language Selector */}
-                        <div className="px-4 py-4">
-                          <p className="text-xs font-medium text-muted-foreground mb-2">Language</p>
-                          <LanguageSelector
-                            variant="outline" 
-                            size="sm" 
-                            currentLanguage={currentLanguage}
-                            onLanguageChange={handleLanguageChange}
-                          />
-                        </div>
-                        
-                        <DropdownMenuSeparator className="bg-border/50" />
+                         <DropdownMenuSeparator className="bg-border/50" />
                         
                         <div className="py-2 pb-3">
                           <DropdownMenuItem 
