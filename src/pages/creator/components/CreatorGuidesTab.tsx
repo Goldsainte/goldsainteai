@@ -17,11 +17,23 @@ type Guide = {
   cover_image_url: string | null;
 };
 
+type RecentPurchase = {
+  id: string;
+  amount_paid: number;
+  currency: string;
+  created_at: string;
+  buyerName: string;
+  guideTitle: string;
+};
+
 export function CreatorGuidesTab() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [guides, setGuides] = useState<Guide[]>([]);
   const [loading, setLoading] = useState(true);
+  const [salesCount, setSalesCount] = useState(0);
+  const [revenue, setRevenue] = useState(0);
+  const [recentPurchases, setRecentPurchases] = useState<RecentPurchase[]>([]);
 
   const load = async () => {
     if (!user) return;
@@ -31,7 +43,51 @@ export function CreatorGuidesTab() {
       .select("id, title, destination, price, currency, status, cover_image_url")
       .eq("creator_id", user.id)
       .order("created_at", { ascending: false });
-    setGuides((data as Guide[]) || []);
+    const guideList = (data as Guide[]) || [];
+    setGuides(guideList);
+
+    const guideIds = guideList.map((g) => g.id);
+    if (guideIds.length > 0) {
+      const { data: purchases } = await supabase
+        .from("itinerary_purchases")
+        .select("id, amount_paid, currency, created_at, buyer_id, product_id")
+        .in("product_id", guideIds)
+        .order("created_at", { ascending: false });
+
+      const list = (purchases as any[]) || [];
+      setSalesCount(list.length);
+      setRevenue(list.reduce((sum, p) => sum + (Number(p.amount_paid) || 0), 0));
+
+      const buyerIds = Array.from(new Set(list.map((p) => p.buyer_id))).filter(Boolean);
+      let buyerMap: Record<string, string> = {};
+      if (buyerIds.length) {
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, full_name, first_name")
+          .in("id", buyerIds);
+        for (const p of (profiles as any[]) || []) {
+          buyerMap[p.id] = p.first_name || (p.full_name?.split(" ")[0] ?? "Traveler");
+        }
+      }
+      const guideMap: Record<string, string> = {};
+      for (const g of guideList) guideMap[g.id] = g.title || "Untitled";
+
+      setRecentPurchases(
+        list.slice(0, 10).map((p) => ({
+          id: p.id,
+          amount_paid: Number(p.amount_paid) || 0,
+          currency: p.currency || "USD",
+          created_at: p.created_at,
+          buyerName: buyerMap[p.buyer_id] || "Traveler",
+          guideTitle: guideMap[p.product_id] || "Guide",
+        }))
+      );
+    } else {
+      setSalesCount(0);
+      setRevenue(0);
+      setRecentPurchases([]);
+    }
+
     setLoading(false);
   };
 
@@ -53,6 +109,18 @@ export function CreatorGuidesTab() {
 
   return (
     <div>
+      {/* Sales analytics */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <Card className="border border-[#E5DFC6] bg-white rounded-2xl p-5">
+          <p className="text-xs uppercase tracking-wider text-[#C7A962] font-medium">Guide Sales</p>
+          <p className="font-secondary text-3xl text-[#0a2225] mt-2">{salesCount}</p>
+        </Card>
+        <Card className="border border-[#E5DFC6] bg-white rounded-2xl p-5">
+          <p className="text-xs uppercase tracking-wider text-[#C7A962] font-medium">Guide Revenue</p>
+          <p className="font-secondary text-3xl text-[#0a2225] mt-2">${revenue.toLocaleString()}</p>
+        </Card>
+      </div>
+
       <div className="flex items-center justify-between mb-6">
         <h2 className="font-secondary text-xl text-[#0a2225]">Your Guides</h2>
         <Button
