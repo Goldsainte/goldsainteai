@@ -13,6 +13,7 @@ import {
 import { Loader2, MapPin, Clock, CheckCircle2, ShieldCheck, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { invokeWithAuth } from "@/lib/supabaseHelpers";
+import { BackButton } from "@/components/ui/BackButton";
 
 type Day = {
   day_number: number;
@@ -151,6 +152,10 @@ export default function ItineraryGuidePage() {
         <title>{guide.title} — Itinerary Guide</title>
         {guide.description && <meta name="description" content={guide.description.slice(0, 155)} />}
       </Helmet>
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6">
+        <BackButton to="/marketplace?tab=itinerary-guides" />
+      </div>
 
       {/* Cover */}
       {guide.cover_image_url && (
