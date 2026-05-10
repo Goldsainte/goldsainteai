@@ -118,8 +118,8 @@ export const unlockScroll = () => {
     document.body.style.position = '';
     document.body.style.width = '';
     document.body.style.paddingRight = '';
-  } catch (e) {
-    console.warn('unlockScroll failed', e);
+  } catch {
+    // silent
   }
 };
 

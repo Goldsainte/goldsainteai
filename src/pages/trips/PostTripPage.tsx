@@ -6,9 +6,9 @@ import {
   PricingVignette,
   ReviewVignette,
 } from "@/components/trips/StepVignettes";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
-import { ArrowLeft, ArrowRight, X, Sparkles, ChevronDown, ChevronUp, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, X, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
 import { toast } from "sonner";
@@ -20,13 +20,12 @@ type BudgetLevel = "accessible" | "elevated" | "ultra_luxury";
 type Pace = "slow" | "balanced" | "packed";
 type WantsRole = "creator" | "agent" | "both";
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 5;
 
 const stepMeta = [
   { title: "Where are you dreaming of?", subtitle: "Start with the destination and dates — we'll handle the rest." },
   { title: "Who's coming along?", subtitle: "A few details help us match you with the right planners." },
   { title: "Set the mood", subtitle: "What kind of experience are you after?" },
-  { title: "Build your visual brief", subtitle: "This is what creators and agents see when they receive your trip — add photos, links, and inspiration." },
   { title: "Anything else?", subtitle: "The little things that make a trip yours." },
   { title: "Review & post", subtitle: "Take a final look before we share your brief." },
 ];
@@ -40,16 +39,11 @@ export default function PostTripPage() {
 
   // Determine if we should skip the intro (prefill flows)
   const hasPrefillParams = !!(
-    searchParams.get("fromStoryboard") ||
     searchParams.get("fromCreator") ||
     searchParams.get("agentId") ||
     searchParams.get("from")
   );
   const [showIntro, setShowIntro] = useState(!hasPrefillParams);
-
-  const storyboardIdFromQuery =
-    searchParams.get("fromStoryboard") ||
-    (searchParams.get("from") === "storyboard" ? searchParams.get("storyboardId") : null);
 
   const { hasItineraryPrefill, prefillData: itineraryPrefill } = useItineraryPrefill();
 
@@ -77,8 +71,6 @@ export default function PostTripPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSafetyModal, setShowSafetyModal] = useState(false);
-  const [storyboardId, setStoryboardId] = useState<string | null>(null);
-  const storyboardSaveRef = useRef<(() => Promise<void>) | null>(null);
 
   // Direct-request: read fromCreator / agentId from URL or sessionStorage
   const [preferredCreatorId, setPreferredCreatorId] = useState<string | null>(null);
@@ -104,7 +96,6 @@ export default function PostTripPage() {
       });
     }
   }, [searchParams]);
-  const storyboardAddItemRef = useRef<((item: any) => void) | null>(null);
   const interestOptions = [
     "Food & wine", "Design hotels", "Adventure", "Wellness",
     "Nightlife", "Culture & museums", "Family-friendly", "Honeymoon / romance",
@@ -134,7 +125,6 @@ export default function PostTripPage() {
         if (data.specialNotes) setSpecialNotes(data.specialNotes);
         if (data.departureCity) setDepartureCity(data.departureCity);
         if (data.wantsRole) setWantsRole(data.wantsRole);
-        if (data.storyboardId) setStoryboardId(data.storyboardId);
         if (data.currentStep != null) setCurrentStep(data.currentStep);
       } catch (e) {
         console.error('Failed to restore pending trip data', e);
@@ -142,61 +132,6 @@ export default function PostTripPage() {
       sessionStorage.removeItem('goldsainte:pendingTrip');
     }
   }, []);
-
-  // After auth redirect, restore pending storyboard from sessionStorage into the database
-  useEffect(() => {
-    if (!user || storyboardId !== "pending-auth") return;
-
-    const pendingRaw = sessionStorage.getItem('goldsainte:pendingStoryboard');
-    if (!pendingRaw) return;
-
-    (async () => {
-      try {
-        const pending = JSON.parse(pendingRaw);
-        const sbTitle = pending.title || destination || "My storyboard";
-        const sbMode = pending.mode || "traveler";
-        const sbItems: any[] = pending.items || [];
-
-        // Create storyboard record
-        const { data: sb, error: sbError } = await supabase
-          .from("storyboards")
-          .insert({
-            owner_id: user.id,
-            role: sbMode,
-            title: sbTitle,
-          })
-          .select("id")
-          .single();
-
-        if (sbError) throw sbError;
-
-        // Insert all items
-        if (sbItems.length > 0) {
-          const rows = sbItems.map((item: any, index: number) => ({
-            storyboard_id: sb.id,
-            item_type: item.kind === "photo" ? "image" : item.kind,
-            source_type: item.source,
-            position: item.position ?? index,
-            image_url: item.kind === "photo" ? (item.data?.full_url || item.data?.thumb_url) : null,
-            title: item.data?.title || item.data?.alt || null,
-            metadata: item.data,
-          }));
-
-          const { error: itemsError } = await supabase
-            .from("storyboard_items")
-            .insert(rows);
-
-          if (itemsError) throw itemsError;
-        }
-
-        // Update state with real ID
-        setStoryboardId(sb.id);
-        sessionStorage.removeItem('goldsainte:pendingStoryboard');
-      } catch (err) {
-        console.error('[PostTripPage] Failed to restore pending storyboard:', err);
-      }
-    })();
-  }, [user, storyboardId]);
 
   // Auto-populate from AI Collection prefill
   useEffect(() => {
@@ -213,13 +148,6 @@ export default function PostTripPage() {
       if (itineraryPrefill.vibes.length > 0) setAestheticTags(itineraryPrefill.vibes);
     }
   }, [hasItineraryPrefill, itineraryPrefill]);
-
-  // Set storyboardId from query param so StoryboardBuilder loads existing items
-  useEffect(() => {
-    if (storyboardIdFromQuery && !storyboardId) {
-      setStoryboardId(storyboardIdFromQuery);
-    }
-  }, [storyboardIdFromQuery]);
 
   function removeAestheticTag(tag: string) {
     setAestheticTags(prev => prev.filter(t => t !== tag));
@@ -250,22 +178,13 @@ export default function PostTripPage() {
         return;
       }
     }
-    if (currentStep === 4) {
+    if (currentStep === 3) {
       if (!flexibility || !specialNotes) {
         setError("Please fill in all fields.");
         return;
       }
     }
     setError(null);
-
-    // Auto-save storyboard when leaving step 4 (index 3) if user hasn't saved yet
-    if (currentStep === 3 && !storyboardId && storyboardSaveRef.current) {
-      try {
-        await storyboardSaveRef.current();
-      } catch (err) {
-        console.error('[PostTripPage] Auto-save storyboard failed:', err);
-      }
-    }
 
     if (currentStep < TOTAL_STEPS - 1) setCurrentStep(s => s + 1);
   }
@@ -291,7 +210,7 @@ export default function PostTripPage() {
           destination, title, startsOn, endsOn, budgetMin, budgetMax,
           budgetLevel, adults, children, occasion, accommodationStyle,
           pace, interests, aestheticTags, flexibility, specialNotes,
-          departureCity, wantsRole, storyboardId, currentStep,
+          departureCity, wantsRole, currentStep,
         }));
         navigate(`/auth?returnTo=${encodeURIComponent('/post-trip')}`);
         return;
@@ -302,11 +221,6 @@ export default function PostTripPage() {
         collection_vibes: itineraryPrefill.vibes,
         ai_itinerary: itineraryPrefill.itinerary,
       } : {};
-
-      // Include storyboard reference in metadata
-      if (storyboardId) {
-        sourceMetadata.source_storyboard_id = storyboardId;
-      }
 
       const insertPayload: any = {
           user_id: user.id,
@@ -340,14 +254,6 @@ export default function PostTripPage() {
         .select("id")
         .single();
       if (insertError) throw insertError;
-
-      // Link storyboard to the new trip request
-      if (storyboardId && insertedTrip?.id) {
-        await supabase
-          .from("storyboards")
-          .update({ trip_request_id: insertedTrip.id } as any)
-          .eq("id", storyboardId);
-      }
 
       // Send notification to preferred creator/agent
       const notifyUserId = preferredCreatorId || preferredAgentId;
@@ -408,9 +314,8 @@ export default function PostTripPage() {
     { num: 1, title: "Choose your destination" },
     { num: 2, title: "Add traveler details" },
     { num: 3, title: "Set the style & pace" },
-    { num: 4, title: "Create your storyboard" },
-    { num: 5, title: "Set pricing & dates" },
-    { num: 6, title: "Review & post" },
+    { num: 4, title: "Add notes & preferences" },
+    { num: 5, title: "Review & post" },
   ];
 
   const [hoveredStep, setHoveredStep] = useState<number | null>(null);
@@ -419,9 +324,8 @@ export default function PostTripPage() {
     1: <DestinationVignette />,
     2: <TravelersVignette />,
     3: <StyleVignette />,
-    4: null,
-    5: <PricingVignette />,
-    6: <ReviewVignette />,
+    4: <PricingVignette />,
+    5: <ReviewVignette />,
   };
 
   if (showIntro) {
@@ -735,31 +639,8 @@ export default function PostTripPage() {
             </>
           )}
 
-          {/* ─── STEP 4: Visual Storyboard ─── */}
+          {/* ─── STEP 4: Notes & role ─── */}
           {currentStep === 3 && (
-            <div className="space-y-4">
-              <div className="rounded-2xl bg-[#FDFBF5] border border-[#C7A962]/30 px-4 py-3">
-                <div className="flex items-start gap-3">
-                  <Sparkles className="h-5 w-5 text-[#C7A962] flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-[#0a2225]">Your visual mood board</p>
-                    <p className="text-xs text-[#4a4a4a] mt-0.5">
-                      Add photos, hotel links, and inspiration images. This is the first thing creators and agents see.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              {storyboardId && (
-                <p className="text-xs text-[#0c4d47] flex items-center gap-1.5">
-                  <Check className="h-3.5 w-3.5" /> Storyboard saved
-                </p>
-              )}
-
-            </div>
-          )}
-
-          {/* ─── STEP 5: Notes & role ─── */}
-          {currentStep === 4 && (
             <>
               <div>
                 <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">How flexible are you? <span className="text-red-500">*</span></label>
@@ -784,8 +665,8 @@ export default function PostTripPage() {
             </>
           )}
 
-          {/* ─── STEP 6: Review ─── */}
-          {currentStep === 5 && (
+          {/* ─── STEP 5: Review ─── */}
+          {currentStep === 4 && (
             <>
               <div className="rounded-2xl bg-white border border-[#E5DFC6] divide-y divide-[#E5DFC6]">
                 <SummaryRow label="Destination" value={destination} />
@@ -831,14 +712,6 @@ export default function PostTripPage() {
                 </div>
               )}
 
-              {/* Storyboard status on review */}
-              {storyboardId && (
-                <div className="flex items-center gap-2 text-xs text-[#0c4d47]">
-                  <Check className="h-3.5 w-3.5" />
-                  <span className="font-medium">Visual storyboard attached</span>
-                </div>
-              )}
-
               {/* Condensed trust & safety */}
               <p className="text-[11px] text-[#9A9079]">
                 Your brief is shared only with vetted professionals. Keep payments on-platform.{" "}
@@ -878,7 +751,7 @@ export default function PostTripPage() {
         </div>
 
         {/* Disclaimer on review step */}
-        {currentStep === 5 && (
+        {currentStep === 4 && (
           <p className="text-center text-[10px] text-[#9A9079] mt-4">
             By posting, you agree to keep all booking communication inside Goldsainte.
           </p>
