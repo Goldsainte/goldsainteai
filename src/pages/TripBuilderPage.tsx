@@ -81,6 +81,13 @@ export default function TripBuilderPage() {
     try {
       setSaving(true);
 
+      // Block re-publish if already submitted or live
+      if (status === "published" && tripData && (tripData.status === "pending_review" || tripData.status === "published")) {
+        toast.error("This trip is already submitted or live. Contact support to make changes.");
+        setSaving(false);
+        return;
+      }
+
       // Gate publishing on Stripe account for creators
       if (status === "published" && isCreator) {
         const { data: profile } = await supabase
@@ -97,38 +104,92 @@ export default function TripBuilderPage() {
       }
       
       const slug = formData.slug || generateSlug(formData.title);
-      
-      const tripPayload = {
-        ...formData,
+
+      // Map "published" submissions to "pending_review" — admin approves to go live
+      const persistedStatus = status === "published" ? "pending_review" : "draft";
+
+      // Pull itinerary days off the form payload — they live in their own table
+      const { itinerary_days: itineraryDays = [], ...rest } = formData;
+
+      const tripPayload: any = {
+        ...rest,
         slug,
-        status,
+        status: persistedStatus,
         creator_type: isAgent ? "agent" : "creator",
         agent_id: isAgent ? user.id : null,
         creator_id: isCreator ? user.id : null,
-        published_at: status === "published" ? new Date().toISOString() : null,
         updated_at: new Date().toISOString(),
       };
 
+      let tripId = editId;
+      let savedSlug = slug;
+
       if (editId) {
-        const { error } = await supabase
+        const { data: updated, error } = await supabase
           .from("packaged_trips")
           .update(tripPayload)
-          .eq("id", editId);
-
+          .eq("id", editId)
+          .select("id, slug")
+          .single();
         if (error) throw error;
-        toast.success(status === "published" ? "Trip published!" : "Draft saved");
+        savedSlug = updated.slug || slug;
       } else {
         const { data, error } = await supabase
           .from("packaged_trips")
           .insert(tripPayload)
-          .select()
+          .select("id, slug")
           .single();
-
         if (error) throw error;
-        toast.success(status === "published" ? "Trip published!" : "Draft saved");
-        
-        // Redirect to edit mode with the new ID
-        navigate(`/trip-builder?edit=${data.id}`, { replace: true });
+        tripId = data.id;
+        savedSlug = data.slug || slug;
+      }
+
+      // Sync itinerary days — delete then insert
+      if (tripId && Array.isArray(itineraryDays)) {
+        const { error: delError } = await supabase
+          .from("trip_itinerary_days")
+          .delete()
+          .eq("trip_id", tripId);
+        if (delError) console.error("Failed to clear itinerary:", delError);
+
+        const validDays = itineraryDays
+          .filter((d: any) => d && (d.title?.trim() || d.description?.trim() || (d.activities?.length ?? 0) > 0 || d.accommodation?.trim()))
+          .map((d: any) => ({
+            trip_id: tripId,
+            day_number: d.day_number,
+            title: d.title || `Day ${d.day_number}`,
+            description: d.description || null,
+            activities: d.activities || [],
+            meals_included: d.meals_included || [],
+            accommodation: d.accommodation || null,
+            is_featured_day: !!d.is_featured_day,
+          }));
+
+        if (validDays.length > 0) {
+          const { error: insError } = await supabase
+            .from("trip_itinerary_days")
+            .insert(validDays);
+          if (insError) console.error("Failed to insert itinerary:", insError);
+        }
+      }
+
+      // Notify admins on first transition into pending_review
+      if (persistedStatus === "pending_review" && tripId) {
+        const { error: notifyErr } = await supabase.rpc("notify_admins_trip_pending_review", {
+          _trip_id: tripId,
+          _trip_title: formData.title || "Untitled trip",
+        });
+        if (notifyErr) console.error("Admin notification failed:", notifyErr);
+      }
+
+      if (persistedStatus === "pending_review") {
+        toast.success("Your trip has been submitted for review. We typically review listings within 24 hours and will notify you when it's live.");
+      } else {
+        toast.success("Draft saved");
+      }
+
+      if (!editId && tripId) {
+        navigate(`/trip-builder?edit=${tripId}`, { replace: true });
       }
     } catch (error: any) {
       toast.error("Failed to save: " + error.message);
@@ -137,11 +198,11 @@ export default function TripBuilderPage() {
     }
   };
 
-  const handlePreview = () => {
-    if (editId) {
-      window.open(`/trip/${tripData?.slug || editId}`, "_blank");
+  const handlePreview = async () => {
+    if (editId && tripData) {
+      window.open(`/marketplace/trip/${tripData.slug || editId}`, "_blank");
     } else {
-      toast.info("Save the trip first to preview it");
+      toast.info("Add a title and destination first, then we'll save and open a preview.");
     }
   };
 

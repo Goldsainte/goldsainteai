@@ -6985,6 +6985,7 @@ export type Database = {
       }
       packaged_trips: {
         Row: {
+          accommodation_type: string | null
           activity_level: string | null
           agent_id: string | null
           available_from: string | null
@@ -7015,8 +7016,11 @@ export type Database = {
           included: Json | null
           is_featured: boolean | null
           is_verified: boolean | null
+          languages: string[] | null
           max_participants: number | null
+          meals_included: string[] | null
           min_participants: number | null
+          minimum_age: number | null
           not_included: Json | null
           original_price: number | null
           passport_required: boolean | null
@@ -7041,6 +7045,7 @@ export type Database = {
           wishlist_count: number | null
         }
         Insert: {
+          accommodation_type?: string | null
           activity_level?: string | null
           agent_id?: string | null
           available_from?: string | null
@@ -7071,8 +7076,11 @@ export type Database = {
           included?: Json | null
           is_featured?: boolean | null
           is_verified?: boolean | null
+          languages?: string[] | null
           max_participants?: number | null
+          meals_included?: string[] | null
           min_participants?: number | null
+          minimum_age?: number | null
           not_included?: Json | null
           original_price?: number | null
           passport_required?: boolean | null
@@ -7097,6 +7105,7 @@ export type Database = {
           wishlist_count?: number | null
         }
         Update: {
+          accommodation_type?: string | null
           activity_level?: string | null
           agent_id?: string | null
           available_from?: string | null
@@ -7127,8 +7136,11 @@ export type Database = {
           included?: Json | null
           is_featured?: boolean | null
           is_verified?: boolean | null
+          languages?: string[] | null
           max_participants?: number | null
+          meals_included?: string[] | null
           min_participants?: number | null
+          minimum_age?: number | null
           not_included?: Json | null
           original_price?: number | null
           passport_required?: boolean | null
@@ -14065,6 +14077,10 @@ export type Database = {
       }
       mark_conversation_messages_read: {
         Args: { p_conversation_id: string; p_user_type: string }
+        Returns: undefined
+      }
+      notify_admins_trip_pending_review: {
+        Args: { _trip_id: string; _trip_title: string }
         Returns: undefined
       }
       notify_trip_members: {

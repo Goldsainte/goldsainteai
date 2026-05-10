@@ -4,6 +4,8 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export function MobileBottomNav() {
   const { user } = useAuth();
+  const accountType = (user?.user_metadata?.account_type as string | undefined)?.toLowerCase();
+  const postTripTo = (accountType === "agent" || accountType === "creator") ? "/trip-builder" : "/post-trip";
 
   const getProfileRoute = () => {
     if (!user) return "/auth";
@@ -20,7 +22,7 @@ export function MobileBottomNav() {
 
   const navItems = [
     { to: "/marketplace", icon: Store, label: "Marketplace" },
-    { to: "/post-trip", icon: PlaneTakeoff, label: "Post a Trip" },
+    { to: postTripTo, icon: PlaneTakeoff, label: "Post a Trip" },
     { to: "/my-trips", icon: Luggage, label: "My Trips" },
     { to: getProfileRoute(), icon: User, label: "Profile" },
   ];
