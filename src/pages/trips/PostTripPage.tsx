@@ -6,9 +6,9 @@ import {
   PricingVignette,
   ReviewVignette,
 } from "@/components/trips/StepVignettes";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
-import { ArrowLeft, ArrowRight, X, Sparkles, ChevronDown, ChevronUp, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, X, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
 import { toast } from "sonner";
@@ -20,13 +20,12 @@ type BudgetLevel = "accessible" | "elevated" | "ultra_luxury";
 type Pace = "slow" | "balanced" | "packed";
 type WantsRole = "creator" | "agent" | "both";
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 5;
 
 const stepMeta = [
   { title: "Where are you dreaming of?", subtitle: "Start with the destination and dates — we'll handle the rest." },
   { title: "Who's coming along?", subtitle: "A few details help us match you with the right planners." },
   { title: "Set the mood", subtitle: "What kind of experience are you after?" },
-  { title: "Build your visual brief", subtitle: "This is what creators and agents see when they receive your trip — add photos, links, and inspiration." },
   { title: "Anything else?", subtitle: "The little things that make a trip yours." },
   { title: "Review & post", subtitle: "Take a final look before we share your brief." },
 ];
@@ -40,16 +39,11 @@ export default function PostTripPage() {
 
   // Determine if we should skip the intro (prefill flows)
   const hasPrefillParams = !!(
-    searchParams.get("fromStoryboard") ||
     searchParams.get("fromCreator") ||
     searchParams.get("agentId") ||
     searchParams.get("from")
   );
   const [showIntro, setShowIntro] = useState(!hasPrefillParams);
-
-  const storyboardIdFromQuery =
-    searchParams.get("fromStoryboard") ||
-    (searchParams.get("from") === "storyboard" ? searchParams.get("storyboardId") : null);
 
   const { hasItineraryPrefill, prefillData: itineraryPrefill } = useItineraryPrefill();
 
@@ -77,8 +71,6 @@ export default function PostTripPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSafetyModal, setShowSafetyModal] = useState(false);
-  const [storyboardId, setStoryboardId] = useState<string | null>(null);
-  const storyboardSaveRef = useRef<(() => Promise<void>) | null>(null);
 
   // Direct-request: read fromCreator / agentId from URL or sessionStorage
   const [preferredCreatorId, setPreferredCreatorId] = useState<string | null>(null);
@@ -104,7 +96,6 @@ export default function PostTripPage() {
       });
     }
   }, [searchParams]);
-  const storyboardAddItemRef = useRef<((item: any) => void) | null>(null);
   const interestOptions = [
     "Food & wine", "Design hotels", "Adventure", "Wellness",
     "Nightlife", "Culture & museums", "Family-friendly", "Honeymoon / romance",
