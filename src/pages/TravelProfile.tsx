@@ -924,6 +924,9 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
           </TabsContent>
         )}
       </Tabs>
+          </TabsContent>
+        </Tabs>
+      </div>
 
       {isOwnProfile && editingPost && (
         <VideoEditModal
