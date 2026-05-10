@@ -246,6 +246,7 @@ export default function CreatorDashboard() {
                     {activeTab === "proposals" && <><FileText className="h-4 w-4 text-[#C7A962]" /> Proposals</>}
                     {activeTab === "trips" && <><Map className="h-4 w-4 text-[#C7A962]" /> My Trips</>}
                     {activeTab === "portfolio" && <><ImageIcon className="h-4 w-4 text-[#C7A962]" /> Portfolio</>}
+                    {activeTab === "guides" && <><BookOpen className="h-4 w-4 text-[#C7A962]" /> Guides</>}
                     {activeTab === "earnings" && <><DollarSign className="h-4 w-4 text-[#C7A962]" /> Earnings</>}
                     {activeTab === "settings" && <><Settings className="h-4 w-4 text-[#C7A962]" /> Settings</>}
                   </span>
@@ -263,6 +264,9 @@ export default function CreatorDashboard() {
                 </SelectItem>
                 <SelectItem value="portfolio" className="py-3">
                   <span className="flex items-center gap-2"><ImageIcon className="h-4 w-4" /> Portfolio</span>
+                </SelectItem>
+                <SelectItem value="guides" className="py-3">
+                  <span className="flex items-center gap-2"><BookOpen className="h-4 w-4" /> Guides</span>
                 </SelectItem>
                 <SelectItem value="earnings" className="py-3">
                   <span className="flex items-center gap-2"><DollarSign className="h-4 w-4" /> Earnings</span>
