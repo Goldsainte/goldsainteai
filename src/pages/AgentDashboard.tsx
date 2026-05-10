@@ -395,6 +395,20 @@ export default function AgentDashboard() {
 
         <StripeConnectOnboarding />
 
+        {pendingTripsCount > 0 && publishedTripsCount === 0 && (
+          <div className="mb-6 rounded-2xl border border-[#C7A962]/40 bg-[#FDF9F0] px-6 py-5 flex items-start gap-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#C7A962]/15 flex-shrink-0">
+              <Hourglass className="h-5 w-5 text-[#C7A962]" />
+            </div>
+            <div>
+              <h3 className="font-secondary text-lg text-[#0a2225]">Your listing is under review</h3>
+              <p className="text-sm text-[#6B7280] mt-1">
+                We typically approve new listings within 24–48 hours. You'll receive an email when it's live.
+              </p>
+            </div>
+          </div>
+        )}
+
         <Tabs defaultValue="available" className="space-y-6">
           <TabsList>
             <TabsTrigger value="available">Available Jobs ({jobs.length})</TabsTrigger>
