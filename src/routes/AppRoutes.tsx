@@ -90,6 +90,7 @@ const CreatorDashboard = lazy(() => import('@/pages/CreatorDashboard'));
 const CreatorTripPage = lazy(() => import('@/pages/CreatorTripPage'));
 const TripBuilderPage = lazy(() => import('@/pages/TripBuilderPage'));
 const ItineraryBuilderPage = lazy(() => import('@/pages/ItineraryBuilderPage'));
+const ItineraryGuidePage = lazy(() => import('@/pages/ItineraryGuidePage'));
 // CreatorProfilePage removed — /creator/:id now redirects to /creators/:id
 const CreatorRedirect = lazy(() => import('@/pages/redirects/CreatorRedirect'));
 const MessagesPage = lazy(() => import('@/pages/MessagesPage'));
@@ -374,6 +375,7 @@ export const AppRoutes = () => (
           </RequireAuth>
         )}
       />
+      <Route path="/itinerary-guide/:id" element={<ItineraryGuidePage />} />
       <Route path="/storyboards" element={<Navigate to="/marketplace" replace />} />
       <Route path="/storyboards/new" element={<Navigate to="/marketplace" replace />} />
       <Route path="/storyboards/:id" element={<Navigate to="/marketplace" replace />} />
