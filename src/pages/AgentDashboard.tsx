@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Briefcase, MapPin, DollarSign, Clock, MessageSquare, CheckCircle, Sparkles, Shield } from "lucide-react";
+import { Briefcase, MapPin, DollarSign, Clock, MessageSquare, CheckCircle, Sparkles, Shield, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { JobMessaging } from "@/components/JobMessaging";
 import { StripeConnectOnboarding } from "@/components/StripeConnectOnboarding";
@@ -337,7 +337,14 @@ export default function AgentDashboard() {
         </div>
 
         {/* Quick Access Navigation */}
-        <div className="flex gap-3 mb-6">
+        <div className="flex flex-wrap gap-3 mb-6">
+          <Button
+            onClick={() => navigate('/trip-builder')}
+            className="bg-[#0c4d47] text-[#E5DFC6] rounded-full px-6 hover:bg-[#0a3d39]"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create New Trip
+          </Button>
           <Button 
             variant="outline" 
             className="flex items-center gap-2"

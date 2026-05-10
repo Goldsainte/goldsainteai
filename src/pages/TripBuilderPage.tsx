@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { formatDistanceToNow } from "date-fns";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -20,6 +21,8 @@ export default function TripBuilderPage() {
   const [tripData, setTripData] = useState<any>(null);
   const [loading, setLoading] = useState(!!editId);
   const formRef = useRef<TripBuilderFormHandle>(null);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const handleSaveRef = useRef<((data: any, status: "draft" | "published") => Promise<void>) | null>(null);
 
   useEffect(() => {
     if (authLoading || roleLoading) return;
@@ -203,6 +206,28 @@ export default function TripBuilderPage() {
     }
   };
 
+  // Keep latest handleSave reachable from the autosave interval
+  useEffect(() => {
+    handleSaveRef.current = handleSave;
+  });
+
+  // Autosave drafts every 60s once a title exists
+  useEffect(() => {
+    if (authLoading || roleLoading || !user) return;
+    const interval = setInterval(async () => {
+      const data = formRef.current?.getCurrentData();
+      if (data?.title && handleSaveRef.current) {
+        try {
+          await handleSaveRef.current(data, "draft");
+          setLastSaved(new Date());
+        } catch (e) {
+          // silent — manual save still works
+        }
+      }
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [authLoading, roleLoading, user]);
+
   const handlePreview = async () => {
     if (editId && tripData) {
       window.open(`/marketplace/trip/${tripData.slug || editId}`, "_blank");
@@ -249,6 +274,12 @@ export default function TripBuilderPage() {
         <h1 className="font-secondary text-2xl sm:text-3xl md:text-4xl text-[#0a2225] tracking-tight">
           {editId ? "Edit Trip" : "Trip Builder"} by <em>Goldsainte AI</em>
         </h1>
+
+        {lastSaved && (
+          <p className="mt-2 text-xs text-[#9A9384]">
+            Saved {formatDistanceToNow(lastSaved)} ago
+          </p>
+        )}
 
         {/* Descriptive caption */}
         <p className="mt-3 text-[#6B7280] text-base max-w-xl leading-relaxed">

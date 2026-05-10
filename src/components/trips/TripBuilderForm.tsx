@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Save, Send, Plus, X, ImagePlus, Loader2, Shuffle, CalendarIcon } from "lucide-react";
+import { Save, Send, Plus, X, ImagePlus, Loader2, Shuffle, CalendarIcon, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrayFieldEditor } from "./ArrayFieldEditor";
@@ -40,6 +40,16 @@ const ACCOMMODATION_TYPES = ["Boutique Hotel", "Luxury Resort", "Hostel", "Campi
 const MEAL_OPTIONS = ["Breakfast", "Lunch", "Dinner", "Snacks"];
 const DAY_MEAL_OPTIONS = ["Breakfast", "Lunch", "Dinner"];
 
+const CANCELLATION_TEMPLATE = `- Deposit ({deposit_percentage}%) is non-refundable after booking confirmation.
+- Cancellations 60+ days before departure: full refund of balance paid beyond deposit.
+- Cancellations 30–60 days before departure: 50% refund of balance.
+- Cancellations under 30 days before departure: no refund.
+- Trip insurance is strongly recommended.`;
+
+const REFUND_TEMPLATE = `- Refunds are processed within 7–10 business days to the original payment method.
+- In the event of a trip cancellation by the operator, 100% refund will be issued including the deposit.
+- Force majeure events are handled case by case with travel credit offered where possible.`;
+
 export type ItineraryDay = {
   day_number: number;
   title: string;
@@ -68,6 +78,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
   const [coverSuggested, setCoverSuggested] = useState(false);
   const [itineraryDays, setItineraryDays] = useState<ItineraryDay[]>([]);
   const [departureMode, setDepartureMode] = useState<"flexible" | "fixed">("flexible");
+  const [aiLoading, setAiLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -91,6 +102,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
     available_from: "",
     available_until: "",
     deposit_percentage: "30",
+    balance_due_days: "",
     passport_required: true,
     visa_required: false,
     vaccination_required: false,
@@ -135,6 +147,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
         available_from: initialData.available_from || "",
         available_until: initialData.available_until || "",
         deposit_percentage: initialData.deposit_percentage?.toString() || "30",
+        balance_due_days: initialData.balance_due_days?.toString() || "",
         passport_required: initialData.passport_required ?? true,
         visa_required: initialData.visa_required ?? false,
         vaccination_required: initialData.vaccination_required ?? false,
@@ -276,6 +289,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
       available_from: formData.available_from || null,
       available_until: formData.available_until || null,
       deposit_percentage: parseInt(formData.deposit_percentage) || 30,
+      balance_due_days: formData.balance_due_days ? parseInt(formData.balance_due_days) : null,
       passport_required: formData.passport_required,
       visa_required: formData.visa_required,
       vaccination_required: formData.vaccination_required,
@@ -300,6 +314,54 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
   useImperativeHandle(ref, () => ({
     getCurrentData: () => preparePayload(),
   }));
+
+  const handleAIItinerary = async () => {
+    if (!formData.title || !formData.destination) {
+      toast.info("Add a title and destination first.");
+      return;
+    }
+    const days = parseInt(formData.duration_days) || itineraryDays.length;
+    if (days <= 0) {
+      toast.info("Set the trip duration first.");
+      return;
+    }
+    setAiLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("ai-trip-itinerary-suggest", {
+        body: {
+          title: formData.title,
+          destination: formData.destination,
+          duration_days: days,
+          trip_type: formData.trip_type || null,
+        },
+      });
+      if (error) throw error;
+      const suggested = (data?.days || []) as Array<any>;
+      if (suggested.length === 0) {
+        toast.error("No itinerary returned. Try again.");
+        return;
+      }
+      setItineraryDays((prev) =>
+        prev.map((d, idx) => {
+          const s = suggested[idx];
+          if (!s) return d;
+          return {
+            ...d,
+            title: s.title || d.title,
+            description: s.description || d.description,
+            activities: Array.isArray(s.activities) ? s.activities : d.activities,
+            accommodation: s.accommodation || d.accommodation,
+          };
+        })
+      );
+      toast.success("Itinerary draft generated. Review and edit each day.");
+    } catch (err: any) {
+      console.error("AI itinerary error:", err);
+      toast.error("Failed to generate itinerary. Please try again.");
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const isValid = formData.title && formData.destination && formData.price_per_person && formData.duration_days;
 
@@ -490,7 +552,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
                   <Label className={labelClasses}>Min Participants</Label>
                   <Input
@@ -508,16 +570,6 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                     value={formData.max_participants}
                     onChange={(e) => updateField("max_participants", e.target.value)}
                     placeholder="12"
-                    className={inputClasses}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className={labelClasses}>Deposit %</Label>
-                  <Input
-                    type="number"
-                    value={formData.deposit_percentage}
-                    onChange={(e) => updateField("deposit_percentage", e.target.value)}
-                    placeholder="30"
                     className={inputClasses}
                   />
                 </div>
@@ -683,6 +735,23 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
 
         {/* ITINERARY TAB */}
         <TabsContent value="itinerary" className="mt-8 space-y-6">
+          {formData.title && formData.destination && itineraryDays.length > 0 && (
+            <div className="flex justify-end">
+              <Button
+                variant="outline"
+                onClick={handleAIItinerary}
+                disabled={aiLoading}
+                className="rounded-full border-[#C7A962]/40 text-[#0c4d47] hover:bg-[#FDF9F0]"
+              >
+                {aiLoading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Sparkles className="h-4 w-4 mr-2" />
+                )}
+                {aiLoading ? "Generating..." : "Suggest with AI"}
+              </Button>
+            </div>
+          )}
           {itineraryDays.length === 0 ? (
             <Card className="border-none bg-white rounded-2xl shadow-sm">
               <CardContent className="py-12 text-center text-sm text-[#6B7280]">
@@ -1046,12 +1115,66 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
 
         {/* POLICIES TAB */}
         <TabsContent value="policies" className="mt-8 space-y-8">
+          {/* Payment & Cancellation Terms */}
+          <Card className="border-none bg-white rounded-2xl shadow-sm">
+            <CardHeader className="pb-4">
+              <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
+              <CardTitle className="font-secondary text-lg text-[#0a2225]">Payment Terms</CardTitle>
+              <p className="text-sm text-[#6B7280] mt-1">
+                Set your deposit and payment schedule. These appear on your trip listing.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className={labelClasses}>Deposit Required (%)</Label>
+                  <Input
+                    type="number"
+                    value={formData.deposit_percentage}
+                    onChange={(e) => updateField("deposit_percentage", e.target.value)}
+                    placeholder="25"
+                    className={inputClasses}
+                  />
+                  <p className="text-xs text-[#9A9384]">
+                    Charged at booking. Remaining balance collected before departure.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label className={labelClasses}>Balance Due (days before trip)</Label>
+                  <Input
+                    type="number"
+                    value={formData.balance_due_days}
+                    onChange={(e) => updateField("balance_due_days", e.target.value)}
+                    placeholder="60"
+                    className={inputClasses}
+                  />
+                  <p className="text-xs text-[#9A9384]">When the remaining balance is collected.</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card className="border-none bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
             <CardHeader className="pb-4">
               <div className="w-12 h-0.5 bg-[#C7A962] mb-3" />
               <CardTitle className="font-secondary text-lg sm:text-xl text-[#0a2225]">Cancellation Policy</CardTitle>
             </CardHeader>
             <CardContent>
+              <button
+                type="button"
+                onClick={() =>
+                  updateField(
+                    "cancellation_policy",
+                    CANCELLATION_TEMPLATE.replace(
+                      "{deposit_percentage}",
+                      formData.deposit_percentage || "30"
+                    )
+                  )
+                }
+                className="text-xs text-[#0c4d47] underline mb-2"
+              >
+                Use template
+              </button>
               <Textarea
                 value={formData.cancellation_policy}
                 onChange={(e) => updateField("cancellation_policy", e.target.value)}
@@ -1068,6 +1191,13 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
               <CardTitle className="font-secondary text-lg sm:text-xl text-[#0a2225]">Refund Policy</CardTitle>
             </CardHeader>
             <CardContent>
+              <button
+                type="button"
+                onClick={() => updateField("refund_policy", REFUND_TEMPLATE)}
+                className="text-xs text-[#0c4d47] underline mb-2"
+              >
+                Use template
+              </button>
               <Textarea
                 value={formData.refund_policy}
                 onChange={(e) => updateField("refund_policy", e.target.value)}
