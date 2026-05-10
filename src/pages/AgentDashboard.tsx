@@ -292,7 +292,7 @@ export default function AgentDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-[#FDF9F0]">
         <div className="container mx-auto px-4 py-8 flex items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
@@ -302,7 +302,7 @@ export default function AgentDashboard() {
 
   if (!agent) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
+      <div className="min-h-screen bg-[#FDF9F0] flex flex-col">
         <main className="flex-1 container mx-auto px-4 py-8">
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
@@ -320,7 +320,7 @@ export default function AgentDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col pb-20 lg:pb-0">
+    <div className="min-h-screen bg-[#FDF9F0] flex flex-col pb-20 lg:pb-0">
       
       <main className="flex-1 container mx-auto px-4 py-8">
         <BackButton className="mb-6" />
@@ -410,14 +410,17 @@ export default function AgentDashboard() {
         )}
 
         <Tabs defaultValue="available" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="available">Available Jobs ({jobs.length})</TabsTrigger>
-            <TabsTrigger value="my-bids">My Bids ({myBids.length})</TabsTrigger>
-            <TabsTrigger value="creator-collabs">Creator Collabs ({collabRequests.length})</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="availability">Availability</TabsTrigger>
-            <TabsTrigger value="verification">Verification</TabsTrigger>
-          </TabsList>
+          <div className="relative">
+            <TabsList className="w-full overflow-x-auto scrollbar-hide bg-transparent border-b border-[#E5DFC6] rounded-none h-11 justify-start gap-0 flex">
+              <TabsTrigger value="available" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Available Jobs ({jobs.length})</TabsTrigger>
+              <TabsTrigger value="my-bids" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">My Bids ({myBids.length})</TabsTrigger>
+              <TabsTrigger value="creator-collabs" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Creator Collabs ({collabRequests.length})</TabsTrigger>
+              <TabsTrigger value="analytics" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Analytics</TabsTrigger>
+              <TabsTrigger value="availability" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Availability</TabsTrigger>
+              <TabsTrigger value="verification" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Verification</TabsTrigger>
+            </TabsList>
+            <div className="pointer-events-none absolute right-0 top-0 h-11 w-12 bg-gradient-to-l from-[#FDF9F0] to-transparent md:hidden" />
+          </div>
 
           <TabsContent value="available" className="space-y-4">
             {jobs.length === 0 ? (
