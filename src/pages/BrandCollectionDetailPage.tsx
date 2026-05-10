@@ -3,12 +3,10 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { TravelStoryboard } from "@/components/storyboards/TravelStoryboard";
 import { TripRequestModal } from "@/components/trips/TripRequestModal";
 import { CollectionHeroCollage } from "@/components/brand/CollectionHeroCollage";
 import { TripSummaryChips } from "@/components/brand/TripSummaryChips";
 import { CollectionSidebar } from "@/components/brand/CollectionSidebar";
-import { SaveToStoryboardButton } from "@/components/storyboards/SaveToStoryboardButton";
 import { ArrowLeft, MapPin } from "lucide-react";
 
 interface BrandProfile {
@@ -245,17 +243,6 @@ export default function BrandCollectionDetailPage() {
               >
                 Request a trip like this
               </Button>
-              <SaveToStoryboardButton
-                assetType="brand_collection"
-                assetData={{
-                  id: collection.id,
-                  title: collection.title,
-                  cover_image_url: collection.cover_image_url,
-                  tags: collection.tags,
-                }}
-                variant="outline"
-                className="w-full rounded-full"
-              />
             </div>
           </div>
         </div>
@@ -300,32 +287,8 @@ export default function BrandCollectionDetailPage() {
               onRequestTrip={handleTripInquiry}
               className="sticky top-8"
             />
-            <SaveToStoryboardButton
-              assetType="brand_collection"
-              assetData={{
-                id: collection.id,
-                title: collection.title,
-                cover_image_url: collection.cover_image_url,
-                tags: collection.tags,
-              }}
-              variant="outline"
-              className="w-full rounded-full"
-            />
           </div>
         </div>
-
-        {/* Inspiration section – reuse TravelStoryboard */}
-        <section className="mt-8 space-y-3">
-          <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#A4987C]">
-            Inspiration from this collection
-          </h2>
-          <TravelStoryboard
-            title=""
-            subtitle=""
-            maxItems={16}
-            highlightTags={highlightTags}
-          />
-        </section>
 
         {related.length > 0 && (
           <section className="mt-8 space-y-3">
