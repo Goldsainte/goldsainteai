@@ -202,6 +202,17 @@ export default function TripBuilderPage() {
 
       if (persistedStatus === "pending_review") {
         toast.success(resubmitNotice ?? "Your trip has been submitted for review. We typically review listings within 24 hours and will notify you when it's live.");
+        // Send agent confirmation email (best-effort, non-blocking)
+        if (user?.email) {
+          supabase.functions.invoke("send-agent-submission-email", {
+            body: {
+              agentEmail: user.email,
+              agentName: (user as any)?.user_metadata?.full_name || "there",
+              tripTitle: formData?.title || "Your trip",
+              tripId,
+            },
+          }).catch((e) => console.error("submission email failed:", e));
+        }
       } else {
         toast.success("Draft saved");
       }
@@ -329,7 +340,7 @@ export default function TripBuilderPage() {
               isEditing={!!editId}
             />
           </div>
-          <div className="hidden xl:flex flex-col w-72 flex-shrink-0">
+          <div className="hidden lg:flex flex-col w-60 flex-shrink-0">
             <div className="sticky top-8">
               <p className="text-[11px] uppercase tracking-widest text-[#9A9384] font-medium mb-4">Live preview</p>
               <div className="rounded-2xl overflow-hidden border border-[#E5DFC6] shadow-sm">
