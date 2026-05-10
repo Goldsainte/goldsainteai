@@ -147,7 +147,7 @@ export default function ItineraryBuilderPage() {
               <Label className={labelClasses}>Cover image</Label>
               <div className="mt-2">
                 <TripImageUploader
-                  imageUrl={form.cover_image_url}
+                  currentUrl={form.cover_image_url}
                   onUpload={(url) => update("cover_image_url", url)}
                 />
               </div>
