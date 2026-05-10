@@ -644,6 +644,7 @@ export function DirectMessageInbox() {
                               message={msg}
                               isSelf={msg.sender_id === user?.id}
                               onDelete={handleDeleteMessage}
+                              currentUserId={user?.id || ""}
                             />
                           )
                         ))}
@@ -822,19 +823,80 @@ function MessageBubble({
   message,
   isSelf,
   onDelete,
+  currentUserId,
 }: {
   message: { id: string; body: string; created_at: string; is_read: boolean };
   isSelf: boolean;
   onDelete?: (id: string) => void;
+  currentUserId: string;
 }) {
   const [hovered, setHovered] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
+  const [reactions, setReactions] = useState<{ emoji: string; user_id: string }[]>([]);
+
+  const REACTION_OPTIONS = ["👍", "❤️", "😂", "🙏", "✈️"];
+
+  const loadReactions = useCallback(async () => {
+    const { data } = await supabase
+      .from("message_reactions")
+      .select("emoji, user_id")
+      .eq("message_id", message.id);
+    if (data) setReactions(data);
+  }, [message.id]);
+
+  useEffect(() => {
+    loadReactions();
+    const channel = supabase
+      .channel(`reactions-${message.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "message_reactions", filter: `message_id=eq.${message.id}` },
+        () => loadReactions()
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [message.id, loadReactions]);
+
+  const toggleReaction = async (emoji: string) => {
+    if (!currentUserId) return;
+    setShowPicker(false);
+    const mine = reactions.find((r) => r.user_id === currentUserId && r.emoji === emoji);
+    if (mine) {
+      await supabase
+        .from("message_reactions")
+        .delete()
+        .eq("message_id", message.id)
+        .eq("user_id", currentUserId)
+        .eq("emoji", emoji);
+    } else {
+      await supabase
+        .from("message_reactions")
+        .insert({ message_id: message.id, user_id: currentUserId, emoji });
+    }
+  };
+
+  const grouped = reactions.reduce<Record<string, { count: number; mine: boolean }>>(
+    (acc, r) => {
+      if (!acc[r.emoji]) acc[r.emoji] = { count: 0, mine: false };
+      acc[r.emoji].count += 1;
+      if (r.user_id === currentUserId) acc[r.emoji].mine = true;
+      return acc;
+    },
+    {}
+  );
 
   return (
     <div
-      className={`flex items-center gap-1.5 ${isSelf ? "justify-end" : "justify-start"}`}
+      className={`flex flex-col ${isSelf ? "items-end" : "items-start"}`}
       onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseLeave={() => {
+        setHovered(false);
+        setShowPicker(false);
+      }}
     >
+      <div className={`flex items-center gap-1.5 ${isSelf ? "justify-end" : "justify-start"} relative`}>
       {isSelf && hovered && onDelete && (
         <button
           onClick={() => onDelete(message.id)}
@@ -842,6 +904,15 @@ function MessageBubble({
           title="Delete message"
         >
           <Trash2 className="h-3.5 w-3.5" />
+        </button>
+      )}
+      {!isSelf && hovered && (
+        <button
+          onClick={() => setShowPicker((v) => !v)}
+          className="p-1.5 rounded-full text-[#9CA3AF] hover:text-[#C7A962] hover:bg-[#F6F0E4] transition-colors"
+          title="Add reaction"
+        >
+          <SmilePlus className="h-3.5 w-3.5" />
         </button>
       )}
       <div
@@ -867,6 +938,50 @@ function MessageBubble({
           )}
         </div>
       </div>
+      {isSelf && hovered && (
+        <button
+          onClick={() => setShowPicker((v) => !v)}
+          className="p-1.5 rounded-full text-[#9CA3AF] hover:text-[#C7A962] hover:bg-[#F6F0E4] transition-colors"
+          title="Add reaction"
+        >
+          <SmilePlus className="h-3.5 w-3.5" />
+        </button>
+      )}
+      {showPicker && (
+        <div
+          className={`absolute -top-10 ${isSelf ? "right-8" : "left-8"} z-20 flex gap-1 bg-white border border-[#E5DFC6] rounded-full shadow-md px-2 py-1`}
+        >
+          {REACTION_OPTIONS.map((emoji) => (
+            <button
+              key={emoji}
+              onClick={() => toggleReaction(emoji)}
+              className="text-lg hover:scale-125 transition-transform p-0.5"
+            >
+              {emoji}
+            </button>
+          ))}
+        </div>
+      )}
+      </div>
+      {Object.keys(grouped).length > 0 && (
+        <div className={`flex gap-1 mt-1 flex-wrap ${isSelf ? "justify-end" : "justify-start"} max-w-[70%]`}>
+          {Object.entries(grouped).map(([emoji, info]) => (
+            <button
+              key={emoji}
+              onClick={() => toggleReaction(emoji)}
+              className={cn(
+                "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border transition-colors",
+                info.mine
+                  ? "bg-[#FDF9F0] border-[#C7A962]/60 text-[#0a2225]"
+                  : "bg-white border-[#E5DFC6] text-[#5a6c6e] hover:bg-[#F6F0E4]"
+              )}
+            >
+              <span>{emoji}</span>
+              <span>{info.count}</span>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
