@@ -140,6 +140,14 @@ export default function Marketplace() {
         query = query.gte("max_participants", filters.travelers);
       }
 
+      // Price range
+      if (filters.minPrice && filters.minPrice > 0) {
+        query = query.gte("price_per_person", filters.minPrice);
+      }
+      if (filters.maxPrice && filters.maxPrice < 10000) {
+        query = query.lte("price_per_person", filters.maxPrice);
+      }
+
       // Category tag filter
       if (filters.category && filters.category !== "Top Rated") {
         const tagVariants = FILTER_TAG_MAP[filters.category] || [filters.category.toLowerCase()];
