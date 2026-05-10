@@ -396,7 +396,7 @@ async function notifyAndEmailOnBookingConfirmed(tripBookingId: string, session: 
         Authorization: `Bearer ${resendApiKey}`,
       },
       body: JSON.stringify({
-        from: 'Goldsainte <booking@goldsainte.com>',
+        from: 'Goldsainte <hello@goldsainte.ai>',
         to: [travelerEmail],
         subject: 'Your Goldsainte booking is confirmed',
         html,
