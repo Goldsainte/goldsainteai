@@ -941,28 +941,40 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
               <CardTitle className="font-secondary text-xl text-[#0a2225]">Travel Requirements</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="flex items-center justify-between p-4 bg-[#FDF9F0] rounded-xl">
-                  <Label className={labelClasses}>Passport Required</Label>
-                  <Switch
-                    checked={formData.passport_required}
-                    onCheckedChange={(v) => updateField("passport_required", v)}
-                  />
-                </div>
-                <div className="flex items-center justify-between p-4 bg-[#FDF9F0] rounded-xl">
-                  <Label className={labelClasses}>Visa Required</Label>
-                  <Switch
-                    checked={formData.visa_required}
-                    onCheckedChange={(v) => updateField("visa_required", v)}
-                  />
-                </div>
-                <div className="flex items-center justify-between p-4 bg-[#FDF9F0] rounded-xl">
-                  <Label className={labelClasses}>Vaccination Required</Label>
-                  <Switch
-                    checked={formData.vaccination_required}
-                    onCheckedChange={(v) => updateField("vaccination_required", v)}
-                  />
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {([
+                  { field: "passport_required" as const, label: "Passport Required", description: "Travelers must hold a valid passport" },
+                  { field: "visa_required" as const, label: "Visa Required", description: "A visa may be needed for this destination" },
+                  { field: "vaccination_required" as const, label: "Vaccination Required", description: "Proof of vaccination may be required" },
+                ]).map(({ field, label, description }) => (
+                  <button
+                    type="button"
+                    key={field}
+                    onClick={() => updateField(field, !formData[field])}
+                    className="flex items-start gap-3 p-4 bg-[#FDF9F0] rounded-xl text-left hover:bg-[#F6F0E4] transition-colors"
+                  >
+                    <span
+                      role="checkbox"
+                      aria-checked={!!formData[field]}
+                      className={cn(
+                        "mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md border transition-colors",
+                        formData[field]
+                          ? "bg-[#0c4d47] border-[#0c4d47]"
+                          : "bg-white border-[#C7B892]"
+                      )}
+                    >
+                      {formData[field] && (
+                        <svg viewBox="0 0 20 20" fill="none" className="h-3.5 w-3.5 text-white">
+                          <path d="M5 10.5l3 3 7-7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </span>
+                    <span className="flex flex-col">
+                      <span className="text-sm font-medium text-[#0a2225]">{label}</span>
+                      <span className="text-xs text-[#6B7280] mt-0.5">{description}</span>
+                    </span>
+                  </button>
+                ))}
               </div>
 
               <div className="space-y-2">
