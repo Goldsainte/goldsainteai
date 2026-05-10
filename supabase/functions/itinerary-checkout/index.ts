@@ -80,10 +80,18 @@ serve(async (req) => {
       ],
       payment_intent_data: {
         metadata: {
+          type: "itinerary_purchase",
           itinerary_product_id: product.id,
+          product_id: product.id,
           buyer_id: user.id,
           creator_id: product.creator_id,
         },
+      },
+      metadata: {
+        type: "itinerary_purchase",
+        product_id: product.id,
+        buyer_id: user.id,
+        creator_id: product.creator_id,
       },
       success_url: successUrl,
       cancel_url: cancelUrl,

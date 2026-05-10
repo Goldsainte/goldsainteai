@@ -177,6 +177,22 @@ export default function TravelerDashboardPage() {
               Start Planning
             </button>
           </div>
+          {/* My Purchases quick link */}
+          <div className="mb-6 flex items-start gap-4 rounded-2xl border border-[#E5DFC6] bg-white p-5 md:items-center md:flex-row flex-col">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xs uppercase tracking-wider text-[#0c4d47] font-medium">Your Library</span>
+              </div>
+              <h3 className="font-secondary text-xl text-[#0a2225]">My Purchases</h3>
+              <p className="text-sm text-[#6B7280] mt-1">Access the itinerary guides you've purchased anytime.</p>
+            </div>
+            <button
+              onClick={() => navigate('/my-purchases')}
+              className="flex-shrink-0 rounded-full bg-[#0c4d47] hover:bg-[#0c4d47]/90 text-white text-sm px-5 py-2.5"
+            >
+              View Purchases
+            </button>
+          </div>
           {/* Tabbed Navigation */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
             {/* Mobile: Dropdown Select */}

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams, useSearchParams, Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -46,8 +46,7 @@ interface CreatorMini {
 export default function ItineraryGuidePage() {
   const { id } = useParams();
   const { user } = useAuth();
-  const [searchParams] = useSearchParams();
-  const purchased = searchParams.get("purchased") === "true";
+  const [hasPurchased, setHasPurchased] = useState(false);
   const [guide, setGuide] = useState<Guide | null>(null);
   const [creator, setCreator] = useState<CreatorMini | null>(null);
   const [loading, setLoading] = useState(true);
@@ -79,8 +78,21 @@ export default function ItineraryGuidePage() {
     })();
   }, [id, user?.id]);
 
+  useEffect(() => {
+    if (!user || !id) return;
+    supabase
+      .from("itinerary_purchases")
+      .select("id")
+      .eq("buyer_id", user.id)
+      .eq("product_id", id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) setHasPurchased(true);
+      });
+  }, [user, id]);
+
   const isOwner = !!user && !!guide && guide.creator_id === user.id;
-  const unlocked = purchased || isOwner;
+  const unlocked = hasPurchased || isOwner;
 
   const handleCheckout = async () => {
     if (!guide) return;
@@ -96,7 +108,7 @@ export default function ItineraryGuidePage() {
         {
           body: {
             itineraryProductId: guide.id,
-            successUrl: `${origin}/itinerary-guide/${guide.id}?purchased=true`,
+            successUrl: `${origin}/itinerary-guide/${guide.id}`,
             cancelUrl: `${origin}/itinerary-guide/${guide.id}`,
           },
         }
@@ -152,7 +164,7 @@ export default function ItineraryGuidePage() {
       )}
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 md:py-14">
-        {purchased && (
+        {hasPurchased && (
           <div className="mb-6 rounded-xl border border-[#0c4d47]/30 bg-[#0c4d47]/5 px-4 py-3 flex items-start gap-3">
             <CheckCircle2 className="h-5 w-5 text-[#0c4d47] mt-0.5" />
             <p className="text-sm text-[#0a2225]">
@@ -297,10 +309,9 @@ export default function ItineraryGuidePage() {
                     What's inside
                   </p>
                   <ul className="mt-2 space-y-1.5 text-sm text-[#0a2225]">
-                    <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-[#0c4d47] mt-0.5" /> Day-by-day itinerary</li>
-                    <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-[#0c4d47] mt-0.5" /> Accommodation tips</li>
-                    <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-[#0c4d47] mt-0.5" /> Local activities</li>
-                    <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-[#0c4d47] mt-0.5" /> Downloadable PDF</li>
+                    <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-[#0c4d47] mt-0.5" /> Full day-by-day itinerary</li>
+                    <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-[#0c4d47] mt-0.5" /> Accommodation recommendations</li>
+                    <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-[#0c4d47] mt-0.5" /> Local activities & tips</li>
                   </ul>
                 </div>
 

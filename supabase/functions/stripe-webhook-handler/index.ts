@@ -135,6 +135,18 @@ async function handleCheckoutCompleted(session: any) {
   } else if (metadata.type === 'booking' && metadata.booking_id) {
     // Handle new booking payment system
     await handleBookingPayment(metadata.booking_id, session);
+  } else if (metadata.type === 'itinerary_purchase' && metadata.product_id && metadata.buyer_id) {
+    const { error } = await supabaseClient.from('itinerary_purchases').insert({
+      buyer_id: metadata.buyer_id,
+      product_id: metadata.product_id,
+      stripe_payment_intent_id: session.payment_intent,
+      amount_paid: (session.amount_total ?? 0) / 100,
+      currency: (session.currency || 'usd').toUpperCase(),
+    });
+    if (error && !error.message?.includes('duplicate')) {
+      console.error('Failed to record itinerary purchase', error);
+    }
+    return;
   }
 }
 
