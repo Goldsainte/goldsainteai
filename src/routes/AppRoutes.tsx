@@ -78,7 +78,6 @@ const PartnerBookingsPage = lazy(() => import('@/pages/PartnerBookingsPage'));
 const BookingDetailPage = lazy(() => import('@/pages/bookings/BookingDetailPage'));
 const EmailPreview = lazy(() => import('@/pages/EmailPreview'));
 const BillingDashboard = lazy(() => import('@/pages/BillingDashboard'));
-const TikTokLabStoryboardsPage = lazy(() => import('@/pages/TikTokLab/StoryboardsPage'));
 const TravelSettings = lazy(() => import('@/pages/TravelSettings'));
 const ApplicationStatusCheck = lazy(() => import('@/pages/ApplicationStatusCheck'));
 const AgentApplicationForm = lazy(() => import('@/pages/AgentApplicationForm'));
