@@ -49,9 +49,24 @@ interface TripData {
   creator_id?: string | null;
   creator_type?: string | null;
   agent_id?: string | null;
+  languages?: string[] | null;
+  departure_dates?: string[] | null;
+  minimum_age?: number | null;
+  accommodation_type?: string | null;
+  meals_included?: string[] | null;
+  cancellation_policy?: string | null;
+  refund_policy?: string | null;
   creator?: {
     id: string;
     full_name: string | null;
+    username?: string | null;
+    avatar_url: string | null;
+    bio: string | null;
+  } | null;
+  agent?: {
+    id: string;
+    full_name: string | null;
+    username: string | null;
     avatar_url: string | null;
     bio: string | null;
   } | null;
@@ -92,6 +107,14 @@ export default function TrovaTripDetailPage() {
             creator:profiles!packaged_trips_creator_id_fkey (
               id,
               full_name,
+              username,
+              avatar_url,
+              bio
+            ),
+            agent:profiles!packaged_trips_agent_id_fkey (
+              id,
+              full_name,
+              username,
               avatar_url,
               bio
             )
@@ -184,6 +207,9 @@ export default function TrovaTripDetailPage() {
     : trip.max_participants;
 
   const isPlatformTrip = trip.creator_type === 'platform' && !trip.creator?.full_name;
+  const hasCreator = !!trip.creator?.full_name;
+  const host = hasCreator ? trip.creator : trip.agent;
+  const hostType: "creator" | "agent" = hasCreator ? "creator" : "agent";
 
   return (
     <div className="min-h-screen bg-[#f7f3ea]">
@@ -260,11 +286,11 @@ export default function TrovaTripDetailPage() {
               </section>
             ) : (
               <MeetYourHostCard
-                hostId={trip.creator?.id || trip.creator_id}
-                hostName={trip.creator?.full_name || "Host"}
-                hostAvatar={trip.creator?.avatar_url}
-                hostBio={trip.creator?.bio}
-                hostType="creator"
+                hostId={host?.id || trip.creator_id || trip.agent_id || ""}
+                hostName={host?.full_name || "Host"}
+                hostAvatar={host?.avatar_url || undefined}
+                hostBio={host?.bio || undefined}
+                hostType={hostType}
               />
             )}
 
@@ -273,6 +299,64 @@ export default function TrovaTripDetailPage() {
             )}
 
             <TripInclusionsCard included={included} notIncluded={notIncluded} />
+
+            {((trip.languages?.length ?? 0) > 0 ||
+              (trip.departure_dates?.length ?? 0) > 0 ||
+              trip.minimum_age ||
+              trip.accommodation_type ||
+              (trip.meals_included?.length ?? 0) > 0) && (
+              <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6 space-y-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7A7151]">Trip Essentials</p>
+                {(trip.departure_dates?.length ?? 0) > 0 && (
+                  <div>
+                    <p className="text-xs font-medium text-[#0a2225] mb-2">Departure Dates</p>
+                    <div className="flex flex-wrap gap-2">
+                      {trip.departure_dates!.map((d: string) => (
+                        <span key={d} className="text-xs bg-[#F5F0E8] text-[#0a2225] px-3 py-1 rounded-full border border-[#E5DFC6]">
+                          {new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {(trip.languages?.length ?? 0) > 0 && (
+                  <div>
+                    <p className="text-xs font-medium text-[#0a2225] mb-2">Languages</p>
+                    <div className="flex flex-wrap gap-2">
+                      {trip.languages!.map((l: string) => (
+                        <span key={l} className="text-xs bg-[#F5F0E8] text-[#0a2225] px-3 py-1 rounded-full border border-[#E5DFC6]">{l}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {(trip.meals_included?.length ?? 0) > 0 && (
+                  <div>
+                    <p className="text-xs font-medium text-[#0a2225] mb-2">Meals Included</p>
+                    <div className="flex flex-wrap gap-2">
+                      {trip.meals_included!.map((m: string) => (
+                        <span key={m} className="text-xs bg-[#FDF9F0] text-[#C7A962] px-3 py-1 rounded-full border border-[#C7A962]/30">{m}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {(trip.minimum_age || trip.accommodation_type) && (
+                  <div className="grid grid-cols-2 gap-4">
+                    {trip.minimum_age && (
+                      <div>
+                        <p className="text-xs text-[#9A9384]">Minimum Age</p>
+                        <p className="text-sm font-medium text-[#0a2225]">{trip.minimum_age}+</p>
+                      </div>
+                    )}
+                    {trip.accommodation_type && (
+                      <div>
+                        <p className="text-xs text-[#9A9384]">Accommodation</p>
+                        <p className="text-sm font-medium text-[#0a2225]">{trip.accommodation_type}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </section>
+            )}
 
             {itineraryDays.length > 0 && (
               <TripItineraryAccordion days={itineraryDays} totalNights={durationNights} />
@@ -294,7 +378,20 @@ export default function TrovaTripDetailPage() {
               destination={trip.destination}
             />
 
-            <TripCancellationPolicySection />
+            {trip.cancellation_policy ? (
+              <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7A7151] mb-4">Cancellation Policy</p>
+                <p className="text-sm text-[#5c5c52] leading-relaxed whitespace-pre-wrap">{trip.cancellation_policy}</p>
+                {trip.refund_policy && (
+                  <>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7A7151] mt-5 mb-3">Refund Policy</p>
+                    <p className="text-sm text-[#5c5c52] leading-relaxed whitespace-pre-wrap">{trip.refund_policy}</p>
+                  </>
+                )}
+              </section>
+            ) : (
+              <TripCancellationPolicySection />
+            )}
 
             <TripTrustBadges />
 
