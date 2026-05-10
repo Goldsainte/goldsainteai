@@ -514,11 +514,6 @@ const About = () => {
           </div>
 
           <div>
-            <h3 className="font-semibold text-base mb-3 text-foreground">D: Car Rentals</h3>
-            <p className="text-sm sm:text-base text-foreground">Booking may be with Goldsainte Transport Limited or the Service Provider. The Rental Agreement signed at pickup governs the rental and supersedes these Terms if there are discrepancies. Only the Main Driver can manage the booking unless authorized otherwise. Full refund if canceled more than 48 hours before rental; partial refund if canceled less than 48 hours before rental (deduct 3 days cost); no refund after rental start or for no-show. Driver age limits and additional fees (young/elderly driver, one-way, cross-border) may apply.</p>
-          </div>
-
-          <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">E: Flights</h3>
             <p className="text-sm sm:text-base text-foreground">Booking is with the airline (via Third-Party Aggregator); Goldsainte is not a contractual party. You enter into an Intermediation Contract with the Aggregator and a Contract of Carriage with the airline. Your Contract of Carriage governs cancellations, changes, and refunds. You are responsible for all travel documentation (passport, visas) and for compliance with check-in and boarding requirements. Charges may include taxes, service fees, baggage, and seat selection. Prohibited practices (e.g., buying flights you don't intend to use) are not allowed. Code-share flights may be operated by a different airline. US regulations for passengers with reduced mobility may apply.</p>
           </div>
