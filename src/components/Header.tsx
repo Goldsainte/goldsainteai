@@ -15,15 +15,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { useTranslation } from "react-i18next";
 import logoWordmark from "@/assets/primary-horizontal-logo-gold-2.png";
 import logomark from "@/assets/logomark-gold.png";
 import { useExpediaModal } from "@/contexts/ExpediaModalContext";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { SearchBar } from "@/components/SearchBar";
-
-import { LanguageSelector } from "@/components/LanguageSelector";
 import { NotificationInbox } from "@/components/NotificationInbox";
 
 export const Header = () => {
@@ -33,8 +28,6 @@ export const Header = () => {
   const { toast } = useToast();
   const { isAdmin } = useUserRole();
   const isMobile = useIsMobile();
-  const { language: currentLanguage, setLanguage: setCurrentLanguage } = useLanguage();
-  const { t } = useTranslation();
   
   
   const [createSheetOpen, setCreateSheetOpen] = useState(false);
@@ -51,17 +44,6 @@ export const Header = () => {
   const isBrand = accountType === "brand";
   const primaryBookingsPath = "/my-bookings";
 
-  const handleLanguageChange = (language: string) => {
-    setCurrentLanguage(language);
-    toast({
-      title: t('language.changed'),
-      description: t('language.setTo', { language: language.toUpperCase() }),
-    });
-  };
-
-  
-
-  // Fetch and subscribe to profile avatar changes
   useEffect(() => {
     if (!user) {
       setProfileAvatarUrl(null);
@@ -383,20 +365,7 @@ export const Header = () => {
                           
                           
                           
-                          <DropdownMenuSeparator className="bg-border/50" />
-                          
-                          {/* Language Selector */}
-                          <div className="px-4 py-4">
-                            <p className="text-xs font-medium text-muted-foreground mb-2">Language</p>
-                            <LanguageSelector
-                              variant="outline" 
-                              size="sm" 
-                              currentLanguage={currentLanguage}
-                              onLanguageChange={handleLanguageChange}
-                            />
-                          </div>
-                          
-                          <DropdownMenuSeparator className="bg-border/50" />
+                           <DropdownMenuSeparator className="bg-border/50" />
                           
                           <div className="py-2 pb-3">
                             <DropdownMenuItem 
@@ -639,20 +608,7 @@ export const Header = () => {
                         
                         
                         
-                        <DropdownMenuSeparator className="bg-border/50" />
-                        
-                        {/* Language Selector */}
-                        <div className="px-4 py-4">
-                          <p className="text-xs font-medium text-muted-foreground mb-2">Language</p>
-                          <LanguageSelector
-                            variant="outline" 
-                            size="sm" 
-                            currentLanguage={currentLanguage}
-                            onLanguageChange={handleLanguageChange}
-                          />
-                        </div>
-                        
-                        <DropdownMenuSeparator className="bg-border/50" />
+                         <DropdownMenuSeparator className="bg-border/50" />
                         
                         <div className="py-2 pb-3">
                           <DropdownMenuItem 
