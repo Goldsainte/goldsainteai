@@ -78,6 +78,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
   const [coverSuggested, setCoverSuggested] = useState(false);
   const [itineraryDays, setItineraryDays] = useState<ItineraryDay[]>([]);
   const [departureMode, setDepartureMode] = useState<"flexible" | "fixed">("flexible");
+  const [aiLoading, setAiLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -313,6 +314,54 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
   useImperativeHandle(ref, () => ({
     getCurrentData: () => preparePayload(),
   }));
+
+  const handleAIItinerary = async () => {
+    if (!formData.title || !formData.destination) {
+      toast.info("Add a title and destination first.");
+      return;
+    }
+    const days = parseInt(formData.duration_days) || itineraryDays.length;
+    if (days <= 0) {
+      toast.info("Set the trip duration first.");
+      return;
+    }
+    setAiLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("ai-trip-itinerary-suggest", {
+        body: {
+          title: formData.title,
+          destination: formData.destination,
+          duration_days: days,
+          trip_type: formData.trip_type || null,
+        },
+      });
+      if (error) throw error;
+      const suggested = (data?.days || []) as Array<any>;
+      if (suggested.length === 0) {
+        toast.error("No itinerary returned. Try again.");
+        return;
+      }
+      setItineraryDays((prev) =>
+        prev.map((d, idx) => {
+          const s = suggested[idx];
+          if (!s) return d;
+          return {
+            ...d,
+            title: s.title || d.title,
+            description: s.description || d.description,
+            activities: Array.isArray(s.activities) ? s.activities : d.activities,
+            accommodation: s.accommodation || d.accommodation,
+          };
+        })
+      );
+      toast.success("Itinerary draft generated. Review and edit each day.");
+    } catch (err: any) {
+      console.error("AI itinerary error:", err);
+      toast.error("Failed to generate itinerary. Please try again.");
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const isValid = formData.title && formData.destination && formData.price_per_person && formData.duration_days;
 
