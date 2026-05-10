@@ -15,15 +15,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { useTranslation } from "react-i18next";
 import logoWordmark from "@/assets/primary-horizontal-logo-gold-2.png";
 import logomark from "@/assets/logomark-gold.png";
 import { useExpediaModal } from "@/contexts/ExpediaModalContext";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { SearchBar } from "@/components/SearchBar";
-
-import { LanguageSelector } from "@/components/LanguageSelector";
 import { NotificationInbox } from "@/components/NotificationInbox";
 
 export const Header = () => {
@@ -33,8 +28,6 @@ export const Header = () => {
   const { toast } = useToast();
   const { isAdmin } = useUserRole();
   const isMobile = useIsMobile();
-  const { language: currentLanguage, setLanguage: setCurrentLanguage } = useLanguage();
-  const { t } = useTranslation();
   
   
   const [createSheetOpen, setCreateSheetOpen] = useState(false);
