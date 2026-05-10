@@ -56,6 +56,11 @@ interface TripData {
   meals_included?: string[] | null;
   cancellation_policy?: string | null;
   refund_policy?: string | null;
+  passport_required?: boolean | null;
+  visa_required?: boolean | null;
+  vaccination_required?: boolean | null;
+  fitness_level_required?: string | null;
+  terms_conditions?: string | null;
   creator?: {
     id: string;
     full_name: string | null;
