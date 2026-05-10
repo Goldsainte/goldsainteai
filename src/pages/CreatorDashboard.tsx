@@ -14,7 +14,9 @@ import {
   DollarSign,
   Settings,
   ImageIcon,
+  ArrowRight,
 } from "lucide-react";
+import { Card } from "@/components/ui/card";
 import { BackButton } from "@/components/ui/BackButton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
