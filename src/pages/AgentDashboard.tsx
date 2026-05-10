@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Briefcase, MapPin, DollarSign, Clock, MessageSquare, CheckCircle, Sparkles, Shield, Plus } from "lucide-react";
+import { Briefcase, MapPin, DollarSign, Clock, MessageSquare, CheckCircle, Sparkles, Shield, Plus, Hourglass } from "lucide-react";
 import { toast } from "sonner";
 import { JobMessaging } from "@/components/JobMessaging";
 import { StripeConnectOnboarding } from "@/components/StripeConnectOnboarding";
@@ -54,6 +54,8 @@ export default function AgentDashboard() {
   });
   const [selectedBidForDetails, setSelectedBidForDetails] = useState<any>(null);
   const [bidDetailsOpen, setBidDetailsOpen] = useState(false);
+  const [pendingTripsCount, setPendingTripsCount] = useState(0);
+  const [publishedTripsCount, setPublishedTripsCount] = useState(0);
 
   useEffect(() => {
     if (authLoading || roleLoading) return;
@@ -194,6 +196,24 @@ export default function AgentDashboard() {
 
       if (collabsError) throw collabsError;
       setCollabRequests(collabsData || []);
+
+      // Fetch agent trip status counts (use auth user id as agent_id on packaged_trips)
+      if (user?.id) {
+        const [{ count: pCount }, { count: pubCount }] = await Promise.all([
+          supabase
+            .from("packaged_trips")
+            .select("*", { count: "exact", head: true })
+            .eq("agent_id", user.id)
+            .eq("status", "pending_review"),
+          supabase
+            .from("packaged_trips")
+            .select("*", { count: "exact", head: true })
+            .eq("agent_id", user.id)
+            .eq("status", "published"),
+        ]);
+        setPendingTripsCount(pCount || 0);
+        setPublishedTripsCount(pubCount || 0);
+      }
 
     } catch (error: any) {
       console.error('Error fetching data:', error);
