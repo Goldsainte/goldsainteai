@@ -46,7 +46,7 @@ export function CreatorSocialInline({ accounts }: Props) {
       {totalReach > 0 && (
         <>
           <span className="text-[#E5DFC6]">·</span>
-          <span className="text-xs">{formatFollowers(totalReach)}+ followers</span>
+          <span className="text-xs">{formatFollowers(totalReach)}+ social followers</span>
         </>
       )}
     </div>
