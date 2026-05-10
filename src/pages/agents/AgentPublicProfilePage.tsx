@@ -35,6 +35,8 @@ interface AgentDetails {
   website: string | null;
   experience_years: number | null;
   response_time_hours?: number | null;
+  professional_license_verified?: boolean | null;
+  insurance_verified?: boolean | null;
 }
 
 export default function AgentPublicProfilePage() {
@@ -310,6 +312,9 @@ export default function AgentPublicProfilePage() {
                 reviewCount={details?.total_reviews}
                 responseTimeHours={details?.response_time_hours ?? null}
                 lastActiveAt={agent.last_active_at ?? null}
+                isVerified={isVerified}
+                professionalLicenseVerified={details?.professional_license_verified ?? null}
+                insuranceVerified={details?.insurance_verified ?? null}
                 onRequestTrip={() =>
                   navigate(`/post-trip?agentId=${agent.id}&agentName=${encodeURIComponent(displayName)}`)
                 }

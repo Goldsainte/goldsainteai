@@ -1,4 +1,4 @@
-import { Activity, Clock } from "lucide-react";
+import { Activity, Clock, Check, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import FollowButton from "@/components/FollowButton";
@@ -12,6 +12,9 @@ interface ProfileSidebarProps {
   targetUserId?: string;
   lastActiveAt?: string | null;
   responseTimeHours?: number | null;
+  isVerified?: boolean;
+  professionalLicenseVerified?: boolean | null;
+  insuranceVerified?: boolean | null;
   className?: string;
 }
 
@@ -23,6 +26,9 @@ export function ProfileSidebar({
   targetUserId,
   lastActiveAt,
   responseTimeHours,
+  isVerified,
+  professionalLicenseVerified,
+  insuranceVerified,
   className,
 }: ProfileSidebarProps) {
   const lastActiveText = lastActiveAt
@@ -121,6 +127,34 @@ export function ProfileSidebar({
           ))}
         </ul>
       </div>
+
+      {(isVerified !== undefined || professionalLicenseVerified !== undefined || insuranceVerified !== undefined) && (
+        <div className="rounded-2xl border border-[#E5DFC6] bg-white p-5">
+          <p className="text-xs uppercase tracking-wider text-[#C7A962] font-medium mb-3">
+            Verified by Goldsainte
+          </p>
+          <ul className="space-y-2.5">
+            {[
+              { label: "Identity confirmed", done: !!isVerified },
+              { label: "Professional credentials", done: !!professionalLicenseVerified },
+              { label: "Insurance on file", done: !!insuranceVerified },
+            ].map((item) => (
+              <li key={item.label} className="flex items-center gap-2.5 text-sm">
+                {item.done ? (
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#0c4d47] text-white flex-shrink-0">
+                    <Check className="h-3 w-3" />
+                  </span>
+                ) : (
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#E5DFC6] text-[#9A9384] flex-shrink-0">
+                    <Circle className="h-2 w-2" />
+                  </span>
+                )}
+                <span className={item.done ? "text-[#0a2225]" : "text-[#9A9384]"}>{item.label}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
