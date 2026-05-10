@@ -449,12 +449,17 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                   <div className="space-y-2">
                     <Label className={labelClasses}>Duration (days) *</Label>
                     <Input type="number" value={formData.duration_days}
-                      onChange={(e) => updateField("duration_days", e.target.value)} placeholder="5" className={inputClasses} />
+                      onChange={(e) => {
+                        const days = parseInt(e.target.value) || 0;
+                        updateField("duration_days", e.target.value);
+                        if (days > 0) updateField("duration_nights", String(days - 1));
+                      }} placeholder="5" className={inputClasses} />
                   </div>
                   <div className="space-y-2">
                     <Label className={labelClasses}>Duration (nights)</Label>
                     <Input type="number" value={formData.duration_nights}
                       onChange={(e) => updateField("duration_nights", e.target.value)} placeholder="4" className={inputClasses} />
+                    <p className="text-[11px] text-[#6B7280]">Auto-calculated from days (you can adjust if needed)</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
