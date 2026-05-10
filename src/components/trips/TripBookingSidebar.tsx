@@ -18,6 +18,7 @@ interface TripBookingSidebarProps {
   creatorId?: string;
   creatorType?: string;
   agentId?: string;
+  tripTitle?: string;
 }
 
 export function TripBookingSidebar({
@@ -32,6 +33,7 @@ export function TripBookingSidebar({
   creatorId,
   creatorType,
   agentId,
+  tripTitle,
 }: TripBookingSidebarProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -155,6 +157,8 @@ export function TripBookingSidebar({
             agent_id: partnerId,
             conversation_type: "trip_inquiry",
             status: "active",
+            trip_id: tripId,
+            trip_title: tripTitle ?? null,
           })
           .select("id")
           .single();
