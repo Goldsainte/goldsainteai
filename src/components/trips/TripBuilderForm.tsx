@@ -1114,4 +1114,4 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
       </div>
     </div>
   );
-}
+});
