@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Settings, Info, Sparkles, PlaneTakeoff, Car, MessageCircle, BarChart3 } from "lucide-react";
+import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Settings, Info, Sparkles, PlaneTakeoff, Car, MessageCircle, BarChart3, Luggage } from "lucide-react";
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
@@ -236,11 +236,11 @@ export const Header = () => {
                               <span className="text-sm font-medium">Travel Marketplace</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() => navigate('/storyboards')}
+                              onClick={() => navigate('/my-trips')}
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                             >
-                              <Plane className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                              <span className="text-sm font-medium">Storyboards</span>
+                              <Luggage className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm font-medium">My Trips</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => navigate('/post-trip')}
@@ -493,11 +493,11 @@ export const Header = () => {
                             <span className="text-sm font-medium">Travel Marketplace</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => navigate('/storyboards')}
+                            onClick={() => navigate('/my-trips')}
                             className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                           >
-                            <Plane className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">Storyboards</span>
+                            <Luggage className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">My Trips</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => navigate('/post-trip')}
