@@ -4968,6 +4968,54 @@ export type Database = {
           },
         ]
       }
+      itinerary_products: {
+        Row: {
+          cover_image_url: string | null
+          created_at: string
+          creator_id: string
+          currency: string
+          days: Json
+          description: string | null
+          destination: string
+          duration_days: number
+          id: string
+          price: number
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          cover_image_url?: string | null
+          created_at?: string
+          creator_id: string
+          currency?: string
+          days?: Json
+          description?: string | null
+          destination: string
+          duration_days: number
+          id?: string
+          price: number
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          cover_image_url?: string | null
+          created_at?: string
+          creator_id?: string
+          currency?: string
+          days?: Json
+          description?: string | null
+          destination?: string
+          duration_days?: number
+          id?: string
+          price?: number
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       itinerary_shares: {
         Row: {
           accepted_at: string | null

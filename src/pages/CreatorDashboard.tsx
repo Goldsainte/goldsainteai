@@ -14,7 +14,9 @@ import {
   DollarSign,
   Settings,
   ImageIcon,
+  ArrowRight,
 } from "lucide-react";
+import { Card } from "@/components/ui/card";
 import { BackButton } from "@/components/ui/BackButton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -219,6 +221,20 @@ export default function CreatorDashboard() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+          {/* Creator tools */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card
+              className="border-none bg-white rounded-2xl shadow-sm p-6 cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => navigate('/itinerary-builder')}
+            >
+              <div className="w-10 h-0.5 bg-[#C7A962] mb-4" />
+              <h3 className="font-secondary text-lg text-[#0a2225] mb-2">Sell an Itinerary Guide</h3>
+              <p className="text-sm text-[#6B7280]">Package your travel knowledge as a digital product. Set your price, publish instantly and earn on every sale.</p>
+              <span className="mt-4 inline-flex items-center gap-1.5 text-sm text-[#0c4d47] font-medium">
+                Create a guide <ArrowRight className="h-3.5 w-3.5" />
+              </span>
+            </Card>
+          </div>
           {isMobile ? (
             <Select value={activeTab} onValueChange={setActiveTab}>
               <SelectTrigger className="w-full bg-white border-[#E5DFC6] rounded-full h-12 px-4 text-sm font-medium text-[#0a2225]">
