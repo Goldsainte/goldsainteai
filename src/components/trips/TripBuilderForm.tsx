@@ -1102,7 +1102,7 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
           className="rounded-full px-6 sm:px-8 py-2.5 w-full sm:w-auto bg-[#0a2225] hover:bg-[#0a2225]/90 text-white transition-all"
         >
           {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
-          Publish Trip
+          Submit for Review
         </Button>
       </div>
     </div>
