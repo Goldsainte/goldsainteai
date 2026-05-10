@@ -63,7 +63,7 @@ export default function BookingConfirmation() {
             {booking.total_price && (
               <>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm" style={{ color: "#7A7151" }}>Trip Total</span>
+                  <span className="text-sm text-[#7A7151]">Trip Total</span>
                   <span className="text-sm font-semibold" style={{ color: "#0a2225" }}>
                     {new Intl.NumberFormat("en-US", {
                       style: "currency",
@@ -72,7 +72,7 @@ export default function BookingConfirmation() {
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm" style={{ color: "#7A7151" }}>Deposit Paid ({booking.deposit_percentage}%)</span>
+                  <span className="text-sm text-[#7A7151]">Deposit Paid ({booking.deposit_percentage}%)</span>
                   <span className="text-sm font-semibold" style={{ color: "#0a2225" }}>
                     {new Intl.NumberFormat("en-US", {
                       style: "currency",
@@ -95,6 +95,19 @@ export default function BookingConfirmation() {
               <span className="text-sm" style={{ color: "#7A7151" }}>Status</span>
               <span className="text-sm font-semibold" style={{ color: "#0c4d47" }}>Confirmed</span>
             </div>
+          </div>
+        )}
+
+        {booking?.status === 'completed' && (
+          <div className="rounded-2xl border border-[#C7A962]/30 bg-[#FDF9F0] p-6 mb-8">
+            <h3 className="font-secondary text-xl text-[#0a2225] mb-1">How was your trip?</h3>
+            <p className="text-sm text-[#6B7280] mb-4">Your review helps other travelers and rewards outstanding specialists.</p>
+            <button
+              onClick={() => navigate(`/reviews/new?booking_id=${booking.id}`)}
+              className="rounded-full bg-[#0c4d47] text-white px-5 py-2 text-xs"
+            >
+              Leave a Review
+            </button>
           </div>
         )}
 
