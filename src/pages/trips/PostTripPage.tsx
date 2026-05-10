@@ -314,9 +314,8 @@ export default function PostTripPage() {
     { num: 1, title: "Choose your destination" },
     { num: 2, title: "Add traveler details" },
     { num: 3, title: "Set the style & pace" },
-    { num: 4, title: "Create your storyboard" },
-    { num: 5, title: "Set pricing & dates" },
-    { num: 6, title: "Review & post" },
+    { num: 4, title: "Add notes & preferences" },
+    { num: 5, title: "Review & post" },
   ];
 
   const [hoveredStep, setHoveredStep] = useState<number | null>(null);
@@ -325,9 +324,8 @@ export default function PostTripPage() {
     1: <DestinationVignette />,
     2: <TravelersVignette />,
     3: <StyleVignette />,
-    4: null,
-    5: <PricingVignette />,
-    6: <ReviewVignette />,
+    4: <PricingVignette />,
+    5: <ReviewVignette />,
   };
 
   if (showIntro) {
@@ -641,31 +639,8 @@ export default function PostTripPage() {
             </>
           )}
 
-          {/* ─── STEP 4: Visual Storyboard ─── */}
+          {/* ─── STEP 4: Notes & role ─── */}
           {currentStep === 3 && (
-            <div className="space-y-4">
-              <div className="rounded-2xl bg-[#FDFBF5] border border-[#C7A962]/30 px-4 py-3">
-                <div className="flex items-start gap-3">
-                  <Sparkles className="h-5 w-5 text-[#C7A962] flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-[#0a2225]">Your visual mood board</p>
-                    <p className="text-xs text-[#4a4a4a] mt-0.5">
-                      Add photos, hotel links, and inspiration images. This is the first thing creators and agents see.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              {storyboardId && (
-                <p className="text-xs text-[#0c4d47] flex items-center gap-1.5">
-                  <Check className="h-3.5 w-3.5" /> Storyboard saved
-                </p>
-              )}
-
-            </div>
-          )}
-
-          {/* ─── STEP 5: Notes & role ─── */}
-          {currentStep === 4 && (
             <>
               <div>
                 <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">How flexible are you? <span className="text-red-500">*</span></label>
@@ -690,8 +665,8 @@ export default function PostTripPage() {
             </>
           )}
 
-          {/* ─── STEP 6: Review ─── */}
-          {currentStep === 5 && (
+          {/* ─── STEP 5: Review ─── */}
+          {currentStep === 4 && (
             <>
               <div className="rounded-2xl bg-white border border-[#E5DFC6] divide-y divide-[#E5DFC6]">
                 <SummaryRow label="Destination" value={destination} />
@@ -737,14 +712,6 @@ export default function PostTripPage() {
                 </div>
               )}
 
-              {/* Storyboard status on review */}
-              {storyboardId && (
-                <div className="flex items-center gap-2 text-xs text-[#0c4d47]">
-                  <Check className="h-3.5 w-3.5" />
-                  <span className="font-medium">Visual storyboard attached</span>
-                </div>
-              )}
-
               {/* Condensed trust & safety */}
               <p className="text-[11px] text-[#9A9079]">
                 Your brief is shared only with vetted professionals. Keep payments on-platform.{" "}
@@ -784,7 +751,7 @@ export default function PostTripPage() {
         </div>
 
         {/* Disclaimer on review step */}
-        {currentStep === 5 && (
+        {currentStep === 4 && (
           <p className="text-center text-[10px] text-[#9A9079] mt-4">
             By posting, you agree to keep all booking communication inside Goldsainte.
           </p>
