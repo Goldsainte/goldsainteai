@@ -413,6 +413,36 @@ export default function Marketplace() {
       return <TripRequestGrid requests={tripRequests} isAdmin={isAdmin} onDelete={handleDeleteRequest} />;
     }
 
+    if (activeTab === "itinerary-guides") {
+      if (isLoadingGuides) {
+        return (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Skeleton key={i} className="h-[360px] rounded-2xl" />
+            ))}
+          </div>
+        );
+      }
+      if (!filteredGuides.length) {
+        return (
+          <div className="py-16 text-center">
+            <BookOpen className="mx-auto mb-4 h-10 w-10 text-[#C7A962]" />
+            <h3 className="font-secondary text-xl text-[#0a2225]">No guides yet</h3>
+            <p className="mt-2 text-sm text-[#6B7280]">
+              Travel creators and agents are publishing new itinerary guides. Check back soon.
+            </p>
+          </div>
+        );
+      }
+      return (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filteredGuides.map((guide: any) => (
+            <ItineraryGuideCard key={guide.id} guide={guide} />
+          ))}
+        </div>
+      );
+    }
+
     return null;
   };
 
@@ -435,6 +465,7 @@ export default function Marketplace() {
 
         <div className="mx-auto max-w-6xl px-4 py-4 md:py-8">
           {/* Category discovery chips */}
+          {activeTab === "trips" && (
           <CategoryChips
             activeCategory={filters.category || "All"}
             onCategoryChange={(cat) => {
@@ -454,13 +485,31 @@ export default function Marketplace() {
             }}
             className="mb-4"
           />
+          )}
           {activeTab === "trips" && <LiveSignalRow />}
           <div className="mb-6 md:mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <MarketplaceTabs activeTab={activeTab} onTabChange={handleTabChange} />
-            <MarketplaceFilters filters={filters} onFilterChange={setFilters} />
+            {activeTab !== "itinerary-guides" && (
+              <MarketplaceFilters filters={filters} onFilterChange={setFilters} />
+            )}
           </div>
 
           {activeTab === "trips" && <ForYouRow />}
+
+          {activeTab === "itinerary-guides" && (
+            <div className="mb-6 max-w-md">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7A7151]" />
+                <input
+                  type="text"
+                  placeholder="Search by destination or title…"
+                  value={guideSearch}
+                  onChange={(e) => setGuideSearch(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-[#E5DFC6] bg-white text-sm focus:outline-none focus:border-[#C7A962] text-[#0a2225]"
+                />
+              </div>
+            </div>
+          )}
 
           {renderContent()}
 
