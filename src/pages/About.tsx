@@ -811,7 +811,7 @@ const About = () => {
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">Our Vision</h3>
           <p className="text-sm sm:text-base text-foreground">
-            Goldsainte, Inc. is building the world's first AI-powered travel marketplace that combines real-time booking, voice AI, travel agent bidding, and creator-led experiences — all in one platform. By integrating technology, social media, and curated travel, we aim to transform how people discover, book, and experience travel.
+            Goldsainte, Inc. is building the world's first AI-powered travel marketplace that combines real-time booking, AI trip planning, specialist matching, and creator-led experiences — all in one platform. By integrating technology, social media, and curated travel, we aim to transform how people discover, book, and experience travel.
           </p>
           <p className="text-sm sm:text-base text-foreground mt-4">
             Our vision is to empower travelers with personalized experiences, enable creators to monetize content meaningfully, and provide agents with dynamic opportunities — all while generating value for our shareholders.
@@ -827,7 +827,7 @@ const About = () => {
           <div className="mb-4">
             <h4 className="font-semibold text-sm sm:text-base mb-2 text-foreground">AI-Powered Travel Marketplace</h4>
             <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
-              <p><strong>End-to-End Booking:</strong> Users can plan, customize, and book trips in real-time using AI voice assistants.</p>
+              <p><strong>End-to-End Booking:</strong> Users can plan, customize, and book trips in real-time using AI-assisted planning and certified travel specialists.</p>
               <p><strong>Personalized Recommendations:</strong> Proprietary algorithms analyze traveler behavior, preferences, and past bookings to deliver highly targeted suggestions.</p>
               <p><strong>Dynamic Pricing:</strong> AI-driven insights help optimize trip margins while providing competitive pricing.</p>
             </div>
