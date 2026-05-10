@@ -110,7 +110,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
     recommended_arrival_airport: "", recommended_departure_airport: "",
     faqs: [] as { question: string; answer: string }[], languages: [] as string[],
     minimum_age: "", accommodation_type: "", meals_included: [] as string[],
-    departure_dates: [] as string[],
+    departure_dates: [] as string[], instant_booking: false,
   });
 
   useEffect(() => {
@@ -156,6 +156,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
         accommodation_type: initialData.accommodation_type || "",
         meals_included: initialData.meals_included || [],
         departure_dates: Array.isArray(initialData.departure_dates) ? initialData.departure_dates : [],
+        instant_booking: initialData.instant_booking ?? false,
       });
       const incomingDeparture = Array.isArray(initialData.departure_dates) ? initialData.departure_dates : [];
       setDepartureMode(incomingDeparture.length > 0 ? "fixed" : "flexible");
@@ -268,6 +269,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
     accommodation_type: formData.accommodation_type || null,
     meals_included: formData.meals_included,
     departure_dates: departureMode === "fixed" ? formData.departure_dates : [],
+    instant_booking: formData.instant_booking,
     itinerary_days: itineraryDays,
   });
 
@@ -823,6 +825,19 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                   <p className={helperClasses}>When the remaining balance is collected.</p>
                 </div>
               </div>
+              <button
+                type="button"
+                onClick={() => updateField('instant_booking', !formData.instant_booking)}
+                className="flex items-start gap-3 w-full text-left mt-4 rounded-xl border border-[#E5DFC6] bg-white p-4 hover:border-[#C7A962]/40 transition"
+              >
+                <div className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${formData.instant_booking ? 'bg-[#0c4d47] border-[#0c4d47]' : 'border-[#E5DFC6] bg-white'}`}>
+                  {formData.instant_booking && <span className="text-white text-xs">✓</span>}
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-[#0a2225]">Enable Instant Booking</p>
+                  <p className="text-xs text-[#6B7280] mt-0.5">Travelers can book immediately without waiting for your approval.</p>
+                </div>
+              </button>
             </div>
 
             <div className="space-y-3 border-t border-[#E5DFC6] pt-10">
