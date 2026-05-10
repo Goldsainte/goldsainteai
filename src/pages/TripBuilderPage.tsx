@@ -22,7 +22,7 @@ export default function TripBuilderPage() {
   const [loading, setLoading] = useState(!!editId);
   const formRef = useRef<TripBuilderFormHandle>(null);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
-  const handleSaveRef = useRef<((data: any, status: "draft" | "published") => Promise<void>) | null>(null);
+  const handleSaveRef = useRef<((data: any, status: "draft" | "published") => Promise<string | null>) | null>(null);
 
   useEffect(() => {
     if (authLoading || roleLoading) return;
@@ -79,8 +79,8 @@ export default function TripBuilderPage() {
       .trim();
   };
 
-  const handleSave = async (formData: any, status: "draft" | "published") => {
-    if (!user) return;
+  const handleSave = async (formData: any, status: "draft" | "published"): Promise<string | null> => {
+    if (!user) return null;
 
     try {
       setSaving(true);
@@ -102,7 +102,7 @@ export default function TripBuilderPage() {
         if (!profile?.stripe_account_id) {
           toast.error("Please set up your payment account in the Earnings tab before publishing a trip.");
           setSaving(false);
-          return;
+          return null;
         }
       }
       
@@ -199,8 +199,10 @@ export default function TripBuilderPage() {
       if (!editId && tripId) {
         navigate(`/trip-builder?edit=${tripId}`, { replace: true });
       }
+      return tripId ?? null;
     } catch (error: any) {
       toast.error("Failed to save: " + error.message);
+      return null;
     } finally {
       setSaving(false);
     }
@@ -218,15 +220,18 @@ export default function TripBuilderPage() {
       const data = formRef.current?.getCurrentData();
       if (data?.title && handleSaveRef.current) {
         try {
-          await handleSaveRef.current(data, "draft");
+          const savedId = await handleSaveRef.current(data, "draft");
           setLastSaved(new Date());
+          if (savedId && !editId) {
+            navigate(`/trip-builder?edit=${savedId}`, { replace: true });
+          }
         } catch (e) {
           // silent — manual save still works
         }
       }
     }, 60000);
     return () => clearInterval(interval);
-  }, [authLoading, roleLoading, user]);
+  }, [authLoading, roleLoading, user, editId, navigate]);
 
   const handlePreview = async () => {
     if (editId && tripData) {
