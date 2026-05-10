@@ -69,15 +69,21 @@ export function TripBookingSidebar({
 
     setIsLoading(true);
     try {
+      const depositAmount = Math.round(pricePerPerson * (depositPercentage / 100));
+      const amountCents = Math.round(depositAmount * 100);
+      const resolvedPartnerId = agentId || creatorId || null;
+
       const { data: booking, error: bookingError } = await supabase
         .from("trip_bookings")
         .insert({
           traveler_id: user.id,
-          partner_id: agentId || creatorId || null,
+          partner_id: resolvedPartnerId,
           partner_role: agentId ? "agent" : "creator",
           total_price: pricePerPerson,
+          deposit_amount: depositAmount,
+          deposit_percentage: depositPercentage,
           currency: currency || "USD",
-          status: "pending_payment",
+          status: "deposit_pending",
           partner_payout: 0,
           platform_commission: 0,
           metadata: { trip_id: tripId, source: "marketplace_booking" },
@@ -89,7 +95,6 @@ export function TripBookingSidebar({
         throw new Error(bookingError?.message || "Failed to create booking record");
       }
 
-      const amountCents = Math.round(pricePerPerson * 100);
       const { data, error } = await supabase.functions.invoke("trip-checkout-create", {
         body: {
           tripBookingId: booking.id,
