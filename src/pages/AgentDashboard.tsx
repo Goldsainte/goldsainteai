@@ -346,14 +346,6 @@ export default function AgentDashboard() {
             <Briefcase className="w-4 h-4" />
             Job Marketplace
           </Button>
-          <Button 
-            variant="outline" 
-            className="flex items-center gap-2"
-            onClick={() => navigate('/agent-dashboard/storyboards/new')}
-          >
-            <Sparkles className="w-4 h-4" />
-            Create Storyboard
-          </Button>
         </div>
 
         {!agent.is_verified && (

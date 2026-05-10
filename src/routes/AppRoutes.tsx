@@ -33,8 +33,8 @@ const AdminHomePage = lazy(() => import('@/pages/admin/AdminHomePage'));
 const AdminTripsPage = lazy(() => import('@/pages/admin/AdminTripsPage'));
 const AdminWaitlistPage = lazy(() => import('@/pages/admin/AdminWaitlistPage'));
 
-const SeedCreators = lazy(() => import('@/pages/admin/SeedCreators'));
 const OpsEscrowDashboardPage = lazy(() => import('@/pages/OpsEscrowDashboardPage'));
+const SeedCreators = lazy(() => import('@/pages/admin/SeedCreators'));
 const AgentPublicProfilePage = lazy(() => import('@/pages/agents/AgentPublicProfilePage'));
 const CreatorPublicProfilePage = lazy(() => import('@/pages/creators/CreatorPublicProfilePage'));
 const TravelProfileRedirect = lazy(() => import('@/pages/redirects/TravelProfileRedirectPage'));
@@ -111,23 +111,16 @@ const EscrowTimelineDashboard = lazy(() => import('@/components/EscrowTimelineDa
 const ActivityLogs = lazy(() => import('@/pages/ActivityLogs'));
 const CustomerVerification = lazy(() => import('@/pages/CustomerVerification'));
 const EmergencyContacts = lazy(() => import('@/pages/EmergencyContacts'));
-const TourActivityDetail = lazy(() => import('@/pages/TourActivityDetail'));
-const RestaurantDetail = lazy(() => import('@/pages/RestaurantDetail'));
-
 const Admin = lazy(() => import('@/pages/Admin'));
 const AdminAgentApprovals = lazy(() => import('@/pages/AdminAgentApprovals'));
 const AdminCancellations = lazy(() => import('@/pages/AdminCancellations'));
 const AdminCancellationAnalytics = lazy(() => import('@/pages/AdminCancellationAnalytics'));
 const AdminCustomerVerifications = lazy(() => import('@/pages/AdminCustomerVerifications'));
 const AdminInquiries = lazy(() => import('@/pages/AdminInquiries'));
-const AdminSeed = lazy(() => import('@/pages/AdminSeed'));
-const UploadEmailAssets = lazy(() => import('@/pages/UploadEmailAssets'));
-const UploadAppleMusicKey = lazy(() => import('@/pages/UploadAppleMusicKey'));
 const UploadAppleSignInKey = lazy(() => import('@/pages/UploadAppleSignInKey'));
 const AdminTransportVendorVetting = lazy(() => import('@/pages/AdminTransportVendorVetting'));
 const PlatformAnalyticsDashboard = lazy(() => import('@/components/PlatformAnalyticsDashboard'));
 const SystemHealth = lazy(() => import('@/pages/SystemHealth'));
-const ArchitectureDiagramPage = lazy(() => import('@/pages/ArchitectureDiagramPage'));
 const Redirect = lazy(() => import('@/pages/Redirect'));
 const About = lazy(() => import('@/pages/About'));
 const BrandProfilePage = lazy(() => import('@/pages/BrandProfilePage'));
@@ -174,10 +167,10 @@ export const AppRoutes = () => (
       <Route path="/help" element={<HelpCenter />} />
       <Route path="/community-guidelines" element={<CommunityGuidelines />} />
       <Route path="/trust-safety" element={<TrustSafety />} />
-      <Route path="/trust-and-safety" element={<TrustSafetyPage />} />
+      <Route path="/trust-and-safety" element={<Navigate to="/trust-safety" replace />} />
       <Route path="/health" element={<HealthCheck />} />
-      <Route path="/legal/terms" element={<LegalTermsPage />} />
-      <Route path="/legal/privacy" element={<LegalPrivacyPage />} />
+      <Route path="/legal/terms" element={<Navigate to="/terms" replace />} />
+      <Route path="/legal/privacy" element={<Navigate to="/privacy-cookies" replace />} />
       <Route path="/legal/creator-agreement" element={<LegalCreatorAgreementPage />} />
       <Route path="/cancellation-refund-policy" element={<CancellationRefundPolicy />} />
       <Route path="/transparency-agreement" element={<TransparencyAgreement />} />
@@ -259,7 +252,7 @@ export const AppRoutes = () => (
         path="/trip/:slug"
         element={<Navigate to="/marketplace" replace />}
       />
-      <Route path="/browse-agents" element={<BrowseAgents />} />
+      <Route path="/browse-agents" element={<Navigate to="/agents" replace />} />
       <Route path="/browse-creators" element={<Navigate to="/creators" replace />} />
       <Route path="/brands/:profileId" element={<BrandProfilePage />} />
       <Route path="/brands/:profileId/collections/:collectionId" element={<BrandCollectionDetailPage />} />
@@ -396,7 +389,7 @@ export const AppRoutes = () => (
       {/* Duplicate /traveler route removed - consolidated to line 331 */}
       <Route path="/partner" element={<Navigate to="/marketplace" replace />} />
       <Route path="/partner/escrow" element={<Navigate to="/marketplace" replace />} />
-      <Route path="/agent/:agentId" element={<AgentProfile />} />
+      <Route path="/agent/:agentId" element={<Navigate to="/agents/:agentId" replace />} />
       <Route path="/agent-dashboard" element={<RequireAgentTerms><AgentDashboard /></RequireAgentTerms>} />
       <Route
         path="/agent/earnings"
@@ -448,8 +441,6 @@ export const AppRoutes = () => (
       <Route path="/activity-logs" element={<AdminGuard><ActivityLogs /></AdminGuard>} />
       <Route path="/customer-verification" element={<RequireAuth><CustomerVerification /></RequireAuth>} />
       <Route path="/emergency-contacts" element={<RequireAuth><EmergencyContacts /></RequireAuth>} />
-      <Route path="/tour/:tourId" element={<RequireAuth><TourActivityDetail /></RequireAuth>} />
-      <Route path="/restaurant/:restaurantId" element={<RequireAuth><RestaurantDetail /></RequireAuth>} />
       <Route path="/earnings" element={<RequireAuth><EarningsDashboard /></RequireAuth>} />
       <Route path="/booking-confirmation" element={<RequireAuth><BookingConfirmation /></RequireAuth>} />
     </Route>
@@ -477,10 +468,7 @@ export const AppRoutes = () => (
       <Route path="/admin/analytics/cancellations" element={<AdminCancellationAnalytics />} />
       <Route path="/admin/customer-verifications" element={<AdminCustomerVerifications />} />
       <Route path="/admin/inquiries" element={<AdminInquiries />} />
-      <Route path="/admin/seed" element={<AdminSeed />} />
       <Route path="/admin/seed-creators" element={<SeedCreators />} />
-      <Route path="/admin/upload-email-assets" element={<UploadEmailAssets />} />
-      <Route path="/admin/upload-apple-music-key" element={<UploadAppleMusicKey />} />
       <Route path="/admin/upload-apple-signin-key" element={<UploadAppleSignInKey />} />
       <Route path="/admin/transport-vendor-vetting" element={<AdminTransportVendorVetting />} />
       <Route path="/admin/platform-analytics" element={<PlatformAnalyticsDashboard />} />
@@ -488,7 +476,6 @@ export const AppRoutes = () => (
       <Route path="/system-health" element={<SystemHealth />} />
     </Route>
 
-    <Route path="/architecture" element={<AdminGuard><ArchitectureDiagramPage /></AdminGuard>} />
     <Route path="/r" element={<Redirect />} />
     <Route path="*" element={<NotFound />} />
   </Routes>

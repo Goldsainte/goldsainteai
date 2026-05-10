@@ -17,6 +17,7 @@ import {
   ArrowLeft,
   Plane,
   SmilePlus,
+  Mic,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -42,6 +43,7 @@ import { MessageSettingsModal } from "./MessageSettingsModal";
 import { RecipientSearchModal } from "./RecipientSearchModal";
 import { NewMessageModal } from "./NewMessageModal";
 import { ProposalComposer } from "./ProposalComposer";
+import { VoiceMessageRecorder } from "@/components/VoiceMessageRecorder";
 import { ProposalMessageCard } from "./ProposalMessageCard";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -58,6 +60,7 @@ export function DirectMessageInbox() {
   const [selectedRecipient, setSelectedRecipient] = useState<{ id: string; name: string } | null>(null);
   const [otherTyping, setOtherTyping] = useState(false);
   const [showProposalComposer, setShowProposalComposer] = useState(false);
+  const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
   const [currentUserAccountType, setCurrentUserAccountType] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -675,6 +678,31 @@ export function DirectMessageInbox() {
                     />
                   </div>
                 )}
+                {showVoiceRecorder && selectedConversation && (
+                  <div className="mb-3 flex items-center justify-between gap-2 rounded-2xl border border-[#E5DFC6] bg-[#FDFBF7] px-3 py-2">
+                    <VoiceMessageRecorder
+                      onSend={async (voiceUrl) => {
+                        try {
+                          await sendMessage(
+                            selectedConversation.otherParticipant.id,
+                            voiceUrl,
+                            selectedConversation.id,
+                          );
+                          setShowVoiceRecorder(false);
+                        } catch (e: any) {
+                          toast({ title: "Failed to send", description: e.message, variant: "destructive" });
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowVoiceRecorder(false)}
+                      className="text-xs text-[#5a6c6e] hover:text-[#0a2225]"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -694,6 +722,15 @@ export function DirectMessageInbox() {
                       <span className="text-xs">Send a Proposal</span>
                     </Button>
                   )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowVoiceRecorder((v) => !v)}
+                    className="md:hidden border-[#E5DFC6] text-[#0a2225] rounded-full h-11 w-11 p-0"
+                    title="Record voice message"
+                  >
+                    <Mic className="h-4 w-4" />
+                  </Button>
                   <Input
                     ref={inputRef}
                     placeholder="Write something…"

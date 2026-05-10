@@ -3,7 +3,6 @@ import {
   DestinationVignette,
   TravelersVignette,
   StyleVignette,
-  StoryboardVignette,
   PricingVignette,
   ReviewVignette,
 } from "@/components/trips/StepVignettes";
@@ -14,9 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
 import { toast } from "sonner";
 import { StoryboardBuilder } from "@/components/storyboards/StoryboardBuilder";
-import { InspirationCarousel } from "@/components/storyboards/InspirationCarousel";
 import { useAuth } from "@/contexts/AuthContext";
-import { useStoryboardPrefill } from "@/hooks/useStoryboardPrefill";
 import { useItineraryPrefill } from "@/hooks/useItineraryPrefill";
 import { cn } from "@/lib/utils";
 
@@ -55,8 +52,6 @@ export default function PostTripPage() {
     searchParams.get("fromStoryboard") ||
     (searchParams.get("from") === "storyboard" ? searchParams.get("storyboardId") : null);
 
-  const { loading: loadingPrefill, prefill, sourceStoryboard, error: prefillError } =
-    useStoryboardPrefill();
   const { hasItineraryPrefill, prefillData: itineraryPrefill } = useItineraryPrefill();
 
   const [destination, setDestination] = useState("");
@@ -226,33 +221,6 @@ export default function PostTripPage() {
       setStoryboardId(storyboardIdFromQuery);
     }
   }, [storyboardIdFromQuery]);
-
-  // Auto-populate form when storyboard prefill data loads
-  useEffect(() => {
-    if (prefill && !hasItineraryPrefill) {
-      if (prefill.title && !title) setTitle(prefill.title);
-      if (prefill.description && !specialNotes) setSpecialNotes(prefill.description);
-      if (sourceStoryboard) {
-        const tags = extractAestheticTags(
-          [prefill.description, sourceStoryboard.description].filter(Boolean).join(" ")
-        );
-        if (tags.length > 0) setAestheticTags(tags);
-      }
-    }
-  }, [prefill, sourceStoryboard, hasItineraryPrefill]);
-
-  function extractAestheticTags(text: string): string[] {
-    if (!text) return [];
-    const aestheticKeywords = [
-      "luxury", "boutique", "design", "romantic", "minimalist", "rustic",
-      "modern", "vintage", "coastal", "urban", "bohemian", "elegant",
-      "contemporary", "traditional", "chic", "intimate", "vibrant",
-      "serene", "artistic", "authentic", "curated", "exclusive"
-    ];
-    const lowercaseText = text.toLowerCase();
-    const found = aestheticKeywords.filter(keyword => lowercaseText.includes(keyword));
-    return [...new Set(found)].slice(0, 5);
-  }
 
   function removeAestheticTag(tag: string) {
     setAestheticTags(prev => prev.filter(t => t !== tag));
@@ -452,7 +420,7 @@ export default function PostTripPage() {
     1: <DestinationVignette />,
     2: <TravelersVignette />,
     3: <StyleVignette />,
-    4: <StoryboardVignette />,
+    4: null,
     5: <PricingVignette />,
     6: <ReviewVignette />,
   };
@@ -631,17 +599,6 @@ export default function PostTripPage() {
               </div>
             </div>
           )}
-          {storyboardIdFromQuery && loadingPrefill && (
-            <div className="mb-3 text-xs text-[#4a4a4a]">Loading storyboard details...</div>
-          )}
-          {prefill && sourceStoryboard && !hasItineraryPrefill && (
-            <div className="mb-3 rounded-2xl bg-[#FDFBF5] border border-[#E5DFC6] px-4 py-3 text-xs text-[#4a4a4a]">
-              Pre-filled from storyboard <span className="font-semibold">{sourceStoryboard.title || "Untitled"}</span>.
-            </div>
-          )}
-          {prefillError && (
-            <p className="mb-3 rounded-2xl bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">{prefillError}</p>
-          )}
         </div>
       )}
 
@@ -808,29 +765,6 @@ export default function PostTripPage() {
                 </p>
               )}
 
-              {/* Browse inspiration carousel */}
-              <div className="mt-6 space-y-3">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-[#C7A962]" />
-                  <p className="text-xs font-medium text-muted-foreground">
-                    Browse thousands of curated photos — tap to add
-                  </p>
-                </div>
-                <InspirationCarousel
-                  onImageClick={(img) => {
-                    storyboardAddItemRef.current?.({
-                      kind: "photo",
-                      source: "manual",
-                      data: {
-                        thumb_url: img.thumbnail_url || img.url,
-                        full_url: img.url,
-                        alt: img.label || "Inspiration photo",
-                        location: img.destination_tags?.[0] || null,
-                      },
-                    });
-                  }}
-                />
-              </div>
             </div>
           )}
 
