@@ -34,7 +34,6 @@ export const SeatMapSelector = ({ flight, passengers, onSeatsSelected, selectedS
   const fetchSeatMap = async () => {
     setLoading(true);
     try {
-      console.log('Seat map functionality temporarily unavailable');
       toast.info("Seat selection is currently unavailable");
       setSeatMap([]);
     } finally {

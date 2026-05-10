@@ -114,7 +114,6 @@ export default function ExpediaSearchBar() {
       guests: { adults, children },
     });
 
-    console.log("Redirecting to Expedia affiliate URL:", url);
     window.location.href = url; // FULL redirect for affiliate tracking
   };
 

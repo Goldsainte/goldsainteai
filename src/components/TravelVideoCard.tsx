@@ -154,10 +154,6 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   };
 
   useEffect(() => {
-    console.log('Collection selector open state:', collectionSelectorOpen);
-  }, [collectionSelectorOpen]);
-
-  useEffect(() => {
     checkIfLiked();
     checkIfSaved();
     // fetchCollaborators removed - feature deleted
@@ -167,7 +163,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
 
   useEffect(() => {
     if (isActive && videoRef.current && post.video_url) {
-      videoRef.current.play().catch(e => console.log('Autoplay prevented:', e));
+      videoRef.current.play().catch(() => {});
       
       if (!hasViewed) {
         const viewTimer = setTimeout(() => {
@@ -326,7 +322,6 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       }
 
       // Save the post
-      console.log('Attempting quick save...');
       let target: any = collections?.find((c) => c.name?.toLowerCase?.() === 'saved');
       if (!target) {
         const created: any = await createCollection('Saved', 'Your saved items', true);

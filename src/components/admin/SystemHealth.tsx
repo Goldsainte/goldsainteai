@@ -47,7 +47,6 @@ export function SystemHealth() {
 
   const runHealthChecks = async () => {
     // TODO: Implement actual health checks
-    console.log("Running health checks...");
   };
 
   const getStatusIcon = (status: string) => {
