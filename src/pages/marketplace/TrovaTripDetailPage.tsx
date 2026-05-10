@@ -455,6 +455,26 @@ export default function TrovaTripDetailPage() {
             <TripTrustBadges />
 
             <TripFAQAccordion faqs={faqs.length > 0 ? faqs : undefined} />
+
+            {similarTrips.length > 0 && (
+              <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7A7151] mb-5">More Trips Like This</p>
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                  {similarTrips.map((t) => (
+                    <Link key={t.id} to={`/marketplace/trip/${t.slug || t.id}`} className="group space-y-2">
+                      <div className="aspect-[4/3] overflow-hidden rounded-xl bg-[#F5F0E8]">
+                        {t.cover_image_url && (
+                          <img src={t.cover_image_url} alt={t.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                        )}
+                      </div>
+                      <p className="font-secondary text-sm text-[#0a2225] line-clamp-1">{t.title}</p>
+                      <p className="text-xs text-[#6B7280] line-clamp-1">{t.destination}</p>
+                      <p className="text-xs font-medium text-[#0a2225]">${t.price_per_person?.toLocaleString()}</p>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
           </div>
 
           {/* Sidebar */}
