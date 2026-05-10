@@ -11,6 +11,7 @@ import { WriteReviewModal } from "@/components/profile/WriteReviewModal";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { MessageButton } from "@/components/messaging/MessageButton";
 
 interface AgentProfile {
   id: string;
@@ -22,6 +23,7 @@ interface AgentProfile {
   instagram_handle: string | null;
   location: string | null;
   featured_photos: string[] | null;
+  last_active_at?: string | null;
 }
 
 interface AgentDetails {
@@ -32,6 +34,7 @@ interface AgentDetails {
   destinations: string[] | null;
   website: string | null;
   experience_years: number | null;
+  response_time_hours?: number | null;
 }
 
 export default function AgentPublicProfilePage() {
@@ -150,12 +153,25 @@ export default function AgentPublicProfilePage() {
           </div>
         </div>
 
+        {/* Cover photo */}
+        <div className="relative h-48 md:h-64 w-full overflow-hidden bg-gradient-to-br from-[#0c4d47] to-[#0a2225]">
+          {agent.featured_photos?.[0] && (
+            <img
+              src={agent.featured_photos[0]}
+              alt=""
+              className="w-full h-full object-cover opacity-70"
+              loading="lazy"
+            />
+          )}
+        </div>
+
         {/* Hero */}
         <ProfileHero
           name={displayName}
           avatarUrl={agent.avatar_url}
           isVerified={isVerified}
-          bio={agent.location}
+          bio={agent.bio}
+          location={agent.location}
         />
 
         {/* Two-column layout */}
@@ -172,6 +188,11 @@ export default function AgentPublicProfilePage() {
                   {agent.bio ||
                     "This agent hasn't added a bio yet, but their trips speak for themselves."}
                 </p>
+                {details?.experience_years ? (
+                  <p className="text-sm text-[#6B7280] mt-2">
+                    <span className="font-medium text-[#0a2225]">{details.experience_years}</span> years experience
+                  </p>
+                ) : null}
               </section>
 
               {/* Specialties */}
@@ -260,11 +281,23 @@ export default function AgentPublicProfilePage() {
 
             {/* Right column — sticky sidebar */}
             <div className="lg:sticky lg:top-20 lg:self-start">
+              {user && user.id !== agent.id && (
+                <div className="mb-3">
+                  <MessageButton
+                    recipientId={agent.id}
+                    recipientName={displayName}
+                    className="w-full rounded-xl border-[#E5DFC6]"
+                    label="Message Agent"
+                  />
+                </div>
+              )}
               <ProfileSidebar
                 name={displayName}
                 targetUserId={agent.id}
                 rating={details?.rating}
                 reviewCount={details?.total_reviews}
+                responseTimeHours={details?.response_time_hours ?? null}
+                lastActiveAt={agent.last_active_at ?? null}
                 onRequestTrip={() =>
                   navigate(`/post-trip?agentId=${agent.id}`)
                 }
