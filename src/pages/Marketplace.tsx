@@ -26,18 +26,17 @@ import { ThisWeekFooter } from "@/components/marketplace/ThisWeekFooter";
 type Tab = "trips" | "trip-requests";
 
 const FILTER_TAG_MAP: Record<string, string[]> = {
+  "Bucket List": ["bucket-list", "bucket list", "once-in-a-lifetime", "iconic", "wonder"],
+  "Luxury Escapes": ["luxury", "high-end", "premium", "exclusive", "villa", "five-star"],
+  "Food & Culture": ["food", "culinary", "culture", "gastronomy", "cuisine", "dining", "heritage"],
+  "Wellness & Reset": ["wellness", "spa", "retreat", "yoga", "meditation", "detox"],
+  "Group Trips": ["group", "friends", "team", "party", "family-friendly", "family"],
+  "Romantic Getaways": ["romantic", "honeymoon", "couples", "romance", "intimate"],
+  "Solo Travel": ["solo", "solo-travel", "independent", "backpacking"],
+  "Cinematic Destinations": ["cinematic", "scenic", "photogenic", "dramatic", "views"],
+  "City Energy": ["city", "urban", "nightlife", "metropolitan", "city-break"],
+  "Nature & Adventure": ["nature", "adventure", "hiking", "trek", "safari", "mountain", "wildlife", "outdoor"],
   "Top Rated": [],
-  "Luxury": ["luxury", "high-end", "Luxury"],
-  "Budget Friendly": ["budget", "budget-friendly", "Budget Friendly"],
-  "All-Inclusive": ["all-inclusive", "All-Inclusive"],
-  "Adventure": ["adventure", "Adventure"],
-  "Family": ["family", "family-friendly", "Family"],
-  "Solo Travel": ["solo", "solo-travel", "Solo Travel"],
-  "Wellness": ["wellness", "spa", "retreat", "Wellness"],
-  "Design-led": ["design", "design-led", "boutique", "Design-led"],
-  "Eco-conscious": ["eco", "eco-conscious", "sustainable", "Eco-conscious"],
-  "Adults only": ["adults-only", "adults only", "Adults only"],
-  "City breaks": ["city", "city-break", "urban", "City breaks"],
 };
 
 export interface SearchFilters {
@@ -109,7 +108,7 @@ export default function Marketplace() {
 
   // Live Trips query — wired with search filters
   const { data: liveTrips, isLoading: isLoadingTrips, isError: isTripsError, refetch: refetchTrips } = useQuery({
-    queryKey: ["marketplace-live-trips", filters.category, filters.destination, filters.startDate, filters.endDate, filters.travelers, filters.sortBy],
+    queryKey: ["marketplace-live-trips", filters.category, filters.destination, filters.startDate, filters.endDate, filters.travelers, filters.sortBy, filters.minPrice, filters.maxPrice],
     queryFn: async () => {
       let query = supabase
         .from("packaged_trips")
@@ -139,6 +138,14 @@ export default function Marketplace() {
       // Travelers capacity
       if (filters.travelers && filters.travelers > 1) {
         query = query.gte("max_participants", filters.travelers);
+      }
+
+      // Price range
+      if (filters.minPrice && filters.minPrice > 0) {
+        query = query.gte("price_per_person", filters.minPrice);
+      }
+      if (filters.maxPrice && filters.maxPrice < 10000) {
+        query = query.lte("price_per_person", filters.maxPrice);
       }
 
       // Category tag filter
