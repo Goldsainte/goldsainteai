@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, MapPin, Calendar, Bookmark, MessageCircle } from "lucide-react";
+import { ArrowRight, MapPin, Calendar, MessageCircle } from "lucide-react";
 import { ProfilePhotoUploader } from "./ProfilePhotoUploader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,6 @@ interface TravelerOverviewTabProps {
   stats: {
     tripRequests: number;
     bookings: number;
-    storyboards: number;
   };
   onAvatarUpdate: (url: string) => void;
 }
@@ -56,7 +55,7 @@ export function TravelerOverviewTab({ profile, stats, onAvatarUpdate }: Traveler
             <p className="text-sm text-[#6B7280] mt-1">Member since {memberSince}</p>
             
             <div className="mt-6 w-full pt-6 border-t border-[#E5DFC6]">
-              <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
                   <p className="text-2xl font-semibold text-[#0a2225]">{stats.tripRequests}</p>
                   <p className="text-xs text-[#6B7280] mt-1">Requests</p>
@@ -64,10 +63,6 @@ export function TravelerOverviewTab({ profile, stats, onAvatarUpdate }: Traveler
                 <div>
                   <p className="text-2xl font-semibold text-[#0a2225]">{stats.bookings}</p>
                   <p className="text-xs text-[#6B7280] mt-1">Bookings</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-semibold text-[#0a2225]">{stats.storyboards}</p>
-                  <p className="text-xs text-[#6B7280] mt-1">Storyboards</p>
                 </div>
               </div>
             </div>
@@ -114,29 +109,11 @@ export function TravelerOverviewTab({ profile, stats, onAvatarUpdate }: Traveler
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="storyboards" className="bg-white border border-[#E5DFC6] rounded-2xl overflow-hidden">
-                <AccordionTrigger className="px-4 py-4 hover:no-underline">
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="p-2 bg-[#F6F0E4] rounded-xl">
-                      <Bookmark className="h-4 w-4 text-[#C7A962]" />
-                    </div>
-                    <span className="text-sm font-medium text-[#0a2225]">Storyboards</span>
-                    <span className="ml-auto mr-2 text-lg font-secondary text-[#C7A962]">{stats.storyboards}</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="px-4 pb-4">
-                  <p className="text-sm text-[#6B7280] mb-3">Your saved inspiration and mood boards</p>
-                  <Link to="/storyboards" className="inline-flex items-center text-sm text-[#0a2225] hover:text-[#C7A962] transition-colors">
-                    View storyboards <ArrowRight className="h-4 w-4 ml-1" />
-                  </Link>
-                </AccordionContent>
-              </AccordionItem>
-
             </Accordion>
           </div>
         ) : (
           /* Quick Stats - Desktop Grid */
-          <div className="lg:col-span-2 grid grid-cols-2 gap-4">
+          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Card className="bg-white border-[#E5DFC6] rounded-2xl hover:shadow-md transition-shadow">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
@@ -173,24 +150,6 @@ export function TravelerOverviewTab({ profile, stats, onAvatarUpdate }: Traveler
               </CardContent>
             </Card>
 
-            <Card className="bg-white border-[#E5DFC6] rounded-2xl hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-xs text-[#C7A962] font-medium tracking-wider uppercase">Storyboards</p>
-                    <p className="text-3xl font-secondary text-[#0a2225] mt-2">{stats.storyboards}</p>
-                    <p className="text-sm text-[#6B7280] mt-1">Saved inspiration</p>
-                  </div>
-                  <div className="p-3 bg-[#F6F0E4] rounded-xl">
-                    <Bookmark className="h-5 w-5 text-[#C7A962]" />
-                  </div>
-                </div>
-                <Link to="/storyboards" className="mt-4 inline-flex items-center text-sm text-[#0a2225] hover:text-[#C7A962] transition-colors">
-                  View storyboards <ArrowRight className="h-4 w-4 ml-1" />
-                </Link>
-              </CardContent>
-            </Card>
-
           </div>
         )}
       </div>
@@ -212,11 +171,6 @@ export function TravelerOverviewTab({ profile, stats, onAvatarUpdate }: Traveler
               <Button asChild className="bg-[#0c4d47] hover:bg-[#073331] text-[#bfad72] rounded-full px-6">
                 <Link to="/post-trip">
                   Post Trip Request
-                </Link>
-              </Button>
-              <Button asChild variant="outline" className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#F6F0E4] rounded-full px-6">
-                <Link to="/storyboards">
-                  Create Storyboard
                 </Link>
               </Button>
             </div>

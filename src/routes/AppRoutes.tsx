@@ -17,8 +17,6 @@ import { OnboardingRouter } from '@/components/routing/OnboardingRouter';
 import { AdminGuard } from '@/hooks/useAdminGuard';
 
 const SearchResults = lazy(() => import('@/pages/SearchResults'));
-const MyStoryboardsPage = lazy(() => import('@/pages/storyboards/MyStoryboardsPage'));
-const StoryboardDetailPage = lazy(() => import('@/pages/storyboards/StoryboardDetailPage'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const BrandApplyPage = lazy(() => import('@/pages/apply/BrandOnboarding'));
 const BrandConsolePage = lazy(() => import('@/pages/BrandConsolePage'));
@@ -34,7 +32,6 @@ const AdminTripsPage = lazy(() => import('@/pages/admin/AdminTripsPage'));
 const AdminWaitlistPage = lazy(() => import('@/pages/admin/AdminWaitlistPage'));
 
 const OpsEscrowDashboardPage = lazy(() => import('@/pages/OpsEscrowDashboardPage'));
-const SeedCreators = lazy(() => import('@/pages/admin/SeedCreators'));
 const AgentPublicProfilePage = lazy(() => import('@/pages/agents/AgentPublicProfilePage'));
 const CreatorPublicProfilePage = lazy(() => import('@/pages/creators/CreatorPublicProfilePage'));
 const TravelProfileRedirect = lazy(() => import('@/pages/redirects/TravelProfileRedirectPage'));
@@ -51,7 +48,6 @@ const AgentProfile = lazy(() => import('@/pages/AgentProfile'));
 const AgentDashboard = lazy(() => import('@/pages/AgentDashboard'));
 const AgentEarningsPage = lazy(() => import('@/pages/agent/AgentEarningsPage'));
 const AgentTripRequests = lazy(() => import('@/pages/AgentTripRequests'));
-const AgentStoryboardBuilderPage = lazy(() => import('@/pages/agents/AgentStoryboardBuilderPage'));
 const AgentContractBuilder = lazy(() => import('@/pages/agent/AgentContractBuilder'));
 const AgentPerformanceDashboard = lazy(() => import('@/pages/AgentPerformanceDashboard'));
 const AgentDealsDashboardPage = lazy(() => import('@/pages/AgentDealsDashboardPage'));
@@ -74,8 +70,6 @@ const PublicStoryboardPage = lazy(() => import('@/pages/public/PublicStoryboardP
 const AgentTripsPage = lazy(() => import('@/pages/AgentTripsPage'));
 const CreatorTripsPage = lazy(() => import('@/pages/CreatorTripsPage'));
 
-const StoryboardNewPage = lazy(() => import('@/pages/storyboards/StoryboardNewPage'));
-
 const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
 const MarketplaceGuidelinesPage = lazy(() => import('@/pages/MarketplaceGuidelinesPage'));
 const HomePage = lazy(() => import('@/pages/HomePage'));
@@ -84,7 +78,6 @@ const PartnerBookingsPage = lazy(() => import('@/pages/PartnerBookingsPage'));
 const BookingDetailPage = lazy(() => import('@/pages/bookings/BookingDetailPage'));
 const EmailPreview = lazy(() => import('@/pages/EmailPreview'));
 const BillingDashboard = lazy(() => import('@/pages/BillingDashboard'));
-const TikTokLabStoryboardsPage = lazy(() => import('@/pages/TikTokLab/StoryboardsPage'));
 const TravelSettings = lazy(() => import('@/pages/TravelSettings'));
 const ApplicationStatusCheck = lazy(() => import('@/pages/ApplicationStatusCheck'));
 const AgentApplicationForm = lazy(() => import('@/pages/AgentApplicationForm'));
@@ -117,8 +110,6 @@ const AdminCancellations = lazy(() => import('@/pages/AdminCancellations'));
 const AdminCancellationAnalytics = lazy(() => import('@/pages/AdminCancellationAnalytics'));
 const AdminCustomerVerifications = lazy(() => import('@/pages/AdminCustomerVerifications'));
 const AdminInquiries = lazy(() => import('@/pages/AdminInquiries'));
-const UploadAppleSignInKey = lazy(() => import('@/pages/UploadAppleSignInKey'));
-const AdminTransportVendorVetting = lazy(() => import('@/pages/AdminTransportVendorVetting'));
 const PlatformAnalyticsDashboard = lazy(() => import('@/components/PlatformAnalyticsDashboard'));
 const SystemHealth = lazy(() => import('@/pages/SystemHealth'));
 const Redirect = lazy(() => import('@/pages/Redirect'));
@@ -374,10 +365,10 @@ export const AppRoutes = () => (
           </RequireAuth>
         )}
       />
-      <Route path="/storyboards" element={<RequireAuth><TikTokLabStoryboardsPage /></RequireAuth>} />
-      <Route path="/storyboards/new" element={<RequireAuth><StoryboardNewPage /></RequireAuth>} />
-      <Route path="/storyboards/:id" element={<RequireAuth><StoryboardDetailPage /></RequireAuth>} />
-      <Route path="/storyboards/:id/edit" element={<RequireAuth><StoryboardNewPage /></RequireAuth>} />
+      <Route path="/storyboards" element={<Navigate to="/marketplace" replace />} />
+      <Route path="/storyboards/new" element={<Navigate to="/marketplace" replace />} />
+      <Route path="/storyboards/:id" element={<Navigate to="/marketplace" replace />} />
+      <Route path="/storyboards/:id/edit" element={<Navigate to="/marketplace" replace />} />
       <Route path="/notifications" element={<RequireAuth><NotificationsPage /></RequireAuth>} />
       <Route path="/messages" element={<RequireAuth><MessagesPage /></RequireAuth>} />
       <Route path="/marketplace-guidelines" element={<MarketplaceGuidelinesPage />} />
@@ -399,7 +390,7 @@ export const AppRoutes = () => (
           </RequireAuth>
         )}
       />
-      <Route path="/agent-dashboard/storyboards/new" element={<RequireAgentTerms><AgentStoryboardBuilderPage /></RequireAgentTerms>} />
+      <Route path="/agent-dashboard/storyboards/new" element={<Navigate to="/marketplace" replace />} />
       <Route path="/agent-trip-requests" element={<RequireAgentTerms><AgentTripRequests /></RequireAgentTerms>} />
       <Route path="/agent-performance" element={<RequireAgentTerms><AgentPerformanceDashboard /></RequireAgentTerms>} />
       <Route path="/agent-deals" element={<RequireAgentTerms><AgentDealsDashboardPage /></RequireAgentTerms>} />
@@ -429,7 +420,7 @@ export const AppRoutes = () => (
       <Route path="/console/brand" element={<RequireAuth><BrandConsolePage /></RequireAuth>} />
       {/* New TikTok Creator Ecosystem Routes */}
       <Route path="/trip/:id" element={<RequireAuth><CreatorTripPage /></RequireAuth>} />
-      <Route path="/trip/:tripId/storyboard" element={<Navigate to="/storyboards" replace />} />
+      <Route path="/trip/:tripId/storyboard" element={<Navigate to="/marketplace" replace />} />
       <Route path="/creator/:id" element={<CreatorRedirect />} />
       <Route path="/my-jobs" element={<RequireAuth><MyJobs /></RequireAuth>} />
       {/* Duplicate /my-trips route removed - using MyTripsPage at line 351 */}
@@ -468,9 +459,6 @@ export const AppRoutes = () => (
       <Route path="/admin/analytics/cancellations" element={<AdminCancellationAnalytics />} />
       <Route path="/admin/customer-verifications" element={<AdminCustomerVerifications />} />
       <Route path="/admin/inquiries" element={<AdminInquiries />} />
-      <Route path="/admin/seed-creators" element={<SeedCreators />} />
-      <Route path="/admin/upload-apple-signin-key" element={<UploadAppleSignInKey />} />
-      <Route path="/admin/transport-vendor-vetting" element={<AdminTransportVendorVetting />} />
       <Route path="/admin/platform-analytics" element={<PlatformAnalyticsDashboard />} />
       <Route path="/admin/trust-safety" element={<TrustSafety />} />
       <Route path="/system-health" element={<SystemHealth />} />

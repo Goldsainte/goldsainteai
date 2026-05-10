@@ -12,7 +12,6 @@ import { ArrowLeft, ArrowRight, X, Sparkles, ChevronDown, ChevronUp, Check } fro
 import { supabase } from "@/integrations/supabase/client";
 import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
 import { toast } from "sonner";
-import { StoryboardBuilder } from "@/components/storyboards/StoryboardBuilder";
 import { useAuth } from "@/contexts/AuthContext";
 import { useItineraryPrefill } from "@/hooks/useItineraryPrefill";
 import { cn } from "@/lib/utils";
@@ -750,15 +749,6 @@ export default function PostTripPage() {
                   </div>
                 </div>
               </div>
-              <StoryboardBuilder
-                storyboardId={storyboardId || undefined}
-                mode="traveler"
-                initialTitle={title || destination}
-                destination={destination}
-                onSaved={(id) => setStoryboardId(id)}
-                saveRef={storyboardSaveRef}
-                addItemRef={storyboardAddItemRef}
-              />
               {storyboardId && (
                 <p className="text-xs text-[#0c4d47] flex items-center gap-1.5">
                   <Check className="h-3.5 w-3.5" /> Storyboard saved

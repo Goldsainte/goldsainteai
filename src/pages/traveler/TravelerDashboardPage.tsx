@@ -27,7 +27,6 @@ interface Profile {
 interface DashboardStats {
   tripRequests: number;
   bookings: number;
-  storyboards: number;
 }
 
 export default function TravelerDashboardPage() {
@@ -36,7 +35,7 @@ export default function TravelerDashboardPage() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [stats, setStats] = useState<DashboardStats>({ tripRequests: 0, bookings: 0, storyboards: 0 });
+  const [stats, setStats] = useState<DashboardStats>({ tripRequests: 0, bookings: 0 });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -51,7 +50,7 @@ export default function TravelerDashboardPage() {
 
       try {
         // Fetch profile and stats in parallel
-        const [profileResult, tripsResult, bookingsResult, storyboardsResult] = await Promise.all([
+        const [profileResult, tripsResult, bookingsResult] = await Promise.all([
           supabase
             .from("profiles")
             .select("id, display_name, first_name, full_name, avatar_url, created_at")
@@ -65,10 +64,6 @@ export default function TravelerDashboardPage() {
             .from("trip_bookings")
             .select("id", { count: "exact", head: true })
             .eq("traveler_id", authUser.id),
-          supabase
-            .from("storyboards")
-            .select("id", { count: "exact", head: true })
-            .eq("owner_id", authUser.id),
         ]);
 
         if (profileResult.data) {
@@ -78,7 +73,6 @@ export default function TravelerDashboardPage() {
         setStats({
           tripRequests: tripsResult.count ?? 0,
           bookings: bookingsResult.count ?? 0,
-          storyboards: storyboardsResult.count ?? 0,
         });
       } catch (err) {
         console.error("Error loading dashboard data:", err);

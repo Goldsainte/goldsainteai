@@ -17,7 +17,7 @@ export const Footer = () => {
       links: [
         { to: "/marketplace", label: "Browse Trips" },
         { to: "/post-trip", label: "Post a Trip" },
-        { to: "/apply/agent", label: "Find a Specialist" },
+        { to: "/agents", label: "Find a Specialist" },
       ],
     },
     {
@@ -51,8 +51,6 @@ export const Footer = () => {
     { to: "/privacy-cookies", label: "Privacy Policy" },
     { to: "/terms", label: "Terms of Service" },
     { to: "/dispute-resolution", label: "Dispute Resolution" },
-    { to: "/cancellation-refund-policy", label: "Cancellation Policy" },
-    { to: "/help", label: "Help Center" },
   ];
 
   return (
