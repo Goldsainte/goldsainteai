@@ -657,7 +657,7 @@ const About = () => {
         <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
           <p className="text-foreground font-semibold mb-2">Complete Service Details Available</p>
           <p className="text-sm sm:text-base text-muted-foreground mb-3">
-            View the full, detailed information about all Goldsainte services including accommodations, attractions, flights, car rentals, and transportation.
+            View the full, detailed information about all Goldsainte services including curated trip packages, agent-planned itineraries, and creator-led travel experiences.
           </p>
           <Link 
             to="/what-we-do" 
@@ -672,7 +672,7 @@ const About = () => {
           
           <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">How Our Platform Works</h3>
-            <p className="text-sm sm:text-base text-foreground">Goldsainte provides an AI-powered platform that makes it easy to compare and book travel experiences from hotels, attractions, car rentals, flights, and transportation providers worldwide. When you make a booking, you enter into a direct contract with the Service Provider.</p>
+            <p className="text-sm sm:text-base text-foreground">Goldsainte provides an AI-powered marketplace that connects travelers with certified travel agents and travel creators to design curated trip packages, agent-planned itineraries, and creator-led travel experiences. When you book, you enter into a direct contract with the relevant specialist or supplier.</p>
           </div>
 
           <div>
@@ -683,21 +683,6 @@ const About = () => {
           <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">2. Attractions</h3>
             <p className="text-sm sm:text-base text-foreground">Discover and book tours, activities, and attractions at your destination. We work with Service Providers and Third-Party Aggregators to offer a wide selection of experiences with transparent pricing.</p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-base mb-3 text-foreground">3. Car Rentals</h3>
-            <p className="text-sm sm:text-base text-foreground">Compare rental cars from multiple companies with clear pricing and flexible booking options. Our platform helps you find the right vehicle for your needs with detailed specifications and customer reviews.</p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-base mb-3 text-foreground">4. Flights</h3>
-            <p className="text-sm sm:text-base text-foreground">Search and book flights through our Third-Party Aggregator partners. Our recommendation system helps you find the best options based on price, travel time, and your preferences.</p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-base mb-3 text-foreground">5. Private and Public Transportation</h3>
-            <p className="text-sm sm:text-base text-foreground">Book ground transportation including private transfers, taxis, and public transit options. Pre-book with confidence knowing all fees are included upfront.</p>
           </div>
 
           <div>
