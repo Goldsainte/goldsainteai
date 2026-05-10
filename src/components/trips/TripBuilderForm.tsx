@@ -308,6 +308,12 @@ export function TripBuilderForm({ initialData, onSave, saving, isEditing }: Trip
           >
             Details
           </TabsTrigger>
+          <TabsTrigger
+            value="itinerary"
+            className="rounded-full px-3 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#0a2225] data-[state=inactive]:text-[#6B7280] transition-all"
+          >
+            Itinerary
+          </TabsTrigger>
           <TabsTrigger 
             value="media" 
             className="rounded-full px-3 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#0a2225] data-[state=inactive]:text-[#6B7280] transition-all"
