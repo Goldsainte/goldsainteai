@@ -182,7 +182,7 @@ export default function TrovaTripDetailPage() {
         setAddons(addonsData || []);
       } catch (err: any) {
         console.error("Error fetching trip:", err);
-        setError(err.message || "Failed to load trip");
+        setError("failed");
       } finally {
         setLoading(false);
       }
@@ -208,7 +208,9 @@ export default function TrovaTripDetailPage() {
           <h1 className="font-secondary text-2xl font-semibold text-[#0a2225]">
             Trip not found
           </h1>
-          <p className="mt-2 text-[#6B7280]">{error || "This trip doesn't exist or has been removed."}</p>
+          <p className="mt-2 text-[#6B7280]">
+            We had trouble loading this trip. Please try again in a moment.
+          </p>
           <Button
             onClick={() => navigate("/marketplace")}
             className="mt-6 bg-[#0C4D47] hover:bg-[#073331]"
