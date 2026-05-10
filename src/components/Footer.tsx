@@ -16,7 +16,6 @@ export const Footer = () => {
       heading: "EXPLORE",
       links: [
         { to: "/marketplace", label: "Browse Trips" },
-        { to: "/what-we-do", label: "How It Works" },
       ],
     },
     {
@@ -31,9 +30,8 @@ export const Footer = () => {
       heading: "COMPANY",
       links: [
         { to: "/about", label: "About Goldsainte" },
-        { to: "/corporate-contact", label: "Investor Relations" },
-        { to: "/corporate-contact", label: "Press" },
-        { to: "/corporate-contact", label: "Corporate Contact" },
+        { to: "/what-we-do", label: "How It Works" },
+        { to: "/corporate-contact", label: "Contact Us" },
       ],
     },
     {
@@ -48,11 +46,11 @@ export const Footer = () => {
   ];
 
   const legalLinks = [
-    { to: "/privacy-cookies", label: "Privacy & Cookies" },
+    { to: "/privacy-cookies", label: "Privacy Policy" },
     { to: "/terms", label: "Terms of Service" },
-    { to: "/legal/creator-agreement", label: "Creator Agreement" },
-    { to: "/help", label: "Accessibility" },
     { to: "/dispute-resolution", label: "Dispute Resolution" },
+    { to: "/cancellation-refund-policy", label: "Cancellation Policy" },
+    { to: "/help", label: "Help Center" },
   ];
 
   return (

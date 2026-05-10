@@ -10,7 +10,6 @@ import {
 import { useTranslation } from "react-i18next";
 import { BackButton } from "@/components/ui/BackButton";
 import founderImage from "@/assets/founder.jpg";
-import ticketmasterLogo from "@/assets/TicketMaster_wordmark.svg";
 import openaiLogo from "@/assets/OpenAI_Logo.svg";
 import geminiLogo from "@/assets/Google_Gemini_logo_2025.svg";
 import goldsainteLogo from "@/assets/wordmark-green.svg";
@@ -23,7 +22,6 @@ import {
 const About = () => {
   const { t } = useTranslation();
   const partners = [
-    { name: "Ticketmaster", logo: ticketmasterLogo },
     { name: "OpenAI", logo: openaiLogo },
     { name: "Google Gemini", logo: geminiLogo }
   ];
@@ -341,7 +339,7 @@ const About = () => {
             <div>
               <h3 className="font-semibold text-base mb-3 text-foreground">Description of the services and measures to support accessibility</h3>
               <p className="text-foreground mb-4">
-                Goldsainte provides users with the capabilities to discover, search, book, and manage travel-related products or services ("Travel Experiences") across accommodations, car rental, flights, taxis, and attractions. Our services are intended to be accessible across desktop and mobile websites, as well as applications ("Platforms"), allowing users to book Travel Experiences, and which support a broad range of user needs.
+                Goldsainte provides users with the capabilities to discover, search, book, and manage travel-related products or services ("Travel Experiences") across curated trip packages, agent-planned itineraries, and travel experiences. Our services are intended to be accessible across desktop and mobile websites, as well as applications ("Platforms"), allowing users to book Travel Experiences, and which support a broad range of user needs.
               </p>
               
               <p className="text-sm sm:text-base text-foreground mb-3">Specifically, we aim to deliver:</p>
@@ -434,7 +432,7 @@ const About = () => {
                 If you have a question about an existing booking or trip, or if you need us to get back to you, visit the Help Center.
               </p>
               <p className="text-foreground">
-                If you have any questions about your Travel Experience (wheelchair access, walk-in baths, etc.), contact the service provider of the Travel Experience (including but not limited to the owner of a hotel or other property, a museum or park, or a car rental company or airline).
+                If you have any questions about your Travel Experience (wheelchair access, walk-in baths, etc.), contact the service provider of the Travel Experience (including but not limited to the owner of a hotel or other property, a museum or park, or a travel specialist or service provider).
               </p>
             </div>
       </AccordionContent>
@@ -857,7 +855,7 @@ const About = () => {
             <h4 className="font-semibold text-sm sm:text-base mb-2 text-foreground">Luxury Positioning</h4>
             <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
               <p><strong>Curated Packages:</strong> Premium experiences with detailed itineraries, exclusive access, and personalized amenities.</p>
-              <p><strong>Industry Partnerships:</strong> Collaborations with Amadeus, Ticketmaster, and other global partners enhance offerings.</p>
+              <p><strong>Industry Partnerships:</strong> Integrations with leading AI and travel technology providers.</p>
               <p><strong>Brand Differentiation:</strong> Combining AI technology, creator influence, and travel expertise positions Goldsainte uniquely in the luxury segment.</p>
             </div>
           </div>
@@ -895,7 +893,7 @@ const About = () => {
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">Competitive Advantage / Moat</h3>
           <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
-            <p><strong>Proprietary Technology:</strong> Voice AI concierge, AI-driven matching, and recommendation systems.</p>
+            <p><strong>Proprietary Technology:</strong> AI trip planning, specialist matching, and personalised recommendation systems.</p>
             <p><strong>Triple-Sided Network:</strong> Integrated ecosystem connecting travelers, agents, and creators.</p>
             <p><strong>Trust & Safety Infrastructure:</strong> Verified agents, content moderation, escrow payouts, and transparent reviews.</p>
             <p><strong>Brand Loyalty:</strong> Curated trips and high-quality creator content increase repeat bookings and engagement.</p>
