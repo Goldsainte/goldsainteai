@@ -15,6 +15,7 @@ import {
   Settings,
   ImageIcon,
   ArrowRight,
+  BookOpen,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { BackButton } from "@/components/ui/BackButton";
@@ -29,6 +30,7 @@ import { CreatorTripsTab } from "./creator/components/CreatorTripsTab";
 import { CreatorEarningsTab } from "./creator/components/CreatorEarningsTab";
 import { CreatorPortfolioTab } from "./creator/components/CreatorPortfolioTab";
 import { CreatorSettingsTab } from "./creator/components/CreatorSettingsTab";
+import { CreatorGuidesTab } from "./creator/components/CreatorGuidesTab";
 import type { TripProposalStatus } from "@/services/proposalService";
 
 type RecentProposal = {
@@ -284,6 +286,9 @@ export default function CreatorDashboard() {
               <TabsTrigger value="portfolio" className={tabTriggerClass}>
                 <ImageIcon className="h-3.5 w-3.5 mr-1.5" /> Portfolio
               </TabsTrigger>
+              <TabsTrigger value="guides" className={tabTriggerClass}>
+                <BookOpen className="h-3.5 w-3.5 mr-1.5" /> Guides
+              </TabsTrigger>
               <TabsTrigger value="earnings" className={tabTriggerClass}>
                 <DollarSign className="h-3.5 w-3.5 mr-1.5" /> Earnings
               </TabsTrigger>
@@ -307,6 +312,10 @@ export default function CreatorDashboard() {
 
           <TabsContent value="portfolio" className="mt-0">
             <CreatorPortfolioTab />
+          </TabsContent>
+
+          <TabsContent value="guides" className="mt-0">
+            <CreatorGuidesTab />
           </TabsContent>
 
           <TabsContent value="earnings" className="mt-0">
