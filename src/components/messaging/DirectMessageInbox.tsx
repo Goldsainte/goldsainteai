@@ -327,9 +327,14 @@ export function DirectMessageInbox() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-200px)] min-h-[500px] border border-[#E5DFC6]/60 rounded-2xl overflow-hidden bg-white shadow-sm">
+    <div className="flex h-[calc(100vh-180px)] min-h-[500px] border border-[#E5DFC6]/60 rounded-2xl overflow-hidden bg-white shadow-sm">
       {/* Left Panel - Conversation List */}
-      <div className="w-80 border-r border-[#E5DFC6]/50 flex flex-col bg-[#FDFBF7]">
+      <div
+        className={cn(
+          "w-full md:w-80 border-r border-[#E5DFC6]/50 flex-col bg-[#FDFBF7]",
+          selectedConversation ? "hidden md:flex" : "flex"
+        )}
+      >
         <div className="p-4 border-b border-[#E5DFC6]/50 flex items-center justify-between">
           <h2 className="font-secondary text-lg font-semibold text-[#0a2225]">Inbox</h2>
           <div className="flex items-center gap-1">
@@ -441,12 +446,29 @@ export function DirectMessageInbox() {
       </div>
 
       {/* Right Panel - Messages */}
-      <div className="flex-1 flex flex-col bg-white">
+      <div
+        className={cn(
+          "flex-1 flex-col bg-white",
+          selectedConversation ? "flex" : "hidden md:flex"
+        )}
+      >
         {selectedConversation ? (
           <>
             {/* Header */}
             <div className="p-4 border-b border-[#E5DFC6]/50 flex items-center justify-between bg-white">
               <div className="flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    setSelectedConversation(null);
+                    setSearchParams({});
+                  }}
+                  className="md:hidden text-[#0a2225] hover:bg-[#F6F0E4] h-9 w-9 -ml-1"
+                  aria-label="Back to inbox"
+                >
+                  <ArrowLeft className="h-5 w-5" />
+                </Button>
                 <Avatar className="h-10 w-10 border-2 border-[#E5DFC6]">
                   <AvatarImage src={selectedConversation.otherParticipant.avatarUrl || undefined} />
                   <AvatarFallback className="bg-[#F6F0E4] text-[#0a2225] font-secondary">
