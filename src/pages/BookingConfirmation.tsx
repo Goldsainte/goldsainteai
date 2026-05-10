@@ -19,7 +19,7 @@ export default function BookingConfirmation() {
     const fetchBooking = async () => {
       const { data } = await supabase
         .from("trip_bookings")
-        .select("id, total_price, currency, status, metadata, created_at")
+        .select("id, total_price, deposit_amount, deposit_percentage, currency, status, metadata, created_at")
         .eq("id", bookingId)
         .single();
       setBooking(data);
