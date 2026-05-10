@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { CreditCard, Bell, Shield, Globe, Loader2, ExternalLink, Save, ShieldCheck, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
@@ -280,38 +280,41 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="flex items-center justify-between">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <Checkbox
+              checked={notifications.email_notifications}
+              onCheckedChange={(checked) => setNotifications((prev) => ({ ...prev, email_notifications: !!checked }))}
+              className="mt-1"
+            />
             <div className="space-y-0.5">
-              <Label className="text-[#0a2225]">Email Notifications</Label>
+              <p className="text-[#0a2225] font-medium">Email Notifications</p>
               <p className="text-sm text-[#6B7280]">Receive updates about your trips and proposals</p>
             </div>
-            <Switch
-              checked={notifications.email_notifications}
-              onCheckedChange={(checked) => setNotifications((prev) => ({ ...prev, email_notifications: checked }))}
-            />
-          </div>
+          </label>
 
-          <div className="flex items-center justify-between">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <Checkbox
+              checked={notifications.sms_notifications}
+              onCheckedChange={(checked) => setNotifications((prev) => ({ ...prev, sms_notifications: !!checked }))}
+              className="mt-1"
+            />
             <div className="space-y-0.5">
-              <Label className="text-[#0a2225]">SMS Notifications</Label>
+              <p className="text-[#0a2225] font-medium">SMS Notifications</p>
               <p className="text-sm text-[#6B7280]">Get text alerts for urgent updates</p>
             </div>
-            <Switch
-              checked={notifications.sms_notifications}
-              onCheckedChange={(checked) => setNotifications((prev) => ({ ...prev, sms_notifications: checked }))}
-            />
-          </div>
+          </label>
 
-          <div className="flex items-center justify-between">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <Checkbox
+              checked={notifications.marketing_emails}
+              onCheckedChange={(checked) => setNotifications((prev) => ({ ...prev, marketing_emails: !!checked }))}
+              className="mt-1"
+            />
             <div className="space-y-0.5">
-              <Label className="text-[#0a2225]">Marketing Communications</Label>
+              <p className="text-[#0a2225] font-medium">Marketing Communications</p>
               <p className="text-sm text-[#6B7280]">Receive travel inspiration and offers</p>
             </div>
-            <Switch
-              checked={notifications.marketing_emails}
-              onCheckedChange={(checked) => setNotifications((prev) => ({ ...prev, marketing_emails: checked }))}
-            />
-          </div>
+          </label>
 
           <Button
             onClick={handleSaveNotifications}
