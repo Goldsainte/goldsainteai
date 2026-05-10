@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -274,11 +274,10 @@ export default function WebhookSettings() {
 
                 <div className="flex items-center justify-between pt-2 border-t">
                   <span className="text-sm font-medium">Active</span>
-                  <Switch
+                  <Checkbox
                     checked={webhook.is_active}
-                    onCheckedChange={() =>
-                      handleToggleActive(webhook.id, webhook.is_active)
-                    }
+                    onCheckedChange={(checked) => { const v = checked === true; (() =>
+                      handleToggleActive(webhook.id, webhook.is_active))(v); }}
                   />
                 </div>
               </CardContent>
@@ -349,11 +348,11 @@ export default function WebhookSettings() {
 
             <div className="flex items-center justify-between">
               <Label htmlFor="active">Active</Label>
-              <Switch
+              <Checkbox
                 id="active"
                 checked={formData.is_active}
-                onCheckedChange={(checked) =>
-                  setFormData((prev) => ({ ...prev, is_active: checked }))
+                onCheckedChange={(checked) => { const v = checked === true; ((checked) =>
+                  setFormData((prev) => ({ ...prev, is_active: checked)(v); }}))
                 }
               />
             </div>

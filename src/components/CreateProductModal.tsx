@@ -14,7 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEcommerceConnections } from "@/hooks/useEcommerceConnections";
-import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ShopifyLogo } from "@/components/icons/ShopifyLogo";
 import { EtsyLogo } from "@/components/icons/EtsyLogo";
@@ -772,7 +772,7 @@ export function CreateProductModal({ open, onOpenChange, defaultTab = "store" }:
                     <Checkbox
                       id="installments"
                       checked={packageForm.installment_available}
-                      onCheckedChange={(checked) => setPackageForm({ ...packageForm, installment_available: checked as boolean })}
+                      onCheckedChange={(checked) => { const v = checked === true; ((checked) => setPackageForm({ ...packageForm, installment_available: checked as boolean)(v); }})}
                     />
                     <Label htmlFor="installments">Installment Plans Available</Label>
                   </div>
@@ -852,7 +852,7 @@ export function CreateProductModal({ open, onOpenChange, defaultTab = "store" }:
                       <Checkbox
                         id="passport"
                         checked={packageForm.passport_required}
-                        onCheckedChange={(checked) => setPackageForm({ ...packageForm, passport_required: checked as boolean })}
+                        onCheckedChange={(checked) => { const v = checked === true; ((checked) => setPackageForm({ ...packageForm, passport_required: checked as boolean)(v); }})}
                       />
                       <Label htmlFor="passport">Passport Required</Label>
                     </div>
@@ -861,7 +861,7 @@ export function CreateProductModal({ open, onOpenChange, defaultTab = "store" }:
                       <Checkbox
                         id="visa"
                         checked={packageForm.visa_required}
-                        onCheckedChange={(checked) => setPackageForm({ ...packageForm, visa_required: checked as boolean })}
+                        onCheckedChange={(checked) => { const v = checked === true; ((checked) => setPackageForm({ ...packageForm, visa_required: checked as boolean)(v); }})}
                       />
                       <Label htmlFor="visa">Visa Required</Label>
                     </div>
@@ -1043,13 +1043,12 @@ export function CreateProductModal({ open, onOpenChange, defaultTab = "store" }:
                       
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
-                          <Switch 
+                          <Checkbox 
                             checked={shopifyConnection.auto_sync_enabled}
-                            onCheckedChange={(checked) => 
+                            onCheckedChange={(checked) => { const v = checked === true; ((checked) => 
                               toggleAutoSync.mutate({ 
                                 connectionId: shopifyConnection.id, 
-                                enabled: checked 
-                              })
+                                enabled: checked)(v); }})
                             }
                           />
                           <Label className="text-sm">Auto-sync daily</Label>
@@ -1126,13 +1125,12 @@ export function CreateProductModal({ open, onOpenChange, defaultTab = "store" }:
                       
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
-                          <Switch 
+                          <Checkbox 
                             checked={etsyConnection.auto_sync_enabled}
-                            onCheckedChange={(checked) => 
+                            onCheckedChange={(checked) => { const v = checked === true; ((checked) => 
                               toggleAutoSync.mutate({ 
                                 connectionId: etsyConnection.id, 
-                                enabled: checked 
-                              })
+                                enabled: checked)(v); }})
                             }
                           />
                           <Label className="text-sm">Auto-sync daily</Label>

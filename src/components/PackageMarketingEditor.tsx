@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Plus, X, Upload, Edit, Trash2, Eye, Image as ImageIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -447,19 +447,19 @@ export function PackageMarketingEditor() {
 
             <div className="space-y-4 border-t pt-4">
               <div className="flex items-center space-x-2">
-                <Switch
+                <Checkbox
                   id="is_published"
                   checked={formData.is_published}
-                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_published: checked }))}
+                  onCheckedChange={(checked) => { const v = checked === true; ((checked) => setFormData(prev => ({ ...prev, is_published: checked)(v); }}))}
                 />
                 <Label htmlFor="is_published">Publish package (make visible to customers)</Label>
               </div>
 
               <div className="flex items-center space-x-2">
-                <Switch
+                <Checkbox
                   id="allow_resale"
                   checked={formData.allow_resale}
-                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, allow_resale: checked }))}
+                  onCheckedChange={(checked) => { const v = checked === true; ((checked) => setFormData(prev => ({ ...prev, allow_resale: checked)(v); }}))}
                 />
                 <Label htmlFor="allow_resale">Allow other creators to resell this package</Label>
               </div>

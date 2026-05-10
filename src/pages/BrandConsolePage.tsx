@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -598,12 +598,11 @@ function CollectionsSection({ brandProfileId }: { brandProfileId: string }) {
                         <span className="text-[10px] uppercase tracking-wide text-[#7A7151]">
                           {c.is_published ? "Published" : "Draft"}
                         </span>
-                        <Switch
+                        <Checkbox
                           checked={c.is_published}
-                          onCheckedChange={(checked) =>
+                          onCheckedChange={(checked) => { const v = checked === true; ((checked) =>
                             updateCollection(c.id, {
-                              is_published: Boolean(checked),
-                            })
+                              is_published: Boolean(checked),)(v); }})
                           }
                         />
                       </div>

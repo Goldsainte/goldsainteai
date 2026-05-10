@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -149,10 +149,10 @@ export function MessageSettingsModal({ open, onOpenChange }: MessageSettingsModa
                   Receive messages from people you don't follow
                 </p>
               </div>
-              <Switch
+              <Checkbox
                 checked={settings.allow_message_requests}
-                onCheckedChange={(checked) =>
-                  setSettings((s) => ({ ...s, allow_message_requests: checked }))
+                onCheckedChange={(checked) => { const v = checked === true; ((checked) =>
+                  setSettings((s) => ({ ...s, allow_message_requests: checked)(v); }}))
                 }
               />
             </div>
@@ -168,10 +168,10 @@ export function MessageSettingsModal({ open, onOpenChange }: MessageSettingsModa
                   Hide requests that may contain spam
                 </p>
               </div>
-              <Switch
+              <Checkbox
                 checked={settings.filter_requests}
-                onCheckedChange={(checked) =>
-                  setSettings((s) => ({ ...s, filter_requests: checked }))
+                onCheckedChange={(checked) => { const v = checked === true; ((checked) =>
+                  setSettings((s) => ({ ...s, filter_requests: checked)(v); }}))
                 }
               />
             </div>
@@ -187,10 +187,10 @@ export function MessageSettingsModal({ open, onOpenChange }: MessageSettingsModa
                   Let others know when you've read their messages
                 </p>
               </div>
-              <Switch
+              <Checkbox
                 checked={settings.show_read_receipts}
-                onCheckedChange={(checked) =>
-                  setSettings((s) => ({ ...s, show_read_receipts: checked }))
+                onCheckedChange={(checked) => { const v = checked === true; ((checked) =>
+                  setSettings((s) => ({ ...s, show_read_receipts: checked)(v); }}))
                 }
               />
             </div>

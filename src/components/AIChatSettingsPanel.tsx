@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
@@ -120,12 +120,12 @@ export const AIChatSettingsPanel = ({ open, onClose, preferences, onPreferencesC
                   <Label>Voice Mode</Label>
                   <p className="text-sm text-muted-foreground">Enable voice chat functionality</p>
                 </div>
-                <Switch
+                <Checkbox
                   checked={localPrefs.general.voiceEnabled}
-                  onCheckedChange={(checked) =>
+                  onCheckedChange={(checked) => { const v = checked === true; ((checked) =>
                     setLocalPrefs({
                       ...localPrefs,
-                      general: { ...localPrefs.general, voiceEnabled: checked },
+                      general: { ...localPrefs.general, voiceEnabled: checked)(v); }},
                     })
                   }
                 />
@@ -137,12 +137,12 @@ export const AIChatSettingsPanel = ({ open, onClose, preferences, onPreferencesC
                   <Label>Auto-Save Conversations</Label>
                   <p className="text-sm text-muted-foreground">Automatically save chat history</p>
                 </div>
-                <Switch
+                <Checkbox
                   checked={localPrefs.general.autoSaveConversation}
-                  onCheckedChange={(checked) =>
+                  onCheckedChange={(checked) => { const v = checked === true; ((checked) =>
                     setLocalPrefs({
                       ...localPrefs,
-                      general: { ...localPrefs.general, autoSaveConversation: checked },
+                      general: { ...localPrefs.general, autoSaveConversation: checked)(v); }},
                     })
                   }
                 />
@@ -357,12 +357,12 @@ export const AIChatSettingsPanel = ({ open, onClose, preferences, onPreferencesC
                   <Label>Flexible Dates</Label>
                   <p className="text-sm text-muted-foreground">Search ±3 days from selected dates</p>
                 </div>
-                <Switch
+                <Checkbox
                   checked={localPrefs.flights.flexibleDates}
-                  onCheckedChange={(checked) =>
+                  onCheckedChange={(checked) => { const v = checked === true; ((checked) =>
                     setLocalPrefs({
                       ...localPrefs,
-                      flights: { ...localPrefs.flights, flexibleDates: checked },
+                      flights: { ...localPrefs.flights, flexibleDates: checked)(v); }},
                     })
                   }
                 />

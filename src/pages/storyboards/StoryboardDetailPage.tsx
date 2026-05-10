@@ -17,7 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { invokeWithAuth } from "@/lib/supabaseHelpers";
 import { Header } from "@/components/Header";
@@ -296,7 +296,7 @@ export default function StoryboardDetailPage() {
                   <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Storyboard title" className="text-xl font-semibold" />
                   <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Add a description (optional)" rows={2} className="resize-none text-sm" />
                   <div className="flex items-center space-x-2">
-                    <Switch id="public" checked={isPublic} onCheckedChange={setIsPublic} />
+                    <Checkbox id="public" checked={isPublic} onCheckedChange={(checked) => { const v = checked === true; (setIsPublic)(v); }} />
                     <Label htmlFor="public" className="text-sm">Make this storyboard public</Label>
                   </div>
                   <div className="flex gap-2">

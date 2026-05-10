@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Calendar,
   MapPin,
@@ -906,9 +906,9 @@ function ResponderProposalForm({
                 creator + agent split.
               </p>
             </div>
-            <Switch
+            <Checkbox
               checked={proposal.collaborating}
-              onCheckedChange={(checked) => onChange("collaborating", checked)}
+              onCheckedChange={(checked) => { const v = checked === true; ((checked) => onChange("collaborating", checked))(v); }}
             />
           </div>
 

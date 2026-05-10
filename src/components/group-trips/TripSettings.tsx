@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Settings, Save, Shield, DollarSign, Bell, Loader2, X } from 'lucide-react';
@@ -245,10 +245,10 @@ export const TripSettings = ({ trip, members, onClose, onUpdate }: TripSettingsP
                 <Label className="font-medium">{notif.label}</Label>
                 <p className="text-sm text-muted-foreground">{notif.description}</p>
               </div>
-              <Switch
+              <Checkbox
                 checked={notificationSettings[notif.key] !== false}
-                onCheckedChange={(checked) =>
-                  setNotificationSettings(prev => ({ ...prev, [notif.key]: checked }))
+                onCheckedChange={(checked) => { const v = checked === true; ((checked) =>
+                  setNotificationSettings(prev => ({ ...prev, [notif.key]: checked)(v); }}))
                 }
               />
             </div>

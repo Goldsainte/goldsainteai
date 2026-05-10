@@ -1,7 +1,7 @@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Users, Sparkles, Briefcase } from "lucide-react";
 
 interface AccountTypeSelectorProps {
@@ -74,7 +74,7 @@ export const AccountTypeSelector = ({
             <Label>Show account type on profile</Label>
             <p className="text-sm text-muted-foreground">Display your account type badge below your bio</p>
           </div>
-          <Switch checked={showBadgeToggle} onCheckedChange={onShowBadgeChange} />
+          <Checkbox checked={showBadgeToggle} onCheckedChange={(checked) => { const v = checked === true; (onShowBadgeChange)(v); }} />
         </div>
       )}
     </div>

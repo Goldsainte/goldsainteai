@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Plus, X, Edit, Trash2, Calendar, Clock, MapPin } from "lucide-react";
@@ -267,10 +267,10 @@ export function ItineraryTemplateBuilder() {
             </div>
 
             <div className="flex items-center space-x-2">
-              <Switch
+              <Checkbox
                 id="is_public"
                 checked={isPublic}
-                onCheckedChange={setIsPublic}
+                onCheckedChange={(checked) => { const v = checked === true; (setIsPublic)(v); }}
               />
               <Label htmlFor="is_public">Make template public (other creators can use it)</Label>
             </div>
@@ -474,10 +474,10 @@ export function ItineraryTemplateBuilder() {
 
                   <div className="space-y-2 flex items-end">
                     <div className="flex items-center space-x-2">
-                      <Switch
+                      <Checkbox
                         id="booking_required"
                         checked={currentItem.booking_required}
-                        onCheckedChange={(checked) => setCurrentItem(prev => ({ ...prev, booking_required: checked }))}
+                        onCheckedChange={(checked) => { const v = checked === true; ((checked) => setCurrentItem(prev => ({ ...prev, booking_required: checked)(v); }}))}
                       />
                       <Label htmlFor="booking_required" className="text-xs">Booking Required</Label>
                     </div>

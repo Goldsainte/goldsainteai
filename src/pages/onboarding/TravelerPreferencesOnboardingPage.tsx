@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import TravelPreferencesWizard from "@/components/TravelPreferencesWizard";
 import { toast } from "sonner";
 import { Sparkles, ArrowRight, Users } from "lucide-react";
@@ -214,9 +214,9 @@ export default function TravelerPreferencesOnboardingPage() {
               {/* Discovery Opt-in */}
               <div className="border-t border-[#E5DFC6]/60 pt-6 mt-8">
                 <div className="flex items-start gap-4 p-4 sm:p-5 rounded-[20px] bg-[#F5EFE1]">
-                  <Switch 
+                  <Checkbox 
                     checked={isDiscoverable}
-                    onCheckedChange={setIsDiscoverable}
+                    onCheckedChange={(checked) => { const v = checked === true; (setIsDiscoverable)(v); }}
                     className="mt-0.5 data-[state=checked]:bg-[#C7B892]"
                   />
                   <div className="flex-1">
