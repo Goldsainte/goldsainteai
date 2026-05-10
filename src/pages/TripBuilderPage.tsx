@@ -268,7 +268,7 @@ export default function TripBuilderPage() {
   return (
     <div className="min-h-screen bg-[#FDF9F0]">
       {/* Editorial Header */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-16">
         {/* Back button - own row */}
         <div className="mb-6">
           <BackButton to={isAgent ? "/agent-dashboard" : "/creator-dashboard"} />
@@ -317,15 +317,53 @@ export default function TripBuilderPage() {
         )}
       </div>
 
-      {/* Form */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-12 md:pb-16">
-        <TripBuilderForm
-          ref={formRef}
-          initialData={tripData}
-          onSave={handleSave}
-          saving={saving}
-          isEditing={!!editId}
-        />
+      {/* Form + live preview */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-12 md:pb-16">
+        <div className="flex gap-8">
+          <div className="flex-1 min-w-0">
+            <TripBuilderForm
+              ref={formRef}
+              initialData={tripData}
+              onSave={handleSave}
+              saving={saving}
+              isEditing={!!editId}
+            />
+          </div>
+          <div className="hidden xl:flex flex-col w-72 flex-shrink-0">
+            <div className="sticky top-8">
+              <p className="text-[11px] uppercase tracking-widest text-[#9A9384] font-medium mb-4">Live preview</p>
+              <div className="rounded-2xl overflow-hidden border border-[#E5DFC6] shadow-sm">
+                <div className="aspect-video bg-[#F5F0E8] relative overflow-hidden">
+                  {previewData?.cover_image_url ? (
+                    <img src={previewData.cover_image_url} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <ImageIcon className="h-8 w-8 text-[#E5DFC6]" />
+                    </div>
+                  )}
+                </div>
+                <div className="p-4 bg-white">
+                  <p className="font-medium text-sm text-[#0a2225] truncate">
+                    {previewData?.title || "Your trip title"}
+                  </p>
+                  <p className="text-xs text-[#9A9384] mt-0.5 flex items-center gap-1">
+                    <MapPin className="h-3 w-3" />
+                    {previewData?.destination || "Destination"}
+                  </p>
+                  <p className="text-sm font-semibold text-[#0a2225] mt-3">
+                    {previewData?.price_per_person
+                      ? `$${Number(previewData.price_per_person).toLocaleString()}`
+                      : "$0"}{" "}
+                    <span className="text-xs font-normal text-[#9A9384]">per person</span>
+                  </p>
+                </div>
+              </div>
+              <p className="text-xs text-[#9A9384] mt-3 text-center">
+                This is how your trip appears in the marketplace
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
