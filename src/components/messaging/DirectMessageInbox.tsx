@@ -13,6 +13,7 @@ import {
   PenSquare,
   Loader2,
   Trash2,
+  HandCoins,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -36,6 +37,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { MessageSettingsModal } from "./MessageSettingsModal";
 import { RecipientSearchModal } from "./RecipientSearchModal";
 import { NewMessageModal } from "./NewMessageModal";
+import { ProposalComposer } from "./ProposalComposer";
+import { ProposalMessageCard } from "./ProposalMessageCard";
 import { supabase } from "@/integrations/supabase/client";
 
 export function DirectMessageInbox() {
@@ -50,6 +53,8 @@ export function DirectMessageInbox() {
   const [showRecipientSearch, setShowRecipientSearch] = useState(false);
   const [selectedRecipient, setSelectedRecipient] = useState<{ id: string; name: string } | null>(null);
   const [otherTyping, setOtherTyping] = useState(false);
+  const [showProposalComposer, setShowProposalComposer] = useState(false);
+  const [currentUserAccountType, setCurrentUserAccountType] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -66,6 +71,33 @@ export function DirectMessageInbox() {
   const { messages, loading: messagesLoading } = useConversationMessages(
     selectedConversation?.id || null
   );
+
+  // Load current user's account_type for agent gating
+  useEffect(() => {
+    let cancelled = false;
+    if (!user) return;
+    supabase
+      .from("profiles")
+      .select("account_type")
+      .eq("id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!cancelled) setCurrentUserAccountType((data as any)?.account_type ?? null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  const isAgent =
+    currentUserAccountType === "agent" ||
+    currentUserAccountType === "travel_agent" ||
+    currentUserAccountType === "admin";
+
+  // Reset composer visibility when switching conversation
+  useEffect(() => {
+    setShowProposalComposer(false);
+  }, [selectedConversation?.id]);
 
   // Typing indicator via broadcast
   const broadcastTyping = useCallback(() => {
@@ -554,12 +586,30 @@ export function DirectMessageInbox() {
                       </div>
                       <div className="space-y-3">
                         {group.messages.map((msg) => (
-                          <MessageBubble
-                            key={msg.id}
-                            message={msg}
-                            isSelf={msg.sender_id === user?.id}
-                            onDelete={handleDeleteMessage}
-                          />
+                          (msg as any).message_type === "proposal" ? (
+                            <div
+                              key={msg.id}
+                              className={`flex ${
+                                msg.sender_id === user?.id ? "justify-end" : "justify-start"
+                              }`}
+                            >
+                              <ProposalMessageCard
+                                message={msg as any}
+                                isSelf={msg.sender_id === user?.id}
+                                currentUserId={user?.id || ""}
+                                recipientId={
+                                  selectedConversation!.otherParticipant.id
+                                }
+                              />
+                            </div>
+                          ) : (
+                            <MessageBubble
+                              key={msg.id}
+                              message={msg}
+                              isSelf={msg.sender_id === user?.id}
+                              onDelete={handleDeleteMessage}
+                            />
+                          )
                         ))}
                       </div>
                     </div>
@@ -579,6 +629,15 @@ export function DirectMessageInbox() {
             {/* Input bar */}
             {!isRequest && (
               <div className="p-4 border-t border-[#E5DFC6]/40 bg-white shadow-[0_-2px_8px_rgba(0,0,0,0.03)]">
+                {showProposalComposer && user && selectedConversation && (
+                  <div className="mb-3 -mx-4 -mt-4">
+                    <ProposalComposer
+                      conversationId={selectedConversation.id}
+                      senderId={user.id}
+                      onClose={() => setShowProposalComposer(false)}
+                    />
+                  </div>
+                )}
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -586,6 +645,18 @@ export function DirectMessageInbox() {
                   }}
                   className="flex gap-2"
                 >
+                  {isAgent && !showProposalComposer && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowProposalComposer(true)}
+                      className="border-[#C7A962]/40 text-[#0c4d47] hover:bg-[#FDF9F0] rounded-full h-11 px-4"
+                      title="Send a Proposal"
+                    >
+                      <HandCoins className="h-4 w-4 mr-1" />
+                      <span className="text-xs">Send a Proposal</span>
+                    </Button>
+                  )}
                   <Input
                     ref={inputRef}
                     placeholder="Write something…"
