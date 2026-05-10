@@ -525,7 +525,7 @@ export default function AgentApplicationForm() {
         return (
           <div className="space-y-8">
             <SectionHeader title="Insurance & Legal" />
-            <p className="text-sm text-[#6B7280] -mt-4">Provide insurance details, upload documents, and accept our terms.</p>
+            <p className="text-sm text-[#6B7280] -mt-4">Provide insurance details and accept our terms.</p>
 
             {/* Insurance */}
             <div className="space-y-4">
@@ -560,9 +560,43 @@ export default function AgentApplicationForm() {
               <Input value={formData.taxIdEIN} onChange={(e) => setFormData({ ...formData, taxIdEIN: e.target.value })} className={luxuryInputClasses} placeholder="XX-XXXXXXX" />
             </div>
 
-            {/* Document Uploads */}
+            {/* Legal Acceptance */}
+            <div className="space-y-4 border-t border-[#E5DFC6] pt-6">
+              <h4 className="font-medium text-[#0a2225]">Legal Agreements</h4>
+              {[
+                { key: "acceptedTerms" as const, label: "Terms of Service", link: "/terms" },
+                { key: "acceptedPrivacy" as const, label: "Privacy Policy", link: "/privacy" },
+                { key: "acceptedVendor" as const, label: "Agent Partnership Agreement", link: "/vendor-agreement" },
+              ].map(({ key, label, link }) => (
+                <div key={key} className="flex items-start space-x-3">
+                  <Checkbox
+                    checked={formData[key]}
+                    onCheckedChange={(checked) => setFormData({ ...formData, [key]: checked as boolean })}
+                    className="data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47] mt-0.5"
+                  />
+                  <label className="text-sm text-[#0a2225]">
+                    I accept the <a href={link} target="_blank" className="text-[#C7A962] hover:underline">{label}</a> *
+                  </label>
+                </div>
+              ))}
+            </div>
+
+            <NavButtons
+              onBack={() => setStep(3)}
+              onNext={() => setStep(5)}
+              nextLabel="Continue to Documents"
+              nextDisabled={!formData.acceptedTerms || !formData.acceptedPrivacy || !formData.acceptedVendor}
+            />
+          </div>
+        );
+
+      case 5:
+        return (
+          <div className="space-y-8">
+            <SectionHeader title="Document Upload" />
+            <p className="text-sm text-[#6B7280] -mt-4">Upload the supporting documents needed to complete your application.</p>
+
             <div className="space-y-4">
-              <h4 className="font-medium text-[#0a2225]">Document Uploads</h4>
               <div className="grid gap-4 md:grid-cols-2">
                 {[
                   { label: "Business License", key: "businessLicenseFile" as const },
@@ -588,39 +622,18 @@ export default function AgentApplicationForm() {
                   </div>
                 ))}
               </div>
-            </div>
-
-            {/* Legal Acceptance */}
-            <div className="space-y-4 border-t border-[#E5DFC6] pt-6">
-              <h4 className="font-medium text-[#0a2225]">Legal Agreements</h4>
-              {[
-                { key: "acceptedTerms" as const, label: "Terms of Service", link: "/terms" },
-                { key: "acceptedPrivacy" as const, label: "Privacy Policy", link: "/privacy" },
-                { key: "acceptedVendor" as const, label: "Agent Partnership Agreement", link: "/vendor-agreement" },
-              ].map(({ key, label, link }) => (
-                <div key={key} className="flex items-start space-x-3">
-                  <Checkbox
-                    checked={formData[key]}
-                    onCheckedChange={(checked) => setFormData({ ...formData, [key]: checked as boolean })}
-                    className="data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47] mt-0.5"
-                  />
-                  <label className="text-sm text-[#0a2225]">
-                    I accept the <a href={link} target="_blank" className="text-[#C7A962] hover:underline">{label}</a> *
-                  </label>
-                </div>
-              ))}
+              <p className="text-xs text-[#9A9079]">PDF, JPG, or PNG accepted. Max 50MB per file.</p>
             </div>
 
             <NavButtons
-              onBack={() => setStep(3)}
+              onBack={() => setStep(4)}
               onNext={saveDraftApplication}
               nextLabel="Continue to Verification"
-              nextDisabled={!formData.acceptedTerms || !formData.acceptedPrivacy || !formData.acceptedVendor}
             />
           </div>
         );
 
-      case 5:
+      case 6:
         return (
           <div className="space-y-8">
             <div className="text-center">
