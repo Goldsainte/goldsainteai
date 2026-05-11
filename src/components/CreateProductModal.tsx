@@ -772,7 +772,7 @@ export function CreateProductModal({ open, onOpenChange, defaultTab = "store" }:
                     <Checkbox
                       id="installments"
                       checked={packageForm.installment_available}
-                      onCheckedChange={(checked) => (checked) => setPackageForm({ ...packageForm, installment_available: checked as boolean})}
+                      onCheckedChange={(checked) => setPackageForm({ ...packageForm, installment_available: checked as boolean})}
                     />
                     <Label htmlFor="installments">Installment Plans Available</Label>
                   </div>
@@ -852,7 +852,7 @@ export function CreateProductModal({ open, onOpenChange, defaultTab = "store" }:
                       <Checkbox
                         id="passport"
                         checked={packageForm.passport_required}
-                        onCheckedChange={(checked) => (checked) => setPackageForm({ ...packageForm, passport_required: checked as boolean})}
+                        onCheckedChange={(checked) => setPackageForm({ ...packageForm, passport_required: checked as boolean})}
                       />
                       <Label htmlFor="passport">Passport Required</Label>
                     </div>
@@ -861,7 +861,7 @@ export function CreateProductModal({ open, onOpenChange, defaultTab = "store" }:
                       <Checkbox
                         id="visa"
                         checked={packageForm.visa_required}
-                        onCheckedChange={(checked) => (checked) => setPackageForm({ ...packageForm, visa_required: checked as boolean})}
+                        onCheckedChange={(checked) => setPackageForm({ ...packageForm, visa_required: checked as boolean})}
                       />
                       <Label htmlFor="visa">Visa Required</Label>
                     </div>
@@ -1045,7 +1045,7 @@ export function CreateProductModal({ open, onOpenChange, defaultTab = "store" }:
                         <div className="flex items-center gap-2">
                           <Checkbox 
                             checked={shopifyConnection.auto_sync_enabled}
-                            onCheckedChange={(checked) => (checked) => 
+                            onCheckedChange={(checked) => 
                               toggleAutoSync.mutate({ 
                                 connectionId: shopifyConnection.id, 
                                 enabled: checked})
@@ -1127,7 +1127,7 @@ export function CreateProductModal({ open, onOpenChange, defaultTab = "store" }:
                         <div className="flex items-center gap-2">
                           <Checkbox 
                             checked={etsyConnection.auto_sync_enabled}
-                            onCheckedChange={(checked) => (checked) => 
+                            onCheckedChange={(checked) => 
                               toggleAutoSync.mutate({ 
                                 connectionId: etsyConnection.id, 
                                 enabled: checked})

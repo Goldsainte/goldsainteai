@@ -450,7 +450,7 @@ export function PackageMarketingEditor() {
                 <Checkbox
                   id="is_published"
                   checked={formData.is_published}
-                  onCheckedChange={(checked) => (checked) => setFormData(prev => ({ ...prev, is_published: checked}))}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_published: checked}))}
                 />
                 <Label htmlFor="is_published">Publish package (make visible to customers)</Label>
               </div>
@@ -459,7 +459,7 @@ export function PackageMarketingEditor() {
                 <Checkbox
                   id="allow_resale"
                   checked={formData.allow_resale}
-                  onCheckedChange={(checked) => (checked) => setFormData(prev => ({ ...prev, allow_resale: checked}))}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, allow_resale: checked}))}
                 />
                 <Label htmlFor="allow_resale">Allow other creators to resell this package</Label>
               </div>
