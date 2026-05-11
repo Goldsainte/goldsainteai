@@ -216,7 +216,7 @@ export default function TravelerPreferencesOnboardingPage() {
                 <div className="flex items-start gap-4 p-4 sm:p-5 rounded-[20px] bg-[#F5EFE1]">
                   <Checkbox 
                     checked={isDiscoverable}
-                    onCheckedChange={(checked) => { const v = checked === true; (setIsDiscoverable)(v); }}
+                    onCheckedChange={(checked) => (setIsDiscoverable)(checked === true)}
                     className="mt-0.5 data-[state=checked]:bg-[#C7B892]"
                   />
                   <div className="flex-1">

@@ -908,7 +908,7 @@ function ResponderProposalForm({
             </div>
             <Checkbox
               checked={proposal.collaborating}
-              onCheckedChange={(checked) => { const v = checked === true; ((checked) => onChange("collaborating", checked))(v); }}
+              onCheckedChange={(checked) => ((checked) => onChange("collaborating", checked))(checked === true)}
             />
           </div>
 

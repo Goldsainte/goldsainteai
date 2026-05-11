@@ -351,7 +351,7 @@ export default function PromoCodeManagement() {
               <Label>Active</Label>
               <Checkbox
                 checked={formData.is_active}
-                onCheckedChange={(checked) => { const v = checked === true; ((checked) => setFormData({ ...formData, is_active: checked)(v); }})}
+                onCheckedChange={(checked) => (checked) => setFormData({ ...formData, is_active: checked})}
               />
             </div>
 

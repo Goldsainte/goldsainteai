@@ -600,9 +600,9 @@ function CollectionsSection({ brandProfileId }: { brandProfileId: string }) {
                         </span>
                         <Checkbox
                           checked={c.is_published}
-                          onCheckedChange={(checked) => { const v = checked === true; ((checked) =>
+                          onCheckedChange={(checked) => (checked) =>
                             updateCollection(c.id, {
-                              is_published: Boolean(checked),)(v); }})
+                              is_published: Boolean(checked),})
                           }
                         />
                       </div>

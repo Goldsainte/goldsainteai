@@ -74,7 +74,7 @@ export const AccountTypeSelector = ({
             <Label>Show account type on profile</Label>
             <p className="text-sm text-muted-foreground">Display your account type badge below your bio</p>
           </div>
-          <Checkbox checked={showBadgeToggle} onCheckedChange={(checked) => { const v = checked === true; (onShowBadgeChange)(v); }} />
+          <Checkbox checked={showBadgeToggle} onCheckedChange={(checked) => (onShowBadgeChange)(checked === true)} />
         </div>
       )}
     </div>

@@ -276,8 +276,8 @@ export default function WebhookSettings() {
                   <span className="text-sm font-medium">Active</span>
                   <Checkbox
                     checked={webhook.is_active}
-                    onCheckedChange={(checked) => { const v = checked === true; (() =>
-                      handleToggleActive(webhook.id, webhook.is_active))(v); }}
+                    onCheckedChange={(checked) => (() =>
+                      handleToggleActive(webhook.id, webhook.is_active))(checked === true)}
                   />
                 </div>
               </CardContent>
@@ -351,8 +351,8 @@ export default function WebhookSettings() {
               <Checkbox
                 id="active"
                 checked={formData.is_active}
-                onCheckedChange={(checked) => { const v = checked === true; ((checked) =>
-                  setFormData((prev) => ({ ...prev, is_active: checked)(v); }}))
+                onCheckedChange={(checked) => (checked) =>
+                  setFormData((prev) => ({ ...prev, is_active: checked}))
                 }
               />
             </div>

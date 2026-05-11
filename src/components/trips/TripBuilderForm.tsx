@@ -553,7 +553,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                     <label key={meal}
                       className={cn("flex items-center gap-2 rounded-xl border px-3 py-2.5 cursor-pointer transition-colors",
                         active ? "bg-[#FDF9F0] border-[#C7A962]" : "bg-white border-[#E5DFC6] hover:border-[#C7A962]/50")}>
-                      <Checkbox checked={active} onCheckedChange={(checked) => { const v = checked === true; (() => toggleArrayValue("meals_included", meal))(v); }} />
+                      <Checkbox checked={active} onCheckedChange={(checked) => (() => toggleArrayValue("meals_included", meal))(checked === true)} />
                       <span className="text-sm text-[#0a2225]">{meal}</span>
                     </label>
                   );
@@ -597,7 +597,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                         </div>
                         <label className="flex items-center gap-2 text-xs text-[#6B7280] mt-8 flex-shrink-0">
                           <span>Featured day</span>
-                          <Checkbox checked={day.is_featured_day} onCheckedChange={(checked) => { const v = checked === true; ((v) => updateDay(idx, { is_featured_day: v)(v); }})} />
+                          <Checkbox checked={day.is_featured_day} onCheckedChange={(checked) => (v) => updateDay(idx, { is_featured_day: v})} />
                         </label>
                       </div>
                       <div className="space-y-2">

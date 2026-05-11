@@ -151,8 +151,8 @@ export function MessageSettingsModal({ open, onOpenChange }: MessageSettingsModa
               </div>
               <Checkbox
                 checked={settings.allow_message_requests}
-                onCheckedChange={(checked) => { const v = checked === true; ((checked) =>
-                  setSettings((s) => ({ ...s, allow_message_requests: checked)(v); }}))
+                onCheckedChange={(checked) => (checked) =>
+                  setSettings((s) => ({ ...s, allow_message_requests: checked}))
                 }
               />
             </div>
@@ -170,8 +170,8 @@ export function MessageSettingsModal({ open, onOpenChange }: MessageSettingsModa
               </div>
               <Checkbox
                 checked={settings.filter_requests}
-                onCheckedChange={(checked) => { const v = checked === true; ((checked) =>
-                  setSettings((s) => ({ ...s, filter_requests: checked)(v); }}))
+                onCheckedChange={(checked) => (checked) =>
+                  setSettings((s) => ({ ...s, filter_requests: checked}))
                 }
               />
             </div>
@@ -189,8 +189,8 @@ export function MessageSettingsModal({ open, onOpenChange }: MessageSettingsModa
               </div>
               <Checkbox
                 checked={settings.show_read_receipts}
-                onCheckedChange={(checked) => { const v = checked === true; ((checked) =>
-                  setSettings((s) => ({ ...s, show_read_receipts: checked)(v); }}))
+                onCheckedChange={(checked) => (checked) =>
+                  setSettings((s) => ({ ...s, show_read_receipts: checked}))
                 }
               />
             </div>
