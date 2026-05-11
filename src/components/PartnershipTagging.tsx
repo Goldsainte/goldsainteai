@@ -80,7 +80,7 @@ export const PartnershipTagging = ({ onPartnershipChange, currentBrandId }: Part
         <Checkbox
           id="paid-partnership"
           checked={isPaidPartnership}
-          onCheckedChange={(checked) => { const v = checked === true; (handleToggle)(v); }}
+          onCheckedChange={(checked) => (handleToggle)(checked === true)}
         />
       </div>
 

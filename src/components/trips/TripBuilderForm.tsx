@@ -553,7 +553,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                     <label key={meal}
                       className={cn("flex items-center gap-2 rounded-xl border px-3 py-2.5 cursor-pointer transition-colors",
                         active ? "bg-[#FDF9F0] border-[#C7A962]" : "bg-white border-[#E5DFC6] hover:border-[#C7A962]/50")}>
-                      <Checkbox checked={active} onCheckedChange={(checked) => { const v = checked === true; (() => toggleArrayValue("meals_included", meal))(v); }} />
+                      <Checkbox checked={active} onCheckedChange={(checked) => (() => toggleArrayValue("meals_included", meal))(checked === true)} />
                       <span className="text-sm text-[#0a2225]">{meal}</span>
                     </label>
                   );

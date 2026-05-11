@@ -270,7 +270,7 @@ export function ItineraryTemplateBuilder() {
               <Checkbox
                 id="is_public"
                 checked={isPublic}
-                onCheckedChange={(checked) => { const v = checked === true; (setIsPublic)(v); }}
+                onCheckedChange={(checked) => (setIsPublic)(checked === true)}
               />
               <Label htmlFor="is_public">Make template public (other creators can use it)</Label>
             </div>

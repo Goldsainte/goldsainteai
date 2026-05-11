@@ -296,7 +296,7 @@ export default function StoryboardDetailPage() {
                   <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Storyboard title" className="text-xl font-semibold" />
                   <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Add a description (optional)" rows={2} className="resize-none text-sm" />
                   <div className="flex items-center space-x-2">
-                    <Checkbox id="public" checked={isPublic} onCheckedChange={(checked) => { const v = checked === true; (setIsPublic)(v); }} />
+                    <Checkbox id="public" checked={isPublic} onCheckedChange={(checked) => (setIsPublic)(checked === true)} />
                     <Label htmlFor="public" className="text-sm">Make this storyboard public</Label>
                   </div>
                   <div className="flex gap-2">
