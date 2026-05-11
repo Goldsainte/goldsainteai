@@ -477,7 +477,7 @@ export function ItineraryTemplateBuilder() {
                       <Checkbox
                         id="booking_required"
                         checked={currentItem.booking_required}
-                        onCheckedChange={(checked) => { const v = checked === true; ((checked) => setCurrentItem(prev => ({ ...prev, booking_required: checked)(v); }}))}
+                        onCheckedChange={(checked) => (checked) => setCurrentItem(prev => ({ ...prev, booking_required: checked}))}
                       />
                       <Label htmlFor="booking_required" className="text-xs">Booking Required</Label>
                     </div>

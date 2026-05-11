@@ -247,8 +247,8 @@ export const TripSettings = ({ trip, members, onClose, onUpdate }: TripSettingsP
               </div>
               <Checkbox
                 checked={notificationSettings[notif.key] !== false}
-                onCheckedChange={(checked) => { const v = checked === true; ((checked) =>
-                  setNotificationSettings(prev => ({ ...prev, [notif.key]: checked)(v); }}))
+                onCheckedChange={(checked) => (checked) =>
+                  setNotificationSettings(prev => ({ ...prev, [notif.key]: checked}))
                 }
               />
             </div>

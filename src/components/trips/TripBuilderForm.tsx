@@ -597,7 +597,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                         </div>
                         <label className="flex items-center gap-2 text-xs text-[#6B7280] mt-8 flex-shrink-0">
                           <span>Featured day</span>
-                          <Checkbox checked={day.is_featured_day} onCheckedChange={(checked) => { const v = checked === true; ((v) => updateDay(idx, { is_featured_day: v)(v); }})} />
+                          <Checkbox checked={day.is_featured_day} onCheckedChange={(checked) => (v) => updateDay(idx, { is_featured_day: v})} />
                         </label>
                       </div>
                       <div className="space-y-2">

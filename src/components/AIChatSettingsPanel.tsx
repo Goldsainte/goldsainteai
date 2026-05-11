@@ -122,10 +122,10 @@ export const AIChatSettingsPanel = ({ open, onClose, preferences, onPreferencesC
                 </div>
                 <Checkbox
                   checked={localPrefs.general.voiceEnabled}
-                  onCheckedChange={(checked) => { const v = checked === true; ((checked) =>
+                  onCheckedChange={(checked) => (checked) =>
                     setLocalPrefs({
                       ...localPrefs,
-                      general: { ...localPrefs.general, voiceEnabled: checked)(v); }},
+                      general: { ...localPrefs.general, voiceEnabled: checked},
                     })
                   }
                 />
@@ -139,10 +139,10 @@ export const AIChatSettingsPanel = ({ open, onClose, preferences, onPreferencesC
                 </div>
                 <Checkbox
                   checked={localPrefs.general.autoSaveConversation}
-                  onCheckedChange={(checked) => { const v = checked === true; ((checked) =>
+                  onCheckedChange={(checked) => (checked) =>
                     setLocalPrefs({
                       ...localPrefs,
-                      general: { ...localPrefs.general, autoSaveConversation: checked)(v); }},
+                      general: { ...localPrefs.general, autoSaveConversation: checked},
                     })
                   }
                 />
@@ -359,10 +359,10 @@ export const AIChatSettingsPanel = ({ open, onClose, preferences, onPreferencesC
                 </div>
                 <Checkbox
                   checked={localPrefs.flights.flexibleDates}
-                  onCheckedChange={(checked) => { const v = checked === true; ((checked) =>
+                  onCheckedChange={(checked) => (checked) =>
                     setLocalPrefs({
                       ...localPrefs,
-                      flights: { ...localPrefs.flights, flexibleDates: checked)(v); }},
+                      flights: { ...localPrefs.flights, flexibleDates: checked},
                     })
                   }
                 />
