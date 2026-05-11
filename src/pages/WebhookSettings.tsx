@@ -351,7 +351,7 @@ export default function WebhookSettings() {
               <Checkbox
                 id="active"
                 checked={formData.is_active}
-                onCheckedChange={(checked) => (checked) =>
+                onCheckedChange={(checked) =>
                   setFormData((prev) => ({ ...prev, is_active: checked}))
                 }
               />

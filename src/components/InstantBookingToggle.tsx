@@ -118,7 +118,7 @@ export const InstantBookingToggle = ({ agentId }: { agentId: string }) => {
           <Checkbox
             id="instant-booking"
             checked={settings.enabled}
-            onCheckedChange={(checked) => (checked) =>
+            onCheckedChange={(checked) =>
               setSettings({ ...settings, enabled: checked})
             }
           />

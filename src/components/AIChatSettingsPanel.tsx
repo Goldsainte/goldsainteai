@@ -122,7 +122,7 @@ export const AIChatSettingsPanel = ({ open, onClose, preferences, onPreferencesC
                 </div>
                 <Checkbox
                   checked={localPrefs.general.voiceEnabled}
-                  onCheckedChange={(checked) => (checked) =>
+                  onCheckedChange={(checked) =>
                     setLocalPrefs({
                       ...localPrefs,
                       general: { ...localPrefs.general, voiceEnabled: checked},
@@ -139,7 +139,7 @@ export const AIChatSettingsPanel = ({ open, onClose, preferences, onPreferencesC
                 </div>
                 <Checkbox
                   checked={localPrefs.general.autoSaveConversation}
-                  onCheckedChange={(checked) => (checked) =>
+                  onCheckedChange={(checked) =>
                     setLocalPrefs({
                       ...localPrefs,
                       general: { ...localPrefs.general, autoSaveConversation: checked},
@@ -359,7 +359,7 @@ export const AIChatSettingsPanel = ({ open, onClose, preferences, onPreferencesC
                 </div>
                 <Checkbox
                   checked={localPrefs.flights.flexibleDates}
-                  onCheckedChange={(checked) => (checked) =>
+                  onCheckedChange={(checked) =>
                     setLocalPrefs({
                       ...localPrefs,
                       flights: { ...localPrefs.flights, flexibleDates: checked},
