@@ -143,6 +143,7 @@ export default function App() {
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <InstallAppPrompt />
           <BrowserRouter>
             <ScrollToTop />
             <AuthProvider>
