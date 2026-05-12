@@ -139,6 +139,14 @@ export const Footer = () => {
             </span>
           ))}
           <span className="text-[#9A9079]">·</span>
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent("show-install-prompt"))}
+            className={legalLinkClasses}
+          >
+            Install App
+          </button>
+          <span className="text-[#9A9079]">·</span>
           <span className="text-xs text-[#9A9079]">© 2026 Goldsainte AI Inc. All rights reserved.</span>
         </div>
       </div>
