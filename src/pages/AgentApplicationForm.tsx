@@ -468,7 +468,7 @@ export default function AgentApplicationForm() {
                 <Input type="url" value={formData.website} onChange={(e) => setFormData({ ...formData, website: e.target.value })} className={luxuryInputClasses} placeholder="https://" />
               </div>
             </div>
-            <NavButtons onNext={() => setStep(2)} />
+            <NavButtons onNext={() => goToStep(2)} />
           </div>
         );
 
@@ -529,7 +529,7 @@ export default function AgentApplicationForm() {
               <Input value={formData.preferredDestinations} onChange={(e) => setFormData({ ...formData, preferredDestinations: e.target.value })} className={luxuryInputClasses} placeholder="e.g. Maldives, Italy, Japan" />
             </div>
 
-            <NavButtons onBack={() => setStep(1)} onNext={() => setStep(3)} />
+            <NavButtons onBack={() => setStep(1)} onNext={() => goToStep(3)} />
           </div>
         );
 
@@ -615,7 +615,7 @@ export default function AgentApplicationForm() {
               <Textarea value={formData.whyGoldsainte} onChange={(e) => setFormData({ ...formData, whyGoldsainte: e.target.value })} className={`${luxuryInputClasses} min-h-[100px]`} placeholder="What excites you about partnering with Goldsainte?" />
             </div>
 
-            <NavButtons onBack={() => setStep(2)} onNext={() => setStep(4)} />
+            <NavButtons onBack={() => setStep(2)} onNext={() => goToStep(4)} />
           </div>
         );
 
@@ -681,7 +681,7 @@ export default function AgentApplicationForm() {
 
             <NavButtons
               onBack={() => setStep(3)}
-              onNext={() => setStep(5)}
+              onNext={() => goToStep(5)}
               nextLabel="Continue to Documents"
               nextDisabled={!formData.acceptedTerms || !formData.acceptedPrivacy || !formData.acceptedVendor}
             />
