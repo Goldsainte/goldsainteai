@@ -287,6 +287,17 @@ export default function CreatorDashboard() {
                 Create a guide <ArrowRight className="h-3.5 w-3.5" />
               </span>
             </Card>
+            <Card
+              className="border-none bg-white rounded-2xl shadow-sm p-6 cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => navigate('/bundle-builder')}
+            >
+              <div className="w-10 h-0.5 bg-[#C7A962] mb-4" />
+              <h3 className="font-secondary text-lg text-[#0a2225] mb-2">Build a Bundle</h3>
+              <p className="text-sm text-[#6B7280]">Combine one trip with up to 3 guides at a discounted price. One checkout, one click for buyers.</p>
+              <span className="mt-4 inline-flex items-center gap-1.5 text-sm text-[#0c4d47] font-medium">
+                Create a bundle <ArrowRight className="h-3.5 w-3.5" />
+              </span>
+            </Card>
           </div>
           {isMobile ? (
             <Select value={activeTab} onValueChange={setActiveTab}>
