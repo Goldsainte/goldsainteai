@@ -22,8 +22,12 @@ export function InstallAppPrompt() {
       (window.navigator as any).standalone;
     if (isStandalone) return;
 
-    const ua = navigator.userAgent.toLowerCase();
-    const ios = /iphone|ipad|ipod/.test(ua) && !(window as unknown as { MSStream?: unknown }).MSStream;
+    const ua = navigator.userAgent;
+    const isIPhone = /iPhone|iPad|iPod/.test(ua);
+    const isMacWithTouch = /Macintosh/.test(ua) && 'ontouchend' in document;
+    const isCriOS = /CriOS/.test(ua); // Chrome on iOS
+    const isFxiOS = /FxiOS/.test(ua); // Firefox on iOS
+    const ios = isIPhone || isMacWithTouch || isCriOS || isFxiOS;
     setIsIOS(ios);
 
     const dismissed = localStorage.getItem(DISMISS_KEY);
