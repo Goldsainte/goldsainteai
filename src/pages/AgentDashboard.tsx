@@ -28,6 +28,7 @@ import { InvoiceGenerator } from "@/components/InvoiceGenerator";
 import { AgentCreatorCollabs } from "@/components/AgentCreatorCollabs";
 import { BackButton } from "@/components/ui/BackButton";
 import { GettingStartedChecklist } from "@/components/onboarding/GettingStartedChecklist";
+import { CreatorPerformanceTab } from "./creator/components/CreatorPerformanceTab";
 import { Link } from "react-router-dom";
 
 export default function AgentDashboard() {
