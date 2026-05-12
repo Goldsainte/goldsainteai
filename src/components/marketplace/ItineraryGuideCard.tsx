@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { MapPin, Clock, Download } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ShareButton } from "@/components/ShareButton";
 
 interface Guide {
   id: string;
@@ -47,6 +48,14 @@ export function ItineraryGuideCard({ guide }: { guide: Guide }) {
         </div>
         <div className="absolute right-3 top-3 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-[#0a2225]">
           {priceLabel}
+        </div>
+        <div className="absolute right-3 bottom-3" onClick={(e) => e.stopPropagation()}>
+          <ShareButton
+            variant="icon"
+            url={`/itinerary-guide/${guide.id}`}
+            title={guide.title}
+            description={guide.destination}
+          />
         </div>
       </div>
 

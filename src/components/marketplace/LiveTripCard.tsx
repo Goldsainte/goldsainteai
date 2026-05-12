@@ -6,6 +6,7 @@ import logomark from "@/assets/logomark-gold.png";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { ShareButton } from "@/components/ShareButton";
 
 interface LiveTripCardProps {
   trip: {
@@ -176,6 +177,14 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
             className={`h-4 w-4 transition ${isSaved ? "text-[#C7A962] fill-[#C7A962]" : "text-[#0a2225]"}`}
           />
         </button>
+        <div className="absolute right-12 top-3" onClick={(e) => e.stopPropagation()}>
+          <ShareButton
+            variant="icon"
+            url={`/marketplace/trip/${trip.slug || trip.id}`}
+            title={trip.title}
+            description={trip.destination}
+          />
+        </div>
       </div>
 
       {/* Content below image */}

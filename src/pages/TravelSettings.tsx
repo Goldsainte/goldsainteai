@@ -14,6 +14,8 @@ import { AccountTypeSelector } from "@/components/AccountTypeSelector";
 import { BusinessVerificationUpload } from "@/components/BusinessVerificationUpload";
 import { BusinessVerifiedBadge } from "@/components/badges/BusinessVerifiedBadge";
 import { BackButton } from "@/components/ui/BackButton";
+import { UsernameField } from "@/components/profile/UsernameField";
+import { FeaturedTikTokManager } from "@/components/profile/FeaturedTikTokManager";
 
 interface Profile {
   username: string | null;
@@ -327,6 +329,36 @@ const TravelSettings = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Public Handle */}
+        {user?.id && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Public Handle</CardTitle>
+              <CardDescription>
+                Pick the handle for your shareable shop link.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <UsernameField userId={user.id} initialValue={profile.username || null} />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Featured TikTok Videos */}
+        {user?.id && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Featured TikTok Videos</CardTitle>
+              <CardDescription>
+                Embed up to 6 TikTok videos on your public profile.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <FeaturedTikTokManager userId={user.id} />
+            </CardContent>
+          </Card>
+        )}
 
         {/* Account Type */}
         <Card>

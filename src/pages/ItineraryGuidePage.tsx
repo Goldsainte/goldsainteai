@@ -14,6 +14,7 @@ import { Loader2, MapPin, Clock, CheckCircle2, ShieldCheck, Lock, Download } fro
 import { toast } from "sonner";
 import { invokeWithAuth } from "@/lib/supabaseHelpers";
 import { BackButton } from "@/components/ui/BackButton";
+import { ShareButton } from "@/components/ShareButton";
 import { generateGuidePdf } from "@/utils/generateGuidePdf";
 
 type Day = {
@@ -155,7 +156,14 @@ export default function ItineraryGuidePage() {
       </Helmet>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6">
-        <BackButton to="/marketplace?tab=itinerary-guides" />
+        <div className="flex items-center justify-between gap-2">
+          <BackButton to="/marketplace?tab=itinerary-guides" />
+          <ShareButton
+            url={`/itinerary-guide/${guide.id}`}
+            title={guide.title}
+            description={guide.destination}
+          />
+        </div>
       </div>
 
       {/* Cover */}
