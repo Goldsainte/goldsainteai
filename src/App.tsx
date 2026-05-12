@@ -121,6 +121,7 @@ function AppContent() {
 
   const hideHeader = shouldHideForPath(location.pathname, HIDE_HEADER_PAGES);
   const hideFooter = shouldHideForPath(location.pathname, HIDE_FOOTER_PREFIXES);
+  useAffiliateRefCapture();
   return (
     <div className="min-h-screen flex-1 flex flex-col w-full max-w-full">
       <SkipNavigation />
