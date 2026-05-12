@@ -298,7 +298,7 @@ export default function ItineraryBuilderPage() {
               {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
               Save draft
             </Button>
-            <Button onClick={() => handleSave("published")} disabled={saving}
+            <Button onClick={() => handleSave("published")} disabled={saving || (creatorStatus !== null && creatorStatus !== "approved")}
               className="rounded-full px-6 bg-[#0c4d47] hover:bg-[#0c4d47]/90 text-white">
               {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
               Publish guide
