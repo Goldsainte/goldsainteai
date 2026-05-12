@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LiveTripCard } from "@/components/marketplace/LiveTripCard";
 import { ItineraryGuideCard } from "@/components/marketplace/ItineraryGuideCard";
+import { BundleCard } from "@/components/marketplace/BundleCard";
 import { ShareButton } from "@/components/ShareButton";
 
 interface ProfileRow {
@@ -32,6 +33,7 @@ export default function ShopPage() {
   const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [trips, setTrips] = useState<any[]>([]);
   const [guides, setGuides] = useState<any[]>([]);
+  const [bundles, setBundles] = useState<any[]>([]);
 
   useEffect(() => {
     if (!handle) return;
@@ -52,7 +54,7 @@ export default function ShopPage() {
         return;
       }
       setProfile(prof as ProfileRow);
-      const [tripsRes, guidesRes] = await Promise.all([
+      const [tripsRes, guidesRes, bundlesRes] = await Promise.all([
         supabase
           .from("packaged_trips")
           .select("*")
@@ -61,6 +63,12 @@ export default function ShopPage() {
           .order("created_at", { ascending: false }),
         supabase
           .from("itinerary_products")
+          .select("*")
+          .eq("creator_id", prof.id)
+          .eq("status", "published")
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("product_bundles")
           .select("*")
           .eq("creator_id", prof.id)
           .eq("status", "published")
@@ -79,6 +87,12 @@ export default function ShopPage() {
           },
         }))
       );
+      setBundles(
+        (bundlesRes.data || []).map((b: any) => ({
+          ...b,
+          creator: { full_name: prof.full_name, username: prof.username },
+        }))
+      );
       setLoading(false);
     })();
     return () => {
@@ -90,9 +104,10 @@ export default function ShopPage() {
     const all = [
       ...trips.map((t) => ({ kind: "trip" as const, item: t, ts: t.created_at })),
       ...guides.map((g) => ({ kind: "guide" as const, item: g, ts: g.created_at })),
+      ...bundles.map((b) => ({ kind: "bundle" as const, item: b, ts: b.created_at })),
     ];
     return all.sort((a, b) => (a.ts < b.ts ? 1 : -1));
-  }, [trips, guides]);
+  }, [trips, guides, bundles]);
 
   if (loading) {
     return (
@@ -172,6 +187,7 @@ export default function ShopPage() {
                 <TabsTrigger value="all">All Products ({merged.length})</TabsTrigger>
                 <TabsTrigger value="trips">Trips ({trips.length})</TabsTrigger>
                 <TabsTrigger value="guides">Guides ({guides.length})</TabsTrigger>
+                <TabsTrigger value="bundles">Bundles ({bundles.length})</TabsTrigger>
               </TabsList>
               <TabsContent value="all" className="mt-6">
                 <ProductGrid items={merged} />
@@ -181,6 +197,9 @@ export default function ShopPage() {
               </TabsContent>
               <TabsContent value="guides" className="mt-6">
                 <ProductGrid items={merged.filter((m) => m.kind === "guide")} />
+              </TabsContent>
+              <TabsContent value="bundles" className="mt-6">
+                <ProductGrid items={merged.filter((m) => m.kind === "bundle")} />
               </TabsContent>
             </Tabs>
           )}
@@ -200,13 +219,11 @@ function ProductGrid({ items }: { items: { kind: "trip" | "guide"; item: any }[]
   }
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {items.map(({ kind, item }) =>
-        kind === "trip" ? (
-          <LiveTripCard key={`t-${item.id}`} trip={item} />
-        ) : (
-          <ItineraryGuideCard key={`g-${item.id}`} guide={item} />
-        )
-      )}
+      {items.map(({ kind, item }) => {
+        if (kind === "trip") return <LiveTripCard key={`t-${item.id}`} trip={item} />;
+        if (kind === "guide") return <ItineraryGuideCard key={`g-${item.id}`} guide={item} />;
+        return <BundleCard key={`b-${item.id}`} bundle={item} />;
+      })}
     </div>
   );
 }
