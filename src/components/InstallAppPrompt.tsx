@@ -77,7 +77,7 @@ export function InstallAppPrompt() {
   if (!showBanner) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-md rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] p-4 shadow-lg sm:left-auto sm:right-4">
+    <div className="fixed bottom-24 lg:bottom-4 left-4 right-4 z-50 mx-auto max-w-md rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] p-4 shadow-lg sm:left-auto sm:right-4">
       <div className="flex items-start gap-3">
         <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#0c4d47] text-[#f7f3ea]">
           {isIOS ? <Share className="h-5 w-5" /> : <Download className="h-5 w-5" />}
