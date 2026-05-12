@@ -22,8 +22,12 @@ export function InstallAppPrompt() {
       (window.navigator as any).standalone;
     if (isStandalone) return;
 
-    const ua = navigator.userAgent.toLowerCase();
-    const ios = /iphone|ipad|ipod/.test(ua) && !(window as unknown as { MSStream?: unknown }).MSStream;
+    const ua = navigator.userAgent;
+    const isIPhone = /iPhone|iPad|iPod/.test(ua);
+    const isMacWithTouch = /Macintosh/.test(ua) && 'ontouchend' in document;
+    const isCriOS = /CriOS/.test(ua); // Chrome on iOS
+    const isFxiOS = /FxiOS/.test(ua); // Firefox on iOS
+    const ios = isIPhone || isMacWithTouch || isCriOS || isFxiOS;
     setIsIOS(ios);
 
     const dismissed = localStorage.getItem(DISMISS_KEY);
@@ -38,7 +42,7 @@ export function InstallAppPrompt() {
     window.addEventListener("beforeinstallprompt", handler);
 
     if (ios && !recentlyDismissed) {
-      const t = window.setTimeout(() => setShowBanner(true), 30000);
+      const t = window.setTimeout(() => setShowBanner(true), 8000);
       return () => {
         window.clearTimeout(t);
         window.removeEventListener("beforeinstallprompt", handler);
@@ -73,7 +77,7 @@ export function InstallAppPrompt() {
   if (!showBanner) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-md rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] p-4 shadow-lg sm:left-auto sm:right-4">
+    <div className="fixed bottom-24 lg:bottom-4 left-4 right-4 z-50 mx-auto max-w-md rounded-2xl border border-[#E5DFC6] bg-[#f7f3ea] p-4 shadow-lg sm:left-auto sm:right-4">
       <div className="flex items-start gap-3">
         <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#0c4d47] text-[#f7f3ea]">
           {isIOS ? <Share className="h-5 w-5" /> : <Download className="h-5 w-5" />}
@@ -82,7 +86,7 @@ export function InstallAppPrompt() {
           <h3 className="font-secondary text-base text-[#0a2225]">Install Goldsainte</h3>
           <p className="mt-1 text-xs leading-relaxed text-[#6E6650]">
             {isIOS
-              ? "Tap the Share icon in Safari, then 'Add to Home Screen' for the best experience."
+              ? <>Tap <span className="inline-flex items-center gap-1 rounded bg-[#E5DFC6]/50 px-1.5 py-0.5 text-[10px] font-medium text-[#0c4d47]"><Share className="h-3 w-3" /> Share</span> at the bottom of Safari, then scroll down and tap <span className="font-medium text-[#0a2225]">Add to Home Screen</span>.</>
               : "Add Goldsainte to your home screen for instant access to trips and bookings."}
           </p>
           {!isIOS && deferredPrompt && (
