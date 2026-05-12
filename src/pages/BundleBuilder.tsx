@@ -88,6 +88,10 @@ export default function BundleBuilder() {
 
   const priceNum = Number(price);
   const priceValid = priceNum > 0 && (includedSum === 0 || priceNum < includedSum);
+  const discountPct =
+    includedSum > 0 && priceNum > 0 && priceNum < includedSum
+      ? ((includedSum - priceNum) / includedSum) * 100
+      : 0;
   const guidesValid = guideIds.length >= 1 && guideIds.length <= 3;
   const formValid =
     !!title.trim() && !!tripId && guidesValid && priceValid;
@@ -260,7 +264,14 @@ export default function BundleBuilder() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>Bundle price</Label>
+              <div className="flex items-center justify-between">
+                <Label>Bundle price</Label>
+                {discountPct > 0 && (
+                  <span className="rounded-full bg-[#0c4d47]/10 px-2 py-0.5 text-[11px] font-medium text-[#0c4d47]">
+                    {discountPct.toFixed(0)}% bundle discount
+                  </span>
+                )}
+              </div>
               <Input
                 type="number"
                 value={price}

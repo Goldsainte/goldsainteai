@@ -36,6 +36,7 @@ import { CreatorPerformanceTab } from "./creator/components/CreatorPerformanceTa
 import { CreatorAffiliateTab } from "./creator/components/CreatorAffiliateTab";
 import { CreatorContentToolsTab } from "./creator/components/CreatorContentToolsTab";
 import { TierBadge, TierBenefitsCard } from "@/components/creator/TierBadge";
+import { useCreatorTierWatcher } from "@/hooks/useCreatorTierWatcher";
 import type { TripProposalStatus } from "@/services/proposalService";
 
 type RecentProposal = {
@@ -91,6 +92,8 @@ export default function CreatorDashboard() {
   const { hasCreatorAccess, loading: roleLoading } = useUserRole();
   const [stats, setStats] = useState<CreatorStats>(EMPTY_STATS);
   const [loading, setLoading] = useState(true);
+
+  useCreatorTierWatcher();
   
   const [profile, setProfile] = useState<Profile | null>(null);
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "overview");
