@@ -165,6 +165,14 @@ export default function ItineraryBuilderPage() {
           Package your travel knowledge as a digital product travelers can buy and download instantly.
         </p>
 
+        {creatorStatus && creatorStatus !== "approved" && (
+          <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            {creatorStatus === "pending"
+              ? "Your creator profile is under review. You can save drafts but cannot publish until approved."
+              : "Your creator profile was not approved. Contact support to learn more."}
+          </div>
+        )}
+
         <div className="mt-12 space-y-12">
           {/* Basics */}
           <div className="space-y-8">
