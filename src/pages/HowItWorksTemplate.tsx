@@ -21,14 +21,14 @@ interface Props {
 export function HowItWorksTemplate({ eyebrow, title, subtitle, steps, finalCta }: Props) {
   return (
     <main className="flex-1 bg-[#FDF9F0]">
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 py-12 md:py-20">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6 py-12 md:py-20">
         <header className="text-center mb-14 md:mb-20">
           <p className="text-xs uppercase tracking-[0.2em] text-[#C7A962] font-medium mb-4">{eyebrow}</p>
-          <h1 className="font-secondary text-3xl md:text-5xl text-[#0a2225] mb-4">{title}</h1>
-          <p className="text-base md:text-lg text-[#6B7280] max-w-2xl mx-auto">{subtitle}</p>
+          <h1 className="font-secondary text-3xl md:text-5xl text-[#0a2225] mb-4 text-balance">{title}</h1>
+          <p className="text-base md:text-lg text-[#6B7280] max-w-2xl mx-auto text-pretty">{subtitle}</p>
         </header>
 
-        <ol className="space-y-10 md:space-y-14">
+        <ol className="space-y-10 md:space-y-14 mx-auto max-w-2xl">
           {steps.map((step) => {
             const Icon = step.icon;
             return (
