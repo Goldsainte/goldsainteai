@@ -292,6 +292,7 @@ export default function CreatorOnboardingPage() {
           onboarding_completed: true,
           onboarding_completed_at: now,
           is_profile_complete: true,
+          creator_status: "pending",
         })
         .eq("id", user.id);
 
@@ -820,13 +821,15 @@ export default function CreatorOnboardingPage() {
                 >
                   Back
                 </Button>
-                <Button
-                  variant="ghost"
-                  onClick={handleSkip}
-                  className="text-[#6B7280] hover:text-[#C7A962] hover:bg-[#FDF9F0] text-sm"
-                >
-                  Skip for Now
-                </Button>
+                {currentStep < STEPS.length - 1 && (
+                  <Button
+                    variant="ghost"
+                    onClick={handleSkip}
+                    className="text-[#6B7280] hover:text-[#C7A962] hover:bg-[#FDF9F0] text-sm"
+                  >
+                    Skip for Now
+                  </Button>
+                )}
               </div>
 
               <div className="flex gap-3">

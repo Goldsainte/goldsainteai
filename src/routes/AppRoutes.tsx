@@ -25,6 +25,7 @@ const AdminDashboardPage = lazy(() => import('@/pages/admin/AdminDashboardPage')
 const AdminSafetyDashboardPage = lazy(() => import('@/pages/admin/AdminSafetyDashboardPage'));
 const AdminAgentsPage = lazy(() => import('@/pages/admin/AdminAgentsPage'));
 const AdminCreatorsPage = lazy(() => import('@/pages/admin/AdminCreatorsPage'));
+const AdminCreatorApprovalsPage = lazy(() => import('@/pages/admin/AdminCreatorApprovalsPage'));
 const AdminBookingsPage = lazy(() => import('@/pages/admin/AdminBookingsPage'));
 const AdminDisputesPage = lazy(() => import('@/pages/admin/AdminDisputesPage'));
 const AdminHomePage = lazy(() => import('@/pages/admin/AdminHomePage'));
@@ -462,6 +463,7 @@ export const AppRoutes = () => (
       <Route path="/admin/safety" element={<AdminSafetyDashboardPage />} />
       <Route path="/admin/agents" element={<AdminAgentsPage />} />
       <Route path="/admin/creators" element={<AdminCreatorsPage />} />
+      <Route path="/admin/creator-approvals" element={<AdminCreatorApprovalsPage />} />
       <Route path="/admin/bookings" element={<AdminBookingsPage />} />
       <Route path="/admin/disputes" element={<AdminDisputesPage />} />
       <Route path="/admin/trips" element={<AdminTripsPage />} />

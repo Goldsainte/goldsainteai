@@ -8261,11 +8261,15 @@ export type Database = {
           created_at: string
           creator_agreement_accepted_at: string | null
           creator_agreement_version: string | null
+          creator_approved_at: string | null
+          creator_approved_by: string | null
           creator_avg_views: number | null
           creator_budget_levels: string[] | null
           creator_followers: number | null
           creator_niches: string[] | null
           creator_pov: string | null
+          creator_rejection_reason: string | null
+          creator_status: string
           destinations_focus_tags: string[] | null
           display_name: string | null
           email: string | null
@@ -8380,11 +8384,15 @@ export type Database = {
           created_at?: string
           creator_agreement_accepted_at?: string | null
           creator_agreement_version?: string | null
+          creator_approved_at?: string | null
+          creator_approved_by?: string | null
           creator_avg_views?: number | null
           creator_budget_levels?: string[] | null
           creator_followers?: number | null
           creator_niches?: string[] | null
           creator_pov?: string | null
+          creator_rejection_reason?: string | null
+          creator_status?: string
           destinations_focus_tags?: string[] | null
           display_name?: string | null
           email?: string | null
@@ -8499,11 +8507,15 @@ export type Database = {
           created_at?: string
           creator_agreement_accepted_at?: string | null
           creator_agreement_version?: string | null
+          creator_approved_at?: string | null
+          creator_approved_by?: string | null
           creator_avg_views?: number | null
           creator_budget_levels?: string[] | null
           creator_followers?: number | null
           creator_niches?: string[] | null
           creator_pov?: string | null
+          creator_rejection_reason?: string | null
+          creator_status?: string
           destinations_focus_tags?: string[] | null
           display_name?: string | null
           email?: string | null

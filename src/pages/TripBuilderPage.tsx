@@ -105,9 +105,15 @@ export default function TripBuilderPage() {
       if (status === "published" && isCreator) {
         const { data: profile } = await supabase
           .from("profiles")
-          .select("stripe_account_id")
+          .select("stripe_account_id, creator_status")
           .eq("id", user.id)
           .maybeSingle();
+
+        if ((profile as any)?.creator_status && (profile as any).creator_status !== "approved") {
+          toast.error("Your creator profile is still under review. You can save drafts but cannot publish trips until approved.");
+          setSaving(false);
+          return null;
+        }
 
         if (!profile?.stripe_account_id) {
           toast.error("Please set up your payment account in the Earnings tab before publishing a trip.");

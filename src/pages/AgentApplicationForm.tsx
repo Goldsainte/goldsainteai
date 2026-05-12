@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -125,6 +125,90 @@ export default function AgentApplicationForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const DRAFT_STORAGE_KEY = "agent_application_draft";
+
+  // Restore draft on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(DRAFT_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setFormData((prev) => ({ ...prev, ...parsed }));
+        toast({ title: "Draft restored", description: "We restored your previous answers." });
+      }
+    } catch {
+      /* noop */
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Autosave non-file fields whenever formData changes
+  useEffect(() => {
+    try {
+      const {
+        businessLicenseFile: _a,
+        insuranceCertificateFile: _b,
+        governmentIdFile: _c,
+        professionalHeadshotFile: _d,
+        ...persistable
+      } = formData;
+      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(persistable));
+    } catch {
+      /* noop */
+    }
+  }, [formData]);
+
+  // Per-step validation with friendly toasts
+  const validateStep = (currentStep: number): boolean => {
+    const missing = (label: string) => {
+      toast({ title: `${label} required`, variant: "destructive" });
+      return false;
+    };
+    if (currentStep === 1) {
+      if (!formData.firstName?.trim()) return missing("First name");
+      if (!formData.lastName?.trim()) return missing("Last name");
+      if (!formData.email?.trim()) return missing("Email");
+      if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+        toast({ title: "Valid email required", variant: "destructive" });
+        return false;
+      }
+      if (!formData.phone?.trim()) return missing("Phone");
+      if (!formData.agencyName?.trim()) return missing("Agency name");
+      if (!formData.businessType) return missing("Business type");
+      return true;
+    }
+    if (currentStep === 2) {
+      if (formData.specializations.length === 0) {
+        toast({ title: "Select at least one specialization", variant: "destructive" });
+        return false;
+      }
+      return true;
+    }
+    if (currentStep === 3) {
+      if (!formData.annualSalesVolume) return missing("Annual sales volume");
+      if (!formData.averageTripValue) return missing("Average trip value");
+      if (formData.primaryFocus.length === 0) {
+        toast({ title: "Select at least one primary focus", variant: "destructive" });
+        return false;
+      }
+      if (!formData.whyGoldsainte?.trim()) return missing("Why Goldsainte");
+      return true;
+    }
+    if (currentStep === 4) {
+      if (!formData.acceptedTerms || !formData.acceptedPrivacy || !formData.acceptedVendor) {
+        toast({ title: "Please accept all legal agreements", variant: "destructive" });
+        return false;
+      }
+      return true;
+    }
+    return true;
+  };
+
+  const goToStep = (target: number) => {
+    if (target > step && !validateStep(step)) return;
+    setStep(target);
+  };
+
   const totalSteps = 6;
   const stepLabels = ["You & Your Business", "Credentials", "Sales & Presence", "Insurance & Legal", "Documents", "Verification"];
 
@@ -249,6 +333,20 @@ export default function AgentApplicationForm() {
       localStorage.setItem('agent_application_id', clientId);
       setStep(6);
 
+      // Send confirmation email (non-blocking)
+      supabase.functions
+        .invoke('send-agent-application-email', {
+          body: { agentEmail: formData.email, agentName: formData.firstName },
+        })
+        .catch((e) => console.error('application email failed:', e));
+
+      // Clear local draft now that it's persisted server-side
+      try {
+        localStorage.removeItem(DRAFT_STORAGE_KEY);
+      } catch {
+        /* noop */
+      }
+
       toast({
         title: "Application saved",
         description: "Now complete identity verification to submit your application.",
@@ -370,7 +468,7 @@ export default function AgentApplicationForm() {
                 <Input type="url" value={formData.website} onChange={(e) => setFormData({ ...formData, website: e.target.value })} className={luxuryInputClasses} placeholder="https://" />
               </div>
             </div>
-            <NavButtons onNext={() => setStep(2)} />
+            <NavButtons onNext={() => goToStep(2)} />
           </div>
         );
 
@@ -431,7 +529,7 @@ export default function AgentApplicationForm() {
               <Input value={formData.preferredDestinations} onChange={(e) => setFormData({ ...formData, preferredDestinations: e.target.value })} className={luxuryInputClasses} placeholder="e.g. Maldives, Italy, Japan" />
             </div>
 
-            <NavButtons onBack={() => setStep(1)} onNext={() => setStep(3)} />
+            <NavButtons onBack={() => setStep(1)} onNext={() => goToStep(3)} />
           </div>
         );
 
@@ -517,7 +615,7 @@ export default function AgentApplicationForm() {
               <Textarea value={formData.whyGoldsainte} onChange={(e) => setFormData({ ...formData, whyGoldsainte: e.target.value })} className={`${luxuryInputClasses} min-h-[100px]`} placeholder="What excites you about partnering with Goldsainte?" />
             </div>
 
-            <NavButtons onBack={() => setStep(2)} onNext={() => setStep(4)} />
+            <NavButtons onBack={() => setStep(2)} onNext={() => goToStep(4)} />
           </div>
         );
 
@@ -583,7 +681,7 @@ export default function AgentApplicationForm() {
 
             <NavButtons
               onBack={() => setStep(3)}
-              onNext={() => setStep(5)}
+              onNext={() => goToStep(5)}
               nextLabel="Continue to Documents"
               nextDisabled={!formData.acceptedTerms || !formData.acceptedPrivacy || !formData.acceptedVendor}
             />
