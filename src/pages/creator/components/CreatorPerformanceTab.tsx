@@ -158,6 +158,7 @@ export function CreatorPerformanceTab({ role = "creator" }: { role?: "creator" |
           icon={<TrendingUp className="h-4 w-4" />}
           label="Conversion"
           value={`${conversionRate.toFixed(2)}%`}
+          subtitle="Industry average: 1.2%"
         />
         <Stat
           icon={<Trophy className="h-4 w-4" />}
@@ -210,11 +211,13 @@ function Stat({
   label,
   value,
   truncate,
+  subtitle,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string;
   truncate?: boolean;
+  subtitle?: string;
 }) {
   return (
     <Card className="p-4">
@@ -223,6 +226,7 @@ function Stat({
         {label}
       </div>
       <p className={`font-secondary text-lg text-[#0a2225] ${truncate ? "truncate" : ""}`}>{value}</p>
+      {subtitle && <p className="mt-0.5 text-[11px] text-[#7A7151]">{subtitle}</p>}
     </Card>
   );
 }
