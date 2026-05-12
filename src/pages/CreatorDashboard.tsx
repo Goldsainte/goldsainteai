@@ -36,6 +36,7 @@ import { CreatorPerformanceTab } from "./creator/components/CreatorPerformanceTa
 import { CreatorAffiliateTab } from "./creator/components/CreatorAffiliateTab";
 import { CreatorContentToolsTab } from "./creator/components/CreatorContentToolsTab";
 import { TierBadge, TierBenefitsCard } from "@/components/creator/TierBadge";
+import { useCreatorTierWatcher } from "@/hooks/useCreatorTierWatcher";
 import type { TripProposalStatus } from "@/services/proposalService";
 
 type RecentProposal = {
