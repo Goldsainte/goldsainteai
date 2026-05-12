@@ -13,6 +13,7 @@ interface RequestBody {
   currency?: string;
   successUrl?: string;
   cancelUrl?: string;
+  affiliateCode?: string;
 }
 
 Deno.serve(async (req) => {
@@ -45,6 +46,11 @@ Deno.serve(async (req) => {
 
     const body = (await req.json()) as RequestBody;
     const { tripBookingId, amountTotalCents, currency = "usd" } = body;
+    const affiliateCode =
+      typeof body.affiliateCode === "string" &&
+      /^[a-zA-Z0-9_-]{3,64}$/.test(body.affiliateCode)
+        ? body.affiliateCode
+        : undefined;
 
     if (!tripBookingId || !amountTotalCents || amountTotalCents <= 0) {
       return new Response(
@@ -150,6 +156,7 @@ Deno.serve(async (req) => {
           trip_booking_id: booking.id,
           trip_request_id: tripRequest.id,
           type: "trip_booking",
+          ...(affiliateCode ? { affiliate_code: affiliateCode } : {}),
         },
       },
       metadata: {
@@ -157,6 +164,7 @@ Deno.serve(async (req) => {
         trip_booking_id: booking.id,
         proposal_id: booking.proposal_id || "",
         type: "trip_booking",
+        ...(affiliateCode ? { affiliate_code: affiliateCode } : {}),
       },
     });
 
