@@ -10,10 +10,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Loader2, MapPin, Clock, CheckCircle2, ShieldCheck, Lock } from "lucide-react";
+import { Loader2, MapPin, Clock, CheckCircle2, ShieldCheck, Lock, Download } from "lucide-react";
 import { toast } from "sonner";
 import { invokeWithAuth } from "@/lib/supabaseHelpers";
 import { BackButton } from "@/components/ui/BackButton";
+import { generateGuidePdf } from "@/utils/generateGuidePdf";
 
 type Day = {
   day_number: number;
@@ -308,6 +309,25 @@ export default function ItineraryGuidePage() {
                     "Get This Guide"
                   )}
                 </Button>
+
+              {unlocked && (
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    generateGuidePdf({
+                      title: guide.title,
+                      destination: guide.destination,
+                      duration_days: guide.duration_days,
+                      description: guide.description,
+                      days: guide.days,
+                      creatorName: creator?.full_name ?? null,
+                    })
+                  }
+                  className="mt-3 w-full rounded-full border-[#0c4d47]/30 text-[#0c4d47] hover:bg-[#0c4d47]/5 h-11"
+                >
+                  <Download className="h-4 w-4 mr-2" /> Download PDF
+                </Button>
+              )}
 
                 <div className="mt-5 border-t border-[#E5DFC6] pt-4">
                   <p className="text-[11px] uppercase tracking-wider text-[#6B7280] font-medium">
