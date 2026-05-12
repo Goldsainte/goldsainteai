@@ -511,3 +511,48 @@ async function notifyAndEmailOnBookingConfirmed(tripBookingId: string, session: 
     console.error('notifyAndEmailOnBookingConfirmed error', e);
   }
 }
+
+/**
+ * Credits an affiliate referrer 10% of the platform commission (platform = 7% of gross).
+ * Idempotency: relies on at-most-once webhook dispatch per session.
+ */
+async function creditAffiliateCommission(args: {
+  affiliateCode?: string | null;
+  grossAmount: number;
+  currency: string;
+}) {
+  try {
+    if (!args.affiliateCode || args.grossAmount <= 0) return;
+    const { data: link } = await supabaseClient
+      .from('affiliate_links')
+      .select('id, creator_id, conversions, total_earnings, commission_rate')
+      .eq('affiliate_code', args.affiliateCode)
+      .eq('is_active', true)
+      .maybeSingle();
+    if (!link) return;
+
+    const PLATFORM_FEE_RATE = 0.07;
+    const referrerShare = (Number(link.commission_rate) || 10) / 100; // default 10%
+    const platformCommission = args.grossAmount * PLATFORM_FEE_RATE;
+    const commissionAmount = Number((platformCommission * referrerShare).toFixed(2));
+    if (commissionAmount <= 0) return;
+
+    await supabaseClient.from('affiliate_commissions').insert({
+      affiliate_link_id: link.id,
+      creator_id: link.creator_id,
+      commission_amount: commissionAmount,
+      currency: args.currency,
+      status: 'pending',
+    });
+
+    await supabaseClient
+      .from('affiliate_links')
+      .update({
+        conversions: (link.conversions ?? 0) + 1,
+        total_earnings: Number(link.total_earnings ?? 0) + commissionAmount,
+      })
+      .eq('id', link.id);
+  } catch (e) {
+    console.error('creditAffiliateCommission error', e);
+  }
+}
