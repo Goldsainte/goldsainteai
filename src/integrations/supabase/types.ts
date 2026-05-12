@@ -2620,6 +2620,47 @@ export type Database = {
         }
         Relationships: []
       }
+      bundle_purchases: {
+        Row: {
+          amount_paid: number
+          bundle_id: string
+          buyer_id: string
+          created_at: string
+          currency: string
+          id: string
+          stripe_payment_intent_id: string | null
+          trip_booking_id: string | null
+        }
+        Insert: {
+          amount_paid: number
+          bundle_id: string
+          buyer_id: string
+          created_at?: string
+          currency?: string
+          id?: string
+          stripe_payment_intent_id?: string | null
+          trip_booking_id?: string | null
+        }
+        Update: {
+          amount_paid?: number
+          bundle_id?: string
+          buyer_id?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          stripe_payment_intent_id?: string | null
+          trip_booking_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bundle_purchases_bundle_id_fkey"
+            columns: ["bundle_id"]
+            isOneToOne: false
+            referencedRelation: "product_bundles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_verifications: {
         Row: {
           business_address: Json | null
@@ -8049,6 +8090,62 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      product_bundles: {
+        Row: {
+          cover_image_url: string | null
+          created_at: string
+          creator_id: string
+          currency: string
+          description: string | null
+          guide_ids: string[]
+          id: string
+          price: number
+          status: string
+          title: string
+          trip_id: string | null
+          updated_at: string
+          view_count: number
+        }
+        Insert: {
+          cover_image_url?: string | null
+          created_at?: string
+          creator_id: string
+          currency?: string
+          description?: string | null
+          guide_ids?: string[]
+          id?: string
+          price: number
+          status?: string
+          title: string
+          trip_id?: string | null
+          updated_at?: string
+          view_count?: number
+        }
+        Update: {
+          cover_image_url?: string | null
+          created_at?: string
+          creator_id?: string
+          currency?: string
+          description?: string | null
+          guide_ids?: string[]
+          id?: string
+          price?: number
+          status?: string
+          title?: string
+          trip_id?: string | null
+          updated_at?: string
+          view_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_bundles_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "packaged_trips"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       product_orders: {
         Row: {
