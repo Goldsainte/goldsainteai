@@ -122,6 +122,9 @@ const BrandProfilePage = lazy(() => import('@/pages/BrandProfilePage'));
 
 const TermsPage = lazy(() => import('@/pages/Terms'));
 const WhatWeDo = lazy(() => import('@/pages/WhatWeDo'));
+const HowItWorksTraveler = lazy(() => import('@/pages/HowItWorksTraveler'));
+const HowItWorksCreator = lazy(() => import('@/pages/HowItWorksCreator'));
+const HowItWorksAgent = lazy(() => import('@/pages/HowItWorksAgent'));
 const DisputeResolution = lazy(() => import('@/pages/DisputeResolution'));
 const PrivacyCookies = lazy(() => import('@/pages/PrivacyCookies'));
 const HelpCenter = lazy(() => import('@/pages/HelpCenter'));
@@ -157,6 +160,9 @@ export const AppRoutes = () => (
       <Route path="/agents/:id" element={<AgentPublicProfilePage />} />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/what-we-do" element={<WhatWeDo />} />
+      <Route path="/how-it-works/traveler" element={<HowItWorksTraveler />} />
+      <Route path="/how-it-works/creator" element={<HowItWorksCreator />} />
+      <Route path="/how-it-works/agent" element={<HowItWorksAgent />} />
       <Route path="/dispute-resolution" element={<DisputeResolution />} />
       <Route path="/privacy-cookies" element={<PrivacyCookies />} />
       <Route path="/help" element={<HelpCenter />} />

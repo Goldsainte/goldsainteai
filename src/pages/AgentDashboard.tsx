@@ -27,6 +27,8 @@ import { PaymentMilestonesManager } from "@/components/PaymentMilestonesManager"
 import { InvoiceGenerator } from "@/components/InvoiceGenerator";
 import { AgentCreatorCollabs } from "@/components/AgentCreatorCollabs";
 import { BackButton } from "@/components/ui/BackButton";
+import { GettingStartedChecklist } from "@/components/onboarding/GettingStartedChecklist";
+import { Link } from "react-router-dom";
 
 export default function AgentDashboard() {
   const { user, isLoading: authLoading } = useAuth();
@@ -354,6 +356,13 @@ export default function AgentDashboard() {
               </Select>
             </div>
           )}
+        </div>
+
+        {user && <GettingStartedChecklist userId={user.id} role="agent" />}
+        <div className="mb-4 text-right">
+          <Link to="/how-it-works/agent" className="text-xs text-[#0c4d47] hover:underline">
+            How it works →
+          </Link>
         </div>
 
         {/* Quick Access Navigation */}

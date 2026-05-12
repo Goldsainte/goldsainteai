@@ -14,6 +14,8 @@ import { TravelerSettingsTab } from "./components/TravelerSettingsTab";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { BackButton } from "@/components/ui/BackButton";
+import { GettingStartedChecklist } from "@/components/onboarding/GettingStartedChecklist";
+import { Link } from "react-router-dom";
 
 interface Profile {
   id: string;
@@ -160,6 +162,12 @@ export default function TravelerDashboardPage() {
           </div>
         ) : (
           <>
+          {user && <GettingStartedChecklist userId={user.id} role="traveler" />}
+          <div className="mb-4 text-right">
+            <Link to="/how-it-works/traveler" className="text-xs text-[#0c4d47] hover:underline">
+              How it works →
+            </Link>
+          </div>
           {/* AI Trip Planner CTA */}
           <div className="mb-6 flex items-start gap-4 rounded-2xl border border-[#C7A962]/30 bg-[#FDF9F0] p-5 md:items-center md:flex-row flex-col">
             <div className="flex-1">

@@ -32,8 +32,15 @@ export const Footer = () => {
       heading: "COMPANY",
       links: [
         { to: "/about", label: "About Goldsainte" },
-        { to: "/what-we-do", label: "How It Works" },
         { to: "/corporate-contact", label: "Contact Us" },
+      ],
+    },
+    {
+      heading: "GETTING STARTED",
+      links: [
+        { to: "/how-it-works/traveler", label: "For Travelers" },
+        { to: "/how-it-works/creator", label: "For Creators" },
+        { to: "/how-it-works/agent", label: "For Agents" },
       ],
     },
     {
@@ -80,7 +87,7 @@ export const Footer = () => {
         </Accordion>
 
         {/* DESKTOP: Grid Layout */}
-        <div className="hidden md:grid grid-cols-4 gap-8 mb-12">
+        <div className="hidden md:grid grid-cols-5 gap-8 mb-12">
           {columns.map((col) => (
             <div key={col.heading}>
               <h4 className={headingClasses}>{col.heading}</h4>
