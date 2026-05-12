@@ -150,6 +150,8 @@ const BookTripPage = lazy(() => import('@/pages/trips/BookTripPage'));
 const BookingConfirmation = lazy(() => import('@/pages/BookingConfirmation'));
 const UsernameRedirect = lazy(() => import('@/pages/UsernameRedirect'));
 const ShopPage = lazy(() => import('@/pages/ShopPage'));
+const BundleBuilder = lazy(() => import('@/pages/BundleBuilder'));
+const BundleDetailPage = lazy(() => import('@/pages/BundleDetailPage'));
 
 export const AppRoutes = () => (
   <Routes>
@@ -158,6 +160,8 @@ export const AppRoutes = () => (
       <Route path="/about" element={<About />} />
       <Route path="/@:username" element={<UsernameRedirect />} />
       <Route path="/@:username/shop" element={<ShopPage />} />
+      <Route path="/bundle/:id" element={<BundleDetailPage />} />
+      <Route path="/bundle-builder" element={<BundleBuilder />} />
       <Route path="/creators" element={<CreatorsPage />} />
       <Route path="/creators/:id" element={<CreatorPublicProfilePage />} />
       <Route path="/agents" element={<BrowseAgents />} />
