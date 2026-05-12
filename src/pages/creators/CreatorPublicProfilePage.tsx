@@ -222,22 +222,24 @@ export default function CreatorPublicProfilePage() {
               <ArrowLeft className="h-4 w-4" />
               Back
             </button>
-            {isOwnProfile && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate("/creator-dashboard?tab=portfolio")}
-                className="border-[#E5DFC6] text-[#0a2225] rounded-full"
-              >
-                <Settings className="h-3.5 w-3.5 mr-1.5" />
-                Edit Profile
-              </Button>
-            )}
-            <ShareButton
-              url={creator.username ? `/@${creator.username}/shop` : `/creators/${creator.id}`}
-              title={`${displayName} on Goldsainte`}
-              description={bio || undefined}
-            />
+            <div className="flex items-center gap-2">
+              {isOwnProfile && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate("/creator-dashboard?tab=portfolio")}
+                  className="border-[#E5DFC6] text-[#0a2225] rounded-full"
+                >
+                  <Settings className="h-3.5 w-3.5 mr-1.5" />
+                  Edit Profile
+                </Button>
+              )}
+              <ShareButton
+                url={creator.username ? `/@${creator.username}/shop` : `/creators/${creator.id}`}
+                title={`${displayName} on Goldsainte`}
+                description={bio || undefined}
+              />
+            </div>
           </div>
         </div>
 
