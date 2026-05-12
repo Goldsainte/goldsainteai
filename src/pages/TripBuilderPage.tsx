@@ -342,7 +342,7 @@ export default function TripBuilderPage() {
           </div>
           <div className="hidden lg:flex flex-col w-60 flex-shrink-0">
             <div className="sticky top-8">
-              <p className="text-[11px] uppercase tracking-widest text-[#9A9384] font-medium mb-4">Live preview</p>
+              <p className="eyebrow mb-4">Live preview</p>
               <div className="rounded-2xl overflow-hidden border border-[#E5DFC6] shadow-sm">
                 <div className="aspect-video bg-[#F5F0E8] relative overflow-hidden">
                   {previewData?.cover_image_url ? (
