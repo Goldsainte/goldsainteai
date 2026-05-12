@@ -137,7 +137,8 @@ export function GettingStartedChecklist({ userId, role }: Props) {
 
     const load = async () => {
       try {
-        const { data: profile } = await supabase
+        const client = supabase as any;
+        const { data: profile } = await client
           .from("profiles")
           .select("*")
           .eq("id", userId)
@@ -147,23 +148,23 @@ export function GettingStartedChecklist({ userId, role }: Props) {
 
         if (role === "traveler") {
           const [{ count: trCount }, { count: wlCount }] = await Promise.all([
-            supabase.from("trip_requests").select("id", { count: "exact", head: true }).eq("traveler_id", userId),
-            supabase.from("trip_wishlist").select("id", { count: "exact", head: true }).eq("user_id", userId),
+            client.from("trip_requests").select("id", { count: "exact", head: true }).eq("traveler_id", userId),
+            client.from("trip_wishlists").select("id", { count: "exact", head: true }).eq("user_id", userId),
           ]);
           stats.tripRequests = trCount || 0;
           stats.savedTrips = wlCount || 0;
         } else if (role === "creator") {
           const [{ count: tCount }, { count: gCount }] = await Promise.all([
-            supabase.from("packaged_trips").select("id", { count: "exact", head: true }).eq("creator_id", userId).eq("status", "published"),
-            supabase.from("itinerary_products").select("id", { count: "exact", head: true }).eq("creator_id", userId).eq("status", "published"),
+            client.from("packaged_trips").select("id", { count: "exact", head: true }).eq("creator_id", userId).eq("status", "published"),
+            client.from("itinerary_products").select("id", { count: "exact", head: true }).eq("creator_id", userId).eq("status", "published"),
           ]);
           stats.trips = tCount || 0;
           stats.guides = gCount || 0;
-          stats.profileViews = profile?.profile_view_count || 0;
+          stats.profileViews = profile?.creator_avg_views || 0;
         } else if (role === "agent") {
           const [{ count: ptCount }, { count: pCount }] = await Promise.all([
-            supabase.from("packaged_trips").select("id", { count: "exact", head: true }).eq("agent_id", userId).eq("status", "published"),
-            supabase.from("trip_proposals").select("id", { count: "exact", head: true }).eq("agent_id", userId),
+            client.from("packaged_trips").select("id", { count: "exact", head: true }).eq("agent_id", userId).eq("status", "published"),
+            client.from("trip_proposals").select("id", { count: "exact", head: true }).eq("agent_id", userId),
           ]);
           stats.publishedTrips = ptCount || 0;
           stats.proposalsSent = pCount || 0;
