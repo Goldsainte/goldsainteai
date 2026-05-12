@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { BackButton } from "@/components/ui/BackButton";
+import { GettingStartedChecklist } from "@/components/onboarding/GettingStartedChecklist";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ProfilePhotoUploader } from "@/pages/traveler/components/ProfilePhotoUploader";
@@ -232,6 +233,13 @@ export default function CreatorDashboard() {
             </div>
           </div>
         </header>
+
+        {user && <GettingStartedChecklist userId={user.id} role="creator" />}
+        <div className="mb-4 text-right">
+          <Link to="/how-it-works/creator" className="text-xs text-[#0c4d47] hover:underline">
+            How it works →
+          </Link>
+        </div>
 
         {/* Onboarding Banner */}
         {onboardingIncomplete && (
