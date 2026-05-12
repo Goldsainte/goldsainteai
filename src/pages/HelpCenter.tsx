@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, BookOpen, CreditCard, XCircle, UserCircle, Sparkles, Users, Briefcase, MapPin } from 'lucide-react';
+import { Search, BookOpen, CreditCard, XCircle, UserCircle, Sparkles, Users, Briefcase, MapPin, Compass } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BackButton } from '@/components/ui/BackButton';
 import { Input } from '@/components/ui/input';
@@ -103,6 +103,32 @@ export default function HelpCenter() {
                     <div className="text-xs text-muted-foreground">{route.description}</div>
                     <div className="text-xs font-mono text-primary/60 mt-1">{route.path}</div>
                   </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Guided Tours */}
+        {!searchQuery && (
+          <div className="mb-12">
+            <h2 className="text-lg sm:text-xl font-semibold mb-6 text-center flex items-center justify-center gap-2">
+              <Compass className="h-5 w-5 text-primary" /> Guided Tours
+            </h2>
+            <div className="grid sm:grid-cols-3 gap-4">
+              {[
+                { to: "/how-it-works/traveler", label: "For Travelers", desc: "Plan and book trips with verified specialists." },
+                { to: "/how-it-works/creator", label: "For Creators", desc: "Monetise your audience with trips and guides." },
+                { to: "/how-it-works/agent", label: "For Agents", desc: "Win clients and run trips end-to-end." },
+              ].map((c) => (
+                <Link
+                  key={c.to}
+                  to={c.to}
+                  className="block p-6 rounded-lg border border-border hover:border-primary hover:bg-primary/5 transition-colors group"
+                >
+                  <div className="font-semibold mb-1 group-hover:text-primary transition-colors">{c.label}</div>
+                  <div className="text-sm text-muted-foreground">{c.desc}</div>
+                  <div className="text-xs text-primary mt-3">View guide →</div>
                 </Link>
               ))}
             </div>
