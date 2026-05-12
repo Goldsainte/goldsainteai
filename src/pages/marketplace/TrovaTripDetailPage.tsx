@@ -270,20 +270,27 @@ export default function TrovaTripDetailPage() {
 
       <main className="container mx-auto max-w-7xl px-4 py-8">
         {/* Back Button */}
-        <Button
-          variant="ghost"
-          onClick={() => {
-            if (window.history.length > 1) {
-              navigate(-1);
-            } else {
-              navigate("/marketplace");
-            }
-          }}
-          className="mb-6 gap-2 text-[#0a2225] hover:bg-[#FDF9F0]"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </Button>
+        <div className="mb-6 flex items-center justify-between gap-2">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              if (window.history.length > 1) {
+                navigate(-1);
+              } else {
+                navigate("/marketplace");
+              }
+            }}
+            className="gap-2 text-[#0a2225] hover:bg-[#FDF9F0]"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+          <ShareButton
+            url={`/marketplace/trip/${trip.slug || trip.id}`}
+            title={trip.title}
+            description={trip.destination}
+          />
+        </div>
 
         {/* Hero */}
         <TripDetailHero
