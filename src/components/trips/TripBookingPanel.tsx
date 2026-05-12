@@ -80,6 +80,8 @@ export function TripBookingPanel({
             tripBookingId: bookingId,
             amountTotalCents,
             currency: currency.toLowerCase(),
+            affiliateCode:
+              (await import("@/hooks/useAffiliateRef")).getActiveAffiliateRef() || undefined,
           },
         }
       );

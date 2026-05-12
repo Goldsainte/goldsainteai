@@ -108,6 +108,8 @@ export default function ItineraryGuidePage() {
     try {
       setCheckingOut(true);
       const origin = window.location.origin;
+      const { getActiveAffiliateRef } = await import("@/hooks/useAffiliateRef");
+      const affiliateCode = getActiveAffiliateRef() || undefined;
       const { data, error } = await invokeWithAuth<{ checkoutUrl: string }>(
         "itinerary-checkout",
         {
@@ -115,6 +117,7 @@ export default function ItineraryGuidePage() {
             itineraryProductId: guide.id,
             successUrl: `${origin}/itinerary-guide/${guide.id}`,
             cancelUrl: `${origin}/itinerary-guide/${guide.id}`,
+            affiliateCode,
           },
         }
       );

@@ -36,6 +36,11 @@ serve(async (req) => {
     const itineraryProductId: string | undefined = body.itineraryProductId;
     const successUrl: string | undefined = body.successUrl;
     const cancelUrl: string | undefined = body.cancelUrl;
+    const affiliateCodeRaw: unknown = body.affiliateCode;
+    const affiliateCode =
+      typeof affiliateCodeRaw === "string" && /^[a-zA-Z0-9_-]{3,64}$/.test(affiliateCodeRaw)
+        ? affiliateCodeRaw
+        : undefined;
     if (!itineraryProductId || !successUrl || !cancelUrl) {
       return new Response(
         JSON.stringify({ error: "itineraryProductId, successUrl and cancelUrl are required" }),
@@ -85,6 +90,7 @@ serve(async (req) => {
           product_id: product.id,
           buyer_id: user.id,
           creator_id: product.creator_id,
+          ...(affiliateCode ? { affiliate_code: affiliateCode } : {}),
         },
       },
       metadata: {
@@ -92,6 +98,7 @@ serve(async (req) => {
         product_id: product.id,
         buyer_id: user.id,
         creator_id: product.creator_id,
+        ...(affiliateCode ? { affiliate_code: affiliateCode } : {}),
       },
       success_url: successUrl,
       cancel_url: cancelUrl,

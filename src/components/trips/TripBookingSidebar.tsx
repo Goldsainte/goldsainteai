@@ -106,6 +106,8 @@ export function TripBookingSidebar({
           currency: (currency || "USD").toLowerCase(),
           successUrl: `${window.location.origin}/booking-confirmation?booking=${booking.id}`,
           cancelUrl: `${window.location.origin}/marketplace/trip/${tripId}`,
+          affiliateCode:
+            (await import("@/hooks/useAffiliateRef")).getActiveAffiliateRef() || undefined,
         },
       });
 
