@@ -292,6 +292,7 @@ export default function CreatorOnboardingPage() {
           onboarding_completed: true,
           onboarding_completed_at: now,
           is_profile_complete: true,
+          creator_status: "pending",
         })
         .eq("id", user.id);
 
