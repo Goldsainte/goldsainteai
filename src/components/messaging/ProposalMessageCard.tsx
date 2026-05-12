@@ -61,6 +61,8 @@ export function ProposalMessageCard({
           currency: "usd",
           successUrl: `${window.location.origin}/booking-confirmation?booking=${booking.id}`,
           cancelUrl: `${window.location.origin}/messages`,
+          affiliateCode:
+            (await import("@/hooks/useAffiliateRef")).getActiveAffiliateRef() || undefined,
         },
       });
       if (error) throw error;
