@@ -463,6 +463,7 @@ export const AppRoutes = () => (
       <Route path="/admin/safety" element={<AdminSafetyDashboardPage />} />
       <Route path="/admin/agents" element={<AdminAgentsPage />} />
       <Route path="/admin/creators" element={<AdminCreatorsPage />} />
+      <Route path="/admin/creator-approvals" element={<AdminCreatorApprovalsPage />} />
       <Route path="/admin/bookings" element={<AdminBookingsPage />} />
       <Route path="/admin/disputes" element={<AdminDisputesPage />} />
       <Route path="/admin/trips" element={<AdminTripsPage />} />
