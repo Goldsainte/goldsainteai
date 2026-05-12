@@ -147,6 +147,13 @@ async function handleCheckoutCompleted(session: any) {
       console.error('Failed to record itinerary purchase', error);
     }
 
+    // Credit affiliate referrer (10% of platform commission, where platform = 7%)
+    await creditAffiliateCommission({
+      affiliateCode: metadata.affiliate_code,
+      grossAmount: (session.amount_total ?? 0) / 100,
+      currency: (session.currency || 'usd').toUpperCase(),
+    });
+
     // Increment creator lifetime sales for tier progression
     try {
       const { data: prod } = await supabaseClient
@@ -432,6 +439,13 @@ async function notifyAndEmailOnBookingConfirmed(tripBookingId: string, session: 
         console.error('Failed to increment partner lifetime sales', tierErr);
       }
     }
+
+    // Credit affiliate referrer if present in session metadata
+    await creditAffiliateCommission({
+      affiliateCode: session?.metadata?.affiliate_code,
+      grossAmount: (session?.amount_total ?? 0) / 100,
+      currency: (session?.currency || bookingData.currency || 'usd').toUpperCase(),
+    });
 
     // 1. Partner notification
     if (bookingData.partner_id) {
