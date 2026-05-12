@@ -176,7 +176,7 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
           <Button
             onClick={handleManagePayments}
             disabled={loadingPortal}
-            className="bg-[#0a2225] hover:bg-[#0a2225]/90 text-white rounded-full"
+            className="bg-[#0c4d47] hover:bg-[#073331] text-white rounded-full"
           >
             {loadingPortal ? (
               <>
