@@ -8276,6 +8276,7 @@ export type Database = {
           email_notifications: boolean | null
           email_verified: boolean | null
           featured_photos: string[] | null
+          featured_tiktok_videos: Json
           first_name: string | null
           followers_count: number | null
           following_count: number | null
@@ -8399,6 +8400,7 @@ export type Database = {
           email_notifications?: boolean | null
           email_verified?: boolean | null
           featured_photos?: string[] | null
+          featured_tiktok_videos?: Json
           first_name?: string | null
           followers_count?: number | null
           following_count?: number | null
@@ -8522,6 +8524,7 @@ export type Database = {
           email_notifications?: boolean | null
           email_verified?: boolean | null
           featured_photos?: string[] | null
+          featured_tiktok_videos?: Json
           first_name?: string | null
           followers_count?: number | null
           following_count?: number | null
