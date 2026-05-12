@@ -22,6 +22,7 @@ import { usePresence } from "@/hooks/usePresence";
 import { useUserChange } from "@/hooks/useUserChange";
 import { ensureCSRFToken } from "@/lib/security/csrf";
 import { AppRoutes } from "@/routes/AppRoutes";
+import { InstallAppPrompt } from "@/components/InstallAppPrompt";
 
 
 
