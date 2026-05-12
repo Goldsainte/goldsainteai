@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { ShareButton } from "@/components/ShareButton";
 import { TripDetailHero } from "@/components/trips/TripDetailHero";
 import { TripAboutSection } from "@/components/trips/TripAboutSection";
 import { MeetYourHostCard } from "@/components/trips/MeetYourHostCard";
