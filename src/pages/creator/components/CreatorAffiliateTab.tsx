@@ -102,6 +102,19 @@ export function CreatorAffiliateTab() {
   const totalClicks = links.reduce((a, l) => a + (l.clicks || 0), 0);
   const totalConv = links.reduce((a, l) => a + (l.conversions || 0), 0);
 
+  const productBreakdown = useMemo(() => {
+    const map = new Map<string, { product: string; clicks: number; conversions: number; earnings: number }>();
+    for (const l of links) {
+      const key = l.product_name || "Untitled";
+      const cur = map.get(key) || { product: key, clicks: 0, conversions: 0, earnings: 0 };
+      cur.clicks += l.clicks || 0;
+      cur.conversions += l.conversions || 0;
+      cur.earnings += Number(l.total_earnings || 0);
+      map.set(key, cur);
+    }
+    return Array.from(map.values()).sort((a, b) => b.earnings - a.earnings);
+  }, [links]);
+
   async function createLink(p: Product) {
     if (!user?.id) return;
     const code = genCode();
@@ -229,6 +242,36 @@ export function CreatorAffiliateTab() {
               </li>
             ))}
           </ul>
+        )}
+      </Card>
+
+      <Card className="p-5">
+        <h3 className="mb-3 font-secondary text-lg text-[#0a2225]">Earnings by product</h3>
+        {productBreakdown.length === 0 ? (
+          <p className="text-sm text-[#6B7280]">No referral activity yet.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-[11px] uppercase tracking-wider text-[#7A7151]">
+                  <th className="py-2 pr-3 font-normal">Product</th>
+                  <th className="py-2 pr-3 text-right font-normal">Clicks</th>
+                  <th className="py-2 pr-3 text-right font-normal">Conversions</th>
+                  <th className="py-2 text-right font-normal">Earnings</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#E5DFC6]/60">
+                {productBreakdown.map((row) => (
+                  <tr key={row.product}>
+                    <td className="py-2 pr-3 text-[#0a2225]">{row.product}</td>
+                    <td className="py-2 pr-3 text-right text-[#0a2225]">{row.clicks.toLocaleString()}</td>
+                    <td className="py-2 pr-3 text-right text-[#0a2225]">{row.conversions.toLocaleString()}</td>
+                    <td className="py-2 text-right font-medium text-[#0c4d47]">${row.earnings.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </Card>
     </div>
