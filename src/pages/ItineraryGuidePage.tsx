@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
+import { useTrackView } from "@/hooks/useTrackView";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,6 +49,7 @@ interface CreatorMini {
 
 export default function ItineraryGuidePage() {
   const { id } = useParams();
+  useTrackView("product", id);
   const { user } = useAuth();
   const [hasPurchased, setHasPurchased] = useState(false);
   const [guide, setGuide] = useState<Guide | null>(null);

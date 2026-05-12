@@ -25,6 +25,7 @@ interface LiveTripCardProps {
     wishlist_count?: number | null;
     booking_count?: number | null;
     view_count?: number | null;
+    weekly_booking_count?: number | null;
     is_verified?: boolean | null;
     created_at?: string | null;
     rating?: number | null;
@@ -120,9 +121,12 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
   // Derive a soft signal automatically if not provided
   const derivedSignal = (() => {
     if (trip.signal) return trip.signal;
-    if (trip.created_at && Date.now() - new Date(trip.created_at).getTime() < 14 * 24 * 60 * 60 * 1000) return "new";
-    if ((trip.view_count ?? 0) > 80) return "trending";
-    if ((trip.booking_count ?? 0) > 0) return "recently-booked";
+    const ageMs = trip.created_at ? Date.now() - new Date(trip.created_at).getTime() : Infinity;
+    const within14d = ageMs < 14 * 24 * 60 * 60 * 1000;
+    const within30d = ageMs < 30 * 24 * 60 * 60 * 1000;
+    if (within30d && (trip.view_count ?? 0) > 100) return "trending";
+    if (within14d) return "new";
+    if ((trip.weekly_booking_count ?? 0) > 3) return "recently-booked";
     return null;
   })();
 
@@ -131,7 +135,7 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
     : derivedSignal === "new"
       ? "New"
       : derivedSignal === "recently-booked"
-        ? "Recently Booked"
+        ? `Booked ${trip.weekly_booking_count} times this week`
         : null;
 
   const styleTag = trip.creator?.content_style_tags?.[0];

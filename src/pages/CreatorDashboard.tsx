@@ -32,6 +32,8 @@ import { CreatorEarningsTab } from "./creator/components/CreatorEarningsTab";
 import { CreatorPortfolioTab } from "./creator/components/CreatorPortfolioTab";
 import { CreatorSettingsTab } from "./creator/components/CreatorSettingsTab";
 import { CreatorGuidesTab } from "./creator/components/CreatorGuidesTab";
+import { CreatorPerformanceTab } from "./creator/components/CreatorPerformanceTab";
+import { TierBadge, TierBenefitsCard } from "@/components/creator/TierBadge";
 import type { TripProposalStatus } from "@/services/proposalService";
 
 type RecentProposal = {
@@ -75,6 +77,8 @@ interface Profile {
   full_name: string | null;
   avatar_url: string | null;
   has_completed_creator_onboarding: boolean | null;
+  creator_tier?: string | null;
+  lifetime_sales_count?: number | null;
 }
 
 export default function CreatorDashboard() {
@@ -96,7 +100,7 @@ export default function CreatorDashboard() {
       if (!user) return;
       const { data } = await supabase
         .from("profiles")
-        .select("display_name, first_name, full_name, avatar_url, has_completed_creator_onboarding")
+        .select("display_name, first_name, full_name, avatar_url, has_completed_creator_onboarding, creator_tier, lifetime_sales_count")
         .eq("id", user.id)
         .maybeSingle();
       if (data) setProfile(data as Profile);
@@ -212,6 +216,11 @@ export default function CreatorDashboard() {
                 <h1 className="font-secondary text-xl md:text-2xl lg:text-3xl text-[#0a2225]">
                   Welcome back, {displayName.split(" ")[0]}
                 </h1>
+                {profile?.creator_tier && (
+                  <div className="mt-2">
+                    <TierBadge tier={profile.creator_tier} size="md" />
+                  </div>
+                )}
               </div>
             </div>
 
@@ -287,6 +296,7 @@ export default function CreatorDashboard() {
                     {activeTab === "trips" && <><Map className="h-4 w-4 text-[#C7A962]" /> My Trips</>}
                     {activeTab === "portfolio" && <><ImageIcon className="h-4 w-4 text-[#C7A962]" /> Portfolio</>}
                     {activeTab === "guides" && <><BookOpen className="h-4 w-4 text-[#C7A962]" /> Guides</>}
+                    {activeTab === "performance" && <><Sparkles className="h-4 w-4 text-[#C7A962]" /> Performance</>}
                     {activeTab === "earnings" && <><DollarSign className="h-4 w-4 text-[#C7A962]" /> Earnings</>}
                     {activeTab === "settings" && <><Settings className="h-4 w-4 text-[#C7A962]" /> Settings</>}
                   </span>
@@ -307,6 +317,9 @@ export default function CreatorDashboard() {
                 </SelectItem>
                 <SelectItem value="guides" className="py-3">
                   <span className="flex items-center gap-2"><BookOpen className="h-4 w-4" /> Guides</span>
+                </SelectItem>
+                <SelectItem value="performance" className="py-3">
+                  <span className="flex items-center gap-2"><Sparkles className="h-4 w-4" /> Performance</span>
                 </SelectItem>
                 <SelectItem value="earnings" className="py-3">
                   <span className="flex items-center gap-2"><DollarSign className="h-4 w-4" /> Earnings</span>
@@ -332,6 +345,9 @@ export default function CreatorDashboard() {
               </TabsTrigger>
               <TabsTrigger value="guides" className={tabTriggerClass}>
                 <BookOpen className="h-3.5 w-3.5 mr-1.5" /> Guides
+              </TabsTrigger>
+              <TabsTrigger value="performance" className={tabTriggerClass}>
+                <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Performance
               </TabsTrigger>
               <TabsTrigger value="earnings" className={tabTriggerClass}>
                 <DollarSign className="h-3.5 w-3.5 mr-1.5" /> Earnings
@@ -360,6 +376,13 @@ export default function CreatorDashboard() {
 
           <TabsContent value="guides" className="mt-0">
             <CreatorGuidesTab />
+          </TabsContent>
+
+          <TabsContent value="performance" className="mt-0">
+            <div className="space-y-6">
+              <TierBenefitsCard tier={profile?.creator_tier} />
+              <CreatorPerformanceTab role="creator" />
+            </div>
           </TabsContent>
 
           <TabsContent value="earnings" className="mt-0">

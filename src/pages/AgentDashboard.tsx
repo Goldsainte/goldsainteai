@@ -28,6 +28,7 @@ import { InvoiceGenerator } from "@/components/InvoiceGenerator";
 import { AgentCreatorCollabs } from "@/components/AgentCreatorCollabs";
 import { BackButton } from "@/components/ui/BackButton";
 import { GettingStartedChecklist } from "@/components/onboarding/GettingStartedChecklist";
+import { CreatorPerformanceTab } from "./creator/components/CreatorPerformanceTab";
 import { Link } from "react-router-dom";
 
 export default function AgentDashboard() {
@@ -425,6 +426,7 @@ export default function AgentDashboard() {
               <TabsTrigger value="my-bids" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">My Bids ({myBids.length})</TabsTrigger>
               <TabsTrigger value="creator-collabs" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Creator Collabs ({collabRequests.length})</TabsTrigger>
               <TabsTrigger value="analytics" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Analytics</TabsTrigger>
+             <TabsTrigger value="performance" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Performance</TabsTrigger>
               <TabsTrigger value="availability" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Availability</TabsTrigger>
               <TabsTrigger value="verification" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Verification</TabsTrigger>
             </TabsList>
@@ -605,6 +607,10 @@ export default function AgentDashboard() {
               {agent && (
                 <AgentAnalyticsDashboard agentId={agent.id} />
               )}
+            </TabsContent>
+
+            <TabsContent value="performance">
+              <CreatorPerformanceTab role="agent" />
             </TabsContent>
 
             <TabsContent value="verification">

@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useTrackView } from "@/hooks/useTrackView";
 import { ShareButton } from "@/components/ShareButton";
 import { TripDetailHero } from "@/components/trips/TripDetailHero";
 import { TripAboutSection } from "@/components/trips/TripAboutSection";
@@ -90,6 +91,7 @@ export default function TrovaTripDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [trip, setTrip] = useState<TripData | null>(null);
+  useTrackView("trip", trip?.id ?? null);
   const [activities, setActivities] = useState<any[]>([]);
   const [itineraryDays, setItineraryDays] = useState<any[]>([]);
   const [addons, setAddons] = useState<any[]>([]);

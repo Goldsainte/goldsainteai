@@ -147,6 +147,23 @@ async function handleCheckoutCompleted(session: any) {
       console.error('Failed to record itinerary purchase', error);
     }
 
+    // Increment creator lifetime sales for tier progression
+    try {
+      const { data: prod } = await supabaseClient
+        .from('itinerary_products')
+        .select('creator_id')
+        .eq('id', metadata.product_id)
+        .single();
+      if (prod?.creator_id) {
+        await supabaseClient.rpc('increment_lifetime_sales', {
+          _user_id: prod.creator_id,
+          _delta: 1,
+        });
+      }
+    } catch (tierErr) {
+      console.error('Failed to increment creator lifetime sales', tierErr);
+    }
+
     // Send branded "Your guide is ready" email
     try {
       const { data: buyerProfile } = await supabaseClient
@@ -403,6 +420,18 @@ async function notifyAndEmailOnBookingConfirmed(tripBookingId: string, session: 
       .single();
 
     if (!bookingData) return;
+
+    // Increment partner (creator/agent) lifetime sales for tier progression
+    if (bookingData.partner_id) {
+      try {
+        await supabaseClient.rpc('increment_lifetime_sales', {
+          _user_id: bookingData.partner_id,
+          _delta: 1,
+        });
+      } catch (tierErr) {
+        console.error('Failed to increment partner lifetime sales', tierErr);
+      }
+    }
 
     // 1. Partner notification
     if (bookingData.partner_id) {

@@ -12,6 +12,8 @@ interface Guide {
   currency: string;
   cover_image_url: string | null;
   description: string | null;
+  created_at?: string | null;
+  view_count?: number | null;
   creator: {
     id: string;
     full_name: string | null;
@@ -46,6 +48,19 @@ export function ItineraryGuideCard({ guide }: { guide: Guide }) {
           <Download className="h-3 w-3" />
           Digital Guide
         </div>
+        {(() => {
+          const ageMs = guide.created_at ? Date.now() - new Date(guide.created_at).getTime() : Infinity;
+          const within14d = ageMs < 14 * 24 * 60 * 60 * 1000;
+          const within30d = ageMs < 30 * 24 * 60 * 60 * 1000;
+          const trending = within30d && (guide.view_count ?? 0) > 100;
+          const label = trending ? "Trending" : within14d ? "New" : null;
+          if (!label) return null;
+          return (
+            <span className="absolute left-3 bottom-3 rounded-full bg-[#FDF9F0]/95 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-[#0c4d47] ring-1 ring-[#0c4d47]/20 backdrop-blur-sm">
+              {label}
+            </span>
+          );
+        })()}
         <div className="absolute right-3 top-3 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-[#0a2225]">
           {priceLabel}
         </div>
