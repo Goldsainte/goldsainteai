@@ -148,12 +148,16 @@ const EarningsDashboard = lazy(() => import('@/pages/EarningsDashboard'));
 const HealthCheck = lazy(() => import('@/pages/HealthCheck'));
 const BookTripPage = lazy(() => import('@/pages/trips/BookTripPage'));
 const BookingConfirmation = lazy(() => import('@/pages/BookingConfirmation'));
+const UsernameRedirect = lazy(() => import('@/pages/UsernameRedirect'));
+const ShopPage = lazy(() => import('@/pages/ShopPage'));
 
 export const AppRoutes = () => (
   <Routes>
     <Route element={<MarketingLayout />}>
       <Route index element={<HomePage />} />
       <Route path="/about" element={<About />} />
+      <Route path="/@:username" element={<UsernameRedirect />} />
+      <Route path="/@:username/shop" element={<ShopPage />} />
       <Route path="/creators" element={<CreatorsPage />} />
       <Route path="/creators/:id" element={<CreatorPublicProfilePage />} />
       <Route path="/agents" element={<BrowseAgents />} />
