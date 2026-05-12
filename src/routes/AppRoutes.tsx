@@ -25,6 +25,7 @@ const AdminDashboardPage = lazy(() => import('@/pages/admin/AdminDashboardPage')
 const AdminSafetyDashboardPage = lazy(() => import('@/pages/admin/AdminSafetyDashboardPage'));
 const AdminAgentsPage = lazy(() => import('@/pages/admin/AdminAgentsPage'));
 const AdminCreatorsPage = lazy(() => import('@/pages/admin/AdminCreatorsPage'));
+const AdminCreatorApprovalsPage = lazy(() => import('@/pages/admin/AdminCreatorApprovalsPage'));
 const AdminBookingsPage = lazy(() => import('@/pages/admin/AdminBookingsPage'));
 const AdminDisputesPage = lazy(() => import('@/pages/admin/AdminDisputesPage'));
 const AdminHomePage = lazy(() => import('@/pages/admin/AdminHomePage'));
