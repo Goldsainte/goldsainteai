@@ -11,6 +11,8 @@ import { CreatorAboutSection } from "@/components/creator/CreatorAboutSection";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { TikTokCarousel } from "@/components/TikTokEmbed";
+import { ShareButton } from "@/components/ShareButton";
 
 // -- Gold section divider component --
 function GoldDivider() {
@@ -37,6 +39,8 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 interface CreatorProfile {
   id: string;
+  username: string | null;
+  featured_tiktok_videos: string[] | null;
   full_name: string | null;
   display_name: string | null;
   avatar_url: string | null;
@@ -90,7 +94,7 @@ export default function CreatorPublicProfilePage() {
         supabase
           .from("profiles")
           .select(
-            "id, full_name, display_name, avatar_url, bio, location, tiktok_handle, instagram_handle, creator_niches, creator_avg_views, creator_followers, featured_photos, cover_image_url, content_style_tags, destinations_focus_tags, travel_philosophy, last_seen_at, website, created_at"
+            "id, username, featured_tiktok_videos, full_name, display_name, avatar_url, bio, location, tiktok_handle, instagram_handle, creator_niches, creator_avg_views, creator_followers, featured_photos, cover_image_url, content_style_tags, destinations_focus_tags, travel_philosophy, last_seen_at, website, created_at"
           )
           .eq("id", id)
           .maybeSingle(),
@@ -107,7 +111,17 @@ export default function CreatorPublicProfilePage() {
           .eq("reviewee_id", id),
       ]);
 
-      setCreator(profileRes.data as CreatorProfile | null);
+      const raw = profileRes.data as any;
+      setCreator(
+        raw
+          ? {
+              ...raw,
+              featured_tiktok_videos: Array.isArray(raw.featured_tiktok_videos)
+                ? raw.featured_tiktok_videos.filter((v: any) => typeof v === "string")
+                : [],
+            }
+          : null
+      );
       setCreatorData(creatorProfileRes.data as CreatorProfileData | null);
 
       const reviews = reviewsRes.data;
@@ -219,6 +233,11 @@ export default function CreatorPublicProfilePage() {
                 Edit Profile
               </Button>
             )}
+            <ShareButton
+              url={creator.username ? `/@${creator.username}/shop` : `/creators/${creator.id}`}
+              title={`${displayName} on Goldsainte`}
+              description={bio || undefined}
+            />
           </div>
         </div>
 
@@ -242,6 +261,15 @@ export default function CreatorPublicProfilePage() {
 
         {/* Spacer after hero card overlap */}
         <div className="h-8 md:h-12" />
+
+        {/* ─── Recent TikTok Videos ─── */}
+        {creator.featured_tiktok_videos && creator.featured_tiktok_videos.length > 0 && (
+          <div className="bg-[#FDF9F0]">
+            <div className="mx-auto max-w-5xl px-4 py-12 md:py-16">
+              <TikTokCarousel urls={creator.featured_tiktok_videos} />
+            </div>
+          </div>
+        )}
 
         {/* ─── Itinerary Guides ─── */}
         {guides.length > 0 && (
