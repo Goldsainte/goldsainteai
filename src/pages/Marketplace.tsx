@@ -482,6 +482,35 @@ export default function Marketplace() {
       );
     }
 
+    if (activeTab === "bundles") {
+      if (isLoadingBundles) {
+        return (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="aspect-[4/3] w-full rounded-2xl" />
+            ))}
+          </div>
+        );
+      }
+      if (!bundles?.length) {
+        return (
+          <div className="py-16 text-center">
+            <h3 className="font-secondary text-xl text-[#0a2225]">No bundles yet</h3>
+            <p className="mt-2 text-sm text-[#6B7280]">
+              Creators are crafting curated bundles. Check back soon.
+            </p>
+          </div>
+        );
+      }
+      return (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {bundles.map((b: any) => (
+            <BundleCard key={b.id} bundle={b} />
+          ))}
+        </div>
+      );
+    }
+
     return null;
   };
 
