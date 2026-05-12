@@ -276,8 +276,7 @@ export default function WebhookSettings() {
                   <span className="text-sm font-medium">Active</span>
                   <Checkbox
                     checked={webhook.is_active}
-                    onCheckedChange={(checked) => (() =>
-                      handleToggleActive(webhook.id, webhook.is_active))(checked === true)}
+                    onCheckedChange={() => handleToggleActive(webhook.id, webhook.is_active)}
                   />
                 </div>
               </CardContent>
