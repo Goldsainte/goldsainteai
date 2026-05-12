@@ -42,7 +42,7 @@ export function InstallAppPrompt() {
     window.addEventListener("beforeinstallprompt", handler);
 
     if (ios && !recentlyDismissed) {
-      const t = window.setTimeout(() => setShowBanner(true), 30000);
+      const t = window.setTimeout(() => setShowBanner(true), 8000);
       return () => {
         window.clearTimeout(t);
         window.removeEventListener("beforeinstallprompt", handler);
