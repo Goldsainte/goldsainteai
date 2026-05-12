@@ -92,6 +92,8 @@ export default function CreatorDashboard() {
   const { hasCreatorAccess, loading: roleLoading } = useUserRole();
   const [stats, setStats] = useState<CreatorStats>(EMPTY_STATS);
   const [loading, setLoading] = useState(true);
+
+  useCreatorTierWatcher();
   
   const [profile, setProfile] = useState<Profile | null>(null);
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "overview");
