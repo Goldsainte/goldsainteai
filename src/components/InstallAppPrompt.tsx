@@ -86,7 +86,7 @@ export function InstallAppPrompt() {
           <h3 className="font-secondary text-base text-[#0a2225]">Install Goldsainte</h3>
           <p className="mt-1 text-xs leading-relaxed text-[#6E6650]">
             {isIOS
-              ? "Tap the Share icon in Safari, then 'Add to Home Screen' for the best experience."
+              ? <>Tap <span className="inline-flex items-center gap-1 rounded bg-[#E5DFC6]/50 px-1.5 py-0.5 text-[10px] font-medium text-[#0c4d47]"><Share className="h-3 w-3" /> Share</span> at the bottom of Safari, then scroll down and tap <span className="font-medium text-[#0a2225]">Add to Home Screen</span>.</>
               : "Add Goldsainte to your home screen for instant access to trips and bookings."}
           </p>
           {!isIOS && deferredPrompt && (
