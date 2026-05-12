@@ -33,7 +33,7 @@ export function TripGrid({ trips }: TripGridProps) {
           className="group cursor-pointer overflow-hidden rounded-2xl border border-[#E5DFC6]/30 bg-white shadow-sm transition-all hover:shadow-md"
         >
           {/* Image */}
-          <div className="relative aspect-[4/3] overflow-hidden">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl">
             {trip.cover_image_url ? (
               <img
                 src={trip.cover_image_url}

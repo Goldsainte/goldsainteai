@@ -108,7 +108,7 @@ export const EmailListManager = ({
               <div className="flex items-center gap-2">
                 <Checkbox
                   checked={entry.notify}
-                  onCheckedChange={(checked) => (() => handleToggleNotify(index))(checked === true)}
+                  onCheckedChange={() => handleToggleNotify(index)}
                   disabled={!notifyAll}
                 />
                 <Button

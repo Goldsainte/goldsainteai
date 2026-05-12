@@ -13,7 +13,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrayFieldEditor } from "./ArrayFieldEditor";
 import { TripImageUploader } from "./TripImageUploader";
-import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -553,7 +552,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                     <label key={meal}
                       className={cn("flex items-center gap-2 rounded-xl border px-3 py-2.5 cursor-pointer transition-colors",
                         active ? "bg-[#FDF9F0] border-[#C7A962]" : "bg-white border-[#E5DFC6] hover:border-[#C7A962]/50")}>
-                      <Checkbox checked={active} onCheckedChange={(checked) => (() => toggleArrayValue("meals_included", meal))(checked === true)} />
+                      <Checkbox checked={active} onCheckedChange={() => toggleArrayValue("meals_included", meal)} />
                       <span className="text-sm text-[#0a2225]">{meal}</span>
                     </label>
                   );

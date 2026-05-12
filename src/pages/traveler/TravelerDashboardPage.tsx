@@ -229,38 +229,38 @@ export default function TravelerDashboardPage() {
               </Select>
             ) : (
               /* Desktop: Horizontal TabsList */
-              <TabsList className="bg-white border border-[#E5DFC6] rounded-full p-1.5 h-auto flex flex-nowrap justify-start gap-1">
+              <TabsList className="w-full overflow-x-auto scrollbar-hide bg-transparent border-b border-[#E5DFC6] rounded-none h-11 justify-start gap-0 flex">
                 <TabsTrigger 
                   value="overview" 
-                  className="rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                  className="rounded-none h-11 border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0 transition-colors"
                 >
                   <Sparkles className="h-3.5 w-3.5 mr-1.5" />
                   Overview
                 </TabsTrigger>
                 <TabsTrigger 
                   value="profile"
-                  className="rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                  className="rounded-none h-11 border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0 transition-colors"
                 >
                   <User className="h-3.5 w-3.5 mr-1.5" />
                   Profile
                 </TabsTrigger>
                 <TabsTrigger 
                   value="trips"
-                  className="rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                  className="rounded-none h-11 border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0 transition-colors"
                 >
                   <Calendar className="h-3.5 w-3.5 mr-1.5" />
                   Trips
                 </TabsTrigger>
                 <TabsTrigger 
                   value="bookings"
-                  className="rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                  className="rounded-none h-11 border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0 transition-colors"
                 >
                   <Plane className="h-3.5 w-3.5 mr-1.5" />
                   Bookings
                 </TabsTrigger>
                 <TabsTrigger 
                   value="settings"
-                  className="rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap data-[state=active]:bg-[#0c4d47] data-[state=active]:text-[#bfad72] data-[state=inactive]:text-[#6B7280] data-[state=inactive]:hover:text-[#0a2225] transition-colors"
+                  className="rounded-none h-11 border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0 transition-colors"
                 >
                   <Settings className="h-3.5 w-3.5 mr-1.5" />
                   Settings
