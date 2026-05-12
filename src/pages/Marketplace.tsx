@@ -23,9 +23,10 @@ import { ForYouRow } from "@/components/marketplace/ForYouRow";
 import { AdaptiveCollectionRow } from "@/components/marketplace/AdaptiveCollectionRow";
 import { ThisWeekFooter } from "@/components/marketplace/ThisWeekFooter";
 import { ItineraryGuideCard } from "@/components/marketplace/ItineraryGuideCard";
+import { BundleCard } from "@/components/marketplace/BundleCard";
 import { BookOpen, Search } from "lucide-react";
 
-type Tab = "trips" | "trip-requests" | "itinerary-guides";
+type Tab = "trips" | "trip-requests" | "itinerary-guides" | "bundles";
 
 const FILTER_TAG_MAP: Record<string, string[]> = {
   "Bucket List": ["bucket-list", "bucket list", "once-in-a-lifetime", "iconic", "wonder"],
@@ -59,7 +60,7 @@ export default function Marketplace() {
   const queryClient = useQueryClient();
   const { isAdmin } = useUserRole();
 
-  const validTabs: Tab[] = ["trips", "trip-requests", "itinerary-guides"];
+  const validTabs: Tab[] = ["trips", "trip-requests", "itinerary-guides", "bundles"];
   const rawTab = (searchParams.get("tab") as string) || "trips";
   const initialTab: Tab = validTabs.includes(rawTab as Tab) ? (rawTab as Tab) : "trips";
 
@@ -321,6 +322,25 @@ export default function Marketplace() {
     g.destination?.toLowerCase().includes(guideSearch.toLowerCase()) ||
     g.title?.toLowerCase().includes(guideSearch.toLowerCase())
   );
+
+  const { data: bundles, isLoading: isLoadingBundles } = useQuery({
+    queryKey: ["product-bundles-marketplace"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("product_bundles")
+        .select("*")
+        .eq("status", "published")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      const rows = data || [];
+      const creatorIds = [...new Set(rows.map((r: any) => r.creator_id).filter(Boolean))];
+      const { data: profiles } = creatorIds.length
+        ? await supabase.from("profiles").select("id, full_name, username").in("id", creatorIds)
+        : { data: [] as any[] };
+      const map = new Map((profiles || []).map((p: any) => [p.id, p]));
+      return rows.map((r: any) => ({ ...r, creator: map.get(r.creator_id) || null }));
+    },
+  });
 
   const handleDeleteRequest = async (id: string) => {
     const { error } = await supabase.from("trip_requests").delete().eq("id", id);
