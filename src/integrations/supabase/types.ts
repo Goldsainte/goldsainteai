@@ -4983,6 +4983,7 @@ export type Database = {
           status: string
           title: string
           updated_at: string
+          view_count: number
         }
         Insert: {
           cover_image_url?: string | null
@@ -4998,6 +4999,7 @@ export type Database = {
           status?: string
           title: string
           updated_at?: string
+          view_count?: number
         }
         Update: {
           cover_image_url?: string | null
@@ -5013,6 +5015,7 @@ export type Database = {
           status?: string
           title?: string
           updated_at?: string
+          view_count?: number
         }
         Relationships: []
       }
@@ -8270,6 +8273,7 @@ export type Database = {
           creator_pov: string | null
           creator_rejection_reason: string | null
           creator_status: string
+          creator_tier: string
           destinations_focus_tags: string[] | null
           display_name: string | null
           email: string | null
@@ -8296,6 +8300,7 @@ export type Database = {
           last_name: string | null
           last_seen_at: string | null
           last_warning_at: string | null
+          lifetime_sales_count: number
           location: string | null
           metadata: Json | null
           notification_preferences: Json | null
@@ -8394,6 +8399,7 @@ export type Database = {
           creator_pov?: string | null
           creator_rejection_reason?: string | null
           creator_status?: string
+          creator_tier?: string
           destinations_focus_tags?: string[] | null
           display_name?: string | null
           email?: string | null
@@ -8420,6 +8426,7 @@ export type Database = {
           last_name?: string | null
           last_seen_at?: string | null
           last_warning_at?: string | null
+          lifetime_sales_count?: number
           location?: string | null
           metadata?: Json | null
           notification_preferences?: Json | null
@@ -8518,6 +8525,7 @@ export type Database = {
           creator_pov?: string | null
           creator_rejection_reason?: string | null
           creator_status?: string
+          creator_tier?: string
           destinations_focus_tags?: string[] | null
           display_name?: string | null
           email?: string | null
@@ -8544,6 +8552,7 @@ export type Database = {
           last_name?: string | null
           last_seen_at?: string | null
           last_warning_at?: string | null
+          lifetime_sales_count?: number
           location?: string | null
           metadata?: Json | null
           notification_preferences?: Json | null
@@ -14185,6 +14194,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_lifetime_sales: {
+        Args: { _delta?: number; _user_id: string }
+        Returns: undefined
+      }
+      increment_product_view: {
+        Args: { _product_id: string }
+        Returns: undefined
+      }
+      increment_trip_view: { Args: { _trip_id: string }; Returns: undefined }
       is_admin: { Args: never; Returns: boolean }
       is_storyboard_collaborator: {
         Args: { storyboard_uuid: string; user_uuid: string }
