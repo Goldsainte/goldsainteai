@@ -213,7 +213,7 @@ export default function ShopPage() {
   );
 }
 
-function ProductGrid({ items }: { items: { kind: "trip" | "guide"; item: any }[] }) {
+function ProductGrid({ items }: { items: { kind: "trip" | "guide" | "bundle"; item: any }[] }) {
   if (items.length === 0) {
     return <p className="py-8 text-center text-sm text-[#6B7280]">Nothing here yet.</p>;
   }
