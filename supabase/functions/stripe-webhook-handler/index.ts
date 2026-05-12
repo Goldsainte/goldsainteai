@@ -219,6 +219,11 @@ async function handleCheckoutCompleted(session: any) {
 
     return;
   }
+
+  if (metadata.type === 'bundle_purchase' && metadata.bundle_id && metadata.buyer_id) {
+    await handleBundlePurchase(metadata, session);
+    return;
+  }
 }
 
 async function handleBundlePurchase(metadata: any, session: any) {
