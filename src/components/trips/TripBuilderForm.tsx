@@ -97,6 +97,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
   const [itineraryDays, setItineraryDays] = useState<ItineraryDay[]>([]);
   const [departureMode, setDepartureMode] = useState<"flexible" | "fixed">("flexible");
   const [aiLoading, setAiLoading] = useState(false);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [formData, setFormData] = useState({
     title: "", description: "", destination: "", price_per_person: "", original_price: "",
     currency: "USD", duration_days: "", duration_nights: "", cover_image_url: "",
@@ -320,6 +321,15 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
 
   const isValid = formData.title && formData.destination && formData.price_per_person && formData.duration_days;
 
+  const getError = (field: string): string | null => {
+    if (!touched[field]) return null;
+    if (field === "title" && !formData.title?.trim()) return "Trip title is required";
+    if (field === "destination" && !formData.destination?.trim()) return "Destination is required";
+    if (field === "price_per_person" && !formData.price_per_person) return "Price per person is required";
+    if (field === "duration_days" && !formData.duration_days) return "Duration is required";
+    return null;
+  };
+
   const markStepComplete = (idx: number) =>
     setCompletedSteps((prev) => {
       const n = new Set(prev);
@@ -375,7 +385,10 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                 <div className="space-y-2">
                   <Label className={labelClasses}>Trip title *</Label>
                   <Input value={formData.title} onChange={(e) => updateField("title", e.target.value)}
-                    placeholder="e.g., 7-Day Jordan Desert & Petra" className={inputClasses} />
+                    onBlur={() => setTouched((prev) => ({ ...prev, title: true }))}
+                    placeholder="e.g., 7-Day Jordan Desert & Petra"
+                    className={`${inputClasses} ${getError("title") ? "border-red-400 focus:border-red-400" : ""}`} />
+                  {getError("title") && <p className="text-xs text-red-500 mt-1">{getError("title")}</p>}
                   <p className={helperClasses}>Keep it specific. "7-Day Jordan Desert & Petra" outperforms "Jordan Trip".</p>
                 </div>
                 <div className="space-y-2">
@@ -386,7 +399,10 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                 <div className="space-y-2">
                   <Label className={labelClasses}>Destination *</Label>
                   <Input value={formData.destination} onChange={(e) => updateField("destination", e.target.value)}
-                    placeholder="e.g., Amalfi Coast, Italy" className={inputClasses} />
+                    onBlur={() => setTouched((prev) => ({ ...prev, destination: true }))}
+                    placeholder="e.g., Amalfi Coast, Italy"
+                    className={`${inputClasses} ${getError("destination") ? "border-red-400 focus:border-red-400" : ""}`} />
+                  {getError("destination") && <p className="text-xs text-red-500 mt-1">{getError("destination")}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label className={labelClasses}>Description</Label>
@@ -425,7 +441,10 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                     <Label className={labelClasses}>Price per person *</Label>
                     <Input type="number" value={formData.price_per_person}
                       onChange={(e) => updateField("price_per_person", e.target.value)}
-                      placeholder="2500" className={inputClasses} />
+                      onBlur={() => setTouched((prev) => ({ ...prev, price_per_person: true }))}
+                      placeholder="2500"
+                      className={`${inputClasses} ${getError("price_per_person") ? "border-red-400 focus:border-red-400" : ""}`} />
+                    {getError("price_per_person") && <p className="text-xs text-red-500 mt-1">{getError("price_per_person")}</p>}
                     <p className={helperClasses}>This is what travelers pay. Your deposit percentage and commission are calculated from this.</p>
                   </div>
                   <div className="space-y-2">
@@ -452,7 +471,11 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                         const days = parseInt(e.target.value) || 0;
                         updateField("duration_days", e.target.value);
                         if (days > 0) updateField("duration_nights", String(days - 1));
-                      }} placeholder="5" className={inputClasses} />
+                      }}
+                      onBlur={() => setTouched((prev) => ({ ...prev, duration_days: true }))}
+                      placeholder="5"
+                      className={`${inputClasses} ${getError("duration_days") ? "border-red-400 focus:border-red-400" : ""}`} />
+                    {getError("duration_days") && <p className="text-xs text-red-500 mt-1">{getError("duration_days")}</p>}
                   </div>
                   <div className="space-y-2">
                     <Label className={labelClasses}>Duration (nights)</Label>
