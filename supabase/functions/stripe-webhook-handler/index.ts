@@ -221,6 +221,105 @@ async function handleCheckoutCompleted(session: any) {
   }
 }
 
+async function handleBundlePurchase(metadata: any, session: any) {
+  console.log("Processing bundle_purchase", metadata.bundle_id);
+  const { data: bundle, error: bErr } = await supabaseClient
+    .from('product_bundles')
+    .select('id, creator_id, currency, trip_id, guide_ids, title')
+    .eq('id', metadata.bundle_id)
+    .single();
+  if (bErr || !bundle) {
+    console.error('Bundle not found', bErr);
+    return;
+  }
+
+  const amountPaid = (session.amount_total ?? 0) / 100;
+  const currency = (session.currency || bundle.currency || 'usd').toUpperCase();
+
+  // Idempotency-friendly insert (stripe_payment_intent_id is UNIQUE)
+  const { data: existing } = await supabaseClient
+    .from('bundle_purchases')
+    .select('id, trip_booking_id')
+    .eq('stripe_payment_intent_id', session.payment_intent)
+    .maybeSingle();
+  if (existing) {
+    console.log('Bundle purchase already recorded', existing.id);
+    return;
+  }
+
+  // 1. Create trip booking for bundled trip (if any)
+  let tripBookingId: string | null = null;
+  if (bundle.trip_id) {
+    const { data: booking, error: bookErr } = await supabaseClient
+      .from('trip_bookings')
+      .insert({
+        traveler_id: metadata.buyer_id,
+        partner_id: bundle.creator_id,
+        partner_role: 'creator',
+        total_price: amountPaid,
+        currency,
+        status: 'confirmed',
+        partner_payout: 0,
+        platform_commission: 0,
+        stripe_payment_intent_id: session.payment_intent,
+        metadata: {
+          source: 'bundle_purchase',
+          bundle_id: bundle.id,
+          trip_id: bundle.trip_id,
+        },
+      } as any)
+      .select('id')
+      .single();
+    if (bookErr) {
+      console.error('Failed to create trip_booking for bundle', bookErr);
+    } else {
+      tripBookingId = booking?.id ?? null;
+    }
+  }
+
+  // 2. Create itinerary_purchases for each guide
+  const guideIds: string[] = Array.isArray(bundle.guide_ids) ? bundle.guide_ids : [];
+  for (const productId of guideIds) {
+    const { error: ipErr } = await supabaseClient.from('itinerary_purchases').insert({
+      buyer_id: metadata.buyer_id,
+      product_id: productId,
+      stripe_payment_intent_id: `${session.payment_intent}:${productId}`,
+      amount_paid: 0,
+      currency,
+    });
+    if (ipErr && !ipErr.message?.includes('duplicate')) {
+      console.error('Failed to record bundled guide purchase', productId, ipErr);
+    }
+  }
+
+  // 3. Record bundle purchase
+  await supabaseClient.from('bundle_purchases').insert({
+    bundle_id: bundle.id,
+    buyer_id: metadata.buyer_id,
+    stripe_payment_intent_id: session.payment_intent,
+    amount_paid: amountPaid,
+    currency,
+    trip_booking_id: tripBookingId,
+  });
+
+  // 4. Affiliate commission
+  await creditAffiliateCommission({
+    affiliateCode: metadata.affiliate_code,
+    grossAmount: amountPaid,
+    currency,
+  });
+
+  // 5. Lifetime sales increment for tier
+  try {
+    await supabaseClient.rpc('increment_lifetime_sales', {
+      _user_id: bundle.creator_id,
+      _delta: 1,
+    });
+  } catch (e) {
+    console.error('increment_lifetime_sales bundle err', e);
+  }
+}
+
 async function handleBookingPayment(bookingId: string, session: any) {
   console.log("Processing booking payment", bookingId);
   
