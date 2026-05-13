@@ -128,7 +128,7 @@ h1{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:38px;l
 </div>
 </div></body></html>`;
 
-    const isConfirmation = template === "confirmation";
+    const isConfirmation = template !== "security";
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
