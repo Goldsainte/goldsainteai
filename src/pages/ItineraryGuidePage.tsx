@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { useTrackView } from "@/hooks/useTrackView";
@@ -49,6 +49,8 @@ interface CreatorMini {
 
 export default function ItineraryGuidePage() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const previewMode = searchParams.get("preview") === "1";
   useTrackView("product", id);
   const { user } = useAuth();
   const [hasPurchased, setHasPurchased] = useState(false);
@@ -97,7 +99,7 @@ export default function ItineraryGuidePage() {
   }, [user, id]);
 
   const isOwner = !!user && !!guide && guide.creator_id === user.id;
-  const unlocked = hasPurchased || isOwner;
+  const unlocked = previewMode ? false : (hasPurchased || isOwner);
 
   const handleCheckout = async () => {
     if (!guide) return;
