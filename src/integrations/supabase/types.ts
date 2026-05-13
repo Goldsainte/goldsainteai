@@ -14290,6 +14290,7 @@ export type Database = {
       }
     }
     Functions: {
+      _email_fanout_post: { Args: { payload: Json }; Returns: undefined }
       accept_proposal_rpc: {
         Args: { proposal_id_input: string }
         Returns: Json
