@@ -122,7 +122,7 @@ serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Marketplace <notifications@yourdomain.com>",
+        from: "Marketplace <notifications@notify.goldsainte.com>",
         to: [profile.email],
         subject,
         html: htmlContent,

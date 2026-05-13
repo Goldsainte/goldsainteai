@@ -213,7 +213,7 @@ async function handleCheckoutCompleted(session: any) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: 'Goldsainte <noreply@goldsainte.com>',
+            from: 'Goldsainte <noreply@notify.goldsainte.com>',
             to: buyerProfile.email,
             subject: `Your itinerary guide is ready — ${guideData.title}`,
             html: `
@@ -337,7 +337,7 @@ async function handleBundlePurchase(metadata: any, session: any) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'Goldsainte <noreply@goldsainte.com>',
+          from: 'Goldsainte <noreply@notify.goldsainte.com>',
           to: buyerProfile.email,
           subject: `Your Goldsainte bundle is confirmed — ${bundle.title}`,
           html: `
@@ -671,7 +671,7 @@ async function notifyAndEmailOnBookingConfirmed(tripBookingId: string, session: 
         Authorization: `Bearer ${resendApiKey}`,
       },
       body: JSON.stringify({
-        from: 'Goldsainte <hello@goldsainte.com>',
+        from: 'Goldsainte <hello@notify.goldsainte.com>',
         to: [travelerEmail],
         subject: 'Your Goldsainte booking is confirmed',
         html,

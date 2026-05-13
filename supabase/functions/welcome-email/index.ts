@@ -52,7 +52,7 @@ serve(async (req) => {
     const name = firstName || "there";
 
     const emailBody = {
-      from: "Goldsainte <hello@goldsainte.com>",
+      from: "Goldsainte <hello@notify.goldsainte.com>",
       to: [email],
       subject: "Welcome to Goldsainte – Your Travel Journey Begins",
       html: `

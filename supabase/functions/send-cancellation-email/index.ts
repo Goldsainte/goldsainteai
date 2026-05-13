@@ -110,7 +110,7 @@ serve(async (req) => {
         'Authorization': `Bearer ${Deno.env.get('RESEND_API_KEY')}`,
       },
       body: JSON.stringify({
-        from: "GoldSainte <onboarding@resend.dev>",
+        from: "GoldSainte <onboarding@notify.goldsainte.com>",
         to: [email],
         subject: `Booking Cancelled - ${bookingReference}`,
         html: emailHtml,
