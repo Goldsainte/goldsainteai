@@ -126,9 +126,17 @@ export default function ShopPage() {
       <Helmet>
         <title>{`${displayName} (@${profile.username}) — Goldsainte`}</title>
         <meta name="description" content={profile.bio?.slice(0, 155) || `Shop trips and guides by ${displayName} on Goldsainte.`} />
+        <meta property="og:type" content="profile" />
+        <meta property="og:url" content={`https://goldsainte.ai${shopPath}`} />
         <meta property="og:title" content={`${displayName} on Goldsainte`} />
         <meta property="og:description" content={profile.bio || `Trips & guides by ${displayName}`} />
-        {profile.cover_image_url && <meta property="og:image" content={profile.cover_image_url} />}
+        <meta property="og:image" content={profile.cover_image_url || profile.avatar_url || "https://goldsainte.ai/og-hero-v3.jpg"} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${displayName} on Goldsainte`} />
+        <meta name="twitter:description" content={profile.bio?.slice(0, 200) || `Trips & guides by ${displayName}`} />
+        <meta name="twitter:image" content={profile.cover_image_url || profile.avatar_url || "https://goldsainte.ai/og-hero-v3.jpg"} />
         <link rel="canonical" href={`https://goldsainte.ai${shopPath}`} />
       </Helmet>
 
