@@ -48,7 +48,7 @@ const validateInquiry = (data: any): { success: boolean; error?: string; data?: 
 };
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
