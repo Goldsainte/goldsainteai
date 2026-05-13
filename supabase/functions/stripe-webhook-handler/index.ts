@@ -293,6 +293,64 @@ async function handleBundlePurchase(metadata: any, session: any) {
   } catch (e) {
     console.error('increment_lifetime_sales bundle err', e);
   }
+
+  // 6. Branded bundle purchase confirmation email
+  try {
+    const { data: buyerProfile } = await supabaseClient
+      .from('profiles')
+      .select('email, full_name')
+      .eq('id', metadata.buyer_id)
+      .single();
+
+    const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
+    if (RESEND_API_KEY && buyerProfile?.email) {
+      const firstName = buyerProfile.full_name?.split(' ')[0] || 'there';
+      const guideCount = guideIds.length;
+      const tripLine = bundle.trip_id
+        ? `Your trip <em>${escapeHtml(bundle.title)}</em> is now reserved — our concierge team will reach out shortly with next steps and confirmation details.`
+        : `Your bundle <em>${escapeHtml(bundle.title)}</em> is ready to explore.`;
+      const guidesLine = guideCount > 0
+        ? `<p style="font-size: 15px; line-height: 1.6; margin: 0 0 24px;">You also have full access to <strong>${guideCount} itinerary guide${guideCount === 1 ? '' : 's'}</strong>, available anytime from your purchases.</p>`
+        : '';
+
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: 'Goldsainte <noreply@goldsainte.ai>',
+          to: buyerProfile.email,
+          subject: `Your Goldsainte bundle is confirmed — ${bundle.title}`,
+          html: `
+            <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; padding: 32px; background: #f7f3ea; color: #0a2225;">
+              <p style="font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #C7A962; margin: 0 0 24px;">Goldsainte</p>
+              <h1 style="font-family: Georgia, serif; font-size: 28px; line-height: 1.2; margin: 0 0 16px; color: #0a2225;">Your bundle is confirmed</h1>
+              <p style="font-size: 15px; line-height: 1.6; margin: 0 0 12px;">Hi ${escapeHtml(firstName)},</p>
+              <p style="font-size: 15px; line-height: 1.6; margin: 0 0 16px;">${tripLine}</p>
+              ${guidesLine}
+              <a href="https://goldsainte.ai/my-purchases" style="display: inline-block; background: #0c4d47; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 999px; font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 500;">View My Purchases</a>
+              <p style="font-size: 13px; color: #6B7280; margin: 32px 0 0; line-height: 1.6;">All communication and payments stay on Goldsainte for your protection. Reply to this email or message us in-app if you need anything.</p>
+              <hr style="border: none; border-top: 1px solid #E5DFC6; margin: 32px 0 16px;" />
+              <p style="font-size: 11px; color: #9A9384; margin: 0;">© 2026 Goldsainte. The smarter travel marketplace.</p>
+            </div>
+          `,
+        }),
+      });
+    }
+  } catch (emailErr) {
+    console.error('Failed to send bundle purchase email', emailErr);
+  }
+}
+
+function escapeHtml(s: string): string {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 const TIER_COMMISSION_PCT: Record<string, number> = {
