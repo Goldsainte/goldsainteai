@@ -45,9 +45,8 @@ const AuthCallback = () => {
         // to avoid racing the trigger and overwriting its metadata-derived account_type.
         let profile: any = null;
         let profileError: any = null;
-        const delays = [0, 150, 350, 700, 1200, 2000]; // ~4.4s total
-        for (const delay of delays) {
-          if (delay) await new Promise((r) => setTimeout(r, delay));
+        for (let attempt = 0; attempt < 5; attempt++) {
+          if (attempt > 0) await new Promise((r) => setTimeout(r, 200));
           const res = await supabase
             .from('profiles')
             .select('id, is_profile_complete, account_type, onboarding_completed, role, first_name, last_name, phone')
@@ -66,10 +65,14 @@ const AuthCallback = () => {
         }
 
         if (!profile) {
-          // Trigger should have created the profile; if it still hasn't after retries,
-          // route to complete-profile rather than inserting and risking a race.
-          console.warn('Profile not found after trigger backoff; routing to complete-profile');
-          navigate('/auth/complete-profile', { replace: true });
+          console.error('Profile not created by trigger after 5 retries');
+          const { toast } = await import('@/hooks/use-toast');
+          toast({
+            title: 'Account setup failed',
+            description: 'Please try signing up again or contact support.',
+            variant: 'destructive',
+          });
+          navigate('/auth');
           return;
         }
 
