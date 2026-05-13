@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { isReservedUsername } from "@/lib/reservedUsernames";
 
 interface ProfileData {
   id: string;
@@ -97,6 +98,11 @@ export function TravelerProfileTab() {
 
   const handleSave = async () => {
     if (!profile?.id) return;
+
+    if (isReservedUsername(formData.username)) {
+      toast.error("This username is reserved and cannot be used");
+      return;
+    }
 
     setSaving(true);
     try {
