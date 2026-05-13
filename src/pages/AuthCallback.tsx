@@ -76,6 +76,28 @@ const AuthCallback = () => {
           return;
         }
 
+        // If the user selected an account type before OAuth, apply it now.
+        // The trigger defaults to 'traveler' for OAuth signups (no metadata),
+        // so we backfill it here without forcing a /auth/complete-profile loop.
+        if (typeof window !== 'undefined') {
+          const pendingAccountType = sessionStorage.getItem('pending_account_type');
+          if (
+            pendingAccountType &&
+            ['traveler', 'creator', 'agent', 'brand'].includes(pendingAccountType) &&
+            (!profile.account_type || profile.account_type === 'traveler') &&
+            pendingAccountType !== profile.account_type
+          ) {
+            const { error: updateError } = await supabase
+              .from('profiles')
+              .update({ account_type: pendingAccountType as any })
+              .eq('id', session.user.id);
+            if (!updateError) {
+              profile.account_type = pendingAccountType;
+            }
+          }
+          sessionStorage.removeItem('pending_account_type');
+        }
+
         // Users with completed onboarding OR is_profile_complete should NOT be redirected
         const hasCompletedOnboarding = profile.onboarding_completed === true;
         const isProfileComplete = profile.is_profile_complete === true;
