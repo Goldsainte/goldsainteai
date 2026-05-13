@@ -229,3 +229,5 @@ project_id = "iwdevxltjuedijrcdejs"
     verify_jwt = false
   [functions.dispatch-message-email]
     verify_jwt = false
+  [functions.email-fanout]
+    verify_jwt = false
