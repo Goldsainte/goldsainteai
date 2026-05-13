@@ -149,6 +149,22 @@ serve(async (req) => {
       })
       .eq("id", cancellation.booking_id);
 
+    // Reverse loyalty points and void unpaid earnings ledger entries
+    try {
+      const { data: pointsReversed } = await supabaseClient.rpc(
+        "reverse_booking_loyalty_points",
+        { target_booking_id: cancellation.booking_id }
+      );
+      const { data: earningsVoided } = await supabaseClient.rpc(
+        "void_booking_earnings",
+        { target_booking_id: cancellation.booking_id }
+      );
+      console.log("Reversal complete", { pointsReversed, earningsVoided });
+    } catch (reversalErr) {
+      // Do not fail the refund if reversal helpers error — log and continue
+      console.error("Reversal helpers failed (refund still succeeded):", reversalErr);
+    }
+
     // Create notification
     await supabaseClient.from("notifications").insert({
       user_id: cancellation.user_id,

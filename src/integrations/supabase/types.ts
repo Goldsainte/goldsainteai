@@ -14658,6 +14658,10 @@ export type Database = {
         Returns: undefined
       }
       refresh_creator_stats: { Args: { p_user_id: string }; Returns: undefined }
+      reverse_booking_loyalty_points: {
+        Args: { target_booking_id: string }
+        Returns: number
+      }
       search_marketplace_jobs: {
         Args: {
           booking_type_filter?: string
@@ -14731,6 +14735,10 @@ export type Database = {
       update_agent_performance_metrics: {
         Args: { target_agent_id: string }
         Returns: boolean
+      }
+      void_booking_earnings: {
+        Args: { target_booking_id: string }
+        Returns: number
       }
     }
     Enums: {
