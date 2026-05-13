@@ -91,21 +91,23 @@ h1{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:38px;l
   <hr class="rule"/>
   <p class="eyebrow">Confirm your email</p>
   <h1>Welcome to Goldsainte.</h1>
+  <p class="tagline">A curated marketplace connecting discerning travelers with the world's most trusted specialists, creators, and brands.</p>
   <p class="lede">Confirm your email address to activate your account and begin curating your journey.</p>
   <div class="cta-wrap"><a href="${CONFIRMATION_URL}" class="cta">Confirm my email</a></div>
   <p class="fallback">Or paste this link into your browser:<br/><a href="${CONFIRMATION_URL}">${CONFIRMATION_URL}</a></p>
   <hr class="divider"/>
   <p class="section-title">What happens next</p>
   <ul class="steps">
-    <li><span class="num">I.</span><span>Confirm your email to activate your account.</span></li>
-    <li><span class="num">II.</span><span>You'll be signed in automatically and guided to your concierge.</span></li>
-    <li><span class="num">III.</span><span>Browse curated trips across 50+ countries, designed by certified specialists.</span></li>
+    <li><span class="num">I.</span><span>Confirm your email to activate your account and secure your profile.</span></li>
+    <li><span class="num">II.</span><span>You'll be signed in automatically and guided to your personal concierge dashboard.</span></li>
+    <li><span class="num">III.</span><span>Complete your traveler profile so our specialists can tailor recommendations to your taste.</span></li>
+    <li><span class="num">IV.</span><span>Browse curated trips across 50+ countries, designed by certified specialists and trusted creators.</span></li>
+    <li><span class="num">V.</span><span>Request a trip or book directly — every reservation is protected on-platform from inquiry to return.</span></li>
   </ul>
   <p class="help">If you have any questions, concerns, or require assistance, please do not hesitate to contact <a href="${SITE_URL}/corporate-contact">Goldsainte Support</a>.</p>
   <p class="security">Goldsainte will never email you and ask you to disclose or verify your password, credit card, or banking account number. If you receive a suspicious email with a link to update your account information, do not click on the link. Instead, report the e-mail to Goldsainte for investigation.</p>
 </div>
 <div class="site-footer">
-  <div class="flogo"><img src="${LOGO_URL}" alt="Goldsainte" /></div>
   <p class="fdesc">A curated marketplace connecting discerning travelers with the world's most trusted specialists, creators, and brands.</p>
   <div class="fnav">
     <a href="${SITE_URL}/marketplace">Browse Trips</a>·
