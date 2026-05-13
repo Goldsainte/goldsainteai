@@ -1,4 +1,9 @@
-const CACHE_NAME = 'goldsainte-v1';
+// __CACHE_VERSION__ is replaced at build time by the swVersion Vite plugin
+// with the current commit SHA (or a timestamp fallback). Each new deploy
+// gets a unique CACHE_NAME, so the activate handler below evicts every
+// older cache and stops serving stale assets.
+const CACHE_VERSION = '__CACHE_VERSION__';
+const CACHE_NAME = `goldsainte-${CACHE_VERSION}`;
 const urlsToCache = ['/', '/marketplace', '/manifest.json', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', (event) => {
