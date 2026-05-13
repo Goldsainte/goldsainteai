@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Play } from "lucide-react";
+import { Play, ExternalLink } from "lucide-react";
 
 const SCRIPT_SRC = "https://www.tiktok.com/embed.js";
 
@@ -33,6 +33,8 @@ export function extractTikTokVideoId(url: string): string | null {
 
 export function TikTokEmbed({ url }: { url: string }) {
   const ref = useRef<HTMLDivElement>(null);
+  const [failed, setFailed] = useState(false);
+
   useEffect(() => {
     const id = extractTikTokVideoId(url);
     if (!id || !ref.current) return;
@@ -46,8 +48,42 @@ export function TikTokEmbed({ url }: { url: string }) {
     ref.current.replaceChildren(blockquote);
 
     ensureTikTokScript();
+
+    // If TikTok hasn't replaced the blockquote with an iframe within 6s,
+    // assume the embed was blocked (geo-restricted, rate-limited, offline)
+    // and surface a graceful fallback link instead of an empty slot.
+    const timer = window.setTimeout(() => {
+      if (!ref.current) return;
+      const iframe = ref.current.querySelector("iframe");
+      if (!iframe) setFailed(true);
+    }, 6000);
+
+    return () => window.clearTimeout(timer);
   }, [url]);
+
+  if (failed) return <TikTokFallback url={url} />;
   return <div ref={ref} className="shrink-0" />;
+}
+
+function TikTokFallback({ url }: { url: string }) {
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="snap-start shrink-0 flex flex-col items-center justify-center gap-3 bg-[#0a2225] text-white/90 rounded-md p-6 text-center"
+      style={{ width: 325, height: 575 }}
+    >
+      <Play className="h-10 w-10 opacity-70" />
+      <p className="font-secondary text-lg">Watch on TikTok</p>
+      <p className="text-xs text-white/60 max-w-[240px]">
+        This video can't be embedded right now — open it on TikTok to watch.
+      </p>
+      <span className="inline-flex items-center gap-1 text-xs text-[#C7A962]">
+        Open <ExternalLink className="h-3 w-3" />
+      </span>
+    </a>
+  );
 }
 
 export function TikTokCarousel({ urls }: { urls: string[] }) {
