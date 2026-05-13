@@ -148,11 +148,20 @@ async function handleCheckoutCompleted(session: any) {
     }
 
     // Credit affiliate referrer (10% of platform commission, where platform = 7%)
-    await creditAffiliateCommission({
-      affiliateCode: metadata.affiliate_code,
-      grossAmount: (session.amount_total ?? 0) / 100,
-      currency: (session.currency || 'usd').toUpperCase(),
-    });
+    {
+      const { data: prodForAff } = await supabaseClient
+        .from('itinerary_products')
+        .select('creator_id')
+        .eq('id', metadata.product_id)
+        .single();
+      await creditAffiliateCommission({
+        affiliateCode: metadata.affiliate_code,
+        grossAmount: (session.amount_total ?? 0) / 100,
+        currency: (session.currency || 'usd').toUpperCase(),
+        buyerId: metadata.buyer_id,
+        productOwnerId: prodForAff?.creator_id ?? null,
+      });
+    }
 
     // Increment creator lifetime sales for tier progression
     try {
@@ -580,6 +589,8 @@ async function notifyAndEmailOnBookingConfirmed(tripBookingId: string, session: 
       affiliateCode: session?.metadata?.affiliate_code,
       grossAmount: (session?.amount_total ?? 0) / 100,
       currency: (session?.currency || bookingData.currency || 'usd').toUpperCase(),
+      buyerId: bookingData.traveler_id,
+      productOwnerId: bookingData.partner_id ?? null,
     });
 
     // 1. Partner notification
@@ -655,6 +666,8 @@ async function creditAffiliateCommission(args: {
   affiliateCode?: string | null;
   grossAmount: number;
   currency: string;
+  buyerId?: string | null;
+  productOwnerId?: string | null;
 }) {
   try {
     if (!args.affiliateCode || args.grossAmount <= 0) return;
@@ -665,6 +678,29 @@ async function creditAffiliateCommission(args: {
       .eq('is_active', true)
       .maybeSingle();
     if (!link) return;
+
+    // Anti-fraud: block self-referral and creator self-purchase
+    if (args.productOwnerId && link.creator_id === args.productOwnerId) {
+      console.log('[affiliate] self-referral blocked: referrer owns the product', {
+        affiliateCode: args.affiliateCode,
+        creatorId: link.creator_id,
+      });
+      return;
+    }
+    if (args.buyerId && args.productOwnerId && args.buyerId === args.productOwnerId) {
+      console.log('[affiliate] creator self-purchase blocked', {
+        buyerId: args.buyerId,
+        productOwnerId: args.productOwnerId,
+      });
+      return;
+    }
+    if (args.buyerId && link.creator_id === args.buyerId) {
+      console.log('[affiliate] buyer used own affiliate link, blocked', {
+        buyerId: args.buyerId,
+        affiliateCode: args.affiliateCode,
+      });
+      return;
+    }
 
     const PLATFORM_FEE_RATE = 0.07;
     const referrerShare = (Number(link.commission_rate) || 10) / 100; // default 10%
