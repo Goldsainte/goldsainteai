@@ -5,7 +5,7 @@ const resendApiKey = Deno.env.get('RESEND_API_KEY');
 const hookSecret = Deno.env.get('SEND_EMAIL_HOOK_SECRET') as string;
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 

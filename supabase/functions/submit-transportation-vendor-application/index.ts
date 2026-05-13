@@ -5,7 +5,7 @@ import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 console.log('[submit-transportation-vendor-application] v2025-01-15');
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 

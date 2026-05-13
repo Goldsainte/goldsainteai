@@ -3,7 +3,7 @@ import Stripe from "https://esm.sh/stripe@16.6.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.46.1";
 
 const cors = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Cache-Control": "no-store",
