@@ -29,7 +29,7 @@ export const TripReminderEmail = ({ bookingId, daysUntil, specialistName, tripNa
 
 export const template = {
   component: TripReminderEmail,
-  subject: (d: any) => `Your trip with ${specialistName ?? ""} is approaching`,
+  subject: (d: any) => `Your trip with ${d.specialistName ?? ""} is approaching`,
   displayName: 'Trip Reminder',
   previewData: {"tripName": "Amalfi in Bloom", "specialistName": "Maison Atelier", "daysUntil": "7", "bookingId": "b-789"},
 } satisfies TemplateEntry

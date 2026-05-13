@@ -28,7 +28,7 @@ export const AdminNewUserPendingEmail = ({ applicantName, applicantRole, applica
 
 export const template = {
   component: AdminNewUserPendingEmail,
-  subject: (d: any) => `New ${applicantRole ?? ""} application awaiting review`,
+  subject: (d: any) => `New ${d.applicantRole ?? ""} application awaiting review`,
   displayName: 'Admin — New User Pending',
   previewData: {"applicantName": "Maison Atelier", "applicantRole": "creator", "applicationId": "ap-555"},
 } satisfies TemplateEntry

@@ -27,7 +27,7 @@ export const NewMessageProfessionalEmail = ({ conversationId, senderName }: Prop
 
 export const template = {
   component: NewMessageProfessionalEmail,
-  subject: (d: any) => `New message from ${senderName ?? ""}`,
+  subject: (d: any) => `New message from ${d.senderName ?? ""}`,
   displayName: 'New Message — Specialist',
   previewData: {"senderName": "Alexandra", "conversationId": "c-321"},
 } satisfies TemplateEntry

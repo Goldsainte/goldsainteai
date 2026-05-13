@@ -27,7 +27,7 @@ export const NewInquiryProfessionalEmail = ({ inquiryId, travelerName }: Props) 
 
 export const template = {
   component: NewInquiryProfessionalEmail,
-  subject: (d: any) => `${travelerName ?? ""} sent you a direct inquiry`,
+  subject: (d: any) => `${d.travelerName ?? ""} sent you a direct inquiry`,
   displayName: 'New Inquiry — Specialist',
   previewData: {"travelerName": "Alexandra", "inquiryId": "i-654"},
 } satisfies TemplateEntry
