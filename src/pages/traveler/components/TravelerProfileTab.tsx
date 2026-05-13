@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { isReservedUsername } from "@/lib/reservedUsernames";
+import { useUsernameAvailability } from "@/hooks/useUsernameAvailability";
+import { Check, X } from "lucide-react";
 
 interface ProfileData {
   id: string;
@@ -95,6 +97,8 @@ export function TravelerProfileTab() {
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
+
+  const usernameCheck = useUsernameAvailability(formData.username, profile?.username);
 
   const handleSave = async () => {
     if (!profile?.id) return;
@@ -212,6 +216,26 @@ export function TravelerProfileTab() {
                 className="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]"
                 placeholder="@username"
               />
+              {usernameCheck.status !== "idle" && (
+                <p
+                  className={`flex items-center gap-1 text-xs ${
+                    usernameCheck.status === "available"
+                      ? "text-[#0c4d47]"
+                      : usernameCheck.status === "checking"
+                      ? "text-[#6B7280]"
+                      : "text-red-600"
+                  }`}
+                  aria-live="polite"
+                >
+                  {usernameCheck.status === "checking" && <Loader2 className="h-3 w-3 animate-spin" />}
+                  {usernameCheck.status === "available" && <Check className="h-3 w-3" />}
+                  {(usernameCheck.status === "taken" ||
+                    usernameCheck.status === "reserved" ||
+                    usernameCheck.status === "invalid" ||
+                    usernameCheck.status === "error") && <X className="h-3 w-3" />}
+                  {usernameCheck.message}
+                </p>
+              )}
             </div>
           </div>
 

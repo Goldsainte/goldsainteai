@@ -7,8 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Camera, Loader2 } from "lucide-react";
+import { Camera, Loader2, Check, X } from "lucide-react";
 import { isReservedUsername } from "@/lib/reservedUsernames";
+import { useUsernameAvailability } from "@/hooks/useUsernameAvailability";
 
 interface Profile {
   id: string;
@@ -47,6 +48,8 @@ export function EditProfileDialog({ open, onOpenChange, profile, onProfileUpdate
     instagram_username: profile.instagram_username || "",
     avatar_url: profile.avatar_url || "",
   });
+
+  const usernameCheck = useUsernameAvailability(formData.username, profile.username);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -202,6 +205,26 @@ export function EditProfileDialog({ open, onOpenChange, profile, onProfileUpdate
                 onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
                 placeholder="Enter username"
               />
+              {usernameCheck.status !== "idle" && (
+                <p
+                  className={`flex items-center gap-1 text-xs ${
+                    usernameCheck.status === "available"
+                      ? "text-[#0c4d47]"
+                      : usernameCheck.status === "checking"
+                      ? "text-[#6B7280]"
+                      : "text-red-600"
+                  }`}
+                  aria-live="polite"
+                >
+                  {usernameCheck.status === "checking" && <Loader2 className="h-3 w-3 animate-spin" />}
+                  {usernameCheck.status === "available" && <Check className="h-3 w-3" />}
+                  {(usernameCheck.status === "taken" ||
+                    usernameCheck.status === "reserved" ||
+                    usernameCheck.status === "invalid" ||
+                    usernameCheck.status === "error") && <X className="h-3 w-3" />}
+                  {usernameCheck.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
