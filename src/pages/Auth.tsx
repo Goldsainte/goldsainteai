@@ -8,6 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import * as Sentry from '@sentry/react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import logomark from '@/assets/logomark-gold.png';
 import { z } from 'zod';
