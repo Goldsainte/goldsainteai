@@ -14322,6 +14322,24 @@ export type Database = {
         Args: { proposal_id_input: string }
         Returns: Json
       }
+      admin_dismiss_email_dlq: {
+        Args: { p_msg_id: number; p_queue_name: string }
+        Returns: boolean
+      }
+      admin_list_email_dlq: {
+        Args: never
+        Returns: {
+          enqueued_at: string
+          message: Json
+          msg_id: number
+          queue_name: string
+          read_ct: number
+        }[]
+      }
+      admin_retry_email_dlq: {
+        Args: { p_msg_id: number; p_queue_name: string }
+        Returns: number
+      }
       admin_update_trip_booking_status: {
         Args: { p_booking_id: string; p_new_status: string }
         Returns: undefined
