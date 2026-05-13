@@ -1,10 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Vary": "Origin",
 };
+}
 
 type Tool = "caption" | "hashtags" | "rewrite";
 
@@ -14,7 +18,7 @@ const MODEL = "gpt-4o-mini";
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
+    headers: { ...corsHeaders(req), "Content-Type": "application/json" },
   });
 }
 
@@ -45,7 +49,7 @@ async function callOpenAI(system: string, user: string, expectJson = true): Prom
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders(req) });
   if (!OPENAI_API_KEY) return jsonResponse({ error: "OPENAI_API_KEY not configured" }, 500);
 
   try {

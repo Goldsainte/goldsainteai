@@ -1,9 +1,13 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Vary": "Origin",
 };
+}
 
 // Comprehensive baggage policy database for major airlines
 const BAGGAGE_POLICIES: { [key: string]: any } = {
@@ -141,7 +145,7 @@ const CHANGE_CANCEL_POLICIES: { [key: string]: any } = {
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -154,7 +158,7 @@ serve(async (req) => {
         error: 'Airline code required (e.g., "AA", "DL", "UA")' 
       }), {
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }
       });
     }
 
@@ -172,7 +176,7 @@ serve(async (req) => {
           suggestion: 'Try: AA, DL, UA, WN, BA, LH'
         }), {
           status: 404,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }
         });
       }
 
@@ -200,7 +204,7 @@ serve(async (req) => {
       }
 
       return new Response(JSON.stringify(result), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }
       });
     }
 
@@ -215,7 +219,7 @@ serve(async (req) => {
           note: 'Policy data available for: AA, DL, UA, WN'
         }), {
           status: 404,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }
         });
       }
 
@@ -234,7 +238,7 @@ serve(async (req) => {
       }
 
       return new Response(JSON.stringify(result), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }
       });
     }
 
@@ -242,7 +246,7 @@ serve(async (req) => {
       error: 'Invalid query type. Use: baggage, change_cancel, or both'
     }), {
       status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }
     });
 
   } catch (error) {
@@ -251,7 +255,7 @@ serve(async (req) => {
       error: error instanceof Error ? error.message : 'Unknown error' 
     }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }
     });
   }
 });

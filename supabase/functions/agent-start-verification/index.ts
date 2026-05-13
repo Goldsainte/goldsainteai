@@ -1,10 +1,14 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Vary": "Origin",
 };
+}
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -13,13 +17,13 @@ const STRIPE_API_BASE = "https://api.stripe.com/v1";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders(req), "Content-Type": "application/json" },
     });
   }
 
@@ -28,7 +32,7 @@ Deno.serve(async (req) => {
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "Missing Authorization header" }), {
         status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       });
     }
 
@@ -40,7 +44,7 @@ Deno.serve(async (req) => {
     if (userError || !user) {
       return new Response(JSON.stringify({ error: "Not authenticated" }), {
         status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       });
     }
 
@@ -59,14 +63,14 @@ Deno.serve(async (req) => {
       console.error("Error loading agent application", appError);
       return new Response(JSON.stringify({ error: "Could not load application" }), {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       });
     }
 
     if (!application) {
       return new Response(
         JSON.stringify({ error: "Please complete your agent application before starting verification." }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -90,7 +94,7 @@ Deno.serve(async (req) => {
       console.error("Stripe Identity error", text);
       return new Response(JSON.stringify({ error: "Stripe verification setup failed" }), {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       });
     }
 
@@ -109,7 +113,7 @@ Deno.serve(async (req) => {
       console.error("Error updating agent_applications with KYC session", updateError);
       return new Response(
         JSON.stringify({ error: "Could not save verification session" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -129,14 +133,14 @@ Deno.serve(async (req) => {
       }),
       {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       }
     );
   } catch (err) {
     console.error("Unexpected error in agent-start-verification", err);
     return new Response(JSON.stringify({ error: "Unexpected error" }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders(req), "Content-Type": "application/json" },
     });
   }
 });

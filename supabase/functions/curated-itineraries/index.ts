@@ -1,11 +1,15 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Vary": "Origin",
 };
+}
 
 interface TravelPreferences {
   travel_style: string[];
@@ -132,7 +136,7 @@ const FALLBACK_IMAGE_POOL = [
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -141,7 +145,7 @@ serve(async (req) => {
     if (!userId) {
       return new Response(
         JSON.stringify({ error: "userId is required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -174,7 +178,7 @@ serve(async (req) => {
         console.log("Returning cached itineraries for user:", userId);
         return new Response(
           JSON.stringify({ itineraries: cached.itineraries, cached: true }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          { headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
         );
       }
     }
@@ -188,7 +192,7 @@ serve(async (req) => {
       console.error("OPENAI_API_KEY not configured");
       return new Response(
         JSON.stringify({ itineraries: getFallbackItineraries() }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -257,7 +261,7 @@ Respond with a JSON array of itinerary objects. Ensure EVERY itinerary has COMPL
       console.error("OpenAI API error:", response.status, errorText);
       return new Response(
         JSON.stringify({ itineraries: getFallbackItineraries() }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -338,13 +342,13 @@ Respond with a JSON array of itinerary objects. Ensure EVERY itinerary has COMPL
 
     return new Response(
       JSON.stringify({ itineraries, cached: false }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
     );
   } catch (error) {
     console.error("Error in curated-itineraries:", error);
     return new Response(
       JSON.stringify({ error: "Internal server error", itineraries: getFallbackItineraries() }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
     );
   }
 });

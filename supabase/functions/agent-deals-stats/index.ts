@@ -1,20 +1,24 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.58.0";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Vary": "Origin",
 };
+}
 
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   if (req.method !== "POST") {
     return new Response("Method not allowed", { 
       status: 405,
-      headers: { ...corsHeaders, "Content-Type": "application/json" }
+      headers: { ...corsHeaders(req), "Content-Type": "application/json" }
     });
   }
 
@@ -40,7 +44,7 @@ Deno.serve(async (req) => {
       JSON.stringify({ message: "Not authenticated" }),
       { 
         status: 401, 
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" }
       }
     );
   }
@@ -59,7 +63,7 @@ Deno.serve(async (req) => {
       JSON.stringify({ message: "Error loading collabs" }),
       { 
         status: 500, 
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" }
       }
     );
   }
@@ -93,6 +97,6 @@ Deno.serve(async (req) => {
 
   return new Response(JSON.stringify(body), {
     status: 200,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
+    headers: { ...corsHeaders(req), "Content-Type": "application/json" },
   });
 });

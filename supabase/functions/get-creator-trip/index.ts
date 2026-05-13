@@ -1,20 +1,24 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Vary": "Origin",
 };
+}
 
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   if (req.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), {
       status: 405,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
     });
   }
 
@@ -29,7 +33,7 @@ Deno.serve(async (req) => {
     if (!tripStoryId) {
       return new Response(JSON.stringify({ error: 'Missing tripStoryId' }), {
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -46,14 +50,14 @@ Deno.serve(async (req) => {
       console.error("Error loading trip story:", storyError);
       return new Response(JSON.stringify({ error: 'Failed to load trip story' }), {
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
     if (!story) {
       return new Response(JSON.stringify({ error: 'Trip story not found' }), {
         status: 404,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -142,13 +146,13 @@ Deno.serve(async (req) => {
 
     return new Response(JSON.stringify(responseBody), {
       status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
     console.error('Unexpected error in get-creator-trip:', error);
     return new Response(JSON.stringify({ error: 'Internal server error', details: error.message }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
     });
   }
 });

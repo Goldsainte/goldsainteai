@@ -1,11 +1,15 @@
 // Supabase Edge Function: send-contract-notification
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Vary": "Origin",
 };
+}
 
 type ContractNotificationRequest = {
   contractId: string;
@@ -16,7 +20,7 @@ type ContractNotificationRequest = {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -25,7 +29,7 @@ serve(async (req) => {
     if (!contractId || !tripId || !recipientEmail || !recipientType) {
       return new Response(
         JSON.stringify({ error: "Missing required fields: contractId, tripId, recipientEmail, recipientType" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -59,7 +63,7 @@ serve(async (req) => {
       console.error("Contract not found:", contractError);
       return new Response(
         JSON.stringify({ error: "Contract not found" }),
-        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 404, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -191,7 +195,7 @@ serve(async (req) => {
           message: "Email logged (RESEND_API_KEY not configured)",
           signingLink 
         }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -225,7 +229,7 @@ serve(async (req) => {
         message: "Contract notification sent successfully",
         emailId: emailData.id
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
     );
 
   } catch (error: any) {
@@ -235,7 +239,7 @@ serve(async (req) => {
         error: error.message || "Failed to send contract notification",
         details: error.toString()
       }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
     );
   }
 });

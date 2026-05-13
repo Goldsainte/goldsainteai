@@ -1,17 +1,21 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Vary": "Origin",
 };
+}
 
 serve(async (req: Request) => {
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   // Check for API key first
@@ -22,7 +26,7 @@ serve(async (req: Request) => {
         success: false, 
         error: "RESEND_API_KEY is not configured in Edge Function secrets" 
       }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
     );
   }
 
@@ -32,7 +36,7 @@ serve(async (req: Request) => {
     if (!email) {
       return new Response(
         JSON.stringify({ success: false, error: "Email is required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -77,7 +81,7 @@ serve(async (req: Request) => {
           error: body.message || "Resend API error",
           details: body 
         }),
-        { status: res.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: res.status, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -88,7 +92,7 @@ serve(async (req: Request) => {
         message: "Test email sent successfully",
         resend_response: body 
       }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 200, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
     );
 
   } catch (error: any) {
@@ -98,7 +102,7 @@ serve(async (req: Request) => {
         success: false, 
         error: error.message || "Internal server error" 
       }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
     );
   }
 });

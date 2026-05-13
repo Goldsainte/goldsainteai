@@ -1,16 +1,20 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { enforceRateLimit } from "../_utils/rate-limit.ts";
 import { buildSafeErrorResponse } from "../_shared/httpError.ts";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Vary": "Origin",
 };
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   // 🔒 Rate limiting
@@ -32,7 +36,7 @@ serve(async (req) => {
     if (!q || !q.trim()) {
       return new Response(
         JSON.stringify({ error: "Search query required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -59,7 +63,7 @@ serve(async (req) => {
       JSON.stringify({ results: data.results || [] }),
       { 
         status: 200, 
-        headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" } 
       }
     );
   } catch (error) {

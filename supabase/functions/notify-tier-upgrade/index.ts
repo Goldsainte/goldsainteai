@@ -1,11 +1,15 @@
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Vary": "Origin",
 };
+}
 
 const TIER_LABEL: Record<string, string> = {
   bronze: "Bronze",
@@ -15,14 +19,14 @@ const TIER_LABEL: Record<string, string> = {
 };
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders(req) });
 
   try {
     const { user_id, tier, previous_tier, commission_rate } = await req.json();
     if (!user_id || !tier || !TIER_LABEL[tier]) {
       return new Response(JSON.stringify({ error: "invalid params" }), {
         status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       });
     }
 
@@ -43,7 +47,7 @@ Deno.serve(async (req) => {
 
     if (!email) {
       return new Response(JSON.stringify({ ok: true, skipped: "no email" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       });
     }
 
@@ -51,7 +55,7 @@ Deno.serve(async (req) => {
     if (!RESEND_API_KEY) {
       console.warn("RESEND_API_KEY not set");
       return new Response(JSON.stringify({ ok: true, skipped: "no resend key" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       });
     }
 
@@ -95,13 +99,13 @@ Deno.serve(async (req) => {
     }
 
     return new Response(JSON.stringify({ ok: true }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders(req), "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("notify-tier-upgrade error", e);
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders(req), "Content-Type": "application/json" },
     });
   }
 });

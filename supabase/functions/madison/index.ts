@@ -1,11 +1,15 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
+  "Vary": "Origin",
 };
+}
 
 const MADISON_SYSTEM_PROMPT = `You are Madison, the luxury travel concierge for Goldsainte.
 
@@ -71,13 +75,13 @@ If the user directly says "create the storyboard for [destination]" or "can you 
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   if (req.method !== "POST") {
     return new Response("Method not allowed", {
       status: 405,
-      headers: corsHeaders,
+      headers: corsHeaders(req),
     });
   }
 
@@ -97,7 +101,7 @@ serve(async (req) => {
         }),
         {
           status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...corsHeaders(req), "Content-Type": "application/json" },
         },
       );
     }
@@ -424,7 +428,7 @@ serve(async (req) => {
       }),
       {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       },
     );
   } catch (err) {
@@ -437,7 +441,7 @@ serve(async (req) => {
       }),
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       },
     );
   }

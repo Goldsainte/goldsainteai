@@ -1,13 +1,17 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Vary": "Origin",
 };
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -19,7 +23,7 @@ serve(async (req) => {
     if (!location || !checkIn || !checkOut) {
       return new Response(
         JSON.stringify({ error: "Missing required parameters: location, checkIn, checkOut" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+        { headers: { ...corsHeaders(req), "Content-Type": "application/json" }, status: 400 }
       );
     }
 
@@ -115,7 +119,7 @@ serve(async (req) => {
           hotels: [], 
           message: `No destination found for "${location}". Please try a different location or be more specific (e.g., "Miami, FL")` 
         }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+        { headers: { ...corsHeaders(req), "Content-Type": "application/json" }, status: 200 }
       );
     }
 
@@ -182,7 +186,7 @@ serve(async (req) => {
     if (rawHotels.length === 0) {
       return new Response(
         JSON.stringify({ hotels: [], message: "No hotels available for selected dates" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+        { headers: { ...corsHeaders(req), "Content-Type": "application/json" }, status: 200 }
       );
     }
 
@@ -287,14 +291,14 @@ serve(async (req) => {
         destination: destination.name,
         totalResults: hotels.length,
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+      { headers: { ...corsHeaders(req), "Content-Type": "application/json" }, status: 200 }
     );
   } catch (error) {
     console.error("Booking.com search error:", error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
     return new Response(
       JSON.stringify({ error: errorMessage, hotels: [] }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+      { headers: { ...corsHeaders(req), "Content-Type": "application/json" }, status: 500 }
     );
   }
 });

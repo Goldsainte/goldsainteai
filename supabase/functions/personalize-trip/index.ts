@@ -1,11 +1,15 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
+  "Vary": "Origin",
 };
+}
 
 interface PersonalizeBody {
   trip: {
@@ -25,7 +29,7 @@ interface PersonalizeBody {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -34,7 +38,7 @@ serve(async (req) => {
     if (!trip || !Array.isArray(baseItinerary) || !Array.isArray(modifiers)) {
       return new Response(JSON.stringify({ error: "Invalid request body" }), {
         status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       });
     }
 
@@ -42,7 +46,7 @@ serve(async (req) => {
     if (!apiKey) {
       return new Response(JSON.stringify({ error: "OPENAI_API_KEY not configured" }), {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       });
     }
 
@@ -113,7 +117,7 @@ Re-cast each day to reflect the modifiers. Update accommodation, hero activity, 
       console.error("OpenAI error", response.status, t);
       return new Response(JSON.stringify({ error: "AI service error" }), {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       });
     }
 
@@ -122,20 +126,20 @@ Re-cast each day to reflect the modifiers. Update accommodation, hero activity, 
     if (!toolCall) {
       return new Response(JSON.stringify({ error: "No structured response" }), {
         status: 502,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       });
     }
 
     const variant = JSON.parse(toolCall.function.arguments);
     return new Response(JSON.stringify({ variant }), {
       status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders(req), "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("personalize-trip error", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown" }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders(req), "Content-Type": "application/json" },
     });
   }
 });

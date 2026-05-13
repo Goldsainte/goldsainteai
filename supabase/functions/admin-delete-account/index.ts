@@ -1,20 +1,24 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  "Vary": "Origin",
 };
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders(req) });
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -29,7 +33,7 @@ Deno.serve(async (req) => {
     const token = authHeader.replace("Bearer ", "");
     const { data: claimsData, error: claimsError } = await userClient.auth.getClaims(token);
     if (claimsError || !claimsData?.claims) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders(req) });
     }
 
     const adminUserId = claimsData.claims.sub as string;
@@ -44,17 +48,17 @@ Deno.serve(async (req) => {
 
     const isAdmin = roles?.some((r: any) => r.role === "admin");
     if (!isAdmin) {
-      return new Response(JSON.stringify({ error: "Forbidden: admin role required" }), { status: 403, headers: corsHeaders });
+      return new Response(JSON.stringify({ error: "Forbidden: admin role required" }), { status: 403, headers: corsHeaders(req) });
     }
 
     const { targetUserId, reason } = await req.json();
     if (!targetUserId || !reason) {
-      return new Response(JSON.stringify({ error: "targetUserId and reason are required" }), { status: 400, headers: corsHeaders });
+      return new Response(JSON.stringify({ error: "targetUserId and reason are required" }), { status: 400, headers: corsHeaders(req) });
     }
 
     // Prevent self-deletion
     if (targetUserId === adminUserId) {
-      return new Response(JSON.stringify({ error: "Cannot delete your own account" }), { status: 400, headers: corsHeaders });
+      return new Response(JSON.stringify({ error: "Cannot delete your own account" }), { status: 400, headers: corsHeaders(req) });
     }
 
     // Log the action before deletion
@@ -87,9 +91,9 @@ Deno.serve(async (req) => {
       // Profile already deleted, log but don't fail
     }
 
-    return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders(req), "Content-Type": "application/json" } });
   } catch (err) {
     console.error("admin-delete-account error:", err);
-    return new Response(JSON.stringify({ error: err.message || "Internal error" }), { status: 500, headers: corsHeaders });
+    return new Response(JSON.stringify({ error: err.message || "Internal error" }), { status: 500, headers: corsHeaders(req) });
   }
 });

@@ -1,10 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Vary": "Origin",
 };
+}
 
 // ⚠️ SECURITY: Input validation for content moderation
 const ALLOWED_CONTENT_TYPES = ['post', 'comment', 'moment', 'message', 'profile'] as const;
@@ -100,7 +104,7 @@ const validateModerationInput = (data: unknown): { success: true; data: Moderati
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -111,7 +115,7 @@ serve(async (req) => {
     } catch {
       return new Response(
         JSON.stringify({ error: 'Invalid JSON in request body' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -121,7 +125,7 @@ serve(async (req) => {
       console.error('❌ [VALIDATION] Invalid input:', validation.error);
       return new Response(
         JSON.stringify({ error: validation.error }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
     console.log('✅ [VALIDATION] Input validated');
@@ -183,7 +187,7 @@ Respond with a JSON object containing:
       if (aiResponse.status === 429) {
         return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
           status: 429,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
         });
       }
       throw new Error('AI moderation failed');
@@ -232,7 +236,7 @@ Respond with a JSON object containing:
           reason: 'Automatic removal due to severe policy violation',
           analysis
         }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
         });
       }
     }
@@ -241,14 +245,14 @@ Respond with a JSON object containing:
       action: analysis.violates_policy ? 'flagged' : 'approved',
       analysis
     }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
     console.error('[MODERATE-CONTENT-ERROR]', error);
     return new Response(JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
     });
   }
 });

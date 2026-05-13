@@ -1,13 +1,17 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
 console.log('[submit-transportation-vendor-application] v2025-01-15');
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Vary": "Origin",
 };
+}
 
 // Validation schema
 const ApplicationSchema = z.object({
@@ -38,7 +42,7 @@ const ApplicationSchema = z.object({
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   const debugId = crypto.randomUUID();
@@ -64,7 +68,7 @@ serve(async (req) => {
           details: 'Not authenticated',
           context: { step, debugId }
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+        { headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }, status: 401 }
       );
     }
 
@@ -81,7 +85,7 @@ serve(async (req) => {
           details: validationResult.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(', '),
           context: { step, debugId, userId: user.id }
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+        { headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }, status: 400 }
       );
     }
 
@@ -133,7 +137,7 @@ serve(async (req) => {
               derivedName: supplierName
             }
           }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+          { headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }, status: 500 }
         );
       }
 
@@ -221,7 +225,7 @@ serve(async (req) => {
           details: vendorError.message,
           context: { step, debugId, userId: user.id, supplierId: supplier.id, code: vendorError.code }
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+        { headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }, status: 500 }
       );
     }
 
@@ -309,7 +313,7 @@ serve(async (req) => {
         ...(applicationData.debug ? { debugId } : {})
       }),
       {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
         status: 200,
       }
     );
@@ -322,7 +326,7 @@ serve(async (req) => {
         context: { step, debugId }
       }),
       {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
         status: 500,
       }
     );

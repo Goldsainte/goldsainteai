@@ -1,11 +1,15 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Vary": "Origin",
 };
+}
 
 const OPENAI_SYSTEM_PROMPT = `You are an expert luxury travel designer for Goldsainte. Based on the conversation history, create a detailed multi-day itinerary in pure JSON format.
 
@@ -43,7 +47,7 @@ INSTRUCTIONS:
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -52,7 +56,7 @@ serve(async (req) => {
     if (!conversationId || !userId) {
       return new Response(
         JSON.stringify({ error: "conversationId and userId required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -73,7 +77,7 @@ serve(async (req) => {
       console.error("Failed to load messages:", messagesError);
       return new Response(
         JSON.stringify({ error: "Failed to load conversation" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -85,7 +89,7 @@ serve(async (req) => {
     if (!openaiKey) {
       return new Response(
         JSON.stringify({ error: "OPENAI_API_KEY not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -112,7 +116,7 @@ serve(async (req) => {
       console.error("OpenAI API error:", openaiResponse.status, errorText);
       return new Response(
         JSON.stringify({ error: "Failed to generate itinerary" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -127,7 +131,7 @@ serve(async (req) => {
       console.error("Failed to parse OpenAI JSON:", itineraryText);
       return new Response(
         JSON.stringify({ error: "Invalid itinerary format" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -205,7 +209,7 @@ serve(async (req) => {
       console.error("Failed to create storyboard:", storyboardError);
       return new Response(
         JSON.stringify({ error: "Failed to create storyboard" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -252,7 +256,7 @@ serve(async (req) => {
       console.error("Failed to insert items:", itemsError);
       return new Response(
         JSON.stringify({ error: "Failed to create storyboard items" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -267,7 +271,7 @@ serve(async (req) => {
       }),
       {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       }
     );
   } catch (error) {
@@ -276,7 +280,7 @@ serve(async (req) => {
       JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       }
     );
   }

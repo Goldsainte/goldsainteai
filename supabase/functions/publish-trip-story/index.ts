@@ -1,13 +1,17 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Vary": "Origin",
 };
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -18,7 +22,7 @@ Deno.serve(async (req) => {
     if (!authHeader) {
       return new Response(
         JSON.stringify({ error: 'Missing authorization header' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+        { headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }, status: 401 }
       );
     }
 
@@ -30,7 +34,7 @@ Deno.serve(async (req) => {
     if (authError || !user) {
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+        { headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }, status: 401 }
       );
     }
 
@@ -65,7 +69,7 @@ Deno.serve(async (req) => {
       console.error('Failed to create trip story:', insertError);
       return new Response(
         JSON.stringify({ error: 'Failed to create trip story' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+        { headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }, status: 500 }
       );
     }
 
@@ -94,7 +98,7 @@ Deno.serve(async (req) => {
               error: 'TikTok not connected. Please connect your TikTok account first.',
               status: 'failed',
             }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+            { headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }, status: 200 }
           );
         }
 
@@ -115,7 +119,7 @@ Deno.serve(async (req) => {
               error: 'TikTok token expired. Please reconnect your TikTok account.',
               status: 'failed',
             }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+            { headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }, status: 200 }
           );
         }
 
@@ -148,7 +152,7 @@ Deno.serve(async (req) => {
             message: 'Story saved and queued for TikTok posting',
             status: 'queued',
           }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+          { headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }, status: 200 }
         );
       } catch (tiktokError: unknown) {
         const errorMessage = tiktokError instanceof Error ? tiktokError.message : 'Failed to post to TikTok';
@@ -164,7 +168,7 @@ Deno.serve(async (req) => {
             error: errorMessage,
             status: 'failed',
           }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+          { headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }, status: 200 }
         );
       }
     }
@@ -176,14 +180,14 @@ Deno.serve(async (req) => {
         message: 'Trip story saved as draft',
         status: 'draft',
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      { headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }, status: 200 }
     );
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Failed to publish trip story';
     console.error('Error in publish-trip-story:', error);
     return new Response(
       JSON.stringify({ error: errorMessage }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      { headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }, status: 500 }
     );
   }
 });

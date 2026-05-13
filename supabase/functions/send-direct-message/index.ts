@@ -1,11 +1,15 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Vary": "Origin",
 };
+}
 
 // Content filter patterns
 const PHONE_REGEX = /(\+?\d[\d\-\s().]{7,}\d)/g;
@@ -53,7 +57,7 @@ function filterMessage(content: string): { safe: string; flagged: boolean; reaso
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -61,7 +65,7 @@ serve(async (req) => {
     if (!authHeader) {
       return new Response(
         JSON.stringify({ error: "No authorization header" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 401, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -76,7 +80,7 @@ serve(async (req) => {
     if (authError || !user) {
       return new Response(
         JSON.stringify({ error: "Invalid token" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 401, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -85,14 +89,14 @@ serve(async (req) => {
     if (!recipientId || !message) {
       return new Response(
         JSON.stringify({ error: "recipientId and message are required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
     if (recipientId === user.id) {
       return new Response(
         JSON.stringify({ error: "Cannot message yourself" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -107,14 +111,14 @@ serve(async (req) => {
       if (recipientSettings.who_can_message === "nobody") {
         return new Response(
           JSON.stringify({ error: "This user is not accepting messages" }),
-          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          { status: 403, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
         );
       }
 
       if (recipientSettings.blocked_users?.includes(user.id)) {
         return new Response(
           JSON.stringify({ error: "You cannot message this user" }),
-          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          { status: 403, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
         );
       }
 
@@ -128,7 +132,7 @@ serve(async (req) => {
         if (!senderProfile?.is_verified) {
           return new Response(
             JSON.stringify({ error: "This user only accepts messages from verified users" }),
-            { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            { status: 403, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
           );
         }
       }
@@ -157,7 +161,7 @@ serve(async (req) => {
         if (existingConversation.status === "blocked") {
           return new Response(
             JSON.stringify({ error: "This conversation has been blocked" }),
-            { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            { status: 403, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
           );
         }
         targetConversationId = existingConversation.id;
@@ -180,7 +184,7 @@ serve(async (req) => {
           console.error("Error creating conversation:", convError);
           return new Response(
             JSON.stringify({ error: "Failed to create conversation" }),
-            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
           );
         }
 
@@ -207,7 +211,7 @@ serve(async (req) => {
       console.error("Error sending message:", msgError);
       return new Response(
         JSON.stringify({ error: "Failed to send message" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -254,13 +258,13 @@ serve(async (req) => {
         isNewConversation,
         contentFiltered: flagged,
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
     );
   } catch (error) {
     console.error("Error in send-direct-message:", error);
     return new Response(
       JSON.stringify({ error: "Internal server error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
     );
   }
 });

@@ -1,9 +1,13 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Vary": "Origin",
 };
+}
 
 // Map common country names to ISO codes and State Dept URLs
 const COUNTRY_MAPPING: { [key: string]: { iso: string; url: string; name: string } } = {
@@ -38,7 +42,7 @@ const LEVEL_DESCRIPTIONS: { [key: number]: { name: string; description: string; 
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -51,7 +55,7 @@ serve(async (req) => {
         error: 'Destination country required' 
       }), {
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }
       });
     }
 
@@ -71,7 +75,7 @@ serve(async (req) => {
           source: 'https://travel.state.gov',
           lastUpdated: new Date().toISOString()
         }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }
         });
       }
 
@@ -131,7 +135,7 @@ Be accurate and cite official sources.`
         source: 'https://travel.state.gov',
         lastUpdated: new Date().toISOString()
       }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }
       });
     }
 
@@ -162,7 +166,7 @@ Be accurate and cite official sources.`
     console.log(`✅ Travel advisory for ${countryInfo.name}: Level ${advisory.level}`);
 
     return new Response(JSON.stringify(advisory), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }
     });
 
   } catch (error) {
@@ -171,7 +175,7 @@ Be accurate and cite official sources.`
       error: error instanceof Error ? error.message : 'Unknown error' 
     }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }
     });
   }
 });

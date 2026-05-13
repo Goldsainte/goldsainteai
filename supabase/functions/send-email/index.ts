@@ -1,17 +1,21 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
 const resendApiKey = Deno.env.get('RESEND_API_KEY');
 const hookSecret = Deno.env.get('SEND_EMAIL_HOOK_SECRET') as string;
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Vary": "Origin",
 };
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -39,7 +43,7 @@ serve(async (req) => {
     if (email_action_type !== 'recovery') {
       return new Response(JSON.stringify({ skipped: true }), {
         status: 200,
-        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+        headers: { 'Content-Type': 'application/json', ...corsHeaders(req) },
       });
     }
 
@@ -122,13 +126,13 @@ serve(async (req) => {
     console.log('Custom recovery email sent:', data);
 
     return new Response(JSON.stringify({ success: true }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
       status: 200,
     });
   } catch (error) {
     console.error('send-email error:', error);
     return new Response(JSON.stringify({ error: (error as Error).message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
       status: 500,
     });
   }

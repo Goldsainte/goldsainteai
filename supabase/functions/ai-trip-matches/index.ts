@@ -1,10 +1,14 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { enforceRateLimit } from "../_utils/rate-limit.ts";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Vary": "Origin",
 };
+}
 
 type ProviderType = "creator" | "agent";
 
@@ -20,13 +24,13 @@ interface MatchedProvider {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   if (req.method !== "POST") {
     return new Response("Method not allowed", { 
       status: 405,
-      headers: corsHeaders 
+      headers: corsHeaders(req) 
     });
   }
 
@@ -43,7 +47,7 @@ Deno.serve(async (req) => {
     if (!tripId) {
       return new Response(
         JSON.stringify({ error: "Missing tripId" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -60,7 +64,7 @@ Deno.serve(async (req) => {
       console.error("Trip error:", tripError);
       return new Response(
         JSON.stringify({ error: "Trip not found" }),
-        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 404, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -100,7 +104,7 @@ Deno.serve(async (req) => {
       console.error("Providers error:", providersError);
       return new Response(
         JSON.stringify({ error: "Could not load providers" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -183,7 +187,7 @@ Deno.serve(async (req) => {
 
     return new Response(
       JSON.stringify({ matches: filtered }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 200, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
     );
   } catch (err) {
     console.error("ai-trip-matches error:", err);
@@ -192,7 +196,7 @@ Deno.serve(async (req) => {
         error: "Unexpected error",
         message: err instanceof Error ? err.message : "Unknown error"
       }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
     );
   }
 });

@@ -1,24 +1,28 @@
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Vary": "Origin",
 };
+}
 
 // Simple in-memory rate limit per cold container
 const recent = new Map<string, number>();
 const TTL_MS = 30 * 60 * 1000;
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders(req) });
   try {
     const { kind, id } = await req.json();
     if (!id || !["trip", "product"].includes(kind)) {
       return new Response(JSON.stringify({ error: "invalid params" }), {
         status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       });
     }
 
@@ -31,7 +35,7 @@ Deno.serve(async (req) => {
     const last = recent.get(rlKey) ?? 0;
     if (now - last < TTL_MS) {
       return new Response(JSON.stringify({ ok: true, deduped: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       });
     }
     recent.set(rlKey, now);
@@ -51,13 +55,13 @@ Deno.serve(async (req) => {
     if (error) throw error;
 
     return new Response(JSON.stringify({ ok: true }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders(req), "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("track-view error", e);
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders(req), "Content-Type": "application/json" },
     });
   }
 });

@@ -1,9 +1,13 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Vary": "Origin",
 };
+}
 
 // Filter out non-restaurant establishments
 function isActualRestaurant(place: any): boolean {
@@ -81,7 +85,7 @@ function transformRestaurant(place: any): any {
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -91,7 +95,7 @@ serve(async (req) => {
       console.error('Missing location parameter');
       return new Response(
         JSON.stringify({ error: 'location (city name) is required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -100,7 +104,7 @@ serve(async (req) => {
       console.error('RAPIDAPI_KEY not configured');
       return new Response(
         JSON.stringify({ error: 'RapidAPI key not configured' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -132,7 +136,7 @@ serve(async (req) => {
           error: 'Failed to resolve city location',
           restaurants: [],
         }),
-        { status: typeaheadResponse.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: typeaheadResponse.status, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -144,7 +148,7 @@ serve(async (req) => {
       console.error(`❌ City not found: ${location}`);
       return new Response(
         JSON.stringify({ error: 'City not found', restaurants: [] }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 404, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -178,7 +182,7 @@ serve(async (req) => {
           error: 'Failed to fetch restaurants',
           restaurants: [],
         }),
-        { status: restaurantsResponse.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: restaurantsResponse.status, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -199,7 +203,7 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ restaurants, count: restaurants.length }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
     );
 
   } catch (error: unknown) {
@@ -207,7 +211,7 @@ serve(async (req) => {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
       JSON.stringify({ error: errorMessage }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
     );
   }
 });

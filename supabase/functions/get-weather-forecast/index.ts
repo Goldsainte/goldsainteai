@@ -1,14 +1,18 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.58.0";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Vary": "Origin",
 };
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -29,7 +33,7 @@ serve(async (req) => {
       console.error('Error fetching trip:', tripError);
       return new Response(
         JSON.stringify({ error: 'Trip not found' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 404, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -44,7 +48,7 @@ serve(async (req) => {
       console.error('No geocoding results for destination:', trip.destination);
       return new Response(
         JSON.stringify({ error: 'Could not find location coordinates' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 404, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -63,7 +67,7 @@ serve(async (req) => {
       console.error('Weather API error:', weatherResponse.status, errorText);
       return new Response(
         JSON.stringify({ error: 'Failed to fetch weather data', details: errorText }),
-        { status: weatherResponse.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: weatherResponse.status, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -86,7 +90,7 @@ serve(async (req) => {
         location: trip.destination,
         coordinates: { lat, lng }
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
     );
 
   } catch (error: unknown) {
@@ -94,7 +98,7 @@ serve(async (req) => {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
       JSON.stringify({ error: errorMessage }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
     );
   }
 });

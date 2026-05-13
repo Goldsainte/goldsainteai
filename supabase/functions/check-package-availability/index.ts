@@ -1,11 +1,15 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { logger, generateTraceId } from "../_shared/structuredLogger.ts";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Vary": "Origin",
 };
+}
 
 interface AvailabilityRequest {
   packageId: string;
@@ -24,7 +28,7 @@ interface AvailabilityResponse {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   const traceId = generateTraceId();
@@ -44,7 +48,7 @@ serve(async (req) => {
       logger.warn("Missing required fields", { packageId, startDate, endDate, participants });
       return new Response(
         JSON.stringify({ error: "Missing required fields" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+        { headers: { ...corsHeaders(req), "Content-Type": "application/json" }, status: 400 }
       );
     }
 
@@ -59,7 +63,7 @@ serve(async (req) => {
       logger.error("Package not found", packageError, { packageId });
       return new Response(
         JSON.stringify({ error: "Package not found" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 404 }
+        { headers: { ...corsHeaders(req), "Content-Type": "application/json" }, status: 404 }
       );
     }
 
@@ -91,7 +95,7 @@ serve(async (req) => {
       logger.error("Error fetching bookings", bookingError, { packageId });
       return new Response(
         JSON.stringify({ error: "Failed to check availability" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+        { headers: { ...corsHeaders(req), "Content-Type": "application/json" }, status: 500 }
       );
     }
 
@@ -116,13 +120,13 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify(response),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+      { headers: { ...corsHeaders(req), "Content-Type": "application/json" }, status: 200 }
     );
   } catch (error: any) {
     logger.fatal("Unexpected error in availability check", error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+      { headers: { ...corsHeaders(req), "Content-Type": "application/json" }, status: 500 }
     );
   } finally {
     logger.clearContext();

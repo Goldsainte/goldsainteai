@@ -1,15 +1,19 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Vary": "Origin",
 };
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -17,7 +21,7 @@ serve(async (req) => {
     if (!authHeader) {
       return new Response(
         JSON.stringify({ error: "No authorization header" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 401, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -31,7 +35,7 @@ serve(async (req) => {
     if (authError || !user) {
       return new Response(
         JSON.stringify({ error: "Invalid token" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 401, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -40,7 +44,7 @@ serve(async (req) => {
     if (!conversationId || !action) {
       return new Response(
         JSON.stringify({ error: "conversationId and action are required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -54,14 +58,14 @@ serve(async (req) => {
     if (convError || !conversation) {
       return new Response(
         JSON.stringify({ error: "Conversation not found" }),
-        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 404, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
     if (conversation.participant_1 !== user.id && conversation.participant_2 !== user.id) {
       return new Response(
         JSON.stringify({ error: "Not authorized" }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 403, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -77,7 +81,7 @@ serve(async (req) => {
         if (conversation.status !== "request") {
           return new Response(
             JSON.stringify({ error: "Can only accept message requests" }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
           );
         }
         updateData = { status: "active" };
@@ -88,7 +92,7 @@ serve(async (req) => {
         if (conversation.status !== "request") {
           return new Response(
             JSON.stringify({ error: "Can only decline message requests" }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
           );
         }
         updateData = { status: "declined" };
@@ -139,7 +143,7 @@ serve(async (req) => {
           console.error("Error deleting messages:", delMsgError);
           return new Response(
             JSON.stringify({ error: "Failed to delete messages" }),
-            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
           );
         }
 
@@ -152,13 +156,13 @@ serve(async (req) => {
           console.error("Error deleting conversation:", delConvError);
           return new Response(
             JSON.stringify({ error: "Failed to delete conversation" }),
-            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
           );
         }
 
         return new Response(
           JSON.stringify({ success: true, message: "Conversation permanently deleted" }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          { headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
         );
 
       case "mark_read":
@@ -179,7 +183,7 @@ serve(async (req) => {
       default:
         return new Response(
           JSON.stringify({ error: "Invalid action" }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
         );
     }
 
@@ -192,19 +196,19 @@ serve(async (req) => {
       console.error("Error updating conversation:", updateError);
       return new Response(
         JSON.stringify({ error: "Failed to update conversation" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
     return new Response(
       JSON.stringify({ success: true, message }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
     );
   } catch (error) {
     console.error("Error in manage-conversation:", error);
     return new Response(
       JSON.stringify({ error: "Internal server error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
     );
   }
 });

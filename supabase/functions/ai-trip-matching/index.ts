@@ -1,9 +1,13 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Vary": "Origin",
 };
+}
 
 interface TripMatchingRequestBody {
   tripRequestId: string;
@@ -11,7 +15,7 @@ interface TripMatchingRequestBody {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers: corsHeaders(req) });
   }
 
   try {
@@ -20,7 +24,7 @@ Deno.serve(async (req) => {
     if (!tripRequestId) {
       return new Response(JSON.stringify({ error: "Missing tripRequestId" }), {
         status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       });
     }
 
@@ -250,7 +254,7 @@ Deno.serve(async (req) => {
         JSON.stringify({ matches: [], message: "No strong matches found" }),
         {
           status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...corsHeaders(req), "Content-Type": "application/json" },
         }
       );
     }
@@ -306,7 +310,7 @@ Deno.serve(async (req) => {
       }),
       {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       }
     );
   } catch (error) {
@@ -318,7 +322,7 @@ Deno.serve(async (req) => {
       }), 
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       }
     );
   }
