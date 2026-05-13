@@ -12,6 +12,8 @@ const ALERT_FROM = "Goldsainte Infra <alerts@notify.goldsainte.com>";
 const QUEUE_DEPTH_THRESHOLD = 100;
 const STUCK_PENDING_MIN = 10;
 const DLQ_THRESHOLD = 10;
+const CRON_STALE_MIN = 60;
+const CRON_FAILURE_THRESHOLD = 5;
 
 interface Breach { key: string; severity: "critical" | "warning"; detail: string }
 
@@ -70,6 +72,28 @@ Deno.serve(async (req) => {
     key: "dlq_spike", severity: "warning",
     detail: `${dlq} emails moved to DLQ in last hour (threshold ${DLQ_THRESHOLD}). Provider/template failure likely.`,
   });
+
+  // 6. Global pg_cron staleness — no job has succeeded in the last hour
+  const { data: cronHealth } = await sb.rpc("email_infra_cron_last_run");
+  const ch = Array.isArray(cronHealth) ? cronHealth[0] : cronHealth;
+  if (ch) {
+    const lastSuccess = ch.last_successful_run ? new Date(ch.last_successful_run).getTime() : 0;
+    const ageMin = lastSuccess ? Math.round((Date.now() - lastSuccess) / 60_000) : Infinity;
+    if (ageMin > CRON_STALE_MIN) {
+      breaches.push({
+        key: "cron_stale",
+        severity: "critical",
+        detail: `No pg_cron job has succeeded in ${ageMin === Infinity ? "any recorded run" : ageMin + " min"} (threshold ${CRON_STALE_MIN} min). ${ch.total_active_jobs} active jobs scheduled. pg_cron worker may be stuck — check Supabase status.`,
+      });
+    }
+    if ((ch.recent_failures ?? 0) >= CRON_FAILURE_THRESHOLD) {
+      breaches.push({
+        key: "cron_failures_spike",
+        severity: "warning",
+        detail: `${ch.recent_failures} cron job runs failed in the last hour (threshold ${CRON_FAILURE_THRESHOLD}). Inspect cron.job_run_details.`,
+      });
+    }
+  }
 
   // Reconcile alerts: open new, resolve recovered
   const breachKeys = breaches.map((b) => b.key);

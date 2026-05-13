@@ -14468,6 +14468,15 @@ export type Database = {
         Returns: boolean
       }
       detect_bot_pattern: { Args: { p_user_id: string }; Returns: boolean }
+      email_infra_cron_last_run: {
+        Args: never
+        Returns: {
+          last_run: string
+          last_successful_run: string
+          recent_failures: number
+          total_active_jobs: number
+        }[]
+      }
       email_infra_cron_status: {
         Args: never
         Returns: {
