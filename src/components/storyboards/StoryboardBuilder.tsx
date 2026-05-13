@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Plus, Link as LinkIcon, Image, X, Upload, Paintbrush } from "lucide-react";
 import { StoryboardPhotoUploader } from "./StoryboardPhotoUploader";
-import { DesignEditorModal } from "./DesignEditorModal";
+import { LazyDesignEditorModal } from "./LazyDesignEditorModal";
 
 type TripFieldsForInsert = {
   destination?: string;
@@ -306,7 +306,7 @@ export function StoryboardBuilder({
             <span className="text-sm font-medium">Open Design Editor</span>
             <span className="text-xs">Create custom covers, caption cards & visual blocks</span>
           </button>
-          <DesignEditorModal
+          <LazyDesignEditorModal
             open={designEditorOpen}
             onOpenChange={setDesignEditorOpen}
             onExport={(url) => {

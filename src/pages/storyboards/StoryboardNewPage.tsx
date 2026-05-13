@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { StoryboardPhotoUploader } from "@/components/storyboards/StoryboardPhotoUploader";
-import { DesignEditorModal } from "@/components/storyboards/DesignEditorModal";
+import { LazyDesignEditorModal } from "@/components/storyboards/LazyDesignEditorModal";
 import { TemplatePicker } from "@/components/storyboards/TemplatePicker";
 import { StoryboardLivePreview } from "@/components/storyboards/StoryboardLivePreview";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -672,7 +672,7 @@ export default function StoryboardNewPage() {
       </div>
 
       {/* Design Editor Modal */}
-      <DesignEditorModal open={showDesignEditor} onOpenChange={setShowDesignEditor} onExport={handleDesignExport} />
+      <LazyDesignEditorModal open={showDesignEditor} onOpenChange={setShowDesignEditor} onExport={handleDesignExport} />
     </div>
   );
 }
