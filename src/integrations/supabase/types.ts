@@ -4552,6 +4552,33 @@ export type Database = {
         }
         Relationships: []
       }
+      email_infra_alerts: {
+        Row: {
+          alert_key: string
+          detail: string
+          id: string
+          opened_at: string
+          resolved_at: string | null
+          severity: string
+        }
+        Insert: {
+          alert_key: string
+          detail: string
+          id?: string
+          opened_at?: string
+          resolved_at?: string | null
+          severity: string
+        }
+        Update: {
+          alert_key?: string
+          detail?: string
+          id?: string
+          opened_at?: string
+          resolved_at?: string | null
+          severity?: string
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -14430,6 +14457,13 @@ export type Database = {
           jobid: number
           jobname: string
           schedule: string
+        }[]
+      }
+      email_infra_queue_depth: {
+        Args: never
+        Returns: {
+          queue_length: number
+          queue_name: string
         }[]
       }
       email_infra_vault_secret_exists: {
