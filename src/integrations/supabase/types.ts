@@ -14263,6 +14263,22 @@ export type Database = {
         Args: { amount: number; from_curr: string; to_curr: string }
         Returns: number
       }
+      create_bundle_purchase: {
+        Args: {
+          _amount_paid: number
+          _bundle_id: string
+          _buyer_id: string
+          _commission_pct: number
+          _creator_id: string
+          _currency: string
+          _guide_ids: string[]
+          _partner_payout: number
+          _platform_commission: number
+          _stripe_payment_intent_id: string
+          _trip_id: string
+        }
+        Returns: string
+      }
       detect_bot_pattern: { Args: { p_user_id: string }; Returns: boolean }
       evaluate_agent_badges: {
         Args: { target_agent_id: string }
