@@ -61,6 +61,7 @@ a{color:#0c4d47;}
 .eyebrow{font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#8a7a3f;margin:0 0 18px;text-align:center;}
 h1{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:38px;line-height:1.15;color:#0a2225;margin:0 0 24px;text-align:center;letter-spacing:-0.01em;}
 .lede{font-family:'Helvetica Neue',Arial,sans-serif;font-size:16px;line-height:1.6;color:#0a2225;opacity:0.85;margin:0 0 36px;text-align:center;}
+.tagline{font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;line-height:1.6;color:#6E6650;font-style:italic;text-align:center;max-width:480px;margin:-12px auto 28px;}
 .cta-wrap{text-align:center;margin:0 0 28px;}
 .cta{display:inline-block;background:#0c4d47;color:#f7f3ea !important;text-decoration:none;font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;letter-spacing:0.18em;text-transform:uppercase;padding:18px 40px;border-radius:2px;font-weight:500;}
 .fallback{font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;line-height:1.6;color:#0a2225;opacity:0.55;text-align:center;margin:0 0 48px;}
@@ -108,7 +109,6 @@ h1{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:38px;l
   <p class="security">Goldsainte will never email you and ask you to disclose or verify your password, credit card, or banking account number. If you receive a suspicious email with a link to update your account information, do not click on the link. Instead, report the e-mail to Goldsainte for investigation.</p>
 </div>
 <div class="site-footer">
-  <p class="fdesc">A curated marketplace connecting discerning travelers with the world's most trusted specialists, creators, and brands.</p>
   <div class="fnav">
     <a href="${SITE_URL}/marketplace">Browse Trips</a>·
     <a href="${SITE_URL}/agents">Specialists</a>·
