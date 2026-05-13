@@ -14423,6 +14423,15 @@ export type Database = {
         Returns: boolean
       }
       detect_bot_pattern: { Args: { p_user_id: string }; Returns: boolean }
+      email_infra_cron_status: {
+        Args: never
+        Returns: {
+          active: boolean
+          jobid: number
+          jobname: string
+          schedule: string
+        }[]
+      }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
