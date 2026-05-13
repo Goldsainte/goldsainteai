@@ -695,6 +695,7 @@ async function creditAffiliateCommission(args: {
   currency: string;
   buyerId?: string | null;
   productOwnerId?: string | null;
+  bookingId?: string | null;
 }) {
   try {
     if (!args.affiliateCode || args.grossAmount <= 0) return;
@@ -741,6 +742,7 @@ async function creditAffiliateCommission(args: {
       commission_amount: commissionAmount,
       currency: args.currency,
       status: 'pending',
+      booking_id: args.bookingId ?? null,
     });
 
     await supabaseClient
