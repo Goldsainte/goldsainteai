@@ -1,14 +1,45 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
+import fs from "fs";
 import { componentTagger } from "lovable-tagger";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
+
+// Inject a deploy-unique CACHE_VERSION into public/sw.js at build time so
+// every deploy invalidates stale PWA caches. Sourced from common CI envs
+// (commit SHA) with a timestamp fallback for local builds.
+function swVersionPlugin() {
+  const version =
+    process.env.VITE_RELEASE_VERSION ||
+    process.env.GITHUB_SHA ||
+    process.env.VERCEL_GIT_COMMIT_SHA ||
+    process.env.COMMIT_SHA ||
+    process.env.SOURCE_VERSION ||
+    `build-${Date.now()}`;
+  const shortVersion = version.slice(0, 12);
+  return {
+    name: "sw-version-injector",
+    apply: "build" as const,
+    closeBundle() {
+      const swPath = path.resolve(__dirname, "dist/sw.js");
+      if (!fs.existsSync(swPath)) return;
+      const src = fs.readFileSync(swPath, "utf8");
+      fs.writeFileSync(swPath, src.replace(/__CACHE_VERSION__/g, shortVersion));
+      // eslint-disable-next-line no-console
+      console.log(`[sw-version-injector] CACHE_VERSION=${shortVersion}`);
+    },
+  };
+}
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   
-  const plugins = [react(), mode === "development" && componentTagger()].filter(Boolean);
+  const plugins = [
+    react(),
+    mode === "development" && componentTagger(),
+    swVersionPlugin(),
+  ].filter(Boolean);
   
   // Add Sentry plugin for source map uploads in production builds
   if (mode === 'production' && env.VITE_SENTRY_AUTH_TOKEN) {
