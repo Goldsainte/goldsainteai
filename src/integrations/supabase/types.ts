@@ -9120,6 +9120,18 @@ export type Database = {
         }
         Relationships: []
       }
+      reserved_usernames: {
+        Row: {
+          username: string
+        }
+        Insert: {
+          username: string
+        }
+        Update: {
+          username?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           booking_id: string
