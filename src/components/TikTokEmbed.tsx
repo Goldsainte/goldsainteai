@@ -18,7 +18,14 @@ function ensureTikTokScript() {
   document.body.appendChild(s);
 }
 
+const TIKTOK_URL_RE = /^https:\/\/(www\.)?tiktok\.com\/@[\w.-]{1,50}\/video\/\d+$/;
+
+export function isSafeTikTokUrl(url: string): boolean {
+  return TIKTOK_URL_RE.test(url);
+}
+
 export function extractTikTokVideoId(url: string): string | null {
+  if (!isSafeTikTokUrl(url)) return null;
   const m = url.match(/\/video\/(\d+)/);
   return m ? m[1] : null;
 }
@@ -28,11 +35,15 @@ export function TikTokEmbed({ url }: { url: string }) {
   useEffect(() => {
     const id = extractTikTokVideoId(url);
     if (!id || !ref.current) return;
-    ref.current.innerHTML = `
-      <blockquote class="tiktok-embed" cite="${url}" data-video-id="${id}" style="max-width:325px;min-width:325px;">
-        <section></section>
-      </blockquote>
-    `;
+
+    const blockquote = document.createElement("blockquote");
+    blockquote.className = "tiktok-embed";
+    blockquote.setAttribute("cite", url);
+    blockquote.setAttribute("data-video-id", id);
+    blockquote.style.cssText = "max-width:325px;min-width:325px;";
+    blockquote.appendChild(document.createElement("section"));
+    ref.current.replaceChildren(blockquote);
+
     ensureTikTokScript();
   }, [url]);
   return <div ref={ref} className="shrink-0" />;
