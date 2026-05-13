@@ -1,325 +1,221 @@
 project_id = "iwdevxltjuedijrcdejs"
 
-[functions.create-agent-application-stripe-account]
-verify_jwt = true
-
-[functions.create-identity-verification]
-verify_jwt = false
-
-[functions.stripe-identity-webhook]
-verify_jwt = false
-
-[functions.notify-admin-new-application]
-verify_jwt = false
-
-[functions.notify-applicant-status-change]
-verify_jwt = false
-
-[functions.create-approved-account]
-verify_jwt = true
-
-[functions.approve-application]
-verify_jwt = true
-
-[functions.notify-admin-verification-complete]
-verify_jwt = false
-
-[functions.amadeus-proxy]
-verify_jwt = true
-
-[functions.get-promoted-vendors]
-verify_jwt = false
-
-[functions.restaurants-search-google]
-verify_jwt = false
-
-[functions.worldwide-restaurants]
-verify_jwt = false
-
-[functions.uber-request-ride]
-verify_jwt = true
-
-[functions.uber-get-products]
-verify_jwt = false
-
-[functions.seed-content-creators]
-verify_jwt = false
-
-[functions.clear-seeded-data]
-verify_jwt = false
-
-[functions.clear-search-cache]
-verify_jwt = true
-
-[functions.apple-music-search]
-verify_jwt = false
-
-[functions.search-hotels]
-verify_jwt = false
-
-[functions.search-destinations]
-verify_jwt = false
-
-[functions.travel-ai-agent]
-verify_jwt = false
-
-[functions.tripadvisor-search-hotels]
-verify_jwt = true
-
-[functions.tripadvisor-search-restaurants]
-verify_jwt = true
-
-[functions.notify-agents-new-job]
-verify_jwt = false
-
-[functions.claim-job]
-verify_jwt = true
-
-[functions.update-job-status]
-verify_jwt = true
-
-[functions.process-job-payment]
-verify_jwt = true
-
-[functions.release-escrow]
-verify_jwt = true
-
-[functions.realtime-voice-session]
-verify_jwt = true
-
-[functions.realtime-sdp-relay]
-verify_jwt = false
-
-[functions.madison]
-verify_jwt = true
-
-[functions.ai-storyboard-itinerary]
-verify_jwt = true
-
-[functions.unsplash-search]
-verify_jwt = false
-
-[functions.viator-search-experiences]
-verify_jwt = false
-
-[functions.submit-job-completion]
-verify_jwt = true
-
-[functions.approve-job-completion]
-verify_jwt = true
-
-[functions.reject-job-completion]
-verify_jwt = true
-
-[functions.process-marketplace-payment]
-verify_jwt = true
-
-[functions.expire-jobs]
-verify_jwt = false
-
-[functions.update-agent-metrics]
-verify_jwt = false
-
-[functions.send-notification]
-verify_jwt = false
-
-[functions.notify-bid-accepted]
-verify_jwt = false
-
-[functions.notify-job-completed]
-verify_jwt = false
-
-[functions.notify-payment-received]
-verify_jwt = false
-
-[functions.notify-milestone-approved]
-verify_jwt = false
-
-[functions.notify-new-bid]
-verify_jwt = false
-
-[functions.create-group-payment-links]
-verify_jwt = true
-
-[functions.verify-group-payment]
-verify_jwt = true
-
-[functions.moderate-content]
-verify_jwt = false
-
-[functions.get-personalized-feed]
-verify_jwt = true
-
-[functions.create-coin-purchase]
-verify_jwt = true
-
-[functions.verify-coin-payment]
-verify_jwt = true
-
-[functions.creator-stripe-onboarding]
-verify_jwt = true
-
-[functions.check-creator-stripe-status]
-verify_jwt = true
-
-[functions.process-gift-payment]
-verify_jwt = true
-
-[functions.purchase-product]
-verify_jwt = true
-
-[functions.track-affiliate-click]
-verify_jwt = false
-
-[functions.verify-product-payment]
-verify_jwt = true
-
-[functions.instagram-api]
-verify_jwt = false
-
-[functions.instagram-oauth-callback]
-verify_jwt = true
-
-[functions.instagram-post]
-verify_jwt = true
-
-[functions.generate-caption]
-verify_jwt = true
-
-[functions.send-password-reset-email]
-verify_jwt = false
-
-[functions.send-email]
-verify_jwt = false
-
-[functions.request-password-reset]
-verify_jwt = false
-
-[functions.save-apple-music-credentials]
-verify_jwt = true
-
-[functions.submit-transportation-vendor-application]
-verify_jwt = true
-
-[functions.update-visa-request-status]
-verify_jwt = false
-
-[functions.create-commission-payout]
-verify_jwt = true
-
-[functions.get-stripe-payout-schedule]
-verify_jwt = true
-
-[functions.stripe-webhook]
-verify_jwt = false
-
-[functions.create-checkout]
-verify_jwt = true
-
-[functions.customer-portal]
-verify_jwt = true
-
-[functions.check-subscription]
-verify_jwt = true
-
-[functions.create-verification-checkout]
-verify_jwt = true
-
-[functions.check-verification]
-verify_jwt = true
-
-[functions.create-trip-booking]
-verify_jwt = true
-
-[functions.create-hotel-booking]
-verify_jwt = true
-
-[functions.check-connection-status]
-verify_jwt = true
-
-[functions.start-connection]
-verify_jwt = true
-
-[functions.accept-proposal]
-verify_jwt = true
-
-[functions.process-proposal-payment]
-verify_jwt = true
-
-[functions.track-affiliate-commission]
-verify_jwt = false
-
-[functions.process-escrow-payment]
-verify_jwt = true
-
-[functions.process-creator-share]
-verify_jwt = false
-
-[functions.process-agent-payout]
-verify_jwt = false
-
-[functions.process-platform-fee]
-verify_jwt = false
-
-[functions.generate-itinerary-pdf]
-verify_jwt = true
-
-[functions.send-itinerary-email]
-verify_jwt = true
-
-[functions.stripe-connect-status]
-verify_jwt = true
-
-[functions.save-to-storyboard]
-verify_jwt = true
-
-[functions.check-stripe-connect-status]
-verify_jwt = true
-
-[functions.update-trip-match-status]
-verify_jwt = true
-
-[functions.ai-trip-matching]
-verify_jwt = false
-
-[functions.trip-checkout-create]
-verify_jwt = true
-
-[functions.generate-signed-contract]
-verify_jwt = true
-
-[functions.send-contract-notification]
-verify_jwt = true
-
-[functions.validate-contract-signature]
-verify_jwt = true
-
-[functions.compute-proposal-insights]
-verify_jwt = false
-
-[functions.ai-booking-concierge]
-verify_jwt = false
-
-[functions.send-phone-verification]
-verify_jwt = true
-
-[functions.check-phone-verification]
-verify_jwt = true
-
-[functions.curated-itineraries]
-verify_jwt = true
-
-[functions.send-direct-message]
-verify_jwt = true
-
-[functions.get-conversations]
-verify_jwt = true
-
-[functions.manage-conversation]
-verify_jwt = true
-
-[functions.test-resend]
-verify_jwt = false
-
-[functions.process-email-queue]
-verify_jwt = true
+[functions]
+  [functions.accept-proposal]
+    verify_jwt = true
+  [functions.ai-booking-concierge]
+    verify_jwt = false
+  [functions.ai-storyboard-itinerary]
+    verify_jwt = true
+  [functions.ai-trip-matching]
+    verify_jwt = false
+  [functions.amadeus-proxy]
+    verify_jwt = true
+  [functions.apple-music-search]
+    verify_jwt = false
+  [functions.approve-application]
+    verify_jwt = true
+  [functions.approve-job-completion]
+    verify_jwt = true
+  [functions.auth-email-hook]
+    verify_jwt = false
+  [functions.check-connection-status]
+    verify_jwt = true
+  [functions.check-creator-stripe-status]
+    verify_jwt = true
+  [functions.check-phone-verification]
+    verify_jwt = true
+  [functions.check-stripe-connect-status]
+    verify_jwt = true
+  [functions.check-subscription]
+    verify_jwt = true
+  [functions.check-verification]
+    verify_jwt = true
+  [functions.claim-job]
+    verify_jwt = true
+  [functions.clear-search-cache]
+    verify_jwt = true
+  [functions.clear-seeded-data]
+    verify_jwt = false
+  [functions.compute-proposal-insights]
+    verify_jwt = false
+  [functions.create-agent-application-stripe-account]
+    verify_jwt = true
+  [functions.create-approved-account]
+    verify_jwt = true
+  [functions.create-checkout]
+    verify_jwt = true
+  [functions.create-coin-purchase]
+    verify_jwt = true
+  [functions.create-commission-payout]
+    verify_jwt = true
+  [functions.create-group-payment-links]
+    verify_jwt = true
+  [functions.create-hotel-booking]
+    verify_jwt = true
+  [functions.create-identity-verification]
+    verify_jwt = false
+  [functions.create-trip-booking]
+    verify_jwt = true
+  [functions.create-verification-checkout]
+    verify_jwt = true
+  [functions.creator-stripe-onboarding]
+    verify_jwt = true
+  [functions.curated-itineraries]
+    verify_jwt = true
+  [functions.customer-portal]
+    verify_jwt = true
+  [functions.expire-jobs]
+    verify_jwt = false
+  [functions.generate-caption]
+    verify_jwt = true
+  [functions.generate-itinerary-pdf]
+    verify_jwt = true
+  [functions.generate-signed-contract]
+    verify_jwt = true
+  [functions.get-conversations]
+    verify_jwt = true
+  [functions.get-personalized-feed]
+    verify_jwt = true
+  [functions.get-promoted-vendors]
+    verify_jwt = false
+  [functions.get-stripe-payout-schedule]
+    verify_jwt = true
+  [functions.instagram-api]
+    verify_jwt = false
+  [functions.instagram-oauth-callback]
+    verify_jwt = true
+  [functions.instagram-post]
+    verify_jwt = true
+  [functions.madison]
+    verify_jwt = true
+  [functions.manage-conversation]
+    verify_jwt = true
+  [functions.moderate-content]
+    verify_jwt = false
+  [functions.notify-admin-new-application]
+    verify_jwt = false
+  [functions.notify-admin-verification-complete]
+    verify_jwt = false
+  [functions.notify-agents-new-job]
+    verify_jwt = false
+  [functions.notify-applicant-status-change]
+    verify_jwt = false
+  [functions.notify-bid-accepted]
+    verify_jwt = false
+  [functions.notify-job-completed]
+    verify_jwt = false
+  [functions.notify-milestone-approved]
+    verify_jwt = false
+  [functions.notify-new-bid]
+    verify_jwt = false
+  [functions.notify-payment-received]
+    verify_jwt = false
+  [functions.process-agent-payout]
+    verify_jwt = false
+  [functions.process-creator-share]
+    verify_jwt = false
+  [functions.process-email-queue]
+    verify_jwt = true
+  [functions.process-escrow-payment]
+    verify_jwt = true
+  [functions.process-gift-payment]
+    verify_jwt = true
+  [functions.process-job-payment]
+    verify_jwt = true
+  [functions.process-marketplace-payment]
+    verify_jwt = true
+  [functions.process-platform-fee]
+    verify_jwt = false
+  [functions.process-proposal-payment]
+    verify_jwt = true
+  [functions.purchase-product]
+    verify_jwt = true
+  [functions.realtime-sdp-relay]
+    verify_jwt = false
+  [functions.realtime-voice-session]
+    verify_jwt = true
+  [functions.reject-job-completion]
+    verify_jwt = true
+  [functions.release-escrow]
+    verify_jwt = true
+  [functions.request-password-reset]
+    verify_jwt = false
+  [functions.restaurants-search-google]
+    verify_jwt = false
+  [functions.save-apple-music-credentials]
+    verify_jwt = true
+  [functions.save-to-storyboard]
+    verify_jwt = true
+  [functions.search-destinations]
+    verify_jwt = false
+  [functions.search-hotels]
+    verify_jwt = false
+  [functions.seed-content-creators]
+    verify_jwt = false
+  [functions.send-contract-notification]
+    verify_jwt = true
+  [functions.send-direct-message]
+    verify_jwt = true
+  [functions.send-email]
+    verify_jwt = false
+  [functions.send-itinerary-email]
+    verify_jwt = true
+  [functions.send-notification]
+    verify_jwt = false
+  [functions.send-password-reset-email]
+    verify_jwt = false
+  [functions.send-phone-verification]
+    verify_jwt = true
+  [functions.start-connection]
+    verify_jwt = true
+  [functions.stripe-connect-status]
+    verify_jwt = true
+  [functions.stripe-identity-webhook]
+    verify_jwt = false
+  [functions.stripe-webhook]
+    verify_jwt = false
+  [functions.submit-job-completion]
+    verify_jwt = true
+  [functions.submit-transportation-vendor-application]
+    verify_jwt = true
+  [functions.test-resend]
+    verify_jwt = false
+  [functions.track-affiliate-click]
+    verify_jwt = false
+  [functions.track-affiliate-commission]
+    verify_jwt = false
+  [functions.travel-ai-agent]
+    verify_jwt = false
+  [functions.trip-checkout-create]
+    verify_jwt = true
+  [functions.tripadvisor-search-hotels]
+    verify_jwt = true
+  [functions.tripadvisor-search-restaurants]
+    verify_jwt = true
+  [functions.uber-get-products]
+    verify_jwt = false
+  [functions.uber-request-ride]
+    verify_jwt = true
+  [functions.unsplash-search]
+    verify_jwt = false
+  [functions.update-agent-metrics]
+    verify_jwt = false
+  [functions.update-job-status]
+    verify_jwt = true
+  [functions.update-trip-match-status]
+    verify_jwt = true
+  [functions.update-visa-request-status]
+    verify_jwt = false
+  [functions.validate-contract-signature]
+    verify_jwt = true
+  [functions.verify-coin-payment]
+    verify_jwt = true
+  [functions.verify-group-payment]
+    verify_jwt = true
+  [functions.verify-product-payment]
+    verify_jwt = true
+  [functions.viator-search-experiences]
+    verify_jwt = false
+  [functions.worldwide-restaurants]
+    verify_jwt = false
