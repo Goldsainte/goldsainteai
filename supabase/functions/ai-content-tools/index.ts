@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { resolveAllowedOrigin } from "../_shared/cors.ts";
+import { checkRateLimit, createRateLimitResponse } from "../_shared/rateLimiter.ts";
 
 function corsHeaders(req?: Request): Record<string, string> {
   return {
@@ -15,7 +16,7 @@ type Tool = "caption" | "hashtags" | "rewrite";
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY") || "";
 const MODEL = "gpt-4o-mini";
 
-function jsonResponse(body: unknown, status = 200) {
+function jsonResponse(req: Request, body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
     headers: { ...corsHeaders(req), "Content-Type": "application/json" },
@@ -50,11 +51,11 @@ async function callOpenAI(system: string, user: string, expectJson = true): Prom
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders(req) });
-  if (!OPENAI_API_KEY) return jsonResponse({ error: "OPENAI_API_KEY not configured" }, 500);
+  if (!OPENAI_API_KEY) return jsonResponse(req, { error: "OPENAI_API_KEY not configured" }, 500);
 
   try {
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader?.startsWith("Bearer ")) return jsonResponse({ error: "Unauthorized" }, 401);
+    if (!authHeader?.startsWith("Bearer ")) return jsonResponse(req, { error: "Unauthorized" }, 401);
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_ANON_KEY")!,
@@ -63,7 +64,17 @@ serve(async (req) => {
     const { data: claims, error: ce } = await supabase.auth.getClaims(
       authHeader.replace("Bearer ", ""),
     );
-    if (ce || !claims?.claims) return jsonResponse({ error: "Unauthorized" }, 401);
+    if (ce || !claims?.claims) return jsonResponse(req, { error: "Unauthorized" }, 401);
+
+    // Rate limit: 30 calls per user per hour
+    const userId = (claims.claims as any).sub as string;
+    const rl = await checkRateLimit({
+      identifier: `user:${userId}`,
+      endpoint: "ai-content-tools",
+      maxRequests: 30,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (!rl.allowed) return createRateLimitResponse(rl, corsHeaders(req));
 
     const body = await req.json();
     const tool: Tool = body.tool;
@@ -76,7 +87,7 @@ serve(async (req) => {
         platform === "Twitter" ? "260 chars" : "220 chars"
       }. Include 1-2 emojis if it fits the vibe. No hashtags.`;
       const out = await callOpenAI(system, user);
-      return jsonResponse(out);
+      return jsonResponse(req, out);
     }
 
     if (tool === "hashtags") {
@@ -85,7 +96,7 @@ serve(async (req) => {
         'You suggest hashtags for travel content. Output strict JSON: { broad: string[], medium: string[], niche: string[] } each with exactly 5 hashtags. Hashtags must include the # prefix and be lowercase, no spaces.';
       const user = `Destination: ${destination}\nTrip type: ${tripType}\nReturn 15 total hashtags grouped by reach (broad = >5M posts, medium = 100k-5M, niche = <100k).`;
       const out = await callOpenAI(system, user);
-      return jsonResponse(out);
+      return jsonResponse(req, out);
     }
 
     if (tool === "rewrite") {
@@ -94,12 +105,12 @@ serve(async (req) => {
         "You rewrite travel product descriptions while preserving facts. Output strict JSON: { versions: string[] } with exactly 3 distinct rewrites.";
       const user = `Original description:\n"""${description}"""\n\nRewrite this in a "${tone}" tone. Each version 2-4 sentences. Keep all factual claims unchanged.`;
       const out = await callOpenAI(system, user);
-      return jsonResponse(out);
+      return jsonResponse(req, out);
     }
 
-    return jsonResponse({ error: "unknown tool" }, 400);
+    return jsonResponse(req, { error: "unknown tool" }, 400);
   } catch (e) {
     console.error("ai-content-tools error", e);
-    return jsonResponse({ error: String(e?.message ?? e) }, 500);
+    return jsonResponse(req, { error: String(e?.message ?? e) }, 500);
   }
 });
