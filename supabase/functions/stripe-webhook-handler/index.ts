@@ -250,80 +250,32 @@ async function handleBundlePurchase(metadata: any, session: any) {
   const amountPaid = (session.amount_total ?? 0) / 100;
   const currency = (session.currency || bundle.currency || 'usd').toUpperCase();
 
-  // Idempotency-friendly insert (stripe_payment_intent_id is UNIQUE)
-  const { data: existing } = await supabaseClient
-    .from('bundle_purchases')
-    .select('id, trip_booking_id')
-    .eq('stripe_payment_intent_id', session.payment_intent)
-    .maybeSingle();
-  if (existing) {
-    console.log('Bundle purchase already recorded', existing.id);
-    return;
-  }
-
   // Tier-based commission split. TIER_COMMISSION values are platform percentages
   // (bronze 15, silver 12, gold 10, platinum 8). Default to bronze when unknown.
   const commissionPct = await getCreatorCommissionPct(bundle.creator_id);
   const platformCommission = Math.round(amountPaid * commissionPct * 100) / 100;
   const partnerPayout = Math.round((amountPaid - platformCommission) * 100) / 100;
 
-  // 1. Create trip booking for bundled trip (if any)
-  let tripBookingId: string | null = null;
-  if (bundle.trip_id) {
-    const { data: booking, error: bookErr } = await supabaseClient
-      .from('trip_bookings')
-      .insert({
-        traveler_id: metadata.buyer_id,
-        partner_id: bundle.creator_id,
-        partner_role: 'creator',
-        total_price: amountPaid,
-        currency,
-        status: 'confirmed',
-        partner_payout: partnerPayout,
-        platform_commission: platformCommission,
-        stripe_payment_intent_id: session.payment_intent,
-        metadata: {
-          source: 'bundle_purchase',
-          bundle_id: bundle.id,
-          trip_id: bundle.trip_id,
-          commission_pct: commissionPct,
-        },
-      } as any)
-      .select('id')
-      .single();
-    if (bookErr) {
-      console.error('Failed to create trip_booking for bundle', bookErr);
-    } else {
-      tripBookingId = booking?.id ?? null;
-    }
-  }
-
-  // 2. Create itinerary_purchases for each guide
+  // Atomic: trip_booking + itinerary_purchases + bundle_purchases in one
+  // transaction via SECURITY DEFINER RPC. Idempotent on stripe_payment_intent_id.
   const guideIds: string[] = Array.isArray(bundle.guide_ids) ? bundle.guide_ids : [];
-  for (const productId of guideIds) {
-    const { error: ipErr } = await supabaseClient.from('itinerary_purchases').insert({
-      buyer_id: metadata.buyer_id,
-      product_id: productId,
-      stripe_payment_intent_id: `${session.payment_intent}:${productId}`,
-      amount_paid: 0,
-      currency,
-    });
-    if (ipErr && !ipErr.message?.includes('duplicate')) {
-      console.error('Failed to record bundled guide purchase', productId, ipErr);
-    }
-  }
-
-  // 3. Record bundle purchase
-  await supabaseClient.from('bundle_purchases').insert({
-    bundle_id: bundle.id,
-    buyer_id: metadata.buyer_id,
-    stripe_payment_intent_id: session.payment_intent,
-    amount_paid: amountPaid,
-    currency,
-    trip_booking_id: tripBookingId,
-    partner_payout: partnerPayout,
-    platform_commission: platformCommission,
+  const { error: rpcErr } = await supabaseClient.rpc('create_bundle_purchase', {
+    _bundle_id: bundle.id,
+    _buyer_id: metadata.buyer_id,
+    _creator_id: bundle.creator_id,
+    _trip_id: bundle.trip_id ?? null,
+    _guide_ids: guideIds,
+    _amount_paid: amountPaid,
+    _currency: currency,
+    _platform_commission: platformCommission,
+    _partner_payout: partnerPayout,
+    _commission_pct: commissionPct,
+    _stripe_payment_intent_id: session.payment_intent,
   });
+  if (rpcErr) {
+    console.error('create_bundle_purchase RPC failed', rpcErr);
+    throw rpcErr;
+  }
 
   // 4. Affiliate commission
   await creditAffiliateCommission({
