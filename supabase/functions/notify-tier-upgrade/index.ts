@@ -61,6 +61,26 @@ Deno.serve(async (req) => {
 
     const tierLabel = TIER_LABEL[tier];
     const subject = `🎉 You've reached ${tierLabel} on Goldsainte`;
+
+    // In-app notification (best-effort; do not block email if it fails)
+    try {
+      await admin.from("notifications").insert({
+        user_id,
+        type: "tier_upgrade",
+        title: `You've reached ${tierLabel}`,
+        message: previous_tier
+          ? `Congrats! You've been promoted from ${TIER_LABEL[previous_tier] || previous_tier} to ${tierLabel}. Your new commission rate is ${commission_rate}%.`
+          : `Congrats! You've reached the ${tierLabel} tier. Your new commission rate is ${commission_rate}%.`,
+        entity_type: "tier",
+        action_url: "/creator/dashboard",
+        action_label: "View dashboard",
+        priority: "high",
+        sent_via_email: true,
+      });
+    } catch (notifErr) {
+      console.error("Failed to insert tier upgrade notification", notifErr);
+    }
+
     const html = `
       <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; color: #0a2225; background: #f7f3ea;">
         <h1 style="font-size: 24px; margin: 0 0 12px;">Congratulations, ${name} 🎉</h1>
