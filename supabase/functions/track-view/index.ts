@@ -48,27 +48,16 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // DB-backed dedup: one view per (ip_hash, kind, entity_id, day).
-    // ON CONFLICT DO NOTHING — if no row inserted, this is a duplicate view today.
-    const { data: inserted, error: dedupErr } = await admin
-      .from("view_dedup")
-      .insert({ ip_hash: ipHash, kind, entity_id: id })
-      .select("ip_hash")
-      .maybeSingle();
-
-    if (dedupErr && dedupErr.code !== "23505") throw dedupErr;
-    if (!inserted || dedupErr?.code === "23505") {
-      return new Response(JSON.stringify({ ok: true, deduped: true }), {
-        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
-      });
-    }
-
-    const fn = kind === "trip" ? "increment_trip_view" : "increment_product_view";
-    const param = kind === "trip" ? { _trip_id: id } : { _product_id: id };
-    const { error } = await admin.rpc(fn, param);
+    // Atomic: dedup insert + view-count increment in one DB transaction.
+    // Returns true only when a NEW view was recorded today.
+    const { data: wasNew, error } = await admin.rpc("track_view_atomic", {
+      _kind: kind,
+      _entity_id: id,
+      _ip_hash: ipHash,
+    });
     if (error) throw error;
 
-    return new Response(JSON.stringify({ ok: true }), {
+    return new Response(JSON.stringify({ ok: true, deduped: !wasNew }), {
       headers: { ...corsHeaders(req), "Content-Type": "application/json" },
     });
   } catch (e) {
