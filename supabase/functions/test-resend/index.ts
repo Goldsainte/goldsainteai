@@ -49,7 +49,7 @@ serve(async (req: Request) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Goldsainte Security <security@goldsainte.ai>",
+        from: "Goldsainte Security <security@goldsainte.com>",
         to: [email],
         subject: "Resend Test from Goldsainte",
         html: `
