@@ -175,7 +175,12 @@ export function CreatorPerformanceTab({ role = "creator" }: { role?: "creator" |
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5DFC6" />
               <XAxis dataKey="date" stroke="#7A7151" fontSize={11} />
-              <YAxis stroke="#7A7151" fontSize={11} allowDecimals={false} />
+              <YAxis
+                stroke="#7A7151"
+                fontSize={11}
+                allowDecimals={false}
+                hide={typeof window !== 'undefined' && window.innerWidth < 640}
+              />
               <Tooltip />
               <Line type="monotone" dataKey="sales" stroke="#0c4d47" strokeWidth={2} dot={false} />
             </LineChart>

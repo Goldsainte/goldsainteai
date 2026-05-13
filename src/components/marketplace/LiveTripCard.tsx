@@ -248,15 +248,14 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
           )}
 
         {(saveCount > 0 || bookingCount > 0) && (
-          <p className="pt-0.5 text-[11px] text-[#7A7151]/80">
-            {bookingCount > 0 && (
-              <span>{bookingCount} traveler{bookingCount === 1 ? "" : "s"} booked</span>
-            )}
-            {bookingCount > 0 && saveCount > 0 && <span className="text-[#C7B892]"> · </span>}
+          <div className="pt-0.5 text-[11px] text-[#7A7151] space-y-0.5">
             {saveCount > 0 && (
-              <span>Saved {saveCount >= 1000 ? `${(saveCount / 1000).toFixed(1)}k` : saveCount} times</span>
+              <p>{saveCount.toLocaleString()} saves</p>
             )}
-          </p>
+            {bookingCount > 0 && (
+              <p>{bookingCount} booked</p>
+            )}
+          </div>
         )}
 
         {trip.created_at && (() => {

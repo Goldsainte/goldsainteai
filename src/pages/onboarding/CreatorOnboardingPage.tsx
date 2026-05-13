@@ -26,6 +26,7 @@ import {
 
 const STEPS = [
   { title: "About You", icon: User },
+  { title: "Social Profile", icon: Globe },
   { title: "Your Niche", icon: Sparkles },
   { title: "Portfolio", icon: Image },
   { title: "Standards", icon: Shield },
@@ -210,12 +211,14 @@ export default function CreatorOnboardingPage() {
   const canProceed = () => {
     switch (currentStep) {
       case 0:
-        return displayName.trim().length > 0 && bio.trim().length > 0 && homeBase.trim().length > 0 && primaryPlatform.length > 0;
+        return displayName.trim().length > 0 && bio.trim().length > 0 && homeBase.trim().length > 0;
       case 1:
-        return selectedNiches.length > 0 && destinations.length > 0;
+        return primaryPlatform.length > 0;
       case 2:
-        return true; // All optional
+        return selectedNiches.length > 0 && destinations.length > 0;
       case 3:
+        return true; // All optional
+      case 4:
         return acceptsTransparency && acceptsSafetyPolicy && tosAccepted && privacyAccepted && creatorAgreementAccepted;
       default:
         return true;
@@ -455,6 +458,16 @@ export default function CreatorOnboardingPage() {
                     />
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* ── Step 2: Social Profile ── */}
+            {currentStep === 1 && (
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Social Profile</h2>
+                  <p className="text-[#6B7280]">Where travelers can find your work</p>
+                </div>
 
                 {/* Primary Platform */}
                 <div>
@@ -507,8 +520,8 @@ export default function CreatorOnboardingPage() {
               </div>
             )}
 
-            {/* ── Step 2: Your Niche ── */}
-            {currentStep === 1 && (
+            {/* ── Step 3: Your Niche ── */}
+            {currentStep === 2 && (
               <div className="space-y-8">
                 <div className="text-center mb-8">
                   <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Your Niche</h2>
@@ -590,8 +603,8 @@ export default function CreatorOnboardingPage() {
               </div>
             )}
 
-            {/* ── Step 3: Your Portfolio (all optional) ── */}
-            {currentStep === 2 && (
+            {/* ── Step 4: Your Portfolio (all optional) ── */}
+            {currentStep === 3 && (
               <div className="space-y-8">
                 <div className="text-center mb-8">
                   <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Your Portfolio</h2>
@@ -721,8 +734,8 @@ export default function CreatorOnboardingPage() {
               </div>
             )}
 
-            {/* ── Step 4: Standards & Legal ── */}
-            {currentStep === 3 && (
+            {/* ── Step 5: Standards & Legal ── */}
+            {currentStep === 4 && (
               <div className="space-y-6">
                 <div className="text-center mb-8">
                   <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Standards & Legal</h2>
