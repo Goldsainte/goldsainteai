@@ -42,7 +42,7 @@ serve(async (req: Request) => {
 
     console.log("✅ RESEND_API_KEY is set. Attempting to send test email to:", email);
 
-    const SITE_URL = "https://goldsainte.com";
+    const SITE_URL = "https://goldsainte.ai";
     const CONFIRMATION_URL = `${SITE_URL}/auth/confirm?token=SAMPLE_TEST_TOKEN_PREVIEW_ONLY`;
 
     const confirmationHtml = `<!DOCTYPE html>
