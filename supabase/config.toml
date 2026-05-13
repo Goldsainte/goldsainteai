@@ -5,6 +5,8 @@ project_id = "iwdevxltjuedijrcdejs"
     verify_jwt = true
   [functions.og-storyboard]
     verify_jwt = false
+  [functions.monitor-email-queue]
+    verify_jwt = false
   [functions.ai-booking-concierge]
     verify_jwt = false
   [functions.ai-storyboard-itinerary]
