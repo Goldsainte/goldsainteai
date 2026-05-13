@@ -30,6 +30,7 @@ import { template as adminNewUserPending } from './admin-new-user-pending.tsx'
 import { template as adminNewTripPending } from './admin-new-trip-pending.tsx'
 import { template as identityVerificationUpdate } from './identity-verification-update.tsx'
 import { template as disputeOpened } from './dispute-opened.tsx'
+import { template as adminQueueAlert } from './admin-queue-alert.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'welcome-traveler': welcomeTraveler,
@@ -53,4 +54,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'admin-new-trip-pending': adminNewTripPending,
   'identity-verification-update': identityVerificationUpdate,
   'dispute-opened': disputeOpened,
+  'admin-queue-alert': adminQueueAlert,
 }
