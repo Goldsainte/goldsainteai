@@ -1,3 +1,4 @@
+import "../_shared/resend-guard.ts";
 // Supabase Edge Function: send-contract-notification
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";

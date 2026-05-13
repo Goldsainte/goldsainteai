@@ -1,3 +1,4 @@
+import "../_shared/resend-guard.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import Stripe from "https://esm.sh/stripe@15.11.0?target=deno";
 import { resolveAllowedOrigin } from "../_shared/cors.ts";

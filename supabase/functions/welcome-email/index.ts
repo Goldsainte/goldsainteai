@@ -1,3 +1,4 @@
+import "../_shared/resend-guard.ts";
 import { serve } from "https://deno.land/std@0.192.0/http/server.ts";
 import { resolveAllowedOrigin } from "../_shared/cors.ts";
 

@@ -1,3 +1,4 @@
+import "../_shared/resend-guard.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
