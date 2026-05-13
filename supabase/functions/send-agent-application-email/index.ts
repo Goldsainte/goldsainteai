@@ -52,7 +52,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Goldsainte <hello@goldsainte.ai>",
+        from: "Goldsainte <hello@goldsainte.com>",
         to: agentEmail,
         subject: "Your Goldsainte advisor application has been received",
         html,

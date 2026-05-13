@@ -115,7 +115,7 @@ Deno.serve(async (req) => {
         Authorization: `Bearer ${resendApiKey}`,
       },
       body: JSON.stringify({
-        from: "Goldsainte <hello@goldsainte.ai>",
+        from: "Goldsainte <hello@goldsainte.com>",
         to: [recipientEmail],
         subject: `New message from ${safeSender} on Goldsainte`,
         html,
