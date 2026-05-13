@@ -2628,6 +2628,8 @@ export type Database = {
           created_at: string
           currency: string
           id: string
+          partner_payout: number
+          platform_commission: number
           stripe_payment_intent_id: string | null
           trip_booking_id: string | null
         }
@@ -2638,6 +2640,8 @@ export type Database = {
           created_at?: string
           currency?: string
           id?: string
+          partner_payout?: number
+          platform_commission?: number
           stripe_payment_intent_id?: string | null
           trip_booking_id?: string | null
         }
@@ -2648,6 +2652,8 @@ export type Database = {
           created_at?: string
           currency?: string
           id?: string
+          partner_payout?: number
+          platform_commission?: number
           stripe_payment_intent_id?: string | null
           trip_booking_id?: string | null
         }
