@@ -1,3 +1,4 @@
+import "../_shared/resend-guard.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0";
 import { resolveAllowedOrigin } from "../_shared/cors.ts";
