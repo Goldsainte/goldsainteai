@@ -321,13 +321,21 @@ const Auth = () => {
     try {
       setIsLoading(true);
       persistRedirectTargetForOAuth();
+      // Pass selectedAccountType via sessionStorage so it survives the OAuth roundtrip
+      // and AuthCallback can backfill the profile if the trigger defaulted to 'traveler'.
+      if (selectedAccountType) {
+        sessionStorage.setItem('pending_account_type', selectedAccountType);
+      }
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: `${window.location.origin}/auth/callback` },
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: { prompt: 'select_account' },
+        },
       });
       if (error) throw error;
     } catch (error: any) {
-      toast({ title: "Sign in failed", description: error.message, variant: "destructive" });
+      toast({ title: 'Google sign-in failed', description: error.message || 'Please try again.', variant: 'destructive' });
       setIsLoading(false);
     }
   };
