@@ -27,7 +27,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { deleteStoryboard } from "@/services/storyboardsService";
 import { toast } from "sonner";
 import { StoryboardPhotoUploader } from "@/components/storyboards/StoryboardPhotoUploader";
-import { DesignEditorModal } from "@/components/storyboards/DesignEditorModal";
+import { LazyDesignEditorModal } from "@/components/storyboards/LazyDesignEditorModal";
 
 export default function StoryboardDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -549,7 +549,7 @@ export default function StoryboardDetailPage() {
         repinnedFromUserId={saveModal.repinnedFromUserId}
       />
 
-      <DesignEditorModal
+      <LazyDesignEditorModal
         open={designEditorOpen}
         onOpenChange={setDesignEditorOpen}
         onExport={async (url) => {
