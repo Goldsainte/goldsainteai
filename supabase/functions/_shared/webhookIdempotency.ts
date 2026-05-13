@@ -93,31 +93,37 @@ export async function checkAndRecordWebhook(
   payload: Record<string, any>,
   provider: string = 'stripe'
 ): Promise<{ shouldProcess: boolean; isNew: boolean }> {
-  // Check if already processed
-  const alreadyProcessed = await isEventProcessed(supabase, eventId);
-  
-  if (alreadyProcessed) {
-    console.log(`[WEBHOOK] Skipping duplicate event ${eventId}`);
+  // Single atomic INSERT — relies on UNIQUE(event_id) constraint to reject
+  // duplicates. No check-then-insert race, no dependency on a healthy SELECT
+  // path under load. If the row was inserted, we won the race and should
+  // process. If we got 23505, another worker (or a Stripe retry) already
+  // owns it — skip silently. Any other error is treated as
+  // "indeterminate, do not process" so Stripe retries cleanly.
+  const { error } = await supabase
+    .from('webhook_events')
+    .insert({
+      event_id: eventId,
+      event_type: eventType,
+      provider,
+      payload,
+      processing_status: 'pending',
+      processed_at: new Date().toISOString(),
+    });
+
+  if (!error) {
+    console.log(`[WEBHOOK] New event ${eventId}, proceeding with processing`);
+    return { shouldProcess: true, isNew: true };
+  }
+
+  if (error.code === '23505') {
+    console.log(`[WEBHOOK] Duplicate event ${eventId} — already recorded`);
     return { shouldProcess: false, isNew: false };
   }
 
-  // Try to record the event (atomic operation via unique constraint)
-  const recorded = await recordWebhookEvent(supabase, {
-    event_id: eventId,
-    event_type: eventType,
-    provider,
-    payload,
-    processing_status: 'pending'
-  });
-
-  if (!recorded) {
-    // Another instance already recorded it (race condition)
-    console.log(`[WEBHOOK] Event ${eventId} recorded by another instance`);
-    return { shouldProcess: false, isNew: false };
-  }
-
-  console.log(`[WEBHOOK] New event ${eventId}, proceeding with processing`);
-  return { shouldProcess: true, isNew: true };
+  // DB unreachable / locked / unknown error — refuse to process so Stripe
+  // will retry. Better to retry than to double-process a payment.
+  console.error(`[WEBHOOK] Idempotency insert failed for ${eventId}:`, error);
+  return { shouldProcess: false, isNew: false };
 }
 
 /**
