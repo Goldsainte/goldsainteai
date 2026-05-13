@@ -56,7 +56,10 @@ export default defineConfig(({ mode }) => {
     ),
   },
     build: {
-      sourcemap: true, // Enable source maps for Sentry
+      // 'hidden' generates .map files for Sentry upload but omits the
+      // //# sourceMappingURL comment so browsers/CDN consumers can't
+      // discover them from public bundles.
+      sourcemap: 'hidden',
     },
   };
 });
