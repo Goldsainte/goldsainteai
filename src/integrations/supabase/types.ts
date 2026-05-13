@@ -14432,6 +14432,10 @@ export type Database = {
           schedule: string
         }[]
       }
+      email_infra_vault_secret_exists: {
+        Args: { _name: string }
+        Returns: boolean
+      }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
