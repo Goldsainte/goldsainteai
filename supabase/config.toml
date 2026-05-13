@@ -3,6 +3,8 @@ project_id = "iwdevxltjuedijrcdejs"
 [functions]
   [functions.accept-proposal]
     verify_jwt = true
+  [functions.og-storyboard]
+    verify_jwt = false
   [functions.ai-booking-concierge]
     verify_jwt = false
   [functions.ai-storyboard-itinerary]
