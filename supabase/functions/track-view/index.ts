@@ -16,6 +16,9 @@ async function sha256Hex(input: string): Promise<string> {
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+const BOT_UA_RE =
+  /bot|crawler|spider|slurp|facebookexternalhit|facebot|twitterbot|linkedinbot|whatsapp|telegrambot|discordbot|skypeuripreview|applebot|pinterestbot|redditbot|embedly|quora link preview|outbrain|vkshare|w3c_validator|chrome-lighthouse|headlesschrome|duckduckbot|baiduspider|yandex|bingbot|googlebot|ahrefsbot|semrushbot|mj12bot|petalbot|gptbot|ccbot|claudebot|perplexitybot/i;
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders(req) });
   try {
@@ -23,6 +26,13 @@ Deno.serve(async (req) => {
     if (!id || !["trip", "product"].includes(kind)) {
       return new Response(JSON.stringify({ error: "invalid params" }), {
         status: 400,
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
+      });
+    }
+
+    const ua = req.headers.get("user-agent") ?? "";
+    if (!ua || BOT_UA_RE.test(ua)) {
+      return new Response(JSON.stringify({ ok: true, bot: true }), {
         headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       });
     }
