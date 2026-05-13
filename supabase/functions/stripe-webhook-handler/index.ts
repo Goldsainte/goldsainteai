@@ -252,6 +252,12 @@ async function handleBundlePurchase(metadata: any, session: any) {
     return;
   }
 
+  // Tier-based commission split. TIER_COMMISSION values are platform percentages
+  // (bronze 15, silver 12, gold 10, platinum 8). Default to bronze when unknown.
+  const commissionPct = await getCreatorCommissionPct(bundle.creator_id);
+  const platformCommission = Math.round(amountPaid * commissionPct * 100) / 100;
+  const partnerPayout = Math.round((amountPaid - platformCommission) * 100) / 100;
+
   // 1. Create trip booking for bundled trip (if any)
   let tripBookingId: string | null = null;
   if (bundle.trip_id) {
@@ -264,13 +270,14 @@ async function handleBundlePurchase(metadata: any, session: any) {
         total_price: amountPaid,
         currency,
         status: 'confirmed',
-        partner_payout: 0,
-        platform_commission: 0,
+        partner_payout: partnerPayout,
+        platform_commission: platformCommission,
         stripe_payment_intent_id: session.payment_intent,
         metadata: {
           source: 'bundle_purchase',
           bundle_id: bundle.id,
           trip_id: bundle.trip_id,
+          commission_pct: commissionPct,
         },
       } as any)
       .select('id')
@@ -305,6 +312,8 @@ async function handleBundlePurchase(metadata: any, session: any) {
     amount_paid: amountPaid,
     currency,
     trip_booking_id: tripBookingId,
+    partner_payout: partnerPayout,
+    platform_commission: platformCommission,
   });
 
   // 4. Affiliate commission
@@ -322,6 +331,28 @@ async function handleBundlePurchase(metadata: any, session: any) {
     });
   } catch (e) {
     console.error('increment_lifetime_sales bundle err', e);
+  }
+}
+
+const TIER_COMMISSION_PCT: Record<string, number> = {
+  bronze: 0.15,
+  silver: 0.12,
+  gold: 0.10,
+  platinum: 0.08,
+};
+
+async function getCreatorCommissionPct(creatorId: string): Promise<number> {
+  try {
+    const { data } = await supabaseClient
+      .from('profiles')
+      .select('creator_tier')
+      .eq('id', creatorId)
+      .maybeSingle();
+    const tier = (data?.creator_tier as string | undefined)?.toLowerCase() ?? 'bronze';
+    return TIER_COMMISSION_PCT[tier] ?? TIER_COMMISSION_PCT.bronze;
+  } catch (e) {
+    console.error('getCreatorCommissionPct error, defaulting to bronze', e);
+    return TIER_COMMISSION_PCT.bronze;
   }
 }
 
