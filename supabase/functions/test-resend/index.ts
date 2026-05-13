@@ -43,7 +43,7 @@ serve(async (req: Request) => {
     console.log("✅ RESEND_API_KEY is set. Attempting to send test email to:", email);
 
     const SITE_URL = "https://goldsainte.ai";
-    const LOGO_URL = "https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/email-assets/wordmark-green.png";
+    const LOGO_URL = "https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/email-assets/wordmark-green-v2.png";
     const CONFIRMATION_URL = `${SITE_URL}/auth/confirm?token=SAMPLE_TEST_TOKEN_PREVIEW_ONLY`;
 
     const confirmationHtml = `<!DOCTYPE html>
@@ -56,7 +56,7 @@ a{color:#0c4d47;}
 .outer{width:100%;background:#f7f3ea;padding:48px 16px;}
 .container{max-width:560px;margin:0 auto;background:#f7f3ea;}
 .brand{text-align:center;padding:8px 0 40px;}
-.brand img{height:28px;width:auto;display:inline-block;}
+.brand img{height:22px;width:auto;display:inline-block;max-width:240px;}
 .rule{border:0;border-top:1px solid rgba(10,34,37,0.15);margin:0 0 40px;}
 .eyebrow{font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#8a7a3f;margin:0 0 18px;text-align:center;}
 h1{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:38px;line-height:1.15;color:#0a2225;margin:0 0 24px;text-align:center;letter-spacing:-0.01em;}
@@ -73,22 +73,17 @@ h1{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:38px;l
 .num{font-family:'Playfair Display',Georgia,serif;font-style:italic;color:#8a7a3f;font-size:18px;flex-shrink:0;width:22px;}
 .help{font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;line-height:1.7;color:#0a2225;opacity:0.8;text-align:center;margin:36px 0 0;}
 .security{font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;line-height:1.7;color:#0a2225;opacity:0.65;text-align:center;margin:20px 0 0;font-style:italic;}
-.site-footer{background:#FDF9F0;border-top:1px solid #E5DFC6;margin-top:56px;padding:40px 24px 28px;}
-.fcols{width:100%;border-collapse:collapse;margin-bottom:32px;}
-.fcols td{vertical-align:top;padding:0 10px 20px;width:20%;}
-.fhead{font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#0a2225;margin:0 0 14px;font-weight:500;}
-.flist{margin:0;padding:0;list-style:none;}
-.flist li{margin:0 0 8px;}
-.flist a{font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;color:#4A4A4A;text-decoration:none;}
-.fsocial{text-align:center;padding:18px 0;border-top:1px solid #E5DFC6;border-bottom:1px solid #E5DFC6;font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#0a2225;}
-.fsocial a{color:#4A4A4A;text-decoration:none;margin:0 6px;}
-.flogo{text-align:center;padding:24px 0 12px;}
-.flogo img{height:40px;width:auto;}
-.fdesc{text-align:center;font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:#6E6650;max-width:520px;margin:0 auto 16px;line-height:1.6;}
-.flegal{text-align:center;font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;color:#9A9079;line-height:1.8;}
+.site-footer{background:#FDF9F0;border-top:1px solid #E5DFC6;margin-top:56px;padding:36px 24px 24px;text-align:center;}
+.flogo{padding:0 0 18px;}
+.flogo img{height:24px;width:auto;max-width:200px;}
+.fdesc{font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:#6E6650;max-width:440px;margin:0 auto 22px;line-height:1.6;}
+.fnav{font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#0a2225;line-height:2.2;padding:18px 0;border-top:1px solid #E5DFC6;border-bottom:1px solid #E5DFC6;margin-bottom:18px;}
+.fnav a{color:#0a2225;text-decoration:none;margin:0 10px;white-space:nowrap;}
+.fsocial{font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#9A9079;margin-bottom:14px;}
+.fsocial a{color:#0a2225;text-decoration:none;margin:0 8px;}
+.flegal{font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;color:#9A9079;line-height:1.8;margin:0 0 8px;}
 .flegal a{color:#9A9079;text-decoration:none;margin:0 4px;}
-.fauto{text-align:center;font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;letter-spacing:0.08em;color:#0a2225;opacity:0.5;padding:18px 0 0;}
-@media (max-width:480px){.fcols td{display:block;width:100%;padding:0 0 18px;}}
+.fauto{font-family:'Helvetica Neue',Arial,sans-serif;font-size:10px;letter-spacing:0.1em;color:#0a2225;opacity:0.45;padding:8px 0 0;text-transform:uppercase;}
 @media (max-width:480px){h1{font-size:30px;}.outer{padding:32px 12px;}}
 </style></head>
 <body><div class="outer"><div class="container">
@@ -110,55 +105,21 @@ h1{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:38px;l
   <p class="security">Goldsainte will never email you and ask you to disclose or verify your password, credit card, or banking account number. If you receive a suspicious email with a link to update your account information, do not click on the link. Instead, report the e-mail to Goldsainte for investigation.</p>
 </div>
 <div class="site-footer">
-  <table class="fcols" role="presentation"><tr>
-    <td>
-      <p class="fhead">Explore</p>
-      <ul class="flist">
-        <li><a href="${SITE_URL}/marketplace">Browse Trips</a></li>
-        <li><a href="${SITE_URL}/post-trip">Post a Trip</a></li>
-        <li><a href="${SITE_URL}/agents">Find a Specialist</a></li>
-      </ul>
-    </td>
-    <td>
-      <p class="fhead">Join Goldsainte</p>
-      <ul class="flist">
-        <li><a href="${SITE_URL}/auth?mode=signup&role=traveler">Sign Up as a Traveler</a></li>
-        <li><a href="${SITE_URL}/apply/agent">Apply as a Travel Agent</a></li>
-        <li><a href="${SITE_URL}/apply/brand">Partner as a Brand</a></li>
-      </ul>
-    </td>
-    <td>
-      <p class="fhead">Company</p>
-      <ul class="flist">
-        <li><a href="${SITE_URL}/about">About Goldsainte</a></li>
-        <li><a href="${SITE_URL}/corporate-contact">Contact Us</a></li>
-      </ul>
-    </td>
-    <td>
-      <p class="fhead">Getting Started</p>
-      <ul class="flist">
-        <li><a href="${SITE_URL}/how-it-works/traveler">For Travelers</a></li>
-        <li><a href="${SITE_URL}/how-it-works/creator">For Creators</a></li>
-        <li><a href="${SITE_URL}/how-it-works/agent">For Agents</a></li>
-      </ul>
-    </td>
-    <td>
-      <p class="fhead">Support</p>
-      <ul class="flist">
-        <li><a href="${SITE_URL}/help">Help Center</a></li>
-        <li><a href="${SITE_URL}/trust-safety">Safety &amp; Trust</a></li>
-        <li><a href="${SITE_URL}/cancellation-refund-policy">Cancellation Policy</a></li>
-        <li><a href="${SITE_URL}/community-guidelines">Community Guidelines</a></li>
-      </ul>
-    </td>
-  </tr></table>
-  <div class="fsocial">Follow Us &nbsp; <a href="https://www.linkedin.com/company/goldsainte/">LinkedIn</a> · <a href="https://www.instagram.com/goldsainteai/">Instagram</a></div>
   <div class="flogo"><img src="${LOGO_URL}" alt="Goldsainte" /></div>
-  <p class="fdesc">Goldsainte is a curated marketplace connecting discerning travelers with the world's most trusted specialists, creators, and brands.</p>
+  <p class="fdesc">A curated marketplace connecting discerning travelers with the world's most trusted specialists, creators, and brands.</p>
+  <div class="fnav">
+    <a href="${SITE_URL}/marketplace">Browse Trips</a>·
+    <a href="${SITE_URL}/agents">Specialists</a>·
+    <a href="${SITE_URL}/about">About</a>·
+    <a href="${SITE_URL}/help">Help</a>·
+    <a href="${SITE_URL}/trust-safety">Trust &amp; Safety</a>·
+    <a href="${SITE_URL}/corporate-contact">Contact</a>
+  </div>
+  <div class="fsocial">Follow &nbsp;<a href="https://www.linkedin.com/company/goldsainte/">LinkedIn</a>·<a href="https://www.instagram.com/goldsainteai/">Instagram</a></div>
   <p class="flegal">
-    <a href="${SITE_URL}/privacy-cookies">Privacy Policy</a> ·
-    <a href="${SITE_URL}/terms">Terms of Service</a> ·
-    <a href="${SITE_URL}/dispute-resolution">Dispute Resolution</a>
+    <a href="${SITE_URL}/privacy-cookies">Privacy</a>·
+    <a href="${SITE_URL}/terms">Terms</a>·
+    <a href="${SITE_URL}/dispute-resolution">Disputes</a>
     <br/>© 2026 Goldsainte AI Inc. All rights reserved.
   </p>
   <p class="fauto">This is an automated message — please do not reply.</p>
