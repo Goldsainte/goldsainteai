@@ -11,9 +11,10 @@ function corsHeaders(req?: Request): Record<string, string> {
 };
 }
 
-// Simple in-memory rate limit per cold container
-const recent = new Map<string, number>();
-const TTL_MS = 30 * 60 * 1000;
+async function sha256Hex(input: string): Promise<string> {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders(req) });
@@ -30,24 +31,27 @@ Deno.serve(async (req) => {
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       req.headers.get("x-real-ip") ||
       "anon";
-    const rlKey = `${ip}:${kind}:${id}`;
-    const now = Date.now();
-    const last = recent.get(rlKey) ?? 0;
-    if (now - last < TTL_MS) {
-      return new Response(JSON.stringify({ ok: true, deduped: true }), {
-        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
-      });
-    }
-    recent.set(rlKey, now);
-    // basic GC
-    if (recent.size > 5000) {
-      for (const [k, v] of recent) if (now - v > TTL_MS) recent.delete(k);
-    }
+    const ipHash = await sha256Hex(`${ip}|${Deno.env.get("SUPABASE_URL") ?? ""}`);
 
     const admin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
+
+    // DB-backed dedup: one view per (ip_hash, kind, entity_id, day).
+    // ON CONFLICT DO NOTHING — if no row inserted, this is a duplicate view today.
+    const { data: inserted, error: dedupErr } = await admin
+      .from("view_dedup")
+      .insert({ ip_hash: ipHash, kind, entity_id: id })
+      .select("ip_hash")
+      .maybeSingle();
+
+    if (dedupErr && dedupErr.code !== "23505") throw dedupErr;
+    if (!inserted || dedupErr?.code === "23505") {
+      return new Response(JSON.stringify({ ok: true, deduped: true }), {
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
+      });
+    }
 
     const fn = kind === "trip" ? "increment_trip_view" : "increment_product_view";
     const param = kind === "trip" ? { _trip_id: id } : { _product_id: id };
