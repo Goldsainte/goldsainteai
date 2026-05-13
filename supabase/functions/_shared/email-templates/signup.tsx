@@ -1,19 +1,7 @@
 /// <reference types="npm:@types/react@18.3.1" />
 
 import * as React from 'npm:react@18.3.1'
-
-import {
-  Body,
-  Container,
-  Head,
-  Heading,
-  Hr,
-  Html,
-  Link,
-  Preview,
-  Section,
-  Text,
-} from 'npm:@react-email/components@0.0.22'
+import { Html } from 'npm:@react-email/components@0.0.22'
 
 interface SignupEmailProps {
   siteName: string
@@ -22,230 +10,122 @@ interface SignupEmailProps {
   confirmationUrl: string
 }
 
-export const SignupEmail = ({
-  siteUrl,
-  confirmationUrl,
-}: SignupEmailProps) => (
+const SITE_URL = 'https://goldsainte.ai'
+const LOGO_URL =
+  'https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/email-assets/wordmark-green-v2.png'
+
+const STYLES = `
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&display=swap');
+body{margin:0;padding:0;background:#f7f3ea;font-family:'Helvetica Neue',Arial,sans-serif;color:#0a2225;-webkit-font-smoothing:antialiased;}
+a{color:#0c4d47;}
+.outer{width:100%;background:#f7f3ea;padding:48px 16px;}
+.container{max-width:560px;margin:0 auto;background:#f7f3ea;}
+.brand{padding:8px 0 28px;font-size:0;line-height:0;}
+.brand img{height:22px;width:auto;max-width:240px;display:block;margin:0 auto;}
+.rule{border:0;border-top:1px solid rgba(10,34,37,0.15);margin:0 0 28px;}
+h1{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:38px;line-height:1.15;color:#0a2225;margin:0 0 14px;text-align:center;letter-spacing:-0.01em;}
+.lede{font-family:'Helvetica Neue',Arial,sans-serif;font-size:16px;line-height:1.6;color:#0a2225;opacity:0.85;margin:0 0 36px;text-align:center;}
+.tagline{font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;line-height:1.6;color:#6E6650;font-style:italic;text-align:center;max-width:480px;margin:0 auto 28px;}
+.cta-wrap{text-align:center;margin:0 0 28px;}
+.cta{display:inline-block;background:#0c4d47;color:#f7f3ea !important;text-decoration:none;font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;letter-spacing:0.18em;text-transform:uppercase;padding:18px 40px;border-radius:2px;font-weight:500;}
+.fallback{font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;line-height:1.6;color:#0a2225;opacity:0.55;text-align:center;margin:0 0 48px;}
+.fallback a{color:#0c4d47;word-break:break-all;text-decoration:underline;opacity:0.8;}
+.divider{border:0;border-top:1px solid rgba(10,34,37,0.12);margin:40px 0;}
+.section-title{font-family:'Playfair Display',Georgia,serif;font-size:20px;font-weight:400;color:#0a2225;margin:0 0 20px;text-align:center;}
+.steps{margin:0 0 16px;padding:0;list-style:none;}
+.steps li{font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;line-height:1.6;color:#0a2225;opacity:0.8;padding:14px 0;border-bottom:1px solid rgba(10,34,37,0.08);display:flex;gap:18px;}
+.steps li:last-child{border-bottom:0;}
+.num{font-family:'Playfair Display',Georgia,serif;font-style:italic;color:#8a7a3f;font-size:18px;flex-shrink:0;width:22px;}
+.help{font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;line-height:1.7;color:#0a2225;opacity:0.8;text-align:center;margin:36px 0 0;}
+.security{font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;line-height:1.7;color:#0a2225;opacity:0.65;text-align:center;margin:20px 0 0;font-style:italic;}
+.site-footer{background:#FDF9F0;border-top:1px solid #E5DFC6;margin-top:56px;padding:36px 24px 24px;text-align:center;}
+.fnav{font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#0a2225;line-height:2.2;padding:18px 0;border-top:1px solid #E5DFC6;border-bottom:1px solid #E5DFC6;margin-bottom:18px;}
+.fnav a{color:#0a2225;text-decoration:none;margin:0 10px;white-space:nowrap;}
+.fsocial{font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#9A9079;margin-bottom:14px;}
+.fsocial a{color:#0a2225;text-decoration:none;margin:0 8px;}
+.flegal{font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;color:#9A9079;line-height:1.8;margin:0 0 8px;}
+.flegal a{color:#9A9079;text-decoration:none;margin:0 4px;}
+.fauto{font-family:'Helvetica Neue',Arial,sans-serif;font-size:10px;letter-spacing:0.1em;color:#0a2225;opacity:0.45;padding:8px 0 0;text-transform:uppercase;}
+@media (max-width:480px){h1{font-size:30px;}.outer{padding:32px 12px;}}
+`
+
+export const SignupEmail = ({ confirmationUrl }: SignupEmailProps) => (
   <Html lang="en" dir="ltr">
-    <Head>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&display=swap"
-        rel="stylesheet"
-      />
-    </Head>
-    <Preview>Welcome to Goldsainte — confirm your email to begin.</Preview>
-    <Body style={main}>
-      <Container style={outer}>
-        <Section style={headerSection}>
-          <Text style={wordmark}>GOLDSAINTE</Text>
-        </Section>
-
-        <Container style={card}>
-          <Heading style={h1}>Welcome to Goldsainte</Heading>
-          <Text style={tagline}>
-            The members-only marketplace for extraordinary travel.
-          </Text>
-
-          <Text style={body}>
-            We've received your request to join Goldsainte. To complete your
-            account setup and unlock access to our curated network of
-            world-class travel designers, please confirm your email address
-            below.
-          </Text>
-
-          <Section style={ctaWrap}>
-            <Link href={confirmationUrl} style={cta}>
-              Verify My Email
-            </Link>
-          </Section>
-
-          <Text style={fineprint}>
-            This link will expire in 24 hours. If the button above doesn't
-            work, copy and paste this URL into your browser:
-          </Text>
-          <Text style={urlLine}>{confirmationUrl}</Text>
-
-          <Hr style={divider} />
-
-          <Heading as="h2" style={h2}>What happens next</Heading>
-          <Text style={step}><span style={stepNum}>1.</span> Confirm your email by clicking the button above.</Text>
-          <Text style={step}><span style={stepNum}>2.</span> Complete your member profile and travel preferences.</Text>
-          <Text style={step}><span style={stepNum}>3.</span> Verify your identity through our secure partner.</Text>
-          <Text style={step}><span style={stepNum}>4.</span> Begin curating storyboards or requesting a trip.</Text>
-          <Text style={step}><span style={stepNum}>5.</span> Connect with our concierge for tailored experiences.</Text>
-
-          <Text style={support}>
-            If you have any questions, our team is available at{' '}
-            <Link href="mailto:hello@goldsainte.com" style={inlineLink}>
-              hello@goldsainte.com
-            </Link>
-            .
-          </Text>
-
-          <Text style={security}>
-            For your security, never share this verification link. Goldsainte
-            will never ask for your password or payment details by email.
-          </Text>
-        </Container>
-
-        <Section style={footer}>
-          <Text style={footerBrand}>GOLDSAINTE</Text>
-          <Text style={footerTag}>Curated travel for the discerning few.</Text>
-          <Text style={footerLinks}>
-            <Link href={siteUrl} style={footerLink}>goldsainte.com</Link>
-            {'  ·  '}
-            <Link href="mailto:hello@goldsainte.com" style={footerLink}>hello@goldsainte.com</Link>
-          </Text>
-          <Text style={footerLegal}>
-            © {new Date().getFullYear()} Goldsainte. All rights reserved.
-          </Text>
-        </Section>
-      </Container>
-    </Body>
+    <head>
+      <meta charSet="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Confirm your email — Goldsainte</title>
+      <style dangerouslySetInnerHTML={{ __html: STYLES }} />
+    </head>
+    <body>
+      <div className="outer">
+        <div className="container">
+          <table role="presentation" width="100%" cellPadding={0} cellSpacing={0} border={0}>
+            <tbody>
+              <tr>
+                <td align="center" className="brand">
+                  <img src={LOGO_URL} alt="Goldsainte" />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <hr className="rule" />
+          <h1>Welcome to Goldsainte.</h1>
+          <p className="tagline">
+            A curated marketplace connecting discerning travelers with the world's most trusted specialists, creators, and brands.
+          </p>
+          <p className="lede">
+            Confirm your email address to activate your account and begin curating your journey.
+          </p>
+          <div className="cta-wrap">
+            <a href={confirmationUrl} className="cta">Confirm my email</a>
+          </div>
+          <p className="fallback">
+            Or paste this link into your browser:<br />
+            <a href={confirmationUrl}>{confirmationUrl}</a>
+          </p>
+          <hr className="divider" />
+          <p className="section-title">What happens next</p>
+          <ul className="steps">
+            <li><span className="num">I.</span><span>Confirm your email to activate your account and secure your profile.</span></li>
+            <li><span className="num">II.</span><span>You'll be signed in automatically and guided to your personal concierge dashboard.</span></li>
+            <li><span className="num">III.</span><span>Complete your traveler profile so our specialists can tailor recommendations to your taste.</span></li>
+            <li><span className="num">IV.</span><span>Browse curated trips across 50+ countries, designed by certified specialists and trusted creators.</span></li>
+            <li><span className="num">V.</span><span>Request a trip or book directly — every reservation is protected on-platform from inquiry to return.</span></li>
+          </ul>
+          <p className="help" style={{ marginTop: '48px' }}>
+            If you have any questions, concerns, or require assistance, please do not hesitate to contact{' '}
+            <a href={`${SITE_URL}/corporate-contact`}>Goldsainte Support</a>.
+          </p>
+          <p className="security">
+            Goldsainte will never email you and ask you to disclose or verify your password, credit card, or banking account number. If you receive a suspicious email with a link to update your account information, do not click on the link. Instead, report the e-mail to Goldsainte for investigation.
+          </p>
+        </div>
+        <div className="site-footer">
+          <div className="fnav">
+            <a href={`${SITE_URL}/marketplace`}>Browse Trips</a>·
+            <a href={`${SITE_URL}/agents`}>Specialists</a>·
+            <a href={`${SITE_URL}/about`}>About</a>·
+            <a href={`${SITE_URL}/help`}>Help</a>·
+            <a href={`${SITE_URL}/trust-safety`}>Trust &amp; Safety</a>·
+            <a href={`${SITE_URL}/corporate-contact`}>Contact</a>
+          </div>
+          <div className="fsocial">
+            Follow &nbsp;
+            <a href="https://www.linkedin.com/company/goldsainte/">LinkedIn</a>·
+            <a href="https://www.instagram.com/goldsainteai/">Instagram</a>
+          </div>
+          <p className="flegal">
+            <a href={`${SITE_URL}/privacy-cookies`}>Privacy</a>·
+            <a href={`${SITE_URL}/terms`}>Terms</a>·
+            <a href={`${SITE_URL}/dispute-resolution`}>Disputes</a>
+            <br />© 2026 Goldsainte AI Inc. All rights reserved.
+          </p>
+          <p className="fauto">This is an automated message — please do not reply.</p>
+        </div>
+      </div>
+    </body>
   </Html>
 )
 
 export default SignupEmail
-
-const main = {
-  backgroundColor: '#ffffff',
-  fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
-  margin: 0,
-  padding: 0,
-}
-const outer = { width: '100%', maxWidth: '620px', margin: '0 auto', padding: '0' }
-const headerSection = { padding: '32px 0 8px', textAlign: 'center' as const }
-const wordmark = {
-  fontFamily: '"Playfair Display", Georgia, serif',
-  fontSize: '20px',
-  letterSpacing: '0.32em',
-  color: '#0a2225',
-  margin: 0,
-  textAlign: 'center' as const,
-}
-const card = {
-  backgroundColor: '#f7f3ea',
-  padding: '48px 44px',
-  margin: '24px 0',
-}
-const h1 = {
-  fontFamily: '"Playfair Display", Georgia, serif',
-  fontSize: '34px',
-  fontWeight: '500' as const,
-  color: '#0a2225',
-  textAlign: 'center' as const,
-  margin: '0 0 14px',
-  lineHeight: '1.15',
-}
-const tagline = {
-  fontSize: '14px',
-  color: '#0a2225',
-  opacity: 0.75,
-  textAlign: 'center' as const,
-  fontStyle: 'italic' as const,
-  margin: '0 auto 28px',
-}
-const body = {
-  fontSize: '15px',
-  color: '#0a2225',
-  lineHeight: '1.7',
-  margin: '0 0 32px',
-}
-const ctaWrap = { textAlign: 'center' as const, margin: '8px 0 28px' }
-const cta = {
-  backgroundColor: '#0c4d47',
-  color: '#f7f3ea',
-  fontSize: '13px',
-  letterSpacing: '0.18em',
-  textTransform: 'uppercase' as const,
-  padding: '16px 36px',
-  textDecoration: 'none',
-  display: 'inline-block',
-  fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
-  fontWeight: '500' as const,
-}
-const fineprint = {
-  fontSize: '12px',
-  color: '#0a2225',
-  opacity: 0.65,
-  margin: '24px 0 6px',
-  textAlign: 'center' as const,
-}
-const urlLine = {
-  fontSize: '11px',
-  color: '#0c4d47',
-  wordBreak: 'break-all' as const,
-  textAlign: 'center' as const,
-  margin: '0 0 8px',
-}
-const divider = {
-  border: 'none',
-  borderTop: '1px solid #8a7a3f',
-  opacity: 0.4,
-  margin: '40px 0 28px',
-}
-const h2 = {
-  fontFamily: '"Playfair Display", Georgia, serif',
-  fontSize: '20px',
-  fontWeight: '500' as const,
-  color: '#0a2225',
-  margin: '0 0 18px',
-}
-const step = {
-  fontSize: '14px',
-  color: '#0a2225',
-  lineHeight: '1.6',
-  margin: '0 0 10px',
-}
-const stepNum = {
-  color: '#8a7a3f',
-  fontFamily: '"Playfair Display", Georgia, serif',
-  marginRight: '8px',
-  fontWeight: '500' as const,
-}
-const support = {
-  fontSize: '14px',
-  color: '#0a2225',
-  lineHeight: '1.6',
-  margin: '48px 0 20px',
-}
-const inlineLink = { color: '#0c4d47', textDecoration: 'underline' }
-const security = {
-  fontSize: '12px',
-  color: '#0a2225',
-  opacity: 0.6,
-  lineHeight: '1.5',
-  margin: '20px 0 0',
-  fontStyle: 'italic' as const,
-}
-const footer = { textAlign: 'center' as const, padding: '12px 0 32px' }
-const footerBrand = {
-  fontFamily: '"Playfair Display", Georgia, serif',
-  fontSize: '14px',
-  letterSpacing: '0.32em',
-  color: '#0a2225',
-  margin: '0 0 6px',
-  textAlign: 'center' as const,
-}
-const footerTag = {
-  fontSize: '11px',
-  color: '#0a2225',
-  opacity: 0.6,
-  fontStyle: 'italic' as const,
-  margin: '0 0 12px',
-  textAlign: 'center' as const,
-}
-const footerLinks = {
-  fontSize: '11px',
-  color: '#0a2225',
-  margin: '0 0 8px',
-  textAlign: 'center' as const,
-}
-const footerLink = { color: '#0c4d47', textDecoration: 'none' }
-const footerLegal = {
-  fontSize: '10px',
-  color: '#0a2225',
-  opacity: 0.5,
-  margin: 0,
-  textAlign: 'center' as const,
-}
