@@ -1,10 +1,14 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Vary": "Origin",
 };
+}
 
 // Database cache with 24-hour TTL
 const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
@@ -231,7 +235,7 @@ async function enrichWithGooglePlaces(hotels: any[], cityName: string) {
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders(req) });
   
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s timeout
@@ -244,7 +248,7 @@ serve(async (req) => {
     
     if (!location || !checkIn || !checkOut) {
       clearTimeout(timeoutId);
-      return new Response(JSON.stringify({ error: "Missing location/checkIn/checkOut" }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 });
+      return new Response(JSON.stringify({ error: "Missing location/checkIn/checkOut" }), { headers: { ...corsHeaders(req), "Content-Type": "application/json" }, status: 400 });
     }
     
     // Validate filter parameter (removed 'amadeus' option)
@@ -273,7 +277,7 @@ serve(async (req) => {
         ...cachedResult,
         cached: true 
       }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
         status: 200,
       });
     } else if (cachedResult) {
@@ -577,7 +581,7 @@ serve(async (req) => {
       ...responseData,
       filter: hotelFilter // Include filter in response for client reference
     }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       status: 200,
     });
   } catch (e) {
@@ -587,13 +591,13 @@ serve(async (req) => {
     // Check if it's a timeout error
     if (e instanceof Error && e.name === 'AbortError') {
       return new Response(JSON.stringify({ error: "Request timed out. Please try again.", results: [] }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
         status: 408,
       });
     }
     
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error", results: [] }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       status: 500,
     });
   }

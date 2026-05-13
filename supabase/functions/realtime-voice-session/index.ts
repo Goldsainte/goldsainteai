@@ -1,12 +1,16 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Cache-Control": "no-store",
+  "Vary": "Origin",
 };
+}
 
 function buildVoiceInstructions(agentProfile: any): string {
   return `You are Madison — the luxury travel concierge for Goldsainte.
@@ -34,7 +38,7 @@ What NOT to do:
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders(req) });
 
   try {
     console.log("[VOICE-SESSION] Start request");
@@ -52,7 +56,7 @@ serve(async (req) => {
       console.error("❌ OPENAI_API_KEY not set");
       return new Response(JSON.stringify({ error: "OPENAI_API_KEY not set" }), {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       });
     }
 
@@ -87,7 +91,7 @@ serve(async (req) => {
         details: errText 
       }), {
         status: 502,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       });
     }
 
@@ -112,14 +116,14 @@ serve(async (req) => {
         got: session?.client_secret 
       }), {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       });
     }
 
     console.log(`✅ Ephemeral token created: ${token.slice(0, 12)}...${token.slice(-4)}`);
     
     return new Response(JSON.stringify({ token, expiresAt }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders(req), "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("❌ Voice session error:", e);
@@ -127,7 +131,7 @@ serve(async (req) => {
       error: e instanceof Error ? e.message : "Unknown error" 
     }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders(req), "Content-Type": "application/json" },
     });
   }
 });

@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { checkRateLimit, getClientIdentifier, createRateLimitResponse, getUserTier, getTieredRateLimit, type SubscriptionTier } from "../_shared/rateLimiter.ts";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
 // ⚠️ SECURITY: Input validation for AI concierge
 const validateConciergeInput = (data: any): { success: boolean; error?: string } => {
@@ -24,10 +25,13 @@ const validateConciergeInput = (data: any): { success: boolean; error?: string }
   return { success: true };
 };
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Vary": "Origin",
 };
+}
 
 // Persistent trip context across tool calls
 const tripContext: {
@@ -50,7 +54,7 @@ const tripContext: {
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -88,7 +92,7 @@ serve(async (req) => {
     
     if (!rateLimit.allowed) {
       console.log('❌ [RATE LIMIT] AI concierge request blocked for:', clientId);
-      return createRateLimitResponse(rateLimit, corsHeaders);
+      return createRateLimitResponse(rateLimit, corsHeaders(req));
     }
     
     console.log(`✅ [RATE LIMIT] ${rateLimit.remaining} AI concierge requests remaining`);
@@ -101,7 +105,7 @@ serve(async (req) => {
       console.error('❌ [VALIDATION] Invalid input:', validation.error);
       return new Response(
         JSON.stringify({ error: validation.error }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
     console.log('✅ [VALIDATION] Input validated');
@@ -1065,13 +1069,13 @@ Remember: You're an AI search concierge that helps find perfect travel options a
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          { status: 429, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
         );
       }
       if (response.status === 402) {
         return new Response(
           JSON.stringify({ error: "Service temporarily unavailable. Please contact support." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          { status: 402, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
         );
       }
       const errorText = await response.text();
@@ -1082,7 +1086,7 @@ Remember: You're an AI search concierge that helps find perfect travel options a
     // If streaming is requested, return the stream directly
     if (stream) {
       return new Response(response.body, {
-        headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+        headers: { ...corsHeaders(req), "Content-Type": "text/event-stream" },
       });
     }
 
@@ -1585,19 +1589,19 @@ ${result.nextSteps?.map((step: string, i: number) => `${i + 1}. ${step}`).join('
           content: finalData.choices[0].message.content,
           toolResults: formattedToolResults
         }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
     return new Response(
       JSON.stringify({ content: aiMessage.content }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
     );
   } catch (error) {
     console.error("Error in ai-booking-concierge:", error);
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : "An error occurred" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
     );
   }
 });

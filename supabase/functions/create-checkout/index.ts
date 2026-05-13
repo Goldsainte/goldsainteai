@@ -5,12 +5,16 @@ import { checkRateLimit, createRateLimitResponse, getClientIdentifier } from "..
 import { logger, generateTraceId } from "../_shared/structuredLogger.ts";
 import { generateIdempotencyKey, withIdempotency } from "../_shared/idempotency.ts";
 import { retryStripeOperation } from "../_shared/retryWithBackoff.ts";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Vary": "Origin",
 };
+}
 
 serve(async (req) => {
   const requestId = generateTraceId();
@@ -21,7 +25,7 @@ serve(async (req) => {
   });
 
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   // Validate request origin against allowlist
@@ -65,7 +69,7 @@ serve(async (req) => {
 
     if (!rateLimitResult.allowed) {
       logger.warn("Rate limit exceeded", { identifier, retryAfter: rateLimitResult.retryAfter });
-      return createRateLimitResponse(rateLimitResult, corsHeaders);
+      return createRateLimitResponse(rateLimitResult, corsHeaders(req));
     }
 
     const { priceId, subscriptionType, tier } = await req.json();
@@ -154,7 +158,7 @@ serve(async (req) => {
     });
 
     return new Response(JSON.stringify({ url: session.url }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
@@ -172,7 +176,7 @@ serve(async (req) => {
         requestId 
       }), 
       {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
         status: error instanceof Error && error.message.includes("not authenticated") ? 401 : 500,
       }
     );

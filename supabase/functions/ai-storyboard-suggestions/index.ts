@@ -1,14 +1,18 @@
 // supabase/functions/ai-storyboard-suggestions/index.ts
 import { serve } from "https://deno.land/std@0.192.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.48.0";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Vary": "Origin",
 };
+}
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: { persistSession: false },
@@ -17,13 +21,13 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   if (req.method !== "POST") {
     return new Response("Method not allowed", { 
       status: 405,
-      headers: corsHeaders 
+      headers: corsHeaders(req) 
     });
   }
 
@@ -38,7 +42,7 @@ serve(async (req) => {
         JSON.stringify({ error: "tripId and storyboardId required" }),
         { 
           status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }
         },
       );
     }
@@ -56,7 +60,7 @@ serve(async (req) => {
         JSON.stringify({ error: "Failed to load trip" }),
         { 
           status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }
         },
       );
     }
@@ -67,7 +71,7 @@ serve(async (req) => {
         JSON.stringify({ error: "Trip not found" }),
         { 
           status: 404,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }
         },
       );
     }
@@ -92,7 +96,7 @@ serve(async (req) => {
         JSON.stringify({ ok: true, skipped: true, message: "Storyboard already has items" }), 
         {
           status: 200,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }
         }
       );
     }
@@ -153,7 +157,7 @@ serve(async (req) => {
         JSON.stringify({ error: "Failed to create storyboard items", details: insertError.message }),
         { 
           status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }
         },
       );
     }
@@ -163,7 +167,7 @@ serve(async (req) => {
       JSON.stringify({ ok: true, itemsCreated: rows.length }), 
       { 
         status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }
       }
     );
   } catch (err) {
@@ -172,7 +176,7 @@ serve(async (req) => {
       JSON.stringify({ error: "Unexpected error", details: err instanceof Error ? err.message : String(err) }),
       { 
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }
       },
     );
   }

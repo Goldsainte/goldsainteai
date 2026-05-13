@@ -1,20 +1,24 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { 
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
   sanitizeText, 
   validateNumber, 
   validateStringLength,
   validateRequestBody 
 } from "../_shared/inputValidation.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
+  "Vary": "Origin",
 };
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -43,7 +47,7 @@ serve(async (req) => {
     if (!valid) {
       return new Response(
         JSON.stringify({ error: 'Missing required fields', details: errors }), 
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -54,7 +58,7 @@ serve(async (req) => {
     if (!validTripTypes.includes(tripType)) {
       return new Response(
         JSON.stringify({ error: 'Invalid trip type' }), 
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -66,7 +70,7 @@ serve(async (req) => {
       if (!destValidation.valid) {
         return new Response(
           JSON.stringify({ error: 'Destination must be 1-200 characters' }), 
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
     } else if (flightRequest?.destination) {
@@ -79,7 +83,7 @@ serve(async (req) => {
     if (!budgetValidation.valid) {
       return new Response(
         JSON.stringify({ error: budgetValidation.error }), 
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -139,14 +143,14 @@ serve(async (req) => {
         caseId: `MKT-${job.id.slice(0, 8).toUpperCase()}`,
         message: 'Your request has been submitted to our Goldsainte Certified Travel Agents. You should receive responses within 24 hours.',
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
     );
   } catch (error) {
     console.error('Error in create-marketplace-lead:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
     return new Response(
       JSON.stringify({ error: errorMessage }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
     );
   }
 });

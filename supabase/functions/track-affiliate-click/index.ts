@@ -1,20 +1,24 @@
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Vary": "Origin",
 };
+}
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders(req) });
   try {
     const { ref } = await req.json();
     if (!ref || typeof ref !== "string") {
       return new Response(JSON.stringify({ error: "ref required" }), {
         status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       });
     }
     const admin = createClient(
@@ -29,7 +33,7 @@ Deno.serve(async (req) => {
       .maybeSingle();
     if (!link) {
       return new Response(JSON.stringify({ ok: true, matched: false }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       });
     }
     const ip =
@@ -47,13 +51,13 @@ Deno.serve(async (req) => {
       .update({ clicks: ((await admin.from("affiliate_links").select("clicks").eq("id", link.id).single()).data?.clicks ?? 0) + 1 })
       .eq("id", link.id);
     return new Response(JSON.stringify({ ok: true, matched: true }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders(req), "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("track-affiliate-click error", e);
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders(req), "Content-Type": "application/json" },
     });
   }
 });

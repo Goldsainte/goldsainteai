@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
 interface NotifyBody {
   tripRequestId: string;
@@ -12,14 +13,17 @@ interface AssignmentRow {
 
 const resendApiKey = Deno.env.get("RESEND_API_KEY");
 const siteUrl = Deno.env.get("SITE_URL") || "";
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Vary": "Origin",
 };
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers: corsHeaders(req) });
   }
 
   try {
@@ -27,7 +31,7 @@ Deno.serve(async (req) => {
     if (!tripRequestId) {
       return new Response(JSON.stringify({ error: "Missing tripRequestId" }), {
         status: 400,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
+        headers: { "Content-Type": "application/json", ...corsHeaders(req) },
       });
     }
 
@@ -69,7 +73,7 @@ Deno.serve(async (req) => {
       });
       return new Response(JSON.stringify({ ok: true, recipients: emails.length }), {
         status: 200,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
+        headers: { "Content-Type": "application/json", ...corsHeaders(req) },
       });
     }
 
@@ -106,13 +110,13 @@ Deno.serve(async (req) => {
 
     return new Response(JSON.stringify({ ok: true, recipients: emails.length }), {
       status: 200,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
+      headers: { "Content-Type": "application/json", ...corsHeaders(req) },
     });
   } catch (err) {
     console.error("send-match-notifications error:", err);
     return new Response(JSON.stringify({ error: "Internal error" }), {
       status: 500,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
+      headers: { "Content-Type": "application/json", ...corsHeaders(req) },
     });
   }
 });

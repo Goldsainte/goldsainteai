@@ -1,12 +1,16 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import OpenAI from "https://esm.sh/openai@4.38.2";
 import { enforceRateLimit } from "../_utils/rate-limit.ts";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
+  "Vary": "Origin",
 };
+}
 
 interface MatchRequestBody {
   tripRequestId: string;
@@ -82,7 +86,7 @@ function scoreHeuristics(trip: TripRequest, source: Record<string, any>): number
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers: corsHeaders(req) });
   }
 
   try {
@@ -91,7 +95,7 @@ Deno.serve(async (req) => {
     if (!tripRequestId) {
       return new Response(JSON.stringify({ error: "Missing tripRequestId" }), {
         status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       });
     }
 
@@ -119,7 +123,7 @@ Deno.serve(async (req) => {
       keyType: "ai",
       userId: trip.user_id,
       req,
-      corsHeaders,
+      corsHeaders(req),
     });
 
     if (rateLimitResponse) {
@@ -333,13 +337,13 @@ Return a JSON array of:
 
     return new Response(JSON.stringify({ ok: true, topCount: top.length }), {
       status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders(req), "Content-Type": "application/json" },
     });
   } catch (error) {
     console.error("ai-trip-matching-embeddings error:", error);
     return new Response(JSON.stringify({ error: "Internal error" }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders(req), "Content-Type": "application/json" },
     });
   }
 });

@@ -1,24 +1,28 @@
 // supabase/functions/booking-actions/index.ts
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.48.0';
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Vary": "Origin",
 };
+}
 
 type Action = 'request_cancellation' | 'open_dispute' | 'admin_update_status';
 
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
     if (req.method !== 'POST') {
       return new Response(
         JSON.stringify({ error: 'Method not allowed' }),
-        { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 405, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -39,7 +43,7 @@ Deno.serve(async (req) => {
     if (!action || !userId) {
       return new Response(
         JSON.stringify({ error: 'Missing action or userId' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -48,7 +52,7 @@ Deno.serve(async (req) => {
       if (!bookingId || !role || !reasonShort) {
         return new Response(
           JSON.stringify({ error: 'Missing cancellation fields' }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -63,7 +67,7 @@ Deno.serve(async (req) => {
         console.error('Booking not found:', bookingError);
         return new Response(
           JSON.stringify({ error: 'Booking not found' }),
-          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 404, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -72,7 +76,7 @@ Deno.serve(async (req) => {
       if (!isTraveler && !isPartner) {
         return new Response(
           JSON.stringify({ error: 'Not authorized for this booking' }),
-          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 403, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -94,7 +98,7 @@ Deno.serve(async (req) => {
         console.error('Could not create cancellation:', cancelError);
         return new Response(
           JSON.stringify({ error: 'Could not create cancellation request' }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -111,7 +115,7 @@ Deno.serve(async (req) => {
 
       return new Response(
         JSON.stringify({ cancellation }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 200, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -120,7 +124,7 @@ Deno.serve(async (req) => {
       if (!bookingId || !type || !summary) {
         return new Response(
           JSON.stringify({ error: 'Missing dispute fields' }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -134,7 +138,7 @@ Deno.serve(async (req) => {
         console.error('Booking not found:', bookingError);
         return new Response(
           JSON.stringify({ error: 'Booking not found' }),
-          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 404, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -144,7 +148,7 @@ Deno.serve(async (req) => {
       if (!isTraveler && !isPartner) {
         return new Response(
           JSON.stringify({ error: 'Not authorized for this booking' }),
-          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 403, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -164,7 +168,7 @@ Deno.serve(async (req) => {
         console.error('Could not open dispute:', disputeError);
         return new Response(
           JSON.stringify({ error: 'Could not open dispute' }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -186,26 +190,26 @@ Deno.serve(async (req) => {
 
       return new Response(
         JSON.stringify({ dispute }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 200, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
     if (action === 'admin_update_status') {
       return new Response(
         JSON.stringify({ error: 'Not implemented in public edge function.' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 403, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
     return new Response(
       JSON.stringify({ error: 'Unknown action' }),
-      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
     );
   } catch (err) {
     console.error('booking-actions error:', err);
     return new Response(
       JSON.stringify({ error: 'Unexpected error', details: String(err) }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
     );
   }
 });

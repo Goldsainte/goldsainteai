@@ -3,11 +3,15 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCurrencyFromLocation } from "../_shared/currencyHelpers.ts";
 import { validateHotelDates, validateNumericParam } from "../_shared/dateValidation.ts";
 import { checkRateLimit, getClientIdentifier, createRateLimitResponse, getUserTier, getTieredRateLimit, type SubscriptionTier } from "../_shared/rateLimiter.ts";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Vary": "Origin",
 };
+}
 
 const EXPEDIA_API_KEY = Deno.env.get("EXPEDIA_API_KEY");
 const EXPEDIA_API_SECRET = Deno.env.get("EXPEDIA_API_SECRET");
@@ -110,7 +114,7 @@ async function enrichWithExpedia(hotelName: string, cityName: string, checkIn: s
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -149,7 +153,7 @@ serve(async (req) => {
     });
     
     if (!rateLimit.allowed) {
-      return createRateLimitResponse(rateLimit, corsHeaders);
+      return createRateLimitResponse(rateLimit, corsHeaders(req));
     }
     
     // Validate dates
@@ -159,7 +163,7 @@ serve(async (req) => {
         error: dateValidation.error,
         results: []
       }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
         status: 400,
       });
     }
@@ -170,7 +174,7 @@ serve(async (req) => {
         error: adultsValidation.error,
         results: []
       }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
         status: 400,
       });
     }
@@ -201,7 +205,7 @@ serve(async (req) => {
         results: [],
         message: 'No hotels found in this city'
       }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
         status: 200,
       });
     }
@@ -303,7 +307,7 @@ serve(async (req) => {
         enrichedCount: filteredByPrice.filter((h: any) => h.hasExpediaData).length
       }
     }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
       status: 200,
     });
 
@@ -311,7 +315,7 @@ serve(async (req) => {
     console.error('Error in hybrid-hotel-search:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
     return new Response(JSON.stringify({ error: errorMessage }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
       status: 500,
     });
   }

@@ -1,8 +1,10 @@
 // Apple Sign-In Init v3.1 - force redeploy
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
@@ -10,10 +12,11 @@ const corsHeaders = {
   'Expires': '0',
   'Vary': 'Origin',
 };
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -35,7 +38,7 @@ Deno.serve(async (req) => {
       console.error('Error fetching credentials:', credError);
       return new Response(
         JSON.stringify({ error: 'Apple Sign-In not configured' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -67,7 +70,7 @@ Deno.serve(async (req) => {
       console.error('Error storing state:', stateError);
       return new Response(
         JSON.stringify({ error: 'Failed to store state' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -94,14 +97,14 @@ Deno.serve(async (req) => {
       headers: {
         'Location': authUrl.toString(),
         'Set-Cookie': `apple_state=${state}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=600`,
-        ...corsHeaders
+        ...corsHeaders(req)
       }
     });
   } catch (error) {
     console.error('Error in apple-signin-init:', error);
     return new Response(
       JSON.stringify({ error: String(error) }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
     );
   }
 });

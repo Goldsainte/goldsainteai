@@ -1,11 +1,15 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCurrencyFromLocation } from "../_shared/currencyHelpers.ts";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Vary": "Origin",
 };
+}
 
 // Database cache with 24-hour TTL
 const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
@@ -156,7 +160,7 @@ async function searchAmadeusFlights(params: any, token: string, retries = 2): Pr
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -191,7 +195,7 @@ serve(async (req) => {
         ...cachedResult,
         cached: true 
       }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
         status: 200,
       });
     }
@@ -211,7 +215,7 @@ serve(async (req) => {
         }),
         { 
           status: 503,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } 
         }
       );
     }
@@ -281,7 +285,7 @@ serve(async (req) => {
     setCache(supabaseClient, cacheKey, responseData);
 
     return new Response(JSON.stringify(responseData), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
       status: 200,
     });
 
@@ -294,7 +298,7 @@ serve(async (req) => {
       dictionaries: {},
       meta: {}
     }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
       status: 500,
     });
   }

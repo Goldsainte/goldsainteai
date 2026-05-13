@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { checkRateLimit, getClientIdentifier, createRateLimitResponse, getUserTier, getTieredRateLimit, type SubscriptionTier } from "../_shared/rateLimiter.ts";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
 // ⚠️ SECURITY: Zod validation for input sanitization
 const z = {
@@ -34,14 +35,17 @@ const searchSchema = z.object({
   query: true // Validated above
 });
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Vary": "Origin",
 };
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -79,7 +83,7 @@ serve(async (req) => {
     
     if (!rateLimit.allowed) {
       console.log('❌ [RATE LIMIT] Destination search blocked for:', clientId);
-      return createRateLimitResponse(rateLimit, corsHeaders);
+      return createRateLimitResponse(rateLimit, corsHeaders(req));
     }
     
     console.log(`✅ [RATE LIMIT] ${rateLimit.remaining} destination searches remaining`);
@@ -101,7 +105,7 @@ serve(async (req) => {
           results: [] 
         }),
         {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
           status: 400,
         }
       );
@@ -115,7 +119,7 @@ serve(async (req) => {
           results: [] 
         }),
         {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
           status: 400,
         }
       );
@@ -150,7 +154,7 @@ serve(async (req) => {
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again later.", results: [] }), {
           status: 429,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
         });
       }
       throw new Error(`Destination search failed: ${response.statusText}`);
@@ -160,7 +164,7 @@ serve(async (req) => {
     console.log('Destinations found:', data.data?.length || 0);
 
     return new Response(JSON.stringify({ results: data.data || [] }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
       status: 200,
     });
 
@@ -169,14 +173,14 @@ serve(async (req) => {
     
     if (error instanceof Error && error.name === 'AbortError') {
       return new Response(JSON.stringify({ error: "Request timed out. Please try again.", results: [] }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
         status: 408,
       });
     }
     
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
     return new Response(JSON.stringify({ error: errorMessage, results: [] }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
       status: 500,
     });
   }

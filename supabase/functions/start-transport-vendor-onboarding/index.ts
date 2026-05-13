@@ -1,14 +1,18 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Vary": "Origin",
 };
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -27,7 +31,7 @@ serve(async (req) => {
     if (userError || !user) {
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 401, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -45,7 +49,7 @@ serve(async (req) => {
       console.error('[start-transport-vendor-onboarding] Error checking supplier:', supplierCheckError);
       return new Response(
         JSON.stringify({ error: 'Database error checking supplier', details: supplierCheckError.message }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -75,7 +79,7 @@ serve(async (req) => {
         console.error('[start-transport-vendor-onboarding] Error creating supplier:', supplierInsertError);
         return new Response(
           JSON.stringify({ error: 'Failed to create supplier', details: supplierInsertError.message }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -114,7 +118,7 @@ serve(async (req) => {
         console.error('[start-transport-vendor-onboarding] Error creating vendor:', vendorInsertError);
         return new Response(
           JSON.stringify({ error: 'Failed to create vendor record', details: vendorInsertError.message }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -125,14 +129,14 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ success: true, supplier_id: supplierId }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 200, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
     );
   } catch (error: unknown) {
     console.error('[start-transport-vendor-onboarding] Unexpected error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
       JSON.stringify({ error: 'Internal server error', details: errorMessage }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
     );
   }
 });

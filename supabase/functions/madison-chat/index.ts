@@ -1,13 +1,17 @@
 import { serve } from "https://deno.land/std@0.192.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.48.0";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Vary": "Origin",
 };
+}
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: { persistSession: false },
@@ -57,13 +61,13 @@ function extractDestination(message: string): string | null {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   if (req.method !== "POST") {
     return new Response("Method not allowed", {
       status: 405,
-      headers: corsHeaders,
+      headers: corsHeaders(req),
     });
   }
 
@@ -74,7 +78,7 @@ serve(async (req) => {
       console.error("[madison-chat] Invalid request body", body);
       return new Response(
         JSON.stringify({ error: "message (string) and userId are required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } },
       );
     }
 
@@ -110,7 +114,7 @@ serve(async (req) => {
         console.error("[madison-chat] Error creating trip:", tripError);
         return new Response(
           JSON.stringify({ error: "Failed to create trip" }),
-          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } },
         );
       }
 
@@ -134,7 +138,7 @@ serve(async (req) => {
             error: "Failed to create storyboard",
             trip,
           }),
-          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } },
         );
       }
 
@@ -164,7 +168,7 @@ serve(async (req) => {
           storyboard,
           message: friendlyMessage,
         }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { headers: { ...corsHeaders(req), "Content-Type": "application/json" } },
       );
     }
 
@@ -175,13 +179,13 @@ serve(async (req) => {
         message:
           "I'd love to help you plan a trip. Try saying something like \"I want to go to Morocco in May for 7 days.\"",
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { headers: { ...corsHeaders(req), "Content-Type": "application/json" } },
     );
   } catch (err) {
     console.error("[madison-chat] Unexpected error:", err);
     return new Response(
       JSON.stringify({ error: "Failed to process message" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } },
     );
   }
 });

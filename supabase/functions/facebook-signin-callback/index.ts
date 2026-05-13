@@ -1,15 +1,19 @@
 // Facebook Sign-In Callback v1.0
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  "Vary": "Origin",
 };
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -32,7 +36,7 @@ Deno.serve(async (req) => {
         headers: {
           'Location': errorRedirect,
           'Set-Cookie': 'facebook_state=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0',
-          ...corsHeaders
+          ...corsHeaders(req)
         }
       });
     }
@@ -41,7 +45,7 @@ Deno.serve(async (req) => {
       console.error('Missing code or state parameter');
       return new Response(
         JSON.stringify({ error: 'Missing code or state parameter' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -64,7 +68,7 @@ Deno.serve(async (req) => {
       console.error('State validation failed:', stateError);
       return new Response(
         JSON.stringify({ error: 'Invalid or expired state' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -78,7 +82,7 @@ Deno.serve(async (req) => {
       console.error('Facebook credentials not configured');
       return new Response(
         JSON.stringify({ error: 'Facebook credentials not configured' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -102,7 +106,7 @@ Deno.serve(async (req) => {
       console.error('Token exchange failed:', tokenData.error);
       return new Response(
         JSON.stringify({ error: 'Failed to exchange code for token' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -120,7 +124,7 @@ Deno.serve(async (req) => {
       console.error('Email not provided by Facebook');
       return new Response(
         JSON.stringify({ error: 'Email permission required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -205,7 +209,7 @@ Deno.serve(async (req) => {
       headers: {
         'Location': redirectUrl,
         'Set-Cookie': 'facebook_state=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0',
-        ...corsHeaders
+        ...corsHeaders(req)
       }
     });
 
@@ -217,7 +221,7 @@ Deno.serve(async (req) => {
       headers: {
         'Location': errorRedirect,
         'Set-Cookie': 'facebook_state=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0',
-        ...corsHeaders
+        ...corsHeaders(req)
       }
     });
   }

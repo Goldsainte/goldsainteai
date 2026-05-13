@@ -1,17 +1,21 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Vary": "Origin",
 };
+}
 
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   // === Environment sanity checks ===
@@ -19,7 +23,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.error("❌ RESEND_API_KEY is not set in the Edge Function environment");
     return new Response(
       JSON.stringify({ error: "Email service is not configured (RESEND_API_KEY missing)." }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
     );
   }
 
@@ -27,7 +31,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.error("❌ SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY missing in Edge Function env");
     return new Response(
       JSON.stringify({ error: "Auth service is not configured correctly." }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
     );
   }
 
@@ -274,7 +278,7 @@ const handler = async (req: Request): Promise<Response> => {
       JSON.stringify({ success: true, message: "Password reset email sent" }),
       {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       }
     );
   } catch (error: any) {
@@ -283,7 +287,7 @@ const handler = async (req: Request): Promise<Response> => {
       JSON.stringify({ error: error.message || "Internal server error" }),
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       }
     );
   }

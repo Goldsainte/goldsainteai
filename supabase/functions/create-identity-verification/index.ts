@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@13.11.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
 // ============================================================================
 // ENVIRONMENT VARIABLES
@@ -62,12 +63,15 @@ const createLogger = (requestId: string): Logger => {
 // CORS HEADERS
 // ============================================================================
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://goldsainte.ai",
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
+  "Vary": "Origin",
 };
+}
 
 // ============================================================================
 // VALIDATION FUNCTIONS
@@ -449,7 +453,7 @@ serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, {
       status: 204,
-      headers: corsHeaders,
+      headers: corsHeaders(req),
     });
   }
 
@@ -463,7 +467,7 @@ serve(async (req: Request) => {
       }),
       {
         status: 405,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       }
     );
   }
@@ -482,7 +486,7 @@ serve(async (req: Request) => {
         }),
         {
           status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...corsHeaders(req), "Content-Type": "application/json" },
         }
       );
     }
@@ -504,7 +508,7 @@ serve(async (req: Request) => {
         }),
         {
           status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...corsHeaders(req), "Content-Type": "application/json" },
         }
       );
     }
@@ -522,7 +526,7 @@ serve(async (req: Request) => {
         }),
         {
           status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...corsHeaders(req), "Content-Type": "application/json" },
         }
       );
     }
@@ -546,7 +550,7 @@ serve(async (req: Request) => {
         {
           status: 429,
           headers: {
-            ...corsHeaders,
+            ...corsHeaders(req),
             "Content-Type": "application/json",
             "Retry-After": String(
               Math.ceil((rateLimit.resetAt - Date.now()) / 1000)
@@ -590,7 +594,7 @@ serve(async (req: Request) => {
           {
             status: 200,
             headers: {
-              ...corsHeaders,
+              ...corsHeaders(req),
               "Content-Type": "application/json",
               "X-RateLimit-Limit": "5",
               "X-RateLimit-Remaining": String(rateLimit.remaining),
@@ -641,7 +645,7 @@ serve(async (req: Request) => {
       {
         status: 200,
         headers: {
-          ...corsHeaders,
+          ...corsHeaders(req),
           "Content-Type": "application/json",
           "X-RateLimit-Limit": "5",
           "X-RateLimit-Remaining": String(rateLimit.remaining),
@@ -669,7 +673,7 @@ serve(async (req: Request) => {
       }),
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       }
     );
   }

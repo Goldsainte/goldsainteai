@@ -1,11 +1,15 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { enforceRateLimit } from "../_utils/rate-limit.ts";
 import { buildSafeErrorResponse } from "../_shared/httpError.ts";
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Vary": "Origin",
 };
+}
 
 // In-memory token cache
 let cachedToken: string | null = null;
@@ -162,14 +166,14 @@ async function searchHotels(params: any, token: string) {
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   // 🔒 Rate limiting
   const limited = await enforceRateLimit({
     keyType: "api",
     req,
-    corsHeaders,
+    corsHeaders(req),
   });
   if (limited) return limited;
 
@@ -190,9 +194,9 @@ serve(async (req) => {
     }
 
     return new Response(JSON.stringify(result), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    return buildSafeErrorResponse("amadeus-proxy", error, corsHeaders);
+    return buildSafeErrorResponse("amadeus-proxy", error, corsHeaders(req));
   }
 });

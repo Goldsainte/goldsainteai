@@ -1,11 +1,15 @@
 // Apple Sign-In Callback Handler v4 - Complete rewrite to force deployment
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
+import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://goldsainte.ai',
+function corsHeaders(req?: Request): Record<string, string> {
+  return {
+  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  "Vary": "Origin",
 };
+}
 
 function decodeJwt(token: string) {
   try {
@@ -30,7 +34,7 @@ function decodeJwt(token: string) {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders(req) });
   }
 
   try {
@@ -81,7 +85,7 @@ Deno.serve(async (req) => {
       console.error('State mismatch or missing state');
       return new Response(
         JSON.stringify({ error: 'Invalid state parameter' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -105,7 +109,7 @@ Deno.serve(async (req) => {
       console.error('Invalid or expired state:', stateError);
       return new Response(
         JSON.stringify({ error: 'Invalid or expired state' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -131,7 +135,7 @@ Deno.serve(async (req) => {
     if (!email) {
       return new Response(
         JSON.stringify({ error: 'Email not provided by Apple' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -156,7 +160,7 @@ Deno.serve(async (req) => {
       console.error('Error fetching users:', getUserError);
       return new Response(
         JSON.stringify({ error: 'Failed to check existing users' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -185,7 +189,7 @@ Deno.serve(async (req) => {
         console.error('Error creating user:', createError);
         return new Response(
           JSON.stringify({ error: 'Failed to create user' }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -205,7 +209,7 @@ Deno.serve(async (req) => {
       console.error('Error generating magic link:', linkError);
       return new Response(
         JSON.stringify({ error: 'Failed to generate session' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -220,7 +224,7 @@ Deno.serve(async (req) => {
       console.error('Failed to extract token from magic link');
       return new Response(
         JSON.stringify({ error: 'Failed to extract session token' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -233,7 +237,7 @@ Deno.serve(async (req) => {
     return new Response(null, {
       status: 302,
       headers: {
-        ...corsHeaders,
+        ...corsHeaders(req),
         'Location': callbackUrl,
         'Set-Cookie': 'apple_state=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=None'
       }
@@ -243,7 +247,7 @@ Deno.serve(async (req) => {
     console.error('Error in apple-signin-callback:', error);
     return new Response(
       JSON.stringify({ error: error.message || 'Internal server error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
     );
   }
 });
