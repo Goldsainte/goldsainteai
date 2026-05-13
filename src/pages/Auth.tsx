@@ -135,6 +135,11 @@ const Auth = () => {
       return;
     }
     if (isSignUpMode || selectedAccountType) {
+      // For signup, an account type must be chosen first
+      if (!selectedAccountType) {
+        setStep('account-type');
+        return;
+      }
       setStep('signup');
     } else {
       setStep('signin');
@@ -239,7 +244,8 @@ const Auth = () => {
     }
     
     if (selectedAccountType !== 'traveler' && selectedAccountType !== 'creator') {
-      toast({ title: "Invalid account type", description: "Please select a valid account type.", variant: "destructive" });
+      toast({ title: "Choose an account type", description: "Please tell us how you'll use Goldsainte." });
+      setStep('account-type');
       setIsLoading(false);
       return;
     }
