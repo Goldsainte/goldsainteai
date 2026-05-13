@@ -13721,6 +13721,30 @@ export type Database = {
         }
         Relationships: []
       }
+      view_dedup: {
+        Row: {
+          created_at: string
+          day: string
+          entity_id: string
+          ip_hash: string
+          kind: string
+        }
+        Insert: {
+          created_at?: string
+          day?: string
+          entity_id: string
+          ip_hash: string
+          kind: string
+        }
+        Update: {
+          created_at?: string
+          day?: string
+          entity_id?: string
+          ip_hash?: string
+          kind?: string
+        }
+        Relationships: []
+      }
       virtual_gifts: {
         Row: {
           coin_cost: number
