@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BackButton } from "@/components/ui/BackButton";
 import { TripImageUploader } from "@/components/trips/TripImageUploader";
 import { ArrayFieldEditor } from "@/components/trips/ArrayFieldEditor";
-import { Loader2, Plus, X, Save, Send, BookOpen } from "lucide-react";
+import { Loader2, Plus, X, Save, Send, BookOpen, Eye } from "lucide-react";
 import { toast } from "sonner";
 
 const CURRENCIES = ["USD", "EUR", "GBP", "AUD", "CAD"];
@@ -298,6 +298,16 @@ export default function ItineraryBuilderPage() {
               {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
               Save draft
             </Button>
+            {editId && (
+              <Button
+                variant="outline"
+                onClick={() => window.open(`/itinerary-guide/${editId}?preview=1`, "_blank", "noopener")}
+                className="rounded-full px-6 border-[#E5DFC6] hover:bg-[#FDF9F0] text-[#0a2225]"
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                Preview as buyer
+              </Button>
+            )}
             <Button onClick={() => handleSave("published")} disabled={saving || (creatorStatus !== null && creatorStatus !== "approved")}
               className="rounded-full px-6 bg-[#0c4d47] hover:bg-[#0c4d47]/90 text-white">
               {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}

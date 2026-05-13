@@ -232,7 +232,7 @@ export default function CreatorDashboard() {
             <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-3">
               <button
                 onClick={() => navigate("/marketplace")}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-[#0a2225] text-white px-5 py-2.5 text-sm font-medium hover:bg-[#0a2225]/90 transition-colors"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] text-white px-5 py-2.5 text-sm font-medium hover:bg-[#0c4d47]/90 transition-colors"
               >
                 <Search className="h-4 w-4" />
                 Browse Trip Requests
