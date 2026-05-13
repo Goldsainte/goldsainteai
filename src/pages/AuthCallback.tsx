@@ -84,17 +84,14 @@ const AuthCallback = () => {
         // 2. Invalid account type AND user has not completed onboarding/profile
         const needsCompletion = !hasValidAccountType && !hasCompletedOnboarding && !isProfileComplete;
 
-        // For OAuth users (Google/Facebook), the trigger auto-assigns 'traveler'
-        // but they haven't actually chosen their role. Force role selection.
-        const provider = (session.user.app_metadata as any)?.provider;
-        const isOAuthUser = provider === 'google' || provider === 'facebook';
-        const triggerAssignedRole = isOAuthUser &&
-          !session.user.user_metadata?.account_type &&
-          profile?.account_type === 'traveler' &&
-          !hasCompletedOnboarding &&
-          !isProfileComplete;
-
-        if (triggerAssignedRole || needsCompletion) {
+        // For brand-new OAuth users (Google/Facebook), the trigger auto-assigns
+        // 'traveler' as a default. We previously force-redirected them to
+        // /auth/complete-profile to pick a role, which created an infinite loop
+        // when CompleteProfile saw account_type='traveler' and bounced them to
+        // /onboarding (or when the page failed to render). Instead, trust the
+        // default assignment and let the normal traveler onboarding flow run.
+        // Users can change their role later from settings.
+        if (needsCompletion) {
           navigate('/auth/complete-profile', { replace: true });
           return;
         }
