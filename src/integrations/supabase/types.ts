@@ -13133,6 +13133,30 @@ export type Database = {
         }
         Relationships: []
       }
+      username_history: {
+        Row: {
+          changed_at: string
+          id: string
+          new_username: string | null
+          old_username: string | null
+          user_id: string
+        }
+        Insert: {
+          changed_at?: string
+          id?: string
+          new_username?: string | null
+          old_username?: string | null
+          user_id: string
+        }
+        Update: {
+          changed_at?: string
+          id?: string
+          new_username?: string | null
+          old_username?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       vendor_availability: {
         Row: {
           block_reason: string | null
@@ -14277,7 +14301,7 @@ export type Database = {
           _stripe_payment_intent_id: string
           _trip_id: string
         }
-        Returns: string
+        Returns: Record<string, unknown>
       }
       detect_bot_pattern: { Args: { p_user_id: string }; Returns: boolean }
       evaluate_agent_badges: {
@@ -14486,6 +14510,10 @@ export type Database = {
       }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
+      track_view_atomic: {
+        Args: { _entity_id: string; _ip_hash: string; _kind: string }
+        Returns: boolean
+      }
       update_agent_performance_metrics: {
         Args: { target_agent_id: string }
         Returns: boolean
