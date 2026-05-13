@@ -3,6 +3,7 @@ import { Route, Routes, Navigate } from 'react-router-dom';
 
 import Auth from '@/pages/Auth';
 import AuthCallback from '@/pages/AuthCallback';
+import UnsubscribePage from '@/pages/UnsubscribePage';
 import CompleteProfile from '@/pages/CompleteProfile';
 import ApplicationVerificationComplete from '@/pages/ApplicationVerificationComplete';
 import ApplicationReviewDashboard from '@/pages/admin/ApplicationReviewDashboard';
@@ -184,6 +185,7 @@ export const AppRoutes = () => (
       <Route path="/cancellation-refund-policy" element={<CancellationRefundPolicy />} />
       <Route path="/transparency-agreement" element={<TransparencyAgreement />} />
       <Route path="/corporate-contact" element={<CorporateContact />} />
+     <Route path="/unsubscribe" element={<UnsubscribePage />} />
     </Route>
 
     <Route element={<AuthLayout />}>

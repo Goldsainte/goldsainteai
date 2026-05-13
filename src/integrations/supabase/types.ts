@@ -6271,6 +6271,7 @@ export type Database = {
           flagged_reason: string | null
           id: string
           is_read: boolean | null
+          notification_email_sent_at: string | null
           read_at: string | null
           receiver_id: string | null
           sender_id: string
@@ -6287,6 +6288,7 @@ export type Database = {
           flagged_reason?: string | null
           id?: string
           is_read?: boolean | null
+          notification_email_sent_at?: string | null
           read_at?: string | null
           receiver_id?: string | null
           sender_id: string
@@ -6303,6 +6305,7 @@ export type Database = {
           flagged_reason?: string | null
           id?: string
           is_read?: boolean | null
+          notification_email_sent_at?: string | null
           read_at?: string | null
           receiver_id?: string | null
           sender_id?: string
