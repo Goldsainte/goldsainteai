@@ -904,7 +904,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
   return (
     <div className="flex flex-col lg:flex-row gap-8">
       {/* Desktop sidebar */}
-      <div className="hidden lg:flex flex-col w-60 flex-shrink-0">
+      <div className="hidden md:flex flex-col w-52 flex-shrink-0">
         <div className="sticky top-8 space-y-1">
           {steps.map((step, idx) => {
             const isActive = currentStep === idx;

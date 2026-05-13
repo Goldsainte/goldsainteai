@@ -70,7 +70,8 @@ export function MarketplaceTabs({ activeTab, onTabChange }: MarketplaceTabsProps
                     `}
                   >
                     <Icon className="h-4 w-4 flex-shrink-0" />
-                    <span>{tab.label}</span>
+                    <span className="sm:hidden">{tab.shortLabel}</span>
+                    <span className="hidden sm:inline">{tab.label}</span>
                   </button>
                 </TooltipTrigger>
                 <TooltipContent 
