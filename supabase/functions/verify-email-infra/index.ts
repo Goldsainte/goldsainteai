@@ -40,18 +40,16 @@ Deno.serve(async (req) => {
 
   // 1. Vault secret present
   try {
-    const { data, error } = await sb
-      .schema("vault" as any)
-      .from("secrets")
-      .select("name")
-      .eq("name", "email_queue_service_role_key")
-      .maybeSingle();
+    const { data, error } = await sb.rpc(
+      "email_infra_vault_secret_exists",
+      { _name: "email_queue_service_role_key" },
+    );
     checks.push({
       name: "vault_secret_email_queue_service_role_key",
-      ok: !error && !!data,
+      ok: !error && data === true,
       detail: error
-        ? `vault read failed: ${error.message}`
-        : data
+        ? `vault check RPC failed: ${error.message}`
+        : data === true
         ? undefined
         : "MISSING — cron dispatcher cannot authenticate to process-email-queue. Run setup_email_infra to repair.",
     });
