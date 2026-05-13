@@ -19,7 +19,7 @@ const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY")!;
 const DEFAULT_SITE_URL = Deno.env.get("SITE_URL") || "https://goldsainteai.lovable.app";
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: cors });
+  if (req.method === "OPTIONS") return new Response(null, { headers: cors(req) });
 
   try {
     // Determine return origin from request body or fallback
@@ -38,7 +38,7 @@ serve(async (req) => {
       console.error("[STRIPE-CONNECT-LINK] No authorization header");
       return new Response(
         JSON.stringify({ error: "Unauthorized - no auth header" }), 
-        { status: 401, headers: { ...cors, "Content-Type": "application/json" } }
+        { status: 401, headers: { ...cors(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -49,7 +49,7 @@ serve(async (req) => {
       console.error("[STRIPE-CONNECT-LINK] Auth error:", uErr);
       return new Response(
         JSON.stringify({ error: "Unauthorized - invalid token" }), 
-        { status: 401, headers: { ...cors, "Content-Type": "application/json" } }
+        { status: 401, headers: { ...cors(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -59,7 +59,7 @@ serve(async (req) => {
       console.error("[STRIPE-CONNECT-LINK] STRIPE_SECRET_KEY not configured");
       return new Response(
         JSON.stringify({ error: "Stripe env not configured" }), 
-        { status: 500, headers: { ...cors, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...cors(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -81,7 +81,7 @@ serve(async (req) => {
       console.error("[STRIPE-CONNECT-LINK] Error fetching profile:", pErr);
       return new Response(
         JSON.stringify({ error: "Failed to fetch user profile" }), 
-        { status: 500, headers: { ...cors, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...cors(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -126,7 +126,7 @@ serve(async (req) => {
           console.error("[STRIPE-CONNECT-LINK] Failed to persist stripe_account_id:", upErr);
           return new Response(
             JSON.stringify({ error: "Failed to persist stripe_account_id" }), 
-            { status: 500, headers: { ...cors, "Content-Type": "application/json" } }
+            { status: 500, headers: { ...cors(req), "Content-Type": "application/json" } }
           );
         }
         
@@ -141,7 +141,7 @@ serve(async (req) => {
               error: 'Stripe Connect is not enabled on this account. Please enable Stripe Connect in your Stripe Dashboard.',
               details: 'To enable creator payouts, you need to activate Stripe Connect.'
             }),
-            { status: 400, headers: { ...cors, "Content-Type": "application/json" } }
+            { status: 400, headers: { ...cors(req), "Content-Type": "application/json" } }
           );
         }
         
@@ -152,13 +152,13 @@ serve(async (req) => {
               details: 'Open your Stripe Dashboard and complete the Platform Profile > Losses section.',
               link: 'https://dashboard.stripe.com/settings/connect/platform-profile'
             }),
-            { status: 400, headers: { ...cors, "Content-Type": "application/json" } }
+            { status: 400, headers: { ...cors(req), "Content-Type": "application/json" } }
           );
         }
         
         return new Response(
           JSON.stringify({ error: stripeErr.message || 'Failed to create Stripe account' }), 
-          { status: 500, headers: { ...cors, "Content-Type": "application/json" } }
+          { status: 500, headers: { ...cors(req), "Content-Type": "application/json" } }
         );
       }
     }
@@ -179,13 +179,13 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ url: link.url }), 
-      { headers: { ...cors, "Content-Type": "application/json" } }
+      { headers: { ...cors(req), "Content-Type": "application/json" } }
     );
   } catch (e: any) {
     console.error("[STRIPE-CONNECT-LINK] Unexpected error:", e);
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), 
-      { status: 500, headers: { ...cors, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...cors(req), "Content-Type": "application/json" } }
     );
   }
 });
