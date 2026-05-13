@@ -25,6 +25,19 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
+    // Resolve caller's user_id from the JWT if present (anonymous calls allowed).
+    let callerUserId: string | null = null;
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      try {
+        const { data: { user } } = await admin.auth.getUser(
+          authHeader.slice("Bearer ".length),
+        );
+        callerUserId = user?.id ?? null;
+      } catch (_) {
+        callerUserId = null;
+      }
+    }
     const { data: link } = await admin
       .from("affiliate_links")
       .select("id, creator_id")
@@ -36,6 +49,17 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       });
     }
+    // Block self-referral: a creator cannot earn off their own click.
+    if (callerUserId && callerUserId === link.creator_id) {
+      console.log("[track-affiliate-click] self-referral blocked", {
+        callerUserId,
+        affiliateCode: ref,
+      });
+      return new Response(
+        JSON.stringify({ ok: true, matched: false, reason: "self_referral" }),
+        { headers: { ...corsHeaders(req), "Content-Type": "application/json" } },
+      );
+    }
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       req.headers.get("x-real-ip") ||
@@ -43,6 +67,7 @@ Deno.serve(async (req) => {
     const ua = req.headers.get("user-agent") || null;
     await admin.from("affiliate_clicks").insert({
       affiliate_link_id: link.id,
+      user_id: callerUserId,
       ip_address: ip,
       user_agent: ua,
     });

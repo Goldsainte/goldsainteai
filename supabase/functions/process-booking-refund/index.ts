@@ -159,7 +159,15 @@ serve(async (req) => {
         "void_booking_earnings",
         { target_booking_id: cancellation.booking_id }
       );
-      console.log("Reversal complete", { pointsReversed, earningsVoided });
+      const { data: commissionsRejected } = await supabaseClient.rpc(
+        "reject_booking_affiliate_commissions",
+        { target_booking_id: cancellation.booking_id }
+      );
+      console.log("Reversal complete", {
+        pointsReversed,
+        earningsVoided,
+        commissionsRejected,
+      });
     } catch (reversalErr) {
       // Do not fail the refund if reversal helpers error — log and continue
       console.error("Reversal helpers failed (refund still succeeded):", reversalErr);

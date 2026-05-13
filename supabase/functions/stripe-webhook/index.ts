@@ -73,56 +73,52 @@ const createLogger = (requestId: string): Logger => {
 // ============================================================================
 
 /**
- * Check if webhook event has already been processed
+ * Atomically claim a webhook event for processing. Returns true if THIS
+ * invocation won the claim (event is new); false if a concurrent retry
+ * has already claimed it. Relies on the unique constraint on
+ * webhook_events.event_id.
  */
-async function checkIdempotency(
-  eventId: string,
-  logger: Logger
-): Promise<boolean> {
-  const { data, error } = await supabaseClient
-    .from("webhook_events")
-    .select("id")
-    .eq("event_id", eventId)
-    .maybeSingle();
-
-  if (error && error.code !== "PGRST116") {
-    // PGRST116 = not found (expected for new events)
-    logger.error("Error checking idempotency", { error });
-    throw error;
-  }
-
-  const isDuplicate = !!data;
-  if (isDuplicate) {
-    logger.info("Duplicate event detected", { eventId });
-  }
-
-  return isDuplicate;
-}
-
-/**
- * Record webhook event for idempotency tracking
- */
-async function recordWebhookEvent(
+async function claimEvent(
   eventId: string,
   eventType: string,
   payload: any,
-  processingDuration: number,
-  errorMessage?: string
-): Promise<void> {
+  logger: Logger
+): Promise<boolean> {
   const { error } = await supabaseClient.from("webhook_events").insert({
     event_id: eventId,
     event_type: eventType,
     event_source: "stripe",
     payload,
-    processing_duration_ms: processingDuration,
-    error_message: errorMessage || null,
+    processing_status: "processing",
     processed_at: new Date().toISOString(),
   });
 
-  // Silently ignore duplicate key errors (23505)
-  if (error && error.code !== "23505") {
-    throw error;
+  if (!error) return true;
+  if (error.code === "23505") {
+    logger.info("Duplicate event detected (already claimed)", { eventId });
+    return false;
   }
+  logger.error("Error claiming event", { error });
+  throw error;
+}
+
+/**
+ * Finalize a previously-claimed webhook event with success/error status
+ * and processing duration.
+ */
+async function finalizeEvent(
+  eventId: string,
+  processingDuration: number,
+  errorMessage?: string
+): Promise<void> {
+  await supabaseClient
+    .from("webhook_events")
+    .update({
+      processing_status: errorMessage ? "failed" : "success",
+      processing_duration_ms: processingDuration,
+      error_message: errorMessage || null,
+    })
+    .eq("event_id", eventId);
 }
 
 // ============================================================================
@@ -1017,10 +1013,15 @@ serve(async (req: Request) => {
       );
     }
 
-    // Check for duplicate events (idempotency)
-    const isDuplicate = await checkIdempotency(event.id, logger);
-    if (isDuplicate) {
-      logger.info("Duplicate event, skipping processing", { eventId: event.id });
+    // Atomically claim the event for processing (idempotency).
+    // If a concurrent retry has already claimed it, return immediately.
+    const claimed = await claimEvent(
+      event.id,
+      event.type,
+      event.data.object,
+      logger
+    );
+    if (!claimed) {
       return new Response(
         JSON.stringify({ received: true, duplicate: true, requestId }),
         { status: 200, headers: { "Content-Type": "application/json" } }
@@ -1085,15 +1086,9 @@ serve(async (req: Request) => {
       });
       throw processingError;
     } finally {
-      // Record webhook event for idempotency
+      // Finalize the previously-claimed event row with the outcome.
       const processingDuration = Date.now() - startTime;
-      await recordWebhookEvent(
-        event.id,
-        event.type,
-        event.data.object,
-        processingDuration,
-        errorMessage
-      );
+      await finalizeEvent(event.id, processingDuration, errorMessage);
     }
 
     const processingDuration = Date.now() - startTime;

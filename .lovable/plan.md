@@ -1,100 +1,83 @@
-## Goal
+# Tier 1 + Tier 2 → 9/10 Implementation Plan
 
-Extend the exact approved signup email design (logo, serif Playfair headline, italic tagline, dark green CTA, gold Roman-numeral steps, full footer with nav/social/legal) to the 5 other auth email templates — keeping the visual chrome identical and only swapping the headline, tagline, lede, CTA label, and "What happens next" steps so the content fits each flow.
-
-All templates will continue to live in `supabase/functions/_shared/email-templates/` and be wired through the existing `auth-email-hook` (no infrastructure changes).
+Locked target: **9/10 by next Wednesday.** Below is split into what I'll code now vs. what you own (accounts, manual QA, infra toggles).
 
 ---
 
-## Per-template content
+## What I'll implement (code changes)
 
-### 1. Password Reset (`recovery.tsx`)
-- **Subject:** Reset your Goldsainte password
-- **Headline:** Reset your password.
-- **Tagline:** Your account security is paramount. Use the secure link below to set a new password.
-- **Lede:** We received a request to reset the password for your Goldsainte account.
-- **CTA:** Reset my password
-- **Steps (What happens next):**
-  - I. Click the button above to open a secure password reset page.
-  - II. Choose a strong, unique password you haven't used before.
-  - III. You'll be signed in automatically once the new password is saved.
-  - IV. Review your account activity and connected devices.
-  - V. Contact our team immediately if you did not request this change.
+### 1. Affiliate self-referral guard
+In `track-affiliate-click` and the commission-write path: reject attribution when the buyer's `user_id` equals the affiliate link's `creator_id`. Add a DB-level guard too (trigger on `affiliate_commissions` insert) so it can't be bypassed.
 
-### 2. Magic Link (`magic-link.tsx`)
-- **Subject:** Your Goldsainte sign-in link
-- **Headline:** Sign in to Goldsainte.
-- **Tagline:** A passwordless link to access your concierge dashboard, valid for a short time only.
-- **Lede:** Use the secure link below to sign in to your account — no password required.
-- **CTA:** Sign me in
-- **Steps:**
-  - I. Click the button above to sign in instantly and securely.
-  - II. You'll arrive on your personal concierge dashboard.
-  - III. Pick up where you left off — saved trips, requests, and conversations.
-  - IV. Continue browsing curated trips across 50+ countries.
-  - V. Reach out anytime if you need assistance from our specialists.
+### 2. Affiliate commission reversal on refund
+Extend `process-booking-refund` with a third RPC `reject_booking_affiliate_commissions(target_booking_id)`. It joins `affiliate_clicks → bookings` and flips matching `affiliate_commissions.status` from `pending`/`approved` to `rejected`. Paid commissions are left alone and surfaced for manual clawback.
 
-### 3. Invite (`invite.tsx`)
-- **Subject:** You've been invited to Goldsainte
-- **Headline:** You're invited to Goldsainte.
-- **Tagline:** A curated marketplace connecting discerning travelers with the world's most trusted specialists, creators, and brands.
-- **Lede:** Accept your invitation to activate your account and begin curating your journey.
-- **CTA:** Accept invitation
-- **Steps:**
-  - I. Accept your invitation to activate your account and secure your profile.
-  - II. You'll be guided to set a password and complete your profile.
-  - III. Tell us about your travel preferences so we can tailor recommendations.
-  - IV. Browse trips designed by certified specialists and trusted creators.
-  - V. Request a trip or book directly — every reservation is protected on-platform.
+### 3. Stripe webhook idempotency hardening
+- Add unique index on `stripe_webhook_events.event_id` (or equivalent dedupe table).
+- Wrap the dedupe check in `INSERT ... ON CONFLICT DO NOTHING` so concurrent retries from Stripe can't both pass the check.
+- Add a daily cron to purge events older than 30 days.
 
-### 4. Email Change (`email-change.tsx`)
-- **Subject:** Confirm your new Goldsainte email
-- **Headline:** Confirm your new email.
-- **Tagline:** A request was made to update the email associated with your Goldsainte account.
-- **Lede:** Confirm this change to keep your account secure and continue receiving important notifications at your new address.
-- **CTA:** Confirm new email
-- **Steps:**
-  - I. Click the button above to confirm your new email address.
-  - II. Future communications and sign-ins will use the new address.
-  - III. Your old email will no longer have access to this account.
-  - IV. Review your account security settings if anything looks unfamiliar.
-  - V. Contact our team immediately if you did not request this change.
+### 4. Username uniqueness verification
+Write a one-shot SQL test that asserts (a) `idx_profiles_username_lower` exists and is unique, (b) the retry loop in `handle_new_user` actually catches `unique_violation`. Commit as `supabase/tests/handle_new_user.sql` for future regression.
 
-### 5. Reauthentication (`reauthentication.tsx`)
-- **Subject:** Your Goldsainte verification code
-- **Headline:** Verify it's you.
-- **Tagline:** A short verification step to protect sensitive account changes.
-- **Lede:** Enter the verification code below to continue with the action you requested on Goldsainte.
-- **CTA replacement:** A large, centered code block displaying `{token}` (using the same dark green / cream palette as the CTA) instead of a button. A small caption underneath: "This code expires in a few minutes."
-- **Steps:**
-  - I. Return to the Goldsainte tab where you started this action.
-  - II. Enter the code above when prompted to verify your identity.
-  - III. The action will complete once the code is accepted.
-  - IV. The code expires shortly — request a new one if needed.
-  - V. Contact our team immediately if you did not request this code.
+### 5. Sentry SDK wiring
+- Add `@sentry/react` to the frontend, init in `src/main.tsx`, wrap `RouteSectionBoundary` to forward errors.
+- Add `@sentry/deno` to a shared `_shared/sentry.ts` and import in the 5 highest-risk edge functions: `stripe-webhook`, `create-cocurated-checkout`, `process-booking-refund`, `email-fanout`, `auth-email-hook`.
+- Requires a `SENTRY_DSN` secret from you (see "What you own" #1).
+
+### 6. pgmq queue + DLQ alerting cron
+New edge function `monitor-email-queue`, scheduled every 5 min via pg_cron. Posts a Slack webhook (or sends a transactional email to admin) when:
+- `email_send_log` has any new `dlq` rows since last check
+- queue depth > 100
+Requires `ADMIN_ALERT_WEBHOOK_URL` secret.
+
+### 7. Bundle splitting
+- `React.lazy` all routes under `/admin/*`
+- `React.lazy` the Fabric.js storyboard design editor
+- Verify with `vite build` output that admin chunk is separate from main bundle.
+
+### 8. OG tag prerendering for storyboard share URLs
+Add an edge function `og-storyboard/:slug` that returns server-rendered HTML with `<meta property="og:*">` tags filled from the storyboard record. Update the storyboard share-link generator to point Twitter/Facebook crawlers at this endpoint via a `_redirects`-style rule, while real users still land on the React app.
 
 ---
 
-## Shared elements (identical across all six templates)
+## What you own (I can't do these for you)
 
-- Same `<style>` block (Playfair Display + Helvetica Neue, cream `#f7f3ea` background, dark text `#0a2225`, dark green CTA `#0c4d47`, gold accents `#8a7a3f`, footer palette).
-- Same header: centered Goldsainte wordmark logo from the `email-assets` bucket.
-- Same divider rules and spacing.
-- Same security paragraph: "Goldsainte will never email you and ask you to disclose or verify your password, credit card, or banking account number…"
-- Same site footer block: nav links (Browse Trips · Specialists · About · Help · Trust & Safety · Contact), social row (LinkedIn · Instagram), legal row (Privacy · Terms · Disputes), copyright "© 2026 Goldsainte AI Inc.", and "This is an automated message — please do not reply."
-- Same fallback "Or paste this link into your browser" line under the CTA (omitted only in `reauthentication.tsx`, where the OTP code replaces the link).
-
----
-
-## Technical notes
-
-- Refactor the shared chrome (style block, header, footer, security notice, steps list renderer) into a single helper inside `_shared/email-templates/` so we don't duplicate ~80 lines of CSS across six files. Each template then exports a small wrapper that supplies `{ headline, tagline, lede, ctaLabel, ctaUrl, steps }` (or, for reauth, an OTP block instead of a CTA).
-- Keep each template's existing exported component name and props signature so `auth-email-hook/index.ts` continues to route correctly with no hook changes.
-- Preserve the existing template variables already passed by the hook (`siteName`, `siteUrl`, `recipient`, `confirmationUrl`, `email`, `newEmail`, `token`).
-- After the edits, redeploy `auth-email-hook` once so all six render with the new design.
+1. **Create Sentry project**, paste the DSN into `SENTRY_DSN` secret. Then I'll finish wiring (#5).
+2. **Slack incoming webhook** for queue alerts → `ADMIN_ALERT_WEBHOOK_URL` secret. Then #6 goes live.
+3. **Toggle HIBP** in Cloud → Users → Auth Settings → "Password HIBP Check". One click.
+4. **Stripe Dashboard alert** for failed webhook deliveries > 1% over 5 min (Stripe → Developers → Webhooks → Alerts).
+5. **k6 load test on staging.** I can write the k6 scripts (`/tests/load/*.js`) targeting signup, checkout, storyboard view — but you run them against staging and watch the dashboards. Tell me if you want the scripts.
+6. **Manual mobile QA at 375px** of the traveler signup → request-a-trip → checkout flow. ~20 min on a real phone or Chrome DevTools. Report any breaks and I'll fix.
+7. **Smoke test against published URL** — the 10-step checklist from the audit. I can't drive a real Stripe payment from here.
 
 ---
 
-## Open question before implementation
+## Explicitly NOT doing
 
-Please confirm the per-template subject lines, headlines, taglines, and the 5 "What happens next" steps above. If you'd like to tweak any wording (e.g., a different CTA label, a shorter tagline, different step copy), tell me which template and what to change and I'll fold the edits into the implementation.
+- **Signup rate limiting** — backend has no good rate-limit primitives yet. Cloudflare or similar at the edge is the right place; not in app code.
+- **Tier 3 items** — runbooks, PITR verification, on-call rotation, compliance sweep. Save for post-launch week 1.
+
+---
+
+## Sequencing
+
+```text
+Day 1 (today):   #1, #2, #3, #4   ← pure code, no secrets needed
+Day 2:           #7, #8           ← bundle split + OG prerender
+Day 2 (you):     create Sentry + Slack accounts, paste secrets
+Day 3:           #5, #6 wired and verified
+Day 3 (you):     HIBP toggle, Stripe webhook alert
+Day 4:           k6 scripts handed off, you run staging soak
+Day 5:           Mobile QA + smoke test
+```
+
+If staging soak is clean → ship Wednesday.
+
+---
+
+## Confirm before I start
+
+- OK to add `@sentry/react` + `@sentry/deno` dependencies?
+- OK to create the new edge functions `monitor-email-queue` and `og-storyboard`?
+- Want the k6 load-test scripts written now (Day 1) or at the end (Day 4)?
