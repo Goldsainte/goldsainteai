@@ -141,7 +141,7 @@ Deno.serve(async (req) => {
               'Authorization': `Bearer ${RESEND_API_KEY}`,
             },
             body: JSON.stringify({
-              from: 'Goldsainte Marketplace <marketplace@goldsainte.com>',
+              from: 'Goldsainte Marketplace <marketplace@notify.goldsainte.com>',
               to: [customerProfile.email],
               subject: `🎉 Bid Accepted - Payment Required for ${job.title}`,
               html: customerEmailHtml,
@@ -215,7 +215,7 @@ Deno.serve(async (req) => {
               'Authorization': `Bearer ${RESEND_API_KEY}`,
             },
             body: JSON.stringify({
-              from: 'Goldsainte Marketplace <marketplace@goldsainte.com>',
+              from: 'Goldsainte Marketplace <marketplace@notify.goldsainte.com>',
               to: [agentProfile.email],
               subject: `🎉 Bid Accepted! New Booking: ${job.title}`,
               html: agentEmailHtml,

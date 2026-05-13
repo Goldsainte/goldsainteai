@@ -821,7 +821,7 @@ const handler = async (req: Request): Promise<Response> => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: "GoldSainte <onboarding@resend.dev>",
+        from: "GoldSainte <onboarding@notify.goldsainte.com>",
         to: [guestEmail],
         subject: emailSubject || `Booking Confirmed - ${bookingReference}`,
         html: emailHtml,

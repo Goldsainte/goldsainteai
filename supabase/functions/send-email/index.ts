@@ -116,7 +116,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Goldsainte Security <security@resend.dev>',
+        from: 'Goldsainte Security <security@notify.goldsainte.com>',
         to: [user.email],
         subject: 'Reset Your Goldsainte Password',
         html,

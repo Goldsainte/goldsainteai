@@ -229,7 +229,7 @@ Deno.serve(async (req) => {
                 'Authorization': `Bearer ${resendApiKey}`,
               },
               body: JSON.stringify({
-                from: 'Goldsainte Marketplace <noreply@goldsainte.com>',
+                from: 'Goldsainte Marketplace <noreply@notify.goldsainte.com>',
                 to: [agent.profiles.email],
                 subject: `🎯 Priority Match: ${job.title}`,
                 html: emailHtml,
