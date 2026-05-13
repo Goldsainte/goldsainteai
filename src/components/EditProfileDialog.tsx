@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Camera, Loader2 } from "lucide-react";
+import { isReservedUsername } from "@/lib/reservedUsernames";
 
 interface Profile {
   id: string;
@@ -96,6 +97,11 @@ export function EditProfileDialog({ open, onOpenChange, profile, onProfileUpdate
     try {
       // Check if username is taken (if changed)
       if (formData.username !== profile.username && formData.username) {
+        if (isReservedUsername(formData.username)) {
+          toast.error('This username is reserved and cannot be used');
+          setLoading(false);
+          return;
+        }
         const { data: existing } = await supabase
           .from('profiles')
           .select('id')
