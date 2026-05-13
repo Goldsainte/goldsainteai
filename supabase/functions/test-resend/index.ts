@@ -55,13 +55,12 @@ body{margin:0;padding:0;background:#f7f3ea;font-family:'Helvetica Neue',Arial,sa
 a{color:#0c4d47;}
 .outer{width:100%;background:#f7f3ea;padding:48px 16px;}
 .container{max-width:560px;margin:0 auto;background:#f7f3ea;}
-.brand{text-align:center;padding:8px 0 40px;}
-.brand img{height:22px;width:auto;display:inline-block;max-width:240px;}
-.rule{border:0;border-top:1px solid rgba(10,34,37,0.15);margin:0 0 40px;}
-.eyebrow{font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#8a7a3f;margin:0 0 18px;text-align:center;}
-h1{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:38px;line-height:1.15;color:#0a2225;margin:0 0 24px;text-align:center;letter-spacing:-0.01em;}
+.brand{padding:8px 0 28px;font-size:0;line-height:0;}
+.brand img{height:22px;width:auto;max-width:240px;display:block;margin:0 auto;}
+.rule{border:0;border-top:1px solid rgba(10,34,37,0.15);margin:0 0 28px;}
+h1{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:38px;line-height:1.15;color:#0a2225;margin:0 0 14px;text-align:center;letter-spacing:-0.01em;}
 .lede{font-family:'Helvetica Neue',Arial,sans-serif;font-size:16px;line-height:1.6;color:#0a2225;opacity:0.85;margin:0 0 36px;text-align:center;}
-.tagline{font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;line-height:1.6;color:#6E6650;font-style:italic;text-align:center;max-width:480px;margin:-12px auto 28px;}
+.tagline{font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;line-height:1.6;color:#6E6650;font-style:italic;text-align:center;max-width:480px;margin:0 auto 28px;}
 .cta-wrap{text-align:center;margin:0 0 28px;}
 .cta{display:inline-block;background:#0c4d47;color:#f7f3ea !important;text-decoration:none;font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;letter-spacing:0.18em;text-transform:uppercase;padding:18px 40px;border-radius:2px;font-weight:500;}
 .fallback{font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;line-height:1.6;color:#0a2225;opacity:0.55;text-align:center;margin:0 0 48px;}
@@ -88,9 +87,8 @@ h1{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:38px;l
 @media (max-width:480px){h1{font-size:30px;}.outer{padding:32px 12px;}}
 </style></head>
 <body><div class="outer"><div class="container">
-  <div class="brand"><img src="${LOGO_URL}" alt="Goldsainte" /></div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" class="brand"><img src="${LOGO_URL}" alt="Goldsainte" /></td></tr></table>
   <hr class="rule"/>
-  <p class="eyebrow">Confirm your email</p>
   <h1>Welcome to Goldsainte.</h1>
   <p class="tagline">A curated marketplace connecting discerning travelers with the world's most trusted specialists, creators, and brands.</p>
   <p class="lede">Confirm your email address to activate your account and begin curating your journey.</p>
@@ -105,7 +103,7 @@ h1{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:38px;l
     <li><span class="num">IV.</span><span>Browse curated trips across 50+ countries, designed by certified specialists and trusted creators.</span></li>
     <li><span class="num">V.</span><span>Request a trip or book directly — every reservation is protected on-platform from inquiry to return.</span></li>
   </ul>
-  <p class="help">If you have any questions, concerns, or require assistance, please do not hesitate to contact <a href="${SITE_URL}/corporate-contact">Goldsainte Support</a>.</p>
+  <p class="help" style="margin-top:48px;">If you have any questions, concerns, or require assistance, please do not hesitate to contact <a href="${SITE_URL}/corporate-contact">Goldsainte Support</a>.</p>
   <p class="security">Goldsainte will never email you and ask you to disclose or verify your password, credit card, or banking account number. If you receive a suspicious email with a link to update your account information, do not click on the link. Instead, report the e-mail to Goldsainte for investigation.</p>
 </div>
 <div class="site-footer">
