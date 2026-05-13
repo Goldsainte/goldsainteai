@@ -8,6 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import * as Sentry from '@sentry/react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import logomark from '@/assets/logomark-gold.png';
 import { z } from 'zod';
@@ -276,11 +277,32 @@ const Auth = () => {
 
       if (error) {
         console.error("Sign up error:", error);
+        let title = "Could not create your account";
         let description = error.message || "An unexpected error occurred.";
-        if (error.message === "Failed to fetch" || error.message?.includes("fetch")) {
-          description = "Unable to connect to authentication server. Please check your internet connection or contact support.";
+        const msg = error.message?.toLowerCase() || "";
+
+        if (msg.includes("already registered") || msg.includes("already been registered")) {
+          title = "Account already exists";
+          description = "An account with this email already exists. Try signing in instead.";
+        } else if (msg.includes("failed to fetch") || msg.includes("network")) {
+          title = "Connection issue";
+          description = "Unable to reach our servers. Check your internet and try again.";
+        } else if (msg.includes("rate limit") || msg.includes("too many")) {
+          title = "Too many attempts";
+          description = "Please wait a minute and try again.";
+        } else if (msg.includes("password")) {
+          title = "Password issue";
+          description = error.message;
+        } else if (msg.includes("email")) {
+          title = "Email issue";
+          description = error.message;
         }
-        toast({ title: "Could not create your account", description, variant: "destructive" });
+
+        toast({ title, description, variant: "destructive" });
+        Sentry.captureException(error, {
+          tags: { flow: 'signup' },
+          extra: { emailDomain: normalizedEmail.split('@')[1] },
+        });
         setIsLoading(false);
         return;
       }
@@ -290,6 +312,7 @@ const Auth = () => {
     } catch (error: any) {
       console.error("Unexpected signup error:", error);
       toast({ title: "Sign up failed", description: error?.message || "An unexpected error occurred.", variant: "destructive" });
+      Sentry.captureException(error, { tags: { flow: 'signup', phase: 'unexpected' } });
       setIsLoading(false);
     }
   };
