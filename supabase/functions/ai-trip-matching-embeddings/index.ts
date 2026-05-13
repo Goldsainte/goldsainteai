@@ -123,7 +123,7 @@ Deno.serve(async (req) => {
       keyType: "ai",
       userId: trip.user_id,
       req,
-      corsHeaders,
+      corsHeaders(req),
     });
 
     if (rateLimitResponse) {

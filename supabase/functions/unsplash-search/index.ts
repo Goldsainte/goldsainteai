@@ -21,7 +21,7 @@ serve(async (req) => {
   const limited = await enforceRateLimit({
     keyType: "api",
     req,
-    corsHeaders,
+    corsHeaders(req),
   });
   if (limited) return limited;
 
@@ -67,6 +67,6 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    return buildSafeErrorResponse("unsplash-search", error, corsHeaders);
+    return buildSafeErrorResponse("unsplash-search", error, corsHeaders(req));
   }
 });

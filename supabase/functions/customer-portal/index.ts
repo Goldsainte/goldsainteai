@@ -69,7 +69,7 @@ serve(async (req) => {
 
     if (!rateLimitResult.allowed) {
       logStep("Rate limit exceeded", { identifier, retryAfter: rateLimitResult.retryAfter });
-      return createRateLimitResponse(rateLimitResult, corsHeaders);
+      return createRateLimitResponse(rateLimitResult, corsHeaders(req));
     }
 
     const stripe = new Stripe(stripeKey, {

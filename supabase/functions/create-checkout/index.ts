@@ -69,7 +69,7 @@ serve(async (req) => {
 
     if (!rateLimitResult.allowed) {
       logger.warn("Rate limit exceeded", { identifier, retryAfter: rateLimitResult.retryAfter });
-      return createRateLimitResponse(rateLimitResult, corsHeaders);
+      return createRateLimitResponse(rateLimitResult, corsHeaders(req));
     }
 
     const { priceId, subscriptionType, tier } = await req.json();

@@ -153,7 +153,7 @@ serve(async (req) => {
     });
     
     if (!rateLimit.allowed) {
-      return createRateLimitResponse(rateLimit, corsHeaders);
+      return createRateLimitResponse(rateLimit, corsHeaders(req));
     }
     
     // Validate dates

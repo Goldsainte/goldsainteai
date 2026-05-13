@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
       keyType: "ai",
       userId,
       req,
-      corsHeaders,
+      corsHeaders(req),
     });
 
     if (rateLimitResponse) {

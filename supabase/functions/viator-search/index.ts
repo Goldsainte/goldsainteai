@@ -112,6 +112,6 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    return buildSafeErrorResponse("viator-search", error, corsHeaders);
+    return buildSafeErrorResponse("viator-search", error, corsHeaders(req));
   }
 });

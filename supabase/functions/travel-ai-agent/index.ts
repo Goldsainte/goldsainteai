@@ -1179,7 +1179,7 @@ serve(async (req) => {
     
     if (!rateLimit.allowed) {
       console.log('❌ [RATE LIMIT] Request blocked for:', clientId);
-      return createRateLimitResponse(rateLimit, corsHeaders);
+      return createRateLimitResponse(rateLimit, corsHeaders(req));
     }
     
     console.log(`✅ [RATE LIMIT] ${rateLimit.remaining} requests remaining`);

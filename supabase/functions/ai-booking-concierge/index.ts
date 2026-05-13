@@ -92,7 +92,7 @@ serve(async (req) => {
     
     if (!rateLimit.allowed) {
       console.log('❌ [RATE LIMIT] AI concierge request blocked for:', clientId);
-      return createRateLimitResponse(rateLimit, corsHeaders);
+      return createRateLimitResponse(rateLimit, corsHeaders(req));
     }
     
     console.log(`✅ [RATE LIMIT] ${rateLimit.remaining} AI concierge requests remaining`);

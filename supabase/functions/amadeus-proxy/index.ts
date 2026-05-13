@@ -173,7 +173,7 @@ serve(async (req) => {
   const limited = await enforceRateLimit({
     keyType: "api",
     req,
-    corsHeaders,
+    corsHeaders(req),
   });
   if (limited) return limited;
 
@@ -197,6 +197,6 @@ serve(async (req) => {
       headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    return buildSafeErrorResponse("amadeus-proxy", error, corsHeaders);
+    return buildSafeErrorResponse("amadeus-proxy", error, corsHeaders(req));
   }
 });
