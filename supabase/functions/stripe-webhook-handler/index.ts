@@ -143,8 +143,16 @@ async function handleCheckoutCompleted(session: any) {
       amount_paid: (session.amount_total ?? 0) / 100,
       currency: (session.currency || 'usd').toUpperCase(),
     });
-    if (error && !error.message?.includes('duplicate')) {
+    const isDuplicate = !!error && (error.code === '23505' || error.message?.includes('duplicate'));
+    if (error && !isDuplicate) {
       console.error('Failed to record itinerary purchase', error);
+    }
+    // On webhook retries (Stripe redelivery), the unique stripe_payment_intent_id
+    // hits a duplicate — skip side effects (affiliate credit, lifetime sales,
+    // confirmation email) so they only fire once per real purchase.
+    if (isDuplicate) {
+      console.log('Itinerary purchase webhook retry — skipping side effects');
+      return;
     }
 
     // Credit affiliate referrer (10% of platform commission, where platform = 7%)
@@ -259,7 +267,7 @@ async function handleBundlePurchase(metadata: any, session: any) {
   // Atomic: trip_booking + itinerary_purchases + bundle_purchases in one
   // transaction via SECURITY DEFINER RPC. Idempotent on stripe_payment_intent_id.
   const guideIds: string[] = Array.isArray(bundle.guide_ids) ? bundle.guide_ids : [];
-  const { error: rpcErr } = await supabaseClient.rpc('create_bundle_purchase', {
+  const { data: rpcData, error: rpcErr } = await supabaseClient.rpc('create_bundle_purchase', {
     _bundle_id: bundle.id,
     _buyer_id: metadata.buyer_id,
     _creator_id: bundle.creator_id,
@@ -275,6 +283,14 @@ async function handleBundlePurchase(metadata: any, session: any) {
   if (rpcErr) {
     console.error('create_bundle_purchase RPC failed', rpcErr);
     throw rpcErr;
+  }
+  // RPC returns { purchase_id, was_new }. On Stripe webhook retries,
+  // was_new is false — skip every side effect below to prevent duplicate
+  // affiliate credits, lifetime-sales bumps, and confirmation emails.
+  const wasNew = Array.isArray(rpcData) ? !!rpcData[0]?.was_new : !!(rpcData as any)?.was_new;
+  if (!wasNew) {
+    console.log('Bundle purchase webhook retry — skipping side effects');
+    return;
   }
 
   // 4. Affiliate commission

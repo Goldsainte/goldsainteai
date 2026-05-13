@@ -266,10 +266,20 @@ export default function BundleBuilder() {
             <div>
               <div className="flex items-center justify-between">
                 <Label>Bundle price</Label>
-                {discountPct > 0 && (
-                  <span className="rounded-full bg-[#0c4d47]/10 px-2 py-0.5 text-[11px] font-medium text-[#0c4d47]">
-                    {discountPct.toFixed(0)}% bundle discount
-                  </span>
+                {priceNum > 0 && includedSum > 0 && (
+                  priceNum < includedSum ? (
+                    <span className="rounded-full bg-[#0c4d47]/10 px-2 py-0.5 text-[11px] font-medium text-[#0c4d47]">
+                      {discountPct.toFixed(0)}% bundle discount
+                    </span>
+                  ) : priceNum === includedSum ? (
+                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-800">
+                      0% discount — same as buying separately
+                    </span>
+                  ) : (
+                    <span className="rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-medium text-red-700">
+                      Priced {(((priceNum - includedSum) / includedSum) * 100).toFixed(0)}% above sum
+                    </span>
+                  )
                 )}
               </div>
               <Input
