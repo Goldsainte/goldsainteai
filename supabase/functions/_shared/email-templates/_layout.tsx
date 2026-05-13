@@ -28,10 +28,11 @@ h1{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:38px;l
 .fallback a{color:#0c4d47;word-break:break-all;text-decoration:underline;opacity:0.8;}
 .divider{border:0;border-top:1px solid rgba(10,34,37,0.12);margin:40px 0;}
 .section-title{font-family:'Playfair Display',Georgia,serif;font-size:20px;font-weight:400;color:#0a2225;margin:0 0 20px;text-align:center;}
-.steps{margin:0 0 16px;padding:0;list-style:none;}
-.steps li{font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;line-height:1.6;color:#0a2225;opacity:0.8;padding:14px 0;border-bottom:1px solid rgba(10,34,37,0.08);display:flex;gap:18px;}
-.steps li:last-child{border-bottom:0;}
-.num{font-family:'Playfair Display',Georgia,serif;font-style:italic;color:#8a7a3f;font-size:18px;flex-shrink:0;width:22px;}
+.steps{width:100%;border-collapse:collapse;margin:0 0 16px;}
+.steps td{font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;line-height:1.6;color:#0a2225;padding:14px 0;border-bottom:1px solid rgba(10,34,37,0.08);vertical-align:top;}
+.steps tr:last-child td{border-bottom:0;}
+.steps td.num{font-family:'Playfair Display',Georgia,serif;font-style:italic;color:#8a7a3f;font-size:18px;width:36px;padding-right:14px;white-space:nowrap;}
+.steps td.body{opacity:0.8;}
 .help{font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;line-height:1.7;color:#0a2225;opacity:0.8;text-align:center;margin:36px 0 0;}
 .security{font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;line-height:1.7;color:#0a2225;opacity:0.65;text-align:center;margin:20px 0 0;font-style:italic;}
 .site-footer{background:#FDF9F0;border-top:1px solid #E5DFC6;margin-top:56px;padding:36px 24px 24px;text-align:center;}
@@ -113,14 +114,16 @@ export const AuthEmailLayout = ({
 
           <hr className="divider" />
           <p className="section-title">What happens next</p>
-          <ul className="steps">
-            {steps.map((step, i) => (
-              <li key={i}>
-                <span className="num">{toRoman(i + 1)}.</span>
-                <span>{step}</span>
-              </li>
-            ))}
-          </ul>
+          <table role="presentation" className="steps" cellPadding={0} cellSpacing={0} border={0}>
+            <tbody>
+              {steps.map((step, i) => (
+                <tr key={i}>
+                  <td className="num">{toRoman(i + 1)}.</td>
+                  <td className="body">{step}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
           <p className="help" style={{ marginTop: '48px' }}>
             If you have any questions, concerns, or require assistance, please do not hesitate to contact{' '}
             <a href={`${SITE_URL}/corporate-contact`}>Goldsainte Support</a>.
