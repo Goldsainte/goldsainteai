@@ -7,8 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Camera, Loader2 } from "lucide-react";
+import { Camera, Loader2, Check, X } from "lucide-react";
 import { isReservedUsername } from "@/lib/reservedUsernames";
+import { useUsernameAvailability } from "@/hooks/useUsernameAvailability";
 
 interface Profile {
   id: string;
