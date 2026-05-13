@@ -40,12 +40,24 @@ const AuthCallback = () => {
           return;
         }
 
-        // Check if profile exists
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('id, is_profile_complete, account_type, onboarding_completed, role, first_name, last_name, phone')
-          .eq('id', session.user.id)
-          .maybeSingle();
+        // The handle_new_user trigger on auth.users is the single source of truth
+        // for profile creation. We READ here (with retry/backoff) — never insert —
+        // to avoid racing the trigger and overwriting its metadata-derived account_type.
+        let profile: any = null;
+        let profileError: any = null;
+        const delays = [0, 150, 350, 700, 1200, 2000]; // ~4.4s total
+        for (const delay of delays) {
+          if (delay) await new Promise((r) => setTimeout(r, delay));
+          const res = await supabase
+            .from('profiles')
+            .select('id, is_profile_complete, account_type, onboarding_completed, role, first_name, last_name, phone')
+            .eq('id', session.user.id)
+            .maybeSingle();
+          profile = res.data;
+          profileError = res.error;
+          if (profile) break;
+          if (profileError && profileError.code !== 'PGRST116') break;
+        }
 
         if (profileError && profileError.code !== 'PGRST116') {
           console.error('Profile query error:', profileError);
@@ -54,43 +66,9 @@ const AuthCallback = () => {
         }
 
         if (!profile) {
-          const accountType = session.user.user_metadata?.account_type || null;
-          // Create minimal profile for new users (email signup or OAuth)
-          const { error: insertError } = await supabase.from('profiles').insert({
-            id: session.user.id,
-            username: session.user.user_metadata?.username || session.user.email?.split('@')[0] || `user_${session.user.id.slice(0, 8)}`,
-            avatar_url: session.user.user_metadata?.avatar_url || null,
-            is_profile_complete: false,
-            account_type: accountType,
-            onboarding_completed: false
-          });
-          
-          if (insertError) {
-            console.error('Profile creation error:', insertError);
-            // If profile already exists (race condition), try to fetch again
-            const { data: retryProfile } = await supabase
-              .from('profiles')
-              .select('id, is_profile_complete, account_type, onboarding_completed, role')
-              .eq('id', session.user.id)
-              .maybeSingle();
-            
-            if (!retryProfile) {
-              navigate('/auth');
-              return;
-            }
-          }
-
-          // If account_type was set from signup metadata, route based on role
-          if (accountType === 'traveler') {
-            navigate('/traveler', { replace: true });
-            return;
-          }
-          if (accountType && ['creator', 'agent', 'brand'].includes(accountType)) {
-            const path = getPostAuthDestination(accountType, false, false);
-            navigate(path, { replace: true });
-            return;
-          }
-          // No account type yet — needs to complete profile
+          // Trigger should have created the profile; if it still hasn't after retries,
+          // route to complete-profile rather than inserting and risking a race.
+          console.warn('Profile not found after trigger backoff; routing to complete-profile');
           navigate('/auth/complete-profile', { replace: true });
           return;
         }
