@@ -24,6 +24,7 @@ import { ensureCSRFToken } from "@/lib/security/csrf";
 import { AppRoutes } from "@/routes/AppRoutes";
 import { InstallAppPrompt } from "@/components/InstallAppPrompt";
 import { useAffiliateRefCapture } from "@/hooks/useAffiliateRef";
+import { RouteSectionBoundary } from "@/routes/RouteSectionBoundary";
 
 
 
@@ -131,7 +132,9 @@ function AppContent() {
       <OnboardingTour />
       {hideHeader ? null : <Header />}
       <main id="main-content" className="flex-1 flex flex-col" tabIndex={-1}>
-        <AppRoutes />
+        <RouteSectionBoundary section="app">
+          <AppRoutes />
+        </RouteSectionBoundary>
       </main>
       {hideFooter ? null : <Footer />}
     </div>
