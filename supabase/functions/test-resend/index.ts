@@ -43,6 +43,7 @@ serve(async (req: Request) => {
     console.log("✅ RESEND_API_KEY is set. Attempting to send test email to:", email);
 
     const SITE_URL = "https://goldsainte.ai";
+    const LOGO_URL = "https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/email-assets/wordmark-green.png";
     const CONFIRMATION_URL = `${SITE_URL}/auth/confirm?token=SAMPLE_TEST_TOKEN_PREVIEW_ONLY`;
 
     const confirmationHtml = `<!DOCTYPE html>
@@ -91,7 +92,7 @@ h1{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:38px;l
 @media (max-width:480px){h1{font-size:30px;}.outer{padding:32px 12px;}}
 </style></head>
 <body><div class="outer"><div class="container">
-  <div class="brand"><img src="${SITE_URL}/email-wordmark.png" alt="Goldsainte" /></div>
+  <div class="brand"><img src="${LOGO_URL}" alt="Goldsainte" /></div>
   <hr class="rule"/>
   <p class="eyebrow">Confirm your email</p>
   <h1>Welcome to Goldsainte.</h1>
@@ -152,7 +153,7 @@ h1{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:38px;l
     </td>
   </tr></table>
   <div class="fsocial">Follow Us &nbsp; <a href="https://www.linkedin.com/company/goldsainte/">LinkedIn</a> · <a href="https://www.instagram.com/goldsainteai/">Instagram</a></div>
-  <div class="flogo"><img src="${SITE_URL}/email-wordmark.png" alt="Goldsainte" /></div>
+  <div class="flogo"><img src="${LOGO_URL}" alt="Goldsainte" /></div>
   <p class="fdesc">Goldsainte is a curated marketplace connecting discerning travelers with the world's most trusted specialists, creators, and brands.</p>
   <p class="flegal">
     <a href="${SITE_URL}/privacy-cookies">Privacy Policy</a> ·
