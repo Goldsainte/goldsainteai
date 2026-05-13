@@ -21,7 +21,7 @@ serve(async (req) => {
   const limited = await enforceRateLimit({
     keyType: "api",
     req,
-    corsHeaders(req),
+    corsHeaders: corsHeaders(req),
   });
   if (limited) return limited;
 
