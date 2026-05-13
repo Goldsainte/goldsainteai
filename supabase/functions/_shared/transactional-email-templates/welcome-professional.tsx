@@ -5,7 +5,7 @@ import type { TemplateEntry } from './registry.ts'
 
 export const WelcomeProfessionalEmail = () => (
   <AuthEmailLayout
-    title='Welcome to Goldsainte'
+    title={"Welcome to Goldsainte"}
     headline={`Welcome to the Goldsainte network.`}
     tagline={`A curated marketplace of the world's most trusted travel specialists, creators, and brands.`}
     lede={`Your application has been approved. You are now part of an invitation-only community of travel professionals serving the world's most discerning travelers.`}
@@ -22,7 +22,7 @@ export const WelcomeProfessionalEmail = () => (
 
 export const template = {
   component: WelcomeProfessionalEmail,
-  subject: 'Welcome to Goldsainte',
+  subject: "Welcome to Goldsainte",
   displayName: 'Welcome — Specialist',
   previewData: {"name": "Maison Atelier"},
 } satisfies TemplateEntry

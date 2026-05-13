@@ -11,7 +11,7 @@ interface Props {
 
 export const AdminNewUserPendingEmail = ({ applicantName, applicantRole, applicationId }: Props) => (
   <AuthEmailLayout
-    title='New {applicantRole} application awaiting review'
+    title={"New {applicantRole} application awaiting review"}
     headline={`A new application is pending.`}
     tagline={`An applicant has submitted documents for review.`}
     lede={`${applicantName ?? ""} has applied as a ${applicantRole ?? ""}. Their identity verification, credentials, and supporting materials are ready for your review.`}

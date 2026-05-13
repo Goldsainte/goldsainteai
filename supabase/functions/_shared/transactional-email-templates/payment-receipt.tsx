@@ -11,7 +11,7 @@ interface Props {
 
 export const PaymentReceiptEmail = ({ amount, bookingId, tripName }: Props) => (
   <AuthEmailLayout
-    title='Your Goldsainte payment receipt'
+    title={"Your Goldsainte payment receipt"}
     headline={`Payment received.`}
     tagline={`A formal receipt for your records.`}
     lede={`We have successfully processed your payment of ${amount ?? ""} for ${tripName ?? ""}. This serves as your official receipt for the transaction.`}
@@ -28,7 +28,7 @@ export const PaymentReceiptEmail = ({ amount, bookingId, tripName }: Props) => (
 
 export const template = {
   component: PaymentReceiptEmail,
-  subject: 'Your Goldsainte payment receipt',
+  subject: "Your Goldsainte payment receipt",
   displayName: 'Payment Receipt',
   previewData: {"amount": "USD 12,500.00", "tripName": "Amalfi in Bloom", "bookingId": "b-789"},
 } satisfies TemplateEntry

@@ -10,7 +10,7 @@ interface Props {
 
 export const TripPublishedEmail = ({ tripId, tripName }: Props) => (
   <AuthEmailLayout
-    title='Your trip is live on the marketplace'
+    title={"Your trip is live on the marketplace"}
     headline={`Your trip is now live.`}
     tagline={`Discerning travelers can now discover your storyboard.`}
     lede={`Your packaged trip ${tripName ?? ""} has passed moderation and is now visible on the Goldsainte marketplace. Travelers may book it directly or request bespoke variations.`}
@@ -27,7 +27,7 @@ export const TripPublishedEmail = ({ tripId, tripName }: Props) => (
 
 export const template = {
   component: TripPublishedEmail,
-  subject: 'Your trip is live on the marketplace',
+  subject: "Your trip is live on the marketplace",
   displayName: 'Trip Published',
   previewData: {"tripName": "Amalfi in Bloom", "tripId": "t-222"},
 } satisfies TemplateEntry

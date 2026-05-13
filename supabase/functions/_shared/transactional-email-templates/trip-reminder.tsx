@@ -12,7 +12,7 @@ interface Props {
 
 export const TripReminderEmail = ({ bookingId, daysUntil, specialistName, tripName }: Props) => (
   <AuthEmailLayout
-    title='Your trip with {specialistName} is approaching'
+    title={"Your trip with {specialistName} is approaching"}
     headline={`Your journey begins soon.`}
     tagline={`A gentle reminder ahead of your departure.`}
     lede={`Your trip ${tripName ?? ""} departs in ${daysUntil ?? ""} days. Now is a good time to review your itinerary, confirm logistics, and reach out to ${specialistName ?? ""} with any final questions.`}

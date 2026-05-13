@@ -10,7 +10,7 @@ interface Props {
 
 export const NewInquiryProfessionalEmail = ({ inquiryId, travelerName }: Props) => (
   <AuthEmailLayout
-    title='{travelerName} sent you a direct inquiry'
+    title={"{travelerName} sent you a direct inquiry"}
     headline={`You have a new direct inquiry.`}
     tagline={`A traveler has reached out to you privately.`}
     lede={`${travelerName ?? ""} found your profile and sent a direct request. They are interested in your services and would like to begin a private conversation.`}

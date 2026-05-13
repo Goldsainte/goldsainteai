@@ -10,7 +10,7 @@ interface Props {
 
 export const ProposalDeclinedEmail = ({ requestSummary, travelerName }: Props) => (
   <AuthEmailLayout
-    title='Your proposal was not selected'
+    title={"Your proposal was not selected"}
     headline={`Thank you for submitting.`}
     tagline={`Your proposal was thoughtfully reviewed.`}
     lede={`${travelerName ?? ""} has decided not to move forward with your proposal for ${requestSummary ?? ""}. Every proposal sharpens your craft — the next opportunity is already in motion.`}
@@ -27,7 +27,7 @@ export const ProposalDeclinedEmail = ({ requestSummary, travelerName }: Props) =
 
 export const template = {
   component: ProposalDeclinedEmail,
-  subject: 'Your proposal was not selected',
+  subject: "Your proposal was not selected",
   displayName: 'Proposal Declined',
   previewData: {"travelerName": "Alexandra", "requestSummary": "a 7-night Amalfi trip"},
 } satisfies TemplateEntry

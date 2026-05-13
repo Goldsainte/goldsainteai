@@ -11,7 +11,7 @@ interface Props {
 
 export const PayoutSentEmail = ({ amount, payoutId, tripName }: Props) => (
   <AuthEmailLayout
-    title='A payout has been sent to your account'
+    title={"A payout has been sent to your account"}
     headline={`A payout is on its way.`}
     tagline={`Your earnings have been released from escrow.`}
     lede={`Goldsainte has released a payout of ${amount ?? ""} to your connected Stripe account for ${tripName ?? ""}. Funds typically arrive within 1–2 business days.`}
@@ -28,7 +28,7 @@ export const PayoutSentEmail = ({ amount, payoutId, tripName }: Props) => (
 
 export const template = {
   component: PayoutSentEmail,
-  subject: 'A payout has been sent to your account',
+  subject: "A payout has been sent to your account",
   displayName: 'Payout Sent',
   previewData: {"amount": "USD 11,562.50", "tripName": "Amalfi in Bloom", "payoutId": "po-111"},
 } satisfies TemplateEntry

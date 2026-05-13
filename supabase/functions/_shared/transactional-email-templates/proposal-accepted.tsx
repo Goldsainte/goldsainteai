@@ -11,7 +11,7 @@ interface Props {
 
 export const ProposalAcceptedEmail = ({ bookingId, travelerName, tripName }: Props) => (
   <AuthEmailLayout
-    title='Your proposal has been accepted'
+    title={"Your proposal has been accepted"}
     headline={`Your proposal has been accepted.`}
     tagline={`${travelerName ?? ""} has chosen to move forward with your proposal.`}
     lede={`Congratulations. The traveler has accepted your proposal for ${tripName ?? ""}. Funds are now held in escrow and the contract is in effect.`}
@@ -28,7 +28,7 @@ export const ProposalAcceptedEmail = ({ bookingId, travelerName, tripName }: Pro
 
 export const template = {
   component: ProposalAcceptedEmail,
-  subject: 'Your proposal has been accepted',
+  subject: "Your proposal has been accepted",
   displayName: 'Proposal Accepted',
   previewData: {"travelerName": "Alexandra", "tripName": "Amalfi in Bloom", "bookingId": "b-789"},
 } satisfies TemplateEntry

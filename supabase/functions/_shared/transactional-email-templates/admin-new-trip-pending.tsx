@@ -11,7 +11,7 @@ interface Props {
 
 export const AdminNewTripPendingEmail = ({ specialistName, tripId, tripName }: Props) => (
   <AuthEmailLayout
-    title='New trip awaiting moderation'
+    title={"New trip awaiting moderation"}
     headline={`A new trip awaits moderation.`}
     tagline={`A specialist has published a trip for review.`}
     lede={`${specialistName ?? ""} has submitted ${tripName ?? ""} for moderation. Review the storyboard, pricing, and inclusions to ensure the listing meets Goldsainte standards.`}
@@ -28,7 +28,7 @@ export const AdminNewTripPendingEmail = ({ specialistName, tripId, tripName }: P
 
 export const template = {
   component: AdminNewTripPendingEmail,
-  subject: 'New trip awaiting moderation',
+  subject: "New trip awaiting moderation",
   displayName: 'Admin — New Trip Pending',
   previewData: {"specialistName": "Maison Atelier", "tripName": "Amalfi in Bloom", "tripId": "t-222"},
 } satisfies TemplateEntry

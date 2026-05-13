@@ -10,7 +10,7 @@ interface Props {
 
 export const IdentityVerificationUpdateEmail = ({ statusDetail, verificationStatus }: Props) => (
   <AuthEmailLayout
-    title='Identity verification update'
+    title={"Identity verification update"}
     headline={`Identity verification update.`}
     tagline={`Your Stripe Identity verification status has changed.`}
     lede={`Stripe Identity has updated your verification status to: ${verificationStatus ?? ""}. ${statusDetail ?? ""}`}
@@ -27,7 +27,7 @@ export const IdentityVerificationUpdateEmail = ({ statusDetail, verificationStat
 
 export const template = {
   component: IdentityVerificationUpdateEmail,
-  subject: 'Identity verification update',
+  subject: "Identity verification update",
   displayName: 'Identity Verification Update',
   previewData: {"verificationStatus": "Verified", "statusDetail": "All marketplace features are now unlocked."},
 } satisfies TemplateEntry

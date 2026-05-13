@@ -9,7 +9,7 @@ interface Props {
 
 export const TripRequestReceivedEmail = ({ requestId }: Props) => (
   <AuthEmailLayout
-    title='We\'ve received your trip request'
+    title={"We've received your trip request"}
     headline={`Your request is being reviewed.`}
     tagline={`Your private brief is now in the hands of our most trusted specialists.`}
     lede={`Thank you for sharing your vision with us. Vetted specialists matching your destination, dates, and budget are reviewing your brief now and will respond with bespoke proposals shortly.`}
@@ -26,7 +26,7 @@ export const TripRequestReceivedEmail = ({ requestId }: Props) => (
 
 export const template = {
   component: TripRequestReceivedEmail,
-  subject: 'We\'ve received your trip request',
+  subject: "We've received your trip request",
   displayName: 'Trip Request Received',
   previewData: {"name": "Alexandra", "destination": "Amalfi Coast", "requestId": "abc-123"},
 } satisfies TemplateEntry

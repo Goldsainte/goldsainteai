@@ -10,7 +10,7 @@ interface Props {
 
 export const NewTripMatchEmail = ({ destination, requestId }: Props) => (
   <AuthEmailLayout
-    title='A traveler is seeking your specialty'
+    title={"A traveler is seeking your specialty"}
     headline={`A trip request matches your specialty.`}
     tagline={`A discerning traveler is seeking a specialist for ${destination ?? ""}.`}
     lede={`Their brief aligns with your destinations, services, and price tier. Review the request and submit a bespoke proposal — first thoughtful responses receive the most attention.`}
@@ -27,7 +27,7 @@ export const NewTripMatchEmail = ({ destination, requestId }: Props) => (
 
 export const template = {
   component: NewTripMatchEmail,
-  subject: 'A traveler is seeking your specialty',
+  subject: "A traveler is seeking your specialty",
   displayName: 'New Trip Match',
   previewData: {"destination": "Amalfi Coast", "requestId": "abc-123"},
 } satisfies TemplateEntry

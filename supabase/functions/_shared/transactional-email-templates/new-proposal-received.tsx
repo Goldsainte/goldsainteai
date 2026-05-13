@@ -10,7 +10,7 @@ interface Props {
 
 export const NewProposalReceivedEmail = ({ proposalId, specialistName }: Props) => (
   <AuthEmailLayout
-    title='A new proposal has arrived'
+    title={"A new proposal has arrived"}
     headline={`A bespoke proposal awaits.`}
     tagline={`${specialistName ?? ""} has crafted a private proposal in response to your trip request.`}
     lede={`Review the itinerary, pricing, and inclusions in your dashboard. You may compare it alongside any other proposals you've received before deciding.`}
@@ -27,7 +27,7 @@ export const NewProposalReceivedEmail = ({ proposalId, specialistName }: Props) 
 
 export const template = {
   component: NewProposalReceivedEmail,
-  subject: 'A new proposal has arrived',
+  subject: "A new proposal has arrived",
   displayName: 'New Proposal Received',
   previewData: {"specialistName": "Maison Atelier", "proposalId": "p-456"},
 } satisfies TemplateEntry

@@ -10,7 +10,7 @@ interface Props {
 
 export const ReviewRequestEmail = ({ bookingId, specialistName }: Props) => (
   <AuthEmailLayout
-    title='Share your Goldsainte experience'
+    title={"Share your Goldsainte experience"}
     headline={`How was your journey?`}
     tagline={`Your private review helps maintain the quality of our marketplace.`}
     lede={`Welcome home. We hope your trip with ${specialistName ?? ""} was everything you imagined. Your honest review — visible only to admins and the specialist — helps us preserve the integrity of the Goldsainte network.`}
@@ -27,7 +27,7 @@ export const ReviewRequestEmail = ({ bookingId, specialistName }: Props) => (
 
 export const template = {
   component: ReviewRequestEmail,
-  subject: 'Share your Goldsainte experience',
+  subject: "Share your Goldsainte experience",
   displayName: 'Post-Trip Review Request',
   previewData: {"specialistName": "Maison Atelier", "bookingId": "b-789"},
 } satisfies TemplateEntry

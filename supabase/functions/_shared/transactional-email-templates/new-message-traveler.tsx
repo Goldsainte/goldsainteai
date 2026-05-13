@@ -10,7 +10,7 @@ interface Props {
 
 export const NewMessageTravelerEmail = ({ conversationId, senderName }: Props) => (
   <AuthEmailLayout
-    title='New message from {senderName}'
+    title={"New message from {senderName}"}
     headline={`You have a new message.`}
     tagline={`${senderName ?? ""} has sent you a private message regarding your trip.`}
     lede={`A new message is waiting in your Goldsainte inbox. All conversations remain securely on-platform to protect both parties.`}

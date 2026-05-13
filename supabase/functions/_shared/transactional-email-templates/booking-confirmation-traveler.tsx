@@ -11,7 +11,7 @@ interface Props {
 
 export const BookingConfirmationTravelerEmail = ({ bookingId, specialistName, tripName }: Props) => (
   <AuthEmailLayout
-    title='Your trip is confirmed'
+    title={"Your trip is confirmed"}
     headline={`Your trip is confirmed.`}
     tagline={`Every detail has been arranged. We wish you an extraordinary journey.`}
     lede={`Your booking with ${specialistName ?? ""} for ${tripName ?? ""} has been confirmed and the contract is now in effect. Payment has been processed and held securely in escrow.`}
@@ -28,7 +28,7 @@ export const BookingConfirmationTravelerEmail = ({ bookingId, specialistName, tr
 
 export const template = {
   component: BookingConfirmationTravelerEmail,
-  subject: 'Your trip is confirmed',
+  subject: "Your trip is confirmed",
   displayName: 'Booking Confirmation — Traveler',
   previewData: {"specialistName": "Maison Atelier", "tripName": "Amalfi in Bloom", "bookingId": "b-789"},
 } satisfies TemplateEntry
