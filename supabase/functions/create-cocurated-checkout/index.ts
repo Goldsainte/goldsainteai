@@ -17,6 +17,18 @@ serve(async (req) => {
   }
 
   try {
+    // SECURITY: do NOT use the raw Origin header for redirect URLs.
+    // Validate against the ALLOWED_ORIGINS allowlist; otherwise an attacker
+    // can create a checkout session whose success_url points to a phishing site.
+    const ALLOWED_ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") || "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const requestOrigin = req.headers.get("origin") || "";
+    const origin = ALLOWED_ORIGINS.includes(requestOrigin)
+      ? requestOrigin
+      : (ALLOWED_ORIGINS[0] || Deno.env.get("SITE_URL") || "https://goldsainte.ai");
+
     const { packageId, promoCode, travelers = 1 } = await req.json();
 
     const supabaseClient = createClient(
@@ -126,6 +138,16 @@ serve(async (req) => {
     const agentPayout = packageData.wholesale_cost + agentCommission;
     const totalMargin = agentCommission + influencerCommission + platformFee;
 
+    // Idempotency key prevents duplicate sessions on rapid double-clicks /
+    // network retries. Scoped per (user|anon, package, travelers, promo).
+    const idempotencyKey = [
+      "cocurated",
+      userId || "anon",
+      packageId,
+      String(travelers),
+      promoCode || "none",
+    ].join(":");
+
     // Create checkout session with automatic split to agent
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -150,8 +172,8 @@ serve(async (req) => {
         quantity: 1
       }],
       mode: 'payment',
-      success_url: `${req.headers.get('origin')}/cocurated-booking-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get('origin')}/cocurated-package/${packageId}`,
+      success_url: `${origin}/cocurated-booking-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/cocurated-package/${packageId}`,
       metadata: {
         package_id: packageId,
         agent_id: packageData.agent_id,
@@ -162,7 +184,7 @@ serve(async (req) => {
         influencer_commission: influencerCommission.toFixed(2),
         platform_fee: platformFee.toFixed(2)
       }
-    });
+    }, { idempotencyKey });
 
     return new Response(
       JSON.stringify({ url: session.url, sessionId: session.id }),
