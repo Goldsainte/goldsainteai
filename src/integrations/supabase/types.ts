@@ -206,6 +206,7 @@ export type Database = {
         Row: {
           affiliate_click_id: string | null
           affiliate_link_id: string
+          booking_id: string | null
           commission_amount: number
           created_at: string
           creator_id: string
@@ -219,6 +220,7 @@ export type Database = {
         Insert: {
           affiliate_click_id?: string | null
           affiliate_link_id: string
+          booking_id?: string | null
           commission_amount: number
           created_at?: string
           creator_id: string
@@ -232,6 +234,7 @@ export type Database = {
         Update: {
           affiliate_click_id?: string | null
           affiliate_link_id?: string
+          booking_id?: string | null
           commission_amount?: number
           created_at?: string
           creator_id?: string
@@ -255,6 +258,13 @@ export type Database = {
             columns: ["affiliate_link_id"]
             isOneToOne: false
             referencedRelation: "affiliate_links"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_commissions_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
             referencedColumns: ["id"]
           },
         ]
@@ -14658,6 +14668,10 @@ export type Database = {
         Returns: undefined
       }
       refresh_creator_stats: { Args: { p_user_id: string }; Returns: undefined }
+      reject_booking_affiliate_commissions: {
+        Args: { target_booking_id: string }
+        Returns: number
+      }
       reverse_booking_loyalty_points: {
         Args: { target_booking_id: string }
         Returns: number
