@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/contexts/AuthContext';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import * as Sentry from '@sentry/react';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -914,6 +914,12 @@ const Auth = () => {
             {signupMethod === 'email' ? (
               <div className="space-y-2">
                 <Label htmlFor="signupEmail" className="text-sm font-medium" style={{ color: '#0a2225' }}>Email address</Label>
+                {selectedAccountType === 'agent' && (
+                  <p className="text-xs text-[#6B7280] mb-3 flex items-start gap-1.5">
+                    <Info className="h-3.5 w-3.5 flex-shrink-0 mt-0.5 text-[#9A9384]" />
+                    <span>Travel agents sign up with email for business correspondence and verification.</span>
+                  </p>
+                )}
                 <Input id="signupEmail" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
               </div>
             ) : (
