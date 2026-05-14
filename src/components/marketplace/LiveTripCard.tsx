@@ -171,23 +171,25 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
             {styleTag}
           </span>
         )}
-        <button
-          type="button"
-          onClick={handleSave}
-          aria-label={isSaved ? "Remove from saved" : "Save trip"}
-          className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/85 backdrop-blur shadow-sm ring-1 ring-black/5 transition hover:bg-white"
-        >
-          <Heart
-            className={`h-4 w-4 transition ${isSaved ? "text-[#C7A962] fill-[#C7A962]" : "text-[#0a2225]"}`}
-          />
-        </button>
-        <div className="absolute right-12 top-3" onClick={(e) => e.stopPropagation()}>
-          <ShareButton
-            variant="icon"
-            url={`/marketplace/trip/${trip.slug || trip.id}`}
-            title={trip.title}
-            description={trip.destination}
-          />
+        <div className="absolute right-3 top-3 flex items-center gap-1.5">
+          <div onClick={(e) => e.stopPropagation()}>
+            <ShareButton
+              variant="icon"
+              url={`/marketplace/trip/${trip.slug || trip.id}`}
+              title={trip.title}
+              description={trip.destination}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={handleSave}
+            aria-label={isSaved ? "Remove from saved" : "Save trip"}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/85 backdrop-blur shadow-sm ring-1 ring-black/5 transition hover:bg-white"
+          >
+            <Heart
+              className={`h-4 w-4 transition ${isSaved ? "text-[#C7A962] fill-[#C7A962]" : "text-[#0a2225]"}`}
+            />
+          </button>
         </div>
       </div>
 
