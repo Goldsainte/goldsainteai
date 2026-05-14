@@ -73,7 +73,7 @@ const CREATOR_ITEMS: ChecklistItem[] = [
     id: "connect-stripe",
     label: "Connect your payout account",
     description: "Set up Stripe Connect to receive commissions on bookings and guide sales.",
-    cta: { label: "Connect Stripe", to: "/creator-dashboard?tab=payouts" },
+    cta: { label: "Connect Stripe", to: "/creator-dashboard?tab=earnings" },
     isComplete: (d) => !!d.profile?.stripe_connect_account_id,
   },
   {
@@ -104,7 +104,7 @@ const AGENT_ITEMS: ChecklistItem[] = [
     id: "connect-stripe",
     label: "Connect your payout account",
     description: "Set up Stripe Connect so you can receive payments from travelers.",
-    cta: { label: "Connect Stripe", to: "/agent-dashboard?tab=payouts" },
+    cta: { label: "Connect Stripe", to: "/agent-dashboard?tab=earnings" },
     isComplete: (d) => !!d.profile?.stripe_connect_account_id,
   },
   {
