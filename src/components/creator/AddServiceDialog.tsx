@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +31,13 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
   const isEdit = !!editService;
   const [tier, setTier] = useState<ServiceTier | null>(editService?.service_tier || initialTier || null);
   const [saving, setSaving] = useState(false);
+
+  // Sync tier when dialog opens with a new initialTier (e.g. from empty-state cards)
+  useEffect(() => {
+    if (open && !isEdit) {
+      setTier(initialTier || null);
+    }
+  }, [open, initialTier, isEdit]);
 
   // Form fields
   const [title, setTitle] = useState(editService?.title || "");
