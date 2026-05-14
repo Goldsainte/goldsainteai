@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { Clock, ChevronRight, Plus, Map, Compass, Sparkles, MoreVertical, Pencil, Trash2, Shield } from "lucide-react";
+import { Clock, ChevronRight, Plus, PenLine, Star, CirclePlus, MoreVertical, Pencil, Trash2, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { AddServiceDialog } from "./AddServiceDialog";
@@ -33,20 +33,20 @@ interface Props {
 const TIER_CONFIG: Record<ServiceTier, { label: string; icon: any; badge: string; cta: string }> = {
   custom_itinerary: {
     label: "Custom Itineraries",
-    icon: Map,
+    icon: PenLine,
     badge: "bg-[#FDF9F0] text-[#0c4d47] border-[#E5DFC6]",
     cta: "Request This",
   },
   full_trip_design: {
     label: "Full Trip Design",
-    icon: Compass,
-    badge: "bg-[#0c4d47] text-[#FDF9F0] border-[#0c4d47]",
+    icon: Star,
+    badge: "bg-[#FDF9F0] text-[#0c4d47] border-[#E5DFC6]",
     cta: "Request This",
   },
   add_on: {
     label: "Add-Ons",
-    icon: Sparkles,
-    badge: "bg-white text-[#0a2225] border-[#E5DFC6]",
+    icon: CirclePlus,
+    badge: "bg-[#FDF9F0] text-[#0c4d47] border-[#E5DFC6]",
     cta: "Add",
   },
 };
@@ -302,7 +302,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile }: Props) {
 
 // Re-export TIERS for empty state usage
 const TIERS = [
-  { value: "custom_itinerary" as ServiceTier, label: "Custom Itinerary", desc: "Personalized day-by-day plans", icon: Map },
-  { value: "full_trip_design" as ServiceTier, label: "Full Trip Design", desc: "Premium end-to-end planning", icon: Compass },
-  { value: "add_on" as ServiceTier, label: "Add-On", desc: "Optional extras & calls", icon: Sparkles },
+  { value: "custom_itinerary" as ServiceTier, label: "Custom Itinerary", desc: "Personalized day-by-day plans", icon: PenLine },
+  { value: "full_trip_design" as ServiceTier, label: "Full Trip Design", desc: "Premium end-to-end planning", icon: Star },
+  { value: "add_on" as ServiceTier, label: "Add-On", desc: "Optional extras & calls", icon: CirclePlus },
 ];

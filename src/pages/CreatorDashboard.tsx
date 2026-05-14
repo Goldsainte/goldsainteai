@@ -313,7 +313,7 @@ export default function CreatorDashboard() {
                     {activeTab === "trips" && <><Map className="h-4 w-4 text-[#C7A962]" /> My Trips</>}
                     {activeTab === "portfolio" && <><ImageIcon className="h-4 w-4 text-[#C7A962]" /> Portfolio</>}
                     {activeTab === "guides" && <><BookOpen className="h-4 w-4 text-[#C7A962]" /> Guides</>}
-                    {activeTab === "services" && <><Sparkles className="h-4 w-4 text-[#C7A962]" /> Custom Services</>}
+                    {activeTab === "services" && <>Custom Services</>}
                     {activeTab === "performance" && <><Sparkles className="h-4 w-4 text-[#C7A962]" /> Performance</>}
                     {activeTab === "affiliate" && <><Sparkles className="h-4 w-4 text-[#C7A962]" /> Affiliate</>}
                     {activeTab === "content" && <><Sparkles className="h-4 w-4 text-[#C7A962]" /> Content Tools</>}
@@ -376,7 +376,7 @@ export default function CreatorDashboard() {
                 <BookOpen className="h-3.5 w-3.5 mr-1.5" /> Guides
               </TabsTrigger>
               <TabsTrigger value="services" className={tabTriggerClass}>
-                <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Custom Services
+                Custom Services
               </TabsTrigger>
               <TabsTrigger value="performance" className={tabTriggerClass}>
                 <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Performance
