@@ -704,10 +704,81 @@ const Auth = () => {
               </p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="signupEmail" className="text-sm font-medium" style={{ color: '#0a2225' }}>Email address</Label>
-              <Input id="signupEmail" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
-            </div>
+            {(selectedAccountType === 'traveler' || selectedAccountType === 'creator') && otpStep === 'request' && (
+              <div className="flex gap-2 p-1 rounded-full" style={{ backgroundColor: '#F5F1E5' }}>
+                <button
+                  type="button"
+                  onClick={() => setSignupMethod('email')}
+                  className="flex-1 py-2 rounded-full text-sm font-medium transition-colors"
+                  style={signupMethod === 'email'
+                    ? { backgroundColor: '#0c4d47', color: '#FFFFFF' }
+                    : { backgroundColor: 'transparent', color: '#0a2225' }}
+                >
+                  Email
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSignupMethod('phone')}
+                  className="flex-1 py-2 rounded-full text-sm font-medium transition-colors"
+                  style={signupMethod === 'phone'
+                    ? { backgroundColor: '#0c4d47', color: '#FFFFFF' }
+                    : { backgroundColor: 'transparent', color: '#0a2225' }}
+                >
+                  Phone
+                </button>
+              </div>
+            )}
+
+            {/* OTP verification view (phone signup, step 2) */}
+            {signupMethod === 'phone' && otpStep === 'verify' && (selectedAccountType === 'traveler' || selectedAccountType === 'creator') ? (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="otpCode" className="text-sm font-medium" style={{ color: '#0a2225' }}>6-digit code</Label>
+                  <Input
+                    id="otpCode"
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                    placeholder="123456"
+                    className="h-14 rounded-xl text-center text-2xl tracking-widest"
+                    style={{ borderColor: '#E8E2D0' }}
+                    autoFocus
+                  />
+                  <p className="text-sm" style={{ color: '#9A9384' }}>Code sent to {phoneForVerification}</p>
+                </div>
+                <Button
+                  type="submit"
+                  className="w-full h-12 rounded-full"
+                  style={{ backgroundColor: '#0c4d47', color: '#E5DFC6' }}
+                  disabled={isLoading || otpCode.length !== 6}
+                >
+                  {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Verifying...</> : 'Verify and create account'}
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => { setOtpStep('request'); setOtpCode(''); }}
+                  className="w-full text-sm hover:underline"
+                  style={{ color: '#9A9384' }}
+                >
+                  Use a different phone number
+                </button>
+              </div>
+            ) : (
+            <>
+            {signupMethod === 'email' ? (
+              <div className="space-y-2">
+                <Label htmlFor="signupEmail" className="text-sm font-medium" style={{ color: '#0a2225' }}>Email address</Label>
+                <Input id="signupEmail" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Label htmlFor="signupPhone" className="text-sm font-medium" style={{ color: '#0a2225' }}>Phone number</Label>
+                <Input id="signupPhone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+1 555 123 4567" required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
+                <p className="text-sm" style={{ color: '#9A9384' }}>Include country code. We'll text you a 6-digit code.</p>
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -719,6 +790,8 @@ const Auth = () => {
                 <Input id="lastName" type="text" placeholder="Doe" value={lastName} onChange={(e) => setLastName(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
               </div>
             </div>
+            {signupMethod === 'email' && (
+            <>
             <div className="space-y-2">
               <Label htmlFor="phone" className="text-sm font-medium" style={{ color: '#0a2225' }}>Phone Number <span style={{ color: '#9A9384' }}>(optional)</span></Label>
               <Input id="phone" type="tel" placeholder="+1 (555) 000-0000" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
@@ -742,8 +815,10 @@ const Auth = () => {
                 </p>
               </div>
             </div>
+            </>
+            )}
 
-            {(selectedAccountType === 'traveler' || selectedAccountType === 'creator') && (
+            {signupMethod === 'email' && (selectedAccountType === 'traveler' || selectedAccountType === 'creator') && (
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-medium" style={{ color: '#0a2225' }}>Password</Label>
                 <Input id="password" type="password" placeholder="Create a password" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} minLength={8} />
@@ -781,6 +856,8 @@ const Auth = () => {
                   <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing...</>
                 ) : (selectedAccountType === 'agent' || selectedAccountType === 'brand') ? (
                   'Continue to Application'
+                ) : signupMethod === 'phone' ? (
+                  'Send code'
                 ) : (
                   'Create Account'
                 )}
@@ -800,6 +877,8 @@ const Auth = () => {
                   Skip for now
                 </button>
               </div>
+            )}
+            </>
             )}
           </form>
         )}
