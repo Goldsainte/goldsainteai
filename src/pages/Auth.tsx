@@ -399,6 +399,7 @@ const Auth = () => {
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
+    // placeholder anchor
     e.preventDefault();
     setIsLoading(true);
     try {
