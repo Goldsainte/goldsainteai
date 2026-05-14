@@ -33,6 +33,7 @@ import { CreatorPortfolioTab } from "./creator/components/CreatorPortfolioTab";
 import { CreatorSettingsTab } from "./creator/components/CreatorSettingsTab";
 import { CreatorGuidesTab } from "./creator/components/CreatorGuidesTab";
 import { CreatorPerformanceTab } from "./creator/components/CreatorPerformanceTab";
+import { CreatorServicesSection } from "@/components/creator/CreatorServicesSection";
 import { CreatorAffiliateTab } from "./creator/components/CreatorAffiliateTab";
 import { CreatorContentToolsTab } from "./creator/components/CreatorContentToolsTab";
 import { TierBadge, TierBenefitsCard } from "@/components/creator/TierBadge";
@@ -312,6 +313,7 @@ export default function CreatorDashboard() {
                     {activeTab === "trips" && <><Map className="h-4 w-4 text-[#C7A962]" /> My Trips</>}
                     {activeTab === "portfolio" && <><ImageIcon className="h-4 w-4 text-[#C7A962]" /> Portfolio</>}
                     {activeTab === "guides" && <><BookOpen className="h-4 w-4 text-[#C7A962]" /> Guides</>}
+                    {activeTab === "services" && <><Sparkles className="h-4 w-4 text-[#C7A962]" /> Custom Services</>}
                     {activeTab === "performance" && <><Sparkles className="h-4 w-4 text-[#C7A962]" /> Performance</>}
                     {activeTab === "affiliate" && <><Sparkles className="h-4 w-4 text-[#C7A962]" /> Affiliate</>}
                     {activeTab === "content" && <><Sparkles className="h-4 w-4 text-[#C7A962]" /> Content Tools</>}
@@ -335,6 +337,9 @@ export default function CreatorDashboard() {
                 </SelectItem>
                 <SelectItem value="guides" className="py-3">
                   <span className="flex items-center gap-2"><BookOpen className="h-4 w-4" /> Guides</span>
+                </SelectItem>
+                <SelectItem value="services" className="py-3">
+                  <span className="flex items-center gap-2"><Sparkles className="h-4 w-4" /> Custom Services</span>
                 </SelectItem>
                 <SelectItem value="performance" className="py-3">
                   <span className="flex items-center gap-2"><Sparkles className="h-4 w-4" /> Performance</span>
@@ -369,6 +374,9 @@ export default function CreatorDashboard() {
               </TabsTrigger>
               <TabsTrigger value="guides" className={tabTriggerClass}>
                 <BookOpen className="h-3.5 w-3.5 mr-1.5" /> Guides
+              </TabsTrigger>
+              <TabsTrigger value="services" className={tabTriggerClass}>
+                <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Custom Services
               </TabsTrigger>
               <TabsTrigger value="performance" className={tabTriggerClass}>
                 <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Performance
@@ -406,6 +414,10 @@ export default function CreatorDashboard() {
 
           <TabsContent value="guides" className="mt-0">
             <CreatorGuidesTab />
+          </TabsContent>
+
+          <TabsContent value="services" className="mt-0">
+            {user?.id && <CreatorServicesSection creatorId={user.id} isOwnProfile={true} />}
           </TabsContent>
 
           <TabsContent value="performance" className="mt-0">
