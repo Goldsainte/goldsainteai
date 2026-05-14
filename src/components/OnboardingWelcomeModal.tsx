@@ -1,5 +1,5 @@
 import { useWelcomeModal } from "@/hooks/useWelcomeModal";
-import { Sparkles, ArrowRight } from "lucide-react";
+import { ArrowRight, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import welcomeHeroImage from "@/assets/luxury-infinity-pool.jpg";
 
@@ -30,7 +30,7 @@ export function OnboardingWelcomeModal() {
     ];
     primaryCta = { label: "Begin Your Journey", href: "/traveler" };
   } else if (accountType === "creator") {
-    title = "Welcome to the Creator Side of Goldsainte";
+    title = "Welcome to the creator side of Goldsainte.";
     subtitle = "Goldsainte is where vision becomes a bookable experience.";
     bullets = [
       "Curate and design journeys that reflect your aesthetic and audience.",
@@ -38,7 +38,7 @@ export function OnboardingWelcomeModal() {
       "Collaborate seamlessly to bring elevated trips to life.",
       "Earn from your taste, your influence, and your creative direction.",
     ];
-    primaryCta = { label: "Open Your Creator Dashboard", href: "/partner" };
+    primaryCta = { label: "Open your creator dashboard", href: "/creator-dashboard" };
     footerLine = "A space reserved for your next idea.";
   } else if (accountType === "agent") {
     title = "Welcome to the agent desk at Goldsainte";
@@ -48,77 +48,77 @@ export function OnboardingWelcomeModal() {
       "Manage bookings, payouts, and disputes from a single partner console.",
       "Keep payments and messaging on-platform to protect your earnings and traveler safety.",
     ];
-    primaryCta = { label: "Open your Partner Console", href: "/partner" };
+    primaryCta = { label: "Open your partner console", href: "/partner" };
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-3 sm:px-4 py-4">
-      <div className="w-full max-w-3xl max-h-[90vh] rounded-3xl bg-[#FDF9F0] border border-[#E5DFC6] overflow-y-auto shadow-[0_24px_60px_rgba(10,34,37,0.25)] text-[#0a2225]">
-        <div className="flex flex-col md:flex-row">
-          {/* Left: Hero Image */}
-          <div className="md:w-[40%] relative">
-            <img
-              src={welcomeHeroImage}
-              alt="Luxury travel destination"
-              className="w-full h-32 sm:h-48 md:h-full object-cover"
-            loading="lazy"/>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent md:bg-gradient-to-r" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0a2225]/70 backdrop-blur-sm px-4 py-6">
+      <div className="relative w-full max-w-md max-h-[92vh] overflow-y-auto rounded-[28px] bg-[#f7f3ea] shadow-[0_30px_80px_-20px_rgba(10,34,37,0.45)] text-[#0a2225]">
+        {/* Close */}
+        <button
+          type="button"
+          onClick={dismiss}
+          aria-label="Close"
+          className="absolute right-4 top-4 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#f7f3ea]/80 text-[#0a2225]/70 hover:text-[#0a2225] hover:bg-white transition-colors"
+        >
+          <X className="h-4 w-4" />
+        </button>
+
+        {/* Hero strip */}
+        <div className="relative h-40 overflow-hidden rounded-t-[28px]">
+          <img
+            src={welcomeHeroImage}
+            alt=""
+            className="h-full w-full object-cover"
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#f7f3ea]" />
+        </div>
+
+        {/* Content */}
+        <div className="px-7 pb-7 -mt-6 space-y-6">
+          <div className="space-y-3">
+            <p className="text-[10px] uppercase tracking-[0.28em] text-[#0c4d47]/70 font-medium">
+              Goldsainte
+            </p>
+            <h2 className="font-secondary text-[26px] sm:text-[28px] leading-[1.15] text-[#0a2225]">
+              {title}
+            </h2>
+            {subtitle && (
+              <p className="text-sm text-[#0a2225]/60 leading-relaxed">
+                {subtitle}
+              </p>
+            )}
           </div>
 
-          {/* Right: Content */}
-          <div className="md:w-[60%] p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-5">
-            {/* Header */}
-            <div className="flex items-center justify-between gap-3">
-              <div className="inline-flex items-center gap-2 text-[10px] sm:text-[11px] uppercase tracking-[0.18em] text-[#7A7151] bg-[#C7B892]/30 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full font-medium">
-                <Sparkles className="h-3 w-3" />
-                Goldsainte
-              </div>
-              <button
-                type="button"
-                onClick={dismiss}
-                className="text-xs text-[#7A7151] hover:text-[#0a2225] underline-offset-2 hover:underline transition-colors"
-              >
-                Skip for now
-              </button>
-            </div>
+          <ul className="space-y-3 border-t border-[#0a2225]/10 pt-5">
+            {bullets.map((b, idx) => (
+              <li key={idx} className="flex gap-3 text-[13.5px] leading-relaxed text-[#0a2225]/80">
+                <span className="mt-[7px] h-1 w-1 rounded-full bg-[#c7a962] flex-shrink-0" />
+                <span>{b}</span>
+              </li>
+            ))}
+          </ul>
 
-            {/* Title & Greeting */}
-            <div className="space-y-1.5 sm:space-y-2">
-              <h2 className="font-secondary text-lg sm:text-xl md:text-2xl font-semibold text-[#0a2225] leading-tight">
-                {title}
-              </h2>
-              {subtitle && (
-                <p className="text-xs sm:text-sm text-[#7A7151]">{subtitle}</p>
-              )}
-            </div>
-
-            {/* Bullet Cards */}
-            <ul className="space-y-1.5 sm:space-y-2">
-              {bullets.map((b, idx) => (
-                <li
-                  key={idx}
-                  className="flex gap-2 sm:gap-3 rounded-xl border border-[#E5DFC6] bg-white/80 px-2.5 sm:px-3 py-2"
-                >
-                  <span className="mt-1 h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-[#C7A962] flex-shrink-0" />
-                  <span className="text-[11px] sm:text-[12px] text-[#3F3A33] leading-relaxed">{b}</span>
-                </li>
-              ))}
-            </ul>
-
-            {/* Footer CTA */}
-            <div className="flex flex-col gap-2 sm:gap-3 pt-1">
-              <Link
-                to={primaryCta.href}
-                onClick={dismiss}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] text-[#FDF9F0] px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold hover:bg-[#0c4d47]/90 transition-colors whitespace-nowrap"
-              >
-                {primaryCta.label}
-                <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              </Link>
-              <p className="text-[10px] sm:text-[11px] text-[#7A7151] leading-relaxed">
-                {footerLine}
-              </p>
-            </div>
+          <div className="space-y-3 pt-1">
+            <Link
+              to={primaryCta.href}
+              onClick={dismiss}
+              className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#0c4d47] text-[#f7f3ea] px-5 py-3.5 text-sm font-medium hover:bg-[#0a2225] transition-colors"
+            >
+              {primaryCta.label}
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+            <button
+              type="button"
+              onClick={dismiss}
+              className="block w-full text-center text-[12px] text-[#0a2225]/50 hover:text-[#0a2225] transition-colors"
+            >
+              Skip for now
+            </button>
+            <p className="pt-2 text-center text-[11px] italic text-[#0a2225]/40 font-secondary">
+              {footerLine}
+            </p>
           </div>
         </div>
       </div>
