@@ -743,6 +743,93 @@ const Auth = () => {
           </form>
         )}
 
+        {/* Phone Sign In Step */}
+        {step === 'phone-signin' && (
+          <form onSubmit={handlePhoneSignIn} className="space-y-4">
+            <div className="text-center mb-2">
+              <h1 className="text-2xl sm:text-3xl font-secondary tracking-tight" style={{ color: '#0a2225' }}>
+                Sign in with phone
+              </h1>
+              <p className="text-sm mt-2" style={{ color: '#9A9384' }}>
+                {otpStep === 'request'
+                  ? "We'll text you a 6-digit code."
+                  : `Enter the code we sent to ${phoneForVerification}.`}
+              </p>
+            </div>
+
+            {otpStep === 'request' ? (
+              <div className="space-y-2">
+                <Label htmlFor="signinPhone" className="text-sm font-medium" style={{ color: '#0a2225' }}>Phone number</Label>
+                <Input
+                  id="signinPhone"
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+1 555 123 4567"
+                  required
+                  disabled={isLoading}
+                  className="h-12 rounded-xl"
+                  style={{ borderColor: '#E8E2D0' }}
+                />
+                <p className="text-sm" style={{ color: '#9A9384' }}>Include your country code.</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Label htmlFor="signinOtp" className="text-sm font-medium" style={{ color: '#0a2225' }}>6-digit code</Label>
+                <Input
+                  id="signinOtp"
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                  placeholder="123456"
+                  className="h-14 rounded-xl text-center text-2xl tracking-widest"
+                  style={{ borderColor: '#E8E2D0' }}
+                  autoFocus
+                />
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              className="w-full h-12 rounded-full"
+              style={{ backgroundColor: '#0c4d47', color: '#E5DFC6' }}
+              disabled={isLoading || (otpStep === 'verify' && otpCode.length !== 6)}
+            >
+              {isLoading
+                ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{otpStep === 'request' ? 'Sending...' : 'Verifying...'}</>
+                : (otpStep === 'request' ? 'Send code' : 'Sign in')}
+            </Button>
+
+            <div className="flex items-center justify-between text-sm pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  if (otpStep === 'verify') {
+                    setOtpStep('request');
+                    setOtpCode('');
+                  } else {
+                    setStep('email');
+                  }
+                }}
+                className="transition-colors"
+                style={{ color: '#9A9384' }}
+              >
+                ← {otpStep === 'verify' ? 'Use a different number' : 'Back'}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setOtpStep('request'); setOtpCode(''); setStep('email'); }}
+                className="hover:underline"
+                style={{ color: '#C7A962' }}
+              >
+                Use email instead
+              </button>
+            </div>
+          </form>
+        )}
+
         {/* Sign Up Step */}
         {step === 'signup' && (
           <form onSubmit={handleSignUp} className="space-y-4">
