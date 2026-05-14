@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Sparkles, User, Plane, Calendar, Bookmark, Settings, Plus, MessageCircle } from "lucide-react";
+import { Sparkles, User, Plane, Calendar, Bookmark, Settings, Plus, MessageCircle, Mail } from "lucide-react";
 import { useRequireOnboarding } from "@/hooks/useRequireOnboarding";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -15,6 +15,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { BackButton } from "@/components/ui/BackButton";
 import { GettingStartedChecklist } from "@/components/onboarding/GettingStartedChecklist";
+import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 interface Profile {
@@ -24,6 +25,7 @@ interface Profile {
   full_name: string | null;
   avatar_url: string | null;
   created_at: string | null;
+  email?: string | null;
 }
 
 interface DashboardStats {
@@ -55,7 +57,7 @@ export default function TravelerDashboardPage() {
         const [profileResult, tripsResult, bookingsResult] = await Promise.all([
           supabase
             .from("profiles")
-            .select("id, display_name, first_name, full_name, avatar_url, created_at")
+            .select("id, display_name, first_name, full_name, avatar_url, created_at, email")
             .eq("id", authUser.id)
             .single(),
           supabase
@@ -162,6 +164,16 @@ export default function TravelerDashboardPage() {
           </div>
         ) : (
           <>
+          {profile && !profile.email && (
+            <div className="rounded-2xl border border-[#C7A962]/30 bg-[#FDF9F0] p-4 mb-6 flex items-start gap-4">
+              <Mail className="h-5 w-5 text-[#C7A962] flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="font-medium text-[#0a2225] text-sm mb-0.5">Add an email to your account</p>
+                <p className="text-xs text-[#6B7280] mb-3">We need an email for booking confirmations, password recovery, and account updates.</p>
+                <Button onClick={() => navigate('/settings?tab=account')} size="sm" className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white">Add email</Button>
+              </div>
+            </div>
+          )}
           {user && <GettingStartedChecklist userId={user.id} role="traveler" />}
           <div className="mb-4 text-right">
             <Link to="/how-it-works/traveler" className="text-xs text-[#0c4d47] hover:underline">
