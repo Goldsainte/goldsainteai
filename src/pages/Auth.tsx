@@ -415,6 +415,50 @@ const Auth = () => {
     setIsLoading(false);
   };
 
+  const handlePhoneSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (otpStep === 'request') {
+      const cleanedPhone = phone.replace(/\s/g, '');
+      if (!cleanedPhone.startsWith('+') || cleanedPhone.length < 8) {
+        toast({ title: 'Invalid phone', description: 'Include country code, e.g. +1 555 123 4567', variant: 'destructive' });
+        return;
+      }
+      setIsLoading(true);
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: cleanedPhone,
+        options: { shouldCreateUser: false },
+      });
+      setIsLoading(false);
+      if (error) {
+        const msg = error.message?.toLowerCase() || '';
+        const description = msg.includes('signups not allowed') || msg.includes('user not found')
+          ? "We couldn't find an account with that phone number. Try signing up instead."
+          : error.message;
+        toast({ title: 'Could not send code', description, variant: 'destructive' });
+        Sentry.captureException(error, { tags: { flow: 'phone_signin_send_otp' } });
+        return;
+      }
+      setPhoneForVerification(cleanedPhone);
+      setOtpStep('verify');
+      toast({ title: 'Code sent', description: `We texted a 6-digit code to ${cleanedPhone}` });
+      return;
+    }
+
+    setIsLoading(true);
+    const { error } = await supabase.auth.verifyOtp({
+      phone: phoneForVerification,
+      token: otpCode,
+      type: 'sms',
+    });
+    setIsLoading(false);
+    if (error) {
+      toast({ title: 'Invalid code', description: error.message, variant: 'destructive' });
+      Sentry.captureException(error, { tags: { flow: 'phone_signin_verify_otp' } });
+      return;
+    }
+    // AuthContext + the Auth page's user-redirect effect will route appropriately.
+  };
+
   const handleProfileComplete = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
