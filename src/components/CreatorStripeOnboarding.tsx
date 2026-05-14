@@ -40,6 +40,18 @@ export const CreatorStripeOnboarding = () => {
     }
   }, []);
 
+  // Listen for global "start-stripe-onboarding" trigger from checklist CTAs
+  useEffect(() => {
+    const handler = () => {
+      // Scroll the card into view, then kick off onboarding
+      const el = document.getElementById('payout-setup');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      startOnboarding();
+    };
+    window.addEventListener('start-stripe-onboarding', handler);
+    return () => window.removeEventListener('start-stripe-onboarding', handler);
+  }, []);
+
   const checkStatus = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -153,7 +165,7 @@ export const CreatorStripeOnboarding = () => {
   }
 
   return (
-    <Card>
+    <Card id="payout-setup" style={{ scrollMarginTop: '6rem' }}>
       <CardHeader>
         <CardTitle>
           Payout Setup
