@@ -378,23 +378,58 @@ export default function CreatorPublicProfilePage() {
         <div className="bg-white">
           <div className="mx-auto max-w-5xl px-4 py-16 md:py-24 text-center">
             <GoldDivider />
-            <div className="mt-10">
-              <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-3">
-                Start Your Journey With {firstName}
-              </h2>
-              <p className="font-primary text-sm text-[#6B7280] mb-8 max-w-md mx-auto">
-                Share your travel style and get a personalized itinerary crafted just for you.
-              </p>
-              <Button
-                onClick={handleRequestTrip}
-                className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-10 h-12 text-sm font-medium shadow-sm"
-              >
-                Request a Trip
-              </Button>
-              <p className="text-[10px] text-[#9CA3AF] mt-3">
-                No commitment · Delivered in 24–48 hours
-              </p>
-            </div>
+            {!isOwnProfile ? (
+              <div className="mt-10">
+                <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-3">
+                  Start Your Journey With {firstName}
+                </h2>
+                <p className="font-primary text-sm text-[#6B7280] mb-8 max-w-md mx-auto">
+                  Share your travel style and get a personalized itinerary crafted just for you.
+                </p>
+                <Button
+                  onClick={handleRequestTrip}
+                  className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-10 h-12 text-sm font-medium shadow-sm"
+                >
+                  Request a Trip
+                </Button>
+                <p className="text-[10px] text-[#9CA3AF] mt-3">
+                  No commitment · Delivered in 24–48 hours
+                </p>
+              </div>
+            ) : (
+              <div className="mt-10">
+                <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-3">
+                  Your Public Profile
+                </h2>
+                <p className="font-primary text-sm text-[#6B7280] mb-2 max-w-md mx-auto">
+                  This is how travelers see your profile.
+                </p>
+                <p className="font-primary text-xs text-[#9CA3AF] mb-8 max-w-md mx-auto">
+                  Visitors will see your services, trips, and reviews here. Share your link to start receiving requests.
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <Button
+                    onClick={() => navigate('/creator-dashboard?tab=settings')}
+                    className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-8 h-12 text-sm font-medium shadow-sm"
+                  >
+                    Edit profile
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      const url = creator.username
+                        ? `https://goldsainte.ai/@${creator.username}`
+                        : `https://goldsainte.ai/creators/${creator.id}`;
+                      navigator.clipboard.writeText(url);
+                      toast.success("Profile link copied", { description: url });
+                    }}
+                    variant="outline"
+                    className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#FDF9F0] rounded-full px-8 h-12 text-sm font-medium"
+                  >
+                    Copy profile link
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
