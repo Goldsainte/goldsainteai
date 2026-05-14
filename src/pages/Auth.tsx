@@ -58,6 +58,10 @@ const Auth = () => {
   const [phone, setPhone] = useState('');
   const [smsOptIn, setSmsOptIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [signupMethod, setSignupMethod] = useState<'email' | 'phone'>('email');
+  const [otpStep, setOtpStep] = useState<'request' | 'verify'>('request');
+  const [otpCode, setOtpCode] = useState('');
+  const [phoneForVerification, setPhoneForVerification] = useState('');
   const { signIn, signUp, user, isLoading: authLoading } = useAuth();
   const redirectTarget = useMemo(() => getRedirectPathFromSearch(location.search), [location.search]);
   
@@ -209,6 +213,60 @@ const Auth = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Phone-based signup flow (traveler / creator only)
+    if (signupMethod === 'phone' && (selectedAccountType === 'traveler' || selectedAccountType === 'creator')) {
+      if (!firstName.trim() || !lastName.trim()) {
+        toast({ title: "Missing information", description: "Please enter your first and last name.", variant: "destructive" });
+        return;
+      }
+      if (otpStep === 'request') {
+        const cleanedPhone = phone.replace(/\s/g, '');
+        if (!cleanedPhone.startsWith('+') || cleanedPhone.length < 8) {
+          toast({ title: 'Invalid phone', description: 'Include country code, e.g. +1 555 123 4567', variant: 'destructive' });
+          return;
+        }
+        setIsLoading(true);
+        const { error } = await supabase.auth.signInWithOtp({
+          phone: cleanedPhone,
+          options: {
+            data: {
+              first_name: firstName,
+              last_name: lastName,
+              full_name: `${firstName} ${lastName}`.trim(),
+              account_type: selectedAccountType,
+            },
+          },
+        });
+        setIsLoading(false);
+        if (error) {
+          toast({ title: 'Could not send code', description: error.message, variant: 'destructive' });
+          Sentry.captureException(error, { tags: { flow: 'phone_signup_send_otp' } });
+          return;
+        }
+        setPhoneForVerification(cleanedPhone);
+        setOtpStep('verify');
+        toast({ title: 'Code sent', description: `We texted a 6-digit code to ${cleanedPhone}` });
+        return;
+      }
+
+      // Verify OTP
+      setIsLoading(true);
+      const { error } = await supabase.auth.verifyOtp({
+        phone: phoneForVerification,
+        token: otpCode,
+        type: 'sms',
+      });
+      setIsLoading(false);
+      if (error) {
+        toast({ title: 'Invalid code', description: error.message, variant: 'destructive' });
+        Sentry.captureException(error, { tags: { flow: 'phone_signup_verify_otp' } });
+        return;
+      }
+      navigate('/auth/callback');
+      return;
+    }
+
     setIsLoading(true);
     
     const normalizedEmail = email.trim().toLowerCase();
@@ -336,19 +394,6 @@ const Auth = () => {
       if (error) throw error;
     } catch (error: any) {
       toast({ title: 'Google sign-in failed', description: error.message || 'Please try again.', variant: 'destructive' });
-      setIsLoading(false);
-    }
-  };
-
-  const handleFacebookSignIn = async () => {
-    try {
-      setIsLoading(true);
-      persistRedirectTargetForOAuth();
-      const origin = encodeURIComponent(window.location.origin);
-      const timestamp = Date.now();
-      window.location.href = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/facebook-signin-init?origin=${origin}&cb=${timestamp}`;
-    } catch (error: any) {
-      toast({ title: "Facebook sign-in failed", description: error?.message || 'Failed to initiate Facebook Sign-In', variant: "destructive" });
       setIsLoading(false);
     }
   };
@@ -518,32 +563,6 @@ const Auth = () => {
                   </svg>
                   Continue with Google
                 </button>
-
-                <button
-                  type="button"
-                  onClick={handleFacebookSignIn}
-                  disabled={isLoading}
-                  className="w-full h-12 rounded-full flex items-center justify-center gap-2.5 text-sm font-medium transition-all hover:-translate-y-0.5 disabled:opacity-50"
-                  style={{ 
-                    border: '1px solid #E8E2D0', 
-                    backgroundColor: '#FFFFFF',
-                    color: '#0a2225',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
-                    e.currentTarget.style.borderColor = '#C7A962';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)';
-                    e.currentTarget.style.borderColor = '#E8E2D0';
-                  }}
-                >
-                  <svg className="h-5 w-5" viewBox="0 0 24 24">
-                    <path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                  </svg>
-                  Continue with Facebook
-                </button>
               </div>
 
               {/* OR Divider */}
@@ -685,10 +704,81 @@ const Auth = () => {
               </p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="signupEmail" className="text-sm font-medium" style={{ color: '#0a2225' }}>Email address</Label>
-              <Input id="signupEmail" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
-            </div>
+            {(selectedAccountType === 'traveler' || selectedAccountType === 'creator') && otpStep === 'request' && (
+              <div className="flex gap-2 p-1 rounded-full" style={{ backgroundColor: '#F5F1E5' }}>
+                <button
+                  type="button"
+                  onClick={() => setSignupMethod('email')}
+                  className="flex-1 py-2 rounded-full text-sm font-medium transition-colors"
+                  style={signupMethod === 'email'
+                    ? { backgroundColor: '#0c4d47', color: '#FFFFFF' }
+                    : { backgroundColor: 'transparent', color: '#0a2225' }}
+                >
+                  Email
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSignupMethod('phone')}
+                  className="flex-1 py-2 rounded-full text-sm font-medium transition-colors"
+                  style={signupMethod === 'phone'
+                    ? { backgroundColor: '#0c4d47', color: '#FFFFFF' }
+                    : { backgroundColor: 'transparent', color: '#0a2225' }}
+                >
+                  Phone
+                </button>
+              </div>
+            )}
+
+            {/* OTP verification view (phone signup, step 2) */}
+            {signupMethod === 'phone' && otpStep === 'verify' && (selectedAccountType === 'traveler' || selectedAccountType === 'creator') ? (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="otpCode" className="text-sm font-medium" style={{ color: '#0a2225' }}>6-digit code</Label>
+                  <Input
+                    id="otpCode"
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                    placeholder="123456"
+                    className="h-14 rounded-xl text-center text-2xl tracking-widest"
+                    style={{ borderColor: '#E8E2D0' }}
+                    autoFocus
+                  />
+                  <p className="text-sm" style={{ color: '#9A9384' }}>Code sent to {phoneForVerification}</p>
+                </div>
+                <Button
+                  type="submit"
+                  className="w-full h-12 rounded-full"
+                  style={{ backgroundColor: '#0c4d47', color: '#E5DFC6' }}
+                  disabled={isLoading || otpCode.length !== 6}
+                >
+                  {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Verifying...</> : 'Verify and create account'}
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => { setOtpStep('request'); setOtpCode(''); }}
+                  className="w-full text-sm hover:underline"
+                  style={{ color: '#9A9384' }}
+                >
+                  Use a different phone number
+                </button>
+              </div>
+            ) : (
+            <>
+            {signupMethod === 'email' ? (
+              <div className="space-y-2">
+                <Label htmlFor="signupEmail" className="text-sm font-medium" style={{ color: '#0a2225' }}>Email address</Label>
+                <Input id="signupEmail" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Label htmlFor="signupPhone" className="text-sm font-medium" style={{ color: '#0a2225' }}>Phone number</Label>
+                <Input id="signupPhone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+1 555 123 4567" required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
+                <p className="text-sm" style={{ color: '#9A9384' }}>Include country code. We'll text you a 6-digit code.</p>
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -700,6 +790,8 @@ const Auth = () => {
                 <Input id="lastName" type="text" placeholder="Doe" value={lastName} onChange={(e) => setLastName(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
               </div>
             </div>
+            {signupMethod === 'email' && (
+            <>
             <div className="space-y-2">
               <Label htmlFor="phone" className="text-sm font-medium" style={{ color: '#0a2225' }}>Phone Number <span style={{ color: '#9A9384' }}>(optional)</span></Label>
               <Input id="phone" type="tel" placeholder="+1 (555) 000-0000" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
@@ -723,8 +815,10 @@ const Auth = () => {
                 </p>
               </div>
             </div>
+            </>
+            )}
 
-            {(selectedAccountType === 'traveler' || selectedAccountType === 'creator') && (
+            {signupMethod === 'email' && (selectedAccountType === 'traveler' || selectedAccountType === 'creator') && (
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-medium" style={{ color: '#0a2225' }}>Password</Label>
                 <Input id="password" type="password" placeholder="Create a password" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} minLength={8} />
@@ -762,6 +856,8 @@ const Auth = () => {
                   <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing...</>
                 ) : (selectedAccountType === 'agent' || selectedAccountType === 'brand') ? (
                   'Continue to Application'
+                ) : signupMethod === 'phone' ? (
+                  'Send code'
                 ) : (
                   'Create Account'
                 )}
@@ -781,6 +877,8 @@ const Auth = () => {
                   Skip for now
                 </button>
               </div>
+            )}
+            </>
             )}
           </form>
         )}
