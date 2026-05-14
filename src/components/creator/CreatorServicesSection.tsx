@@ -1,11 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
-import { Clock, ChevronRight, Plus, BookOpen, Map, Compass, Sparkles, MoreVertical, Pencil, Trash2, Shield } from "lucide-react";
+import { Clock, ChevronRight, Plus, Map, Compass, Sparkles, MoreVertical, Pencil, Trash2, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { AddServiceDialog } from "./AddServiceDialog";
 import { toast } from "sonner";
 
-type ServiceTier = "digital_guide" | "custom_itinerary" | "full_trip_design" | "add_on";
+type ServiceTier = "custom_itinerary" | "full_trip_design" | "add_on";
 
 interface Service {
   id: string;
@@ -31,13 +31,27 @@ interface Props {
 }
 
 const TIER_CONFIG: Record<ServiceTier, { label: string; icon: any; badge: string; cta: string }> = {
-  digital_guide: { label: "Digital Guides", icon: BookOpen, badge: "bg-emerald-50 text-emerald-700 border-emerald-200", cta: "Purchase" },
-  custom_itinerary: { label: "Custom Itineraries", icon: Map, badge: "bg-amber-50 text-amber-700 border-amber-200", cta: "Request This" },
-  full_trip_design: { label: "Full Trip Design", icon: Compass, badge: "bg-blue-50 text-blue-700 border-blue-200", cta: "Request This" },
-  add_on: { label: "Add-Ons", icon: Sparkles, badge: "bg-purple-50 text-purple-700 border-purple-200", cta: "Add" },
+  custom_itinerary: {
+    label: "Custom Itineraries",
+    icon: Map,
+    badge: "bg-[#FDF9F0] text-[#0c4d47] border-[#E5DFC6]",
+    cta: "Request This",
+  },
+  full_trip_design: {
+    label: "Full Trip Design",
+    icon: Compass,
+    badge: "bg-[#0c4d47] text-[#FDF9F0] border-[#0c4d47]",
+    cta: "Request This",
+  },
+  add_on: {
+    label: "Add-Ons",
+    icon: Sparkles,
+    badge: "bg-white text-[#0a2225] border-[#E5DFC6]",
+    cta: "Add",
+  },
 };
 
-const TIER_ORDER: ServiceTier[] = ["digital_guide", "custom_itinerary", "full_trip_design", "add_on"];
+const TIER_ORDER: ServiceTier[] = ["custom_itinerary", "full_trip_design", "add_on"];
 
 function formatPrice(cents: number, currency: string) {
   return new Intl.NumberFormat("en-US", {
@@ -181,8 +195,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile }: Props) {
                         {/* Price + meta */}
                         <div className="flex items-center gap-3 mt-4 flex-wrap">
                           <span className="text-base font-semibold text-[#0a2225]">
-                            {tierKey === "digital_guide" ? "" : "From "}
-                            {formatPrice(service.starting_price_cents, service.currency)}
+                            From {formatPrice(service.starting_price_cents, service.currency)}
                           </span>
                           {service.delivery_days && tierKey !== "add_on" && (
                             <span className="flex items-center gap-1 text-xs text-[#9CA3AF]">
@@ -235,14 +248,22 @@ export function CreatorServicesSection({ creatorId, isOwnProfile }: Props) {
         /* Empty state: clear intro + tier picker */
         <div>
           <div className="mb-6 max-w-2xl">
-            <h3 className="font-secondary text-xl text-[#0a2225] mb-2">
-              Set up your travel services
+            <h3 className="font-secondary text-2xl text-[#0a2225] mb-3">
+              Offer custom services from your profile
             </h3>
-            <p className="text-sm text-[#6B7280] leading-relaxed">
-              These are the offerings travelers can purchase or request directly from your profile. Pick a service type below to create your first one — you can add more anytime.
+            <p className="text-sm text-[#6B7280] leading-relaxed mb-2">
+              Beyond selling fixed itinerary guides, you can offer personalised services that travelers request directly from your profile. You get paid when work is delivered.
+            </p>
+            <ul className="text-sm text-[#6B7280] leading-relaxed mb-6 space-y-1">
+              <li><strong className="text-[#0a2225]">Custom Itinerary</strong> — A traveler shares their dates and style, you design a one-of-one day-by-day plan.</li>
+              <li><strong className="text-[#0a2225]">Full Trip Design</strong> — End-to-end trip planning with bookings, restaurant recs, and revisions.</li>
+              <li><strong className="text-[#0a2225]">Add-On</strong> — Short extras like a 30-minute planning call or restaurant list for an existing trip.</li>
+            </ul>
+            <p className="text-xs text-[#9A9384] mb-8">
+              Looking to sell a downloadable guide instead? <a href="/itinerary-builder" className="underline text-[#0c4d47]">Use the Itinerary Builder</a>.
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {TIERS.map((t) => {
               const T = t;
               return (
@@ -281,7 +302,6 @@ export function CreatorServicesSection({ creatorId, isOwnProfile }: Props) {
 
 // Re-export TIERS for empty state usage
 const TIERS = [
-  { value: "digital_guide" as ServiceTier, label: "Digital Guide", desc: "Downloadable guides & PDFs", icon: BookOpen },
   { value: "custom_itinerary" as ServiceTier, label: "Custom Itinerary", desc: "Personalized day-by-day plans", icon: Map },
   { value: "full_trip_design" as ServiceTier, label: "Full Trip Design", desc: "Premium end-to-end planning", icon: Compass },
   { value: "add_on" as ServiceTier, label: "Add-On", desc: "Optional extras & calls", icon: Sparkles },

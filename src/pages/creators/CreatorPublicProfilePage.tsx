@@ -312,7 +312,7 @@ export default function CreatorPublicProfilePage() {
         {/* ─── 3. SERVICES — Clarity Layer (Fiverr) ─── */}
         <div className="bg-[#FDF9F0]">
           <div className="mx-auto max-w-5xl px-4 py-16 md:py-20">
-            <SectionLabel>Travel Services</SectionLabel>
+            <SectionLabel>Custom Services</SectionLabel>
             <CreatorServicesSection
               creatorId={creator.id}
               isOwnProfile={isOwnProfile}

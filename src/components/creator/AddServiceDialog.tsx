@@ -5,9 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { BookOpen, Map, Compass, Sparkles, Plus, X, Check } from "lucide-react";
+import { Map, Compass, Sparkles, Plus, X, Check } from "lucide-react";
 
-type ServiceTier = "digital_guide" | "custom_itinerary" | "full_trip_design" | "add_on";
+type ServiceTier = "custom_itinerary" | "full_trip_design" | "add_on";
 
 interface Props {
   open: boolean;
@@ -19,10 +19,9 @@ interface Props {
 }
 
 const TIERS: { value: ServiceTier; label: string; desc: string; icon: any; color: string }[] = [
-  { value: "digital_guide", label: "Digital Guide", desc: "Downloadable guides, maps & PDFs", icon: BookOpen, color: "text-emerald-600 bg-emerald-50 border-emerald-200" },
-  { value: "custom_itinerary", label: "Custom Itinerary", desc: "Personalized day-by-day plans", icon: Map, color: "text-amber-600 bg-amber-50 border-amber-200" },
-  { value: "full_trip_design", label: "Full Trip Design", desc: "Premium end-to-end trip planning", icon: Compass, color: "text-blue-600 bg-blue-50 border-blue-200" },
-  { value: "add_on", label: "Add-On", desc: "Optional extras like 1:1 calls", icon: Sparkles, color: "text-purple-600 bg-purple-50 border-purple-200" },
+  { value: "custom_itinerary", label: "Custom Itinerary", desc: "Personalized day-by-day plans", icon: Map, color: "bg-[#FDF9F0] text-[#0c4d47] border-[#E5DFC6]" },
+  { value: "full_trip_design", label: "Full Trip Design", desc: "Premium end-to-end trip planning", icon: Compass, color: "bg-[#0c4d47] text-[#FDF9F0] border-[#0c4d47]" },
+  { value: "add_on", label: "Add-On", desc: "Optional extras like 1:1 calls", icon: Sparkles, color: "bg-white text-[#0a2225] border-[#E5DFC6]" },
 ];
 
 const DELIVERY_OPTIONS = ["2 days", "3 days", "5 days", "7 days", "14 days"];
@@ -88,7 +87,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
       revisions: ["custom_itinerary", "full_trip_design"].includes(tier) ? (parseInt(revisions) || 0) : null,
       has_priority_support: tier === "full_trip_design" ? hasPriority : false,
       duration_minutes: tier === "add_on" ? (parseInt(durationMinutes) || null) : null,
-      file_url: tier === "digital_guide" ? (fileUrl || null) : null,
+      file_url: null,
     };
 
     let error;
@@ -174,14 +173,6 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
               <label className="text-xs font-medium text-[#6B7280] mb-1 block">Price (USD) *</label>
               <Input type="number" min="0" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="99" />
             </div>
-
-            {/* Tier-specific fields */}
-            {tier === "digital_guide" && (
-              <div>
-                <label className="text-xs font-medium text-[#6B7280] mb-1 block">File URL / Link</label>
-                <Input value={fileUrl} onChange={(e) => setFileUrl(e.target.value)} placeholder="https://..." />
-              </div>
-            )}
 
             {(tier === "custom_itinerary" || tier === "full_trip_design") && (
               <>
