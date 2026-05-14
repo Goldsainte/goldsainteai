@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Briefcase, MapPin, DollarSign, Clock, MessageSquare, CheckCircle, Sparkles, Shield, Plus, Hourglass } from "lucide-react";
+import { Briefcase, MapPin, DollarSign, Clock, MessageSquare, CheckCircle, Sparkles, Shield, Plus, Hourglass, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { JobMessaging } from "@/components/JobMessaging";
 import { StripeConnectOnboarding } from "@/components/StripeConnectOnboarding";
@@ -59,6 +59,19 @@ export default function AgentDashboard() {
   const [bidDetailsOpen, setBidDetailsOpen] = useState(false);
   const [pendingTripsCount, setPendingTripsCount] = useState(0);
   const [publishedTripsCount, setPublishedTripsCount] = useState(0);
+  const [profile, setProfile] = useState<{ email: string | null } | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("profiles")
+      .select("email")
+      .eq("id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) setProfile(data as { email: string | null });
+      });
+  }, [user]);
 
   useEffect(() => {
     if (authLoading || roleLoading) return;
@@ -359,6 +372,16 @@ export default function AgentDashboard() {
           )}
         </div>
 
+        {profile && !profile.email && (
+          <div className="rounded-2xl border border-[#C7A962]/30 bg-[#FDF9F0] p-4 mb-6 flex items-start gap-4">
+            <Mail className="h-5 w-5 text-[#C7A962] flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-medium text-[#0a2225] text-sm mb-0.5">Add an email to your account</p>
+              <p className="text-xs text-[#6B7280] mb-3">We need an email for booking confirmations, password recovery, and account updates.</p>
+              <Button onClick={() => navigate('/settings?tab=account')} size="sm" className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white">Add email</Button>
+            </div>
+          </div>
+        )}
         {user && <GettingStartedChecklist userId={user.id} role="agent" />}
         <div className="mb-4 text-right">
           <Link to="/how-it-works/agent" className="text-xs text-[#0c4d47] hover:underline">
