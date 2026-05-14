@@ -97,8 +97,8 @@ export function CreatorServicesSection({ creatorId, isOwnProfile }: Props) {
 
   return (
     <div>
-      {/* Add Service button for owners */}
-      {isOwnProfile && (
+      {/* Add Service button for owners — only show once they have at least one service */}
+      {isOwnProfile && hasAny && (
         <div className="flex justify-end mb-4">
           <Button
             variant="outline"
@@ -231,25 +231,37 @@ export function CreatorServicesSection({ creatorId, isOwnProfile }: Props) {
           })}
         </div>
       ) : isOwnProfile ? (
-        /* Empty state: show 4 tier cards */
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {TIERS.map((t) => {
-            const T = t;
-            return (
-              <button
-                key={t.value}
-                onClick={() => { setEditService(null); setDialogOpen(true); }}
-                className="rounded-xl border-2 border-dashed border-[#E5DFC6] bg-white/60 p-6 text-center hover:shadow-md transition-shadow group"
-              >
-                <div className={`inline-flex items-center justify-center h-10 w-10 rounded-full mb-3 ${TIER_CONFIG[t.value].badge}`}>
-                  <T.icon className="h-5 w-5" />
-                </div>
-                <p className="font-secondary text-sm text-[#0a2225] mb-1">{t.label}</p>
-                <p className="text-xs text-[#9CA3AF]">{t.desc}</p>
-                <Plus className="h-4 w-4 text-[#C7A962] mx-auto mt-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </button>
-            );
-          })}
+        /* Empty state: clear intro + tier picker */
+        <div>
+          <div className="mb-6 max-w-2xl">
+            <h3 className="font-secondary text-xl text-[#0a2225] mb-2">
+              Set up your travel services
+            </h3>
+            <p className="text-sm text-[#6B7280] leading-relaxed">
+              These are the offerings travelers can purchase or request directly from your profile. Pick a service type below to create your first one — you can add more anytime.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            {TIERS.map((t) => {
+              const T = t;
+              return (
+                <button
+                  key={t.value}
+                  onClick={() => { setEditService(null); setDialogOpen(true); }}
+                  className="rounded-xl border-2 border-dashed border-[#E5DFC6] bg-white/60 p-5 text-left hover:bg-white hover:border-[#0c4d47]/30 hover:shadow-md transition-all group"
+                >
+                  <div className={`inline-flex items-center justify-center h-10 w-10 rounded-full mb-3 ${TIER_CONFIG[t.value].badge}`}>
+                    <T.icon className="h-5 w-5" />
+                  </div>
+                  <p className="font-secondary text-base text-[#0a2225] mb-1">{t.label}</p>
+                  <p className="text-xs text-[#6B7280] leading-relaxed mb-4">{t.desc}</p>
+                  <span className="inline-flex items-center gap-1 text-xs font-medium text-[#0c4d47] group-hover:gap-2 transition-all">
+                    <Plus className="h-3.5 w-3.5" /> Create {t.label.toLowerCase()}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       ) : null}
 
