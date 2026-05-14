@@ -24,7 +24,7 @@ const passwordSchema = z.string()
   .regex(/[0-9]/, "Password must contain at least one number")
   .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character");
 
-type AuthStep = 'account-type' | 'email' | 'signin' | 'signup' | 'forgot-password' | 'verify-email' | 'profile';
+type AuthStep = 'account-type' | 'email' | 'signin' | 'signup' | 'forgot-password' | 'verify-email' | 'profile' | 'phone-signin';
 type AccountType = 'traveler' | 'creator' | 'agent' | 'brand' | null;
 
 const Auth = () => {
@@ -415,6 +415,50 @@ const Auth = () => {
     setIsLoading(false);
   };
 
+  const handlePhoneSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (otpStep === 'request') {
+      const cleanedPhone = phone.replace(/\s/g, '');
+      if (!cleanedPhone.startsWith('+') || cleanedPhone.length < 8) {
+        toast({ title: 'Invalid phone', description: 'Include country code, e.g. +1 555 123 4567', variant: 'destructive' });
+        return;
+      }
+      setIsLoading(true);
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: cleanedPhone,
+        options: { shouldCreateUser: false },
+      });
+      setIsLoading(false);
+      if (error) {
+        const msg = error.message?.toLowerCase() || '';
+        const description = msg.includes('signups not allowed') || msg.includes('user not found')
+          ? "We couldn't find an account with that phone number. Try signing up instead."
+          : error.message;
+        toast({ title: 'Could not send code', description, variant: 'destructive' });
+        Sentry.captureException(error, { tags: { flow: 'phone_signin_send_otp' } });
+        return;
+      }
+      setPhoneForVerification(cleanedPhone);
+      setOtpStep('verify');
+      toast({ title: 'Code sent', description: `We texted a 6-digit code to ${cleanedPhone}` });
+      return;
+    }
+
+    setIsLoading(true);
+    const { error } = await supabase.auth.verifyOtp({
+      phone: phoneForVerification,
+      token: otpCode,
+      type: 'sms',
+    });
+    setIsLoading(false);
+    if (error) {
+      toast({ title: 'Invalid code', description: error.message, variant: 'destructive' });
+      Sentry.captureException(error, { tags: { flow: 'phone_signin_verify_otp' } });
+      return;
+    }
+    // AuthContext + the Auth page's user-redirect effect will route appropriately.
+  };
+
   const handleProfileComplete = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
@@ -601,6 +645,19 @@ const Auth = () => {
                 </Button>
               </div>
 
+              {!isSignUpMode && (
+                <div className="text-center pt-1">
+                  <button
+                    type="button"
+                    onClick={() => { setOtpStep('request'); setOtpCode(''); setStep('phone-signin'); }}
+                    className="text-sm font-medium hover:underline"
+                    style={{ color: '#C7A962' }}
+                  >
+                    Sign in with phone instead
+                  </button>
+                </div>
+              )}
+
               {/* Footer Links */}
               <div className="mt-8 space-y-3 text-center">
                 {isSignUpMode ? (
@@ -681,6 +738,93 @@ const Auth = () => {
             <div className="mt-3 text-center text-sm">
               <button type="button" onClick={() => setStep('signup')} className="hover:underline" style={{ color: '#9A9384' }}>
                 Need an account? Create one instead
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* Phone Sign In Step */}
+        {step === 'phone-signin' && (
+          <form onSubmit={handlePhoneSignIn} className="space-y-4">
+            <div className="text-center mb-2">
+              <h1 className="text-2xl sm:text-3xl font-secondary tracking-tight" style={{ color: '#0a2225' }}>
+                Sign in with phone
+              </h1>
+              <p className="text-sm mt-2" style={{ color: '#9A9384' }}>
+                {otpStep === 'request'
+                  ? "We'll text you a 6-digit code."
+                  : `Enter the code we sent to ${phoneForVerification}.`}
+              </p>
+            </div>
+
+            {otpStep === 'request' ? (
+              <div className="space-y-2">
+                <Label htmlFor="signinPhone" className="text-sm font-medium" style={{ color: '#0a2225' }}>Phone number</Label>
+                <Input
+                  id="signinPhone"
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+1 555 123 4567"
+                  required
+                  disabled={isLoading}
+                  className="h-12 rounded-xl"
+                  style={{ borderColor: '#E8E2D0' }}
+                />
+                <p className="text-sm" style={{ color: '#9A9384' }}>Include your country code.</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Label htmlFor="signinOtp" className="text-sm font-medium" style={{ color: '#0a2225' }}>6-digit code</Label>
+                <Input
+                  id="signinOtp"
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                  placeholder="123456"
+                  className="h-14 rounded-xl text-center text-2xl tracking-widest"
+                  style={{ borderColor: '#E8E2D0' }}
+                  autoFocus
+                />
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              className="w-full h-12 rounded-full"
+              style={{ backgroundColor: '#0c4d47', color: '#E5DFC6' }}
+              disabled={isLoading || (otpStep === 'verify' && otpCode.length !== 6)}
+            >
+              {isLoading
+                ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{otpStep === 'request' ? 'Sending...' : 'Verifying...'}</>
+                : (otpStep === 'request' ? 'Send code' : 'Sign in')}
+            </Button>
+
+            <div className="flex items-center justify-between text-sm pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  if (otpStep === 'verify') {
+                    setOtpStep('request');
+                    setOtpCode('');
+                  } else {
+                    setStep('email');
+                  }
+                }}
+                className="transition-colors"
+                style={{ color: '#9A9384' }}
+              >
+                ← {otpStep === 'verify' ? 'Use a different number' : 'Back'}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setOtpStep('request'); setOtpCode(''); setStep('email'); }}
+                className="hover:underline"
+                style={{ color: '#C7A962' }}
+              >
+                Use email instead
               </button>
             </div>
           </form>
