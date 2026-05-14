@@ -21,7 +21,11 @@ interface ChecklistItem {
   id: string;
   label: string;
   description: string;
-  cta: { label: string; to: string | ((d: ChecklistData) => string) };
+  cta: {
+    label: string;
+    to: string | ((d: ChecklistData) => string);
+    event?: string;
+  };
   isComplete: (d: ChecklistData) => boolean;
 }
 
@@ -73,14 +77,14 @@ const CREATOR_ITEMS: ChecklistItem[] = [
     id: "connect-stripe",
     label: "Connect your payout account",
     description: "Set up Stripe Connect to receive commissions on bookings and guide sales.",
-    cta: { label: "Connect Stripe", to: "/creator-dashboard?tab=earnings" },
+    cta: { label: "Connect Stripe", to: "/creator-dashboard?tab=earnings", event: "start-stripe-onboarding" },
     isComplete: (d) => !!d.profile?.stripe_connect_account_id,
   },
   {
     id: "create-content",
     label: "Publish your first product",
     description: "Create a trip package or sell a digital itinerary guide.",
-    cta: { label: "Get started", to: "/creator-dashboard" },
+    cta: { label: "Get started", to: "/trip-builder" },
     isComplete: (d) => (d.trips || 0) > 0 || (d.guides || 0) > 0,
   },
   {
@@ -104,7 +108,7 @@ const AGENT_ITEMS: ChecklistItem[] = [
     id: "connect-stripe",
     label: "Connect your payout account",
     description: "Set up Stripe Connect so you can receive payments from travelers.",
-    cta: { label: "Connect Stripe", to: "/agent-dashboard?tab=earnings" },
+    cta: { label: "Connect Stripe", to: "/agent-dashboard?tab=earnings", event: "start-stripe-onboarding" },
     isComplete: (d) => !!d.profile?.stripe_connect_account_id,
   },
   {
@@ -233,13 +237,26 @@ export function GettingStartedChecklist({ userId, role }: Props) {
                 )}
               </div>
               {!done && (
-                <Link
-                  to={to}
-                  className="flex-shrink-0 inline-flex items-center gap-1 text-xs sm:text-sm font-medium text-[#0c4d47] hover:underline whitespace-nowrap"
-                >
-                  {item.cta.label}
-                  <ChevronRight className="h-3.5 w-3.5" />
-                </Link>
+                item.cta.event ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.dispatchEvent(new CustomEvent(item.cta.event!));
+                    }}
+                    className="flex-shrink-0 inline-flex items-center gap-1 text-xs sm:text-sm font-medium text-[#0c4d47] hover:underline whitespace-nowrap"
+                  >
+                    {item.cta.label}
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </button>
+                ) : (
+                  <Link
+                    to={to}
+                    className="flex-shrink-0 inline-flex items-center gap-1 text-xs sm:text-sm font-medium text-[#0c4d47] hover:underline whitespace-nowrap"
+                  >
+                    {item.cta.label}
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </Link>
+                )
               )}
             </li>
           );
