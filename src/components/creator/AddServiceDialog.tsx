@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,7 @@ interface Props {
   creatorId: string;
   onCreated: () => void;
   editService?: any;
+  initialTier?: ServiceTier | null;
 }
 
 const TIERS: { value: ServiceTier; label: string; desc: string; icon: any; color: string }[] = [
@@ -26,10 +27,17 @@ const TIERS: { value: ServiceTier; label: string; desc: string; icon: any; color
 
 const DELIVERY_OPTIONS = ["2 days", "3 days", "5 days", "7 days", "14 days"];
 
-export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, editService }: Props) {
+export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, editService, initialTier }: Props) {
   const isEdit = !!editService;
-  const [tier, setTier] = useState<ServiceTier | null>(editService?.service_tier || null);
+  const [tier, setTier] = useState<ServiceTier | null>(editService?.service_tier || initialTier || null);
   const [saving, setSaving] = useState(false);
+
+  // Sync tier when dialog opens with a new initialTier (e.g. from empty-state cards)
+  useEffect(() => {
+    if (open && !isEdit) {
+      setTier(initialTier || null);
+    }
+  }, [open, initialTier, isEdit]);
 
   // Form fields
   const [title, setTitle] = useState(editService?.title || "");
