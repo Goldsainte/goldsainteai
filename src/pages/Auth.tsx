@@ -58,6 +58,10 @@ const Auth = () => {
   const [phone, setPhone] = useState('');
   const [smsOptIn, setSmsOptIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [signupMethod, setSignupMethod] = useState<'email' | 'phone'>('email');
+  const [otpStep, setOtpStep] = useState<'request' | 'verify'>('request');
+  const [otpCode, setOtpCode] = useState('');
+  const [phoneForVerification, setPhoneForVerification] = useState('');
   const { signIn, signUp, user, isLoading: authLoading } = useAuth();
   const redirectTarget = useMemo(() => getRedirectPathFromSearch(location.search), [location.search]);
   
@@ -209,6 +213,60 @@ const Auth = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Phone-based signup flow (traveler / creator only)
+    if (signupMethod === 'phone' && (selectedAccountType === 'traveler' || selectedAccountType === 'creator')) {
+      if (!firstName.trim() || !lastName.trim()) {
+        toast({ title: "Missing information", description: "Please enter your first and last name.", variant: "destructive" });
+        return;
+      }
+      if (otpStep === 'request') {
+        const cleanedPhone = phone.replace(/\s/g, '');
+        if (!cleanedPhone.startsWith('+') || cleanedPhone.length < 8) {
+          toast({ title: 'Invalid phone', description: 'Include country code, e.g. +1 555 123 4567', variant: 'destructive' });
+          return;
+        }
+        setIsLoading(true);
+        const { error } = await supabase.auth.signInWithOtp({
+          phone: cleanedPhone,
+          options: {
+            data: {
+              first_name: firstName,
+              last_name: lastName,
+              full_name: `${firstName} ${lastName}`.trim(),
+              account_type: selectedAccountType,
+            },
+          },
+        });
+        setIsLoading(false);
+        if (error) {
+          toast({ title: 'Could not send code', description: error.message, variant: 'destructive' });
+          Sentry.captureException(error, { tags: { flow: 'phone_signup_send_otp' } });
+          return;
+        }
+        setPhoneForVerification(cleanedPhone);
+        setOtpStep('verify');
+        toast({ title: 'Code sent', description: `We texted a 6-digit code to ${cleanedPhone}` });
+        return;
+      }
+
+      // Verify OTP
+      setIsLoading(true);
+      const { error } = await supabase.auth.verifyOtp({
+        phone: phoneForVerification,
+        token: otpCode,
+        type: 'sms',
+      });
+      setIsLoading(false);
+      if (error) {
+        toast({ title: 'Invalid code', description: error.message, variant: 'destructive' });
+        Sentry.captureException(error, { tags: { flow: 'phone_signup_verify_otp' } });
+        return;
+      }
+      navigate('/auth/callback');
+      return;
+    }
+
     setIsLoading(true);
     
     const normalizedEmail = email.trim().toLowerCase();
@@ -336,19 +394,6 @@ const Auth = () => {
       if (error) throw error;
     } catch (error: any) {
       toast({ title: 'Google sign-in failed', description: error.message || 'Please try again.', variant: 'destructive' });
-      setIsLoading(false);
-    }
-  };
-
-  const handleFacebookSignIn = async () => {
-    try {
-      setIsLoading(true);
-      persistRedirectTargetForOAuth();
-      const origin = encodeURIComponent(window.location.origin);
-      const timestamp = Date.now();
-      window.location.href = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/facebook-signin-init?origin=${origin}&cb=${timestamp}`;
-    } catch (error: any) {
-      toast({ title: "Facebook sign-in failed", description: error?.message || 'Failed to initiate Facebook Sign-In', variant: "destructive" });
       setIsLoading(false);
     }
   };
