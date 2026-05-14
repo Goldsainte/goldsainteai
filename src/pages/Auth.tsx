@@ -601,6 +601,19 @@ const Auth = () => {
                 </Button>
               </div>
 
+              {!isSignUpMode && (
+                <div className="text-center pt-1">
+                  <button
+                    type="button"
+                    onClick={() => { setOtpStep('request'); setOtpCode(''); setStep('phone-signin'); }}
+                    className="text-sm font-medium hover:underline"
+                    style={{ color: '#C7A962' }}
+                  >
+                    Sign in with phone instead
+                  </button>
+                </div>
+              )}
+
               {/* Footer Links */}
               <div className="mt-8 space-y-3 text-center">
                 {isSignUpMode ? (
