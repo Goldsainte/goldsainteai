@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Map, Compass, Sparkles, Plus, X, Check } from "lucide-react";
+import { PenLine, Star, CirclePlus, Plus, X, Check } from "lucide-react";
 
 type ServiceTier = "custom_itinerary" | "full_trip_design" | "add_on";
 
@@ -19,9 +19,9 @@ interface Props {
 }
 
 const TIERS: { value: ServiceTier; label: string; desc: string; icon: any; color: string }[] = [
-  { value: "custom_itinerary", label: "Custom Itinerary", desc: "Personalized day-by-day plans", icon: Map, color: "bg-[#FDF9F0] text-[#0c4d47] border-[#E5DFC6]" },
-  { value: "full_trip_design", label: "Full Trip Design", desc: "Premium end-to-end trip planning", icon: Compass, color: "bg-[#0c4d47] text-[#FDF9F0] border-[#0c4d47]" },
-  { value: "add_on", label: "Add-On", desc: "Optional extras like 1:1 calls", icon: Sparkles, color: "bg-white text-[#0a2225] border-[#E5DFC6]" },
+  { value: "custom_itinerary", label: "Custom Itinerary", desc: "Personalized day-by-day plans", icon: PenLine, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
+  { value: "full_trip_design", label: "Full Trip Design", desc: "Premium end-to-end trip planning", icon: Star, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
+  { value: "add_on", label: "Add-On", desc: "Optional extras like 1:1 calls", icon: CirclePlus, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
 ];
 
 const DELIVERY_OPTIONS = ["2 days", "3 days", "5 days", "7 days", "14 days"];
