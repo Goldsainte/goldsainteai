@@ -53,6 +53,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile }: Props) {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editService, setEditService] = useState<Service | null>(null);
+  const [pendingTier, setPendingTier] = useState<ServiceTier | null>(null);
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
 
   const fetchServices = useCallback(async () => {
@@ -103,7 +104,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile }: Props) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => { setEditService(null); setDialogOpen(true); }}
+            onClick={() => { setEditService(null); setPendingTier(null); setDialogOpen(true); }}
             className="border-[#E5DFC6] text-[#0a2225] rounded-full"
           >
             <Plus className="h-4 w-4 mr-1.5" /> Add Service
@@ -247,7 +248,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile }: Props) {
               return (
                 <button
                   key={t.value}
-                  onClick={() => { setEditService(null); setDialogOpen(true); }}
+                  onClick={() => { setEditService(null); setPendingTier(t.value); setDialogOpen(true); }}
                   className="rounded-xl border-2 border-dashed border-[#E5DFC6] bg-white/60 p-5 text-left hover:bg-white hover:border-[#0c4d47]/30 hover:shadow-md transition-all group"
                 >
                   <div className={`inline-flex items-center justify-center h-10 w-10 rounded-full mb-3 ${TIER_CONFIG[t.value].badge}`}>
@@ -272,6 +273,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile }: Props) {
         creatorId={creatorId}
         onCreated={fetchServices}
         editService={editService}
+        initialTier={pendingTier}
       />
     </div>
   );
