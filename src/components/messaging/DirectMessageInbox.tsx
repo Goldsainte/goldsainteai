@@ -46,9 +46,13 @@ import { ProposalComposer } from "./ProposalComposer";
 import { VoiceMessageRecorder } from "@/components/VoiceMessageRecorder";
 import { ProposalMessageCard } from "./ProposalMessageCard";
 import { supabase } from "@/integrations/supabase/client";
+import { MentionAutocomplete, type MentionSuggestion } from "./MentionAutocomplete";
+import { extractMentions, renderTextWithMentions } from "@/lib/mentionHelpers";
+import { Link, useNavigate } from "react-router-dom";
 
 export function DirectMessageInbox() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState("primary");
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
@@ -62,6 +66,8 @@ export function DirectMessageInbox() {
   const [showProposalComposer, setShowProposalComposer] = useState(false);
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
   const [currentUserAccountType, setCurrentUserAccountType] = useState<string | null>(null);
+  const [mentionQuery, setMentionQuery] = useState<string | null>(null);
+  const [mentionStart, setMentionStart] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -204,6 +210,40 @@ export function DirectMessageInbox() {
         selectedConversation.id
       );
       setNewMessage("");
+      setMentionQuery(null);
+      setMentionStart(null);
+
+      // Fire @mention notifications for any @username referenced (other than the recipient and self)
+      const mentions = extractMentions(trimmed);
+      if (mentions.length > 0 && user) {
+        try {
+          const { data: mentionedProfiles } = await supabase
+            .from("profiles")
+            .select("id, username")
+            .in("username", mentions);
+          const recipientId = selectedConversation.otherParticipant.id;
+          const senderName =
+            (user.user_metadata?.full_name as string | undefined) ||
+            (user.user_metadata?.first_name as string | undefined) ||
+            user.email ||
+            "Someone";
+          await Promise.all(
+            (mentionedProfiles || [])
+              .filter((p: any) => p.id !== user.id && p.id !== recipientId)
+              .map((p: any) =>
+                supabase.rpc("notify_message_mention", {
+                  _target_user_id: p.id,
+                  _conversation_id: selectedConversation.id,
+                  _sender_name: senderName,
+                  _excerpt: trimmed,
+                })
+              )
+          );
+        } catch (err) {
+          // Non-fatal: message already sent
+          console.warn("Mention notification failed", err);
+        }
+      }
     } catch (e: any) {
       toast({
         title: "Failed to send",
@@ -213,6 +253,43 @@ export function DirectMessageInbox() {
     } finally {
       setSending(false);
     }
+  };
+
+  // Track @mention typing in the composer
+  const handleComposerChange = (value: string) => {
+    setNewMessage(value);
+    broadcastTyping();
+    const caret = inputRef.current?.selectionStart ?? value.length;
+    const upToCaret = value.slice(0, caret);
+    const match = upToCaret.match(/(?:^|\s)@(\w{0,30})$/);
+    if (match) {
+      setMentionQuery(match[1]);
+      setMentionStart(caret - match[1].length - 1); // position of '@'
+    } else {
+      setMentionQuery(null);
+      setMentionStart(null);
+    }
+  };
+
+  const handleSelectMention = (s: MentionSuggestion) => {
+    if (mentionStart === null || !s.username) {
+      setMentionQuery(null);
+      setMentionStart(null);
+      return;
+    }
+    const caret = inputRef.current?.selectionStart ?? newMessage.length;
+    const before = newMessage.slice(0, mentionStart);
+    const after = newMessage.slice(caret);
+    const insertion = `@${s.username} `;
+    const next = before + insertion + after;
+    setNewMessage(next);
+    setMentionQuery(null);
+    setMentionStart(null);
+    requestAnimationFrame(() => {
+      const pos = (before + insertion).length;
+      inputRef.current?.focus();
+      inputRef.current?.setSelectionRange(pos, pos);
+    });
   };
 
   const handleAcceptRequest = async () => {
@@ -648,6 +725,7 @@ export function DirectMessageInbox() {
                               isSelf={msg.sender_id === user?.id}
                               onDelete={handleDeleteMessage}
                               currentUserId={user?.id || ""}
+                              onMentionClick={(username) => navigate(`/@${username}`)}
                             />
                           )
                         ))}
@@ -708,8 +786,19 @@ export function DirectMessageInbox() {
                     e.preventDefault();
                     handleSend();
                   }}
-                  className="flex gap-2"
+                  className="flex gap-2 relative"
                 >
+                  {mentionQuery !== null && (
+                    <MentionAutocomplete
+                      query={mentionQuery}
+                      excludeUserId={user?.id}
+                      onSelect={handleSelectMention}
+                      onClose={() => {
+                        setMentionQuery(null);
+                        setMentionStart(null);
+                      }}
+                    />
+                  )}
                   {isAgent && !showProposalComposer && (
                     <Button
                       type="button"
@@ -733,12 +822,9 @@ export function DirectMessageInbox() {
                   </Button>
                   <Input
                     ref={inputRef}
-                    placeholder="Write something…"
+                    placeholder="Write something… use @ to mention"
                     value={newMessage}
-                    onChange={(e) => {
-                      setNewMessage(e.target.value);
-                      broadcastTyping();
-                    }}
+                    onChange={(e) => handleComposerChange(e.target.value)}
                     className="flex-1 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20 rounded-full bg-[#FDFBF7] h-11"
                     disabled={sending}
                   />
