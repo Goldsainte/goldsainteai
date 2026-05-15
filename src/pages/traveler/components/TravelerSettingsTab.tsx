@@ -158,25 +158,25 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
     <div className="space-y-6">
       {/* Payment Methods */}
       <Card className="bg-white border-[#E5DFC6] rounded-2xl">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-[#F6F0E4] rounded-xl">
+        <CardHeader className="p-5 sm:p-6">
+          <div className="flex items-start gap-3">
+            <div className="shrink-0 p-2 bg-[#F6F0E4] rounded-xl">
               <CreditCard className="h-5 w-5 text-[#C7A962]" />
             </div>
-            <div>
-              <CardTitle className="font-secondary text-xl text-[#0a2225]">Payment Methods</CardTitle>
-              <CardDescription>Manage your saved payment methods</CardDescription>
+            <div className="min-w-0">
+              <CardTitle className="font-secondary text-lg sm:text-xl text-[#0a2225]">Payment Methods</CardTitle>
+              <CardDescription className="text-sm">Manage your saved payment methods</CardDescription>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 p-5 sm:p-6 pt-0 sm:pt-0">
           <p className="text-sm text-[#6B7280]">
             Access the Stripe Customer Portal to add, remove, or update your payment methods and view billing history.
           </p>
           <Button
             onClick={handleManagePayments}
             disabled={loadingPortal}
-            className="bg-[#0c4d47] hover:bg-[#073331] text-white rounded-full"
+            className="w-full sm:w-auto bg-[#0c4d47] hover:bg-[#073331] text-white rounded-full"
           >
             {loadingPortal ? (
               <>
@@ -195,18 +195,18 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
 
       {/* Travel Preferences */}
       <Card className="bg-white border-[#E5DFC6] rounded-2xl">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-[#F6F0E4] rounded-xl">
+        <CardHeader className="p-5 sm:p-6">
+          <div className="flex items-start gap-3">
+            <div className="shrink-0 p-2 bg-[#F6F0E4] rounded-xl">
               <Globe className="h-5 w-5 text-[#C7A962]" />
             </div>
-            <div>
-              <CardTitle className="font-secondary text-xl text-[#0a2225]">Travel Preferences</CardTitle>
-              <CardDescription>Help us personalize your recommendations</CardDescription>
+            <div className="min-w-0">
+              <CardTitle className="font-secondary text-lg sm:text-xl text-[#0a2225]">Travel Preferences</CardTitle>
+              <CardDescription className="text-sm">Help us personalize your recommendations</CardDescription>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 p-5 sm:p-6 pt-0 sm:pt-0">
           {/* Travel Style */}
           <div className="space-y-3">
             <Label className="text-[#0a2225] font-medium">Travel Style</Label>
@@ -260,7 +260,7 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
             </div>
           ) : null}
 
-          <Button variant="outline" className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#F6F0E4] rounded-full" asChild>
+          <Button variant="outline" className="w-full sm:w-auto border-[#E5DFC6] text-[#0a2225] hover:bg-[#F6F0E4] rounded-full" asChild>
             <a href="/onboarding/traveler/preferences">Edit All Preferences</a>
           </Button>
         </CardContent>
@@ -268,18 +268,18 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
 
       {/* Notification Preferences */}
       <Card className="bg-white border-[#E5DFC6] rounded-2xl">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-[#F6F0E4] rounded-xl">
+        <CardHeader className="p-5 sm:p-6">
+          <div className="flex items-start gap-3">
+            <div className="shrink-0 p-2 bg-[#F6F0E4] rounded-xl">
               <Bell className="h-5 w-5 text-[#C7A962]" />
             </div>
-            <div>
-              <CardTitle className="font-secondary text-xl text-[#0a2225]">Notifications</CardTitle>
-              <CardDescription>Control how we reach you</CardDescription>
+            <div className="min-w-0">
+              <CardTitle className="font-secondary text-lg sm:text-xl text-[#0a2225]">Notifications</CardTitle>
+              <CardDescription className="text-sm">Control how we reach you</CardDescription>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 p-5 sm:p-6 pt-0 sm:pt-0">
           <label className="flex items-start gap-3 cursor-pointer">
             <Checkbox
               checked={notifications.email_notifications}
@@ -319,7 +319,7 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
           <Button
             onClick={handleSaveNotifications}
             disabled={savingNotifications}
-            className="bg-[#0c4d47] hover:bg-[#073331] text-white rounded-full"
+            className="w-full sm:w-auto bg-[#0c4d47] hover:bg-[#073331] text-white rounded-full"
           >
             {savingNotifications ? (
               <>
@@ -338,50 +338,50 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
 
       {/* Security & Privacy */}
       <Card className="bg-white border-[#E5DFC6] rounded-2xl">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-[#F6F0E4] rounded-xl">
+        <CardHeader className="p-5 sm:p-6">
+          <div className="flex items-start gap-3">
+            <div className="shrink-0 p-2 bg-[#F6F0E4] rounded-xl">
               <Shield className="h-5 w-5 text-[#C7A962]" />
             </div>
-            <div>
-              <CardTitle className="font-secondary text-xl text-[#0a2225]">Security & Privacy</CardTitle>
-              <CardDescription>Manage your account security</CardDescription>
+            <div className="min-w-0">
+              <CardTitle className="font-secondary text-lg sm:text-xl text-[#0a2225]">Security & Privacy</CardTitle>
+              <CardDescription className="text-sm">Manage your account security</CardDescription>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between py-3 border-b border-[#E5DFC6]">
-            <div>
+        <CardContent className="space-y-4 p-5 sm:p-6 pt-0 sm:pt-0">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 py-3 border-b border-[#E5DFC6]">
+            <div className="min-w-0">
               <p className="text-[#0a2225] font-medium">Change Password</p>
               <p className="text-sm text-[#6B7280]">Update your account password</p>
             </div>
             <Button 
               variant="outline" 
               size="sm" 
-              className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#F6F0E4] rounded-full"
+              className="w-full sm:w-auto border-[#E5DFC6] text-[#0a2225] hover:bg-[#F6F0E4] rounded-full shrink-0"
               onClick={handleChangePassword}
             >
               Update
             </Button>
           </div>
 
-          <div className="flex items-center justify-between py-3 border-b border-[#E5DFC6]">
-            <div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 py-3 border-b border-[#E5DFC6]">
+            <div className="min-w-0">
               <p className="text-[#0a2225] font-medium">Two-Factor Authentication</p>
               <p className="text-sm text-[#6B7280]">Add an extra layer of security</p>
             </div>
-            <Badge variant="outline" className="border-[#E5DFC6] text-[#6B7280]">Coming Soon</Badge>
+            <Badge variant="outline" className="self-start sm:self-auto border-[#E5DFC6] text-[#6B7280]">Coming Soon</Badge>
           </div>
 
-          <div className="flex items-center justify-between py-3">
-            <div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 py-3">
+            <div className="min-w-0">
               <p className="text-[#0a2225] font-medium">Download My Data</p>
               <p className="text-sm text-[#6B7280]">Export a copy of your account data</p>
             </div>
             <Button 
               variant="outline" 
               size="sm" 
-              className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#F6F0E4] rounded-full"
+              className="w-full sm:w-auto border-[#E5DFC6] text-[#0a2225] hover:bg-[#F6F0E4] rounded-full shrink-0"
               onClick={handleDownloadData}
             >
               Download
@@ -392,36 +392,36 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
 
       {/* Identity Verification */}
       <Card className="bg-white border-[#E5DFC6] rounded-2xl">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-[#F6F0E4] rounded-xl">
+        <CardHeader className="p-5 sm:p-6">
+          <div className="flex items-start gap-3">
+            <div className="shrink-0 p-2 bg-[#F6F0E4] rounded-xl">
               <ShieldCheck className="h-5 w-5 text-[#C7A962]" />
             </div>
-            <div>
-              <CardTitle className="font-secondary text-xl text-[#0a2225]">Identity Verification</CardTitle>
-              <CardDescription>Verify your identity to unlock premium features</CardDescription>
+            <div className="min-w-0">
+              <CardTitle className="font-secondary text-lg sm:text-xl text-[#0a2225]">Identity Verification</CardTitle>
+              <CardDescription className="text-sm">Verify your identity to unlock premium features</CardDescription>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-5 sm:p-6 pt-0 sm:pt-0">
           <CustomerVerificationUpload />
         </CardContent>
       </Card>
 
       {/* Emergency Contacts */}
       <Card className="bg-white border-[#E5DFC6] rounded-2xl">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-[#F6F0E4] rounded-xl">
+        <CardHeader className="p-5 sm:p-6">
+          <div className="flex items-start gap-3">
+            <div className="shrink-0 p-2 bg-[#F6F0E4] rounded-xl">
               <AlertCircle className="h-5 w-5 text-[#C7A962]" />
             </div>
-            <div>
-              <CardTitle className="font-secondary text-xl text-[#0a2225]">Emergency Contacts</CardTitle>
-              <CardDescription>Required for high-value bookings over $5,000</CardDescription>
+            <div className="min-w-0">
+              <CardTitle className="font-secondary text-lg sm:text-xl text-[#0a2225]">Emergency Contacts</CardTitle>
+              <CardDescription className="text-sm">Required for high-value bookings over $5,000</CardDescription>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-5 sm:p-6 pt-0 sm:pt-0">
           <EmergencyContactsManager />
         </CardContent>
       </Card>

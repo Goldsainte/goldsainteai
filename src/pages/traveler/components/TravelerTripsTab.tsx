@@ -113,14 +113,11 @@ export function TravelerTripsTab({ userId }: TravelerTripsTabProps) {
   );
 
   const EmptyState = ({ message, showCTA = true }: { message: string; showCTA?: boolean }) => (
-    <div className="text-center py-12">
-      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#F6F0E4] flex items-center justify-center">
-        <MapPin className="h-8 w-8 text-[#C7A962]" />
-      </div>
+    <div className="text-center py-12 px-4">
       <h3 className="font-secondary text-xl text-[#0a2225] mb-2">{message}</h3>
-      <p className="text-[#6B7280] mb-6">Your dream destination is waiting to be discovered.</p>
+      <p className="text-[#6B7280] mb-6 text-sm">Your dream destination is waiting to be discovered.</p>
       {showCTA && (
-        <Button asChild className="bg-[#0c4d47] hover:bg-[#0a2225] text-[#f7f3ea] rounded-full px-6">
+        <Button asChild className="bg-[#0c4d47] hover:bg-[#0a2225] text-[#f7f3ea] rounded-full px-6 h-11">
           <Link to="/post-trip">
             <Plus className="h-4 w-4 mr-2" />
             Request a Trip
@@ -142,38 +139,36 @@ export function TravelerTripsTab({ userId }: TravelerTripsTabProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-end">
-        <Button asChild className="bg-[#0c4d47] hover:bg-[#0a2225] text-[#f7f3ea] rounded-full px-6">
-          <Link to="/post-trip">
-            <Plus className="h-4 w-4 mr-2" />
-            Request a Trip
-          </Link>
-        </Button>
-      </div>
-
-      {/* Tabs */}
+      {/* Tabs + CTA row */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="bg-[#F6F0E4] p-1 rounded-full w-full md:w-auto">
-          <TabsTrigger
-            value="active"
-            className="rounded-full px-6 data-[state=active]:bg-white data-[state=active]:text-[#0a2225] data-[state=active]:shadow-sm"
-          >
-            Active ({activeRequests.length})
-          </TabsTrigger>
-          <TabsTrigger
-            value="in-progress"
-            className="rounded-full px-6 data-[state=active]:bg-white data-[state=active]:text-[#0a2225] data-[state=active]:shadow-sm"
-          >
-            In Progress ({inProgressRequests.length})
-          </TabsTrigger>
-          <TabsTrigger
-            value="past"
-            className="rounded-full px-6 data-[state=active]:bg-white data-[state=active]:text-[#0a2225] data-[state=active]:shadow-sm"
-          >
-            Past ({completedRequests.length})
-          </TabsTrigger>
-        </TabsList>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <TabsList className="bg-[#F6F0E4] p-1 rounded-full w-full sm:w-auto grid grid-cols-3 sm:flex h-auto">
+            <TabsTrigger
+              value="active"
+              className="rounded-full px-2 sm:px-5 py-2 text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:text-[#0a2225] data-[state=active]:shadow-sm"
+            >
+              Active ({activeRequests.length})
+            </TabsTrigger>
+            <TabsTrigger
+              value="in-progress"
+              className="rounded-full px-2 sm:px-5 py-2 text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:text-[#0a2225] data-[state=active]:shadow-sm"
+            >
+              In Progress ({inProgressRequests.length})
+            </TabsTrigger>
+            <TabsTrigger
+              value="past"
+              className="rounded-full px-2 sm:px-5 py-2 text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:text-[#0a2225] data-[state=active]:shadow-sm"
+            >
+              Past ({completedRequests.length})
+            </TabsTrigger>
+          </TabsList>
+          <Button asChild size="sm" className="hidden sm:inline-flex bg-[#0c4d47] hover:bg-[#0a2225] text-[#f7f3ea] rounded-full px-5">
+            <Link to="/post-trip">
+              <Plus className="h-4 w-4 mr-2" />
+              Request a Trip
+            </Link>
+          </Button>
+        </div>
 
         <TabsContent value="active" className="mt-6 space-y-4">
           {activeRequests.length > 0 ? (
