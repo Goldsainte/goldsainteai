@@ -14642,7 +14642,6 @@ export type Database = {
         }
         Returns: undefined
       }
-      phone_exists: { Args: { p_phone: string }; Returns: boolean }
       process_package_resale_commission: {
         Args: { p_booking_id: string }
         Returns: boolean

@@ -9,7 +9,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CustomerVerificationUpload } from "@/components/CustomerVerificationUpload";
 import { EmergencyContactsManager } from "@/components/EmergencyContactsManager";
-import { PhoneSignInLinkCard } from "@/components/auth/PhoneSignInLinkCard";
 
 interface TravelPreferences {
   travel_style?: string[] | null;
@@ -365,8 +364,6 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
               Update
             </Button>
           </div>
-
-          <PhoneSignInLinkCard />
 
           <div className="flex items-center justify-between py-3 border-b border-[#E5DFC6]">
             <div>
