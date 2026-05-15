@@ -93,6 +93,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const bootstrapSession = async () => {
       try {
         if (sessionSetByListener.current) {
+          authBootstrapResolved.current = true;
           setIsLoading(false);
           return;
         }
@@ -112,6 +113,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setSession(hydrated.session);
             setUser(hydrated.session?.user ?? null);
           }
+          authBootstrapResolved.current = true;
           setIsLoading(false);
           resetSessionFailureCount();
           return;
