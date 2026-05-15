@@ -8,7 +8,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { ToastAction } from '@/components/ui/toast';
 import * as Sentry from '@sentry/react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import logomark from '@/assets/logomark-gold.png';
@@ -25,7 +24,7 @@ const passwordSchema = z.string()
   .regex(/[0-9]/, "Password must contain at least one number")
   .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character");
 
-type AuthStep = 'account-type' | 'email' | 'signin' | 'signup' | 'forgot-password' | 'verify-email' | 'profile' | 'phone-signin';
+type AuthStep = 'account-type' | 'email' | 'signin' | 'signup' | 'forgot-password' | 'verify-email' | 'profile';
 type AccountType = 'traveler' | 'creator' | 'agent' | 'brand' | null;
 
 const Auth = () => {
@@ -59,10 +58,6 @@ const Auth = () => {
   const [phone, setPhone] = useState('');
   const [smsOptIn, setSmsOptIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [signupMethod, setSignupMethod] = useState<'email' | 'phone'>('email');
-  const [otpStep, setOtpStep] = useState<'request' | 'verify'>('request');
-  const [otpCode, setOtpCode] = useState('');
-  const [phoneForVerification, setPhoneForVerification] = useState('');
   const { signIn, signUp, user, isLoading: authLoading } = useAuth();
   const redirectTarget = useMemo(() => getRedirectPathFromSearch(location.search), [location.search]);
   
