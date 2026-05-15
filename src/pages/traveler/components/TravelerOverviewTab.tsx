@@ -61,10 +61,10 @@ export function TravelerOverviewTab({ profile, stats, onAvatarUpdate }: Traveler
             <Link to="/post-trip">Request a Trip</Link>
           </Button>
           <Link
-            to="/storyboards"
+            to="/marketplace"
             className="group inline-flex items-center justify-center sm:justify-start text-sm text-[#0a2225]/70 hover:text-[#0a2225] transition-colors h-11 sm:h-auto"
           >
-            Browse storyboards for inspiration
+            Browse the marketplace
             <ArrowRight className="h-4 w-4 ml-1.5 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </div>
