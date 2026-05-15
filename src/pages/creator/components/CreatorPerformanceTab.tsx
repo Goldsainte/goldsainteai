@@ -60,8 +60,9 @@ export function CreatorPerformanceTab({ role = "creator" }: { role?: "creator" |
           .limit(50),
         supabase
           .from("trip_bookings")
-          .select("created_at, total_price, metadata")
+          .select("created_at, total_price, metadata, status")
           .eq("partner_id", user.id)
+          .in("status", ["paid", "confirmed", "completed"])
           .gte("created_at", sinceIso),
         supabase
           .from("itinerary_purchases")

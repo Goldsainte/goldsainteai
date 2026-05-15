@@ -14,6 +14,11 @@ const STREAM_ENDPOINT = import.meta.env.VITE_PRESENCE_STREAM_ENDPOINT || "/api/p
 const TENANT_HEADER = "x-tenant-id";
 const DEFAULT_TENANT = import.meta.env.VITE_TENANT_ID || "public";
 
+// Presence sync only runs when an explicit endpoint is configured.
+// In Lovable preview / static deployments these endpoints don't exist,
+// so we no-op to avoid 404 noise.
+export const PRESENCE_ENABLED = Boolean(import.meta.env.VITE_PRESENCE_HEARTBEAT_ENDPOINT);
+
 const RETRY_OPTIONS = {
   attempts: 3,
   backoffMs: 500,
@@ -29,6 +34,9 @@ type PresenceStreamMessage = {
 };
 
 export async function sendPresenceHeartbeat(status: "online" | "offline") {
+  if (!PRESENCE_ENABLED) {
+    return { ok: true } as HeartbeatResponse;
+  }
   try {
     const response = await httpJson<HeartbeatResponse>(
       HEARTBEAT_ENDPOINT,
@@ -55,6 +63,9 @@ export async function sendPresenceHeartbeat(status: "online" | "offline") {
 }
 
 export async function fetchPresenceSnapshot() {
+  if (!PRESENCE_ENABLED) {
+    return {} as PresenceSnapshot;
+  }
   try {
     return await httpJson<PresenceSnapshot>(
       STATUS_ENDPOINT,
@@ -77,6 +88,9 @@ export async function fetchPresenceSnapshot() {
 }
 
 export async function markOffline() {
+  if (!PRESENCE_ENABLED) {
+    return;
+  }
   try {
     const response = await httpRequest(
       HEARTBEAT_ENDPOINT,
@@ -103,7 +117,7 @@ export async function markOffline() {
 export async function subscribeToPresenceStream(
   onMessage: (message: PresenceStreamMessage) => void,
 ): Promise<() => void> {
-  if (!STREAM_ENDPOINT) {
+  if (!PRESENCE_ENABLED || !STREAM_ENDPOINT) {
     return () => undefined;
   }
 
