@@ -135,10 +135,10 @@ export function EmergencyContactsManager() {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              <Phone className="h-5 w-5" />
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="min-w-0">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <Phone className="h-5 w-5 shrink-0" />
               Emergency Contacts
             </CardTitle>
             <CardDescription>
@@ -147,7 +147,7 @@ export function EmergencyContactsManager() {
           </div>
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-              <Button size="sm">
+              <Button size="sm" className="w-full sm:w-auto shrink-0">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Contact
               </Button>
