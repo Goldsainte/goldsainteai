@@ -3,27 +3,10 @@ import { useNavigate, Link, Navigate, useSearchParams } from "react-router-dom";
 import { invokeWithAuth } from "@/lib/supabaseHelpers";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import {
-  Sparkles,
-  Search,
-  Plus,
-  AlertCircle,
-  Send,
-  FileText,
-  Map,
-  DollarSign,
-  Settings,
-  ImageIcon,
-  ArrowRight,
-  BookOpen,
-} from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { BackButton } from "@/components/ui/BackButton";
-import { Button } from "@/components/ui/button";
+import { AlertCircle } from "lucide-react";
 import { GettingStartedChecklist } from "@/components/onboarding/GettingStartedChecklist";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ProfilePhotoUploader } from "@/pages/traveler/components/ProfilePhotoUploader";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useUserRole } from "@/hooks/useUserRole";
 import { CreatorOverviewTab } from "./creator/components/CreatorOverviewTab";
@@ -190,87 +173,74 @@ export default function CreatorDashboard() {
 
   const displayName = profile?.display_name || profile?.first_name || profile?.full_name || "Creator";
 
-  const getInitials = (name?: string | null) => {
-    if (!name) return "?";
-    return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+  const TAB_KEYS = [
+    "overview",
+    "proposals",
+    "trips",
+    "portfolio",
+    "guides",
+    "services",
+    "performance",
+    "affiliate",
+    "content",
+    "earnings",
+    "settings",
+  ] as const;
+  type TabKey = (typeof TAB_KEYS)[number];
+
+  const TAB_LABELS: Record<TabKey, string> = {
+    overview: "Studio",
+    proposals: "Proposals",
+    trips: "Trips",
+    portfolio: "Portfolio",
+    guides: "Guides",
+    services: "Services",
+    performance: "Performance",
+    affiliate: "Affiliate",
+    content: "Content",
+    earnings: "Earnings",
+    settings: "Settings",
   };
 
   const tabTriggerClass =
-    "rounded-none h-11 border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0 transition-colors";
+    "rounded-none h-11 border-b border-transparent data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#0a2225]/55 text-[11px] uppercase tracking-[0.28em] font-medium px-5 whitespace-nowrap flex-shrink-0 transition-colors";
 
   return (
-    <main className="min-h-screen bg-[#FDF9F0] pb-24 lg:pb-0">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 md:py-12">
-        <BackButton className="mb-4" />
-
-        {/* Header */}
-        <header className="mb-6 md:mb-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6">
-            <div className="flex items-center gap-3 md:gap-4">
-              <ProfilePhotoUploader
-                userId={user?.id || ""}
-                currentAvatarUrl={profile?.avatar_url}
-                displayName={displayName}
-                onUploadComplete={(url) =>
-                  setProfile((prev) => prev ? { ...prev, avatar_url: url } : prev)
-                }
-                size="sm"
-              />
-              <div>
-                <p className="text-xs text-[#C7A962] font-medium tracking-wider uppercase flex items-center gap-1.5">
-                  <Sparkles className="h-3 w-3" />
-                  Creator Dashboard
-                </p>
-                <h1 className="font-secondary text-xl md:text-2xl lg:text-3xl text-[#0a2225]">
-                  Welcome back, {displayName.split(" ")[0]}
-                </h1>
-                {profile?.creator_tier && (
-                  <div className="mt-2">
-                    <TierBadge tier={profile.creator_tier} size="md" />
-                  </div>
-                )}
-              </div>
+    <main className="min-h-screen bg-[#f7f3ea] pb-24 lg:pb-0 text-[#0a2225]">
+      <div className="mx-auto max-w-5xl px-5 sm:px-8 pt-8 md:pt-16 pb-12">
+        {/* Editorial header */}
+        <header className="mb-8 md:mb-10">
+          <p className="text-[10px] md:text-[11px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
+            The Atelier
+          </p>
+          <h1 className="mt-2 md:mt-3 font-secondary text-[28px] leading-tight md:text-4xl text-[#0a2225]">
+            {loading ? "Welcome" : `Welcome, ${displayName.split(" ")[0]}`}
+          </h1>
+          <p className="mt-2 text-sm text-[#0a2225]/60 max-w-md">
+            Your studio for shaping trip proposals, packaging journeys, and growing what you earn on-platform.
+          </p>
+          {profile?.creator_tier && (
+            <div className="mt-4">
+              <TierBadge tier={profile.creator_tier} size="md" />
             </div>
-
-            <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-3">
-              <button
-                onClick={() => navigate("/marketplace")}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] text-white px-5 py-2.5 text-sm font-medium hover:bg-[#0c4d47]/90 transition-colors"
-              >
-                <Search className="h-4 w-4" />
-                Browse Trip Requests
-              </button>
-              <button
-                onClick={() => navigate("/trip-builder")}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full border border-[#E5DFC6] bg-white text-[#0a2225] px-5 py-2.5 text-sm font-medium hover:bg-[#F6F0E4] transition-colors"
-              >
-                <Plus className="h-4 w-4" />
-                Create Trip Package
-              </button>
-            </div>
-          </div>
+          )}
         </header>
 
         {user && <GettingStartedChecklist userId={user.id} role="creator" />}
-        <div className="mb-4 text-right">
-          <Link to="/how-it-works/creator" className="text-xs text-[#0c4d47] hover:underline">
-            How it works →
-          </Link>
-        </div>
 
         {/* Onboarding Banner */}
         {onboardingIncomplete && (
-          <div className="mb-8 rounded-2xl border border-[#C7A962] bg-[#C7A962]/10 px-6 py-5 flex items-center justify-between gap-4">
+          <div className="mb-8 rounded-2xl border border-[#0c4d47]/20 bg-white/70 px-6 py-5 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <AlertCircle className="w-5 h-5 text-[#C7A962] flex-shrink-0" />
+              <AlertCircle className="w-5 h-5 text-[#0c4d47] flex-shrink-0" />
               <div>
-                <p className="font-medium text-[#0a2225]">Complete Your Creator Profile</p>
-                <p className="text-sm text-[#6B7280]">Finish onboarding to unlock all features and start earning commissions.</p>
+                <p className="font-secondary text-base text-[#0a2225]">Complete your creator profile</p>
+                <p className="text-sm text-[#0a2225]/65">Finish onboarding to unlock all features and start earning commissions.</p>
               </div>
             </div>
             <Link
               to="/onboarding/creator"
-              className="inline-flex items-center gap-2 rounded-full bg-[#C7A962] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#B39952] transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-5 py-2.5 text-sm font-medium text-[#f7f3ea] hover:bg-[#0a2225] transition-colors whitespace-nowrap"
             >
               Complete Setup
             </Link>
@@ -279,122 +249,27 @@ export default function CreatorDashboard() {
 
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-          {/* Creator tools */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card
-              className="border-none bg-white rounded-2xl shadow-sm p-6 cursor-pointer hover:shadow-md transition-shadow"
-              onClick={() => navigate('/itinerary-builder')}
-            >
-              <div className="w-10 h-0.5 bg-[#C7A962] mb-4" />
-              <h3 className="font-secondary text-lg text-[#0a2225] mb-2">Sell an Itinerary Guide</h3>
-              <p className="text-sm text-[#6B7280]">Package your travel knowledge as a digital product. Set your price, publish instantly and earn on every sale.</p>
-              <span className="mt-4 inline-flex items-center gap-1.5 text-sm text-[#0c4d47] font-medium">
-                Create a guide <ArrowRight className="h-3.5 w-3.5" />
-              </span>
-            </Card>
-            <Card
-              className="border-none bg-white rounded-2xl shadow-sm p-6 cursor-pointer hover:shadow-md transition-shadow"
-              onClick={() => navigate('/bundle-builder')}
-            >
-              <div className="w-10 h-0.5 bg-[#C7A962] mb-4" />
-              <h3 className="font-secondary text-lg text-[#0a2225] mb-2">Build a Bundle</h3>
-              <p className="text-sm text-[#6B7280]">Combine one trip with up to 3 guides at a discounted price. One checkout, one click for buyers.</p>
-              <span className="mt-4 inline-flex items-center gap-1.5 text-sm text-[#0c4d47] font-medium">
-                Create a bundle <ArrowRight className="h-3.5 w-3.5" />
-              </span>
-            </Card>
-          </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-10 mt-2">
           {isMobile ? (
             <Select value={activeTab} onValueChange={setActiveTab}>
-              <SelectTrigger className="w-full bg-white border-[#E5DFC6] rounded-full h-12 px-4 text-sm font-medium text-[#0a2225]">
-                <SelectValue>
-                  <span className="flex items-center gap-2">
-                    {activeTab === "overview" && <><Sparkles className="h-4 w-4 text-[#C7A962]" /> Overview</>}
-                    {activeTab === "proposals" && <><FileText className="h-4 w-4 text-[#C7A962]" /> Proposals</>}
-                    {activeTab === "trips" && <><Map className="h-4 w-4 text-[#C7A962]" /> My Trips</>}
-                    {activeTab === "portfolio" && <><ImageIcon className="h-4 w-4 text-[#C7A962]" /> Portfolio</>}
-                    {activeTab === "guides" && <><BookOpen className="h-4 w-4 text-[#C7A962]" /> Guides</>}
-                    {activeTab === "services" && <>Custom Services</>}
-                    {activeTab === "performance" && <><Sparkles className="h-4 w-4 text-[#C7A962]" /> Performance</>}
-                    {activeTab === "affiliate" && <><Sparkles className="h-4 w-4 text-[#C7A962]" /> Affiliate</>}
-                    {activeTab === "content" && <><Sparkles className="h-4 w-4 text-[#C7A962]" /> Content Tools</>}
-                    {activeTab === "earnings" && <><DollarSign className="h-4 w-4 text-[#C7A962]" /> Earnings</>}
-                    {activeTab === "settings" && <><Settings className="h-4 w-4 text-[#C7A962]" /> Settings</>}
-                  </span>
-                </SelectValue>
+              <SelectTrigger className="w-full bg-transparent border-[#0a2225]/15 rounded-full h-11 px-5 text-sm font-medium text-[#0a2225]">
+                <SelectValue>{TAB_LABELS[(activeTab as TabKey) ?? "overview"] ?? "Studio"}</SelectValue>
               </SelectTrigger>
-              <SelectContent className="bg-white border-[#E5DFC6] rounded-xl">
-                <SelectItem value="overview" className="py-3">
-                  <span className="flex items-center gap-2"><Sparkles className="h-4 w-4" /> Overview</span>
-                </SelectItem>
-                <SelectItem value="proposals" className="py-3">
-                  <span className="flex items-center gap-2"><FileText className="h-4 w-4" /> Proposals</span>
-                </SelectItem>
-                <SelectItem value="trips" className="py-3">
-                  <span className="flex items-center gap-2"><Map className="h-4 w-4" /> My Trips</span>
-                </SelectItem>
-                <SelectItem value="portfolio" className="py-3">
-                  <span className="flex items-center gap-2"><ImageIcon className="h-4 w-4" /> Portfolio</span>
-                </SelectItem>
-                <SelectItem value="guides" className="py-3">
-                  <span className="flex items-center gap-2"><BookOpen className="h-4 w-4" /> Guides</span>
-                </SelectItem>
-                <SelectItem value="services" className="py-3">
-                  <span className="flex items-center gap-2"><Sparkles className="h-4 w-4" /> Custom Services</span>
-                </SelectItem>
-                <SelectItem value="performance" className="py-3">
-                  <span className="flex items-center gap-2"><Sparkles className="h-4 w-4" /> Performance</span>
-                </SelectItem>
-                <SelectItem value="affiliate" className="py-3">
-                  <span className="flex items-center gap-2"><Sparkles className="h-4 w-4" /> Affiliate</span>
-                </SelectItem>
-                <SelectItem value="content" className="py-3">
-                  <span className="flex items-center gap-2"><Sparkles className="h-4 w-4" /> Content Tools</span>
-                </SelectItem>
-                <SelectItem value="earnings" className="py-3">
-                  <span className="flex items-center gap-2"><DollarSign className="h-4 w-4" /> Earnings</span>
-                </SelectItem>
-                <SelectItem value="settings" className="py-3">
-                  <span className="flex items-center gap-2"><Settings className="h-4 w-4" /> Settings</span>
-                </SelectItem>
+              <SelectContent className="bg-[#f7f3ea] border-[#0a2225]/15 rounded-xl">
+                {TAB_KEYS.map((key) => (
+                  <SelectItem key={key} value={key} className="py-3">
+                    {TAB_LABELS[key]}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           ) : (
-            <TabsList className="w-full overflow-x-auto scrollbar-hide bg-transparent border-b border-[#E5DFC6] rounded-none h-11 justify-start gap-0 flex">
-              <TabsTrigger value="overview" className={tabTriggerClass}>
-                <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Overview
-              </TabsTrigger>
-              <TabsTrigger value="proposals" className={tabTriggerClass}>
-                <FileText className="h-3.5 w-3.5 mr-1.5" /> Proposals
-              </TabsTrigger>
-              <TabsTrigger value="trips" className={tabTriggerClass}>
-                <Map className="h-3.5 w-3.5 mr-1.5" /> My Trips
-              </TabsTrigger>
-              <TabsTrigger value="portfolio" className={tabTriggerClass}>
-                <ImageIcon className="h-3.5 w-3.5 mr-1.5" /> Portfolio
-              </TabsTrigger>
-              <TabsTrigger value="guides" className={tabTriggerClass}>
-                <BookOpen className="h-3.5 w-3.5 mr-1.5" /> Guides
-              </TabsTrigger>
-              <TabsTrigger value="services" className={tabTriggerClass}>
-                Custom Services
-              </TabsTrigger>
-              <TabsTrigger value="performance" className={tabTriggerClass}>
-                <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Performance
-              </TabsTrigger>
-              <TabsTrigger value="affiliate" className={tabTriggerClass}>
-                <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Affiliate
-              </TabsTrigger>
-              <TabsTrigger value="content" className={tabTriggerClass}>
-                <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Content Tools
-              </TabsTrigger>
-              <TabsTrigger value="earnings" className={tabTriggerClass}>
-                <DollarSign className="h-3.5 w-3.5 mr-1.5" /> Earnings
-              </TabsTrigger>
-              <TabsTrigger value="settings" className={tabTriggerClass}>
-                <Settings className="h-3.5 w-3.5 mr-1.5" /> Settings
-              </TabsTrigger>
+            <TabsList className="w-full bg-transparent border-b border-[#0a2225]/15 rounded-none h-11 justify-start gap-0 flex p-0 overflow-x-auto">
+              {TAB_KEYS.map((key) => (
+                <TabsTrigger key={key} value={key} className={tabTriggerClass}>
+                  {TAB_LABELS[key]}
+                </TabsTrigger>
+              ))}
             </TabsList>
           )}
 
@@ -445,6 +320,63 @@ export default function CreatorDashboard() {
             <CreatorSettingsTab />
           </TabsContent>
         </Tabs>
+
+        {/* Editorial footer */}
+        <footer className="mt-16 pt-10 border-t border-[#0a2225]/10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
+                Find work
+              </p>
+              <h3 className="mt-3 font-secondary text-xl text-[#0a2225]">
+                Browse open trip requests
+              </h3>
+              <p className="mt-2 text-sm text-[#0a2225]/65 leading-relaxed">
+                See what travelers are dreaming up and send a tailored proposal to win the brief.
+              </p>
+              <Link
+                to="/marketplace?tab=trip-requests"
+                className="mt-3 inline-block text-sm text-[#0c4d47] underline underline-offset-4 decoration-[#0c4d47]/30 hover:decoration-[#0c4d47]"
+              >
+                Open the marketplace →
+              </Link>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
+                Package a trip
+              </p>
+              <h3 className="mt-3 font-secondary text-xl text-[#0a2225]">
+                Build something to sell
+              </h3>
+              <p className="mt-2 text-sm text-[#0a2225]/65 leading-relaxed">
+                Turn your taste into bookable trips and digital guides — published in minutes, sold on-platform.
+              </p>
+              <Link
+                to="/trip-builder"
+                className="mt-3 inline-block text-sm text-[#0c4d47] underline underline-offset-4 decoration-[#0c4d47]/30 hover:decoration-[#0c4d47]"
+              >
+                Open the trip builder →
+              </Link>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
+                New here?
+              </p>
+              <h3 className="mt-3 font-secondary text-xl text-[#0a2225]">
+                How creators earn on Goldsainte
+              </h3>
+              <p className="mt-2 text-sm text-[#0a2225]/65 leading-relaxed">
+                A short guide to proposals, payouts, fees and how the marketplace splits work.
+              </p>
+              <Link
+                to="/how-it-works/creator"
+                className="mt-3 inline-block text-sm text-[#0c4d47] underline underline-offset-4 decoration-[#0c4d47]/30 hover:decoration-[#0c4d47]"
+              >
+                Read the guide →
+              </Link>
+            </div>
+          </div>
+        </footer>
       </div>
     </main>
   );
