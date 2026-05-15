@@ -14631,6 +14631,15 @@ export type Database = {
         Args: { _trip_id: string; _trip_title: string }
         Returns: undefined
       }
+      notify_message_mention: {
+        Args: {
+          _conversation_id: string
+          _excerpt: string
+          _sender_name: string
+          _target_user_id: string
+        }
+        Returns: string
+      }
       notify_trip_members: {
         Args: {
           p_data?: Json
