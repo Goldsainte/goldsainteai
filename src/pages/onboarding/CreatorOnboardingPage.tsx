@@ -213,7 +213,17 @@ export default function CreatorOnboardingPage() {
       case 0:
         return displayName.trim().length > 0 && bio.trim().length > 0 && homeBase.trim().length > 0;
       case 1:
-        return primaryPlatform.length > 0;
+        if (primaryPlatform.length === 0) return false;
+        if (primaryPlatform === "tiktok") return tiktokHandle.trim().length > 0;
+        if (primaryPlatform === "instagram") return instagramHandle.trim().length > 0;
+        if (primaryPlatform === "youtube") return website.trim().length > 0;
+        if (primaryPlatform === "multi")
+          return (
+            tiktokHandle.trim().length > 0 ||
+            instagramHandle.trim().length > 0 ||
+            website.trim().length > 0
+          );
+        return true;
       case 2:
         return selectedNiches.length > 0 && destinations.length > 0;
       case 3:
