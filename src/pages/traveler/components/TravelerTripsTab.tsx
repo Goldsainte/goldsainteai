@@ -120,10 +120,10 @@ export function TravelerTripsTab({ userId }: TravelerTripsTabProps) {
       <h3 className="font-secondary text-xl text-[#0a2225] mb-2">{message}</h3>
       <p className="text-[#6B7280] mb-6">Your dream destination is waiting to be discovered.</p>
       {showCTA && (
-        <Button asChild className="bg-[#0a2225] hover:bg-[#0a2225]/90 text-white rounded-full px-6">
+        <Button asChild className="bg-[#0c4d47] hover:bg-[#0a2225] text-[#f7f3ea] rounded-full px-6">
           <Link to="/post-trip">
             <Plus className="h-4 w-4 mr-2" />
-            Post a Trip Request
+            Request a Trip
           </Link>
         </Button>
       )}
@@ -143,15 +143,11 @@ export function TravelerTripsTab({ userId }: TravelerTripsTabProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs text-[#C7A962] font-medium tracking-wider uppercase">Your Trips</p>
-          <h2 className="font-secondary text-2xl text-[#0a2225] mt-1">Trip Requests</h2>
-        </div>
-        <Button asChild className="bg-[#0a2225] hover:bg-[#0a2225]/90 text-white rounded-full px-6">
+      <div className="flex items-center justify-end">
+        <Button asChild className="bg-[#0c4d47] hover:bg-[#0a2225] text-[#f7f3ea] rounded-full px-6">
           <Link to="/post-trip">
             <Plus className="h-4 w-4 mr-2" />
-            New Request
+            Request a Trip
           </Link>
         </Button>
       </div>
