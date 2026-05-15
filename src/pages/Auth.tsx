@@ -108,6 +108,7 @@ const Auth = () => {
         if (typeof window !== 'undefined') {
           sessionStorage.removeItem(AUTH_REDIRECT_STORAGE_KEY);
         }
+        clearPersistedAuthFlow();
         navigate(destination, { replace: true });
         return;
       }
@@ -132,6 +133,7 @@ const Auth = () => {
             profile?.is_profile_complete ?? false
           );
 
+          clearPersistedAuthFlow();
           navigate(path, { replace: true });
         } catch (error) {
           console.error("Error determining post-auth destination:", error);
@@ -475,10 +477,12 @@ const Auth = () => {
     const destination = redirectTarget ?? storedRedirect;
     if (destination) {
       if (typeof window !== 'undefined') sessionStorage.removeItem(AUTH_REDIRECT_STORAGE_KEY);
+      clearPersistedAuthFlow();
       navigate(destination, { replace: true });
       return;
     }
     const postAuthDestination = getPostAuthDestination(profile?.account_type, profile?.onboarding_completed);
+    clearPersistedAuthFlow();
     navigate(postAuthDestination, { replace: true });
   };
 
