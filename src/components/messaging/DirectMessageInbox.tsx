@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { format, formatDistanceToNow, isToday, isYesterday, isSameDay } from "date-fns";
 import {
   Archive,
@@ -48,7 +48,6 @@ import { ProposalMessageCard } from "./ProposalMessageCard";
 import { supabase } from "@/integrations/supabase/client";
 import { MentionAutocomplete, type MentionSuggestion } from "./MentionAutocomplete";
 import { extractMentions, renderTextWithMentions } from "@/lib/mentionHelpers";
-import { Link, useNavigate } from "react-router-dom";
 
 export function DirectMessageInbox() {
   const { user } = useAuth();
