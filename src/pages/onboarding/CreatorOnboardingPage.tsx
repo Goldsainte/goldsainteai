@@ -614,21 +614,6 @@ export default function CreatorOnboardingPage() {
                     onChange={setDestinations}
                     maxSelections={10}
                   />
-                  {destinations.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-3">
-                      {destinations.map((dest) => (
-                        <span
-                          key={dest}
-                          className="inline-flex items-center gap-1 px-3 py-1 bg-[#FDF9F0] border border-[#C7A962] rounded-full text-sm text-[#0a2225]"
-                        >
-                          {dest}
-                          <button onClick={() => removeDestination(dest)} className="ml-1 text-[#6B7280] hover:text-[#0a2225]">
-                            ×
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
                 </div>
               </div>
             )}
