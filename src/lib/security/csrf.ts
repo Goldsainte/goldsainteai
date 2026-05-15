@@ -3,6 +3,10 @@ const DEFAULT_ENDPOINT = "/api/csrf-token";
 
 const csrfEndpoint = import.meta.env.VITE_CSRF_TOKEN_ENDPOINT || DEFAULT_ENDPOINT;
 
+// CSRF token endpoint only exists when explicitly configured (custom backend).
+// In Lovable preview / static deployments, no-op to avoid 404 noise.
+const CSRF_ENABLED = Boolean(import.meta.env.VITE_CSRF_TOKEN_ENDPOINT);
+
 const hasSessionStorage = () => typeof window !== 'undefined' && typeof window.sessionStorage !== 'undefined';
 
 let inMemoryToken: string | null = null;
@@ -53,6 +57,9 @@ export function getCachedCSRFToken(): string | null {
 }
 
 async function requestToken(method: "GET" | "POST"): Promise<string | null> {
+  if (!CSRF_ENABLED) {
+    return null;
+  }
   try {
     const response = await fetch(csrfEndpoint, {
       method,
