@@ -431,8 +431,8 @@ const Auth = () => {
       setIsLoading(false);
       if (error) {
         const msg = error.message?.toLowerCase() || '';
-        const description = msg.includes('signups not allowed') || msg.includes('user not found')
-          ? "We couldn't find an account with that phone number. Try signing up instead."
+        const description = msg.includes('signups not allowed') || msg.includes('user not found') || msg.includes('phone not found')
+          ? "No account is linked to this phone. If you signed up with email, sign in with email first then link your phone from Settings → Sign in with phone."
           : error.message;
         toast({ title: 'Could not send code', description, variant: 'destructive' });
         Sentry.captureException(error, { tags: { flow: 'phone_signin_send_otp' } });
