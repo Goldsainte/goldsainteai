@@ -223,16 +223,16 @@ export default function TravelerDashboardPage() {
                     Get inspired
                   </p>
                   <h3 className="mt-3 font-secondary text-xl text-[#0a2225]">
-                    Browse Storyboards
+                    Browse the Marketplace
                   </h3>
                   <p className="mt-2 text-sm text-[#0a2225]/65 leading-relaxed">
-                    Editorial trip ideas curated by our creators — pin the moments you love.
+                    Editorial trips curated by our creators and agents — find the journey that inspires you.
                   </p>
                   <Link
-                    to="/storyboards"
+                    to="/marketplace"
                     className="mt-3 inline-block text-sm text-[#0c4d47] underline underline-offset-4 decoration-[#0c4d47]/30 hover:decoration-[#0c4d47]"
                   >
-                    Explore storyboards →
+                    Explore the marketplace →
                   </Link>
                 </div>
                 <div>
