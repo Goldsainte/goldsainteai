@@ -125,6 +125,55 @@ const Auth = () => {
     }
   }, [redirectTarget]);
 
+  // Cross-device email verification: poll session + listen for auth changes
+  // while sitting on the verify-email step, so the desktop tab advances even
+  // when the user clicks the confirmation link on their phone.
+  useEffect(() => {
+    if (step !== 'verify-email') return;
+
+    let cancelled = false;
+
+    const handleVerified = () => {
+      if (cancelled) return;
+      cancelled = true;
+      toast({ title: 'Email verified', description: 'Taking you to finish setting up your profile.' });
+      navigate('/auth/complete-profile', { replace: true });
+    };
+
+    const interval = setInterval(async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user?.email_confirmed_at) {
+          clearInterval(interval);
+          handleVerified();
+        } else if (session?.user) {
+          // Refresh the user object in case email_confirmed_at hasn't propagated to session
+          const { data: { user: freshUser } } = await supabase.auth.getUser();
+          if (freshUser?.email_confirmed_at) {
+            clearInterval(interval);
+            handleVerified();
+          }
+        }
+      } catch (err) {
+        // Silent — we'll try again on the next tick
+      }
+    }, 3000);
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if ((event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'TOKEN_REFRESHED') &&
+          session?.user?.email_confirmed_at) {
+        clearInterval(interval);
+        handleVerified();
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+      subscription.unsubscribe();
+    };
+  }, [step, navigate, toast]);
+
   const handleContinueWithEmail = () => {
     if (!email.trim()) {
       toast({ title: "Email required", description: "Please enter your email address.", variant: "destructive" });
@@ -802,6 +851,25 @@ const Auth = () => {
               <p className="text-sm" style={{ color: '#9A9384' }}>
                 Once you verify your email, you'll be redirected back to complete your profile.
               </p>
+              <button
+                type="button"
+                onClick={async () => {
+                  const { data: { user: freshUser } } = await supabase.auth.getUser();
+                  if (freshUser?.email_confirmed_at) {
+                    navigate('/auth/complete-profile', { replace: true });
+                  } else {
+                    toast({
+                      title: "Not verified yet",
+                      description: "We don't see a confirmation yet. Click the link in your email, then try again.",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+                className="mt-3 text-sm font-medium hover:underline transition-colors"
+                style={{ color: '#0c4d47' }}
+              >
+                Already verified? Continue →
+              </button>
             </div>
           </div>
         )}
