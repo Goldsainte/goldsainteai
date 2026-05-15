@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const sessionBootstrapFailures = useRef(0);
   const MAX_SESSION_FAILURES = 3;
   const sessionSetByListener = useRef(false);
+  const authBootstrapResolved = useRef(false);
 
   const handleSessionSyncFailure = async (error: unknown) => {
     if (!SESSION_SYNC_ENABLED) {
@@ -67,6 +68,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (!isMounted) return;
+
+        // Ignore the eager INITIAL_SESSION event until we've explicitly
+        // restored from storage. This avoids a refresh race where auth briefly
+        // looks signed out and routing falls back to the account-type chooser.
+        if (event === 'INITIAL_SESSION' && !authBootstrapResolved.current) {
+          return;
+        }
+
         setSession(session);
         setUser(session?.user ?? null);
         sessionSetByListener.current = true;
@@ -84,6 +93,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const bootstrapSession = async () => {
       try {
         if (sessionSetByListener.current) {
+          authBootstrapResolved.current = true;
           setIsLoading(false);
           return;
         }
@@ -103,6 +113,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setSession(hydrated.session);
             setUser(hydrated.session?.user ?? null);
           }
+          authBootstrapResolved.current = true;
           setIsLoading(false);
           resetSessionFailureCount();
           return;
@@ -118,10 +129,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setSession(data.session);
           setUser(data.session?.user ?? null);
         }
+        authBootstrapResolved.current = true;
         resetSessionFailureCount();
         setIsLoading(false);
       } catch (error) {
         if (!isMounted) return;
+        authBootstrapResolved.current = true;
         if (error instanceof SessionSyncError) {
           await handleSessionSyncFailure(error);
         } else {

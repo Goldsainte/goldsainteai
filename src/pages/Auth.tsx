@@ -27,6 +27,18 @@ const passwordSchema = z.string()
 type AuthStep = 'account-type' | 'email' | 'signin' | 'signup' | 'forgot-password' | 'verify-email' | 'profile';
 type AccountType = 'traveler' | 'creator' | 'agent' | 'brand' | null;
 
+const AUTH_FLOW_STORAGE_KEY = 'goldsainte:authFlow';
+
+type PersistedAuthFlow = {
+  step: AuthStep;
+  selectedAccountType: AccountType;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  smsOptIn: boolean;
+};
+
 const Auth = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -36,6 +48,16 @@ const Auth = () => {
   const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const mode = searchParams.get('mode');
   const roleFromUrl = searchParams.get('role') as AccountType | null;
+  const persistedFlow = useMemo<PersistedAuthFlow | null>(() => {
+    if (typeof window === 'undefined') return null;
+
+    try {
+      const raw = sessionStorage.getItem(AUTH_FLOW_STORAGE_KEY);
+      return raw ? (JSON.parse(raw) as PersistedAuthFlow) : null;
+    } catch {
+      return null;
+    }
+  }, []);
   
   const getInitialStep = (): AuthStep => {
     if (mode === 'signup') {
@@ -47,16 +69,16 @@ const Auth = () => {
     return 'email';
   };
   
-  const [step, setStep] = useState<AuthStep>(getInitialStep);
+  const [step, setStep] = useState<AuthStep>(persistedFlow?.step ?? getInitialStep);
   const [selectedAccountType, setSelectedAccountType] = useState<AccountType>(
-    roleFromUrl && ['traveler', 'creator', 'agent', 'brand'].includes(roleFromUrl) ? roleFromUrl : null
+    persistedFlow?.selectedAccountType ?? (roleFromUrl && ['traveler', 'creator', 'agent', 'brand'].includes(roleFromUrl) ? roleFromUrl : null)
   );
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(persistedFlow?.email ?? '');
   const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [smsOptIn, setSmsOptIn] = useState(false);
+  const [firstName, setFirstName] = useState(persistedFlow?.firstName ?? '');
+  const [lastName, setLastName] = useState(persistedFlow?.lastName ?? '');
+  const [phone, setPhone] = useState(persistedFlow?.phone ?? '');
+  const [smsOptIn, setSmsOptIn] = useState(persistedFlow?.smsOptIn ?? false);
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp, user, isLoading: authLoading } = useAuth();
   const redirectTarget = useMemo(() => getRedirectPathFromSearch(location.search), [location.search]);
@@ -67,6 +89,11 @@ const Auth = () => {
     if (typeof window === 'undefined') return;
     const destination = redirectTarget ?? '/';
     sessionStorage.setItem(AUTH_REDIRECT_STORAGE_KEY, destination);
+  };
+
+  const clearPersistedAuthFlow = () => {
+    if (typeof window === 'undefined') return;
+    sessionStorage.removeItem(AUTH_FLOW_STORAGE_KEY);
   };
 
   // Redirect if already logged in
@@ -81,6 +108,7 @@ const Auth = () => {
         if (typeof window !== 'undefined') {
           sessionStorage.removeItem(AUTH_REDIRECT_STORAGE_KEY);
         }
+        clearPersistedAuthFlow();
         navigate(destination, { replace: true });
         return;
       }
@@ -105,6 +133,7 @@ const Auth = () => {
             profile?.is_profile_complete ?? false
           );
 
+          clearPersistedAuthFlow();
           navigate(path, { replace: true });
         } catch (error) {
           console.error("Error determining post-auth destination:", error);
@@ -124,6 +153,33 @@ const Auth = () => {
       sessionStorage.removeItem(AUTH_REDIRECT_STORAGE_KEY);
     }
   }, [redirectTarget]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const shouldPersist =
+      step === 'signup' ||
+      step === 'verify-email' ||
+      (step === 'email' && (!!email || !!selectedAccountType));
+
+    if (!shouldPersist) {
+      sessionStorage.removeItem(AUTH_FLOW_STORAGE_KEY);
+      return;
+    }
+
+    sessionStorage.setItem(
+      AUTH_FLOW_STORAGE_KEY,
+      JSON.stringify({
+        step,
+        selectedAccountType,
+        email,
+        firstName,
+        lastName,
+        phone,
+        smsOptIn,
+      } satisfies PersistedAuthFlow)
+    );
+  }, [step, selectedAccountType, email, firstName, lastName, phone, smsOptIn]);
 
   // Cross-device email verification: poll session + listen for auth changes
   // while sitting on the verify-email step, so the desktop tab advances even
@@ -421,10 +477,12 @@ const Auth = () => {
     const destination = redirectTarget ?? storedRedirect;
     if (destination) {
       if (typeof window !== 'undefined') sessionStorage.removeItem(AUTH_REDIRECT_STORAGE_KEY);
+      clearPersistedAuthFlow();
       navigate(destination, { replace: true });
       return;
     }
     const postAuthDestination = getPostAuthDestination(profile?.account_type, profile?.onboarding_completed);
+    clearPersistedAuthFlow();
     navigate(postAuthDestination, { replace: true });
   };
 
