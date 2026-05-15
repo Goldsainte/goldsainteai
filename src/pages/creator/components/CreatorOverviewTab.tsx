@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Search, BookOpen, Plus } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { ProposalStatusBadge } from "@/components/proposals/ProposalStatusBadge";
 import type { TripProposalStatus } from "@/services/proposalService";
 
@@ -32,156 +33,165 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
   const fmt = (n: number) =>
     `$${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
 
-  const statItems = [
-    { label: "Active Proposals", value: loading ? "—" : stats.activeProposals.toString() },
-    { label: "Accepted", value: loading ? "—" : stats.acceptedProposals.toString() },
-    { label: "Total Sent", value: loading ? "—" : stats.totalProposalsSent.toString() },
-    { label: "Response Rate", value: loading ? "—" : `${stats.responseRate}%` },
-    { label: "Total Earnings", value: loading ? "—" : fmt(stats.totalEarnings) },
-    { label: "Pending", value: loading ? "—" : fmt(stats.pendingEarnings) },
-    { label: "Guide Sales", value: loading ? "—" : stats.guideSales.toString() },
-    { label: "Guide Revenue", value: loading ? "—" : fmt(stats.guideRevenue) },
+  const steps = [
+    {
+      n: "01",
+      title: "Browse trip requests",
+      body:
+        "Travelers post the journeys they want. Pick a brief that fits your taste and expertise.",
+    },
+    {
+      n: "02",
+      title: "Send a tailored proposal",
+      body:
+        "Build a thoughtful itinerary with your price, inclusions, and timeline. We handle escrow.",
+    },
+    {
+      n: "03",
+      title: "Get booked & paid on-platform",
+      body:
+        "Travelers confirm, payments are held in escrow, funds release as milestones complete.",
+    },
   ];
 
+  const statItems = [
+    { label: "Active proposals", value: loading ? "—" : stats.activeProposals.toString() },
+    { label: "Accepted", value: loading ? "—" : stats.acceptedProposals.toString() },
+    { label: "Response rate", value: loading ? "—" : `${stats.responseRate}%` },
+    { label: "Total earnings", value: loading ? "—" : fmt(stats.totalEarnings) },
+  ];
+
+  const hasActivity =
+    !loading &&
+    (stats.totalProposalsSent > 0 ||
+      stats.totalEarnings > 0 ||
+      stats.guideSales > 0);
+
   return (
-    <div className="space-y-10">
-      {/* Editorial Stat Blocks */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-0 bg-white border border-[#E5DFC6] rounded-2xl overflow-hidden">
-        {statItems.map((item, i) => (
-          <div
-            key={item.label}
-            className={`p-5 md:p-6 text-center ${
-              i < statItems.length - 1 ? "border-b md:border-b-0 md:border-r border-[#E5DFC6]" : ""
-            } ${i % 2 !== 0 && i < statItems.length - 1 ? "border-r-0 md:border-r" : ""}`}
+    <div className="space-y-12">
+      {/* Editorial hero */}
+      <section className="border-t border-[#0a2225]/10 pt-8 md:pt-10">
+        <p className="text-[10px] md:text-[11px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
+          Start here
+        </p>
+        <h2 className="mt-3 md:mt-4 font-secondary text-[28px] md:text-5xl leading-[1.15] text-[#0a2225] max-w-2xl">
+          Find a brief, design the trip, get paid.
+        </h2>
+        <p className="mt-4 md:mt-5 max-w-xl text-[15px] leading-relaxed text-[#0a2225]/65">
+          The marketplace is full of travelers waiting for the right specialist. Send a proposal or
+          publish a packaged trip ready to book.
+        </p>
+
+        <div className="mt-7 md:mt-8 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-x-8">
+          <Button
+            asChild
+            className="rounded-full bg-[#0c4d47] hover:bg-[#0a2225] text-[#f7f3ea] px-7 h-12 text-sm tracking-wide w-full sm:w-auto"
           >
-            <p className="font-secondary text-2xl md:text-3xl text-[#0a2225]">{item.value}</p>
-            <p className="text-xs uppercase tracking-[0.15em] text-[#6B7280] mt-2 font-medium">
-              {item.label}
-            </p>
-          </div>
-        ))}
-      </div>
+            <Link to="/marketplace?tab=trip-requests">Browse trip requests</Link>
+          </Button>
+          <Link
+            to="/trip-builder"
+            className="group inline-flex items-center justify-center sm:justify-start text-sm text-[#0a2225]/70 hover:text-[#0a2225] transition-colors h-11 sm:h-auto"
+          >
+            Or package a new trip
+            <ArrowRight className="h-4 w-4 ml-1.5 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </div>
+      </section>
 
-      {/* Storyboard Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Link
-          to="/storyboards/new"
-          className="group flex items-center gap-4 rounded-2xl border border-[#E5DFC6] bg-white px-6 py-5 hover:border-[#C7A962]/50 hover:shadow-sm transition-all"
-        >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0c4d47]/10 text-[#0c4d47] group-hover:bg-[#0c4d47] group-hover:text-white transition-colors">
-            <Plus className="h-5 w-5" />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-[#0a2225]">Create Storyboard</p>
-            <p className="text-xs text-[#6B7280] mt-0.5">Build an itinerary to showcase or share</p>
-          </div>
-        </Link>
-        <Link
-          to="/storyboards"
-          className="group flex items-center gap-4 rounded-2xl border border-[#E5DFC6] bg-white px-6 py-5 hover:border-[#C7A962]/50 hover:shadow-sm transition-all"
-        >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#C7A962]/10 text-[#C7A962] group-hover:bg-[#C7A962] group-hover:text-white transition-colors">
-            <BookOpen className="h-5 w-5" />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-[#0a2225]">My Storyboards</p>
-            <p className="text-xs text-[#6B7280] mt-0.5">Manage and publish your trip boards</p>
-          </div>
-        </Link>
-      </div>
+      {/* How it works — editorial three-step */}
+      <section className="border-t border-[#0a2225]/10 pt-8 md:pt-10">
+        <p className="text-[10px] md:text-[11px] uppercase tracking-[0.32em] text-[#0c4d47]/70 mb-6 md:mb-8">
+          How Goldsainte works for creators
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-8">
+          {steps.map((s) => (
+            <div key={s.n} className="space-y-3">
+              <p className="font-secondary text-2xl text-[#c7a962]">{s.n}</p>
+              <h3 className="font-secondary text-xl text-[#0a2225]">{s.title}</h3>
+              <p className="text-sm leading-relaxed text-[#0a2225]/65">{s.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-      {/* Open Trip Requests Banner */}
+      {/* Open trip requests nudge */}
       {!loading && stats.openTripRequests > 0 && (
         <Link
           to="/marketplace?tab=trip-requests"
-          className="flex items-center justify-between rounded-2xl border border-[#C7A962]/30 bg-[#C7A962]/5 px-6 py-4 hover:bg-[#C7A962]/10 transition-colors"
+          className="flex items-center justify-between rounded-2xl border border-[#0a2225]/10 bg-white/70 px-6 py-4 hover:bg-white transition-colors"
         >
-          <div className="flex items-center gap-3">
-            <Search className="w-5 h-5 text-[#C7A962]" />
-            <span className="text-sm font-medium text-[#0a2225]">
-              {stats.openTripRequests} open trip request{stats.openTripRequests !== 1 ? "s" : ""} in the marketplace
-            </span>
-          </div>
-          <span className="text-sm text-[#C7A962] font-medium">View all →</span>
+          <span className="text-sm text-[#0a2225]">
+            <span className="font-secondary text-base">{stats.openTripRequests}</span>{" "}
+            open trip request{stats.openTripRequests !== 1 ? "s" : ""} in the marketplace right now
+          </span>
+          <span className="text-sm text-[#0c4d47] font-medium">View all →</span>
         </Link>
       )}
 
-      {/* Recent Proposals */}
-      <section>
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="font-secondary text-2xl text-[#0a2225]">Recent Proposals</h2>
-            <p className="mt-1 text-sm text-[#6B7280]">Your latest bids on trip requests</p>
-          </div>
-          <Link
-            to="/my-proposals"
-            className="text-sm font-medium text-[#C7A962] hover:text-[#B39952] transition-colors"
-          >
-            View All →
-          </Link>
-        </div>
-
-        <div className="bg-white border border-[#E5DFC6] rounded-2xl overflow-hidden divide-y divide-[#E5DFC6]">
-          {loading ? (
-            <div className="p-12 text-center">
-              <p className="text-sm text-[#6B7280]">Loading your proposals...</p>
-            </div>
-          ) : stats.recentProposals.length === 0 ? (
-            <div className="p-12 text-center">
-              <h3 className="font-secondary text-xl text-[#0a2225]">Your creator journey starts here</h3>
-              <p className="text-sm text-[#6B7280] mt-2 max-w-md mx-auto">
-                Post your first trip package or create a digital itinerary guide to start earning.
-              </p>
-              <div className="flex flex-wrap justify-center gap-3 mt-5">
-                <Link
-                  to="/trip-builder"
-                  className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-white px-5 py-2.5 text-sm font-medium hover:bg-[#0a3d39] transition-colors"
-                >
-                  <Plus className="h-4 w-4" /> Create a Trip
-                </Link>
-                <Link
-                  to="/itinerary-builder"
-                  className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-white text-[#0a2225] px-5 py-2.5 text-sm font-medium hover:bg-[#FDF9F0] transition-colors"
-                >
-                  <BookOpen className="h-4 w-4" /> Sell a Guide
-                </Link>
-                {stats.openTripRequests > 0 && (
-                  <Link
-                    to="/marketplace"
-                    className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0a2225]/90 transition-colors"
-                  >
-                    <Search className="h-4 w-4" /> Browse Trip Requests
-                  </Link>
-                )}
+      {/* Quiet stats — only once there's activity */}
+      {hasActivity && (
+        <section className="border-t border-[#0a2225]/10 pt-8 md:pt-10">
+          <p className="text-[10px] uppercase tracking-[0.32em] text-[#0c4d47]/70 mb-5">
+            Your studio, at a glance
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-8">
+            {statItems.map((item) => (
+              <div key={item.label}>
+                <p className="font-secondary text-2xl md:text-3xl text-[#0a2225]">{item.value}</p>
+                <p className="text-[11px] uppercase tracking-[0.2em] text-[#0a2225]/55 mt-1.5">
+                  {item.label}
+                </p>
               </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Recent Proposals */}
+      {stats.recentProposals.length > 0 && (
+        <section className="border-t border-[#0a2225]/10 pt-8 md:pt-10">
+          <div className="flex items-end justify-between mb-6">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
+                Latest activity
+              </p>
+              <h2 className="mt-2 font-secondary text-2xl text-[#0a2225]">Recent proposals</h2>
             </div>
-          ) : (
-            stats.recentProposals.map((proposal) => (
+            <Link
+              to="/my-proposals"
+              className="text-sm text-[#0c4d47] underline underline-offset-4 decoration-[#0c4d47]/30 hover:decoration-[#0c4d47]"
+            >
+              View all →
+            </Link>
+          </div>
+
+          <div className="divide-y divide-[#0a2225]/10 border-y border-[#0a2225]/10">
+            {stats.recentProposals.map((proposal) => (
               <Link
                 key={proposal.id}
                 to={`/marketplace/request/${proposal.tripRequestId}`}
-                className="flex items-center justify-between gap-4 px-6 py-4 hover:bg-[#FDF9F0] transition-colors group"
+                className="flex items-center justify-between gap-4 py-4 hover:bg-white/40 transition-colors group px-1"
               >
-                <div className="flex items-center gap-4 flex-1 min-w-0">
-                  <div className="w-0.5 h-8 rounded-full bg-[#C7A962] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-[#0a2225] truncate">{proposal.tripTitle}</h3>
-                    <p className="text-sm text-[#6B7280] mt-0.5">
-                      {proposal.destination} ·{" "}
-                      {new Date(proposal.createdAt).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </p>
-                  </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-secondary text-base text-[#0a2225] truncate">
+                    {proposal.tripTitle}
+                  </h3>
+                  <p className="text-xs text-[#0a2225]/55 mt-1">
+                    {proposal.destination} ·{" "}
+                    {new Date(proposal.createdAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </p>
                 </div>
                 <ProposalStatusBadge status={proposal.status} />
               </Link>
-            ))
-          )}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
