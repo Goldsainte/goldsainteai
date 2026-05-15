@@ -41,28 +41,28 @@ export function TravelerOverviewTab({ profile, stats, onAvatarUpdate }: Traveler
   return (
     <div className="space-y-12">
       {/* Editorial hero */}
-      <section className="border-t border-[#0a2225]/10 pt-10">
-        <p className="text-[11px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
-          Welcome, {firstName}
+      <section className="border-t border-[#0a2225]/10 pt-8 md:pt-10">
+        <p className="text-[10px] md:text-[11px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
+          Start here
         </p>
-        <h2 className="mt-4 font-secondary text-3xl md:text-5xl leading-[1.1] text-[#0a2225] max-w-2xl">
+        <h2 className="mt-3 md:mt-4 font-secondary text-[28px] md:text-5xl leading-[1.15] text-[#0a2225] max-w-2xl">
           A quieter way to design the journeys that matter.
         </h2>
-        <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-[#0a2225]/65">
-          This is your private studio. Begin by telling us about a trip you're dreaming
-          of — we'll bring the right people to design it with you.
+        <p className="mt-4 md:mt-5 max-w-xl text-[15px] leading-relaxed text-[#0a2225]/65">
+          Tell us about a trip you're dreaming of — we'll bring the right
+          creators and agents to design it with you.
         </p>
 
-        <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4">
+        <div className="mt-7 md:mt-8 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-x-8">
           <Button
             asChild
-            className="rounded-full bg-[#0c4d47] hover:bg-[#0a2225] text-[#f7f3ea] px-7 h-12 text-sm tracking-wide"
+            className="rounded-full bg-[#0c4d47] hover:bg-[#0a2225] text-[#f7f3ea] px-7 h-12 text-sm tracking-wide w-full sm:w-auto"
           >
             <Link to="/post-trip">Request a Trip</Link>
           </Button>
           <Link
             to="/storyboards"
-            className="group inline-flex items-center text-sm text-[#0a2225]/70 hover:text-[#0a2225] transition-colors"
+            className="group inline-flex items-center justify-center sm:justify-start text-sm text-[#0a2225]/70 hover:text-[#0a2225] transition-colors h-11 sm:h-auto"
           >
             Browse storyboards for inspiration
             <ArrowRight className="h-4 w-4 ml-1.5 transition-transform group-hover:translate-x-0.5" />
@@ -71,8 +71,8 @@ export function TravelerOverviewTab({ profile, stats, onAvatarUpdate }: Traveler
       </section>
 
       {/* How it works — editorial three-step */}
-      <section className="border-t border-[#0a2225]/10 pt-10">
-        <p className="text-[11px] uppercase tracking-[0.32em] text-[#0c4d47]/70 mb-8">
+      <section className="border-t border-[#0a2225]/10 pt-8 md:pt-10">
+        <p className="text-[10px] md:text-[11px] uppercase tracking-[0.32em] text-[#0c4d47]/70 mb-6 md:mb-8">
           How Goldsainte works for you
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-8">

@@ -119,17 +119,18 @@ export default function TravelerDashboardPage() {
 
   return (
     <main className="min-h-screen bg-[#f7f3ea] pb-24 lg:pb-0 text-[#0a2225]">
-      <div className="mx-auto max-w-5xl px-5 sm:px-8 pt-10 md:pt-16 pb-12">
+      <div className="mx-auto max-w-5xl px-5 sm:px-8 pt-8 md:pt-16 pb-12">
         {/* Editorial header */}
-        <header className="flex items-end justify-between gap-6 mb-10">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
-              Your Studio
-            </p>
-            <h1 className="mt-3 font-secondary text-3xl md:text-4xl text-[#0a2225]">
-              Goldsainte
-            </h1>
-          </div>
+        <header className="mb-8 md:mb-10">
+          <p className="text-[10px] md:text-[11px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
+            The Studio
+          </p>
+          <h1 className="mt-2 md:mt-3 font-secondary text-[28px] leading-tight md:text-4xl text-[#0a2225]">
+            {loading ? "Welcome" : `Welcome, ${displayName.split(" ")[0]}`}
+          </h1>
+          <p className="mt-2 text-sm text-[#0a2225]/60 max-w-md">
+            Your private space to dream up trips and review proposals from our network.
+          </p>
         </header>
 
         {loading ? (
@@ -155,7 +156,7 @@ export default function TravelerDashboardPage() {
                   </SelectContent>
                 </Select>
               ) : (
-                <TabsList className="w-full bg-transparent border-b border-[#0a2225]/15 rounded-none h-11 justify-start gap-0 flex p-0">
+                <TabsList className="w-full bg-transparent border-b border-[#0a2225]/15 rounded-none h-11 justify-start gap-0 flex p-0 overflow-x-auto">
                   {(["overview", "journeys", "profile", "settings"] as const).map((key) => (
                     <TabsTrigger
                       key={key}
@@ -197,15 +198,62 @@ export default function TravelerDashboardPage() {
               </TabsContent>
             </Tabs>
 
-            {/* Quiet footer link */}
-            <div className="mt-16 pt-6 border-t border-[#0a2225]/10 text-center">
-              <Link
-                to="/how-it-works/traveler"
-                className="text-[11px] uppercase tracking-[0.28em] text-[#0a2225]/50 hover:text-[#0a2225] transition-colors"
-              >
-                How Goldsainte works
-              </Link>
-            </div>
+            {/* Editorial footer */}
+            <footer className="mt-16 pt-10 border-t border-[#0a2225]/10">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
+                    Need a hand?
+                  </p>
+                  <h3 className="mt-3 font-secondary text-xl text-[#0a2225]">
+                    Speak with the concierge
+                  </h3>
+                  <p className="mt-2 text-sm text-[#0a2225]/65 leading-relaxed">
+                    Our team is available to help shape your trip or answer questions about a proposal.
+                  </p>
+                  <Link
+                    to="/messages"
+                    className="mt-3 inline-block text-sm text-[#0c4d47] underline underline-offset-4 decoration-[#0c4d47]/30 hover:decoration-[#0c4d47]"
+                  >
+                    Open messages →
+                  </Link>
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
+                    Get inspired
+                  </p>
+                  <h3 className="mt-3 font-secondary text-xl text-[#0a2225]">
+                    Browse Storyboards
+                  </h3>
+                  <p className="mt-2 text-sm text-[#0a2225]/65 leading-relaxed">
+                    Editorial trip ideas curated by our creators — pin the moments you love.
+                  </p>
+                  <Link
+                    to="/storyboards"
+                    className="mt-3 inline-block text-sm text-[#0c4d47] underline underline-offset-4 decoration-[#0c4d47]/30 hover:decoration-[#0c4d47]"
+                  >
+                    Explore storyboards →
+                  </Link>
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
+                    New here?
+                  </p>
+                  <h3 className="mt-3 font-secondary text-xl text-[#0a2225]">
+                    How Goldsainte works
+                  </h3>
+                  <p className="mt-2 text-sm text-[#0a2225]/65 leading-relaxed">
+                    A short guide to requesting trips, reviewing proposals and booking on-platform.
+                  </p>
+                  <Link
+                    to="/how-it-works/traveler"
+                    className="mt-3 inline-block text-sm text-[#0c4d47] underline underline-offset-4 decoration-[#0c4d47]/30 hover:decoration-[#0c4d47]"
+                  >
+                    Read the guide →
+                  </Link>
+                </div>
+              </div>
+            </footer>
           </>
         )}
       </div>
