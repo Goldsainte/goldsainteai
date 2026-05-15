@@ -947,11 +947,13 @@ function MessageBubble({
   isSelf,
   onDelete,
   currentUserId,
+  onMentionClick,
 }: {
   message: { id: string; body: string; created_at: string; is_read: boolean };
   isSelf: boolean;
   onDelete?: (id: string) => void;
   currentUserId: string;
+  onMentionClick?: (username: string) => void;
 }) {
   const [hovered, setHovered] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
@@ -1046,7 +1048,23 @@ function MessageBubble({
         }`}
       >
         <p className="text-sm whitespace-pre-wrap leading-relaxed text-[#0a2225]">
-          {message.body}
+          {renderTextWithMentions(message.body, () => {}).map((part, idx) =>
+            typeof part === "string" ? (
+              <span key={idx}>{part}</span>
+            ) : (
+              <button
+                key={part.key}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMentionClick?.(part.username);
+                }}
+                className="font-medium text-[#0c4d47] hover:underline"
+              >
+                @{part.username}
+              </button>
+            )
+          )}
         </p>
         <div className={`flex items-center gap-1 mt-1.5 ${isSelf ? "justify-end" : "justify-start"}`}>
           <span className="text-[10px] text-[#9CA3AF]">
