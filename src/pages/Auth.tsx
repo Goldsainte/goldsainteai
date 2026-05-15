@@ -8,6 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 import * as Sentry from '@sentry/react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import logomark from '@/assets/logomark-gold.png';
@@ -227,6 +228,33 @@ const Auth = () => {
           return;
         }
         setIsLoading(true);
+        // Pre-check: phone already linked to another account?
+        const { data: phoneTaken, error: checkError } = await supabase.rpc('phone_exists', { p_phone: cleanedPhone });
+        if (checkError) {
+          console.error('Phone check error:', checkError);
+        }
+        if (phoneTaken === true) {
+          setIsLoading(false);
+          toast({
+            title: 'Phone already in use',
+            description: 'An account already exists with this phone number. Sign in instead?',
+            action: (
+              <ToastAction
+                altText="Sign in"
+                onClick={() => {
+                  setMode('signin');
+                  setSignupMethod('phone');
+                  setPhone(cleanedPhone);
+                  setOtpStep('request');
+                }}
+              >
+                Sign in
+              </ToastAction>
+            ),
+            duration: 10000,
+          });
+          return;
+        }
         const { error } = await supabase.auth.signInWithOtp({
           phone: cleanedPhone,
           options: {
