@@ -65,9 +65,9 @@ export function CreatorPerformanceTab({ role = "creator" }: { role?: "creator" |
           .gte("created_at", sinceIso),
         supabase
           .from("itinerary_purchases")
-          .select("created_at, amount_paid, product_id, itinerary_products!inner(creator_id)")
+          .select("purchased_at, amount_paid, product_id, itinerary_products!inner(creator_id)")
           .eq("itinerary_products.creator_id", user.id)
-          .gte("created_at", sinceIso),
+          .gte("purchased_at", sinceIso),
       ]);
 
       if (cancelled) return;
@@ -80,7 +80,7 @@ export function CreatorPerformanceTab({ role = "creator" }: { role?: "creator" |
           source: (b.metadata as any)?.utm_source || null,
         })),
         ...((purchaseRes.data as any[]) || []).map((p) => ({
-          created_at: p.created_at,
+          created_at: p.purchased_at,
           amount: Number(p.amount_paid || 0),
           source: null,
         })),
