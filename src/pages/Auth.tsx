@@ -242,7 +242,7 @@ const Auth = () => {
               <ToastAction
                 altText="Sign in"
                 onClick={() => {
-                  setMode('signin');
+                  setStep('phone-signin');
                   setSignupMethod('phone');
                   setPhone(cleanedPhone);
                   setOtpStep('request');
