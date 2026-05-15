@@ -121,13 +121,16 @@ export function CreatorGuidesTab() {
         </Card>
       </div>
 
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="font-secondary text-xl text-[#0a2225]">Your Guides</h2>
+      <div className="flex items-center justify-between gap-3 mb-6">
+        <h2 className="font-secondary text-xl text-[#0a2225] min-w-0 truncate">Your Guides</h2>
         <Button
           onClick={() => navigate("/itinerary-builder")}
-          className="rounded-full bg-[#0c4d47] hover:bg-[#0c4d47]/90 text-white"
+          size="sm"
+          className="rounded-full bg-[#0c4d47] hover:bg-[#0c4d47]/90 text-white shrink-0 h-9 px-4 text-xs sm:text-sm sm:h-10 sm:px-5"
         >
-          <Plus className="h-4 w-4 mr-1.5" /> Create New Guide
+          <Plus className="h-4 w-4 sm:mr-1.5" />
+          <span className="hidden sm:inline">Create New Guide</span>
+          <span className="sm:hidden ml-1">New</span>
         </Button>
       </div>
 
