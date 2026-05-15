@@ -27,6 +27,18 @@ const passwordSchema = z.string()
 type AuthStep = 'account-type' | 'email' | 'signin' | 'signup' | 'forgot-password' | 'verify-email' | 'profile';
 type AccountType = 'traveler' | 'creator' | 'agent' | 'brand' | null;
 
+const AUTH_FLOW_STORAGE_KEY = 'goldsainte:authFlow';
+
+type PersistedAuthFlow = {
+  step: AuthStep;
+  selectedAccountType: AccountType;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  smsOptIn: boolean;
+};
+
 const Auth = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -36,6 +48,16 @@ const Auth = () => {
   const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const mode = searchParams.get('mode');
   const roleFromUrl = searchParams.get('role') as AccountType | null;
+  const persistedFlow = useMemo<PersistedAuthFlow | null>(() => {
+    if (typeof window === 'undefined') return null;
+
+    try {
+      const raw = sessionStorage.getItem(AUTH_FLOW_STORAGE_KEY);
+      return raw ? (JSON.parse(raw) as PersistedAuthFlow) : null;
+    } catch {
+      return null;
+    }
+  }, []);
   
   const getInitialStep = (): AuthStep => {
     if (mode === 'signup') {
@@ -47,16 +69,16 @@ const Auth = () => {
     return 'email';
   };
   
-  const [step, setStep] = useState<AuthStep>(getInitialStep);
+  const [step, setStep] = useState<AuthStep>(persistedFlow?.step ?? getInitialStep);
   const [selectedAccountType, setSelectedAccountType] = useState<AccountType>(
-    roleFromUrl && ['traveler', 'creator', 'agent', 'brand'].includes(roleFromUrl) ? roleFromUrl : null
+    persistedFlow?.selectedAccountType ?? (roleFromUrl && ['traveler', 'creator', 'agent', 'brand'].includes(roleFromUrl) ? roleFromUrl : null)
   );
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(persistedFlow?.email ?? '');
   const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [smsOptIn, setSmsOptIn] = useState(false);
+  const [firstName, setFirstName] = useState(persistedFlow?.firstName ?? '');
+  const [lastName, setLastName] = useState(persistedFlow?.lastName ?? '');
+  const [phone, setPhone] = useState(persistedFlow?.phone ?? '');
+  const [smsOptIn, setSmsOptIn] = useState(persistedFlow?.smsOptIn ?? false);
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp, user, isLoading: authLoading } = useAuth();
   const redirectTarget = useMemo(() => getRedirectPathFromSearch(location.search), [location.search]);
