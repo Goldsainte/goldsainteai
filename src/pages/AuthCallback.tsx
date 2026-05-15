@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { AUTH_REDIRECT_STORAGE_KEY, getRedirectPathFromSearch, sanitizeRedirectPath } from '@/lib/auth/redirect';
 import { getPostAuthDestination } from '@/lib/auth/postAuthRouting';
+import { toast } from '@/hooks/use-toast';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -83,22 +84,46 @@ const AuthCallback = () => {
         // returning from the OAuth flow.
         if (typeof window !== 'undefined') {
           const pendingAccountType = sessionStorage.getItem('pending_account_type');
+          sessionStorage.removeItem('pending_account_type');
+
+          const allowedTypes = ['traveler', 'creator', 'brand'];
           if (
-            pendingAccountType === 'traveler' &&
-            (!profile.account_type || profile.account_type === 'traveler') &&
-            profile.account_type !== 'traveler'
+            pendingAccountType &&
+            allowedTypes.includes(pendingAccountType) &&
+            profile.account_type !== pendingAccountType
           ) {
+            // Trigger likely defaulted account_type to 'traveler' because OAuth
+            // providers don't pass our metadata. Override with the user's
+            // actual selection from the signup page. 'agent' is intentionally
+            // excluded — agents must go through the formal /apply/agent flow.
             const { error: updateError } = await supabase
               .from('profiles')
-              .update({ account_type: 'traveler' as any })
+              .update({ account_type: pendingAccountType as any })
               .eq('id', session.user.id);
             if (!updateError) {
-              profile.account_type = 'traveler';
+              profile.account_type = pendingAccountType;
+            } else {
+              console.error('Failed to update account_type from pending:', updateError);
             }
           }
-          // Always clear — privileged roles are intentionally ignored here and
-          // must be granted through the admin approval flow.
-          sessionStorage.removeItem('pending_account_type');
+
+          // Agent selections via Google can't be auto-applied — route them to
+          // the formal application flow.
+          if (pendingAccountType === 'agent') {
+            toast({
+              title: 'Complete your agent application',
+              description: 'You signed in with Google but agents need to complete a formal application.',
+            });
+            navigate('/apply/agent', { replace: true });
+            return;
+          }
+
+          // If we just promoted the user to creator, force them through
+          // creator onboarding instead of any cached destination.
+          if (profile.account_type === 'creator' && !profile.onboarding_completed) {
+            navigate('/onboarding/creator', { replace: true });
+            return;
+          }
         }
 
         // Users with completed onboarding OR is_profile_complete should NOT be redirected
@@ -150,6 +175,13 @@ const AuthCallback = () => {
         if (typeof window !== 'undefined') {
           sessionStorage.removeItem(AUTH_REDIRECT_STORAGE_KEY);
         }
+
+        console.log('[AuthCallback] Routing decision:', {
+          account_type: profile.account_type,
+          onboarding_completed: profile.onboarding_completed,
+          is_profile_complete: profile.is_profile_complete,
+          destination: path,
+        });
 
         navigate(path, { replace: true });
       } catch (err) {
