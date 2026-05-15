@@ -77,6 +77,17 @@ export function usePhoneVerification() {
       if (error) throw error;
       if (!data?.verified) throw new Error(data?.error || 'Invalid code');
 
+      // Also link this phone to the auth account so the user can sign in with it.
+      // Best-effort: don't fail the verification if linking errors out.
+      try {
+        const { error: linkError } = await supabase.auth.updateUser({ phone });
+        if (linkError) {
+          console.warn('Phone verified but auth link failed:', linkError.message);
+        }
+      } catch (linkErr) {
+        console.warn('Phone verified but auth link threw:', linkErr);
+      }
+
       setState(prev => ({ ...prev, isLoading: false, verified: true }));
       toast({
         title: 'Phone Verified',
