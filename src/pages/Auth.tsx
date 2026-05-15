@@ -91,6 +91,11 @@ const Auth = () => {
     sessionStorage.setItem(AUTH_REDIRECT_STORAGE_KEY, destination);
   };
 
+  const clearPersistedAuthFlow = () => {
+    if (typeof window === 'undefined') return;
+    sessionStorage.removeItem(AUTH_FLOW_STORAGE_KEY);
+  };
+
   // Redirect if already logged in
   useEffect(() => {
     if (user && !authLoading) {
@@ -146,6 +151,33 @@ const Auth = () => {
       sessionStorage.removeItem(AUTH_REDIRECT_STORAGE_KEY);
     }
   }, [redirectTarget]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const shouldPersist =
+      step === 'signup' ||
+      step === 'verify-email' ||
+      (step === 'email' && (!!email || !!selectedAccountType));
+
+    if (!shouldPersist) {
+      sessionStorage.removeItem(AUTH_FLOW_STORAGE_KEY);
+      return;
+    }
+
+    sessionStorage.setItem(
+      AUTH_FLOW_STORAGE_KEY,
+      JSON.stringify({
+        step,
+        selectedAccountType,
+        email,
+        firstName,
+        lastName,
+        phone,
+        smsOptIn,
+      } satisfies PersistedAuthFlow)
+    );
+  }, [step, selectedAccountType, email, firstName, lastName, phone, smsOptIn]);
 
   // Cross-device email verification: poll session + listen for auth changes
   // while sitting on the verify-email step, so the desktop tab advances even
