@@ -851,6 +851,25 @@ const Auth = () => {
               <p className="text-sm" style={{ color: '#9A9384' }}>
                 Once you verify your email, you'll be redirected back to complete your profile.
               </p>
+              <button
+                type="button"
+                onClick={async () => {
+                  const { data: { user: freshUser } } = await supabase.auth.getUser();
+                  if (freshUser?.email_confirmed_at) {
+                    navigate('/auth/complete-profile', { replace: true });
+                  } else {
+                    toast({
+                      title: "Not verified yet",
+                      description: "We don't see a confirmation yet. Click the link in your email, then try again.",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+                className="mt-3 text-sm font-medium hover:underline transition-colors"
+                style={{ color: '#0c4d47' }}
+              >
+                Already verified? Continue →
+              </button>
             </div>
           </div>
         )}
