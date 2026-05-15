@@ -134,18 +134,18 @@ export function CreatorPerformanceTab({ role = "creator" }: { role?: "creator" |
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h2 className="font-secondary text-xl text-[#0a2225]">Performance</h2>
-        <div className="flex gap-1 rounded-full bg-[#FDF9F0] p-1 ring-1 ring-[#E5DFC6]">
+        <div className="flex gap-1 rounded-full bg-[#FDF9F0] p-1 ring-1 ring-[#E5DFC6] self-start sm:self-auto">
           {([7, 30, 90] as Range[]).map((r) => (
             <button
               key={r}
               onClick={() => setRange(r)}
-              className={`rounded-full px-3 py-1 text-[12px] transition ${
+              className={`rounded-full px-3 py-1.5 text-[12px] whitespace-nowrap transition ${
                 range === r ? "bg-[#0c4d47] text-white" : "text-[#0a2225]"
               }`}
             >
-              Last {r} days
+              {r} days
             </button>
           ))}
         </div>

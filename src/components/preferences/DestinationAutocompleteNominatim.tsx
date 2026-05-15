@@ -33,7 +33,7 @@ function useDebounce<T>(value: T, delay: number): T {
 }
 
 export const DestinationAutocompleteNominatim: React.FC<DestinationAutocompleteProps> = ({
-  placeholder = "Start typing a city or region…",
+  placeholder = "Start typing, then choose from the list…",
   value,
   onChange,
   maxSelections = 10,
@@ -123,8 +123,9 @@ export const DestinationAutocompleteNominatim: React.FC<DestinationAutocompleteP
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      if (input.trim()) {
-        handleAddDestination(input);
+      // Prefer the top suggestion so users don't have to click
+      if (suggestions.length > 0) {
+        handleAddDestination(suggestions[0]);
       }
     }
   };
@@ -175,18 +176,23 @@ export const DestinationAutocompleteNominatim: React.FC<DestinationAutocompleteP
         )}
       </div>
 
+      <p className="text-xs text-[#7A7151]">
+        Type a place, then tap a suggestion to add it. {value.length}/{maxSelections} selected.
+      </p>
+
       {value.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {value.map((destination) => (
             <div
               key={destination}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F5EFE1] border border-[#E5DFC6] text-sm text-[#0a2225]"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-white border border-[#0a2225]/15 text-sm text-[#0a2225] hover:border-[#0a2225]/30 transition-colors"
             >
-              <MapPin className="w-3 h-3 text-[#C7B892]" />
-              <span className="truncate max-w-[200px]">{destination}</span>
+              <MapPin className="w-3 h-3 text-[#0c4d47]" />
+              <span className="truncate max-w-[240px]">{destination}</span>
               <button
                 type="button"
-                className="ml-1 hover:text-red-600 transition-colors"
+                aria-label={`Remove ${destination}`}
+                className="ml-0.5 text-[#7A7151] hover:text-[#0a2225] transition-colors"
                 onClick={() => handleRemoveDestination(destination)}
               >
                 <X className="w-3.5 h-3.5" />
@@ -195,10 +201,6 @@ export const DestinationAutocompleteNominatim: React.FC<DestinationAutocompleteP
           ))}
         </div>
       )}
-
-      <p className="text-xs text-[#9A9079]">
-        {value.length}/{maxSelections} destinations selected
-      </p>
     </div>
   );
 };

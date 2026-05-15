@@ -230,17 +230,17 @@ export default function CreatorDashboard() {
 
         {/* Onboarding Banner */}
         {onboardingIncomplete && (
-          <div className="mb-8 rounded-2xl border border-[#0c4d47]/20 bg-white/70 px-6 py-5 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="w-5 h-5 text-[#0c4d47] flex-shrink-0" />
-              <div>
+          <div className="mb-8 rounded-2xl border border-[#0c4d47]/20 bg-white/70 px-5 sm:px-6 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-start sm:items-center gap-3 min-w-0">
+              <AlertCircle className="w-5 h-5 text-[#0c4d47] flex-shrink-0 mt-0.5 sm:mt-0" />
+              <div className="min-w-0">
                 <p className="font-secondary text-base text-[#0a2225]">Complete your creator profile</p>
                 <p className="text-sm text-[#0a2225]/65">Finish onboarding to unlock all features and start earning commissions.</p>
               </div>
             </div>
             <Link
               to="/onboarding/creator"
-              className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-5 py-2.5 text-sm font-medium text-[#f7f3ea] hover:bg-[#0a2225] transition-colors whitespace-nowrap"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-5 py-2.5 text-sm font-medium text-[#f7f3ea] hover:bg-[#0a2225] transition-colors whitespace-nowrap w-full sm:w-auto shrink-0"
             >
               Complete Setup
             </Link>

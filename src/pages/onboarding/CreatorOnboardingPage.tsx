@@ -213,7 +213,17 @@ export default function CreatorOnboardingPage() {
       case 0:
         return displayName.trim().length > 0 && bio.trim().length > 0 && homeBase.trim().length > 0;
       case 1:
-        return primaryPlatform.length > 0;
+        if (primaryPlatform.length === 0) return false;
+        if (primaryPlatform === "tiktok") return tiktokHandle.trim().length > 0;
+        if (primaryPlatform === "instagram") return instagramHandle.trim().length > 0;
+        if (primaryPlatform === "youtube") return website.trim().length > 0;
+        if (primaryPlatform === "multi")
+          return (
+            tiktokHandle.trim().length > 0 ||
+            instagramHandle.trim().length > 0 ||
+            website.trim().length > 0
+          );
+        return true;
       case 2:
         return selectedNiches.length > 0 && destinations.length > 0;
       case 3:
@@ -489,7 +499,10 @@ export default function CreatorOnboardingPage() {
                 {/* Social handles */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-[#0a2225] font-medium">TikTok Handle</Label>
+                    <Label className="text-[#0a2225] font-medium">
+                      TikTok Handle
+                      {(primaryPlatform === "tiktok") && <span className="text-[#0c4d47]"> *</span>}
+                    </Label>
                     <Input
                       value={tiktokHandle}
                       onChange={(e) => setTiktokHandle(e.target.value)}
@@ -498,7 +511,10 @@ export default function CreatorOnboardingPage() {
                     />
                   </div>
                   <div>
-                    <Label className="text-[#0a2225] font-medium">Instagram Handle</Label>
+                    <Label className="text-[#0a2225] font-medium">
+                      Instagram Handle
+                      {(primaryPlatform === "instagram") && <span className="text-[#0c4d47]"> *</span>}
+                    </Label>
                     <Input
                       value={instagramHandle}
                       onChange={(e) => setInstagramHandle(e.target.value)}
@@ -509,7 +525,10 @@ export default function CreatorOnboardingPage() {
                 </div>
 
                 <div>
-                  <Label className="text-[#0a2225] font-medium">Website / Portfolio</Label>
+                  <Label className="text-[#0a2225] font-medium">
+                    Website / Portfolio
+                    {(primaryPlatform === "youtube") && <span className="text-[#0c4d47]"> * (YouTube channel URL)</span>}
+                  </Label>
                   <Input
                     value={website}
                     onChange={(e) => setWebsite(e.target.value)}
@@ -517,6 +536,17 @@ export default function CreatorOnboardingPage() {
                     className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
                   />
                 </div>
+
+                {primaryPlatform === "multi" && (
+                  <p className="text-xs text-[#7A7151] -mt-3">
+                    Add at least one handle or link so travelers can find your work.
+                  </p>
+                )}
+                {primaryPlatform && primaryPlatform !== "multi" && (
+                  <p className="text-xs text-[#7A7151] -mt-3">
+                    Your {primaryPlatform === "tiktok" ? "TikTok handle" : primaryPlatform === "instagram" ? "Instagram handle" : "channel link"} is required so travelers can verify your work.
+                  </p>
+                )}
               </div>
             )}
 
@@ -584,21 +614,6 @@ export default function CreatorOnboardingPage() {
                     onChange={setDestinations}
                     maxSelections={10}
                   />
-                  {destinations.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-3">
-                      {destinations.map((dest) => (
-                        <span
-                          key={dest}
-                          className="inline-flex items-center gap-1 px-3 py-1 bg-[#FDF9F0] border border-[#C7A962] rounded-full text-sm text-[#0a2225]"
-                        >
-                          {dest}
-                          <button onClick={() => removeDestination(dest)} className="ml-1 text-[#6B7280] hover:text-[#0a2225]">
-                            ×
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
                 </div>
               </div>
             )}
