@@ -43,7 +43,12 @@ export const Header = () => {
   const isAgentAccount = accountType === "agent";
   const isBrand = accountType === "brand";
   const primaryBookingsPath = "/my-bookings";
-  const postTripPath = (isAgentAccount || isCreator) ? "/trip-builder" : "/post-trip";
+  // Travelers use /post-trip to request a custom trip from agents.
+  // Creators/agents have a dedicated "Create Trip Package" item that points
+  // at /trip-builder, so we hide the traveler-facing entry for them to avoid
+  // two menu items routing to the same place.
+  const postTripPath = "/post-trip";
+  const showRequestTrip = !isAgentAccount && !isCreator;
 
   useEffect(() => {
     if (!user) {
@@ -225,13 +230,15 @@ export const Header = () => {
                               <Luggage className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                               <span className="text-sm font-medium">My Trips</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => navigate(postTripPath)}
-                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                            >
-                              <PlaneTakeoff className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                              <span className="text-sm font-medium">Post a Trip</span>
-                            </DropdownMenuItem>
+                            {showRequestTrip && (
+                              <DropdownMenuItem
+                                onClick={() => navigate(postTripPath)}
+                                className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                              >
+                                <PlaneTakeoff className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                <span className="text-sm font-medium">Request a Trip</span>
+                              </DropdownMenuItem>
+                            )}
                             {!isAgentAccount && !isCreator && (
                               <DropdownMenuItem
                                 onClick={() => navigate('/my-purchases')}
@@ -478,13 +485,15 @@ export const Header = () => {
                             <Luggage className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                             <span className="text-sm font-medium">My Trips</span>
                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => navigate(postTripPath)}
-                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                          >
-                            <PlaneTakeoff className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">Post a Trip</span>
-                          </DropdownMenuItem>
+                          {showRequestTrip && (
+                            <DropdownMenuItem
+                              onClick={() => navigate(postTripPath)}
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                            >
+                              <PlaneTakeoff className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                              <span className="text-sm font-medium">Request a Trip</span>
+                            </DropdownMenuItem>
+                          )}
                           {!isAgentAccount && !isCreator && (
                             <DropdownMenuItem
                               onClick={() => navigate('/my-purchases')}
