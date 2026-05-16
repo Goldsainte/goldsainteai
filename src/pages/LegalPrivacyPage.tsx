@@ -12,82 +12,55 @@ export default function LegalPrivacyPage() {
         <p className="text-[11px] uppercase tracking-[0.2em] text-[#7A7151]">Legal</p>
         <h1 className="font-secondary text-3xl text-[#0a2225]">Privacy Policy</h1>
         <p className="text-sm text-[#4a4a4a]">
-          Learn how Goldsainte collects, uses, and protects your data. The
-          sections below are placeholders until final policy text is published.
+          A plain-language summary of what we collect, how we use it, and the
+          controls you have over your data.
         </p>
       </header>
 
       <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6 space-y-3 shadow-sm">
-        <h2 className="text-lg font-semibold text-[#0a2225]">Data we collect</h2>
+        <h2 className="text-lg font-semibold text-[#0a2225]">Information we collect</h2>
         <p className="text-sm leading-relaxed text-[#4a4a4a]">
-          We collect information you provide directly — including your name,
-          email address, phone number, profile photo, travel preferences, and
-          trip details — when you create an account, request a trip, or
-          communicate with travel professionals on Goldsainte. For verified
-          professionals, we also collect identity verification data via Stripe
-          Identity (government ID, selfie, and address). When you make a
-          booking, payment information is processed and stored by Stripe; we
-          retain only transaction metadata (amount, currency, status, last 4
-          digits of card). We automatically collect device, browser, IP
-          address, referral source, and usage analytics (page views, clicks,
-          searches) to operate and improve the platform.
+          When you create an account, we collect your name, email, optional
+          phone number, and role (traveler, creator, or agent). When you publish
+          a trip or itinerary, we collect details you provide including title,
+          destination, pricing, photos, and descriptions. When you message
+          another user, we store messages to enable the conversation and for
+          safety review if needed. When you make a payment, we collect
+          transaction metadata (amount, currency, payment status) — we never see
+          or store your card details, which are handled directly by Stripe.
         </p>
       </section>
 
       <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6 space-y-3 shadow-sm">
-        <h2 className="text-lg font-semibold text-[#0a2225]">How we use your data</h2>
+        <h2 className="text-lg font-semibold text-[#0a2225]">How we use your information</h2>
         <p className="text-sm leading-relaxed text-[#4a4a4a]">
-          We use your information to (1) operate the marketplace — matching
-          travelers with agents and creators, processing bookings, and
-          enabling on-platform messaging; (2) verify identity and prevent
-          fraud, including running KYC checks and monitoring for off-platform
-          activity that violates our terms; (3) process payments and payouts
-          through Stripe; (4) personalize recommendations, search results,
-          and storyboards; (5) send transactional emails (booking
-          confirmations, trip updates, security alerts) and, with your
-          consent, marketing communications; (6) respond to support requests
-          and resolve disputes; and (7) comply with legal obligations
-          including tax, anti-money-laundering, and travel regulations.
+          We use your information to operate the platform: match you with
+          relevant trips or trip requests, process payments via Stripe Connect,
+          deliver email and SMS notifications you opt into, prevent fraud
+          through automated and manual review, and improve the product through
+          aggregated, anonymized analytics. We never sell your personal
+          information to third parties.
         </p>
       </section>
 
       <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6 space-y-3 shadow-sm">
-        <h2 className="text-lg font-semibold text-[#0a2225]">Your choices</h2>
+        <h2 className="text-lg font-semibold text-[#0a2225]">Your privacy controls</h2>
         <p className="text-sm leading-relaxed text-[#4a4a4a]">
-          You can review and update your profile at any time from your
-          account settings. You may unsubscribe from marketing emails via the
-          link in any message; transactional emails relating to active
-          bookings cannot be disabled. You can request a copy of your data or
-          deletion of your account by emailing{' '}
-          <a href="mailto:privacy@goldsainte.ai" className="underline">
-            privacy@goldsainte.ai
-          </a>
-          . We will respond within 30 days. Note that we may retain certain
-          records (bookings, payments, tax documents) for as long as required
-          by law, typically up to 7 years. Cookies can be managed through
-          your browser settings; disabling them may affect site functionality.
+          You can update your profile information anytime in Settings. You can
+          opt out of marketing emails through the unsubscribe link in any
+          email, or in Settings. You can request a copy of your data or request
+          account deletion by emailing{' '}
+          <a href="mailto:privacy@goldsainte.com" className="text-[#0c4d47] underline">
+            privacy@goldsainte.com
+          </a>{' '}
+          — we process these requests within 30 days as required by GDPR and
+          CCPA. After deletion, transactional records (bookings, payouts) are
+          retained per legal and tax requirements for the minimum period
+          required by law.
         </p>
       </section>
 
-      <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6 space-y-3 shadow-sm">
-        <h2 className="text-lg font-semibold text-[#0a2225]">Sharing &amp; third parties</h2>
-        <p className="text-sm leading-relaxed text-[#4a4a4a]">
-          We share data with travel professionals you transact with (so they
-          can fulfil your trip), with service providers acting on our behalf
-          (Stripe for payments and identity, Resend for email, Supabase for
-          hosting, analytics providers), and when legally required (subpoenas,
-          regulators, fraud investigations). We do not sell your personal
-          data. International transfers are protected by Standard Contractual
-          Clauses where applicable.
-        </p>
-      </section>
-
-      <p className="text-xs text-[#7A7151]">
-        Last updated: May 2026. Contact:{' '}
-        <a href="mailto:privacy@goldsainte.ai" className="underline">
-          privacy@goldsainte.ai
-        </a>
-      </p>
+      <p className="text-xs text-[#7A7151]">Last updated: May 2026.</p>
     </div>
   );
 }
