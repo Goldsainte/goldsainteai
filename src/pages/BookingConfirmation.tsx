@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { CheckCircle2, Loader2, ArrowRight } from "lucide-react";
+import { CheckCircle2, Loader2, ArrowRight, Clock, AlertCircle } from "lucide-react";
 import logomark from "@/assets/logomark-gold.png";
 import { trackPurchaseConversionOnce } from "@/lib/analytics/conversions";
 
@@ -55,6 +55,60 @@ export default function BookingConfirmation() {
     return (
       <main className="min-h-screen flex items-center justify-center bg-[#f7f3ea]">
         <Loader2 className="h-8 w-8 animate-spin text-[#0c4d47]" />
+      </main>
+    );
+  }
+
+  if (booking && (booking.status === "deposit_pending" || booking.status === "payment_pending")) {
+    return (
+      <main className="min-h-screen flex items-center justify-center px-4 py-12 bg-[#f7f3ea]">
+        <div className="w-full max-w-xl text-center">
+          <img src={logomark} alt="Goldsainte" className="h-16 w-16 mx-auto mb-8" loading="lazy" />
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6 bg-[#FDF9F0] border border-[#C7A962]/30">
+            <Clock className="h-10 w-10 text-[#c7a962]" />
+          </div>
+          <h1 className="font-secondary text-4xl mb-3 text-[#0a2225]">Almost there</h1>
+          <p className="text-base text-[#4a4a4a] mb-8">
+            Your payment is being processed. We'll email you the moment it's confirmed — usually within a few minutes.
+          </p>
+          <button
+            onClick={() => navigate("/my-trips")}
+            className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white px-7 h-12 text-sm font-medium"
+          >
+            View My Trips
+          </button>
+        </div>
+      </main>
+    );
+  }
+
+  if (booking && (booking.status === "payment_failed" || booking.status === "cancelled")) {
+    return (
+      <main className="min-h-screen flex items-center justify-center px-4 py-12 bg-[#f7f3ea]">
+        <div className="w-full max-w-xl text-center">
+          <img src={logomark} alt="Goldsainte" className="h-16 w-16 mx-auto mb-8" loading="lazy" />
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6 bg-[#FDECEC] border border-[#C24545]/30">
+            <AlertCircle className="h-10 w-10 text-[#C24545]" />
+          </div>
+          <h1 className="font-secondary text-4xl mb-3 text-[#0a2225]">Payment didn't go through</h1>
+          <p className="text-base text-[#4a4a4a] mb-8">
+            We weren't able to complete your payment. Your card was not charged. Try again or contact our team.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button
+              onClick={() => navigate(-1)}
+              className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white px-7 h-12 text-sm font-medium"
+            >
+              Try Again
+            </button>
+            <button
+              onClick={() => (window.location.href = "mailto:hello@goldsainte.com")}
+              className="rounded-full border border-[#E5DFC6] text-[#0a2225] px-7 h-12 text-sm font-medium"
+            >
+              Contact Support
+            </button>
+          </div>
+        </div>
       </main>
     );
   }
