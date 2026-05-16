@@ -238,8 +238,12 @@ export default function BrandOnboarding() {
       const filePath = `brand-documents/${fileName}`;
       const { error } = await supabase.storage.from('application-documents').upload(filePath, file);
       if (error) throw error;
-      const { data: urlData } = supabase.storage.from('application-documents').getPublicUrl(filePath);
-      setUploadedDocuments(prev => [...prev, { type: documentType, url: urlData.publicUrl, uploadedAt: new Date().toISOString(), fileName: file.name, fileSize: file.size }]);
+      // Bucket is private — store a long-lived signed URL (1 year)
+      const { data: urlData, error: signError } = await supabase.storage
+        .from('application-documents')
+        .createSignedUrl(filePath, 60 * 60 * 24 * 365);
+      if (signError || !urlData) throw signError ?? new Error('Failed to sign URL');
+      setUploadedDocuments(prev => [...prev, { type: documentType, url: urlData.signedUrl, uploadedAt: new Date().toISOString(), fileName: file.name, fileSize: file.size }]);
       toast.success(`${documentType} uploaded`);
     } catch (error) { console.error(error); toast.error('Upload failed'); }
   };
