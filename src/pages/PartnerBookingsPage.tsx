@@ -5,6 +5,7 @@ import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { MapPin, HandCoins, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { confirmDialog } from "@/components/ui/confirm-dialog";
 import { toast } from "sonner";
 
 type BookingRow = {
@@ -158,7 +159,12 @@ function PartnerBookingRowCard({
   const handleRelease = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!confirm("Release the deposit and mark this trip as completed?")) return;
+    const ok = await confirmDialog({
+      title: "Release the deposit?",
+      description: "This will mark the trip as completed and transfer the deposit. This action cannot be undone.",
+      confirmText: "Release deposit",
+    });
+    if (!ok) return;
     setReleasing(true);
     try {
       const { data, error } = await supabase.functions.invoke(
