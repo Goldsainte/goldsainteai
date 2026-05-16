@@ -84,10 +84,11 @@ export const AgentVerificationUpload = ({
         throw uploadError;
       }
 
-      // Get public URL
-      const { data: urlData } = supabase.storage
+      // Bucket is private — generate a long-lived signed URL (1 year)
+      const { data: urlData, error: signError } = await supabase.storage
         .from("verification-documents")
-        .getPublicUrl(filePath);
+        .createSignedUrl(filePath, 60 * 60 * 24 * 365);
+      if (signError || !urlData) throw signError ?? new Error("Failed to sign URL");
 
       // Create verification request
       const { error: requestError } = await supabase
@@ -95,7 +96,8 @@ export const AgentVerificationUpload = ({
         .insert({
           agent_id: agentId,
           verification_type: verificationType,
-          document_urls: [urlData.publicUrl],
+          document_urls: [urlData.signedUrl],
+          document_paths: [filePath],
           additional_info: { document_type: documentType },
         });
 
