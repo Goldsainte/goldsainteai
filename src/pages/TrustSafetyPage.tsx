@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async';
+import { Shield, Flag, CreditCard } from 'lucide-react';
 import { BackButton } from '@/components/ui/BackButton';
 
 export default function TrustSafetyPage() {
@@ -9,86 +10,99 @@ export default function TrustSafetyPage() {
       </Helmet>
       <BackButton className="mb-4" />
       <header className="space-y-2">
-        <p className="text-[11px] uppercase tracking-[0.2em] text-[#7A7151]">Safety</p>
-        <h1 className="font-secondary text-3xl text-[#0a2225]">Trust &amp; Safety</h1>
+        <p className="text-[11px] uppercase tracking-[0.2em] text-[#7A7151]">Safety &amp; Trust</p>
+        <h1 className="font-secondary text-3xl text-[#0a2225]">Travel with confidence</h1>
         <p className="text-sm text-[#4a4a4a]">
-          How we keep travelers, creators, agents, and brands safe. These
-          sections outline the policies, verification, and reporting flows in
-          place.
+          Goldsainte is built on a foundation of verified professionals,
+          transparent transactions, and accountable communication. Here&apos;s
+          how we keep your travel experience safe.
         </p>
       </header>
 
       <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6 space-y-3 shadow-sm">
-        <h2 className="text-lg font-semibold text-[#0a2225]">Verification</h2>
+        <div className="flex items-center gap-2">
+          <Shield className="h-5 w-5 text-[#0c4d47]" />
+          <h2 className="text-lg font-semibold text-[#0a2225]">Verification</h2>
+        </div>
         <p className="text-sm leading-relaxed text-[#4a4a4a]">
-          Every travel agent and creator on Goldsainte completes mandatory
-          identity verification through Stripe Identity before they can
-          accept a booking. This includes government-issued ID, a live
-          selfie match, and address confirmation. Agents must additionally
-          provide proof of professional credentials (IATA, ASTA, or
-          equivalent licensing where applicable) and are reviewed by our
-          team before approval. Verified professionals carry a visible
-          badge across their profile, storyboards, and proposals so you
-          always know who you're working with.
+          Every travel agent on Goldsainte completes Stripe Identity verification,
+          providing government-issued ID confirmation before they can publish or
+          receive payments. Travel creators must connect verified social profiles
+          and pass a quality review. Brand partners undergo business verification
+          including company registration and verified contact details.
+        </p>
+        <p className="text-sm leading-relaxed text-[#4a4a4a]">
+          Verified accounts display a tier badge on their profile and listings.
+          Look for the cream-and-green badge before booking — it confirms the
+          professional has passed our checks.
         </p>
       </section>
 
       <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6 space-y-3 shadow-sm">
-        <h2 className="text-lg font-semibold text-[#0a2225]">Reporting</h2>
+        <div className="flex items-center gap-2">
+          <Flag className="h-5 w-5 text-[#0c4d47]" />
+          <h2 className="text-lg font-semibold text-[#0a2225]">Reporting and moderation</h2>
+        </div>
         <p className="text-sm leading-relaxed text-[#4a4a4a]">
-          You can report a storyboard, trip, message, or user from the menu
-          on any profile or content card. Reports go directly to our trust
-          &amp; safety team and are typically reviewed within 24 hours. Our
-          automated systems also flag attempts to share off-platform
-          contact details (phone numbers, personal email, bank details) or
-          payment links in chat, and warn both parties in real time. For
-          urgent safety concerns or suspected fraud, email{' '}
-          <a href="mailto:safety@goldsainte.ai" className="underline">
-            safety@goldsainte.ai
-          </a>
-          . Confirmed violations result in warnings, suspension, or
-          permanent removal depending on severity.
+          If you encounter a listing, message, or behavior that violates our
+          community guidelines, report it directly from the page using the menu
+          icon. Our moderation team reviews every report within 24 hours.
+        </p>
+        <p className="text-sm leading-relaxed text-[#4a4a4a]">
+          We remove content and suspend accounts that violate our policies on
+          fraud, harassment, misleading information, or unauthorized commercial
+          activity. Repeated violations result in permanent removal from the
+          platform.
+        </p>
+        <p className="text-sm leading-relaxed text-[#4a4a4a]">
+          For urgent safety concerns during a trip, contact us immediately at{' '}
+          <a href="mailto:safety@goldsainte.com" className="text-[#0c4d47] underline">
+            safety@goldsainte.com
+          </a>{' '}
+          or use the in-app emergency contact feature.
         </p>
       </section>
 
       <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6 space-y-3 shadow-sm">
-        <h2 className="text-lg font-semibold text-[#0a2225]">Payments &amp; protection</h2>
+        <div className="flex items-center gap-2">
+          <CreditCard className="h-5 w-5 text-[#0c4d47]" />
+          <h2 className="text-lg font-semibold text-[#0a2225]">Payments and protection</h2>
+        </div>
         <p className="text-sm leading-relaxed text-[#4a4a4a]">
-          All payments are processed by Stripe and held in escrow.
-          Travelers pay Goldsainte, not the agent directly; funds are
-          released to the travel professional in milestones tied to the
-          trip (typically deposit on confirmation, balance closer to
-          departure, and a portion held until trip completion). This means
-          if a professional fails to deliver, we can pause payouts and
-          process a refund per our{' '}
-          <a href="/cancellation-refund-policy" className="underline">
-            Cancellation &amp; Refund Policy
-          </a>
-          . Payouts to professionals run via Stripe Connect with full KYC
-          and anti-money-laundering checks. Buyer and seller protection
-          only applies to transactions completed on-platform — trips paid
-          outside Goldsainte are not protected.
+          All payments on Goldsainte are processed through Stripe, a PCI Level 1
+          certified payment processor. We never see or store your card details.
+        </p>
+        <p className="text-sm leading-relaxed text-[#4a4a4a]">
+          For booked trips, your payment is held in escrow through Stripe Connect
+          until the trip begins. This ensures the travel professional only
+          receives payment for trips that are confirmed and ongoing. If your
+          trip is cancelled per our cancellation policy, you&apos;re eligible for
+          a refund.
+        </p>
+        <p className="text-sm leading-relaxed text-[#4a4a4a]">
+          If you have a dispute with a travel professional, file a claim through
+          your booking page. Our dispute resolution team reviews evidence from
+          both parties and issues a binding decision within 7 business days. See
+          our{' '}
+          <a href="/cancellation-refund-policy" className="text-[#0c4d47] underline">
+            refund policy and dispute process
+          </a>{' '}
+          for full details.
         </p>
       </section>
 
-      <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6 space-y-3 shadow-sm">
-        <h2 className="text-lg font-semibold text-[#0a2225]">On-platform only</h2>
-        <p className="text-sm leading-relaxed text-[#4a4a4a]">
-          For your protection, all communication, document sharing, and
-          payment must remain inside Goldsainte. We cannot mediate
-          disputes, refund payments, or enforce supplier terms for any
-          activity that moves to WhatsApp, personal email, bank transfer,
-          or external payment links. If a professional asks you to move
-          off-platform, please report it.
-        </p>
-      </section>
-
-      <p className="text-xs text-[#7A7151]">
-        Last updated: May 2026. Contact:{' '}
-        <a href="mailto:safety@goldsainte.ai" className="underline">
-          safety@goldsainte.ai
+      <section className="rounded-2xl bg-[#0c4d47] p-6 text-center space-y-3">
+        <h2 className="font-secondary text-xl text-white">Questions or concerns?</h2>
+        <p className="text-sm text-white/80">Our team is here to help.</p>
+        <a
+          href="mailto:support@goldsainte.com"
+          className="inline-block rounded-full bg-white text-[#0c4d47] px-6 py-2 text-sm font-medium hover:bg-[#FDF9F0]"
+        >
+          Contact Support
         </a>
-      </p>
+      </section>
+
+      <p className="text-xs text-[#7A7151]">Last updated: May 2026.</p>
     </div>
   );
 }
