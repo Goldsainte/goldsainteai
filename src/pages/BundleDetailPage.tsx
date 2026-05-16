@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,10 +9,15 @@ import { ShareButton } from "@/components/ShareButton";
 import { Loader2, Layers } from "lucide-react";
 import NotFound from "@/pages/NotFound";
 import { getActiveAffiliateRef } from "@/hooks/useAffiliateRef";
+import { trackPurchaseConversionOnce } from "@/lib/analytics/conversions";
+import { getStoredGclid } from "@/lib/analytics/gclid";
 
 export default function BundleDetailPage() {
   const { id } = useParams();
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const purchasedFlag = searchParams.get("payment") === "success";
+  const checkoutSessionId = searchParams.get("session_id");
   const [loading, setLoading] = useState(true);
   const [bundle, setBundle] = useState<any>(null);
   const [trip, setTrip] = useState<any>(null);
@@ -88,9 +93,10 @@ export default function BundleDetailPage() {
         {
           body: {
             bundleId: bundle.id,
-            successUrl: `${origin}/bundle/${bundle.id}?payment=success`,
+            successUrl: `${origin}/bundle/${bundle.id}?payment=success&session_id={CHECKOUT_SESSION_ID}`,
             cancelUrl: `${origin}/bundle/${bundle.id}?payment=cancelled`,
             affiliateCode: getActiveAffiliateRef() || undefined,
+            gclid: getStoredGclid() || undefined,
           },
         }
       );
@@ -101,6 +107,18 @@ export default function BundleDetailPage() {
       setBusy(false);
     }
   };
+
+  // Fire Google Ads purchase conversion once per checkout session
+  useEffect(() => {
+    if (!purchasedFlag || !bundle?.price) return;
+    const dedupKey = checkoutSessionId || `bundle_${bundle.id}`;
+    trackPurchaseConversionOnce(dedupKey, {
+      value: Number(bundle.price),
+      currency: bundle.currency || "USD",
+      transactionId: checkoutSessionId || bundle.id,
+      productType: "bundle",
+    });
+  }, [purchasedFlag, checkoutSessionId, bundle?.price, bundle?.currency, bundle?.id]);
 
   if (loading) {
     return (
