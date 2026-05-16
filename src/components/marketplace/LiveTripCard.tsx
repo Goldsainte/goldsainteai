@@ -142,6 +142,14 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
   const saveCount = trip.wishlist_count ?? 0;
   const bookingCount = trip.booking_count ?? 0;
 
+  const roleBadge = (() => {
+    const t = trip.creator_type;
+    if (!t || t === "platform") return null;
+    if (t === "agent") return { label: "Travel Agent", className: "bg-[#0c4d47]/8 text-[#0c4d47] ring-[#0c4d47]/20" };
+    if (t === "creator") return { label: "Creator", className: "bg-[#C7A962]/15 text-[#7a5a13] ring-[#C7A962]/30" };
+    return null;
+  })();
+
   return (
     <article
       onClick={() => navigate(`/marketplace/trip/${trip.slug || trip.id}`)}
@@ -196,7 +204,16 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
       {/* Content below image */}
       <div className="space-y-1 px-0.5">
         {trip.creator ? (
-          <CreatorAttribution creator={trip.creator} className="mb-1" />
+          <div className="mb-1 flex items-center gap-1.5">
+            <CreatorAttribution creator={trip.creator} />
+            {roleBadge && (
+              <span
+                className={`rounded-full px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider ring-1 ${roleBadge.className}`}
+              >
+                {roleBadge.label}
+              </span>
+            )}
+          </div>
         ) : trip.creator_type === "platform" ? (
           <div className="mb-1 flex items-center gap-1.5">
             <img
