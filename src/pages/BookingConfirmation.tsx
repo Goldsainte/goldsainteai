@@ -18,16 +18,58 @@ export default function BookingConfirmation() {
       navigate("/marketplace");
       return;
     }
+    let cancelled = false;
+    let attempts = 0;
+    const PENDING = new Set([
+      "pending",
+      "processing",
+      "payment_pending",
+      "deposit_pending",
+      "requires_action",
+      "requires_confirmation",
+    ]);
+
     const fetchBooking = async () => {
       const { data } = await supabase
         .from("trip_bookings")
-        .select("id, total_price, deposit_amount, deposit_percentage, currency, status, metadata, created_at")
+        .select(
+          "id, total_price, deposit_amount, deposit_percentage, currency, status, metadata, created_at"
+        )
         .eq("id", bookingId)
         .single();
+      if (cancelled) return;
       setBooking(data);
       setIsLoading(false);
+      // Poll until the webhook flips status out of a pending state.
+      // Max ~60s (30 * 2s) — covers typical Stripe webhook + 3DS latency.
+      if (data && PENDING.has(data.status) && attempts < 30) {
+        attempts += 1;
+        setTimeout(fetchBooking, 2000);
+      }
     };
     fetchBooking();
+
+    // Realtime fallback in case the webhook is faster than the next poll tick.
+    const channel = supabase
+      .channel(`booking-${bookingId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "trip_bookings",
+          filter: `id=eq.${bookingId}`,
+        },
+        (payload) => {
+          if (!cancelled && payload.new) setBooking(payload.new);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(channel);
+    };
   }, [bookingId, navigate]);
 
   // Fire Google Ads purchase conversion once per booking when the booking is
