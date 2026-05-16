@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Sparkles, ArrowLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronRight } from "lucide-react";
 
 export function MarketplaceHeader() {
   return (
@@ -33,7 +33,6 @@ export function MarketplaceHeader() {
               to="/post-trip"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0C4D47] px-6 py-3 text-sm font-semibold text-[#E5DFC6] shadow-sm transition hover:bg-[#073331] w-full sm:w-auto"
             >
-              <Sparkles className="h-4 w-4" />
               Post a Trip Request
             </Link>
 
