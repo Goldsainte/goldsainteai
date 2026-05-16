@@ -454,29 +454,7 @@ export function TripRequestDrawer({
                 </div>
               </div>
 
-              {/* Itinerary & files */}
-              <div className="flex flex-col rounded-2xl border border-[#E5DFC6] bg-white">
-                <div className="flex items-center justify-between border-b border-[#E5DFC6] px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-[#7A7151]" />
-                    <p className="text-xs font-semibold uppercase tracking-wide text-[#7A7151]">
-                      Itinerary & files
-                    </p>
-                  </div>
-                </div>
-                <div className="px-4 py-3 text-xs text-[#8C8470]">
-                  <p className="mb-2">
-                    Attach proposals, day-by-day itineraries, or PDFs for this
-                    trip.
-                  </p>
-                  <Button size="sm" variant="outline" disabled>
-                    Upload file
-                  </Button>
-                  <p className="mt-2 text-[10px] text-[#8C8470]">
-                    File upload coming soon
-                  </p>
-                </div>
-              </div>
+              {/* Itinerary & files — pending dedicated attachments UX */}
 
               {/* Booking & Payment */}
               <TripBookingPanel

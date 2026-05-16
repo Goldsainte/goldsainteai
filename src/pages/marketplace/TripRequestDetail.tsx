@@ -524,7 +524,46 @@ export default function TripRequestDetail() {
                         <div className="flex items-center justify-between gap-3 px-1">
                           <button
                             type="button"
-                            onClick={() => toast.info("Chat feature coming soon")}
+                            onClick={async () => {
+                              if (!user) {
+                                navigate("/auth");
+                                return;
+                              }
+                              const partnerId = (proposal as any).proposer_id;
+                              if (!partnerId) {
+                                toast.error("Unable to open chat — proposer info missing.");
+                                return;
+                              }
+                              try {
+                                const { data: existing } = await supabase
+                                  .from("user_conversations")
+                                  .select("id")
+                                  .eq("customer_id", user.id)
+                                  .eq("agent_id", partnerId)
+                                  .limit(1)
+                                  .maybeSingle();
+                                let conversationId = existing?.id;
+                                if (!conversationId) {
+                                  const { data: created, error: createErr } = await supabase
+                                    .from("user_conversations")
+                                    .insert({
+                                      customer_id: user.id,
+                                      agent_id: partnerId,
+                                      conversation_type: "trip_inquiry",
+                                      status: "active",
+                                      trip_id: request?.id ?? null,
+                                      trip_title: request?.destination ?? null,
+                                    })
+                                    .select("id")
+                                    .single();
+                                  if (createErr) throw createErr;
+                                  conversationId = created.id;
+                                }
+                                navigate(`/messages?conversation=${conversationId}`);
+                              } catch (err: any) {
+                                toast.error(err.message || "Failed to open conversation.");
+                              }
+                            }}
                             className="inline-flex items-center gap-1.5 rounded-full border border-border bg-white px-5 py-2.5 text-[14px] font-medium text-foreground hover:border-[hsl(var(--gold))] transition-colors"
                           >
                             Message

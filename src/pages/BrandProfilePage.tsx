@@ -9,6 +9,7 @@ import { BrandGallery } from "@/components/brand/BrandGallery";
 import { BrandProfileSidebar } from "@/components/brand/BrandProfileSidebar";
 import { BrandRegionsSection } from "@/components/brand/BrandRegionsSection";
 import { toast } from "sonner";
+import { SaveToStoryboardModal } from "@/components/discovery/SaveToStoryboardModal";
 
 interface BrandProfile {
   id: string;
@@ -115,11 +116,8 @@ export default function BrandProfilePage() {
     navigate(`/post-trip?brandId=${brand?.id}&brandName=${encodeURIComponent(brand?.brand_name || "")}`);
   };
 
-  const handleAddToStoryboard = () => {
-    toast.info("Save to storyboard", {
-      description: "This feature is coming soon!",
-    });
-  };
+  const [saveOpen, setSaveOpen] = useState(false);
+  const handleAddToStoryboard = () => setSaveOpen(true);
 
   if (loading) {
     return (
@@ -312,6 +310,17 @@ export default function BrandProfilePage() {
           </div>
         </div>
       </div>
+      {brand && (
+        <SaveToStoryboardModal
+          open={saveOpen}
+          onOpenChange={setSaveOpen}
+          imageUrl={brand.cover_image_url || brand.logo_url || ""}
+          title={brand.brand_name}
+          subtitle={brand.tagline || undefined}
+          sourceType="brand"
+          sourceId={brand.id}
+        />
+      )}
     </>
   );
 }

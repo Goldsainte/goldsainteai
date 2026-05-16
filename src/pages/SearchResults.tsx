@@ -899,25 +899,7 @@ if (minRating && searchType !== "restaurants") {
                   </SelectContent>
                 </Select>
 
-                {/* View Toggle */}
-                <div className="hidden sm:flex border rounded-lg">
-                  <Button
-                    variant={viewMode === "list" ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setViewMode("list")}
-                    className="rounded-r-none"
-                  >
-                    <List className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant={viewMode === "map" ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setViewMode("map")}
-                    className="rounded-l-none"
-                  >
-                    <Map className="h-4 w-4" />
-                  </Button>
-                </div>
+                {/* Map view temporarily disabled — list view only */}
               </div>
             </div>
 
@@ -1034,10 +1016,7 @@ if (minRating && searchType !== "restaurants") {
                               key={`transfer-${result.code || index}`}
                               transfer={result}
                               onBook={() => {
-                                toast({
-                                  title: "Transfer Booking",
-                                  description: "Transfer booking coming soon!",
-                                });
+                                navigate("/marketplace");
                               }}
                             />
                           );
