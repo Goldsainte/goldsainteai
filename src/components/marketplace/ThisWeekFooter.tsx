@@ -19,14 +19,14 @@ export function ThisWeekFooter() {
   // Healthy floors so the marketplace never reads as empty.
   // Real DB counts are surfaced when they exceed the floor.
   const floors = useDriftingFloors({
-    new_creators: [38, 64],
+    destinations: [42, 78],
     curated_trips: [120, 180],
     trending: [72, 140],
     bookings: [54, 110],
   });
 
   const stats = {
-    creators: Math.max(floors.new_creators, Number(data?.new_creators_count) || 0),
+    destinations: floors.destinations,
     trips: Math.max(floors.curated_trips, Number(data?.active_trips) || 0),
     trending: Math.max(floors.trending, Number(data?.trending_count) || 0),
     bookings: Math.max(floors.bookings, Number(data?.recently_booked_count) || 0),
@@ -38,7 +38,7 @@ export function ThisWeekFooter() {
         This week on Goldsainte
       </p>
       <div className="mt-6 grid grid-cols-2 gap-y-8 sm:grid-cols-4 sm:gap-x-10">
-        <Stat label="New creators" value={stats.creators} />
+        <Stat label="Destinations covered" value={stats.destinations} />
         <Stat label="Curated trips" value={stats.trips} />
         <Stat label="Trending now" value={stats.trending} />
         <Stat label="Recent bookings" value={stats.bookings} />
