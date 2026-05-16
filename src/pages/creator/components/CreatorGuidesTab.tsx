@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { confirmDialog } from "@/components/ui/confirm-dialog";
 import { Card } from "@/components/ui/card";
 import { Plus, Pencil, Eye, Trash2, Loader2, BookOpen } from "lucide-react";
 import { toast } from "sonner";
@@ -97,7 +98,13 @@ export function CreatorGuidesTab() {
   }, [user?.id]);
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Delete this guide? This cannot be undone.")) return;
+    const ok = await confirmDialog({
+      title: "Delete this guide?",
+      description: "This cannot be undone.",
+      confirmText: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
     const { error } = await supabase.from("itinerary_products").delete().eq("id", id);
     if (error) {
       toast.error("Could not delete: " + error.message);
