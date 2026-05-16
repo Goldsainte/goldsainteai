@@ -1392,14 +1392,8 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
                   />
                 </div>
 
-                <Button
-                  onClick={async () => {
-                    toast.info("Music story posting coming soon!");
-                  }}
-                  disabled={uploading}
-                  className="w-full"
-                >
-                  Post with Music
+                <Button disabled className="w-full" title="Music posts launching soon">
+                  Music posts launching soon
                 </Button>
               </>
             )}
