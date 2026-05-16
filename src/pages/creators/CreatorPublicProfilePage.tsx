@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { ArrowLeft, PenLine, LogIn, Settings, Plus, ArrowRight } from "lucide-react";
+import { ArrowLeft, PenLine, LogIn, Settings, Plus, ArrowRight, MoreHorizontal, Link2, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ReviewsList } from "@/components/profile/ReviewsList";
 import { WriteReviewModal } from "@/components/profile/WriteReviewModal";
@@ -9,6 +9,13 @@ import { CreatorHeroSection } from "@/components/creator/CreatorHeroSection";
 import { CreatorServicesSection } from "@/components/creator/CreatorServicesSection";
 import { CreatorAboutSection } from "@/components/creator/CreatorAboutSection";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { TikTokCarousel } from "@/components/TikTokEmbed";
@@ -223,25 +230,73 @@ export default function CreatorPublicProfilePage() {
               Back
             </button>
             <div className="flex items-center gap-2">
-              {isOwnProfile && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate("/creator-dashboard?tab=portfolio")}
-                  className="border-[#E5DFC6] text-[#0a2225] rounded-full"
-                >
-                  <Settings className="h-3.5 w-3.5 mr-1.5" />
-                  Edit Profile
-                </Button>
+              {isOwnProfile ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      aria-label="Profile options"
+                      className="font-primary border-[#E5DFC6] text-[#0a2225] rounded-full h-9 w-9 p-0"
+                    >
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="font-primary w-52 bg-white border-[#E5DFC6]">
+                    <DropdownMenuItem onClick={() => navigate("/creator-dashboard?tab=portfolio")}>
+                      <Settings className="h-3.5 w-3.5 mr-2" /> Edit profile
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        const url = creator.username
+                          ? `https://goldsainte.ai/@${creator.username}`
+                          : `https://goldsainte.ai/creators/${creator.id}`;
+                        navigator.clipboard.writeText(url);
+                        toast.success("Profile link copied");
+                      }}
+                    >
+                      <Link2 className="h-3.5 w-3.5 mr-2" /> Copy profile link
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() =>
+                        navigate(
+                          creator.username ? `/@${creator.username}` : `/creators/${creator.id}`
+                        )
+                      }
+                    >
+                      <Eye className="h-3.5 w-3.5 mr-2" /> Public preview
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <ShareButton
+                  url={creator.username ? `/@${creator.username}/shop` : `/creators/${creator.id}`}
+                  title={`${displayName} on Goldsainte`}
+                  description={bio || undefined}
+                />
               )}
-              <ShareButton
-                url={creator.username ? `/@${creator.username}/shop` : `/creators/${creator.id}`}
-                title={`${displayName} on Goldsainte`}
-                description={bio || undefined}
-              />
             </div>
           </div>
         </div>
+
+        {/* Owner banner (only visible to profile owner) */}
+        {isOwnProfile && (
+          <div className="border-b border-[#E5DFC6]/60 bg-[#F5F0E0]/60">
+            <div className="mx-auto max-w-5xl px-4 py-2.5 flex items-center justify-between gap-3 flex-wrap">
+              <p className="font-primary text-xs text-[#6B7280]">
+                <span className="font-medium text-[#0a2225]">Owner view</span>
+                <span className="hidden sm:inline"> · This is how travelers see your profile.</span>
+              </p>
+              <button
+                onClick={() => navigate("/creator-dashboard?tab=portfolio")}
+                className="font-primary text-xs font-medium text-[#0c4d47] hover:text-[#0a3d39] underline-offset-2 hover:underline"
+              >
+                Edit profile
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* ─── 1. HERO — Trust Layer ─── */}
         <CreatorHeroSection
@@ -375,10 +430,10 @@ export default function CreatorPublicProfilePage() {
         </div>
 
         {/* ─── 6. FINAL CTA ─── */}
-        <div className="bg-white">
-          <div className="mx-auto max-w-5xl px-4 py-16 md:py-24 text-center">
-            <GoldDivider />
-            {!isOwnProfile ? (
+        {!isOwnProfile && (
+          <div className="bg-white">
+            <div className="mx-auto max-w-5xl px-4 py-16 md:py-24 text-center">
+              <GoldDivider />
               <div className="mt-10">
                 <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-3">
                   Start Your Journey With {firstName}
@@ -388,50 +443,17 @@ export default function CreatorPublicProfilePage() {
                 </p>
                 <Button
                   onClick={handleRequestTrip}
-                  className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-10 h-12 text-sm font-medium shadow-sm"
+                  className="font-primary bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-10 h-12 text-sm font-medium shadow-sm"
                 >
                   Request a Trip
                 </Button>
-                <p className="text-[10px] text-[#9CA3AF] mt-3">
+                <p className="font-primary text-[10px] text-[#9CA3AF] mt-3">
                   No commitment · Delivered in 24–48 hours
                 </p>
               </div>
-            ) : (
-              <div className="mt-10">
-                <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-3">
-                  Your Public Profile
-                </h2>
-                <p className="font-primary text-sm text-[#6B7280] mb-2 max-w-md mx-auto">
-                  This is how travelers see your profile.
-                </p>
-                <p className="font-primary text-xs text-[#9CA3AF] mb-8 max-w-md mx-auto">
-                  Visitors will see your services, trips, and reviews here. Share your link to start receiving requests.
-                </p>
-                <div className="flex flex-wrap items-center justify-center gap-3">
-                  <Button
-                    onClick={() => navigate('/creator-dashboard?tab=settings')}
-                    className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-8 h-12 text-sm font-medium shadow-sm"
-                  >
-                    Edit profile
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      const url = creator.username
-                        ? `https://goldsainte.ai/@${creator.username}`
-                        : `https://goldsainte.ai/creators/${creator.id}`;
-                      navigator.clipboard.writeText(url);
-                      toast.success("Profile link copied", { description: url });
-                    }}
-                    variant="outline"
-                    className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#FDF9F0] rounded-full px-8 h-12 text-sm font-medium"
-                  >
-                    Copy profile link
-                  </Button>
-                </div>
-              </div>
-            )}
+            </div>
           </div>
-        </div>
+        )}
 
       </div>
     </>
