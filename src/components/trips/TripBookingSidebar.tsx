@@ -50,6 +50,13 @@ export function TripBookingSidebar({
     }).format(price);
   };
 
+  // Canonical guest-side platform fee: 3.5% added on top of the deposit.
+  // (Host-side 3.5% is deducted from payout — handled server-side.)
+  const GUEST_FEE_RATE = 0.035;
+  const depositBase = Math.round(pricePerPerson * (depositPercentage / 100));
+  const guestServiceFee = Math.round(depositBase * GUEST_FEE_RATE * 100) / 100;
+  const depositTotal = depositBase + guestServiceFee;
+
   const isPlatformTrip = creatorType === "platform" && !agentId && !creatorId;
   const partnerId = agentId || creatorId;
   const partnerRole = agentId ? "agent" : (creatorType || "creator");
@@ -73,8 +80,8 @@ export function TripBookingSidebar({
 
     setIsLoading(true);
     try {
-      const depositAmount = Math.round(pricePerPerson * (depositPercentage / 100));
-      const amountCents = Math.round(depositAmount * 100);
+      const depositAmount = depositBase;
+      const amountCents = Math.round(depositTotal * 100);
       const resolvedPartnerId = agentId || creatorId || null;
 
       const { data: booking, error: bookingError } = await supabase
@@ -90,7 +97,12 @@ export function TripBookingSidebar({
           status: "deposit_pending",
           partner_payout: 0,
           platform_commission: 0,
-          metadata: { trip_id: tripId, source: "marketplace_booking" },
+          metadata: {
+            trip_id: tripId,
+            source: "marketplace_booking",
+            guest_service_fee: guestServiceFee,
+            guest_service_fee_rate: GUEST_FEE_RATE,
+          },
         } as any)
         .select("id")
         .single();
@@ -253,9 +265,24 @@ export function TripBookingSidebar({
             Reserve with {depositPercentage}% deposit
           </span>
         </div>
-        <p className="mt-1 text-xs text-[#6B7280]">
-          Flexible payment plans available at checkout
-        </p>
+        <div className="mt-3 space-y-1.5 text-xs text-[#4a4a4a]">
+          <div className="flex items-center justify-between">
+            <span>Deposit ({depositPercentage}%)</span>
+            <span>{formatPrice(depositBase)}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span>Service fee (3.5%)</span>
+            <span>{formatPrice(guestServiceFee)}</span>
+          </div>
+          <div className="flex items-center justify-between border-t border-[#E5DFC6] pt-1.5 font-semibold text-[#0a2225]">
+            <span>Due today</span>
+            <span>{formatPrice(depositTotal)}</span>
+          </div>
+          <p className="pt-1 text-[11px] text-[#7A7151]">
+            Remaining balance of {formatPrice(pricePerPerson - depositBase)} is due before
+            departure. Flexible payment plans available at checkout.
+          </p>
+        </div>
       </div>
 
       {/* How It Works */}
