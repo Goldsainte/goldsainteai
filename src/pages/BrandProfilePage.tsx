@@ -310,6 +310,17 @@ export default function BrandProfilePage() {
           </div>
         </div>
       </div>
+      {brand && (
+        <SaveToStoryboardModal
+          open={saveOpen}
+          onOpenChange={setSaveOpen}
+          imageUrl={brand.hero_image_url || brand.logo_url || ""}
+          title={brand.brand_name}
+          subtitle={brand.tagline || undefined}
+          sourceType="brand"
+          sourceId={brand.id}
+        />
+      )}
     </>
   );
 }
