@@ -433,10 +433,8 @@ function TripRow({ trip, muted }: TripRowProps) {
 
 function TripRequestRow({ req, onDelete }: { req: TripRequestWithProposals; onDelete: (id: string) => void }) {
   const [isDeleting, setIsDeleting] = useState(false);
-  
-  // TEMPORARY FIX: Set proposals to empty array since nested select was removed
-  // Proposal counts will show as 0 until we fix the database relationship or add separate query
-  const proposals: { status: string }[] = [];
+
+  const proposals = req.trip_proposals ?? [];
   const proposalCount = proposals.length;
   const acceptedCount = proposals.filter(
     (p) => p.status === "accepted"
