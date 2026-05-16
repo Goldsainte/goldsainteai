@@ -143,7 +143,42 @@ export default function MyTripsPage() {
             console.error("❌ [MyTripsPage] Error loading trip_requests:", requestsError);
             setRequests([]);
           } else {
-            setRequests((requestsData ?? []) as any);
+            const baseRequests = (requestsData ?? []) as any[];
+
+            // Enrich each trip request with its proposals via a separate query
+            // (the nested select was removed because no FK exists between
+            // trip_proposals and trip_requests).
+            const requestIds = baseRequests.map((r) => r.id);
+            let enriched = baseRequests;
+            if (requestIds.length > 0) {
+              const { data: proposalsData, error: proposalsError } =
+                await supabase
+                  .from("trip_proposals")
+                  .select("id, trip_request_id, status, created_at")
+                  .in("trip_request_id", requestIds)
+                  .order("created_at", { ascending: false });
+
+              if (proposalsError) {
+                console.error(
+                  "❌ [MyTripsPage] Error loading trip_proposals:",
+                  proposalsError,
+                );
+              } else {
+                const grouped = (proposalsData ?? []).reduce<
+                  Record<string, { status: string }[]>
+                >((acc, p) => {
+                  if (!p.trip_request_id) return acc;
+                  (acc[p.trip_request_id] ||= []).push({ status: p.status });
+                  return acc;
+                }, {});
+                enriched = baseRequests.map((r) => ({
+                  ...r,
+                  trip_proposals: grouped[r.id] ?? [],
+                }));
+              }
+            }
+
+            setRequests(enriched as any);
           }
         }
       } catch (err: any) {
