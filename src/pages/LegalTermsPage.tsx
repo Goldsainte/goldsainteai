@@ -21,26 +21,77 @@ export default function LegalTermsPage() {
       <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6 space-y-3 shadow-sm">
         <h2 className="text-lg font-semibold text-[#0a2225]">Using Goldsainte</h2>
         <p className="text-sm leading-relaxed text-[#4a4a4a]">
-          TODO: Add details about account eligibility, responsible use, and how
-          we handle changes to the service.
+          You must be at least 18 years old and able to enter into a binding
+          contract to use Goldsainte. You agree to provide accurate
+          information, keep your account credentials secure, and use the
+          platform only for lawful purposes. Goldsainte is a curated
+          marketplace that connects travelers with independent travel agents,
+          creators, and third-party suppliers. We are not the airline, hotel,
+          tour operator, or supplier for any trip booked through the
+          platform. We may update these terms from time to time; material
+          changes will be communicated by email or in-product notice at least
+          14 days before they take effect.
         </p>
       </section>
 
       <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6 space-y-3 shadow-sm">
-        <h2 className="text-lg font-semibold text-[#0a2225]">Content & conduct</h2>
+        <h2 className="text-lg font-semibold text-[#0a2225]">Content &amp; conduct</h2>
         <p className="text-sm leading-relaxed text-[#4a4a4a]">
-          TODO: Outline acceptable use, intellectual property, and what happens
-          if content is flagged for review.
+          You retain ownership of the content you post (storyboards, photos,
+          messages) and grant Goldsainte a worldwide, non-exclusive licence
+          to host, display, and distribute it on the platform. You must not
+          post content that is unlawful, infringing, fraudulent, harassing,
+          or that solicits off-platform payment or contact. All communication
+          and payment relating to a trip must stay on Goldsainte; sharing
+          phone numbers, personal email, bank details, or external payment
+          links is grounds for suspension and forfeits buyer/seller
+          protection. We may remove content, suspend accounts, or terminate
+          access at our discretion for violations of these terms or our
+          Community Guidelines.
         </p>
       </section>
 
       <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6 space-y-3 shadow-sm">
-        <h2 className="text-lg font-semibold text-[#0a2225]">Payments & bookings</h2>
+        <h2 className="text-lg font-semibold text-[#0a2225]">Payments &amp; bookings</h2>
         <p className="text-sm leading-relaxed text-[#4a4a4a]">
-          TODO: Describe how bookings, fees, and payouts are handled, including
-          Stripe Connect readiness.
+          All payments are processed by Stripe. Goldsainte charges a 7%
+          platform fee on each transaction (3.5% deducted from the
+          professional's payout and 3.5% added to the traveler's total).
+          Funds are held in escrow and released to the travel professional
+          per the milestones agreed in the booking. Refund and cancellation
+          eligibility is governed by supplier rules and the travel
+          professional's terms — see our{' '}
+          <a href="/cancellation-refund-policy" className="underline">
+            Cancellation &amp; Refund Policy
+          </a>{' '}
+          for full detail. Chargebacks initiated outside our dispute process
+          may result in account suspension. Travel professionals receive
+          payouts via Stripe Connect and are responsible for their own tax
+          obligations.
         </p>
       </section>
+
+      <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6 space-y-3 shadow-sm">
+        <h2 className="text-lg font-semibold text-[#0a2225]">Liability &amp; disputes</h2>
+        <p className="text-sm leading-relaxed text-[#4a4a4a]">
+          Goldsainte's liability is limited to the platform fee paid for the
+          relevant booking. We are not liable for the acts, omissions, or
+          performance of independent travel professionals or third-party
+          suppliers, nor for events outside our reasonable control
+          (including travel disruptions, weather, or government action).
+          Disputes should first be raised through our in-platform resolution
+          centre. These terms are governed by the laws of England and Wales,
+          and any unresolved dispute will be subject to the exclusive
+          jurisdiction of its courts.
+        </p>
+      </section>
+
+      <p className="text-xs text-[#7A7151]">
+        Last updated: May 2026. Contact:{' '}
+        <a href="mailto:legal@goldsainte.ai" className="underline">
+          legal@goldsainte.ai
+        </a>
+      </p>
     </div>
   );
 }
