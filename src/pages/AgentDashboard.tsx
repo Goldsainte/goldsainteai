@@ -5,7 +5,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { SimpleHeader } from "@/components/SimpleHeader";
 import { Footer } from "@/components/Footer";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Briefcase, MapPin, DollarSign, Clock, MessageSquare, CheckCircle, Sparkles, Shield, Plus, Hourglass } from "lucide-react";
+import { Briefcase, Clock, Shield, Plus, Hourglass } from "lucide-react";
 import { toast } from "sonner";
 import { JobMessaging } from "@/components/JobMessaging";
 import { StripeConnectOnboarding } from "@/components/StripeConnectOnboarding";
@@ -30,6 +30,8 @@ import { BackButton } from "@/components/ui/BackButton";
 import { GettingStartedChecklist } from "@/components/onboarding/GettingStartedChecklist";
 import { CreatorPerformanceTab } from "./creator/components/CreatorPerformanceTab";
 import { Link } from "react-router-dom";
+import { AgentAvailableJobsTab } from "./agent/components/AgentAvailableJobsTab";
+import { AgentMyBidsTab } from "./agent/components/AgentMyBidsTab";
 
 export default function AgentDashboard() {
   const { user, isLoading: authLoading } = useAuth();
@@ -446,134 +448,34 @@ export default function AgentDashboard() {
             <div className="pointer-events-none absolute right-0 top-0 h-11 w-12 bg-gradient-to-l from-[#FDF9F0] to-transparent md:hidden" />
           </div>
 
-          <TabsContent value="available" className="space-y-4">
-            {jobs.length === 0 ? (
-              <div className="bg-white border border-[#E5DFC6] rounded-2xl p-12 text-center">
-                <h3 className="font-secondary text-2xl text-[#0a2225] mb-2">No trip requests available</h3>
-                <p className="text-sm text-[#6B7280]">Check back later for new opportunities.</p>
-              </div>
-            ) : (
-              jobs.map((job) => (
-                <div key={job.id} className="bg-white border border-[#E5DFC6] rounded-2xl p-6 transition-shadow hover:shadow-md">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="pr-4">
-                      <h3 className="font-secondary text-xl text-[#0a2225] mb-1">{job.title}</h3>
-                      <p className="text-sm text-[#6B7280]">{job.description}</p>
-                    </div>
-                    <span className="inline-flex items-center rounded-full bg-[#FDF9F0] border border-[#E5DFC6] px-3 py-1 text-xs text-[#0a2225] whitespace-nowrap">{job.booking_type}</span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-4 mb-6 text-sm text-[#0a2225]">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-[#0c4d47]" />
-                      <span>{job.destination}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="h-4 w-4 text-[#0c4d47]" />
-                      <span>${job.budget_min} – ${job.budget_max}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-[#0c4d47]" />
-                      <span>{new Date(job.created_at).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => {
-                      if (!agent.is_verified) {
-                        toast.error('Your application must be approved before you can place bids');
-                        return;
-                      }
-                      setSelectedJob(job);
-                      setIsBidDialogOpen(true);
-                    }}
-                    disabled={!agent.is_verified}
-                    className="w-full rounded-full bg-[#0c4d47] px-6 py-3 text-sm font-medium text-[#E5DFC6] hover:bg-[#0a3d39] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {agent.is_verified ? 'Submit Proposal' : 'Awaiting Approval'}
-                  </button>
-                </div>
-              ))
-            )}
+          <TabsContent value="available">
+            <AgentAvailableJobsTab
+              jobs={jobs}
+              isVerified={!!agent.is_verified}
+              onSelectJob={(job) => {
+                setSelectedJob(job);
+                setIsBidDialogOpen(true);
+              }}
+            />
           </TabsContent>
 
-          <TabsContent value="my-bids" className="space-y-4">
-            {myBids.length === 0 ? (
-              <div className="bg-white border border-[#E5DFC6] rounded-2xl p-12 text-center">
-                <h3 className="font-secondary text-2xl text-[#0a2225] mb-2">No proposals yet</h3>
-                <p className="text-sm text-[#6B7280]">Submit your first proposal from the Available Jobs tab.</p>
-              </div>
-            ) : (
-              myBids.map((bid) => (
-                <div key={bid.id} className="bg-white border border-[#E5DFC6] rounded-2xl p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="pr-4">
-                      <h3 className="font-secondary text-xl text-[#0a2225] mb-1">{bid.marketplace_jobs?.title}</h3>
-                      <p className="text-sm text-[#6B7280]">{bid.marketplace_jobs?.destination}</p>
-                    </div>
-                    <div className="flex flex-wrap gap-2 justify-end">
-                      <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs whitespace-nowrap ${
-                        bid.status === 'accepted' ? 'bg-[#0c4d47] text-[#E5DFC6]' :
-                        bid.status === 'rejected' ? 'bg-[#fce7e6] text-[#a02622]' :
-                        'bg-[#FDF9F0] border border-[#E5DFC6] text-[#0a2225]'
-                      }`}>{bid.status}</span>
-                      {bid.marketplace_jobs?.status && (
-                        <span className="inline-flex items-center rounded-full bg-[#FDF9F0] border border-[#E5DFC6] px-3 py-1 text-xs text-[#0a2225] whitespace-nowrap">
-                          Trip: {bid.marketplace_jobs.status.replace('_', ' ')}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-[#6B7280]">Your proposal:</span>
-                      <span className="font-medium text-[#0a2225]">{bid.currency} {bid.proposed_price}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#6B7280]">Completion time:</span>
-                      <span className="text-[#0a2225]">{bid.estimated_completion_days} days</span>
-                    </div>
-                    <p className="text-sm text-[#0a2225] mt-3 leading-relaxed">{bid.proposal_details}</p>
-
-                    {bid.status === 'accepted' && (
-                      <div className="flex flex-wrap gap-2 mt-5">
-                        <button
-                          onClick={() => {
-                            setSelectedJobForMessaging(bid.marketplace_jobs);
-                            setIsMessagingDialogOpen(true);
-                          }}
-                          className="flex-1 min-w-[160px] inline-flex items-center justify-center gap-2 rounded-full border border-[#0a2225] px-5 py-2.5 text-sm text-[#0a2225] hover:bg-[#0a2225] hover:text-white transition-colors"
-                        >
-                          <MessageSquare className="h-4 w-4" />
-                          Message traveler
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSelectedBidForDetails(bid);
-                            setBidDetailsOpen(true);
-                          }}
-                          className="flex-1 min-w-[160px] inline-flex items-center justify-center gap-2 rounded-full border border-[#0a2225] px-5 py-2.5 text-sm text-[#0a2225] hover:bg-[#0a2225] hover:text-white transition-colors"
-                        >
-                          <DollarSign className="h-4 w-4" />
-                          Payment details
-                        </button>
-                        {bid.marketplace_jobs?.status === 'in_progress' && (
-                          <button
-                            onClick={() => {
-                              setCompletionJob(bid.marketplace_jobs);
-                              setCompletionModalOpen(true);
-                            }}
-                            className="flex-1 min-w-[160px] inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-5 py-2.5 text-sm text-[#E5DFC6] hover:bg-[#0a3d39] transition-colors"
-                          >
-                            <CheckCircle className="h-4 w-4" />
-                            Submit completion
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))
-            )}
-            </TabsContent>
+          <TabsContent value="my-bids">
+            <AgentMyBidsTab
+              myBids={myBids}
+              onMessage={(job) => {
+                setSelectedJobForMessaging(job);
+                setIsMessagingDialogOpen(true);
+              }}
+              onPaymentDetails={(bid) => {
+                setSelectedBidForDetails(bid);
+                setBidDetailsOpen(true);
+              }}
+              onSubmitCompletion={(job) => {
+                setCompletionJob(job);
+                setCompletionModalOpen(true);
+              }}
+            />
+          </TabsContent>
 
             <TabsContent value="creator-collabs">
               {agent && (
