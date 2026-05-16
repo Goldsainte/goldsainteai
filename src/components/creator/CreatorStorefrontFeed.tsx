@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Layers, MoreVertical, Edit2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { confirmDialog } from "@/components/ui/confirm-dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { deleteStoryboard } from "@/services/storyboardsService";
 import { toast } from "sonner";
@@ -95,7 +96,13 @@ export function CreatorStorefrontFeed({
                   <DropdownMenuItem
                     className="text-red-500 focus:text-red-600"
                     onClick={async () => {
-                      if (!window.confirm(`Delete "${sb.title}"? This cannot be undone.`)) return;
+                      const ok = await confirmDialog({
+                        title: `Delete "${sb.title}"?`,
+                        description: "This cannot be undone.",
+                        confirmText: "Delete",
+                        destructive: true,
+                      });
+                      if (!ok) return;
                       try {
                         await deleteStoryboard(sb.id);
                         toast.success("Storyboard deleted");

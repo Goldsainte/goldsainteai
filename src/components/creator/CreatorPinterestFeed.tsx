@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Plus, X, ArrowRight, Layers, MoreVertical, Edit2, Trash2, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { confirmDialog } from "@/components/ui/confirm-dialog";
 import { CATEGORY_KEYWORDS } from "@/components/ui/CategoryChips";
 import { RefinementChips } from "@/components/discovery/RefinementChips";
 import { DiscoveryFeed } from "@/components/discovery/DiscoveryFeed";
@@ -259,7 +260,13 @@ export function CreatorPinterestFeed({
                     <DropdownMenuItem
                       className="text-red-400 focus:text-red-300"
                       onClick={async () => {
-                        if (!window.confirm(`Delete "${sb.title}"? This cannot be undone.`)) return;
+                        const ok = await confirmDialog({
+                          title: `Delete "${sb.title}"?`,
+                          description: "This cannot be undone.",
+                          confirmText: "Delete",
+                          destructive: true,
+                        });
+                        if (!ok) return;
                         try {
                           await deleteStoryboard(sb.id);
                           toast.success("Storyboard deleted");

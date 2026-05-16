@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/button";
+import { confirmDialog } from "@/components/ui/confirm-dialog";
 
 function formatMoney(amount: number | null | undefined, currency?: string | null) {
   if (!amount) return "—";
@@ -444,7 +445,14 @@ function TripRequestRow({ req, onDelete }: { req: TripRequestWithProposals; onDe
     e.preventDefault();
     e.stopPropagation();
     
-    if (!confirm("Are you sure you want to delete this trip request? This action cannot be undone.")) {
+    if (
+      !(await confirmDialog({
+        title: "Delete trip request?",
+        description: "This action cannot be undone.",
+        confirmText: "Delete",
+        destructive: true,
+      }))
+    ) {
       return;
     }
 

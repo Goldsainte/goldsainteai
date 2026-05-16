@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { confirmDialog } from "@/components/ui/confirm-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { ChevronLeft, ChevronRight, X, Eye, Archive, Volume2, VolumeX, Trash, Music2 } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -383,7 +384,12 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
 
   const handleDeleteMoment = async () => {
     if (!currentUserId || currentUserId !== currentMoment.user_id) return;
-    const confirmDel = window.confirm('Delete this story?');
+    const confirmDel = await confirmDialog({
+      title: 'Delete this story?',
+      description: 'This action cannot be undone.',
+      confirmText: 'Delete',
+      destructive: true,
+    });
     if (!confirmDel) return;
     try {
       const { error } = await supabase.from('moments').delete().eq('id', currentMoment.id);

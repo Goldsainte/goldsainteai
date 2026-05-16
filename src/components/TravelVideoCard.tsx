@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, memo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { confirmDialog } from "@/components/ui/confirm-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircle, Share2, MoreVertical, MapPin, ExternalLink, Edit, Volume2, VolumeX, Repeat2, Send, Bookmark, Users, Music2, TrendingUp, Play, Pause, Trash2, Gift } from "lucide-react";
@@ -133,9 +134,13 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const isOwnPost = user?.id === post.user_id;
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this Sainte? This action cannot be undone.')) {
-      return;
-    }
+    const ok = await confirmDialog({
+      title: 'Delete this Sainte?',
+      description: 'This action cannot be undone.',
+      confirmText: 'Delete',
+      destructive: true,
+    });
+    if (!ok) return;
 
     try {
       const { error } = await supabase
