@@ -10,8 +10,8 @@ export function HowItWorksTimeline() {
     },
     {
       label: "Step 2",
-      title: "Madison drafts your storyboard",
-      body: "Goldsainte AI sketches a visual storyboard with destinations, hotel vibes, and experiences that match your brief.",
+      title: "We craft your storyboard",
+      body: "Your travel concierge sketches a visual itinerary tailored to your style, budget, and pace. You review, edit, and approve.",
     },
     {
       label: "Step 3",
