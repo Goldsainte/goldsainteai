@@ -42,6 +42,11 @@ serve(async (req) => {
       typeof affiliateCodeRaw === "string" && /^[a-zA-Z0-9_-]{3,64}$/.test(affiliateCodeRaw)
         ? affiliateCodeRaw
         : undefined;
+    const gclidRaw: unknown = body.gclid;
+    const gclid =
+      typeof gclidRaw === "string" && gclidRaw.length > 0 && gclidRaw.length <= 256
+        ? gclidRaw
+        : undefined;
     if (!bundleId || !successUrl || !cancelUrl) {
       return new Response(
         JSON.stringify({ error: "bundleId, successUrl and cancelUrl are required" }),
@@ -75,6 +80,7 @@ serve(async (req) => {
       creator_id: bundle.creator_id,
     };
     if (affiliateCode) meta.affiliate_code = affiliateCode;
+    if (gclid) meta.gclid = gclid;
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
