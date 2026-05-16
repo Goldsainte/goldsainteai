@@ -116,7 +116,7 @@
         "body": "Füge TikToks, Reels, Stimmungsbilder oder Notizen ein. Erzähl uns, wer reist, wann und welches Gefühl die Reise vermitteln soll."
       },
       "step2": {
-        "title": "Madison entwirft dein Storyboard",
+        "title": "Wir gestalten dein Storyboard",
         "body": "Unser KI-Concierge übersetzt deine Inspiration in ein visuelles Storyboard mit Reisezielen, Hotelambiente und kuratierten Erlebnissen, die zu deiner Ästhetik passen."
       },
       "step3": {
@@ -294,7 +294,7 @@
     "storyboards": {
       "title": "Handverlesene Reisen, bereit zur Buchung oder Personalisierung",
       "description": "Entdecke von Experten gestaltete Reisen, die du sofort buchen kannst — oder personalisiere sie mit einem zertifizierten Spezialisten.",
-      "startWithMadison": "Starte ein Storyboard mit Madison",
+      "startWithMadison": "Starte ein Storyboard",
       "exploreStoryboards": "Entdecke die Creator- & Reiseagenten-Marktplatz-Kollektion",
       "exploreAll": "Alle Reisen entdecken",
       "creatorAgentCollab": "Creator + Agent-Kollaboration",
@@ -304,7 +304,7 @@
       "title": "Wähle, wie du Goldsainte beitrittst",
       "traveler": {
         "title": "Als Reisender registrieren",
-        "body": "Erstelle dein Profil, speichere Inspiration und lass Madison dir helfen, deine Traumreisen zu planen.",
+        "body": "Erstelle dein Profil, speichere Inspiration und lass unseren Concierge dir helfen, deine Traumreisen zu planen.",
         "button": "Loslegen"
       },
       "joinAsCreator": {

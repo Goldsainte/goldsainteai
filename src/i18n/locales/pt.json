@@ -116,7 +116,7 @@
         "body": "Cole TikToks, Reels, imagens de mood ou notas. Diga-nos quem viaja, quando, e o sentimento que quer para a viagem."
       },
       "step2": {
-        "title": "Madison cria seu storyboard",
+        "title": "Criamos seu storyboard",
         "body": "Nosso concierge IA traduz sua inspiração em um storyboard visual com destinos, vibes de hotel e experiências curadas que combinam com sua estética."
       },
       "step3": {
@@ -294,7 +294,7 @@
     "storyboards": {
       "title": "Viagens Selecionadas, Prontas para Reservar ou Personalizar",
       "description": "Explore viagens projetadas por especialistas que você pode reservar instantaneamente — ou personalize com um especialista certificado.",
-      "startWithMadison": "Comece um storyboard com Madison",
+      "startWithMadison": "Comece um storyboard",
       "exploreStoryboards": "Explore a Coleção do Marketplace de Criadores e Agentes",
       "exploreAll": "Explorar Todas as Viagens",
       "creatorAgentCollab": "Colaboração Criador + Agente",
@@ -304,7 +304,7 @@
       "title": "Escolha como entrar na Goldsainte",
       "traveler": {
         "title": "Cadastre-se como viajante",
-        "body": "Crie seu perfil, salve inspiração e deixe a Madison ajudar a planejar suas viagens dos sonhos.",
+        "body": "Crie seu perfil, salve inspiração e deixe nosso concierge ajudar a planejar suas viagens dos sonhos.",
         "button": "Começar"
       },
       "joinAsCreator": {
