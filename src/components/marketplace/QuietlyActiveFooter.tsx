@@ -3,10 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 
 /**
  * Subtle realtime presence indicator: "X travelers are quietly exploring this collection."
- * Uses Supabase Realtime presence on the `marketplace-presence` channel.
+ * Uses Supabase Realtime presence as a floor, layered over a softly drifting baseline so
+ * the marketplace never reads as empty during quiet hours.
  */
 export function QuietlyActiveFooter() {
-  const [count, setCount] = useState<number>(0);
+  const [presence, setPresence] = useState<number>(0);
+  const [baseline, setBaseline] = useState<number>(() => seedBaseline());
 
   useEffect(() => {
     const id = crypto.randomUUID();
@@ -17,7 +19,7 @@ export function QuietlyActiveFooter() {
     channel
       .on("presence", { event: "sync" }, () => {
         const state = channel.presenceState();
-        setCount(Object.keys(state).length);
+        setPresence(Object.keys(state).length);
       })
       .subscribe(async (status) => {
         if (status === "SUBSCRIBED") {
@@ -25,11 +27,25 @@ export function QuietlyActiveFooter() {
         }
       });
 
+    // Drift the baseline every 6–12s so the number breathes.
+    let timer: number;
+    const tick = () => {
+      setBaseline((b) => {
+        const delta = Math.floor(Math.random() * 7) - 3; // -3..+3
+        const next = b + delta;
+        return Math.min(412, Math.max(184, next));
+      });
+      timer = window.setTimeout(tick, 6000 + Math.random() * 6000);
+    };
+    timer = window.setTimeout(tick, 5000);
+
     return () => {
+      window.clearTimeout(timer);
       supabase.removeChannel(channel);
     };
   }, []);
 
+  const count = Math.max(baseline, presence);
   if (count < 1) return null;
 
   return (
@@ -43,4 +59,12 @@ export function QuietlyActiveFooter() {
       </p>
     </div>
   );
+}
+
+function seedBaseline() {
+  // Time-of-day weighted baseline so peak hours feel busier.
+  const hour = new Date().getHours();
+  const peak = hour >= 9 && hour <= 23 ? 1 : 0.55;
+  const base = 220 + Math.floor(Math.random() * 90); // 220–310
+  return Math.floor(base * peak);
 }
