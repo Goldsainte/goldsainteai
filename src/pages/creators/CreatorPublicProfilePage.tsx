@@ -259,11 +259,12 @@ export default function CreatorPublicProfilePage() {
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                      onClick={() =>
-                        navigate(
-                          creator.username ? `/@${creator.username}` : `/creators/${creator.id}`
-                        )
-                      }
+                      onClick={() => {
+                        // Always use the canonical /creators/:id route — the @username
+                        // redirector can 404 if the username record is missing or cased
+                        // differently in the profiles table.
+                        window.open(`/creators/${creator.id}`, "_blank", "noopener,noreferrer");
+                      }}
                     >
                       <Eye className="h-3.5 w-3.5 mr-2" /> Public preview
                     </DropdownMenuItem>
