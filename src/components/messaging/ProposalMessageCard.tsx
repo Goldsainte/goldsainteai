@@ -63,6 +63,8 @@ export function ProposalMessageCard({
           cancelUrl: `${window.location.origin}/messages`,
           affiliateCode:
             (await import("@/hooks/useAffiliateRef")).getActiveAffiliateRef() || undefined,
+          gclid:
+            (await import("@/lib/analytics/gclid")).getStoredGclid() || undefined,
         },
       });
       if (error) throw error;
