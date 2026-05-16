@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { confirmDialog } from "@/components/ui/confirm-dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -536,10 +537,14 @@ export function PackageMarketingEditor() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => {
-                      if (confirm("Are you sure you want to delete this package?")) {
-                        deletePackageMutation.mutate(pkg.id);
-                      }
+                    onClick={async () => {
+                      const ok = await confirmDialog({
+                        title: "Delete this package?",
+                        description: "This action cannot be undone.",
+                        confirmText: "Delete",
+                        destructive: true,
+                      });
+                      if (ok) deletePackageMutation.mutate(pkg.id);
                     }}
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
