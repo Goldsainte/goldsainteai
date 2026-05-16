@@ -92,5 +92,11 @@ export default defineConfig(({ mode }) => {
       // discover them from public bundles.
       sourcemap: 'hidden',
     },
+    // Strip noisy debug calls from production bundles. console.warn /
+    // console.error / console.info are preserved so real problems still
+    // surface in production. Dev builds keep everything for debugging.
+    esbuild: mode === 'production'
+      ? { drop: ['debugger'], pure: ['console.log', 'console.debug', 'console.trace'] }
+      : undefined,
   };
 });
