@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { ArrowLeft, PenLine, LogIn, Settings, Plus, ArrowRight } from "lucide-react";
+import { ArrowLeft, PenLine, LogIn, Settings, Plus, ArrowRight, MoreHorizontal, Link2, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ReviewsList } from "@/components/profile/ReviewsList";
 import { WriteReviewModal } from "@/components/profile/WriteReviewModal";
@@ -9,6 +9,13 @@ import { CreatorHeroSection } from "@/components/creator/CreatorHeroSection";
 import { CreatorServicesSection } from "@/components/creator/CreatorServicesSection";
 import { CreatorAboutSection } from "@/components/creator/CreatorAboutSection";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { TikTokCarousel } from "@/components/TikTokEmbed";
