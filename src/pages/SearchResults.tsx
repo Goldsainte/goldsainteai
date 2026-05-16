@@ -1016,10 +1016,7 @@ if (minRating && searchType !== "restaurants") {
                               key={`transfer-${result.code || index}`}
                               transfer={result}
                               onBook={() => {
-                                toast({
-                                  title: "Transfer Booking",
-                                  description: "Transfer booking coming soon!",
-                                });
+                                navigate("/marketplace");
                               }}
                             />
                           );
