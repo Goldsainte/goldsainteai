@@ -8,6 +8,7 @@ import {
   type Storyboard 
 } from "@/services/storyboardsService";
 import { Button } from "@/components/ui/button";
+import { confirmDialog } from "@/components/ui/confirm-dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -60,7 +61,13 @@ export default function MyStoryboardsPage() {
   };
 
   const handleDeleteStoryboard = async (id: string, title: string) => {
-    if (!window.confirm(`Delete "${title}"? This action cannot be undone.`)) return;
+    const ok = await confirmDialog({
+      title: `Delete "${title}"?`,
+      description: "This action cannot be undone.",
+      confirmText: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
     
     try {
       await deleteStoryboard(id);
