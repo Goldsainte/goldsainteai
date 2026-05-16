@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { confirmDialog } from "@/components/ui/confirm-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -140,7 +141,13 @@ export default function PromoCodeManagement() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Delete this promo code?")) return;
+    const ok = await confirmDialog({
+      title: "Delete this promo code?",
+      description: "This action cannot be undone.",
+      confirmText: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
 
     try {
       const { error } = await supabase
