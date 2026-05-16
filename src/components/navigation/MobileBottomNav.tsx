@@ -12,9 +12,9 @@ export function MobileBottomNav() {
     const accountType = user.user_metadata?.account_type;
     switch (accountType) {
       case "creator":
-        return `/creator/${user.id}`;
+        return `/creators/${user.id}`;
       case "agent":
-        return "/agent-dashboard";
+        return `/agents/${user.id}`;
       default:
         return "/traveler";
     }
