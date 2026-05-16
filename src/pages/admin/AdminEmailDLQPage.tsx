@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { confirmDialog } from "@/components/ui/confirm-dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { RefreshCw, RotateCcw, X } from "lucide-react";
@@ -50,7 +51,13 @@ export default function AdminEmailDLQPage() {
   };
 
   const dismiss = async (row: DLQRow) => {
-    if (!confirm("Permanently dismiss this failed email?")) return;
+    const ok = await confirmDialog({
+      title: "Permanently dismiss this failed email?",
+      description: "It will be removed from the dead-letter queue.",
+      confirmText: "Dismiss",
+      destructive: true,
+    });
+    if (!ok) return;
     const key = `${row.queue_name}-${row.msg_id}`;
     setBusyId(key);
     const { error } = await (supabase as any).rpc("admin_dismiss_email_dlq", {
