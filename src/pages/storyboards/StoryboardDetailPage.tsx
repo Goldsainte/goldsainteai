@@ -15,6 +15,7 @@ import {
   type Storyboard,
 } from "@/services/storyboardsService";
 import { Button } from "@/components/ui/button";
+import { confirmDialog } from "@/components/ui/confirm-dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -200,7 +201,14 @@ export default function StoryboardDetailPage() {
   };
 
   const handleDeleteStoryboard = async () => {
-    if (!id || !window.confirm("Delete this entire storyboard? This cannot be undone.")) return;
+    if (!id) return;
+    const ok = await confirmDialog({
+      title: "Delete this storyboard?",
+      description: "This cannot be undone.",
+      confirmText: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
     setDeleting(true);
     try {
       await deleteStoryboard(id);
@@ -221,7 +229,13 @@ export default function StoryboardDetailPage() {
   };
 
   const handleDeleteItem = async (itemId: string) => {
-    if (!window.confirm("Remove this item from your storyboard?")) return;
+    const ok = await confirmDialog({
+      title: "Remove this item?",
+      description: "It will be removed from your storyboard.",
+      confirmText: "Remove",
+      destructive: true,
+    });
+    if (!ok) return;
     try {
       await removeStoryboardItem(itemId);
       setStoryboard(prev =>
