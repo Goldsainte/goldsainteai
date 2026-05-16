@@ -6,6 +6,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ConfirmDialogHost } from "@/components/ui/confirm-dialog";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
@@ -148,6 +149,7 @@ export default function App() {
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <ConfirmDialogHost />
           <InstallAppPrompt />
           <BrowserRouter>
             <ScrollToTop />
