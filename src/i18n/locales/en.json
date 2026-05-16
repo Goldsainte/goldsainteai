@@ -131,7 +131,7 @@
         "body": "Paste TikToks, Reels, mood images or notes. Tell us who's traveling, when, and the feeling you want the trip to hold."
       },
       "step2": {
-        "title": "Madison drafts your storyboard",
+        "title": "We craft your storyboard",
         "body": "Our AI concierge translates your inspiration into a visual storyboard with destinations, hotel vibes and curated experiences that match your aesthetic."
       },
       "step3": {
@@ -174,7 +174,7 @@
     "storyboards": {
       "title": "Handpicked Journeys, Ready to Book or Personalize",
       "description": "Explore expertly designed trips you can book instantly — or customize with a certified specialist to make them your own.",
-      "startWithMadison": "Start a storyboard with Madison",
+      "startWithMadison": "Start a storyboard",
       "exploreStoryboards": "Explore the Creator & Travel Agent Marketplace Collection",
       "exploreAll": "Explore All Journeys",
       "creatorAgentCollab": "Creator + Agent collab",
@@ -184,7 +184,7 @@
       "title": "Choose how you join Goldsainte",
       "traveler": {
         "title": "Sign up as a traveler",
-        "body": "Create your profile, save inspiration, and let Madison help plan your dream trips.",
+        "body": "Create your profile, save inspiration, and let our concierge help plan your dream trips.",
         "button": "Get started"
       },
       "joinAsCreator": {
@@ -338,7 +338,7 @@
     "shop": "Shop",
     "affiliateLinks": "Affiliate Links",
     "company": "Company",
-    "concierge": "Madison by Goldsainte AI",
+    "concierge": "Goldsainte Concierge",
     "about": "About"
   },
   "footer": {

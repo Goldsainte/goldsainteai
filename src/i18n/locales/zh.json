@@ -136,7 +136,7 @@
         "body": "粘贴TikTok、Reels、情绪图片或笔记。告诉我们谁出行、何时，以及您希望旅行带来的感觉。"
       },
       "step2": {
-        "title": "Madison起草您的故事板",
+        "title": "我们起草您的故事板",
         "body": "我们的AI礼宾将您的灵感翻译成视觉故事板，包含与您美学相符的目的地、酒店氛围和精选体验。"
       },
       "step3": {
@@ -294,7 +294,7 @@
     "storyboards": {
       "title": "精选旅程，可立即预订或个性化定制",
       "description": "探索专家设计的可即时预订的旅行——或与认证专家定制成专属于您的旅程。",
-      "startWithMadison": "与Madison开始一个故事板",
+      "startWithMadison": "开始一个故事板",
       "exploreStoryboards": "探索创作者与旅行代理市场系列",
       "exploreAll": "探索所有旅程",
       "creatorAgentCollab": "创作者+代理协作",
@@ -304,7 +304,7 @@
       "title": "选择您加入Goldsainte的方式",
       "traveler": {
         "title": "注册为旅行者",
-        "body": "创建您的个人资料，保存灵感，让Madison帮助规划您的梦想之旅。",
+        "body": "创建您的个人资料，保存灵感，让我们的礼宾帮助规划您的梦想之旅。",
         "button": "开始"
       },
       "joinAsCreator": {

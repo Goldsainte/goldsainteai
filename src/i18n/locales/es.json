@@ -136,7 +136,7 @@
         "body": "Pega TikToks, Reels, imágenes de inspiración o notas. Cuéntanos quién viaja, cuándo y la sensación que deseas que tenga el viaje."
       },
       "step2": {
-        "title": "Madison crea tu storyboard",
+        "title": "Creamos tu storyboard",
         "body": "Nuestra IA concierge traduce tu inspiración en un storyboard visual con destinos, ambientes de hotel y experiencias curadas que coinciden con tu estética."
       },
       "step3": {
@@ -294,7 +294,7 @@
     "storyboards": {
       "title": "Viajes Seleccionados, Listos para Reservar o Personalizar",
       "description": "Explora viajes diseñados por expertos que puedes reservar al instante — o personalizarlos con un especialista certificado.",
-      "startWithMadison": "Comienza un storyboard con Madison",
+      "startWithMadison": "Comienza un storyboard",
       "exploreStoryboards": "Explora la Colección del Mercado de Creadores y Agentes",
       "exploreAll": "Explorar Todos los Viajes",
       "creatorAgentCollab": "Colaboración Creador + Agente",
@@ -304,7 +304,7 @@
       "title": "Elige cómo te unes a Goldsainte",
       "traveler": {
         "title": "Regístrate como viajero",
-        "body": "Crea tu perfil, guarda inspiración y deja que Madison te ayude a planificar tus viajes soñados.",
+        "body": "Crea tu perfil, guarda inspiración y deja que nuestro concierge te ayude a planificar tus viajes soñados.",
         "button": "Comenzar"
       },
       "joinAsCreator": {
