@@ -311,7 +311,7 @@ export default function BrandCollectionDetailPage() {
                       loading="lazy"/>
                     ) : (
                       <div className="flex h-full items-center justify-center text-xs text-[#8C8470]">
-                        Preview coming soon
+                        {item.title}
                       </div>
                     )}
                   </div>
