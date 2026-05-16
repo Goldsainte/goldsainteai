@@ -113,14 +113,10 @@ export function AgentAnalyticsDashboard({ agentId }: AgentAnalyticsDashboardProp
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {[...Array(6)].map((_, i) => (
-          <Card key={i}>
-            <CardHeader className="pb-2">
-              <div className="h-4 bg-muted rounded animate-pulse" />
-            </CardHeader>
-            <CardContent>
-              <div className="h-8 bg-muted rounded animate-pulse" />
-            </CardContent>
-          </Card>
+          <div key={i} className="bg-white border border-[#E5DFC6] rounded-2xl p-6">
+            <div className="h-4 bg-[#FDF9F0] rounded animate-pulse mb-3" />
+            <div className="h-8 bg-[#FDF9F0] rounded animate-pulse" />
+          </div>
         ))}
       </div>
     );
@@ -129,16 +125,14 @@ export function AgentAnalyticsDashboard({ agentId }: AgentAnalyticsDashboardProp
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {statCards.map((stat) => (
-        <Card key={stat.title}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-            <stat.icon className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stat.value}</div>
-            <p className="text-xs text-muted-foreground">{stat.description}</p>
-          </CardContent>
-        </Card>
+        <div key={stat.title} className="bg-white border border-[#E5DFC6] rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs uppercase tracking-wider text-[#6B7280]">{stat.title}</p>
+            <stat.icon className="h-4 w-4 text-[#0c4d47]" />
+          </div>
+          <div className="font-secondary text-3xl text-[#0a2225] mb-1">{stat.value}</div>
+          <p className="text-xs text-[#6B7280]">{stat.description}</p>
+        </div>
       ))}
     </div>
   );

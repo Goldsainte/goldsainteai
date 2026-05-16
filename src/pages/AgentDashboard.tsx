@@ -448,154 +448,129 @@ export default function AgentDashboard() {
 
           <TabsContent value="available" className="space-y-4">
             {jobs.length === 0 ? (
-              <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12">
-                  <Briefcase className="h-16 w-16 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No jobs available</h3>
-                  <p className="text-muted-foreground">Check back later for new opportunities</p>
-                </CardContent>
-              </Card>
+              <div className="bg-white border border-[#E5DFC6] rounded-2xl p-12 text-center">
+                <h3 className="font-secondary text-2xl text-[#0a2225] mb-2">No trip requests available</h3>
+                <p className="text-sm text-[#6B7280]">Check back later for new opportunities.</p>
+              </div>
             ) : (
               jobs.map((job) => (
-                <Card key={job.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-xl font-secondary">{job.title}</CardTitle>
-                        <CardDescription>{job.description}</CardDescription>
-                      </div>
-                      <Badge>{job.booking_type}</Badge>
+                <div key={job.id} className="bg-white border border-[#E5DFC6] rounded-2xl p-6 transition-shadow hover:shadow-md">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="pr-4">
+                      <h3 className="font-secondary text-xl text-[#0a2225] mb-1">{job.title}</h3>
+                      <p className="text-sm text-[#6B7280]">{job.description}</p>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-3 gap-4 mb-4">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">{job.destination}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">${job.budget_min} - ${job.budget_max}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">{new Date(job.created_at).toLocaleDateString()}</span>
-                      </div>
+                    <span className="inline-flex items-center rounded-full bg-[#FDF9F0] border border-[#E5DFC6] px-3 py-1 text-xs text-[#0a2225] whitespace-nowrap">{job.booking_type}</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 mb-6 text-sm text-[#0a2225]">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-[#0c4d47]" />
+                      <span>{job.destination}</span>
                     </div>
-                    <Button 
-                      className="w-full" 
-                      onClick={() => {
-                        if (!agent.is_verified) {
-                          toast.error('Your application must be approved before you can place bids');
-                          return;
-                        }
-                        setSelectedJob(job);
-                        setIsBidDialogOpen(true);
-                      }}
-                      disabled={!agent.is_verified}
-                    >
-                      {agent.is_verified ? 'Place Bid' : 'Awaiting Approval'}
-                    </Button>
-                  </CardContent>
-                </Card>
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4 text-[#0c4d47]" />
+                      <span>${job.budget_min} – ${job.budget_max}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-[#0c4d47]" />
+                      <span>{new Date(job.created_at).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (!agent.is_verified) {
+                        toast.error('Your application must be approved before you can place bids');
+                        return;
+                      }
+                      setSelectedJob(job);
+                      setIsBidDialogOpen(true);
+                    }}
+                    disabled={!agent.is_verified}
+                    className="w-full rounded-full bg-[#0c4d47] px-6 py-3 text-sm font-medium text-[#E5DFC6] hover:bg-[#0a3d39] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {agent.is_verified ? 'Submit Proposal' : 'Awaiting Approval'}
+                  </button>
+                </div>
               ))
             )}
           </TabsContent>
 
           <TabsContent value="my-bids" className="space-y-4">
             {myBids.length === 0 ? (
-              <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12">
-                  <Briefcase className="h-16 w-16 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No bids yet</h3>
-                  <p className="text-muted-foreground">Start bidding on available jobs</p>
-                </CardContent>
-              </Card>
+              <div className="bg-white border border-[#E5DFC6] rounded-2xl p-12 text-center">
+                <h3 className="font-secondary text-2xl text-[#0a2225] mb-2">No proposals yet</h3>
+                <p className="text-sm text-[#6B7280]">Submit your first proposal from the Available Jobs tab.</p>
+              </div>
             ) : (
               myBids.map((bid) => (
-                <Card key={bid.id}>
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-xl font-secondary">{bid.marketplace_jobs?.title}</CardTitle>
-                        <CardDescription>{bid.marketplace_jobs?.destination}</CardDescription>
-                      </div>
-                      <div className="flex gap-2">
-                        <Badge variant={
-                          bid.status === 'accepted' ? 'default' : 
-                          bid.status === 'rejected' ? 'destructive' :
-                          'secondary'
-                        }>
-                          {bid.status}
-                        </Badge>
-                        {bid.marketplace_jobs?.status && (
-                          <Badge variant={
-                            bid.marketplace_jobs.status === 'in_progress' ? 'default' :
-                            bid.marketplace_jobs.status === 'pending_approval' ? 'secondary' :
-                            bid.marketplace_jobs.status === 'completed' ? 'default' :
-                            'outline'
-                          }>
-                            Job: {bid.marketplace_jobs.status.replace('_', ' ')}
-                          </Badge>
-                        )}
-                      </div>
+                <div key={bid.id} className="bg-white border border-[#E5DFC6] rounded-2xl p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="pr-4">
+                      <h3 className="font-secondary text-xl text-[#0a2225] mb-1">{bid.marketplace_jobs?.title}</h3>
+                      <p className="text-sm text-[#6B7280]">{bid.marketplace_jobs?.destination}</p>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="text-sm text-muted-foreground">Your Bid:</span>
-                        <span className="font-semibold">{bid.currency} {bid.proposed_price}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-muted-foreground">Completion Time:</span>
-                        <span>{bid.estimated_completion_days} days</span>
-                      </div>
-                      <p className="text-sm mt-2">{bid.proposal_details}</p>
-                      
-                       {bid.status === 'accepted' && (
-                        <div className="flex gap-2 mt-4">
-                          <Button 
-                            onClick={() => {
-                              setSelectedJobForMessaging(bid.marketplace_jobs);
-                              setIsMessagingDialogOpen(true);
-                            }}
-                            className="flex-1"
-                            variant="outline"
-                          >
-                            <MessageSquare className="h-4 w-4 mr-2" />
-                            Message Customer
-                          </Button>
-                          
-                          <Button 
-                            onClick={() => {
-                              setSelectedBidForDetails(bid);
-                              setBidDetailsOpen(true);
-                            }}
-                            className="flex-1"
-                            variant="outline"
-                          >
-                            <DollarSign className="h-4 w-4 mr-2" />
-                            Payment Details
-                          </Button>
-                          
-                          {bid.marketplace_jobs?.status === 'in_progress' && (
-                            <Button 
-                              onClick={() => {
-                                setCompletionJob(bid.marketplace_jobs);
-                                setCompletionModalOpen(true);
-                              }}
-                              className="flex-1"
-                            >
-                              <CheckCircle className="h-4 w-4 mr-2" />
-                              Submit Completion
-                            </Button>
-                          )}
-                        </div>
+                    <div className="flex flex-wrap gap-2 justify-end">
+                      <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs whitespace-nowrap ${
+                        bid.status === 'accepted' ? 'bg-[#0c4d47] text-[#E5DFC6]' :
+                        bid.status === 'rejected' ? 'bg-[#fce7e6] text-[#a02622]' :
+                        'bg-[#FDF9F0] border border-[#E5DFC6] text-[#0a2225]'
+                      }`}>{bid.status}</span>
+                      {bid.marketplace_jobs?.status && (
+                        <span className="inline-flex items-center rounded-full bg-[#FDF9F0] border border-[#E5DFC6] px-3 py-1 text-xs text-[#0a2225] whitespace-nowrap">
+                          Trip: {bid.marketplace_jobs.status.replace('_', ' ')}
+                        </span>
                       )}
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-[#6B7280]">Your proposal:</span>
+                      <span className="font-medium text-[#0a2225]">{bid.currency} {bid.proposed_price}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#6B7280]">Completion time:</span>
+                      <span className="text-[#0a2225]">{bid.estimated_completion_days} days</span>
+                    </div>
+                    <p className="text-sm text-[#0a2225] mt-3 leading-relaxed">{bid.proposal_details}</p>
+
+                    {bid.status === 'accepted' && (
+                      <div className="flex flex-wrap gap-2 mt-5">
+                        <button
+                          onClick={() => {
+                            setSelectedJobForMessaging(bid.marketplace_jobs);
+                            setIsMessagingDialogOpen(true);
+                          }}
+                          className="flex-1 min-w-[160px] inline-flex items-center justify-center gap-2 rounded-full border border-[#0a2225] px-5 py-2.5 text-sm text-[#0a2225] hover:bg-[#0a2225] hover:text-white transition-colors"
+                        >
+                          <MessageSquare className="h-4 w-4" />
+                          Message traveler
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelectedBidForDetails(bid);
+                            setBidDetailsOpen(true);
+                          }}
+                          className="flex-1 min-w-[160px] inline-flex items-center justify-center gap-2 rounded-full border border-[#0a2225] px-5 py-2.5 text-sm text-[#0a2225] hover:bg-[#0a2225] hover:text-white transition-colors"
+                        >
+                          <DollarSign className="h-4 w-4" />
+                          Payment details
+                        </button>
+                        {bid.marketplace_jobs?.status === 'in_progress' && (
+                          <button
+                            onClick={() => {
+                              setCompletionJob(bid.marketplace_jobs);
+                              setCompletionModalOpen(true);
+                            }}
+                            className="flex-1 min-w-[160px] inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-5 py-2.5 text-sm text-[#E5DFC6] hover:bg-[#0a3d39] transition-colors"
+                          >
+                            <CheckCircle className="h-4 w-4" />
+                            Submit completion
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
               ))
             )}
             </TabsContent>

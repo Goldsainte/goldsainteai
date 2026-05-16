@@ -93,9 +93,9 @@ export default function AgentProfile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-[#FDF9F0]">
         <div className="container mx-auto px-4 py-8 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0c4d47]"></div>
         </div>
       </div>
     );
@@ -103,53 +103,52 @@ export default function AgentProfile() {
 
   if (!agent) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
+      <div className="min-h-screen bg-[#FDF9F0] flex flex-col">
         <main className="flex-1 container mx-auto px-4 py-8">
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <h3 className="text-lg font-semibold mb-2">Agent Not Found</h3>
-              <p className="text-muted-foreground text-center mb-4">
-                The agent profile you're looking for doesn't exist
-              </p>
-              <Button onClick={() => navigate('/marketplace')}>Back to Marketplace</Button>
-            </CardContent>
-          </Card>
+          <div className="bg-white border border-[#E5DFC6] rounded-2xl p-12 text-center">
+            <h3 className="font-secondary text-2xl text-[#0a2225] mb-2">Agent not found</h3>
+            <p className="text-sm text-[#6B7280] mb-6">The agent profile you're looking for doesn't exist.</p>
+            <button
+              onClick={() => navigate('/marketplace')}
+              className="inline-flex items-center rounded-full bg-[#0c4d47] px-6 py-3 text-sm text-[#E5DFC6] hover:bg-[#0a3d39] transition-colors"
+            >
+              Back to the collection
+            </button>
+          </div>
         </main>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-[#FDF9F0] flex flex-col">
       <main className="flex-1 container mx-auto px-4 py-8">
-        <Button
-          variant="ghost"
+        <button
           onClick={() => navigate(-1)}
-          className="mb-6"
+          className="inline-flex items-center gap-2 text-sm text-[#0c4d47] hover:underline mb-6"
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
+          <ArrowLeft className="h-4 w-4" />
           Back
-        </Button>
+        </button>
 
         <div className="grid md:grid-cols-3 gap-6">
           {/* Left Column - Agent Info */}
           <div className="md:col-span-1 space-y-6">
-            <Card>
-              <CardContent className="pt-6">
+            <div className="bg-white border border-[#E5DFC6] rounded-2xl p-6">
                 <div className="flex flex-col items-center text-center">
                   <Avatar className="h-24 w-24 mb-4">
                     <AvatarImage src={agent.profile_image_url} />
-                    <AvatarFallback className="text-2xl">
+                    <AvatarFallback className="text-2xl bg-[#FDF9F0] text-[#0a2225]">
                       {agent.agency_name?.charAt(0) || 'A'}
                     </AvatarFallback>
                   </Avatar>
 
-                  <h1 className="text-2xl font-secondary text-primary mb-1">
+                  <h1 className="font-secondary text-2xl text-[#0a2225] mb-1">
                     {agent.agency_name}
                   </h1>
 
                   {agent.profiles && (
-                    <p className="text-sm text-muted-foreground mb-3">
+                    <p className="text-sm text-[#6B7280] mb-3">
                       {agent.profiles.first_name} {agent.profiles.last_name}
                     </p>
                   )}
@@ -157,8 +156,8 @@ export default function AgentProfile() {
                   <div className="space-y-3 mb-4">
                     <div className="flex items-center gap-2">
                       <Star className="h-5 w-5 fill-[#C7A962] text-[#C7A962]" />
-                      <span className="text-2xl font-bold">{agent.rating?.toFixed(1) || "N/A"}</span>
-                      <span className="text-muted-foreground">({agent.total_reviews || 0} reviews)</span>
+                      <span className="font-secondary text-2xl text-[#0a2225]">{agent.rating?.toFixed(1) || "N/A"}</span>
+                      <span className="text-sm text-[#6B7280]">({agent.total_reviews || 0} reviews)</span>
                     </div>
                     
                     <TrustBadges
@@ -181,7 +180,7 @@ export default function AgentProfile() {
                     </div>
                   ) : null}
 
-                  <p className="text-sm text-muted-foreground mb-4">
+                  <p className="text-sm text-[#6B7280] mb-4 leading-relaxed">
                     {agent.bio || 'No bio available'}
                   </p>
 
@@ -191,74 +190,73 @@ export default function AgentProfile() {
                       recipientName={agent.agency_name}
                       className="w-full"
                     />
-                    <Button className="w-full" onClick={() => navigate('/marketplace')}>
-                      Request Service
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="w-full"
-                      onClick={() => setShowReportModal(true)}
+                    <button
+                      onClick={() => navigate('/marketplace')}
+                      className="w-full rounded-full bg-[#0c4d47] px-6 py-2.5 text-sm text-[#E5DFC6] hover:bg-[#0a3d39] transition-colors"
                     >
-                      <Flag className="h-4 w-4 mr-2" />
-                      Report Agent
-                    </Button>
+                      Request a Trip
+                    </button>
+                    <button
+                      onClick={() => setShowReportModal(true)}
+                      className="w-full inline-flex items-center justify-center gap-2 rounded-full border border-[#0a2225] px-6 py-2.5 text-sm text-[#0a2225] hover:bg-[#0a2225] hover:text-white transition-colors"
+                    >
+                      <Flag className="h-4 w-4" />
+                      Report agent
+                    </button>
                   </div>
                 </div>
 
-                <Separator className="my-6" />
+                <div className="my-6 border-t border-[#E5DFC6]" />
 
                 <div className="space-y-3">
                   {agent.email && (
                     <div className="flex items-center gap-2 text-sm">
-                      <Mail className="h-4 w-4 text-muted-foreground" />
-                      <span className="truncate">{agent.email}</span>
+                      <Mail className="h-4 w-4 text-[#0c4d47]" />
+                      <span className="truncate text-[#0a2225]">{agent.email}</span>
                     </div>
                   )}
                   {agent.phone && (
                     <div className="flex items-center gap-2 text-sm">
-                      <Phone className="h-4 w-4 text-muted-foreground" />
-                      <span>{agent.phone}</span>
+                      <Phone className="h-4 w-4 text-[#0c4d47]" />
+                      <span className="text-[#0a2225]">{agent.phone}</span>
                     </div>
                   )}
                   {agent.website && (
                     <div className="flex items-center gap-2 text-sm">
-                      <Globe className="h-4 w-4 text-muted-foreground" />
-                      <a href={agent.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate">
+                      <Globe className="h-4 w-4 text-[#0c4d47]" />
+                      <a href={agent.website} target="_blank" rel="noopener noreferrer" className="text-[#0c4d47] hover:underline truncate">
                         Website
                       </a>
                     </div>
                   )}
                   {agent.experience_years && (
                     <div className="flex items-center gap-2 text-sm">
-                      <Briefcase className="h-4 w-4 text-muted-foreground" />
-                      <span>{agent.experience_years} years experience</span>
+                      <Briefcase className="h-4 w-4 text-[#0c4d47]" />
+                      <span className="text-[#0a2225]">{agent.experience_years} years experience</span>
                     </div>
                   )}
                 </div>
-              </CardContent>
-            </Card>
+            </div>
 
             {/* Stats Card */}
             {stats && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Performance Stats</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
+              <div className="bg-white border border-[#E5DFC6] rounded-2xl p-6">
+                <h2 className="font-secondary text-lg text-[#0a2225] mb-4">Performance</h2>
+                <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Completion Rate</span>
-                    <span className="font-semibold">{stats.completionRate}%</span>
+                    <span className="text-sm text-[#6B7280]">Completion rate</span>
+                    <span className="text-sm font-medium text-[#0a2225]">{stats.completionRate}%</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Jobs Completed</span>
-                    <span className="font-semibold">{stats.completedJobs}</span>
+                    <span className="text-sm text-[#6B7280]">Trips delivered</span>
+                    <span className="text-sm font-medium text-[#0a2225]">{stats.completedJobs}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Avg. Completion</span>
-                    <span className="font-semibold">{stats.avgCompletionTime} days</span>
+                    <span className="text-sm text-[#6B7280]">Avg. completion</span>
+                    <span className="text-sm font-medium text-[#0a2225]">{stats.avgCompletionTime} days</span>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             )}
           </div>
 
@@ -266,111 +264,93 @@ export default function AgentProfile() {
           <div className="md:col-span-2 space-y-6">
             {/* Specializations */}
             {agent.specializations && agent.specializations.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Award className="h-5 w-5" />
-                    Specializations
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {agent.specializations.map((spec: string) => (
-                      <Badge key={spec} variant="secondary">{spec}</Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="bg-white border border-[#E5DFC6] rounded-2xl p-6">
+                <h2 className="font-secondary text-xl text-[#0a2225] mb-4 flex items-center gap-2">
+                  <Award className="h-5 w-5 text-[#0c4d47]" />
+                  Specializations
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {agent.specializations.map((spec: string) => (
+                    <span key={spec} className="inline-flex items-center rounded-full bg-[#FDF9F0] border border-[#E5DFC6] px-3 py-1 text-xs text-[#0a2225]">{spec}</span>
+                  ))}
+                </div>
+              </div>
             )}
 
             {/* Destinations */}
             {agent.destinations && agent.destinations.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MapPin className="h-5 w-5" />
-                    Destination Expertise
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {agent.destinations.map((dest: string) => (
-                      <Badge key={dest} variant="outline">{dest}</Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="bg-white border border-[#E5DFC6] rounded-2xl p-6">
+                <h2 className="font-secondary text-xl text-[#0a2225] mb-4 flex items-center gap-2">
+                  <MapPin className="h-5 w-5 text-[#0c4d47]" />
+                  Destination expertise
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {agent.destinations.map((dest: string) => (
+                    <span key={dest} className="inline-flex items-center rounded-full border border-[#E5DFC6] px-3 py-1 text-xs text-[#0a2225]">{dest}</span>
+                  ))}
+                </div>
+              </div>
             )}
 
             {/* Languages */}
             {agent.languages && agent.languages.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Languages</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {agent.languages.map((lang: string) => (
-                      <Badge key={lang} variant="secondary">{lang}</Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="bg-white border border-[#E5DFC6] rounded-2xl p-6">
+                <h2 className="font-secondary text-xl text-[#0a2225] mb-4">Languages</h2>
+                <div className="flex flex-wrap gap-2">
+                  {agent.languages.map((lang: string) => (
+                    <span key={lang} className="inline-flex items-center rounded-full bg-[#FDF9F0] border border-[#E5DFC6] px-3 py-1 text-xs text-[#0a2225]">{lang}</span>
+                  ))}
+                </div>
+              </div>
             )}
 
             {/* Reviews */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Customer Reviews ({reviews.length})</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {reviews.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-8">
-                    No reviews yet
-                  </p>
-                ) : (
-                  <div className="space-y-4">
-                    {reviews.map((review) => (
-                      <div key={review.id} className="border-b pb-4 last:border-0">
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <Avatar className="h-8 w-8">
-                              <AvatarImage src={review.profiles?.avatar_url} />
-                              <AvatarFallback>
-                                {review.profiles?.first_name?.charAt(0) || 'U'}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <p className="font-medium text-sm">
-                                {review.profiles?.first_name
-                                  ? `${review.profiles.first_name} ${review.profiles.last_name ?? ''}`
-                                  : 'Customer'}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {new Date(review.created_at).toLocaleDateString()}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            {Array.from({ length: 5 }).map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`h-4 w-4 ${
-                                  i < review.rating
-                                    ? 'fill-[#C7A962] text-[#C7A962]'
-                                    : 'text-gray-300'
-                                }`}
-                              />
-                            ))}
+            <div className="bg-white border border-[#E5DFC6] rounded-2xl p-6">
+              <h2 className="font-secondary text-xl text-[#0a2225] mb-4">Traveler reviews ({reviews.length})</h2>
+              {reviews.length === 0 ? (
+                <p className="text-sm text-[#6B7280] text-center py-8">No reviews yet.</p>
+              ) : (
+                <div className="space-y-4">
+                  {reviews.map((review) => (
+                    <div key={review.id} className="border-b border-[#E5DFC6] pb-4 last:border-0">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src={review.profiles?.avatar_url} />
+                            <AvatarFallback className="bg-[#FDF9F0] text-[#0a2225] text-xs">
+                              {review.profiles?.first_name?.charAt(0) || 'U'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="text-sm font-medium text-[#0a2225]">
+                              {review.profiles?.first_name
+                                ? `${review.profiles.first_name} ${review.profiles.last_name ?? ''}`
+                                : 'Traveler'}
+                            </p>
+                            <p className="text-xs text-[#6B7280]">
+                              {new Date(review.created_at).toLocaleDateString()}
+                            </p>
                           </div>
                         </div>
-                        <p className="text-sm">{review.review_text}</p>
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`h-4 w-4 ${
+                                i < review.rating
+                                  ? 'fill-[#C7A962] text-[#C7A962]'
+                                  : 'text-[#E5DFC6]'
+                              }`}
+                            />
+                          ))}
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                      <p className="text-sm text-[#0a2225] leading-relaxed">{review.review_text}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Travel Storyboard */}
             <div className="mt-6">
