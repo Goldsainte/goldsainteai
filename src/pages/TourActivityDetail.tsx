@@ -204,13 +204,13 @@ export default function TourActivityDetail() {
                 <Button 
                   className="w-full" 
                   size="lg"
-                  onClick={() => toast.info('Booking functionality coming soon!')}
+                  onClick={() => navigate("/marketplace")}
                 >
-                  Check Availability
+                  Find a Specialist for This Activity
                 </Button>
 
                 <p className="text-xs text-muted-foreground text-center">
-                  You won't be charged yet
+                  Browse Goldsainte travel specialists who can book this for you.
                 </p>
               </CardContent>
             </Card>
