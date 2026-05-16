@@ -97,7 +97,6 @@ export const AgentVerificationUpload = ({
           agent_id: agentId,
           verification_type: verificationType,
           document_urls: [urlData.signedUrl],
-          document_paths: [filePath],
           additional_info: { document_type: documentType },
         });
 
