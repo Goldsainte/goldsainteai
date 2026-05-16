@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Check, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { trackPurchaseConversionOnce } from "@/lib/analytics/conversions";
 
 export default function CoCuratedBookingSuccess() {
   const [searchParams] = useSearchParams();
@@ -35,6 +36,16 @@ export default function CoCuratedBookingSuccess() {
       if (data.success) {
         setBookingId(data.bookingId);
         toast.success('Booking confirmed!');
+        // Fire Google Ads purchase conversion (deduped per session_id)
+        const value = Number(data.amount ?? data.value ?? 0);
+        if (value > 0 || data.bookingId) {
+          trackPurchaseConversionOnce(sessionId, {
+            value: value || 0,
+            currency: (data.currency as string) || 'USD',
+            transactionId: data.bookingId || sessionId,
+            productType: 'trip_booking',
+          });
+        }
       } else {
         throw new Error(data.message || 'Verification failed');
       }
