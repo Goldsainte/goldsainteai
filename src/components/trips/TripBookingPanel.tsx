@@ -82,6 +82,8 @@ export function TripBookingPanel({
             currency: currency.toLowerCase(),
             affiliateCode:
               (await import("@/hooks/useAffiliateRef")).getActiveAffiliateRef() || undefined,
+            gclid:
+              (await import("@/lib/analytics/gclid")).getStoredGclid() || undefined,
           },
         }
       );

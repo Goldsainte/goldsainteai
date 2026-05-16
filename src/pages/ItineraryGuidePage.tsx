@@ -17,6 +17,8 @@ import { invokeWithAuth } from "@/lib/supabaseHelpers";
 import { BackButton } from "@/components/ui/BackButton";
 import { ShareButton } from "@/components/ShareButton";
 import { generateGuidePdf } from "@/utils/generateGuidePdf";
+import { trackPurchaseConversionOnce } from "@/lib/analytics/conversions";
+import { getStoredGclid } from "@/lib/analytics/gclid";
 
 type Day = {
   day_number: number;
@@ -51,6 +53,8 @@ export default function ItineraryGuidePage() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const previewMode = searchParams.get("preview") === "1";
+  const purchasedFlag = searchParams.get("purchased") === "true";
+  const checkoutSessionId = searchParams.get("session_id");
   useTrackView("product", id);
   const { user } = useAuth();
   const [hasPurchased, setHasPurchased] = useState(false);
@@ -117,9 +121,10 @@ export default function ItineraryGuidePage() {
         {
           body: {
             itineraryProductId: guide.id,
-            successUrl: `${origin}/itinerary-guide/${guide.id}`,
+            successUrl: `${origin}/itinerary-guide/${guide.id}?purchased=true&session_id={CHECKOUT_SESSION_ID}`,
             cancelUrl: `${origin}/itinerary-guide/${guide.id}`,
             affiliateCode,
+            gclid: getStoredGclid() || undefined,
           },
         }
       );
@@ -135,6 +140,17 @@ export default function ItineraryGuidePage() {
     if (!guide) return "";
     return `${guide.currency === "USD" ? "$" : ""}${Number(guide.price).toFixed(0)} ${guide.currency}`;
   }, [guide]);
+
+  // Fire Google Ads purchase conversion once per checkout session
+  useEffect(() => {
+    if (!purchasedFlag || !checkoutSessionId || !guide?.price) return;
+    trackPurchaseConversionOnce(checkoutSessionId, {
+      value: Number(guide.price),
+      currency: guide.currency || "USD",
+      transactionId: checkoutSessionId,
+      productType: "itinerary",
+    });
+  }, [purchasedFlag, checkoutSessionId, guide?.price, guide?.currency]);
 
   if (loading) {
     return (

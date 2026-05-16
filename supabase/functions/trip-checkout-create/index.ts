@@ -18,6 +18,7 @@ interface RequestBody {
   successUrl?: string;
   cancelUrl?: string;
   affiliateCode?: string;
+  gclid?: string;
 }
 
 Deno.serve(async (req) => {
@@ -54,6 +55,12 @@ Deno.serve(async (req) => {
       typeof body.affiliateCode === "string" &&
       /^[a-zA-Z0-9_-]{3,64}$/.test(body.affiliateCode)
         ? body.affiliateCode
+        : undefined;
+    const gclid =
+      typeof body.gclid === "string" &&
+      body.gclid.length > 0 &&
+      body.gclid.length <= 256
+        ? body.gclid
         : undefined;
 
     if (!tripBookingId || !amountTotalCents || amountTotalCents <= 0) {
@@ -161,6 +168,7 @@ Deno.serve(async (req) => {
           trip_request_id: tripRequest.id,
           type: "trip_booking",
           ...(affiliateCode ? { affiliate_code: affiliateCode } : {}),
+          ...(gclid ? { gclid } : {}),
         },
       },
       metadata: {
@@ -169,6 +177,7 @@ Deno.serve(async (req) => {
         proposal_id: booking.proposal_id || "",
         type: "trip_booking",
         ...(affiliateCode ? { affiliate_code: affiliateCode } : {}),
+        ...(gclid ? { gclid } : {}),
       },
     });
 

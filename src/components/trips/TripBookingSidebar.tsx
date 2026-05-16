@@ -108,6 +108,8 @@ export function TripBookingSidebar({
           cancelUrl: `${window.location.origin}/marketplace/trip/${tripId}`,
           affiliateCode:
             (await import("@/hooks/useAffiliateRef")).getActiveAffiliateRef() || undefined,
+          gclid:
+            (await import("@/lib/analytics/gclid")).getStoredGclid() || undefined,
         },
       });
 

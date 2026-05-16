@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { CheckCircle2, Loader2, ArrowRight } from "lucide-react";
 import logomark from "@/assets/logomark-gold.png";
+import { trackPurchaseConversionOnce } from "@/lib/analytics/conversions";
 
 export default function BookingConfirmation() {
   const [searchParams] = useSearchParams();
@@ -10,6 +11,7 @@ export default function BookingConfirmation() {
   const bookingId = searchParams.get("booking");
   const [booking, setBooking] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const conversionFired = useRef(false);
 
   useEffect(() => {
     if (!bookingId) {
@@ -27,6 +29,27 @@ export default function BookingConfirmation() {
     };
     fetchBooking();
   }, [bookingId, navigate]);
+
+  // Fire Google Ads purchase conversion once per booking when the booking is
+  // considered paid (status confirmed or completed, or any deposit captured).
+  useEffect(() => {
+    if (!booking || conversionFired.current) return;
+    const paidStatuses = ["confirmed", "completed", "deposit_paid", "paid"];
+    const isPaid = paidStatuses.includes(booking.status);
+    const value =
+      Number(booking.deposit_amount) ||
+      Number(booking.total_price) ||
+      0;
+    if (isPaid && value > 0) {
+      trackPurchaseConversionOnce(booking.id, {
+        value,
+        currency: booking.currency || "USD",
+        transactionId: booking.id,
+        productType: "trip_booking",
+      });
+      conversionFired.current = true;
+    }
+  }, [booking]);
 
   if (isLoading) {
     return (

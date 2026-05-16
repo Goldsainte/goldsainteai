@@ -45,6 +45,11 @@ serve(async (req) => {
       typeof affiliateCodeRaw === "string" && /^[a-zA-Z0-9_-]{3,64}$/.test(affiliateCodeRaw)
         ? affiliateCodeRaw
         : undefined;
+    const gclidRaw: unknown = body.gclid;
+    const gclid =
+      typeof gclidRaw === "string" && gclidRaw.length > 0 && gclidRaw.length <= 256
+        ? gclidRaw
+        : undefined;
     if (!itineraryProductId || !successUrl || !cancelUrl) {
       return new Response(
         JSON.stringify({ error: "itineraryProductId, successUrl and cancelUrl are required" }),
@@ -95,6 +100,7 @@ serve(async (req) => {
           buyer_id: user.id,
           creator_id: product.creator_id,
           ...(affiliateCode ? { affiliate_code: affiliateCode } : {}),
+          ...(gclid ? { gclid } : {}),
         },
       },
       metadata: {
@@ -103,6 +109,7 @@ serve(async (req) => {
         buyer_id: user.id,
         creator_id: product.creator_id,
         ...(affiliateCode ? { affiliate_code: affiliateCode } : {}),
+        ...(gclid ? { gclid } : {}),
       },
       success_url: successUrl,
       cancel_url: cancelUrl,
