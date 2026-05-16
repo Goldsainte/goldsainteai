@@ -314,7 +314,7 @@ export default function BrandProfilePage() {
         <SaveToStoryboardModal
           open={saveOpen}
           onOpenChange={setSaveOpen}
-          imageUrl={brand.hero_image_url || brand.logo_url || ""}
+          imageUrl={brand.cover_image_url || brand.logo_url || ""}
           title={brand.brand_name}
           subtitle={brand.tagline || undefined}
           sourceType="brand"
