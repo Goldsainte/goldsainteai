@@ -113,15 +113,15 @@ export const CreatorAIMagic: React.FC = () => {
               </div>
             ))}
           </div>
-          <div className="px-3 pt-2">
-            <div className="inline-flex items-center gap-1 rounded-full bg-white/80 border border-[#E5DFC6] px-2 py-0.5 text-[10px] text-[#0a2225]">
-              <MapPin className="w-2 h-2 text-[#C7A962]" />
-              Captured in Santorini · Jun 12–14
+          <div className="px-2 pt-1.5 sm:px-3 sm:pt-2 min-w-0">
+            <div className="inline-flex max-w-full items-center gap-1 rounded-full bg-white/80 border border-[#E5DFC6] px-1.5 py-[1px] sm:px-2 sm:py-0.5 text-[8px] sm:text-[10px] text-[#0a2225]">
+              <MapPin className="w-[7px] h-[7px] sm:w-2 sm:h-2 text-[#C7A962] shrink-0" />
+              <span className="truncate">Captured in Santorini · Jun 12–14</span>
             </div>
           </div>
-          <div className="px-3 pt-2">
-            <button className="w-full rounded-full bg-[#0c4d47] text-[#FDFBF7] text-[10px] font-medium py-1.5 flex items-center justify-center gap-1.5">
-              <Sparkles className="w-2.5 h-2.5 text-[#C7A962]" />
+          <div className="px-2 pt-1.5 sm:px-3 sm:pt-2">
+            <button className="w-full rounded-full bg-[#0c4d47] text-[#FDFBF7] text-[8px] sm:text-[10px] font-medium py-1 sm:py-1.5 flex items-center justify-center gap-1.5 whitespace-nowrap">
+              <Sparkles className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-[#C7A962] shrink-0" />
               Generate with Goldsainte AI
             </button>
           </div>
