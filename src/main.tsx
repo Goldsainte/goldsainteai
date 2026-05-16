@@ -13,6 +13,11 @@ if (import.meta.env.VITE_SENTRY_DSN) {
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
+import { captureGclidFromUrl } from "@/lib/analytics/gclid";
+
+// Capture Google Ads click identifier (gclid) on landing so we can attribute
+// downstream conversions even after navigation.
+captureGclidFromUrl();
 
 const rootElement = document.getElementById("root");
 
