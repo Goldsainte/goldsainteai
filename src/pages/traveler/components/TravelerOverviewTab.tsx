@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MapPin, Calendar, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface TravelerOverviewTabProps {
@@ -19,6 +19,7 @@ interface TravelerOverviewTabProps {
 
 export function TravelerOverviewTab({ profile, stats, onAvatarUpdate }: TravelerOverviewTabProps) {
   const firstName = profile?.display_name?.split(" ")[0] || profile?.first_name || "there";
+  const isFirstTimeUser = stats.tripRequests === 0 && stats.bookings === 0;
 
   const steps = [
     {
@@ -85,6 +86,58 @@ export function TravelerOverviewTab({ profile, stats, onAvatarUpdate }: Traveler
           ))}
         </div>
       </section>
+
+      {/* First-time user guidance tiles */}
+      {isFirstTimeUser && (
+        <section className="border-t border-[#0a2225]/10 pt-8 md:pt-10">
+          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-[#9A9384] mb-2">
+            Welcome to Goldsainte
+          </p>
+          <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">
+            Let's plan your first trip
+          </h2>
+          <p className="text-sm text-[#6B7280] mb-6">
+            Three ways to get started — pick whichever feels right.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <Link
+              to="/marketplace"
+              className="block rounded-xl border border-[#E5DFC6] hover:border-[#C7A962]/50 p-4 transition-colors"
+            >
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#FDF9F0] mb-3">
+                <MapPin className="h-4 w-4 text-[#0c4d47]" />
+              </div>
+              <p className="font-secondary text-base text-[#0a2225] mb-1">Browse Trips</p>
+              <p className="text-xs text-[#6B7280]">Explore curated journeys ready to book.</p>
+            </Link>
+
+            <Link
+              to="/post-trip"
+              className="block rounded-xl border border-[#E5DFC6] hover:border-[#C7A962]/50 p-4 transition-colors"
+            >
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#FDF9F0] mb-3">
+                <Calendar className="h-4 w-4 text-[#0c4d47]" />
+              </div>
+              <p className="font-secondary text-base text-[#0a2225] mb-1">Tell Us Your Dream</p>
+              <p className="text-xs text-[#6B7280]">
+                Post a trip request and receive personalized proposals.
+              </p>
+            </Link>
+
+            <Link
+              to="/creators"
+              className="block rounded-xl border border-[#E5DFC6] hover:border-[#C7A962]/50 p-4 transition-colors"
+            >
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#FDF9F0] mb-3">
+                <MessageCircle className="h-4 w-4 text-[#0c4d47]" />
+              </div>
+              <p className="font-secondary text-base text-[#0a2225] mb-1">Find a Specialist</p>
+              <p className="text-xs text-[#6B7280]">Browse vetted travel agents and creators.</p>
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* Quiet stats footer */}
       {(stats.tripRequests > 0 || stats.bookings > 0) && (
