@@ -1,6 +1,7 @@
-import { BadgeCheck, Star, MapPin } from "lucide-react";
+import { BadgeCheck, Star, MapPin, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FollowButton from "@/components/FollowButton";
+import wordmark from "@/assets/wordmark-green.svg";
 
 interface CreatorHeroSectionProps {
   name: string;
@@ -35,25 +36,38 @@ export function CreatorHeroSection({
   onRequestTrip,
   fallbackCoverUrl,
 }: CreatorHeroSectionProps) {
-  const heroImage = coverImageUrl || fallbackCoverUrl || "/placeholder.svg";
+  const heroImage = coverImageUrl || fallbackCoverUrl || null;
   const hasStats = (tripsCompleted ?? 0) > 0 || (clientsServed ?? 0) > 0;
+  const isGenericTitle = !title || title === "Travel Designer";
+  const showCompleteNudge = Boolean(isOwnProfile && (isGenericTitle || !location));
 
   return (
     <section className="relative w-full">
-      {/* Full-width destination hero image */}
-      <div className="relative h-[420px] md:h-[520px] w-full overflow-hidden">
-        <img
-          src={heroImage}
-          alt={`${name}'s destination`}
-          className="absolute inset-0 h-full w-full object-cover"
-        loading="lazy"/>
-        {/* Gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+      {/* Full-width destination hero image (or branded fallback) */}
+      <div className="relative h-[360px] md:h-[520px] w-full overflow-hidden">
+        {heroImage ? (
+          <>
+            <img
+              src={heroImage}
+              alt={`${name}'s destination`}
+              className="absolute inset-0 h-full w-full object-cover"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+          </>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-b from-[#F5EFE0] via-[#F7F3EA] to-[#EDE4CC]">
+            <div className="absolute inset-0 flex items-center justify-center opacity-[0.08]">
+              <img src={wordmark} alt="" className="w-[60%] max-w-[420px]" />
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#F7F3EA] via-transparent to-transparent" />
+          </div>
+        )}
       </div>
 
       {/* Floating profile card overlay */}
       <div className="relative mx-auto max-w-5xl px-4">
-        <div className="relative -mt-32 md:-mt-36 bg-white rounded-2xl border border-[#E5DFC6] shadow-lg p-6 md:p-8 max-w-lg">
+        <div className="relative -mt-24 md:-mt-32 bg-white rounded-2xl border border-[#E5DFC6] shadow-lg p-6 md:p-8 max-w-lg">
           {/* Avatar + Name */}
           <div className="flex items-start gap-5">
             <div className="relative shrink-0">
@@ -85,11 +99,16 @@ export function CreatorHeroSection({
 
               {/* Rating + Stats */}
               <div className="flex items-center gap-4 mt-3 flex-wrap">
-                {avgRating != null && (
+                {avgRating != null ? (
                   <span className="flex items-center gap-1 text-sm text-[#0a2225] font-medium">
                     <Star className="h-3.5 w-3.5 fill-[#C7A962] text-[#C7A962]" />
                     {avgRating.toFixed(1)}
                     <span className="text-[#9CA3AF] font-normal">({reviewCount})</span>
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-[#F5F0E0] px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide text-[#7A7151]">
+                    <Sparkles className="h-3 w-3" />
+                    New designer
                   </span>
                 )}
                 {hasStats && (
@@ -114,7 +133,7 @@ export function CreatorHeroSection({
           <div className="flex items-center gap-3 mt-6">
             <Button
               onClick={onRequestTrip}
-              className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-8 h-11 text-sm font-medium shadow-sm flex-1 md:flex-none"
+              className="font-primary bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-8 h-11 text-sm font-medium shadow-sm flex-1 md:flex-none"
             >
               Request a Trip
             </Button>
@@ -122,6 +141,15 @@ export function CreatorHeroSection({
               <FollowButton targetUserId={targetUserId} />
             )}
           </div>
+
+          {showCompleteNudge && (
+            <div className="mt-5 flex items-start gap-2 rounded-xl border border-[#E5DFC6] bg-[#FDF9F0] px-3.5 py-2.5">
+              <Sparkles className="h-3.5 w-3.5 text-[#C7A962] mt-0.5 shrink-0" />
+              <p className="font-primary text-xs text-[#6B7280] leading-relaxed">
+                Add your specialty and home base to help travelers find you.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </section>
