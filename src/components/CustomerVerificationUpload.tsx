@@ -91,7 +91,9 @@ export function CustomerVerificationUpload() {
 
     setStarting(true);
     try {
-      const returnUrl = `${window.location.origin}/customer-verification?status=complete`;
+      // Return travelers to their Settings tab on the profile hub so they land
+      // back exactly where they launched verification from.
+      const returnUrl = `${window.location.origin}/traveler?tab=settings&verification=complete`;
 
       const { data, error } = await supabase.functions.invoke("create-identity-verification", {
         body: {
