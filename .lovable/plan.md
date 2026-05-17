@@ -1,30 +1,48 @@
-# Fix bubble sizing inside the camera-roll phone on mobile
+# Fix Travel Agent Application Submission
 
-## Problem
-In `src/components/home/CreatorAIMagic.tsx` (Scene 1), the phone frame is only `w-[160px]` on mobile but scales up to `w-[200px]` on `md+`. The two bubbles inside it use a fixed `text-[10px]` with `px-2 py-0.5` padding (location pill) and `text-[10px] py-1.5` (CTA button). At 160px wide the strings "Captured in Santorini · Jun 12–14" and "Generate with Goldsainte AI" visually crowd / overflow the phone, while looking fine on desktop.
+Confirmed both root causes by inspecting the live database.
 
-## Change (scoped to lines 116–127 of `CreatorAIMagic.tsx`)
-Make the bubbles responsive — smaller on mobile, current size from `sm:` up. No layout, copy, color, or animation changes.
+## Bug 1 — Storage bucket capped at 5MB
 
-1. **Location pill (line 117–120)**
-   - Add responsive text + icon size: `text-[8px] sm:text-[10px]`
-   - Tighten padding on mobile: `px-1.5 py-[1px] sm:px-2 sm:py-0.5`
-   - Icon: `w-[7px] h-[7px] sm:w-2 sm:h-2`
-   - Optional: wrap text in `truncate max-w-full` and add `min-w-0` so it never overflows the phone interior.
+Bucket `application-documents` currently has `file_size_limit = 5242880` (5 MB), but the UI promises 50 MB. Anything over 5 MB fails with "object exceeded the maximum allowed size".
 
-2. **Generate CTA button (line 122–126)**
-   - Responsive text: `text-[8px] sm:text-[10px]`
-   - Tighter vertical padding on mobile: `py-1 sm:py-1.5`
-   - Icon: `w-2 h-2 sm:w-2.5 sm:h-2.5`
-   - Add `whitespace-nowrap` so it stays one line.
+**Fix (migration):**
+- Update `storage.buckets` for id `application-documents`: set `file_size_limit = 52428800` (50 MB) and keep the existing allowed mime types (`image/jpeg, image/png, image/jpg, image/webp, application/pdf`).
 
-3. **Outer wrappers (lines 116 & 122)**
-   - Change `px-3 pt-2` → `px-2 pt-1.5 sm:px-3 sm:pt-2` to reclaim a few pixels of horizontal room on mobile.
+**Fix (client, `src/pages/AgentApplicationForm.tsx`):**
+- In `handleFileUpload`, add a 50 MB guard before calling `supabase.storage…upload(...)` so oversized files are rejected with a clear toast instead of waiting on a server error.
 
-## Out of scope
-- Phone frame dimensions, Scene 2/3 layouts, copy, colors, animations, and the parent `CameraRollHighlight` section all stay as-is.
-- No design-system token changes.
+## Bug 2 — `business_type` constraint mismatch
+
+Live constraint:
+```
+CHECK (business_type = ANY (ARRAY['independent','agency','tour_operator','dmc']))
+```
+
+Form options (Step 1 select):
+```
+sole_proprietor | partnership | llc | corporation
+```
+
+Every submission violates the check. This is a true vocabulary mismatch — the DB describes the *kind of travel business*, the form describes *legal entity structure*. The cleanest fix is to align the form to the schema's domain meaning (which also matches how the rest of the marketplace categorizes agents).
+
+**Fix (client, `src/pages/AgentApplicationForm.tsx`):**
+- Change `businessType` union type to `"independent" | "agency" | "tour_operator" | "dmc" | ""`.
+- Replace the four `<SelectItem>` options with:
+  - Independent Advisor (`independent`)
+  - Agency (`agency`)
+  - Tour Operator (`tour_operator`)
+  - DMC / Destination Management (`dmc`)
+- Keep the existing required-field validation (already enforced at line 177 / 250).
+
+No DB constraint change needed; this preserves data integrity and matches existing rows.
 
 ## Verification
-- Resize preview to 375px width and confirm both bubbles sit cleanly inside the phone with no clipping or wrapping.
-- Confirm desktop (≥640px) renders identically to today.
+1. Reload `/apply/agent`, walk through all 6 steps.
+2. Upload a 100 KB image, a 5 MB PDF, a 30 MB file — all succeed.
+3. Upload a 60 MB file — rejected client-side with a friendly toast.
+4. Submit with each of the 4 new business type values — insert succeeds, lands on Verification step.
+
+## Files touched
+- New migration: raise `application-documents` size limit to 50 MB.
+- `src/pages/AgentApplicationForm.tsx`: add 50 MB client check; update `businessType` type + Select options.
