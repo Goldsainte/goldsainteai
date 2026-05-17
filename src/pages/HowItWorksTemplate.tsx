@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Play } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { AvailabilityNotice } from "@/components/onboarding/AvailabilityNotice";
 
 export interface HowItWorksStep {
   number: string;
@@ -16,9 +18,12 @@ interface Props {
   subtitle: string;
   steps: HowItWorksStep[];
   finalCta: { heading: string; description: string; label: string; to: string };
+  plainSummary?: string;
+  extraSection?: React.ReactNode;
 }
 
-export function HowItWorksTemplate({ eyebrow, title, subtitle, steps, finalCta }: Props) {
+export function HowItWorksTemplate({ eyebrow, title, subtitle, steps, finalCta, plainSummary, extraSection }: Props) {
+  const { t } = useTranslation();
   return (
     <main className="flex-1 bg-[#FDF9F0]">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 py-12 md:py-20">
@@ -26,7 +31,14 @@ export function HowItWorksTemplate({ eyebrow, title, subtitle, steps, finalCta }
           <p className="text-xs uppercase tracking-[0.2em] text-[#C7A962] font-medium mb-4">{eyebrow}</p>
           <h1 className="font-secondary text-3xl md:text-5xl text-[#0a2225] mb-4 text-balance">{title}</h1>
           <p className="text-base md:text-lg text-[#6B7280] max-w-2xl mx-auto text-pretty">{subtitle}</p>
+          {plainSummary && (
+            <p className="text-base text-[#4a4a4a] mt-6 italic max-w-2xl mx-auto">
+              {t('howItWorks.inOneSentence', 'In one sentence:')} {plainSummary}
+            </p>
+          )}
         </header>
+
+        <AvailabilityNotice />
 
         <ol className="space-y-10 md:space-y-14 mx-auto max-w-2xl">
           {steps.map((step) => {
@@ -55,6 +67,18 @@ export function HowItWorksTemplate({ eyebrow, title, subtitle, steps, finalCta }
             );
           })}
         </ol>
+
+        {extraSection}
+
+        <div className="text-center mt-12 mb-8">
+          <p className="text-xs uppercase tracking-[0.2em] text-[#9A9384] mb-2">
+            {t('howItWorks.preferToWatch', 'Prefer to watch?')}
+          </p>
+          <Link to="/help/video-tour" className="inline-flex items-center gap-2 text-[#0c4d47] underline text-sm">
+            <Play className="h-4 w-4" />
+            {t('howItWorks.videoTour', 'Watch a 90-second tour of Goldsainte')}
+          </Link>
+        </div>
 
         <div className="mt-16 md:mt-24 rounded-2xl bg-[#0a2225] text-white px-6 sm:px-10 py-10 md:py-14 text-center">
           <h2 className="font-secondary text-2xl md:text-3xl mb-3">{finalCta.heading}</h2>
