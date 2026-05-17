@@ -63,6 +63,20 @@ const TRAVELER_ITEMS: ChecklistItem[] = [
     cta: { label: "Browse trips", to: "/marketplace" },
     isComplete: (d) => (d.savedTrips || 0) > 0,
   },
+  {
+    id: "read-trust-safety",
+    label: "Read how we protect your trip",
+    description: "Learn how escrow, verification, and dispute resolution keep your money safe.",
+    cta: { label: "Trust & Safety", to: "/trust-safety" },
+    isComplete: () => false,
+  },
+  {
+    id: "set-notifications",
+    label: "Set your notification preferences",
+    description: "Choose email or SMS so you never miss a proposal from a specialist.",
+    cta: { label: "Notification settings", to: "/travel-settings" },
+    isComplete: (d) => !!d.profile?.notification_preferences_set,
+  },
 ];
 
 const CREATOR_ITEMS: ChecklistItem[] = [
@@ -94,6 +108,20 @@ const CREATOR_ITEMS: ChecklistItem[] = [
     cta: { label: "View my profile", to: (d) => `/creators/${d.profile?.id || ""}` },
     isComplete: (d) => (d.profileViews || 0) > 10,
   },
+  {
+    id: "review-tax-info",
+    label: "Review tax information",
+    description: "Goldsainte issues annual tax documents based on your country of residence.",
+    cta: { label: "Learn more", to: "/help/tax-information" },
+    isComplete: () => false,
+  },
+  {
+    id: "set-notifications",
+    label: "Set your notification preferences",
+    description: "Stay on top of new bookings, messages, and tier upgrades.",
+    cta: { label: "Notification settings", to: "/creator-dashboard?tab=settings" },
+    isComplete: (d) => !!d.profile?.notification_preferences_set,
+  },
 ];
 
 const AGENT_ITEMS: ChecklistItem[] = [
@@ -124,6 +152,20 @@ const AGENT_ITEMS: ChecklistItem[] = [
     description: "Browse open trip requests and submit a custom proposal.",
     cta: { label: "View requests", to: "/marketplace?tab=trip-requests" },
     isComplete: (d) => (d.proposalsSent || 0) > 0,
+  },
+  {
+    id: "review-tax-info",
+    label: "Review tax and credentials information",
+    description: "Tax documents and credential requirements vary by country. Review what applies to you.",
+    cta: { label: "Learn more", to: "/help/agent-requirements" },
+    isComplete: () => false,
+  },
+  {
+    id: "set-notifications",
+    label: "Set your notification preferences",
+    description: "Get instant alerts for new requests and traveler messages.",
+    cta: { label: "Notification settings", to: "/agent-dashboard?tab=settings" },
+    isComplete: (d) => !!d.profile?.notification_preferences_set,
   },
 ];
 

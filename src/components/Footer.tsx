@@ -41,6 +41,10 @@ export const Footer = () => {
         { to: "/how-it-works/traveler", label: "For Travelers" },
         { to: "/how-it-works/creator", label: "For Creators" },
         { to: "/how-it-works/agent", label: "For Agents" },
+        { to: "/help", label: "Help Center" },
+        { to: "/help/supported-countries", label: "Where we're available" },
+        { to: "/help/payments-and-fees", label: "Payments and fees" },
+        { to: "/help/trust-and-safety", label: "Safety and trust" },
       ],
     },
     {

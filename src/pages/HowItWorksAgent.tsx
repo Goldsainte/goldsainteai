@@ -1,5 +1,7 @@
 import { FileText, ShieldCheck, CreditCard, Plane, Inbox, Briefcase, DollarSign } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { HowItWorksTemplate, type HowItWorksStep } from "./HowItWorksTemplate";
+import { CurrenciesAndPayouts } from "@/components/onboarding/CurrenciesAndPayouts";
 
 const STEPS: HowItWorksStep[] = [
   { number: "01", icon: FileText, title: "Complete your application", description: "Submit your agency information, credentials and supporting documents for review.", cta: { label: "Apply now", to: "/apply/agent" } },
@@ -12,12 +14,15 @@ const STEPS: HowItWorksStep[] = [
 ];
 
 export default function HowItWorksAgent() {
+  const { t } = useTranslation();
   return (
     <HowItWorksTemplate
-      eyebrow="For Travel Agents"
-      title="A modern marketplace for specialists"
-      subtitle="Win new clients, run trips end-to-end and get paid securely — all in one platform."
+      eyebrow={t('howItWorks.agent.eyebrow', 'For Travel Agents')}
+      title={t('howItWorks.agent.title', 'A modern marketplace for specialists')}
+      subtitle={t('howItWorks.agent.subtitle', 'Win new clients, run trips end-to-end and get paid securely — all in one platform.')}
+      plainSummary={t('howItWorks.agent.summary', 'Win clients from real trip requests, manage bookings end-to-end, get paid securely via escrow.')}
       steps={STEPS}
+      extraSection={<CurrenciesAndPayouts />}
       finalCta={{
         heading: "Apply to join Goldsainte",
         description: "Verified specialists earn from curated trips and live trip requests.",
