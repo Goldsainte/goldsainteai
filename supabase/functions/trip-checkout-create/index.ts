@@ -1,14 +1,12 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import Stripe from "https://esm.sh/stripe@15.11.0?target=deno";
-import { resolveAllowedOrigin } from "../_shared/cors.ts";
-
-function corsHeaders(req?: Request): Record<string, string> {
+function corsHeaders(_req?: Request): Record<string, string> {
   return {
-  "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Vary": "Origin",
-};
+    "Access-Control-Allow-Origin": "https://goldsainte.ai",
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Vary": "Origin",
+  };
 }
 
 interface RequestBody {
