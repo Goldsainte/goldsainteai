@@ -74,22 +74,23 @@ export default function ApplicationVerificationComplete() {
   }, [applicationType]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/20 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#FDF9F0] p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <img 
-            src={logomark} 
-            alt="Goldsainte" 
+          <img
+            src={logomark}
+            alt="Goldsainte"
             className="h-12 w-auto mx-auto mb-4"
-          loading="lazy"/>
-          <h1 className="text-2xl font-semibold text-foreground mb-2">
+            loading="lazy"
+          />
+          <h1 className="font-secondary text-[26px] md:text-[31px] text-[#0a2225] mb-2">
             Verification Complete
           </h1>
         </div>
 
-        <Card>
+        <Card className="bg-white border border-[#E5DFC6] rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
           <CardHeader>
-            <CardTitle className="flex items-center gap-3">
+            <CardTitle className="flex items-center gap-3 font-secondary text-[#0a2225]">
               {status === 'pending' && (
                 <>
                   <Clock className="h-6 w-6 text-[#C7A962] animate-pulse" />
@@ -98,7 +99,7 @@ export default function ApplicationVerificationComplete() {
               )}
               {status === 'success' && (
                 <>
-                  <CheckCircle className="h-6 w-6 text-green-500" />
+                  <CheckCircle className="h-6 w-6 text-[#0c4d47]" />
                   Identity Verified
                 </>
               )}
@@ -113,33 +114,33 @@ export default function ApplicationVerificationComplete() {
           
           <CardContent className="space-y-4">
             {status === 'pending' && (
-              <p className="text-muted-foreground">
+              <p className="text-[#6B7280]">
                 We're confirming your identity verification with Stripe...
               </p>
             )}
             
             {status === 'success' && (
               <>
-                <p className="text-muted-foreground">
+                <p className="text-[#6B7280]">
                   Your identity has been successfully verified. Our team will review your{' '}
                   {applicationType} application and get back to you within 1-2 business days.
                 </p>
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2">What happens next?</h3>
-                  <ul className="text-sm text-muted-foreground space-y-2">
-                    <li>✓ Our team reviews your application</li>
-                    <li>✓ We'll email you when approved</li>
-                    <li>✓ You'll receive login credentials</li>
-                    <li>✓ Start using Goldsainte immediately</li>
+                <div className="bg-[#F5EFE1] border border-[#E5DFC6] p-4 rounded-xl">
+                  <h3 className="font-secondary text-lg text-[#0a2225] mb-2">What happens next?</h3>
+                  <ul className="text-sm text-[#0a2225] space-y-2">
+                    <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />Our team reviews your application</li>
+                    <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />We'll email you when approved</li>
+                    <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />You'll receive login credentials</li>
+                    <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />Start using Goldsainte immediately</li>
                   </ul>
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-[#6B7280]">
                   You'll receive an email confirmation shortly. Please check your spam folder
                   if you don't see it within a few minutes.
                 </p>
                 <Button
                   onClick={() => navigate('/')}
-                  className="w-full"
+                  className="w-full bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full"
                   size="lg"
                 >
                   Return to Home
@@ -149,14 +150,14 @@ export default function ApplicationVerificationComplete() {
             
             {status === 'error' && (
               <>
-                <p className="text-muted-foreground">
+                <p className="text-[#6B7280]">
                   There was an issue processing your verification. Please contact our support team
                   at support@goldsainte.com for assistance.
                 </p>
                 <Button
                   onClick={() => navigate('/')}
                   variant="outline"
-                  className="w-full"
+                  className="w-full border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full"
                 >
                   Return to Home
                 </Button>
