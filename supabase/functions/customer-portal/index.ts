@@ -84,7 +84,18 @@ serve(async (req) => {
       .single();
     
     let customerId = profileData?.stripe_customer_id;
-    
+
+    // Verify cached customer still exists in current Stripe environment
+    if (customerId) {
+      try {
+        await stripe.customers.retrieve(customerId);
+        logStep("Using cached customer ID", { customerId });
+      } catch (e) {
+        logStep("Cached customer not found, will re-resolve", { customerId });
+        customerId = null;
+      }
+    }
+
     // If no cached ID, look up by email and cache it
     if (!customerId) {
       const customers = await stripe.customers.list({ email: user.email, limit: 1 });
@@ -109,8 +120,6 @@ serve(async (req) => {
         .eq('id', user.id);
       
       logStep("Cached Stripe customer ID", { customerId });
-    } else {
-      logStep("Using cached customer ID", { customerId });
     }
 
     const portalSession = await stripe.billingPortal.sessions.create({
