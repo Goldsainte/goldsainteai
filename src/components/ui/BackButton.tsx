@@ -12,10 +12,17 @@ export function BackButton({ label = "Back", to, className = "" }: BackButtonPro
   const navigate = useNavigate();
 
   const handleClick = () => {
-    if (to) {
+    // Always prefer going back to the actual previous page so users return to
+    // wherever they came from, not a hardcoded route. The `to` prop is only a
+    // fallback for when there is no in-app history (e.g. user landed here
+    // directly via a shared link or fresh tab).
+    const hasHistory = typeof window !== "undefined" && window.history.length > 1;
+    if (hasHistory) {
+      navigate(-1);
+    } else if (to) {
       navigate(to);
     } else {
-      navigate(-1);
+      navigate("/");
     }
   };
 
