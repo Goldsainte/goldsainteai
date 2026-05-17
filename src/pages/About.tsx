@@ -14,7 +14,7 @@ import openaiLogo from "@/assets/OpenAI_Logo.svg";
 import goldsainteLogo from "@/assets/wordmark-green.svg";
 import primaryLogoGreen from "@/assets/primary-horizontal-logo-green.svg";
 import { 
-  Sparkles, Share2, Briefcase, BookOpen, BarChart3,
+  Sparkles, Share2, Briefcase, Map, BarChart3,
   DollarSign, ShieldCheck, FileCheck, MessageCircle, Inbox, CreditCard,
 } from "lucide-react";
 
@@ -34,9 +34,9 @@ const About = () => {
           description: "Describe your dream trip in plain language. Our AI reads your brief, infers destinations, budget and style, and matches you with the verified specialists best suited to design it."
         },
         {
-          icon: BookOpen,
-          title: "Storyboards",
-          description: "Editorial, Pinterest-style travel boards built by creators and agents. Browse, save and turn any storyboard into a bookable, fully-priced itinerary."
+          icon: Map,
+          title: "Personalised Proposals",
+          description: "Every proposal is a fully-priced itinerary tailored to your brief — destinations, accommodation, experiences, transfers and cancellation terms, side-by-side and easy to compare."
         }
       ]
     },
