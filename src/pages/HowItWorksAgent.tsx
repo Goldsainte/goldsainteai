@@ -1,4 +1,4 @@
-import { FileText, ShieldCheck, CreditCard, Plane, Inbox, Briefcase, DollarSign } from "lucide-react";
+import { FileText, ShieldCheck, CreditCard, Plane, Inbox, Briefcase, DollarSign, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { HowItWorksTemplate, type HowItWorksStep } from "./HowItWorksTemplate";
 import { CurrenciesAndPayouts } from "@/components/onboarding/CurrenciesAndPayouts";
@@ -20,8 +20,11 @@ export default function HowItWorksAgent() {
       eyebrow={t('howItWorks.agent.eyebrow', 'For Travel Agents')}
       title={t('howItWorks.agent.title', 'A modern marketplace for specialists')}
       subtitle={t('howItWorks.agent.subtitle', 'Win new clients, run trips end-to-end and get paid securely — all in one platform.')}
-      plainSummary={t('howItWorks.agent.summary', 'Win clients from real trip requests, manage bookings end-to-end, get paid securely via escrow.')}
       steps={STEPS}
+      factCard={{
+        text: "Traveler funds are held in escrow and released to you as each trip milestone is delivered. Disputes resolved within 7 business days.",
+        icon: Shield,
+      }}
       extraSection={<CurrenciesAndPayouts />}
       finalCta={{
         heading: "Apply to join Goldsainte",
