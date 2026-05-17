@@ -244,18 +244,17 @@ export default function HotelDetails() {
               </div>
             ))}
             {photos.length > 5 && (
-              <Button 
-                variant="secondary" 
-                className="absolute bottom-4 right-4"
+              <button
                 onClick={() => setShowGallery(true)}
+                className="absolute bottom-4 right-4 rounded-full bg-white/95 backdrop-blur border border-[#E5DFC6] px-4 py-2 text-xs font-medium text-[#0a2225] hover:bg-white shadow-sm transition-colors"
               >
-                View All {photos.length} Photos
-              </Button>
+                View all {photos.length} photos
+              </button>
             )}
           </div>
         ) : (
-          <div className="h-96 bg-muted rounded-lg flex items-center justify-center mb-6">
-            <p className="text-muted-foreground">No photos available</p>
+          <div className="h-96 bg-[#F5F0E0] border border-[#E5DFC6] rounded-2xl flex items-center justify-center mb-6">
+            <p className="text-sm text-[#7A7151]">No photos available</p>
           </div>
         )}
 
