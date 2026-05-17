@@ -248,9 +248,22 @@ export default function BrandOnboarding() {
     } catch (error) { console.error(error); toast.error('Upload failed'); }
   };
 
+  const formatCityLabel = (value: string) =>
+    value
+      .trim()
+      .replace(/\s+/g, ' ')
+      .split(' ')
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+      .join(' ');
+
   const addCity = () => {
-    if (cityInput.trim() && !formData.cities.includes(cityInput.trim())) {
-      setFormData(prev => ({ ...prev, cities: [...prev.cities, cityInput.trim()] }));
+    const formattedCity = formatCityLabel(cityInput);
+
+    if (
+      formattedCity &&
+      !formData.cities.some((city) => city.toLowerCase() === formattedCity.toLowerCase())
+    ) {
+      setFormData(prev => ({ ...prev, cities: [...prev.cities, formattedCity] }));
       setCityInput('');
     }
   };
@@ -453,16 +466,45 @@ export default function BrandOnboarding() {
 
             <div>
               <Label className="font-medium text-[#0a2225]">Cities/Locations</Label>
-              <div className="flex gap-2 mt-2">
-                <Input value={cityInput} onChange={(e) => setCityInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCity())} className={luxuryInputClasses} placeholder="Enter a city and press Enter" />
-                <Button type="button" onClick={addCity} variant="outline" className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20">Add</Button>
+              <div className="mt-2 space-y-2">
+                <div className="flex flex-col gap-2 md:flex-row">
+                  <Input
+                    value={cityInput}
+                    onChange={(e) => setCityInput(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCity())}
+                    className={luxuryInputClasses}
+                    placeholder="Add one city or location"
+                    aria-describedby="brand-city-help"
+                  />
+                  <Button
+                    type="button"
+                    onClick={addCity}
+                    variant="outline"
+                    className="min-w-[120px] border-[#E5DFC6] px-5 text-[#0a2225] hover:bg-[#E5DFC6]/20"
+                  >
+                    Add city
+                  </Button>
+                </div>
+                <p id="brand-city-help" className="text-sm text-[#7A7151]">
+                  Press Enter after each city or click Add city.
+                </p>
               </div>
               {formData.cities.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-3">
+                <div className="mt-3 flex flex-wrap gap-2">
                   {formData.cities.map((city) => (
-                    <div key={city} className="flex items-center gap-1 px-3 py-1 bg-[#F5EFE1] text-[#7A7151] rounded-full text-sm border border-[#E5DFC6]">
-                      {city}
-                      <button type="button" onClick={() => setFormData(prev => ({ ...prev, cities: prev.cities.filter(c => c !== city) }))} className="ml-1 hover:text-[#0a2225]"><X className="h-3 w-3" /></button>
+                    <div
+                      key={city}
+                      className="inline-flex items-center gap-2 rounded-md border border-[#E5DFC6] bg-[#F8F4EA] px-3.5 py-2 text-sm text-[#0a2225]"
+                    >
+                      <span className="font-medium leading-none">{city}</span>
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, cities: prev.cities.filter(c => c !== city) }))}
+                        className="text-[#7A7151] transition-colors hover:text-[#0a2225]"
+                        aria-label={`Remove ${city}`}
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
                     </div>
                   ))}
                 </div>
