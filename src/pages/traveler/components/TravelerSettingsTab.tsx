@@ -33,7 +33,9 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
   });
 
   useEffect(() => {
-    const fetchPreferences = async () => {
+    if (!userId) return;
+
+    const fetchSettings = async () => {
       const { data } = await supabase
         .from("user_travel_preferences")
         .select("*")
@@ -49,11 +51,24 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
           accessibility_needs: data.accessibility_needs,
         });
       }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("notification_preferences")
+        .eq("id", userId)
+        .maybeSingle();
+
+      if (profile?.notification_preferences) {
+        const prefs = profile.notification_preferences as Record<string, boolean>;
+        setNotifications({
+          email_notifications: prefs.email ?? true,
+          sms_notifications: prefs.sms ?? false,
+          marketing_emails: prefs.marketing ?? false,
+        });
+      }
     };
 
-    if (userId) {
-      fetchPreferences();
-    }
+    fetchSettings();
   }, [userId]);
 
   const handleManagePayments = async () => {
@@ -87,11 +102,23 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
   const handleSaveNotifications = async () => {
     setSavingNotifications(true);
     try {
-      // Would save to a user_settings table
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          notification_preferences: {
+            email: notifications.email_notifications,
+            sms: notifications.sms_notifications,
+            push: true,
+            marketing: notifications.marketing_emails,
+          },
+        })
+        .eq("id", userId);
+
+      if (error) throw error;
       toast.success("Notification preferences saved");
-    } catch (error) {
-      toast.error("Failed to save preferences");
+    } catch (error: any) {
+      console.error("Save notifications error:", error);
+      toast.error(error.message || "Failed to save preferences");
     } finally {
       setSavingNotifications(false);
     }
