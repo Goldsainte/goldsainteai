@@ -130,6 +130,11 @@ const HowItWorksAgent = lazy(() => import('@/pages/HowItWorksAgent'));
 const DisputeResolution = lazy(() => import('@/pages/DisputeResolution'));
 const PrivacyCookies = lazy(() => import('@/pages/PrivacyCookies'));
 const HelpCenter = lazy(() => import('@/pages/HelpCenter'));
+const SupportedCountriesPage = lazy(() => import('@/pages/help/SupportedCountriesPage'));
+const VideoTourPage = lazy(() => import('@/pages/help/VideoTourPage'));
+const TaxInformationPage = lazy(() => import('@/pages/help/TaxInformationPage'));
+const AgentRequirementsPage = lazy(() => import('@/pages/help/AgentRequirementsPage'));
+const PaymentsAndFeesPage = lazy(() => import('@/pages/help/PaymentsAndFeesPage'));
 const CommunityGuidelines = lazy(() => import('@/pages/CommunityGuidelines'));
 const TrustSafety = lazy(() => import('@/pages/TrustSafety'));
 const LegalTermsPage = lazy(() => import('@/pages/LegalTermsPage'));
@@ -176,6 +181,12 @@ export const AppRoutes = () => (
       <Route path="/dispute-resolution" element={<DisputeResolution />} />
       <Route path="/privacy-cookies" element={<PrivacyCookies />} />
       <Route path="/help" element={<HelpCenter />} />
+      <Route path="/help/supported-countries" element={<SupportedCountriesPage />} />
+      <Route path="/help/video-tour" element={<VideoTourPage />} />
+      <Route path="/help/tax-information" element={<TaxInformationPage />} />
+      <Route path="/help/agent-requirements" element={<AgentRequirementsPage />} />
+      <Route path="/help/payments-and-fees" element={<PaymentsAndFeesPage />} />
+      <Route path="/help/trust-and-safety" element={<Navigate to="/trust-safety" replace />} />
       <Route path="/community-guidelines" element={<CommunityGuidelines />} />
       <Route path="/trust-safety" element={<TrustSafety />} />
       <Route path="/trust-and-safety" element={<Navigate to="/trust-safety" replace />} />
