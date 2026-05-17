@@ -24,15 +24,22 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders(req) });
   }
 
-  // Validate request origin against allowlist
-  const ALLOWED_ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") || "")
-    .split(",")
-    .map(s => s.trim())
-    .filter(Boolean);
+  // Reflect allowed request origins; fall back to production.
+  const ALLOWED_HOST_RE = /^https:\/\/[a-z0-9-]+\.(lovable\.app|lovableproject\.com)$/i;
+  const STATIC_ALLOWED = new Set([
+    "https://goldsainte.ai",
+    "https://www.goldsainte.ai",
+    "https://goldsainteai.lovable.app",
+    "http://localhost:5173",
+    "http://localhost:8080",
+    "http://localhost:3000",
+  ]);
   const requestOrigin = req.headers.get("origin") || "";
-  const origin = ALLOWED_ORIGINS.includes(requestOrigin)
+  const isOriginAllowed =
+    STATIC_ALLOWED.has(requestOrigin) || ALLOWED_HOST_RE.test(requestOrigin);
+  const origin = isOriginAllowed
     ? requestOrigin
-    : (ALLOWED_ORIGINS[0] || Deno.env.get("SITE_URL") || "https://goldsainte.ai");
+    : (Deno.env.get("SITE_URL") || "https://goldsainte.ai");
 
   try {
     logStep("Function started");
@@ -122,9 +129,23 @@ serve(async (req) => {
       logStep("Cached Stripe customer ID", { customerId });
     }
 
+    // Accept caller-provided returnUrl, but only if it's on an allowed origin.
+    let returnUrl = `${origin}/traveler?tab=settings`;
+    try {
+      if (req.headers.get("content-length") && req.headers.get("content-type")?.includes("application/json")) {
+        const body = await req.json().catch(() => ({}));
+        if (body?.returnUrl && typeof body.returnUrl === "string") {
+          const u = new URL(body.returnUrl);
+          if (STATIC_ALLOWED.has(u.origin) || ALLOWED_HOST_RE.test(u.origin)) {
+            returnUrl = body.returnUrl;
+          }
+        }
+      }
+    } catch (_) { /* ignore body parse errors */ }
+
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: customerId,
-      return_url: `${origin}/traveler`,
+      return_url: returnUrl,
     });
     logStep("Customer portal session created", { sessionId: portalSession.id });
 
