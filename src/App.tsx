@@ -146,6 +146,12 @@ function AppContent() {
 export default function App() {
   const [introComplete, setIntroComplete] = useState(() => {
     if (typeof window === "undefined") return true;
+    const isStandalone =
+      window.matchMedia?.("(display-mode: standalone)").matches ||
+      // iOS Safari
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window.navigator as any).standalone === true;
+    if (!isStandalone) return true;
     return sessionStorage.getItem("goldsainte-intro-seen") === "true";
   });
 
