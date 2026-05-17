@@ -217,7 +217,7 @@ const handler = async (req: Request): Promise<Response> => {
     const { subject, html } = getEmailContent(accountType, name);
 
     const emailResponse = await resend.emails.send({
-      from: "Goldsainte <onboarding@notify.goldsainte.com>",
+      from: "Goldsainte <hello@goldsainte.com>",
       to: [email],
       subject,
       html,

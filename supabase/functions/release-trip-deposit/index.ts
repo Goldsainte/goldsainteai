@@ -241,7 +241,7 @@ async function sendReviewRequestEmail(admin: ReturnType<typeof createClient>, bo
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "Goldsainte <noreply@notify.goldsainte.com>",
+      from: "Goldsainte <hello@goldsainte.com>",
       to: [travelerEmail],
       subject,
       html,

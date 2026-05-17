@@ -52,7 +52,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Goldsainte <hello@notify.goldsainte.com>",
+        from: "Goldsainte <hello@goldsainte.com>",
         to: agentEmail,
         subject: `Your trip listing is under review — ${tripTitle || "Your trip"}`,
         html,

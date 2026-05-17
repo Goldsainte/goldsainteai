@@ -8,7 +8,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 const ALERT_TO = Deno.env.get("EMAIL_INFRA_ALERT_TO") || "info@goldsainte.com";
-const ALERT_FROM = "Goldsainte Infra <alerts@notify.goldsainte.com>";
+const ALERT_FROM = "Goldsainte Infra <hello@goldsainte.com>";
 const QUEUE_DEPTH_THRESHOLD = 100;
 const STUCK_PENDING_MIN = 10;
 const DLQ_THRESHOLD = 10;
