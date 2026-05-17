@@ -55,6 +55,13 @@ export interface SearchFilters {
 
 export default function Marketplace() {
   const { user } = useAuth();
+
+  // Mark marketplace as visited for the Getting Started checklist
+  useEffect(() => {
+    if (user?.id) {
+      localStorage.setItem(`visited_marketplace_${user.id}`, "true");
+    }
+  }, [user?.id]);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();

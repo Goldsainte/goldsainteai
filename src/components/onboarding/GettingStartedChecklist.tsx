@@ -75,7 +75,7 @@ const TRAVELER_ITEMS: ChecklistItem[] = [
     label: "Set your notification preferences",
     description: "Choose email or SMS so you never miss a proposal from a specialist.",
     cta: { label: "Notification settings", to: "/travel-settings" },
-    isComplete: (d) => !!d.profile?.notification_preferences_set,
+    isComplete: (d) => !!d.profile?.notification_preferences,
   },
 ];
 
@@ -92,7 +92,8 @@ const CREATOR_ITEMS: ChecklistItem[] = [
     label: "Connect your payout account",
     description: "Set up Stripe Connect to receive commissions on bookings and guide sales.",
     cta: { label: "Connect Stripe", to: "/creator-dashboard?tab=earnings", event: "start-stripe-onboarding" },
-    isComplete: (d) => !!d.profile?.stripe_connect_account_id,
+    isComplete: (d) =>
+      !!(d.profile?.stripe_connect_account_id || d.profile?.stripe_account_id),
   },
   {
     id: "create-content",
@@ -120,7 +121,7 @@ const CREATOR_ITEMS: ChecklistItem[] = [
     label: "Set your notification preferences",
     description: "Stay on top of new bookings, messages, and tier upgrades.",
     cta: { label: "Notification settings", to: "/creator-dashboard?tab=settings" },
-    isComplete: (d) => !!d.profile?.notification_preferences_set,
+    isComplete: (d) => !!d.profile?.notification_preferences,
   },
 ];
 
@@ -130,14 +131,17 @@ const AGENT_ITEMS: ChecklistItem[] = [
     label: "Verify your identity",
     description: "Complete Stripe Identity verification to publish trips.",
     cta: { label: "Start verification", to: "/apply/agent" },
-    isComplete: (d) => d.profile?.agent_verification_status === "verified",
+    isComplete: (d) =>
+      d.profile?.agent_verification_status === "verified" ||
+      d.profile?.identity_verified === true,
   },
   {
     id: "connect-stripe",
     label: "Connect your payout account",
     description: "Set up Stripe Connect so you can receive payments from travelers.",
     cta: { label: "Connect Stripe", to: "/agent-dashboard?tab=earnings", event: "start-stripe-onboarding" },
-    isComplete: (d) => !!d.profile?.stripe_connect_account_id,
+    isComplete: (d) =>
+      !!(d.profile?.stripe_connect_account_id || d.profile?.stripe_account_id),
   },
   {
     id: "publish-trip",
@@ -165,7 +169,7 @@ const AGENT_ITEMS: ChecklistItem[] = [
     label: "Set your notification preferences",
     description: "Get instant alerts for new requests and traveler messages.",
     cta: { label: "Notification settings", to: "/agent-dashboard?tab=settings" },
-    isComplete: (d) => !!d.profile?.notification_preferences_set,
+    isComplete: (d) => !!d.profile?.notification_preferences,
   },
 ];
 
@@ -190,7 +194,15 @@ export function GettingStartedChecklist({ userId, role }: Props) {
           .eq("id", userId)
           .maybeSingle();
 
-        const stats: ChecklistData = { profile };
+        const browsedKey = `visited_marketplace_${userId}`;
+        const stats: ChecklistData = {
+          profile,
+          activity: {
+            has_browsed_marketplace:
+              typeof window !== "undefined" &&
+              localStorage.getItem(browsedKey) === "true",
+          },
+        };
 
         if (role === "traveler") {
           const [{ count: trCount }, { count: wlCount }] = await Promise.all([
