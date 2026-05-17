@@ -10,7 +10,7 @@ const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SENDGRID_API_KEY = Deno.env.get("SENDGRID_API_KEY");
 const FROM_EMAIL = Deno.env.get("FROM_EMAIL") || "hello@goldsainte.com";
 const FROM_NAME = Deno.env.get("FROM_NAME") || "Goldsainte";
-const FRONTEND_URL = Deno.env.get("FRONTEND_URL") || "https://goldsainte.com";
+const FRONTEND_URL = Deno.env.get("FRONTEND_URL") || "https://goldsainte.ai";
 const SUPPORT_EMAIL = Deno.env.get("SUPPORT_EMAIL") || "support@goldsainte.com";
 
 // ============================================================================
