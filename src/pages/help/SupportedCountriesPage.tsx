@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft, Globe } from "lucide-react";
+import { FlagGlyph } from "@/components/help/FlagGlyph";
 
 const REGIONS: { name: string; countries: string[] }[] = [
   {
@@ -51,9 +52,12 @@ export default function SupportedCountriesPage() {
           {REGIONS.map((region) => (
             <section key={region.name} className="rounded-2xl border border-[#E5DFC6] bg-white p-6">
               <h2 className="font-secondary text-xl text-[#0a2225] mb-4">{region.name}</h2>
-              <ul className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 text-sm text-[#4A4A4A]">
+              <ul className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3 text-sm text-[#4A4A4A]">
                 {region.countries.map((c) => (
-                  <li key={c}>{c}</li>
+                  <li key={c} className="flex items-center gap-3">
+                    <FlagGlyph country={c} className="flex-shrink-0 opacity-80" />
+                    <span>{c}</span>
+                  </li>
                 ))}
               </ul>
             </section>
