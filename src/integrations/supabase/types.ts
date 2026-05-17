@@ -8506,6 +8506,7 @@ export type Database = {
           creator_tier: string
           destinations_focus_tags: string[] | null
           display_name: string | null
+          dispute_preference: string | null
           email: string | null
           email_notifications: boolean | null
           email_verified: boolean | null
@@ -8632,6 +8633,7 @@ export type Database = {
           creator_tier?: string
           destinations_focus_tags?: string[] | null
           display_name?: string | null
+          dispute_preference?: string | null
           email?: string | null
           email_notifications?: boolean | null
           email_verified?: boolean | null
@@ -8758,6 +8760,7 @@ export type Database = {
           creator_tier?: string
           destinations_focus_tags?: string[] | null
           display_name?: string | null
+          dispute_preference?: string | null
           email?: string | null
           email_notifications?: boolean | null
           email_verified?: boolean | null

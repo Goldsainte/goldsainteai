@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS dispute_preference text DEFAULT 'platform_mediation' CHECK (dispute_preference IN ('platform_mediation','direct_first','auto_refund'));
