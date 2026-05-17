@@ -324,7 +324,7 @@ export const AppRoutes = () => (
         )}
       />
       <Route path="/application/status" element={<ApplicationStatusCheck />} />
-      <Route path="/apply/agent" element={<RequireAuth><AgentApplicationForm /></RequireAuth>} />
+      <Route path="/apply/agent" element={<AgentApplicationForm />} />
       <Route path="/agent-onboarding" element={<Navigate to="/apply/agent" replace />} />
       <Route
         path="/trips"
