@@ -18,11 +18,11 @@ interface Props {
   subtitle: string;
   steps: HowItWorksStep[];
   finalCta: { heading: string; description: string; label: string; to: string };
-  plainSummary?: string;
+  factCard?: { text: string; icon?: React.ComponentType<{ className?: string }> };
   extraSection?: React.ReactNode;
 }
 
-export function HowItWorksTemplate({ eyebrow, title, subtitle, steps, finalCta, plainSummary, extraSection }: Props) {
+export function HowItWorksTemplate({ eyebrow, title, subtitle, steps, finalCta, factCard, extraSection }: Props) {
   const { t } = useTranslation();
   return (
     <main className="flex-1 bg-[#FDF9F0]">
@@ -31,12 +31,18 @@ export function HowItWorksTemplate({ eyebrow, title, subtitle, steps, finalCta, 
           <p className="text-xs uppercase tracking-[0.2em] text-[#C7A962] font-medium mb-4">{eyebrow}</p>
           <h1 className="font-secondary text-3xl md:text-5xl text-[#0a2225] mb-4 text-balance">{title}</h1>
           <p className="text-base md:text-lg text-[#6B7280] max-w-2xl mx-auto text-pretty">{subtitle}</p>
-          {plainSummary && (
-            <p className="text-base text-[#4a4a4a] mt-6 italic max-w-2xl mx-auto">
-              {t('howItWorks.inOneSentence', 'In one sentence:')} {plainSummary}
-            </p>
-          )}
         </header>
+
+        {factCard && (
+          <div className="rounded-xl bg-white border border-[#E5DFC6] px-5 py-4 mb-10 max-w-2xl mx-auto -mt-6">
+            <div className="flex items-start gap-3">
+              {factCard.icon && <factCard.icon className="h-4 w-4 text-[#C7A962] flex-shrink-0 mt-0.5" />}
+              <p className="text-sm text-[#4a4a4a] leading-relaxed text-left">
+                {factCard.text}
+              </p>
+            </div>
+          </div>
+        )}
 
         <AvailabilityNotice />
 

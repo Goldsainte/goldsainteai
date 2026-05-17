@@ -1,4 +1,4 @@
-import { UserCircle, ShieldCheck, CreditCard, Camera, Share2, DollarSign, Star } from "lucide-react";
+import { UserCircle, ShieldCheck, CreditCard, Camera, Share2, DollarSign, Star, TrendingUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { HowItWorksTemplate, type HowItWorksStep } from "./HowItWorksTemplate";
 import { CurrenciesAndPayouts } from "@/components/onboarding/CurrenciesAndPayouts";
@@ -20,8 +20,11 @@ export default function HowItWorksCreator() {
       eyebrow={t('howItWorks.creator.eyebrow', 'For Creators')}
       title={t('howItWorks.creator.title', 'Turn your audience into bookings')}
       subtitle={t('howItWorks.creator.subtitle', 'A complete commerce layer for travel creators — sell trips, sell guides, get paid.')}
-      plainSummary={t('howItWorks.creator.summary', 'Sell your travel knowledge as packaged trips or digital guides, get paid through Stripe.')}
       steps={STEPS}
+      factCard={{
+        text: "Creators earn between 85% and 92% commission depending on tier. Payouts settle through Stripe Connect within 2 business days.",
+        icon: TrendingUp,
+      }}
       extraSection={<CurrenciesAndPayouts />}
       finalCta={{
         heading: "Start earning with your audience",

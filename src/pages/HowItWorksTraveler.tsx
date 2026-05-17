@@ -1,4 +1,4 @@
-import { Search, Send, MessageCircle, CreditCard, ShieldCheck, Star, Plane } from "lucide-react";
+import { Search, Send, MessageCircle, CreditCard, ShieldCheck, Star, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { HowItWorksTemplate, type HowItWorksStep } from "./HowItWorksTemplate";
 
@@ -18,8 +18,11 @@ export default function HowItWorksTraveler() {
       eyebrow={t('howItWorks.traveler.eyebrow', 'For Travelers')}
       title={t('howItWorks.traveler.title', 'How Goldsainte works')}
       subtitle={t('howItWorks.traveler.subtitle', 'Your private studio for designing extraordinary travel — from inspiration to confirmation.')}
-      plainSummary={t('howItWorks.traveler.summary', 'Find a travel specialist, pay safely through escrow, take the trip.')}
       steps={STEPS}
+      factCard={{
+        text: "Most travelers receive 3-5 proposals within 48 hours of posting a trip request.",
+        icon: Clock,
+      }}
       finalCta={{
         heading: "Ready to begin?",
         description: "Post your first trip request and start receiving proposals from verified specialists.",
