@@ -159,11 +159,43 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
 
   const handleDownloadData = async () => {
     try {
-      toast("Coming soon", {
-        description: "Data export functionality will be available soon",
-      });
-    } catch (error) {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        toast.error("Please sign in to download your data");
+        return;
+      }
+
+      toast.loading("Preparing your data export...");
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/export-user-data`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error('Export failed');
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `goldsainte-data-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast.dismiss();
+      toast.success("Your data has been downloaded");
+    } catch (error: any) {
+      toast.dismiss();
       console.error('Error downloading data:', error);
+      toast.error(error.message || "Failed to download data");
     }
   };
 
