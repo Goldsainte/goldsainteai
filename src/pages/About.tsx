@@ -11,84 +11,82 @@ import { useTranslation } from "react-i18next";
 import { BackButton } from "@/components/ui/BackButton";
 import founderImage from "@/assets/founder.jpg";
 import openaiLogo from "@/assets/OpenAI_Logo.svg";
-import geminiLogo from "@/assets/Google_Gemini_logo_2025.svg";
 import goldsainteLogo from "@/assets/wordmark-green.svg";
 import primaryLogoGreen from "@/assets/primary-horizontal-logo-green.svg";
 import { 
-  Sparkles, Share2, Briefcase, Package, BarChart3, 
-  DollarSign, Users, FileCheck, MessageCircle, 
+  Sparkles, Share2, Briefcase, BookOpen, BarChart3,
+  DollarSign, ShieldCheck, FileCheck, MessageCircle, Inbox, CreditCard,
 } from "lucide-react";
 
 const About = () => {
   const { t } = useTranslation();
   const partners = [
     { name: "OpenAI", logo: openaiLogo },
-    { name: "Google Gemini", logo: geminiLogo }
   ];
 
   const featureCategories = [
     {
-      category: "AI-Powered Intelligence",
+      category: "AI-Powered Trip Design",
       features: [
         {
           icon: Sparkles,
-          title: "AI Trip Planning",
-          description: "Describe your dream trip in plain language and our AI builds a personalised itinerary, matches you with the right specialist, and structures the full journey."
+          title: "AI Trip Matching",
+          description: "Describe your dream trip in plain language. Our AI reads your brief, infers destinations, budget and style, and matches you with the verified specialists best suited to design it."
         },
         {
-          icon: Sparkles,
-          title: "Personal AI Agent",
-          description: "Your AI learns your style, budget, and preferences to deliver smarter, personalized recommendations every time you travel."
+          icon: BookOpen,
+          title: "Storyboards",
+          description: "Editorial, Pinterest-style travel boards built by creators and agents. Browse, save and turn any storyboard into a bookable, fully-priced itinerary."
         }
       ]
     },
     {
-      category: "Creator Economy",
+      category: "Marketplace & Bookings",
+      features: [
+        {
+          icon: Inbox,
+          title: "Trip Request Marketplace",
+          description: "Post a trip request once. Certified travel agents and creators submit tailored proposals you can compare side-by-side — itinerary, pricing, reviews and cancellation terms."
+        },
+        {
+          icon: Briefcase,
+          title: "Packaged Trips & Services",
+          description: "Browse ready-to-book trips and creator-led services across every region and style — from short city breaks to multi-stop, multi-week journeys."
+        },
+        {
+          icon: CreditCard,
+          title: "Escrow & Milestone Payments",
+          description: "All payments stay on-platform. Funds are held in escrow and released to your specialist as each milestone of your trip is delivered."
+        },
+        {
+          icon: ShieldCheck,
+          title: "Verified Specialists",
+          description: "Every agent and creator is vetted, identity-verified through Stripe Identity, and held to clear marketplace standards before they can publish or take bookings."
+        }
+      ]
+    },
+    {
+      category: "For Creators & Agents",
       features: [
         {
           icon: Share2,
-          title: "Create, Share & Earn",
-          description: "A social platform where content creators can showcase journeys, build interactive travel plans, and generate income."
-        },
-        {
-          icon: Package,
-          title: "CoCurated™ Packages",
-          description: "Exclusive travel experiences designed by top creators and experts, blending inspiration with seamless booking."
-        },
-        {
-          icon: BarChart3,
-          title: "Creator Dashboard",
-          description: "Comprehensive tools, analytics, and partnerships—all built to empower creators with insights and growth."
+          title: "Creator Profiles & Storefronts",
+          description: "Creators turn their audience into bookings with a public profile, storyboards, packaged trips and digital guides — all monetised in one place."
         },
         {
           icon: DollarSign,
-          title: "Creator Payouts",
-          description: "Multiple revenue streams with tiered commissions (5-15%) based on performance and engagement."
-        }
-      ]
-    },
-    {
-      category: "Seamless Experience",
-      features: [
-        {
-          icon: Briefcase,
-          title: "Expert Agent Marketplace",
-          description: "Post complex itineraries, get AI-matched with certified agents, and pay securely in milestones with real-time tracking."
+          title: "Industry-Leading Payouts",
+          description: "Creators earn 85–92% commission depending on tier. Agents keep the full value of the trips they design, less a small marketplace fee. Payouts settle via Stripe Connect."
         },
         {
-          icon: Users,
-          title: "Group Bookings & Split Payments",
-          description: "Make group planning seamless with secure payment links, split tracking, and transparent cost sharing."
-        },
-        {
-          icon: FileCheck,
-          title: "Itinerary Management",
-          description: "Keep everything organized—day-by-day plans, document uploads, calendar sync, and travel information in one place."
+          icon: BarChart3,
+          title: "Dashboards & Analytics",
+          description: "Track requests, proposals, bookings, earnings and reviews from one workspace built for travel professionals."
         },
         {
           icon: MessageCircle,
-          title: "Real-Time Communication",
-          description: "Instant chat with agents, push notifications for updates, and seamless communication throughout your journey."
+          title: "On-Platform Messaging",
+          description: "Real-time chat between travelers, agents and creators — with notifications, attachments and a full audit trail, so every conversation stays protected."
         }
       ]
     }
