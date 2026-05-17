@@ -78,7 +78,10 @@ export function ManagePaymentsSection({
       }
       const { data, error } = await supabase.functions.invoke(
         "customer-portal",
-        { headers: { Authorization: `Bearer ${session.access_token}` } },
+        {
+          headers: { Authorization: `Bearer ${session.access_token}` },
+          body: { returnUrl: window.location.href },
+        },
       );
       if (error) throw error;
       if (data?.url) window.open(data.url, "_blank");
