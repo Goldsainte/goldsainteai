@@ -26,6 +26,7 @@ import { AppRoutes } from "@/routes/AppRoutes";
 import { InstallAppPrompt } from "@/components/InstallAppPrompt";
 import { useAffiliateRefCapture } from "@/hooks/useAffiliateRef";
 import { RouteSectionBoundary } from "@/routes/RouteSectionBoundary";
+import GoldsainteIntro from "@/components/GoldsainteIntro";
 
 
 
@@ -143,8 +144,19 @@ function AppContent() {
 }
 
 export default function App() {
+  const [introComplete, setIntroComplete] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return sessionStorage.getItem("goldsainte-intro-seen") === "true";
+  });
+
+  const handleIntroComplete = () => {
+    sessionStorage.setItem("goldsainte-intro-seen", "true");
+    setIntroComplete(true);
+  };
+
   return (
     <HelmetProvider>
+      {!introComplete && <GoldsainteIntro onComplete={handleIntroComplete} />}
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
