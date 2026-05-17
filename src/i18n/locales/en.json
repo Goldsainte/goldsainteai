@@ -427,10 +427,10 @@
   "about": {
     "founderLetter": {
       "title": "Letter from the Founder",
-      "p1": "When Goldsainte first launched, people asked how we were different from other services. The answer was clear: we brought innovation, safety, and elevated experiences to transportation. Today, we've grown far beyond those roots.",
-      "p2": "We're now building something bigger: a global AI-powered travel ecosystem that transforms how people explore, plan, and share their adventures.",
-      "p3": "At Goldsainte, we believe travel is more than logistics—it's about creating experiences worth sharing, building community, and empowering both travelers and creators to thrive.",
-      "p4": "From our beginnings to today's AI-driven platform, we've always stood for trust, innovation, and empowerment. The future of travel isn't just about where you go—it's about how seamlessly and meaningfully you get there.",
+      "p1": "When Goldsainte first launched, people asked how we were different from other travel services. The answer was simple: we combined trust, technology and taste in a way the industry had stopped doing. Today, we've grown far beyond those roots.",
+      "p2": "Goldsainte is now a global luxury travel marketplace — where travelers, certified travel agents and modern creators meet to design extraordinary trips together.",
+      "p3": "We believe travel is more than logistics. It's about creating experiences worth sharing, building real relationships with the specialists who design them, and giving creators a credible way to turn inspiration into bookable journeys.",
+      "p4": "Our platform pairs AI-powered matching with verified human expertise. Travelers post a trip request and receive tailored proposals. Creators publish storyboards and packaged trips. Agents win new clients and get paid securely through escrow. Everything happens on-platform, protected end-to-end.",
       "p5": "Thank you for being part of this journey. The best adventures are still ahead.",
       "signature": "Andre C. Powell Jr.",
       "title2": "CEO & Founder",
@@ -439,24 +439,22 @@
     "sections": {
       "whatIs": {
         "title": "What is Goldsainte?",
-        "p1": "Goldsainte AI is a voice-activated, AI-powered travel marketplace that merges automation with verified human expertise to deliver fully personalized, end-to-end trip planning and booking. With the wake word \"Hey, Goldsainte,\" users can engage a conversational concierge to search, plan, and book flights, hotels, dining, events, and transportation—completely hands-free and in real-time.",
-        "p2": "At the core of the platform is a travel agent marketplace where users can post complex itineraries, receive competitive bids from certified agents, and pay securely through milestone-based transactions. The system supports group bookings, split payments, full itinerary management, and real-time messaging, making it easy to coordinate even the most intricate trips.",
-        "p3": "Goldsainte also powers a unique creator economy: content creators collaborate with agents to co-create and promote curated travel experiences, while transportation vendors can onboard, promote their services, and be included in creator or agent-led packages. This three-way ecosystem—AI + Agents + Creators—makes Goldsainte the first platform to unify inspiration, planning, and booking within one intelligent, social commerce environment."
+        "p1": "Goldsainte is a luxury travel marketplace that connects three audiences: high-intent travelers, certified travel agents and modern travel creators. Browse editorial storyboards, post a trip request to receive tailored proposals from verified specialists, or book ready-made packaged trips directly. AI handles the matching; people design the trips."
       },
       "features": {
         "title": "What We Offer"
       },
       "mission": {
         "title": "Our Mission",
-        "p1": "At Goldsainte, we believe that travel is more than just booking a flight or reserving a hotel—it's about creating unforgettable experiences, building meaningful connections, and empowering people to share their journeys in ways that inspire others.",
-        "p2": "Our mission is to redefine the travel industry by combining cutting-edge AI technology with the creativity and passion of travelers, creators, and travel experts worldwide. We're dedicated to making travel more accessible, personalized, and rewarding.",
-        "p3": "Whether you're a solo explorer seeking hidden gems, a content creator building your brand, or a travel expert sharing your knowledge, Goldsainte provides the tools, platform, and community to help you thrive.",
-        "p4": "Our AI-powered ecosystem is designed to simplify the complexities of travel planning while preserving the magic of discovery. From intelligent matching to personalized AI agents that learn your travel style, we're leveraging technology to make every journey smarter, smoother, and more enjoyable.",
-        "p5": "Ultimately, our mission is to transform how the world travels. We're creating an ecosystem where technology enhances human experience, where creators are valued and rewarded, and where every journey—no matter how big or small—becomes a story worth sharing."
+        "p1": "At Goldsainte, we believe travel is more than booking a flight or reserving a hotel — it's about creating unforgettable experiences, building meaningful relationships with the specialists who design them, and sharing journeys in ways that inspire others.",
+        "p2": "Our mission is to rebuild the modern travel marketplace around trust, taste and technology — pairing AI-powered matching with verified travel agents and creators worldwide, so every traveler gets a trip designed for them and every specialist gets paid fairly.",
+        "p3": "Whether you're a traveler planning a once-in-a-lifetime trip, a creator turning your audience into bookings, or a certified agent looking for a serious commercial home, Goldsainte gives you the tools, protections and community to thrive.",
+        "p4": "Behind the scenes, our AI matches briefs to the right specialists, structures proposals into clear bookable contracts, and keeps payments safe in escrow — releasing funds as each milestone of your trip is delivered.",
+        "p5": "Ultimately, we're building a travel ecosystem where technology enhances human expertise, where creators and agents are valued and rewarded, and where every journey becomes a story worth sharing."
       },
       "partners": {
         "title": "Our Partners & Technology",
-        "description": "Goldsainte leverages industry leaders like Amadeus, Ticketmaster, OpenAI, Google Gemini, Shopify, and Etsy to bring you curated and real-time travel experiences and seamless marketplace integrations."
+        "description": "Goldsainte is built on industry-leading infrastructure — OpenAI for AI matching and trip intelligence, Stripe for escrow payments, Connect payouts and identity verification, and a modern cloud backend for messaging, storage and real-time collaboration."
       },
       "legal": {
         "title": "Legal",
