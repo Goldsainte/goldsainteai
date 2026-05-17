@@ -18,7 +18,7 @@ type AgentApplicationData = {
   phone: string;
   dateOfBirth: string;
   agencyName: string;
-  businessType: "sole_proprietor" | "partnership" | "llc" | "corporation" | "";
+  businessType: "independent" | "agency" | "tour_operator" | "dmc" | "";
   businessAddress: string;
   businessCity: string;
   businessState: string;
@@ -226,6 +226,15 @@ export default function AgentApplicationForm() {
 
   const handleFileUpload = async (file: File, fieldName: string) => {
     try {
+      const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+      if (file.size > MAX_FILE_SIZE) {
+        toast({
+          title: "File too large",
+          description: `${file.name} is ${(file.size / 1024 / 1024).toFixed(1)}MB. Maximum is 50MB per file.`,
+          variant: "destructive",
+        });
+        return null;
+      }
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}_${fieldName}.${fileExt}`;
       const filePath = `agent-applications/${formData.email}/${fileName}`;
@@ -440,10 +449,10 @@ export default function AgentApplicationForm() {
                 <Select value={formData.businessType} onValueChange={(value: any) => setFormData({ ...formData, businessType: value })}>
                   <SelectTrigger className={luxurySelectClasses}><SelectValue placeholder="Select type" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="sole_proprietor">Sole Proprietor</SelectItem>
-                    <SelectItem value="partnership">Partnership</SelectItem>
-                    <SelectItem value="llc">LLC</SelectItem>
-                    <SelectItem value="corporation">Corporation</SelectItem>
+                    <SelectItem value="independent">Independent Advisor</SelectItem>
+                    <SelectItem value="agency">Agency</SelectItem>
+                    <SelectItem value="tour_operator">Tour Operator</SelectItem>
+                    <SelectItem value="dmc">DMC / Destination Management</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
