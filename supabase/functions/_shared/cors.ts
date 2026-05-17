@@ -13,8 +13,9 @@ const STATIC_ALLOWED = new Set<string>([
   "http://localhost:3000",
 ]);
 
-// Allow any *.lovable.app (preview/sandbox subdomains) and the configured project preview.
-const ALLOWED_HOST_RE = /^https:\/\/[a-z0-9-]+\.lovable\.app$/i;
+// Allow any *.lovable.app and *.lovableproject.com (preview/sandbox subdomains).
+const ALLOWED_HOST_RE =
+  /^https:\/\/[a-z0-9-]+\.(lovable\.app|lovableproject\.com)$/i;
 
 function isAllowed(origin: string): boolean {
   if (!origin) return false;
