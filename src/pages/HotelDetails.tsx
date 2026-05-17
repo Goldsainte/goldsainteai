@@ -161,8 +161,8 @@ export default function HotelDetails() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b">
+      <div className="min-h-screen bg-[#FDF9F0]">
+        <div className="sticky top-0 z-10 bg-[#FDF9F0]/95 backdrop-blur border-b border-[#E5DFC6]">
           <div className="max-w-7xl mx-auto p-4">
             <Skeleton className="h-10 w-32" />
           </div>
@@ -178,13 +178,18 @@ export default function HotelDetails() {
 
   if (error || !hotelData) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card className="p-8 max-w-md text-center">
-          <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Unable to Load Hotel</h2>
-          <p className="text-muted-foreground mb-4">{error || 'Hotel not found'}</p>
-          <Button onClick={() => navigate('/')}>Back to Search</Button>
-        </Card>
+      <div className="min-h-screen bg-[#FDF9F0] flex items-center justify-center px-4">
+        <div className="bg-white border border-[#E5DFC6] rounded-2xl p-10 max-w-md text-center">
+          <AlertCircle className="h-10 w-10 text-[#C7A962] mx-auto mb-4" />
+          <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Unable to load hotel</h2>
+          <p className="text-sm text-[#6B7280] mb-6">{error || 'Hotel not found'}</p>
+          <button
+            onClick={() => navigate('/')}
+            className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white px-6 py-2.5 text-sm font-medium transition-colors"
+          >
+            Back to search
+          </button>
+        </div>
       </div>
     );
   }
@@ -195,16 +200,19 @@ export default function HotelDetails() {
   const coordinates = hotelData.coordinates || {};
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-[#FDF9F0] pb-24 text-[#0a2225]">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b">
+      <div className="sticky top-0 z-10 bg-[#FDF9F0]/95 backdrop-blur border-b border-[#E5DFC6]">
         <div className="max-w-7xl mx-auto p-4 flex items-center justify-between">
-          <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+          <button
+            onClick={() => navigate(-1)}
+            className="inline-flex items-center text-sm text-[#0a2225] hover:text-[#0c4d47] transition-colors"
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
-          </Button>
+          </button>
           {checkIn && checkOut && (
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-[#6B7280]">
               {checkIn} - {checkOut} · {guests} guest{guests > 1 ? 's' : ''}
             </div>
           )}
@@ -258,8 +266,8 @@ export default function HotelDetails() {
         <div className="mb-6">
           <div className="flex items-start justify-between mb-2">
             <div>
-              <h1 className="text-3xl font-bold mb-2">{hotelData.name}</h1>
-              <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
+              <h1 className="font-secondary text-4xl text-[#0a2225] mb-2">{hotelData.name}</h1>
+              <div className="flex items-center gap-4 text-sm text-[#6B7280] flex-wrap">
                 <div className="flex items-center gap-1">
                   <MapPin className="h-4 w-4" />
                   {hotelData.address}, {hotelData.city}
@@ -272,11 +280,11 @@ export default function HotelDetails() {
                   </div>
                 )}
                 {hotelData.reviewScore && (
-                  <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 rounded">
-                    <Star className="h-4 w-4 fill-primary text-primary" />
-                    <span className="font-semibold">{hotelData.reviewScore}/10</span>
+                  <div className="flex items-center gap-2 px-3 py-1 bg-[#F5F0E0] border border-[#E5DFC6] rounded-full">
+                    <Star className="h-4 w-4 fill-[#C7A962] text-[#C7A962]" />
+                    <span className="font-medium text-[#0a2225]">{hotelData.reviewScore}/10</span>
                     {hotelData.reviewCount > 0 && (
-                      <span className="text-muted-foreground">({hotelData.reviewCount} reviews)</span>
+                      <span className="text-[#7A7151]">({hotelData.reviewCount} reviews)</span>
                     )}
                   </div>
                 )}
@@ -287,157 +295,181 @@ export default function HotelDetails() {
 
         {/* Tabs */}
         <Tabs defaultValue="overview" className="mb-6">
-          <TabsList className="w-full justify-start">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="rooms">Rooms & Prices</TabsTrigger>
-            <TabsTrigger value="amenities">Amenities</TabsTrigger>
-            <TabsTrigger value="policies">Policies</TabsTrigger>
-            <TabsTrigger value="location">Location</TabsTrigger>
+          <TabsList className="w-full justify-start bg-transparent border-b border-[#E5DFC6] rounded-none p-0 h-auto">
+            {[
+              { v: 'overview', l: 'Overview' },
+              { v: 'rooms', l: 'Rooms & Prices' },
+              { v: 'amenities', l: 'Amenities' },
+              { v: 'policies', l: 'Policies' },
+              { v: 'location', l: 'Location' },
+            ].map((t) => (
+              <TabsTrigger
+                key={t.v}
+                value={t.v}
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#0c4d47] data-[state=active]:bg-transparent data-[state=active]:text-[#0a2225] data-[state=active]:shadow-none text-[#6B7280] px-4 py-3 text-sm"
+              >
+                {t.l}
+              </TabsTrigger>
+            ))}
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6 mt-6">
-            <Card className="p-6">
-              <h3 className="text-xl font-semibold mb-4">About</h3>
-              <p className="text-muted-foreground whitespace-pre-line">
+            <div className="bg-white border border-[#E5DFC6] rounded-2xl p-6">
+              <h3 className="font-secondary text-xl text-[#0a2225] mb-4">About</h3>
+              <p className="text-[#5c5c52] whitespace-pre-line leading-relaxed">
                 {hotelData.description || 'No description available.'}
               </p>
-            </Card>
+            </div>
 
             {facilities.length > 0 && (
-              <Card className="p-6">
-                <h3 className="text-xl font-semibold mb-4">Popular Amenities</h3>
+              <div className="bg-white border border-[#E5DFC6] rounded-2xl p-6">
+                <h3 className="font-secondary text-xl text-[#0a2225] mb-4">Popular amenities</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {facilities.slice(0, 9).map((facility: any, idx: number) => {
                     const IconComponent = facility.icon ? facilityIcons[facility.icon] : CheckCircle2;
                     return (
                       <div key={idx} className="flex items-center gap-2">
-                        <IconComponent className="h-4 w-4 text-primary flex-shrink-0" />
-                        <span className="text-sm">{facility.label}</span>
+                        <IconComponent className="h-4 w-4 text-[#C7A962] flex-shrink-0" />
+                        <span className="text-sm text-[#0a2225]">{facility.label}</span>
                       </div>
                     );
                   })}
                 </div>
-              </Card>
+              </div>
             )}
           </TabsContent>
 
           <TabsContent value="rooms" className="space-y-4 mt-6">
             {!checkIn || !checkOut ? (
-              <Card className="p-6 text-center">
-                <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Select Dates to See Prices</h3>
-                <p className="text-muted-foreground mb-4">
+              <div className="bg-white border border-[#E5DFC6] rounded-2xl p-10 text-center">
+                <AlertCircle className="h-10 w-10 text-[#C7A962] mx-auto mb-4" />
+                <h3 className="font-secondary text-xl text-[#0a2225] mb-2">Select dates to see prices</h3>
+                <p className="text-sm text-[#6B7280] mb-6 max-w-sm mx-auto">
                   Choose your check-in and check-out dates to view available rooms and pricing.
                 </p>
-                <Button onClick={() => navigate('/')}>Search with Dates</Button>
-              </Card>
+                <button
+                  onClick={() => navigate('/')}
+                  className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white px-6 py-2.5 text-sm font-medium transition-colors"
+                >
+                  Search with dates
+                </button>
+              </div>
             ) : loadingRooms ? (
-              <Card className="p-6 flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary mr-3" />
-                <span>Loading room availability...</span>
-              </Card>
+              <div className="bg-white border border-[#E5DFC6] rounded-2xl p-8 flex items-center justify-center">
+                <Loader2 className="h-6 w-6 animate-spin text-[#0c4d47] mr-3" />
+                <span className="text-sm text-[#6B7280]">Loading room availability…</span>
+              </div>
             ) : offers.length > 0 ? (
               offers.map((offer) => (
-                <Card key={offer.roomTypeId} className="p-6">
+                <div key={offer.roomTypeId} className="bg-white border border-[#E5DFC6] rounded-2xl p-6">
                   <div className="flex flex-col md:flex-row gap-6">
                     <div className="flex-1">
-                      <h3 className="text-xl font-semibold mb-2">{offer.name}</h3>
-                      <p className="text-sm text-muted-foreground mb-3">{offer.description}</p>
+                      <h3 className="font-secondary text-xl text-[#0a2225] mb-2">{offer.name}</h3>
+                      <p className="text-sm text-[#6B7280] mb-3">{offer.description}</p>
                       
                       {offer.amenities.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-3">
                           {offer.amenities.slice(0, 4).map((amenity, idx) => (
-                            <Badge key={idx} variant="secondary" className="text-xs">
+                            <span
+                              key={idx}
+                              className="rounded-full bg-[#FDF9F0] border border-[#E5DFC6] px-2.5 py-0.5 text-[11px] text-[#0a2225]"
+                            >
                               {amenity.label}
-                            </Badge>
+                            </span>
                           ))}
                         </div>
                       )}
                       
                       <div className="space-y-1 text-sm">
                         {offer.mealPlan && (
-                          <div className="flex items-center gap-2 text-primary">
+                          <div className="flex items-center gap-2 text-[#0c4d47]">
                             <Coffee className="h-4 w-4" />
                             {offer.mealPlan}
                           </div>
                         )}
-                        <div className={offer.refundable ? 'text-green-600' : 'text-muted-foreground'}>
+                        <div className={offer.refundable ? 'text-[#0c4d47]' : 'text-[#6B7280]'}>
                           {offer.refundable ? '✓ Free cancellation' : 'Non-refundable'}
                         </div>
                         {offer.cancellationPolicy && (
-                          <p className="text-xs text-muted-foreground">{offer.cancellationPolicy}</p>
+                          <p className="text-xs text-[#7A7151]">{offer.cancellationPolicy}</p>
                         )}
                       </div>
                     </div>
                     
                     <div className="flex flex-col items-end justify-between min-w-[180px]">
                       <div className="text-right">
-                        <div className="text-2xl font-bold">
+                        <div className="font-secondary text-2xl text-[#0a2225]">
                           {offer.total.displayText}
                         </div>
                         {offer.total.taxesAndFees > 0 && (
-                          <div className="text-xs text-muted-foreground">
+                          <div className="text-xs text-[#7A7151]">
                             +{offer.total.currency} {offer.total.taxesAndFees.toFixed(2)} taxes & fees
                           </div>
                         )}
                         {offer.remaining && offer.remaining < 5 && (
-                          <div className="text-xs text-destructive font-medium mt-1">
+                          <div className="text-xs text-red-700 font-medium mt-1">
                             Only {offer.remaining} left!
                           </div>
                         )}
                       </div>
-                      <Button onClick={() => handleBookRoom(offer)} className="w-full mt-4">
-                        Book Now
+                      <button
+                        onClick={() => handleBookRoom(offer)}
+                        className="w-full mt-4 rounded-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white py-2.5 text-sm font-medium transition-colors inline-flex items-center justify-center"
+                      >
+                        Request a Trip
                         <ExternalLink className="h-4 w-4 ml-2" />
-                      </Button>
+                      </button>
                     </div>
                   </div>
-                </Card>
+                </div>
               ))
             ) : (
-              <Card className="p-6 text-center">
-                <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">No Rooms Available</h3>
-                <p className="text-muted-foreground mb-4">
+              <div className="bg-white border border-[#E5DFC6] rounded-2xl p-10 text-center">
+                <AlertCircle className="h-10 w-10 text-[#C7A962] mx-auto mb-4" />
+                <h3 className="font-secondary text-xl text-[#0a2225] mb-2">No rooms available</h3>
+                <p className="text-sm text-[#6B7280] mb-6 max-w-sm mx-auto">
                   No rooms are available for your selected dates. Try different dates or view on Booking.com.
                 </p>
-                <Button onClick={() => handleBookRoom()}>
+                <button
+                  onClick={() => handleBookRoom()}
+                  className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white px-6 py-2.5 text-sm font-medium transition-colors inline-flex items-center"
+                >
                   View on Booking.com
                   <ExternalLink className="h-4 w-4 ml-2" />
-                </Button>
-              </Card>
+                </button>
+              </div>
             )}
           </TabsContent>
 
           <TabsContent value="amenities" className="mt-6">
-            <Card className="p-6">
-              <h3 className="text-xl font-semibold mb-4">All Amenities</h3>
+            <div className="bg-white border border-[#E5DFC6] rounded-2xl p-6">
+              <h3 className="font-secondary text-xl text-[#0a2225] mb-4">All amenities</h3>
               {facilities.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {facilities.map((facility: any, idx: number) => {
                     const IconComponent = facility.icon ? facilityIcons[facility.icon] : CheckCircle2;
                     return (
                       <div key={idx} className="flex items-center gap-2">
-                        <IconComponent className="h-4 w-4 text-primary flex-shrink-0" />
-                        <span className="text-sm">{facility.label}</span>
+                        <IconComponent className="h-4 w-4 text-[#C7A962] flex-shrink-0" />
+                        <span className="text-sm text-[#0a2225]">{facility.label}</span>
                       </div>
                     );
                   })}
                 </div>
               ) : (
-                <p className="text-muted-foreground">No amenities information available.</p>
+                <p className="text-sm text-[#6B7280]">No amenities information available.</p>
               )}
-            </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="policies" className="mt-6">
-            <Card className="p-6 space-y-4">
+            <div className="bg-white border border-[#E5DFC6] rounded-2xl p-6 space-y-5">
               <div>
-                <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
-                  Check-in / Check-out
+                <h3 className="font-secondary text-lg text-[#0a2225] mb-2 flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-[#C7A962]" />
+                  Check-in / check-out
                 </h3>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-[#6B7280] space-y-0.5">
                   <p>Check-in: {policies.checkInFrom || 'Not specified'}</p>
                   <p>Check-out: {policies.checkOutTo || 'Not specified'}</p>
                 </div>
@@ -445,26 +477,26 @@ export default function HotelDetails() {
 
               {policies.importantNotes && policies.importantNotes.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">Important Information</h3>
-                  <ul className="text-sm text-muted-foreground space-y-1">
+                  <h3 className="font-secondary text-lg text-[#0a2225] mb-2">Important information</h3>
+                  <ul className="text-sm text-[#6B7280] space-y-1">
                     {policies.importantNotes.map((note: string, idx: number) => (
                       <li key={idx}>• {note}</li>
                     ))}
                   </ul>
                 </div>
               )}
-            </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="location" className="mt-6">
-            <Card className="p-6">
-              <h3 className="text-xl font-semibold mb-4">Location</h3>
+            <div className="bg-white border border-[#E5DFC6] rounded-2xl p-6">
+              <h3 className="font-secondary text-xl text-[#0a2225] mb-4">Location</h3>
               <div className="space-y-4">
                 <div className="flex items-start gap-2">
-                  <MapPin className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
+                  <MapPin className="h-5 w-5 mt-0.5 text-[#C7A962] flex-shrink-0" />
                   <div>
-                    <p className="font-medium">{hotelData.name}</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="font-medium text-[#0a2225]">{hotelData.name}</p>
+                    <p className="text-sm text-[#6B7280]">
                       {hotelData.address}<br />
                       {hotelData.city}, {hotelData.zip}<br />
                       {hotelData.country}
@@ -473,8 +505,8 @@ export default function HotelDetails() {
                 </div>
                 
                 {coordinates.lat && coordinates.lng && (
-                  <div className="h-64 bg-muted rounded-lg flex items-center justify-center">
-                    <p className="text-sm text-muted-foreground">
+                  <div className="h-64 bg-[#FDF9F0] border border-[#E5DFC6] rounded-xl flex items-center justify-center">
+                    <p className="text-sm text-[#7A7151]">
                       Coordinates: {coordinates.lat}, {coordinates.lng}
                     </p>
                   </div>
@@ -482,8 +514,8 @@ export default function HotelDetails() {
 
                 {hotelData.nearbyPOIs && hotelData.nearbyPOIs.length > 0 && (
                   <div>
-                    <h4 className="font-semibold mb-2">Nearby</h4>
-                    <ul className="space-y-1 text-sm text-muted-foreground">
+                    <h4 className="font-secondary text-base text-[#0a2225] mb-2">Nearby</h4>
+                    <ul className="space-y-1 text-sm text-[#6B7280]">
                       {hotelData.nearbyPOIs.slice(0, 5).map((poi: any, idx: number) => (
                         <li key={idx}>• {poi.name || poi}</li>
                       ))}
@@ -491,25 +523,28 @@ export default function HotelDetails() {
                   </div>
                 )}
               </div>
-            </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
 
       {/* Sticky Booking Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur border-t p-4 z-10">
+      <div className="fixed bottom-0 left-0 right-0 bg-[#FDF9F0]/95 backdrop-blur border-t border-[#E5DFC6] p-4 z-10">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="text-sm text-muted-foreground">
+          <div className="text-sm text-[#6B7280]">
             {checkIn && checkOut ? (
               `${checkIn} - ${checkOut}`
             ) : (
               'Select dates to see prices'
             )}
           </div>
-          <Button size="lg" onClick={() => handleBookRoom()}>
-            View Rooms & Book
+          <button
+            onClick={() => handleBookRoom()}
+            className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white px-6 py-3 text-sm font-medium transition-colors inline-flex items-center"
+          >
+            Request a Trip
             <ExternalLink className="h-4 w-4 ml-2" />
-          </Button>
+          </button>
         </div>
       </div>
 
