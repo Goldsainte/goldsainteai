@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
-import { TrendingUp, Eye, Heart, MessageCircle, Share2, Bookmark, MousePointerClick } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { TrendingUp, Eye, Heart, MessageCircle, Share2, Bookmark, MousePointerClick } from "lucide-react";
 
 interface AnalyticsData {
   partnership_id: string;
@@ -88,24 +86,27 @@ export const PartnershipAnalytics = () => {
   };
 
   if (loading) {
-    return <div className="text-center py-8">Loading analytics...</div>;
+    return <div className="text-center py-8 text-sm text-[#6B7280]">Loading analytics…</div>;
   }
 
   if (analytics.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        <TrendingUp className="h-12 w-12 mx-auto mb-4 opacity-50" />
-        <p>No partnership analytics available yet</p>
+      <div className="bg-white border border-[#E5DFC6] rounded-2xl p-10 text-center">
+        <TrendingUp className="h-10 w-10 mx-auto mb-4 text-[#C7A962]" />
+        <h3 className="font-secondary text-lg text-[#0a2225] mb-1">No analytics yet</h3>
+        <p className="text-sm text-[#6B7280]">
+          Approved partnership posts will surface their performance here.
+        </p>
       </div>
     );
   }
 
   const StatItem = ({ icon: Icon, label, value }: any) => (
-    <div className="flex items-center gap-2">
-      <Icon className="h-4 w-4 text-muted-foreground" />
+    <div className="flex items-center gap-2.5">
+      <Icon className="h-4 w-4 text-[#C7A962]" />
       <div>
-        <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="text-lg font-semibold">{value.toLocaleString()}</p>
+        <p className="text-[11px] uppercase tracking-wide text-[#7A7151]">{label}</p>
+        <p className="text-lg font-medium text-[#0a2225]">{value.toLocaleString()}</p>
       </div>
     </div>
   );
@@ -113,25 +114,27 @@ export const PartnershipAnalytics = () => {
   return (
     <div className="space-y-4">
       {analytics.map((data) => (
-        <Card key={data.partnership_id}>
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src={data.creator.avatar_url || ""} />
-                <AvatarFallback>
-                  {data.creator.username[0]?.toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <CardTitle className="text-base">@{data.creator.username}</CardTitle>
-                <CardDescription className="text-sm line-clamp-1">
-                  {data.post.caption}
-                </CardDescription>
-              </div>
-              <Badge variant="secondary">Active</Badge>
+        <div
+          key={data.partnership_id}
+          className="bg-white border border-[#E5DFC6] rounded-2xl p-6"
+        >
+          <div className="flex items-center gap-3 mb-5">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={data.creator.avatar_url || ""} />
+              <AvatarFallback className="bg-[#F5F0E0] text-[#0a2225]">
+                {data.creator.username[0]?.toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p className="font-secondary text-base text-[#0a2225]">@{data.creator.username}</p>
+              <p className="text-xs text-[#6B7280] line-clamp-1">
+                {data.post.caption}
+              </p>
             </div>
-          </CardHeader>
-          <CardContent>
+            <span className="rounded-full bg-[#FDF9F0] border border-[#E5DFC6] px-3 py-1 text-[10px] uppercase tracking-wide text-[#0c4d47]">
+              Active
+            </span>
+          </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <StatItem icon={Eye} label="Views" value={data.views} />
               <StatItem icon={Heart} label="Likes" value={data.likes} />
@@ -140,8 +143,7 @@ export const PartnershipAnalytics = () => {
               <StatItem icon={Bookmark} label="Saves" value={data.saves} />
               <StatItem icon={MousePointerClick} label="Click-throughs" value={data.click_throughs} />
             </div>
-          </CardContent>
-        </Card>
+        </div>
       ))}
     </div>
   );
