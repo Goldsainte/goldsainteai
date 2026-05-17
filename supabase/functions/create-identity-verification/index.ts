@@ -315,10 +315,15 @@ async function createVerificationSession(
   });
 
   try {
-    // Determine return URL based on application type
+    // Determine return URL based on application type.
+    // After verification, send users back to a role-appropriate landing page.
+    // For application flows (agent/brand), accounts may not yet exist, so the
+    // /application/verification-complete handoff page is still used; once a
+    // dashboard re-verification flow exists, callers should pass an explicit
+    // returnUrl pointing to that dashboard's settings tab.
     const frontendUrl = Deno.env.get("FRONTEND_URL") || "https://goldsainte.ai";
     const defaultReturnUrl = applicationType === "traveler"
-      ? `${frontendUrl}/customer-verification?status=complete`
+      ? `${frontendUrl}/traveler?tab=settings&verification=complete`
       : `${frontendUrl}/application/verification-complete?type=${applicationType}`;
 
     // Create verification session
