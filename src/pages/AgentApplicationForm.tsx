@@ -370,10 +370,17 @@ export default function AgentApplicationForm() {
       localStorage.setItem('agent_application_id', clientId);
       setStep(6);
 
-      // Send confirmation email (non-blocking)
+      // Send confirmation email (non-blocking) via the unified transactional
+      // email system so styling matches the rest of the app's emails and the
+      // CTA link points to the real /application/status route.
       supabase.functions
-        .invoke('send-agent-application-email', {
-          body: { agentEmail: formData.email, agentName: formData.firstName },
+        .invoke('send-transactional-email', {
+          body: {
+            templateName: 'application-received-professional',
+            recipientEmail: formData.email,
+            idempotencyKey: `agent-application-received-${clientId}`,
+            templateData: { agentName: formData.firstName },
+          },
         })
         .catch((e) => console.error('application email failed:', e));
 
