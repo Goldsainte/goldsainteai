@@ -17,7 +17,7 @@ export const Footer = () => {
       links: [
         { to: "/marketplace", label: "Browse Trips" },
         { to: "/post-trip", label: "Post a Trip" },
-        { to: "/agents", label: "Find a Specialist" },
+        { to: "/apply/agent", label: "Find a Specialist" },
       ],
     },
     {
