@@ -32,6 +32,9 @@ import { template as identityVerificationUpdate } from './identity-verification-
 import { template as disputeOpened } from './dispute-opened.tsx'
 import { template as adminQueueAlert } from './admin-queue-alert.tsx'
 import { template as applicationReceivedProfessional } from './application-received-professional.tsx'
+import { template as applicationApprovedProfessional } from './application-approved-professional.tsx'
+import { template as applicationDeclinedProfessional } from './application-declined-professional.tsx'
+import { template as applicationInfoRequestedProfessional } from './application-info-requested-professional.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'welcome-traveler': welcomeTraveler,
@@ -57,4 +60,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'dispute-opened': disputeOpened,
   'admin-queue-alert': adminQueueAlert,
   'application-received-professional': applicationReceivedProfessional,
+  'application-approved-professional': applicationApprovedProfessional,
+  'application-declined-professional': applicationDeclinedProfessional,
+  'application-info-requested-professional': applicationInfoRequestedProfessional,
 }
