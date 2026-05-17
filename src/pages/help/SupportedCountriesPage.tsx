@@ -1,32 +1,32 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft, Globe } from "lucide-react";
 
-const REGIONS: { name: string; countries: [string, string][] }[] = [
+const REGIONS: { name: string; countries: string[] }[] = [
   {
     name: "Americas",
-    countries: [["United States", "US"], ["Canada", "CA"], ["Mexico", "MX"], ["Brazil", "BR"]],
+    countries: ["United States", "Canada", "Mexico", "Brazil"],
   },
   {
     name: "Europe",
     countries: [
-      ["Austria","AT"],["Belgium","BE"],["Bulgaria","BG"],["Croatia","HR"],["Cyprus","CY"],["Czechia","CZ"],
-      ["Denmark","DK"],["Estonia","EE"],["Finland","FI"],["France","FR"],["Germany","DE"],["Greece","GR"],
-      ["Hungary","HU"],["Ireland","IE"],["Italy","IT"],["Latvia","LV"],["Liechtenstein","LI"],["Lithuania","LT"],
-      ["Luxembourg","LU"],["Malta","MT"],["Netherlands","NL"],["Norway","NO"],["Poland","PL"],["Portugal","PT"],
-      ["Romania","RO"],["Slovakia","SK"],["Slovenia","SI"],["Spain","ES"],["Sweden","SE"],["Switzerland","CH"],
-      ["United Kingdom","GB"],
+      "Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czechia",
+      "Denmark", "Estonia", "Finland", "France", "Germany", "Greece",
+      "Hungary", "Ireland", "Italy", "Latvia", "Liechtenstein", "Lithuania",
+      "Luxembourg", "Malta", "Netherlands", "Norway", "Poland", "Portugal",
+      "Romania", "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland",
+      "United Kingdom",
     ],
   },
   {
     name: "Asia-Pacific",
     countries: [
-      ["Australia","AU"],["Hong Kong","HK"],["India","IN"],["Indonesia","ID"],["Japan","JP"],["Malaysia","MY"],
-      ["New Zealand","NZ"],["Philippines","PH"],["Singapore","SG"],["Thailand","TH"],
+      "Australia", "Hong Kong", "India", "Indonesia", "Japan", "Malaysia",
+      "New Zealand", "Philippines", "Singapore", "Thailand",
     ],
   },
   {
     name: "Middle East / Africa",
-    countries: [["South Africa","ZA"], ["United Arab Emirates","AE"]],
+    countries: ["South Africa", "United Arab Emirates"],
   },
 ];
 
@@ -51,12 +51,9 @@ export default function SupportedCountriesPage() {
           {REGIONS.map((region) => (
             <section key={region.name} className="rounded-2xl border border-[#E5DFC6] bg-white p-6">
               <h2 className="font-secondary text-xl text-[#0a2225] mb-4">{region.name}</h2>
-              <ul className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3 text-sm text-[#4A4A4A]">
-                {region.countries.map(([name, code]) => (
-                  <li key={name} className="flex items-baseline gap-3">
-                    <span className="font-mono text-[11px] tracking-[0.15em] text-[#C7A962] w-6 flex-shrink-0">{code}</span>
-                    <span>{name}</span>
-                  </li>
+              <ul className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 text-sm text-[#4A4A4A]">
+                {region.countries.map((c) => (
+                  <li key={c}>{c}</li>
                 ))}
               </ul>
             </section>
