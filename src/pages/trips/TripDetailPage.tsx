@@ -84,7 +84,9 @@ export default function TripDetailPage() {
         <div className="text-center">
           <h1 className="font-secondary text-2xl text-[#0a2225]">Trip not found</h1>
           <button
-            onClick={() => navigate("/marketplace?tab=trips")}
+            onClick={() =>
+              window.history.length > 1 ? navigate(-1) : navigate("/marketplace?tab=trips")
+            }
             className="mt-4 text-[#0C4D47] hover:underline"
           >
             Browse all trips

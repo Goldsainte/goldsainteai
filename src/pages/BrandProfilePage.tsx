@@ -143,7 +143,9 @@ export default function BrandProfilePage() {
               We couldn't find this brand. It may have been removed or is still being onboarded.
             </p>
             <Button
-              onClick={() => navigate("/marketplace?tab=brands")}
+              onClick={() =>
+                window.history.length > 1 ? navigate(-1) : navigate("/marketplace?tab=brands")
+              }
               className="mt-6 bg-[#0c4d47] hover:bg-[#0a3d39] text-white"
             >
               Browse all brands

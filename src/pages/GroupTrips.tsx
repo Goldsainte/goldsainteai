@@ -79,7 +79,9 @@ const GroupTrips = () => {
         <div className="flex items-center justify-between mb-6">
           <Button
             variant="ghost"
-            onClick={() => navigate('/group-trips')}
+            onClick={() =>
+              window.history.length > 1 ? navigate(-1) : navigate('/group-trips')
+            }
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to All Trips
