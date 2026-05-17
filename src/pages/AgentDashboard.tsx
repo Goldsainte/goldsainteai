@@ -22,6 +22,7 @@ import { JobCompletionModal } from "@/components/JobCompletionModal";
 import { AgentAvailabilityCalendar } from "@/components/AgentAvailabilityCalendar";
 import { AgentAnalyticsDashboard } from "@/components/AgentAnalyticsDashboard";
 import { AgentVerificationUpload } from "@/components/AgentVerificationUpload";
+import { AgentSettingsTab } from "./agent/components/AgentSettingsTab";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PaymentMilestonesManager } from "@/components/PaymentMilestonesManager";
 import { InvoiceGenerator } from "@/components/InvoiceGenerator";
@@ -444,6 +445,7 @@ export default function AgentDashboard() {
              <TabsTrigger value="performance" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Performance</TabsTrigger>
               <TabsTrigger value="availability" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Availability</TabsTrigger>
               <TabsTrigger value="verification" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Verification</TabsTrigger>
+              <TabsTrigger value="settings" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Settings</TabsTrigger>
             </TabsList>
             <div className="pointer-events-none absolute right-0 top-0 h-11 w-12 bg-gradient-to-l from-[#FDF9F0] to-transparent md:hidden" />
           </div>
@@ -511,6 +513,10 @@ export default function AgentDashboard() {
                   onVerificationSubmit={fetchData}
                 />
               )}
+            </TabsContent>
+
+            <TabsContent value="settings">
+              <AgentSettingsTab />
             </TabsContent>
           </Tabs>
 
