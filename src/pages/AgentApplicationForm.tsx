@@ -60,6 +60,28 @@ type AgentApplicationData = {
   acceptedVendor: boolean;
 };
 
+const ALLOWED_BUSINESS_TYPES = ["independent", "agency", "tour_operator", "dmc"] as const;
+type BusinessType = (typeof ALLOWED_BUSINESS_TYPES)[number];
+
+const LEGACY_BUSINESS_TYPE_MAP: Record<string, BusinessType> = {
+  sole_proprietor: "independent",
+  partnership: "agency",
+  llc: "agency",
+  corporation: "agency",
+};
+
+const normalizeBusinessType = (value: unknown): BusinessType | "" => {
+  if (typeof value !== "string") return "";
+
+  const normalized = value.trim().toLowerCase().replace(/\s+/g, "_");
+
+  if ((ALLOWED_BUSINESS_TYPES as readonly string[]).includes(normalized)) {
+    return normalized as BusinessType;
+  }
+
+  return LEGACY_BUSINESS_TYPE_MAP[normalized] ?? "";
+};
+
 const luxuryInputClasses = "min-h-[48px] w-full max-w-full border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 focus:ring-offset-0 rounded-lg placeholder:text-sm box-border";
 const luxurySelectClasses = "min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg";
 
@@ -133,7 +155,11 @@ export default function AgentApplicationForm() {
       const saved = localStorage.getItem(DRAFT_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        setFormData((prev) => ({ ...prev, ...parsed }));
+        setFormData((prev) => ({
+          ...prev,
+          ...parsed,
+          businessType: normalizeBusinessType(parsed.businessType),
+        }));
         toast({ title: "Draft restored", description: "We restored your previous answers." });
       }
     } catch {
@@ -253,10 +279,12 @@ export default function AgentApplicationForm() {
   const saveDraftApplication = async () => {
     setIsLoading(true);
     try {
+      const normalizedBusinessType = normalizeBusinessType(formData.businessType);
+
       if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone) {
         throw new Error("Please fill in all required personal information fields");
       }
-      if (!formData.agencyName || !formData.businessType) {
+      if (!formData.agencyName || !normalizedBusinessType) {
         throw new Error("Please fill in all required business information fields");
       }
 
@@ -300,7 +328,7 @@ export default function AgentApplicationForm() {
           phone: formData.phone,
           date_of_birth: formData.dateOfBirth || null,
           agency_name: formData.agencyName,
-          business_type: formData.businessType,
+          business_type: normalizedBusinessType,
           business_address: formData.businessAddress,
           business_city: formData.businessCity,
           business_state: formData.businessState,
@@ -446,7 +474,7 @@ export default function AgentApplicationForm() {
               </div>
               <div>
                 <Label className="text-sm font-medium text-[#0a2225]">Business Type *</Label>
-                <Select value={formData.businessType} onValueChange={(value: any) => setFormData({ ...formData, businessType: value })}>
+                <Select value={formData.businessType} onValueChange={(value: BusinessType) => setFormData({ ...formData, businessType: value })}>
                   <SelectTrigger className={luxurySelectClasses}><SelectValue placeholder="Select type" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="independent">Independent Advisor</SelectItem>
