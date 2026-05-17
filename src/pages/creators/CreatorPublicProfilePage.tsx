@@ -182,7 +182,9 @@ export default function CreatorPublicProfilePage() {
           <h1 className="font-secondary text-2xl text-[#0a2225]">Creator not found</h1>
           <p className="mt-2 text-sm text-[#6B7280]">We couldn't find this creator.</p>
           <button
-            onClick={() => navigate("/creators")}
+            onClick={() =>
+              window.history.length > 1 ? navigate(-1) : navigate("/creators")
+            }
             className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#0c4d47] px-5 py-2.5 text-sm text-white hover:bg-[#0a3d39]"
           >
             Browse creators

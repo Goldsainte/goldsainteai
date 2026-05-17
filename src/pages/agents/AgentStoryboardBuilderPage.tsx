@@ -13,7 +13,9 @@ export default function AgentStoryboardBuilderPage() {
     <main className="min-h-screen bg-[#f7f3ea] px-4 py-8">
       <div className="mx-auto max-w-5xl">
         <button
-          onClick={() => navigate("/agent-dashboard")}
+          onClick={() =>
+            window.history.length > 1 ? navigate(-1) : navigate("/agent-dashboard")
+          }
           className="mb-6 inline-flex items-center gap-2 text-[11px] text-[#4a4a4a] hover:text-[#0a2225]"
         >
           <ArrowLeft className="h-3 w-3" />

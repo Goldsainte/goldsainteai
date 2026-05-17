@@ -105,7 +105,9 @@ export default function AgentPublicProfilePage() {
             We couldn't find this agent. They may have been removed or haven't completed onboarding.
           </p>
           <button
-            onClick={() => navigate("/agents")}
+            onClick={() =>
+              window.history.length > 1 ? navigate(-1) : navigate("/agents")
+            }
             className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#0c4d47] px-5 py-2.5 text-sm text-white hover:bg-[#0a3d39]"
           >
             Browse agents

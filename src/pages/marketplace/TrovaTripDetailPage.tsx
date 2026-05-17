@@ -229,7 +229,9 @@ export default function TrovaTripDetailPage() {
             We had trouble loading this trip. Please try again in a moment.
           </p>
           <Button
-            onClick={() => navigate("/marketplace")}
+            onClick={() =>
+              window.history.length > 1 ? navigate(-1) : navigate("/marketplace")
+            }
             className="mt-6 bg-[#0C4D47] hover:bg-[#073331]"
           >
             Browse Trips

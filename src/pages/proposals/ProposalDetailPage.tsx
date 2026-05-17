@@ -213,7 +213,7 @@ export default function ProposalDetailPage() {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
         <p className="text-sm text-destructive">{error}</p>
-        <Button variant="link" onClick={() => navigate('/marketplace/trip-requests')}>Go back</Button>
+        <Button variant="link" onClick={() => (window.history.length > 1 ? navigate(-1) : navigate('/marketplace/trip-requests'))}>Go back</Button>
       </div>
     );
   }

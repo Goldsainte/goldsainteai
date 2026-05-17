@@ -109,7 +109,9 @@ export default function AgentProfile() {
             <h3 className="font-secondary text-2xl text-[#0a2225] mb-2">Agent not found</h3>
             <p className="text-sm text-[#6B7280] mb-6">The agent profile you're looking for doesn't exist.</p>
             <button
-              onClick={() => navigate('/marketplace')}
+              onClick={() =>
+                window.history.length > 1 ? navigate(-1) : navigate('/marketplace')
+              }
               className="inline-flex items-center rounded-full bg-[#0c4d47] px-6 py-3 text-sm text-[#E5DFC6] hover:bg-[#0a3d39] transition-colors"
             >
               Back to the collection
