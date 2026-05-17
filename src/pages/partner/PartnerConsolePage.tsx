@@ -66,70 +66,70 @@ export default function PartnerConsolePage() {
 
   if (checking || !allowed) {
     return (
-      <main className="min-h-screen bg-[#0a2225] text-[#E5DFC6] flex items-center justify-center">
-        <p className="text-xs">Loading your Goldsainte space…</p>
+      <main className="min-h-screen bg-[#FDF9F0] text-[#0a2225] flex items-center justify-center">
+        <p className="text-xs text-[#6B7280]">Loading your Goldsainte space…</p>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-background text-foreground px-4 py-6">
-      <div className="mx-auto max-w-6xl space-y-6">
-        <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <main className="min-h-screen bg-[#FDF9F0] text-[#0a2225] px-4 py-10">
+      <div className="mx-auto max-w-6xl space-y-8">
+        <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>
-            <p className="inline-flex items-center gap-2 text-[11px] text-primary font-semibold">
-              <Sparkles className="h-3 w-3" />
-              Goldsainte partner console
+            <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-[#7A7151] font-medium">
+              <Sparkles className="h-3 w-3 text-[#C7A962]" />
+              Partner console
             </p>
-            <h1 className="text-lg md:text-xl font-semibold">
-              Your TikTok travel pipeline
+            <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225] mt-1">
+              Your travel pipeline
             </h1>
-            <p className="text-[11px] text-muted-foreground max-w-md">
-              View briefs you've responded to, bookings in progress, and what
-              you've earned — in one clean view.
+            <p className="text-sm text-[#6B7280] max-w-md mt-2">
+              Briefs you've responded to, bookings in progress, and what
+              you've earned — in one editorial view.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2 text-[11px]">
+          <div className="flex flex-wrap gap-2">
             <Link
               to="/storyboards"
-              className="rounded-full bg-primary text-primary-foreground px-3 py-1 font-semibold hover:bg-primary/90"
+              className="rounded-full bg-[#0c4d47] px-5 py-2.5 text-xs font-medium text-white hover:bg-[#0a3d39] transition-colors"
             >
-              Open Goldsainte Creator Lab
+              Open Creator Lab
             </Link>
             <Link
               to="/earnings"
-              className="rounded-full border border-border bg-card px-3 py-1 hover:bg-accent"
+              className="rounded-full border border-[#E5DFC6] bg-white px-5 py-2.5 text-xs font-medium text-[#0a2225] hover:bg-[#F5F0E0] transition-colors"
             >
-              View earnings & payouts
+              Earnings & payouts
             </Link>
           </div>
         </header>
 
         {error && (
-          <p className="text-[11px] text-destructive bg-destructive/10 border border-destructive/40 rounded-2xl px-3 py-2">
+          <p className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-2xl px-4 py-3">
             {error}
           </p>
         )}
 
-        {loading && <p className="text-xs">Loading your pipeline…</p>}
+        {loading && <p className="text-xs text-[#6B7280]">Loading your pipeline…</p>}
 
         {/* Top summary cards */}
         {earnings && (
-          <section className="grid gap-4 md:grid-cols-3 text-xs">
+          <section className="grid gap-4 md:grid-cols-3">
             <SummaryCard
-              icon={<FileText className="h-4 w-4 text-primary" />}
+              icon={<FileText className="h-4 w-4 text-[#C7A962]" />}
               label="Open briefs & proposals"
               value={pipeline.proposals.length}
               helper="Trip requests you've responded to."
             />
             <SummaryCard
-              icon={<DollarSign className="h-4 w-4 text-primary" />}
+              icon={<DollarSign className="h-4 w-4 text-[#C7A962]" />}
               label="Available earnings"
               value={`${currency} ${earnings.available.toFixed(2)}`}
               helper="Ready to move to your payout account."
             />
             <SummaryCard
-              icon={<Video className="h-4 w-4 text-primary" />}
+              icon={<Video className="h-4 w-4 text-[#C7A962]" />}
               label={
                 accountType === "creator"
                   ? "Storyboard tasks"
@@ -140,51 +140,53 @@ export default function PartnerConsolePage() {
                   (b) => b.status === "paid" || b.status === "in_progress",
                 ).length
               }
-              helper="Trips where your creative or itinerary work matters now."
+              helper="Trips where your work matters now."
             />
           </section>
         )}
 
-        {/* Pipeline: proposals */}
-        <section className="grid gap-4 md:grid-cols-2 text-xs">
-          <div className="rounded-3xl bg-card border border-border p-4 space-y-3">
-            <div className="flex items-center justify-between gap-2">
+        {/* Pipeline */}
+        <section className="grid gap-6 md:grid-cols-2">
+          <div className="bg-white border border-[#E5DFC6] rounded-2xl p-6 space-y-4">
+            <div className="flex items-start justify-between gap-2">
               <div>
-                <p className="text-[11px] font-semibold">
+                <h2 className="font-secondary text-lg text-[#0a2225]">
                   Trip briefs & proposals
-                </p>
-                <p className="text-[10px] text-muted-foreground">
+                </h2>
+                <p className="text-xs text-[#6B7280] mt-1">
                   Requests you've pitched on, before they become bookings.
                 </p>
               </div>
-              <FileText className="h-4 w-4 text-primary" />
+              <FileText className="h-4 w-4 text-[#C7A962] mt-1" />
             </div>
 
             {pipeline.proposals.length === 0 && !loading ? (
-              <p className="text-[11px] text-muted-foreground">
-                No active proposals yet. Head to Goldsainte Creator Lab or the trip
-                marketplace to find briefs to respond to.
-              </p>
+              <div className="text-center py-8">
+                <p className="text-sm text-[#6B7280] max-w-xs mx-auto">
+                  No active proposals yet. Head to the Creator Lab or trip
+                  marketplace to find briefs to respond to.
+                </p>
+              </div>
             ) : (
-              <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+              <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
                 {pipeline.proposals.map((p) => (
                   <button
                     key={p.id}
                     onClick={() => navigate(`/trip/${p.trip_request_id}`)}
-                    className="w-full text-left rounded-2xl bg-muted/40 border border-border px-3 py-2 hover:border-primary"
+                    className="w-full text-left rounded-xl bg-[#FDF9F0] border border-[#E5DFC6] px-4 py-3 hover:border-[#0c4d47] transition-colors"
                   >
-                    <p className="text-[10px] text-muted-foreground">
+                    <p className="text-[11px] text-[#7A7151]">
                       {new Date(p.created_at).toLocaleDateString()} ·{" "}
-                      <span className="text-primary">{p.status}</span>
+                      <span className="text-[#0c4d47] font-medium uppercase tracking-wide">{p.status}</span>
                     </p>
-                    <p className="text-[12px] font-semibold">
+                    <p className="text-sm font-medium text-[#0a2225] mt-0.5">
                       {p.trips?.title || "Trip brief"}
                     </p>
-                    <p className="text-[10px] text-muted-foreground">
+                    <p className="text-xs text-[#6B7280]">
                       {p.trips?.destination || "Destination TBD"}
                     </p>
                     {p.price_from && (
-                      <p className="mt-1 text-[10px] text-primary">
+                      <p className="mt-1 text-xs text-[#0c4d47] font-medium">
                         Proposed: ${p.price_from}
                       </p>
                     )}
@@ -194,51 +196,51 @@ export default function PartnerConsolePage() {
             )}
           </div>
 
-          {/* Pipeline: bookings */}
-          <div className="rounded-3xl bg-card border border-border p-4 space-y-3">
-            <div className="flex items-center justify-between gap-2">
+          <div className="bg-white border border-[#E5DFC6] rounded-2xl p-6 space-y-4">
+            <div className="flex items-start justify-between gap-2">
               <div>
-                <p className="text-[11px] font-semibold">Active bookings</p>
-                <p className="text-[10px] text-muted-foreground">
-                  Deals that have moved beyond the pitch — where your delivery
-                  matters.
+                <h2 className="font-secondary text-lg text-[#0a2225]">Active bookings</h2>
+                <p className="text-xs text-[#6B7280] mt-1">
+                  Deals that have moved beyond the pitch — where your delivery matters.
                 </p>
               </div>
-              <DollarSign className="h-4 w-4 text-primary" />
+              <DollarSign className="h-4 w-4 text-[#C7A962] mt-1" />
             </div>
 
             {pipeline.bookings.length === 0 && !loading ? (
-              <p className="text-[11px] text-muted-foreground">
-                Once a traveler accepts your proposal and pays, those trips will
-                show up here as active bookings.
-              </p>
+              <div className="text-center py-8">
+                <p className="text-sm text-[#6B7280] max-w-xs mx-auto">
+                  Once a traveler accepts your proposal and pays, those trips will
+                  appear here as active bookings.
+                </p>
+              </div>
             ) : (
-              <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+              <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
                 {pipeline.bookings.map((b) => (
                   <button
                     key={b.id}
                     onClick={() => navigate(`/booking/${b.id}`)}
-                    className="w-full text-left rounded-2xl bg-muted/40 border border-border px-3 py-2 hover:border-primary"
+                    className="w-full text-left rounded-xl bg-[#FDF9F0] border border-[#E5DFC6] px-4 py-3 hover:border-[#0c4d47] transition-colors"
                   >
-                    <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-start justify-between gap-2">
                       <div>
-                        <p className="text-[10px] text-muted-foreground">
+                        <p className="text-[11px] text-[#7A7151]">
                           {new Date(b.created_at).toLocaleDateString()}
                         </p>
-                        <p className="text-[12px] font-semibold">
+                        <p className="text-sm font-medium text-[#0a2225] mt-0.5">
                           {b.trips?.title || "Trip booking"}
                         </p>
-                        <p className="text-[10px] text-muted-foreground">
+                        <p className="text-xs text-[#6B7280]">
                           {b.trips?.destination || "Destination TBD"}
                         </p>
                       </div>
                       <div className="text-right">
                         {b.total_amount && (
-                          <p className="text-[11px] text-primary font-semibold">
+                          <p className="text-sm text-[#0c4d47] font-medium">
                             {b.currency || "USD"} {b.total_amount}
                           </p>
                         )}
-                        <p className="text-[9px] text-muted-foreground">
+                        <p className="text-[10px] uppercase tracking-wide text-[#7A7151] mt-0.5">
                           {b.status}
                         </p>
                       </div>
@@ -250,26 +252,26 @@ export default function PartnerConsolePage() {
           </div>
         </section>
 
-        {/* Goldsainte Creator Lab CTA */}
-        <section className="rounded-3xl bg-accent text-accent-foreground p-4 md:p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs">
-          <div className="space-y-1 max-w-xl">
-            <p className="text-[11px] text-muted-foreground uppercase tracking-[0.2em]">
+        {/* Creator Lab CTA */}
+        <section className="rounded-2xl bg-white border border-[#E5DFC6] p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="space-y-2 max-w-xl">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-[#7A7151]">
               Grow with Goldsainte
             </p>
-            <p className="text-sm font-semibold">
-              Use Goldsainte Creator Lab to design better boards and close more trips.
-            </p>
-            <p className="text-[11px] text-muted-foreground">
-              Creators: storyboard each journey like a TikTok series. Agents:
+            <h2 className="font-secondary text-xl text-[#0a2225]">
+              Design better boards. Close more trips.
+            </h2>
+            <p className="text-sm text-[#6B7280]">
+              Creators storyboard each journey like an editorial series. Agents
               plug in the contracts behind the scenes. Together, you ship trips
               travelers brag about.
             </p>
           </div>
           <Link
             to="/storyboards"
-            className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-[11px] hover:bg-accent/50"
+            className="inline-flex items-center gap-1.5 rounded-full bg-[#0c4d47] px-5 py-2.5 text-xs font-medium text-white hover:bg-[#0a3d39] transition-colors whitespace-nowrap"
           >
-            Open Goldsainte Creator Lab
+            Open Creator Lab
             <ArrowRight className="h-3 w-3" />
           </Link>
         </section>
@@ -290,13 +292,13 @@ function SummaryCard({
   helper: string;
 }) {
   return (
-    <div className="rounded-3xl bg-card border border-border p-4 space-y-2">
+    <div className="bg-white border border-[#E5DFC6] rounded-2xl p-5 space-y-2">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-[11px] text-muted-foreground">{label}</p>
+        <p className="text-[11px] uppercase tracking-wide text-[#7A7151]">{label}</p>
         {icon}
       </div>
-      <p className="text-sm font-semibold">{value}</p>
-      <p className="text-[10px] text-muted-foreground">{helper}</p>
+      <p className="font-secondary text-2xl text-[#0a2225]">{value}</p>
+      <p className="text-xs text-[#6B7280]">{helper}</p>
     </div>
   );
 }
