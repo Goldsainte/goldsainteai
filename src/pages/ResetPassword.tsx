@@ -27,21 +27,50 @@ const ResetPassword = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if there's a recovery token in the URL
+    // Supabase's new PKCE recovery flow fires a PASSWORD_RECOVERY auth event
+    // after exchanging the code in the URL. The legacy implicit flow sets
+    // `#type=recovery` in the hash. Accept either, plus any active session
+    // (the /verify endpoint logs the user in before redirecting here).
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const type = hashParams.get('type');
-    
-    if (type === 'recovery') {
+    const queryParams = new URLSearchParams(window.location.search);
+    const hasHashRecovery = hashParams.get('type') === 'recovery';
+    const hasCodeParam = !!queryParams.get('code') || !!queryParams.get('token_hash');
+
+    if (hasHashRecovery || hasCodeParam) {
       setHasToken(true);
-    } else {
-      // No token, redirect to auth page
-      toast({
-        title: "Invalid link",
-        description: "This password reset link is invalid or has expired.",
-        variant: "destructive",
-      });
-      navigate('/auth');
     }
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
+        setHasToken(true);
+      }
+    });
+
+    // Fallback: if a session already exists (user landed here from email link
+    // after Supabase auto-exchanged the code), allow them to set a new password.
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) setHasToken(true);
+    });
+
+    // Only bounce to /auth if after a short grace period nothing surfaced.
+    const timeout = setTimeout(() => {
+      setHasToken((prev) => {
+        if (!prev) {
+          toast({
+            title: "Invalid link",
+            description: "This password reset link is invalid or has expired.",
+            variant: "destructive",
+          });
+          navigate('/auth');
+        }
+        return prev;
+      });
+    }, 1500);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
   }, [navigate, toast]);
 
   const handleResetPassword = async (e: React.FormEvent) => {
