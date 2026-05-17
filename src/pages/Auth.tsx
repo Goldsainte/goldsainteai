@@ -450,14 +450,14 @@ const Auth = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const { error } = await supabase.functions.invoke('request-password-reset', {
-        body: { email, redirectTo: `${window.location.origin}/reset-password` },
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
       });
       if (error) throw error;
       toast({ title: "Reset email sent", description: "Check your email for a password reset link from Goldsainte." });
       setStep('email');
     } catch (error: any) {
-      const errorMessage = error?.context?.body?.error || error?.message || error?.error || "Failed to send reset email.";
+      const errorMessage = error?.message || "Failed to send reset email.";
       toast({ title: "Error", description: errorMessage, variant: "destructive" });
     }
     setIsLoading(false);
