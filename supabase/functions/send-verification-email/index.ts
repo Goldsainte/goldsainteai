@@ -106,7 +106,7 @@ serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Goldsainte Travel <onboarding@notify.goldsainte.com>",
+        from: "Goldsainte Travel <hello@goldsainte.com>",
         to: [user.email],
         subject,
         html,
