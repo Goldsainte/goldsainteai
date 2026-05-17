@@ -317,18 +317,14 @@ export function PrivacyDataSection() {
         return;
       }
       toast.loading("Preparing your data export...");
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/export-user-data`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-            "Content-Type": "application/json",
-          },
-        },
+      const { data, error } = await supabase.functions.invoke(
+        "export-user-data",
+        { method: "POST" },
       );
-      if (!response.ok) throw new Error("Export failed");
-      const blob = await response.blob();
+      if (error) throw error;
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: "application/json",
+      });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
