@@ -267,17 +267,32 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
 function ShareRow({ title, url }: { title: string; url: string }) {
   const t = encodeURIComponent(title);
   const u = encodeURIComponent(url);
-  const twitter = `https://twitter.com/intent/tweet?text=${t}&url=${u}`;
+  const x = `https://twitter.com/intent/tweet?text=${t}&url=${u}`;
   const linkedin = `https://www.linkedin.com/sharing/share-offsite/?url=${u}`;
   const email = `mailto:?subject=${t}&body=${u}`;
+  const [copied, setCopied] = useState(false);
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      toast.success("Link copied");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Could not copy link");
+    }
+  };
   const cls =
     "inline-flex items-center justify-center px-4 py-2 rounded-full border border-[#E5DFC6] text-xs uppercase tracking-wider text-[#0a2225]/70 hover:text-[#0c4d47] hover:border-[#0c4d47] transition";
   return (
     <div className="mt-12 flex items-center gap-3 flex-wrap">
       <span className="text-[10px] tracking-[0.25em] uppercase text-[#0a2225]/50 mr-1">Share</span>
-      <a href={twitter} target="_blank" rel="noopener noreferrer" className={cls}>Twitter</a>
+      <a href={x} target="_blank" rel="noopener noreferrer" className={cls}>X</a>
       <a href={linkedin} target="_blank" rel="noopener noreferrer" className={cls}>LinkedIn</a>
       <a href={email} className={cls}>Email</a>
+      <button type="button" onClick={copyLink} className={`${cls} gap-1.5`}>
+        {copied ? <Check size={13} strokeWidth={2} /> : <Copy size={13} strokeWidth={2} />}
+        {copied ? "Copied" : "Copy link"}
+      </button>
     </div>
   );
 }
