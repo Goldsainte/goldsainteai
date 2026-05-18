@@ -2,11 +2,20 @@ import { useMemo } from "react";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
 
-export default function Markdown({ source }: { source: string }) {
+export default function Markdown({ source, variant = "editorial" }: { source: string; variant?: "editorial" | "feature" }) {
   const html = useMemo(() => {
     const raw = marked.parse(source || "", { async: false }) as string;
     return DOMPurify.sanitize(raw);
   }, [source]);
+  if (variant === "editorial") {
+    return (
+      <div
+        className="prose-editorial"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    );
+  }
   return (
     <div
       className="newsroom-prose max-w-none text-[#0a2225]

@@ -1,0 +1,1 @@
+ALTER TABLE public.newsroom_authors ADD COLUMN IF NOT EXISTS signature_image_url text;
