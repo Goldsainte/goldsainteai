@@ -23,6 +23,9 @@ const MARKETING_PATHS = new Set([
   "/agents",
   "/creators",
   "/what-we-do",
+  "/help",
+  "/trust-safety",
+  "/apply/agent",
 ]);
 
 // Common search-engine + social-preview crawler signatures.
