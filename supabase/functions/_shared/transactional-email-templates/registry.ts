@@ -9,7 +9,6 @@ export interface TemplateEntry {
   previewData?: Record<string, any>
 }
 
-import { template as welcomeTraveler } from './welcome-traveler.tsx'
 import { template as tripRequestReceived } from './trip-request-received.tsx'
 import { template as newProposalReceived } from './new-proposal-received.tsx'
 import { template as bookingConfirmationTraveler } from './booking-confirmation-traveler.tsx'
@@ -37,7 +36,6 @@ import { template as applicationDeclinedProfessional } from './application-decli
 import { template as applicationInfoRequestedProfessional } from './application-info-requested-professional.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
-  'welcome-traveler': welcomeTraveler,
   'trip-request-received': tripRequestReceived,
   'new-proposal-received': newProposalReceived,
   'booking-confirmation-traveler': bookingConfirmationTraveler,
