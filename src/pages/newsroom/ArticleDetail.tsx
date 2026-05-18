@@ -98,120 +98,137 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         })}</script>
       </Helmet>
 
-      <article className="max-w-3xl mx-auto px-6 pt-12 md:pt-16 pb-10 animate-fade-in">
+      <article className="max-w-[680px] mx-auto px-6 pt-12 md:pt-20 pb-8 animate-fade-in">
         <Link
           to="/newsroom"
-          className="text-[10px] tracking-[0.3em] uppercase text-[#0c4d47] hover:underline"
+          className="text-[11px] tracking-[0.25em] uppercase text-[#0c4d47] hover:underline"
         >
-          ← Newsroom
+          ← Back to Newsroom
         </Link>
 
-        <p className="mt-12 text-[10px] tracking-[0.3em] uppercase text-[#C7A962]">{typeLabel}</p>
-        <h1 className="font-secondary text-3xl md:text-5xl leading-[1.1] mt-4 tracking-tight">{article.title}</h1>
-        {article.subtitle && (
-          <p className="font-secondary text-lg md:text-2xl text-[#0a2225]/70 mt-6 leading-snug max-w-2xl">
-            {article.subtitle}
-          </p>
-        )}
+        <h1
+          className="font-secondary mt-10 text-[34px] md:text-[52px] leading-[1.08] text-[#0a2225]"
+          style={{ letterSpacing: "-0.01em" }}
+        >
+          {article.title}
+        </h1>
 
-        {/* Author identity block */}
-        <div className="mt-10 flex items-center gap-4 pt-6 border-t border-[#E5DFC6]">
-          {article.author?.avatar_url ? (
-            <img
-              src={article.author.avatar_url}
-              alt={article.author.full_name}
-              className="w-12 h-12 rounded-full object-cover border border-[#E5DFC6]"
-            />
-          ) : (
-            <div className="w-12 h-12 rounded-full bg-[#F6F0E4] border border-[#E5DFC6]" />
-          )}
-          <div className="flex-1 min-w-0">
-            <p className="font-secondary text-base text-[#0a2225] leading-tight">
-              {article.author?.full_name || "Goldsainte Editorial"}
-            </p>
-            <p className="text-[11px] uppercase tracking-[0.2em] text-[#0a2225]/55 mt-1">
-              {article.author?.title || "Newsroom"}
-            </p>
-          </div>
-          <div className="text-right text-[11px] uppercase tracking-[0.2em] text-[#0a2225]/55 leading-tight">
-            <div>{formatDate(article.published_at)}</div>
-            <div className="mt-1">{readingTime(article.body)} min read</div>
-          </div>
+        <div className="mt-8 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-[#0a2225]/70">
+          <span>By {article.author?.full_name || "Goldsainte"}</span>
+          <span className="text-[#0a2225]/30">·</span>
+          <span>{formatDate(article.published_at)}</span>
+          <span className="text-[#0a2225]/30">·</span>
+          <span className="text-[#0c4d47]">{article.category || typeLabel}</span>
         </div>
+
+        {article.subtitle && (
+          <div className="mt-10 border-l-2 border-[#C7A962] pl-5 py-1">
+            <p className="text-[15px] italic text-[#0a2225]/75 leading-relaxed">
+              <span className="font-semibold not-italic text-[#0a2225]">Editor's Note:</span>{" "}
+              {article.subtitle}
+            </p>
+          </div>
+        )}
       </article>
 
-      {article.hero_image_url && (
-        <figure className="w-full overflow-hidden animate-fade-in">
+      {/* Optional inline image — only for non-press-release articles */}
+      {article.type !== "press_release" && article.hero_image_url && (
+        <figure className="max-w-[680px] mx-auto px-6 mt-12 animate-fade-in">
           <img
             src={article.hero_image_url}
             alt={article.hero_image_alt || article.title}
-            className="w-full aspect-[16/9] md:aspect-[21/9] object-cover"
+            className="w-full aspect-[16/9] object-cover rounded-sm"
           />
           {article.hero_image_credit && (
-            <figcaption className="max-w-3xl mx-auto px-6 text-[11px] text-[#0a2225]/50 mt-3 italic">
+            <figcaption className="text-[11px] text-[#0a2225]/50 mt-3 italic">
               {article.hero_image_credit}
             </figcaption>
           )}
         </figure>
       )}
 
-      <div className="max-w-3xl mx-auto px-6 pt-16 pb-16 overflow-hidden">
-        <Markdown source={article.body} />
+      <div className="max-w-[680px] mx-auto px-6 pt-12 pb-16">
+        <Markdown source={article.body} variant="editorial" />
 
-        {article.tags && article.tags.length > 0 && (
-          <div className="mt-12 flex flex-wrap gap-2">
-            {article.tags.map((t) => (
-              <span key={t} className="text-[10px] uppercase tracking-wider px-3 py-1 border border-[#E5DFC6] text-[#0a2225]/70">
-                {t}
-              </span>
-            ))}
+        {article.author?.signature_image_url && (
+          <div className="mt-16 mb-4">
+            <img
+              src={article.author.signature_image_url}
+              alt={`${article.author.full_name} signature`}
+              className="h-20 w-auto opacity-90"
+            />
           </div>
         )}
 
-        <ShareRow title={article.title} url={canonical} />
-
         {article.type === "press_release" && (
           <>
-            <hr className="my-16 border-[#E5DFC6]" />
-            <h3 className="font-secondary text-xl mb-4">About Goldsainte</h3>
-            <p className="text-sm text-[#0a2225]/70 leading-relaxed mb-10">{COMPANY_BOILERPLATE_LONG}</p>
+            <hr className="my-16 border-t border-[#E5DFC6]" />
+            <h3 className="font-secondary text-2xl text-[#0a2225] mb-4">About Goldsainte</h3>
+            <p className="text-[15px] text-[#0a2225]/80 leading-[1.7] mb-8">
+              Goldsainte is an AI-powered travel marketplace headquartered in Charlotte,
+              North Carolina. Founded in 2026, Goldsainte connects travelers with vetted
+              travel creators and certified travel agents through a platform that combines
+              AI trip planning, escrow-protected payments via Stripe Connect, and verified
+              professional expertise across 47 countries. For more information, visit{" "}
+              <a href="https://goldsainte.ai" className="text-[#0c4d47] underline underline-offset-2">
+                goldsainte.ai
+              </a>
+              .
+            </p>
+            <Link
+              to="/newsroom/media-kit"
+              className="inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.25em] text-[#0c4d47] hover:text-[#0a3d39]"
+            >
+              Download brand assets <span aria-hidden>→</span>
+            </Link>
 
-            <h3 className="font-secondary text-xl mb-4">Press Contact</h3>
-            <p className="text-sm text-[#0a2225]/80">
+            <hr className="my-16 border-t border-[#E5DFC6]" />
+            <h3 className="font-secondary text-2xl text-[#0a2225] mb-4">Press Contact</h3>
+            <p className="text-[15px] text-[#0a2225]/80 leading-[1.7]">
               {article.press_contact_name || "Goldsainte Press Team"}
               <br />
               <a
-                href={`mailto:${article.press_contact_email || "press@goldsainte.ai"}`}
-                className="text-[#0c4d47] underline underline-offset-4"
+                href={`mailto:${article.press_contact_email || "press@goldsainte.com"}`}
+                className="text-[#0c4d47] underline underline-offset-2"
               >
-                {article.press_contact_email || "press@goldsainte.ai"}
+                {article.press_contact_email || "press@goldsainte.com"}
               </a>
             </p>
           </>
         )}
+
+        <ShareRow title={article.title} url={canonical} />
       </div>
 
       {related.length > 0 && (
-        <section className="border-t border-[#E5DFC6]">
-          <div className="max-w-5xl mx-auto px-6 py-16">
-            <h3 className="font-secondary text-xl md:text-2xl mb-8">Related Articles</h3>
+        <section className="bg-[#FDF9F0] border-t border-[#E5DFC6]">
+          <div className="max-w-5xl mx-auto px-6 py-20">
+            <h3 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-10">
+              Related stories
+            </h3>
             <div className="grid md:grid-cols-3 gap-8">
               {related.map((r) => (
                 <Link key={r.id} to={articlePath(r)} className="group block">
-                  <div className="aspect-[4/3] bg-[#F6F0E4] overflow-hidden rounded-2xl mb-4">
-                    {r.hero_image_url && (
+                  {r.hero_image_url ? (
+                    <div className="aspect-[4/3] overflow-hidden rounded-sm mb-5">
                       <img
                         src={r.hero_image_url}
                         alt={r.title}
                         className="w-full h-full object-cover group-hover:scale-[1.02] transition duration-700"
                       />
-                    )}
-                  </div>
-                  <span className="text-[10px] tracking-[0.25em] uppercase text-[#C7A962]">
-                    {formatDate(r.published_at)}
-                  </span>
-                  <p className="font-secondary text-base leading-snug mt-1 group-hover:text-[#0c4d47] transition">
+                    </div>
+                  ) : (
+                    <div className="aspect-[4/3] rounded-sm mb-5 bg-gradient-to-br from-[#0c4d47] to-[#0a2225] flex items-center justify-center">
+                      <span className="text-[10px] tracking-[0.3em] uppercase text-[#C7A962]">
+                        {r.type === "press_release" ? "Press Release" : "News"}
+                      </span>
+                    </div>
+                  )}
+                  <p className="font-secondary text-lg md:text-xl leading-snug text-[#0a2225] group-hover:text-[#0c4d47] transition">
                     {r.title}
+                  </p>
+                  <p className="mt-2 text-[12px] tracking-wide text-[#0a2225]/55">
+                    {formatDate(r.published_at)}
                   </p>
                 </Link>
               ))}
