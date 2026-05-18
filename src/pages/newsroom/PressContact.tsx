@@ -15,7 +15,15 @@ const schema = z.object({
   message: z.string().trim().min(10).max(4000),
 });
 
-const TOPICS = ["General", "Founder Interview", "Product Demo", "Industry Comment"];
+const TOPICS = [
+  "General",
+  "Founder Interview",
+  "Speaking Request",
+  "Podcast",
+  "Broadcast",
+  "Product Demo",
+  "Industry Comment",
+];
 
 export default function PressContact() {
   const [submitting, setSubmitting] = useState(false);
@@ -80,47 +88,69 @@ export default function PressContact() {
         <meta name="description" content="Submit press inquiries to Goldsainte: interviews, demos, industry comment, and more." />
         <link rel="canonical" href={`${BASE_URL}/newsroom/press-contact`} />
       </Helmet>
-      <div className="max-w-2xl mx-auto px-5 sm:px-6 py-12 md:py-20">
-        <h1 className="font-secondary text-3xl md:text-4xl mb-4">Press Contact</h1>
-        <p className="text-[#0a2225]/70 mb-8 md:mb-10">
+      <div className="max-w-5xl mx-auto px-5 sm:px-6 py-8 sm:py-10 md:py-16">
+        <div className="grid gap-8 md:gap-12 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:items-start">
+          <div className="md:sticky md:top-[calc(var(--header-height,64px)+88px)] space-y-5">
+            <div>
+              <p className="mb-3 text-[10px] uppercase tracking-[0.24em] text-[#C7A962]">Press Contact</p>
+              <h1 className="font-secondary text-[28px] sm:text-[34px] md:text-[40px] leading-[1.02] mb-4">Press Contact</h1>
+            </div>
+            <p className="text-[15px] leading-[1.75] text-[#0a2225]/72">
           For interview requests, demos, or industry commentary, submit the form below or email{" "}
           <a href="mailto:press@goldsainte.com" className="text-[#0c4d47] underline">press@goldsainte.com</a>.
-        </p>
-
-        {done ? (
-          <div className="border border-[#0c4d47] p-8 bg-white">
-            <p className="font-secondary text-xl md:text-2xl mb-2">Thank you.</p>
-            <p className="text-[#0a2225]/70">A member of our team will reply within one business day.</p>
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-sm border border-[#E5DFC6] bg-white px-4 py-4">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-[#0a2225]/48">Response</p>
+                <p className="mt-2 font-secondary text-xl text-[#0a2225]">1 business day</p>
+              </div>
+              <div className="rounded-sm border border-[#E5DFC6] bg-white px-4 py-4">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-[#0a2225]/48">Best for</p>
+                <p className="mt-2 font-secondary text-xl text-[#0a2225]">Press + broadcast</p>
+              </div>
+            </div>
           </div>
-        ) : (
-          <form onSubmit={onSubmit} className="space-y-5">
-            <Field name="reporter_name" label="Reporter name" required />
-            <Field name="publication" label="Publication" required />
-            <Field name="email" label="Email" type="email" required />
-            <Field name="phone" label="Phone (optional)" />
-            <div>
-              <label className="text-xs uppercase tracking-wider text-[#0a2225]/70">Inquiry topic *</label>
-              <select name="topic" required defaultValue=""
-                className="mt-2 w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/30 focus:border-[#0c4d47]">
-                <option value="" disabled>Select…</option>
-                {TOPICS.map((t) => <option key={t} value={t}>{t}</option>)}
-              </select>
+
+          {done ? (
+            <div className="border border-[#0c4d47] p-6 sm:p-8 bg-white rounded-sm">
+              <p className="font-secondary text-xl md:text-2xl mb-2">Thank you.</p>
+              <p className="text-[#0a2225]/70">A member of our team will reply within one business day.</p>
             </div>
-            <Field name="deadline" label="Deadline" type="date" required />
-            <div>
-              <label className="text-xs uppercase tracking-wider text-[#0a2225]/70">Message *</label>
-              <textarea name="message" required rows={6}
-                className="mt-2 w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/30 focus:border-[#0c4d47]" />
-            </div>
-            <button
-              type="submit"
-              disabled={submitting}
-              className="px-8 py-3 rounded-full bg-[#0c4d47] text-white text-sm tracking-wide hover:bg-[#0a3d39] disabled:opacity-50 transition"
-            >
-              {submitting ? "Submitting…" : "Submit inquiry"}
-            </button>
-          </form>
-        )}
+          ) : (
+            <form onSubmit={onSubmit} className="space-y-5 rounded-sm border border-[#E5DFC6] bg-white p-5 sm:p-6 md:p-8">
+              <div className="grid gap-5 md:grid-cols-2">
+                <Field name="reporter_name" label="Reporter name" required />
+                <Field name="publication" label="Publication" required />
+                <Field name="email" label="Email" type="email" required />
+                <Field name="phone" label="Phone (optional)" />
+                <div>
+                  <label className="text-[10px] uppercase tracking-[0.22em] text-[#0a2225]/60">Inquiry topic *</label>
+                  <select name="topic" required defaultValue=""
+                    className="mt-2 w-full rounded-sm border border-[#E5DFC6] bg-white px-4 py-3 text-sm text-[#0a2225] focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/25 focus:border-[#0c4d47] transition">
+                    <option value="" disabled>Select…</option>
+                    {TOPICS.map((t) => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <Field name="deadline" label="Deadline" type="date" required />
+                  <p className="mt-2 text-[11px] leading-relaxed text-[#0a2225]/52">Include the publication deadline for priority response handling.</p>
+                </div>
+              </div>
+              <div>
+                <label className="text-[10px] uppercase tracking-[0.22em] text-[#0a2225]/60">Message *</label>
+                <textarea name="message" required rows={7}
+                  className="mt-2 w-full rounded-sm border border-[#E5DFC6] bg-white px-4 py-3 text-sm text-[#0a2225] focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/25 focus:border-[#0c4d47] transition" />
+              </div>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full sm:w-auto px-6 py-3 rounded-sm bg-[#0c4d47] text-white text-[11px] uppercase tracking-[0.2em] hover:bg-[#0a3d39] disabled:opacity-50 transition"
+              >
+                {submitting ? "Submitting…" : "Submit inquiry"}
+              </button>
+            </form>
+          )}
+        </div>
       </div>
     </>
   );
@@ -129,14 +159,14 @@ export default function PressContact() {
 function Field({ name, label, type = "text", required }: { name: string; label: string; type?: string; required?: boolean }) {
   return (
     <div>
-      <label className="text-xs uppercase tracking-wider text-[#0a2225]/70">
-        {label} {required && "*"}
+      <label className="text-[10px] uppercase tracking-[0.22em] text-[#0a2225]/60">
+        {label} {required && <span className="text-[#0c4d47]">*</span>}
       </label>
       <input
         name={name}
         type={type}
         required={required}
-        className="mt-2 w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/30 focus:border-[#0c4d47]"
+        className="mt-2 w-full rounded-sm border border-[#E5DFC6] bg-white px-4 py-3 text-sm text-[#0a2225] focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/25 focus:border-[#0c4d47] transition"
       />
     </div>
   );
