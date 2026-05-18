@@ -1,6 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { BASE_URL } from "./lib";
+import { NewsroomPageHeader, newsroomPageShellClass } from "./ui";
 
 export default function EditorialPolicy() {
   return (
@@ -14,23 +15,20 @@ export default function EditorialPolicy() {
         <link rel="canonical" href={`${BASE_URL}/newsroom/editorial-policy`} />
       </Helmet>
 
-      <div className="max-w-2xl mx-auto px-5 sm:px-6 py-12 md:py-28">
+      <div className={`${newsroomPageShellClass} max-w-2xl`}>
         {/* Hero */}
-        <header className="mb-20 md:mb-24 animate-fade-in">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-5">
-            Editorial Philosophy
-          </p>
-          <h1 className="font-secondary text-2xl md:text-3xl leading-[1.2] mb-6">
-            The Goldsainte Newsroom exists to explore the future of modern
-            travel through thoughtful storytelling, company news, industry
-            insight, and curated editorial perspectives.
-          </h1>
-          <p className="text-base text-[#0a2225]/70 leading-relaxed">
-            Our editorial approach is guided by clarity, trust, design, and the
-            belief that extraordinary travel begins long before a booking is
-            made.
-          </p>
-        </header>
+        <NewsroomPageHeader
+          eyebrow="Editorial Philosophy"
+          title="The Goldsainte Newsroom exists to explore the future of modern travel through thoughtful storytelling, company news, industry insight, and curated editorial perspectives."
+          className="mb-14 md:mb-24 animate-fade-in"
+          intro={
+            <p>
+              Our editorial approach is guided by clarity, trust, design, and the
+              belief that extraordinary travel begins long before a booking is
+              made.
+            </p>
+          }
+        />
 
         <Divider />
 
@@ -75,7 +73,7 @@ export default function EditorialPolicy() {
 
         {/* Pull quote */}
         <figure className="my-24 md:my-28 text-center animate-fade-in">
-          <blockquote className="font-secondary text-2xl md:text-3xl leading-[1.25] text-[#0a2225]">
+          <blockquote className="font-secondary text-[24px] md:text-3xl leading-[1.2] text-[#0a2225]">
             <span className="text-[#C7A962] mr-1">“</span>
             The best travel story is always a human one.
             <span className="text-[#C7A962] ml-1">”</span>
@@ -139,7 +137,7 @@ export default function EditorialPolicy() {
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-4">
             Continue Reading
           </p>
-          <h3 className="font-secondary text-2xl md:text-3xl leading-tight mb-6">
+          <h3 className="font-secondary text-[24px] md:text-3xl leading-tight mb-6">
             Explore the Goldsainte Newsroom.
           </h3>
           <Link
@@ -174,7 +172,7 @@ function Section({
           {eyebrow}
         </p>
       )}
-      <h2 className="font-secondary text-xl md:text-2xl leading-tight mb-6 text-[#0a2225]">
+      <h2 className="font-secondary text-[22px] md:text-2xl leading-tight mb-5 md:mb-6 text-[#0a2225]">
         {title}
       </h2>
       <div className="space-y-5 text-base text-[#0a2225]/80 leading-relaxed">

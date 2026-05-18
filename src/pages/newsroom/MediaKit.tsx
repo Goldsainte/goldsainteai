@@ -32,6 +32,7 @@ import wordmarkGold from "@/assets/newsroom/logos/wordmark-gold.png";
 import wordmarkGreen from "@/assets/newsroom/logos/wordmark-green.png";
 import logomarkSealGold from "@/assets/newsroom/logos/logomark-seal-gold.png";
 import logomarkSealGreen from "@/assets/newsroom/logos/logomark-seal-green.png";
+import { newsroomPageShellClass, newsroomSectionTitleClass } from "./ui";
 
 const COLORS = [
   { name: "Cream", role: "Primary surface", hex: "#FDF9F0", text: "#0a2225" },
@@ -267,7 +268,7 @@ export default function MediaKit() {
       </Helmet>
 
       {/* HERO */}
-      <section className="relative h-[54vh] min-h-[360px] sm:min-h-[420px] md:h-[62vh] md:min-h-[460px] w-full overflow-hidden">
+      <section className="relative h-[44vh] min-h-[300px] sm:min-h-[420px] md:h-[62vh] md:min-h-[460px] w-full overflow-hidden">
         <img
           src={heroImage}
           alt="A cinematic luxury hotel suite at golden hour with a leather suitcase and cream cashmere throw, evoking modern global hospitality."
@@ -277,11 +278,11 @@ export default function MediaKit() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a2225]/40 via-[#0a2225]/25 to-[#0a2225]/80" />
         <div className="absolute inset-0 flex items-end">
-          <div className="max-w-5xl mx-auto w-full px-5 sm:px-6 pb-8 sm:pb-10 md:pb-20">
+          <div className="max-w-5xl mx-auto w-full px-5 sm:px-6 pb-6 sm:pb-10 md:pb-20">
             <p className="text-[9px] sm:text-[10px] tracking-[0.22em] sm:tracking-[0.32em] uppercase text-[#C7A962] mb-3 sm:mb-5">
               Goldsainte Newsroom · Media Kit
             </p>
-            <h1 className="font-secondary text-[28px] sm:text-[34px] md:text-5xl text-[#FDF9F0] max-w-xl md:max-w-2xl leading-[1.02] md:leading-[1.1]">
+            <h1 className="font-secondary text-[28px] sm:text-[34px] md:text-5xl text-[#FDF9F0] max-w-[14ch] sm:max-w-xl md:max-w-2xl leading-[1.02] md:leading-[1.1]">
               Brand Assets &amp; Editorial Resources
             </h1>
             <p className="mt-4 sm:mt-5 max-w-md sm:max-w-lg text-[#FDF9F0]/82 text-[14px] sm:text-sm md:text-base leading-[1.55] sm:leading-[1.65]">
@@ -310,7 +311,7 @@ export default function MediaKit() {
 
       <div className="bg-[#FDF9F0]">
         {/* INTRO */}
-        <section className="max-w-5xl mx-auto px-5 sm:px-6 py-10 md:py-28">
+        <section className={`${newsroomPageShellClass} pt-8 sm:pt-10 md:py-28`}>
           <div className="grid md:grid-cols-12 gap-8 md:gap-12 items-start">
             <div className="md:col-span-4">
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
@@ -318,7 +319,7 @@ export default function MediaKit() {
               </p>
             </div>
             <div className="md:col-span-8">
-              <p className="font-secondary text-2xl md:text-3xl text-[#0a2225] leading-[1.35]">
+              <p className="font-secondary text-[24px] md:text-3xl text-[#0a2225] leading-[1.3]">
                 Everything an editor, producer, or journalist needs to write about
                 Goldsainte with accuracy and visual integrity — in one place.
               </p>
@@ -339,12 +340,12 @@ export default function MediaKit() {
         </div>
 
         {/* LOGOS */}
-        <section className="max-w-5xl mx-auto px-5 sm:px-6 py-10 md:py-28">
+        <section className={`${newsroomPageShellClass} pt-8 sm:pt-10 md:py-28`}>
           <div className="mb-12 max-w-3xl">
             <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
               02 — Identity
             </p>
-            <h2 className="font-secondary text-2xl md:text-3xl mt-3 text-[#0a2225]">
+            <h2 className={`${newsroomSectionTitleClass} mt-3`}>
               Logo
             </h2>
             <p className="text-base text-[#0a2225]/70 mt-4 leading-relaxed">
@@ -363,7 +364,7 @@ export default function MediaKit() {
             />
           </div>
 
-          <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-x-8 sm:gap-y-4">
+          <div className="mt-6 sm:mt-10 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-x-8 sm:gap-y-4">
             <button
               onClick={() => {
                 toast.promise(downloadLogoAssets(), {
@@ -389,12 +390,12 @@ export default function MediaKit() {
 
         {/* COLOR */}
         <section className="bg-white/60 border-y border-[#E5DFC6]">
-          <div className="max-w-5xl mx-auto px-5 sm:px-6 py-12 md:py-28">
+          <div className={`${newsroomPageShellClass} py-10 md:py-28`}>
             <div className="mb-12">
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
                 03 — Palette
               </p>
-              <h2 className="font-secondary text-2xl md:text-3xl mt-3 text-[#0a2225]">
+              <h2 className={`${newsroomSectionTitleClass} mt-3`}>
                 The Goldsainte Palette
               </h2>
               <p className="text-base text-[#0a2225]/70 mt-4 max-w-2xl leading-relaxed">
@@ -411,17 +412,17 @@ export default function MediaKit() {
         </section>
 
         {/* TYPOGRAPHY SHOWCASE */}
-        <section className="max-w-5xl mx-auto px-5 sm:px-6 py-12 md:py-28">
+        <section className={`${newsroomPageShellClass} py-10 md:py-28`}>
           <div className="mb-12">
             <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
               04 — Typography
             </p>
-            <h2 className="font-secondary text-2xl md:text-3xl mt-3 text-[#0a2225]">
+              <h2 className={`${newsroomSectionTitleClass} mt-3`}>
               Editorial Voice in Practice
             </h2>
           </div>
 
-          <div className="border border-[#E5DFC6] bg-white/60 rounded-sm p-8 md:p-14 space-y-12">
+          <div className="border border-[#E5DFC6] bg-white/60 rounded-sm p-5 sm:p-8 md:p-14 space-y-10 md:space-y-12">
             <div className="space-y-3">
               <p className="text-[10px] tracking-[0.3em] uppercase text-[#0a2225]/45">
                 Eyebrow · Section label
@@ -437,7 +438,7 @@ export default function MediaKit() {
               <p className="text-[10px] tracking-[0.3em] uppercase text-[#0a2225]/45">
                 Display headline · Serif
               </p>
-              <h3 className="font-secondary text-4xl md:text-6xl leading-[1.05] text-[#0a2225]">
+              <h3 className="font-secondary text-[30px] sm:text-4xl md:text-6xl leading-[1.05] text-[#0a2225]">
                 Travel doesn&apos;t belong to algorithms.
               </h3>
             </div>
@@ -446,7 +447,7 @@ export default function MediaKit() {
               <p className="text-[10px] tracking-[0.3em] uppercase text-[#0a2225]/45">
                 Standfirst · Editorial subhead
               </p>
-              <p className="font-secondary text-xl md:text-2xl leading-[1.45] text-[#0a2225]/85 max-w-2xl">
+              <p className="font-secondary text-[20px] md:text-2xl leading-[1.4] text-[#0a2225]/85 max-w-2xl">
                 It belongs to the people who actually know the place — and to the
                 travelers willing to trust them.
               </p>
@@ -482,7 +483,7 @@ export default function MediaKit() {
               <p className="text-[10px] tracking-[0.3em] uppercase text-[#0a2225]/45">
                 Pull quote
               </p>
-              <blockquote className="font-secondary text-2xl md:text-3xl leading-[1.4] text-[#0c4d47] max-w-3xl">
+              <blockquote className="font-secondary text-[24px] md:text-3xl leading-[1.3] text-[#0c4d47] max-w-3xl">
                 <span className="text-[#C7A962] mr-1">&ldquo;</span>
                 Extraordinary travel begins with perspective.
                 <span className="text-[#C7A962] ml-1">&rdquo;</span>
@@ -494,12 +495,12 @@ export default function MediaKit() {
 
         {/* BOILERPLATE */}
         <section className="bg-white/60 border-y border-[#E5DFC6]">
-          <div className="max-w-5xl mx-auto px-5 sm:px-6 py-12 md:py-28">
+          <div className={`${newsroomPageShellClass} py-10 md:py-28`}>
             <div className="mb-10">
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
                 05 — Boilerplate
               </p>
-              <h2 className="font-secondary text-2xl md:text-3xl mt-3 text-[#0a2225]">
+              <h2 className={`${newsroomSectionTitleClass} mt-3`}>
                 Approved Company Language
               </h2>
               <p className="text-base text-[#0a2225]/70 mt-4 max-w-2xl leading-relaxed">
@@ -516,12 +517,12 @@ export default function MediaKit() {
           id="press-packs"
           className="bg-white/60 border-y border-[#E5DFC6]"
         >
-          <div className="max-w-5xl mx-auto px-5 sm:px-6 py-12 md:py-28">
+          <div className={`${newsroomPageShellClass} py-10 md:py-28`}>
             <div className="mb-12">
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
                 06 — Downloads
               </p>
-              <h2 className="font-secondary text-2xl md:text-3xl mt-3 text-[#0a2225]">
+              <h2 className={`${newsroomSectionTitleClass} mt-3`}>
                 Press Packs
               </h2>
               <p className="text-base text-[#0a2225]/70 mt-4 max-w-2xl leading-relaxed">
@@ -585,14 +586,14 @@ export default function MediaKit() {
 
         {/* EDITORIAL FOOTER */}
         <section className="bg-[#FDF9F0]">
-          <div className="max-w-5xl mx-auto px-5 sm:px-6 py-12 md:py-28">
-            <div className="h-px bg-[#E5DFC6] mb-20" />
+          <div className={`${newsroomPageShellClass} py-10 md:py-28`}>
+            <div className="h-px bg-[#E5DFC6] mb-12 md:mb-20" />
             <div className="grid md:grid-cols-12 gap-10 items-start">
               <div className="md:col-span-7 space-y-6">
                 <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
                   07 — For the Press
                 </p>
-                <h2 className="font-secondary text-3xl md:text-5xl leading-[1.1] text-[#0a2225]">
+                <h2 className="font-secondary text-[28px] md:text-5xl leading-[1.08] text-[#0a2225]">
                   For media inquiries, interviews, and founder commentary.
                 </h2>
                 <p className="text-base text-[#0a2225]/70 leading-relaxed max-w-xl">

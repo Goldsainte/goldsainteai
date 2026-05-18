@@ -3,6 +3,11 @@ import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { articlePath, fetchPublishedArticles, formatDate, BASE_URL } from "./lib";
+import {
+  NewsroomMobilePicker,
+  NewsroomPageHeader,
+  newsroomPageShellClass,
+} from "./ui";
 
 const FILTERS = [
   { key: "all", label: "All" },
@@ -55,40 +60,32 @@ export default function Archive() {
         <link rel="canonical" href={`${BASE_URL}/newsroom/archive`} />
       </Helmet>
 
-      <div className="max-w-5xl mx-auto px-5 sm:px-6 py-12 md:py-20">
+      <div className={newsroomPageShellClass}>
         {/* Header */}
-        <header className="mb-10 sm:mb-12 text-center">
-          <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.18em] sm:tracking-[0.22em] text-[#0a2225]/50 mb-3 sm:mb-4">
-            Goldsainte Newsroom · Archive
-          </p>
-          <h1 className="font-secondary text-[40px] sm:text-4xl md:text-5xl leading-[1.02] text-[#0a2225] mb-4">
-            All Coverage
-          </h1>
-          <p className="text-[15px] sm:text-base leading-[1.7] text-[#0a2225]/60 max-w-xl mx-auto">
-            Every press release, company announcement, and editorial piece — in one place.
-          </p>
-        </header>
+        <NewsroomPageHeader
+          eyebrow="Goldsainte Newsroom · Archive"
+          title="All Coverage"
+          centered
+          className="mb-8 sm:mb-12"
+          intro={
+            <p className="max-w-xl">
+              Every press release, company announcement, and editorial piece — in one place.
+            </p>
+          }
+        />
 
         {/* Filters */}
         <div className="mb-10 sm:mb-14">
           <div className="sm:hidden">
-            <label htmlFor="archive-filter" className="sr-only">Filter newsroom archive</label>
-            <div className="relative">
-              <select
-                id="archive-filter"
-                value={filter}
-                onChange={(e) => {
-                  setFilter(e.target.value as FilterKey);
-                  setVisibleCount(20);
-                }}
-                className="w-full appearance-none rounded-sm border border-[#E5DFC6] bg-white px-4 py-3 pr-10 text-[10px] uppercase tracking-[0.16em] text-[#0a2225] focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/20"
-              >
-                {FILTERS.map(({ key, label }) => (
-                  <option key={key} value={key}>{label}</option>
-                ))}
-              </select>
-              <span className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-[#0a2225]/55">▾</span>
-            </div>
+            <NewsroomMobilePicker
+              label="Filter newsroom archive"
+              value={filter}
+              options={FILTERS.map(({ key, label }) => ({ label, value: key }))}
+              onChange={(value) => {
+                setFilter(value as FilterKey);
+                setVisibleCount(20);
+              }}
+            />
           </div>
 
           <div className="hidden sm:flex -mx-6 px-6 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -136,7 +133,7 @@ export default function Archive() {
 
         {!isLoading &&
           years.map((year) => (
-            <section key={year} className="mb-16">
+            <section key={year} className="mb-14 md:mb-16">
               <h2
                 id={`year-${year}`}
                 className="font-secondary text-2xl text-[#0a2225]/80 mb-6 pb-3 border-b border-[#E5DFC6]"
@@ -149,7 +146,7 @@ export default function Archive() {
                   <li key={a.id}>
                     <Link
                       to={articlePath(a)}
-                      className="grid md:grid-cols-[140px_1fr] gap-3 md:gap-6 py-6 group"
+                      className="grid md:grid-cols-[140px_1fr] gap-3 md:gap-6 py-5 sm:py-6 group"
                     >
                       <span className="hidden md:block text-xs text-[#0a2225]/50 uppercase tracking-wider pt-1">
                         {formatDate(a.published_at)}
@@ -160,8 +157,8 @@ export default function Archive() {
                             {formatDate(a.published_at)}
                           </span>
                         </div>
-                        <div className="flex items-start gap-3 flex-wrap">
-                          <p className="font-secondary text-xl text-[#0a2225] group-hover:text-[#0c4d47] transition flex-1 min-w-0">
+                        <div className="flex items-start gap-2.5 sm:gap-3 flex-wrap">
+                          <p className="font-secondary text-[18px] sm:text-xl leading-[1.2] text-[#0a2225] group-hover:text-[#0c4d47] transition flex-1 min-w-0">
                             {a.title}
                           </p>
                           <span className="flex-shrink-0 inline-block px-2.5 py-1 rounded-full bg-[#0c4d47]/10 text-[#0c4d47] text-[10px] uppercase tracking-[0.18em]">

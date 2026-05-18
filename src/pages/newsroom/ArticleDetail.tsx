@@ -13,6 +13,7 @@ import {
   formatDate,
 } from "./lib";
 import Markdown from "./Markdown";
+import { newsroomPageShellClass } from "./ui";
 
 export default function ArticleDetail({ expectedType }: { expectedType: "press_release" | "news" }) {
   const { slug } = useParams<{ slug: string }>();
@@ -118,7 +119,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         })}</script>
       </Helmet>
 
-      <article className="max-w-[680px] mx-auto px-5 sm:px-6 pt-8 md:pt-20 pb-8 animate-fade-in">
+      <article className={`${newsroomPageShellClass} max-w-[680px] pb-6 md:pb-8 animate-fade-in`}>
         <Link
           to="/newsroom"
           className="inline-flex items-center gap-2 text-[11px] tracking-[0.25em] uppercase text-[#0c4d47] hover:text-[#0a3d39] transition"
@@ -127,13 +128,13 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         </Link>
 
         <h1
-          className="font-secondary mt-8 md:mt-10 text-[28px] sm:text-[34px] md:text-[42px] leading-[1.1] text-[#0a2225]"
+          className="font-secondary mt-6 sm:mt-8 md:mt-10 text-[28px] sm:text-[34px] md:text-[42px] leading-[1.06] text-[#0a2225]"
           style={{ letterSpacing: "-0.01em" }}
         >
           {article.title}
         </h1>
 
-        <div className="mt-5 md:mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] sm:text-[14px] text-[#0a2225]/70">
+        <div className="mt-4 sm:mt-5 md:mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-[12px] sm:text-[14px] text-[#0a2225]/70">
           <span>By {article.author?.full_name || "Goldsainte"}</span>
           <span className="text-[#0a2225]/30">·</span>
           <span>{formatDate(article.published_at)}</span>
@@ -180,7 +181,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         </div>
       ) : null}
 
-      <div className="max-w-[680px] mx-auto px-5 sm:px-6 pt-8 md:pt-12 pb-12 md:pb-16">
+      <div className="max-w-[680px] mx-auto px-5 sm:px-6 pt-7 md:pt-12 pb-12 md:pb-16">
         {article.type === "press_release" && (
           <p className="mb-5 md:mb-6 text-[10px] sm:text-[11px] tracking-[0.18em] sm:tracking-[0.22em] uppercase text-[#0a2225]/70 font-medium">
             Charlotte, NC&nbsp;&mdash;&nbsp;{formatDate(article.published_at)}&nbsp;&mdash;

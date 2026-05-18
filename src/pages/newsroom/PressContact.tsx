@@ -4,6 +4,14 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { BASE_URL } from "./lib";
+import {
+  NewsroomMobilePicker,
+  NewsroomPageHeader,
+  newsroomFieldClass,
+  newsroomFieldLabelClass,
+  newsroomPageShellClass,
+  newsroomTextAreaClass,
+} from "./ui";
 
 const schema = z.object({
   reporter_name: z.string().trim().min(1).max(120),
@@ -28,6 +36,7 @@ const TOPICS = [
 export default function PressContact() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const [selectedTopic, setSelectedTopic] = useState("");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -78,6 +87,7 @@ export default function PressContact() {
     }
     setSubmitting(false);
     setDone(true);
+    setSelectedTopic("");
     form.reset();
   }
 
@@ -88,17 +98,19 @@ export default function PressContact() {
         <meta name="description" content="Submit press inquiries to Goldsainte: interviews, demos, industry comment, and more." />
         <link rel="canonical" href={`${BASE_URL}/newsroom/press-contact`} />
       </Helmet>
-      <div className="max-w-5xl mx-auto px-5 sm:px-6 py-8 sm:py-10 md:py-16">
+      <div className={newsroomPageShellClass}>
         <div className="grid gap-8 md:gap-12 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:items-start">
           <div className="md:sticky md:top-[calc(var(--header-height,64px)+88px)] space-y-5">
-            <div>
-              <p className="mb-3 text-[10px] uppercase tracking-[0.24em] text-[#C7A962]">Press Contact</p>
-              <h1 className="font-secondary text-[28px] sm:text-[34px] md:text-[40px] leading-[1.02] mb-4">Press Contact</h1>
-            </div>
-            <p className="text-[15px] leading-[1.75] text-[#0a2225]/72">
-          For interview requests, demos, or industry commentary, submit the form below or email{" "}
-          <a href="mailto:press@goldsainte.com" className="text-[#0c4d47] underline">press@goldsainte.com</a>.
-            </p>
+            <NewsroomPageHeader
+              eyebrow="Press Contact"
+              title="Press Contact"
+              intro={
+                <p>
+                  For interview requests, demos, or industry commentary, submit the form below or email{" "}
+                  <a href="mailto:press@goldsainte.com" className="text-[#0c4d47] underline">press@goldsainte.com</a>.
+                </p>
+              }
+            />
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-sm border border-[#E5DFC6] bg-white px-4 py-4">
                 <p className="text-[10px] uppercase tracking-[0.2em] text-[#0a2225]/48">Response</p>
@@ -124,27 +136,35 @@ export default function PressContact() {
                 <Field name="email" label="Email" type="email" required />
                 <Field name="phone" label="Phone (optional)" />
                 <div>
-                  <label className="text-[10px] uppercase tracking-[0.22em] text-[#0a2225]/60">Inquiry topic *</label>
-                  <select name="topic" required defaultValue=""
-                    className="mt-2 w-full rounded-sm border border-[#E5DFC6] bg-white px-4 py-3 text-sm text-[#0a2225] focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/25 focus:border-[#0c4d47] transition">
+                  <label className={newsroomFieldLabelClass}>Inquiry topic *</label>
+                  <div className="mt-2 sm:hidden">
+                    <input type="hidden" name="topic" value={selectedTopic} />
+                    <NewsroomMobilePicker
+                      label="Inquiry topic"
+                      value={selectedTopic}
+                      options={[{ label: "Select…", value: "" }, ...TOPICS.map((t) => ({ label: t, value: t }))]}
+                      onChange={setSelectedTopic}
+                    />
+                  </div>
+                  <select name="topic" defaultValue="" className={`${newsroomFieldClass} hidden sm:block`}>
                     <option value="" disabled>Select…</option>
                     {TOPICS.map((t) => <option key={t} value={t}>{t}</option>)}
                   </select>
                 </div>
                 <div>
                   <Field name="deadline" label="Deadline" type="date" required />
-                  <p className="mt-2 text-[11px] leading-relaxed text-[#0a2225]/52">Include the publication deadline for priority response handling.</p>
+                  <p className="mt-2 text-[10px] sm:text-[11px] leading-relaxed text-[#0a2225]/52">Include the publication deadline for priority response handling.</p>
                 </div>
               </div>
               <div>
-                <label className="text-[10px] uppercase tracking-[0.22em] text-[#0a2225]/60">Message *</label>
+                <label className={newsroomFieldLabelClass}>Message *</label>
                 <textarea name="message" required rows={7}
-                  className="mt-2 w-full rounded-sm border border-[#E5DFC6] bg-white px-4 py-3 text-sm text-[#0a2225] focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/25 focus:border-[#0c4d47] transition" />
+                  className={newsroomTextAreaClass} />
               </div>
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full sm:w-auto px-6 py-3 rounded-sm bg-[#0c4d47] text-white text-[11px] uppercase tracking-[0.2em] hover:bg-[#0a3d39] disabled:opacity-50 transition"
+                className="w-full sm:w-auto px-6 py-3 rounded-sm bg-[#0c4d47] text-white text-[10px] sm:text-[11px] uppercase tracking-[0.18em] sm:tracking-[0.2em] hover:bg-[#0a3d39] disabled:opacity-50 transition"
               >
                 {submitting ? "Submitting…" : "Submit inquiry"}
               </button>
@@ -159,14 +179,14 @@ export default function PressContact() {
 function Field({ name, label, type = "text", required }: { name: string; label: string; type?: string; required?: boolean }) {
   return (
     <div>
-      <label className="text-[10px] uppercase tracking-[0.22em] text-[#0a2225]/60">
+      <label className={newsroomFieldLabelClass}>
         {label} {required && <span className="text-[#0c4d47]">*</span>}
       </label>
       <input
         name={name}
         type={type}
         required={required}
-        className="mt-2 w-full rounded-sm border border-[#E5DFC6] bg-white px-4 py-3 text-sm text-[#0a2225] focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/25 focus:border-[#0c4d47] transition"
+        className={newsroomFieldClass}
       />
     </div>
   );

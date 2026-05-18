@@ -2,6 +2,12 @@ import { Helmet } from "react-helmet-async";
 import { useQuery } from "@tanstack/react-query";
 import { fetchAuthors, BASE_URL } from "./lib";
 import signatureImage from "@/assets/newsroom/signature-andre-powell.png";
+import {
+  NewsroomPageHeader,
+  newsroomPageSectionClass,
+  newsroomPageShellClass,
+  newsroomSectionTitleClass,
+} from "./ui";
 
 const FOUNDER_BACKGROUND = [
   {
@@ -46,21 +52,19 @@ export default function Leadership() {
         <link rel="canonical" href={`${BASE_URL}/newsroom/leadership`} />
       </Helmet>
 
-      <div className="max-w-5xl mx-auto px-6 py-16 md:py-24 space-y-20 md:space-y-24">
+      <div className={`${newsroomPageShellClass} px-5 sm:px-6 space-y-14 md:space-y-24`}>
         {/* Page header */}
-        <header className="max-w-3xl">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-[#C7A962] mb-4">
-            Goldsainte Newsroom · Founder
-          </p>
-          <h1 className="font-secondary text-4xl md:text-5xl leading-[1.1] mb-6 text-[#0a2225]">
-            The founder building the future of travel.
-          </h1>
-          <p className="text-base text-[#0a2225]/75 leading-relaxed">
-            Goldsainte is led by founder and CEO Andre C. Powell, Jr. His background
-            spans luxury transportation, consumer marketplaces, franchise operations,
-            and AI-enabled travel technology.
-          </p>
-        </header>
+        <NewsroomPageHeader
+          eyebrow="Goldsainte Newsroom · Founder"
+          title="The founder building the future of travel."
+          intro={
+            <p>
+              Goldsainte is led by founder and CEO Andre C. Powell, Jr. His background
+              spans luxury transportation, consumer marketplaces, franchise operations,
+              and AI-enabled travel technology.
+            </p>
+          }
+        />
 
         {/* Loading skeleton */}
         {isLoading && (
@@ -91,7 +95,7 @@ export default function Leadership() {
             <article
               key={a.id}
               id={a.slug}
-              className="grid md:grid-cols-[280px_1fr] gap-10 md:gap-14 pt-12 border-t border-[#E5DFC6]"
+              className="grid md:grid-cols-[280px_1fr] gap-8 md:gap-14 pt-10 md:pt-12 border-t border-[#E5DFC6]"
             >
               {/* Portrait */}
               <div className="md:sticky md:top-32 self-start">
@@ -125,7 +129,7 @@ export default function Leadership() {
                 <p className="text-[10px] uppercase tracking-[0.3em] text-[#C7A962] mb-3">
                   {a.title}
                 </p>
-                <h2 className="font-secondary text-3xl md:text-4xl leading-tight text-[#0a2225]">
+                <h2 className="font-secondary text-[24px] sm:text-[30px] md:text-4xl leading-[1.08] text-[#0a2225]">
                   {a.full_name}
                 </h2>
 
@@ -174,11 +178,11 @@ export default function Leadership() {
           ))}
 
         {/* Founder Background */}
-        <section className="pt-12 border-t border-[#E5DFC6]">
+        <section className={newsroomPageSectionClass}>
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#C7A962] mb-3">
             Founder Background
           </p>
-          <h2 className="font-secondary text-2xl md:text-3xl leading-tight mb-10 max-w-2xl text-[#0a2225]">
+          <h2 className={`${newsroomSectionTitleClass} mb-8 md:mb-10 max-w-2xl`}>
             A through-line from luxury transportation to AI-powered travel.
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
@@ -199,12 +203,12 @@ export default function Leadership() {
         </section>
 
         {/* Media Notes */}
-        <section className="pt-12 border-t border-[#E5DFC6] grid md:grid-cols-[260px_1fr] gap-8 md:gap-14">
+        <section className={`grid md:grid-cols-[260px_1fr] gap-8 md:gap-14 ${newsroomPageSectionClass}`}>
           <div>
             <p className="text-[10px] uppercase tracking-[0.3em] text-[#C7A962] mb-3">
               Media Notes
             </p>
-            <h2 className="font-secondary text-2xl md:text-3xl leading-tight text-[#0a2225]">
+            <h2 className={newsroomSectionTitleClass}>
               For the press.
             </h2>
           </div>

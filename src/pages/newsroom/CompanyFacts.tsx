@@ -1,5 +1,11 @@
 import { Helmet } from "react-helmet-async";
 import { BASE_URL } from "./lib";
+import {
+  NewsroomPageHeader,
+  newsroomPageSectionClass,
+  newsroomPageShellClass,
+  newsroomSectionTitleClass,
+} from "./ui";
 
 const FACTS: { label: string; value: string }[] = [
   { label: "Headquarters", value: "Charlotte, North Carolina, USA" },
@@ -47,25 +53,27 @@ export default function CompanyFacts() {
           email: "press@goldsainte.com",
         })}</script>
       </Helmet>
-      <div className="max-w-5xl mx-auto px-5 sm:px-6 py-12 md:py-28 space-y-16 md:space-y-32">
+      <div className={`${newsroomPageShellClass} space-y-12 md:space-y-24`}>
         {/* Hero */}
         <section>
-          <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-6">Company Facts</p>
-          <h1 className="font-secondary text-2xl md:text-4xl leading-[1.05] mb-6 max-w-3xl">
-            Goldsainte is building the intelligent marketplace for modern travel.
-          </h1>
-          <p className="text-base text-[#0a2225]/75 leading-relaxed max-w-3xl">
-            Goldsainte is an AI-powered global travel marketplace that enables travelers to discover, create,
-            customize, and book curated travel experiences through a network of vetted travel creators, independent
-            travel advisors, and hospitality partners.
-          </p>
+          <NewsroomPageHeader
+            eyebrow="Company Facts"
+            title="Goldsainte is building the intelligent marketplace for modern travel."
+            intro={
+              <p>
+                Goldsainte is an AI-powered global travel marketplace that enables travelers to discover, create,
+                customize, and book curated travel experiences through a network of vetted travel creators, independent
+                travel advisors, and hospitality partners.
+              </p>
+            }
+          />
         </section>
 
         {/* Overview */}
-        <section className="grid md:grid-cols-[260px_1fr] gap-10 md:gap-16 pt-12 border-t border-[#E5DFC6]">
+        <section className={`grid md:grid-cols-[260px_1fr] gap-8 md:gap-16 ${newsroomPageSectionClass}`}>
           <div>
             <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-3">Overview</p>
-            <h2 className="font-secondary text-2xl md:text-3xl leading-tight">
+            <h2 className={newsroomSectionTitleClass}>
               A connected ecosystem for inspiration, planning, and booking.
             </h2>
           </div>
@@ -84,12 +92,12 @@ export default function CompanyFacts() {
         </section>
 
         {/* Facts table */}
-        <section className="pt-12 border-t border-[#E5DFC6]">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-8">At a glance</p>
+        <section className={newsroomPageSectionClass}>
+          <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.24em] sm:tracking-[0.3em] text-[#0c4d47] mb-6 sm:mb-8">At a glance</p>
           <dl className="divide-y divide-[#E5DFC6] border-y border-[#E5DFC6]">
             {FACTS.map((f) => (
               <div key={f.label} className="grid md:grid-cols-[220px_1fr] gap-4 py-6">
-                <dt className="text-xs uppercase tracking-[0.18em] text-[#0a2225]/55 pt-1">{f.label}</dt>
+                <dt className="text-[11px] sm:text-xs uppercase tracking-[0.16em] sm:tracking-[0.18em] text-[#0a2225]/55 pt-1">{f.label}</dt>
                 <dd className="text-[#0a2225] leading-relaxed">{f.value}</dd>
               </div>
             ))}
@@ -97,10 +105,10 @@ export default function CompanyFacts() {
         </section>
 
         {/* Core Products */}
-        <section className="grid md:grid-cols-[260px_1fr] gap-10 md:gap-16 pt-12 border-t border-[#E5DFC6]">
+        <section className={`grid md:grid-cols-[260px_1fr] gap-8 md:gap-16 ${newsroomPageSectionClass}`}>
           <div>
             <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-3">Core Products</p>
-            <h2 className="font-secondary text-2xl md:text-3xl leading-tight">
+            <h2 className={newsroomSectionTitleClass}>
               What we build.
             </h2>
           </div>
@@ -118,10 +126,10 @@ export default function CompanyFacts() {
         </section>
 
         {/* Company History */}
-        <section className="grid md:grid-cols-[260px_1fr] gap-10 md:gap-16 pt-12 border-t border-[#E5DFC6]">
+        <section className={`grid md:grid-cols-[260px_1fr] gap-8 md:gap-16 ${newsroomPageSectionClass}`}>
           <div>
             <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-3">Company History</p>
-            <h2 className="font-secondary text-2xl md:text-3xl leading-tight">
+            <h2 className={newsroomSectionTitleClass}>
               From luxury transportation to a next-generation travel marketplace.
             </h2>
           </div>

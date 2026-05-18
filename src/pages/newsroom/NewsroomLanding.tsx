@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import wordmarkGold from "@/assets/wordmark-gold.png";
 import { articlePath, fetchPublishedArticles, formatDate, EXTERNAL_PRESS, BASE_URL } from "./lib";
+import { NewsroomPageHeader } from "./ui";
 
 export default function NewsroomLanding() {
   const { data: articles = [] } = useQuery({
@@ -60,18 +61,19 @@ export default function NewsroomLanding() {
       </Helmet>
 
       {/* Editorial masthead — newspaper nameplate */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-6 pt-14 sm:pt-20 md:pt-24 pb-10 md:pb-16 text-center">
-        <p className="text-[10px] sm:text-[11px] tracking-[0.28em] sm:tracking-[0.35em] uppercase text-[#0c4d47] mb-5 md:mb-6">
-          Vol. 1 · The Goldsainte Press
-        </p>
-       <h1 className="font-secondary text-[32px] sm:text-[40px] md:text-[52px] leading-[0.95] tracking-tight text-[#0a2225]">
-          Newsroom
-        </h1>
-        <div className="mt-6 md:mt-8 mx-auto max-w-3xl border-t-2 border-[#C7A962]" />
-        <p className="mt-5 md:mt-6 text-sm md:text-base text-[#0a2225]/70 max-w-2xl mx-auto leading-relaxed">
-          Press releases, company announcements, and editorial coverage from the team
-          building the future of trip design.
-        </p>
+      <section className="max-w-7xl mx-auto px-5 sm:px-6 pt-8 sm:pt-12 md:pt-24 pb-8 md:pb-16 text-center">
+        <NewsroomPageHeader
+          eyebrow="Vol. 1 · The Goldsainte Press"
+          title="Newsroom"
+          centered
+          intro={
+            <p className="max-w-2xl">
+              Press releases, company announcements, and editorial coverage from the team
+              building the future of trip design.
+            </p>
+          }
+        />
+        <div className="mt-5 md:mt-8 mx-auto max-w-3xl border-t-2 border-[#C7A962]" />
         <div className="mt-6 md:mt-7 flex justify-center">
           <a
             href="mailto:press@goldsainte.com"
@@ -102,7 +104,7 @@ export default function NewsroomLanding() {
                 <span className="text-[10px] tracking-[0.25em] sm:tracking-[0.3em] uppercase text-[#C7A962] mb-2 sm:mb-3 block">
                   Featured · {featured.type === "press_release" ? "Press Release" : featured.type}
                 </span>
-                <h2 className="font-secondary text-white text-2xl sm:text-3xl md:text-5xl leading-[1.05] tracking-tight mb-3 sm:mb-4 group-hover:text-[#FDF9F0] transition">
+                <h2 className="font-secondary text-white text-[24px] sm:text-3xl md:text-5xl leading-[1.05] tracking-tight mb-3 sm:mb-4 group-hover:text-[#FDF9F0] transition">
                   {featured.title}
                 </h2>
                 <p className="hidden sm:block text-white/80 leading-relaxed text-sm md:text-base max-w-2xl mb-3 line-clamp-2">
@@ -126,19 +128,19 @@ export default function NewsroomLanding() {
               Newsroom updates, delivered when news breaks.
             </p>
           </div>
-          <form onSubmit={subscribe} className="flex rounded-full border border-[#E5DFC6] bg-white overflow-hidden w-full md:w-auto">
+          <form onSubmit={subscribe} className="flex flex-col sm:flex-row rounded-[18px] sm:rounded-full border border-[#E5DFC6] bg-white overflow-hidden w-full md:w-auto">
             <input
               type="email"
               required
               placeholder="your@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="px-4 sm:px-5 py-3 text-sm bg-transparent outline-none flex-1 min-w-0 md:w-72"
+              className="px-4 sm:px-5 py-3 text-[13px] sm:text-sm bg-transparent outline-none flex-1 min-w-0 md:w-72"
             />
             <button
               type="submit"
               disabled={submitting}
-              className="flex-shrink-0 px-5 sm:px-6 py-3 text-[11px] tracking-[0.2em] uppercase border-l border-[#E5DFC6] hover:bg-[#f0ead9] disabled:opacity-50"
+              className="flex-shrink-0 px-5 sm:px-6 py-3 text-[10px] sm:text-[11px] tracking-[0.18em] sm:tracking-[0.2em] uppercase border-t sm:border-t-0 sm:border-l border-[#E5DFC6] hover:bg-[#f0ead9] disabled:opacity-50"
             >
               {submitting ? "…" : "Subscribe"}
             </button>
@@ -175,7 +177,7 @@ export default function NewsroomLanding() {
 function Column({ title, items, emptyText }: { title: string; items: any[]; emptyText: string }) {
   return (
     <div>
-      <h3 className="font-secondary text-xl md:text-2xl mb-6">{title}</h3>
+      <h3 className="font-secondary text-[22px] md:text-2xl mb-5 md:mb-6">{title}</h3>
       {items.length === 0 ? (
         <p className="text-sm text-[#0a2225]/50 italic">{emptyText}</p>
       ) : (
