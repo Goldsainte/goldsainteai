@@ -70,11 +70,18 @@ Deno.serve(async (req) => {
 
       case 'agent_application.approved':
       case 'brand_application.approved': {
-        const isAgent = event === 'agent_application.approved'
+        // Approval email is sent by notify-applicant-status-change.
+        // Welcome — Specialist now fires post-Identity verification from stripe-identity-webhook.
+        break
+      }
+
+      case 'agent_application.identity_verified':
+      case 'brand_application.identity_verified': {
+        const isAgent = event === 'agent_application.identity_verified'
         const email = isAgent ? record.email : record.primary_contact_email
         const name = isAgent ? record.first_name : record.primary_contact_name
         results.push(await send('welcome-professional', email,
-          `welcome-pro-${record.id}`,
+          `welcome-pro-verified-${record.id}`,
           { name: name || 'there', accountType: isAgent ? 'agent' : 'brand' }))
         break
       }

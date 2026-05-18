@@ -333,6 +333,15 @@ async function updateAgentApplication(
       application.email
     );
 
+    // Fire post-verification "Welcome — Specialist" email via fanout
+    try {
+      await supabaseClient.functions.invoke('email-fanout', {
+        body: { event: 'agent_application.identity_verified', record: application },
+      });
+    } catch (e) {
+      logger.warn('Failed to dispatch welcome-pro fanout (agent)', { error: String(e) });
+    }
+
     logger.info("Agent application updated to verified", {
       applicationId: application.id,
     });
@@ -473,6 +482,15 @@ async function updateBrandApplication(
       application.brand_name,
       application.primary_contact_email
     );
+
+    // Fire post-verification "Welcome — Specialist" email via fanout
+    try {
+      await supabaseClient.functions.invoke('email-fanout', {
+        body: { event: 'brand_application.identity_verified', record: application },
+      });
+    } catch (e) {
+      logger.warn('Failed to dispatch welcome-pro fanout (brand)', { error: String(e) });
+    }
 
     logger.info("Brand application updated to verified", {
       applicationId: application.id,
