@@ -98,44 +98,64 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         })}</script>
       </Helmet>
 
-      <article className="max-w-3xl mx-auto px-6 py-16 md:py-24">
+      <article className="max-w-3xl mx-auto px-6 pt-12 md:pt-16 pb-10 animate-fade-in">
         <Link
           to="/newsroom"
-          className="text-xs tracking-[0.2em] uppercase text-[#0c4d47] hover:underline"
+          className="text-[10px] tracking-[0.3em] uppercase text-[#0c4d47] hover:underline"
         >
           ← Newsroom
         </Link>
 
-        <p className="mt-10 text-[10px] tracking-[0.3em] uppercase text-[#C7A962]">{typeLabel}</p>
-        <h1 className="font-secondary text-2xl md:text-4xl leading-[1.05] mt-4">{article.title}</h1>
+        <p className="mt-12 text-[10px] tracking-[0.3em] uppercase text-[#C7A962]">{typeLabel}</p>
+        <h1 className="font-secondary text-3xl md:text-5xl leading-[1.1] mt-4 tracking-tight">{article.title}</h1>
         {article.subtitle && (
-          <p className="font-secondary text-xl md:text-2xl text-[#0a2225]/70 mt-5 leading-snug">
+          <p className="font-secondary text-lg md:text-2xl text-[#0a2225]/70 mt-6 leading-snug max-w-2xl">
             {article.subtitle}
           </p>
         )}
 
-        <p className="mt-8 text-sm text-[#0a2225]/60 uppercase tracking-wider">
-          {article.dateline_location && <span className="font-semibold">{article.dateline_location} — </span>}
-          {formatDate(article.published_at)}
-        </p>
+        {/* Author identity block */}
+        <div className="mt-10 flex items-center gap-4 pt-6 border-t border-[#E5DFC6]">
+          {article.author?.avatar_url ? (
+            <img
+              src={article.author.avatar_url}
+              alt={article.author.full_name}
+              className="w-12 h-12 rounded-full object-cover border border-[#E5DFC6]"
+            />
+          ) : (
+            <div className="w-12 h-12 rounded-full bg-[#F6F0E4] border border-[#E5DFC6]" />
+          )}
+          <div className="flex-1 min-w-0">
+            <p className="font-secondary text-base text-[#0a2225] leading-tight">
+              {article.author?.full_name || "Goldsainte Editorial"}
+            </p>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-[#0a2225]/55 mt-1">
+              {article.author?.title || "Newsroom"}
+            </p>
+          </div>
+          <div className="text-right text-[11px] uppercase tracking-[0.2em] text-[#0a2225]/55 leading-tight">
+            <div>{formatDate(article.published_at)}</div>
+            <div className="mt-1">{readingTime(article.body)} min read</div>
+          </div>
+        </div>
       </article>
 
       {article.hero_image_url && (
-        <figure className="max-w-5xl mx-auto px-6">
+        <figure className="w-full overflow-hidden animate-fade-in">
           <img
             src={article.hero_image_url}
             alt={article.hero_image_alt || article.title}
-            className="w-full aspect-[16/9] object-cover"
+            className="w-full aspect-[16/9] md:aspect-[21/9] object-cover"
           />
           {article.hero_image_credit && (
-            <figcaption className="text-xs text-[#0a2225]/50 mt-3 italic">
+            <figcaption className="max-w-3xl mx-auto px-6 text-[11px] text-[#0a2225]/50 mt-3 italic">
               {article.hero_image_credit}
             </figcaption>
           )}
         </figure>
       )}
 
-      <div className="max-w-3xl mx-auto px-6 py-16">
+      <div className="max-w-3xl mx-auto px-6 pt-16 pb-16 overflow-hidden">
         <Markdown source={article.body} />
 
         {article.tags && article.tags.length > 0 && (
@@ -161,10 +181,10 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
               {article.press_contact_name || "Goldsainte Press Team"}
               <br />
               <a
-                href={`mailto:${article.press_contact_email || "press@goldsainte.com"}`}
+                href={`mailto:${article.press_contact_email || "press@goldsainte.ai"}`}
                 className="text-[#0c4d47] underline underline-offset-4"
               >
-                {article.press_contact_email || "press@goldsainte.com"}
+                {article.press_contact_email || "press@goldsainte.ai"}
               </a>
             </p>
           </>
@@ -219,4 +239,10 @@ function ShareRow({ title, url }: { title: string; url: string }) {
       <a href={email} className={cls}>Email</a>
     </div>
   );
+}
+
+function readingTime(body: string | null | undefined): number {
+  if (!body) return 1;
+  const words = body.trim().split(/\s+/).length;
+  return Math.max(1, Math.round(words / 220));
 }
