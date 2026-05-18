@@ -97,10 +97,10 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
           ← Newsroom
         </Link>
 
-        <p className="mt-10 text-[10px] tracking-[0.3em] uppercase text-[#c9a84c]">{typeLabel}</p>
-        <h1 className="font-serif text-4xl md:text-6xl leading-[1.05] mt-4">{article.title}</h1>
+        <p className="mt-10 text-[10px] tracking-[0.3em] uppercase text-[#C7A962]">{typeLabel}</p>
+        <h1 className="font-secondary text-4xl md:text-6xl leading-[1.05] mt-4">{article.title}</h1>
         {article.subtitle && (
-          <p className="font-serif text-xl md:text-2xl text-[#0a2225]/70 mt-5 leading-snug">
+          <p className="font-secondary text-xl md:text-2xl text-[#0a2225]/70 mt-5 leading-snug">
             {article.subtitle}
           </p>
         )}
@@ -132,7 +132,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         {article.tags && article.tags.length > 0 && (
           <div className="mt-12 flex flex-wrap gap-2">
             {article.tags.map((t) => (
-              <span key={t} className="text-[10px] uppercase tracking-wider px-3 py-1 border border-[#0a2225]/20 text-[#0a2225]/70">
+              <span key={t} className="text-[10px] uppercase tracking-wider px-3 py-1 border border-[#E5DFC6] text-[#0a2225]/70">
                 {t}
               </span>
             ))}
@@ -141,10 +141,10 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
 
         <hr className="my-16 border-[#0a2225]/15" />
 
-        <h3 className="font-serif text-xl mb-4">About Goldsainte</h3>
+        <h3 className="font-secondary text-xl mb-4">About Goldsainte</h3>
         <p className="text-sm text-[#0a2225]/70 leading-relaxed mb-10">{COMPANY_BOILERPLATE_LONG}</p>
 
-        <h3 className="font-serif text-xl mb-4">Press Contact</h3>
+        <h3 className="font-secondary text-xl mb-4">Press Contact</h3>
         <p className="text-sm text-[#0a2225]/80">
           {article.press_contact_name || "Press Office"}
           <br />
