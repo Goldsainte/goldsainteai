@@ -18,11 +18,12 @@ const FOUNDER_BACKGROUND = [
 ];
 
 export default function Leadership() {
-  const { data: authors = [] } = useQuery({
+  const { data: allAuthors = [] } = useQuery({
     queryKey: ["newsroom", "authors"],
     queryFn: fetchAuthors,
     staleTime: 1000 * 60 * 10,
   });
+  const authors = allAuthors.filter((a) => a.slug === "andre-powell");
 
   return (
     <>
