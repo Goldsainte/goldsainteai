@@ -20,7 +20,7 @@ export default function EditorialPolicy() {
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-5">
             Editorial Philosophy
           </p>
-          <h1 className="font-primary text-2xl md:text-3xl leading-[1.2] mb-6">
+          <h1 className="font-secondary text-2xl md:text-3xl leading-[1.2] mb-6">
             The Goldsainte Newsroom exists to explore the future of modern
             travel through thoughtful storytelling, company news, industry
             insight, and curated editorial perspectives.
@@ -75,7 +75,7 @@ export default function EditorialPolicy() {
 
         {/* Pull quote */}
         <figure className="my-24 md:my-28 text-center animate-fade-in">
-          <blockquote className="font-primary text-2xl md:text-3xl leading-[1.25] text-[#0a2225]">
+          <blockquote className="font-secondary text-2xl md:text-3xl leading-[1.25] text-[#0a2225]">
             <span className="text-[#C7A962] mr-1">“</span>
             The best travel story is always a human one.
             <span className="text-[#C7A962] ml-1">”</span>
@@ -139,7 +139,7 @@ export default function EditorialPolicy() {
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-4">
             Continue Reading
           </p>
-          <h3 className="font-primary text-2xl md:text-3xl leading-tight mb-6">
+          <h3 className="font-secondary text-2xl md:text-3xl leading-tight mb-6">
             Explore the Goldsainte Newsroom.
           </h3>
           <Link
@@ -174,7 +174,7 @@ function Section({
           {eyebrow}
         </p>
       )}
-      <h2 className="font-primary text-xl md:text-2xl leading-tight mb-6 text-[#0a2225]">
+      <h2 className="font-secondary text-xl md:text-2xl leading-tight mb-6 text-[#0a2225]">
         {title}
       </h2>
       <div className="space-y-5 text-base text-[#0a2225]/80 leading-relaxed">
