@@ -6765,6 +6765,7 @@ export type Database = {
           id: string
           linkedin_url: string | null
           quote: string | null
+          signature_image_url: string | null
           slug: string
           title: string
           twitter_url: string | null
@@ -6780,6 +6781,7 @@ export type Database = {
           id?: string
           linkedin_url?: string | null
           quote?: string | null
+          signature_image_url?: string | null
           slug: string
           title: string
           twitter_url?: string | null
@@ -6795,6 +6797,7 @@ export type Database = {
           id?: string
           linkedin_url?: string | null
           quote?: string | null
+          signature_image_url?: string | null
           slug?: string
           title?: string
           twitter_url?: string | null
