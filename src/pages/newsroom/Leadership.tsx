@@ -38,10 +38,10 @@ export default function Leadership() {
   return (
     <>
       <Helmet>
-        <title>Leadership | Goldsainte Newsroom</title>
+        <title>Founder | Goldsainte Newsroom</title>
         <meta
           name="description"
-          content="Meet the founders and leadership team behind Goldsainte."
+          content="Meet Andre C. Powell, Jr., founder and CEO of Goldsainte."
         />
         <link rel="canonical" href={`${BASE_URL}/newsroom/leadership`} />
       </Helmet>
@@ -50,10 +50,10 @@ export default function Leadership() {
         {/* Page header */}
         <header className="max-w-3xl">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#C7A962] mb-4">
-            Goldsainte Newsroom · Leadership
+            Goldsainte Newsroom · Founder
           </p>
           <h1 className="font-primary text-4xl md:text-5xl leading-[1.1] mb-6 text-[#0a2225]">
-            The people building the future of travel.
+            The founder building the future of travel.
           </h1>
           <p className="text-base text-[#0a2225]/75 leading-relaxed">
             Goldsainte is led by founder and CEO Andre C. Powell, Jr. His background
