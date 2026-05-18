@@ -180,7 +180,7 @@ function ColorCard({ c }: { c: typeof COLORS[number] }) {
         </div>
       </div>
       <div className="p-5 bg-[#FDF9F0]">
-        <p className="font-secondary text-xl text-[#0a2225]">{c.name}</p>
+        <p className="font-primary text-xl text-[#0a2225]">{c.name}</p>
         <p className="text-[11px] tracking-[0.18em] uppercase text-[#0a2225]/50 mt-1">
           {c.role}
         </p>
@@ -227,7 +227,7 @@ function BoilerplatePanel() {
         <p className="text-[11px] tracking-[0.22em] uppercase text-[#C7A962]">
           {current.meta}
         </p>
-        <p className="font-secondary text-lg md:text-xl leading-[1.7] text-[#0a2225]/90">
+        <p className="font-primary text-lg md:text-xl leading-[1.7] text-[#0a2225]/90">
           {current.text}
         </p>
         <div className="flex flex-wrap gap-3 pt-2">
@@ -280,7 +280,7 @@ export default function MediaKit() {
             <p className="text-[10px] tracking-[0.32em] uppercase text-[#C7A962] mb-5">
               Goldsainte Newsroom · Media Kit
             </p>
-            <h1 className="font-secondary text-3xl md:text-5xl text-[#FDF9F0] max-w-2xl leading-[1.1] tracking-[-0.01em]">
+            <h1 className="font-primary text-3xl md:text-5xl text-[#FDF9F0] max-w-2xl leading-[1.1] tracking-[-0.01em]">
               Brand Assets &amp; Editorial Resources
             </h1>
             <p className="mt-5 max-w-lg text-[#FDF9F0]/75 text-sm md:text-base leading-[1.65]">
@@ -317,7 +317,7 @@ export default function MediaKit() {
               </p>
             </div>
             <div className="md:col-span-8">
-              <p className="font-secondary text-2xl md:text-3xl text-[#0a2225] leading-[1.35]">
+              <p className="font-primary text-2xl md:text-3xl text-[#0a2225] leading-[1.35]">
                 Everything an editor, producer, or journalist needs to write about
                 Goldsainte with accuracy and visual integrity — in one place.
               </p>
@@ -343,7 +343,7 @@ export default function MediaKit() {
             <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
               02 — Identity
             </p>
-            <h2 className="font-secondary text-2xl md:text-3xl mt-3 text-[#0a2225]">
+            <h2 className="font-primary text-2xl md:text-3xl mt-3 text-[#0a2225]">
               Logo
             </h2>
             <p className="text-base text-[#0a2225]/70 mt-4 leading-relaxed">
@@ -393,7 +393,7 @@ export default function MediaKit() {
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
                 03 — Palette
               </p>
-              <h2 className="font-secondary text-2xl md:text-3xl mt-3 text-[#0a2225]">
+              <h2 className="font-primary text-2xl md:text-3xl mt-3 text-[#0a2225]">
                 The Goldsainte Palette
               </h2>
               <p className="text-base text-[#0a2225]/70 mt-4 max-w-2xl leading-relaxed">
@@ -415,7 +415,7 @@ export default function MediaKit() {
             <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
               04 — Typography
             </p>
-            <h2 className="font-secondary text-2xl md:text-3xl mt-3 text-[#0a2225]">
+            <h2 className="font-primary text-2xl md:text-3xl mt-3 text-[#0a2225]">
               Editorial Voice in Practice
             </h2>
           </div>
@@ -436,7 +436,7 @@ export default function MediaKit() {
               <p className="text-[10px] tracking-[0.3em] uppercase text-[#0a2225]/45">
                 Display headline · Serif
               </p>
-              <h3 className="font-secondary text-4xl md:text-6xl leading-[1.05] text-[#0a2225]">
+              <h3 className="font-primary text-4xl md:text-6xl leading-[1.05] text-[#0a2225]">
                 Travel doesn&apos;t belong to algorithms.
               </h3>
             </div>
@@ -445,7 +445,7 @@ export default function MediaKit() {
               <p className="text-[10px] tracking-[0.3em] uppercase text-[#0a2225]/45">
                 Standfirst · Editorial subhead
               </p>
-              <p className="font-secondary text-xl md:text-2xl leading-[1.45] text-[#0a2225]/85 max-w-2xl">
+              <p className="font-primary text-xl md:text-2xl leading-[1.45] text-[#0a2225]/85 max-w-2xl">
                 It belongs to the people who actually know the place — and to the
                 travelers willing to trust them.
               </p>
@@ -481,7 +481,7 @@ export default function MediaKit() {
               <p className="text-[10px] tracking-[0.3em] uppercase text-[#0a2225]/45">
                 Pull quote
               </p>
-              <blockquote className="font-secondary text-2xl md:text-3xl leading-[1.4] text-[#0c4d47] max-w-3xl">
+              <blockquote className="font-primary text-2xl md:text-3xl leading-[1.4] text-[#0c4d47] max-w-3xl">
                 <span className="text-[#C7A962] mr-1">&ldquo;</span>
                 Extraordinary travel begins with perspective.
                 <span className="text-[#C7A962] ml-1">&rdquo;</span>
@@ -498,7 +498,7 @@ export default function MediaKit() {
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
                 05 — Boilerplate
               </p>
-              <h2 className="font-secondary text-2xl md:text-3xl mt-3 text-[#0a2225]">
+              <h2 className="font-primary text-2xl md:text-3xl mt-3 text-[#0a2225]">
                 Approved Company Language
               </h2>
               <p className="text-base text-[#0a2225]/70 mt-4 max-w-2xl leading-relaxed">
@@ -520,7 +520,7 @@ export default function MediaKit() {
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
                 07 — Downloads
               </p>
-              <h2 className="font-secondary text-2xl md:text-3xl mt-3 text-[#0a2225]">
+              <h2 className="font-primary text-2xl md:text-3xl mt-3 text-[#0a2225]">
                 Press Packs
               </h2>
               <p className="text-base text-[#0a2225]/70 mt-4 max-w-2xl leading-relaxed">
@@ -549,7 +549,7 @@ export default function MediaKit() {
                         <span className="font-mono text-[11px] tracking-[0.22em] uppercase text-[#C7A962] w-8 shrink-0">
                           {String(PRESS_PACKS.indexOf(p) + 1).padStart(2, "0")}
                         </span>
-                        <h3 className="font-secondary text-xl md:text-2xl text-[#0a2225]">
+                        <h3 className="font-primary text-xl md:text-2xl text-[#0a2225]">
                           {p.title}
                         </h3>
                       </div>
@@ -591,7 +591,7 @@ export default function MediaKit() {
                 <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
                   08 — For the Press
                 </p>
-                <h2 className="font-secondary text-3xl md:text-5xl leading-[1.1] text-[#0a2225]">
+                <h2 className="font-primary text-3xl md:text-5xl leading-[1.1] text-[#0a2225]">
                   For media inquiries, interviews, and founder commentary.
                 </h2>
                 <p className="text-base text-[#0a2225]/70 leading-relaxed max-w-xl">
@@ -632,7 +632,7 @@ export default function MediaKit() {
                   <p className="text-[10px] tracking-[0.3em] uppercase text-[#C7A962] mb-2">
                     Signed
                   </p>
-                  <p className="font-secondary italic text-lg text-[#0a2225]/90">
+                  <p className="font-primary italic text-lg text-[#0a2225]/90">
                     Andre C. Powell, Jr.
                   </p>
                 </div>

@@ -36,7 +36,7 @@ export default function Leadership() {
         {/* Intro */}
         <header className="max-w-3xl">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-4">Leadership</p>
-          <h1 className="font-secondary text-2xl md:text-3xl leading-tight mb-5">
+          <h1 className="font-primary text-2xl md:text-3xl leading-tight mb-5">
             Goldsainte is led by founder and CEO Andre C. Powell, Jr.
           </h1>
           <p className="text-base text-[#0a2225]/75 leading-relaxed">
@@ -75,9 +75,9 @@ export default function Leadership() {
             </div>
             <div>
               <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-3">{a.title}</p>
-              <h2 className="font-secondary text-2xl md:text-3xl leading-tight">{a.full_name}</h2>
+              <h2 className="font-primary text-2xl md:text-3xl leading-tight">{a.full_name}</h2>
               {a.quote && (
-                <blockquote className="font-secondary text-lg md:text-xl italic text-[#0a2225]/85 border-l-2 border-[#C7A962] pl-5 my-7 leading-snug">
+                <blockquote className="font-primary text-lg md:text-xl italic text-[#0a2225]/85 border-l-2 border-[#C7A962] pl-5 my-7 leading-snug">
                   "{a.quote}"
                 </blockquote>
               )}
@@ -105,7 +105,7 @@ export default function Leadership() {
         {/* Founder Background */}
         <section className="pt-12 border-t border-[#E5DFC6]">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-3">Founder Background</p>
-          <h2 className="font-secondary text-2xl md:text-3xl leading-tight mb-10 max-w-2xl">
+          <h2 className="font-primary text-2xl md:text-3xl leading-tight mb-10 max-w-2xl">
             A through-line from luxury transportation to AI-powered travel.
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
@@ -127,7 +127,7 @@ export default function Leadership() {
         <section className="pt-12 border-t border-[#E5DFC6] grid md:grid-cols-[260px_1fr] gap-8 md:gap-14">
           <div>
             <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-3">Media Notes</p>
-            <h2 className="font-secondary text-2xl md:text-3xl leading-tight">For the press.</h2>
+            <h2 className="font-primary text-2xl md:text-3xl leading-tight">For the press.</h2>
           </div>
           <p className="text-base text-[#0a2225]/80 leading-relaxed self-center">
             For interviews, speaking requests, media inquiries, or founder commentary, contact{" "}
