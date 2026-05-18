@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
+  <url><loc>https://goldsainte.ai/newsroom</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://goldsainte.ai/newsroom/media-kit</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://goldsainte.ai/newsroom/company-facts</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://goldsainte.ai/newsroom/leadership</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://goldsainte.ai/newsroom/editorial-policy</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://goldsainte.ai/newsroom/press-contact</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://goldsainte.ai/newsroom/archive</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url>
+    <loc>https://goldsainte.ai/newsroom/news/state-of-the-modern-travel-marketplace</loc>
+    <lastmod>2026-05-18T05:45:51.937Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://goldsainte.ai/newsroom/news/why-we-built-goldsainte</loc>
+    <lastmod>2026-05-18T05:45:51.937Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://goldsainte.ai/newsroom/press-releases/goldsainte-launches-ai-powered-travel-marketplace</loc>
+    <lastmod>2026-05-18T15:31:14.722Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>
