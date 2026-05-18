@@ -160,6 +160,19 @@ const ShopPage = lazy(() => import('@/pages/ShopPage'));
 const BundleBuilder = lazy(() => import('@/pages/BundleBuilder'));
 const BundleDetailPage = lazy(() => import('@/pages/BundleDetailPage'));
 
+const NewsroomLayout = lazy(() => import('@/pages/newsroom/NewsroomLayout'));
+const NewsroomLanding = lazy(() => import('@/pages/newsroom/NewsroomLanding'));
+const NewsroomArticleDetail = lazy(() => import('@/pages/newsroom/ArticleDetail'));
+const NewsroomArchive = lazy(() => import('@/pages/newsroom/Archive'));
+const NewsroomMediaKit = lazy(() => import('@/pages/newsroom/MediaKit'));
+const NewsroomCompanyFacts = lazy(() => import('@/pages/newsroom/CompanyFacts'));
+const NewsroomLeadership = lazy(() => import('@/pages/newsroom/Leadership'));
+const NewsroomEditorialPolicy = lazy(() => import('@/pages/newsroom/EditorialPolicy'));
+const NewsroomPressContact = lazy(() => import('@/pages/newsroom/PressContact'));
+const AdminNewsroomList = lazy(() => import('@/pages/admin/AdminNewsroomList'));
+const AdminArticleEditor = lazy(() => import('@/pages/admin/AdminArticleEditor'));
+const AdminNewsroomAuthors = lazy(() => import('@/pages/admin/AdminNewsroomAuthors'));
+
 export const AppRoutes = () => (
   <Routes>
     <Route element={<MarketingLayout />}>
@@ -198,6 +211,18 @@ export const AppRoutes = () => (
       <Route path="/transparency-agreement" element={<TransparencyAgreement />} />
       <Route path="/corporate-contact" element={<CorporateContact />} />
      <Route path="/unsubscribe" element={<UnsubscribePage />} />
+
+      <Route path="/newsroom" element={<NewsroomLayout />}>
+        <Route index element={<NewsroomLanding />} />
+        <Route path="archive" element={<NewsroomArchive />} />
+        <Route path="media-kit" element={<NewsroomMediaKit />} />
+        <Route path="company-facts" element={<NewsroomCompanyFacts />} />
+        <Route path="leadership" element={<NewsroomLeadership />} />
+        <Route path="editorial-policy" element={<NewsroomEditorialPolicy />} />
+        <Route path="press-contact" element={<NewsroomPressContact />} />
+        <Route path="press-releases/:slug" element={<NewsroomArticleDetail expectedType="press_release" />} />
+        <Route path="news/:slug" element={<NewsroomArticleDetail expectedType="news" />} />
+      </Route>
     </Route>
 
     <Route element={<AuthLayout />}>
@@ -497,6 +522,10 @@ export const AppRoutes = () => (
       <Route path="/admin/trips" element={<AdminGuard><AdminTripsPage /></AdminGuard>} />
       <Route path="/admin/waitlist" element={<AdminGuard><AdminWaitlistPage /></AdminGuard>} />
       <Route path="/admin/email-dlq" element={<AdminGuard><AdminEmailDLQPage /></AdminGuard>} />
+      <Route path="/admin/newsroom" element={<AdminGuard><AdminNewsroomList /></AdminGuard>} />
+      <Route path="/admin/newsroom/new" element={<AdminGuard><AdminArticleEditor /></AdminGuard>} />
+      <Route path="/admin/newsroom/authors" element={<AdminGuard><AdminNewsroomAuthors /></AdminGuard>} />
+      <Route path="/admin/newsroom/:id/edit" element={<AdminGuard><AdminArticleEditor /></AdminGuard>} />
       <Route path="/admin/marketplace" element={<Navigate to="/admin" replace />} />
       <Route path="/admin/escrow" element={<AdminGuard><OpsEscrowDashboardPage /></AdminGuard>} />
       <Route path="/admin/cancellations" element={<AdminGuard><AdminCancellations /></AdminGuard>} />
