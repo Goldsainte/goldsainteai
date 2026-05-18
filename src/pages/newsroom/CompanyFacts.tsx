@@ -93,11 +93,11 @@ export default function CompanyFacts() {
 
         {/* Facts table */}
         <section className={newsroomPageSectionClass}>
-          <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-8">At a glance</p>
+          <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.24em] sm:tracking-[0.3em] text-[#0c4d47] mb-6 sm:mb-8">At a glance</p>
           <dl className="divide-y divide-[#E5DFC6] border-y border-[#E5DFC6]">
             {FACTS.map((f) => (
               <div key={f.label} className="grid md:grid-cols-[220px_1fr] gap-4 py-6">
-                <dt className="text-xs uppercase tracking-[0.18em] text-[#0a2225]/55 pt-1">{f.label}</dt>
+                <dt className="text-[11px] sm:text-xs uppercase tracking-[0.16em] sm:tracking-[0.18em] text-[#0a2225]/55 pt-1">{f.label}</dt>
                 <dd className="text-[#0a2225] leading-relaxed">{f.value}</dd>
               </div>
             ))}
