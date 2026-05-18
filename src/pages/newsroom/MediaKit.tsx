@@ -17,6 +17,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import heroImage from "@/assets/newsroom/mediakit-hero.jpg";
+import signatureImage from "@/assets/newsroom/signature-andre-powell.png";
 import logomarkGold from "@/assets/newsroom/logos/logomark-gold.png";
 import logomarkGreen from "@/assets/newsroom/logos/logomark-green.png";
 import primaryHorizontalGold from "@/assets/newsroom/logos/primary-horizontal-gold.png";
@@ -632,9 +633,14 @@ export default function MediaKit() {
                   <p className="text-[10px] tracking-[0.3em] uppercase text-[#C7A962] mb-2">
                     Signed
                   </p>
-                  <p className="font-primary italic text-lg text-[#0a2225]/90">
-                    Andre C. Powell, Jr.
-                  </p>
+                  <div style={{ mixBlendMode: "multiply" }}>
+                    <img
+                      src={signatureImage}
+                      alt="Signature of Andre C. Powell, Jr., Founder & CEO of Goldsainte"
+                      className="h-20 w-auto -ml-2 select-none"
+                      draggable={false}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
