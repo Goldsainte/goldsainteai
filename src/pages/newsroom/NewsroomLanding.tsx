@@ -73,7 +73,7 @@ export default function NewsroomLanding() {
             </p>
           }
         />
-        <div className="mt-6 md:mt-8 mx-auto max-w-3xl border-t-2 border-[#C7A962]" />
+        <div className="mt-5 md:mt-8 mx-auto max-w-3xl border-t-2 border-[#C7A962]" />
         <div className="mt-6 md:mt-7 flex justify-center">
           <a
             href="mailto:press@goldsainte.com"
@@ -128,7 +128,7 @@ export default function NewsroomLanding() {
               Newsroom updates, delivered when news breaks.
             </p>
           </div>
-          <form onSubmit={subscribe} className="flex flex-col sm:flex-row rounded-[20px] sm:rounded-full border border-[#E5DFC6] bg-white overflow-hidden w-full md:w-auto">
+          <form onSubmit={subscribe} className="flex flex-col sm:flex-row rounded-[18px] sm:rounded-full border border-[#E5DFC6] bg-white overflow-hidden w-full md:w-auto">
             <input
               type="email"
               required
@@ -177,7 +177,7 @@ export default function NewsroomLanding() {
 function Column({ title, items, emptyText }: { title: string; items: any[]; emptyText: string }) {
   return (
     <div>
-      <h3 className="font-secondary text-xl md:text-2xl mb-6">{title}</h3>
+      <h3 className="font-secondary text-[22px] md:text-2xl mb-5 md:mb-6">{title}</h3>
       {items.length === 0 ? (
         <p className="text-sm text-[#0a2225]/50 italic">{emptyText}</p>
       ) : (
