@@ -6665,6 +6665,161 @@ export type Database = {
           },
         ]
       }
+      newsroom_articles: {
+        Row: {
+          author_id: string | null
+          body: string
+          canonical_url: string | null
+          category: string | null
+          created_at: string
+          dateline_location: string | null
+          excerpt: string
+          hero_image_alt: string | null
+          hero_image_credit: string | null
+          hero_image_url: string | null
+          id: string
+          meta_description: string | null
+          meta_title: string | null
+          og_image_url: string | null
+          press_contact_email: string | null
+          press_contact_name: string | null
+          published_at: string | null
+          slug: string
+          status: string
+          subtitle: string | null
+          tags: string[] | null
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          body: string
+          canonical_url?: string | null
+          category?: string | null
+          created_at?: string
+          dateline_location?: string | null
+          excerpt: string
+          hero_image_alt?: string | null
+          hero_image_credit?: string | null
+          hero_image_url?: string | null
+          id?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          og_image_url?: string | null
+          press_contact_email?: string | null
+          press_contact_name?: string | null
+          published_at?: string | null
+          slug: string
+          status?: string
+          subtitle?: string | null
+          tags?: string[] | null
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          body?: string
+          canonical_url?: string | null
+          category?: string | null
+          created_at?: string
+          dateline_location?: string | null
+          excerpt?: string
+          hero_image_alt?: string | null
+          hero_image_credit?: string | null
+          hero_image_url?: string | null
+          id?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          og_image_url?: string | null
+          press_contact_email?: string | null
+          press_contact_name?: string | null
+          published_at?: string | null
+          slug?: string
+          status?: string
+          subtitle?: string | null
+          tags?: string[] | null
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "newsroom_articles_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "newsroom_authors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      newsroom_authors: {
+        Row: {
+          avatar_url: string | null
+          bio: string
+          created_at: string
+          email: string | null
+          expertise: string[] | null
+          full_name: string
+          id: string
+          linkedin_url: string | null
+          quote: string | null
+          slug: string
+          title: string
+          twitter_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio: string
+          created_at?: string
+          email?: string | null
+          expertise?: string[] | null
+          full_name: string
+          id?: string
+          linkedin_url?: string | null
+          quote?: string | null
+          slug: string
+          title: string
+          twitter_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string
+          created_at?: string
+          email?: string | null
+          expertise?: string[] | null
+          full_name?: string
+          id?: string
+          linkedin_url?: string | null
+          quote?: string | null
+          slug?: string
+          title?: string
+          twitter_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      newsroom_subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           action_label: string | null
@@ -8187,6 +8342,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      press_inquiries: {
+        Row: {
+          created_at: string
+          deadline: string
+          email: string
+          handled: boolean
+          id: string
+          message: string
+          phone: string | null
+          publication: string
+          reporter_name: string
+          topic: string
+        }
+        Insert: {
+          created_at?: string
+          deadline: string
+          email: string
+          handled?: boolean
+          id?: string
+          message: string
+          phone?: string | null
+          publication: string
+          reporter_name: string
+          topic: string
+        }
+        Update: {
+          created_at?: string
+          deadline?: string
+          email?: string
+          handled?: boolean
+          id?: string
+          message?: string
+          phone?: string | null
+          publication?: string
+          reporter_name?: string
+          topic?: string
+        }
+        Relationships: []
       }
       processed_payments: {
         Row: {
