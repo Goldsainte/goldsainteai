@@ -42,7 +42,8 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
   }
 
   const canonical = article.canonical_url || `${BASE_URL}${articlePath(article)}`;
-  const ogImg = article.og_image_url || article.hero_image_url || undefined;
+  const DEFAULT_OG_IMAGE = `${BASE_URL}/newsroom-og-default.jpg`;
+  const ogImg = article.og_image_url || article.hero_image_url || DEFAULT_OG_IMAGE;
   const typeLabel =
     article.type === "press_release" ? "Press Release" : article.type === "announcement" ? "Announcement" : "News";
   const wordCount = (article.body || "").trim().split(/\s+/).filter(Boolean).length;
@@ -58,7 +59,16 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         <meta property="og:title" content={article.title} />
         <meta property="og:description" content={article.excerpt} />
         <meta property="og:url" content={canonical} />
-        {ogImg && <meta property="og:image" content={ogImg} />}
+        {ogImg && (
+          <>
+            <meta property="og:image" content={ogImg} />
+            <meta property="og:image:secure_url" content={ogImg} />
+            <meta property="og:image:width" content="1200" />
+            <meta property="og:image:height" content="630" />
+            <meta property="og:image:alt" content={article.hero_image_alt || article.title} />
+            <meta property="og:image:type" content="image/jpeg" />
+          </>
+        )}
         {article.published_at && (
           <meta property="article:published_time" content={article.published_at} />
         )}
@@ -69,13 +79,18 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={article.title} />
         <meta name="twitter:description" content={article.excerpt} />
-        {ogImg && <meta name="twitter:image" content={ogImg} />}
+        {ogImg && (
+          <>
+            <meta name="twitter:image" content={ogImg} />
+            <meta name="twitter:image:alt" content={article.hero_image_alt || article.title} />
+          </>
+        )}
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "NewsArticle",
           headline: article.title,
           description: article.excerpt,
-          image: [article.hero_image_url, article.og_image_url].filter(Boolean),
+          image: [article.hero_image_url, article.og_image_url, DEFAULT_OG_IMAGE].filter(Boolean),
           datePublished: article.published_at,
           dateModified: article.updated_at,
           author: article.author
@@ -112,7 +127,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         </Link>
 
         <h1
-          className="font-primary mt-8 md:mt-10 text-[28px] sm:text-[34px] md:text-[42px] leading-[1.1] text-[#0a2225]"
+          className="font-secondary mt-8 md:mt-10 text-[28px] sm:text-[34px] md:text-[42px] leading-[1.1] text-[#0a2225]"
           style={{ letterSpacing: "-0.01em" }}
         >
           {article.title}
@@ -186,7 +201,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         {article.type === "press_release" && (
           <div className="mt-12 md:mt-16 grid gap-5 md:gap-6 md:grid-cols-2">
             <div className="bg-[#F6F0E4] rounded-xl p-6 md:p-8">
-              <h3 className="font-primary text-xl text-[#0a2225] mb-3">About Goldsainte</h3>
+              <h3 className="font-secondary text-xl text-[#0a2225] mb-3">About Goldsainte</h3>
               <p className="text-[14px] text-[#0a2225]/80 leading-[1.6] mb-5">
                 Goldsainte is an AI-powered travel marketplace headquartered in Charlotte,
                 North Carolina. Founded in 2026, Goldsainte connects travelers with vetted
@@ -206,7 +221,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
               </Link>
             </div>
             <div className="bg-[#F6F0E4] rounded-xl p-6 md:p-8">
-              <h3 className="font-primary text-xl text-[#0a2225] mb-3">Press Contact</h3>
+              <h3 className="font-secondary text-xl text-[#0a2225] mb-3">Press Contact</h3>
               <p className="text-[14px] text-[#0a2225]/80 leading-[1.6]">
                 {article.press_contact_name || "Goldsainte Press Team"}
                 <br />
@@ -227,7 +242,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
       {related.length > 0 && (
         <section className="bg-[#FDF9F0] border-t border-[#E5DFC6]">
           <div className="max-w-5xl mx-auto px-5 sm:px-6 py-12 md:py-20">
-            <h3 className="font-primary text-2xl md:text-3xl text-[#0a2225] mb-8 md:mb-10">
+            <h3 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-8 md:mb-10">
               Related stories
             </h3>
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
@@ -248,7 +263,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
                       </span>
                     </div>
                   )}
-                  <p className="font-primary text-lg md:text-xl leading-snug text-[#0a2225] group-hover:text-[#0c4d47] transition">
+                  <p className="font-secondary text-lg md:text-xl leading-snug text-[#0a2225] group-hover:text-[#0c4d47] transition">
                     {r.title}
                   </p>
                   <p className="mt-2 text-[12px] tracking-wide text-[#0a2225]/55">

@@ -64,7 +64,7 @@ export default function NewsroomLanding() {
         <p className="text-[10px] sm:text-[11px] tracking-[0.28em] sm:tracking-[0.35em] uppercase text-[#0c4d47] mb-5 md:mb-6">
           Vol. 1 · The Goldsainte Press
         </p>
-        <h1 className="font-primary text-[44px] sm:text-[56px] md:text-[80px] leading-[0.95] tracking-tight text-[#0a2225]">
+       <h1 className="font-secondary text-[32px] sm:text-[40px] md:text-[52px] leading-[0.95] tracking-tight text-[#0a2225]">
           Newsroom
         </h1>
         <div className="mt-6 md:mt-8 mx-auto max-w-3xl border-t-2 border-[#C7A962]" />
@@ -102,7 +102,7 @@ export default function NewsroomLanding() {
                 <span className="text-[10px] tracking-[0.25em] sm:tracking-[0.3em] uppercase text-[#C7A962] mb-2 sm:mb-3 block">
                   Featured · {featured.type === "press_release" ? "Press Release" : featured.type}
                 </span>
-                <h2 className="font-primary text-white text-2xl sm:text-3xl md:text-5xl leading-[1.05] tracking-tight mb-3 sm:mb-4 group-hover:text-[#FDF9F0] transition">
+                <h2 className="font-secondary text-white text-2xl sm:text-3xl md:text-5xl leading-[1.05] tracking-tight mb-3 sm:mb-4 group-hover:text-[#FDF9F0] transition">
                   {featured.title}
                 </h2>
                 <p className="hidden sm:block text-white/80 leading-relaxed text-sm md:text-base max-w-2xl mb-3 line-clamp-2">
@@ -122,7 +122,7 @@ export default function NewsroomLanding() {
         <div className="max-w-7xl mx-auto px-5 sm:px-6 py-8 md:py-10 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
           <div>
             <p className="text-[10px] tracking-[0.3em] uppercase text-[#C7A962] mb-1.5">Stay informed</p>
-            <p className="font-primary text-lg sm:text-xl md:text-2xl text-[#0a2225] leading-snug">
+            <p className="font-secondary text-lg sm:text-xl md:text-2xl text-[#0a2225] leading-snug">
               Newsroom updates, delivered when news breaks.
             </p>
           </div>
@@ -152,13 +152,13 @@ export default function NewsroomLanding() {
           <Column title="Company News" items={news} emptyText="No company news yet." />
           {EXTERNAL_PRESS.length > 0 && (
             <div>
-              <h3 className="font-primary text-xl md:text-2xl mb-6">In the Press</h3>
+              <h3 className="font-secondary text-xl md:text-2xl mb-6">In the Press</h3>
               <ul className="space-y-5">
                 {EXTERNAL_PRESS.map((p, i) => (
                   <li key={i}>
                     <a href={p.url} target="_blank" rel="noopener noreferrer" className="block group">
                       <span className="text-[10px] tracking-[0.25em] uppercase text-[#C7A962]">{p.outlet}</span>
-                      <p className="font-primary text-base group-hover:text-[#0c4d47] transition mt-1">{p.title}</p>
+                      <p className="font-secondary text-base group-hover:text-[#0c4d47] transition mt-1">{p.title}</p>
                       <span className="text-xs text-[#0a2225]/50 mt-1 block">{p.date}</span>
                     </a>
                   </li>
@@ -175,7 +175,7 @@ export default function NewsroomLanding() {
 function Column({ title, items, emptyText }: { title: string; items: any[]; emptyText: string }) {
   return (
     <div>
-      <h3 className="font-primary text-xl md:text-2xl mb-6">{title}</h3>
+      <h3 className="font-secondary text-xl md:text-2xl mb-6">{title}</h3>
       {items.length === 0 ? (
         <p className="text-sm text-[#0a2225]/50 italic">{emptyText}</p>
       ) : (
@@ -186,7 +186,7 @@ function Column({ title, items, emptyText }: { title: string; items: any[]; empt
                 <span className="text-[10px] tracking-[0.25em] uppercase text-[#C7A962]">
                   {formatDate(a.published_at)}
                 </span>
-                <p className="font-primary text-base leading-snug group-hover:text-[#0c4d47] transition mt-1">
+                <p className="font-secondary text-base leading-snug group-hover:text-[#0c4d47] transition mt-1">
                   {a.title}
                 </p>
               </Link>

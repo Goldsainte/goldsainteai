@@ -61,7 +61,7 @@ export default function Archive() {
           <p className="text-[11px] uppercase tracking-[0.22em] text-[#0a2225]/50 mb-4">
             Goldsainte Newsroom · Archive
           </p>
-          <h1 className="font-primary text-4xl md:text-5xl text-[#0a2225] mb-4">
+          <h1 className="font-secondary text-4xl md:text-5xl text-[#0a2225] mb-4">
             All Coverage
           </h1>
           <p className="text-[#0a2225]/60 max-w-xl mx-auto">
@@ -117,7 +117,7 @@ export default function Archive() {
             <section key={year} className="mb-16">
               <h2
                 id={`year-${year}`}
-                className="font-primary text-2xl text-[#0a2225]/80 mb-6 pb-3 border-b border-[#E5DFC6]"
+                className="font-secondary text-2xl text-[#0a2225]/80 mb-6 pb-3 border-b border-[#E5DFC6]"
               >
                 {year}
               </h2>
@@ -139,7 +139,7 @@ export default function Archive() {
                           </span>
                         </div>
                         <div className="flex items-start gap-3 flex-wrap">
-                          <p className="font-primary text-xl text-[#0a2225] group-hover:text-[#0c4d47] transition flex-1 min-w-0">
+                          <p className="font-secondary text-xl text-[#0a2225] group-hover:text-[#0c4d47] transition flex-1 min-w-0">
                             {a.title}
                           </p>
                           <span className="flex-shrink-0 inline-block px-2.5 py-1 rounded-full bg-[#0c4d47]/10 text-[#0c4d47] text-[10px] uppercase tracking-[0.18em]">

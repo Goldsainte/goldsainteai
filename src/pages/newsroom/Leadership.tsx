@@ -52,7 +52,7 @@ export default function Leadership() {
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#C7A962] mb-4">
             Goldsainte Newsroom · Founder
           </p>
-          <h1 className="font-primary text-4xl md:text-5xl leading-[1.1] mb-6 text-[#0a2225]">
+          <h1 className="font-secondary text-4xl md:text-5xl leading-[1.1] mb-6 text-[#0a2225]">
             The founder building the future of travel.
           </h1>
           <p className="text-base text-[#0a2225]/75 leading-relaxed">
@@ -103,7 +103,7 @@ export default function Leadership() {
                   />
                 ) : (
                   <div className="w-full aspect-[4/5] rounded-sm border border-[#E5DFC6] bg-gradient-to-br from-[#0c4d47] to-[#0a3d39] flex items-center justify-center shadow-[0_20px_50px_-20px_rgba(10,34,37,0.25)]">
-                    <span className="font-primary text-6xl text-[#C7A962] tracking-wider">
+                    <span className="font-secondary text-6xl text-[#C7A962] tracking-wider">
                       {initialsOf(a.full_name)}
                     </span>
                   </div>
@@ -125,12 +125,12 @@ export default function Leadership() {
                 <p className="text-[10px] uppercase tracking-[0.3em] text-[#C7A962] mb-3">
                   {a.title}
                 </p>
-                <h2 className="font-primary text-3xl md:text-4xl leading-tight text-[#0a2225]">
+                <h2 className="font-secondary text-3xl md:text-4xl leading-tight text-[#0a2225]">
                   {a.full_name}
                 </h2>
 
                 {a.quote && (
-                  <blockquote className="font-primary text-lg md:text-xl italic text-[#0a2225]/85 border-l-2 border-[#C7A962] pl-5 my-7 leading-snug">
+                  <blockquote className="font-secondary text-lg md:text-xl italic text-[#0a2225]/85 border-l-2 border-[#C7A962] pl-5 my-7 leading-snug">
                     "{a.quote}"
                   </blockquote>
                 )}
@@ -178,7 +178,7 @@ export default function Leadership() {
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#C7A962] mb-3">
             Founder Background
           </p>
-          <h2 className="font-primary text-2xl md:text-3xl leading-tight mb-10 max-w-2xl text-[#0a2225]">
+          <h2 className="font-secondary text-2xl md:text-3xl leading-tight mb-10 max-w-2xl text-[#0a2225]">
             A through-line from luxury transportation to AI-powered travel.
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
@@ -204,7 +204,7 @@ export default function Leadership() {
             <p className="text-[10px] uppercase tracking-[0.3em] text-[#C7A962] mb-3">
               Media Notes
             </p>
-            <h2 className="font-primary text-2xl md:text-3xl leading-tight text-[#0a2225]">
+            <h2 className="font-secondary text-2xl md:text-3xl leading-tight text-[#0a2225]">
               For the press.
             </h2>
           </div>
