@@ -266,7 +266,7 @@ export default function MediaKit() {
       </Helmet>
 
       {/* HERO */}
-      <section className="relative h-[70vh] min-h-[520px] w-full overflow-hidden">
+      <section className="relative h-[62vh] min-h-[460px] w-full overflow-hidden">
         <img
           src={heroImage}
           alt="A cinematic luxury hotel suite at golden hour with a leather suitcase and cream cashmere throw, evoking modern global hospitality."
@@ -274,30 +274,30 @@ export default function MediaKit() {
           width={1920}
           height={1080}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a2225]/55 via-[#0a2225]/35 to-[#0a2225]/75" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a2225]/40 via-[#0a2225]/25 to-[#0a2225]/80" />
         <div className="absolute inset-0 flex items-end">
-          <div className="max-w-6xl mx-auto w-full px-6 pb-16 md:pb-24">
-            <p className="text-[11px] tracking-[0.32em] uppercase text-[#C7A962] mb-6">
+          <div className="max-w-5xl mx-auto w-full px-6 pb-14 md:pb-20">
+            <p className="text-[10px] tracking-[0.32em] uppercase text-[#C7A962] mb-5">
               Goldsainte Newsroom · Media Kit
             </p>
-            <h1 className="font-secondary text-4xl md:text-6xl text-[#FDF9F0] max-w-3xl leading-[1.05]">
+            <h1 className="font-secondary text-3xl md:text-5xl text-[#FDF9F0] max-w-2xl leading-[1.1] tracking-[-0.01em]">
               Brand Assets &amp; Editorial Resources
             </h1>
-            <p className="mt-6 max-w-xl text-[#FDF9F0]/80 text-base md:text-lg leading-relaxed">
+            <p className="mt-5 max-w-lg text-[#FDF9F0]/75 text-sm md:text-base leading-[1.65]">
               Approved logos, executive imagery, editorial assets, and brand materials
               for media and press use.
             </p>
-            <div className="mt-9 flex flex-wrap gap-3">
+            <div className="mt-8 flex flex-wrap gap-3">
               <a
                 href="#press-packs"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#FDF9F0] text-[#0a2225] text-[11px] tracking-[0.22em] uppercase hover:bg-white transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0c4d47] text-[#FDF9F0] text-[10px] tracking-[0.24em] uppercase hover:bg-[#0a3d39] transition-colors"
               >
                 <Download className="h-3.5 w-3.5" />
                 Download press packs
               </a>
               <a
                 href="mailto:press@goldsainte.com?subject=Goldsainte%20Media%20Kit%20Request"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-[#FDF9F0]/40 text-[#FDF9F0] text-[11px] tracking-[0.22em] uppercase hover:border-[#FDF9F0] transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-[#FDF9F0]/35 text-[#FDF9F0] text-[10px] tracking-[0.24em] uppercase hover:border-[#FDF9F0] transition-colors"
               >
                 Request full archive
                 <ArrowUpRight className="h-3.5 w-3.5" />
