@@ -51,7 +51,7 @@ export default function CompanyFacts() {
         {/* Hero */}
         <section>
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-6">Company Facts</p>
-          <h1 className="font-secondary text-2xl md:text-4xl leading-[1.05] mb-6 max-w-3xl">
+          <h1 className="font-primary text-2xl md:text-4xl leading-[1.05] mb-6 max-w-3xl">
             Goldsainte is building the intelligent marketplace for modern travel.
           </h1>
           <p className="text-base text-[#0a2225]/75 leading-relaxed max-w-3xl">
@@ -65,7 +65,7 @@ export default function CompanyFacts() {
         <section className="grid md:grid-cols-[260px_1fr] gap-10 md:gap-16 pt-12 border-t border-[#E5DFC6]">
           <div>
             <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-3">Overview</p>
-            <h2 className="font-secondary text-2xl md:text-3xl leading-tight">
+            <h2 className="font-primary text-2xl md:text-3xl leading-tight">
               A connected ecosystem for inspiration, planning, and booking.
             </h2>
           </div>
@@ -100,7 +100,7 @@ export default function CompanyFacts() {
         <section className="grid md:grid-cols-[260px_1fr] gap-10 md:gap-16 pt-12 border-t border-[#E5DFC6]">
           <div>
             <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-3">Core Products</p>
-            <h2 className="font-secondary text-2xl md:text-3xl leading-tight">
+            <h2 className="font-primary text-2xl md:text-3xl leading-tight">
               What we build.
             </h2>
           </div>
@@ -121,7 +121,7 @@ export default function CompanyFacts() {
         <section className="grid md:grid-cols-[260px_1fr] gap-10 md:gap-16 pt-12 border-t border-[#E5DFC6]">
           <div>
             <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-3">Company History</p>
-            <h2 className="font-secondary text-2xl md:text-3xl leading-tight">
+            <h2 className="font-primary text-2xl md:text-3xl leading-tight">
               From luxury transportation to a next-generation travel marketplace.
             </h2>
           </div>

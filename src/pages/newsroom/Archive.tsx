@@ -21,7 +21,7 @@ export default function Archive() {
         <link rel="canonical" href={`${BASE_URL}/newsroom/archive`} />
       </Helmet>
       <div className="max-w-5xl mx-auto px-6 py-20">
-        <h1 className="font-secondary text-3xl md:text-4xl mb-6">Archive</h1>
+        <h1 className="font-primary text-3xl md:text-4xl mb-6">Archive</h1>
         <div className="flex gap-3 mb-12 text-xs uppercase tracking-wider">
           {[
             ["all", "All"],
@@ -48,7 +48,7 @@ export default function Archive() {
                   {formatDate(a.published_at)}
                 </span>
                 <div>
-                  <p className="font-secondary text-xl group-hover:text-[#0c4d47] transition">{a.title}</p>
+                  <p className="font-primary text-xl group-hover:text-[#0c4d47] transition">{a.title}</p>
                   <p className="text-sm text-[#0a2225]/60 mt-1">{a.excerpt}</p>
                 </div>
               </Link>

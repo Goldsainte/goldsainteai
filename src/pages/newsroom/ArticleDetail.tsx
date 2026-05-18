@@ -106,7 +106,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         </Link>
 
         <h1
-          className="font-secondary mt-10 text-[34px] md:text-[52px] leading-[1.08] text-[#0a2225]"
+          className="font-primary mt-10 text-[34px] md:text-[52px] leading-[1.08] text-[#0a2225]"
           style={{ letterSpacing: "-0.01em" }}
         >
           {article.title}
@@ -162,7 +162,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         {article.type === "press_release" && (
           <>
             <hr className="my-16 border-t border-[#E5DFC6]" />
-            <h3 className="font-secondary text-2xl text-[#0a2225] mb-4">About Goldsainte</h3>
+            <h3 className="font-primary text-2xl text-[#0a2225] mb-4">About Goldsainte</h3>
             <p className="text-[15px] text-[#0a2225]/80 leading-[1.7] mb-8">
               Goldsainte is an AI-powered travel marketplace headquartered in Charlotte,
               North Carolina. Founded in 2026, Goldsainte connects travelers with vetted
@@ -182,7 +182,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
             </Link>
 
             <hr className="my-16 border-t border-[#E5DFC6]" />
-            <h3 className="font-secondary text-2xl text-[#0a2225] mb-4">Press Contact</h3>
+            <h3 className="font-primary text-2xl text-[#0a2225] mb-4">Press Contact</h3>
             <p className="text-[15px] text-[#0a2225]/80 leading-[1.7]">
               {article.press_contact_name || "Goldsainte Press Team"}
               <br />
@@ -202,7 +202,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
       {related.length > 0 && (
         <section className="bg-[#FDF9F0] border-t border-[#E5DFC6]">
           <div className="max-w-5xl mx-auto px-6 py-20">
-            <h3 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-10">
+            <h3 className="font-primary text-2xl md:text-3xl text-[#0a2225] mb-10">
               Related stories
             </h3>
             <div className="grid md:grid-cols-3 gap-8">
@@ -223,7 +223,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
                       </span>
                     </div>
                   )}
-                  <p className="font-secondary text-lg md:text-xl leading-snug text-[#0a2225] group-hover:text-[#0c4d47] transition">
+                  <p className="font-primary text-lg md:text-xl leading-snug text-[#0a2225] group-hover:text-[#0c4d47] transition">
                     {r.title}
                   </p>
                   <p className="mt-2 text-[12px] tracking-wide text-[#0a2225]/55">
