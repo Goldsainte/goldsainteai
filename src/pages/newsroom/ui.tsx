@@ -67,6 +67,7 @@ export function NewsroomMobilePicker({
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const [rect, setRect] = useState<{ left: number; top: number; width: number } | null>(null);
 
   const activeLabel = useMemo(
@@ -76,7 +77,8 @@ export function NewsroomMobilePicker({
 
   useEffect(() => {
     function handlePointer(event: PointerEvent) {
-      if (!ref.current?.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (!ref.current?.contains(target) && !panelRef.current?.contains(target)) {
         setOpen(false);
       }
     }
@@ -135,6 +137,7 @@ export function NewsroomMobilePicker({
       {open && rect
         ? createPortal(
             <div
+              ref={panelRef}
               style={{
                 position: "fixed",
                 left: rect.left,
