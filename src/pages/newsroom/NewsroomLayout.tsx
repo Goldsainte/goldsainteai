@@ -20,16 +20,16 @@ export default function NewsroomLayout() {
   return (
     <div className="bg-[#FDF9F0] text-[#0a2225]">
       <div
-        className="border-b border-[#E5DFC6] bg-[#FDF9F0]/95 backdrop-blur-sm sticky z-20 shadow-[0_1px_0_#E5DFC6]"
+        className="border-b border-[#E5DFC6] bg-[#FDF9F0] sticky z-20 shadow-[0_1px_0_#E5DFC6]"
         style={{ top: "var(--header-height, 64px)" }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="md:hidden flex items-center gap-3 py-2.5">
+          <div className="md:hidden flex items-center gap-2 py-2">
             <NavLink
               to="/newsroom"
               end
               className={({ isActive }) =>
-                `flex-shrink-0 border-r border-[#E5DFC6] pr-3 text-[9px] tracking-[0.18em] uppercase font-medium transition-colors ${
+                `font-sans flex-shrink-0 border-r border-[#E5DFC6] pr-2 text-[9px] tracking-[0.16em] uppercase font-medium transition-colors ${
                   isActive ? "text-[#0c4d47]" : "text-[#0a2225]/55 hover:text-[#0a2225]"
                 }`
               }
@@ -44,7 +44,8 @@ export default function NewsroomLayout() {
                 id="newsroom-mobile-nav"
                 value={currentSection}
                 onChange={(e) => navigate(e.target.value)}
-                className="w-full appearance-none rounded-sm border border-[#E5DFC6] bg-white/90 px-3 py-2.5 pr-9 text-[10px] tracking-[0.16em] uppercase text-[#0a2225] focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/20"
+                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+                className="w-full appearance-none rounded-sm border border-[#E5DFC6] bg-white px-2.5 py-1.5 pr-7 text-[10px] leading-tight tracking-[0.14em] uppercase text-[#0a2225] focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/20"
               >
                 <option value="/newsroom">Overview</option>
                 {navItems.map((item) => (
@@ -53,7 +54,7 @@ export default function NewsroomLayout() {
                   </option>
                 ))}
               </select>
-              <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[#0a2225]/55">
+              <span className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-[10px] text-[#0a2225]/55">
                 ▾
               </span>
             </div>
