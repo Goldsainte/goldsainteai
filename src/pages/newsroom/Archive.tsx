@@ -40,7 +40,7 @@ export default function Archive() {
             </button>
           ))}
         </div>
-        <ul className="divide-y divide-[#0a2225]/10">
+        <ul className="divide-y divide-[#E5DFC6]">
           {filtered.map((a) => (
             <li key={a.id}>
               <Link to={articlePath(a)} className="grid md:grid-cols-[140px_1fr] gap-6 py-6 group">

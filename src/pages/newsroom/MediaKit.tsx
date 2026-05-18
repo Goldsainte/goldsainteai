@@ -8,10 +8,10 @@ import {
 } from "./lib";
 
 const COLORS = [
-  { name: "Cream", hex: "#f7f3ea" },
+  { name: "Cream", hex: "#FDF9F0" },
   { name: "Ink", hex: "#0a2225" },
   { name: "Forest", hex: "#0c4d47" },
-  { name: "Gold", hex: "#c9a84c" },
+  { name: "Gold", hex: "#C7A962" },
 ];
 
 function copy(text: string, label: string) {

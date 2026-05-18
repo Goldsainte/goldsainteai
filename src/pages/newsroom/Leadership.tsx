@@ -32,7 +32,7 @@ export default function Leadership() {
                 <h2 className="font-secondary text-3xl">{a.full_name}</h2>
                 <p className="text-[#0c4d47] uppercase text-xs tracking-[0.2em] mt-2">{a.title}</p>
                 {a.quote && (
-                  <blockquote className="font-secondary text-xl italic text-[#0a2225]/80 border-l-2 border-[#c9a84c] pl-4 my-6">
+                  <blockquote className="font-secondary text-xl italic text-[#0a2225]/80 border-l-2 border-[#C7A962] pl-4 my-6">
                     "{a.quote}"
                   </blockquote>
                 )}
