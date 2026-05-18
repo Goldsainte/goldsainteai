@@ -12,4 +12,11 @@
   <url><loc>https://goldsainte.ai/terms</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
   <url><loc>https://goldsainte.ai/cancellation-refund-policy</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
   <url><loc>https://goldsainte.ai/community-guidelines</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://goldsainte.ai/newsroom</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://goldsainte.ai/newsroom/media-kit</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://goldsainte.ai/newsroom/company-facts</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://goldsainte.ai/newsroom/leadership</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://goldsainte.ai/newsroom/editorial-policy</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://goldsainte.ai/newsroom/press-contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://goldsainte.ai/newsroom/archive</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
 </urlset>
