@@ -57,37 +57,59 @@ export default function Archive() {
 
       <div className="max-w-5xl mx-auto px-5 sm:px-6 py-12 md:py-20">
         {/* Header */}
-        <header className="mb-12 text-center">
-          <p className="text-[11px] uppercase tracking-[0.22em] text-[#0a2225]/50 mb-4">
+        <header className="mb-10 sm:mb-12 text-center">
+          <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.18em] sm:tracking-[0.22em] text-[#0a2225]/50 mb-3 sm:mb-4">
             Goldsainte Newsroom · Archive
           </p>
-          <h1 className="font-secondary text-4xl md:text-5xl text-[#0a2225] mb-4">
+          <h1 className="font-secondary text-[40px] sm:text-4xl md:text-5xl leading-[1.02] text-[#0a2225] mb-4">
             All Coverage
           </h1>
-          <p className="text-[#0a2225]/60 max-w-xl mx-auto">
+          <p className="text-[15px] sm:text-base leading-[1.7] text-[#0a2225]/60 max-w-xl mx-auto">
             Every press release, company announcement, and editorial piece — in one place.
           </p>
         </header>
 
         {/* Filters */}
-        <div className="mb-14 -mx-6 px-6 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <div className="flex gap-2 snap-x justify-center min-w-min">
-            {FILTERS.map(({ key, label }) => (
-              <button
-                key={key}
-                onClick={() => {
-                  setFilter(key);
+        <div className="mb-10 sm:mb-14">
+          <div className="sm:hidden">
+            <label htmlFor="archive-filter" className="sr-only">Filter newsroom archive</label>
+            <div className="relative">
+              <select
+                id="archive-filter"
+                value={filter}
+                onChange={(e) => {
+                  setFilter(e.target.value as FilterKey);
                   setVisibleCount(20);
                 }}
-                className={`flex-shrink-0 snap-start px-4 py-2 rounded-full text-[11px] uppercase tracking-[0.18em] transition-colors whitespace-nowrap ${
-                  filter === key
-                    ? "bg-[#0c4d47] text-white"
-                    : "border border-[#E5DFC6] text-[#0a2225]/70 hover:border-[#0c4d47] hover:text-[#0c4d47]"
-                }`}
+                className="w-full appearance-none rounded-sm border border-[#E5DFC6] bg-white px-4 py-3 pr-10 text-[10px] uppercase tracking-[0.16em] text-[#0a2225] focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/20"
               >
-                {label}
-              </button>
-            ))}
+                {FILTERS.map(({ key, label }) => (
+                  <option key={key} value={key}>{label}</option>
+                ))}
+              </select>
+              <span className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-[#0a2225]/55">▾</span>
+            </div>
+          </div>
+
+          <div className="hidden sm:flex -mx-6 px-6 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex gap-2 snap-x justify-center min-w-min mx-auto">
+              {FILTERS.map(({ key, label }) => (
+                <button
+                  key={key}
+                  onClick={() => {
+                    setFilter(key);
+                    setVisibleCount(20);
+                  }}
+                  className={`flex-shrink-0 snap-start px-4 py-2 rounded-full text-[11px] uppercase tracking-[0.18em] transition-colors whitespace-nowrap ${
+                    filter === key
+                      ? "bg-[#0c4d47] text-white"
+                      : "border border-[#E5DFC6] text-[#0a2225]/70 hover:border-[#0c4d47] hover:text-[#0c4d47]"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 

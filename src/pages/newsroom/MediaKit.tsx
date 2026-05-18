@@ -267,7 +267,7 @@ export default function MediaKit() {
       </Helmet>
 
       {/* HERO */}
-      <section className="relative h-[62vh] min-h-[460px] w-full overflow-hidden">
+      <section className="relative h-[54vh] min-h-[360px] sm:min-h-[420px] md:h-[62vh] md:min-h-[460px] w-full overflow-hidden">
         <img
           src={heroImage}
           alt="A cinematic luxury hotel suite at golden hour with a leather suitcase and cream cashmere throw, evoking modern global hospitality."
@@ -277,28 +277,28 @@ export default function MediaKit() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a2225]/40 via-[#0a2225]/25 to-[#0a2225]/80" />
         <div className="absolute inset-0 flex items-end">
-          <div className="max-w-5xl mx-auto w-full px-6 pb-14 md:pb-20">
-            <p className="text-[10px] tracking-[0.32em] uppercase text-[#C7A962] mb-5">
+          <div className="max-w-5xl mx-auto w-full px-5 sm:px-6 pb-8 sm:pb-10 md:pb-20">
+            <p className="text-[9px] sm:text-[10px] tracking-[0.22em] sm:tracking-[0.32em] uppercase text-[#C7A962] mb-3 sm:mb-5">
               Goldsainte Newsroom · Media Kit
             </p>
-            <h1 className="font-secondary text-3xl md:text-5xl text-[#FDF9F0] max-w-2xl leading-[1.1] tracking-[-0.01em]">
+            <h1 className="font-secondary text-[28px] sm:text-[34px] md:text-5xl text-[#FDF9F0] max-w-xl md:max-w-2xl leading-[1.02] md:leading-[1.1]">
               Brand Assets &amp; Editorial Resources
             </h1>
-            <p className="mt-5 max-w-lg text-[#FDF9F0]/75 text-sm md:text-base leading-[1.65]">
+            <p className="mt-4 sm:mt-5 max-w-md sm:max-w-lg text-[#FDF9F0]/82 text-[14px] sm:text-sm md:text-base leading-[1.55] sm:leading-[1.65]">
               Approved logos, executive imagery, editorial assets, and brand materials
               for media and press use.
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row sm:flex-wrap gap-3">
+            <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row sm:flex-wrap gap-3">
               <a
                 href="#press-packs"
-                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#0c4d47] text-[#FDF9F0] text-[10px] tracking-[0.24em] uppercase hover:bg-[#0a3d39] transition-colors"
+                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-5 sm:px-6 py-3 rounded-full bg-[#0c4d47] text-[#FDF9F0] text-[10px] tracking-[0.18em] sm:tracking-[0.24em] uppercase hover:bg-[#0a3d39] transition-colors"
               >
                 <Download className="h-3.5 w-3.5" />
                 Download press packs
               </a>
               <a
                 href="mailto:press@goldsainte.com?subject=Goldsainte%20Media%20Kit%20Request"
-                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-6 py-3 rounded-full border border-[#FDF9F0]/35 text-[#FDF9F0] text-[10px] tracking-[0.24em] uppercase hover:border-[#FDF9F0] transition-colors"
+                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-5 sm:px-6 py-3 rounded-full border border-[#FDF9F0]/35 text-[#FDF9F0] text-[10px] tracking-[0.18em] sm:tracking-[0.24em] uppercase hover:border-[#FDF9F0] transition-colors"
               >
                 Request full archive
                 <ArrowUpRight className="h-3.5 w-3.5" />
@@ -310,8 +310,8 @@ export default function MediaKit() {
 
       <div className="bg-[#FDF9F0]">
         {/* INTRO */}
-        <section className="max-w-5xl mx-auto px-5 sm:px-6 py-12 md:py-28">
-          <div className="grid md:grid-cols-12 gap-12 items-start">
+        <section className="max-w-5xl mx-auto px-5 sm:px-6 py-10 md:py-28">
+          <div className="grid md:grid-cols-12 gap-8 md:gap-12 items-start">
             <div className="md:col-span-4">
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
                 01 — The Kit
@@ -334,12 +334,12 @@ export default function MediaKit() {
           </div>
         </section>
 
-        <div className="max-w-5xl mx-auto px-6">
+        <div className="max-w-5xl mx-auto px-5 sm:px-6">
           <div className="h-px bg-[#E5DFC6]" />
         </div>
 
         {/* LOGOS */}
-        <section className="max-w-5xl mx-auto px-5 sm:px-6 py-12 md:py-28">
+        <section className="max-w-5xl mx-auto px-5 sm:px-6 py-10 md:py-28">
           <div className="mb-12 max-w-3xl">
             <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
               02 — Identity
@@ -354,7 +354,7 @@ export default function MediaKit() {
             </p>
           </div>
 
-          <div className="rounded-sm border border-[#E5DFC6] bg-[#FDF9F0] p-12 md:p-20 flex items-center justify-center">
+          <div className="rounded-sm border border-[#E5DFC6] bg-[#FDF9F0] p-6 sm:p-8 md:p-20 flex items-center justify-center">
             <img
               src={primaryHorizontalGreen}
               alt="Goldsainte primary horizontal logo in forest green."
@@ -363,7 +363,7 @@ export default function MediaKit() {
             />
           </div>
 
-          <div className="mt-10 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-4 sm:gap-x-8 sm:gap-y-4">
+          <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-x-8 sm:gap-y-4">
             <button
               onClick={() => {
                 toast.promise(downloadLogoAssets(), {
