@@ -146,7 +146,7 @@ export default function PressContact() {
                       onChange={setSelectedTopic}
                     />
                   </div>
-                  <select name="topic" required defaultValue="" className={`${newsroomFieldClass} hidden sm:block`}>
+                  <select name="topic" defaultValue="" className={`${newsroomFieldClass} hidden sm:block`}>
                     <option value="" disabled>Select…</option>
                     {TOPICS.map((t) => <option key={t} value={t}>{t}</option>)}
                   </select>
@@ -164,7 +164,7 @@ export default function PressContact() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full sm:w-auto px-6 py-3 rounded-sm bg-[#0c4d47] text-white text-[11px] uppercase tracking-[0.2em] hover:bg-[#0a3d39] disabled:opacity-50 transition"
+                className="w-full sm:w-auto px-6 py-3 rounded-sm bg-[#0c4d47] text-white text-[10px] sm:text-[11px] uppercase tracking-[0.18em] sm:tracking-[0.2em] hover:bg-[#0a3d39] disabled:opacity-50 transition"
               >
                 {submitting ? "Submitting…" : "Submit inquiry"}
               </button>
