@@ -203,6 +203,24 @@ Deno.serve(async (req) => {
 
       // ---------- IDENTITY ----------
       case 'identity_verification.updated': {
+        // For professionals (agent/brand), the dedicated `welcome-professional`
+        // email is dispatched directly from stripe-identity-webhook on the
+        // `*.identity_verified` event. Skip the generic notice for them to
+        // avoid duplicate inbox messages. Travelers still receive this email.
+        const { data: agentApp } = await supabase
+          .from('agent_applications')
+          .select('id')
+          .eq('created_user_id', record.user_id)
+          .maybeSingle()
+        const { data: brandApp } = await supabase
+          .from('brand_applications')
+          .select('id')
+          .eq('created_user_id', record.user_id)
+          .maybeSingle()
+        if (agentApp || brandApp) {
+          results.push({ skipped: 'professional_uses_welcome_professional' })
+          break
+        }
         const email = await getEmail(record.user_id)
         const name = await getProfileName(record.user_id)
         results.push(await send('identity-verification-update', email,
