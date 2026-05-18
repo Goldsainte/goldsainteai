@@ -36,7 +36,7 @@ export default function EditorialPolicy() {
 
         <Section eyebrow="01" title="What We Publish">
           <p>The newsroom publishes:</p>
-          <ul className="mt-4 space-y-2 text-[#0a2225]/80">
+          <ul className="mt-4 pl-5 space-y-2 list-disc marker:text-[#C7A962] text-[#0a2225]/80">
             {[
               "Official company announcements",
               "Product and platform updates",
@@ -45,10 +45,7 @@ export default function EditorialPolicy() {
               "Marketplace insights",
               "Founder perspectives and interviews",
             ].map((item) => (
-              <li key={item} className="flex items-start gap-3">
-                <span className="text-[#C7A962] mt-2 text-[8px]">●</span>
-                <span>{item}</span>
-              </li>
+              <li key={item}>{item}</li>
             ))}
           </ul>
           <p className="mt-6 text-[#0a2225]/70">
@@ -80,7 +77,7 @@ export default function EditorialPolicy() {
         <figure className="my-24 md:my-28 text-center animate-fade-in">
           <blockquote className="font-primary text-2xl md:text-3xl leading-[1.25] text-[#0a2225]">
             <span className="text-[#C7A962] mr-1">“</span>
-            Extraordinary travel begins with perspective.
+            The best travel story is always a human one.
             <span className="text-[#C7A962] ml-1">”</span>
           </blockquote>
           <div className="mt-6 mx-auto w-10 h-px bg-[#C7A962]" />
@@ -173,7 +170,7 @@ function Section({
   return (
     <section className="animate-fade-in">
       {eyebrow && (
-        <p className="text-[10px] uppercase tracking-[0.3em] text-[#0a2225]/40 mb-4">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-[#C7A962] mb-4">
           {eyebrow}
         </p>
       )}
