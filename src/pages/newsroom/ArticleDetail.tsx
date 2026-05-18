@@ -1,6 +1,10 @@
 import { Helmet } from "react-helmet-async";
 import { Link, useParams, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { ArrowLeft, Check, Copy } from "lucide-react";
+import { toast } from "sonner";
+import wordmarkGold from "@/assets/wordmark-gold.png";
 import {
   BASE_URL,
   articlePath,
@@ -41,6 +45,8 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
   const ogImg = article.og_image_url || article.hero_image_url || undefined;
   const typeLabel =
     article.type === "press_release" ? "Press Release" : article.type === "announcement" ? "Announcement" : "News";
+  const wordCount = (article.body || "").trim().split(/\s+/).filter(Boolean).length;
+  const readMinutes = Math.max(1, Math.ceil(wordCount / 200));
 
   return (
     <>
@@ -100,9 +106,9 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
       <article className="max-w-[680px] mx-auto px-6 pt-12 md:pt-20 pb-8 animate-fade-in">
         <Link
           to="/newsroom"
-          className="text-[11px] tracking-[0.25em] uppercase text-[#0c4d47] hover:underline"
+          className="inline-flex items-center gap-2 text-[11px] tracking-[0.25em] uppercase text-[#0c4d47] hover:text-[#0a3d39] transition"
         >
-          ← Back to Newsroom
+          <ArrowLeft size={14} strokeWidth={1.75} /> Back to Newsroom
         </Link>
 
         <h1
@@ -112,12 +118,15 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
           {article.title}
         </h1>
 
-        <div className="mt-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-[14px] text-[#0a2225]/70">
+        <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-[14px] text-[#0a2225]/70">
           <span>By {article.author?.full_name || "Goldsainte"}</span>
           <span className="text-[#0a2225]/30">·</span>
           <span>{formatDate(article.published_at)}</span>
           <span className="text-[#0a2225]/30">·</span>
-          <span className="text-[#0c4d47]">{article.category || typeLabel}</span>
+          <span>{readMinutes} min read</span>
+          <span className="inline-flex items-center bg-[#0c4d47]/10 text-[#0c4d47] px-3 py-0.5 rounded-full text-[11px] tracking-wide uppercase">
+            {article.category || typeLabel}
+          </span>
         </div>
 
         {article.subtitle && (
@@ -130,8 +139,8 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         )}
       </article>
 
-      {/* Optional inline image — only for non-press-release articles */}
-      {article.type !== "press_release" && article.hero_image_url && (
+      {/* Hero image — shown for all article types; branded fallback for press releases without one */}
+      {article.hero_image_url ? (
         <figure className="max-w-[680px] mx-auto px-6 mt-12 animate-fade-in">
           <img
             src={article.hero_image_url}
@@ -144,7 +153,17 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
             </figcaption>
           )}
         </figure>
-      )}
+      ) : article.type === "press_release" ? (
+        <div className="max-w-[680px] mx-auto px-6 mt-12 animate-fade-in">
+          <div className="w-full aspect-[21/6] rounded-sm bg-gradient-to-br from-[#0c4d47] to-[#0a2225] flex items-center justify-center">
+            <img
+              src={wordmarkGold}
+              alt="Goldsainte"
+              className="h-7 md:h-9 w-auto opacity-90"
+            />
+          </div>
+        </div>
+      ) : null}
 
       <div className="max-w-[680px] mx-auto px-6 pt-12 pb-16">
         {article.type === "press_release" && (
@@ -248,17 +267,32 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
 function ShareRow({ title, url }: { title: string; url: string }) {
   const t = encodeURIComponent(title);
   const u = encodeURIComponent(url);
-  const twitter = `https://twitter.com/intent/tweet?text=${t}&url=${u}`;
+  const x = `https://twitter.com/intent/tweet?text=${t}&url=${u}`;
   const linkedin = `https://www.linkedin.com/sharing/share-offsite/?url=${u}`;
   const email = `mailto:?subject=${t}&body=${u}`;
+  const [copied, setCopied] = useState(false);
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      toast.success("Link copied");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Could not copy link");
+    }
+  };
   const cls =
     "inline-flex items-center justify-center px-4 py-2 rounded-full border border-[#E5DFC6] text-xs uppercase tracking-wider text-[#0a2225]/70 hover:text-[#0c4d47] hover:border-[#0c4d47] transition";
   return (
     <div className="mt-12 flex items-center gap-3 flex-wrap">
       <span className="text-[10px] tracking-[0.25em] uppercase text-[#0a2225]/50 mr-1">Share</span>
-      <a href={twitter} target="_blank" rel="noopener noreferrer" className={cls}>Twitter</a>
+      <a href={x} target="_blank" rel="noopener noreferrer" className={cls}>X</a>
       <a href={linkedin} target="_blank" rel="noopener noreferrer" className={cls}>LinkedIn</a>
       <a href={email} className={cls}>Email</a>
+      <button type="button" onClick={copyLink} className={`${cls} gap-1.5`}>
+        {copied ? <Check size={13} strokeWidth={2} /> : <Copy size={13} strokeWidth={2} />}
+        {copied ? "Copied" : "Copy link"}
+      </button>
     </div>
   );
 }
