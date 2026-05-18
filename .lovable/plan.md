@@ -1,16 +1,13 @@
-## Goal
-Make the newsroom mobile dropdown menus open cleanly above the page content instead of sliding behind the separator line or nearby sections.
+## Problem
+After portaling the dropdown panel to `document.body`, the options render correctly but selecting one doesn't change the value. The outside-click handler treats the portaled panel as "outside" the picker and closes it on `pointerdown`, which unmounts the panel before the option's `click` fires.
 
-## What I’ll change
-1. Update the shared mobile picker so its open panel renders in a safer stacking layer on mobile.
-2. Adjust the newsroom layout container so the sticky mobile section bar and the dropdown panel don’t compete with the next content section.
-3. Check every place using the shared picker in the newsroom, especially:
-   - top section switcher in `NewsroomLayout.tsx`
-   - archive filter in `Archive.tsx`
-   - press contact topic picker in `PressContact.tsx`
-4. Validate the fix on the phone viewport and confirm the opened options list stays fully visible above separators and content.
+## Fix
+In `src/pages/newsroom/ui.tsx`:
+- Add a ref to the portaled panel.
+- Update the document `pointerdown` listener to treat clicks inside either the trigger wrapper or the panel as "inside" (do not close).
+- Keep escape-to-close and outside-click-to-close behavior intact.
 
-## Technical details
-- Likely changes will be in `src/pages/newsroom/ui.tsx` and `src/pages/newsroom/NewsroomLayout.tsx`, with small follow-up adjustments only if needed in picker consumers.
-- I’ll correct the stacking context rather than just increasing random spacing, so the dropdown panel behaves consistently across mobile newsroom pages.
-- Validation will be done on the 390px mobile viewport where the issue is currently reproducible.
+No other files need changes; all consumers (`NewsroomLayout`, `Archive`, `PressContact`) already use the shared component.
+
+## Validation
+Reproduce on the mobile viewport: open the section dropdown on `/newsroom/archive`, tap a different option, confirm the route changes and the trigger label updates. Repeat for the Archive filter and Press Contact topic picker.
