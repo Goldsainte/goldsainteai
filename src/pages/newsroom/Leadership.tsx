@@ -160,25 +160,14 @@ export default function Leadership() {
                   <p className="text-[10px] uppercase tracking-[0.3em] text-[#C7A962] mb-3">
                     Signed
                   </p>
-                  {a.signature_image_url ? (
-                    <div style={{ mixBlendMode: "multiply" }}>
-                      <img
-                        src={a.signature_image_url}
-                        alt={`Signature of ${a.full_name}`}
-                        className="h-16 w-auto -ml-2 select-none"
-                        draggable={false}
-                      />
-                    </div>
-                  ) : (
-                    <div style={{ mixBlendMode: "multiply" }}>
-                      <img
-                        src={signatureImage}
-                        alt="Signature of Andre C. Powell, Jr."
-                        className="h-16 w-auto -ml-2 select-none"
-                        draggable={false}
-                      />
-                    </div>
-                  )}
+                  <div style={{ mixBlendMode: "multiply" }}>
+                    <img
+                      src={a.signature_image_url || signatureImage}
+                      alt={`Signature of ${a.full_name}`}
+                      className="h-28 md:h-32 w-auto -ml-3 select-none"
+                      draggable={false}
+                    />
+                  </div>
                 </div>
               </div>
             </article>
