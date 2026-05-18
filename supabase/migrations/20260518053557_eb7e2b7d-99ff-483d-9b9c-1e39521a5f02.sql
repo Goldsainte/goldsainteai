@@ -1,0 +1,7 @@
+UPDATE public.newsroom_authors
+SET
+  full_name = 'Andre C. Powell, Jr.',
+  quote = 'Modern travelers do not just want another booking engine. They want trusted expertise, inspired discovery, and a better way to design the journey.',
+  bio = E'Andre C. Powell, Jr. is the Founder and CEO of Goldsainte, an AI-powered global travel marketplace built to modernize how travelers discover, plan, and book curated travel experiences.\n\nBefore launching Goldsainte AI, Powell founded Goldsainte''s luxury transportation platform, which expanded through licensing and franchising into more than 350 cities across over 50 countries. That experience revealed a larger opportunity: travelers did not simply need transportation — they needed a better system for the entire journey.\n\nGoldsainte AI represents that evolution. The platform connects travelers with vetted travel creators, independent travel advisors, and hospitality partners through AI-powered itinerary creation, proposal-based planning, and marketplace booking.\n\nPowell''s background spans operations, hospitality, consumer marketplaces, franchise development, and technology-enabled service platforms. His leadership approach centers on trust, execution, premium service design, and building systems that make extraordinary travel more accessible.',
+  expertise = ARRAY['Founder-Led Strategy','AI Travel Marketplace','Luxury Travel','Consumer Platforms','Global Expansion','Creator Economy']
+WHERE slug = 'andre-powell';
