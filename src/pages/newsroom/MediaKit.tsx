@@ -10,10 +10,13 @@ import {
   COMPANY_BOILERPLATE_MEDIUM,
   COMPANY_BOILERPLATE_SHORT,
 } from "./lib";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import heroImage from "@/assets/newsroom/mediakit-hero.jpg";
-import worldImage1 from "@/assets/newsroom/mediakit-world-1.jpg";
-import worldImage2 from "@/assets/newsroom/mediakit-world-2.jpg";
-import worldImage3 from "@/assets/newsroom/mediakit-world-3.jpg";
 import founderImage from "@/assets/newsroom/inline-founder-desk.jpg";
 import logomarkGold from "@/assets/newsroom/logos/logomark-gold.png";
 import logomarkGreen from "@/assets/newsroom/logos/logomark-green.png";
@@ -559,134 +562,88 @@ export default function MediaKit() {
         {/* PRESS PACKS */}
         <section
           id="press-packs"
-          className="bg-[#0a2225] text-[#FDF9F0]"
+          className="bg-white/60 border-y border-[#E5DFC6]"
         >
           <div className="max-w-5xl mx-auto px-6 py-20 md:py-28">
             <div className="mb-12">
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
                 07 — Downloads
               </p>
-              <h2 className="font-secondary text-2xl md:text-3xl mt-3 text-[#FDF9F0]">
+              <h2 className="font-secondary text-2xl md:text-3xl mt-3 text-[#0a2225]">
                 Press Packs
               </h2>
-              <p className="text-base text-[#FDF9F0]/70 mt-4 max-w-2xl leading-relaxed">
+              <p className="text-base text-[#0a2225]/70 mt-4 max-w-2xl leading-relaxed">
                 Curated archives for journalists, broadcasters, and editorial
                 partners. Email{" "}
-                <a className="text-[#C7A962] underline underline-offset-4" href="mailto:press@goldsainte.ai">
+                <a className="text-[#0c4d47] underline underline-offset-4" href="mailto:press@goldsainte.ai">
                   press@goldsainte.ai
                 </a>{" "}
                 to receive the latest packs directly.
               </p>
             </div>
-            <div className="grid md:grid-cols-2 gap-px bg-[#FDF9F0]/10 border border-[#FDF9F0]/10">
+            <Accordion
+              type="single"
+              collapsible
+              className="border-t border-[#E5DFC6]"
+            >
               {PRESS_PACKS.map((p) => (
-                <a
+                <AccordionItem
                   key={p.title}
-                  href={`mailto:press@goldsainte.ai?subject=${encodeURIComponent(
-                    `Request: ${p.title}`,
-                  )}`}
-                  className="group bg-[#0a2225] p-7 md:p-9 hover:bg-[#0c4d47] transition-colors duration-500 flex flex-col justify-between gap-8 min-h-[180px]"
+                  value={p.title}
+                  className="border-b border-[#E5DFC6]"
                 >
-                  <div>
-                    <div className="flex items-start justify-between gap-4">
-                      <h3 className="font-secondary text-xl md:text-2xl text-[#FDF9F0]">
-                        {p.title}
-                      </h3>
-                      <span className="text-[10px] tracking-[0.25em] uppercase text-[#C7A962] mt-1.5">
+                  <AccordionTrigger className="py-6 hover:no-underline group">
+                    <div className="flex items-center justify-between w-full gap-6 pr-4">
+                      <div className="flex items-baseline gap-5 text-left">
+                        <span className="font-mono text-[11px] tracking-[0.22em] uppercase text-[#C7A962] w-8 shrink-0">
+                          {String(PRESS_PACKS.indexOf(p) + 1).padStart(2, "0")}
+                        </span>
+                        <h3 className="font-secondary text-xl md:text-2xl text-[#0a2225]">
+                          {p.title}
+                        </h3>
+                      </div>
+                      <span className="text-[10px] tracking-[0.25em] uppercase text-[#0a2225]/45 hidden sm:inline">
                         {p.type}
                       </span>
                     </div>
-                    <p className="text-sm text-[#FDF9F0]/65 leading-relaxed mt-3">
-                      {p.desc}
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-between text-[11px] tracking-[0.22em] uppercase text-[#FDF9F0]/70 group-hover:text-[#FDF9F0]">
-                    <span>{p.file}</span>
-                    <Download className="h-4 w-4 transition-transform group-hover:-translate-y-0.5" />
-                  </div>
-                </a>
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-8">
+                    <div className="pl-0 sm:pl-[52px] grid md:grid-cols-12 gap-6 items-start">
+                      <p className="md:col-span-8 text-base text-[#0a2225]/75 leading-relaxed">
+                        {p.desc}
+                      </p>
+                      <div className="md:col-span-4 flex md:justify-end">
+                        <a
+                          href={`mailto:press@goldsainte.ai?subject=${encodeURIComponent(
+                            `Request: ${p.title}`,
+                          )}`}
+                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0c4d47] text-[#FDF9F0] text-[11px] tracking-[0.22em] uppercase hover:bg-[#0a3d39] transition-colors"
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                          Request {p.type}
+                        </a>
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
               ))}
-            </div>
-          </div>
-        </section>
-
-        {/* BRAND WORLD */}
-        <section className="bg-[#FDF9F0]">
-          <div className="max-w-6xl mx-auto px-6 py-20 md:py-28">
-            <div className="grid md:grid-cols-12 gap-10 mb-14 items-end">
-              <div className="md:col-span-5">
-                <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
-                  08 — Brand World
-                </p>
-                <h2 className="font-secondary text-2xl md:text-3xl mt-3 text-[#0a2225]">
-                  The Goldsainte Atmosphere
-                </h2>
-              </div>
-              <div className="md:col-span-7">
-                <p className="text-base text-[#0a2225]/75 leading-relaxed max-w-xl">
-                  Light, texture, and quiet detail — a visual language drawn from the
-                  destinations and rituals we curate. Use these references when
-                  approximating the Goldsainte mood in editorial layouts.
-                </p>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-12 gap-4 md:gap-6">
-              <div className="md:col-span-7 md:row-span-2">
-                <div className="overflow-hidden rounded-sm border border-[#E5DFC6] aspect-[4/5] md:aspect-auto md:h-full">
-                  <img
-                    src={worldImage1}
-                    alt="Sun-drenched Mediterranean villa terrace with linen drapes and olive trees at golden hour."
-                    className="w-full h-full object-cover transition-transform duration-[1.2s] ease-out hover:scale-[1.03]"
-                    loading="lazy"
-                  />
-                </div>
-              </div>
-              <div className="md:col-span-5">
-                <div className="overflow-hidden rounded-sm border border-[#E5DFC6] aspect-[4/3]">
-                  <img
-                    src={worldImage2}
-                    alt="An aged leather travel journal, antique brass compass, and silk scarf on a dark walnut desk."
-                    className="w-full h-full object-cover transition-transform duration-[1.2s] ease-out hover:scale-[1.03]"
-                    loading="lazy"
-                  />
-                </div>
-              </div>
-              <div className="md:col-span-5">
-                <div className="overflow-hidden rounded-sm border border-[#E5DFC6] aspect-[4/3]">
-                  <img
-                    src={worldImage3}
-                    alt="A black car arriving at a grand hotel at dusk, warm lobby light spilling onto rain-wet cobblestones."
-                    className="w-full h-full object-cover transition-transform duration-[1.2s] ease-out hover:scale-[1.03]"
-                    loading="lazy"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <blockquote className="mt-20 text-center max-w-3xl mx-auto">
-              <span className="block w-10 h-px bg-[#C7A962] mx-auto mb-8" />
-              <p className="font-secondary text-2xl md:text-3xl leading-[1.4] text-[#0c4d47]">
-                Built for travelers who notice the difference between a destination
-                and an experience.
-              </p>
-              <span className="block w-10 h-px bg-[#C7A962] mx-auto mt-8" />
-            </blockquote>
+            </Accordion>
           </div>
         </section>
 
         {/* EDITORIAL FOOTER */}
-        <section className="bg-[#0c4d47] text-[#FDF9F0]">
+        <section className="bg-[#FDF9F0]">
           <div className="max-w-5xl mx-auto px-6 py-20 md:py-28">
+            <div className="h-px bg-[#E5DFC6] mb-20" />
             <div className="grid md:grid-cols-12 gap-10 items-start">
               <div className="md:col-span-7 space-y-6">
                 <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
-                  For the Press
+                  08 — For the Press
                 </p>
-                <h2 className="font-secondary text-3xl md:text-5xl leading-[1.1]">
+                <h2 className="font-secondary text-3xl md:text-5xl leading-[1.1] text-[#0a2225]">
                   For media inquiries, interviews, and founder commentary.
                 </h2>
-                <p className="text-base text-[#FDF9F0]/75 leading-relaxed max-w-xl">
+                <p className="text-base text-[#0a2225]/70 leading-relaxed max-w-xl">
                   Our newsroom team typically responds within one business day. For
                   time-sensitive editorial deadlines, please note the publication
                   date in your subject line.
@@ -694,20 +651,20 @@ export default function MediaKit() {
                 <div className="flex flex-wrap gap-3 pt-2">
                   <a
                     href="mailto:press@goldsainte.ai?subject=Press%20inquiry"
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#FDF9F0] text-[#0c4d47] text-[11px] tracking-[0.22em] uppercase hover:bg-white transition-colors"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0c4d47] text-[#FDF9F0] text-[11px] tracking-[0.22em] uppercase hover:bg-[#0a3d39] transition-colors"
                   >
                     press@goldsainte.ai
                   </a>
                   <Link
                     to="/newsroom"
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-[#FDF9F0]/40 text-[#FDF9F0] text-[11px] tracking-[0.22em] uppercase hover:border-[#FDF9F0] transition-colors"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-[#E5DFC6] text-[#0a2225] text-[11px] tracking-[0.22em] uppercase hover:border-[#0c4d47] hover:text-[#0c4d47] transition-colors"
                   >
                     Return to newsroom
                     <ArrowUpRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
               </div>
-              <div className="md:col-span-5 md:pl-10 md:border-l border-[#FDF9F0]/15 space-y-6 text-sm text-[#FDF9F0]/70 leading-relaxed">
+              <div className="md:col-span-5 md:pl-10 md:border-l border-[#E5DFC6] space-y-6 text-sm text-[#0a2225]/70 leading-relaxed">
                 <div>
                   <p className="text-[10px] tracking-[0.3em] uppercase text-[#C7A962] mb-2">
                     Headquarters
@@ -724,7 +681,7 @@ export default function MediaKit() {
                   <p className="text-[10px] tracking-[0.3em] uppercase text-[#C7A962] mb-2">
                     Signed
                   </p>
-                  <p className="font-secondary italic text-lg text-[#FDF9F0]/90">
+                  <p className="font-secondary italic text-lg text-[#0a2225]/90">
                     Andre C. Powell, Jr.
                   </p>
                 </div>
