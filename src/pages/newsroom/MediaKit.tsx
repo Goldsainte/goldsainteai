@@ -17,7 +17,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import heroImage from "@/assets/newsroom/mediakit-hero.jpg";
-import founderImage from "@/assets/newsroom/inline-founder-desk.jpg";
 import logomarkGold from "@/assets/newsroom/logos/logomark-gold.png";
 import logomarkGreen from "@/assets/newsroom/logos/logomark-green.png";
 import primaryHorizontalGold from "@/assets/newsroom/logos/primary-horizontal-gold.png";
