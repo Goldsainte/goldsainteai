@@ -286,6 +286,9 @@ function ShareRow({ title, url }: { title: string; url: string }) {
   const x = `https://twitter.com/intent/tweet?text=${t}&url=${u}`;
   const linkedin = `https://www.linkedin.com/sharing/share-offsite/?url=${u}`;
   const email = `mailto:?subject=${t}&body=${u}`;
+  const sms = `sms:?&body=${t}%20${u}`;
+  const whatsapp = `https://wa.me/?text=${t}%20${u}`;
+  const threads = `https://www.threads.net/intent/post?text=${t}%20${u}`;
   const [copied, setCopied] = useState(false);
   const copyLink = async () => {
     try {
@@ -297,13 +300,25 @@ function ShareRow({ title, url }: { title: string; url: string }) {
       toast.error("Could not copy link");
     }
   };
+  const shareInstagram = async () => {
+    try {
+      await navigator.clipboard.writeText(`${title} ${url}`);
+      toast.success("Link copied — paste it into your Instagram story or DM");
+    } catch {
+      toast.error("Could not copy link");
+    }
+  };
   const cls =
     "inline-flex items-center justify-center px-4 py-2 rounded-full border border-[#E5DFC6] text-xs uppercase tracking-wider text-[#0a2225]/70 hover:text-[#0c4d47] hover:border-[#0c4d47] transition";
   return (
     <div className="mt-12 flex items-center gap-3 flex-wrap">
       <span className="text-[10px] tracking-[0.25em] uppercase text-[#0a2225]/50 mr-1">Share</span>
-      <a href={x} target="_blank" rel="noopener noreferrer" className={cls}>X</a>
+      <a href={sms} className={cls}>Text</a>
+      <a href={whatsapp} target="_blank" rel="noopener noreferrer" className={cls}>WhatsApp</a>
       <a href={linkedin} target="_blank" rel="noopener noreferrer" className={cls}>LinkedIn</a>
+      <a href={threads} target="_blank" rel="noopener noreferrer" className={cls}>Threads</a>
+      <button type="button" onClick={shareInstagram} className={cls}>Instagram</button>
+      <a href={x} target="_blank" rel="noopener noreferrer" className={cls}>X</a>
       <a href={email} className={cls}>Email</a>
       <button type="button" onClick={copyLink} className={`${cls} gap-1.5`}>
         {copied ? <Check size={13} strokeWidth={2} /> : <Copy size={13} strokeWidth={2} />}
