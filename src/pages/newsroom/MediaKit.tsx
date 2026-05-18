@@ -231,10 +231,10 @@ function BoilerplatePanel() {
         <p className="font-primary text-lg md:text-xl leading-[1.7] text-[#0a2225]/90">
           {current.text}
         </p>
-        <div className="flex flex-wrap gap-3 pt-2">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 pt-2">
           <button
             onClick={onCopy}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0c4d47] text-[#FDF9F0] text-[11px] tracking-[0.22em] uppercase hover:bg-[#0a3d39] transition-colors"
+            className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-[#0c4d47] text-[#FDF9F0] text-[11px] tracking-[0.22em] uppercase hover:bg-[#0a3d39] transition-colors"
           >
             {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
             {copied ? "Copied" : "Copy text"}
@@ -243,7 +243,7 @@ function BoilerplatePanel() {
             onClick={() =>
               downloadText(`Goldsainte-Boilerplate-${current.label}.txt`, current.text)
             }
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#E5DFC6] text-[#0a2225] text-[11px] tracking-[0.22em] uppercase hover:border-[#0c4d47] hover:text-[#0c4d47] transition-colors"
+            className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-[#E5DFC6] text-[#0a2225] text-[11px] tracking-[0.22em] uppercase hover:border-[#0c4d47] hover:text-[#0c4d47] transition-colors"
           >
             <Download className="h-3.5 w-3.5" />
             Download .txt
