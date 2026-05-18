@@ -522,6 +522,10 @@ export const AppRoutes = () => (
       <Route path="/admin/trips" element={<AdminGuard><AdminTripsPage /></AdminGuard>} />
       <Route path="/admin/waitlist" element={<AdminGuard><AdminWaitlistPage /></AdminGuard>} />
       <Route path="/admin/email-dlq" element={<AdminGuard><AdminEmailDLQPage /></AdminGuard>} />
+      <Route path="/admin/newsroom" element={<AdminGuard><AdminNewsroomList /></AdminGuard>} />
+      <Route path="/admin/newsroom/new" element={<AdminGuard><AdminArticleEditor /></AdminGuard>} />
+      <Route path="/admin/newsroom/authors" element={<AdminGuard><AdminNewsroomAuthors /></AdminGuard>} />
+      <Route path="/admin/newsroom/:id/edit" element={<AdminGuard><AdminArticleEditor /></AdminGuard>} />
       <Route path="/admin/marketplace" element={<Navigate to="/admin" replace />} />
       <Route path="/admin/escrow" element={<AdminGuard><OpsEscrowDashboardPage /></AdminGuard>} />
       <Route path="/admin/cancellations" element={<AdminGuard><AdminCancellations /></AdminGuard>} />
