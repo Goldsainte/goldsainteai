@@ -337,57 +337,51 @@ export default function MediaKit() {
 
         {/* LOGOS */}
         <section className="max-w-5xl mx-auto px-6 py-20 md:py-28">
-          <div className="flex flex-wrap items-end justify-between gap-6 mb-12">
-            <div>
-              <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
-                02 — Identity
-              </p>
-              <h2 className="font-secondary text-2xl md:text-3xl mt-3 text-[#0a2225]">
-                Logo Suite
-              </h2>
-              <p className="text-base text-[#0a2225]/70 mt-4 max-w-2xl leading-relaxed">
-                The complete Goldsainte mark in primary, secondary, and monogram
-                configurations — each in forest green and gold. Click any logo to
-                download the PNG.
-              </p>
-            </div>
-            <a
-              href="mailto:press@goldsainte.ai?subject=Logo%20suite%20request%20(SVG)"
-              className="inline-flex items-center gap-2 text-[11px] tracking-[0.22em] uppercase text-[#0c4d47] hover:underline underline-offset-4"
+          <div className="mb-12 max-w-3xl">
+            <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
+              02 — Identity
+            </p>
+            <h2 className="font-secondary text-2xl md:text-3xl mt-3 text-[#0a2225]">
+              Logo
+            </h2>
+            <p className="text-base text-[#0a2225]/70 mt-4 leading-relaxed">
+              The Goldsainte mark is provided in primary, secondary, wordmark, and
+              monogram configurations — each in forest green and gold. Please use
+              the marks as supplied, without recoloring, distortion, or effects.
+            </p>
+          </div>
+
+          <div className="rounded-sm border border-[#0a2225]/10 bg-[#FDF9F0] p-12 md:p-20 flex items-center justify-center">
+            <img
+              src={primaryHorizontalGreen}
+              alt="Goldsainte primary horizontal logo in forest green."
+              className="max-h-16 md:max-h-20 w-auto"
+              loading="lazy"
+            />
+          </div>
+
+          <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
+            <button
+              onClick={() => {
+                toast.promise(downloadLogoAssets(), {
+                  loading: "Preparing logo assets…",
+                  success: "Logo assets downloaded",
+                  error: "Download failed. Please try again.",
+                });
+              }}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0c4d47] text-[#FDF9F0] text-[11px] tracking-[0.22em] uppercase hover:bg-[#0a3d39] transition-colors"
             >
               <Download className="h-3.5 w-3.5" />
-              Request SVG &amp; full ZIP
+              Download Logo Assets
+            </button>
+            <a
+              href="mailto:press@goldsainte.ai?subject=Logo%20request%20(SVG)"
+              className="inline-flex items-center gap-2 text-[11px] tracking-[0.22em] uppercase text-[#0c4d47] hover:underline underline-offset-4"
+            >
+              Request SVG masters
+              <ArrowUpRight className="h-3.5 w-3.5" />
             </a>
           </div>
-
-          <div className="space-y-14">
-            {LOGO_GROUPS.map((group) => (
-              <div key={group.title}>
-                <div className="mb-5 flex items-baseline justify-between gap-6">
-                  <div>
-                    <h3 className="font-secondary text-xl text-[#0a2225]">
-                      {group.title}
-                    </h3>
-                    <p className="text-sm text-[#0a2225]/60 mt-1 max-w-xl leading-relaxed">
-                      {group.subtitle}
-                    </p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {group.items.map((item) => (
-                    <LogoTile key={item.filename} asset={item} />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <p className="text-xs text-[#0a2225]/55 mt-10 max-w-2xl leading-relaxed">
-            Usage: maintain minimum clear space equal to the height of the monogram.
-            Do not recolor, distort, rotate, or apply effects. Use the green marks
-            on cream or light surfaces, and the gold marks on dark or photographic
-            backgrounds. SVG masters and additional formats available on request.
-          </p>
         </section>
 
         {/* COLOR */}
