@@ -13,34 +13,31 @@ const navItems = [
 export default function NewsroomLayout() {
   return (
     <div className="bg-[#FDF9F0] text-[#0a2225]">
-      <div className="border-b border-[#E5DFC6] bg-[#FDF9F0]/95 backdrop-blur sticky top-14 sm:top-16 md:top-20 z-20">
-        <div className="max-w-7xl mx-auto px-6 py-3 flex flex-wrap items-center gap-x-6 gap-y-2">
-          <NavLink
-            to="/newsroom"
-            end
-            className="text-[10px] tracking-[0.25em] uppercase text-[#0c4d47] font-medium"
-          >
-            Newsroom
-          </NavLink>
-          <nav className="flex flex-wrap gap-x-5 gap-y-1 text-xs">
-            {navItems.slice(1).map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.end}
-                className={({ isActive }) =>
-                  `tracking-wide uppercase transition-colors ${
-                    isActive
-                      ? "text-[#0c4d47] font-semibold"
-                      : "text-[#0a2225]/60 hover:text-[#0a2225]"
-                  }`
-                }
-              >
-                {item.label}
-              </NavLink>
-            ))}
-          </nav>
-        </div>
+      <div
+        className="border-b border-[#E5DFC6] bg-[#FDF9F0]/95 backdrop-blur sticky z-20 shadow-[0_1px_0_rgba(10,34,37,0.04)]"
+        style={{ top: "var(--header-height)" }}
+      >
+        <nav
+          className="max-w-7xl mx-auto px-6 py-3 flex items-center gap-x-5 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden text-xs"
+          aria-label="Newsroom sections"
+        >
+          {navItems.slice(1).map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.end}
+              className={({ isActive }) =>
+                `tracking-wide uppercase transition-colors shrink-0 ${
+                  isActive
+                    ? "text-[#0c4d47] font-semibold"
+                    : "text-[#0a2225]/60 hover:text-[#0a2225]"
+                }`
+              }
+            >
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
       </div>
       <Outlet />
     </div>
