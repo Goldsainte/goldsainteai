@@ -94,6 +94,20 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // 🔒 AUTH: admin only
+    const authHeader = req.headers.get('Authorization') ?? '';
+    if (!authHeader.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } });
+    }
+    const { data: { user } } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
+    if (!user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } });
+    }
+    const { data: roles } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
+    if (!roles?.some((r: { role: string }) => r.role === 'admin')) {
+      return new Response(JSON.stringify({ error: 'Forbidden: admin only' }), { status: 403, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } });
+    }
+
     const { numCreators = 15, mode = 'new', skipCheck = false } = await req.json().catch(() => ({}));
 
     // Check existing data unless skipCheck is true
