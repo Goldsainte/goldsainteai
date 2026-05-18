@@ -38,5 +38,5 @@ SET
   hero_image_alt = 'A designer hotel suite at blue hour with a distant city skyline.',
   hero_image_credit = 'Photograph for Goldsainte',
   og_image_url = 'https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/newsroom-media/articles/hero-press-launch.jpg',
-  press_contact_email = COALESCE(press_contact_email, 'press@goldsainte.ai')
+  press_contact_email = COALESCE(press_contact_email, 'press@goldsainte.com')
 WHERE slug = 'goldsainte-launches-ai-powered-travel-marketplace';

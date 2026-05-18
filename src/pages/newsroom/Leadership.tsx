@@ -132,10 +132,10 @@ export default function Leadership() {
           <p className="text-base text-[#0a2225]/80 leading-relaxed self-center">
             For interviews, speaking requests, media inquiries, or founder commentary, contact{" "}
             <a
-              href="mailto:press@goldsainte.ai"
+              href="mailto:press@goldsainte.com"
               className="text-[#0c4d47] underline underline-offset-4 hover:text-[#0a2225]"
             >
-              press@goldsainte.ai
+              press@goldsainte.com
             </a>
             .
           </p>
