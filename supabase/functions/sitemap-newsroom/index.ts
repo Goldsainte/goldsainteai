@@ -49,8 +49,12 @@ Deno.serve(async (req) => {
       const loc = `${BASE_URL}/newsroom/${segment}/${a.slug}`;
       const pub = a.published_at ? new Date(a.published_at).toISOString() : new Date().toISOString();
       const mod = a.updated_at ? new Date(a.updated_at).toISOString() : pub;
+      const isRecent = a.published_at && (Date.now() - new Date(a.published_at).getTime()) < 2 * 24 * 60 * 60 * 1000;
+      const newsBlock = isRecent
+        ? `\n    <news:news>\n      <news:publication>\n        <news:name>Goldsainte Newsroom</news:name>\n        <news:language>en</news:language>\n      </news:publication>\n      <news:publication_date>${pub}</news:publication_date>\n      <news:title>${esc(a.title)}</news:title>\n    </news:news>`
+        : "";
       urls.push(
-        `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${mod}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.8</priority>\n    <news:news>\n      <news:publication>\n        <news:name>Goldsainte Newsroom</news:name>\n        <news:language>en</news:language>\n      </news:publication>\n      <news:publication_date>${pub}</news:publication_date>\n      <news:title>${esc(a.title)}</news:title>\n    </news:news>\n  </url>`,
+        `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${mod}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.8</priority>${newsBlock}\n  </url>`,
       );
     }
 
