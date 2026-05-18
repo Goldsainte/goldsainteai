@@ -24,6 +24,10 @@ import secondaryHorizontalGold from "@/assets/newsroom/logos/secondary-horizonta
 import secondaryHorizontalGreen from "@/assets/newsroom/logos/secondary-horizontal-green.png";
 import secondaryVerticalGold from "@/assets/newsroom/logos/secondary-vertical-gold.png";
 import secondaryVerticalGreen from "@/assets/newsroom/logos/secondary-vertical-green.png";
+import wordmarkGold from "@/assets/newsroom/logos/wordmark-gold.png";
+import wordmarkGreen from "@/assets/newsroom/logos/wordmark-green.png";
+import logomarkSealGold from "@/assets/newsroom/logos/logomark-seal-gold.png";
+import logomarkSealGreen from "@/assets/newsroom/logos/logomark-seal-green.png";
 
 const COLORS = [
   { name: "Cream", role: "Primary surface", hex: "#FDF9F0", text: "#0a2225" },
@@ -152,6 +156,22 @@ const LOGO_GROUPS: { title: string; subtitle: string; items: LogoAsset[] }[] = [
     items: [
       { src: logomarkGold, alt: "Goldsainte monogram in gold.", label: "Monogram", variant: "Gold", filename: "goldsainte-monogram-gold.png", bg: "dark", fit: "square" },
       { src: logomarkGreen, alt: "Goldsainte monogram in forest green.", label: "Monogram", variant: "Green", filename: "goldsainte-monogram-green.png", bg: "light", fit: "square" },
+    ],
+  },
+  {
+    title: "Wordmark",
+    subtitle: "Typographic wordmark for press headers, captions, and horizontal lockups where the seal is omitted.",
+    items: [
+      { src: wordmarkGold, alt: "Goldsainte wordmark in gold.", label: "Wordmark", variant: "Gold", filename: "goldsainte-wordmark-gold.png", bg: "dark", fit: "wide" },
+      { src: wordmarkGreen, alt: "Goldsainte wordmark in forest green.", label: "Wordmark", variant: "Green", filename: "goldsainte-wordmark-green.png", bg: "light", fit: "wide" },
+    ],
+  },
+  {
+    title: "Logomark Seal",
+    subtitle: "Circular seal lockup for stamps, badges, certificates, and crested applications.",
+    items: [
+      { src: logomarkSealGold, alt: "Goldsainte circular logomark seal in gold.", label: "Logomark Seal", variant: "Gold", filename: "goldsainte-logomark-seal-gold.png", bg: "dark", fit: "square" },
+      { src: logomarkSealGreen, alt: "Goldsainte circular logomark seal in forest green.", label: "Logomark Seal", variant: "Green", filename: "goldsainte-logomark-seal-green.png", bg: "light", fit: "square" },
     ],
   },
 ];
