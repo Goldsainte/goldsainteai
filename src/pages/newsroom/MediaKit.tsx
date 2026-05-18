@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Copy, Check, Download, ArrowUpRight } from "lucide-react";
+import JSZip from "jszip";
 import {
   BASE_URL,
   COMPANY_BOILERPLATE_LONG,
@@ -107,116 +108,46 @@ const PRESS_PACKS = [
   },
 ];
 
-type LogoAsset = {
-  src: string;
-  alt: string;
-  label: string;
-  variant: "Gold" | "Green";
-  filename: string;
-  bg: "light" | "dark";
-  fit: "wide" | "tall" | "square";
-};
-
-const LOGO_GROUPS: { title: string; subtitle: string; items: LogoAsset[] }[] = [
-  {
-    title: "Primary Logo · Horizontal",
-    subtitle: "Default lockup for editorial layouts, headers, and partner placements.",
-    items: [
-      { src: primaryHorizontalGold, alt: "Goldsainte primary horizontal logo in gold.", label: "Primary Horizontal", variant: "Gold", filename: "goldsainte-primary-horizontal-gold.png", bg: "dark", fit: "wide" },
-      { src: primaryHorizontalGreen, alt: "Goldsainte primary horizontal logo in forest green.", label: "Primary Horizontal", variant: "Green", filename: "goldsainte-primary-horizontal-green.png", bg: "light", fit: "wide" },
-    ],
-  },
-  {
-    title: "Primary Logo · Vertical",
-    subtitle: "Stacked lockup for portrait formats, covers, and centered compositions.",
-    items: [
-      { src: primaryVerticalGold, alt: "Goldsainte primary vertical logo in gold.", label: "Primary Vertical", variant: "Gold", filename: "goldsainte-primary-vertical-gold.png", bg: "dark", fit: "tall" },
-      { src: primaryVerticalGreen, alt: "Goldsainte primary vertical logo in forest green.", label: "Primary Vertical", variant: "Green", filename: "goldsainte-primary-vertical-green.png", bg: "light", fit: "tall" },
-    ],
-  },
-  {
-    title: "Secondary Logo · Horizontal",
-    subtitle: "Refined horizontal lockup without the surrounding seal.",
-    items: [
-      { src: secondaryHorizontalGold, alt: "Goldsainte secondary horizontal logo in gold.", label: "Secondary Horizontal", variant: "Gold", filename: "goldsainte-secondary-horizontal-gold.png", bg: "dark", fit: "wide" },
-      { src: secondaryHorizontalGreen, alt: "Goldsainte secondary horizontal logo in forest green.", label: "Secondary Horizontal", variant: "Green", filename: "goldsainte-secondary-horizontal-green.png", bg: "light", fit: "wide" },
-    ],
-  },
-  {
-    title: "Secondary Logo · Vertical",
-    subtitle: "Stacked monogram and wordmark without the surrounding seal.",
-    items: [
-      { src: secondaryVerticalGold, alt: "Goldsainte secondary vertical logo in gold.", label: "Secondary Vertical", variant: "Gold", filename: "goldsainte-secondary-vertical-gold.png", bg: "dark", fit: "tall" },
-      { src: secondaryVerticalGreen, alt: "Goldsainte secondary vertical logo in forest green.", label: "Secondary Vertical", variant: "Green", filename: "goldsainte-secondary-vertical-green.png", bg: "light", fit: "tall" },
-    ],
-  },
-  {
-    title: "Monogram",
-    subtitle: "Standalone seal for avatars, favicons, app icons, and tight crops.",
-    items: [
-      { src: logomarkGold, alt: "Goldsainte monogram in gold.", label: "Monogram", variant: "Gold", filename: "goldsainte-monogram-gold.png", bg: "dark", fit: "square" },
-      { src: logomarkGreen, alt: "Goldsainte monogram in forest green.", label: "Monogram", variant: "Green", filename: "goldsainte-monogram-green.png", bg: "light", fit: "square" },
-    ],
-  },
-  {
-    title: "Wordmark",
-    subtitle: "Typographic wordmark for press headers, captions, and horizontal lockups where the seal is omitted.",
-    items: [
-      { src: wordmarkGold, alt: "Goldsainte wordmark in gold.", label: "Wordmark", variant: "Gold", filename: "goldsainte-wordmark-gold.png", bg: "dark", fit: "wide" },
-      { src: wordmarkGreen, alt: "Goldsainte wordmark in forest green.", label: "Wordmark", variant: "Green", filename: "goldsainte-wordmark-green.png", bg: "light", fit: "wide" },
-    ],
-  },
-  {
-    title: "Logomark Seal",
-    subtitle: "Circular seal lockup for stamps, badges, certificates, and crested applications.",
-    items: [
-      { src: logomarkSealGold, alt: "Goldsainte circular logomark seal in gold.", label: "Logomark Seal", variant: "Gold", filename: "goldsainte-logomark-seal-gold.png", bg: "dark", fit: "square" },
-      { src: logomarkSealGreen, alt: "Goldsainte circular logomark seal in forest green.", label: "Logomark Seal", variant: "Green", filename: "goldsainte-logomark-seal-green.png", bg: "light", fit: "square" },
-    ],
-  },
+const LOGO_FILES: { src: string; filename: string }[] = [
+  { src: primaryHorizontalGold, filename: "goldsainte-primary-horizontal-gold.png" },
+  { src: primaryHorizontalGreen, filename: "goldsainte-primary-horizontal-green.png" },
+  { src: primaryVerticalGold, filename: "goldsainte-primary-vertical-gold.png" },
+  { src: primaryVerticalGreen, filename: "goldsainte-primary-vertical-green.png" },
+  { src: secondaryHorizontalGold, filename: "goldsainte-secondary-horizontal-gold.png" },
+  { src: secondaryHorizontalGreen, filename: "goldsainte-secondary-horizontal-green.png" },
+  { src: secondaryVerticalGold, filename: "goldsainte-secondary-vertical-gold.png" },
+  { src: secondaryVerticalGreen, filename: "goldsainte-secondary-vertical-green.png" },
+  { src: logomarkGold, filename: "goldsainte-monogram-gold.png" },
+  { src: logomarkGreen, filename: "goldsainte-monogram-green.png" },
+  { src: wordmarkGold, filename: "goldsainte-wordmark-gold.png" },
+  { src: wordmarkGreen, filename: "goldsainte-wordmark-green.png" },
+  { src: logomarkSealGold, filename: "goldsainte-logomark-seal-gold.png" },
+  { src: logomarkSealGreen, filename: "goldsainte-logomark-seal-green.png" },
 ];
 
-function LogoTile({ asset }: { asset: LogoAsset }) {
-  const isDark = asset.bg === "dark";
-  const aspect =
-    asset.fit === "square" ? "aspect-square" : asset.fit === "tall" ? "aspect-[3/4]" : "aspect-[5/2]";
-  const maxH =
-    asset.fit === "square" ? "max-h-20" : asset.fit === "tall" ? "max-h-32" : "max-h-12";
-  return (
-    <div className="group rounded-sm overflow-hidden border border-[#0a2225]/10 bg-white shadow-[0_8px_24px_-18px_rgba(10,34,37,0.25)] hover:shadow-[0_24px_60px_-28px_rgba(10,34,37,0.4)] transition-all duration-500">
-      <div
-        className={`relative ${aspect} flex items-center justify-center px-10 md:px-16 py-10 ${
-          isDark ? "bg-[#0a2225]" : "bg-[#FDF9F0]"
-        }`}
-      >
-        <span
-          className="absolute top-3 left-3 text-[9px] tracking-[0.28em] uppercase"
-          style={{ color: isDark ? "rgba(253,249,240,0.55)" : "rgba(10,34,37,0.45)" }}
-        >
-          {asset.label} · {asset.variant}
-        </span>
-        <img
-          src={asset.src}
-          alt={asset.alt}
-          className={`${maxH} max-w-full object-contain`}
-          loading="lazy"
-        />
-      </div>
-      <div className="flex items-center justify-between px-5 py-4 bg-[#FDF9F0] border-t border-[#0a2225]/10">
-        <span className="text-[10px] tracking-[0.25em] uppercase text-[#0a2225]/60">
-          PNG · {asset.variant}
-        </span>
-        <a
-          href={asset.src}
-          download={asset.filename}
-          className="inline-flex items-center gap-1.5 text-[10px] tracking-[0.25em] uppercase text-[#0c4d47] hover:text-[#0a2225] transition-colors"
-        >
-          <Download className="h-3 w-3" />
-          Download
-        </a>
-      </div>
-    </div>
+async function downloadLogoAssets() {
+  const zip = new JSZip();
+  const folder = zip.folder("Goldsainte-Logo-Assets")!;
+  await Promise.all(
+    LOGO_FILES.map(async (f) => {
+      const res = await fetch(f.src);
+      const blob = await res.blob();
+      folder.file(f.filename, blob);
+    })
   );
+  folder.file(
+    "USAGE.txt",
+    "Goldsainte Logo Assets\n\nUsage: Maintain minimum clear space equal to the height of the monogram. Do not recolor, distort, rotate, or apply effects. Use green marks on cream or light surfaces; use gold marks on dark or photographic backgrounds.\n\nFor SVG masters or custom formats, contact press@goldsainte.ai."
+  );
+  const blob = await zip.generateAsync({ type: "blob" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "Goldsainte-Logo-Assets.zip";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 function ColorCard({ c }: { c: typeof COLORS[number] }) {
