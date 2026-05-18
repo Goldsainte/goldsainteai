@@ -41,8 +41,8 @@ export default function NewsroomLanding() {
         <meta name="description" content="Press releases, company updates, and editorial coverage from Goldsainte — the AI-powered travel marketplace." />
         <link rel="canonical" href={`${BASE_URL}/newsroom`} />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="Goldsainte Newsroom" />
-        <meta property="og:description" content="News from the future of travel." />
+        <meta property="og:title" content="The Goldsainte Newsroom" />
+        <meta property="og:description" content="Press releases, company announcements, and editorial coverage from the team building the future of trip design." />
         <meta property="og:url" content={`${BASE_URL}/newsroom`} />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
@@ -58,38 +58,43 @@ export default function NewsroomLanding() {
         })}</script>
       </Helmet>
 
-      <section className="max-w-7xl mx-auto px-6 pt-20 pb-16">
-        <p className="text-[11px] tracking-[0.3em] uppercase text-[#0c4d47] mb-6">Goldsainte Newsroom</p>
-        <h1 className="font-secondary text-5xl md:text-7xl leading-[1.05] tracking-tight max-w-4xl mb-6">
-          News from the future of travel.
-        </h1>
-        <p className="text-lg md:text-xl text-[#0a2225]/70 max-w-2xl mb-10 leading-relaxed">
-          Press releases, company updates, and editorial coverage of the travel marketplace transformation.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
-          <a
-            href="mailto:press@goldsainte.com"
-            className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-[#0c4d47] text-white text-sm tracking-wide hover:bg-[#0a3d39] transition"
-          >
-            Press inquiries
-          </a>
-          <form onSubmit={subscribe} className="flex border border-[#E5DFC6] bg-white">
-            <input
-              type="email"
-              required
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="px-4 py-3 text-sm bg-transparent outline-none w-64"
-            />
-            <button
-              type="submit"
-              disabled={submitting}
-              className="px-5 py-3 text-xs tracking-wide uppercase border-l border-[#E5DFC6] hover:bg-[#f0ead9] disabled:opacity-50"
+      <section className="max-w-7xl mx-auto px-6 pt-16 pb-10">
+        <p className="text-[11px] tracking-[0.3em] uppercase text-[#0c4d47] mb-5">Goldsainte Newsroom</p>
+        <div className="grid md:grid-cols-[1.1fr_1fr] gap-10 items-end">
+          <div>
+            <h1 className="font-secondary text-5xl md:text-6xl leading-[1.05] tracking-tight mb-5">
+              The Goldsainte Newsroom
+            </h1>
+            <p className="text-base md:text-lg text-[#0a2225]/70 max-w-xl leading-relaxed">
+              Press releases, company announcements, and editorial coverage from the team
+              building the future of trip design.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
+            <a
+              href="mailto:press@goldsainte.com"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-[#0c4d47] text-white text-sm tracking-wide hover:bg-[#0a3d39] transition"
             >
-              {submitting ? "…" : "Subscribe"}
-            </button>
-          </form>
+              Press inquiries
+            </a>
+            <form onSubmit={subscribe} className="flex rounded-full border border-[#E5DFC6] bg-white overflow-hidden">
+              <input
+                type="email"
+                required
+                placeholder="your@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="px-4 py-3 text-sm bg-transparent outline-none w-56"
+              />
+              <button
+                type="submit"
+                disabled={submitting}
+                className="px-5 py-3 text-xs tracking-wide uppercase border-l border-[#E5DFC6] hover:bg-[#f0ead9] disabled:opacity-50"
+              >
+                {submitting ? "…" : "Subscribe"}
+              </button>
+            </form>
+          </div>
         </div>
       </section>
 
@@ -99,7 +104,7 @@ export default function NewsroomLanding() {
             to={articlePath(featured)}
             className="grid md:grid-cols-2 gap-10 group items-stretch"
           >
-            <div className="aspect-[4/3] bg-[#F6F0E4] overflow-hidden">
+            <div className="aspect-[4/3] bg-[#F6F0E4] overflow-hidden rounded-2xl">
               {featured.hero_image_url && (
                 <img
                   src={featured.hero_image_url}
@@ -125,14 +130,12 @@ export default function NewsroomLanding() {
       )}
 
       <section className="border-t border-[#E5DFC6]">
-        <div className="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-3 gap-12">
+        <div className={`max-w-7xl mx-auto px-6 py-20 grid gap-12 ${EXTERNAL_PRESS.length > 0 ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
           <Column title="Recent Press Releases" items={pressReleases} emptyText="No press releases yet." />
           <Column title="Company News" items={news} emptyText="No company news yet." />
-          <div>
-            <h3 className="font-secondary text-2xl mb-6">In the Press</h3>
-            {EXTERNAL_PRESS.length === 0 ? (
-              <p className="text-sm text-[#0a2225]/50 italic">Coverage links coming soon.</p>
-            ) : (
+          {EXTERNAL_PRESS.length > 0 && (
+            <div>
+              <h3 className="font-secondary text-2xl mb-6">In the Press</h3>
               <ul className="space-y-5">
                 {EXTERNAL_PRESS.map((p, i) => (
                   <li key={i}>
@@ -144,8 +147,8 @@ export default function NewsroomLanding() {
                   </li>
                 ))}
               </ul>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </section>
 
