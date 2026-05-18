@@ -65,7 +65,6 @@ export default function Archive() {
         <NewsroomPageHeader
           eyebrow="Goldsainte Newsroom · Archive"
           title="All Coverage"
-          centered
           className="mb-8 sm:mb-12"
           intro={
             <p className="max-w-xl">
