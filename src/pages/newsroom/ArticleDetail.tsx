@@ -107,7 +107,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         </Link>
 
         <p className="mt-10 text-[10px] tracking-[0.3em] uppercase text-[#C7A962]">{typeLabel}</p>
-        <h1 className="font-secondary text-xl md:text-2xl md:text-4xl leading-[1.05] mt-4">{article.title}</h1>
+        <h1 className="font-secondary text-2xl md:text-4xl leading-[1.05] mt-4">{article.title}</h1>
         {article.subtitle && (
           <p className="font-secondary text-xl md:text-2xl text-[#0a2225]/70 mt-5 leading-snug">
             {article.subtitle}

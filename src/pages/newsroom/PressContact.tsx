@@ -81,7 +81,7 @@ export default function PressContact() {
         <link rel="canonical" href={`${BASE_URL}/newsroom/press-contact`} />
       </Helmet>
       <div className="max-w-2xl mx-auto px-6 py-20">
-        <h1 className="font-secondary text-xl md:text-2xl md:text-3xl md:text-4xl mb-4">Press Contact</h1>
+        <h1 className="font-secondary text-3xl md:text-4xl mb-4">Press Contact</h1>
         <p className="text-[#0a2225]/70 mb-10">
           For interview requests, demos, or industry commentary, submit the form below or email{" "}
           <a href="mailto:press@goldsainte.com" className="text-[#0c4d47] underline">press@goldsainte.com</a>.

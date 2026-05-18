@@ -28,7 +28,7 @@ export default function MediaKit() {
       </Helmet>
       <div className="max-w-5xl mx-auto px-6 py-20 space-y-20">
         <header>
-          <h1 className="font-secondary text-xl md:text-2xl md:text-3xl md:text-4xl mb-4">Media Kit</h1>
+          <h1 className="font-secondary text-3xl md:text-4xl mb-4">Media Kit</h1>
           <p className="text-[#0a2225]/70 max-w-2xl">
             Logos, headshots, product imagery, and approved boilerplate for editorial use.
             For custom requests, email{" "}
@@ -43,7 +43,7 @@ export default function MediaKit() {
         </header>
 
         <section>
-          <h2 className="font-secondary text-xl md:text-2xl md:text-3xl mb-6">Brand Colors</h2>
+          <h2 className="font-secondary text-2xl md:text-3xl mb-6">Brand Colors</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {COLORS.map((c) => (
               <button
@@ -62,10 +62,10 @@ export default function MediaKit() {
         </section>
 
         <section>
-          <h2 className="font-secondary text-xl md:text-2xl md:text-3xl mb-6">Typography</h2>
+          <h2 className="font-secondary text-2xl md:text-3xl mb-6">Typography</h2>
           <div className="grid md:grid-cols-2 gap-6 text-sm">
             <div className="border border-[#0a2225]/15 p-6">
-              <p className="font-secondary text-xl md:text-2xl md:text-3xl mb-2">Serif Display</p>
+              <p className="font-secondary text-2xl md:text-3xl mb-2">Serif Display</p>
               <p className="text-[#0a2225]/60">Used for headlines and editorial titles.</p>
             </div>
             <div className="border border-[#0a2225]/15 p-6">
@@ -76,7 +76,7 @@ export default function MediaKit() {
         </section>
 
         <section>
-          <h2 className="font-secondary text-xl md:text-2xl md:text-3xl mb-6">Approved Boilerplate</h2>
+          <h2 className="font-secondary text-2xl md:text-3xl mb-6">Approved Boilerplate</h2>
           <div className="space-y-6">
             {[
               ["~30 words", COMPANY_BOILERPLATE_SHORT],
@@ -100,7 +100,7 @@ export default function MediaKit() {
         </section>
 
         <section>
-          <h2 className="font-secondary text-xl md:text-2xl md:text-3xl mb-6">Logos & Headshots</h2>
+          <h2 className="font-secondary text-2xl md:text-3xl mb-6">Logos & Headshots</h2>
           <p className="text-sm text-[#0a2225]/60 max-w-xl">
             High-resolution logo files (PNG/SVG, light & dark) and founder headshots are available on request.
             Email <a className="text-[#0c4d47] underline" href="mailto:press@goldsainte.com">press@goldsainte.com</a>.

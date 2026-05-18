@@ -62,7 +62,7 @@ export default function NewsroomLanding() {
         <p className="text-[11px] tracking-[0.3em] uppercase text-[#0c4d47] mb-5">Goldsainte Newsroom</p>
         <div className="grid md:grid-cols-[1.1fr_1fr] gap-10 items-end">
           <div>
-            <h1 className="font-secondary text-xl md:text-2xl md:text-4xl leading-[1.05] tracking-tight mb-5">
+            <h1 className="font-secondary text-2xl md:text-4xl leading-[1.05] tracking-tight mb-5">
               The Goldsainte Newsroom
             </h1>
             <p className="text-sm md:text-base text-[#0a2225]/70 max-w-xl leading-relaxed">
@@ -117,7 +117,7 @@ export default function NewsroomLanding() {
               <span className="text-[10px] tracking-[0.3em] uppercase text-[#C7A962] mb-4">
                 Featured · {featured.type === "press_release" ? "Press Release" : featured.type}
               </span>
-              <h2 className="font-secondary text-xl md:text-2xl md:text-4xl leading-tight mb-5 group-hover:text-[#0c4d47] transition">
+              <h2 className="font-secondary text-2xl md:text-4xl leading-tight mb-5 group-hover:text-[#0c4d47] transition">
                 {featured.title}
               </h2>
               <p className="text-[#0a2225]/70 leading-relaxed mb-6 text-lg">{featured.excerpt}</p>
