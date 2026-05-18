@@ -60,19 +60,19 @@ export default function NewsroomLanding() {
       </Helmet>
 
       {/* Editorial masthead — newspaper nameplate */}
-      <section className="max-w-7xl mx-auto px-6 pt-24 pb-16 text-center">
-        <p className="text-[11px] tracking-[0.35em] uppercase text-[#0c4d47] mb-6">
+      <section className="max-w-7xl mx-auto px-5 sm:px-6 pt-14 sm:pt-20 md:pt-24 pb-10 md:pb-16 text-center">
+        <p className="text-[10px] sm:text-[11px] tracking-[0.28em] sm:tracking-[0.35em] uppercase text-[#0c4d47] mb-5 md:mb-6">
           Vol. 1 · The Goldsainte Press
         </p>
-        <h1 className="font-primary text-[56px] md:text-[80px] leading-[0.95] tracking-tight text-[#0a2225]">
+        <h1 className="font-primary text-[44px] sm:text-[56px] md:text-[80px] leading-[0.95] tracking-tight text-[#0a2225]">
           Newsroom
         </h1>
-        <div className="mt-8 mx-auto max-w-3xl border-t-2 border-[#C7A962]" />
-        <p className="mt-6 text-sm md:text-base text-[#0a2225]/70 max-w-2xl mx-auto leading-relaxed">
+        <div className="mt-6 md:mt-8 mx-auto max-w-3xl border-t-2 border-[#C7A962]" />
+        <p className="mt-5 md:mt-6 text-sm md:text-base text-[#0a2225]/70 max-w-2xl mx-auto leading-relaxed">
           Press releases, company announcements, and editorial coverage from the team
           building the future of trip design.
         </p>
-        <div className="mt-7 flex justify-center">
+        <div className="mt-6 md:mt-7 flex justify-center">
           <a
             href="mailto:press@goldsainte.com"
             className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-[#0c4d47] text-white text-xs tracking-[0.2em] uppercase hover:bg-[#0a3d39] transition"
@@ -83,9 +83,9 @@ export default function NewsroomLanding() {
       </section>
 
       {featured && (
-        <section className="max-w-7xl mx-auto px-6 pb-16">
+        <section className="max-w-7xl mx-auto px-5 sm:px-6 pb-12 md:pb-16">
           <Link to={articlePath(featured)} className="group block">
-            <div className="relative w-full aspect-[21/9] overflow-hidden rounded-2xl">
+            <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] md:aspect-[21/9] overflow-hidden rounded-xl md:rounded-2xl">
               {featured.hero_image_url ? (
                 <img
                   src={featured.hero_image_url}
@@ -98,14 +98,14 @@ export default function NewsroomLanding() {
                 </div>
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/85 via-[#0a2225]/30 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-6 md:p-12 max-w-4xl">
-                <span className="text-[10px] tracking-[0.3em] uppercase text-[#C7A962] mb-3 block">
+              <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6 md:p-12 max-w-4xl">
+                <span className="text-[10px] tracking-[0.25em] sm:tracking-[0.3em] uppercase text-[#C7A962] mb-2 sm:mb-3 block">
                   Featured · {featured.type === "press_release" ? "Press Release" : featured.type}
                 </span>
-                <h2 className="font-primary text-white text-3xl md:text-5xl leading-[1.05] tracking-tight mb-4 group-hover:text-[#FDF9F0] transition">
+                <h2 className="font-primary text-white text-2xl sm:text-3xl md:text-5xl leading-[1.05] tracking-tight mb-3 sm:mb-4 group-hover:text-[#FDF9F0] transition">
                   {featured.title}
                 </h2>
-                <p className="text-white/80 leading-relaxed text-sm md:text-base max-w-2xl mb-3 line-clamp-2">
+                <p className="hidden sm:block text-white/80 leading-relaxed text-sm md:text-base max-w-2xl mb-3 line-clamp-2">
                   {featured.excerpt}
                 </p>
                 <span className="text-[11px] uppercase tracking-[0.2em] text-white/70">
@@ -119,10 +119,10 @@ export default function NewsroomLanding() {
 
       {/* Subscribe strip */}
       <section className="border-y border-[#E5DFC6] bg-[#F6F0E4]/50">
-        <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 py-8 md:py-10 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
           <div>
             <p className="text-[10px] tracking-[0.3em] uppercase text-[#C7A962] mb-1.5">Stay informed</p>
-            <p className="font-primary text-xl md:text-2xl text-[#0a2225] leading-snug">
+            <p className="font-primary text-lg sm:text-xl md:text-2xl text-[#0a2225] leading-snug">
               Newsroom updates, delivered when news breaks.
             </p>
           </div>
@@ -133,12 +133,12 @@ export default function NewsroomLanding() {
               placeholder="your@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="px-5 py-3 text-sm bg-transparent outline-none flex-1 md:w-72"
+              className="px-4 sm:px-5 py-3 text-sm bg-transparent outline-none flex-1 min-w-0 md:w-72"
             />
             <button
               type="submit"
               disabled={submitting}
-              className="px-6 py-3 text-[11px] tracking-[0.2em] uppercase border-l border-[#E5DFC6] hover:bg-[#f0ead9] disabled:opacity-50"
+              className="flex-shrink-0 px-5 sm:px-6 py-3 text-[11px] tracking-[0.2em] uppercase border-l border-[#E5DFC6] hover:bg-[#f0ead9] disabled:opacity-50"
             >
               {submitting ? "…" : "Subscribe"}
             </button>
@@ -147,7 +147,7 @@ export default function NewsroomLanding() {
       </section>
 
       <section className="border-t border-[#E5DFC6]">
-        <div className={`max-w-7xl mx-auto px-6 py-20 grid gap-12 ${EXTERNAL_PRESS.length > 0 ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
+        <div className={`max-w-7xl mx-auto px-5 sm:px-6 py-12 md:py-20 grid gap-10 md:gap-12 ${EXTERNAL_PRESS.length > 0 ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
           <Column title="Recent Press Releases" items={pressReleases} emptyText="No press releases yet." />
           <Column title="Company News" items={news} emptyText="No company news yet." />
           {EXTERNAL_PRESS.length > 0 && (

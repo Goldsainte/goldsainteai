@@ -47,7 +47,7 @@ export default function CompanyFacts() {
           email: "press@goldsainte.com",
         })}</script>
       </Helmet>
-      <div className="max-w-5xl mx-auto px-6 py-20 md:py-28 space-y-24 md:space-y-32">
+      <div className="max-w-5xl mx-auto px-5 sm:px-6 py-12 md:py-28 space-y-16 md:space-y-32">
         {/* Hero */}
         <section>
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-6">Company Facts</p>

@@ -14,7 +14,7 @@ export default function EditorialPolicy() {
         <link rel="canonical" href={`${BASE_URL}/newsroom/editorial-policy`} />
       </Helmet>
 
-      <div className="max-w-2xl mx-auto px-6 py-20 md:py-28">
+      <div className="max-w-2xl mx-auto px-5 sm:px-6 py-12 md:py-28">
         {/* Hero */}
         <header className="mb-20 md:mb-24 animate-fade-in">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-5">
