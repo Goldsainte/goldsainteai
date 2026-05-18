@@ -511,54 +511,6 @@ export default function MediaKit() {
           </div>
         </section>
 
-        {/* FOUNDER */}
-        <section className="max-w-5xl mx-auto px-6 py-20 md:py-28">
-          <div className="grid md:grid-cols-12 gap-10 items-center">
-            <div className="md:col-span-5">
-              <div className="aspect-[4/5] overflow-hidden rounded-sm border border-[#E5DFC6] shadow-[0_20px_50px_-20px_rgba(10,34,37,0.25)]">
-                <img
-                  src={founderImage}
-                  alt="Andre C. Powell, Jr., founder and CEO of Goldsainte."
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
-              </div>
-            </div>
-            <div className="md:col-span-7">
-              <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
-                06 — Executive Imagery
-              </p>
-              <h2 className="font-secondary text-2xl md:text-3xl mt-3 text-[#0a2225]">
-                Andre C. Powell, Jr.
-              </h2>
-              <p className="text-[11px] tracking-[0.22em] uppercase text-[#0a2225]/55 mt-2">
-                Founder &amp; Chief Executive Officer
-              </p>
-              <p className="text-base text-[#0a2225]/75 mt-6 leading-relaxed">
-                High-resolution editorial portraits, broadcast-ready headshots, and
-                approved short and long-form biographies are available for press
-                profiles, interviews, and panel materials.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <a
-                  href="mailto:press@goldsainte.com?subject=Founder%20headshots%20request"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0c4d47] text-[#FDF9F0] text-[11px] tracking-[0.22em] uppercase hover:bg-[#0a3d39] transition-colors"
-                >
-                  <Download className="h-3.5 w-3.5" />
-                  Request headshot pack
-                </a>
-                <Link
-                  to="/newsroom/leadership"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#E5DFC6] text-[#0a2225] text-[11px] tracking-[0.22em] uppercase hover:border-[#0c4d47] hover:text-[#0c4d47] transition-colors"
-                >
-                  Founder profile
-                  <ArrowUpRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* PRESS PACKS */}
         <section
           id="press-packs"
