@@ -172,7 +172,7 @@ function Section({
           {eyebrow}
         </p>
       )}
-      <h2 className="font-secondary text-xl md:text-2xl leading-tight mb-6 text-[#0a2225]">
+      <h2 className="font-secondary text-[22px] md:text-2xl leading-tight mb-5 md:mb-6 text-[#0a2225]">
         {title}
       </h2>
       <div className="space-y-5 text-base text-[#0a2225]/80 leading-relaxed">
