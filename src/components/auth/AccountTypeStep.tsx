@@ -94,6 +94,19 @@ export function AccountTypeStep({ onComplete }: Props) {
         console.error("Error updating profile", upsertError);
         setError("Could not save your profile. Please try again.");
       } else {
+        // Fire one-time welcome email for travelers (idempotent per user id).
+        if (accountType === "traveler" && user.email) {
+          supabase.functions
+            .invoke("send-transactional-email", {
+              body: {
+                templateName: "welcome-traveler",
+                recipientEmail: user.email,
+                idempotencyKey: `welcome-traveler-${user.id}`,
+                templateData: { name: firstName.trim() || undefined },
+              },
+            })
+            .catch((e) => console.error("welcome-traveler email failed:", e));
+        }
         onComplete();
       }
     } finally {
