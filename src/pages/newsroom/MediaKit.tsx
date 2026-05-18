@@ -288,17 +288,17 @@ export default function MediaKit() {
               Approved logos, executive imagery, editorial assets, and brand materials
               for media and press use.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-8 flex flex-col sm:flex-row sm:flex-wrap gap-3">
               <a
                 href="#press-packs"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0c4d47] text-[#FDF9F0] text-[10px] tracking-[0.24em] uppercase hover:bg-[#0a3d39] transition-colors"
+                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#0c4d47] text-[#FDF9F0] text-[10px] tracking-[0.24em] uppercase hover:bg-[#0a3d39] transition-colors"
               >
                 <Download className="h-3.5 w-3.5" />
                 Download press packs
               </a>
               <a
                 href="mailto:press@goldsainte.com?subject=Goldsainte%20Media%20Kit%20Request"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-[#FDF9F0]/35 text-[#FDF9F0] text-[10px] tracking-[0.24em] uppercase hover:border-[#FDF9F0] transition-colors"
+                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-6 py-3 rounded-full border border-[#FDF9F0]/35 text-[#FDF9F0] text-[10px] tracking-[0.24em] uppercase hover:border-[#FDF9F0] transition-colors"
               >
                 Request full archive
                 <ArrowUpRight className="h-3.5 w-3.5" />
@@ -363,7 +363,7 @@ export default function MediaKit() {
             />
           </div>
 
-          <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
+          <div className="mt-10 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-4 sm:gap-x-8 sm:gap-y-4">
             <button
               onClick={() => {
                 toast.promise(downloadLogoAssets(), {
@@ -372,14 +372,14 @@ export default function MediaKit() {
                   error: "Download failed. Please try again.",
                 });
               }}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0c4d47] text-[#FDF9F0] text-[11px] tracking-[0.22em] uppercase hover:bg-[#0a3d39] transition-colors"
+              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#0c4d47] text-[#FDF9F0] text-[11px] tracking-[0.22em] uppercase hover:bg-[#0a3d39] transition-colors"
             >
               <Download className="h-3.5 w-3.5" />
               Download Logo Assets
             </button>
             <a
               href="mailto:press@goldsainte.com?subject=Logo%20request%20(SVG)"
-              className="inline-flex items-center gap-2 text-[11px] tracking-[0.22em] uppercase text-[#0c4d47] hover:underline underline-offset-4"
+              className="inline-flex w-full sm:w-auto items-center justify-center sm:justify-start gap-2 text-[11px] tracking-[0.22em] uppercase text-[#0c4d47] hover:underline underline-offset-4"
             >
               Request SVG masters
               <ArrowUpRight className="h-3.5 w-3.5" />
@@ -519,7 +519,7 @@ export default function MediaKit() {
           <div className="max-w-5xl mx-auto px-6 py-20 md:py-28">
             <div className="mb-12">
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
-                07 — Downloads
+                06 — Downloads
               </p>
               <h2 className="font-primary text-2xl md:text-3xl mt-3 text-[#0a2225]">
                 Press Packs
@@ -590,7 +590,7 @@ export default function MediaKit() {
             <div className="grid md:grid-cols-12 gap-10 items-start">
               <div className="md:col-span-7 space-y-6">
                 <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
-                  08 — For the Press
+                  07 — For the Press
                 </p>
                 <h2 className="font-primary text-3xl md:text-5xl leading-[1.1] text-[#0a2225]">
                   For media inquiries, interviews, and founder commentary.
@@ -600,16 +600,16 @@ export default function MediaKit() {
                   time-sensitive editorial deadlines, please note the publication
                   date in your subject line.
                 </p>
-                <div className="flex flex-wrap gap-3 pt-2">
+                <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 pt-2">
                   <a
                     href="mailto:press@goldsainte.com?subject=Press%20inquiry"
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0c4d47] text-[#FDF9F0] text-[11px] tracking-[0.22em] uppercase hover:bg-[#0a3d39] transition-colors"
+                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#0c4d47] text-[#FDF9F0] text-[11px] tracking-[0.22em] uppercase hover:bg-[#0a3d39] transition-colors"
                   >
                     press@goldsainte.com
                   </a>
                   <Link
                     to="/newsroom"
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-[#E5DFC6] text-[#0a2225] text-[11px] tracking-[0.22em] uppercase hover:border-[#0c4d47] hover:text-[#0c4d47] transition-colors"
+                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-6 py-3 rounded-full border border-[#E5DFC6] text-[#0a2225] text-[11px] tracking-[0.22em] uppercase hover:border-[#0c4d47] hover:text-[#0c4d47] transition-colors"
                   >
                     Return to newsroom
                     <ArrowUpRight className="h-3.5 w-3.5" />
