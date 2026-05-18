@@ -8,4 +8,4 @@ Allow: /newsroom
 Allow: /newsroom/
 
 Sitemap: https://goldsainte.ai/sitemap.xml
-Sitemap: https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/sitemap-newsroom
+Sitemap: https://goldsainte.ai/newsroom-sitemap.xml
