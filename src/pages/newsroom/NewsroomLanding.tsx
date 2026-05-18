@@ -61,11 +61,10 @@ export default function NewsroomLanding() {
       </Helmet>
 
       {/* Editorial masthead — newspaper nameplate */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-6 pt-8 sm:pt-12 md:pt-24 pb-8 md:pb-16 text-center">
+      <section className="max-w-7xl mx-auto px-5 sm:px-6 pt-8 sm:pt-12 md:pt-24 pb-8 md:pb-16">
         <NewsroomPageHeader
           eyebrow="Vol. 1 · The Goldsainte Press"
           title="Newsroom"
-          centered
           intro={
             <p className="max-w-2xl">
               Press releases, company announcements, and editorial coverage from the team
@@ -73,8 +72,8 @@ export default function NewsroomLanding() {
             </p>
           }
         />
-        <div className="mt-5 md:mt-8 mx-auto max-w-3xl border-t-2 border-[#C7A962]" />
-        <div className="mt-6 md:mt-7 flex justify-center">
+        <div className="mt-5 md:mt-8 max-w-3xl border-t-2 border-[#C7A962]" />
+        <div className="mt-6 md:mt-7 flex">
           <a
             href="mailto:press@goldsainte.com"
             className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-[#0c4d47] text-white text-xs tracking-[0.2em] uppercase hover:bg-[#0a3d39] transition"
