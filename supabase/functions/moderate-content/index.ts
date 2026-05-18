@@ -108,6 +108,27 @@ serve(async (req) => {
   }
 
   try {
+    // 🔒 AUTH: require an authenticated caller to prevent moderation abuse
+    const supabaseUrlEarly = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKeyEarly = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const authClient = createClient(supabaseUrlEarly, supabaseKeyEarly);
+    const authHeader = req.headers.get('Authorization') ?? '';
+    if (!authHeader.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
+      );
+    }
+    const { data: { user }, error: authError } = await authClient.auth.getUser(
+      authHeader.replace('Bearer ', '')
+    );
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
+      );
+    }
+
     // ⚠️ SECURITY: Parse and validate input
     let rawBody: unknown;
     try {
