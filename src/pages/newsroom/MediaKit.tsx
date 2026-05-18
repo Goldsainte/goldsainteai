@@ -310,7 +310,7 @@ export default function MediaKit() {
 
       <div className="bg-[#FDF9F0]">
         {/* INTRO */}
-        <section className="max-w-5xl mx-auto px-6 py-20 md:py-28">
+        <section className="max-w-5xl mx-auto px-5 sm:px-6 py-12 md:py-28">
           <div className="grid md:grid-cols-12 gap-12 items-start">
             <div className="md:col-span-4">
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
@@ -339,7 +339,7 @@ export default function MediaKit() {
         </div>
 
         {/* LOGOS */}
-        <section className="max-w-5xl mx-auto px-6 py-20 md:py-28">
+        <section className="max-w-5xl mx-auto px-5 sm:px-6 py-12 md:py-28">
           <div className="mb-12 max-w-3xl">
             <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
               02 — Identity
@@ -389,7 +389,7 @@ export default function MediaKit() {
 
         {/* COLOR */}
         <section className="bg-white/60 border-y border-[#E5DFC6]">
-          <div className="max-w-5xl mx-auto px-6 py-20 md:py-28">
+          <div className="max-w-5xl mx-auto px-5 sm:px-6 py-12 md:py-28">
             <div className="mb-12">
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
                 03 — Palette
@@ -411,7 +411,7 @@ export default function MediaKit() {
         </section>
 
         {/* TYPOGRAPHY SHOWCASE */}
-        <section className="max-w-5xl mx-auto px-6 py-20 md:py-28">
+        <section className="max-w-5xl mx-auto px-5 sm:px-6 py-12 md:py-28">
           <div className="mb-12">
             <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
               04 — Typography
@@ -494,7 +494,7 @@ export default function MediaKit() {
 
         {/* BOILERPLATE */}
         <section className="bg-white/60 border-y border-[#E5DFC6]">
-          <div className="max-w-5xl mx-auto px-6 py-20 md:py-28">
+          <div className="max-w-5xl mx-auto px-5 sm:px-6 py-12 md:py-28">
             <div className="mb-10">
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
                 05 — Boilerplate
@@ -516,7 +516,7 @@ export default function MediaKit() {
           id="press-packs"
           className="bg-white/60 border-y border-[#E5DFC6]"
         >
-          <div className="max-w-5xl mx-auto px-6 py-20 md:py-28">
+          <div className="max-w-5xl mx-auto px-5 sm:px-6 py-12 md:py-28">
             <div className="mb-12">
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
                 06 — Downloads
@@ -585,7 +585,7 @@ export default function MediaKit() {
 
         {/* EDITORIAL FOOTER */}
         <section className="bg-[#FDF9F0]">
-          <div className="max-w-5xl mx-auto px-6 py-20 md:py-28">
+          <div className="max-w-5xl mx-auto px-5 sm:px-6 py-12 md:py-28">
             <div className="h-px bg-[#E5DFC6] mb-20" />
             <div className="grid md:grid-cols-12 gap-10 items-start">
               <div className="md:col-span-7 space-y-6">

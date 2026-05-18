@@ -55,7 +55,7 @@ export default function Archive() {
         <link rel="canonical" href={`${BASE_URL}/newsroom/archive`} />
       </Helmet>
 
-      <div className="max-w-5xl mx-auto px-6 py-20">
+      <div className="max-w-5xl mx-auto px-5 sm:px-6 py-12 md:py-20">
         {/* Header */}
         <header className="mb-12 text-center">
           <p className="text-[11px] uppercase tracking-[0.22em] text-[#0a2225]/50 mb-4">
