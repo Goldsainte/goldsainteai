@@ -1,17 +1,20 @@
-// Cloudflare Worker — route social crawlers on goldsainte.ai/newsroom/*
-// to the Supabase prerender edge function so link previews show the
-// per-article og:image. Humans pass through to the SPA unchanged.
+// Cloudflare Worker — route newsroom article detail URLs on
+// goldsainte.ai/newsroom/* to the prerender endpoint so the origin never
+// serves the generic SPA index.html for press releases or news articles.
 
 const PRERENDER = "https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/newsroom-prerender";
-const BOT_UA = /facebookexternalhit|Facebot|Twitterbot|LinkedInBot|Slackbot|Discordbot|TelegramBot|WhatsApp|Pinterest|redditbot|Embedly|Applebot|bingbot|Googlebot|SkypeUriPreview|vkShare|W3C_Validator|outbrain|quora link preview|showyoubot|tumblr|bitlybot|nuzzel|Bytespider|ia_archiver/i;
+const ARTICLE_PATH = /^\/newsroom\/(press-releases|news)\/[^/?#]+\/?$/i;
 
 export default {
   async fetch(request) {
     const url = new URL(request.url);
-    const ua = request.headers.get("user-agent") || "";
-    if (url.pathname.startsWith("/newsroom/") && BOT_UA.test(ua)) {
+    if (ARTICLE_PATH.test(url.pathname)) {
       const target = `${PRERENDER}?path=${encodeURIComponent(url.pathname)}`;
-      return fetch(target, { headers: { "user-agent": ua } });
+      return fetch(target, {
+        headers: {
+          "user-agent": request.headers.get("user-agent") || "",
+        },
+      });
     }
     return fetch(request);
   },
