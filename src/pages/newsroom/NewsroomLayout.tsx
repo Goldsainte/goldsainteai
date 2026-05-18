@@ -1,7 +1,6 @@
 import { Outlet, NavLink } from "react-router-dom";
 
 const navItems = [
-  { to: "/newsroom", label: "Newsroom", end: true },
   { to: "/newsroom/archive", label: "Archive" },
   { to: "/newsroom/media-kit", label: "Media Kit" },
   { to: "/newsroom/company-facts", label: "Company Facts" },
@@ -14,30 +13,44 @@ export default function NewsroomLayout() {
   return (
     <div className="bg-[#FDF9F0] text-[#0a2225]">
       <div
-        className="border-b border-[#E5DFC6] bg-[#FDF9F0]/95 backdrop-blur sticky z-20 shadow-[0_1px_0_rgba(10,34,37,0.04)]"
-        style={{ top: "var(--header-height)" }}
+        className="border-b border-[#E5DFC6] bg-[#FDF9F0]/95 backdrop-blur-sm sticky z-20 shadow-[0_1px_0_#E5DFC6]"
+        style={{ top: "var(--header-height, 64px)" }}
       >
-        <nav
-          className="max-w-7xl mx-auto px-6 py-3 flex items-center gap-x-5 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden text-xs"
-          aria-label="Newsroom sections"
-        >
-          {navItems.slice(1).map((item) => (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center gap-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
+              to="/newsroom"
+              end
               className={({ isActive }) =>
-                `tracking-wide uppercase transition-colors shrink-0 ${
-                  isActive
-                    ? "text-[#0c4d47] font-semibold"
-                    : "text-[#0a2225]/60 hover:text-[#0a2225]"
+                `flex-shrink-0 py-3.5 pr-5 mr-1 border-r border-[#E5DFC6] text-[10px] tracking-[0.28em] uppercase font-medium transition-colors ${
+                  isActive ? "text-[#0c4d47]" : "text-[#0a2225]/50 hover:text-[#0a2225]"
                 }`
               }
             >
-              {item.label}
+              Newsroom
             </NavLink>
-          ))}
-        </nav>
+            <nav
+              className="flex items-center gap-0 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+              aria-label="Newsroom sections"
+            >
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) =>
+                    `flex-shrink-0 px-4 py-3.5 text-[10px] tracking-[0.2em] uppercase whitespace-nowrap transition-colors border-b-2 ${
+                      isActive
+                        ? "text-[#0c4d47] border-[#C7A962]"
+                        : "text-[#0a2225]/55 border-transparent hover:text-[#0a2225]"
+                    }`
+                  }
+                >
+                  {item.label}
+                </NavLink>
+              ))}
+            </nav>
+          </div>
+        </div>
       </div>
       <Outlet />
     </div>
