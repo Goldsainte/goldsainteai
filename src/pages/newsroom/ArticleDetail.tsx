@@ -190,7 +190,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
                   <span className="text-[10px] tracking-[0.25em] uppercase text-[#C7A962]">
                     {formatDate(r.published_at)}
                   </span>
-                  <p className="font-secondary text-lg leading-snug mt-1 group-hover:text-[#0c4d47] transition">
+                  <p className="font-secondary text-base leading-snug mt-1 group-hover:text-[#0c4d47] transition">
                     {r.title}
                   </p>
                 </Link>

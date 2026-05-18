@@ -120,7 +120,7 @@ export default function NewsroomLanding() {
               <h2 className="font-secondary text-2xl md:text-4xl leading-tight mb-5 group-hover:text-[#0c4d47] transition">
                 {featured.title}
               </h2>
-              <p className="text-[#0a2225]/70 leading-relaxed mb-6 text-lg">{featured.excerpt}</p>
+              <p className="text-[#0a2225]/70 leading-relaxed mb-6 text-base">{featured.excerpt}</p>
               <span className="text-xs uppercase tracking-wider text-[#0a2225]/50">
                 {formatDate(featured.published_at)}
               </span>
@@ -141,7 +141,7 @@ export default function NewsroomLanding() {
                   <li key={i}>
                     <a href={p.url} target="_blank" rel="noopener noreferrer" className="block group">
                       <span className="text-[10px] tracking-[0.25em] uppercase text-[#C7A962]">{p.outlet}</span>
-                      <p className="font-secondary text-lg group-hover:text-[#0c4d47] transition mt-1">{p.title}</p>
+                      <p className="font-secondary text-base group-hover:text-[#0c4d47] transition mt-1">{p.title}</p>
                       <span className="text-xs text-[#0a2225]/50 mt-1 block">{p.date}</span>
                     </a>
                   </li>
@@ -185,7 +185,7 @@ function Column({ title, items, emptyText }: { title: string; items: any[]; empt
                 <span className="text-[10px] tracking-[0.25em] uppercase text-[#C7A962]">
                   {formatDate(a.published_at)}
                 </span>
-                <p className="font-secondary text-lg leading-snug group-hover:text-[#0c4d47] transition mt-1">
+                <p className="font-secondary text-base leading-snug group-hover:text-[#0c4d47] transition mt-1">
                   {a.title}
                 </p>
               </Link>

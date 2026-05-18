@@ -54,7 +54,7 @@ export default function CompanyFacts() {
           <h1 className="font-secondary text-2xl md:text-4xl leading-[1.05] mb-6 max-w-3xl">
             Goldsainte is building the intelligent marketplace for modern travel.
           </h1>
-          <p className="text-lg text-[#0a2225]/75 leading-relaxed max-w-3xl">
+          <p className="text-base text-[#0a2225]/75 leading-relaxed max-w-3xl">
             Goldsainte is an AI-powered global travel marketplace that enables travelers to discover, create,
             customize, and book curated travel experiences through a network of vetted travel creators, independent
             travel advisors, and hospitality partners.

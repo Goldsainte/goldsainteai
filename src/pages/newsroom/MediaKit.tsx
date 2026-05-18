@@ -53,7 +53,7 @@ export default function MediaKit() {
               >
                 <div className="aspect-square" style={{ background: c.hex }} />
                 <div className="p-3">
-                  <p className="font-secondary text-lg">{c.name}</p>
+                  <p className="font-secondary text-base">{c.name}</p>
                   <p className="text-xs text-[#0a2225]/60 font-mono">{c.hex}</p>
                 </div>
               </button>
@@ -69,7 +69,7 @@ export default function MediaKit() {
               <p className="text-[#0a2225]/60">Used for headlines and editorial titles.</p>
             </div>
             <div className="border border-[#0a2225]/15 p-6">
-              <p className="text-3xl mb-2">Sans Body</p>
+              <p className="text-2xl mb-2">Sans Body</p>
               <p className="text-[#0a2225]/60">Used for body copy, UI, and metadata.</p>
             </div>
           </div>
