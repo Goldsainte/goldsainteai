@@ -31,6 +31,41 @@ function swVersionPlugin() {
   };
 }
 
+// Generate public/newsroom-sitemap.xml at dev start and build time by
+// calling the deployed sitemap-newsroom edge function. Lovable hosting
+// does not process _redirects files, so we must materialize the sitemap
+// as a real static file under public/ for /newsroom-sitemap.xml to work.
+function newsroomSitemapPlugin() {
+  const SUPABASE_URL = "https://iwdevxltjuedijrcdejs.supabase.co";
+  const ENDPOINT = `${SUPABASE_URL}/functions/v1/sitemap-newsroom`;
+  const OUT = path.resolve(__dirname, "public/newsroom-sitemap.xml");
+
+  async function write() {
+    try {
+      const res = await fetch(ENDPOINT, { headers: { accept: "application/xml" } });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const xml = await res.text();
+      if (!xml.startsWith("<?xml")) throw new Error("non-xml response");
+      fs.writeFileSync(OUT, xml, "utf8");
+      // eslint-disable-next-line no-console
+      console.log(`[newsroom-sitemap] wrote ${OUT} (${xml.length} bytes)`);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn(`[newsroom-sitemap] skipped: ${(e as Error).message}`);
+    }
+  }
+
+  return {
+    name: "newsroom-sitemap",
+    async buildStart() {
+      await write();
+    },
+    async configureServer() {
+      await write();
+    },
+  };
+}
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
@@ -39,6 +74,7 @@ export default defineConfig(({ mode }) => {
     react(),
     mode === "development" && componentTagger(),
     swVersionPlugin(),
+    newsroomSitemapPlugin(),
   ].filter(Boolean);
   
   // Add Sentry plugin for source map uploads in production builds
