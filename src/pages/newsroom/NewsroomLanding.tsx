@@ -151,22 +151,6 @@ export default function NewsroomLanding() {
           )}
         </div>
       </section>
-
-      <section className="border-t border-[#E5DFC6] bg-[#F6F0E4]">
-        <div className="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-4 gap-8 text-sm">
-          {[
-            { to: "/newsroom/media-kit", label: "Media Kit", desc: "Logos, brand assets, headshots." },
-            { to: "/newsroom/company-facts", label: "Company Facts", desc: "Goldsainte at a glance." },
-            { to: "/newsroom/leadership", label: "Leadership", desc: "Founders and executives." },
-            { to: "/newsroom/editorial-policy", label: "Editorial Policy", desc: "Our standards." },
-          ].map((item) => (
-            <Link key={item.to} to={item.to} className="group">
-              <p className="font-secondary text-xl mb-2 group-hover:text-[#0c4d47] transition">{item.label}</p>
-              <p className="text-[#0a2225]/60">{item.desc}</p>
-            </Link>
-          ))}
-        </div>
-      </section>
     </>
   );
 }
