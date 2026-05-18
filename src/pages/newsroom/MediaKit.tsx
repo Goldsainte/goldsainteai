@@ -14,6 +14,16 @@ import worldImage1 from "@/assets/newsroom/mediakit-world-1.jpg";
 import worldImage2 from "@/assets/newsroom/mediakit-world-2.jpg";
 import worldImage3 from "@/assets/newsroom/mediakit-world-3.jpg";
 import founderImage from "@/assets/newsroom/inline-founder-desk.jpg";
+import logomarkGold from "@/assets/newsroom/logos/logomark-gold.png";
+import logomarkGreen from "@/assets/newsroom/logos/logomark-green.png";
+import primaryHorizontalGold from "@/assets/newsroom/logos/primary-horizontal-gold.png";
+import primaryHorizontalGreen from "@/assets/newsroom/logos/primary-horizontal-green.png";
+import primaryVerticalGold from "@/assets/newsroom/logos/primary-vertical-gold.png";
+import primaryVerticalGreen from "@/assets/newsroom/logos/primary-vertical-green.png";
+import secondaryHorizontalGold from "@/assets/newsroom/logos/secondary-horizontal-gold.png";
+import secondaryHorizontalGreen from "@/assets/newsroom/logos/secondary-horizontal-green.png";
+import secondaryVerticalGold from "@/assets/newsroom/logos/secondary-vertical-gold.png";
+import secondaryVerticalGreen from "@/assets/newsroom/logos/secondary-vertical-green.png";
 
 const COLORS = [
   { name: "Cream", role: "Primary surface", hex: "#FDF9F0", text: "#0a2225" },
@@ -92,6 +102,100 @@ const PRESS_PACKS = [
     type: "ZIP",
   },
 ];
+
+type LogoAsset = {
+  src: string;
+  alt: string;
+  label: string;
+  variant: "Gold" | "Green";
+  filename: string;
+  bg: "light" | "dark";
+  fit: "wide" | "tall" | "square";
+};
+
+const LOGO_GROUPS: { title: string; subtitle: string; items: LogoAsset[] }[] = [
+  {
+    title: "Primary Logo · Horizontal",
+    subtitle: "Default lockup for editorial layouts, headers, and partner placements.",
+    items: [
+      { src: primaryHorizontalGold, alt: "Goldsainte primary horizontal logo in gold.", label: "Primary Horizontal", variant: "Gold", filename: "goldsainte-primary-horizontal-gold.png", bg: "dark", fit: "wide" },
+      { src: primaryHorizontalGreen, alt: "Goldsainte primary horizontal logo in forest green.", label: "Primary Horizontal", variant: "Green", filename: "goldsainte-primary-horizontal-green.png", bg: "light", fit: "wide" },
+    ],
+  },
+  {
+    title: "Primary Logo · Vertical",
+    subtitle: "Stacked lockup for portrait formats, covers, and centered compositions.",
+    items: [
+      { src: primaryVerticalGold, alt: "Goldsainte primary vertical logo in gold.", label: "Primary Vertical", variant: "Gold", filename: "goldsainte-primary-vertical-gold.png", bg: "dark", fit: "tall" },
+      { src: primaryVerticalGreen, alt: "Goldsainte primary vertical logo in forest green.", label: "Primary Vertical", variant: "Green", filename: "goldsainte-primary-vertical-green.png", bg: "light", fit: "tall" },
+    ],
+  },
+  {
+    title: "Secondary Logo · Horizontal",
+    subtitle: "Refined horizontal lockup without the surrounding seal.",
+    items: [
+      { src: secondaryHorizontalGold, alt: "Goldsainte secondary horizontal logo in gold.", label: "Secondary Horizontal", variant: "Gold", filename: "goldsainte-secondary-horizontal-gold.png", bg: "dark", fit: "wide" },
+      { src: secondaryHorizontalGreen, alt: "Goldsainte secondary horizontal logo in forest green.", label: "Secondary Horizontal", variant: "Green", filename: "goldsainte-secondary-horizontal-green.png", bg: "light", fit: "wide" },
+    ],
+  },
+  {
+    title: "Secondary Logo · Vertical",
+    subtitle: "Stacked monogram and wordmark without the surrounding seal.",
+    items: [
+      { src: secondaryVerticalGold, alt: "Goldsainte secondary vertical logo in gold.", label: "Secondary Vertical", variant: "Gold", filename: "goldsainte-secondary-vertical-gold.png", bg: "dark", fit: "tall" },
+      { src: secondaryVerticalGreen, alt: "Goldsainte secondary vertical logo in forest green.", label: "Secondary Vertical", variant: "Green", filename: "goldsainte-secondary-vertical-green.png", bg: "light", fit: "tall" },
+    ],
+  },
+  {
+    title: "Monogram",
+    subtitle: "Standalone seal for avatars, favicons, app icons, and tight crops.",
+    items: [
+      { src: logomarkGold, alt: "Goldsainte monogram in gold.", label: "Monogram", variant: "Gold", filename: "goldsainte-monogram-gold.png", bg: "dark", fit: "square" },
+      { src: logomarkGreen, alt: "Goldsainte monogram in forest green.", label: "Monogram", variant: "Green", filename: "goldsainte-monogram-green.png", bg: "light", fit: "square" },
+    ],
+  },
+];
+
+function LogoTile({ asset }: { asset: LogoAsset }) {
+  const isDark = asset.bg === "dark";
+  const aspect =
+    asset.fit === "square" ? "aspect-square" : asset.fit === "tall" ? "aspect-[4/5]" : "aspect-[16/9]";
+  return (
+    <div className="group rounded-sm overflow-hidden border border-[#0a2225]/10 bg-white shadow-[0_8px_24px_-18px_rgba(10,34,37,0.25)] hover:shadow-[0_24px_60px_-28px_rgba(10,34,37,0.4)] transition-all duration-500">
+      <div
+        className={`relative ${aspect} flex items-center justify-center px-8 md:px-12 py-8 ${
+          isDark ? "bg-[#0a2225]" : "bg-[#FDF9F0]"
+        }`}
+      >
+        <span
+          className="absolute top-3 left-3 text-[9px] tracking-[0.28em] uppercase"
+          style={{ color: isDark ? "rgba(253,249,240,0.55)" : "rgba(10,34,37,0.45)" }}
+        >
+          {asset.label} · {asset.variant}
+        </span>
+        <img
+          src={asset.src}
+          alt={asset.alt}
+          className="max-h-full max-w-full object-contain"
+          loading="lazy"
+        />
+      </div>
+      <div className="flex items-center justify-between px-5 py-4 bg-[#FDF9F0] border-t border-[#0a2225]/10">
+        <span className="text-[10px] tracking-[0.25em] uppercase text-[#0a2225]/60">
+          PNG · {asset.variant}
+        </span>
+        <a
+          href={asset.src}
+          download={asset.filename}
+          className="inline-flex items-center gap-1.5 text-[10px] tracking-[0.25em] uppercase text-[#0c4d47] hover:text-[#0a2225] transition-colors"
+        >
+          <Download className="h-3 w-3" />
+          Download
+        </a>
+      </div>
+    </div>
+  );
+}
 
 function ColorCard({ c }: { c: typeof COLORS[number] }) {
   const [copied, setCopied] = useState(false);
@@ -194,39 +298,6 @@ function BoilerplatePanel() {
   );
 }
 
-function LogoTile({
-  variant,
-}: {
-  variant: "wordmark-light" | "wordmark-dark" | "monogram-light" | "monogram-dark";
-}) {
-  const isLight = variant.endsWith("light");
-  const isWordmark = variant.startsWith("wordmark");
-  return (
-    <div
-      className={`aspect-[4/3] flex items-center justify-center border border-[#0a2225]/10 rounded-sm relative overflow-hidden ${
-        isLight ? "bg-[#FDF9F0]" : "bg-[#0a2225]"
-      }`}
-    >
-      <span
-        className="font-secondary tracking-tight"
-        style={{
-          color: isLight ? "#0c4d47" : "#C7A962",
-          fontSize: isWordmark ? "1.75rem" : "2.5rem",
-          letterSpacing: isWordmark ? "-0.02em" : "0",
-        }}
-      >
-        {isWordmark ? "Goldsainte" : "G"}
-      </span>
-      <span
-        className="absolute top-3 left-3 text-[9px] tracking-[0.25em] uppercase"
-        style={{ color: isLight ? "rgba(10,34,37,0.45)" : "rgba(253,249,240,0.5)" }}
-      >
-        {isWordmark ? "Wordmark" : "Monogram"} · {isLight ? "Light" : "Dark"}
-      </span>
-    </div>
-  );
-}
-
 export default function MediaKit() {
   return (
     <>
@@ -313,7 +384,7 @@ export default function MediaKit() {
 
         {/* LOGOS */}
         <section className="max-w-5xl mx-auto px-6 py-20 md:py-28">
-          <div className="flex items-baseline justify-between mb-10">
+          <div className="flex flex-wrap items-end justify-between gap-6 mb-12">
             <div>
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
                 02 — Identity
@@ -321,24 +392,48 @@ export default function MediaKit() {
               <h2 className="font-secondary text-2xl md:text-3xl mt-3 text-[#0a2225]">
                 Logo Suite
               </h2>
+              <p className="text-base text-[#0a2225]/70 mt-4 max-w-2xl leading-relaxed">
+                The complete Goldsainte mark in primary, secondary, and monogram
+                configurations — each in forest green and gold. Click any logo to
+                download the PNG.
+              </p>
             </div>
             <a
-              href="mailto:press@goldsainte.ai?subject=Logo%20suite%20request"
-              className="hidden md:inline-flex items-center gap-2 text-[11px] tracking-[0.22em] uppercase text-[#0c4d47] hover:underline underline-offset-4"
+              href="mailto:press@goldsainte.ai?subject=Logo%20suite%20request%20(SVG)"
+              className="inline-flex items-center gap-2 text-[11px] tracking-[0.22em] uppercase text-[#0c4d47] hover:underline underline-offset-4"
             >
               <Download className="h-3.5 w-3.5" />
-              Logo ZIP
+              Request SVG &amp; full ZIP
             </a>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <LogoTile variant="wordmark-light" />
-            <LogoTile variant="wordmark-dark" />
-            <LogoTile variant="monogram-light" />
-            <LogoTile variant="monogram-dark" />
+
+          <div className="space-y-14">
+            {LOGO_GROUPS.map((group) => (
+              <div key={group.title}>
+                <div className="mb-5 flex items-baseline justify-between gap-6">
+                  <div>
+                    <h3 className="font-secondary text-xl text-[#0a2225]">
+                      {group.title}
+                    </h3>
+                    <p className="text-sm text-[#0a2225]/60 mt-1 max-w-xl leading-relaxed">
+                      {group.subtitle}
+                    </p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {group.items.map((item) => (
+                    <LogoTile key={item.filename} asset={item} />
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
-          <p className="text-xs text-[#0a2225]/55 mt-6 max-w-xl">
-            Maintain minimum clear space equal to the height of the wordmark. Do not
-            recolor, distort, or apply effects. SVG and PNG provided on request.
+
+          <p className="text-xs text-[#0a2225]/55 mt-10 max-w-2xl leading-relaxed">
+            Usage: maintain minimum clear space equal to the height of the monogram.
+            Do not recolor, distort, rotate, or apply effects. Use the green marks
+            on cream or light surfaces, and the gold marks on dark or photographic
+            backgrounds. SVG masters and additional formats available on request.
           </p>
         </section>
 
