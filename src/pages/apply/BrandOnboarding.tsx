@@ -329,6 +329,19 @@ export default function BrandOnboarding() {
       localStorage.setItem('brand_application_id', appId);
       localStorage.setItem('brand_application_email', formData.primaryContactEmail);
 
+      // Send confirmation email via the unified transactional email system so
+      // brand applicants receive the same acknowledgement agents do.
+      supabase.functions
+        .invoke('send-transactional-email', {
+          body: {
+            templateName: 'application-received-professional',
+            recipientEmail: formData.primaryContactEmail,
+            idempotencyKey: `brand-application-received-${appId}`,
+            templateData: { agentName: formData.primaryContactName },
+          },
+        })
+        .catch((e) => console.error('application email failed:', e));
+
       setVerificationStatus('success');
       toast.success('Application submitted! Redirecting to verification...');
       setTimeout(() => { window.location.href = url; }, 2000);
