@@ -42,7 +42,8 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
   }
 
   const canonical = article.canonical_url || `${BASE_URL}${articlePath(article)}`;
-  const ogImg = article.og_image_url || article.hero_image_url || undefined;
+  const DEFAULT_OG_IMAGE = `${BASE_URL}/newsroom-og-default.jpg`;
+  const ogImg = article.og_image_url || article.hero_image_url || DEFAULT_OG_IMAGE;
   const typeLabel =
     article.type === "press_release" ? "Press Release" : article.type === "announcement" ? "Announcement" : "News";
   const wordCount = (article.body || "").trim().split(/\s+/).filter(Boolean).length;
@@ -58,7 +59,16 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         <meta property="og:title" content={article.title} />
         <meta property="og:description" content={article.excerpt} />
         <meta property="og:url" content={canonical} />
-        {ogImg && <meta property="og:image" content={ogImg} />}
+        {ogImg && (
+          <>
+            <meta property="og:image" content={ogImg} />
+            <meta property="og:image:secure_url" content={ogImg} />
+            <meta property="og:image:width" content="1200" />
+            <meta property="og:image:height" content="630" />
+            <meta property="og:image:alt" content={article.hero_image_alt || article.title} />
+            <meta property="og:image:type" content="image/jpeg" />
+          </>
+        )}
         {article.published_at && (
           <meta property="article:published_time" content={article.published_at} />
         )}
@@ -69,13 +79,18 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={article.title} />
         <meta name="twitter:description" content={article.excerpt} />
-        {ogImg && <meta name="twitter:image" content={ogImg} />}
+        {ogImg && (
+          <>
+            <meta name="twitter:image" content={ogImg} />
+            <meta name="twitter:image:alt" content={article.hero_image_alt || article.title} />
+          </>
+        )}
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "NewsArticle",
           headline: article.title,
           description: article.excerpt,
-          image: [article.hero_image_url, article.og_image_url].filter(Boolean),
+          image: [article.hero_image_url, article.og_image_url, DEFAULT_OG_IMAGE].filter(Boolean),
           datePublished: article.published_at,
           dateModified: article.updated_at,
           author: article.author
