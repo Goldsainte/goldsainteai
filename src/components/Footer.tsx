@@ -32,6 +32,8 @@ export const Footer = () => {
       heading: "COMPANY",
       links: [
         { to: "/about", label: "About Goldsainte" },
+        { to: "/newsroom", label: "Newsroom" },
+        { to: "/newsroom/press-contact", label: "Press" },
         { to: "/corporate-contact", label: "Contact Us" },
       ],
     },
