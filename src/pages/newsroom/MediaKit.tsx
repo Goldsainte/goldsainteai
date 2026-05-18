@@ -10,10 +10,13 @@ import {
   COMPANY_BOILERPLATE_MEDIUM,
   COMPANY_BOILERPLATE_SHORT,
 } from "./lib";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import heroImage from "@/assets/newsroom/mediakit-hero.jpg";
-import worldImage1 from "@/assets/newsroom/mediakit-world-1.jpg";
-import worldImage2 from "@/assets/newsroom/mediakit-world-2.jpg";
-import worldImage3 from "@/assets/newsroom/mediakit-world-3.jpg";
 import founderImage from "@/assets/newsroom/inline-founder-desk.jpg";
 import logomarkGold from "@/assets/newsroom/logos/logomark-gold.png";
 import logomarkGreen from "@/assets/newsroom/logos/logomark-green.png";
