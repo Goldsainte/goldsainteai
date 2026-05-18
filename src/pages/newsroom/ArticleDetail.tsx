@@ -3,7 +3,6 @@ import { Link, useParams, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
   BASE_URL,
-  COMPANY_BOILERPLATE_LONG,
   articlePath,
   fetchArticleBySlug,
   fetchRelatedArticles,
@@ -258,8 +257,3 @@ function ShareRow({ title, url }: { title: string; url: string }) {
   );
 }
 
-function readingTime(body: string | null | undefined): number {
-  if (!body) return 1;
-  const words = body.trim().split(/\s+/).length;
-  return Math.max(1, Math.round(words / 220));
-}
