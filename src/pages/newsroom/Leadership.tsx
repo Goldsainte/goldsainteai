@@ -142,19 +142,6 @@ export default function Leadership() {
                     .map((para, i) => <p key={i}>{para}</p>)}
                 </div>
 
-                {a.expertise && a.expertise.length > 0 && (
-                  <div className="mt-8 flex flex-wrap gap-2">
-                    {a.expertise.map((e) => (
-                      <span
-                        key={e}
-                        className="text-[10px] uppercase tracking-[0.18em] px-3 py-1.5 rounded-full border border-[#E5DFC6] text-[#0a2225]/75"
-                      >
-                        {e}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
                 {/* Signature */}
                 <div className="mt-10 pt-6 border-t border-[#E5DFC6]">
                   <p className="text-[10px] uppercase tracking-[0.3em] text-[#C7A962] mb-3">
@@ -169,6 +156,19 @@ export default function Leadership() {
                     />
                   </div>
                 </div>
+
+                {a.expertise && a.expertise.length > 0 && (
+                  <div className="mt-8 flex flex-wrap gap-2">
+                    {a.expertise.map((e) => (
+                      <span
+                        key={e}
+                        className="text-[10px] uppercase tracking-[0.18em] px-3 py-1.5 rounded-full border border-[#E5DFC6] text-[#0a2225]/75"
+                      >
+                        {e}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </article>
           ))}
