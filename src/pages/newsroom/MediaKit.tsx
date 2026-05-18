@@ -159,11 +159,13 @@ const LOGO_GROUPS: { title: string; subtitle: string; items: LogoAsset[] }[] = [
 function LogoTile({ asset }: { asset: LogoAsset }) {
   const isDark = asset.bg === "dark";
   const aspect =
-    asset.fit === "square" ? "aspect-square" : asset.fit === "tall" ? "aspect-[4/5]" : "aspect-[16/9]";
+    asset.fit === "square" ? "aspect-square" : asset.fit === "tall" ? "aspect-[3/4]" : "aspect-[5/2]";
+  const maxH =
+    asset.fit === "square" ? "max-h-20" : asset.fit === "tall" ? "max-h-32" : "max-h-12";
   return (
     <div className="group rounded-sm overflow-hidden border border-[#0a2225]/10 bg-white shadow-[0_8px_24px_-18px_rgba(10,34,37,0.25)] hover:shadow-[0_24px_60px_-28px_rgba(10,34,37,0.4)] transition-all duration-500">
       <div
-        className={`relative ${aspect} flex items-center justify-center px-8 md:px-12 py-8 ${
+        className={`relative ${aspect} flex items-center justify-center px-10 md:px-16 py-10 ${
           isDark ? "bg-[#0a2225]" : "bg-[#FDF9F0]"
         }`}
       >
@@ -176,7 +178,7 @@ function LogoTile({ asset }: { asset: LogoAsset }) {
         <img
           src={asset.src}
           alt={asset.alt}
-          className="max-h-full max-w-full object-contain"
+          className={`${maxH} max-w-full object-contain`}
           loading="lazy"
         />
       </div>
