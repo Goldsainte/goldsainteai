@@ -39,13 +39,36 @@ export default function PressContact() {
       return;
     }
     setSubmitting(true);
-    const insert = { ...parsed.data, phone: parsed.data.phone || null };
+    const id = crypto.randomUUID();
+    const insert = { id, ...parsed.data, phone: parsed.data.phone || null };
     const { error } = await (supabase as any).from("press_inquiries").insert(insert);
-    setSubmitting(false);
     if (error) {
+      setSubmitting(false);
       toast.error("Could not submit. Please email press@goldsainte.com.");
       return;
     }
+    // Notify the press team — non-blocking on failure
+    try {
+      await supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "press-inquiry-received",
+          recipientEmail: "press@goldsainte.com",
+          idempotencyKey: `press-inquiry-${id}`,
+          templateData: {
+            reporter_name: parsed.data.reporter_name,
+            publication: parsed.data.publication,
+            email: parsed.data.email,
+            phone: parsed.data.phone || "",
+            topic: parsed.data.topic,
+            deadline: parsed.data.deadline,
+            message: parsed.data.message,
+          },
+        },
+      });
+    } catch {
+      // Inquiry is saved; email delivery will retry via the queue
+    }
+    setSubmitting(false);
     setDone(true);
     form.reset();
   }
@@ -78,7 +101,7 @@ export default function PressContact() {
             <div>
               <label className="text-xs uppercase tracking-wider text-[#0a2225]/70">Inquiry topic *</label>
               <select name="topic" required defaultValue=""
-                className="mt-2 w-full border border-[#E5DFC6] bg-white px-4 py-3 text-sm">
+                className="mt-2 w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/30 focus:border-[#0c4d47]">
                 <option value="" disabled>Select…</option>
                 {TOPICS.map((t) => <option key={t} value={t}>{t}</option>)}
               </select>
@@ -87,12 +110,12 @@ export default function PressContact() {
             <div>
               <label className="text-xs uppercase tracking-wider text-[#0a2225]/70">Message *</label>
               <textarea name="message" required rows={6}
-                className="mt-2 w-full border border-[#E5DFC6] bg-white px-4 py-3 text-sm" />
+                className="mt-2 w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/30 focus:border-[#0c4d47]" />
             </div>
             <button
               type="submit"
               disabled={submitting}
-              className="px-8 py-3 rounded-full bg-[#0c4d47] text-white text-sm tracking-wide hover:bg-[#0a3d39] disabled:opacity-50"
+              className="px-8 py-3 rounded-full bg-[#0c4d47] text-white text-sm tracking-wide hover:bg-[#0a3d39] disabled:opacity-50 transition"
             >
               {submitting ? "Submitting…" : "Submit inquiry"}
             </button>
@@ -113,7 +136,7 @@ function Field({ name, label, type = "text", required }: { name: string; label: 
         name={name}
         type={type}
         required={required}
-        className="mt-2 w-full border border-[#E5DFC6] bg-white px-4 py-3 text-sm"
+        className="mt-2 w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/30 focus:border-[#0c4d47]"
       />
     </div>
   );

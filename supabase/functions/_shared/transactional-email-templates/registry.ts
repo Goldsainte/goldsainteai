@@ -35,6 +35,7 @@ import { template as applicationReceivedProfessional } from './application-recei
 import { template as applicationApprovedProfessional } from './application-approved-professional.tsx'
 import { template as applicationDeclinedProfessional } from './application-declined-professional.tsx'
 import { template as applicationInfoRequestedProfessional } from './application-info-requested-professional.tsx'
+import { template as pressInquiryReceived } from './press-inquiry-received.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'welcome-traveler': welcomeTraveler,
@@ -63,4 +64,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'application-approved-professional': applicationApprovedProfessional,
   'application-declined-professional': applicationDeclinedProfessional,
   'application-info-requested-professional': applicationInfoRequestedProfessional,
+  'press-inquiry-received': pressInquiryReceived,
 }
