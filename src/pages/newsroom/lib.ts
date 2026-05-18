@@ -99,4 +99,18 @@ export async function fetchAuthors() {
   return (data || []) as NewsroomAuthor[];
 }
 
+export async function fetchRelatedArticles(opts: { category: string | null; excludeId: string; limit?: number }) {
+  let q = (supabase as any)
+    .from("newsroom_articles")
+    .select("id, slug, type, title, excerpt, published_at, category, hero_image_url")
+    .eq("status", "published")
+    .neq("id", opts.excludeId)
+    .order("published_at", { ascending: false })
+    .limit(opts.limit ?? 3);
+  if (opts.category) q = q.eq("category", opts.category);
+  const { data, error } = await q;
+  if (error) throw error;
+  return (data || []) as Pick<NewsroomArticle, "id" | "slug" | "type" | "title" | "excerpt" | "published_at" | "category" | "hero_image_url">[];
+}
+
 export const EXTERNAL_PRESS: { outlet: string; title: string; url: string; date: string }[] = [];
