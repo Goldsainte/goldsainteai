@@ -147,7 +147,7 @@ export default function EditorialPolicy() {
           </h3>
           <Link
             to="/newsroom"
-            className="inline-block text-xs uppercase tracking-[0.25em] text-[#f7f3ea] bg-[#0c4d47] px-7 py-4 hover:bg-[#0a2225] transition-colors"
+            className="inline-block text-xs uppercase tracking-[0.25em] text-white bg-[#0c4d47] px-7 py-4 rounded-full hover:bg-[#0a3d39] transition-colors"
           >
             Visit the Newsroom →
           </Link>
