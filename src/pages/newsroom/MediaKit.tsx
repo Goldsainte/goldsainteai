@@ -32,7 +32,7 @@ import wordmarkGold from "@/assets/newsroom/logos/wordmark-gold.png";
 import wordmarkGreen from "@/assets/newsroom/logos/wordmark-green.png";
 import logomarkSealGold from "@/assets/newsroom/logos/logomark-seal-gold.png";
 import logomarkSealGreen from "@/assets/newsroom/logos/logomark-seal-green.png";
-import { newsroomPageSectionClass, newsroomPageShellClass, newsroomSectionTitleClass } from "./ui";
+import { newsroomPageShellClass, newsroomSectionTitleClass } from "./ui";
 
 const COLORS = [
   { name: "Cream", role: "Primary surface", hex: "#FDF9F0", text: "#0a2225" },
