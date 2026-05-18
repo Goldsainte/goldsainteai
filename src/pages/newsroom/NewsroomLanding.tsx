@@ -62,10 +62,10 @@ export default function NewsroomLanding() {
         <p className="text-[11px] tracking-[0.3em] uppercase text-[#0c4d47] mb-5">Goldsainte Newsroom</p>
         <div className="grid md:grid-cols-[1.1fr_1fr] gap-10 items-end">
           <div>
-            <h1 className="font-secondary text-5xl md:text-6xl leading-[1.05] tracking-tight mb-5">
+            <h1 className="font-secondary text-2xl md:text-4xl leading-[1.05] tracking-tight mb-5">
               The Goldsainte Newsroom
             </h1>
-            <p className="text-base md:text-lg text-[#0a2225]/70 max-w-xl leading-relaxed">
+            <p className="text-sm md:text-base text-[#0a2225]/70 max-w-xl leading-relaxed">
               Press releases, company announcements, and editorial coverage from the team
               building the future of trip design.
             </p>
@@ -117,10 +117,10 @@ export default function NewsroomLanding() {
               <span className="text-[10px] tracking-[0.3em] uppercase text-[#C7A962] mb-4">
                 Featured · {featured.type === "press_release" ? "Press Release" : featured.type}
               </span>
-              <h2 className="font-secondary text-3xl md:text-5xl leading-tight mb-5 group-hover:text-[#0c4d47] transition">
+              <h2 className="font-secondary text-2xl md:text-4xl leading-tight mb-5 group-hover:text-[#0c4d47] transition">
                 {featured.title}
               </h2>
-              <p className="text-[#0a2225]/70 leading-relaxed mb-6 text-lg">{featured.excerpt}</p>
+              <p className="text-[#0a2225]/70 leading-relaxed mb-6 text-base">{featured.excerpt}</p>
               <span className="text-xs uppercase tracking-wider text-[#0a2225]/50">
                 {formatDate(featured.published_at)}
               </span>
@@ -135,13 +135,13 @@ export default function NewsroomLanding() {
           <Column title="Company News" items={news} emptyText="No company news yet." />
           {EXTERNAL_PRESS.length > 0 && (
             <div>
-              <h3 className="font-secondary text-2xl mb-6">In the Press</h3>
+              <h3 className="font-secondary text-xl md:text-2xl mb-6">In the Press</h3>
               <ul className="space-y-5">
                 {EXTERNAL_PRESS.map((p, i) => (
                   <li key={i}>
                     <a href={p.url} target="_blank" rel="noopener noreferrer" className="block group">
                       <span className="text-[10px] tracking-[0.25em] uppercase text-[#C7A962]">{p.outlet}</span>
-                      <p className="font-secondary text-lg group-hover:text-[#0c4d47] transition mt-1">{p.title}</p>
+                      <p className="font-secondary text-base group-hover:text-[#0c4d47] transition mt-1">{p.title}</p>
                       <span className="text-xs text-[#0a2225]/50 mt-1 block">{p.date}</span>
                     </a>
                   </li>
@@ -174,7 +174,7 @@ export default function NewsroomLanding() {
 function Column({ title, items, emptyText }: { title: string; items: any[]; emptyText: string }) {
   return (
     <div>
-      <h3 className="font-secondary text-2xl mb-6">{title}</h3>
+      <h3 className="font-secondary text-xl md:text-2xl mb-6">{title}</h3>
       {items.length === 0 ? (
         <p className="text-sm text-[#0a2225]/50 italic">{emptyText}</p>
       ) : (
@@ -185,7 +185,7 @@ function Column({ title, items, emptyText }: { title: string; items: any[]; empt
                 <span className="text-[10px] tracking-[0.25em] uppercase text-[#C7A962]">
                   {formatDate(a.published_at)}
                 </span>
-                <p className="font-secondary text-lg leading-snug group-hover:text-[#0c4d47] transition mt-1">
+                <p className="font-secondary text-base leading-snug group-hover:text-[#0c4d47] transition mt-1">
                   {a.title}
                 </p>
               </Link>

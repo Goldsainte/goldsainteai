@@ -10,8 +10,8 @@ export default function EditorialPolicy() {
         <link rel="canonical" href={`${BASE_URL}/newsroom/editorial-policy`} />
       </Helmet>
       <div className="max-w-3xl mx-auto px-6 py-20 font-secondary">
-        <h1 className="text-5xl mb-6">Editorial Policy</h1>
-        <p className="text-[#0a2225]/70 mb-12 leading-relaxed text-lg">
+        <h1 className="text-3xl md:text-4xl mb-6">Editorial Policy</h1>
+        <p className="text-[#0a2225]/70 mb-12 leading-relaxed text-base">
           The Goldsainte Newsroom publishes original press releases, company news, and editorial commentary on the travel industry.
           Our work is guided by the standards below.
         </p>
@@ -53,7 +53,7 @@ export default function EditorialPolicy() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mb-10">
-      <h2 className="text-2xl mb-3">{title}</h2>
+      <h2 className="text-xl md:text-2xl mb-3">{title}</h2>
       <p className="text-[#0a2225]/80 leading-relaxed font-sans text-base">{children}</p>
     </section>
   );
