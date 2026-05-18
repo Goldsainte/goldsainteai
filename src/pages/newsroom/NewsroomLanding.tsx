@@ -64,7 +64,7 @@ export default function NewsroomLanding() {
         <p className="text-[10px] sm:text-[11px] tracking-[0.28em] sm:tracking-[0.35em] uppercase text-[#0c4d47] mb-5 md:mb-6">
           Vol. 1 · The Goldsainte Press
         </p>
-        <h1 className="font-secondary text-[44px] sm:text-[56px] md:text-[80px] leading-[0.95] tracking-tight text-[#0a2225]">
+       <h1 className="font-secondary text-[32px] sm:text-[40px] md:text-[52px] leading-[0.95] tracking-tight text-[#0a2225]">
           Newsroom
         </h1>
         <div className="mt-6 md:mt-8 mx-auto max-w-3xl border-t-2 border-[#C7A962]" />
