@@ -1,6 +1,4 @@
 import { Outlet, NavLink } from "react-router-dom";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 
 const navItems = [
   { to: "/newsroom", label: "Newsroom", end: true },
@@ -14,8 +12,7 @@ const navItems = [
 
 export default function NewsroomLayout() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#FDF9F0] text-[#0a2225]">
-      <Header />
+    <div className="bg-[#FDF9F0] text-[#0a2225]">
       <div className="border-b border-[#E5DFC6] bg-[#FDF9F0]/95 backdrop-blur sticky top-14 sm:top-16 md:top-20 z-20">
         <div className="max-w-7xl mx-auto px-6 py-3 flex flex-wrap items-center gap-x-6 gap-y-2">
           <NavLink
@@ -45,10 +42,7 @@ export default function NewsroomLayout() {
           </nav>
         </div>
       </div>
-      <main className="flex-1">
-        <Outlet />
-      </main>
-      <Footer />
+      <Outlet />
     </div>
   );
 }
