@@ -51,6 +51,7 @@ export type NewsroomAuthor = {
   twitter_url: string | null;
   quote: string | null;
   expertise: string[] | null;
+  signature_image_url?: string | null;
 };
 
 export function articlePath(a: Pick<NewsroomArticle, "type" | "slug">) {
