@@ -162,7 +162,7 @@ function ColorCard({ c }: { c: typeof COLORS[number] }) {
   return (
     <button
       onClick={onCopy}
-      className="group text-left rounded-sm overflow-hidden border border-[#0a2225]/10 bg-white shadow-[0_8px_24px_-16px_rgba(10,34,37,0.25)] hover:shadow-[0_24px_60px_-28px_rgba(10,34,37,0.45)] hover:-translate-y-[2px] transition-all duration-500"
+      className="group text-left rounded-sm overflow-hidden border border-[#E5DFC6] bg-white shadow-[0_8px_24px_-16px_rgba(10,34,37,0.25)] hover:shadow-[0_24px_60px_-28px_rgba(10,34,37,0.45)] hover:-translate-y-[2px] transition-all duration-500"
     >
       <div
         className="aspect-[5/6] relative"
@@ -240,7 +240,7 @@ function BoilerplatePanel() {
             onClick={() =>
               downloadText(`Goldsainte-Boilerplate-${current.label}.txt`, current.text)
             }
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#0a2225]/20 text-[#0a2225] text-[11px] tracking-[0.22em] uppercase hover:border-[#0c4d47] hover:text-[#0c4d47] transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#E5DFC6] text-[#0a2225] text-[11px] tracking-[0.22em] uppercase hover:border-[#0c4d47] hover:text-[#0c4d47] transition-colors"
           >
             <Download className="h-3.5 w-3.5" />
             Download .txt
@@ -351,7 +351,7 @@ export default function MediaKit() {
             </p>
           </div>
 
-          <div className="rounded-sm border border-[#0a2225]/10 bg-[#FDF9F0] p-12 md:p-20 flex items-center justify-center">
+          <div className="rounded-sm border border-[#E5DFC6] bg-[#FDF9F0] p-12 md:p-20 flex items-center justify-center">
             <img
               src={primaryHorizontalGreen}
               alt="Goldsainte primary horizontal logo in forest green."
@@ -546,7 +546,7 @@ export default function MediaKit() {
                 </a>
                 <Link
                   to="/newsroom/leadership"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#0a2225]/20 text-[#0a2225] text-[11px] tracking-[0.22em] uppercase hover:border-[#0c4d47] hover:text-[#0c4d47] transition-colors"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#E5DFC6] text-[#0a2225] text-[11px] tracking-[0.22em] uppercase hover:border-[#0c4d47] hover:text-[#0c4d47] transition-colors"
                 >
                   Founder profile
                   <ArrowUpRight className="h-3.5 w-3.5" />
