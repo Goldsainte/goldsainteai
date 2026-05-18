@@ -164,7 +164,6 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
           </div>
         </div>
       ) : null}
-      )}
 
       <div className="max-w-[680px] mx-auto px-6 pt-12 pb-16">
         {article.type === "press_release" && (
