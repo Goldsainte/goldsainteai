@@ -1002,3 +1002,36 @@ All colors MUST be HSL.
     @apply text-[11px] font-medium uppercase tracking-[0.2em] text-[#9A9384];
   }
 }
+
+/* Newsroom editorial article body — Airbnb-style narrow column */
+.prose-editorial { color: #0a2225; font-size: 17px; line-height: 1.7; }
+.prose-editorial p { margin-bottom: 1.5em; }
+.prose-editorial h2 {
+  font-family: var(--font-secondary, 'Cormorant Garamond', serif);
+  font-size: 30px; font-weight: 500; line-height: 1.2;
+  margin-top: 2.5em; margin-bottom: 1em; color: #0a2225;
+  letter-spacing: -0.01em;
+}
+.prose-editorial h3 {
+  font-family: var(--font-secondary, 'Cormorant Garamond', serif);
+  font-size: 22px; font-weight: 500;
+  margin-top: 2em; margin-bottom: 0.75em; color: #0a2225;
+}
+.prose-editorial ul { list-style: disc; padding-left: 1.5em; margin-bottom: 1.5em; }
+.prose-editorial ul li { margin-bottom: 0.5em; color: #0a2225; }
+.prose-editorial ol { list-style: decimal; padding-left: 1.5em; margin-bottom: 1.5em; }
+.prose-editorial ol li { margin-bottom: 0.5em; color: #0a2225; }
+.prose-editorial strong { font-weight: 600; color: #0a2225; }
+.prose-editorial a {
+  color: #0c4d47; text-decoration: underline;
+  text-underline-offset: 3px; text-decoration-thickness: 1px;
+}
+.prose-editorial a:hover { color: #0a3d39; }
+.prose-editorial em { font-style: italic; }
+.prose-editorial blockquote {
+  border-left: 2px solid #C7A962;
+  padding-left: 1.25em; margin: 2em 0;
+  font-style: italic; color: #0a2225;
+  font-size: 19px; line-height: 1.5;
+}
+.prose-editorial hr { border: 0; border-top: 1px solid #E5DFC6; margin: 2.5em 0; }
