@@ -1,0 +1,1 @@
+DELETE FROM public.newsroom_authors WHERE slug = 'andre-saint';
