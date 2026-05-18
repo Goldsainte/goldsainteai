@@ -13,7 +13,7 @@ interface ApplicationApprovedProps {
 export const ApplicationApprovedProfessionalEmail = ({
   recipientName,
   applicationType = 'agent',
-  stripeOnboardingUrl,
+  stripeOnboardingUrl: _stripeOnboardingUrl,
   adminNotes,
 }: ApplicationApprovedProps) => {
   const typeLabel =
@@ -22,9 +22,7 @@ export const ApplicationApprovedProfessionalEmail = ({
   const steps = [
     `Log in with the email you applied with — you'll set your permanent password on first sign-in.`,
     `Complete Stripe Identity verification to unlock your dashboard.`,
-    stripeOnboardingUrl
-      ? `Connect your bank account through Stripe Connect to receive on-platform payouts.`
-      : `Set up your public profile and your first Storyboard.`,
+    `Connect your bank account through Stripe Connect to receive on-platform payouts.`,
     `All communication and payment must remain on-platform per our Terms.`,
   ]
 
@@ -41,7 +39,7 @@ export const ApplicationApprovedProfessionalEmail = ({
       steps={steps}
       cta={{
         label: 'Sign in to your dashboard',
-        url: stripeOnboardingUrl || `https://goldsainte.ai/login`,
+        url: `https://goldsainte.ai/login?next=%2Fonboarding%2Fstripe-identity`,
       }}
     />
   )
