@@ -106,13 +106,13 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         </Link>
 
         <h1
-          className="font-primary mt-10 text-[34px] md:text-[52px] leading-[1.08] text-[#0a2225]"
+          className="font-primary mt-10 text-[34px] md:text-[42px] leading-[1.08] text-[#0a2225]"
           style={{ letterSpacing: "-0.01em" }}
         >
           {article.title}
         </h1>
 
-        <div className="mt-8 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-[#0a2225]/70">
+        <div className="mt-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-[14px] text-[#0a2225]/70">
           <span>By {article.author?.full_name || "Goldsainte"}</span>
           <span className="text-[#0a2225]/30">·</span>
           <span>{formatDate(article.published_at)}</span>
@@ -147,6 +147,11 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
       )}
 
       <div className="max-w-[680px] mx-auto px-6 pt-12 pb-16">
+        {article.type === "press_release" && (
+          <p className="mb-6 text-[11px] tracking-[0.22em] uppercase text-[#0a2225]/70 font-medium">
+            Charlotte, NC&nbsp;&mdash;&nbsp;{formatDate(article.published_at)}&nbsp;&mdash;
+          </p>
+        )}
         <Markdown source={article.body} variant="editorial" />
 
         {article.author?.signature_image_url && (
@@ -160,40 +165,41 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         )}
 
         {article.type === "press_release" && (
-          <>
-            <hr className="my-16 border-t border-[#E5DFC6]" />
-            <h3 className="font-primary text-2xl text-[#0a2225] mb-4">About Goldsainte</h3>
-            <p className="text-[15px] text-[#0a2225]/80 leading-[1.7] mb-8">
-              Goldsainte is an AI-powered travel marketplace headquartered in Charlotte,
-              North Carolina. Founded in 2026, Goldsainte connects travelers with vetted
-              travel creators and certified travel agents through a platform that combines
-              AI trip planning, escrow-protected payments via Stripe Connect, and verified
-              professional expertise across 47 countries. For more information, visit{" "}
-              <a href="https://goldsainte.ai" className="text-[#0c4d47] underline underline-offset-2">
-                goldsainte.ai
-              </a>
-              .
-            </p>
-            <Link
-              to="/newsroom/media-kit"
-              className="inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.25em] text-[#0c4d47] hover:text-[#0a3d39]"
-            >
-              Download brand assets <span aria-hidden>→</span>
-            </Link>
-
-            <hr className="my-16 border-t border-[#E5DFC6]" />
-            <h3 className="font-primary text-2xl text-[#0a2225] mb-4">Press Contact</h3>
-            <p className="text-[15px] text-[#0a2225]/80 leading-[1.7]">
-              {article.press_contact_name || "Goldsainte Press Team"}
-              <br />
-              <a
-                href={`mailto:${article.press_contact_email || "press@goldsainte.com"}`}
-                className="text-[#0c4d47] underline underline-offset-2"
+          <div className="mt-16 grid gap-6 md:grid-cols-2">
+            <div className="bg-[#F6F0E4] rounded-xl p-8">
+              <h3 className="font-primary text-xl text-[#0a2225] mb-3">About Goldsainte</h3>
+              <p className="text-[14px] text-[#0a2225]/80 leading-[1.7] mb-5">
+                Goldsainte is an AI-powered travel marketplace headquartered in Charlotte,
+                North Carolina. Founded in 2026, Goldsainte connects travelers with vetted
+                travel creators and certified travel agents through a platform that combines
+                AI trip planning, escrow-protected payments via Stripe Connect, and verified
+                professional expertise across 47 countries. For more information, visit{" "}
+                <a href="https://goldsainte.ai" className="text-[#0c4d47] underline underline-offset-2">
+                  goldsainte.ai
+                </a>
+                .
+              </p>
+              <Link
+                to="/newsroom/media-kit"
+                className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.25em] text-[#0c4d47] hover:text-[#0a3d39]"
               >
-                {article.press_contact_email || "press@goldsainte.com"}
-              </a>
-            </p>
-          </>
+                Download brand assets <span aria-hidden>→</span>
+              </Link>
+            </div>
+            <div className="bg-[#F6F0E4] rounded-xl p-8">
+              <h3 className="font-primary text-xl text-[#0a2225] mb-3">Press Contact</h3>
+              <p className="text-[14px] text-[#0a2225]/80 leading-[1.7]">
+                {article.press_contact_name || "Goldsainte Press Team"}
+                <br />
+                <a
+                  href={`mailto:${article.press_contact_email || "press@goldsainte.com"}`}
+                  className="text-[#0c4d47] underline underline-offset-2"
+                >
+                  {article.press_contact_email || "press@goldsainte.com"}
+                </a>
+              </p>
+            </div>
+          </div>
         )}
 
         <ShareRow title={article.title} url={canonical} />
