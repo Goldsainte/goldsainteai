@@ -177,6 +177,89 @@ const PAGES: Record<string, PageMeta> = {
       },
     ],
   },
+  "/help": {
+    title: "Help Center — Goldsainte",
+    description:
+      "Answers for travelers, agents, and creators on Goldsainte. Booking, payments, fees, identity verification, cancellations, and trust & safety.",
+    h1: "Help Center",
+    intro:
+      "Find answers to common questions about booking trips, managing proposals, payments and fees, identity verification, cancellations, and how Goldsainte protects every transaction on-platform.",
+    sections: [
+      {
+        heading: "For Travelers",
+        body: "How to request a trip, compare proposals, book securely on-platform, and manage payments through milestone-based escrow.",
+        links: [
+          { label: "Browse the Marketplace", href: "/marketplace" },
+          { label: "Trust & Safety", href: "/trust-safety" },
+        ],
+      },
+      {
+        heading: "For Agents & Creators",
+        body: "How to apply, pass identity verification, build a profile, submit proposals, get paid, and grow your book of business on Goldsainte.",
+        links: [
+          { label: "Apply as an Agent", href: "/apply/agent" },
+          { label: "About Goldsainte", href: "/about" },
+        ],
+      },
+      {
+        heading: "Payments & Fees",
+        body: "Goldsainte charges a transparent 7% platform fee — 3.5% deducted from the host and 3.5% added to the guest. All payments are processed on-platform with milestone-based escrow.",
+      },
+    ],
+  },
+  "/trust-safety": {
+    title: "Trust & Safety — Goldsainte",
+    description:
+      "How Goldsainte keeps travelers, agents, and creators safe: mandatory identity verification, on-platform payments, escrow, and dispute resolution.",
+    h1: "Trust & Safety",
+    intro:
+      "Trust is the foundation of every booking on Goldsainte. We verify every account, escrow every payment, and keep every conversation on-platform — so travelers, agents, and creators can transact with confidence at the high end of travel.",
+    sections: [
+      {
+        heading: "Mandatory Identity Verification",
+        body: "Every traveler, agent, and creator on Goldsainte completes Stripe Identity verification before they can transact. No exceptions.",
+      },
+      {
+        heading: "On-Platform Payments & Escrow",
+        body: "All payments are processed on Goldsainte with milestone-based escrow. Funds release as the trip progresses, with built-in refund protection and dispute resolution.",
+      },
+      {
+        heading: "On-Platform Communication",
+        body: "Conversations, contracts, and itineraries stay on Goldsainte — protecting both sides with a complete, on-the-record audit trail.",
+        links: [
+          { label: "Help Center", href: "/help" },
+          { label: "About Goldsainte", href: "/about" },
+        ],
+      },
+    ],
+  },
+  "/apply/agent": {
+    title: "Apply as a Travel Agent — Goldsainte",
+    description:
+      "Join Goldsainte as a certified travel agent. Access qualified high-intent travel requests, manage proposals, and grow your business on-platform.",
+    h1: "Apply as a Travel Agent",
+    intro:
+      "Goldsainte is built for serious travel professionals. Apply to join our marketplace and gain access to a continuous pipeline of qualified, high-intent travel requests from discerning travelers worldwide.",
+    sections: [
+      {
+        heading: "What You Get",
+        body: "Qualified, high-intent leads. A polished proposal workspace. On-platform payments with milestone escrow. A verified profile that builds long-term trust with travelers.",
+      },
+      {
+        heading: "Requirements",
+        body: "Active travel agency credentials, proven specialty regions, mandatory Stripe Identity verification, and a commitment to on-platform communication and payments.",
+        links: [
+          { label: "Trust & Safety", href: "/trust-safety" },
+          { label: "Help Center", href: "/help" },
+        ],
+      },
+      {
+        heading: "How It Works",
+        body: "Submit your application. Our team reviews credentials within a few business days. Approved agents complete identity verification, build their profile, and start receiving briefs.",
+        links: [{ label: "About Goldsainte", href: "/about" }],
+      },
+    ],
+  },
 };
 
 function normalizePath(raw: string | null): string | null {
