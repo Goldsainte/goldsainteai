@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -65,6 +66,8 @@ export function NewsroomMobilePicker({
 }: MobilePickerProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [rect, setRect] = useState<{ left: number; top: number; width: number } | null>(null);
 
   const activeLabel = useMemo(
     () => options.find((option) => option.value === value)?.label ?? options[0]?.label ?? "",
@@ -93,10 +96,28 @@ export function NewsroomMobilePicker({
     };
   }, []);
 
+  useLayoutEffect(() => {
+    if (!open) return;
+    function update() {
+      const el = triggerRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      setRect({ left: r.left, top: r.bottom + 6, width: r.width });
+    }
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, true);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
+    };
+  }, [open]);
+
   return (
     <div ref={ref} className={cn("relative", className)}>
       <span className="sr-only">{label}</span>
       <button
+        ref={triggerRef}
         type="button"
         aria-label={label}
         aria-haspopup="listbox"
@@ -111,9 +132,19 @@ export function NewsroomMobilePicker({
         <ChevronDown className={cn("h-4 w-4 shrink-0 text-[#0a2225]/55 transition-transform", open && "rotate-180")} />
       </button>
 
-      {open ? (
-        <div className="absolute inset-x-0 top-[calc(100%+6px)] z-40 overflow-hidden rounded-sm border border-[#E5DFC6] bg-white shadow-[0_20px_48px_-28px_rgba(10,34,37,0.45)]">
-          <div role="listbox" aria-label={label} className="py-1.5">
+      {open && rect
+        ? createPortal(
+            <div
+              style={{
+                position: "fixed",
+                left: rect.left,
+                top: rect.top,
+                width: rect.width,
+                zIndex: 9999,
+              }}
+              className="overflow-hidden rounded-sm border border-[#E5DFC6] bg-white shadow-[0_20px_48px_-28px_rgba(10,34,37,0.45)]"
+            >
+              <div role="listbox" aria-label={label} className="py-1.5">
             {options.map((option) => {
               const active = option.value === value;
               return (
@@ -138,9 +169,11 @@ export function NewsroomMobilePicker({
                 </button>
               );
             })}
-          </div>
-        </div>
-      ) : null}
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }
