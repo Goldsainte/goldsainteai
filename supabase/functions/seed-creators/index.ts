@@ -71,6 +71,26 @@ Deno.serve(async (req) => {
       }
     );
 
+    // 🔒 AUTH: admin only
+    const authHeader = req.headers.get('Authorization') ?? '';
+    if (!authHeader.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
+      });
+    }
+    const { data: { user } } = await supabaseAdmin.auth.getUser(authHeader.replace('Bearer ', ''));
+    if (!user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
+      });
+    }
+    const { data: roles } = await supabaseAdmin.from('user_roles').select('role').eq('user_id', user.id);
+    if (!roles?.some((r: { role: string }) => r.role === 'admin')) {
+      return new Response(JSON.stringify({ error: 'Forbidden: admin only' }), {
+        status: 403, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
+      });
+    }
+
     const results = [];
     const errors = [];
 

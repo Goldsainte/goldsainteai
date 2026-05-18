@@ -158,20 +158,20 @@ async function verifyAdminUser(
 
     logger.info("User authenticated", { userId: user.id });
 
-    // Check if user has admin role
-    const { data: profile, error: profileError } = await supabaseAdmin
-      .from("profiles")
+    // Check if user has admin role via the authoritative user_roles table
+    const { data: roles, error: rolesError } = await supabaseAdmin
+      .from("user_roles")
       .select("role")
-      .eq("id", user.id)
-      .single();
+      .eq("user_id", user.id);
 
-    if (profileError || !profile) {
-      logger.error("Failed to fetch user profile", { error: profileError });
-      return { authorized: false, error: "User profile not found" };
+    if (rolesError) {
+      logger.error("Failed to fetch user roles", { error: rolesError });
+      return { authorized: false, error: "Failed to verify role" };
     }
 
-    if (profile.role !== "admin") {
-      logger.warn("User is not an admin", { userId: user.id, role: profile.role });
+    const isAdmin = (roles ?? []).some((r: { role: string }) => r.role === "admin");
+    if (!isAdmin) {
+      logger.warn("User is not an admin", { userId: user.id });
       return {
         authorized: false,
         error: "Insufficient permissions. Admin role required.",
