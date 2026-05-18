@@ -103,7 +103,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         })}</script>
       </Helmet>
 
-      <article className="max-w-[680px] mx-auto px-6 pt-12 md:pt-20 pb-8 animate-fade-in">
+      <article className="max-w-[680px] mx-auto px-5 sm:px-6 pt-8 md:pt-20 pb-8 animate-fade-in">
         <Link
           to="/newsroom"
           className="inline-flex items-center gap-2 text-[11px] tracking-[0.25em] uppercase text-[#0c4d47] hover:text-[#0a3d39] transition"
@@ -112,13 +112,13 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         </Link>
 
         <h1
-          className="font-primary mt-10 text-[34px] md:text-[42px] leading-[1.08] text-[#0a2225]"
+          className="font-primary mt-8 md:mt-10 text-[28px] sm:text-[34px] md:text-[42px] leading-[1.1] text-[#0a2225]"
           style={{ letterSpacing: "-0.01em" }}
         >
           {article.title}
         </h1>
 
-        <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-[14px] text-[#0a2225]/70">
+        <div className="mt-5 md:mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] sm:text-[14px] text-[#0a2225]/70">
           <span>By {article.author?.full_name || "Goldsainte"}</span>
           <span className="text-[#0a2225]/30">·</span>
           <span>{formatDate(article.published_at)}</span>
@@ -130,8 +130,8 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         </div>
 
         {article.subtitle && (
-          <div className="mt-10 border-l-2 border-[#C7A962] pl-5 py-1">
-            <p className="text-[15px] italic text-[#0a2225]/75 leading-relaxed">
+          <div className="mt-8 md:mt-10 border-l-2 border-[#C7A962] pl-4 sm:pl-5 py-1">
+            <p className="text-[14px] sm:text-[15px] italic text-[#0a2225]/75 leading-relaxed">
               <span className="font-semibold not-italic text-[#0a2225]">Editor's Note:</span>{" "}
               {article.subtitle}
             </p>
@@ -141,7 +141,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
 
       {/* Hero image — shown for all article types; branded fallback for press releases without one */}
       {article.hero_image_url ? (
-        <figure className="max-w-[680px] mx-auto px-6 mt-12 animate-fade-in">
+        <figure className="max-w-[680px] mx-auto px-5 sm:px-6 mt-8 md:mt-12 animate-fade-in">
           <img
             src={article.hero_image_url}
             alt={article.hero_image_alt || article.title}
@@ -154,8 +154,8 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
           )}
         </figure>
       ) : article.type === "press_release" ? (
-        <div className="max-w-[680px] mx-auto px-6 mt-12 animate-fade-in">
-          <div className="w-full aspect-[21/6] rounded-sm bg-gradient-to-br from-[#0c4d47] to-[#0a2225] flex items-center justify-center">
+        <div className="max-w-[680px] mx-auto px-5 sm:px-6 mt-8 md:mt-12 animate-fade-in">
+          <div className="w-full aspect-[16/9] sm:aspect-[21/6] rounded-sm bg-gradient-to-br from-[#0c4d47] to-[#0a2225] flex items-center justify-center">
             <img
               src={wordmarkGold}
               alt="Goldsainte"
@@ -165,16 +165,16 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         </div>
       ) : null}
 
-      <div className="max-w-[680px] mx-auto px-6 pt-12 pb-16">
+      <div className="max-w-[680px] mx-auto px-5 sm:px-6 pt-8 md:pt-12 pb-12 md:pb-16">
         {article.type === "press_release" && (
-          <p className="mb-6 text-[11px] tracking-[0.22em] uppercase text-[#0a2225]/70 font-medium">
+          <p className="mb-5 md:mb-6 text-[10px] sm:text-[11px] tracking-[0.18em] sm:tracking-[0.22em] uppercase text-[#0a2225]/70 font-medium">
             Charlotte, NC&nbsp;&mdash;&nbsp;{formatDate(article.published_at)}&nbsp;&mdash;
           </p>
         )}
         <Markdown source={article.body} variant="editorial" />
 
         {article.author?.signature_image_url && (
-          <div className="mt-16 mb-4">
+          <div className="mt-12 md:mt-16 mb-4">
             <img
               src={article.author.signature_image_url}
               alt={`${article.author.full_name} signature`}
@@ -184,10 +184,10 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         )}
 
         {article.type === "press_release" && (
-          <div className="mt-16 grid gap-6 md:grid-cols-2">
-            <div className="bg-[#F6F0E4] rounded-xl p-8">
+          <div className="mt-12 md:mt-16 grid gap-5 md:gap-6 md:grid-cols-2">
+            <div className="bg-[#F6F0E4] rounded-xl p-6 md:p-8">
               <h3 className="font-primary text-xl text-[#0a2225] mb-3">About Goldsainte</h3>
-              <p className="text-[14px] text-[#0a2225]/80 leading-[1.7] mb-5">
+              <p className="text-[14px] text-[#0a2225]/80 leading-[1.6] mb-5">
                 Goldsainte is an AI-powered travel marketplace headquartered in Charlotte,
                 North Carolina. Founded in 2026, Goldsainte connects travelers with vetted
                 travel creators and certified travel agents through a platform that combines
@@ -205,9 +205,9 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
                 Download brand assets <span aria-hidden>→</span>
               </Link>
             </div>
-            <div className="bg-[#F6F0E4] rounded-xl p-8">
+            <div className="bg-[#F6F0E4] rounded-xl p-6 md:p-8">
               <h3 className="font-primary text-xl text-[#0a2225] mb-3">Press Contact</h3>
-              <p className="text-[14px] text-[#0a2225]/80 leading-[1.7]">
+              <p className="text-[14px] text-[#0a2225]/80 leading-[1.6]">
                 {article.press_contact_name || "Goldsainte Press Team"}
                 <br />
                 <a
@@ -226,11 +226,11 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
 
       {related.length > 0 && (
         <section className="bg-[#FDF9F0] border-t border-[#E5DFC6]">
-          <div className="max-w-5xl mx-auto px-6 py-20">
-            <h3 className="font-primary text-2xl md:text-3xl text-[#0a2225] mb-10">
+          <div className="max-w-5xl mx-auto px-5 sm:px-6 py-12 md:py-20">
+            <h3 className="font-primary text-2xl md:text-3xl text-[#0a2225] mb-8 md:mb-10">
               Related stories
             </h3>
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
               {related.map((r) => (
                 <Link key={r.id} to={articlePath(r)} className="group block">
                   {r.hero_image_url ? (
