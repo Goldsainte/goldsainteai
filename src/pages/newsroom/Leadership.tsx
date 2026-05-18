@@ -17,7 +17,7 @@ export default function Leadership() {
         <link rel="canonical" href={`${BASE_URL}/newsroom/leadership`} />
       </Helmet>
       <div className="max-w-5xl mx-auto px-6 py-20">
-        <h1 className="font-secondary text-5xl mb-12">Leadership</h1>
+        <h1 className="font-secondary text-xl md:text-2xl md:text-3xl md:text-4xl mb-12">Leadership</h1>
         <div className="space-y-20">
           {authors.map((a) => (
             <article key={a.id} id={a.slug} className="grid md:grid-cols-[200px_1fr] gap-10">
@@ -29,7 +29,7 @@ export default function Leadership() {
                 )}
               </div>
               <div>
-                <h2 className="font-secondary text-3xl">{a.full_name}</h2>
+                <h2 className="font-secondary text-xl md:text-2xl md:text-3xl">{a.full_name}</h2>
                 <p className="text-[#0c4d47] uppercase text-xs tracking-[0.2em] mt-2">{a.title}</p>
                 {a.quote && (
                   <blockquote className="font-secondary text-xl italic text-[#0a2225]/80 border-l-2 border-[#C7A962] pl-4 my-6">

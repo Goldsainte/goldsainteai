@@ -21,7 +21,7 @@ export default function Archive() {
         <link rel="canonical" href={`${BASE_URL}/newsroom/archive`} />
       </Helmet>
       <div className="max-w-5xl mx-auto px-6 py-20">
-        <h1 className="font-secondary text-5xl mb-6">Archive</h1>
+        <h1 className="font-secondary text-xl md:text-2xl md:text-3xl md:text-4xl mb-6">Archive</h1>
         <div className="flex gap-3 mb-12 text-xs uppercase tracking-wider">
           {[
             ["all", "All"],

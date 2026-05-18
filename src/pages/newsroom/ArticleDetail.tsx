@@ -107,7 +107,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         </Link>
 
         <p className="mt-10 text-[10px] tracking-[0.3em] uppercase text-[#C7A962]">{typeLabel}</p>
-        <h1 className="font-secondary text-4xl md:text-6xl leading-[1.05] mt-4">{article.title}</h1>
+        <h1 className="font-secondary text-xl md:text-2xl md:text-4xl leading-[1.05] mt-4">{article.title}</h1>
         {article.subtitle && (
           <p className="font-secondary text-xl md:text-2xl text-[#0a2225]/70 mt-5 leading-snug">
             {article.subtitle}
@@ -174,7 +174,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
       {related.length > 0 && (
         <section className="border-t border-[#E5DFC6]">
           <div className="max-w-5xl mx-auto px-6 py-16">
-            <h3 className="font-secondary text-2xl mb-8">Related Articles</h3>
+            <h3 className="font-secondary text-xl md:text-2xl mb-8">Related Articles</h3>
             <div className="grid md:grid-cols-3 gap-8">
               {related.map((r) => (
                 <Link key={r.id} to={articlePath(r)} className="group block">
