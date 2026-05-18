@@ -129,10 +129,10 @@ export default function EditorialPolicy() {
           </p>
           <p>
             <a
-              href="mailto:press@goldsainte.ai"
+              href="mailto:press@goldsainte.com"
               className="text-[#0c4d47] underline underline-offset-4 hover:text-[#0a2225] transition-colors"
             >
-              press@goldsainte.ai
+              press@goldsainte.com
             </a>
           </p>
         </Section>

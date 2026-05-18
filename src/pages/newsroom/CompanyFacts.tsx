@@ -11,7 +11,7 @@ const FACTS: { label: string; value: string }[] = [
   { label: "User Types", value: "Travelers, Travel Creators, Independent Travel Advisors, Hospitality & Experience Partners" },
   { label: "Investment Status", value: "Privately held" },
   { label: "General Contact", value: "hello@goldsainte.ai" },
-  { label: "Press Contact", value: "press@goldsainte.ai" },
+  { label: "Press Contact", value: "press@goldsainte.com" },
 ];
 
 const CORE_PRODUCTS = [
@@ -44,7 +44,7 @@ export default function CompanyFacts() {
             addressRegion: "NC",
             addressCountry: "US",
           },
-          email: "press@goldsainte.ai",
+          email: "press@goldsainte.com",
         })}</script>
       </Helmet>
       <div className="max-w-5xl mx-auto px-6 py-20 md:py-28 space-y-24 md:space-y-32">

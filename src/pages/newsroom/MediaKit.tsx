@@ -140,7 +140,7 @@ async function downloadLogoAssets() {
   );
   folder.file(
     "USAGE.txt",
-    "Goldsainte Logo Assets\n\nUsage: Maintain minimum clear space equal to the height of the monogram. Do not recolor, distort, rotate, or apply effects. Use green marks on cream or light surfaces; use gold marks on dark or photographic backgrounds.\n\nFor SVG masters or custom formats, contact press@goldsainte.ai."
+    "Goldsainte Logo Assets\n\nUsage: Maintain minimum clear space equal to the height of the monogram. Do not recolor, distort, rotate, or apply effects. Use green marks on cream or light surfaces; use gold marks on dark or photographic backgrounds.\n\nFor SVG masters or custom formats, contact press@goldsainte.com."
   );
   const blob = await zip.generateAsync({ type: "blob" });
   const url = URL.createObjectURL(blob);
@@ -297,7 +297,7 @@ export default function MediaKit() {
                 Download press packs
               </a>
               <a
-                href="mailto:press@goldsainte.ai?subject=Goldsainte%20Media%20Kit%20Request"
+                href="mailto:press@goldsainte.com?subject=Goldsainte%20Media%20Kit%20Request"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-[#FDF9F0]/40 text-[#FDF9F0] text-[11px] tracking-[0.22em] uppercase hover:border-[#FDF9F0] transition-colors"
               >
                 Request full archive
@@ -325,8 +325,8 @@ export default function MediaKit() {
               <p className="text-base text-[#0a2225]/70 mt-6 leading-relaxed max-w-2xl">
                 The materials below are pre-approved for editorial use. For interviews,
                 speaking requests, or custom assets, contact{" "}
-                <a className="text-[#0c4d47] underline underline-offset-4" href="mailto:press@goldsainte.ai">
-                  press@goldsainte.ai
+                <a className="text-[#0c4d47] underline underline-offset-4" href="mailto:press@goldsainte.com">
+                  press@goldsainte.com
                 </a>
                 .
               </p>
@@ -378,7 +378,7 @@ export default function MediaKit() {
               Download Logo Assets
             </button>
             <a
-              href="mailto:press@goldsainte.ai?subject=Logo%20request%20(SVG)"
+              href="mailto:press@goldsainte.com?subject=Logo%20request%20(SVG)"
               className="inline-flex items-center gap-2 text-[11px] tracking-[0.22em] uppercase text-[#0c4d47] hover:underline underline-offset-4"
             >
               Request SVG masters
@@ -541,7 +541,7 @@ export default function MediaKit() {
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <a
-                  href="mailto:press@goldsainte.ai?subject=Founder%20headshots%20request"
+                  href="mailto:press@goldsainte.com?subject=Founder%20headshots%20request"
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0c4d47] text-[#FDF9F0] text-[11px] tracking-[0.22em] uppercase hover:bg-[#0a3d39] transition-colors"
                 >
                   <Download className="h-3.5 w-3.5" />
@@ -575,8 +575,8 @@ export default function MediaKit() {
               <p className="text-base text-[#0a2225]/70 mt-4 max-w-2xl leading-relaxed">
                 Curated archives for journalists, broadcasters, and editorial
                 partners. Email{" "}
-                <a className="text-[#0c4d47] underline underline-offset-4" href="mailto:press@goldsainte.ai">
-                  press@goldsainte.ai
+                <a className="text-[#0c4d47] underline underline-offset-4" href="mailto:press@goldsainte.com">
+                  press@goldsainte.com
                 </a>{" "}
                 to receive the latest packs directly.
               </p>
@@ -614,7 +614,7 @@ export default function MediaKit() {
                       </p>
                       <div className="md:col-span-4 flex md:justify-end">
                         <a
-                          href={`mailto:press@goldsainte.ai?subject=${encodeURIComponent(
+                          href={`mailto:press@goldsainte.com?subject=${encodeURIComponent(
                             `Request: ${p.title}`,
                           )}`}
                           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0c4d47] text-[#FDF9F0] text-[11px] tracking-[0.22em] uppercase hover:bg-[#0a3d39] transition-colors"
@@ -650,10 +650,10 @@ export default function MediaKit() {
                 </p>
                 <div className="flex flex-wrap gap-3 pt-2">
                   <a
-                    href="mailto:press@goldsainte.ai?subject=Press%20inquiry"
+                    href="mailto:press@goldsainte.com?subject=Press%20inquiry"
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0c4d47] text-[#FDF9F0] text-[11px] tracking-[0.22em] uppercase hover:bg-[#0a3d39] transition-colors"
                   >
-                    press@goldsainte.ai
+                    press@goldsainte.com
                   </a>
                   <Link
                     to="/newsroom"
