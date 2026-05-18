@@ -1,4 +1,5 @@
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { NewsroomMobilePicker } from "./ui";
 
 const navItems = [
   { to: "/newsroom/archive", label: "Archive" },
@@ -17,6 +18,8 @@ export default function NewsroomLayout() {
       (item) => location.pathname === item.to || location.pathname.startsWith(`${item.to}/`),
     )?.to ?? "/newsroom";
 
+  const mobileOptions = [{ to: "/newsroom", label: "Overview" }, ...navItems];
+
   return (
     <div className="bg-[#FDF9F0] text-[#0a2225]">
       <div
@@ -24,40 +27,25 @@ export default function NewsroomLayout() {
         style={{ top: "var(--header-height, 64px)" }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="md:hidden flex items-center gap-2 py-2">
+          <div className="md:hidden flex items-center gap-3 py-3">
             <NavLink
               to="/newsroom"
               end
               className={({ isActive }) =>
-                `font-sans flex-shrink-0 border-r border-[#E5DFC6] pr-2 text-[9px] tracking-[0.16em] uppercase font-medium transition-colors ${
+                `font-sans flex-shrink-0 border-r border-[#E5DFC6] pr-3 text-[9px] tracking-[0.18em] uppercase font-medium leading-none transition-colors ${
                   isActive ? "text-[#0c4d47]" : "text-[#0a2225]/55 hover:text-[#0a2225]"
                 }`
               }
             >
               Newsroom
             </NavLink>
-            <div className="relative min-w-0 flex-1">
-              <label htmlFor="newsroom-mobile-nav" className="sr-only">
-                Choose a newsroom section
-              </label>
-              <select
-                id="newsroom-mobile-nav"
-                value={currentSection}
-                onChange={(e) => navigate(e.target.value)}
-                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
-                className="w-full appearance-none rounded-sm border border-[#E5DFC6] bg-white px-2.5 py-1.5 pr-7 text-[10px] leading-tight tracking-[0.14em] uppercase text-[#0a2225] focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/20"
-              >
-                <option value="/newsroom">Overview</option>
-                {navItems.map((item) => (
-                  <option key={item.to} value={item.to}>
-                    {item.label}
-                  </option>
-                ))}
-              </select>
-              <span className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-[10px] text-[#0a2225]/55">
-                ▾
-              </span>
-            </div>
+            <NewsroomMobilePicker
+              label="Choose a newsroom section"
+              value={currentSection}
+              options={mobileOptions.map((item) => ({ label: item.label, value: item.to }))}
+              onChange={(value) => navigate(value)}
+              className="min-w-0 flex-1"
+            />
           </div>
 
           <div className="hidden md:flex items-center gap-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
@@ -95,7 +83,9 @@ export default function NewsroomLayout() {
           </div>
         </div>
       </div>
-      <Outlet />
+      <div className="pt-4 md:pt-0">
+        <Outlet />
+      </div>
     </div>
   );
 }
