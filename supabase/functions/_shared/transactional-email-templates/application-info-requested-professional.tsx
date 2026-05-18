@@ -32,7 +32,7 @@ export const ApplicationInfoRequestedProfessionalEmail = ({
     cta={{
       label: 'Update your application',
       url: applicationId
-        ? `https://goldsainte.ai/application/update/${applicationId}`
+        ? `https://goldsainte.ai/application/status?id=${applicationId}`
         : `https://goldsainte.ai/application/status`,
     }}
   />
