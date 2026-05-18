@@ -298,39 +298,6 @@ function BoilerplatePanel() {
   );
 }
 
-function LogoTile({
-  variant,
-}: {
-  variant: "wordmark-light" | "wordmark-dark" | "monogram-light" | "monogram-dark";
-}) {
-  const isLight = variant.endsWith("light");
-  const isWordmark = variant.startsWith("wordmark");
-  return (
-    <div
-      className={`aspect-[4/3] flex items-center justify-center border border-[#0a2225]/10 rounded-sm relative overflow-hidden ${
-        isLight ? "bg-[#FDF9F0]" : "bg-[#0a2225]"
-      }`}
-    >
-      <span
-        className="font-secondary tracking-tight"
-        style={{
-          color: isLight ? "#0c4d47" : "#C7A962",
-          fontSize: isWordmark ? "1.75rem" : "2.5rem",
-          letterSpacing: isWordmark ? "-0.02em" : "0",
-        }}
-      >
-        {isWordmark ? "Goldsainte" : "G"}
-      </span>
-      <span
-        className="absolute top-3 left-3 text-[9px] tracking-[0.25em] uppercase"
-        style={{ color: isLight ? "rgba(10,34,37,0.45)" : "rgba(253,249,240,0.5)" }}
-      >
-        {isWordmark ? "Wordmark" : "Monogram"} · {isLight ? "Light" : "Dark"}
-      </span>
-    </div>
-  );
-}
-
 export default function MediaKit() {
   return (
     <>
