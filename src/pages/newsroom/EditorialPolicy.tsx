@@ -19,14 +19,21 @@ export default function EditorialPolicy() {
         {/* Hero */}
         <NewsroomPageHeader
           eyebrow="Editorial Philosophy"
-          title="The Goldsainte Newsroom exists to explore the future of modern travel through thoughtful storytelling, company news, industry insight, and curated editorial perspectives."
+          title="Editorial Philosophy"
           className="mb-14 md:mb-24 animate-fade-in"
           intro={
-            <p>
-              Our editorial approach is guided by clarity, trust, design, and the
-              belief that extraordinary travel begins long before a booking is
-              made.
-            </p>
+            <>
+              <p className="font-secondary text-[22px] sm:text-[26px] md:text-[30px] leading-[1.25] text-[#0a2225]">
+                The Goldsainte Newsroom exists to explore the future of modern
+                travel through thoughtful storytelling, company news, industry
+                insight, and curated editorial perspectives.
+              </p>
+              <p className="mt-5">
+                Our editorial approach is guided by clarity, trust, design, and
+                the belief that extraordinary travel begins long before a
+                booking is made.
+              </p>
+            </>
           }
         />
 
