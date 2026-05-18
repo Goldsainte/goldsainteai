@@ -36,6 +36,7 @@ const TOPICS = [
 export default function PressContact() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const [selectedTopic, setSelectedTopic] = useState("");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -86,6 +87,7 @@ export default function PressContact() {
     }
     setSubmitting(false);
     setDone(true);
+    setSelectedTopic("");
     form.reset();
   }
 
@@ -177,14 +179,14 @@ export default function PressContact() {
 function Field({ name, label, type = "text", required }: { name: string; label: string; type?: string; required?: boolean }) {
   return (
     <div>
-      <label className="text-[10px] uppercase tracking-[0.22em] text-[#0a2225]/60">
+      <label className={newsroomFieldLabelClass}>
         {label} {required && <span className="text-[#0c4d47]">*</span>}
       </label>
       <input
         name={name}
         type={type}
         required={required}
-        className="mt-2 w-full rounded-sm border border-[#E5DFC6] bg-white px-4 py-3 text-sm text-[#0a2225] focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/25 focus:border-[#0c4d47] transition"
+        className={newsroomFieldClass}
       />
     </div>
   );
