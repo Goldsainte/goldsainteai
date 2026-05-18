@@ -39,11 +39,11 @@ export default function CompanyFacts() {
         })}</script>
       </Helmet>
       <div className="max-w-4xl mx-auto px-6 py-20">
-        <h1 className="font-serif text-5xl mb-4">Goldsainte at a glance</h1>
+        <h1 className="font-secondary text-5xl mb-4">Goldsainte at a glance</h1>
         <p className="text-[#0a2225]/70 mb-12 max-w-2xl">
           Core facts, figures, and contact information for reporters and analysts.
         </p>
-        <dl className="divide-y divide-[#0a2225]/10 border-y border-[#0a2225]/10">
+        <dl className="divide-y divide-[#E5DFC6] border-y border-[#E5DFC6]">
           {FACTS.map((f) => (
             <div key={f.label} className="grid md:grid-cols-[200px_1fr] gap-4 py-5">
               <dt className="text-xs uppercase tracking-wider text-[#0a2225]/60 pt-1">{f.label}</dt>

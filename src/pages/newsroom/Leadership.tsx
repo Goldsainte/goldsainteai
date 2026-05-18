@@ -17,7 +17,7 @@ export default function Leadership() {
         <link rel="canonical" href={`${BASE_URL}/newsroom/leadership`} />
       </Helmet>
       <div className="max-w-5xl mx-auto px-6 py-20">
-        <h1 className="font-serif text-5xl mb-12">Leadership</h1>
+        <h1 className="font-secondary text-5xl mb-12">Leadership</h1>
         <div className="space-y-20">
           {authors.map((a) => (
             <article key={a.id} id={a.slug} className="grid md:grid-cols-[200px_1fr] gap-10">
@@ -25,14 +25,14 @@ export default function Leadership() {
                 {a.avatar_url ? (
                   <img src={a.avatar_url} alt={a.full_name} className="w-full aspect-square object-cover" />
                 ) : (
-                  <div className="w-full aspect-square bg-[#e8e1cf]" />
+                  <div className="w-full aspect-square bg-[#F6F0E4]" />
                 )}
               </div>
               <div>
-                <h2 className="font-serif text-3xl">{a.full_name}</h2>
+                <h2 className="font-secondary text-3xl">{a.full_name}</h2>
                 <p className="text-[#0c4d47] uppercase text-xs tracking-[0.2em] mt-2">{a.title}</p>
                 {a.quote && (
-                  <blockquote className="font-serif text-xl italic text-[#0a2225]/80 border-l-2 border-[#c9a84c] pl-4 my-6">
+                  <blockquote className="font-secondary text-xl italic text-[#0a2225]/80 border-l-2 border-[#C7A962] pl-4 my-6">
                     "{a.quote}"
                   </blockquote>
                 )}
@@ -40,7 +40,7 @@ export default function Leadership() {
                 {a.expertise && a.expertise.length > 0 && (
                   <div className="mt-5 flex flex-wrap gap-2">
                     {a.expertise.map((e) => (
-                      <span key={e} className="text-[10px] uppercase tracking-wider px-3 py-1 border border-[#0a2225]/20">
+                      <span key={e} className="text-[10px] uppercase tracking-wider px-3 py-1 border border-[#E5DFC6]">
                         {e}
                       </span>
                     ))}

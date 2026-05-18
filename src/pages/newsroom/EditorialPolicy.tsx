@@ -9,7 +9,7 @@ export default function EditorialPolicy() {
         <meta name="description" content="Goldsainte editorial standards, sourcing practices, corrections policy, and disclosures." />
         <link rel="canonical" href={`${BASE_URL}/newsroom/editorial-policy`} />
       </Helmet>
-      <div className="max-w-3xl mx-auto px-6 py-20 font-serif">
+      <div className="max-w-3xl mx-auto px-6 py-20 font-secondary">
         <h1 className="text-5xl mb-6">Editorial Policy</h1>
         <p className="text-[#0a2225]/70 mb-12 leading-relaxed text-lg">
           The Goldsainte Newsroom publishes original press releases, company news, and editorial commentary on the travel industry.

@@ -60,7 +60,7 @@ export default function NewsroomLanding() {
 
       <section className="max-w-7xl mx-auto px-6 pt-20 pb-16">
         <p className="text-[11px] tracking-[0.3em] uppercase text-[#0c4d47] mb-6">Goldsainte Newsroom</p>
-        <h1 className="font-serif text-5xl md:text-7xl leading-[1.05] tracking-tight max-w-4xl mb-6">
+        <h1 className="font-secondary text-5xl md:text-7xl leading-[1.05] tracking-tight max-w-4xl mb-6">
           News from the future of travel.
         </h1>
         <p className="text-lg md:text-xl text-[#0a2225]/70 max-w-2xl mb-10 leading-relaxed">
@@ -69,11 +69,11 @@ export default function NewsroomLanding() {
         <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
           <a
             href="mailto:press@goldsainte.com"
-            className="inline-flex items-center justify-center px-6 py-3 bg-[#0c4d47] text-white text-sm tracking-wide hover:bg-[#0a2225] transition"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-[#0c4d47] text-white text-sm tracking-wide hover:bg-[#0a3d39] transition"
           >
             Press inquiries
           </a>
-          <form onSubmit={subscribe} className="flex border border-[#0a2225]/20 bg-white">
+          <form onSubmit={subscribe} className="flex border border-[#E5DFC6] bg-white">
             <input
               type="email"
               required
@@ -85,7 +85,7 @@ export default function NewsroomLanding() {
             <button
               type="submit"
               disabled={submitting}
-              className="px-5 py-3 text-xs tracking-wide uppercase border-l border-[#0a2225]/20 hover:bg-[#f0ead9] disabled:opacity-50"
+              className="px-5 py-3 text-xs tracking-wide uppercase border-l border-[#E5DFC6] hover:bg-[#f0ead9] disabled:opacity-50"
             >
               {submitting ? "…" : "Subscribe"}
             </button>
@@ -99,7 +99,7 @@ export default function NewsroomLanding() {
             to={articlePath(featured)}
             className="grid md:grid-cols-2 gap-10 group items-stretch"
           >
-            <div className="aspect-[4/3] bg-[#e8e1cf] overflow-hidden">
+            <div className="aspect-[4/3] bg-[#F6F0E4] overflow-hidden">
               {featured.hero_image_url && (
                 <img
                   src={featured.hero_image_url}
@@ -109,10 +109,10 @@ export default function NewsroomLanding() {
               )}
             </div>
             <div className="flex flex-col justify-center">
-              <span className="text-[10px] tracking-[0.3em] uppercase text-[#c9a84c] mb-4">
+              <span className="text-[10px] tracking-[0.3em] uppercase text-[#C7A962] mb-4">
                 Featured · {featured.type === "press_release" ? "Press Release" : featured.type}
               </span>
-              <h2 className="font-serif text-3xl md:text-5xl leading-tight mb-5 group-hover:text-[#0c4d47] transition">
+              <h2 className="font-secondary text-3xl md:text-5xl leading-tight mb-5 group-hover:text-[#0c4d47] transition">
                 {featured.title}
               </h2>
               <p className="text-[#0a2225]/70 leading-relaxed mb-6 text-lg">{featured.excerpt}</p>
@@ -124,12 +124,12 @@ export default function NewsroomLanding() {
         </section>
       )}
 
-      <section className="border-t border-[#0a2225]/10">
+      <section className="border-t border-[#E5DFC6]">
         <div className="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-3 gap-12">
           <Column title="Recent Press Releases" items={pressReleases} emptyText="No press releases yet." />
           <Column title="Company News" items={news} emptyText="No company news yet." />
           <div>
-            <h3 className="font-serif text-2xl mb-6">In the Press</h3>
+            <h3 className="font-secondary text-2xl mb-6">In the Press</h3>
             {EXTERNAL_PRESS.length === 0 ? (
               <p className="text-sm text-[#0a2225]/50 italic">Coverage links coming soon.</p>
             ) : (
@@ -137,8 +137,8 @@ export default function NewsroomLanding() {
                 {EXTERNAL_PRESS.map((p, i) => (
                   <li key={i}>
                     <a href={p.url} target="_blank" rel="noopener noreferrer" className="block group">
-                      <span className="text-[10px] tracking-[0.25em] uppercase text-[#c9a84c]">{p.outlet}</span>
-                      <p className="font-serif text-lg group-hover:text-[#0c4d47] transition mt-1">{p.title}</p>
+                      <span className="text-[10px] tracking-[0.25em] uppercase text-[#C7A962]">{p.outlet}</span>
+                      <p className="font-secondary text-lg group-hover:text-[#0c4d47] transition mt-1">{p.title}</p>
                       <span className="text-xs text-[#0a2225]/50 mt-1 block">{p.date}</span>
                     </a>
                   </li>
@@ -149,7 +149,7 @@ export default function NewsroomLanding() {
         </div>
       </section>
 
-      <section className="border-t border-[#0a2225]/10 bg-[#efe7d3]">
+      <section className="border-t border-[#E5DFC6] bg-[#F6F0E4]">
         <div className="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-4 gap-8 text-sm">
           {[
             { to: "/newsroom/media-kit", label: "Media Kit", desc: "Logos, brand assets, headshots." },
@@ -158,7 +158,7 @@ export default function NewsroomLanding() {
             { to: "/newsroom/editorial-policy", label: "Editorial Policy", desc: "Our standards." },
           ].map((item) => (
             <Link key={item.to} to={item.to} className="group">
-              <p className="font-serif text-xl mb-2 group-hover:text-[#0c4d47] transition">{item.label}</p>
+              <p className="font-secondary text-xl mb-2 group-hover:text-[#0c4d47] transition">{item.label}</p>
               <p className="text-[#0a2225]/60">{item.desc}</p>
             </Link>
           ))}
@@ -171,7 +171,7 @@ export default function NewsroomLanding() {
 function Column({ title, items, emptyText }: { title: string; items: any[]; emptyText: string }) {
   return (
     <div>
-      <h3 className="font-serif text-2xl mb-6">{title}</h3>
+      <h3 className="font-secondary text-2xl mb-6">{title}</h3>
       {items.length === 0 ? (
         <p className="text-sm text-[#0a2225]/50 italic">{emptyText}</p>
       ) : (
@@ -179,10 +179,10 @@ function Column({ title, items, emptyText }: { title: string; items: any[]; empt
           {items.map((a) => (
             <li key={a.id}>
               <Link to={articlePath(a)} className="block group">
-                <span className="text-[10px] tracking-[0.25em] uppercase text-[#c9a84c]">
+                <span className="text-[10px] tracking-[0.25em] uppercase text-[#C7A962]">
                   {formatDate(a.published_at)}
                 </span>
-                <p className="font-serif text-lg leading-snug group-hover:text-[#0c4d47] transition mt-1">
+                <p className="font-secondary text-lg leading-snug group-hover:text-[#0c4d47] transition mt-1">
                   {a.title}
                 </p>
               </Link>

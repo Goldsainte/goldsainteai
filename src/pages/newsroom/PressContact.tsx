@@ -58,7 +58,7 @@ export default function PressContact() {
         <link rel="canonical" href={`${BASE_URL}/newsroom/press-contact`} />
       </Helmet>
       <div className="max-w-2xl mx-auto px-6 py-20">
-        <h1 className="font-serif text-5xl mb-4">Press Contact</h1>
+        <h1 className="font-secondary text-5xl mb-4">Press Contact</h1>
         <p className="text-[#0a2225]/70 mb-10">
           For interview requests, demos, or industry commentary, submit the form below or email{" "}
           <a href="mailto:press@goldsainte.com" className="text-[#0c4d47] underline">press@goldsainte.com</a>.
@@ -66,7 +66,7 @@ export default function PressContact() {
 
         {done ? (
           <div className="border border-[#0c4d47] p-8 bg-white">
-            <p className="font-serif text-2xl mb-2">Thank you.</p>
+            <p className="font-secondary text-2xl mb-2">Thank you.</p>
             <p className="text-[#0a2225]/70">A member of our team will reply within one business day.</p>
           </div>
         ) : (
@@ -78,7 +78,7 @@ export default function PressContact() {
             <div>
               <label className="text-xs uppercase tracking-wider text-[#0a2225]/70">Inquiry topic *</label>
               <select name="topic" required defaultValue=""
-                className="mt-2 w-full border border-[#0a2225]/20 bg-white px-4 py-3 text-sm">
+                className="mt-2 w-full border border-[#E5DFC6] bg-white px-4 py-3 text-sm">
                 <option value="" disabled>Select…</option>
                 {TOPICS.map((t) => <option key={t} value={t}>{t}</option>)}
               </select>
@@ -87,12 +87,12 @@ export default function PressContact() {
             <div>
               <label className="text-xs uppercase tracking-wider text-[#0a2225]/70">Message *</label>
               <textarea name="message" required rows={6}
-                className="mt-2 w-full border border-[#0a2225]/20 bg-white px-4 py-3 text-sm" />
+                className="mt-2 w-full border border-[#E5DFC6] bg-white px-4 py-3 text-sm" />
             </div>
             <button
               type="submit"
               disabled={submitting}
-              className="px-8 py-3 bg-[#0c4d47] text-white text-sm tracking-wide hover:bg-[#0a2225] disabled:opacity-50"
+              className="px-8 py-3 rounded-full bg-[#0c4d47] text-white text-sm tracking-wide hover:bg-[#0a3d39] disabled:opacity-50"
             >
               {submitting ? "Submitting…" : "Submit inquiry"}
             </button>
@@ -113,7 +113,7 @@ function Field({ name, label, type = "text", required }: { name: string; label: 
         name={name}
         type={type}
         required={required}
-        className="mt-2 w-full border border-[#0a2225]/20 bg-white px-4 py-3 text-sm"
+        className="mt-2 w-full border border-[#E5DFC6] bg-white px-4 py-3 text-sm"
       />
     </div>
   );

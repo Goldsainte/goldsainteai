@@ -12,8 +12,8 @@ const navItems = [
 
 export default function NewsroomLayout() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#f7f3ea] text-[#0a2225]">
-      <div className="border-b border-[#0a2225]/10 bg-[#f7f3ea] sticky top-0 z-30 backdrop-blur">
+    <div className="min-h-screen flex flex-col bg-[#FDF9F0] text-[#0a2225]">
+      <div className="border-b border-[#E5DFC6] bg-[#FDF9F0] sticky top-0 z-30 backdrop-blur">
         <div className="max-w-7xl mx-auto px-6 py-3 flex flex-wrap items-center gap-x-6 gap-y-2">
           <span className="text-[10px] tracking-[0.25em] uppercase text-[#0c4d47] font-medium">
             Goldsainte Newsroom

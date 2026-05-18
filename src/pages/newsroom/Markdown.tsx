@@ -9,8 +9,8 @@ export default function Markdown({ source }: { source: string }) {
   }, [source]);
   return (
     <div
-      className="prose prose-lg max-w-none font-serif text-[#0a2225] leading-relaxed
-        prose-headings:font-serif prose-headings:text-[#0a2225]
+      className="prose prose-lg max-w-none font-secondary text-[#0a2225] leading-relaxed
+        prose-headings:font-secondary prose-headings:text-[#0a2225]
         prose-a:text-[#0c4d47] prose-a:underline-offset-4
         prose-blockquote:border-l-[#0c4d47] prose-blockquote:text-[#0a2225]/80
         prose-img:rounded"
