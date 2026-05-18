@@ -1018,36 +1018,36 @@ All colors MUST be HSL.
   color: #0a2225;
   font-family: inherit;
   font-size: 17px;
-  line-height: 1.7;
+  line-height: 1.5;
 }
 @media (min-width: 640px) {
-  .prose-editorial { font-size: 18px; line-height: 1.75; }
+  .prose-editorial { font-size: 18px; line-height: 1.5; }
 }
 .prose-editorial p {
-  margin-bottom: 1.6em;
+  margin-bottom: 1em;
   font-family: inherit;
   font-size: inherit;
-  line-height: inherit;
+  line-height: 1.5;
 }
-.prose-editorial li { font-family: inherit; font-size: inherit; line-height: inherit; }
+.prose-editorial li { font-family: inherit; font-size: inherit; line-height: 1.5; }
 .prose-editorial h2 {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 32px; font-weight: 500; line-height: 1.2;
-  margin-top: 3em; margin-bottom: 1.1em; color: #0a2225;
+  margin-top: 1.6em; margin-bottom: 0.6em; color: #0a2225;
   letter-spacing: -0.01em;
 }
 @media (min-width: 640px) {
-  .prose-editorial h2 { font-size: 36px; margin-top: 3.4em; }
+  .prose-editorial h2 { font-size: 36px; margin-top: 1.8em; }
 }
 .prose-editorial h3 {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 24px; font-weight: 500;
-  margin-top: 2.4em; margin-bottom: 0.8em; color: #0a2225;
+  margin-top: 1.4em; margin-bottom: 0.5em; color: #0a2225;
 }
-.prose-editorial ul { list-style: disc; padding-left: 1.4em; margin: 1.8em 0; }
-.prose-editorial ul li { margin-bottom: 0.75em; color: #0a2225; padding-left: 0.25em; }
-.prose-editorial ol { list-style: decimal; padding-left: 1.4em; margin: 1.8em 0; }
-.prose-editorial ol li { margin-bottom: 0.75em; color: #0a2225; padding-left: 0.25em; }
+.prose-editorial ul { list-style: disc; padding-left: 1.4em; margin: 1em 0; }
+.prose-editorial ul li { margin-bottom: 0.35em; color: #0a2225; padding-left: 0.25em; line-height: 1.5; }
+.prose-editorial ol { list-style: decimal; padding-left: 1.4em; margin: 1em 0; }
+.prose-editorial ol li { margin-bottom: 0.35em; color: #0a2225; padding-left: 0.25em; line-height: 1.5; }
 .prose-editorial strong { font-weight: 600; color: #0a2225; }
 .prose-editorial a {
   color: #0c4d47; text-decoration: underline;
@@ -1057,9 +1057,9 @@ All colors MUST be HSL.
 .prose-editorial em { font-style: italic; }
 .prose-editorial blockquote {
   border-left: 2px solid #C7A962;
-  padding-left: 1.5em; margin: 2.4em 0;
+  padding-left: 1.5em; margin: 1.4em 0;
   font-style: italic; color: #0a2225;
   font-family: inherit;
-  font-size: 1.05em; line-height: 1.55;
+  font-size: 1.05em; line-height: 1.5;
 }
-.prose-editorial hr { border: 0; border-top: 1px solid #E5DFC6; margin: 3em 0; }
+.prose-editorial hr { border: 0; border-top: 1px solid #E5DFC6; margin: 1.8em 0; }
