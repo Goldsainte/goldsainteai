@@ -103,7 +103,7 @@ export function NewsroomMobilePicker({
         aria-expanded={open}
         onClick={() => setOpen((current) => !current)}
         className={cn(
-          "flex h-11 w-full items-center justify-between rounded-sm border border-[#E5DFC6] bg-white px-3.5 text-left text-[11px] uppercase tracking-[0.14em] text-[#0a2225] transition-colors hover:border-[#d6cfb7] focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/20",
+          "flex h-10 w-full items-center justify-between rounded-sm border border-[#E5DFC6] bg-white px-3 text-left text-[10px] uppercase tracking-[0.12em] text-[#0a2225] transition-colors hover:border-[#d6cfb7] focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/20",
           triggerClassName,
         )}
       >
@@ -127,7 +127,7 @@ export function NewsroomMobilePicker({
                     setOpen(false);
                   }}
                   className={cn(
-                    "flex w-full items-center justify-between gap-3 px-3.5 py-3 text-left text-[11px] uppercase tracking-[0.14em] transition-colors",
+                    "flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-[10px] uppercase tracking-[0.12em] transition-colors",
                     active
                       ? "bg-[#F6F0E4] text-[#0c4d47]"
                       : "text-[#0a2225]/78 hover:bg-[#FAF6EC]",
