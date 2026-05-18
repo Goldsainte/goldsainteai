@@ -5,7 +5,7 @@ const navItems = [
   { to: "/newsroom/archive", label: "Archive" },
   { to: "/newsroom/media-kit", label: "Media Kit" },
   { to: "/newsroom/company-facts", label: "Company Facts" },
-  { to: "/newsroom/leadership", label: "Leadership" },
+  { to: "/newsroom/leadership", label: "Founder" },
   { to: "/newsroom/editorial-policy", label: "Editorial Policy" },
   { to: "/newsroom/press-contact", label: "Press Contact" },
 ];
