@@ -6,6 +6,7 @@ import {
   COMPANY_BOILERPLATE_LONG,
   articlePath,
   fetchArticleBySlug,
+  fetchRelatedArticles,
   formatDate,
 } from "./lib";
 import Markdown from "./Markdown";
@@ -16,6 +17,14 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
     queryKey: ["newsroom", "article", slug],
     queryFn: () => fetchArticleBySlug(slug!),
     enabled: !!slug,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const { data: related = [] } = useQuery({
+    queryKey: ["newsroom", "related", article?.id, article?.category],
+    queryFn: () =>
+      fetchRelatedArticles({ category: article!.category, excludeId: article!.id, limit: 3 }),
+    enabled: !!article,
     staleTime: 1000 * 60 * 5,
   });
 
@@ -139,23 +148,75 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
           </div>
         )}
 
-        <hr className="my-16 border-[#0a2225]/15" />
+        <ShareRow title={article.title} url={canonical} />
 
-        <h3 className="font-secondary text-xl mb-4">About Goldsainte</h3>
-        <p className="text-sm text-[#0a2225]/70 leading-relaxed mb-10">{COMPANY_BOILERPLATE_LONG}</p>
+        {article.type === "press_release" && (
+          <>
+            <hr className="my-16 border-[#E5DFC6]" />
+            <h3 className="font-secondary text-xl mb-4">About Goldsainte</h3>
+            <p className="text-sm text-[#0a2225]/70 leading-relaxed mb-10">{COMPANY_BOILERPLATE_LONG}</p>
 
-        <h3 className="font-secondary text-xl mb-4">Press Contact</h3>
-        <p className="text-sm text-[#0a2225]/80">
-          {article.press_contact_name || "Press Office"}
-          <br />
-          <a
-            href={`mailto:${article.press_contact_email || "press@goldsainte.com"}`}
-            className="text-[#0c4d47] underline underline-offset-4"
-          >
-            {article.press_contact_email || "press@goldsainte.com"}
-          </a>
-        </p>
+            <h3 className="font-secondary text-xl mb-4">Press Contact</h3>
+            <p className="text-sm text-[#0a2225]/80">
+              {article.press_contact_name || "Goldsainte Press Team"}
+              <br />
+              <a
+                href={`mailto:${article.press_contact_email || "press@goldsainte.com"}`}
+                className="text-[#0c4d47] underline underline-offset-4"
+              >
+                {article.press_contact_email || "press@goldsainte.com"}
+              </a>
+            </p>
+          </>
+        )}
       </div>
+
+      {related.length > 0 && (
+        <section className="border-t border-[#E5DFC6]">
+          <div className="max-w-5xl mx-auto px-6 py-16">
+            <h3 className="font-secondary text-2xl mb-8">Related Articles</h3>
+            <div className="grid md:grid-cols-3 gap-8">
+              {related.map((r) => (
+                <Link key={r.id} to={articlePath(r)} className="group block">
+                  <div className="aspect-[4/3] bg-[#F6F0E4] overflow-hidden rounded-2xl mb-4">
+                    {r.hero_image_url && (
+                      <img
+                        src={r.hero_image_url}
+                        alt={r.title}
+                        className="w-full h-full object-cover group-hover:scale-[1.02] transition duration-700"
+                      />
+                    )}
+                  </div>
+                  <span className="text-[10px] tracking-[0.25em] uppercase text-[#C7A962]">
+                    {formatDate(r.published_at)}
+                  </span>
+                  <p className="font-secondary text-lg leading-snug mt-1 group-hover:text-[#0c4d47] transition">
+                    {r.title}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </>
+  );
+}
+
+function ShareRow({ title, url }: { title: string; url: string }) {
+  const t = encodeURIComponent(title);
+  const u = encodeURIComponent(url);
+  const twitter = `https://twitter.com/intent/tweet?text=${t}&url=${u}`;
+  const linkedin = `https://www.linkedin.com/sharing/share-offsite/?url=${u}`;
+  const email = `mailto:?subject=${t}&body=${u}`;
+  const cls =
+    "inline-flex items-center justify-center px-4 py-2 rounded-full border border-[#E5DFC6] text-xs uppercase tracking-wider text-[#0a2225]/70 hover:text-[#0c4d47] hover:border-[#0c4d47] transition";
+  return (
+    <div className="mt-12 flex items-center gap-3 flex-wrap">
+      <span className="text-[10px] tracking-[0.25em] uppercase text-[#0a2225]/50 mr-1">Share</span>
+      <a href={twitter} target="_blank" rel="noopener noreferrer" className={cls}>Twitter</a>
+      <a href={linkedin} target="_blank" rel="noopener noreferrer" className={cls}>LinkedIn</a>
+      <a href={email} className={cls}>Email</a>
+    </div>
   );
 }
