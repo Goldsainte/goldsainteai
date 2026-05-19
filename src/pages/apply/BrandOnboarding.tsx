@@ -771,7 +771,17 @@ export default function BrandOnboarding() {
                     className={`data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47] mt-0.5 ${errors[key] ? 'border-red-500' : ''}`}
                   />
                   <label className="text-sm text-[#0a2225]">
-                    I accept the <a href={link} target="_blank" className="text-[#C7A962] hover:underline">{label}</a> *
+                    I accept the <a
+                      href={link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.open(link, '_blank', 'noopener,noreferrer');
+                      }}
+                      className="text-[#C7A962] hover:underline"
+                    >{label}</a> *
                   </label>
                 </div>
               ))}

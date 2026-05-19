@@ -164,6 +164,11 @@ export function LegalComplianceAcceptance({
                       href={doc.link}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.open(doc.link, '_blank', 'noopener,noreferrer');
+                      }}
                       className="text-xs text-[#C7A962] hover:underline flex items-center gap-1"
                     >
                       Full Document <ExternalLink className="w-3 h-3" />
