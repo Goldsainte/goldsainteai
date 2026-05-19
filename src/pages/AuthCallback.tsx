@@ -13,13 +13,20 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
+        const hashParams = new URLSearchParams(location.hash.startsWith('#') ? location.hash.slice(1) : location.hash);
+        const queryParams = new URLSearchParams(location.search);
+        const isRecoveryFlow =
+          hashParams.get('type') === 'recovery' ||
+          queryParams.get('type') === 'recovery' ||
+          queryParams.has('token_hash');
+
         // Wait for Supabase to confirm the session is ready (event-driven, with 5s fallback)
         const session = await new Promise<any>((resolve) => {
           const timeout = setTimeout(() => resolve(null), 5000);
 
           const { data: { subscription } } = supabase.auth.onAuthStateChange(
             (event, sessionData) => {
-              if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+              if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
                 clearTimeout(timeout);
                 subscription.unsubscribe();
                 resolve(sessionData);
@@ -38,6 +45,18 @@ const AuthCallback = () => {
 
         if (!session) {
           navigate('/auth', { replace: true });
+          return;
+        }
+
+        if (isRecoveryFlow) {
+          navigate(
+            {
+              pathname: '/reset-password',
+              search: location.search,
+              hash: location.hash,
+            },
+            { replace: true }
+          );
           return;
         }
 
@@ -191,7 +210,7 @@ const AuthCallback = () => {
     };
 
     handleAuthCallback();
-  }, [navigate, location.search]);
+  }, [navigate, location.hash, location.search]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
