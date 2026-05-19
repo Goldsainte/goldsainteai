@@ -517,6 +517,7 @@ export const AppRoutes = () => (
       <Route path="/admin/safety" element={<AdminGuard><AdminSafetyDashboardPage /></AdminGuard>} />
       <Route path="/admin/agents" element={<AdminGuard><AdminAgentsPage /></AdminGuard>} />
       <Route path="/admin/creators" element={<AdminGuard><AdminCreatorsPage /></AdminGuard>} />
+      <Route path="/admin/users" element={<AdminGuard><AdminUsersPage /></AdminGuard>} />
       <Route path="/admin/creator-approvals" element={<AdminGuard><AdminCreatorApprovalsPage /></AdminGuard>} />
       <Route path="/admin/bookings" element={<AdminGuard><AdminBookingsPage /></AdminGuard>} />
       <Route path="/admin/disputes" element={<AdminGuard><AdminDisputesPage /></AdminGuard>} />
