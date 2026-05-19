@@ -1,15 +1,15 @@
-import "../_shared/resend-guard.ts";
 import * as React from "npm:react@18.3.1";
 import { renderAsync } from "npm:@react-email/components@0.0.22";
+import { createClient } from "npm:@supabase/supabase-js@2";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { resolveAllowedOrigin } from "../_shared/cors.ts";
 import { RecoveryEmail } from "../_shared/email-templates/recovery.tsx";
 
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 const SITE_NAME = "goldsainteai";
-const PASSWORD_RESET_SENDER = "goldsainteai <noreply@notify.goldsainte.com>";
+const SENDER_DOMAIN = "notify.goldsainte.com";
+const PASSWORD_RESET_SENDER = `${SITE_NAME} <noreply@${SENDER_DOMAIN}>`;
 
 function corsHeaders(req?: Request): Record<string, string> {
   return {
@@ -24,15 +24,6 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders(req) });
   }
 
-  // === Environment sanity checks ===
-  if (!RESEND_API_KEY) {
-    console.error("❌ RESEND_API_KEY is not set in the Edge Function environment");
-    return new Response(
-      JSON.stringify({ error: "Email service is not configured (RESEND_API_KEY missing)." }),
-      { status: 500, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
-    );
-  }
-
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
     console.error("❌ SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY missing in Edge Function env");
     return new Response(
@@ -43,6 +34,7 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const { email, redirectTo } = await req.json();
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     
     if (!email) {
       throw new Error("Email is required");
@@ -99,31 +91,52 @@ const handler = async (req: Request): Promise<Response> => {
         confirmationUrl: appResetUrl.toString(),
       })
     );
-    
-    const emailResponse = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: PASSWORD_RESET_SENDER,
-        to: [email],
-        subject: "Reset your Goldsainte password",
-        html: emailHtml,
+    const emailText = await renderAsync(
+      React.createElement(RecoveryEmail, {
+        siteName: SITE_NAME,
+        confirmationUrl: appResetUrl.toString(),
       }),
+      { plainText: true }
+    );
+
+    const messageId = crypto.randomUUID();
+
+    await supabase.from('email_send_log').insert({
+      message_id: messageId,
+      template_name: 'recovery',
+      recipient_email: email,
+      status: 'pending',
     });
 
-    if (!emailResponse.ok) {
-      const errorData = await emailResponse.json().catch(() => null);
-      console.error("❌ Failed to send email via Resend:", errorData || emailResponse.statusText);
-      throw new Error(
-        errorData?.message || `Failed to send email (Resend status ${emailResponse.status})`
-      );
+    const { error: enqueueError } = await supabase.rpc('enqueue_email', {
+      queue_name: 'auth_emails',
+      payload: {
+        message_id: messageId,
+        to: email,
+        from: PASSWORD_RESET_SENDER,
+        sender_domain: SENDER_DOMAIN,
+        subject: 'Reset your Goldsainte password',
+        html: emailHtml,
+        text: emailText,
+        purpose: 'transactional',
+        label: 'recovery',
+        queued_at: new Date().toISOString(),
+      },
+    });
+
+    if (enqueueError) {
+      console.error('❌ Failed to enqueue password reset email:', enqueueError);
+      await supabase.from('email_send_log').insert({
+        message_id: messageId,
+        template_name: 'recovery',
+        recipient_email: email,
+        status: 'failed',
+        error_message: 'Failed to enqueue recovery email',
+      });
+      throw new Error('Failed to queue password reset email');
     }
 
-    const emailResult = await emailResponse.json();
-    console.log("Password reset email sent successfully:", emailResult);
+    console.log('Password reset email queued successfully:', { email, messageId });
 
     return new Response(
       JSON.stringify({ success: true, message: "Password reset email sent" }),
