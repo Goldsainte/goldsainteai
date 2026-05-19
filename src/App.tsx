@@ -123,6 +123,31 @@ function AppContent() {
     }
   }, [location.pathname]);
 
+  useEffect(() => {
+    const hashParams = new URLSearchParams(location.hash.startsWith("#") ? location.hash.slice(1) : location.hash);
+    const queryParams = new URLSearchParams(location.search);
+    const hashType = hashParams.get("type");
+    const queryType = queryParams.get("type");
+    const isRecoveryHash = hashType === "recovery";
+    const isRecoveryTokenHash = Boolean(queryParams.get("token_hash")) && (queryType === "recovery" || isRecoveryHash);
+    const isRecoveryCodeFallback = Boolean(queryParams.get("code")) && (queryType === "recovery" || location.pathname === "/" || location.pathname === "/auth/callback");
+
+    if (location.pathname === "/reset-password") {
+      return;
+    }
+
+    if (isRecoveryHash || isRecoveryTokenHash || isRecoveryCodeFallback) {
+      navigate(
+        {
+          pathname: "/reset-password",
+          search: location.search,
+          hash: location.hash,
+        },
+        { replace: true }
+      );
+    }
+  }, [location.hash, location.pathname, location.search, navigate]);
+
   const hideHeader = shouldHideForPath(location.pathname, HIDE_HEADER_PAGES);
   const hideFooter = shouldHideForPath(location.pathname, HIDE_FOOTER_PREFIXES);
   useAffiliateRefCapture();

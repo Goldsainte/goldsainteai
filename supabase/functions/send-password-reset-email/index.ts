@@ -28,7 +28,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log('Sending password reset email to:', email);
 
-    const resetLink = `${Deno.env.get('SUPABASE_URL')}/auth/v1/verify?token=${token_hash}&type=recovery&redirect_to=${redirect_to || 'https://goldsainte.com'}`;
+    const defaultRedirect = redirect_to || 'https://goldsainte.ai/reset-password';
+    const resetLink = `${Deno.env.get('SUPABASE_URL')}/auth/v1/verify?token=${token_hash}&type=recovery&redirect_to=${encodeURIComponent(defaultRedirect)}`;
 
     const emailSubject = 'Reset Your Goldsainte Password';
 

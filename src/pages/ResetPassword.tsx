@@ -34,14 +34,15 @@ const ResetPassword = () => {
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     const queryParams = new URLSearchParams(window.location.search);
     const hasHashRecovery = hashParams.get('type') === 'recovery';
+    const hasQueryRecovery = queryParams.get('type') === 'recovery';
     const hasCodeParam = !!queryParams.get('code') || !!queryParams.get('token_hash');
 
-    if (hasHashRecovery || hasCodeParam) {
+    if (hasHashRecovery || hasQueryRecovery || hasCodeParam) {
       setHasToken(true);
     }
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
+      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         setHasToken(true);
       }
     });
