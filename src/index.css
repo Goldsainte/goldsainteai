@@ -378,7 +378,10 @@ All colors MUST be HSL.
     -moz-osx-font-smoothing: grayscale;
     /* Optimize for touch devices */
     -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
+    /* Do NOT set `touch-action: manipulation` on body — it interferes
+       with iOS Safari's native scrolling and can cause the page to feel
+       stuck when transitioning between full-height sections. We only
+       apply it to interactive elements (buttons/links) below. */
   }
   
   /* Desktop body text */
@@ -421,10 +424,9 @@ All colors MUST be HSL.
       transform: scale(0.97);
     }
     
-    /* Smooth scrolling */
-    * {
-      scroll-behavior: smooth;
-    }
+    /* Smooth scrolling — scope to the document root only.
+       Applying `scroll-behavior: smooth` to `*` on iOS Safari causes
+       scroll to stutter/stick when moving between sections. */
     
     /* Prevent text selection on buttons */
     button, a[role="button"] {
