@@ -96,6 +96,41 @@ const AuthCallback = () => {
           return;
         }
 
+        // Fire welcome email exactly once, when a fresh signup lands here.
+        // The flag is set by Auth.tsx (email signup) and by handleGoogleSignIn
+        // (OAuth). Fire-and-forget — never block routing on email delivery.
+        if (typeof window !== 'undefined') {
+          const pendingWelcomeRaw = sessionStorage.getItem('pending_welcome_email');
+          if (pendingWelcomeRaw) {
+            sessionStorage.removeItem('pending_welcome_email');
+            try {
+              const pending = JSON.parse(pendingWelcomeRaw) as {
+                accountType?: string;
+                firstName?: string;
+                lastName?: string;
+              };
+              const fullName = [pending.firstName, pending.lastName]
+                .filter(Boolean)
+                .join(' ')
+                .trim() ||
+                [profile.first_name, profile.last_name].filter(Boolean).join(' ').trim() ||
+                undefined;
+              void supabase.functions.invoke('send-welcome-email', {
+                body: {
+                  email: session.user.email,
+                  accountType: pending.accountType || profile.account_type || 'traveler',
+                  fullName,
+                  displayName: pending.firstName || profile.first_name || undefined,
+                },
+              }).catch((err) => {
+                console.warn('[AuthCallback] welcome email invoke failed:', err);
+              });
+            } catch (err) {
+              console.warn('[AuthCallback] could not parse pending_welcome_email:', err);
+            }
+          }
+        }
+
         // SECURITY: Only allow OAuth signups to self-assign 'traveler'.
         // Creator / agent / brand accounts require admin approval and CANNOT be
         // set client-side via sessionStorage — that would let an attacker
