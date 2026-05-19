@@ -1,237 +1,352 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
-import { Shield, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { BackButton } from "@/components/ui/BackButton";
+import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
+import {
+  ShieldCheck,
+  BadgeCheck,
+  Lock,
+  AlertTriangle,
+  CreditCard,
+  Gavel,
+  Phone,
+  MessageSquare,
+  ArrowUpRight,
+  Eye,
+  UserCheck,
+  FileText,
+} from "lucide-react";
 
-interface UserReport {
-  id: string;
-  reporter_id: string;
-  reported_user_id: string;
-  report_type: string;
-  report_category: string;
-  description: string;
-  status: string;
-  severity: string;
-  created_at: string;
-  admin_notes?: string;
-  resolved_by?: string;
-  resolved_at?: string;
-}
+// ─────────────────────────────────────────────
+// Data
+// ─────────────────────────────────────────────
 
-export default function TrustSafety() {
-  const [reports, setReports] = useState<UserReport[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedReport, setSelectedReport] = useState<string | null>(null);
-  const [resolutionNotes, setResolutionNotes] = useState("");
-  const navigate = useNavigate();
+const PILLARS = [
+  {
+    icon: BadgeCheck,
+    eyebrow: "01 — Verification",
+    title: "Every professional is verified before going live.",
+    body: "Travel agents complete Stripe Identity verification — government-issued ID confirmed — before they can publish a listing or receive a single payment. Travel creators connect verified social profiles and pass a quality review. Brand partners provide company registration documents and verified contact details. All professionals display a tiered verification badge on their profile.",
+    details: [
+      "Government ID checked via Stripe Identity",
+      "Social profile verification for creators",
+      "Business registration for brand partners",
+      "Ongoing account monitoring post-approval",
+    ],
+  },
+  {
+    icon: CreditCard,
+    eyebrow: "02 — Payments",
+    title: "Your money is protected from the moment you pay.",
+    body: "Every payment on Goldsainte is processed by Stripe, a PCI Level 1 certified processor. We never see or store your card details. For booked trips, funds are held in escrow through Stripe Connect and released to the travel professional only after the trip begins — so you are never paying for something that hasn't been delivered.",
+    details: [
+      "PCI Level 1 certified payment processing",
+      "Escrow holds funds until trip commencement",
+      "No card details stored by Goldsainte",
+      "Refund eligibility per our cancellation policy",
+    ],
+  },
+  {
+    icon: Gavel,
+    eyebrow: "03 — Disputes",
+    title: "If something goes wrong, we step in.",
+    body: "File a claim directly from your booking page. Our dispute resolution team reviews evidence from both parties — including on-platform messages, documents, and payment records — and issues a binding decision within 7 business days. This is why we require all booking communication to stay on-platform: it gives us the record we need to protect you.",
+    details: [
+      "Claim filed from your booking page",
+      "Evidence review within 2 business days",
+      "Binding decision issued in 7 business days",
+      "Escalation path to senior review if needed",
+    ],
+    cta: { label: "Refund policy & dispute process", to: "/cancellation-refund-policy" },
+  },
+  {
+    icon: MessageSquare,
+    eyebrow: "04 — Communication",
+    title: "Keep it on-platform. It's how we protect you.",
+    body: "All trip details, booking changes, and payment requests must stay inside Goldsainte. If a professional asks you to communicate or pay outside the platform — via wire transfer, WhatsApp, personal email, or any external link — do not comply, and report it immediately. Off-platform activity voids your booking protections.",
+    details: [
+      "No personal phone numbers or emails in chat",
+      "No external payment links or bank transfers",
+      "All booking approvals documented on-platform",
+      "Chat monitoring for fraud indicators",
+    ],
+  },
+  {
+    icon: Eye,
+    eyebrow: "05 — Moderation",
+    title: "Every report is reviewed by a human within 24 hours.",
+    body: "Use the flag icon on any listing, message, or profile to report something that doesn't feel right. Our moderation team reviews every report. Content that violates our policies is removed. Accounts engaged in fraud, harassment, or misrepresentation are suspended. Repeat violations result in permanent removal.",
+    details: [
+      "24-hour human review of all reports",
+      "Immediate suspension for high-severity cases",
+      "Permanent removal for repeat violations",
+      "Reporter confidentiality protected",
+    ],
+  },
+  {
+    icon: UserCheck,
+    eyebrow: "06 — Accountability",
+    title: "Professionals are held to ongoing standards — not just at signup.",
+    body: "Verification is not a one-time event. Goldsainte continuously monitors account behavior, booking completion rates, traveler reviews, and response patterns. Professionals who fall below our standards receive warnings, remediation requirements, or removal. Our tiered badge system reflects current standing, not just initial approval.",
+    details: [
+      "Ongoing booking completion monitoring",
+      "Traveler review score tracking",
+      "Response time and quality standards",
+      "Tier badge reflects current standing",
+    ],
+  },
+];
 
-  useEffect(() => {
-    checkAdminAccess();
-    loadReports();
-  }, []);
+const EMERGENCY_LINKS = [
+  {
+    icon: Phone,
+    label: "Emergency during a trip",
+    desc: "Use the in-app emergency contact feature or call local emergency services first.",
+    contact: "emergency contacts feature",
+    to: "/emergency-contacts",
+  },
+  {
+    icon: AlertTriangle,
+    label: "Urgent safety concern",
+    desc: "Email our safety team directly — monitored around the clock.",
+    contact: "safety@goldsainte.com",
+    href: "mailto:safety@goldsainte.com",
+  },
+  {
+    icon: FileText,
+    label: "Dispute or billing issue",
+    desc: "File a claim from your booking page, or contact support.",
+    contact: "support@goldsainte.com",
+    href: "mailto:support@goldsainte.com",
+  },
+];
 
-  const checkAdminAccess = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      navigate("/auth");
-      return;
-    }
+// ─────────────────────────────────────────────
+// Sub-components
+// ─────────────────────────────────────────────
 
-    const { data: roles } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .eq("role", "admin")
-      .maybeSingle();
-
-    if (!roles) {
-      toast.error("Admin access required");
-      navigate("/");
-    }
-  };
-
-  const loadReports = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("user_reports")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setReports(data || []);
-    } catch (error) {
-      console.error("Error loading reports:", error);
-      toast.error("Failed to load reports");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleUpdateStatus = async (reportId: string, newStatus: string) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      const { error } = await supabase
-        .from("user_reports")
-        .update({
-          status: newStatus,
-          resolved_by: user.id,
-          resolved_at: new Date().toISOString(),
-          admin_notes: resolutionNotes || null,
-        })
-        .eq("id", reportId);
-
-      if (error) throw error;
-
-      toast.success("Report updated successfully");
-      setSelectedReport(null);
-      setResolutionNotes("");
-      loadReports();
-    } catch (error) {
-      console.error("Error updating report:", error);
-      toast.error("Failed to update report");
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    const variants: Record<string, any> = {
-      pending: { variant: "secondary", icon: AlertTriangle },
-      under_review: { variant: "default", icon: Shield },
-      resolved: { variant: "default", icon: CheckCircle },
-      dismissed: { variant: "outline", icon: XCircle },
-    };
-    const config = variants[status] || variants.pending;
-    const Icon = config.icon;
-    return (
-      <Badge variant={config.variant} className="gap-1">
-        <Icon className="h-3 w-3" />
-        {status.replace("_", " ")}
-      </Badge>
-    );
-  };
-
-  if (loading) {
-    return (
-      <div className="container py-8">
-        <div className="animate-pulse space-y-4">
-          {[...Array(3)].map((_, i) => (
-            <Card key={i}>
-              <CardHeader>
-                <div className="h-6 bg-muted rounded w-1/3" />
-              </CardHeader>
-              <CardContent>
-                <div className="h-20 bg-muted rounded" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
+function PillarCard({ pillar, index }: { pillar: (typeof PILLARS)[number]; index: number }) {
+  const Icon = pillar.icon;
   return (
-    <div className="container py-8 max-w-6xl">
-      <BackButton className="mb-6" />
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <Shield className="h-8 w-8" />
-          Trust & Safety
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          Review and manage user reports
+    <section
+      id={`pillar-${index + 1}`}
+      className="grid md:grid-cols-12 gap-8 md:gap-14 py-16 md:py-20 border-t border-[#E5DFC6]"
+    >
+      {/* Left: number + icon */}
+      <div className="md:col-span-4 flex md:flex-col items-start gap-4">
+        <div className="flex-shrink-0 w-10 h-10 rounded-sm bg-[#0c4d47]/10 flex items-center justify-center">
+          <Icon className="h-5 w-5 text-[#0c4d47]" />
+        </div>
+        <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mt-0 md:mt-2">
+          {pillar.eyebrow}
         </p>
       </div>
 
-      <div className="space-y-4">
-        {reports.length === 0 ? (
-          <Card>
-            <CardContent className="text-center py-12">
-              <Shield className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No reports to review</p>
-            </CardContent>
-          </Card>
-        ) : (
-          reports.map((report) => (
-            <Card key={report.id}>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-lg">
-                      {report.report_type.replace("_", " ")} - {report.report_category.replace("_", " ")}
-                    </CardTitle>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Severity: <Badge variant="outline">{report.severity}</Badge>
-                    </p>
-                  </div>
-                  {getStatusBadge(report.status)}
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <p className="font-medium mb-1">Description:</p>
-                  <p className="text-sm text-muted-foreground">
-                    {report.description}
-                  </p>
-                </div>
+      {/* Right: content */}
+      <div className="md:col-span-8">
+        <h2 className="font-secondary text-2xl md:text-3xl leading-[1.25] text-[#0a2225] mb-5">
+          {pillar.title}
+        </h2>
+        <p className="text-base text-[#0a2225]/75 leading-relaxed mb-8">{pillar.body}</p>
 
-                <div className="text-xs text-muted-foreground">
-                  Reported on: {new Date(report.created_at).toLocaleDateString()}
-                </div>
+        {/* Detail pills */}
+        <ul className="grid sm:grid-cols-2 gap-3">
+          {pillar.details.map((d) => (
+            <li
+              key={d}
+              className="flex items-start gap-2.5 text-sm text-[#0a2225]/70 leading-snug"
+            >
+              <ShieldCheck className="h-4 w-4 text-[#0c4d47] flex-shrink-0 mt-0.5" />
+              {d}
+            </li>
+          ))}
+        </ul>
 
-                {report.admin_notes && (
-                  <div className="bg-muted/50 p-3 rounded-lg">
-                    <p className="font-medium text-sm mb-1">Admin Notes:</p>
-                    <p className="text-sm">{report.admin_notes}</p>
-                  </div>
-                )}
-
-                {report.status === "pending" && (
-                  <div className="space-y-3 border-t pt-4">
-                    <Textarea
-                      placeholder="Add resolution notes..."
-                      value={selectedReport === report.id ? resolutionNotes : ""}
-                      onChange={(e) => {
-                        setSelectedReport(report.id);
-                        setResolutionNotes(e.target.value);
-                      }}
-                      rows={3}
-                    />
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        onClick={() => handleUpdateStatus(report.id, "under_review")}
-                      >
-                        Mark Under Review
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="default"
-                        onClick={() => handleUpdateStatus(report.id, "resolved")}
-                      >
-                        Resolve
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleUpdateStatus(report.id, "dismissed")}
-                      >
-                        Dismiss
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))
+        {pillar.cta && (
+          <Link
+            to={pillar.cta.to}
+            className="inline-flex items-center gap-1.5 mt-8 text-[11px] uppercase tracking-[0.22em] text-[#0c4d47] hover:underline underline-offset-4"
+          >
+            {pillar.cta.label}
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </Link>
         )}
       </div>
-    </div>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────
+// Page
+// ─────────────────────────────────────────────
+
+export default function TrustSafety() {
+  return (
+    <>
+      <Helmet>
+        <title>Trust &amp; Safety · Goldsainte</title>
+        <meta
+          name="description"
+          content="How Goldsainte protects travelers and travel professionals — verification, escrow payments, dispute resolution, and real-time moderation."
+        />
+      </Helmet>
+
+      <div className="bg-[#FDF9F0] text-[#0a2225]">
+
+        {/* ── HERO ── */}
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 md:pt-24 pb-16 md:pb-20">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-5">
+            Safety &amp; Trust
+          </p>
+          <h1 className="font-secondary text-3xl sm:text-4xl md:text-6xl leading-[1.08] tracking-tight text-[#0a2225] max-w-3xl mb-6">
+            Travel with confidence. We built the protection in.
+          </h1>
+          <p className="text-base md:text-lg text-[#0a2225]/70 leading-relaxed max-w-2xl mb-10">
+            Goldsainte is built on verified professionals, escrow-protected payments,
+            documented communication, and a moderation team that actually responds.
+            Here is exactly how every layer works.
+          </p>
+
+          {/* Six-pillar stat strip */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {[
+              { stat: "ID verified", label: "Every travel agent" },
+              { stat: "Escrow", label: "All trip payments" },
+              { stat: "24 hrs", label: "Report review SLA" },
+              { stat: "7 days", label: "Dispute resolution" },
+              { stat: "PCI L1", label: "Payment security" },
+              { stat: "On-platform", label: "All communication" },
+            ].map((s) => (
+              <div
+                key={s.stat}
+                className="border border-[#E5DFC6] rounded-sm bg-white/60 px-4 py-4"
+              >
+                <p className="font-secondary text-xl md:text-2xl text-[#0c4d47]">
+                  {s.stat}
+                </p>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#0a2225]/50 mt-1">
+                  {s.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── PILLARS ── */}
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          {PILLARS.map((pillar, i) => (
+            <PillarCard key={pillar.eyebrow} pillar={pillar} index={i} />
+          ))}
+        </div>
+
+        {/* ── WHAT WE WILL NEVER DO ── */}
+        <section className="border-t border-[#E5DFC6] bg-white/60">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 md:py-20">
+            <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mb-4">
+              Our commitments
+            </p>
+            <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-10 max-w-xl">
+              What Goldsainte will never do.
+            </h2>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {[
+                "Ask you to pay outside the platform",
+                "Request your full card number by message or email",
+                "Share your personal information without consent",
+                "Pressure you to book before reviewing a proposal",
+                "Ignore a report or close it without review",
+                "Release escrow funds before a trip begins",
+                "Allow unverified professionals to accept bookings",
+                "Penalize you for filing a legitimate dispute",
+              ].map((item) => (
+                <div
+                  key={item}
+                  className="flex items-start gap-3 border border-[#E5DFC6] rounded-sm px-5 py-4 bg-[#FDF9F0]"
+                >
+                  <span className="text-[#C7A962] font-secondary text-xl leading-none mt-0.5">
+                    ×
+                  </span>
+                  <p className="text-sm text-[#0a2225]/80 leading-snug">{item}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── EMERGENCY / CONTACT ── */}
+        <section className="border-t border-[#E5DFC6]">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 md:py-20">
+            <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mb-4">
+              Need help now?
+            </p>
+            <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-10">
+              We are always reachable.
+            </h2>
+            <div className="grid sm:grid-cols-3 gap-4 mb-12">
+              {EMERGENCY_LINKS.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div
+                    key={item.label}
+                    className="border border-[#E5DFC6] rounded-sm bg-white/60 p-6 space-y-3"
+                  >
+                    <div className="w-9 h-9 rounded-sm bg-[#0c4d47]/10 flex items-center justify-center">
+                      <Icon className="h-4 w-4 text-[#0c4d47]" />
+                    </div>
+                    <p className="text-[10px] uppercase tracking-[0.22em] text-[#0a2225]/50">
+                      {item.label}
+                    </p>
+                    <p className="text-sm text-[#0a2225]/70 leading-relaxed">{item.desc}</p>
+                    {item.href ? (
+                      <a
+                        href={item.href}
+                        className="text-[11px] uppercase tracking-[0.2em] text-[#0c4d47] hover:underline underline-offset-4"
+                      >
+                        {item.contact}
+                      </a>
+                    ) : (
+                      <Link
+                        to={item.to!}
+                        className="text-[11px] uppercase tracking-[0.2em] text-[#0c4d47] hover:underline underline-offset-4"
+                      >
+                        {item.contact}
+                      </Link>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Final CTA strip */}
+            <div className="rounded-sm bg-[#0c4d47] px-6 py-8 md:px-10 md:py-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+              <div>
+                <h3 className="font-secondary text-xl md:text-2xl text-white mb-2">
+                  Questions about your booking or account?
+                </h3>
+                <p className="text-sm text-white/70">
+                  Our support team responds within one business day.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
+                <a
+                  href="mailto:support@goldsainte.com"
+                  className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-white text-[#0c4d47] text-[11px] uppercase tracking-[0.2em] font-medium hover:bg-[#FDF9F0] transition"
+                >
+                  Contact support
+                </a>
+                <Link
+                  to="/community-guidelines"
+                  className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-white/30 text-white text-[11px] uppercase tracking-[0.2em] hover:border-white transition"
+                >
+                  Community guidelines
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-10">
+          <p className="text-xs text-[#0a2225]/35">Last updated: May 2026.</p>
+        </div>
+      </div>
+    </>
   );
 }
