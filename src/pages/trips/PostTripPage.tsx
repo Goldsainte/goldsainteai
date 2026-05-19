@@ -335,7 +335,7 @@ export default function PostTripPage() {
     });
 
     return (
-      <div className="flex-1 bg-[#f7f3ea] text-[#0a2225] min-h-screen relative overflow-hidden">
+      <div className="flex-1 bg-[#f7f3ea] text-[#0a2225] min-h-screen relative overflow-x-hidden">
         {/* Soft background shimmer */}
         <div
           className="absolute inset-0 pointer-events-none"

@@ -51,7 +51,7 @@ export function HomeHero() {
     }).format(price);
 
   return (
-    <section className="bg-[#f7f3ea] text-[#0a2225] md:min-h-[calc(100vh-56px)] md:max-h-[calc(100vh-56px)]">
+    <section className="bg-[#f7f3ea] text-[#0a2225] md:min-h-[calc(100svh-56px)] md:max-h-[calc(100svh-56px)]">
       <div className="mx-auto max-w-6xl px-4 py-8 md:py-12 md:h-full">
         {/* Two Column Grid — stretch forces equal height */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 items-stretch md:h-full">
@@ -134,7 +134,7 @@ export function HomeHero() {
           </div>
 
           {/* RIGHT: Luxury visual stack — h-full stretches to match left */}
-          <div className="md:h-full md:max-h-[calc(100vh-56px-96px)]">
+          <div className="md:h-full md:max-h-[calc(100svh-56px-96px)]">
             <div className="relative h-full aspect-[4/5] md:aspect-auto">
               {/* soft frame */}
               <div className="absolute inset-0 translate-x-2 translate-y-2 md:translate-x-4 md:translate-y-4 rounded-3xl md:rounded-[32px] border border-[#E5DFC6]/80" />
