@@ -50,16 +50,12 @@ const personasCarouselData: PersonaCarouselCardProps[] = [
     headline: "Creators",
     tagline: "Turn your content into bookable experiences.",
     href: "/auth?mode=signup&role=creator",
-    browseHref: "/creators",
-    browseLabel: "Browse Creators",
   },
   {
     image: agentPlanningImg,
     headline: "Agents",
     tagline: "Verified leads delivered to your inbox.",
     href: "/apply/agent",
-    browseHref: "/agents",
-    browseLabel: "Browse Agents",
   },
   {
     image: tropicalHideawayImg,

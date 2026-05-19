@@ -44,8 +44,6 @@ const Marketplace = lazy(() => import('@/pages/Marketplace'));
 const TripRequestDetail = lazy(() => import('@/pages/marketplace/TripRequestDetail'));
 const TripDetail = lazy(() => import('@/pages/marketplace/TripDetail'));
 const TrovaTripDetailPage = lazy(() => import('@/pages/marketplace/TrovaTripDetailPage'));
-const BrowseAgents = lazy(() => import('@/pages/BrowseAgents'));
-const CreatorsPage = lazy(() => import('@/pages/CreatorsPage'));
 const CreatorOnboardingPage = lazy(() => import('@/pages/onboarding/CreatorOnboardingPage'));
 const AgentProfile = lazy(() => import('@/pages/AgentProfile'));
 
@@ -183,9 +181,9 @@ export const AppRoutes = () => (
       <Route path="/@:username/shop" element={<ShopPage />} />
       <Route path="/bundle/:id" element={<BundleDetailPage />} />
       <Route path="/bundle-builder" element={<BundleBuilder />} />
-      <Route path="/creators" element={<CreatorsPage />} />
+      <Route path="/creators" element={<Navigate to="/marketplace" replace />} />
       <Route path="/creators/:id" element={<CreatorPublicProfilePage />} />
-      <Route path="/agents" element={<BrowseAgents />} />
+      <Route path="/agents" element={<Navigate to="/marketplace" replace />} />
       <Route path="/agents/:id" element={<AgentPublicProfilePage />} />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/what-we-do" element={<WhatWeDo />} />
@@ -301,8 +299,8 @@ export const AppRoutes = () => (
         path="/trip/:slug"
         element={<Navigate to="/marketplace" replace />}
       />
-      <Route path="/browse-agents" element={<Navigate to="/agents" replace />} />
-      <Route path="/browse-creators" element={<Navigate to="/creators" replace />} />
+      <Route path="/browse-agents" element={<Navigate to="/marketplace" replace />} />
+      <Route path="/browse-creators" element={<Navigate to="/marketplace" replace />} />
       <Route path="/brands/:profileId" element={<BrandProfilePage />} />
       <Route path="/brands/:profileId/collections/:collectionId" element={<BrandCollectionDetailPage />} />
       <Route

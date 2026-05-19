@@ -175,9 +175,9 @@ export default function MyStoryboardsPage() {
                   size="sm"
                   variant="outline"
                   className="rounded-full border-[#E5DFC6] text-[#0a2225] hover:bg-[#FDF9F0]"
-                  onClick={() => navigate("/creators")}
+                  onClick={() => navigate("/marketplace")}
                 >
-                  Browse Creators
+                  Explore Marketplace
                 </Button>
               </div>
             </CardContent>
