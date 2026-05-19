@@ -61,6 +61,8 @@ export const Footer = () => {
   const legalLinks = [
     { to: "/privacy-cookies", label: "Privacy Policy" },
     { to: "/terms", label: "Terms of Service" },
+    { to: "/legal/creator-agreement", label: "Creator Agreement" },
+    { to: "/legal/agent-agreement", label: "Agent Agreement" },
     { to: "/dispute-resolution", label: "Dispute Resolution" },
   ];
 

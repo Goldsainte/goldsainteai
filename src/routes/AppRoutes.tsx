@@ -136,10 +136,9 @@ const AgentRequirementsPage = lazy(() => import('@/pages/help/AgentRequirementsP
 const PaymentsAndFeesPage = lazy(() => import('@/pages/help/PaymentsAndFeesPage'));
 const CommunityGuidelines = lazy(() => import('@/pages/CommunityGuidelines'));
 const TrustSafety = lazy(() => import('@/pages/TrustSafety'));
-const LegalTermsPage = lazy(() => import('@/pages/LegalTermsPage'));
-const LegalPrivacyPage = lazy(() => import('@/pages/LegalPrivacyPage'));
 const AdminTrustSafety = lazy(() => import('@/pages/admin/AdminTrustSafety'));
 const LegalCreatorAgreementPage = lazy(() => import('@/pages/LegalCreatorAgreementPage'));
+const LegalAgentAgreementPage = lazy(() => import('@/pages/LegalAgentAgreementPage'));
 const CancellationRefundPolicy = lazy(() => import('@/pages/CancellationRefundPolicy'));
 const CorporateContact = lazy(() => import('@/pages/CorporateContact'));
 const TransparencyAgreement = lazy(() => import('@/pages/TransparencyAgreement'));
@@ -206,6 +205,7 @@ export const AppRoutes = () => (
       <Route path="/legal/terms" element={<Navigate to="/terms" replace />} />
       <Route path="/legal/privacy" element={<Navigate to="/privacy-cookies" replace />} />
       <Route path="/legal/creator-agreement" element={<LegalCreatorAgreementPage />} />
+      <Route path="/legal/agent-agreement" element={<LegalAgentAgreementPage />} />
       <Route path="/cancellation-refund-policy" element={<CancellationRefundPolicy />} />
       <Route path="/transparency-agreement" element={<TransparencyAgreement />} />
       <Route path="/corporate-contact" element={<CorporateContact />} />
