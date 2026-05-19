@@ -139,7 +139,7 @@ const CommunityGuidelines = lazy(() => import('@/pages/CommunityGuidelines'));
 const TrustSafety = lazy(() => import('@/pages/TrustSafety'));
 const LegalTermsPage = lazy(() => import('@/pages/LegalTermsPage'));
 const LegalPrivacyPage = lazy(() => import('@/pages/LegalPrivacyPage'));
-const TrustSafetyPage = lazy(() => import('@/pages/TrustSafetyPage'));
+const AdminTrustSafety = lazy(() => import('@/pages/admin/AdminTrustSafety'));
 const LegalCreatorAgreementPage = lazy(() => import('@/pages/LegalCreatorAgreementPage'));
 const CancellationRefundPolicy = lazy(() => import('@/pages/CancellationRefundPolicy'));
 const CorporateContact = lazy(() => import('@/pages/CorporateContact'));
@@ -533,7 +533,7 @@ export const AppRoutes = () => (
       <Route path="/admin/customer-verifications" element={<AdminGuard><AdminCustomerVerifications /></AdminGuard>} />
       <Route path="/admin/inquiries" element={<AdminGuard><AdminInquiries /></AdminGuard>} />
       <Route path="/admin/platform-analytics" element={<AdminGuard><PlatformAnalyticsDashboard /></AdminGuard>} />
-      <Route path="/admin/trust-safety" element={<AdminGuard><TrustSafety /></AdminGuard>} />
+      <Route path="/admin/trust-safety" element={<AdminGuard><AdminTrustSafety /></AdminGuard>} />
       <Route path="/system-health" element={<AdminGuard><SystemHealth /></AdminGuard>} />
     </Route>
 
