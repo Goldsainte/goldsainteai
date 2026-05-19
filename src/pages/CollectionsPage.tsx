@@ -296,8 +296,8 @@ export default function CollectionsPage() {
                     </Link>
                   </Button>
                   <Button asChild variant="outline" className="rounded-full px-6 border-[#E5DFC6] hover:bg-white/60">
-                    <Link to="/creators">
-                      Browse Creators for Inspiration
+                    <Link to="/marketplace">
+                      Explore Marketplace
                     </Link>
                   </Button>
                 </div>

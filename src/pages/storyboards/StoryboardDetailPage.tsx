@@ -416,7 +416,7 @@ export default function StoryboardDetailPage() {
                       </Button>
                     </>
                   )}
-                  <Button size="sm" variant="outline" onClick={() => navigate("/creators")}>Browse Creators</Button>
+                  <Button size="sm" variant="outline" onClick={() => navigate("/marketplace")}>Explore Marketplace</Button>
                 </div>
                 {isOwner && showUploader && (
                   <div className="mt-4 max-w-md mx-auto">

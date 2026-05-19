@@ -126,14 +126,14 @@ export function TravelerOverviewTab({ profile, stats, onAvatarUpdate }: Traveler
             </Link>
 
             <Link
-              to="/creators"
+              to="/marketplace"
               className="block rounded-xl border border-[#E5DFC6] hover:border-[#C7A962]/50 p-4 transition-colors"
             >
               <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#FDF9F0] mb-3">
                 <MessageCircle className="h-4 w-4 text-[#0c4d47]" />
               </div>
-              <p className="font-secondary text-base text-[#0a2225] mb-1">Find a Specialist</p>
-              <p className="text-xs text-[#6B7280]">Browse vetted travel agents and creators.</p>
+              <p className="font-secondary text-base text-[#0a2225] mb-1">Explore the Marketplace</p>
+              <p className="text-xs text-[#6B7280]">Discover curated trips, guides, and bundles.</p>
             </Link>
           </div>
         </section>

@@ -1,27 +1,31 @@
-## Plan: Swap public Trust & Safety page
+## Goal
 
-### 1. Replace `src/pages/TrustSafety.tsx`
-Full overwrite with the uploaded editorial public-facing page (hero + 6 pillars + commitments + emergency contacts + CTA). Replaces the old admin report dashboard that previously lived at this filename.
+Take the public-facing creator and travel-agent directory listings offline so empty grids don't undermine credibility. Keep direct profile URLs, signup/apply flows, and admin tooling untouched.
 
-### 2. Move the admin dashboard to its own file
-The admin route at line 536 still expects a `TrustSafety` component. To keep that working without leaving the admin dashboard code orphaned, rename the existing admin dashboard component to a new file:
-- Create `src/pages/admin/AdminTrustSafety.tsx` containing the current admin report-review logic (verbatim from today's `TrustSafety.tsx`, just renamed export).
-- Update `AppRoutes.tsx` line 536 to import and use `AdminTrustSafety` instead of `TrustSafety`.
+## Changes
 
-This preserves the admin functionality while letting the public `/trust-safety` route serve the new editorial page.
+1. **`src/routes/AppRoutes.tsx`** — Replace the directory routes with redirects to the marketplace; leave individual profile routes alone.
+   - `/creators` → `<Navigate to="/marketplace" replace />`
+   - `/agents` → `<Navigate to="/marketplace" replace />`
+   - `/browse-creators` and `/browse-agents` redirects updated to `/marketplace` as well.
+   - `/creators/:id` and `/agents/:id` remain functional (direct links keep working).
+   - Drop the now-unused `CreatorsPage` and `BrowseAgents` lazy imports.
 
-### 3. Update `src/routes/AppRoutes.tsx`
-- Line 142: remove `TrustSafetyPage` lazy import (no longer used).
-- Line 204: keep `<Route path="/trust-safety" element={<TrustSafety />} />` — `TrustSafety` is now the public page, so no element change needed.
-- Line 536: change to `<Route path="/admin/trust-safety" element={<AdminGuard><AdminTrustSafety /></AdminGuard>} />` and add lazy import for `AdminTrustSafety`.
+2. **Navigation surfaces** — Remove or hide any link pointing at the directory pages.
+   - Audit `Header.tsx`, `MobileBottomNav.tsx`, footer, marketplace tabs, and homepage sections (`WhoItsFor`, `RoleSpecificCTAs`, `HowItWorksSection`, `StoryboardsHighlight`) for `to="/creators"` or `to="/agents"` links. Rewrite each to `/marketplace` or remove the CTA if it was directory-specific. Admin sidebar links (`/admin/creators`, `/admin/agents`) stay.
 
-### 4. Delete `src/pages/TrustSafetyPage.tsx`
-No longer referenced after the import is removed.
+3. **Marketplace UI** — If `MarketplaceTabs` exposes a "Creators" or "Agents" tab that renders `CreatorGrid` / agent list, hide that tab. Leave the Trips/Storyboards tabs as the default surface. Keep the underlying components in the codebase so we can re-enable them once supply exists.
 
-### 5. Community Guidelines
-Wait for the user to paste/upload the new `CommunityGuidelines.tsx` code, then do a full replacement in a follow-up step.
+4. **Keep intact**
+   - All `/apply/agent`, `/apply/brand`, and creator signup CTAs.
+   - Direct profile pages `/creators/:id`, `/agents/:id`.
+   - Admin dashboards under `/admin/creators` and `/admin/agents`.
+   - Marketing copy that references creators/agents conceptually (no empty lists are rendered there).
 
-### Notes
-- No backend, schema, or business-logic changes.
-- Admin `/admin/trust-safety` continues to work via the renamed `AdminTrustSafety` component.
-- The user's instruction said "leave admin pointing to `TrustSafety`" — but since `TrustSafety.tsx` is being fully replaced with the public page, the admin dashboard must be relocated or it would be deleted. Renaming to `AdminTrustSafety` is the minimal safe move.
+## Verification
+
+- Visit `/creators`, `/agents`, `/browse-creators`, `/browse-agents` → all land on `/marketplace`.
+- `/creators/<id>` and `/agents/<id>` still render the profile if the id exists.
+- Header, mobile nav, and homepage no longer link to the directory pages.
+- Marketplace no longer surfaces an empty Creators or Agents tab.
+- `/apply/agent` and creator signup CTAs still work end-to-end.
