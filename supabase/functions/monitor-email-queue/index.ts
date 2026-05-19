@@ -7,7 +7,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 // is bucketed per 15-minute window so we don't spam during ongoing incidents.
 
 const WINDOW_MINUTES = 15;
-const THRESHOLDS = { dlq: 1, failed: 5, pending: 200 } as const;
+const THRESHOLDS = { dlq: 5, failed: 20, pending: 200 } as const;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
