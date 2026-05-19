@@ -107,8 +107,8 @@ const EMERGENCY_LINKS = [
     icon: AlertTriangle,
     label: "Urgent safety concern",
     desc: "Email our safety team directly — monitored around the clock.",
-    contact: "safety@goldsainte.com",
-    href: "mailto:safety@goldsainte.com",
+    contact: "support@goldsainte.com",
+    href: "mailto:support@goldsainte.com",
   },
   {
     icon: FileText,

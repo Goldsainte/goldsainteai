@@ -113,10 +113,10 @@ export default function EditorialPolicy() {
           <p>
             Editorial questions or correction requests may be directed to{" "}
             <a
-              href="mailto:editor@goldsainte.ai"
+              href="mailto:info@goldsainte.com"
               className="text-[#0c4d47] underline underline-offset-4 hover:text-[#0a2225] transition-colors"
             >
-              editor@goldsainte.ai
+              info@goldsainte.com
             </a>
             .
           </p>
@@ -131,10 +131,10 @@ export default function EditorialPolicy() {
           </p>
           <p>
             <a
-              href="mailto:press@goldsainte.com"
+              href="mailto:info@goldsainte.com"
               className="text-[#0c4d47] underline underline-offset-4 hover:text-[#0a2225] transition-colors"
             >
-              press@goldsainte.com
+              info@goldsainte.com
             </a>
           </p>
         </Section>

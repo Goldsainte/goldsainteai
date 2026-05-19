@@ -227,10 +227,10 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
                 {article.press_contact_name || "Goldsainte Press Team"}
                 <br />
                 <a
-                  href={`mailto:${article.press_contact_email || "press@goldsainte.com"}`}
+                  href={`mailto:${article.press_contact_email || "info@goldsainte.com"}`}
                   className="text-[#0c4d47] underline underline-offset-2"
                 >
-                  {article.press_contact_email || "press@goldsainte.com"}
+                  {article.press_contact_email || "info@goldsainte.com"}
                 </a>
               </p>
             </div>

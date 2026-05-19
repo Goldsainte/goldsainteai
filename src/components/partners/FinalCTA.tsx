@@ -39,7 +39,7 @@ export const FinalCTA = () => {
           <div className="mt-12 pt-8 border-t border-white/20">
             <p className="text-white/80">
               <strong className="text-white">Review process takes 3–5 business days.</strong>
-              <span className="block mt-2">Questions? Contact our partner team at partners@goldsainte.com</span>
+              <span className="block mt-2">Questions? Contact our partner team at support@goldsainte.com</span>
             </p>
           </div>
         </div>

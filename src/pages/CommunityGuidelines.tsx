@@ -392,7 +392,7 @@ export default function CommunityGuidelines() {
                 </p>
                 <div className="flex flex-wrap gap-3 pt-2">
                   <a
-                    href="mailto:trust@goldsainte.com"
+                    href="mailto:support@goldsainte.com"
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0c4d47] text-white text-[11px] uppercase tracking-[0.2em] hover:bg-[#0a3d39] transition"
                   >
                     <Flag className="h-3.5 w-3.5" />
@@ -413,10 +413,10 @@ export default function CommunityGuidelines() {
                     Appeals
                   </p>
                   <a
-                    href="mailto:trust@goldsainte.com"
+                    href="mailto:support@goldsainte.com"
                     className="text-[#0c4d47] underline underline-offset-2 hover:text-[#0a2225]"
                   >
-                    trust@goldsainte.com
+                    support@goldsainte.com
                   </a>
                 </div>
                 <div>
@@ -424,10 +424,10 @@ export default function CommunityGuidelines() {
                     Urgent safety reports
                   </p>
                   <a
-                    href="mailto:safety@goldsainte.com"
+                    href="mailto:support@goldsainte.com"
                     className="text-[#0c4d47] underline underline-offset-2 hover:text-[#0a2225]"
                   >
-                    safety@goldsainte.com
+                    support@goldsainte.com
                   </a>
                 </div>
                 <div>

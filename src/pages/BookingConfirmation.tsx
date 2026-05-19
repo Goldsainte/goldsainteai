@@ -144,7 +144,7 @@ export default function BookingConfirmation() {
               Try Again
             </button>
             <button
-              onClick={() => (window.location.href = "mailto:hello@goldsainte.com")}
+              onClick={() => (window.location.href = "mailto:info@goldsainte.com")}
               className="rounded-full border border-[#E5DFC6] text-[#0a2225] px-7 h-12 text-sm font-medium"
             >
               Contact Support

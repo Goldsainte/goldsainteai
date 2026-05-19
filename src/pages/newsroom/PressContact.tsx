@@ -61,7 +61,7 @@ export default function PressContact() {
     const { error } = await (supabase as any).from("press_inquiries").insert(insert);
     if (error) {
       setSubmitting(false);
-      toast.error("Could not submit. Please email press@goldsainte.com.");
+      toast.error("Could not submit. Please email info@goldsainte.com.");
       return;
     }
     // Notify the press team — non-blocking on failure
@@ -69,7 +69,7 @@ export default function PressContact() {
       await supabase.functions.invoke("send-transactional-email", {
         body: {
           templateName: "press-inquiry-received",
-          recipientEmail: "press@goldsainte.com",
+          recipientEmail: "info@goldsainte.com",
           idempotencyKey: `press-inquiry-${id}`,
           templateData: {
             reporter_name: parsed.data.reporter_name,
@@ -107,7 +107,7 @@ export default function PressContact() {
               intro={
                 <p>
                   For interview requests, demos, or industry commentary, submit the form below or email{" "}
-                  <a href="mailto:press@goldsainte.com" className="text-[#0c4d47] underline">press@goldsainte.com</a>.
+                  <a href="mailto:info@goldsainte.com" className="text-[#0c4d47] underline">info@goldsainte.com</a>.
                 </p>
               }
             />

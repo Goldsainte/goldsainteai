@@ -356,7 +356,7 @@ export default function Terms() {
             <p className="mb-3">You have the right to opt out of this Arbitration Agreement by sending written notice within 30 days of first accepting these Terms. Send notice to:</p>
             <p className="pl-6 mb-3">Goldsainte Legal Department<br />
             [Address]<br />
-            Email: legal@goldsainte.com</p>
+            Email: support@goldsainte.com</p>
             <p>Your notice must include your name, address, and a clear statement that you wish to opt out. If you opt out, all other parts of these Terms will continue to apply.</p>
 
             <h4 className="text-xl font-semibold mb-3 mt-6">Modification</h4>

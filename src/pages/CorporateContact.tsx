@@ -40,7 +40,7 @@ const CONTACTS = [
     eyebrow: "02",
     title: "Travel Agent Support",
     desc: "Dedicated support for travel agents and their partnerships on Goldsainte.",
-    email: "agent@goldsainte.com",
+    email: "support@goldsainte.com",
     response: "12 hours",
     handles: [
       "Agent application and onboarding",
@@ -54,7 +54,7 @@ const CONTACTS = [
     eyebrow: "03",
     title: "Creator Support",
     desc: "Support for content creators building their travel brand on Goldsainte.",
-    email: "creator@goldsainte.com",
+    email: "support@goldsainte.com",
     response: "1 business day",
     handles: [
       "Creator application and onboarding",
@@ -68,7 +68,7 @@ const CONTACTS = [
     eyebrow: "04",
     title: "Trust & Safety",
     desc: "Report safety concerns, fraud, harassment, or policy violations.",
-    email: "safety@goldsainte.com",
+    email: "support@goldsainte.com",
     response: "24 hours",
     handles: [
       "Reporting fraud or scam attempts",
@@ -82,7 +82,7 @@ const CONTACTS = [
     eyebrow: "05",
     title: "Press & Media",
     desc: "Journalists, broadcasters, and editorial partners — our newsroom team.",
-    email: "press@goldsainte.com",
+    email: "info@goldsainte.com",
     response: "1 business day",
     handles: [
       "Interview and commentary requests",

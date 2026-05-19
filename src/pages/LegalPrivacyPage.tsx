@@ -50,8 +50,8 @@ export default function LegalPrivacyPage() {
           opt out of marketing emails through the unsubscribe link in any
           email, or in Settings. You can request a copy of your data or request
           account deletion by emailing{' '}
-          <a href="mailto:privacy@goldsainte.com" className="text-[#0c4d47] underline">
-            privacy@goldsainte.com
+          <a href="mailto:support@goldsainte.com" className="text-[#0c4d47] underline">
+            support@goldsainte.com
           </a>{' '}
           — we process these requests within 30 days as required by GDPR and
           CCPA. After deletion, transactional records (bookings, payouts) are

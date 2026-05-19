@@ -216,10 +216,10 @@ export default function Leadership() {
             For interviews, speaking requests, media inquiries, or founder commentary,
             contact{" "}
             <a
-              href="mailto:press@goldsainte.com"
+              href="mailto:info@goldsainte.com"
               className="text-[#0c4d47] underline underline-offset-4 hover:text-[#0a2225] transition"
             >
-              press@goldsainte.com
+              info@goldsainte.com
             </a>
             .
           </p>

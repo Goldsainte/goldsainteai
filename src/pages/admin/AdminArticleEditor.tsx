@@ -30,7 +30,7 @@ const empty = {
   tags: "",
   dateline_location: "",
   press_contact_name: "",
-  press_contact_email: "press@goldsainte.com",
+  press_contact_email: "info@goldsainte.com",
 };
 
 export default function AdminArticleEditor() {

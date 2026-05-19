@@ -168,7 +168,7 @@ export const PrivacyDialog = ({ children }: { children: React.ReactNode }) => (
 
           <section>
             <h3 className="font-semibold text-base mb-2">10. Contact Us</h3>
-            <p>For privacy-related inquiries, contact us at: privacy@goldsainte.com</p>
+            <p>For privacy-related inquiries, contact us at: support@goldsainte.com</p>
           </section>
         </div>
       </ScrollArea>
@@ -433,7 +433,7 @@ export const InsuranceDialog = ({ children }: { children: React.ReactNode }) => 
 
           <section>
             <h3 className="font-semibold text-base mb-2">12. Questions and Support</h3>
-            <p>For questions regarding insurance requirements or claims, contact: insurance@goldsainte.com</p>
+            <p>For questions regarding insurance requirements or claims, contact: support@goldsainte.com</p>
           </section>
         </div>
       </ScrollArea>

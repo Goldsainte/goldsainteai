@@ -75,7 +75,7 @@ export default function NewsroomLanding() {
         <div className="mt-5 md:mt-8 max-w-3xl border-t-2 border-[#C7A962]" />
         <div className="mt-6 md:mt-7 flex">
           <a
-            href="mailto:press@goldsainte.com"
+            href="mailto:info@goldsainte.com"
             className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-[#0c4d47] text-white text-xs tracking-[0.2em] uppercase hover:bg-[#0a3d39] transition"
           >
             Press inquiries
