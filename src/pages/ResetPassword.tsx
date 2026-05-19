@@ -188,7 +188,7 @@ const ResetPassword = () => {
       <div className="min-h-screen bg-background">
         <div className="h-20 bg-primary" />
         <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-6xl items-start justify-center px-4 py-8 sm:px-6 sm:py-12">
-          <div className="w-full max-w-xl rounded-[28px] border border-border/70 bg-card p-10 text-center shadow-xl">
+          <div className="w-full max-w-xl rounded-xl border border-border/70 bg-card p-10 text-center shadow-xl">
             <img src={logomark} alt="Goldsainte" className="mx-auto mb-6 h-16 w-16" loading="lazy" />
             <Loader2 className="mx-auto mb-4 h-10 w-10 animate-spin text-primary" />
             <h1 className="mb-3 font-secondary text-3xl text-foreground">Validating reset link</h1>
@@ -204,7 +204,7 @@ const ResetPassword = () => {
       <div className="min-h-screen bg-background">
         <div className="h-20 bg-primary" />
         <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-6xl items-start justify-center px-4 py-8 sm:px-6 sm:py-12">
-          <Card className="w-full max-w-xl rounded-[28px] border border-border/70 bg-card p-10 text-center shadow-xl">
+          <Card className="w-full max-w-xl rounded-xl border border-border/70 bg-card p-10 text-center shadow-xl">
             <CheckCircle2 className="mx-auto mb-5 h-16 w-16 text-primary" />
             <h1 className="mb-3 font-secondary text-3xl text-foreground">Password updated</h1>
             <p className="mx-auto mb-6 text-muted-foreground">
@@ -220,7 +220,7 @@ const ResetPassword = () => {
     <div className="min-h-screen bg-background">
       <div className="h-20 bg-primary" />
       <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-6xl items-start justify-center px-4 py-8 sm:px-6 sm:py-12">
-        <Card className="w-full max-w-xl rounded-[28px] border border-border/70 bg-card p-8 shadow-xl sm:p-10">
+        <Card className="w-full max-w-xl rounded-xl border border-border/70 bg-card p-8 shadow-xl sm:p-10">
           <div className="mb-10 flex flex-col items-center text-center">
             <img src={logomark} alt="Goldsainte" className="mb-5 h-16 w-16" loading="lazy" />
             <h1 className="font-secondary text-4xl text-foreground">Reset your password</h1>
@@ -239,7 +239,7 @@ const ResetPassword = () => {
                 required
                 disabled={isLoading}
                 minLength={8}
-                className="h-14 rounded-2xl border-border/80 bg-background px-5 text-base"
+                className="h-14 rounded-xl border-border/80 bg-background px-5 text-base"
               />
             </div>
 
@@ -254,11 +254,11 @@ const ResetPassword = () => {
                 required
                 disabled={isLoading}
                 minLength={8}
-                className="h-14 rounded-2xl border-border/80 bg-background px-5 text-base"
+                className="h-14 rounded-xl border-border/80 bg-background px-5 text-base"
               />
             </div>
 
-            <div className="rounded-2xl border border-border/70 bg-background/60 p-5">
+            <div className="rounded-xl border border-border/70 bg-background/60 p-5">
               <p className="mb-3 text-sm uppercase tracking-[0.18em] text-muted-foreground">Password requirements</p>
               <ul className="space-y-2 text-sm text-foreground/80">
                 <li>At least 8 characters</li>
@@ -269,7 +269,7 @@ const ResetPassword = () => {
               </ul>
             </div>
 
-            <Button type="submit" className="h-14 w-full rounded-2xl text-base" disabled={isLoading || isVerifying}>
+            <Button type="submit" className="h-14 w-full rounded-xl text-base" disabled={isLoading || isVerifying}>
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
