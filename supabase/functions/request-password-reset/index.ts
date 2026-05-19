@@ -100,6 +100,7 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
     const messageId = crypto.randomUUID();
+    const runId = `password-reset-${messageId}`;
 
     await supabase.from('email_send_log').insert({
       message_id: messageId,
@@ -111,6 +112,7 @@ const handler = async (req: Request): Promise<Response> => {
     const { error: enqueueError } = await supabase.rpc('enqueue_email', {
       queue_name: 'auth_emails',
       payload: {
+        run_id: runId,
         message_id: messageId,
         to: email,
         from: PASSWORD_RESET_SENDER,
@@ -120,6 +122,7 @@ const handler = async (req: Request): Promise<Response> => {
         text: emailText,
         purpose: 'transactional',
         label: 'recovery',
+        idempotency_key: runId,
         queued_at: new Date().toISOString(),
       },
     });
