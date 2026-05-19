@@ -1,0 +1,34 @@
+# Goldsainte
+
+> Goldsainte is an AI-powered global travel marketplace connecting travelers with vetted travel creators and independent travel advisors to discover, design, and book curated trips.
+
+## Pages
+
+- [Home](/): Plan, discover, and book extraordinary trips with certified travel specialists.
+- [Marketplace](/marketplace): Browse curated travel packages and request custom trips.
+- [Creators](/creators): TikTok and lifestyle creators offering storyboards and travel guides.
+- [Travel Agents](/agents): Browse certified independent travel advisors.
+- [Bundle Builder](/bundle-builder): Build a custom travel bundle from creator storyboards.
+- [What We Do](/what-we-do): Overview of the Goldsainte platform.
+- [About](/about): Company background and mission.
+- [How It Works — Travelers](/how-it-works/traveler): How travelers plan and book trips.
+- [How It Works — Creators](/how-it-works/creator): How creators monetize storyboards.
+- [How It Works — Agents](/how-it-works/agent): How travel agents grow on Goldsainte.
+- [Apply as an Agent](/apply/agent): Application for independent travel advisors.
+- [Apply as a Brand](/apply/brand): Application for hospitality and experience partners.
+- [Trust & Safety](/trust-safety): Verification, escrow, and on-platform protection.
+- [Help Center](/help): Support articles and FAQs.
+- [Newsroom](/newsroom): Press releases, news, and company updates.
+- [Company Facts](/newsroom/company-facts): Headquarters, leadership, and key facts.
+- [Media Kit](/newsroom/media-kit): Logos, brand assets, and press resources.
+- [Leadership](/newsroom/leadership): Founders and executive team.
+- [Press Contact](/newsroom/press-contact): How to reach the Goldsainte press team.
+
+## Optional
+
+- [Terms of Service](/terms)
+- [Privacy & Cookies](/privacy-cookies)
+- [Cancellation & Refund Policy](/cancellation-refund-policy)
+- [Community Guidelines](/community-guidelines)
+- [Dispute Resolution](/dispute-resolution)
+- [Editorial Policy](/newsroom/editorial-policy)

@@ -7,5 +7,5 @@ Disallow: /email-preview
 Allow: /newsroom
 Allow: /newsroom/
 
-Sitemap: https://goldsainte.ai/sitemap.xml
-Sitemap: https://goldsainte.ai/newsroom-sitemap.xml
+Sitemap: https://goldsainteai.lovable.app/sitemap.xml
+Sitemap: https://goldsainteai.lovable.app/newsroom-sitemap.xml
