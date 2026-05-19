@@ -416,6 +416,20 @@ const Auth = () => {
 
       setStep("verify-email");
       setIsLoading(false);
+      // Mark that a welcome email should be sent after the user confirms
+      // their email and lands on /auth/callback for the first time.
+      try {
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem(
+            'pending_welcome_email',
+            JSON.stringify({
+              accountType: selectedAccountType || 'traveler',
+              firstName,
+              lastName,
+            }),
+          );
+        }
+      } catch {}
     } catch (error: any) {
       console.error("Unexpected signup error:", error);
       toast({ title: "Sign up failed", description: error?.message || "An unexpected error occurred.", variant: "destructive" });
@@ -432,6 +446,13 @@ const Auth = () => {
       // and AuthCallback can backfill the profile if the trigger defaulted to 'traveler'.
       if (selectedAccountType) {
         sessionStorage.setItem('pending_account_type', selectedAccountType);
+        // Same flag as email signup so AuthCallback fires the welcome email
+        // on first OAuth completion. Safe to set even if the user already
+        // has an account — AuthCallback only consumes it once per session.
+        sessionStorage.setItem(
+          'pending_welcome_email',
+          JSON.stringify({ accountType: selectedAccountType }),
+        );
       }
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
