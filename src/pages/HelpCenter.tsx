@@ -41,7 +41,6 @@ const GUIDED_TOURS = [
 
 const POPULAR_LINKS = [
   { path: "/my-trips", label: "My Trips", icon: BookOpen },
-  { path: "/browse-agents", label: "Browse Agents", icon: Briefcase },
   { path: "/marketplace", label: "Marketplace", icon: Sparkles },
   { path: "/apply/agent", label: "Become an Agent", icon: Users },
   { path: "/creator-dashboard", label: "Creator Dashboard", icon: Users },

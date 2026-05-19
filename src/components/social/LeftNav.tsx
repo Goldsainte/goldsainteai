@@ -41,10 +41,6 @@ export default function LeftNav() {
       <nav className="space-y-1">
         <NavItemLink to="/"><Home className="w-6 h-6" /> Home</NavItemLink>
         <NavItemLink to="/marketplace"><Store className="w-6 h-6" /> The Collection</NavItemLink>
-        <NavItemLink to="/browse-creators"><Users className="w-6 h-6" /> Browse Creators</NavItemLink>
-        <NavItemLink to="/browse-agents"><Building className="w-6 h-6" /> Browse Agents</NavItemLink>
-        
-        
         <NavItemLink to="/post-trip"><PlaneTakeoff className="w-6 h-6" /> Post a Trip</NavItemLink>
         
         {/* My Proposals - Agents and Creators */}
