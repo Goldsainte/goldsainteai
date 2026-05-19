@@ -11,6 +11,14 @@ const SITE_NAME = "goldsainteai";
 const SENDER_DOMAIN = "notify.goldsainte.com";
 const PASSWORD_RESET_SENDER = `${SITE_NAME} <noreply@${SENDER_DOMAIN}>`;
 
+function generateToken(): string {
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes)
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
+}
+
 function corsHeaders(req?: Request): Record<string, string> {
   return {
   "Access-Control-Allow-Origin": resolveAllowedOrigin(req),
@@ -101,6 +109,30 @@ const handler = async (req: Request): Promise<Response> => {
 
     const messageId = crypto.randomUUID();
     const idempotencyKey = `password-reset-${messageId}`;
+    const normalizedEmail = email.trim().toLowerCase();
+    let unsubscribeToken = generateToken();
+
+    const { data: existingToken, error: tokenLookupError } = await supabase
+      .from('email_unsubscribe_tokens')
+      .select('token')
+      .eq('email', normalizedEmail)
+      .maybeSingle();
+
+    if (tokenLookupError) {
+      throw new Error('Failed to prepare password reset email');
+    }
+
+    if (existingToken?.token) {
+      unsubscribeToken = existingToken.token;
+    } else {
+      const { error: tokenInsertError } = await supabase
+        .from('email_unsubscribe_tokens')
+        .upsert({ email: normalizedEmail, token: unsubscribeToken }, { onConflict: 'email' });
+
+      if (tokenInsertError) {
+        throw new Error('Failed to prepare password reset email');
+      }
+    }
 
     await supabase.from('email_send_log').insert({
       message_id: messageId,
@@ -122,6 +154,7 @@ const handler = async (req: Request): Promise<Response> => {
         purpose: 'transactional',
         label: 'recovery',
         idempotency_key: idempotencyKey,
+        unsubscribe_token: unsubscribeToken,
         queued_at: new Date().toISOString(),
       },
     });
