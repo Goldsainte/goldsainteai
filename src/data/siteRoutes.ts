@@ -36,7 +36,6 @@ export const siteRoutes: RouteInfo[] = [
   { path: '/creators/:id', label: 'Creator Profile', description: 'Public creator profile page', category: 'social', requiresAuth: false },
   { path: '/travel-settings', label: 'Creator Settings', description: 'Edit your public creator profile and TikTok details.', category: 'social', requiresAuth: true },
   { path: '/creator-dashboard', label: 'Creator Dashboard', description: 'Your TikTok travel performance and earnings', category: 'social', requiresAuth: true },
-  { path: '/browse-creators', label: 'Creator Marketplace', description: 'Agents can discover TikTok travel creators', category: 'social' },
   { path: '/storyboards', label: 'Goldsainte Creator Lab', description: 'Build TikTok-ready stories linked to trips', category: 'social', requiresAuth: true },
   { path: '/trip/:id', label: 'Creator Trip Page', description: 'Bookable experience behind TikTok content', category: 'social' },
   { path: '/collabs/new', label: 'New Collaboration', description: 'Agents & creators partner on selling trips', category: 'social', requiresAuth: true },
