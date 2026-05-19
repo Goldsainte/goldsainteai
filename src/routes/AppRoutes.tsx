@@ -33,6 +33,7 @@ const AdminHomePage = lazy(() => import('@/pages/admin/AdminHomePage'));
 const AdminTripsPage = lazy(() => import('@/pages/admin/AdminTripsPage'));
 const AdminWaitlistPage = lazy(() => import('@/pages/admin/AdminWaitlistPage'));
 const AdminEmailDLQPage = lazy(() => import('@/pages/admin/AdminEmailDLQPage'));
+const AdminUsersPage = lazy(() => import('@/pages/admin/AdminUsersPage'));
 
 const OpsEscrowDashboardPage = lazy(() => import('@/pages/OpsEscrowDashboardPage'));
 const AgentPublicProfilePage = lazy(() => import('@/pages/agents/AgentPublicProfilePage'));
