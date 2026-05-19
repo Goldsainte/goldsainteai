@@ -16,6 +16,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { AccountTypeStep } from '@/components/auth/AccountTypeStep';
 import { getPostAuthDestination } from '@/lib/auth/postAuthRouting';
 import { AUTH_REDIRECT_STORAGE_KEY, getRedirectPathFromSearch, sanitizeRedirectPath } from '@/lib/auth/redirect';
+import { requestPasswordReset } from '@/lib/auth/requestPasswordReset';
 
 const passwordSchema = z.string()
   .min(8, "Password must be at least 8 characters")
@@ -450,10 +451,10 @@ const Auth = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-      if (error) throw error;
+      const result = await requestPasswordReset(email);
+      if (!result.ok) {
+        throw new Error(result.error || 'Failed to send reset email.');
+      }
       toast({ title: "Reset email sent", description: "Check your email for a password reset link from Goldsainte." });
       setStep('email');
     } catch (error: any) {

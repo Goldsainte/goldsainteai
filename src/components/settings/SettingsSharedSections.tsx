@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { requestPasswordReset } from "@/lib/auth/requestPasswordReset";
 
 interface SectionShellProps {
   icon: any;
@@ -263,10 +264,8 @@ export function SecuritySection() {
         return;
       }
       toast.loading("Sending password reset email...");
-      const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-      if (error) throw error;
+      const result = await requestPasswordReset(user.email);
+      if (!result.ok) throw new Error(result.error || "Failed to send reset email.");
       toast.dismiss();
       toast.success("Password reset email sent! Check your inbox.");
     } catch (error: any) {
