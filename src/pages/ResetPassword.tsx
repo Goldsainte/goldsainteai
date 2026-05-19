@@ -41,6 +41,29 @@ const ResetPassword = () => {
       setHasToken(true);
     }
 
+    const tokenHash = queryParams.get('token_hash') || hashParams.get('token_hash');
+    const recoveryType = queryParams.get('type') || hashParams.get('type');
+
+    if (tokenHash && recoveryType === 'recovery') {
+      supabase.auth.verifyOtp({
+        token_hash: tokenHash,
+        type: 'recovery',
+      }).then(({ error }) => {
+        if (error) {
+          console.error('Recovery token verification failed:', error);
+          toast({
+            title: 'Invalid link',
+            description: 'This password reset link is invalid or has expired.',
+            variant: 'destructive',
+          });
+          navigate('/auth', { replace: true });
+          return;
+        }
+
+        setHasToken(true);
+      });
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         setHasToken(true);
