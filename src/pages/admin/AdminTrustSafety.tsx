@@ -24,7 +24,7 @@ interface UserReport {
   resolved_at?: string;
 }
 
-export default function TrustSafety() {
+export default function AdminTrustSafety() {
   const [reports, setReports] = useState<UserReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
