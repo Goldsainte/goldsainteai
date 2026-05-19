@@ -183,7 +183,7 @@ export default function CreatorPublicProfilePage() {
           <p className="mt-2 text-sm text-[#6B7280]">We couldn't find this creator.</p>
           <button
             onClick={() =>
-              window.history.length > 1 ? navigate(-1) : navigate("/creators")
+              window.history.length > 1 ? navigate(-1) : navigate("/marketplace")
             }
             className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#0c4d47] px-5 py-2.5 text-sm text-white hover:bg-[#0a3d39]"
           >
