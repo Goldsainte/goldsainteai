@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { usePanelStore } from "@/stores/panelStore";
-import { Home, Users, Search, MessageCircle, Bell, BarChart3, User2, Store, Building, PlaneTakeoff, Sparkles, FileText } from "lucide-react";
+import { Home, Search, MessageCircle, Bell, BarChart3, User2, Store, PlaneTakeoff, Sparkles, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
