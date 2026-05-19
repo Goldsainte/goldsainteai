@@ -1,4 +1,4 @@
-import { Home, Search, User, LogIn, LogOut, LayoutDashboard, Briefcase, ShieldCheck, TrendingUp, Info, DollarSign, Users, Sparkles } from "lucide-react";
+import { Home, Search, User, LogIn, LogOut, LayoutDashboard, Briefcase, ShieldCheck, TrendingUp, Info, DollarSign, Sparkles } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import logomark from "@/assets/logomark-gold.png";
@@ -35,7 +35,6 @@ const items: NavItem[] = [
   { title: "Traveler Console", url: "/traveler", icon: LayoutDashboard, authRequired: true, hideFor: ['creator', 'agent', 'brand'] },
   { title: "The Collection", url: "/marketplace", icon: Briefcase, authRequired: true },
   { title: "My Jobs", url: "/my-jobs", icon: Briefcase, authRequired: true },
-  { title: "Browse Agents", url: "/browse-agents", icon: Users },
   { title: "Creator Earnings", url: "/agent/earnings", icon: DollarSign, authRequired: true, showFor: "creator" },
   { title: "About", url: "/about", icon: Info },
 ];

@@ -43,8 +43,7 @@ export function FeedSidebar() {
 
   const navItems = [
     { to: "/home", icon: Home, label: "Home" },
-    { to: "/browse-creators", icon: Users, label: "Creator Marketplace" },
-    
+    { to: "/marketplace", icon: Users, label: "Marketplace" },
     { to: "/messages", icon: MessageCircle, label: "Messages" },
     { to: "/creator-dashboard", icon: BarChart3, label: "Dashboard" },
   ];

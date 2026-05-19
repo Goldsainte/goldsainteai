@@ -106,7 +106,7 @@ export default function AgentPublicProfilePage() {
           </p>
           <button
             onClick={() =>
-              window.history.length > 1 ? navigate(-1) : navigate("/agents")
+              window.history.length > 1 ? navigate(-1) : navigate("/marketplace")
             }
             className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#0c4d47] px-5 py-2.5 text-sm text-white hover:bg-[#0a3d39]"
           >

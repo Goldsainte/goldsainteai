@@ -168,7 +168,7 @@ export const helpCenterFAQs: FAQ[] = [
   {
     id: 'agent-hire',
     question: 'How do I hire a travel agent?',
-    answer: 'Browse agents at /browse-agents, view their profiles, reviews, and specialties. Message them directly or post a trip request for agents to bid on.',
+    answer: 'Post a trip request from the marketplace and vetted specialists will respond with proposals. You can review their profiles and message them directly from your inbox.',
     category: 'agent'
   },
   {

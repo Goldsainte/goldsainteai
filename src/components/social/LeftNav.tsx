@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { usePanelStore } from "@/stores/panelStore";
-import { Home, Users, Search, MessageCircle, Bell, BarChart3, User2, Store, Building, PlaneTakeoff, Sparkles, FileText } from "lucide-react";
+import { Home, Search, MessageCircle, Bell, BarChart3, User2, Store, PlaneTakeoff, Sparkles, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
@@ -41,10 +41,6 @@ export default function LeftNav() {
       <nav className="space-y-1">
         <NavItemLink to="/"><Home className="w-6 h-6" /> Home</NavItemLink>
         <NavItemLink to="/marketplace"><Store className="w-6 h-6" /> The Collection</NavItemLink>
-        <NavItemLink to="/browse-creators"><Users className="w-6 h-6" /> Browse Creators</NavItemLink>
-        <NavItemLink to="/browse-agents"><Building className="w-6 h-6" /> Browse Agents</NavItemLink>
-        
-        
         <NavItemLink to="/post-trip"><PlaneTakeoff className="w-6 h-6" /> Post a Trip</NavItemLink>
         
         {/* My Proposals - Agents and Creators */}
