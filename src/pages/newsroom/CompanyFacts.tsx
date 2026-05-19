@@ -16,8 +16,8 @@ const FACTS: { label: string; value: string }[] = [
   { label: "Markets Served", value: "United States with expanding global marketplace participation across destinations throughout North America, Europe, Asia, the Caribbean, the Middle East, and Africa." },
   { label: "User Types", value: "Travelers, Travel Creators, Independent Travel Advisors, Hospitality & Experience Partners" },
   { label: "Investment Status", value: "Privately held" },
-  { label: "General Contact", value: "hello@goldsainte.ai" },
-  { label: "Press Contact", value: "press@goldsainte.com" },
+  { label: "General Contact", value: "info@goldsainte.com" },
+  { label: "Press Contact", value: "info@goldsainte.com" },
 ];
 
 const CORE_PRODUCTS = [
@@ -50,7 +50,7 @@ export default function CompanyFacts() {
             addressRegion: "NC",
             addressCountry: "US",
           },
-          email: "press@goldsainte.com",
+          email: "info@goldsainte.com",
         })}</script>
       </Helmet>
       <div className={`${newsroomPageShellClass} space-y-12 md:space-y-24`}>
