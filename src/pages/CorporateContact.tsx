@@ -1,292 +1,359 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Building2, Users, Briefcase, Info, TrendingUp, Search, HelpCircle, BookOpen, MessageSquare, Mail, Copy } from "lucide-react";
-import { useNavigate, Link } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
+import { Link } from "react-router-dom";
+import { toast } from "sonner";
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import primaryLogoGreen from "@/assets/primary-horizontal-logo-green.svg";
-import { useToast } from "@/hooks/use-toast";
-import { BackButton } from "@/components/ui/BackButton";
+  Users,
+  Briefcase,
+  MessageSquare,
+  Info,
+  TrendingUp,
+  ShieldCheck,
+  Mail,
+  Copy,
+  Check,
+  ArrowUpRight,
+  Clock,
+  ChevronDown,
+} from "lucide-react";
 
-export default function CorporateContact() {
-  const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
-  const { toast } = useToast();
+// ─────────────────────────────────────────────
+// Data
+// ─────────────────────────────────────────────
 
-  const handleCopyEmail = (email: string) => {
-    navigator.clipboard.writeText(email);
-    toast({
-      title: "Email copied",
-      description: "Email address copied to clipboard",
+const CONTACTS = [
+  {
+    icon: Users,
+    eyebrow: "01",
+    title: "Customer Support",
+    desc: "Help with bookings, payments, account issues, and trip management.",
+    email: "support@goldsainte.com",
+    response: "1 business day",
+    handles: [
+      "Booking inquiries and modifications",
+      "Payment and refund questions",
+      "Account management and verification",
+      "Technical support and platform issues",
+    ],
+  },
+  {
+    icon: Briefcase,
+    eyebrow: "02",
+    title: "Travel Agent Support",
+    desc: "Dedicated support for travel agents and their partnerships on Goldsainte.",
+    email: "agent@goldsainte.com",
+    response: "12 hours",
+    handles: [
+      "Agent application and onboarding",
+      "Commission and payout questions",
+      "Platform tools and features",
+      "Partnership and co-curated opportunities",
+    ],
+  },
+  {
+    icon: MessageSquare,
+    eyebrow: "03",
+    title: "Creator Support",
+    desc: "Support for content creators building their travel brand on Goldsainte.",
+    email: "creator@goldsainte.com",
+    response: "1 business day",
+    handles: [
+      "Creator application and onboarding",
+      "Monetization and earnings questions",
+      "Content and portfolio tools",
+      "Collaboration opportunities",
+    ],
+  },
+  {
+    icon: ShieldCheck,
+    eyebrow: "04",
+    title: "Trust & Safety",
+    desc: "Report safety concerns, fraud, harassment, or policy violations.",
+    email: "safety@goldsainte.com",
+    response: "24 hours",
+    handles: [
+      "Reporting fraud or scam attempts",
+      "Harassment and conduct violations",
+      "Off-platform payment requests",
+      "Urgent safety concerns during a trip",
+    ],
+  },
+  {
+    icon: Info,
+    eyebrow: "05",
+    title: "Press & Media",
+    desc: "Journalists, broadcasters, and editorial partners — our newsroom team.",
+    email: "press@goldsainte.com",
+    response: "1 business day",
+    handles: [
+      "Interview and commentary requests",
+      "Media kit and brand assets",
+      "Founder speaking opportunities",
+      "Corporate and product information",
+    ],
+  },
+  {
+    icon: TrendingUp,
+    eyebrow: "06",
+    title: "Investor Relations",
+    desc: "For investors, financial analysts, and shareholder inquiries.",
+    email: "investors@goldsainte.com",
+    response: "2–3 business days",
+    handles: [
+      "Investment and funding inquiries",
+      "Corporate governance questions",
+      "Financial information requests",
+      "Shareholder communications",
+    ],
+  },
+];
+
+const QUICK_LINKS = [
+  { label: "Help Center", to: "/help", desc: "Browse FAQs and guides" },
+  { label: "Community Guidelines", to: "/community-guidelines", desc: "Platform standards" },
+  { label: "Trust & Safety", to: "/trust-safety", desc: "How we protect you" },
+  { label: "Newsroom", to: "/newsroom", desc: "Press releases and news" },
+];
+
+// ─────────────────────────────────────────────
+// Sub-components
+// ─────────────────────────────────────────────
+
+function ContactCard({ contact }: { contact: (typeof CONTACTS)[number] }) {
+  const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const Icon = contact.icon;
+
+  function copyEmail() {
+    navigator.clipboard.writeText(contact.email).then(() => {
+      setCopied(true);
+      toast.success("Email address copied");
+      setTimeout(() => setCopied(false), 1600);
     });
-  };
-
-  const contacts = [
-    {
-      icon: <Users className="h-6 w-6" />,
-      title: "Customer Support",
-      description: "Get help with your bookings and account",
-      email: "support@goldsainte.com",
-      responseTime: "Usually responds within 24 hours",
-      details: [
-        "Help with bookings and cancellations",
-        "Payment and refund inquiries",
-        "Account management",
-        "Technical support"
-      ]
-    },
-    {
-      icon: <Briefcase className="h-6 w-6" />,
-      title: "Travel Agent Support",
-      description: "Support for travel agents and partners",
-      email: "agent@goldsainte.com",
-      responseTime: "Usually responds within 12 hours",
-      details: [
-        "Agent-specific inquiries",
-        "Partnership opportunities",
-        "Commission and payment questions",
-        "Technical tools and platform support"
-      ]
-    },
-    {
-      icon: <MessageSquare className="h-6 w-6" />,
-      title: "Creator Support",
-      description: "Support for content creators",
-      email: "creator@goldsainte.com",
-      responseTime: "Usually responds within 24 hours",
-      details: [
-        "Content creator inquiries",
-        "Monetization questions",
-        "Platform features and tools",
-        "Partnership opportunities"
-      ]
-    },
-    {
-      icon: <Info className="h-6 w-6" />,
-      title: "General Information",
-      description: "General inquiries and information",
-      email: "info@goldsainte.com",
-      responseTime: "Usually responds within 48 hours",
-      details: [
-        "General questions about our services",
-        "Media inquiries and press",
-        "Partnership and collaboration opportunities",
-        "Corporate information"
-      ]
-    },
-    {
-      icon: <TrendingUp className="h-6 w-6" />,
-      title: "Investor Relations",
-      description: "For investors and financial inquiries",
-      email: "investors@goldsainte.com",
-      responseTime: "Usually responds within 2-3 business days",
-      details: [
-        "Investment opportunities",
-        "Financial information and reports",
-        "Corporate governance",
-        "Shareholder inquiries"
-      ]
-    }
-  ];
-
-  const filteredContacts = contacts.filter(contact => 
-    searchQuery === "" || 
-    contact.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    contact.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    contact.details.some(detail => detail.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  }
 
   return (
-    <div className="min-h-screen bg-background">
-      <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 md:py-12 max-w-5xl">
-        {/* Back Button */}
-        <BackButton className="mb-6" />
-
-        {/* Logo Section */}
-        <div className="flex justify-center mb-6 sm:mb-8">
-          <img 
-            src={primaryLogoGreen} 
-            alt="Goldsainte" 
-            className="h-4 sm:h-6 md:h-7 w-auto"
-          loading="lazy"/>
+    <div className="border border-[#E5DFC6] rounded-sm bg-white/60">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-start gap-5 px-6 py-6 text-left group"
+      >
+        {/* Icon */}
+        <div className="flex-shrink-0 w-10 h-10 rounded-sm bg-[#0c4d47]/10 flex items-center justify-center mt-0.5">
+          <Icon className="h-4 w-4 text-[#0c4d47]" />
         </div>
 
-        {/* Hero Section */}
-        <div className="mb-8 sm:mb-12 text-center max-w-3xl mx-auto">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-secondary text-primary mb-4">
-            Contact Us
-          </h1>
-          <p className="text-xs sm:text-sm text-muted-foreground mb-6 sm:mb-8 px-2">
-            Find the right team to help you. Choose the department that best matches your inquiry for the fastest response.
+        {/* Labels */}
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] uppercase tracking-[0.22em] text-[#C7A962] mb-1">
+            {contact.eyebrow}
           </p>
+          <p className="font-secondary text-lg md:text-xl text-[#0a2225] group-hover:text-[#0c4d47] transition leading-tight">
+            {contact.title}
+          </p>
+          <p className="text-sm text-[#0a2225]/55 mt-1 leading-snug">{contact.desc}</p>
+        </div>
 
-          {/* Search Bar */}
-          <div className="relative max-w-md mx-auto">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Search departments..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-10 sm:h-12 text-sm sm:text-base"
-            />
+        {/* Chevron */}
+        <ChevronDown
+          className={`flex-shrink-0 h-4 w-4 text-[#0a2225]/30 mt-2 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {open && (
+        <div className="px-6 pb-8 border-t border-[#E5DFC6] pt-6 space-y-6">
+          {/* Email + response time */}
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.22em] text-[#0a2225]/40 mb-2">
+                Email
+              </p>
+              <a
+                href={`mailto:${contact.email}`}
+                className="text-sm text-[#0c4d47] underline underline-offset-4 hover:text-[#0a2225] transition"
+              >
+                {contact.email}
+              </a>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.22em] text-[#0a2225]/40 mb-2">
+                Response time
+              </p>
+              <div className="flex items-center gap-1.5 text-sm text-[#0a2225]/70">
+                <Clock className="h-3.5 w-3.5 text-[#C7A962]" />
+                Within {contact.response}
+              </div>
+            </div>
+          </div>
+
+          {/* Handles */}
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.22em] text-[#0a2225]/40 mb-3">
+              We can help with
+            </p>
+            <ul className="grid sm:grid-cols-2 gap-2">
+              {contact.handles.map((h) => (
+                <li
+                  key={h}
+                  className="flex items-start gap-2 text-sm text-[#0a2225]/70 leading-snug"
+                >
+                  <ShieldCheck className="h-3.5 w-3.5 text-[#0c4d47] flex-shrink-0 mt-0.5" />
+                  {h}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* CTA buttons */}
+          <div className="flex flex-wrap gap-3">
+            <a
+              href={`mailto:${contact.email}`}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0c4d47] text-white text-[11px] uppercase tracking-[0.2em] hover:bg-[#0a3d39] transition"
+            >
+              <Mail className="h-3.5 w-3.5" />
+              Send email
+            </a>
+            <button
+              onClick={copyEmail}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#E5DFC6] text-[#0a2225] text-[11px] uppercase tracking-[0.2em] hover:border-[#0c4d47] hover:text-[#0c4d47] transition"
+            >
+              {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+              {copied ? "Copied" : "Copy address"}
+            </button>
           </div>
         </div>
-
-        {/* Contact Departments Accordion */}
-        <Accordion type="single" collapsible className="space-y-3 sm:space-y-4 mb-8 sm:mb-12">
-          {filteredContacts.map((contact, index) => (
-            <AccordionItem 
-              key={index} 
-              value={`contact-${index}`}
-              className="border-0 rounded-lg px-4 sm:px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors"
-            >
-              <AccordionTrigger className="text-sm sm:text-base font-medium hover:no-underline text-[#0c4d47] py-3 sm:py-4">
-                <div className="flex items-center gap-3">
-                  {contact.icon}
-                  <span>{contact.title}</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="pt-3 sm:pt-4 space-y-3 sm:space-y-4 text-sm sm:text-base leading-relaxed">
-                <div className="flex justify-center mb-4 sm:mb-6">
-                  <img 
-                    src={primaryLogoGreen} 
-                    alt="Goldsainte" 
-                    className="h-4 sm:h-5 md:h-7 w-auto"
-                  loading="lazy"/>
-                </div>
-                
-                <p className="text-foreground">{contact.description}</p>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-foreground">
-                    <Mail className="h-4 w-4 text-primary" />
-                    <a href={`mailto:${contact.email}`} className="hover:underline">
-                      {contact.email}
-                    </a>
-                  </div>
-                  {contact.responseTime && (
-                    <p className="text-xs sm:text-sm text-muted-foreground">
-                      {contact.responseTime}
-                    </p>
-                  )}
-                </div>
-
-                {contact.details && contact.details.length > 0 && (
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">We can help with:</h4>
-                    <ul className="space-y-1 text-foreground">
-                      {contact.details.map((detail, idx) => (
-                        <li key={idx} className="flex items-start gap-2">
-                          <span className="text-primary mt-1">•</span>
-                          <span>{detail}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                <div className="flex flex-wrap gap-2 pt-2">
-                  <Button 
-                    size="sm" 
-                    asChild
-                    className="text-xs sm:text-sm"
-                  >
-                    <a href={`mailto:${contact.email}`}>
-                      <Mail className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                      Send Email
-                    </a>
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleCopyEmail(contact.email)}
-                    className="text-xs sm:text-sm"
-                  >
-                    <Copy className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                    Copy Email
-                  </Button>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-
-        {/* Additional Resources */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8 sm:mb-12">
-          <Card className="bg-primary/5">
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-start gap-3 sm:gap-4">
-                <div className="p-2 sm:p-3 rounded-lg bg-primary/10">
-                  <HelpCircle className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-base sm:text-lg font-semibold mb-2">Help Center</h3>
-                  <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
-                    Find answers to common questions in our comprehensive help center
-                  </p>
-                  <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
-                    <a href="/help">
-                      Visit Help Center
-                    </a>
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-primary/5">
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-start gap-3 sm:gap-4">
-                <div className="p-2 sm:p-3 rounded-lg bg-primary/10">
-                  <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-base sm:text-lg font-semibold mb-2">Community Guidelines</h3>
-                  <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
-                    Learn about our community standards and policies
-                  </p>
-                  <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
-                    <a href="/community-guidelines">
-                      Read Guidelines
-                    </a>
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Help Center CTA */}
-        <Card className="max-w-3xl mx-auto mb-8">
-          <CardContent className="p-6 sm:p-8 text-center">
-            <h3 className="text-lg sm:text-xl font-semibold mb-3">Need Quick Answers?</h3>
-            <p className="text-muted-foreground mb-6 text-sm sm:text-base">
-              Visit our AI-powered Help Center for instant answers to common questions about navigation, bookings, and more.
-            </p>
-            <Button variant="outline" size="lg" asChild>
-              <Link to="/help">Visit Help Center</Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Business Hours Notice */}
-        <Card className="max-w-3xl mx-auto">
-          <CardContent className="p-4 sm:p-6 text-center">
-            <h3 className="text-base sm:text-lg font-semibold mb-2">Business Hours</h3>
-            <p className="text-xs sm:text-sm text-muted-foreground">
-              Our support teams operate Monday through Friday, 9:00 AM - 6:00 PM EST.
-              For urgent matters outside business hours, please mark your email as "Urgent" in the subject line.
-            </p>
-          </CardContent>
-        </Card>
-      </main>
+      )}
     </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// Page
+// ─────────────────────────────────────────────
+
+export default function CorporateContact() {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filtered =
+    searchQuery.trim() === ""
+      ? CONTACTS
+      : CONTACTS.filter(
+          (c) =>
+            c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            c.desc.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            c.handles.some((h) => h.toLowerCase().includes(searchQuery.toLowerCase()))
+        );
+
+  return (
+    <>
+      <div className="bg-[#FDF9F0] text-[#0a2225]">
+
+        {/* ── HERO ── */}
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 md:pt-24 pb-14 md:pb-20">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-5">
+            Contact
+          </p>
+          <h1 className="font-secondary text-3xl sm:text-4xl md:text-6xl leading-[1.08] tracking-tight text-[#0a2225] max-w-3xl mb-6">
+            Get in touch with the right team.
+          </h1>
+          <p className="text-base md:text-lg text-[#0a2225]/70 leading-relaxed max-w-xl mb-10">
+            Six dedicated departments — each with a direct email and a committed response
+            time. Choose the team that matches your inquiry for the fastest reply.
+          </p>
+
+          {/* Business hours notice */}
+          <div className="flex items-start gap-3 border border-[#E5DFC6] rounded-sm bg-white/60 px-5 py-4 max-w-lg">
+            <Clock className="h-4 w-4 text-[#C7A962] flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-[#0a2225]/70 leading-relaxed">
+              Support teams operate Monday–Friday, 9:00 AM – 6:00 PM EST. For urgent
+              matters outside business hours, mark your subject line <strong>Urgent</strong>.
+            </p>
+          </div>
+        </section>
+
+        {/* ── SEARCH + CONTACTS ── */}
+        <section className="border-t border-[#E5DFC6]">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-14 md:py-18">
+            <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mb-6">
+              Departments
+            </p>
+
+            {/* Search */}
+            <div className="relative max-w-md mb-8">
+              <input
+                type="text"
+                placeholder="Search departments…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-3 rounded-sm border border-[#E5DFC6] bg-white text-sm text-[#0a2225] placeholder:text-[#0a2225]/35 focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/25 focus:border-[#0c4d47] transition"
+              />
+            </div>
+
+            {/* Contact cards */}
+            <div className="space-y-3">
+              {filtered.length === 0 ? (
+                <p className="py-12 text-center text-sm text-[#0a2225]/50 italic">
+                  No departments match "{searchQuery}".
+                </p>
+              ) : (
+                filtered.map((contact) => (
+                  <ContactCard key={contact.email} contact={contact} />
+                ))
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* ── QUICK LINKS ── */}
+        <section className="border-t border-[#E5DFC6] bg-white/60">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-14 md:py-18">
+            <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mb-4">
+              Helpful resources
+            </p>
+            <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
+              {QUICK_LINKS.map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className="group block border border-[#E5DFC6] rounded-sm px-5 py-5 hover:border-[#0c4d47] transition"
+                >
+                  <p className="font-secondary text-base text-[#0a2225] group-hover:text-[#0c4d47] transition mb-1">
+                    {link.label}
+                  </p>
+                  <p className="text-xs text-[#0a2225]/50 mb-3">{link.desc}</p>
+                  <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.2em] text-[#0c4d47]">
+                    Visit <ArrowUpRight className="h-3 w-3" />
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── DARK CTA ── */}
+        <section className="border-t border-[#E5DFC6]">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 md:py-20">
+            <div className="rounded-sm bg-[#0c4d47] px-6 py-8 md:px-10 md:py-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+              <div>
+                <h3 className="font-secondary text-xl md:text-2xl text-white mb-2">
+                  Need an instant answer?
+                </h3>
+                <p className="text-sm text-white/70">
+                  The Help Center has FAQs, guides, and an AI assistant ready now.
+                </p>
+              </div>
+              <div className="flex-shrink-0">
+                <Link
+                  to="/help"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-[#0c4d47] text-[11px] uppercase tracking-[0.2em] font-medium hover:bg-[#FDF9F0] transition"
+                >
+                  Visit Help Center
+                  <ArrowUpRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </>
   );
 }

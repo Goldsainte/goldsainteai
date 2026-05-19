@@ -1,37 +1,87 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, BookOpen, CreditCard, XCircle, UserCircle, Sparkles, Users, Briefcase, MapPin, Compass } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { BackButton } from '@/components/ui/BackButton';
-import { Input } from '@/components/ui/input';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { HelpCenterChat } from '@/components/HelpCenterChat';
-import { helpCenterFAQs, searchFAQs, getFAQsByCategory } from '@/data/helpCenterFAQs';
-import { siteRoutes, searchRoutes } from '@/data/siteRoutes';
-import primaryLogoGreen from "@/assets/primary-horizontal-logo-green.svg";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Search,
+  BookOpen,
+  CreditCard,
+  XCircle,
+  UserCircle,
+  Sparkles,
+  Users,
+  Briefcase,
+  MapPin,
+  ArrowUpRight,
+  MessageSquare,
+  ChevronDown,
+} from "lucide-react";
+import { HelpCenterChat } from "@/components/HelpCenterChat";
+import { helpCenterFAQs, searchFAQs, getFAQsByCategory } from "@/data/helpCenterFAQs";
+import { siteRoutes, searchRoutes } from "@/data/siteRoutes";
 
-const categories = [
-  { id: 'bookings', label: 'Bookings', icon: BookOpen },
-  { id: 'payments', label: 'Payments', icon: CreditCard },
-  { id: 'cancellations', label: 'Cancellations', icon: XCircle },
-  { id: 'account', label: 'Account', icon: UserCircle },
-  { id: 'ai-features', label: 'AI Features', icon: Sparkles },
-  { id: 'creator', label: 'Creator Program', icon: Users },
-  { id: 'agent', label: 'Agent Marketplace', icon: Briefcase },
-  { id: 'navigation', label: 'Navigation', icon: MapPin },
+// ─────────────────────────────────────────────
+// Data
+// ─────────────────────────────────────────────
+
+const CATEGORIES = [
+  { id: "bookings", label: "Bookings", icon: BookOpen },
+  { id: "payments", label: "Payments", icon: CreditCard },
+  { id: "cancellations", label: "Cancellations", icon: XCircle },
+  { id: "account", label: "Account", icon: UserCircle },
+  { id: "ai-features", label: "AI Features", icon: Sparkles },
+  { id: "creator", label: "Creator Program", icon: Users },
+  { id: "agent", label: "Agent Marketplace", icon: Briefcase },
+  { id: "navigation", label: "Navigation", icon: MapPin },
 ];
 
-const popularRoutes = [
-  { path: '/my-trips', label: 'My Trips', icon: BookOpen },
-  { path: '/browse-agents', label: 'Browse Agents', icon: Briefcase },
-  { path: '/marketplace', label: 'Marketplace', icon: Sparkles },
-  { path: '/apply/agent', label: 'Become an Agent', icon: Users },
-  { path: '/creator-dashboard', label: 'Creator Dashboard', icon: Users },
-  { path: '/corporate-contact', label: 'Contact Us', icon: UserCircle },
+const GUIDED_TOURS = [
+  { to: "/how-it-works/traveler", label: "For Travelers", desc: "Plan and book trips with verified specialists across 50+ countries." },
+  { to: "/how-it-works/creator", label: "For Creators", desc: "Monetise your audience with trips, guides, and curated experiences." },
+  { to: "/how-it-works/agent", label: "For Agents", desc: "Win clients, manage trips, and grow your practice end-to-end." },
 ];
+
+const POPULAR_LINKS = [
+  { path: "/my-trips", label: "My Trips", icon: BookOpen },
+  { path: "/browse-agents", label: "Browse Agents", icon: Briefcase },
+  { path: "/marketplace", label: "Marketplace", icon: Sparkles },
+  { path: "/apply/agent", label: "Become an Agent", icon: Users },
+  { path: "/creator-dashboard", label: "Creator Dashboard", icon: Users },
+  { path: "/corporate-contact", label: "Contact Us", icon: MessageSquare },
+];
+
+// ─────────────────────────────────────────────
+// Sub-components
+// ─────────────────────────────────────────────
+
+function FAQItem({ faq }: { faq: { id: string; question: string; answer: string } }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="border-b border-[#E5DFC6]">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-start justify-between gap-4 py-5 text-left group"
+      >
+        <span className="font-secondary text-base md:text-lg text-[#0a2225] leading-snug group-hover:text-[#0c4d47] transition">
+          {faq.question}
+        </span>
+        <ChevronDown
+          className={`h-4 w-4 text-[#0a2225]/40 flex-shrink-0 mt-1 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      {open && (
+        <div className="pb-6 text-sm md:text-base text-[#0a2225]/70 leading-relaxed pr-8">
+          {faq.answer}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// Page
+// ─────────────────────────────────────────────
 
 export default function HelpCenter() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const filteredFAQs = searchQuery
@@ -42,197 +92,232 @@ export default function HelpCenter() {
 
   const filteredRoutes = searchQuery ? searchRoutes(searchQuery) : [];
 
+  const activeCategoryLabel = CATEGORIES.find((c) => c.id === selectedCategory)?.label;
+
   return (
-    <div className="flex-1 bg-background">
-      <div className="container mx-auto px-4 md:px-6 py-8 max-w-6xl">
-        {/* Back Button */}
-        <BackButton className="mb-6" />
+    <>
+      <div className="bg-[#FDF9F0] text-[#0a2225]">
 
-        {/* Logo */}
-        <div className="flex justify-center mb-6 sm:mb-8">
-          <img 
-            src={primaryLogoGreen} 
-            alt="Goldsainte" 
-            className="h-4 sm:h-6 md:h-7 w-auto"
-          loading="lazy"/>
-        </div>
-
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-secondary text-primary mb-4">
+        {/* ── HERO ── */}
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 md:pt-24 pb-12 md:pb-16">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-5">
             Help Center
+          </p>
+          <h1 className="font-secondary text-3xl sm:text-4xl md:text-6xl leading-[1.08] tracking-tight text-[#0a2225] max-w-3xl mb-6">
+            How can we help?
           </h1>
-          <p className="text-sm sm:text-base text-muted-foreground mb-8">
-            Get instant answers with our AI assistant or browse FAQs below
+          <p className="text-base md:text-lg text-[#0a2225]/70 leading-relaxed max-w-xl mb-10">
+            Browse frequently asked questions, explore our guides, or ask the AI assistant
+            for an instant answer.
           </p>
 
           {/* Search */}
-          <div className="max-w-2xl mx-auto relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            <Input
+          <div className="relative max-w-2xl">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#0a2225]/35 pointer-events-none" />
+            <input
               type="text"
-              placeholder="Search for help articles, pages, or ask a question..."
+              placeholder="Search for help articles, pages, or a question…"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-10 sm:h-12 text-base"
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setSelectedCategory(null);
+              }}
+              className="w-full pl-11 pr-4 py-3.5 rounded-sm border border-[#E5DFC6] bg-white text-sm text-[#0a2225] placeholder:text-[#0a2225]/35 focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/25 focus:border-[#0c4d47] transition"
             />
           </div>
-        </div>
+        </section>
 
-        {/* Search Results for Routes */}
+        {/* ── SEARCH RESULTS: ROUTES ── */}
         {searchQuery && filteredRoutes.length > 0 && (
-          <div className="mb-8 p-6 bg-primary/5 rounded-lg border border-primary/20">
-            <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-primary" />
-              Pages matching "{searchQuery}"
-            </h3>
-            <div className="grid sm:grid-cols-2 gap-3">
-              {filteredRoutes.slice(0, 6).map((route) => (
-                <Link
-                  key={route.path}
-                  to={route.path}
-                  className="flex items-start gap-3 p-3 rounded-md hover:bg-background transition-colors group"
-                >
-                  <div className="text-primary group-hover:scale-110 transition-transform">
-                    →
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-medium text-sm group-hover:text-primary transition-colors">
-                      {route.label}
+          <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-10">
+            <div className="border border-[#E5DFC6] rounded-sm bg-white/60 px-6 py-6">
+              <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mb-4">
+                Pages matching "{searchQuery}"
+              </p>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {filteredRoutes.slice(0, 6).map((route) => (
+                  <Link
+                    key={route.path}
+                    to={route.path}
+                    className="flex items-start gap-3 p-4 rounded-sm border border-[#E5DFC6] hover:border-[#0c4d47] bg-[#FDF9F0] group transition"
+                  >
+                    <ArrowUpRight className="h-4 w-4 text-[#0c4d47] flex-shrink-0 mt-0.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                    <div>
+                      <p className="text-sm font-medium text-[#0a2225] group-hover:text-[#0c4d47] transition">
+                        {route.label}
+                      </p>
+                      <p className="text-xs text-[#0a2225]/50 mt-0.5">{route.description}</p>
                     </div>
-                    <div className="text-xs text-muted-foreground">{route.description}</div>
-                    <div className="text-xs font-mono text-primary/60 mt-1">{route.path}</div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ── GUIDED TOURS (no search) ── */}
+        {!searchQuery && (
+          <section className="border-t border-[#E5DFC6]">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 py-14 md:py-18">
+              <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mb-4">
+                Guided tours
+              </p>
+              <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-8">
+                Where do you want to start?
+              </h2>
+              <div className="grid sm:grid-cols-3 gap-4">
+                {GUIDED_TOURS.map((tour) => (
+                  <Link
+                    key={tour.to}
+                    to={tour.to}
+                    className="group block border border-[#E5DFC6] rounded-sm bg-white/60 px-6 py-6 hover:border-[#0c4d47] transition"
+                  >
+                    <p className="font-secondary text-xl text-[#0a2225] group-hover:text-[#0c4d47] transition mb-2">
+                      {tour.label}
+                    </p>
+                    <p className="text-sm text-[#0a2225]/60 leading-relaxed mb-4">{tour.desc}</p>
+                    <span className="inline-flex items-center gap-1 text-[11px] uppercase tracking-[0.2em] text-[#0c4d47]">
+                      View guide <ArrowUpRight className="h-3 w-3" />
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ── POPULAR PAGES (no search) ── */}
+        {!searchQuery && (
+          <section className="border-t border-[#E5DFC6] bg-white/60">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 py-14 md:py-18">
+              <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mb-4">
+                Popular pages
+              </p>
+              <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+                {POPULAR_LINKS.map((link) => {
+                  const Icon = link.icon;
+                  return (
+                    <Link
+                      key={link.path}
+                      to={link.path}
+                      className="flex items-center gap-3 border border-[#E5DFC6] rounded-sm px-5 py-4 hover:border-[#0c4d47] hover:text-[#0c4d47] group transition"
+                    >
+                      <Icon className="h-4 w-4 text-[#0c4d47] flex-shrink-0" />
+                      <span className="text-sm text-[#0a2225] group-hover:text-[#0c4d47] transition">
+                        {link.label}
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ── CATEGORY FILTERS ── */}
+        <section className="border-t border-[#E5DFC6]">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-14 md:py-18">
+            {!searchQuery && (
+              <>
+                <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mb-4">
+                  Browse by category
+                </p>
+                {/* Scroll on mobile */}
+                <div className="-mx-4 px-4 sm:mx-0 sm:px-0 mb-10">
+                  <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none snap-x">
+                    <button
+                      onClick={() => setSelectedCategory(null)}
+                      className={`flex-shrink-0 snap-start px-4 py-2 rounded-full text-[11px] uppercase tracking-[0.18em] transition-colors whitespace-nowrap ${
+                        selectedCategory === null
+                          ? "bg-[#0c4d47] text-white"
+                          : "border border-[#E5DFC6] text-[#0a2225]/70 hover:border-[#0c4d47] hover:text-[#0c4d47]"
+                      }`}
+                    >
+                      All
+                    </button>
+                    {CATEGORIES.map((cat) => {
+                      const Icon = cat.icon;
+                      return (
+                        <button
+                          key={cat.id}
+                          onClick={() => setSelectedCategory(cat.id)}
+                          className={`flex-shrink-0 snap-start flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] uppercase tracking-[0.18em] transition-colors whitespace-nowrap ${
+                            selectedCategory === cat.id
+                              ? "bg-[#0c4d47] text-white"
+                              : "border border-[#E5DFC6] text-[#0a2225]/70 hover:border-[#0c4d47] hover:text-[#0c4d47]"
+                          }`}
+                        >
+                          <Icon className="h-3 w-3" />
+                          {cat.label}
+                        </button>
+                      );
+                    })}
                   </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
+                </div>
+              </>
+            )}
 
-        {/* Guided Tours */}
-        {!searchQuery && (
-          <div className="mb-12">
-            <h2 className="text-lg sm:text-xl font-semibold mb-6 text-center flex items-center justify-center gap-2">
-              <Compass className="h-5 w-5 text-primary" /> Guided Tours
+            {/* FAQ heading */}
+            <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mb-3">
+              {searchQuery
+                ? `${filteredFAQs.length} result${filteredFAQs.length !== 1 ? "s" : ""} for "${searchQuery}"`
+                : selectedCategory
+                ? `${activeCategoryLabel}`
+                : "Frequently asked questions"}
+            </p>
+            <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-8">
+              {searchQuery ? "Search results" : selectedCategory ? activeCategoryLabel : "Common questions"}
             </h2>
-            <div className="grid sm:grid-cols-3 gap-4">
-              {[
-                { to: "/how-it-works/traveler", label: "For Travelers", desc: "Plan and book trips with verified specialists." },
-                { to: "/how-it-works/creator", label: "For Creators", desc: "Monetise your audience with trips and guides." },
-                { to: "/how-it-works/agent", label: "For Agents", desc: "Win clients and run trips end-to-end." },
-              ].map((c) => (
+
+            {filteredFAQs.length === 0 ? (
+              <div className="py-16 text-center border border-[#E5DFC6] rounded-sm bg-white/60">
+                <p className="text-sm text-[#0a2225]/50 mb-2">No results found.</p>
+                <p className="text-sm text-[#0a2225]/40">Try the AI assistant below for an instant answer.</p>
+              </div>
+            ) : (
+              <div className="border-t border-[#E5DFC6]">
+                {filteredFAQs.map((faq) => (
+                  <FAQItem key={faq.id} faq={faq} />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* ── STILL NEED HELP ── */}
+        <section className="border-t border-[#E5DFC6]">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 md:py-20">
+            <div className="rounded-sm bg-[#0c4d47] px-6 py-8 md:px-10 md:py-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+              <div>
+                <h3 className="font-secondary text-xl md:text-2xl text-white mb-2">
+                  Still need help?
+                </h3>
+                <p className="text-sm text-white/70">
+                  Our support team responds within one business day.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
                 <Link
-                  key={c.to}
-                  to={c.to}
-                  className="block p-6 rounded-lg border border-border hover:border-primary hover:bg-primary/5 transition-colors group"
+                  to="/corporate-contact"
+                  className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-white text-[#0c4d47] text-[11px] uppercase tracking-[0.2em] font-medium hover:bg-[#FDF9F0] transition"
                 >
-                  <div className="font-semibold mb-1 group-hover:text-primary transition-colors">{c.label}</div>
-                  <div className="text-sm text-muted-foreground">{c.desc}</div>
-                  <div className="text-xs text-primary mt-3">View guide →</div>
+                  Contact support
                 </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Popular Routes */}
-        {!searchQuery && (
-          <div className="mb-12">
-            <h2 className="text-lg sm:text-xl font-semibold mb-6 text-center">Popular Pages</h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {popularRoutes.map((route) => (
                 <Link
-                  key={route.path}
-                  to={route.path}
-                  className="flex items-center gap-3 p-4 rounded-lg border border-border hover:border-primary hover:bg-primary/5 transition-colors group"
+                  to="/messages"
+                  className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-white/30 text-white text-[11px] uppercase tracking-[0.2em] hover:border-white transition"
                 >
-                  <route.icon className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
-                  <span className="font-medium group-hover:text-primary transition-colors">
-                    {route.label}
-                  </span>
+                  Message us
+                  <ArrowUpRight className="h-3.5 w-3.5 ml-1.5" />
                 </Link>
-              ))}
+              </div>
             </div>
           </div>
-        )}
-
-        {/* Category Filters */}
-        {!searchQuery && (
-          <div className="mb-8">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center">Browse by Category</h2>
-            <div className="flex flex-wrap justify-center gap-2">
-              <Button
-                variant={selectedCategory === null ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedCategory(null)}
-              >
-                All
-              </Button>
-              {categories.map((cat) => (
-                <Button
-                  key={cat.id}
-                  variant={selectedCategory === cat.id ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory(cat.id)}
-                  className="gap-2"
-                >
-                  <cat.icon className="h-4 w-4" />
-                  {cat.label}
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* FAQs */}
-        <div className="mb-12">
-          <h2 className="text-lg sm:text-xl font-semibold mb-6">
-            {searchQuery
-              ? `Search Results (${filteredFAQs.length})`
-              : selectedCategory
-              ? `${categories.find(c => c.id === selectedCategory)?.label} FAQs`
-              : 'Frequently Asked Questions'}
-          </h2>
-
-          {filteredFAQs.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <p>No results found. Try asking the AI assistant!</p>
-            </div>
-          ) : (
-            <Accordion type="single" collapsible className="w-full">
-              {filteredFAQs.map((faq) => (
-                <AccordionItem key={faq.id} value={faq.id}>
-                  <AccordionTrigger className="text-left hover:text-primary text-sm sm:text-base">
-                    {faq.question}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground">
-                    {faq.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          )}
-        </div>
-
-        {/* Contact Support */}
-        <div className="text-center p-8 bg-muted rounded-lg">
-          <h3 className="font-semibold mb-2">Still need help?</h3>
-          <p className="text-muted-foreground mb-4">
-            Contact our support team or chat with an AI assistant
-          </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            <Button asChild variant="outline">
-              <Link to="/corporate-contact">Contact Support</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link to="/messages">Message Customer Service</Link>
-            </Button>
-          </div>
-        </div>
+        </section>
       </div>
 
-      {/* AI Chat Widget */}
+      {/* AI Chat Widget — unchanged */}
       <HelpCenterChat />
-    </div>
+    </>
   );
 }
