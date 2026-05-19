@@ -74,6 +74,18 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const { action_link } = await generateLinkResponse.json();
+    const actionUrl = new URL(action_link);
+    const tokenHash = actionUrl.searchParams.get('token');
+    const recoveryType = actionUrl.searchParams.get('type') || 'recovery';
+
+    if (!tokenHash) {
+      throw new Error('Failed to generate a valid recovery token');
+    }
+
+    const appResetUrl = new URL(redirectTo || 'https://goldsainte.ai/reset-password');
+    appResetUrl.searchParams.set('token_hash', tokenHash);
+    appResetUrl.searchParams.set('type', recoveryType);
+
     console.log("Recovery link generated successfully");
 
     // Send branded email using Resend
@@ -210,13 +222,13 @@ const handler = async (req: Request): Promise<Response> => {
               <p>To reset your password, click the button below. This link will expire in 1 hour for security purposes.</p>
               
               <div style="text-align: center;">
-                <a href="${action_link}" class="button">Reset Your Password</a>
+                <a href="${appResetUrl.toString()}" class="button">Reset Your Password</a>
               </div>
               
               <div class="info-box">
                 <p style="margin: 0; font-size: 14px; color: #595959;">
                   Or copy and paste this link into your browser:<br>
-                  <a href="${action_link}" style="color: #0c4d47; word-break: break-all;">${action_link}</a>
+                  <a href="${appResetUrl.toString()}" style="color: #0c4d47; word-break: break-all;">${appResetUrl.toString()}</a>
                 </p>
               </div>
               
