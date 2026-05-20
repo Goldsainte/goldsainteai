@@ -1,6 +1,14 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { Helmet } from "react-helmet-async";
+import { ArrowLeft, ArrowUpRight, Check, Copy } from "lucide-react";
+import { toast } from "sonner";
 import { newsroomPageShellClass } from "./ui";
+
+const ARTICLE_URL = "https://goldsainteai.lovable.app/newsroom/news/world-cup-reality-check";
+const OG_IMAGE = "https://goldsainteai.lovable.app/og-world-cup-reality-check.jpg";
+const SHARE_HEADLINE =
+  "The World Cup Reality Check: When Hype Meets the Hotel Bill — why 80% of U.S. hotels say bookings are falling short, and how to plan travel around experience, not buzz.";
 
 // ─── ARTICLE DATA ────────────────────────────────────────────────────────────
 const article = {
