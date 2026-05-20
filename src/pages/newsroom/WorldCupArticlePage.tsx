@@ -105,7 +105,7 @@ function PullQuote({ children }: { children: React.ReactNode }) {
       <p
         style={{
           fontFamily: "'Cormorant Garamond', serif",
-          fontSize: "clamp(20px, 2.5vw, 26px)",
+          fontSize: "16px",
           fontStyle: "italic",
           fontWeight: 400,
           lineHeight: 1.55,
@@ -478,7 +478,7 @@ export default function WorldCupArticlePage() {
           <p
             style={{
               fontFamily: "'Cormorant Garamond', serif",
-              fontSize: "22px",
+              fontSize: "16px",
               fontWeight: 400,
               fontStyle: "italic",
               color: "#FDF9F0",
