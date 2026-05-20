@@ -364,6 +364,7 @@ export const Header = () => {
                                       { label: 'Creators dashboard', path: '/admin/creators' },
                                       { label: 'Bookings & revenue', path: '/admin/bookings' },
                                       { label: 'Disputes', path: '/admin/disputes' },
+                                      { label: 'Newsroom', path: '/admin/newsroom' },
                                     ].map((item) => (
                                       <DropdownMenuItem
                                         key={item.path}
@@ -619,6 +620,7 @@ export const Header = () => {
                                     { label: 'Creators dashboard', path: '/admin/creators' },
                                     { label: 'Bookings & revenue', path: '/admin/bookings' },
                                     { label: 'Disputes', path: '/admin/disputes' },
+                                    { label: 'Newsroom', path: '/admin/newsroom' },
                                   ].map((item) => (
                                     <DropdownMenuItem
                                       key={item.path}

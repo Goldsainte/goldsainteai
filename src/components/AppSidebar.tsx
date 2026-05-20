@@ -171,6 +171,21 @@ export function AppSidebar() {
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <NavLink
+                        to="/admin/newsroom"
+                        className={({ isActive }) =>
+                          isActive
+                            ? "bg-accent/10 text-accent font-medium"
+                            : "hover:bg-muted/50"
+                        }
+                      >
+                        <Newspaper className="h-5 w-5" />
+                        {open && <span>Newsroom</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 </>
               )}
             </SidebarMenu>
