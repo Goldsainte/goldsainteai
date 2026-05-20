@@ -167,6 +167,7 @@ const NewsroomCompanyFacts = lazy(() => import('@/pages/newsroom/CompanyFacts'))
 const NewsroomLeadership = lazy(() => import('@/pages/newsroom/Leadership'));
 const NewsroomEditorialPolicy = lazy(() => import('@/pages/newsroom/EditorialPolicy'));
 const NewsroomPressContact = lazy(() => import('@/pages/newsroom/PressContact'));
+const NewsroomWorldCupArticle = lazy(() => import('@/pages/newsroom/WorldCupArticlePage'));
 const AdminNewsroomList = lazy(() => import('@/pages/admin/AdminNewsroomList'));
 const AdminArticleEditor = lazy(() => import('@/pages/admin/AdminArticleEditor'));
 const AdminNewsroomAuthors = lazy(() => import('@/pages/admin/AdminNewsroomAuthors'));
@@ -220,6 +221,7 @@ export const AppRoutes = () => (
         <Route path="editorial-policy" element={<NewsroomEditorialPolicy />} />
         <Route path="press-contact" element={<NewsroomPressContact />} />
         <Route path="press-releases/:slug" element={<NewsroomArticleDetail expectedType="press_release" />} />
+        <Route path="news/world-cup-reality-check" element={<NewsroomWorldCupArticle />} />
         <Route path="news/:slug" element={<NewsroomArticleDetail expectedType="news" />} />
       </Route>
     </Route>

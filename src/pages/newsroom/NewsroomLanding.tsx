@@ -8,6 +8,26 @@ import wordmarkGold from "@/assets/wordmark-gold.png";
 import { articlePath, fetchPublishedArticles, formatDate, EXTERNAL_PRESS, BASE_URL } from "./lib";
 import { NewsroomPageHeader } from "./ui";
 
+// Static editorial articles authored as dedicated React pages (not in DB).
+const STATIC_NEWS: Array<{
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  published_at: string;
+  href: string;
+}> = [
+  {
+    id: "static-world-cup-reality-check",
+    slug: "world-cup-reality-check",
+    title: "The World Cup Reality Check: When Hype Meets the Hotel Bill",
+    excerpt:
+      "Eighty percent of U.S. hotels say World Cup bookings are falling short — and the reason why reveals everything wrong with how we plan travel around hype.",
+    published_at: "2026-05-01",
+    href: "/newsroom/news/world-cup-reality-check",
+  },
+];
+
 export default function NewsroomLanding() {
   const { data: articles = [] } = useQuery({
     queryKey: ["newsroom", "all"],
@@ -17,7 +37,17 @@ export default function NewsroomLanding() {
 
   const featured = articles.find((a) => a.type === "press_release") || articles[0];
   const pressReleases = articles.filter((a) => a.type === "press_release").slice(0, 5);
-  const news = articles.filter((a) => a.type === "news").slice(0, 5);
+  const dbNews = articles
+    .filter((a) => a.type === "news")
+    .map((a) => ({
+      id: a.id,
+      slug: a.slug,
+      title: a.title,
+      excerpt: a.excerpt,
+      published_at: a.published_at,
+      href: articlePath(a),
+    }));
+  const news = [...STATIC_NEWS, ...dbNews].slice(0, 6);
 
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -183,7 +213,7 @@ function Column({ title, items, emptyText }: { title: string; items: any[]; empt
         <ul className="space-y-5">
           {items.map((a) => (
             <li key={a.id}>
-              <Link to={articlePath(a)} className="block group">
+              <Link to={a.href ?? articlePath(a)} className="block group">
                 <span className="text-[10px] tracking-[0.25em] uppercase text-[#C7A962]">
                   {formatDate(a.published_at)}
                 </span>
