@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { newsroomPageShellClass } from "./ui";
 
 // ─── ARTICLE DATA ────────────────────────────────────────────────────────────
 const article = {
@@ -154,111 +155,40 @@ export default function WorldCupArticlePage() {
   return (
     <div style={{ background: "#FDF9F0", minHeight: "100vh", color: "#0a2225" }}>
 
-      {/* ── BACK NAV ── */}
-      <div
-        className="sticky top-0 z-10"
-        style={{ background: "#FDF9F0", borderBottom: "1px solid #E5DFC6" }}
-      >
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link
-            to="/newsroom"
-            className="flex items-center gap-2 transition-opacity hover:opacity-60"
-            style={{ fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "#0a2225" }}
-          >
-            <ArrowLeft size={13} strokeWidth={1.5} />
-            Newsroom
-          </Link>
-          <span
-            style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: "15px",
-              fontWeight: 500,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              color: "#0a2225",
-            }}
-          >
-            Goldsainte<span style={{ color: "#C7A962" }}>.</span>AI
-          </span>
-        </div>
-      </div>
-
-      {/* ── HERO ── */}
-      <header className="max-w-3xl mx-auto px-6 pt-16 pb-10">
-        {/* Category */}
-        <div
-          className="flex items-center gap-3 mb-5"
-          style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", color: "#C7A962" }}
+      {/* ── HERO (matches ArticleDetail) ── */}
+      <article className={`${newsroomPageShellClass} max-w-[680px] pb-6 md:pb-8 animate-fade-in`}>
+        <Link
+          to="/newsroom"
+          className="inline-flex items-center gap-2 text-[11px] tracking-[0.25em] uppercase text-[#0c4d47] hover:text-[#0a3d39] transition"
         >
-          {article.category}
-          <span style={{ display: "block", width: "32px", height: "1px", background: "#C7A962" }} />
-        </div>
+          <ArrowLeft size={14} strokeWidth={1.75} /> Back to Newsroom
+        </Link>
 
-        {/* Title */}
         <h1
-          style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: "clamp(34px, 5vw, 54px)",
-            fontWeight: 400,
-            lineHeight: 1.15,
-            color: "#0a2225",
-            marginBottom: "20px",
-          }}
+          className="font-secondary mt-6 sm:mt-8 md:mt-10 text-[28px] sm:text-[34px] md:text-[42px] leading-[1.06] text-[#0a2225]"
+          style={{ letterSpacing: "-0.01em" }}
         >
-          The World Cup Reality Check: When{" "}
-          <em style={{ fontStyle: "italic", color: "#0c4d47" }}>Hype</em> Meets
-          the Hotel Bill
+          {article.title}
         </h1>
 
-        {/* Subtitle */}
-        <p
-          style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: "20px",
-            fontWeight: 300,
-            fontStyle: "italic",
-            color: "#3a5a57",
-            lineHeight: 1.6,
-            borderLeft: "2px solid #C7A962",
-            paddingLeft: "20px",
-            marginBottom: "28px",
-          }}
-        >
-          {article.subtitle}
-        </p>
-
-        {/* Meta */}
-        <div
-          className="flex flex-wrap items-center gap-x-4 gap-y-2"
-          style={{
-            fontSize: "11px",
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-            color: "#6b7280",
-            paddingBottom: "28px",
-            borderBottom: "1px solid #E5DFC6",
-          }}
-        >
-          <span>Goldsainte AI Newsroom</span>
-          <span style={{ color: "#C7A962" }}>◆</span>
+        <div className="mt-4 sm:mt-5 md:mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-[12px] sm:text-[14px] text-[#0a2225]/70">
+          <span>By Goldsainte AI Newsroom</span>
+          <span className="text-[#0a2225]/30">·</span>
           <span>{article.date}</span>
-          <span style={{ color: "#C7A962" }}>◆</span>
+          <span className="text-[#0a2225]/30">·</span>
           <span>{article.readTime}</span>
+          <span className="inline-flex items-center bg-[#0c4d47]/10 text-[#0c4d47] px-3 py-0.5 rounded-full text-[11px] tracking-wide uppercase">
+            {article.category}
+          </span>
         </div>
 
-        {/* Excerpt */}
-        <p
-          className="mt-6"
-          style={{
-            fontSize: "16px",
-            lineHeight: 1.85,
-            color: "#0a2225",
-            fontWeight: 300,
-          }}
-        >
-          {article.excerpt}
-        </p>
-      </header>
+        <div className="mt-8 md:mt-10 border-l-2 border-[#C7A962] pl-4 sm:pl-5 py-1">
+          <p className="text-[14px] sm:text-[15px] italic text-[#0a2225]/75 leading-relaxed">
+            <span className="font-semibold not-italic text-[#0a2225]">Editor's Note:</span>{" "}
+            {article.subtitle}
+          </p>
+        </div>
+      </article>
 
       {/* ── BODY ── */}
       <article className="max-w-3xl mx-auto px-6 pb-24">
