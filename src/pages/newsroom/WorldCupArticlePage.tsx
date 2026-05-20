@@ -162,6 +162,27 @@ function InsightItem({
 export default function WorldCupArticlePage() {
   return (
     <div style={{ background: "#FDF9F0", minHeight: "100vh", color: "#0a2225" }}>
+      <Helmet>
+        <title>{article.title} | Goldsainte Newsroom</title>
+        <meta name="description" content={article.excerpt} />
+        <link rel="canonical" href={ARTICLE_URL} />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={article.title} />
+        <meta property="og:description" content={article.subtitle} />
+        <meta property="og:url" content={ARTICLE_URL} />
+        <meta property="og:image" content={OG_IMAGE} />
+        <meta property="og:image:secure_url" content={OG_IMAGE} />
+        <meta property="og:image:width" content="1216" />
+        <meta property="og:image:height" content="640" />
+        <meta property="og:image:alt" content={article.title} />
+        <meta property="og:image:type" content="image/jpeg" />
+        <meta property="article:section" content={article.category} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={article.title} />
+        <meta name="twitter:description" content={article.subtitle} />
+        <meta name="twitter:image" content={OG_IMAGE} />
+        <meta name="twitter:image:alt" content={article.title} />
+      </Helmet>
 
       {/* ── HERO (matches ArticleDetail) ── */}
       <article className={`${newsroomPageShellClass} max-w-[680px] pb-6 md:pb-8 animate-fade-in`}>
