@@ -54,6 +54,7 @@ export const Footer = () => {
         { to: "/trust-safety", label: "Safety & Trust" },
         { to: "/cancellation-refund-policy", label: "Cancellation Policy" },
         { to: "/community-guidelines", label: "Community Guidelines" },
+        { to: "/privacy-cookies", label: "Privacy Policy" },
       ],
     },
   ];
