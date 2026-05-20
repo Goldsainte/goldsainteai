@@ -1,4 +1,4 @@
-import { Home, Search, User, LogIn, LogOut, LayoutDashboard, Briefcase, ShieldCheck, TrendingUp, Info, DollarSign, Sparkles } from "lucide-react";
+import { Home, Search, User, LogIn, LogOut, LayoutDashboard, Briefcase, ShieldCheck, TrendingUp, Info, DollarSign, Sparkles, Newspaper } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import logomark from "@/assets/logomark-gold.png";
@@ -168,6 +168,21 @@ export function AppSidebar() {
                       >
                         <ShieldCheck className="h-5 w-5" />
                         {open && <span>Customer Verifications</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <NavLink
+                        to="/admin/newsroom"
+                        className={({ isActive }) =>
+                          isActive
+                            ? "bg-accent/10 text-accent font-medium"
+                            : "hover:bg-muted/50"
+                        }
+                      >
+                        <Newspaper className="h-5 w-5" />
+                        {open && <span>Newsroom</span>}
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

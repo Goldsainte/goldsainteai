@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Settings, Info, Sparkles, PlaneTakeoff, Car, MessageCircle, BarChart3, Luggage, BookOpen } from "lucide-react";
+import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Settings, Info, Sparkles, PlaneTakeoff, Car, MessageCircle, BarChart3, Luggage, BookOpen, Newspaper } from "lucide-react";
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
@@ -364,6 +364,7 @@ export const Header = () => {
                                       { label: 'Creators dashboard', path: '/admin/creators' },
                                       { label: 'Bookings & revenue', path: '/admin/bookings' },
                                       { label: 'Disputes', path: '/admin/disputes' },
+                                      { label: 'Newsroom', path: '/admin/newsroom' },
                                     ].map((item) => (
                                       <DropdownMenuItem
                                         key={item.path}
@@ -619,6 +620,7 @@ export const Header = () => {
                                     { label: 'Creators dashboard', path: '/admin/creators' },
                                     { label: 'Bookings & revenue', path: '/admin/bookings' },
                                     { label: 'Disputes', path: '/admin/disputes' },
+                                    { label: 'Newsroom', path: '/admin/newsroom' },
                                   ].map((item) => (
                                     <DropdownMenuItem
                                       key={item.path}
