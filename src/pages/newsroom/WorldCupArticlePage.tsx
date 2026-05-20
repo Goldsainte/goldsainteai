@@ -1,6 +1,14 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { Helmet } from "react-helmet-async";
+import { ArrowLeft, ArrowUpRight, Check, Copy } from "lucide-react";
+import { toast } from "sonner";
 import { newsroomPageShellClass } from "./ui";
+
+const ARTICLE_URL = "https://goldsainteai.lovable.app/newsroom/news/world-cup-reality-check";
+const OG_IMAGE = "https://goldsainteai.lovable.app/og-world-cup-reality-check.jpg";
+const SHARE_HEADLINE =
+  "The World Cup Reality Check: When Hype Meets the Hotel Bill — why 80% of U.S. hotels say bookings are falling short, and how to plan travel around experience, not buzz.";
 
 // ─── ARTICLE DATA ────────────────────────────────────────────────────────────
 const article = {
@@ -154,6 +162,27 @@ function InsightItem({
 export default function WorldCupArticlePage() {
   return (
     <div style={{ background: "#FDF9F0", minHeight: "100vh", color: "#0a2225" }}>
+      <Helmet>
+        <title>{article.title} | Goldsainte Newsroom</title>
+        <meta name="description" content={article.excerpt} />
+        <link rel="canonical" href={ARTICLE_URL} />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={article.title} />
+        <meta property="og:description" content={article.subtitle} />
+        <meta property="og:url" content={ARTICLE_URL} />
+        <meta property="og:image" content={OG_IMAGE} />
+        <meta property="og:image:secure_url" content={OG_IMAGE} />
+        <meta property="og:image:width" content="1216" />
+        <meta property="og:image:height" content="640" />
+        <meta property="og:image:alt" content={article.title} />
+        <meta property="og:image:type" content="image/jpeg" />
+        <meta property="article:section" content={article.category} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={article.title} />
+        <meta name="twitter:description" content={article.subtitle} />
+        <meta name="twitter:image" content={OG_IMAGE} />
+        <meta name="twitter:image:alt" content={article.title} />
+      </Helmet>
 
       {/* ── HERO (matches ArticleDetail) ── */}
       <article className={`${newsroomPageShellClass} max-w-[680px] pb-6 md:pb-8 animate-fade-in`}>
@@ -486,6 +515,9 @@ export default function WorldCupArticlePage() {
           </div>
         </div>
 
+        {/* SHARE */}
+        <ShareRow title={SHARE_HEADLINE} url={ARTICLE_URL} />
+
         {/* BACK LINK */}
         <div className="mt-12">
           <Link
@@ -504,6 +536,54 @@ export default function WorldCupArticlePage() {
         </div>
 
       </article>
+    </div>
+  );
+}
+
+function ShareRow({ title, url }: { title: string; url: string }) {
+  const t = encodeURIComponent(title);
+  const u = encodeURIComponent(url);
+  const x = `https://twitter.com/intent/tweet?text=${t}&url=${u}`;
+  const linkedin = `https://www.linkedin.com/sharing/share-offsite/?url=${u}`;
+  const email = `mailto:?subject=${encodeURIComponent("The World Cup Reality Check: When Hype Meets the Hotel Bill")}&body=${t}%20${u}`;
+  const sms = `sms:?&body=${t}%20${u}`;
+  const whatsapp = `https://wa.me/?text=${t}%20${u}`;
+  const threads = `https://www.threads.net/intent/post?text=${t}%20${u}`;
+  const [copied, setCopied] = useState(false);
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(`${title} ${url}`);
+      setCopied(true);
+      toast.success("Link copied");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Could not copy link");
+    }
+  };
+  const shareInstagram = async () => {
+    try {
+      await navigator.clipboard.writeText(`${title} ${url}`);
+      toast.success("Link copied — paste it into your Instagram story or DM");
+    } catch {
+      toast.error("Could not copy link");
+    }
+  };
+  const cls =
+    "inline-flex items-center justify-center px-4 py-2 rounded-full border border-[#E5DFC6] text-xs uppercase tracking-wider text-[#0a2225]/70 hover:text-[#0c4d47] hover:border-[#0c4d47] transition";
+  return (
+    <div className="mt-12 flex items-center gap-3 flex-wrap">
+      <span className="text-[10px] tracking-[0.25em] uppercase text-[#0a2225]/50 mr-1">Share</span>
+      <a href={sms} className={cls}>Text</a>
+      <a href={whatsapp} target="_blank" rel="noopener noreferrer" className={cls}>WhatsApp</a>
+      <a href={linkedin} target="_blank" rel="noopener noreferrer" className={cls}>LinkedIn</a>
+      <a href={threads} target="_blank" rel="noopener noreferrer" className={cls}>Threads</a>
+      <button type="button" onClick={shareInstagram} className={cls}>Instagram</button>
+      <a href={x} target="_blank" rel="noopener noreferrer" className={cls}>X</a>
+      <a href={email} className={cls}>Email</a>
+      <button type="button" onClick={copyLink} className={`${cls} gap-1.5`}>
+        {copied ? <Check size={13} strokeWidth={2} /> : <Copy size={13} strokeWidth={2} />}
+        {copied ? "Copied" : "Copy link"}
+      </button>
     </div>
   );
 }
