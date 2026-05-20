@@ -43,20 +43,20 @@ const DisputeResolution = () => {
     setIsSubmitting(true);
     
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      const { error } = await supabase.from("dispute_submissions").insert({
-        user_id: user?.id || null,
-        name: values.name,
-        email: values.email,
-        phone: values.phone || null,
-        booking_reference: values.bookingReference || null,
-        dispute_type: values.disputeType,
-        description: values.description,
-        preferred_contact_method: values.preferredContactMethod,
+      const { data, error } = await supabase.functions.invoke("submit-dispute", {
+        body: {
+          name: values.name,
+          email: values.email,
+          phone: values.phone || null,
+          bookingReference: values.bookingReference || null,
+          disputeType: values.disputeType,
+          description: values.description,
+          preferredContactMethod: values.preferredContactMethod,
+        },
       });
 
       if (error) throw error;
+      if (data && (data as any).error) throw new Error((data as any).error);
 
       toast({
         title: "Dispute Submitted",

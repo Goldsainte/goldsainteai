@@ -157,6 +157,8 @@ project_id = "iwdevxltjuedijrcdejs"
     verify_jwt = false
   [functions.seed-content-creators]
     verify_jwt = false
+  [functions.submit-dispute]
+    verify_jwt = false
   [functions.send-contract-notification]
     verify_jwt = true
   [functions.send-direct-message]
