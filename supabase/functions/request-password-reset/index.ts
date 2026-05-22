@@ -8,7 +8,7 @@ import { RecoveryEmail } from "../_shared/email-templates/recovery.tsx";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 const SITE_NAME = "Goldsainte";
-const SENDER_DOMAIN = "goldsainte.com";
+const SENDER_DOMAIN = "notify.goldsainte.com";
 const PASSWORD_RESET_SENDER = `${SITE_NAME} <hello@${SENDER_DOMAIN}>`;
 
 function generateToken(): string {
@@ -72,6 +72,28 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (!generateLinkResponse.ok) {
       const errorData = await generateLinkResponse.json().catch(() => null);
+      // Silent success for unknown/unregistered emails to prevent enumeration.
+      // GoTrue returns 404 with error_code "user_not_found" when no auth.users row exists.
+      const isUserNotFound =
+        generateLinkResponse.status === 404 ||
+        errorData?.error_code === "user_not_found" ||
+        errorData?.code === "user_not_found" ||
+        /user.*not.*found/i.test(errorData?.message || "");
+
+      if (isUserNotFound) {
+        console.log("ℹ️ Password reset requested for unknown email, returning silent success:", email);
+        await supabase.from('email_send_log').insert({
+          message_id: crypto.randomUUID(),
+          template_name: 'recovery',
+          recipient_email: email,
+          status: 'skipped_user_not_found',
+        });
+        return new Response(
+          JSON.stringify({ success: true, message: "Password reset email sent" }),
+          { status: 200, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
+        );
+      }
+
       console.error("❌ Failed to generate recovery link:", errorData || generateLinkResponse.statusText);
       throw new Error(
         errorData?.message || `Failed to generate recovery link (status ${generateLinkResponse.status})`
