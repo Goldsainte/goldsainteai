@@ -43,6 +43,7 @@ export const DestinationAutocompleteNominatim: React.FC<DestinationAutocompleteP
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [fetchFailed, setFetchFailed] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const debouncedInput = useDebounce(input, 300);
@@ -56,12 +57,14 @@ export const DestinationAutocompleteNominatim: React.FC<DestinationAutocompleteP
 
     const fetchSuggestions = async () => {
       setLoading(true);
+      setFetchFailed(false);
       try {
         const response = await fetch(
           `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(debouncedInput)}&limit=8&addressdetails=1&featuretype=city`,
           {
             headers: {
               'Accept': 'application/json',
+              'Accept-Language': 'en',
             }
           }
         );
@@ -70,25 +73,26 @@ export const DestinationAutocompleteNominatim: React.FC<DestinationAutocompleteP
         
         const data: NominatimResult[] = await response.json();
         
-        // Filter to cities/towns/islands and format nicely
-        const filtered = data
-          .filter(item => 
-            ['city', 'town', 'village', 'island', 'administrative', 'municipality'].includes(item.type) ||
-            ['place', 'boundary'].includes(item.class)
-          )
-          .map(item => {
-            // Extract clean city name from display_name
-            const parts = item.display_name.split(',').map(p => p.trim());
-            // Return first 2-3 parts for cleaner display
-            return parts.slice(0, 3).join(', ');
-          })
-          .filter((name, index, self) => self.indexOf(name) === index); // Remove duplicates
-        
+        const formatItem = (item: NominatimResult) =>
+          item.display_name.split(',').map(p => p.trim()).slice(0, 3).join(', ');
+
+        const preferred = data.filter(item =>
+          ['city', 'town', 'village', 'island', 'administrative', 'municipality'].includes(item.type) ||
+          ['place', 'boundary', 'administrative'].includes(item.class)
+        );
+
+        // Fallback: if strict filter discards everything but API returned items, show them all
+        const source = preferred.length > 0 ? preferred : data;
+        const filtered = source
+          .map(formatItem)
+          .filter((name, index, self) => name && self.indexOf(name) === index);
+
         setSuggestions(filtered);
         setShowDropdown(filtered.length > 0);
       } catch (error) {
         console.error('Nominatim search error:', error);
         setSuggestions([]);
+        setFetchFailed(true);
       } finally {
         setLoading(false);
       }
@@ -121,11 +125,13 @@ export const DestinationAutocompleteNominatim: React.FC<DestinationAutocompleteP
   }, [value, maxSelections, onChange]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" || e.key === ",") {
       e.preventDefault();
-      // Prefer the top suggestion so users don't have to click
       if (suggestions.length > 0) {
         handleAddDestination(suggestions[0]);
+      } else if (input.trim().length >= 2) {
+        // Free-text fallback so users are never blocked by Nominatim
+        handleAddDestination(input);
       }
     }
   };
@@ -177,7 +183,10 @@ export const DestinationAutocompleteNominatim: React.FC<DestinationAutocompleteP
       </div>
 
       <p className="text-xs text-[#7A7151]">
-        Type a place, then tap a suggestion to add it. {value.length}/{maxSelections} selected.
+        {fetchFailed
+          ? "Can't reach suggestions — press Enter to add it manually."
+          : "Type a place and pick a suggestion, or press Enter to add it manually."}
+        {" "}{value.length}/{maxSelections} selected.
       </p>
 
       {value.length > 0 && (
