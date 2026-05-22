@@ -1,51 +1,32 @@
+## Problem
 
-## Context
+`Primary Destinations` on `/onboarding/creator` (Step 3) uses `DestinationAutocompleteNominatim`. Two failure modes block users:
 
-Two separate issues are conflated under "password reset emails aren't sending":
+1. **Enter does nothing unless Nominatim returned suggestions.** `handleKeyDown` only adds when `suggestions.length > 0`. If Nominatim is slow, rate-limited (its public API throttles aggressively and frequently 403s from browser origins), or the over-strict type filter (`city/town/village/island/administrative/municipality` + class `place/boundary`) discards everything, the dropdown stays empty and the input is a dead end.
+2. **No free-text fallback.** Users can't manually commit what they typed, and Step 2 validation requires `destinations.length > 0`, so onboarding cannot proceed → blocks every new creator signup.
 
-1. **The `/supabase/templates` folder having only 2 HTML files is not a bug.** Those are legacy native Supabase templates. The active templates are React Email files in `supabase/functions/_shared/email-templates/` (all 6 are present: signup, recovery, magic-link, invite, email-change, reauthentication), rendered by `auth-email-hook` and `request-password-reset`, then queued through Lovable Emails.
+## Fix (frontend-only, scoped to `DestinationAutocompleteNominatim.tsx`)
 
-2. **The real bug visible in GoTrue logs:** every recent `/admin/generate_link` call returns `404 user_not_found`. `request-password-reset/index.ts` throws on that 404, so nothing is ever enqueued, nothing is logged in `email_send_log`, nothing shows in Lovable Emails or Resend. Users see "we sent a link" (or a generic error) and never receive anything.
+1. **Enter always adds something.**
+   - If suggestions exist → add `suggestions[0]` (current behavior).
+   - Else if `input.trim().length >= 2` → add the raw trimmed input as a free-text destination.
+2. **Relax suggestion filter** so common results aren't discarded: keep any Nominatim result whose `class` is `place`, `boundary`, or `administrative`, OR whose `type` is in the existing set. Falls back to "show all results" if the filter yields zero but the API returned items.
+3. **Resilience for Nominatim failures.**
+   - On fetch error / non-OK / empty result, do not silently swallow — surface a small helper hint under the input: "Can't reach suggestions — press Enter to add manually."
+   - Send a proper `User-Agent`-equivalent by adding `Accept-Language` header (Nominatim policy) and continue regardless.
+4. **Comma key** also commits (Enter or `,`) — common UX expectation for tag inputs and reduces reliance on the dropdown.
+5. **Helper copy update** under input: "Type a place and pick a suggestion, or press Enter to add it manually. {n}/{max} selected."
 
-You confirmed some affected users are already approved/active, so there's also a second failure mode in the queue itself that needs an audit.
+No changes to `CreatorOnboardingPage.tsx`, validation, schema, or other consumers (`TravelPreferencesWizard` keeps identical API — `value: string[]`, `onChange`).
 
-## Plan
+## Validation
 
-### 1. Fix `request-password-reset` to silent-success on unknown emails
+- On `/onboarding/creator` Step 3: type "Bali", press Enter with dropdown empty → chip appears, can proceed to Step 4.
+- Type "Paris", wait for dropdown, press Enter → top suggestion added (unchanged behavior).
+- Type "Tokyo," (comma) → chip added.
+- Disconnect network / block nominatim → fallback hint shows, Enter still adds free text, user unblocked.
+- `TravelPreferencesWizard` consumer still works (same props).
 
-Rewrite the edge function so that:
-- If `admin/generate_link` returns `404 user_not_found`, the function logs the attempt (with `status: 'skipped_user_not_found'` in `email_send_log` for observability) and returns `{ success: true }` to the client. No email is queued. This is the standard anti-enumeration pattern and matches your answer.
-- All other errors continue to return 500.
-- The client (`requestPasswordReset.ts`) already handles success generically — no UI change needed; users always see "If an account exists, we've sent a reset link."
+## Files
 
-### 2. Audit and unblock approved-user resets
-
-Investigate why approved users with valid `auth.users` rows aren't receiving the email:
-- Query `email_send_log` for `template_name = 'recovery'` in the last 7 days, grouped by `status` (`pending`, `sent`, `failed`, `bounced`).
-- Query the `transactional_emails` pgmq queue and DLQ for stuck or failed recovery messages.
-- Check the latest `process-email-queue` edge function logs for sender errors (`no_matching_sender`, 4xx/5xx from Lovable Emails API).
-- Verify the Lovable Emails project toggle is still **on** and the `notify.goldsainte.com` sender is registered.
-
-Based on findings, the likely fixes are one or more of:
-- Re-toggle Lovable Emails / re-register the sender domain via `setup_email_infra` (idempotent).
-- Redeploy `process-email-queue` if cron has drifted.
-- Requeue any DLQ recovery messages once the sender is healthy.
-
-### 3. Validation
-
-- Trigger a password reset for a **known approved user** with a real inbox → expect `email_send_log` row `recovery / sent`, email delivered from `hello@goldsainte.com`.
-- Trigger a password reset for a **non-existent email** → expect `success: true` response, no email sent, log row `skipped_user_not_found`, no 404 in GoTrue logs propagating to the function as an error.
-- Confirm no new entries in DLQ after both tests.
-
-## Technical details
-
-Files touched:
-- `supabase/functions/request-password-reset/index.ts` — branch on `generateLinkResponse.status === 404` (and/or `error_code === 'user_not_found'`) → log + early-return success instead of throwing.
-- No client changes.
-- No schema changes.
-- No template changes. The `/supabase/templates` HTML files can be left alone or deleted as cleanup (not required for the fix).
-
-Out of scope:
-- Changing the post-approval auth model.
-- Adding a "no account found" branded email (you chose silent success).
-- Touching signup, magic-link, or other auth flows.
+- `src/components/preferences/DestinationAutocompleteNominatim.tsx` — only file modified.
