@@ -1,30 +1,51 @@
+
 ## Context
 
-Auth emails on this project are intentionally routed through **Lovable Emails**, not Resend. Resend hasn't shown auth logs in 4 days because it was never sending them — that's expected.
+Two separate issues are conflated under "password reset emails aren't sending":
 
-The real issues:
+1. **The `/supabase/templates` folder having only 2 HTML files is not a bug.** Those are legacy native Supabase templates. The active templates are React Email files in `supabase/functions/_shared/email-templates/` (all 6 are present: signup, recovery, magic-link, invite, email-change, reauthentication), rendered by `auth-email-hook` and `request-password-reset`, then queued through Lovable Emails.
 
-1. **Supabase is not calling `auth-email-hook` for signups.** Last 24h shows only 1 auth row in `email_send_log` (a recovery), zero signups. Supabase is falling back to its default sender, which is hard rate-limited → the `over_email_send_rate_limit` 429s users are hitting.
-2. **The one auth email that did reach the hook went to DLQ** with `403 no_matching_sender` from the Lovable Email API, even though `notify.goldsainte.com` is verified. This points to Lovable Emails being toggled off (or the sender registration being out of sync) at the project level.
+2. **The real bug visible in GoTrue logs:** every recent `/admin/generate_link` call returns `404 user_not_found`. `request-password-reset/index.ts` throws on that 404, so nothing is ever enqueued, nothing is logged in `email_send_log`, nothing shows in Lovable Emails or Resend. Users see "we sent a link" (or a generic error) and never receive anything.
 
-## Fix
+You confirmed some affected users are already approved/active, so there's also a second failure mode in the queue itself that needs an audit.
 
-1. **Verify Lovable Emails is enabled for the project.** If it's off, re-enable it (`toggle_project_emails: enabled=true`). This alone should clear the `no_matching_sender` 403 since the domain is already verified.
-2. **Re-run `setup_email_infra`** (idempotent). This refreshes the vault service-role key, the `process-email-queue` cron, and re-registers the sender — required after any recent service-role key rotation or partial setup.
-3. **Re-deploy `auth-email-hook`** so Supabase re-registers the hook URL. This is what actually fixes the signup 429s: once the hook is active, signup emails route through our queue instead of Supabase's default sender.
-4. **Validate.**
-   - Trigger one fresh signup with a real inbox.
-   - Confirm a new `email_send_log` row appears with `template_name='signup'` → `status='sent'`.
-   - Confirm no new `over_email_send_rate_limit` entries in auth logs.
-   - Confirm the email arrives from `hello@goldsainte.com`.
-5. **Optional cleanup (not required for the fix):** the legacy `send-email`, `send-welcome-email`, `send-password-reset-email`, etc. still call Resend directly. They're unrelated to auth and can stay as-is. We can migrate them to the Lovable Emails queue later if you want a single pipeline.
+## Plan
 
-## What this does NOT touch
+### 1. Fix `request-password-reset` to silent-success on unknown emails
 
-React app, routing, Supabase tables, RLS, Stripe, transactional Resend functions, email templates, or the recent SEO prerender work. Risk is low — worst case the re-enable takes a minute to propagate.
+Rewrite the edge function so that:
+- If `admin/generate_link` returns `404 user_not_found`, the function logs the attempt (with `status: 'skipped_user_not_found'` in `email_send_log` for observability) and returns `{ success: true }` to the client. No email is queued. This is the standard anti-enumeration pattern and matches your answer.
+- All other errors continue to return 500.
+- The client (`requestPasswordReset.ts`) already handles success generically — no UI change needed; users always see "If an account exists, we've sent a reset link."
 
-## Technical detail (for reference)
+### 2. Audit and unblock approved-user resets
 
-- `auth-email-hook/index.ts` is already on the correct queue-based pattern (enqueues to `auth_emails` pgmq, with `sender_domain = notify.goldsainte.com`, `from = Goldsainte <hello@goldsainte.com>`).
-- DLQ error `no_matching_sender` from the Lovable Email API on a verified subdomain almost always means the project-level emails toggle is off or the sender hasn't been re-registered after a service-role key rotation — both are fixed by steps 1–3 above.
-- Resend's `RESEND_API_KEY` continues to be used by the ~20 legacy transactional functions guarded by `resend-guard.ts`. Those are healthy and unrelated to the auth 429s.
+Investigate why approved users with valid `auth.users` rows aren't receiving the email:
+- Query `email_send_log` for `template_name = 'recovery'` in the last 7 days, grouped by `status` (`pending`, `sent`, `failed`, `bounced`).
+- Query the `transactional_emails` pgmq queue and DLQ for stuck or failed recovery messages.
+- Check the latest `process-email-queue` edge function logs for sender errors (`no_matching_sender`, 4xx/5xx from Lovable Emails API).
+- Verify the Lovable Emails project toggle is still **on** and the `notify.goldsainte.com` sender is registered.
+
+Based on findings, the likely fixes are one or more of:
+- Re-toggle Lovable Emails / re-register the sender domain via `setup_email_infra` (idempotent).
+- Redeploy `process-email-queue` if cron has drifted.
+- Requeue any DLQ recovery messages once the sender is healthy.
+
+### 3. Validation
+
+- Trigger a password reset for a **known approved user** with a real inbox → expect `email_send_log` row `recovery / sent`, email delivered from `hello@goldsainte.com`.
+- Trigger a password reset for a **non-existent email** → expect `success: true` response, no email sent, log row `skipped_user_not_found`, no 404 in GoTrue logs propagating to the function as an error.
+- Confirm no new entries in DLQ after both tests.
+
+## Technical details
+
+Files touched:
+- `supabase/functions/request-password-reset/index.ts` — branch on `generateLinkResponse.status === 404` (and/or `error_code === 'user_not_found'`) → log + early-return success instead of throwing.
+- No client changes.
+- No schema changes.
+- No template changes. The `/supabase/templates` HTML files can be left alone or deleted as cleanup (not required for the fix).
+
+Out of scope:
+- Changing the post-approval auth model.
+- Adding a "no account found" branded email (you chose silent success).
+- Touching signup, magic-link, or other auth flows.
