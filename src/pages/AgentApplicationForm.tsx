@@ -180,6 +180,8 @@ export default function AgentApplicationForm() {
         insuranceCertificateFile: _b,
         governmentIdFile: _c,
         professionalHeadshotFile: _d,
+        password: _p,
+        passwordConfirm: _pc,
         ...persistable
       } = formData;
       localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(persistable));
