@@ -11,11 +11,11 @@ export default function ApplicationStatusCheck() {
   const [status, setStatus] = useState<{
     id: string;
     type: 'agent' | 'brand';
-    admin_status: string;
+    status: string;
     stripe_verification_status?: string;
     created_at: string;
     rejection_reason?: string;
-    user_account_created?: boolean;
+    user_id?: string | null;
   } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +29,7 @@ export default function ApplicationStatusCheck() {
       // Check agent applications
       const { data: agentApp } = await supabase
         .from('agent_applications')
-        .select('id, email, first_name, last_name, admin_status, stripe_verification_status, created_at, rejection_reason, user_account_created')
+        .select('id, email, first_name, last_name, status, stripe_verification_status, created_at, rejection_reason, user_id')
         .eq('email', email)
         .order('created_at', { ascending: false })
         .maybeSingle() as any;
@@ -37,7 +37,7 @@ export default function ApplicationStatusCheck() {
       // Check brand applications
       const { data: brandApp } = await supabase
         .from('brand_applications')
-        .select('id, brand_name, primary_contact_email, admin_status, stripe_verification_status, created_at, rejection_reason, user_account_created')
+        .select('id, brand_name, primary_contact_email, status, stripe_verification_status, created_at, rejection_reason, user_id')
         .eq('primary_contact_email', email)
         .order('created_at', { ascending: false })
         .maybeSingle() as any;
@@ -60,16 +60,18 @@ export default function ApplicationStatusCheck() {
     }
   };
 
-  const getStatusBadge = (adminStatus: string) => {
-    switch (adminStatus) {
-      case 'pending_review':
-        return <Badge variant="outline" className="bg-[#FDF9F0]"><Clock className="mr-1 h-3 w-3" />Pending Review</Badge>;
+  const getStatusBadge = (s: string) => {
+    switch (s) {
+      case 'pending_verification':
+        return <Badge variant="outline" className="bg-[#FDF9F0]"><Clock className="mr-1 h-3 w-3" />Awaiting Verification</Badge>;
+      case 'verified':
+        return <Badge variant="outline" className="bg-green-50"><CheckCircle className="mr-1 h-3 w-3" />Account Active</Badge>;
       case 'approved':
-        return <Badge variant="outline" className="bg-green-50"><CheckCircle className="mr-1 h-3 w-3" />Approved</Badge>;
+        return <Badge variant="outline" className="bg-green-50"><CheckCircle className="mr-1 h-3 w-3" />Account Active</Badge>;
       case 'rejected':
         return <Badge variant="outline" className="bg-red-50"><XCircle className="mr-1 h-3 w-3" />Rejected</Badge>;
       default:
-        return <Badge variant="outline">{adminStatus}</Badge>;
+        return <Badge variant="outline">{s}</Badge>;
     }
   };
 
@@ -110,7 +112,7 @@ export default function ApplicationStatusCheck() {
                     <CardTitle className="text-lg">
                       {status.type === 'agent' ? 'Agent Application' : 'Brand Application'}
                     </CardTitle>
-                    {getStatusBadge(status.admin_status)}
+                    {getStatusBadge(status.status)}
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm">
@@ -130,25 +132,25 @@ export default function ApplicationStatusCheck() {
                     </div>
                   )}
 
-                  {status.admin_status === 'rejected' && status.rejection_reason && (
+                  {status.status === 'rejected' && status.rejection_reason && (
                     <div className="rounded-lg bg-red-50 p-3">
                       <strong className="text-red-900">Reason:</strong>
                       <p className="text-red-700">{status.rejection_reason}</p>
                     </div>
                   )}
 
-                  {status.admin_status === 'approved' && status.user_account_created && (
+                  {(status.status === 'verified' || status.status === 'approved') && status.user_id && (
                     <div className="rounded-lg bg-green-50 p-3">
                       <p className="text-green-900">
-                        ✅ Your account has been created! Check your email for login credentials.
+                        ✅ Your account is active. Sign in with the email and password you used to apply.
                       </p>
                     </div>
                   )}
 
-                  {status.admin_status === 'pending_review' && (
+                  {status.status === 'pending_verification' && (
                     <div className="rounded-lg bg-[#F0F7F6] p-3">
                       <p className="text-blue-900">
-                        We're reviewing your application. You'll receive an email when there's an update.
+                        Complete identity verification to activate your account.
                       </p>
                     </div>
                   )}

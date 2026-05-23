@@ -121,30 +121,43 @@ export default function ApplicationVerificationComplete() {
             
             {status === 'success' && (
               <>
-                <p className="text-[#6B7280]">
-                  Your identity has been successfully verified. Our team will review your{' '}
-                  {applicationType} application and get back to you within 1-2 business days.
-                </p>
-                <div className="bg-[#F5EFE1] border border-[#E5DFC6] p-4 rounded-xl">
-                  <h3 className="font-secondary text-lg text-[#0a2225] mb-2">What happens next?</h3>
-                  <ul className="text-sm text-[#0a2225] space-y-2">
-                    <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />Our team reviews your application</li>
-                    <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />We'll email you when approved</li>
-                    <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />You'll receive login credentials</li>
-                    <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />Start using Goldsainte immediately</li>
-                  </ul>
-                </div>
-                <p className="text-sm text-[#6B7280]">
-                  You'll receive an email confirmation shortly. Please check your spam folder
-                  if you don't see it within a few minutes.
-                </p>
-                <Button
-                  onClick={() => navigate('/')}
-                  className="w-full bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full"
-                  size="lg"
-                >
-                  Return to Home
-                </Button>
+                {applicationType === 'agent' ? (
+                  <>
+                    <p className="text-[#0a2225]">
+                      Your identity is verified and your Goldsainte advisor account is
+                      <strong> live</strong>.
+                    </p>
+                    <div className="bg-[#F5EFE1] border border-[#E5DFC6] p-4 rounded-xl">
+                      <h3 className="font-secondary text-lg text-[#0a2225] mb-2">Next steps</h3>
+                      <ul className="text-sm text-[#0a2225] space-y-2">
+                        <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />Open your advisor dashboard</li>
+                        <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />Connect Stripe in Earnings to enable payouts</li>
+                        <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />Publish your first trip in Trip Builder</li>
+                      </ul>
+                    </div>
+                    <Button
+                      onClick={() => navigate('/agent?tab=earnings')}
+                      className="w-full bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full"
+                      size="lg"
+                    >
+                      Continue to Dashboard
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-[#6B7280]">
+                      Your identity has been successfully verified. Our team will review your
+                      {' '}brand application and get back to you within 1–2 business days.
+                    </p>
+                    <Button
+                      onClick={() => navigate('/')}
+                      className="w-full bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full"
+                      size="lg"
+                    >
+                      Return to Home
+                    </Button>
+                  </>
+                )}
               </>
             )}
             

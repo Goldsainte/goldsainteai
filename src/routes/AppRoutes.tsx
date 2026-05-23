@@ -109,7 +109,6 @@ const ActivityLogs = lazy(() => import('@/pages/ActivityLogs'));
 const CustomerVerification = lazy(() => import('@/pages/CustomerVerification'));
 const EmergencyContacts = lazy(() => import('@/pages/EmergencyContacts'));
 const Admin = lazy(() => import('@/pages/Admin'));
-const AdminAgentApprovals = lazy(() => import('@/pages/AdminAgentApprovals'));
 const AdminCancellations = lazy(() => import('@/pages/AdminCancellations'));
 const AdminCancellationAnalytics = lazy(() => import('@/pages/AdminCancellationAnalytics'));
 const AdminCustomerVerifications = lazy(() => import('@/pages/AdminCustomerVerifications'));
@@ -512,7 +511,6 @@ export const AppRoutes = () => (
     >
       <Route path="/admin" element={<AdminGuard><AdminHomePage /></AdminGuard>} />
       <Route path="/admin/applications" element={<AdminGuard><ApplicationReviewDashboard /></AdminGuard>} />
-      <Route path="/admin/agent-approvals" element={<AdminGuard><AdminAgentApprovals /></AdminGuard>} />
       <Route path="/admin/safety" element={<AdminGuard><AdminSafetyDashboardPage /></AdminGuard>} />
       <Route path="/admin/agents" element={<AdminGuard><AdminAgentsPage /></AdminGuard>} />
       <Route path="/admin/creators" element={<AdminGuard><AdminCreatorsPage /></AdminGuard>} />

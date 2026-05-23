@@ -81,6 +81,7 @@ interface AgentApplication {
   approved_at?: string | null;
   rejected_at?: string | null;
   rejection_reason?: string | null;
+  user_id?: string | null;
 }
 
 interface BrandApplication {
@@ -614,23 +615,26 @@ const AgentApplicationDetail: React.FC<{
       {/* Action Buttons - Show based on status */}
       <div className="flex flex-wrap gap-2">
         {application.status === 'verified' && (
-          <>
-            <Button
-              variant="outline"
-              onClick={onReject}
-              className="border-[#E5DFC6] text-[#5b2c2c] hover:bg-[#f0d1d1] rounded-xl"
-            >
-              <XCircle className="mr-2 h-4 w-4" />
-              Reject
-            </Button>
-            <Button
-              onClick={onApprove}
-              className="bg-[#0c4d47] hover:bg-[#0a3d3a] text-[#E5DFC6] rounded-xl"
-            >
-              <CheckCircle className="mr-2 h-4 w-4" />
-              Approve
-            </Button>
-          </>
+          <Alert className="w-full bg-[#cfe8d7] border-[#0c4d47]/20 rounded-xl">
+            <CheckCheck className="h-4 w-4 text-[#0c4d47]" />
+            <AlertDescription className="text-[#0c4d47]">
+              Identity verified — agent account is live. No admin action needed.
+              {!application.user_id && (
+                <span className="block mt-2 text-[#5b2c2c]">
+                  ⚠ Account record missing (webhook may have failed). Click below to re-run provisioning.
+                </span>
+              )}
+            </AlertDescription>
+          </Alert>
+        )}
+        {application.status === 'verified' && !application.user_id && (
+          <Button
+            onClick={onApprove}
+            className="bg-[#0c4d47] hover:bg-[#0a3d3a] text-[#E5DFC6] rounded-xl"
+          >
+            <CheckCircle className="mr-2 h-4 w-4" />
+            Re-run Account Provisioning
+          </Button>
         )}
         {application.status === 'pending_verification' && (
           <>

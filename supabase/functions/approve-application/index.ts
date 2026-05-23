@@ -7,6 +7,7 @@ import {
   sendAgentRejectionEmail,
   sendBrandRejectionEmail,
 } from "../_shared/email-service.ts";
+import { createAgentAccountFromApplication } from "../_shared/createAgentAccount.ts";
 
 // ============================================================================
 // ENVIRONMENT VARIABLES
@@ -290,213 +291,21 @@ async function approveAgentApplication(
   sendWelcome: boolean,
   logger: Logger
 ): Promise<{ success: boolean; userId?: string; error?: string }> {
-  logger.info("Starting agent approval process", { applicationId });
-
-  // 1. Fetch application
-  const { data: application, error: fetchError } = await supabaseAdmin
-    .from("agent_applications")
-    .select("*")
-    .eq("id", applicationId)
-    .single();
-
-  if (fetchError || !application) {
-    logger.error("Failed to fetch application", { error: fetchError });
-    return { success: false, error: "Application not found" };
-  }
-
-  const app = application as AgentApplication;
-
-  // 2. Validate application status
-  if (app.status === "approved") {
-    logger.warn("Application already approved", { applicationId });
-    return { success: false, error: "Application already approved" };
-  }
-
-  if (app.status !== "verified") {
-    logger.warn("Application not in verified status", {
-      applicationId,
-      currentStatus: app.status,
-    });
-    return {
-      success: false,
-      error: `Application must be verified before approval. Current status: ${app.status}`,
-    };
-  }
-
-  // 3. Generate temporary password
-  const temporaryPassword = generateTemporaryPassword();
-  logger.info("Generated temporary password");
-
-  // 4. Create auth account
-  logger.info("Creating auth account", { email: app.email });
-  
-  const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser(
-    {
-      email: app.email,
-      password: temporaryPassword,
-      email_confirm: true, // Auto-confirm email since we verified via Stripe Identity
-      user_metadata: {
-        first_name: app.first_name,
-        last_name: app.last_name,
-        account_type: "agent",
-        application_id: applicationId,
-      },
-    }
-  );
-
-  if (authError || !authData.user) {
-    logger.error("Failed to create auth account", { error: authError });
-    return {
-      success: false,
-      error: `Failed to create auth account: ${authError?.message}`,
-    };
-  }
-
-  const userId = authData.user.id;
-  logger.info("Auth account created", { userId });
-
-  try {
-    // 5. Create or update profile (upsert to handle trigger-created profiles)
-    logger.info("Upserting profile", { userId });
-    
-    const { error: profileError } = await supabaseAdmin.from("profiles").upsert({
-      id: userId,
-      email: app.email,
-      username: app.email.split("@")[0],
-      first_name: app.first_name,
-      last_name: app.last_name,
-      phone: app.phone || null, // NULL if empty to avoid unique constraint
-      account_type: "agent",
-      role: "agent",
-      is_verified: true,
-      email_verified: true,
-      identity_verified: true,
-      is_profile_complete: false,
-      onboarding_completed: false,
-      created_at: new Date().toISOString(),
-    }, { onConflict: 'id' });
-
-    if (profileError) {
-      logger.error("Failed to upsert profile", { error: profileError });
-      throw new Error(`Failed to upsert profile: ${profileError.message}`);
-    }
-
-    // 6. Create travel_agents record
-    logger.info("Creating travel agent profile", { userId });
-    
-    const { error: agentError } = await supabaseAdmin
-      .from("travel_agents")
-      .insert({
-        user_id: userId,
-        agency_name: app.agency_name,
-        business_type: app.business_type,
-        bio: `${app.years_experience} years of experience specializing in ${app.specialties.slice(0, 3).join(", ")}`,
-        website: app.website,
-        status: "active",
-        is_accepting_requests: true,
-        onboarded_at: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-      });
-
-    if (agentError) {
-      logger.error("Failed to create agent profile", { error: agentError });
-      throw new Error(`Failed to create agent profile: ${agentError.message}`);
-    }
-
-    // 7. Assign role
-    logger.info("Assigning agent role", { userId });
-    
-    const { error: roleError } = await supabaseAdmin.from("user_roles").insert({
-      user_id: userId,
-      role: "agent",
-    });
-
-    if (roleError) {
-      logger.error("Failed to assign role", { error: roleError });
-      // Non-fatal, continue
-    }
-
-    // 8. Update application status
-    logger.info("Updating application status", { applicationId });
-    
-    const { error: updateError } = await supabaseAdmin
-      .from("agent_applications")
-      .update({
-        status: "approved",
-        user_id: userId,
-        admin_reviewer_id: adminUserId,
-        reviewed_at: new Date().toISOString(),
-        approved_at: new Date().toISOString(),
-        approval_notes: approvalNotes,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", applicationId);
-
-    if (updateError) {
-      logger.error("Failed to update application", { error: updateError });
-      throw new Error(`Failed to update application: ${updateError.message}`);
-    }
-
-    // 9. Log audit event
-    await supabaseAdmin.from("application_audit_log").insert({
-      application_id: applicationId,
-      application_type: "agent",
-      action: "approved",
-      actor_id: adminUserId,
-      actor_type: "admin",
-      details: {
-        user_id: userId,
-        approval_notes: approvalNotes,
-        approved_at: new Date().toISOString(),
-      },
-      created_at: new Date().toISOString(),
-    });
-
-    // 10. Create success notification for applicant
-    await supabaseAdmin.from("notifications").insert({
-      user_id: userId,
-      type: "application_update",
-      title: "🎉 Application Approved!",
-      message: "Your travel agent application has been approved. Welcome to Goldsainte!",
-      priority: "high",
-      created_at: new Date().toISOString(),
-    });
-
-    // 11. Send welcome email
-    if (sendWelcome) {
-      await sendWelcomeEmail(
-        app.email,
-        app.first_name,
-        temporaryPassword,
-        "agent",
-        undefined,
-        logger
-      );
-    }
-
-    logger.info("Agent approval completed successfully", {
-      applicationId,
-      userId,
-    });
-
-    return { success: true, userId };
-  } catch (error: any) {
-    // Rollback: Delete auth account if profile creation failed
-    logger.error("Error during approval, attempting rollback", {
-      error: error.message,
-    });
-
-    try {
-      await supabaseAdmin.auth.admin.deleteUser(userId);
-      logger.info("Auth account deleted (rollback)", { userId });
-    } catch (rollbackError: any) {
-      logger.error("Failed to rollback auth account", {
-        error: rollbackError.message,
-      });
-    }
-
-    return { success: false, error: error.message };
-  }
+  // Agent approval is now self-serve via Stripe Identity. This endpoint
+  // remains as a manual safety net (and so the admin dashboard can
+  // re-run provisioning if the webhook ever fails). It calls the same
+  // shared helper the webhook uses and never issues a temp password.
+  logger.info("Manual agent provisioning requested", { applicationId, adminUserId });
+  const result = await createAgentAccountFromApplication(applicationId, {
+    adminUserId,
+    approvalNotes,
+    logger,
+  });
+  // sendWelcome is intentionally ignored for agents — the agent sets
+  // their own password during the application flow, so there is nothing
+  // to mail.
+  void sendWelcome;
+  return result;
 }
 
 // ============================================================================

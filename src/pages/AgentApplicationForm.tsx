@@ -15,6 +15,8 @@ type AgentApplicationData = {
   firstName: string;
   lastName: string;
   email: string;
+  password: string;
+  passwordConfirm: string;
   phone: string;
   dateOfBirth: string;
   agencyName: string;
@@ -100,6 +102,8 @@ export default function AgentApplicationForm() {
     firstName: prefillData?.firstName || "",
     lastName: prefillData?.lastName || "",
     email: prefillData?.email || "",
+    password: "",
+    passwordConfirm: "",
     phone: prefillData?.phone || "",
     dateOfBirth: "",
     agencyName: "",
@@ -176,6 +180,8 @@ export default function AgentApplicationForm() {
         insuranceCertificateFile: _b,
         governmentIdFile: _c,
         professionalHeadshotFile: _d,
+        password: _p,
+        passwordConfirm: _pc,
         ...persistable
       } = formData;
       localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(persistable));
@@ -196,6 +202,14 @@ export default function AgentApplicationForm() {
       if (!formData.email?.trim()) return missing("Email");
       if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
         toast({ title: "Valid email required", variant: "destructive" });
+        return false;
+      }
+      if (!formData.password || formData.password.length < 8) {
+        toast({ title: "Password must be at least 8 characters", variant: "destructive" });
+        return false;
+      }
+      if (formData.password !== formData.passwordConfirm) {
+        toast({ title: "Passwords don't match", variant: "destructive" });
         return false;
       }
       if (!formData.phone?.trim()) return missing("Phone");
@@ -287,6 +301,37 @@ export default function AgentApplicationForm() {
       if (!formData.agencyName || !normalizedBusinessType) {
         throw new Error("Please fill in all required business information fields");
       }
+      if (!formData.password || formData.password.length < 8) {
+        throw new Error("Please set a password (at least 8 characters) in step 1");
+      }
+
+      // Ensure the applicant has an auth session BEFORE the application is
+      // persisted, so we can store user_id on agent_applications and the
+      // Identity webhook can auto-provision the live account.
+      let { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) {
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/application/verification-complete?type=agent`,
+            data: {
+              first_name: formData.firstName,
+              last_name: formData.lastName,
+              account_type: "agent",
+            },
+          },
+        });
+        if (signUpError) {
+          // Likely "User already registered" — prompt them to sign in.
+          throw new Error(
+            signUpError.message?.toLowerCase().includes("registered")
+              ? "An account with this email already exists. Please sign in first, then re-open this application."
+              : signUpError.message,
+          );
+        }
+        authUser = signUpData.user ?? null;
+      }
 
       // File uploads
       let businessLicensePath = null;
@@ -322,6 +367,7 @@ export default function AgentApplicationForm() {
         .from('agent_applications')
         .insert({
           id: clientId,
+          user_id: authUser?.id ?? null,
           first_name: formData.firstName,
           last_name: formData.lastName,
           email: formData.email,
@@ -474,6 +520,28 @@ export default function AgentApplicationForm() {
               <div>
                 <Label className="text-sm font-medium text-[#0a2225]">Phone *</Label>
                 <Input type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className={luxuryInputClasses} />
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">Password *</Label>
+                <Input
+                  type="password"
+                  autoComplete="new-password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className={luxuryInputClasses}
+                  placeholder="At least 8 characters"
+                />
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">Confirm Password *</Label>
+                <Input
+                  type="password"
+                  autoComplete="new-password"
+                  value={formData.passwordConfirm}
+                  onChange={(e) => setFormData({ ...formData, passwordConfirm: e.target.value })}
+                  className={luxuryInputClasses}
+                  placeholder="Re-enter password"
+                />
               </div>
               <div>
                 <Label className="text-sm font-medium text-[#0a2225]">Agency Name *</Label>
@@ -782,10 +850,11 @@ export default function AgentApplicationForm() {
               <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#FDF9F0] border border-[#C7A962]/30">
                 <Shield className="h-10 w-10 text-[#C7A962]" />
               </div>
-              <h3 className="mb-3 font-secondary text-2xl text-[#0a2225]">Identity Verification Required</h3>
+              <h3 className="mb-3 font-secondary text-2xl text-[#0a2225]">One Last Step — Verify Your Identity</h3>
               <p className="text-base text-[#6B7280] max-w-md mx-auto">
-                All travel agents must complete identity verification through Stripe Identity.
-                This typically takes 2-3 minutes.
+                Completing Stripe Identity verification activates your advisor account
+                <strong className="text-[#0a2225]"> immediately</strong> — there is no waiting period
+                or admin review. Takes 2–3 minutes.
               </p>
             </div>
 
