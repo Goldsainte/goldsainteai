@@ -993,7 +993,8 @@ serve(async (req: Request) => {
     // Verify webhook signature
     let event: Stripe.Event;
     try {
-      event = stripe.webhooks.constructEvent(
+      // Deno SubtleCrypto is async-only — must use constructEventAsync.
+      event = await stripe.webhooks.constructEventAsync(
         body,
         signature,
         STRIPE_WEBHOOK_SECRET
