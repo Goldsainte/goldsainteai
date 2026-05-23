@@ -26,7 +26,8 @@ Deno.serve(async (req) => {
 
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(rawBody, sig, STRIPE_WEBHOOK_SECRET_IDENTITY);
+    // Deno SubtleCrypto is async-only — must use constructEventAsync.
+    event = await stripe.webhooks.constructEventAsync(rawBody, sig, STRIPE_WEBHOOK_SECRET_IDENTITY);
   } catch (err) {
     console.error("Stripe webhook signature verification failed", err);
     return new Response("Bad signature", { status: 400 });
