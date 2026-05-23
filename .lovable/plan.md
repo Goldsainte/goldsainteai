@@ -1,44 +1,24 @@
-# Replace manual creator approval with Stripe verification gate
+# End-to-end creator publish-gate test
 
-## Audit result (most important finding first)
+## What I'll do
 
-I grep'd the entire repo (src, supabase/functions, supabase/migrations) for `creator_status`. Results:
+1. **Sign up a throwaway creator** in the preview (`creator+test-<timestamp>@goldsainte.test`) and complete all 5 onboarding steps, exercising every Continue/Back/Skip button.
+2. **Verify the welcome card** shows the new "Live" chip and Stripe-verification copy (no "in review" wording).
+3. **Click "Connect payouts in Earnings"** to confirm the handoff exists, then **abandon Stripe** (don't complete it).
+4. **Go to Trip Builder**, fill in a minimal trip:
+   - Click **Save draft** → expect success.
+   - Click **Publish** → expect block with toast "Finish Stripe payout verification…" and "Open Earnings" action.
+5. **Simulate Stripe verification** by flipping `stripe_charges_enabled = true` (and setting a fake `stripe_account_id` if null) on the test creator's `profiles` row via the insert tool. This stands in for the real Stripe Connect webhook, which can't run from browser automation.
+6. **Return to Trip Builder** → click **Publish** → expect success, trip row appears in `packaged_trips` with `status = 'pending_review'`.
+7. **Repeat steps 4–6 in the Itinerary Builder** to confirm identical behavior (draft works, publish blocked pre-Stripe, publish succeeds post-Stripe, row in `itinerary_products` with `status = 'pending_review'`).
+8. **Cleanup**: delete the test creator's profile + auth row + any created trips via the existing account-moderation edge function (or direct DB delete) so the preview DB stays tidy.
 
-- **No RLS policy gates on `creator_status`.** Marketplace visibility of `packaged_trips` / `itinerary_products` is driven by their own `status` column (`pending_review` → `published`), not by the creator's approval state.
-- **No edge function reads `creator_status`.** No search, ranking, or matching function depends on it.
-- **Only 4 client files reference it:** `TripBuilderPage.tsx`, `ItineraryBuilderPage.tsx`, `CreatorOnboardingPage.tsx`, `AdminCreatorApprovalsPage.tsx` (plus generated `types.ts`).
-- **One migration** (`20260512023311_…sql`) added the column with default `'pending'` and an admin-only UPDATE policy.
+## What I'll report back
 
-**Conclusion:** removing the client-side `creator_status` gates fully unblocks creators. No marketplace visibility filter needs to change. The DB column can stay (harmless legacy) — no destructive migration needed for this change.
+For each of the 7 numbered steps: pass/fail, exact toast/copy seen, screenshot of key states (welcome card, blocked publish, successful publish), and the resulting DB row ids + status values.
 
-## Changes
+## Caveats
 
-### 1. `src/pages/onboarding/CreatorOnboardingPage.tsx`
-- `handleSubmit` (line ~326): remove the `creator_status: "pending"` field from the profile update. We stop writing it entirely and treat publishing as a pure Stripe gate.
-- Welcome card (lines ~398–415): remove the "In review" chip and the "Your profile is in review / publishing unlocks after approval" banner. Replace with:
-  - A "Live" chip (green) next to the display name.
-  - A panel: **"Your profile is live"** — "Travelers can discover and follow you now. One step left before you can publish bookable trips: connect Stripe to verify your identity and unlock payouts."
-- Keep the existing "Set up payouts" block and "Connect payouts in Earnings" button unchanged.
-
-### 2. `src/pages/TripBuilderPage.tsx` (lines 104–128)
-- `.select("stripe_account_id, creator_status")` → `.select("stripe_account_id, stripe_charges_enabled")`.
-- Delete the `creator_status !== "approved"` block entirely.
-- Change the Stripe check from `!profile?.stripe_account_id` to `!profile?.stripe_charges_enabled`.
-- Update the toast: *"Finish Stripe payout verification to unlock publishing. You can save drafts in the meantime."* — keep the existing `action: { label: "Open Earnings", onClick: … }`.
-
-### 3. `src/pages/ItineraryBuilderPage.tsx`
-- Remove the `creatorStatus` state, the `useEffect` at lines 52–60 that fetches it, and the gate at line 109.
-- Add the same Stripe check as TripBuilder before publishing: fetch `stripe_charges_enabled` and block publish with the same toast + "Open Earnings" action. Drafts always allowed.
-- After this, TripBuilder and ItineraryBuilder behave identically.
-
-### 4. Retire `AdminCreatorApprovalsPage`
-- The route `/admin/creator-approvals` is registered in `src/routes/AppRoutes.tsx` but **no nav link, button, or import anywhere else points to it** (confirmed via grep — only the route registration and the file itself reference it).
-- Decision: **remove the route registration and delete the page file.** Clean removal, nothing to break. (If you'd prefer to keep it as a read-only "all creators" view, say the word and I'll convert it instead — but since nothing links to it, deletion is cleaner.)
-
-### 5. Not changing
-- The `profiles.creator_status` column and its admin-only UPDATE policy. Harmless legacy; removing would require a destructive migration with no benefit since no code reads it after this change.
-- `trip_status` review flow (`pending_review` → admin promote → `published`). Trip-level editorial review is separate from creator-level approval and remains intact per your final flow description.
-
-## Resulting flow
-
-Onboarding completes → profile is live immediately (no `creator_status` written) → creator builds a trip → "Save draft" always works → "Publish" blocked **only** while `stripe_charges_enabled = false`, with an actionable toast linking to Earnings → creator completes Stripe Connect identity verification → `stripe_charges_enabled` flips true (already synced by `check-creator-stripe-status`) → publish succeeds → trip enters `pending_review` → editor promotes → trip appears in marketplace.
+- Stripe Connect identity verification is simulated via DB flip, not a real Stripe round-trip. This faithfully tests the **app's gate logic** (which is what changed), but does not test the **webhook → `stripe_charges_enabled` flip** path itself. If you want the webhook path verified too, that needs to be done manually in the preview with a real Stripe test identity.
+- If signup hits email confirmation, I'll either disable auto-confirm requirement for the test or use the admin path; will flag before proceeding.
+- All actions run against the preview DB only.
