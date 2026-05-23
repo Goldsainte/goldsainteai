@@ -110,13 +110,18 @@ export default function TripBuilderPage() {
           .maybeSingle();
 
         if ((profile as any)?.creator_status && (profile as any).creator_status !== "approved") {
-          toast.error("Your creator profile is still under review. You can save drafts but cannot publish trips until approved.");
+          toast.error("Your creator profile is still under review by our editors — you can save drafts and we'll unlock publishing once approved.");
           setSaving(false);
           return null;
         }
 
         if (!profile?.stripe_account_id) {
-          toast.error("Please set up your payment account in the Earnings tab before publishing a trip.");
+          toast.error("Connect your payout account in Earnings before publishing your first trip.", {
+            action: {
+              label: "Open Earnings",
+              onClick: () => navigate("/creator-dashboard?tab=earnings"),
+            },
+          });
           setSaving(false);
           return null;
         }
