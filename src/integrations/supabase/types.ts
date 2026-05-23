@@ -6752,13 +6752,6 @@ export type Database = {
             referencedRelation: "newsroom_authors"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "newsroom_articles_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "newsroom_authors_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       newsroom_authors: {
@@ -14457,54 +14450,6 @@ export type Database = {
         }
         Relationships: []
       }
-      newsroom_authors_public: {
-        Row: {
-          avatar_url: string | null
-          bio: string | null
-          created_at: string | null
-          expertise: string[] | null
-          full_name: string | null
-          id: string | null
-          linkedin_url: string | null
-          quote: string | null
-          signature_image_url: string | null
-          slug: string | null
-          title: string | null
-          twitter_url: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          bio?: string | null
-          created_at?: string | null
-          expertise?: string[] | null
-          full_name?: string | null
-          id?: string | null
-          linkedin_url?: string | null
-          quote?: string | null
-          signature_image_url?: string | null
-          slug?: string | null
-          title?: string | null
-          twitter_url?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          bio?: string | null
-          created_at?: string | null
-          expertise?: string[] | null
-          full_name?: string | null
-          id?: string | null
-          linkedin_url?: string | null
-          quote?: string | null
-          signature_image_url?: string | null
-          slug?: string | null
-          title?: string | null
-          twitter_url?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       platform_analytics: {
         Row: {
           total_agents: number | null
@@ -14590,6 +14535,31 @@ export type Database = {
       admin_dismiss_email_dlq: {
         Args: { p_msg_id: number; p_queue_name: string }
         Returns: boolean
+      }
+      admin_get_newsroom_authors: {
+        Args: never
+        Returns: {
+          avatar_url: string | null
+          bio: string
+          created_at: string
+          email: string | null
+          expertise: string[] | null
+          full_name: string
+          id: string
+          linkedin_url: string | null
+          quote: string | null
+          signature_image_url: string | null
+          slug: string
+          title: string
+          twitter_url: string | null
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "newsroom_authors"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       admin_list_email_dlq: {
         Args: never
