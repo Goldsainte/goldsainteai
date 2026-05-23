@@ -301,6 +301,37 @@ export default function AgentApplicationForm() {
       if (!formData.agencyName || !normalizedBusinessType) {
         throw new Error("Please fill in all required business information fields");
       }
+      if (!formData.password || formData.password.length < 8) {
+        throw new Error("Please set a password (at least 8 characters) in step 1");
+      }
+
+      // Ensure the applicant has an auth session BEFORE the application is
+      // persisted, so we can store user_id on agent_applications and the
+      // Identity webhook can auto-provision the live account.
+      let { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) {
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/application/verification-complete?type=agent`,
+            data: {
+              first_name: formData.firstName,
+              last_name: formData.lastName,
+              account_type: "agent",
+            },
+          },
+        });
+        if (signUpError) {
+          // Likely "User already registered" — prompt them to sign in.
+          throw new Error(
+            signUpError.message?.toLowerCase().includes("registered")
+              ? "An account with this email already exists. Please sign in first, then re-open this application."
+              : signUpError.message,
+          );
+        }
+        authUser = signUpData.user ?? null;
+      }
 
       // File uploads
       let businessLicensePath = null;
