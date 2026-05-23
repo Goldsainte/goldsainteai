@@ -144,21 +144,6 @@ export function AppSidebar() {
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
                       <NavLink
-                        to="/admin/agent-approvals"
-                        className={({ isActive }) =>
-                          isActive
-                            ? "bg-accent/10 text-accent font-medium"
-                            : "hover:bg-muted/50"
-                        }
-                      >
-                        <ShieldCheck className="h-5 w-5" />
-                        {open && <span>Agent Approvals</span>}
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <NavLink
                         to="/admin/customer-verifications"
                         className={({ isActive }) =>
                           isActive
