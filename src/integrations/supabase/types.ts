@@ -14536,6 +14536,31 @@ export type Database = {
         Args: { p_msg_id: number; p_queue_name: string }
         Returns: boolean
       }
+      admin_get_newsroom_authors: {
+        Args: never
+        Returns: {
+          avatar_url: string | null
+          bio: string
+          created_at: string
+          email: string | null
+          expertise: string[] | null
+          full_name: string
+          id: string
+          linkedin_url: string | null
+          quote: string | null
+          signature_image_url: string | null
+          slug: string
+          title: string
+          twitter_url: string | null
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "newsroom_authors"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       admin_list_email_dlq: {
         Args: never
         Returns: {
