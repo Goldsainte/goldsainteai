@@ -1594,8 +1594,8 @@ export default function AdminApplicationsPage() {
                 <SelectContent className="bg-white border-[#E5DFC6] rounded-xl">
                   <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="pending_verification">Pending Verification</SelectItem>
-                  <SelectItem value="verified">Verified - Awaiting Review</SelectItem>
-                  <SelectItem value="approved">Approved</SelectItem>
+                  <SelectItem value="verified">Verified (Agents: Live · Brands: Awaiting Review)</SelectItem>
+                  <SelectItem value="approved">Approved (Brands)</SelectItem>
                   <SelectItem value="rejected">Rejected</SelectItem>
                   <SelectItem value="failed">Verification Failed</SelectItem>
                 </SelectContent>
