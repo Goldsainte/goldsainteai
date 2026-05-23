@@ -1,60 +1,44 @@
-## End-to-end agent self-provisioning test
+## What I found (definitive)
 
-I'll execute the full path with a throwaway email and report at each checkpoint. The most important checkpoint is the **Stripe Identity webhook firing** — without it the agent stays as `agent_applications.status='verified'` with no `travel_agents` row, and `RequireAgentTerms` bounces them to `/`.
+I ran `GET /v1/webhook_endpoints` against your account using `STRIPE_SECRET_KEY` and the result is genuinely `[]` — zero endpoints. I also confirmed:
 
-## Pre-flight verified
+- `STRIPE_SECRET_KEY` begins with **`sk_test_`** → account `acct_1SLdsPFBVaLSioru`, TEST mode.
+- Stripe Identity **is enabled** — I successfully listed `identity.verification_sessions` (the test session `vs_1SXZEFFBVaLSioruH4U4D6b2` exists on the account, livemode=false).
+- The `identity.verification_session.*` event family IS available on the account.
 
-- `STRIPE_WEBHOOK_SECRET_IDENTITY` is present in project secrets ✓
-- `STRIPE_SECRET_KEY` is present ✓
-- Webhook handler code at `supabase/functions/stripe-identity-webhook/index.ts` calls `createAgentAccountFromApplication` on `verified` status ✓
+Conclusion: the `agent-verification-webhook` endpoint you can see in the Stripe Dashboard is in **Live mode**, not Test. Our edge functions and our `STRIPE_SECRET_KEY` are Test mode, so they will never see Live-mode signing secrets or events. That's the entire mismatch. Nothing is wrong with Stripe Identity availability or the API version on that endpoint — it just lives in the wrong mode for our integration.
 
-What I can't verify from code alone: whether the **Stripe Dashboard webhook endpoint is actually registered** and pointed at `https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/stripe-identity-webhook` with the `identity.verification_session.verified` event subscribed. I'll detect this empirically — if the webhook never fires after verification, that's the diagnosis.
+## The single correct endpoint configuration
 
-## Test sequence
+- **URL:** `https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/stripe-identity-webhook`
+- **API version:** `2024-06-20` (matches the version pinned in our Stripe SDK init)
+- **Events (exactly 4):**
+  - `identity.verification_session.verified`
+  - `identity.verification_session.requires_input`
+  - `identity.verification_session.processing`
+  - `identity.verification_session.canceled`
+- **Mode:** Test (since `STRIPE_SECRET_KEY` is `sk_test_…`). When you go live you'll repeat this in Live mode with a Live signing secret.
 
-1. **Browser → `/apply/agent`**
-   - Step 1: email = `agent-e2e-{ts}@goldsainte.test`, set password, **first try mismatched passwords** to confirm validation fires, then match.
-   - Steps 2–5: fill required fields, click **Back** once mid-flow to verify state preservation, then forward through to submit.
-   - Verify in DB: `agent_applications` row exists with `status='pending_verification'` and `user_id` populated.
-   - Verify in `auth.users`: user created.
+## stripe-identity-webhook vs agent-verification-webhook
 
-2. **Stripe Identity (test mode)**
-   - Click "Verify identity," complete the test-mode flow (instant pass).
-   - **Wait + poll** `application_audit_log` and `edge_function_logs` for `stripe-identity-webhook` invocation.
-   - Outcome A — webhook fires: `agent_applications.status='verified'`, `travel_agents` row inserted with `status='active'`, `user_roles` has `agent`, audit log shows `account_provisioned`.
-   - Outcome B — webhook silent for >60s: report that Identity webhook endpoint is NOT registered in Stripe Dashboard. Provide exact endpoint URL + event list the user needs to add.
+Both files exist in `supabase/functions/`. They do similar things, but only one is wired up by the real flow:
 
-3. **Auto-login & gate checks**
-   - Navigate to `/agent` (the dashboard route — confirm whether `/agent-dashboard` or `/agent` is canonical).
-   - Confirm terms-modal appears (first login), accept.
-   - Confirm dashboard renders without redirect to `/`.
+- **`stripe-identity-webhook`** — Called by the application onboarding flow (`agent_applications` / `brand_applications` / traveler KYC). This is the **live, canonical handler** and the one our docs (`docs/STRIPE_IDENTITY_WEBHOOK_SETUP.md`) point Stripe at. The newly-registered endpoint must hit this URL.
+- **`agent-verification-webhook`** — Older handler tied to a different schema (`agent_applications.kyc_session_id` keyed by `agent_id`, updates `profiles.agent_verification_status`). The current self-provisioning flow uses `createAgentAccountFromApplication` inside `stripe-identity-webhook`, not this file. It is **dead code** and the source of the naming confusion in the dashboard.
 
-4. **Stripe Connect onboarding**
-   - Navigate to Settings → Earnings tab, click Stripe Connect.
-   - In test mode, jump to the Stripe-hosted form, submit test data, return.
-   - Verify `travel_agents.stripe_charges_enabled=true`.
+## Plan
 
-5. **Trip Builder publish**
-   - Navigate to `/trip-builder`, fill minimum required fields.
-   - Click **Submit for review**.
-   - Verify `packaged_trips` row exists with `status='pending_review'`.
+1. **Create the Test-mode endpoint via Stripe API** with the URL, API version, and 4 events above. Capture the returned `secret` (`whsec_…`).
+2. **Hand you the signing secret** and prompt you to paste it into `STRIPE_WEBHOOK_SECRET_IDENTITY` via the secret-update modal. (I cannot write secret values directly; this is the only step that needs your click.)
+3. **Verify the secret took** by reading the deployed function env and re-firing a signed simulated `identity.verification_session.verified` event with the new secret. Expected: 200 OK, signature verified, `createAgentAccountFromApplication` runs against a fresh test `agent_applications` row, `travel_agents` + `user_roles` rows appear, audit log shows `account_provisioned`.
+4. **Retire dead code**: delete `supabase/functions/agent-verification-webhook/` (both `index.ts` and the deployed function via `delete_edge_functions`) and remove the matching reference from `supabase/functions/agent-start-verification/index.ts` if it still points at the old shape. Update `mem://integrations/stripe-identity-kyc-system-comprehensive` to name `stripe-identity-webhook` as the only Identity handler.
+5. **Document Live-mode handoff** in `docs/STRIPE_IDENTITY_WEBHOOK_SETUP.md`: when switching `STRIPE_SECRET_KEY` to `sk_live_…`, you must register the same endpoint in Live mode and paste that Live signing secret over `STRIPE_WEBHOOK_SECRET_IDENTITY` (or split into Test/Live secrets).
 
-## Cleanup
-After the run, delete the test agent: `auth.users`, `profiles`, `travel_agents`, `agent_applications`, `user_roles`, any `packaged_trips`. I'll skip cleanup if you want to inspect the data.
+## What you'll need to do
 
-## What I'll report back
-
-For each checkpoint: ✓ or ✗ with the DB row / log line / error. Specifically:
-- whether mismatched-password validation actually blocks submit
-- whether Back/Next preserves field state
-- **whether the Identity webhook fired** (the critical one) — with edge function log timestamp and audit log row
-- whether `travel_agents` got created automatically
-- whether `RequireAgentTerms` lets the user into the dashboard
-- whether Stripe Connect flips `stripe_charges_enabled`
-- whether trip publish succeeds
+Exactly one thing: paste the `whsec_…` value I give you into the `STRIPE_WEBHOOK_SECRET_IDENTITY` modal when it pops up. Everything else (endpoint creation, deletion of dead function, retest) I do.
 
 ## Caveats
 
-- This creates real DB rows under your live (Lovable Cloud) project. I'll use an obviously fake email (`@goldsainte.test`) and clean up after.
-- Stripe Connect onboarding in test mode is multi-screen and may require manual help if a captcha appears — I'll pause and ask if I hit one.
-- If the Identity webhook isn't registered in your Stripe Dashboard, the test will halt at step 2 with a clear remediation message; I won't be able to register the endpoint for you (Stripe Dashboard action).
+- The endpoint will be Test-mode only. Real users in production will need a Live-mode endpoint registered the same way once you flip to `sk_live_`.
+- If you want me to also delete the Live-mode `agent-verification-webhook` endpoint visible in your dashboard, I'll need a Live secret key — say the word and I'll request `STRIPE_SECRET_KEY_LIVE` via the secrets modal. Otherwise I'll leave the Live dashboard untouched.
