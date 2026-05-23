@@ -23,7 +23,8 @@ export async function verifyStripeWebhook(
     });
 
     // Verify signature and construct event
-    const event = stripe.webhooks.constructEvent(body, signature, secret);
+    // Deno SubtleCrypto is async-only — must use constructEventAsync.
+    const event = await stripe.webhooks.constructEventAsync(body, signature, secret);
 
     logger.info("Webhook signature verified", {
       eventType: event.type,

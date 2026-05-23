@@ -26,7 +26,8 @@ serve(async (req) => {
 
   try {
     const body = await req.text();
-    const event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    // Deno SubtleCrypto is async-only — must use constructEventAsync.
+    const event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
     
     console.log(`Processing webhook event: ${event.type}`);
 

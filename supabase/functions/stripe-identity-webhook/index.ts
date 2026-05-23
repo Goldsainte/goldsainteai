@@ -766,7 +766,17 @@ serve(async (req: Request) => {
     // Verify webhook signature
     let event: Stripe.Event;
     try {
-      event = stripe.webhooks.constructEvent(
+      // TEMP DEBUG — remove after secret mismatch resolved
+      logger.info("DEBUG secret fingerprint", {
+        secretLen: STRIPE_WEBHOOK_SECRET?.length ?? 0,
+        secretPrefix: STRIPE_WEBHOOK_SECRET?.slice(0, 10),
+        secretSuffix: STRIPE_WEBHOOK_SECRET?.slice(-4),
+        bodyLen: body.length,
+      });
+      // Deno's SubtleCrypto is async-only, so we MUST use constructEventAsync.
+      // The sync constructEvent throws "SubtleCryptoProvider cannot be used in
+      // a synchronous context" and every real Stripe webhook would fail.
+      event = await stripe.webhooks.constructEventAsync(
         body,
         signature,
         STRIPE_WEBHOOK_SECRET
