@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, CheckCircle2, Shield, ArrowRight, ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { isDuplicateEmailError } from "@/lib/auth/duplicateEmail";
+import { isDuplicateEmailError, isDuplicateEmailSignupResponse } from "@/lib/auth/duplicateEmail";
 
 type AgentApplicationData = {
   firstName: string;
@@ -332,6 +332,13 @@ export default function AgentApplicationForm() {
             );
           }
           throw new Error(signUpError.message);
+        }
+        // GoTrue enumeration protection returns a fake user with empty
+        // identities for duplicate emails. Treat that as duplicate too.
+        if (isDuplicateEmailSignupResponse(signUpData)) {
+          throw new Error(
+            "An account with this email already exists. Please sign in first, then re-open this application to continue where you left off.",
+          );
         }
         authUser = signUpData.user ?? null;
       }

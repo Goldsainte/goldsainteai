@@ -17,7 +17,7 @@ import { AccountTypeStep } from '@/components/auth/AccountTypeStep';
 import { getPostAuthDestination } from '@/lib/auth/postAuthRouting';
 import { AUTH_REDIRECT_STORAGE_KEY, getRedirectPathFromSearch, sanitizeRedirectPath } from '@/lib/auth/redirect';
 import { requestPasswordReset } from '@/lib/auth/requestPasswordReset';
-import { isDuplicateEmailError } from '@/lib/auth/duplicateEmail';
+import { isDuplicateEmailError, isDuplicateEmailSignupResponse } from '@/lib/auth/duplicateEmail';
 import { ToastAction } from '@/components/ui/toast';
 
 const passwordSchema = z.string()
@@ -427,6 +427,23 @@ const Auth = () => {
         Sentry.captureException(error, {
           tags: { flow: 'signup' },
           extra: { emailDomain: normalizedEmail.split('@')[1] },
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // GoTrue enumeration protection: duplicate email returns success with
+      // an empty `identities` array and no session. Treat it as duplicate.
+      if (isDuplicateEmailSignupResponse(data)) {
+        toast({
+          title: "Account already exists",
+          description: "An account with this email already exists — sign in instead.",
+          variant: "destructive",
+          action: (
+            <ToastAction altText="Sign in" onClick={() => setStep('signin')}>
+              Sign in
+            </ToastAction>
+          ),
         });
         setIsLoading(false);
         return;
