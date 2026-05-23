@@ -26,7 +26,6 @@ const AdminDashboardPage = lazy(() => import('@/pages/admin/AdminDashboardPage')
 const AdminSafetyDashboardPage = lazy(() => import('@/pages/admin/AdminSafetyDashboardPage'));
 const AdminAgentsPage = lazy(() => import('@/pages/admin/AdminAgentsPage'));
 const AdminCreatorsPage = lazy(() => import('@/pages/admin/AdminCreatorsPage'));
-const AdminCreatorApprovalsPage = lazy(() => import('@/pages/admin/AdminCreatorApprovalsPage'));
 const AdminBookingsPage = lazy(() => import('@/pages/admin/AdminBookingsPage'));
 const AdminDisputesPage = lazy(() => import('@/pages/admin/AdminDisputesPage'));
 const AdminHomePage = lazy(() => import('@/pages/admin/AdminHomePage'));
@@ -518,7 +517,6 @@ export const AppRoutes = () => (
       <Route path="/admin/agents" element={<AdminGuard><AdminAgentsPage /></AdminGuard>} />
       <Route path="/admin/creators" element={<AdminGuard><AdminCreatorsPage /></AdminGuard>} />
       <Route path="/admin/users" element={<AdminGuard><AdminUsersPage /></AdminGuard>} />
-      <Route path="/admin/creator-approvals" element={<AdminGuard><AdminCreatorApprovalsPage /></AdminGuard>} />
       <Route path="/admin/bookings" element={<AdminGuard><AdminBookingsPage /></AdminGuard>} />
       <Route path="/admin/disputes" element={<AdminGuard><AdminDisputesPage /></AdminGuard>} />
       <Route path="/admin/trips" element={<AdminGuard><AdminTripsPage /></AdminGuard>} />

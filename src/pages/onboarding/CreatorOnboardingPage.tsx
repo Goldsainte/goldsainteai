@@ -323,7 +323,6 @@ export default function CreatorOnboardingPage() {
           onboarding_completed: true,
           onboarding_completed_at: now,
           is_profile_complete: true,
-          creator_status: "pending",
         })
         .eq("id", user.id);
 
@@ -395,9 +394,9 @@ export default function CreatorOnboardingPage() {
               )}
               <div>
                 <h2 className="font-secondary text-xl text-[#0a2225]">{displayName}</h2>
-                <div className="inline-flex items-center gap-1.5 mt-1 px-2.5 py-0.5 bg-[#FDF9F0] border border-[#C7A962] rounded-full text-xs text-[#C7A962] font-medium">
-                  <Clock className="w-3 h-3" />
-                  In review
+                <div className="inline-flex items-center gap-1.5 mt-1 px-2.5 py-0.5 bg-emerald-50 border border-emerald-600 rounded-full text-xs text-emerald-700 font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                  Live
                 </div>
               </div>
             </div>
@@ -406,9 +405,9 @@ export default function CreatorOnboardingPage() {
               <div className="flex items-start gap-3">
                 <Shield className="w-5 h-5 text-[#C7A962] flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-[#0a2225] mb-1">Your profile is in review</p>
+                  <p className="text-sm font-medium text-[#0a2225] mb-1">Your profile is live</p>
                   <p className="text-xs text-[#6B7280] leading-relaxed">
-                    Our editors typically respond within 1–2 business days. You can build trip drafts now — publishing unlocks after approval.
+                    Travelers can discover and follow you now. One step left before you can publish bookable trips: complete Stripe payout verification.
                   </p>
                 </div>
               </div>

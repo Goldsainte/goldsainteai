@@ -35,7 +35,6 @@ export default function ItineraryBuilderPage() {
   const editId = searchParams.get("edit");
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(!!editId);
-  const [creatorStatus, setCreatorStatus] = useState<string | null>(null);
   const [form, setForm] = useState({
     title: "",
     destination: "",
@@ -48,16 +47,6 @@ export default function ItineraryBuilderPage() {
   const [days, setDays] = useState<Day[]>([
     { day_number: 1, title: "", description: "", activities: [], accommodation: "" },
   ]);
-
-  useEffect(() => {
-    if (!user) return;
-    supabase
-      .from("profiles")
-      .select("creator_status")
-      .eq("id", user.id)
-      .maybeSingle()
-      .then(({ data }) => setCreatorStatus((data as any)?.creator_status ?? null));
-  }, [user]);
 
   useEffect(() => {
     if (!editId) return;
@@ -106,9 +95,21 @@ export default function ItineraryBuilderPage() {
 
   const handleSave = async (status: "draft" | "published") => {
     if (!user) return;
-    if (status === "published" && creatorStatus !== "approved") {
-      toast.error("Your creator profile is still under review. You can save drafts but cannot publish until approved.");
-      return;
+    if (status === "published") {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("stripe_charges_enabled")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (!(profile as any)?.stripe_charges_enabled) {
+        toast.error("Finish Stripe payout verification to unlock publishing. You can save drafts in the meantime.", {
+          action: {
+            label: "Open Earnings",
+            onClick: () => navigate("/creator-dashboard?tab=earnings"),
+          },
+        });
+        return;
+      }
     }
     if (!form.title.trim() || !form.destination.trim() || !form.price) {
       toast.error("Title, destination and price are required.");
