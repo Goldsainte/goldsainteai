@@ -98,10 +98,11 @@ const AuthCallback = () => {
 
         // Fire welcome email exactly once, when a fresh signup lands here.
         // The flag is set by Auth.tsx (email signup) and by handleGoogleSignIn
-        // (OAuth). Fire-and-forget — never block routing on email delivery.
+        // (OAuth). Routed through the Lovable email queue via
+        // `send-transactional-email` — no second provider. Fire-and-forget.
         if (typeof window !== 'undefined') {
           const pendingWelcomeRaw = sessionStorage.getItem('pending_welcome_email');
-          if (pendingWelcomeRaw) {
+          if (pendingWelcomeRaw && session.user.email) {
             sessionStorage.removeItem('pending_welcome_email');
             try {
               const pending = JSON.parse(pendingWelcomeRaw) as {
@@ -109,22 +110,29 @@ const AuthCallback = () => {
                 firstName?: string;
                 lastName?: string;
               };
-              const fullName = [pending.firstName, pending.lastName]
-                .filter(Boolean)
-                .join(' ')
-                .trim() ||
-                [profile.first_name, profile.last_name].filter(Boolean).join(' ').trim() ||
-                undefined;
-              void supabase.functions.invoke('send-welcome-email', {
-                body: {
-                  email: session.user.email,
-                  accountType: pending.accountType || profile.account_type || 'traveler',
-                  fullName,
-                  displayName: pending.firstName || profile.first_name || undefined,
-                },
-              }).catch((err) => {
-                console.warn('[AuthCallback] welcome email invoke failed:', err);
-              });
+              const accountType =
+                pending.accountType || profile.account_type || 'traveler';
+              const isProfessional =
+                accountType === 'creator' ||
+                accountType === 'agent' ||
+                accountType === 'brand';
+              const templateName = isProfessional
+                ? 'welcome-professional'
+                : 'welcome-traveler';
+              const firstName =
+                pending.firstName || profile.first_name || undefined;
+              void supabase.functions
+                .invoke('send-transactional-email', {
+                  body: {
+                    templateName,
+                    recipientEmail: session.user.email,
+                    idempotencyKey: `welcome-${session.user.id}`,
+                    templateData: { firstName, accountType },
+                  },
+                })
+                .catch((err) => {
+                  console.warn('[AuthCallback] welcome email invoke failed:', err);
+                });
             } catch (err) {
               console.warn('[AuthCallback] could not parse pending_welcome_email:', err);
             }
