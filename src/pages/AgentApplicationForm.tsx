@@ -850,10 +850,11 @@ export default function AgentApplicationForm() {
               <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#FDF9F0] border border-[#C7A962]/30">
                 <Shield className="h-10 w-10 text-[#C7A962]" />
               </div>
-              <h3 className="mb-3 font-secondary text-2xl text-[#0a2225]">Identity Verification Required</h3>
+              <h3 className="mb-3 font-secondary text-2xl text-[#0a2225]">One Last Step — Verify Your Identity</h3>
               <p className="text-base text-[#6B7280] max-w-md mx-auto">
-                All travel agents must complete identity verification through Stripe Identity.
-                This typically takes 2-3 minutes.
+                Completing Stripe Identity verification activates your advisor account
+                <strong className="text-[#0a2225]"> immediately</strong> — there is no waiting period
+                or admin review. Takes 2–3 minutes.
               </p>
             </div>
 
