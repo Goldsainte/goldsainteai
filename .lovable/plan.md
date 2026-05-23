@@ -1,82 +1,44 @@
-# Creator Journey — End-to-End Fixes
+# Replace manual creator approval with Stripe verification gate
 
-## Decisions
+## Audit result (most important finding first)
 
-1. **Manual creator approval is intentional.** `AdminCreatorApprovalsPage` exists and admin sign-off is the curation moat for Goldsainte. We keep `creator_status: "pending"` on onboarding completion and `TripBuilderPage` keeps the `!== "approved"` publish gate. Fix the UX so creators are never surprised by it.
-2. **Avatars bucket is fine.** The current RLS (`(storage.foldername(name))[1] = auth.uid()::text`) matches `${user.id}/cover/${ts}.ext` because `foldername[1]` is the first path segment (`user.id`), not the last. No migration needed — but we'll add a code comment so a future refactor doesn't blindly move it.
+I grep'd the entire repo (src, supabase/functions, supabase/migrations) for `creator_status`. Results:
+
+- **No RLS policy gates on `creator_status`.** Marketplace visibility of `packaged_trips` / `itinerary_products` is driven by their own `status` column (`pending_review` → `published`), not by the creator's approval state.
+- **No edge function reads `creator_status`.** No search, ranking, or matching function depends on it.
+- **Only 4 client files reference it:** `TripBuilderPage.tsx`, `ItineraryBuilderPage.tsx`, `CreatorOnboardingPage.tsx`, `AdminCreatorApprovalsPage.tsx` (plus generated `types.ts`).
+- **One migration** (`20260512023311_…sql`) added the column with default `'pending'` and an admin-only UPDATE policy.
+
+**Conclusion:** removing the client-side `creator_status` gates fully unblocks creators. No marketplace visibility filter needs to change. The DB column can stay (harmless legacy) — no destructive migration needed for this change.
 
 ## Changes
 
 ### 1. `src/pages/onboarding/CreatorOnboardingPage.tsx`
+- `handleSubmit` (line ~326): remove the `creator_status: "pending"` field from the profile update. We stop writing it entirely and treat publishing as a pure Stripe gate.
+- Welcome card (lines ~398–415): remove the "In review" chip and the "Your profile is in review / publishing unlocks after approval" banner. Replace with:
+  - A "Live" chip (green) next to the display name.
+  - A panel: **"Your profile is live"** — "Travelers can discover and follow you now. One step left before you can publish bookable trips: connect Stripe to verify your identity and unlock payouts."
+- Keep the existing "Set up payouts" block and "Connect payouts in Earnings" button unchanged.
 
-**Welcome card (post-submit screen, ~line 339–395)** — replace the generic "Welcome to Goldsainte / Creator Partner" card with a clear two-status panel:
+### 2. `src/pages/TripBuilderPage.tsx` (lines 104–128)
+- `.select("stripe_account_id, creator_status")` → `.select("stripe_account_id, stripe_charges_enabled")`.
+- Delete the `creator_status !== "approved"` block entirely.
+- Change the Stripe check from `!profile?.stripe_account_id` to `!profile?.stripe_charges_enabled`.
+- Update the toast: *"Finish Stripe payout verification to unlock publishing. You can save drafts in the meantime."* — keep the existing `action: { label: "Open Earnings", onClick: … }`.
 
-- Pending review banner: "Your profile is in review. Our editors typically respond within 1–2 business days. You can build trip drafts now, but publishing unlocks after approval."
-- Stripe payouts row: "Set up payouts (required before publishing)" with a button linking to `/creator-dashboard?tab=earnings` (Earnings tab is where Stripe Connect lives).
-- Keep "View Your Dashboard" CTA.
+### 3. `src/pages/ItineraryBuilderPage.tsx`
+- Remove the `creatorStatus` state, the `useEffect` at lines 52–60 that fetches it, and the gate at line 109.
+- Add the same Stripe check as TripBuilder before publishing: fetch `stripe_charges_enabled` and block publish with the same toast + "Open Earnings" action. Drafts always allowed.
+- After this, TripBuilder and ItineraryBuilder behave identically.
 
-**Fee inputs (handleSubmit, lines 274–275)** — replace:
-```ts
-planning_fee_amount: planningFee ? parseInt(planningFee) * 100 : null,
-itinerary_fee_amount: itineraryFee ? parseInt(itineraryFee) * 100 : null,
-```
-with a `toCents(value)` helper that:
-- returns `null` for empty
-- `parseFloat`, rejects `NaN` / negative / `> 1_000_000`
-- returns `Math.round(n * 100)`
-- on invalid: `toast.error("Enter a valid non-negative fee (e.g. 150.50).")` and abort submit before the DB write.
+### 4. Retire `AdminCreatorApprovalsPage`
+- The route `/admin/creator-approvals` is registered in `src/routes/AppRoutes.tsx` but **no nav link, button, or import anywhere else points to it** (confirmed via grep — only the route registration and the file itself reference it).
+- Decision: **remove the route registration and delete the page file.** Clean removal, nothing to break. (If you'd prefer to keep it as a read-only "all creators" view, say the word and I'll convert it instead — but since nothing links to it, deletion is cleaner.)
 
-Also clamp the `<Input type="number">` for fees with `min="0"` `step="0.01"`.
+### 5. Not changing
+- The `profiles.creator_status` column and its admin-only UPDATE policy. Harmless legacy; removing would require a destructive migration with no benefit since no code reads it after this change.
+- `trip_status` review flow (`pending_review` → admin promote → `published`). Trip-level editorial review is separate from creator-level approval and remains intact per your final flow description.
 
-**Stale step comments (lines 102 / 108 / 119)** — renumber so they match the 5-step `STEPS` array and the JSX comments below:
-- `// Step 2: Your Niche` → `// Step 3: Your Niche`
-- `// Step 3: Portfolio (all optional)` → `// Step 4: Portfolio (all optional)`
-- `// Step 4: Standards & Legal` → `// Step 5: Standards & Legal`
+## Resulting flow
 
-(The `// Step 1: About You` and the existing JSX `Step 2: Social Profile` etc. are already correct.)
-
-**`handleSkip` (lines 169–196)** — currently sets `account_type/role: "creator"` but never sets onboarding flags, then routes to `/creator-dashboard`. `useRequireOnboarding` for creators checks `onboarding_completed || has_completed_creator_onboarding`; neither is set → user gets bounced straight back to `/onboarding/creator`. So the loop is broken today.
-
-Fix: route Skip to `/creator-dashboard?onboarding=resume` (which dashboard already understands as "incomplete creator") AND keep flags unset so they're forced to resume. To make that work without the redirect bounce, update the routing path so skipped-creator state lands somewhere usable:
-- Set `has_completed_creator_onboarding: false` explicitly (already default, but explicit).
-- Navigate to `/onboarding/creator?resume=1` instead of `/creator-dashboard` — this matches the existing prefill logic in `loadExistingProfile` and avoids the dashboard bounce.
-- Update toast: "Progress saved. Pick up where you left off anytime."
-
-(If you'd rather Skip drop them on the dashboard with a banner, that's a follow-up — current `useRequireOnboarding` makes that a bigger change.)
-
-**Cover upload (line 655–656)** — leave logic alone, add a one-line comment above the upload:
-```ts
-// Path MUST start with `${user.id}/...` — avatars RLS scopes by (storage.foldername(name))[1].
-```
-
-### 2. `src/pages/TripBuilderPage.tsx`
-
-No logic change. Improve the publish-gate toasts (lines 113 and 119) to be actionable:
-- pending: `"Your creator profile is still under review by our editors — you can save drafts and we'll unlock publishing once approved."`
-- no stripe: `"Connect your payout account in Earnings before publishing your first trip."` + a second `toast()` with a link to `/creator-dashboard?tab=earnings`.
-
-## Flow confirmation after fixes
-
-```text
-Signup (Google or email)
-  → AuthCallback fires welcome-traveler email (name prop now correct)
-  → AccountTypeStep: pick "Creator"
-  → /onboarding/creator
-      Step 1 About You ─ Continue gated by displayName+bio+homeBase ─ Back disabled
-      Step 2 Social    ─ Continue gated by primary platform + matching handle ─ Skip routes to /onboarding/creator?resume=1
-      Step 3 Niche     ─ Continue gated by ≥1 niche + ≥1 destination
-      Step 4 Portfolio ─ all optional; cover upload to avatars/{uid}/cover/* (RLS-compliant)
-      Step 5 Standards ─ Launch gated by 5 checkboxes; fees parsed via toCents
-  → handleSubmit writes creator_status:"pending", onboarding_completed:true
-  → Welcome card shows: "In review" banner + "Set up payouts" CTA → /creator-dashboard?tab=earnings
-  → Dashboard → Earnings tab → Stripe Connect onboarding (creator-stripe-onboarding edge fn)
-  → Trip Builder → Save Draft works any time
-  → Publish blocked until creator_status='approved' AND stripe_account_id present (toasts now actionable)
-  → After admin approves in /admin/creators, publish writes status='pending_review' to packaged_trips
-  → Trip appears in marketplace pipeline as pending_review (admin promotes to live)
-```
-
-## Out of scope
-
-- Adding an in-onboarding Stripe Connect step (would require a 6th step + return-URL handling). The welcome-card CTA + Earnings-tab flow covers the gap for now.
-- Migrating cover images to a dedicated bucket. Current path is RLS-compliant; revisit if we add per-asset size or MIME limits.
+Onboarding completes → profile is live immediately (no `creator_status` written) → creator builds a trip → "Save draft" always works → "Publish" blocked **only** while `stripe_charges_enabled = false`, with an actionable toast linking to Earnings → creator completes Stripe Connect identity verification → `stripe_charges_enabled` flips true (already synced by `check-creator-stripe-status`) → publish succeeds → trip enters `pending_review` → editor promotes → trip appears in marketplace.
