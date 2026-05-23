@@ -377,32 +377,67 @@ export default function CreatorOnboardingPage() {
           <h1 className="font-secondary text-4xl md:text-5xl text-[#0a2225] mb-4">
             Welcome to Goldsainte.
           </h1>
-          <p className="text-[#6B7280] text-lg mb-12">Your journeys inspire the world.</p>
+          <p className="text-[#6B7280] text-lg mb-10">Your journeys inspire the world.</p>
 
-          <div className="bg-white border-2 border-[#C7A962] rounded-2xl p-8 shadow-lg">
-            {avatarUrl ? (
-              <img
-                src={avatarUrl}
-                alt={displayName}
-                className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-2 border-[#C7A962]"
-              loading="lazy"/>
-            ) : (
-              <div className="w-24 h-24 rounded-full mx-auto mb-4 bg-[#FDF9F0] border-2 border-[#C7A962] flex items-center justify-center">
-                <User className="w-10 h-10 text-[#C7A962]" />
+          <div className="bg-white border-2 border-[#C7A962] rounded-2xl p-8 shadow-lg text-left">
+            <div className="flex items-center gap-4 mb-6">
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={displayName}
+                  className="w-16 h-16 rounded-full object-cover border-2 border-[#C7A962] flex-shrink-0"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-[#FDF9F0] border-2 border-[#C7A962] flex items-center justify-center flex-shrink-0">
+                  <User className="w-7 h-7 text-[#C7A962]" />
+                </div>
+              )}
+              <div>
+                <h2 className="font-secondary text-xl text-[#0a2225]">{displayName}</h2>
+                <div className="inline-flex items-center gap-1.5 mt-1 px-2.5 py-0.5 bg-[#FDF9F0] border border-[#C7A962] rounded-full text-xs text-[#C7A962] font-medium">
+                  <Clock className="w-3 h-3" />
+                  In review
+                </div>
               </div>
-            )}
+            </div>
 
-            <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">{displayName}</h2>
+            <div className="rounded-xl bg-[#FDF9F0] border border-[#E5DFC6] p-4 mb-4">
+              <div className="flex items-start gap-3">
+                <Shield className="w-5 h-5 text-[#C7A962] flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-[#0a2225] mb-1">Your profile is in review</p>
+                  <p className="text-xs text-[#6B7280] leading-relaxed">
+                    Our editors typically respond within 1–2 business days. You can build trip drafts now — publishing unlocks after approval.
+                  </p>
+                </div>
+              </div>
+            </div>
 
-            <div className="inline-flex items-center gap-2 px-4 py-1 bg-[#FDF9F0] border border-[#C7A962] rounded-full text-sm text-[#C7A962] font-medium mb-4">
-              <Sparkles className="w-4 h-4" />
-              Creator Partner
+            <div className="rounded-xl bg-white border border-[#E5DFC6] p-4">
+              <div className="flex items-start gap-3 mb-3">
+                <Wallet className="w-5 h-5 text-[#0c4d47] flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-[#0a2225] mb-1">Set up payouts</p>
+                  <p className="text-xs text-[#6B7280] leading-relaxed">
+                    Required before publishing your first trip. We use Stripe Connect to handle commissions and payouts securely.
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={() => navigate("/creator-dashboard?tab=earnings")}
+                variant="outline"
+                className="w-full border-[#0c4d47] text-[#0c4d47] hover:bg-[#0c4d47] hover:text-white"
+              >
+                Connect payouts in Earnings
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
             </div>
           </div>
 
           <Button
             onClick={() => navigate("/creator-dashboard")}
-            className="mt-8 bg-[#0a2225] hover:bg-[#0a2225]/90 text-white px-8 py-6 rounded-xl text-lg"
+            className="mt-6 bg-[#0a2225] hover:bg-[#0a2225]/90 text-white px-8 py-6 rounded-xl text-lg"
           >
             View Your Dashboard
             <ArrowRight className="w-5 h-5 ml-2" />
