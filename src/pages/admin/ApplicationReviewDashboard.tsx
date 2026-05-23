@@ -81,6 +81,7 @@ interface AgentApplication {
   approved_at?: string | null;
   rejected_at?: string | null;
   rejection_reason?: string | null;
+  user_id?: string | null;
 }
 
 interface BrandApplication {
