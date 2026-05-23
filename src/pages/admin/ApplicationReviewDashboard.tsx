@@ -1539,10 +1539,11 @@ export default function AdminApplicationsPage() {
             <div className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-[#6B7280] uppercase tracking-wide">Awaiting Review</p>
+                  <p className="text-xs text-[#6B7280] uppercase tracking-wide">Brands Awaiting Review</p>
                   <p className="text-3xl font-secondary text-[#0a2225] mt-1">
-                    {stats.verifiedAgents + stats.verifiedBrands}
+                    {stats.verifiedBrands}
                   </p>
+                  <p className="text-[11px] text-[#6B7280] mt-1">Agents auto-activate after verification</p>
                 </div>
                 <div className="h-12 w-12 rounded-full bg-[#f5e9c5] flex items-center justify-center">
                   <Clock className="h-6 w-6 text-[#6d5223]" />
@@ -1555,10 +1556,11 @@ export default function AdminApplicationsPage() {
             <div className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-[#6B7280] uppercase tracking-wide">Pending Verification</p>
+                  <p className="text-xs text-[#6B7280] uppercase tracking-wide">Identity Verification In Progress</p>
                   <p className="text-3xl font-secondary text-[#0a2225] mt-1">
                     {stats.pendingAgents + stats.pendingBrands}
                   </p>
+                  <p className="text-[11px] text-[#6B7280] mt-1">Submitted but haven't completed Stripe Identity</p>
                 </div>
                 <div className="h-12 w-12 rounded-full bg-[#fef3cd] flex items-center justify-center">
                   <AlertTriangle className="h-6 w-6 text-[#856404]" />
