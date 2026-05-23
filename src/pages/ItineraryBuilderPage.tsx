@@ -117,6 +117,7 @@ export default function ItineraryBuilderPage() {
     }
     try {
       setSaving(true);
+      const persistedStatus = status === "published" ? "pending_review" : "draft";
       const payload = {
         creator_id: user.id,
         title: form.title.trim(),
@@ -127,7 +128,7 @@ export default function ItineraryBuilderPage() {
         cover_image_url: form.cover_image_url || null,
         description: form.description || null,
         days: days as any,
-        status,
+        status: persistedStatus,
       };
       if (editId) {
         const { error } = await supabase
@@ -139,7 +140,7 @@ export default function ItineraryBuilderPage() {
         const { error } = await supabase.from("itinerary_products").insert(payload);
         if (error) throw error;
       }
-      toast.success(status === "published" ? "Guide published" : "Draft saved");
+      toast.success(status === "published" ? "Guide submitted for review" : "Draft saved");
       navigate("/creator-dashboard");
     } catch (e: any) {
       toast.error("Failed to save: " + e.message);
