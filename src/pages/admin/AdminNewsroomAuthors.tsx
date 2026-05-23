@@ -11,7 +11,8 @@ export default function AdminNewsroomAuthors() {
   const [editing, setEditing] = useState<any | null>(null);
 
   async function load() {
-    const { data } = await (supabase as any).from("newsroom_authors").select("*").order("full_name");
+    // Use SECURITY DEFINER RPC so admins can read the protected email column
+    const { data } = await (supabase as any).rpc("admin_get_newsroom_authors");
     setAuthors(data || []);
   }
   useEffect(() => { load(); }, []);
