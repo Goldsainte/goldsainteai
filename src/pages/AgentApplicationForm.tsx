@@ -490,6 +490,28 @@ export default function AgentApplicationForm() {
                 <Input type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className={luxuryInputClasses} />
               </div>
               <div>
+                <Label className="text-sm font-medium text-[#0a2225]">Password *</Label>
+                <Input
+                  type="password"
+                  autoComplete="new-password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className={luxuryInputClasses}
+                  placeholder="At least 8 characters"
+                />
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">Confirm Password *</Label>
+                <Input
+                  type="password"
+                  autoComplete="new-password"
+                  value={formData.passwordConfirm}
+                  onChange={(e) => setFormData({ ...formData, passwordConfirm: e.target.value })}
+                  className={luxuryInputClasses}
+                  placeholder="Re-enter password"
+                />
+              </div>
+              <div>
                 <Label className="text-sm font-medium text-[#0a2225]">Agency Name *</Label>
                 <Input value={formData.agencyName} onChange={(e) => setFormData({ ...formData, agencyName: e.target.value })} className={luxuryInputClasses} />
               </div>
