@@ -317,21 +317,26 @@ Deno.serve(async (req) => {
             })
             .eq('id', 1)
 
-          // Stop processing — remaining messages stay in queue (VT expires, retried next cycle)
-          return new Response(
-            JSON.stringify({ processed: totalProcessed, stopped: 'rate_limited' }),
-            { headers: { 'Content-Type': 'application/json' } }
-          )
+          // Rate-limited: stop processing THIS queue (but still try the next
+          // queue, and let `retry_after_until` gate the next cron tick).
+          // Do NOT return — that would starve the transactional queue behind
+          // an auth-queue 429 (or vice versa).
+          break
         }
 
-        // 403s are permanent configuration or authorization failures for this
-        // message, so move straight to DLQ and stop processing the rest of the batch.
+        // 403s are permanent configuration/auth failures for THIS message.
+        // Move it to DLQ and continue with the rest of the batch. One poison
+        // message must never starve every other queued email.
         if (isForbidden(error)) {
-          await moveToDlq(supabase, queue, msg, errorMsg.slice(0, 1000))
-          return new Response(
-            JSON.stringify({ processed: totalProcessed, stopped: 'forbidden' }),
-            { headers: { 'Content-Type': 'application/json' } }
-          )
+          try {
+            await moveToDlq(supabase, queue, msg, errorMsg.slice(0, 1000))
+          } catch (dlqErr) {
+            console.error('Failed to move forbidden message to DLQ', { queue, msg_id: msg.msg_id, dlqErr })
+          }
+          if (i < messages.length - 1) {
+            await new Promise((r) => setTimeout(r, sendDelayMs))
+          }
+          continue
         }
 
         // Log non-429 failures to track real retry attempts.
