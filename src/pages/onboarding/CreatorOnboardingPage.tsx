@@ -670,6 +670,7 @@ export default function CreatorOnboardingPage() {
                           if (!file || !user) return;
                           if (file.size > 50 * 1024 * 1024) { toast.error("Max 50MB"); return; }
                           const ext = file.name.split(".").pop();
+                          // Path MUST start with `${user.id}/...` — avatars RLS scopes by (storage.foldername(name))[1].
                           const path = `${user.id}/cover/${Date.now()}.${ext}`;
                           const { error } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
                           if (error) { toast.error("Upload failed"); return; }
