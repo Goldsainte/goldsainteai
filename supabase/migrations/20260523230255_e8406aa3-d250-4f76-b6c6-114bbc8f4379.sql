@@ -1,0 +1,1 @@
+DELETE FROM public.agent_applications WHERE id = '6d53391b-866f-4fe5-b7c6-2b5dd7bcbda1';
