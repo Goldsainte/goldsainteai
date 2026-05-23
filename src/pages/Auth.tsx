@@ -17,6 +17,8 @@ import { AccountTypeStep } from '@/components/auth/AccountTypeStep';
 import { getPostAuthDestination } from '@/lib/auth/postAuthRouting';
 import { AUTH_REDIRECT_STORAGE_KEY, getRedirectPathFromSearch, sanitizeRedirectPath } from '@/lib/auth/redirect';
 import { requestPasswordReset } from '@/lib/auth/requestPasswordReset';
+import { isDuplicateEmailError } from '@/lib/auth/duplicateEmail';
+import { ToastAction } from '@/components/ui/toast';
 
 const passwordSchema = z.string()
   .min(8, "Password must be at least 8 characters")
@@ -396,7 +398,7 @@ const Auth = () => {
             description,
             variant: "destructive",
             action: (
-              <ToastAction altText="Sign in" onClick={() => setMode('login')}>
+              <ToastAction altText="Sign in" onClick={() => setStep('signin')}>
                 Sign in
               </ToastAction>
             ),
