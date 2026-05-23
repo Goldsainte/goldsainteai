@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, CheckCircle2, Shield, ArrowRight, ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { isDuplicateEmailError } from "@/lib/auth/duplicateEmail";
 
 type AgentApplicationData = {
   firstName: string;
@@ -323,12 +324,14 @@ export default function AgentApplicationForm() {
           },
         });
         if (signUpError) {
-          // Likely "User already registered" — prompt them to sign in.
-          throw new Error(
-            signUpError.message?.toLowerCase().includes("registered")
-              ? "An account with this email already exists. Please sign in first, then re-open this application."
-              : signUpError.message,
-          );
+          // Duplicate email — surface a clear, application-specific message
+          // so the agent knows to sign in and resume the application.
+          if (isDuplicateEmailError(signUpError)) {
+            throw new Error(
+              "An account with this email already exists. Please sign in first, then re-open this application to continue where you left off.",
+            );
+          }
+          throw new Error(signUpError.message);
         }
         authUser = signUpData.user ?? null;
       }
