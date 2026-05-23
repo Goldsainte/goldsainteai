@@ -388,9 +388,25 @@ const Auth = () => {
         let description = error.message || "An unexpected error occurred.";
         const msg = error.message?.toLowerCase() || "";
 
-        if (msg.includes("already registered") || msg.includes("already been registered")) {
+        if (isDuplicateEmailError(error)) {
           title = "Account already exists";
-          description = "An account with this email already exists. Try signing in instead.";
+          description = "An account with this email already exists — sign in instead.";
+          toast({
+            title,
+            description,
+            variant: "destructive",
+            action: (
+              <ToastAction altText="Sign in" onClick={() => setMode('login')}>
+                Sign in
+              </ToastAction>
+            ),
+          });
+          Sentry.captureException(error, {
+            tags: { flow: 'signup', reason: 'duplicate_email' },
+            extra: { emailDomain: normalizedEmail.split('@')[1] },
+          });
+          setIsLoading(false);
+          return;
         } else if (msg.includes("failed to fetch") || msg.includes("network")) {
           title = "Connection issue";
           description = "Unable to reach our servers. Check your internet and try again.";
