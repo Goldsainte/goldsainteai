@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@13.11.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import { sendVerificationFailedEmail } from "../_shared/email-service.ts";
+import { createAgentAccountFromApplication } from "../_shared/createAgentAccount.ts";
 
 // ============================================================================
 // ENVIRONMENT VARIABLES
@@ -319,19 +320,28 @@ async function updateAgentApplication(
       verificationReport
     );
 
-    // Send notifications
-    await sendApplicantNotification(
-      application.email,
-      `${application.first_name} ${application.last_name}`,
-      "verified",
-      "agent"
-    );
-    await sendAdminNotification(
+    // Auto-provision the live agent account. No admin in the loop.
+    // Failures are surfaced via application_audit_log
+    // (action='account_provision_failed') so an admin can re-run via
+    // approve-application if needed.
+    const provisionResult = await createAgentAccountFromApplication(
       application.id,
-      "agent",
-      `${application.first_name} ${application.last_name}`,
-      application.email
+      { logger },
     );
+    if (!provisionResult.success) {
+      logger.error("Auto-provisioning failed after verification", {
+        applicationId: application.id,
+        error: provisionResult.error,
+      });
+      // Don't throw — application is still marked verified. Admin can
+      // re-run approve-application to retry provisioning.
+    } else {
+      logger.info("Agent account auto-provisioned", {
+        applicationId: application.id,
+        userId: provisionResult.userId,
+        alreadyExists: provisionResult.alreadyExists,
+      });
+    }
 
     // Fire post-verification "Welcome — Specialist" email via fanout
     try {
