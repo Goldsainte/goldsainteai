@@ -85,18 +85,39 @@ export async function createAgentAccountFromApplication(
   let userId: string;
   let createdAuthUser = false;
 
-  // Try to find existing auth user by email (admin API).
-  // Supabase v2 lacks a getUserByEmail helper, so we paginate listUsers.
+  // Try to find existing auth user by email.
+  // Primary lookup: profiles.email is unique and indexed — direct hit regardless
+  // of how many users exist. Fallback: paginated listUsers filtered by email.
+  // We never want to reach createUser when the agent already signed up via the form.
   let existingUser: { id: string } | null = null;
   try {
-    // Single page of 200 is fine for now; the email is also unique on profiles.
-    const { data: list } = await supabase.auth.admin.listUsers({ page: 1, perPage: 200 });
-    existingUser =
-      list?.users?.find(
-        (u: any) => (u.email || "").toLowerCase() === application.email.toLowerCase(),
-      ) ?? null;
+    const { data: profileByEmail } = await supabase
+      .from("profiles")
+      .select("id")
+      .ilike("email", application.email)
+      .maybeSingle();
+    if (profileByEmail?.id) {
+      existingUser = { id: profileByEmail.id };
+    }
   } catch (e: any) {
-    log.warn("listUsers lookup failed; proceeding to create", { error: e?.message });
+    log.warn("profiles email lookup failed", { error: e?.message });
+  }
+
+  if (!existingUser) {
+    try {
+      // GoTrue listUsers supports a server-side email filter — exact match, no pagination needed.
+      const { data: list } = await supabase.auth.admin.listUsers({
+        // @ts-ignore – filter is supported by GoTrue admin API
+        filter: `email.eq.${application.email}`,
+        perPage: 1,
+      });
+      const match = list?.users?.find(
+        (u: any) => (u.email || "").toLowerCase() === application.email.toLowerCase(),
+      );
+      if (match) existingUser = { id: match.id };
+    } catch (e: any) {
+      log.warn("listUsers email-filter lookup failed", { error: e?.message });
+    }
   }
 
   if (existingUser) {
@@ -105,8 +126,9 @@ export async function createAgentAccountFromApplication(
   } else {
     // Generate a random password the user will never use; they'll set their
     // own via the password-reset flow if they hit this path.
-    const placeholder =
-      crypto.randomUUID() + crypto.randomUUID().toUpperCase() + "!a1";
+    // CRITICAL: bcrypt rejects passwords >72 bytes — GoTrue panics with 500.
+    // A single UUID (36 chars) + a small entropy/complexity suffix stays well under.
+    const placeholder = crypto.randomUUID().replace(/-/g, "") + "Aa1!"; // 36 bytes
     const { data: authData, error: authError } =
       await supabase.auth.admin.createUser({
         email: application.email,
