@@ -1,59 +1,60 @@
-## Findings
+## End-to-end agent self-provisioning test
 
-I read `ApplicationReviewDashboard.tsx` end-to-end and traced the approve handler. Three of the four items are already correct; only one needs an edit.
+I'll execute the full path with a throwaway email and report at each checkpoint. The most important checkpoint is the **Stripe Identity webhook firing** — without it the agent stays as `agent_applications.status='verified'` with no `travel_agents` row, and `RequireAgentTerms` bounces them to `/`.
 
-### 1. Dead `approved` branches — only one is dead
+## Pre-flight verified
 
-- **Line 657 (`AgentApplicationDetail`)** — DEAD. Agent lifecycle is now `pending_verification → verified → rejected/failed`. Agents cannot reach `approved`. **Remove this block.**
-- **Line 1015 (`BrandApplicationDetail`)** — STILL LIVE. Brands keep the manual-review flow: `handleApprove` at line 1381 invokes `approve-application` with `action:'approve'`, which transitions brand rows to `status='approved'`. This component is brand-only, so the branch is already correctly scoped. **Keep as-is.**
+- `STRIPE_WEBHOOK_SECRET_IDENTITY` is present in project secrets ✓
+- `STRIPE_SECRET_KEY` is present ✓
+- Webhook handler code at `supabase/functions/stripe-identity-webhook/index.ts` calls `createAgentAccountFromApplication` on `verified` status ✓
 
-### 2. Metrics tile labels — already accurate
+What I can't verify from code alone: whether the **Stripe Dashboard webhook endpoint is actually registered** and pointed at `https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/stripe-identity-webhook` with the `identity.verification_session.verified` event subscribed. I'll detect this empirically — if the webhook never fires after verification, that's the diagnosis.
 
-Lines 1338-1346 compute `pendingAgents`/`pendingBrands` from `status === 'pending_verification'`. Line 1559 renders:
+## Test sequence
 
-> **"Identity Verification In Progress"** — `{pendingAgents + pendingBrands}` — subtext: "Submitted but haven't completed Stripe Identity"
+1. **Browser → `/apply/agent`**
+   - Step 1: email = `agent-e2e-{ts}@goldsainte.test`, set password, **first try mismatched passwords** to confirm validation fires, then match.
+   - Steps 2–5: fill required fields, click **Back** once mid-flow to verify state preservation, then forward through to submit.
+   - Verify in DB: `agent_applications` row exists with `status='pending_verification'` and `user_id` populated.
+   - Verify in `auth.users`: user created.
 
-That label already says exactly what you asked for: it represents applicants who started but haven't passed Stripe Identity, not items awaiting admin action. No change.
+2. **Stripe Identity (test mode)**
+   - Click "Verify identity," complete the test-mode flow (instant pass).
+   - **Wait + poll** `application_audit_log` and `edge_function_logs` for `stripe-identity-webhook` invocation.
+   - Outcome A — webhook fires: `agent_applications.status='verified'`, `travel_agents` row inserted with `status='active'`, `user_roles` has `agent`, audit log shows `account_provisioned`.
+   - Outcome B — webhook silent for >60s: report that Identity webhook endpoint is NOT registered in Stripe Dashboard. Provide exact endpoint URL + event list the user needs to add.
 
-If you want it even more literal I can change "In Progress" → "Not Yet Complete," but the current text is correct.
+3. **Auto-login & gate checks**
+   - Navigate to `/agent` (the dashboard route — confirm whether `/agent-dashboard` or `/agent` is canonical).
+   - Confirm terms-modal appears (first login), accept.
+   - Confirm dashboard renders without redirect to `/`.
 
-### 3. Recovery branch — confirmed working
+4. **Stripe Connect onboarding**
+   - Navigate to Settings → Earnings tab, click Stripe Connect.
+   - In test mode, jump to the Stripe-hosted form, submit test data, return.
+   - Verify `travel_agents.stripe_charges_enabled=true`.
 
-Line 630 (`status === 'verified' && !application.user_id`) renders a **"Re-run Account Provisioning"** button. Click path:
+5. **Trip Builder publish**
+   - Navigate to `/trip-builder`, fill minimum required fields.
+   - Click **Submit for review**.
+   - Verify `packaged_trips` row exists with `status='pending_review'`.
 
-```
-button onClick → setApprovalDialogOpen(true)
-            → ApprovalDialog
-            → handleApprove (line 1381)
-            → supabase.functions.invoke('approve-application',
-                { action: 'approve', applicationType: 'agent', ... })
-            → approve-application agent branch
-            → createAgentAccountFromApplication (idempotent shared helper)
-            → fetchApplications() refresh
-```
+## Cleanup
+After the run, delete the test agent: `auth.users`, `profiles`, `travel_agents`, `agent_applications`, `user_roles`, any `packaged_trips`. I'll skip cleanup if you want to inspect the data.
 
-The shared helper is idempotent (no-op if `user_id` already set, rolls back on partial failure, writes to `application_audit_log`). Recovery path is wired and safe.
+## What I'll report back
 
-The accompanying alert at line 622-626 already surfaces the warning ("⚠ Account record missing (webhook may have failed). Click below to re-run provisioning.") so the admin sees why the button is there.
+For each checkpoint: ✓ or ✗ with the DB row / log line / error. Specifically:
+- whether mismatched-password validation actually blocks submit
+- whether Back/Next preserves field state
+- **whether the Identity webhook fired** (the critical one) — with edge function log timestamp and audit log row
+- whether `travel_agents` got created automatically
+- whether `RequireAgentTerms` lets the user into the dashboard
+- whether Stripe Connect flips `stripe_charges_enabled`
+- whether trip publish succeeds
 
-### 4. Filter dropdown (line 1594-1600)
+## Caveats
 
-Current options: `all`, `pending_verification`, `verified`, `approved`, `rejected`, `failed`. All five statuses are still in the real lifecycle when you union agent + brand:
-
-- `pending_verification` — both
-- `verified` — both (terminal-live for agents, awaiting-review for brands)
-- `approved` — brands only (labeled "Approved (Brands)" already)
-- `rejected` — both
-- `failed` — both (verification failure)
-
-Nothing to remove. Current labels are correct.
-
-## The single change
-
-In `src/pages/admin/ApplicationReviewDashboard.tsx`, delete lines 657-664 (the `application.status === 'approved'` block inside `AgentApplicationDetail`). Leave the identically-structured block at 1015 inside `BrandApplicationDetail` untouched.
-
-## Out of scope
-
-- No edge function, RLS, or migration changes — none of them assume agents reach `approved`.
-- No metrics/label rewrite — current copy already reflects the new reality.
-- No filter dropdown change — every option still maps to a real status for at least one application type.
+- This creates real DB rows under your live (Lovable Cloud) project. I'll use an obviously fake email (`@goldsainte.test`) and clean up after.
+- Stripe Connect onboarding in test mode is multi-screen and may require manual help if a captcha appears — I'll pause and ask if I hit one.
+- If the Identity webhook isn't registered in your Stripe Dashboard, the test will halt at step 2 with a clear remediation message; I won't be able to register the endpoint for you (Stripe Dashboard action).
