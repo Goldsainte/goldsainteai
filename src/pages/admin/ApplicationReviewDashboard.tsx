@@ -654,14 +654,6 @@ const AgentApplicationDetail: React.FC<{
             </Button>
           </>
         )}
-        {application.status === 'approved' && (
-          <Alert className="w-full bg-[#cfe8d7] border-[#0c4d47]/20 rounded-xl">
-            <CheckCheck className="h-4 w-4 text-[#0c4d47]" />
-            <AlertDescription className="text-[#0c4d47]">
-              This application has been approved. The applicant has been notified and can now access the platform.
-            </AlertDescription>
-          </Alert>
-        )}
         {application.status === 'rejected' && (
           <Alert className="w-full bg-[#f0d1d1] border-[#5b2c2c]/20 rounded-xl">
             <XCircle className="h-4 w-4 text-[#5b2c2c]" />
