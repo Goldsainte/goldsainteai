@@ -759,6 +759,8 @@ export default function CreatorOnboardingPage() {
                           }
                           placeholder="e.g., 150"
                           type="number"
+                          min="0"
+                          step="0.01"
                           className="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
                         />
                       </div>
