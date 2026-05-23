@@ -127,7 +127,7 @@ const AuthCallback = () => {
                     templateName,
                     recipientEmail: session.user.email,
                     idempotencyKey: `welcome-${session.user.id}`,
-                    templateData: { firstName, accountType },
+                    templateData: { name: firstName, accountType },
                   },
                 })
                 .catch((err) => {
