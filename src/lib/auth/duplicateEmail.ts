@@ -23,3 +23,22 @@ export function isDuplicateEmailError(error: unknown): boolean {
     haystack.includes("already been registered")
   );
 }
+
+/**
+ * GoTrue's "Prevent email enumeration" protection (enabled on this project)
+ * causes `supabase.auth.signUp()` to silently SUCCEED for a duplicate email,
+ * returning a fake user object with `identities: []` and no session — instead
+ * of returning an error. Our trigger-level `email_already_registered` raise
+ * never even runs in this path.
+ *
+ * Callers must check the returned `data` shape in addition to `error`.
+ * See: https://supabase.com/docs/guides/auth/auth-identity-linking#user-enumeration
+ */
+export function isDuplicateEmailSignupResponse(
+  data: { user?: { identities?: unknown[] | null } | null; session?: unknown } | null | undefined,
+): boolean {
+  if (!data || !data.user) return false;
+  if (data.session) return false;
+  const identities = data.user.identities;
+  return Array.isArray(identities) && identities.length === 0;
+}
