@@ -35,7 +35,6 @@ export default function ItineraryBuilderPage() {
   const editId = searchParams.get("edit");
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(!!editId);
-  const [creatorStatus, setCreatorStatus] = useState<string | null>(null);
   const [form, setForm] = useState({
     title: "",
     destination: "",
@@ -48,16 +47,6 @@ export default function ItineraryBuilderPage() {
   const [days, setDays] = useState<Day[]>([
     { day_number: 1, title: "", description: "", activities: [], accommodation: "" },
   ]);
-
-  useEffect(() => {
-    if (!user) return;
-    supabase
-      .from("profiles")
-      .select("creator_status")
-      .eq("id", user.id)
-      .maybeSingle()
-      .then(({ data }) => setCreatorStatus((data as any)?.creator_status ?? null));
-  }, [user]);
 
   useEffect(() => {
     if (!editId) return;
@@ -106,9 +95,21 @@ export default function ItineraryBuilderPage() {
 
   const handleSave = async (status: "draft" | "published") => {
     if (!user) return;
-    if (status === "published" && creatorStatus !== "approved") {
-      toast.error("Your creator profile is still under review. You can save drafts but cannot publish until approved.");
-      return;
+    if (status === "published") {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("stripe_charges_enabled")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (!(profile as any)?.stripe_charges_enabled) {
+        toast.error("Finish Stripe payout verification to unlock publishing. You can save drafts in the meantime.", {
+          action: {
+            label: "Open Earnings",
+            onClick: () => navigate("/creator-dashboard?tab=earnings"),
+          },
+        });
+        return;
+      }
     }
     if (!form.title.trim() || !form.destination.trim() || !form.price) {
       toast.error("Title, destination and price are required.");
@@ -164,14 +165,6 @@ export default function ItineraryBuilderPage() {
         <p className="mt-3 text-[#6B7280] text-base max-w-xl leading-relaxed">
           Package your travel knowledge as a digital product travelers can buy and download instantly.
         </p>
-
-        {creatorStatus && creatorStatus !== "approved" && (
-          <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-            {creatorStatus === "pending"
-              ? "Your creator profile is under review. You can save drafts but cannot publish until approved."
-              : "Your creator profile was not approved. Contact support to learn more."}
-          </div>
-        )}
 
         <div className="mt-12 space-y-12">
           {/* Basics */}
@@ -308,7 +301,7 @@ export default function ItineraryBuilderPage() {
                 Preview as buyer
               </Button>
             )}
-            <Button onClick={() => handleSave("published")} disabled={saving || (creatorStatus !== null && creatorStatus !== "approved")}
+            <Button onClick={() => handleSave("published")} disabled={saving}
               className="rounded-full px-6 bg-[#0c4d47] hover:bg-[#0c4d47]/90 text-white">
               {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
               Publish guide
