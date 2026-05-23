@@ -99,13 +99,13 @@ export default function CreatorOnboardingPage() {
   const [instagramHandle, setInstagramHandle] = useState("");
   const [website, setWebsite] = useState("");
 
-  // Step 2: Your Niche
+  // Step 3: Your Niche
   const [selectedNiches, setSelectedNiches] = useState<string[]>([]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [selectedBudgets, setSelectedBudgets] = useState<string[]>([]);
   const [destinations, setDestinations] = useState<string[]>([]);
 
-  // Step 3: Portfolio (all optional)
+  // Step 4: Portfolio (all optional)
   const [coverImageUrl, setCoverImageUrl] = useState("");
   const [featuredPhotos, setFeaturedPhotos] = useState<string[]>([]);
   const [creatorMedia, setCreatorMedia] = useState<MediaEntry[]>([]);
@@ -116,7 +116,7 @@ export default function CreatorOnboardingPage() {
   const [planningFee, setPlanningFee] = useState("");
   const [itineraryFee, setItineraryFee] = useState("");
 
-  // Step 4: Standards & Legal
+  // Step 5: Standards & Legal
   const [responseTime, setResponseTime] = useState(24);
   const [acceptsTransparency, setAcceptsTransparency] = useState(false);
   const [acceptsSafetyPolicy, setAcceptsSafetyPolicy] = useState(false);
@@ -188,7 +188,9 @@ export default function CreatorOnboardingPage() {
         .update(updateData)
         .eq("id", user.id);
       toast.success("Progress saved! You can finish onboarding anytime from your dashboard.");
-      navigate("/creator-dashboard");
+      // Route back into the wizard — useRequireOnboarding would otherwise bounce
+      // an incomplete creator off the dashboard and create a redirect loop.
+      navigate("/onboarding/creator?resume=1");
     } catch (error) {
       console.error("Error saving partial progress:", error);
       toast.error("Failed to save progress.");
@@ -251,6 +253,22 @@ export default function CreatorOnboardingPage() {
       } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
+      // Validate fee inputs — preserve cents and reject garbage.
+      const toCents = (raw: string): number | null | "invalid" => {
+        const v = raw?.trim();
+        if (!v) return null;
+        const n = parseFloat(v);
+        if (!Number.isFinite(n) || n < 0 || n > 1_000_000) return "invalid";
+        return Math.round(n * 100);
+      };
+      const planningCents = toCents(planningFee);
+      const itineraryCents = toCents(itineraryFee);
+      if (planningCents === "invalid" || itineraryCents === "invalid") {
+        toast.error("Enter a valid non-negative fee (e.g. 150.50).");
+        setIsSubmitting(false);
+        return;
+      }
+
       const now = new Date().toISOString();
 
       const { error } = await supabase
@@ -271,8 +289,8 @@ export default function CreatorOnboardingPage() {
           creator_budget_levels: selectedBudgets,
           destinations_focus_tags: destinations,
           pricing_model: pricingModel,
-          planning_fee_amount: planningFee ? parseInt(planningFee) * 100 : null,
-          itinerary_fee_amount: itineraryFee ? parseInt(itineraryFee) * 100 : null,
+          planning_fee_amount: planningCents,
+          itinerary_fee_amount: itineraryCents,
           response_commitment_hours: responseTime,
           accepts_transparency_agreement: acceptsTransparency,
           transparency_agreement_signed_at: acceptsTransparency ? now : null,
