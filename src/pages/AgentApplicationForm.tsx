@@ -367,6 +367,7 @@ export default function AgentApplicationForm() {
         .from('agent_applications')
         .insert({
           id: clientId,
+          user_id: authUser?.id ?? null,
           first_name: formData.firstName,
           last_name: formData.lastName,
           email: formData.email,
