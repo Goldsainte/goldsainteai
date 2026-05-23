@@ -15,6 +15,8 @@ type AgentApplicationData = {
   firstName: string;
   lastName: string;
   email: string;
+  password: string;
+  passwordConfirm: string;
   phone: string;
   dateOfBirth: string;
   agencyName: string;
@@ -100,6 +102,8 @@ export default function AgentApplicationForm() {
     firstName: prefillData?.firstName || "",
     lastName: prefillData?.lastName || "",
     email: prefillData?.email || "",
+    password: "",
+    passwordConfirm: "",
     phone: prefillData?.phone || "",
     dateOfBirth: "",
     agencyName: "",
@@ -196,6 +200,14 @@ export default function AgentApplicationForm() {
       if (!formData.email?.trim()) return missing("Email");
       if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
         toast({ title: "Valid email required", variant: "destructive" });
+        return false;
+      }
+      if (!formData.password || formData.password.length < 8) {
+        toast({ title: "Password must be at least 8 characters", variant: "destructive" });
+        return false;
+      }
+      if (formData.password !== formData.passwordConfirm) {
+        toast({ title: "Passwords don't match", variant: "destructive" });
         return false;
       }
       if (!formData.phone?.trim()) return missing("Phone");
