@@ -6752,6 +6752,13 @@ export type Database = {
             referencedRelation: "newsroom_authors"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "newsroom_articles_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "newsroom_authors_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       newsroom_authors: {
@@ -14447,6 +14454,54 @@ export type Database = {
           supplier_type?: string | null
           tags?: string[] | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      newsroom_authors_public: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string | null
+          expertise: string[] | null
+          full_name: string | null
+          id: string | null
+          linkedin_url: string | null
+          quote: string | null
+          signature_image_url: string | null
+          slug: string | null
+          title: string | null
+          twitter_url: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          expertise?: string[] | null
+          full_name?: string | null
+          id?: string | null
+          linkedin_url?: string | null
+          quote?: string | null
+          signature_image_url?: string | null
+          slug?: string | null
+          title?: string | null
+          twitter_url?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          expertise?: string[] | null
+          full_name?: string | null
+          id?: string | null
+          linkedin_url?: string | null
+          quote?: string | null
+          signature_image_url?: string | null
+          slug?: string | null
+          title?: string | null
+          twitter_url?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
