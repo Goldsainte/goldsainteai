@@ -265,7 +265,7 @@ export default function AgentApplicationForm() {
     "Corporate Incentive Travel", "Milestone Celebrations",
   ];
 
-  const handleFileUpload = async (file: File, fieldName: string) => {
+  const handleFileUpload = async (file: File, fieldName: string, userId: string) => {
     try {
       const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
       if (file.size > MAX_FILE_SIZE) {
@@ -278,7 +278,9 @@ export default function AgentApplicationForm() {
       }
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}_${fieldName}.${fileExt}`;
-      const filePath = `agent-applications/${formData.email}/${fileName}`;
+      // First folder segment MUST be the authenticated user's UID to satisfy
+      // the storage RLS policy `(storage.foldername(name))[1] = auth.uid()::text`.
+      const filePath = `${userId}/agent-applications/${fileName}`;
       const { error: uploadError } = await supabase.storage
         .from('application-documents')
         .upload(filePath, file);

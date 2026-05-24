@@ -1,44 +1,51 @@
-## What I found (definitive)
+# Agent run fixes
 
-I ran `GET /v1/webhook_endpoints` against your account using `STRIPE_SECRET_KEY` and the result is genuinely `[]` — zero endpoints. I also confirmed:
+## 1. (BLOCKER) Fix document upload RLS — `src/pages/AgentApplicationForm.tsx`
 
-- `STRIPE_SECRET_KEY` begins with **`sk_test_`** → account `acct_1SLdsPFBVaLSioru`, TEST mode.
-- Stripe Identity **is enabled** — I successfully listed `identity.verification_sessions` (the test session `vs_1SXZEFFBVaLSioruH4U4D6b2` exists on the account, livemode=false).
-- The `identity.verification_session.*` event family IS available on the account.
+`handleFileUpload` currently builds:
+```
+agent-applications/{email}/{fileName}
+```
+First folder segment is the literal `agent-applications`, so the policy `(storage.foldername(name))[1] = auth.uid()::text` always fails.
 
-Conclusion: the `agent-verification-webhook` endpoint you can see in the Stripe Dashboard is in **Live mode**, not Test. Our edge functions and our `STRIPE_SECRET_KEY` are Test mode, so they will never see Live-mode signing secrets or events. That's the entire mismatch. Nothing is wrong with Stripe Identity availability or the API version on that endpoint — it just lives in the wrong mode for our integration.
+Change:
+- `handleFileUpload(file, fieldName)` → accept `userId` and build `${userId}/agent-applications/${fileName}` (UID first, descriptive subfolder second, no email in path — emails can contain `@`/`.` which are messy in keys and leak PII).
+- In `saveDraftApplication`, pass `authUser.id` into each `handleFileUpload(...)` call. The sign-up that produces `authUser` already runs before the uploads.
+- Guard: if `!authUser?.id`, abort with a clear toast before attempting uploads.
 
-## The single correct endpoint configuration
+No other code reads these paths from storage directly (`rg` shows only this file writes them; the path string is stored on `agent_applications.document_*` columns and read by admins via signed URLs, which work regardless of folder layout). Existing records keep their old paths; only new uploads use the new layout.
 
-- **URL:** `https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/stripe-identity-webhook`
-- **API version:** `2024-06-20` (matches the version pinned in our Stripe SDK init)
-- **Events (exactly 4):**
-  - `identity.verification_session.verified`
-  - `identity.verification_session.requires_input`
-  - `identity.verification_session.processing`
-  - `identity.verification_session.canceled`
-- **Mode:** Test (since `STRIPE_SECRET_KEY` is `sk_test_…`). When you go live you'll repeat this in Live mode with a Live signing secret.
+Verify: real upload of all four documents in the agent flow completes without an RLS error; rows appear under `{uid}/agent-applications/...` in the `application-documents` bucket.
 
-## stripe-identity-webhook vs agent-verification-webhook
+## 2. (BLOCKER) Fix legal links — `src/pages/AgentApplicationForm.tsx` (~L787–789)
 
-Both files exist in `supabase/functions/`. They do similar things, but only one is wired up by the real flow:
+In the legal-acceptance array:
+- `"Privacy Policy"` link `/privacy` → `/privacy-cookies` (confirmed route at `AppRoutes.tsx:192`).
+- `"Agent Partnership Agreement"` link `/vendor-agreement` → `/legal/agent-agreement` (confirmed at `AppRoutes.tsx:207`).
+- `"Terms of Service"` link `/terms` stays.
 
-- **`stripe-identity-webhook`** — Called by the application onboarding flow (`agent_applications` / `brand_applications` / traveler KYC). This is the **live, canonical handler** and the one our docs (`docs/STRIPE_IDENTITY_WEBHOOK_SETUP.md`) point Stripe at. The newly-registered endpoint must hit this URL.
-- **`agent-verification-webhook`** — Older handler tied to a different schema (`agent_applications.kyc_session_id` keyed by `agent_id`, updates `profiles.agent_verification_status`). The current self-provisioning flow uses `createAgentAccountFromApplication` inside `stripe-identity-webhook`, not this file. It is **dead code** and the source of the naming confusion in the dashboard.
+Also add `rel="noopener noreferrer"` alongside the existing `target="_blank"` on all three anchors so the agent doesn't lose progress and we don't open a tabnabbing hole.
 
-## Plan
+Verify: click each of the three links in the form, each loads its real page in a new tab.
 
-1. **Create the Test-mode endpoint via Stripe API** with the URL, API version, and 4 events above. Capture the returned `secret` (`whsec_…`).
-2. **Hand you the signing secret** and prompt you to paste it into `STRIPE_WEBHOOK_SECRET_IDENTITY` via the secret-update modal. (I cannot write secret values directly; this is the only step that needs your click.)
-3. **Verify the secret took** by reading the deployed function env and re-firing a signed simulated `identity.verification_session.verified` event with the new secret. Expected: 200 OK, signature verified, `createAgentAccountFromApplication` runs against a fresh test `agent_applications` row, `travel_agents` + `user_roles` rows appear, audit log shows `account_provisioned`.
-4. **Retire dead code**: delete `supabase/functions/agent-verification-webhook/` (both `index.ts` and the deployed function via `delete_edge_functions`) and remove the matching reference from `supabase/functions/agent-start-verification/index.ts` if it still points at the old shape. Update `mem://integrations/stripe-identity-kyc-system-comprehensive` to name `stripe-identity-webhook` as the only Identity handler.
-5. **Document Live-mode handoff** in `docs/STRIPE_IDENTITY_WEBHOOK_SETUP.md`: when switching `STRIPE_SECRET_KEY` to `sk_live_…`, you must register the same endpoint in Live mode and paste that Live signing secret over `STRIPE_WEBHOOK_SECRET_IDENTITY` (or split into Test/Live secrets).
+## 3. Diagnose Stripe Identity "Verification Issue"
 
-## What you'll need to do
+Read-only investigation, no code changes yet:
 
-Exactly one thing: paste the `whsec_…` value I give you into the `STRIPE_WEBHOOK_SECRET_IDENTITY` modal when it pops up. Everything else (endpoint creation, deletion of dead function, retest) I do.
+1. Find the most recent `agent_applications` row with a `stripe_identity_session_id` (or whichever column stores it) — pull `id`, `email`, `admin_status`, `created_user_id`, `stripe_identity_status`, `stripe_connect_account_id`.
+2. Pull `stripe-identity-webhook` edge function logs for that session id — confirm whether Stripe delivered `identity.verification_session.verified` and whether the handler returned 200.
+3. Pull `create-agent-application-stripe-account` logs (and any `createAgentAccountFromApplication` invocation) for the same application id — look for thrown errors, especially `connect_not_enabled`, missing `SITE_URL`, or "Application must be approved first".
+4. Query `application_audit_log` for that application_id where `action` IN (`identity_verified`, `identity_failed`, `account_provision_failed`, `account_provisioned`).
+5. Check `webhook_events` table for the matching Stripe event id to confirm idempotency wasn't the culprit.
 
-## Caveats
+Report findings: which of the three layers failed (Stripe session itself / identity webhook / account-provisioning function / front-end branch), with the exact error message and the audit-log row id. Only then propose a fix in a follow-up.
 
-- The endpoint will be Test-mode only. Real users in production will need a Live-mode endpoint registered the same way once you flip to `sk_live_`.
-- If you want me to also delete the Live-mode `agent-verification-webhook` endpoint visible in your dashboard, I'll need a Live secret key — say the word and I'll request `STRIPE_SECRET_KEY_LIVE` via the secrets modal. Otherwise I'll leave the Live dashboard untouched.
+## 4. Full agent run re-test
+
+After (1) and (2) ship and (3) is diagnosed, run the end-to-end agent flow again and report each stage: sign-up → application form (incl. all 4 doc uploads + 3 legal links) → submit → Stripe Identity verification → return page → audit-log + DB state.
+
+## Technical notes
+
+- Files touched: `src/pages/AgentApplicationForm.tsx` only (sections 1 and 2). No migrations — existing storage policy is already correct; we're conforming the client to it.
+- Diagnosis tools: `supabase--edge_function_logs`, `supabase--read_query` on `agent_applications`, `application_audit_log`, `webhook_events`.
+- `BrandOnboarding.tsx` uses the same bucket; **out of scope** for this task (brand flow isn't part of the agent run), but worth flagging for the post-launch cleanup pass — it likely has the same RLS bug.
