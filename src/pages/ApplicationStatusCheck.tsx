@@ -109,7 +109,7 @@ export default function ApplicationStatusCheck() {
                 onChange={(e) => setEmail(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && checkStatus()}
               />
-              <Button onClick={checkStatus} disabled={loading || !email}>
+              <Button onClick={() => checkStatus()} disabled={loading || !email}>
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Check Status"}
               </Button>
             </div>
