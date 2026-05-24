@@ -322,9 +322,16 @@ async function createVerificationSession(
     // dashboard re-verification flow exists, callers should pass an explicit
     // returnUrl pointing to that dashboard's settings tab.
     const frontendUrl = Deno.env.get("FRONTEND_URL") || "https://goldsainte.ai";
+    // Carry application_id through the URL so the verification-complete page
+    // can identify the row without depending on the user's localStorage
+    // (which is empty when the user clicks the Stripe return link from a
+    // different browser / device than the one that submitted the form).
+    const applicationIdParam = (metadata as Record<string, string> | undefined)?.applicationId;
     const defaultReturnUrl = applicationType === "traveler"
       ? `${frontendUrl}/traveler?tab=settings&verification=complete`
-      : `${frontendUrl}/application/verification-complete?type=${applicationType}`;
+      : `${frontendUrl}/application/verification-complete?type=${applicationType}${
+          applicationIdParam ? `&application_id=${applicationIdParam}` : ""
+        }&vs={VERIFICATION_SESSION_ID}`;
 
     // Create verification session
     const verificationSession = await stripe.identity.verificationSessions.create(
