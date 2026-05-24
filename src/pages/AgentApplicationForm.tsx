@@ -154,18 +154,28 @@ export default function AgentApplicationForm() {
 
   const DRAFT_STORAGE_KEY = "agent_application_draft";
 
-  // Restore draft on mount
+  // Offer to restore an earlier draft (opt-in, so a brand-new signup
+  // never inherits another applicant's cached answers).
   useEffect(() => {
     try {
       const saved = localStorage.getItem(DRAFT_STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
+      if (!saved) return;
+      const parsed = JSON.parse(saved);
+      const label = [parsed?.firstName, parsed?.lastName].filter(Boolean).join(" ")
+        || parsed?.email
+        || "an unfinished application";
+      const resume = window.confirm(
+        `Resume your previous draft for ${label}?\n\nClick Cancel to start a new application.`
+      );
+      if (resume) {
         setFormData((prev) => ({
           ...prev,
           ...parsed,
           businessType: normalizeBusinessType(parsed.businessType),
         }));
-        toast({ title: "Draft restored", description: "We restored your previous answers." });
+        toast({ title: "Draft restored" });
+      } else {
+        localStorage.removeItem(DRAFT_STORAGE_KEY);
       }
     } catch {
       /* noop */
