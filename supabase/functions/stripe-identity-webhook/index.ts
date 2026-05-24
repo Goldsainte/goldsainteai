@@ -424,6 +424,80 @@ async function updateAgentApplication(
       applicationId: application.id,
     });
 
+    // ID-name vs application-name fraud check. Stripe verifying the
+    // document only proves the document is real — not that it belongs
+    // to the person filling out the application. Reject mismatches.
+    const verifiedFirst = verified_outputs?.first_name;
+    const verifiedLast = verified_outputs?.last_name;
+    const nameCheck = verifiedNameMatchesExpected(
+      verifiedFirst,
+      verifiedLast,
+      application.first_name,
+      application.last_name,
+    );
+    if (!nameCheck.match) {
+      logger.warn("Identity verified but name does not match application", {
+        applicationId: application.id,
+        reason: nameCheck.reason,
+        verifiedFirst,
+        verifiedLast,
+        expectedFirst: application.first_name,
+        expectedLast: application.last_name,
+      });
+
+      const mismatchReport = {
+        ...verificationReport,
+        name_mismatch: {
+          reason: nameCheck.reason,
+          verified_first_name: verifiedFirst ?? null,
+          verified_last_name: verifiedLast ?? null,
+          expected_first_name: application.first_name,
+          expected_last_name: application.last_name,
+        },
+      };
+
+      const { error: rejectError } = await supabaseClient
+        .from("agent_applications")
+        .update({
+          status: "rejected",
+          stripe_verification_status: status,
+          stripe_verified_at: new Date().toISOString(),
+          stripe_verification_report: mismatchReport,
+          rejection_reason:
+            "The name on the government ID does not match the name on the application.",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", application.id);
+      if (rejectError) {
+        logger.error("Failed to write name-mismatch rejection", {
+          error: rejectError,
+        });
+        throw rejectError;
+      }
+
+      await logAuditEvent(application.id, "agent", "rejected", {
+        reason: "id_name_mismatch",
+        detail: nameCheck.reason,
+        verified_first_name: verifiedFirst ?? null,
+        verified_last_name: verifiedLast ?? null,
+        expected_first_name: application.first_name,
+        expected_last_name: application.last_name,
+      });
+
+      await sendApplicantNotification(
+        application.email,
+        `${application.first_name} ${application.last_name}`,
+        "failed",
+        "agent",
+        "The name on the government ID you uploaded does not match the name on your application. If this is a clerical issue (e.g., a maiden name or middle name), please contact support.",
+      );
+
+      logger.info("Agent application rejected for name mismatch", {
+        applicationId: application.id,
+      });
+      return; // skip provisioning
+    }
+
     // Update application
     const { error: updateError } = await supabaseClient
       .from("agent_applications")
