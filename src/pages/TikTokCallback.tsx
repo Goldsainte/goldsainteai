@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { EditorialLoader } from '@/components/EditorialLoader';
 import { useToast } from '@/hooks/use-toast';
 
 export default function TikTokCallback() {
@@ -79,81 +79,25 @@ export default function TikTokCallback() {
   const returnTo = searchParams.get('return_to') || 'tiktok-lab';
   const redirectLabel = returnTo === 'onboarding' ? 'creator onboarding' : 'Goldsainte Creator Lab';
 
+  const title =
+    status === 'success'
+      ? 'Connected'
+      : status === 'error'
+      ? 'Connection Issue'
+      : 'Connecting';
+  const subtitle =
+    status === 'success'
+      ? `Redirecting to ${redirectLabel}.`
+      : status === 'error'
+      ? `Redirecting back to ${redirectLabel}.`
+      : 'Verifying your TikTok account.';
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="w-full max-w-md rounded-2xl bg-card p-8 shadow-lg ring-1 ring-border">
-        <div className="flex flex-col items-center gap-4">
-          {status === 'processing' && (
-            <>
-              <Loader2 className="h-12 w-12 animate-spin text-foreground" />
-              <div className="text-center">
-                <h2 className="text-lg font-semibold text-foreground">
-                  Connecting TikTok...
-                </h2>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Please wait while we complete the connection.
-                </p>
-              </div>
-            </>
-          )}
-          
-          {status === 'success' && (
-            <>
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100">
-                <svg
-                  className="h-6 w-6 text-emerald-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              </div>
-              <div className="text-center">
-                <h2 className="text-lg font-semibold text-foreground">
-                  Success!
-                </h2>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Redirecting to {redirectLabel}...
-                </p>
-              </div>
-            </>
-          )}
-          
-          {status === 'error' && (
-            <>
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
-                <svg
-                  className="h-6 w-6 text-red-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </div>
-              <div className="text-center">
-                <h2 className="text-lg font-semibold text-foreground">
-                  Connection Failed
-                </h2>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Redirecting back to {redirectLabel}...
-                </p>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
+    <EditorialLoader
+      eyebrow="TikTok"
+      title={title}
+      subtitle={subtitle}
+      status={status}
+    />
   );
 }
