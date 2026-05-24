@@ -21,7 +21,7 @@ export const ApplicationApprovedProfessionalEmail = ({
 
   const steps = [
     `Log in with the email you applied with — you'll set your permanent password on first sign-in.`,
-    `Complete Stripe Identity verification to unlock your dashboard.`,
+    `Accept the Marketplace Terms to unlock your dashboard.`,
     `Connect your bank account through Stripe Connect to receive on-platform payouts.`,
     `All communication and payment must remain on-platform per our Terms.`,
   ]
@@ -39,7 +39,7 @@ export const ApplicationApprovedProfessionalEmail = ({
       steps={steps}
       cta={{
         label: 'Sign in to your dashboard',
-        url: `https://goldsainte.ai/login?next=%2Fonboarding%2Fstripe-identity`,
+        url: `https://goldsainte.ai/login?next=%2Fagent-dashboard`,
       }}
     />
   )
