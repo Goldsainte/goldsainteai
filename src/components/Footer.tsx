@@ -24,7 +24,7 @@ export const Footer = () => {
       heading: "JOIN GOLDSAINTE",
       links: [
         { to: "/auth?mode=signup&role=traveler", label: "Sign Up as a Traveler" },
-        { to: "/apply/agent/signup", label: "Apply as a Travel Agent" },
+        { to: "/auth?mode=signup&role=agent", label: "Apply as a Travel Agent" },
         { to: "/apply/brand", label: "Partner as a Brand" },
       ],
     },

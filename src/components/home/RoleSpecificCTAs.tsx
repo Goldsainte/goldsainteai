@@ -43,7 +43,7 @@ const pathways: Pathway[] = [
     description:
       "Craft personalized luxury itineraries and deliver concierge-level travel planning at scale.",
     cta: "Join as a Travel Expert",
-    link: "/apply/agent/signup",
+    link: "/auth?mode=signup&role=agent",
     image: agentImage,
     alt: "Refined fine dining setting representing the bespoke luxury experiences travel experts design.",
   },

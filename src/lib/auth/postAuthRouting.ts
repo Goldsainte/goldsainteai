@@ -37,7 +37,7 @@ export function getPostAuthDestination(
   }
   // Agents always resume in the application flow until the profile is complete.
   // The application route itself handles the "email not yet verified" case
-  // by redirecting to /apply/agent/signup?unverified=1.
+  // by redirecting to /auth?mode=signup&role=agent.
   if (accountType === "agent" && !isProfileComplete) {
     return "/apply/agent";
   }

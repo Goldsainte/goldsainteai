@@ -249,7 +249,7 @@ export default function Profile() {
                 Emergency Contacts
               </Button>
               {!isAdmin && !isAgent && !roleLoading && (
-                <Button onClick={() => navigate('/apply/agent/signup')} variant="outline" className="w-full justify-start gap-2">
+                <Button onClick={() => navigate('/auth?mode=signup&role=agent')} variant="outline" className="w-full justify-start gap-2">
                   <Briefcase className="h-4 w-4" />
                   Become a Travel Agent
                 </Button>

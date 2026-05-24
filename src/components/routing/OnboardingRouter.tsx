@@ -59,7 +59,7 @@ export function OnboardingRouter() {
             // Email not yet confirmed → back to signup with resend UI,
             // never to a dead-end "verify your email" page.
             if (!user.email_confirmed_at) {
-              setDestination('/apply/agent/signup?unverified=1');
+              setDestination('/auth?mode=signup&role=agent');
               break;
             }
             const { data: agentApp } = await supabase

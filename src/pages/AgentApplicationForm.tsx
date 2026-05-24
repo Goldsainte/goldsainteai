@@ -963,10 +963,10 @@ export default function AgentApplicationForm() {
     );
   }
   if (!user) {
-    return <Navigate to="/apply/agent/signup" replace />;
+    return <Navigate to="/auth?mode=signup&role=agent" replace />;
   }
   if (!user.email_confirmed_at) {
-    return <Navigate to="/apply/agent/signup?unverified=1" replace />;
+    return <Navigate to="/auth?mode=signup&role=agent" replace />;
   }
 
   return <AgentApplicationFormInner />;

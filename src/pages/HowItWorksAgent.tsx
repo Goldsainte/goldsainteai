@@ -4,7 +4,7 @@ import { HowItWorksTemplate, type HowItWorksStep } from "./HowItWorksTemplate";
 import { CurrenciesAndPayouts } from "@/components/onboarding/CurrenciesAndPayouts";
 
 const STEPS: HowItWorksStep[] = [
-  { number: "01", icon: FileText, title: "Complete your application", description: "Submit your agency information, credentials and supporting documents for review.", cta: { label: "Apply now", to: "/apply/agent/signup" } },
+  { number: "01", icon: FileText, title: "Complete your application", description: "Submit your agency information, credentials and supporting documents for review.", cta: { label: "Apply now", to: "/auth?mode=signup&role=agent" } },
   { number: "02", icon: ShieldCheck, title: "Verify your identity", description: "Stripe Identity verification keeps the marketplace trusted and unlocks publishing." },
   { number: "03", icon: CreditCard, title: "Connect Stripe Connect", description: "Set up your payout account so escrowed funds settle directly to your bank.", cta: { label: "Set up payouts", to: "/agent-dashboard?tab=payouts" } },
   { number: "04", icon: Plane, title: "Publish your first trip", description: "Build a complete listing — itinerary, pricing, inclusions and cancellation terms — and submit for review.", cta: { label: "Open Trip Builder", to: "/trip-builder" } },
@@ -30,7 +30,7 @@ export default function HowItWorksAgent() {
         heading: "Apply to join Goldsainte",
         description: "Verified specialists earn from curated trips and live trip requests.",
         label: "Start your application",
-        to: "/apply/agent/signup",
+        to: "/auth?mode=signup&role=agent",
       }}
     />
   );
