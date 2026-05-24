@@ -393,7 +393,7 @@ function AgentApplicationFormInner() {
       ];
       const missing = requiredDocs.find((d) => !d.file);
       if (missing) {
-        setStep(5);
+        setStep(10);
         throw new Error(`${missing.label} is required. Please upload it before continuing.`);
       }
 
@@ -407,8 +407,10 @@ function AgentApplicationFormInner() {
         govIdPath = await handleFileUpload(formData.governmentIdFile!, 'government_id', authUser.id, formData.email);
         headshotPath = await handleFileUpload(formData.professionalHeadshotFile!, 'headshot', authUser.id, formData.email);
       } catch (uploadErr: any) {
-        setStep(5);
-        throw new Error(uploadErr?.message || 'Document upload failed. Please try again.');
+        setStep(10);
+        const msg = uploadErr?.message || 'Document upload failed. Please try again.';
+        setFormData((prev: any) => ({ ...prev, __documentUploadError: msg }));
+        throw new Error(msg);
       }
 
       const extendedData = {
