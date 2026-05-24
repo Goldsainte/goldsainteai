@@ -1,80 +1,65 @@
-## Goal
+## Confirmed targets
 
-Make `/apply/agent/signup` the single front door for new agents. `/apply/agent` (the application form) should only be reached by an already-authenticated, email-confirmed user resuming their application. Eliminate any flash of the form during the auth-loading window.
+- **Beach-photo "Apply as Travel Agent" page (KEEP, edit):** `src/pages/Auth.tsx` at route `/auth` (specifically `/auth?mode=signup&role=agent`). The split-screen with the Unsplash beach hero on the left, and email / first name / last name / phone / SMS opt-in fields on the right.
+- **Duplicate to DELETE:** `src/pages/AgentSignup.tsx` at route `/apply/agent/signup`.
+- **6-step application (KEEP unchanged structurally):** `src/pages/AgentApplicationForm.tsx` at route `/apply/agent`.
 
-## 1. Re-point public/marketing entry points → `/apply/agent/signup`
+Final flow: `/auth?mode=signup&role=agent` (beach photo, now with password + verification) → "check your email" state → email link → `/apply/agent?verified=1` (6-step form, prefilled).
 
-These are entry points for prospective (unauthenticated) agents. Change the target from `/apply/agent` to `/apply/agent/signup`:
+## 1. Move signup + verification logic into `Auth.tsx`
 
-- `src/components/Footer.tsx` line 27 — "Apply as a Travel Agent" link
-- `src/components/Footer.tsx` line 20 — "Find a Specialist" (this is mis-targeted; should point to `/marketplace` or `/agents`, not the application form — re-point to `/agents` / browse, NOT signup)
-- `src/components/Header.tsx` lines 330 and 586 — agent CTAs
-- `src/components/home/RoleSpecificCTAs.tsx` line 46 — "Apply as a Travel Agent"
-- `src/sections/HomeLuxurySections.tsx` line 58
-- `src/pages/HowItWorksAgent.tsx` lines 7 and 33 — "Apply now" CTA buttons
-- `src/data/siteRoutes.ts` line 49 — update the registered marketing path label/target to `/apply/agent/signup`
-- `src/pages/HelpCenter.tsx` line 45 — "Become an Agent" link
-- `src/pages/Profile.tsx` line 252 — "Become an Agent" button (this is an unauthenticated-or-not-yet-agent user clicking from their profile; goes to signup)
+In the agent branch of the signup submit handler (currently the block at line ~373–377 that navigates to `/apply/agent/signup`):
 
-## 2. Re-point authenticated-but-resuming entry points → `/apply/agent`
+- Add **password** and **confirm password** fields to the agent signup form (only when `selectedAccountType === 'agent'`; the existing email/password Auth flow already has password fields for other roles — reuse the same `Input` styling and the existing `passwordSchema` validator at the top of the file).
+- On submit for agent role: call `supabase.auth.signUp({ email, password, options: { emailRedirectTo: \`${window.location.origin}/apply/agent?verified=1\`, data: { first_name, last_name, phone, sms_opt_in, account_type: 'agent', intended_flow: 'agent_application' } } })`.
+- Reuse the duplicate-email guards (`isDuplicateEmailError`, `isDuplicateEmailSignupResponse`) — already imported in Auth.tsx.
+- Defensive `supabase.auth.signOut()` if `data.session` or `data.user.email_confirmed_at` is returned (auto-confirm safety net), so the user never silently skips verification.
+- On success, switch the page into a **"check your email" state** (new local state `agentCheckEmailFor: string | null`) that renders the MailCheck card currently in AgentSignup.tsx (lines 165–214) — confirmation message, resend button calling `supabase.auth.resend({ type: 'signup', email, options: { emailRedirectTo: '/apply/agent?verified=1' } })`, and a "Start over" link.
+- Do NOT navigate away after submit; the user stays on `/auth` until they click the email link.
 
-These already imply a signed-in user; keep them pointing at the form, but they will pass through the form's hardened gate which will bounce unauth users to signup. No change required, just confirmed:
+## 2. Delete `AgentSignup.tsx` and its route
 
-- `src/components/routing/OnboardingRouter.tsx` lines 62/73/81 — already correctly differentiates verified vs unverified
-- `src/lib/auth/postAuthRouting.ts` line 42 — post-login routing for an agent profile
-- `src/hooks/useRequireOnboarding.ts` line 58 — already inside an authenticated context
-- `src/pages/AgentDashboard.tsx` lines 161 and 333 — only reachable when signed in
-- `src/pages/AuthCallback.tsx` line 179 — see #3
-- `src/contexts/AuthContext.tsx` line 254 — error-message string only; update text to reference `/apply/agent/signup` for clarity
+- Delete `src/pages/AgentSignup.tsx`.
+- In `src/routes/AppRoutes.tsx` remove line 352 (`<Route path="/apply/agent/signup" element={<AgentSignup />} />`) and its import.
 
-## 3. Fix `Auth.tsx` line 375 and `AuthCallback.tsx` line 179
+## 3. Repoint links back to `/auth?mode=signup&role=agent`
 
-- **`src/pages/Auth.tsx` line 373–377**: When `selectedAccountType === 'agent'` during email/password signup, do NOT call the account-creation auth code on this page. Instead, navigate to `/apply/agent/signup` and pass the typed `email`, `firstName`, `lastName`, `phone`, `smsOptIn` via `navigate` state so `AgentSignup` can prefill its form. Update the toast copy to say "Create your agent account" instead of "redirected to the application form".
-- **`src/pages/AuthCallback.tsx` line 174–181**: A Google OAuth user who picked "agent" already has a verified email (Google verifies). They should go directly to `/apply/agent` (the form) — which is current behavior — but only after we ensure their `account_type` is set to `agent`. Add that update (mirroring the traveler/creator branch above it) before the navigate. No URL change.
+Files I changed in the previous loop that pointed to `/apply/agent/signup` — revert each to `/auth?mode=signup&role=agent`:
 
-## 4. Harden `AgentApplicationForm.tsx` gate
+- `src/components/Footer.tsx` ("Apply as a Travel Agent")
+- `src/components/Header.tsx` (two CTAs)
+- `src/components/home/RoleSpecificCTAs.tsx`
+- `src/sections/HomeLuxurySections.tsx`
+- `src/pages/HowItWorksAgent.tsx` (two CTAs)
+- `src/pages/HelpCenter.tsx`
+- `src/pages/Profile.tsx`
+- `src/data/siteRoutes.ts` (replace the `/apply/agent/signup` entry with the existing `/auth` entry — no duplicate needed)
+- `src/contexts/AuthContext.tsx` (error-string reference only)
+- `src/pages/AgentApplicationForm.tsx`: the hardened gate currently redirects unauthenticated users to `/apply/agent/signup`. Change both `<Navigate>` targets to `/auth?mode=signup&role=agent` (and `?unverified=1` query for the unverified branch).
+- `src/pages/AuthCallback.tsx`: no change to the Google branch (already navigates to `/apply/agent` after promoting account_type to agent).
 
-The current gate at lines 906–918 returns early on `authLoading`, but the three `useEffect`s above (prefill at 156, draft-restore at 200, autosave at 228) still run on mount before the gate decides to redirect. The draft-restore effect in particular shows a `window.confirm()` to anyone hitting the URL — including unauthenticated visitors — for a flash.
+## 4. Keep the hardened gate on `AgentApplicationForm`
 
-Fix by extracting the form body into a child component `<AgentApplicationFormInner />` and have the outer `AgentApplicationForm` do ONLY the gate:
+The `AgentApplicationFormInner` extraction from the previous loop stays — it still prevents flash-of-form for unauthenticated visitors hitting `/apply/agent` directly. Only the redirect targets change (see above).
 
-```text
-export default function AgentApplicationForm() {
-  const { user, isLoading } = useAuth();
-  if (isLoading) return <FullPageLoader />;
-  if (!user) return <Navigate to="/apply/agent/signup" replace />;
-  if (!user.email_confirmed_at)
-    return <Navigate to="/apply/agent/signup?unverified=1" replace />;
-  return <AgentApplicationFormInner user={user} />;
-}
-```
+## 5. Confirm "exactly one of each"
 
-Move all existing state, effects, handlers, and JSX into `AgentApplicationFormInner`. Because that component only mounts after the gate passes, none of its effects (prefill, draft restore, autosave) can fire for an unauthenticated user, and the form cannot flash.
-
-## 5. Confirm single application form
-
-Confirmed by file scan: the only agent application form is `src/pages/AgentApplicationForm.tsx`. `src/pages/apply/` contains only `BrandOnboarding.tsx`. `AppRoutes.tsx` routes `/apply/agent` → `AgentApplicationForm` and `/apply/agent/signup` → `AgentSignup`. No stale/duplicate page. The legacy `/agent-onboarding` route already redirects to `/apply/agent` (which now passes through the hardened gate). No deletions needed.
+After this work:
+- **One quick-signup page for agents:** `src/pages/Auth.tsx` at `/auth?mode=signup&role=agent` (beach-photo, with new password + email-verify state).
+- **One 6-step application:** `src/pages/AgentApplicationForm.tsx` at `/apply/agent` (gated; only reached post-verify).
+- No `AgentSignup.tsx`, no `/apply/agent/signup` route.
 
 ## Verification
 
-After implementation, manually test:
-1. Logged-out, click "Apply as a Travel Agent" from footer, header, homepage → all three land on `/apply/agent/signup`.
-2. Logged-out, type `/apply/agent` directly → instant redirect to `/apply/agent/signup`, no flash of the form, no draft-restore confirm dialog.
-3. From `Auth.tsx` signup form pick "agent" → lands on `/apply/agent/signup` (not the application form).
-4. Complete signup → email link → `/apply/agent?verified=1` → form renders prefilled.
-5. Mid-application close+reopen, sign in again → routed to `/apply/agent` to resume.
+1. Logged-out → Footer / Header / Homepage "Apply as a Travel Agent" → all land on `/auth?mode=signup&role=agent` (beach photo).
+2. Fill form (incl. password + confirm) → click Continue → "Check your email" panel renders on the same page.
+3. Click email link → lands on `/apply/agent?verified=1` with name/email/phone prefilled from signup metadata.
+4. Logged-out, go directly to `/apply/agent` → instant redirect to `/auth?mode=signup&role=agent`, no flash.
+5. `grep "/apply/agent/signup"` returns zero results across `src/`.
 
 ## Files to edit
 
-- `src/components/Footer.tsx`
-- `src/components/Header.tsx`
-- `src/components/home/RoleSpecificCTAs.tsx`
-- `src/sections/HomeLuxurySections.tsx`
-- `src/pages/HowItWorksAgent.tsx`
-- `src/pages/HelpCenter.tsx`
-- `src/pages/Profile.tsx`
-- `src/data/siteRoutes.ts`
-- `src/contexts/AuthContext.tsx` (error string only)
-- `src/pages/Auth.tsx`
-- `src/pages/AuthCallback.tsx`
-- `src/pages/AgentApplicationForm.tsx` (extract inner component for hardened gate)
+- `src/pages/Auth.tsx` (add password + verify state for agent branch)
+- `src/routes/AppRoutes.tsx` (remove route + import)
+- `src/pages/AgentSignup.tsx` (delete)
+- `src/components/Footer.tsx`, `src/components/Header.tsx`, `src/components/home/RoleSpecificCTAs.tsx`, `src/sections/HomeLuxurySections.tsx`, `src/pages/HowItWorksAgent.tsx`, `src/pages/HelpCenter.tsx`, `src/pages/Profile.tsx`, `src/data/siteRoutes.ts`, `src/contexts/AuthContext.tsx`, `src/pages/AgentApplicationForm.tsx` (repoint links/redirects)
