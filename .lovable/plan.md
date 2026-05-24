@@ -1,43 +1,53 @@
 
 ## What happened
 
-- Stripe sent `identity.verification_session.verified` for `vs_1TaiAHF9Y0dnmu4YdEBqwH2P` at 3:00:06 PM → 500 (row lookup failed because `stripe_verification_session_id` wasn't persisted yet).
-- That failed attempt still wrote a row into `webhook_events` with the event ID (with `error_message` set).
-- The user manually resent the event at 3:16:30 PM. The webhook saw the existing `webhook_events` row, logged `"Event already processed (duplicate)"`, returned 200 — and never ran the update / provisioning / email.
-- DB confirms: `agent_applications` row `75e7e1fe-…` is still `status=pending_verification`, `stripe_verification_status=pending`, `stripe_verified_at=null`. No `travel_agents` row, no welcome email, no admin notification.
+Stripe resend worked — application is now `verified`, the welcome email arrived, and the user logged in. But two real bugs surfaced:
 
-So no — it did not actually work. Stripe is happy, our backend is not.
+1. **404 from the email's "Open My Dashboard" link.** The template hardcodes a redirect to `/login?next=/onboarding/stripe-identity`. That route doesn't exist (the app uses `/n/*`, not `/onboarding/*`), and at this point the user has *already finished* Stripe Identity — so we shouldn't be sending them back to a KYC page anyway. They should land on the agent home.
 
-## Fix (3 parts)
+2. **Auto-provisioning silently no-op'd.** Webhook logs show `"Account already provisioned for application"` with `alreadyExists: true`. The DB disagrees: `profiles.account_type='agent'` is set, but there is **no `travel_agents` row** and **no `user_roles` row** for `900acef9-…`. Root cause is in `supabase/functions/_shared/createAgentAccount.ts`:
 
-### 1. Unstick this specific application (one-off data fix)
+   ```ts
+   if (application.user_id) {
+     return { success: true, alreadyExists: true };  // ← wrong signal
+   }
+   ```
 
-- Delete the poisoned `webhook_events` rows for this session's events (`evt_1TaiBtF9Y0dnmu4Y9NaD6BOj` and the earlier `processing` event `evt_1TaiBqF9Y0dnmu4YcK2FVoeq`, plus any earlier failed entries for the same session) so the resend isn't blocked.
-- Ask the user to click **Resend** on the `verified` event one more time in Stripe. With the row backfilled and the poison entries gone, the webhook will:
-  - Mark the application `verified` + set `stripe_verified_at`
-  - Call `createAgentAccountFromApplication` → creates `travel_agents` row, sets `profiles.account_type='agent'`, inserts `user_roles`
-  - Invoke `email-fanout` for `agent_application.identity_verified` → sends the "Welcome — Specialist" email
-  - Notify admins
+   `agent_applications.user_id` is populated at signup, *before* the application is filed. So the helper short-circuits for every agent who signed up first (which is the standard flow now), skipping the `travel_agents` insert, `user_roles` insert, audit log, and welcome notification. The correct idempotency signal is the existence of a `travel_agents` row for that `user_id`.
 
-Fallback if the resend still misbehaves: directly invoke `createAgentAccountFromApplication` for application `75e7e1fe-adbc-4934-b056-c23e9b649b77` via a tiny one-shot edge function call, then update the row manually.
+## Fix
 
-### 2. Fix the idempotency bug (root cause, prevents recurrence)
+### 1. Fix the false-idempotent short-circuit (root cause)
 
-In `supabase/functions/stripe-identity-webhook/index.ts`:
+In `supabase/functions/_shared/createAgentAccount.ts`:
 
-- Change `isEventProcessed` to only treat an event as processed when the stored row has `error_message IS NULL` (i.e. a *successful* prior processing).
-- Equivalently / additionally: in the main handler, when `recordWebhookEvent` is called after a failure, store with a deterministic flag and let retries proceed. Use upsert keyed on `event_id` so the second successful run overwrites the failure row with `error_message=null` and `processed_at=now()`.
+- Remove the `if (application.user_id) return alreadyExists` early-return.
+- Replace it with a check based on the `travel_agents` table: if a row with `user_id = application.user_id` already exists, return early. Otherwise, treat `application.user_id` as the resolved `userId` and proceed to step 3 (DB provisioning) — skip step 2 (auth user lookup/create) entirely, since the user is already known.
+- This makes the helper truly idempotent and self-healing: any future agent stuck in this state will be fixed on the next webhook resend or manual admin re-run.
+- Redeploy `stripe-identity-webhook` (it imports this helper).
 
-This makes Stripe retries (and manual resends) actually do work after a transient failure, instead of silently 200-ing forever.
+### 2. Fix the broken email CTA destination
 
-### 3. Sanity check
+In `supabase/functions/_shared/transactional-email-templates/application-approved-professional.tsx`:
 
-- After the resend, re-query `agent_applications` for the row and verify `status='verified'`, `stripe_verified_at` populated, `travel_agents` row exists for `user_id=900acef9-c282-4252-b95f-0088b4a215ee`, and `profiles.account_type='agent'`.
-- Check `notifications` / email logs for the welcome email + admin notification.
+- Change the CTA URL from `/login?next=%2Fonboarding%2Fstripe-identity` to `/login?next=%2Fagent-dashboard` (the real agent home, gated by `RequireAgentTerms`).
+- Update the on-page copy line that says "Complete Stripe Identity verification to unlock your dashboard" — by the time this email is sent, identity is already verified. Replace that step with something accurate ("Sign in and accept the Marketplace Terms to unlock your dashboard").
+- Redeploy `send-transactional-email` so the new template is served.
 
-## Technical notes
+### 3. Backfill this specific user (one-off)
 
-- File touched: `supabase/functions/stripe-identity-webhook/index.ts` (functions `isEventProcessed` and `recordWebhookEvent` around lines 99–141).
-- One-off data ops via `supabase--insert` migration (DELETE on `webhook_events` for the two `evt_…` ids).
-- No schema change needed; `webhook_events.error_message` column already exists.
-- No frontend changes.
+Run the now-fixed provisioning helper for application `75e7e1fe-adbc-4934-b056-c23e9b649b77` to create the missing `travel_agents` and `user_roles` rows. Two equivalent ways:
+
+- Curl the `stripe-identity-webhook` retry path is messy — instead, invoke the existing `approve-application` edge function (which also calls `createAgentAccountFromApplication`) for that application id. With the fix in place it will now insert the missing rows. Easiest: do the inserts directly via a small migration / data op, mirroring exactly what the helper does (travel_agents insert + user_roles insert + application_audit_log + notification). This is safer than re-running the webhook because we control the exact values.
+
+### 4. Verify
+
+Re-query `travel_agents` and `user_roles` for `900acef9-…` — both should now have rows. Confirm the user can hit `/agent-dashboard` after signing in (gated by `RequireAgentTerms` — if they haven't accepted terms yet they'll be sent to the terms page, which is correct).
+
+## Technical notes / files touched
+
+- `supabase/functions/_shared/createAgentAccount.ts` — replace the user_id-based short-circuit with a `travel_agents` existence check; skip the auth-user create branch when `application.user_id` is already set.
+- `supabase/functions/_shared/transactional-email-templates/application-approved-professional.tsx` — fix CTA URL + onboarding steps copy.
+- One-off data op via migration to insert `travel_agents` + `user_roles` + audit row + notification for `user_id=900acef9-c282-4252-b95f-0088b4a215ee`.
+- Redeploy `stripe-identity-webhook` and `send-transactional-email`.
+- No schema changes. No frontend changes.

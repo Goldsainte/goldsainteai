@@ -68,16 +68,38 @@ export async function createAgentAccountFromApplication(
     return { success: false, error: "Application not found" };
   }
 
-  // Idempotency: already provisioned
+  // Idempotency: a travel_agents row is the true signal that provisioning
+  // ran end-to-end. `agent_applications.user_id` is populated at signup
+  // (before the application is filed), so it is NOT a safe proxy for
+  // "already provisioned" — using it caused silent no-ops where profile
+  // was set but travel_agents + user_roles were never created.
   if (application.user_id) {
-    log.info("Account already provisioned for application", {
+    const { data: existingAgentRow } = await supabase
+      .from("travel_agents")
+      .select("id")
+      .eq("user_id", application.user_id)
+      .maybeSingle();
+    if (existingAgentRow) {
+      log.info("Account already provisioned for application", {
+        applicationId,
+        userId: application.user_id,
+      });
+      return {
+        success: true,
+        userId: application.user_id,
+        alreadyExists: true,
+      };
+    }
+    log.info("Application has user_id but no travel_agents row — provisioning", {
       applicationId,
       userId: application.user_id,
     });
-    return { success: true, userId: application.user_id, alreadyExists: true };
   }
 
   // 2. Resolve / create the auth user.
+  //    Fast path: if the application already has a user_id (agent signed up
+  //    before applying — the standard flow today), reuse it and skip the
+  //    auth lookup/create entirely.
   //    The agent may have signed up *before* applying (new flow — preferred,
   //    sets their own password). In that case we look them up by email.
   //    Otherwise we create the auth user now WITHOUT a password and rely on
@@ -85,6 +107,10 @@ export async function createAgentAccountFromApplication(
   let userId: string;
   let createdAuthUser = false;
 
+  if (application.user_id) {
+    userId = application.user_id;
+    log.info("Reusing application.user_id for provisioning", { userId });
+  } else {
   // Try to find existing auth user by email.
   // Primary lookup: profiles.email is unique and indexed — direct hit regardless
   // of how many users exist. Fallback: paginated listUsers filtered by email.
@@ -152,6 +178,7 @@ export async function createAgentAccountFromApplication(
     createdAuthUser = true;
     log.info("Auth user created", { userId });
   }
+  } // end else (no application.user_id)
 
   // 3. Provision DB rows. Roll back the auth user iff WE created it.
   try {
