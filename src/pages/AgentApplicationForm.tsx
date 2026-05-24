@@ -550,33 +550,11 @@ export default function AgentApplicationForm() {
               </div>
               <div>
                 <Label className="text-sm font-medium text-[#0a2225]">Email *</Label>
-                <Input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className={luxuryInputClasses} />
+                <Input type="email" value={formData.email} readOnly className={`${luxuryInputClasses} bg-[#FDF9F0] cursor-not-allowed`} />
               </div>
               <div>
                 <Label className="text-sm font-medium text-[#0a2225]">Phone *</Label>
                 <Input type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className={luxuryInputClasses} />
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-[#0a2225]">Password *</Label>
-                <Input
-                  type="password"
-                  autoComplete="new-password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className={luxuryInputClasses}
-                  placeholder="At least 8 characters"
-                />
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-[#0a2225]">Confirm Password *</Label>
-                <Input
-                  type="password"
-                  autoComplete="new-password"
-                  value={formData.passwordConfirm}
-                  onChange={(e) => setFormData({ ...formData, passwordConfirm: e.target.value })}
-                  className={luxuryInputClasses}
-                  placeholder="Re-enter password"
-                />
               </div>
               <div>
                 <Label className="text-sm font-medium text-[#0a2225]">Agency Name *</Label>
