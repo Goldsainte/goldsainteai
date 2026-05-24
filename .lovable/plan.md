@@ -1,68 +1,48 @@
-## What I found
+## What I found this time
 
-The signup at 20:53 UTC for `info@cornellfacilities.com` (user `caea0d50-…`) DID reach Supabase Auth. The auth hook fired and returned 200 OK:
+A fresh `auth.users` row was created at **21:12:46 UTC** for `info@cornellfacilities.com` (id `866d93db-…`, `email_confirmed_at = null`), but:
+
+- **No `email_send_log` row** was written after 20:24 for this address.
+- **No `auth-email-hook` invocation** appears in the Edge Function logs around 21:12 (the only entry today is a `shutdown` at 21:06).
+
+So Supabase Auth created the user, but it **never called our email hook at all** — which is why the queue-based pipeline we just deployed shows nothing. Our hook isn't broken; it isn't being asked to do anything.
+
+## Why this is happening
+
+This address has been hammered today:
 
 ```
-hook: https://lovable-api.com/.../backend/email-hook
-action: user_confirmation_requested
-success: true
-duration: 294ms
+15:32  signup confirm     → sent
+19:58  application-received → sent
+20:24  welcome-professional → sent
+20:53  signup attempt (deleted user)
+21:12  signup attempt (current user, no hook fired)
 ```
 
-But unlike every previous signup for that address (5/14, 5/15, 5/24 15:32 — all logged as `pending` → `sent`), this attempt produced **zero rows in `email_send_log`**. So the auth hook accepted the request, but the email was never enqueued into the project's queue. Two real problems are colliding:
+Supabase Auth has **built-in per-recipient rate limiting** for outbound auth emails (default: 4 emails/hour to the same address, independent of our queue, independent of Mailgun). When the limit trips, Supabase silently skips the email send — and because the send is skipped, the email webhook is never called. From the outside it looks identical to "the hook is broken." It isn't. The send was suppressed upstream of the hook.
 
-### Problem 1 — the auth-email-hook is on the OLD direct-send pattern
-
-`supabase/functions/auth-email-hook/index.ts` still imports `@lovable.dev/email-js` and sends inline via the managed Lovable Email API. The current standard is the queue-based pattern (calls `enqueue_email` RPC → `process-email-queue` drains it → logged in `email_send_log` with retries / DLQ).
-
-Consequences of being on the old pattern:
-- No queue → no automatic retries on transient failure or Mailgun rate-limit
-- No `email_send_log` row → we have no visibility when a send silently fails (which is exactly what's happening now)
-- Inconsistent with the transactional pipeline that DOES log
-
-This explains why the previous "signup" rows existed (those went through a working path) but the latest one didn't — the hook now returns 200 to Auth without producing an enqueue record we can see.
-
-### Problem 2 — Mailgun-side suppression is the most likely silent failure
-
-`info@cornellfacilities.com` has received 5 emails from us in 10 days, with multiple signup attempts. Mailgun maintains its own suppression list (bounces, complaints, "previously unsubscribed") that is **independent of our `suppressed_emails` table** (which is empty for this address). When Mailgun suppresses an address, the API returns success but never delivers — exactly the symptom here.
-
-This is not in our database; it lives in Mailgun. We can't see it from the project, but we can clear it.
+The current user row was created successfully; only the confirmation email was dropped.
 
 ## Fix
 
-### 1. Upgrade `auth-email-hook` to the queue-based pattern
+### 1. Unblock this address right now
 
-Re-scaffold `auth-email-hook` so it imports `@supabase/supabase-js` and calls `supabase.rpc('enqueue_email', ...)` against the `auth_emails` pgmq queue, then redeploy it. After this, every auth email (signup, recovery, magic link) will:
-- Land in `email_send_log` with status `pending`
-- Be drained by `process-email-queue` with retries
-- Land as `sent` or `dlq` with an actual `error_message` we can read
+Manually confirm the current `866d93db-…` user so they can proceed without waiting on the email, OR delete the user and have them sign up again from a different address to verify the hook fires end-to-end. I'll do whichever you prefer.
 
-Custom email templates in `_shared/email-templates/` are preserved.
+### 2. Verify the rate limit is the actual cause
 
-### 2. Clear Mailgun suppression for `info@cornellfacilities.com`
+Check the project's Auth → Rate Limits configuration and the auth logs around 21:12 for a `rate_limit_exceeded` / `email_rate_limit` event. If confirmed, that's the smoking gun and explains every "didn't get the email" report today for this address.
 
-You need to do this in the Mailgun dashboard (we can't do it from the project):
-- Mailgun → Sending → Suppressions
-- Search `info@cornellfacilities.com`
-- Remove from Bounces, Unsubscribes, and Complaints if present
+### 3. Two ways to prevent this from recurring
 
-If the address shows up there, that's the root cause of the silent drop. Once removed, future sends will reach the inbox.
-
-### 3. Re-test and verify
-
-After steps 1 and 2:
-- Sign up again with that address
-- Check `email_send_log` — there should be a `pending` row within ~5s, then `sent`
-- If it goes to `dlq` instead, the `error_message` column will tell us exactly what Mailgun rejected (auth, domain, rate-limit, etc.)
+- **Raise the per-email auth rate limit** in Auth settings (e.g. 10/hour) so normal repeat signups during testing don't get silently suppressed.
+- **Surface rate-limit failures in the UI.** Right now the signup form shows success even when Supabase drops the email. We should detect the Supabase rate-limit response on `signUp()` and show the user "Too many attempts for this email — wait an hour or use a different address" instead of letting them think it worked.
 
 ### 4. Going forward
 
-With the queue-based hook in place, "the email didn't arrive" stops being a black box. Every send produces a row with a status and an error string, so we can answer the question definitively next time instead of guessing.
+With (2) and (3) in place, "the email didn't arrive" stops being mysterious — either there's a `pending`/`dlq` row in `email_send_log` (queue problem, which we can debug), or the UI tells the user it was rate-limited (Supabase suppression, which is expected behavior). No more silent drops.
 
-## Technical notes
+## Questions before I implement
 
-- Files touched: `supabase/functions/auth-email-hook/index.ts` (re-scaffolded), templates in `_shared/email-templates/*.tsx` (preserved as-is)
-- Deploy: `auth-email-hook`
-- No DB schema changes — `enqueue_email` RPC and `auth_emails` pgmq queue already exist (transactional pipeline uses the same infra)
-- No frontend changes
-- Mailgun suppression clearing must be done by you in the Mailgun dashboard — not scriptable from here
+- Do you want me to **manually confirm** the current user `866d93db-…`, or **delete it** so you can re-test the signup flow from a clean state (ideally with a different email so we bypass the rate limit)?
+- OK to raise the per-email auth rate limit to a higher value (e.g. 10/hour), or do you want to keep Supabase's default?
