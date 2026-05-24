@@ -21,6 +21,103 @@ const stripe = new Stripe(STRIPE_SECRET_KEY, {
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 // ============================================================================
+// IDENTITY NAME MATCHING
+// ============================================================================
+
+/**
+ * Normalize a name for comparison: lowercase, strip diacritics, drop
+ * non-letter chars, collapse whitespace.
+ */
+function normalizeName(value: string | null | undefined): string {
+  if (!value) return "";
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z\s'-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Returns true if two name parts are a reasonable match.
+ * - Equal after normalization, OR
+ * - One is a prefix of the other and the prefix is >= 3 chars
+ *   (handles "Andy" vs "Andrew", but rejects "J" vs "Jonathan").
+ */
+function namePartMatches(a: string, b: string): boolean {
+  const an = normalizeName(a);
+  const bn = normalizeName(b);
+  if (!an || !bn) return false;
+  if (an === bn) return true;
+  const short = an.length < bn.length ? an : bn;
+  const long = an.length < bn.length ? bn : an;
+  return short.length >= 3 && long.startsWith(short);
+}
+
+/**
+ * Compare the verified ID name against the expected name on the application.
+ * Last name must match strictly (after normalization). First name allows the
+ * prefix tolerance above to accommodate diminutives ("Mike"/"Michael").
+ * Middle names on the ID are ignored — we only compare the first token of
+ * each side as the "first name".
+ */
+function verifiedNameMatchesExpected(
+  verifiedFirst: string | undefined,
+  verifiedLast: string | undefined,
+  expectedFirst: string | undefined,
+  expectedLast: string | undefined,
+): { match: boolean; reason?: string } {
+  const vFirst = normalizeName(verifiedFirst).split(" ")[0] || "";
+  const vLast = normalizeName(verifiedLast).split(" ").pop() || "";
+  const eFirst = normalizeName(expectedFirst).split(" ")[0] || "";
+  const eLast = normalizeName(expectedLast).split(" ").pop() || "";
+
+  if (!vFirst || !vLast || !eFirst || !eLast) {
+    return { match: false, reason: "missing_name_on_id_or_application" };
+  }
+  if (normalizeName(vLast) !== normalizeName(eLast)) {
+    return { match: false, reason: "last_name_mismatch" };
+  }
+  if (!namePartMatches(vFirst, eFirst)) {
+    return { match: false, reason: "first_name_mismatch" };
+  }
+  return { match: true };
+}
+
+/**
+ * Stripe webhook events do NOT include `verified_outputs` by default — they
+ * must be retrieved via the API. Pull the session with verified_outputs
+ * expanded so we can run the name-match check.
+ */
+async function hydrateVerifiedOutputs(
+  session: VerificationSession,
+  logger: Logger,
+): Promise<VerificationSession> {
+  if (session.status !== "verified") return session;
+  if (session.verified_outputs?.first_name && session.verified_outputs?.last_name) {
+    return session;
+  }
+  try {
+    const hydrated = await stripe.identity.verificationSessions.retrieve(
+      session.id,
+      { expand: ["verified_outputs"] },
+    );
+    logger.info("Hydrated verification session with verified_outputs", {
+      sessionId: session.id,
+      hasOutputs: Boolean((hydrated as any).verified_outputs),
+    });
+    return hydrated as unknown as VerificationSession;
+  } catch (e: any) {
+    logger.error("Failed to hydrate verification session", {
+      sessionId: session.id,
+      error: e?.message,
+    });
+    return session;
+  }
+}
+
+// ============================================================================
 // TYPES
 // ============================================================================
 
