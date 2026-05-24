@@ -34,12 +34,15 @@ export default function AgentSignup() {
     unverified && user?.email && !user.email_confirmed_at ? user.email : null,
   );
 
-  // If a verified, signed-in user reaches this page, send them straight into the app.
+  // If a verified, signed-in user reaches this page, send them straight into
+  // the app — but NOT while we're sitting on the just-submitted check-email
+  // panel (otherwise an auto-confirmed session would skip verification UX).
   useEffect(() => {
+    if (checkEmailFor) return;
     if (user?.email_confirmed_at) {
       navigate("/apply/agent", { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, navigate, checkEmailFor]);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,6 +108,18 @@ export default function AgentSignup() {
         });
         navigate(`/auth?returnTo=${encodeURIComponent("/apply/agent")}`);
         return;
+      }
+
+      // Defensive: if the project ever has auto-confirm enabled, signUp will
+      // return a fully authenticated session. We never want to silently skip
+      // the email-confirmation step, so sign them straight back out before
+      // showing the check-email panel.
+      if (data?.session || data?.user?.email_confirmed_at) {
+        try {
+          await supabase.auth.signOut();
+        } catch {
+          // best-effort; we still show the check-email panel below
+        }
       }
 
       setCheckEmailFor(email.trim().toLowerCase());
