@@ -858,12 +858,14 @@ async function processVerificationCompleted(
     logger.info("Identified as agent application", {
       applicationId: agentApp.id,
     });
-    await updateAgentApplication(sessionId, verificationSession, logger);
+    const hydrated = await hydrateVerifiedOutputs(verificationSession, logger);
+    await updateAgentApplication(sessionId, hydrated, logger);
   } else if (brandApp) {
     logger.info("Identified as brand application", {
       applicationId: brandApp.id,
     });
-    await updateBrandApplication(sessionId, verificationSession, logger);
+    const hydrated = await hydrateVerifiedOutputs(verificationSession, logger);
+    await updateBrandApplication(sessionId, hydrated, logger);
   } else if (travelerVerification) {
     logger.info("Identified as traveler verification", {
       verificationId: travelerVerification.id,
