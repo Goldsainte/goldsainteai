@@ -1,7 +1,5 @@
 import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 
-const SERIF = "'Cormorant Garamond', Georgia, serif";
-
 type Status = "processing" | "success" | "error";
 
 interface EditorialLoaderProps {
@@ -23,18 +21,12 @@ export function EditorialLoader({
   status = "processing",
 }: EditorialLoaderProps) {
   return (
-    <div className="bg-[#f7f3ea] text-[#0a2225] flex-1 py-24 px-6 selection:bg-[#c9a84c]/30">
-      <section className="w-full max-w-xl mx-auto text-center">
-        <div className="flex justify-center mb-10">
-          <div className="w-px h-16 bg-[#0a2225]" />
-        </div>
-        <span className="block uppercase tracking-[0.3em] text-[9px] font-bold mb-8 text-[#c9a84c]">
+    <div className="bg-[#FDF9F0] text-[#0a2225] flex-1 py-24 px-6">
+      <section className="w-full max-w-2xl mx-auto text-center">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-5">
           {eyebrow}
-        </span>
-        <h1
-          className="text-5xl md:text-6xl italic mb-10 tracking-tight leading-[0.95]"
-          style={{ fontFamily: SERIF }}
-        >
+        </p>
+        <h1 className="font-secondary text-3xl sm:text-4xl md:text-5xl leading-[1.08] tracking-tight text-[#0a2225] mb-8">
           {title}
         </h1>
         <div className="flex justify-center mb-6">
@@ -49,7 +41,7 @@ export function EditorialLoader({
           )}
         </div>
         {subtitle && (
-          <p className="text-base leading-relaxed max-w-sm mx-auto text-[#0a2225]/70 font-light">
+          <p className="text-base text-[#0a2225]/70 leading-relaxed max-w-md mx-auto">
             {subtitle}
           </p>
         )}

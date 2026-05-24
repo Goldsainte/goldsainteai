@@ -4,8 +4,6 @@ import type { LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { AvailabilityNotice } from "@/components/onboarding/AvailabilityNotice";
 
-const SERIF = "'Cormorant Garamond', Georgia, serif";
-
 export interface HowItWorksStep {
   number: string;
   icon: LucideIcon;
@@ -27,28 +25,22 @@ interface Props {
 export function HowItWorksTemplate({ eyebrow, title, subtitle, steps, finalCta, factCard, extraSection }: Props) {
   const { t } = useTranslation();
   return (
-    <main className="flex-1 bg-[#f7f3ea] text-[#0a2225] selection:bg-[#c9a84c]/30">
-      <div className="mx-auto max-w-3xl px-4 sm:px-6 py-20 md:py-28">
+    <main className="flex-1 bg-[#FDF9F0] text-[#0a2225]">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 pt-16 md:pt-24 pb-20 md:pb-24">
         {/* HERO */}
-        <header className="text-center mb-20 md:mb-24">
-          <div className="flex justify-center mb-10">
-            <div className="w-px h-16 bg-[#0a2225]" />
-          </div>
-          <p className="text-[9px] uppercase tracking-[0.3em] text-[#c9a84c] font-bold mb-8">{eyebrow}</p>
-          <h1
-            className="text-5xl md:text-6xl italic mb-8 tracking-tight leading-[0.95] text-balance"
-            style={{ fontFamily: SERIF }}
-          >
+        <header className="max-w-3xl mb-16 md:mb-20">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-5">{eyebrow}</p>
+          <h1 className="font-secondary text-3xl sm:text-4xl md:text-6xl leading-[1.08] tracking-tight text-[#0a2225] mb-6">
             {title}
           </h1>
-          <p className="text-base md:text-lg text-[#0a2225]/70 font-light max-w-xl mx-auto leading-relaxed text-pretty">
+          <p className="text-base md:text-lg text-[#0a2225]/70 leading-relaxed max-w-2xl">
             {subtitle}
           </p>
         </header>
 
         {factCard && (
-          <div className="border-l border-[#c9a84c] pl-6 py-2 mb-16 max-w-2xl mx-auto">
-            <p className="text-base italic text-[#0a2225]/80 leading-relaxed" style={{ fontFamily: SERIF }}>
+          <div className="border-l-2 border-[#C7A962] pl-6 py-2 mb-16 max-w-2xl">
+            <p className="text-base text-[#0a2225]/80 leading-relaxed">
               {factCard.text}
             </p>
           </div>
@@ -57,24 +49,23 @@ export function HowItWorksTemplate({ eyebrow, title, subtitle, steps, finalCta, 
         <AvailabilityNotice />
 
         {/* STEPS */}
-        <ol className="space-y-16 md:space-y-20 mx-auto max-w-2xl mt-12">
+        <ol className="mt-12 max-w-4xl">
           {steps.map((step) => (
-            <li key={step.number} className="grid grid-cols-[auto_1fr] gap-8 md:gap-12 items-start">
-              <span
-                className="text-3xl md:text-4xl italic text-[#c9a84c] leading-none pt-2"
-                style={{ fontFamily: SERIF }}
-              >
-                {step.number}
-              </span>
-              <div className="pt-1 border-t border-[#0a2225]/10 -mt-2 pt-6">
-                <h2 className="text-2xl md:text-3xl italic text-[#0a2225] mb-4 tracking-tight" style={{ fontFamily: SERIF }}>
+            <li key={step.number} className="py-14 md:py-16 border-t border-[#E5DFC6] grid md:grid-cols-12 gap-8 md:gap-14">
+              <div className="md:col-span-4">
+                <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962]">
+                  {step.number}
+                </p>
+              </div>
+              <div className="md:col-span-8">
+                <h2 className="font-secondary text-2xl md:text-3xl leading-[1.25] text-[#0a2225] mb-4">
                   {step.title}
                 </h2>
-                <p className="text-base text-[#0a2225]/75 leading-relaxed font-light">{step.description}</p>
+                <p className="text-base text-[#0a2225]/70 leading-relaxed">{step.description}</p>
                 {step.cta && (
                   <Link
                     to={step.cta.to}
-                    className="inline-flex items-center gap-2 mt-5 text-[10px] uppercase tracking-[0.2em] font-semibold text-[#0c4d47] border-b border-[#0c4d47] pb-1 hover:text-[#0a2225] hover:border-[#0a2225] transition-colors"
+                    className="inline-flex items-center gap-2 mt-6 text-[11px] uppercase tracking-[0.22em] text-[#0c4d47] border-b border-[#0c4d47] pb-1 hover:text-[#0a2225] hover:border-[#0a2225] transition-colors"
                   >
                     {step.cta.label}
                     <ArrowRight className="h-3 w-3" strokeWidth={1.5} />
@@ -87,8 +78,8 @@ export function HowItWorksTemplate({ eyebrow, title, subtitle, steps, finalCta, 
 
         {extraSection && <div className="mt-20">{extraSection}</div>}
 
-        <div className="text-center mt-20 mb-16">
-          <p className="text-[9px] uppercase tracking-[0.3em] text-[#0a2225]/40 font-bold mb-3">
+        <div className="border-t border-[#E5DFC6] mt-16 pt-10 mb-16">
+          <p className="text-[10px] uppercase tracking-[0.28em] text-[#0a2225]/40 mb-3">
             {t('howItWorks.preferToWatch', 'Prefer to watch?')}
           </p>
           <Link
@@ -101,25 +92,21 @@ export function HowItWorksTemplate({ eyebrow, title, subtitle, steps, finalCta, 
         </div>
 
         {/* FINAL CTA */}
-        <div className="mt-20 md:mt-28 bg-[#0a2225] text-[#f7f3ea] px-8 sm:px-12 py-16 md:py-20 text-center relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-48 h-48 bg-[#c9a84c]/15 rounded-full -mr-24 -mt-24 blur-3xl" />
-          <p className="relative z-10 text-[9px] uppercase tracking-[0.3em] text-[#c9a84c] font-bold mb-6">
+        <div className="mt-16 md:mt-20 bg-[#0a2225] text-[#FDF9F0] px-8 sm:px-12 py-16 md:py-20 rounded-sm">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[#C7A962] mb-5">
             Begin
           </p>
-          <h2
-            className="relative z-10 text-4xl md:text-5xl italic mb-6 tracking-tight leading-tight"
-            style={{ fontFamily: SERIF }}
-          >
+          <h2 className="font-secondary text-3xl sm:text-4xl md:text-5xl leading-[1.1] tracking-tight mb-6 max-w-2xl">
             {finalCta.heading}
           </h2>
-          <p className="relative z-10 text-base text-[#f7f3ea]/70 max-w-xl mx-auto mb-10 font-light leading-relaxed">
+          <p className="text-base text-[#FDF9F0]/70 max-w-2xl mb-10 leading-relaxed">
             {finalCta.description}
           </p>
           <Link
             to={finalCta.to}
-            className="relative z-10 group inline-flex items-center gap-4 border border-[#f7f3ea] px-12 py-5 transition-all hover:bg-[#f7f3ea] hover:text-[#0a2225]"
+            className="group inline-flex items-center gap-3 bg-[#C7A962] text-[#0a2225] px-10 py-4 rounded-sm transition-all hover:bg-[#FDF9F0]"
           >
-            <span className="text-xs uppercase tracking-[0.2em] font-semibold">{finalCta.label}</span>
+            <span className="text-[11px] uppercase tracking-[0.22em] font-medium">{finalCta.label}</span>
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" strokeWidth={1.5} />
           </Link>
         </div>
