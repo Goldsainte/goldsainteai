@@ -99,7 +99,7 @@ const createLogger = (requestId: string): Logger => {
 async function isEventProcessed(eventId: string): Promise<boolean> {
   const { data, error } = await supabaseClient
     .from("webhook_events")
-    .select("id")
+    .select("id, error_message")
     .eq("event_id", eventId)
     .single();
 
@@ -108,7 +108,9 @@ async function isEventProcessed(eventId: string): Promise<boolean> {
     throw error;
   }
 
-  return !!data;
+  // Only treat as processed if a prior run completed without error.
+  // Rows from failed attempts must NOT short-circuit retries/resends.
+  return !!data && !data.error_message;
 }
 
 /**
@@ -121,18 +123,24 @@ async function recordWebhookEvent(
   processingDuration: number,
   errorMessage?: string
 ): Promise<void> {
-  const { error } = await supabaseClient.from("webhook_events").insert({
-    event_id: eventId,
-    event_type: eventType,
-    event_source: "stripe_identity",
-    payload,
-    processing_duration_ms: processingDuration,
-    error_message: errorMessage || null,
-    processed_at: new Date().toISOString(),
-  });
+  // Upsert keyed on event_id so a successful retry overwrites a prior
+  // failure row (clears error_message, refreshes processed_at).
+  const { error } = await supabaseClient
+    .from("webhook_events")
+    .upsert(
+      {
+        event_id: eventId,
+        event_type: eventType,
+        event_source: "stripe_identity",
+        payload,
+        processing_duration_ms: processingDuration,
+        error_message: errorMessage || null,
+        processed_at: new Date().toISOString(),
+      },
+      { onConflict: "event_id" },
+    );
 
   if (error) {
-    // If duplicate key error (event already processed by another instance), silently ignore
     if (error.code === "23505") {
       return;
     }
