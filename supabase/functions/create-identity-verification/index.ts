@@ -385,17 +385,42 @@ async function createVerificationSession(
       const emailField =
         applicationType === "agent" ? "email" : "primary_contact_email";
 
-      const { data: updated, error: updateError } = await supabaseClient
-        .from(tableName)
-        .update({
-          stripe_verification_session_id: verificationSession.id,
-          stripe_verification_status: "pending",
-        })
-        .eq(emailField, email)
-        .in("status", ["pending_verification", "draft"])
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .select("id");
+      // PostgREST does not reliably support ORDER BY/LIMIT on UPDATE — do a
+      // two-step lookup-then-update so the persist write actually lands.
+      // Prefer the explicit applicationId passed by the caller; fall back to
+      // the newest matching row by email.
+      let targetId: string | null =
+        (metadata as Record<string, string> | undefined)?.applicationId || null;
+
+      if (!targetId) {
+        const { data: found, error: findError } = await supabaseClient
+          .from(tableName)
+          .select("id")
+          .eq(emailField, email)
+          .in("status", ["pending_verification", "draft"])
+          .order("created_at", { ascending: false })
+          .limit(1);
+        if (findError) {
+          logger.error("Failed to look up application for session persist", {
+            error: findError,
+            email,
+            applicationType,
+          });
+        } else if (found && found.length > 0) {
+          targetId = found[0].id;
+        }
+      }
+
+      const { data: updated, error: updateError } = targetId
+        ? await supabaseClient
+            .from(tableName)
+            .update({
+              stripe_verification_session_id: verificationSession.id,
+              stripe_verification_status: "pending",
+            })
+            .eq("id", targetId)
+            .select("id")
+        : { data: null, error: null } as any;
 
       if (updateError) {
         logger.error("Failed to persist verification session id on application", {
@@ -404,14 +429,21 @@ async function createVerificationSession(
           applicationType,
           sessionId: verificationSession.id,
         });
-        // Don't throw — surfacing the session URL still lets the user verify;
-        // but the webhook reconciliation will then fail.
+        // Hard fail — without the session id on the row the webhook cannot
+        // reconcile and the user gets stuck on "Still Confirming". Better to
+        // surface the failure now than silently strand the application.
+        throw new Error(
+          `Failed to persist verification session id: ${updateError.message}`
+        );
       } else if (!updated || updated.length === 0) {
         logger.error("No matching application found to attach session id", {
           email,
           applicationType,
           sessionId: verificationSession.id,
         });
+        throw new Error(
+          "No matching application row found to attach Stripe Identity session"
+        );
       } else {
         logger.info("Attached session id to application", {
           applicationId: updated[0].id,
