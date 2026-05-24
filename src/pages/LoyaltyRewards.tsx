@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Copy, Check } from "lucide-react";
 
-const SERIF = "'Cormorant Garamond', Georgia, serif";
 const MONO = "ui-monospace, 'SF Mono', Menlo, monospace";
 
 interface LoyaltyPoints {
@@ -108,8 +107,8 @@ export default function LoyaltyRewards() {
 
   if (loading) {
     return (
-      <div className="bg-[#f7f3ea] flex-1 py-24 px-6">
-        <p className="text-center text-[#0a2225]/60 italic" style={{ fontFamily: SERIF }}>
+      <div className="bg-[#FDF9F0] flex-1 py-24 px-6">
+        <p className="text-center text-[#0a2225]/60 font-secondary text-xl">
           Loading your dossier…
         </p>
       </div>
@@ -122,185 +121,201 @@ export default function LoyaltyRewards() {
   const progress = config.next ? Math.min(100, (lifetime / config.threshold) * 100) : 100;
 
   return (
-    <div className="bg-[#f7f3ea] text-[#0a2225] flex-1 py-20 px-6 selection:bg-[#c9a84c]/30">
-      <section className="w-full max-w-4xl mx-auto">
+    <div className="bg-[#FDF9F0] text-[#0a2225] flex-1">
+      <section className="w-full max-w-5xl mx-auto px-4 sm:px-6 pt-16 md:pt-24 pb-20">
         {/* HEADER */}
-        <header className="grid grid-cols-1 md:grid-cols-12 border-t border-b border-[#0a2225] py-8 mb-16 gap-6">
-          <div className="md:col-span-8">
-            <span className="block uppercase tracking-[0.2em] text-[10px] font-bold mb-4 text-[#c9a84c]">
-              Loyalty
-            </span>
-            <h1 className="text-4xl md:text-5xl tracking-tight" style={{ fontFamily: SERIF }}>
-              Rewards & Standing
-            </h1>
-          </div>
-          <div className="md:col-span-4 md:text-right flex flex-col justify-end">
-            <span className="block text-[9px] uppercase tracking-[0.2em] opacity-40 mb-1">
-              Points Balance
-            </span>
-            <span className="text-2xl italic" style={{ fontFamily: SERIF }}>
-              {(loyaltyData?.points_balance || 0).toLocaleString()}
-            </span>
-          </div>
+        <header className="max-w-3xl mb-14 md:mb-16">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-5">
+            Loyalty
+          </p>
+          <h1 className="font-secondary text-3xl sm:text-4xl md:text-6xl leading-[1.08] tracking-tight text-[#0a2225] mb-6">
+            Rewards & Standing
+          </h1>
+          <p className="text-base md:text-lg text-[#0a2225]/70 leading-relaxed max-w-2xl">
+            Your points balance, current tier, and benefits — earned with every booking, review, and referral on Goldsainte.
+          </p>
         </header>
 
+        <div className="border-y border-[#E5DFC6] bg-white/60 -mx-4 sm:-mx-6 px-4 sm:px-6 py-8 mb-16">
+          <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.28em] text-[#0a2225]/40 mb-2">
+                Points Balance
+              </p>
+              <p className="font-secondary text-4xl md:text-5xl leading-none text-[#0a2225]">
+                {(loyaltyData?.points_balance || 0).toLocaleString()}
+              </p>
+            </div>
+            <p className="text-sm text-[#0a2225]/60" style={{ fontFamily: MONO }}>
+              Lifetime · {lifetime.toLocaleString()} pts
+            </p>
+          </div>
+        </div>
+
         {/* TIER + PROGRESS */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-20">
-          <div className="md:col-span-7">
-            <label className="block text-[9px] uppercase tracking-[0.2em] font-bold opacity-40 mb-3">
-              Current Tier
-            </label>
-            <h2 className="text-5xl italic mb-8 tracking-tight" style={{ fontFamily: SERIF }}>
-              {currentTier[0].toUpperCase() + currentTier.slice(1)}
+        <div className="py-14 md:py-18 border-t border-[#E5DFC6] grid md:grid-cols-12 gap-8 md:gap-14">
+          <div className="md:col-span-4">
+            <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962]">
+              01 — Current Tier
+            </p>
+          </div>
+          <div className="md:col-span-8">
+            <h2 className="font-secondary text-2xl md:text-3xl leading-[1.25] text-[#0a2225] mb-4 capitalize">
+              {currentTier}
             </h2>
 
             {config.next && (
-              <div className="mb-8">
-                <div className="flex justify-between text-[10px] uppercase tracking-[0.2em] font-bold opacity-60 mb-3">
+              <div className="mb-10">
+                <div className="flex justify-between text-[10px] uppercase tracking-[0.22em] text-[#0a2225]/60 mb-3">
                   <span>Progress to {config.next}</span>
                   <span style={{ fontFamily: MONO }}>{lifetime.toLocaleString()} / {config.threshold.toLocaleString()}</span>
                 </div>
-                <div className="h-px bg-[#0a2225]/15 relative">
+                <div className="h-px bg-[#E5DFC6] relative">
                   <div
-                    className="absolute inset-y-0 left-0 bg-[#c9a84c]"
+                    className="absolute inset-y-0 left-0 bg-[#C7A962]"
                     style={{ width: `${progress}%`, height: "1px" }}
                   />
                 </div>
               </div>
             )}
 
-            <label className="block text-[9px] uppercase tracking-[0.2em] font-bold opacity-40 mb-4 mt-10">
+            <p className="text-[10px] uppercase tracking-[0.22em] text-[#0c4d47] mb-3 mt-8">
               Member Benefits
-            </label>
-            <ul className="space-y-3 border-l border-[#c9a84c]/40 pl-6">
+            </p>
+            <ul className="space-y-2.5">
               {config.benefits.map((benefit, i) => (
-                <li key={i} className="text-base italic text-[#0a2225]/80" style={{ fontFamily: SERIF }}>
+                <li key={i} className="flex items-start gap-2.5 text-sm text-[#0a2225]/70 leading-snug">
+                  <span className="text-[#0c4d47] mt-0.5 flex-shrink-0">✓</span>
                   {benefit}
                 </li>
               ))}
             </ul>
           </div>
+        </div>
 
-          <div className="md:col-span-5">
-            <div className="bg-[#0a2225] p-10 text-[#f7f3ea] relative overflow-hidden h-full">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-[#c9a84c]/15 rounded-full -mr-16 -mt-16 blur-3xl" />
-              <label className="relative z-10 block text-[9px] uppercase tracking-[0.3em] font-bold opacity-50 mb-8">
-                Earn Points
-              </label>
-              <ul className="relative z-10 space-y-6">
-                <li>
-                  <p className="text-2xl italic mb-1" style={{ fontFamily: SERIF }}>+100 pts</p>
-                  <p className="text-sm opacity-70">Per completed booking</p>
-                </li>
-                <li>
-                  <p className="text-2xl italic mb-1" style={{ fontFamily: SERIF }}>+50 pts</p>
-                  <p className="text-sm opacity-70">For each review you leave</p>
-                </li>
-                <li>
-                  <p className="text-2xl italic mb-1" style={{ fontFamily: SERIF }}>+500 pts</p>
-                  <p className="text-sm opacity-70">Per successful referral</p>
-                </li>
-              </ul>
-            </div>
+        <div className="py-14 md:py-18 border-t border-[#E5DFC6] grid md:grid-cols-12 gap-8 md:gap-14">
+          <div className="md:col-span-4">
+            <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962]">
+              02 — Earn Points
+            </p>
+          </div>
+          <div className="md:col-span-8 grid sm:grid-cols-3 gap-4">
+            {[
+              { pts: "+100", label: "Per completed booking" },
+              { pts: "+50", label: "For each review you leave" },
+              { pts: "+500", label: "Per successful referral" },
+            ].map((item) => (
+              <div key={item.label} className="border border-[#E5DFC6] rounded-sm bg-[#FDF9F0] p-6">
+                <p className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-2">{item.pts}<span className="text-sm text-[#0a2225]/40 ml-1">pts</span></p>
+                <p className="text-sm text-[#0a2225]/70 leading-snug">{item.label}</p>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* REFERRAL */}
-        <div className="border-t border-[#0a2225]/10 pt-16 mb-20">
-          <span className="block text-[9px] uppercase tracking-[0.2em] font-bold opacity-40 mb-3">
-            Referral
-          </span>
-          <h2 className="text-3xl md:text-4xl italic mb-4 tracking-tight" style={{ fontFamily: SERIF }}>
-            Invite Friends
-          </h2>
-          <p className="text-base text-[#0a2225]/70 font-light max-w-xl mb-8">
-            Share your code and earn 500 points for each friend who completes a booking.
-          </p>
-
-          <div className="flex items-center gap-4 border-b border-[#0a2225]/30 pb-3 max-w-md">
-            <span className="flex-1 text-lg tracking-wider" style={{ fontFamily: MONO }}>
-              {referralCode}
-            </span>
-            <button
-              onClick={copyReferralLink}
-              className="text-[10px] uppercase tracking-[0.2em] font-semibold text-[#0c4d47] hover:text-[#0a2225] transition-colors flex items-center gap-2"
-            >
-              {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-              {copied ? "Copied" : "Copy link"}
-            </button>
+        <div className="py-14 md:py-18 border-t border-[#E5DFC6] grid md:grid-cols-12 gap-8 md:gap-14">
+          <div className="md:col-span-4">
+            <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962]">
+              03 — Referral
+            </p>
           </div>
+          <div className="md:col-span-8">
+            <h2 className="font-secondary text-2xl md:text-3xl leading-[1.25] text-[#0a2225] mb-4">
+              Invite Friends
+            </h2>
+            <p className="text-base text-[#0a2225]/70 leading-relaxed max-w-xl mb-8">
+              Share your code and earn 500 points for each friend who completes a booking.
+            </p>
 
-          <div className="mt-12">
-            <label className="block text-[9px] uppercase tracking-[0.2em] font-bold opacity-40 mb-6">
-              Your Referrals ({referrals.length})
-            </label>
-            {referrals.length === 0 ? (
-              <p className="text-base italic text-[#0a2225]/60" style={{ fontFamily: SERIF }}>
-                No referrals yet — share your link to begin.
+            <div className="flex items-center gap-4 border-b border-[#E5DFC6] pb-3 max-w-md">
+              <span className="flex-1 text-lg tracking-wider text-[#0a2225]" style={{ fontFamily: MONO }}>
+                {referralCode}
+              </span>
+              <button
+                onClick={copyReferralLink}
+                className="text-[10px] uppercase tracking-[0.22em] text-[#0c4d47] hover:text-[#0a2225] transition-colors flex items-center gap-2"
+              >
+                {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                {copied ? "Copied" : "Copy link"}
+              </button>
+            </div>
+
+            <div className="mt-10">
+              <p className="text-[10px] uppercase tracking-[0.22em] text-[#0a2225]/40 mb-5">
+                Your Referrals ({referrals.length})
+              </p>
+              {referrals.length === 0 ? (
+                <p className="text-sm text-[#0a2225]/60">
+                  No referrals yet — share your link to begin.
+                </p>
+              ) : (
+                <ul className="space-y-4 max-w-2xl">
+                  {referrals.map((ref) => (
+                    <li
+                      key={ref.id}
+                      className="flex items-center justify-between border-b border-[#E5DFC6] pb-4"
+                    >
+                      <div>
+                        <p className="text-[10px] uppercase tracking-[0.22em] text-[#C7A962] mb-1">
+                          {ref.status}
+                        </p>
+                        <p className="text-sm text-[#0a2225]/60" style={{ fontFamily: MONO }}>
+                          {new Date(ref.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      {ref.status === "rewarded" && (
+                        <p className="font-secondary text-xl text-[#0c4d47]">
+                          +{ref.referrer_points_earned} pts
+                        </p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* HISTORY */}
+        <div className="py-14 md:py-18 border-t border-[#E5DFC6] grid md:grid-cols-12 gap-8 md:gap-14">
+          <div className="md:col-span-4">
+            <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962]">
+              04 — Ledger
+            </p>
+          </div>
+          <div className="md:col-span-8">
+            <h2 className="font-secondary text-2xl md:text-3xl leading-[1.25] text-[#0a2225] mb-8">
+              Points History
+            </h2>
+            {transactions.length === 0 ? (
+              <p className="text-sm text-[#0a2225]/60">
+                No transactions yet.
               </p>
             ) : (
-              <ul className="space-y-4 max-w-2xl">
-                {referrals.map((ref) => (
+              <ul className="space-y-5 max-w-2xl">
+                {transactions.map((txn) => (
                   <li
-                    key={ref.id}
-                    className="flex items-center justify-between border-b border-[#0a2225]/10 pb-4"
+                    key={txn.id}
+                    className="flex items-center justify-between border-b border-[#E5DFC6] pb-4"
                   >
                     <div>
-                      <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#c9a84c] mb-1">
-                        {ref.status}
-                      </p>
-                      <p className="text-sm text-[#0a2225]/60" style={{ fontFamily: MONO }}>
-                        {new Date(ref.created_at).toLocaleDateString()}
+                      <p className="text-base text-[#0a2225] mb-1">{txn.reason}</p>
+                      <p className="text-xs text-[#0a2225]/50" style={{ fontFamily: MONO }}>
+                        {new Date(txn.created_at).toLocaleDateString()}
                       </p>
                     </div>
-                    {ref.status === "rewarded" && (
-                      <p className="text-lg italic" style={{ fontFamily: SERIF }}>
-                        +{ref.referrer_points_earned} pts
-                      </p>
-                    )}
+                    <p
+                      className={`font-secondary text-xl ${txn.points_amount > 0 ? "text-[#0c4d47]" : "text-[#0a2225]/60"}`}
+                    >
+                      {txn.points_amount > 0 ? "+" : ""}
+                      {txn.points_amount} pts
+                    </p>
                   </li>
                 ))}
               </ul>
             )}
           </div>
-        </div>
-
-        {/* HISTORY */}
-        <div className="border-t border-[#0a2225]/10 pt-16">
-          <span className="block text-[9px] uppercase tracking-[0.2em] font-bold opacity-40 mb-3">
-            Ledger
-          </span>
-          <h2 className="text-3xl md:text-4xl italic mb-10 tracking-tight" style={{ fontFamily: SERIF }}>
-            Points History
-          </h2>
-          {transactions.length === 0 ? (
-            <p className="text-base italic text-[#0a2225]/60" style={{ fontFamily: SERIF }}>
-              No transactions yet.
-            </p>
-          ) : (
-            <ul className="space-y-5 max-w-2xl">
-              {transactions.map((txn) => (
-                <li
-                  key={txn.id}
-                  className="flex items-center justify-between border-b border-[#0a2225]/10 pb-4"
-                >
-                  <div>
-                    <p className="text-base mb-1">{txn.reason}</p>
-                    <p className="text-xs text-[#0a2225]/50" style={{ fontFamily: MONO }}>
-                      {new Date(txn.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <p
-                    className={`text-xl italic ${txn.points_amount > 0 ? "text-[#0c4d47]" : "text-[#0a2225]/60"}`}
-                    style={{ fontFamily: SERIF }}
-                  >
-                    {txn.points_amount > 0 ? "+" : ""}
-                    {txn.points_amount} pts
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
         </div>
       </section>
     </div>

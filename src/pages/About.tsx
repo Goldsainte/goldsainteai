@@ -93,24 +93,18 @@ const About = () => {
   ];
 
   return (
-    <div className="bg-[#f7f3ea] text-[#0a2225] flex-1 selection:bg-[#c9a84c]/30">
-      <div className="container mx-auto px-4 sm:px-6 py-16 md:py-24 max-w-5xl">
+    <div className="bg-[#FDF9F0] text-[#0a2225] flex-1">
+      <div className="container mx-auto px-4 sm:px-6 pt-16 md:pt-24 pb-16 md:pb-20 max-w-5xl">
         <BackButton className="mb-8" />
         {/* Editorial Hero */}
-        <header className="text-center mb-20 md:mb-24">
-          <div className="flex justify-center mb-10">
-            <div className="w-px h-16 bg-[#0a2225]" />
-          </div>
-          <span className="block uppercase tracking-[0.3em] text-[9px] font-bold mb-8 text-[#c9a84c]">
+        <header className="max-w-3xl mb-16 md:mb-20">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-5">
             About Goldsainte
-          </span>
-          <h1
-            className="text-5xl md:text-6xl italic mb-8 tracking-tight leading-[0.95] text-balance"
-            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
-          >
+          </p>
+          <h1 className="font-secondary text-3xl sm:text-4xl md:text-6xl leading-[1.08] tracking-tight text-[#0a2225] mb-6">
             The Smarter Travel Marketplace
           </h1>
-          <p className="text-base md:text-lg text-[#0a2225]/70 font-light max-w-xl mx-auto leading-relaxed text-pretty">
+          <p className="text-base md:text-lg text-[#0a2225]/70 leading-relaxed max-w-2xl">
             {t('home.hero.subtitle')}
           </p>
         </header>
@@ -949,6 +943,7 @@ const About = () => {
     </AccordionItem>
 
     </Accordion>
+    </div>
     </div>
   );
 };
