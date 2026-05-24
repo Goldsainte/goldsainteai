@@ -1,59 +1,37 @@
-# Admin Alert: Auth Email Failure Monitoring
+## Goal
+Make signup confirmation emails send reliably again and prove the fix with real end-to-end checks so you are not burning credits on trial-and-error.
 
-Add an early-warning system that notifies admins the moment any `auth_emails` row lands in `failed` or `dlq` status in `email_send_log` — so we catch silent fallbacks to default Supabase templates before users complain.
+## What I’ll fix
+1. **Repair the auth signup email path**
+   - Verify the authentication system is actually calling the custom auth email hook for new signups.
+   - Fix any hook/config mismatch so new signups create auth email log entries every time.
+   - Redeploy the email functions so the live backend is using the corrected code.
 
-## What gets built
+2. **Repair the stuck email dispatcher path**
+   - Investigate why the queue health check reports old pending emails even though the cron job exists.
+   - Fix the dispatcher/authentication/runtime issue that is preventing pending emails from draining consistently.
+   - Re-test queue processing after the fix.
 
-### 1. Database trigger (migration)
-- `AFTER INSERT` trigger on `email_send_log`
-- Fires only when `template_name = 'auth_emails'` AND `status IN ('failed', 'dlq')`
-- Inserts a row into the existing `notifications` table targeted at all users with the `admin` role (looked up via `user_roles` + `has_role`)
-- Notification payload includes: recipient email, status, error_message, created_at, message_id
+3. **Add hard proof and safer diagnostics**
+   - Add/strengthen logging around auth email enqueue + dispatch so future failures are obvious immediately.
+   - Validate with a real signup flow and confirm a fresh email log row appears and advances to sent.
+   - Keep the admin failure notification path intact so fallback or delivery failures are surfaced fast.
 
-### 2. Admin UI badge (frontend)
-- Small alert pill in the admin nav/header showing unread auth-email-failure count
-- Click → opens a panel listing recent failures (recipient, error, timestamp, retry status)
-- Uses existing real-time notifications channel — no new subscription infra needed
-- Visible only to users with `admin` role
-
-### 3. Optional email alert to admins (deferred)
-- Not in this plan — Slack/email pings can be added later if the in-app alert proves insufficient
+## Expected outcome
+- New signup attempts produce a confirmation email for the user.
+- The email pipeline shows a fresh log entry for the signup and it progresses correctly.
+- The queue health check no longer reports stale pending email buildup.
 
 ## Technical details
+- Current evidence already shows:
+  - `notify.goldsainte.com` is verified, so this is **not** a domain verification problem.
+  - Both `info@cornellfacilities.com` and `andre.powelljr@gmail.com` were created today as unconfirmed auth users.
+  - There are **no fresh auth email log rows** for those signups, which points at the signup-to-hook path failing before enqueue/logging.
+  - The health endpoint reports **27 pending emails older than 10 minutes**, so the dispatcher path also needs repair.
+  - Recent logs for `auth-email-hook` and `process-email-queue` are effectively absent, which strongly suggests a wiring/deployment/config issue rather than a normal template render failure.
 
-**Migration:**
-```sql
-CREATE OR REPLACE FUNCTION public.notify_admins_auth_email_failure()
-RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
-BEGIN
-  IF NEW.template_name = 'auth_emails' AND NEW.status IN ('failed','dlq') THEN
-    INSERT INTO public.notifications (user_id, type, title, message, metadata)
-    SELECT ur.user_id, 'auth_email_failure',
-           'Auth email failed: ' || NEW.recipient_email,
-           COALESCE(NEW.error_message, 'Delivery failed after retries'),
-           jsonb_build_object(
-             'message_id', NEW.message_id,
-             'recipient', NEW.recipient_email,
-             'status', NEW.status,
-             'error', NEW.error_message
-           )
-    FROM public.user_roles ur WHERE ur.role = 'admin';
-  END IF;
-  RETURN NEW;
-END $$;
-
-CREATE TRIGGER trg_notify_admins_auth_email_failure
-AFTER INSERT ON public.email_send_log
-FOR EACH ROW EXECUTE FUNCTION public.notify_admins_auth_email_failure();
-```
-
-**Frontend:**
-- New component `AuthEmailFailureAlert.tsx` in admin layout
-- Queries `notifications` where `type = 'auth_email_failure'` AND `read = false`
-- Subscribes to realtime inserts on same channel
-- Detail panel reuses existing notification list patterns
-
-## Out of scope
-- No changes to `auth-email-hook`, templates, or queue logic
-- No changes to existing notification infrastructure
-- No external alerting (Slack, SMS, email-to-admin)
+## Validation I’ll run after the fix
+- Trigger a fresh signup test.
+- Confirm a new auth email record is written.
+- Confirm it moves out of pending.
+- Confirm the backend health check reports clean queue status.

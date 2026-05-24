@@ -14703,6 +14703,10 @@ export type Database = {
         Returns: boolean
       }
       detect_bot_pattern: { Args: { p_user_id: string }; Returns: boolean }
+      email_infra_count_stuck_pending: {
+        Args: { _older_than_minutes?: number }
+        Returns: number
+      }
       email_infra_cron_last_run: {
         Args: never
         Returns: {
