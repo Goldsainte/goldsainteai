@@ -345,23 +345,26 @@ export default function AgentApplicationForm() {
         authUser = signUpData.user ?? null;
       }
 
-      // File uploads
+      // File uploads (require authenticated user for RLS)
+      if (!authUser?.id) {
+        throw new Error("Could not establish your account session. Please sign in and retry.");
+      }
       let businessLicensePath = null;
       let insuranceCertPath = null;
       let govIdPath = null;
       let headshotPath = null;
 
       if (formData.businessLicenseFile) {
-        businessLicensePath = await handleFileUpload(formData.businessLicenseFile, 'business_license');
+        businessLicensePath = await handleFileUpload(formData.businessLicenseFile, 'business_license', authUser.id);
       }
       if (formData.insuranceCertificateFile) {
-        insuranceCertPath = await handleFileUpload(formData.insuranceCertificateFile, 'insurance_certificate');
+        insuranceCertPath = await handleFileUpload(formData.insuranceCertificateFile, 'insurance_certificate', authUser.id);
       }
       if (formData.governmentIdFile) {
-        govIdPath = await handleFileUpload(formData.governmentIdFile, 'government_id');
+        govIdPath = await handleFileUpload(formData.governmentIdFile, 'government_id', authUser.id);
       }
       if (formData.professionalHeadshotFile) {
-        headshotPath = await handleFileUpload(formData.professionalHeadshotFile, 'headshot');
+        headshotPath = await handleFileUpload(formData.professionalHeadshotFile, 'headshot', authUser.id);
       }
 
       const extendedData = {
