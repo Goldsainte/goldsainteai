@@ -366,6 +366,7 @@ function AgentApplicationFormInner() {
 
   const saveDraftApplication = async () => {
     setIsLoading(true);
+    setFormData((prev: any) => ({ ...prev, __documentUploadError: undefined }));
     try {
       const normalizedBusinessType = normalizeBusinessType(formData.businessType);
 
