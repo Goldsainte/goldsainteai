@@ -1035,7 +1035,26 @@ const Auth = () => {
                   const { data: { user: freshUser } } = await supabase.auth.getUser();
                   if (freshUser?.email_confirmed_at) {
                     navigate('/auth/complete-profile', { replace: true });
-                  } else {
+                    return;
+                  }
+                  // Fallback: user likely verified on another device, so this
+                  // browser has no session to refresh. Ask the server.
+                  try {
+                    const { data } = await supabase.functions.invoke('check-email-verified', {
+                      body: { email },
+                    });
+                    if (data?.verified) {
+                      toast({
+                        title: 'Email verified on another device',
+                        description: 'Please sign in here to finish setting up your profile.',
+                      });
+                      navigate(`/auth?mode=signin&email=${encodeURIComponent(email)}`, { replace: true });
+                      return;
+                    }
+                  } catch {
+                    /* fall through to "not verified yet" */
+                  }
+                  {
                     toast({
                       title: "Not verified yet",
                       description: "We don't see a confirmation yet. Click the link in your email, then try again.",
