@@ -395,16 +395,34 @@ function AgentApplicationFormInner() {
       if (!formData.agencyName || !normalizedBusinessType) {
         throw new Error("Please fill in all required business information fields");
       }
-      // By the time we reach this code the user is guaranteed to be authenticated
-      // and email-confirmed — the route is gated upstream. Just read the user.
+      // Require a confirmed authenticated user before attempting any upload.
+      // The route is gated upstream, but we double-check here so an expired
+      // or not-yet-ready session produces a clear error on the Documents step
+      // instead of a backend 403 from upload-application-document.
+      const { data: sessionData } = await supabase.auth.getSession();
       const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (!authUser?.id) {
-        throw new Error("Your session expired. Please sign in and try again.");
+      if (!sessionData?.session?.access_token || !authUser?.id) {
+        setStep(5);
+        const msg = "Your session isn't ready yet. Please sign in again and retry.";
+        setFormData((prev: any) => ({ ...prev, __documentUploadError: msg }));
+        throw new Error(msg);
+      }
+      if (!authUser.email_confirmed_at) {
+        setStep(5);
+        const msg = "Please confirm your email before uploading documents, then retry.";
+        setFormData((prev: any) => ({ ...prev, __documentUploadError: msg }));
+        throw new Error(msg);
+      }
+      if ((authUser.email ?? '').toLowerCase() !== (formData.email ?? '').toLowerCase()) {
+        setStep(5);
+        const msg = "The application email doesn't match your signed-in account. Please sign in with the matching email.";
+        setFormData((prev: any) => ({ ...prev, __documentUploadError: msg }));
+        throw new Error(msg);
       }
 
-      // All four documents are required. Verify presence before attempting
-      // uploads so we can keep the user on the Documents step with a clear
-      // message rather than producing an application with null document paths.
+      // Verify required documents are present before attempting uploads so we
+      // keep the user on the Documents step with a clear message rather than
+      // producing an application with null document paths.
       const requiredDocs: Array<{ file: File | null | undefined; field: string; label: string }> = [
         { file: formData.businessLicenseFile, field: 'business_license', label: 'Business License' },
         { file: formData.insuranceCertificateFile, field: 'insurance_certificate', label: 'Insurance Certificate' },
@@ -929,7 +947,6 @@ function AgentApplicationFormInner() {
       case 5:
         return (
           <div className="space-y-8">
-            <SectionHeader title="Document Upload" />
             <Step10Documents formData={formData} setFormData={setFormData} />
 
             <NavButtons
