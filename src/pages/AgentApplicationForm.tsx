@@ -790,8 +790,8 @@ export default function AgentApplicationForm() {
               <h4 className="font-medium text-[#0a2225]">Legal Agreements</h4>
               {[
                 { key: "acceptedTerms" as const, label: "Terms of Service", link: "/terms" },
-                { key: "acceptedPrivacy" as const, label: "Privacy Policy", link: "/privacy" },
-                { key: "acceptedVendor" as const, label: "Agent Partnership Agreement", link: "/vendor-agreement" },
+                { key: "acceptedPrivacy" as const, label: "Privacy Policy", link: "/privacy-cookies" },
+                { key: "acceptedVendor" as const, label: "Agent Partnership Agreement", link: "/legal/agent-agreement" },
               ].map(({ key, label, link }) => (
                 <div key={key} className="flex items-start space-x-3">
                   <Checkbox
@@ -800,7 +800,7 @@ export default function AgentApplicationForm() {
                     className="data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47] mt-0.5"
                   />
                   <label className="text-sm text-[#0a2225]">
-                    I accept the <a href={link} target="_blank" className="text-[#C7A962] hover:underline">{label}</a> *
+                    I accept the <a href={link} target="_blank" rel="noopener noreferrer" className="text-[#C7A962] hover:underline">{label}</a> *
                   </label>
                 </div>
               ))}
