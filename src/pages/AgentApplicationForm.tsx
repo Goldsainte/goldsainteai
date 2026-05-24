@@ -149,7 +149,10 @@ function AgentApplicationFormInner() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const DRAFT_STORAGE_KEY = "agent_application_draft";
+  const LEGACY_DRAFT_STORAGE_KEY = "agent_application_draft";
+  const DRAFT_STORAGE_KEY = user?.id
+    ? `agent_application_draft:${user.id}`
+    : null;
 
   // Prefill from the authenticated user's profile + auth metadata as soon
   // as the session is ready. Editable, but no retyping required.
@@ -198,8 +201,31 @@ function AgentApplicationFormInner() {
   // Offer to restore an earlier draft (opt-in, so a brand-new signup
   // never inherits another applicant's cached answers).
   useEffect(() => {
+    // Wait until we know who the user is — drafts are now per-user scoped
+    // so a brand-new account never sees another applicant's leftover draft.
+    if (!DRAFT_STORAGE_KEY || !user) return;
     try {
-      const saved = localStorage.getItem(DRAFT_STORAGE_KEY);
+      let saved = localStorage.getItem(DRAFT_STORAGE_KEY);
+
+      // One-time migration: if the legacy unscoped draft exists and its
+      // email matches the current user, claim it for them. Otherwise
+      // discard it — it belonged to a different applicant on this browser.
+      const legacy = localStorage.getItem(LEGACY_DRAFT_STORAGE_KEY);
+      if (legacy) {
+        try {
+          const legacyParsed = JSON.parse(legacy);
+          const legacyEmail = (legacyParsed?.email || "").toLowerCase();
+          const currentEmail = (user.email || "").toLowerCase();
+          if (!saved && legacyEmail && currentEmail && legacyEmail === currentEmail) {
+            localStorage.setItem(DRAFT_STORAGE_KEY, legacy);
+            saved = legacy;
+          }
+        } catch {
+          /* discard malformed legacy draft */
+        }
+        localStorage.removeItem(LEGACY_DRAFT_STORAGE_KEY);
+      }
+
       if (!saved) return;
       const parsed = JSON.parse(saved);
       const label = [parsed?.firstName, parsed?.lastName].filter(Boolean).join(" ")
@@ -222,10 +248,11 @@ function AgentApplicationFormInner() {
       /* noop */
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user?.id]);
 
   // Autosave non-file fields whenever formData changes
   useEffect(() => {
+    if (!DRAFT_STORAGE_KEY) return;
     try {
       const {
         businessLicenseFile: _a,
@@ -238,7 +265,7 @@ function AgentApplicationFormInner() {
     } catch {
       /* noop */
     }
-  }, [formData]);
+  }, [formData, DRAFT_STORAGE_KEY]);
 
   // Per-step validation with friendly toasts
   const validateStep = (currentStep: number): boolean => {
@@ -467,7 +494,8 @@ function AgentApplicationFormInner() {
 
       // Clear local draft now that it's persisted server-side
       try {
-        localStorage.removeItem(DRAFT_STORAGE_KEY);
+        if (DRAFT_STORAGE_KEY) localStorage.removeItem(DRAFT_STORAGE_KEY);
+        localStorage.removeItem(LEGACY_DRAFT_STORAGE_KEY);
       } catch {
         /* noop */
       }
