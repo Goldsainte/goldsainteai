@@ -55,14 +55,40 @@ export function OnboardingRouter() {
             // Creators go to creator onboarding
             setDestination('/onboarding/creator');
             break;
-          case 'agent':
-            // Agents go to agent application
-            setDestination('/apply/agent');
+          case 'agent': {
+            // If they already submitted an application, route to status —
+            // not back to the empty application form.
+            const { data: agentApp } = await supabase
+              .from('agent_applications')
+              .select('id, email, status')
+              .eq('user_id', user.id)
+              .in('status', ['pending_verification', 'verified', 'approved', 'under_review'])
+              .order('created_at', { ascending: false })
+              .limit(1)
+              .maybeSingle();
+            if (agentApp) {
+              setDestination(`/application/status?email=${encodeURIComponent(agentApp.email)}`);
+            } else {
+              setDestination('/apply/agent');
+            }
             break;
-          case 'brand':
-            // Brands go to brand application
-            setDestination('/apply/brand');
+          }
+          case 'brand': {
+            const { data: brandApp } = await supabase
+              .from('brand_applications')
+              .select('id, primary_contact_email, status')
+              .eq('user_id', user.id)
+              .in('status', ['pending_verification', 'verified', 'approved', 'under_review'])
+              .order('created_at', { ascending: false })
+              .limit(1)
+              .maybeSingle();
+            if (brandApp) {
+              setDestination(`/application/status?email=${encodeURIComponent(brandApp.primary_contact_email)}`);
+            } else {
+              setDestination('/apply/brand');
+            }
             break;
+          }
           default:
             // Fallback to traveler preferences
             setDestination('/onboarding/traveler/preferences');
