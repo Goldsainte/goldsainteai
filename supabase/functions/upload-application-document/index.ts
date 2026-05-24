@@ -4,8 +4,6 @@ import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 const ALLOWED_FIELDS = new Set([
   'business_license',
   'insurance_certificate',
-  'government_id',
-  'headshot',
 ]);
 const ALLOWED_MIME = new Set([
   'application/pdf',

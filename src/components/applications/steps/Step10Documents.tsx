@@ -11,24 +11,19 @@ interface Step10Props {
 const luxuryInputClasses = "mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 focus:ring-offset-0 rounded-lg placeholder:text-sm";
 
 const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'image/heif'];
-const ALLOWED_TYPES_IMAGE_ONLY = ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'image/heif'];
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
-function validateFile(file: File, imageOnly = false): string | null {
+function validateFile(file: File): string | null {
   if (file.size > MAX_FILE_SIZE) {
     return `${file.name} is ${(file.size / 1024 / 1024).toFixed(1)}MB — max is 50MB.`;
   }
-  const allowed = imageOnly ? ALLOWED_TYPES_IMAGE_ONLY : ALLOWED_TYPES;
-  // Some phones report empty type — fall back to extension check
   const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
-  const extOk = imageOnly
-    ? ['jpg', 'jpeg', 'png', 'heic', 'heif'].includes(ext)
-    : ['pdf', 'jpg', 'jpeg', 'png', 'heic', 'heif'].includes(ext);
-  if (file.type && !allowed.includes(file.type) && !extOk) {
-    return `Unsupported file: ${file.name}. Please use ${imageOnly ? 'JPG, PNG, or HEIC' : 'PDF, JPG, PNG, or HEIC'}.`;
+  const extOk = ['pdf', 'jpg', 'jpeg', 'png', 'heic', 'heif'].includes(ext);
+  if (file.type && !ALLOWED_TYPES.includes(file.type) && !extOk) {
+    return `Unsupported file: ${file.name}. Please use PDF, JPG, PNG, or HEIC.`;
   }
   if (!file.type && !extOk) {
-    return `Could not detect file type for ${file.name}. Please use ${imageOnly ? 'JPG, PNG, or HEIC' : 'PDF, JPG, PNG, or HEIC'}.`;
+    return `Could not detect file type for ${file.name}. Please use PDF, JPG, PNG, or HEIC.`;
   }
   return null;
 }
@@ -36,10 +31,10 @@ function validateFile(file: File, imageOnly = false): string | null {
 export const Step10Documents = ({ formData, setFormData }: Step10Props) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handlePick = (fieldKey: string, imageOnly = false) => (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePick = (fieldKey: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const err = validateFile(file, imageOnly);
+    const err = validateFile(file);
     if (err) {
       setErrors((prev) => ({ ...prev, [fieldKey]: err }));
       // clear the input so user can re-pick
@@ -73,7 +68,7 @@ export const Step10Documents = ({ formData, setFormData }: Step10Props) => {
           <h3 className="font-secondary text-xl md:text-2xl text-[#0a2225]">Document Uploads</h3>
         </div>
         <p className="mb-6 text-sm text-[#6B7280] ml-4">
-          Please upload the required documents. Accepted formats: PDF, JPG, PNG, or HEIC (iPhone photos). Max 50MB each.
+          Please upload your business license and proof of insurance. Accepted formats: PDF, JPG, PNG, or HEIC (iPhone photos). Max 50MB each. Your identity will be verified separately through Stripe Identity in the final step — no government ID or headshot needed here.
         </p>
         <div className="space-y-5">
           <div>
@@ -109,42 +104,6 @@ export const Step10Documents = ({ formData, setFormData }: Step10Props) => {
               )}
               {errors.insuranceCertificateFile && (
                 <p className="mt-2 text-xs text-red-600">{errors.insuranceCertificateFile}</p>
-              )}
-            </div>
-          </div>
-          <div>
-            <Label htmlFor="governmentIdFile" className="text-sm font-medium text-[#0a2225]">Government-Issued ID</Label>
-            <div className="mt-1.5 border-2 border-dashed border-[#E5DFC6] hover:border-[#C7A962] bg-[#FDF9F0]/50 rounded-xl p-4 transition-colors cursor-pointer">
-              <Input
-                id="governmentIdFile"
-                type="file"
-                accept=".pdf,.jpg,.jpeg,.png,.heic,.heif,application/pdf,image/*"
-                className="cursor-pointer"
-                onChange={handlePick('governmentIdFile')}
-              />
-              {formData.governmentIdFile && (
-                <p className="mt-2 text-xs text-[#0c4d47]">✓ {formData.governmentIdFile.name}</p>
-              )}
-              {errors.governmentIdFile && (
-                <p className="mt-2 text-xs text-red-600">{errors.governmentIdFile}</p>
-              )}
-            </div>
-          </div>
-          <div>
-            <Label htmlFor="professionalHeadshotFile" className="text-sm font-medium text-[#0a2225]">Professional Headshot</Label>
-            <div className="mt-1.5 border-2 border-dashed border-[#E5DFC6] hover:border-[#C7A962] bg-[#FDF9F0]/50 rounded-xl p-4 transition-colors cursor-pointer">
-              <Input
-                id="professionalHeadshotFile"
-                type="file"
-                accept=".jpg,.jpeg,.png,.heic,.heif,image/*"
-                className="cursor-pointer"
-                onChange={handlePick('professionalHeadshotFile', true)}
-              />
-              {formData.professionalHeadshotFile && (
-                <p className="mt-2 text-xs text-[#0c4d47]">✓ {formData.professionalHeadshotFile.name}</p>
-              )}
-              {errors.professionalHeadshotFile && (
-                <p className="mt-2 text-xs text-red-600">{errors.professionalHeadshotFile}</p>
               )}
             </div>
           </div>
