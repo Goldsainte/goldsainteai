@@ -251,7 +251,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // ===================================================================
       if (accountType === 'agent' || accountType === 'brand') {
         throw new Error(
-          `${accountType} accounts require application approval. Please use the signup flow at /apply/agent/signup or /apply/brand`
+          `${accountType} accounts require application approval. Please use the signup flow at /auth?mode=signup&role=agent or /apply/brand`
         );
       }
 

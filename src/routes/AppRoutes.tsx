@@ -82,7 +82,6 @@ const BillingDashboard = lazy(() => import('@/pages/BillingDashboard'));
 const TravelSettings = lazy(() => import('@/pages/TravelSettings'));
 const ApplicationStatusCheck = lazy(() => import('@/pages/ApplicationStatusCheck'));
 const AgentApplicationForm = lazy(() => import('@/pages/AgentApplicationForm'));
-const AgentSignup = lazy(() => import('@/pages/AgentSignup'));
 
 const CreatorSettingsPage = lazy(() => import('@/pages/CreatorSettingsPage'));
 
@@ -349,7 +348,6 @@ export const AppRoutes = () => (
         )}
       />
       <Route path="/application/status" element={<ApplicationStatusCheck />} />
-      <Route path="/apply/agent/signup" element={<AgentSignup />} />
       <Route path="/apply/agent" element={<AgentApplicationForm />} />
       <Route path="/agent-onboarding" element={<Navigate to="/apply/agent" replace />} />
       <Route

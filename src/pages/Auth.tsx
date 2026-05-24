@@ -370,20 +370,18 @@ const Auth = () => {
     }
     // Phone is optional for signup
 
-    if (selectedAccountType === 'agent') {
-      toast({ title: "Create your agent account", description: "Set up your account and verify your email before starting the application." });
-      navigate('/apply/agent/signup', { state: { email: normalizedEmail, firstName, lastName, phone, smsOptIn } });
-      setIsLoading(false);
-      return;
-    }
     if (selectedAccountType === 'brand') {
       toast({ title: "Complete Your Application", description: "You'll be redirected to the brand application form." });
       navigate('/brand/onboarding', { state: { email: normalizedEmail, firstName, lastName, phone, smsOptIn } });
       setIsLoading(false);
       return;
     }
-    
-    if (selectedAccountType !== 'traveler' && selectedAccountType !== 'creator') {
+
+    if (
+      selectedAccountType !== 'traveler' &&
+      selectedAccountType !== 'creator' &&
+      selectedAccountType !== 'agent'
+    ) {
       toast({ title: "Choose an account type", description: "Please tell us how you'll use Goldsainte." });
       setStep('account-type');
       setIsLoading(false);
@@ -402,7 +400,10 @@ const Auth = () => {
         email: normalizedEmail,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo:
+            selectedAccountType === 'agent'
+              ? `${window.location.origin}/apply/agent?verified=1`
+              : `${window.location.origin}/auth/callback`,
           data: {
             first_name: firstName,
             last_name: lastName,
@@ -410,6 +411,9 @@ const Auth = () => {
             phone_number: phone || null,
             account_type: selectedAccountType,
             sms_notifications: smsOptIn,
+            ...(selectedAccountType === 'agent'
+              ? { intended_flow: 'agent_application' }
+              : {}),
           },
         },
       });
@@ -887,7 +891,7 @@ const Auth = () => {
               </div>
             </div>
 
-            {(selectedAccountType === 'traveler' || selectedAccountType === 'creator') && (
+            {(selectedAccountType === 'traveler' || selectedAccountType === 'creator' || selectedAccountType === 'agent') && (
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-medium" style={{ color: '#0a2225' }}>Password</Label>
                 <Input id="password" type="password" placeholder="Create a password" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} minLength={8} />

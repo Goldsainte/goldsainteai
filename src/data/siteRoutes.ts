@@ -46,7 +46,7 @@ export const siteRoutes: RouteInfo[] = [
   
   // Marketplace & Agents
   { path: '/marketplace', label: 'Marketplace', description: 'Browse services and products', category: 'marketplace' },
-  { path: '/apply/agent/signup', label: 'Become an Agent', description: 'Create your agent account to start an application', category: 'marketplace' },
+  { path: '/auth?mode=signup&role=agent', label: 'Become an Agent', description: 'Create your agent account to start an application', category: 'marketplace' },
   { path: '/agent-dashboard', label: 'Agent Dashboard', description: 'Manage agent work', category: 'marketplace', requiresAuth: true, requiresRole: 'agent' },
   { path: '/agent-trip-requests', label: 'Trip Requests', description: 'View trip requests', category: 'marketplace', requiresAuth: true, requiresRole: 'agent' },
   { path: '/agent-performance', label: 'Performance', description: 'View performance metrics', category: 'marketplace', requiresAuth: true, requiresRole: 'agent' },

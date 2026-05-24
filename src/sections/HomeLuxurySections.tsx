@@ -55,7 +55,7 @@ const personasCarouselData: PersonaCarouselCardProps[] = [
     image: agentPlanningImg,
     headline: "Agents",
     tagline: "Verified leads delivered to your inbox.",
-    href: "/apply/agent/signup",
+    href: "/auth?mode=signup&role=agent",
   },
   {
     image: tropicalHideawayImg,
