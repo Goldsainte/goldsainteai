@@ -1,52 +1,35 @@
-## Plan
+## Root cause
 
-### What I will change
+`agent_applications` has a unique constraint on `email`. One orphan row already exists for `info@cornellfacilities.com` (id `75e7e1fe…`, `user_id = NULL`, status `pending_verification`, created 2026-05-17 — predates the auth wiring). On resubmit, the form mints a new `clientId`, the upsert runs as an INSERT, the `id` doesn't collide but the `email` does, and `onConflict: 'id'` can't resolve a conflict on a column it isn't targeting.
 
-1. **Lock the document step to the 2-document flow**
-   - Keep only **Business License** and **Insurance Certificate** in the document step.
-   - Keep **Government ID** and **Professional Headshot** out of this step because identity verification is already handled in the next step by **Stripe Identity**.
-   - Make sure the UI, `formData`, required-doc validation, upload calls, and edge function all match this exact 2-document contract.
+## Fix
 
-2. **Harden upload authorization and auth readiness**
-   - Update the submit/upload path so uploads only run when there is a real authenticated user with a confirmed email.
-   - Use the current authenticated session/user as the source of truth before calling `upload-application-document`.
-   - If auth is not ready or the user is not confirmed, keep the user on the document step with a clear error instead of attempting upload and getting a backend 403.
+### 1. Claim the orphan row (one-time data fix)
 
-3. **Remove the duplicate “Document Upload” title**
-   - Remove one of the two headings so the document step shows the title only once.
-   - I’ll keep the heading inside `Step10Documents` and remove the extra `SectionHeader` from `AgentApplicationForm.tsx`.
+Set `user_id` on the existing row to the authenticated user's id, so future logic finds it by `user_id`. Done via `supabase--insert` UPDATE against id `75e7e1fe-adbc-4934-b056-c23e9b649b77`. (We'll fetch the auth user's id for `info@cornellfacilities.com` first.)
 
-4. **Verify step completion behavior**
-   - Confirm the step requires the correct document(s), shows upload errors inline, and advances to **Stripe Identity verification** after successful upload and save.
+### 2. Add a partial unique index on `user_id`
 
-### What I found in the current code
+Migration: `CREATE UNIQUE INDEX agent_applications_user_id_unique ON agent_applications (user_id) WHERE user_id IS NOT NULL;`
 
-- The live `Step10Documents` component in the codebase already renders **2 upload fields**, not 4.
-- `formData` also only tracks **2 file fields**.
-- The edge function allowlist also only accepts **2 field names**.
-- So the correct route is the one you asked for: **the 2-document route**, not wiring up all four.
-- The remaining issues I found are:
-  - the page still renders a **duplicate Document Upload header**
-  - the submit path still needs a stricter **auth/session readiness guard** to avoid upload attempts when the authenticated user is not fully available
-  - there is stale/misleading inline commentary in `AgentApplicationForm.tsx` that still references four documents
+This makes "one agent = one application row" a real DB-level guarantee and lets us use `onConflict: 'user_id'` safely.
 
-### Files to update
+### 3. Rewrite `saveDraftApplication` lookup-then-upsert (src/pages/AgentApplicationForm.tsx, ~line 460)
 
-- `src/pages/AgentApplicationForm.tsx`
-- `src/components/applications/steps/Step10Documents.tsx` (only if needed for messaging/consistency)
-- `supabase/functions/upload-application-document/index.ts` (only if auth validation or messaging needs tightening)
+Before the upsert:
+- Query `agent_applications` for a row matching `user_id = authUser.id` → if found, reuse its `id`.
+- Otherwise query by `email = formData.email` (case-insensitive) → if found (orphan from pre-auth attempt), reuse its `id` AND set `user_id = authUser.id` in the upsert payload so it's claimed.
+- Otherwise mint a new `clientId`.
 
-### Validation
+Keep `.upsert({...}, { onConflict: 'id' })` since we now always pass the correct existing id. This is robust regardless of whether the partial unique index exists, and resubmissions cleanly UPDATE the agent's single row.
 
-After implementation, I will test the flow by:
-- reaching the **Documents** step as a confirmed authenticated user
-- uploading the required document files
-- confirming the upload request succeeds
-- confirming the application saves successfully
-- confirming the flow advances to **Stripe Identity verification**
+### 4. Verify
 
-### Technical notes
+- Test resubmit with `info@cornellfacilities.com`: should UPDATE the existing row (not insert), no unique-constraint error, advance to Stripe Identity (step 6).
+- Confirm the row's `user_id` is now populated and status remains `pending_verification`.
 
-- No database migration should be needed.
-- The chosen fix is: **remove the redundant Gov ID + headshot path and keep the document flow at exactly two uploads**.
-- If the blocker reproduces after the code changes, I’ll inspect the edge function response path directly to determine whether the failure is a frontend auth-timing issue or a backend validation failure.
+## Files
+
+- `supabase/migrations/<new>.sql` — partial unique index on `user_id`
+- `src/pages/AgentApplicationForm.tsx` — lookup-then-upsert in `saveDraftApplication`
+- Data fix: UPDATE the orphan row's `user_id` via insert tool

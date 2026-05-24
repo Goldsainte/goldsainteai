@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS agent_applications_user_id_unique ON public.agent_applications (user_id) WHERE user_id IS NOT NULL;
