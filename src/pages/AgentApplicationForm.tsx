@@ -929,7 +929,6 @@ function AgentApplicationFormInner() {
       case 5:
         return (
           <div className="space-y-8">
-            <SectionHeader title="Document Upload" />
             <Step10Documents formData={formData} setFormData={setFormData} />
 
             <NavButtons
