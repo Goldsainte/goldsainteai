@@ -7,7 +7,14 @@ const ALLOWED_FIELDS = new Set([
   'government_id',
   'headshot',
 ]);
-const ALLOWED_MIME = new Set(['application/pdf', 'image/jpeg', 'image/png', 'image/jpg']);
+const ALLOWED_MIME = new Set([
+  'application/pdf',
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/heic',
+  'image/heif',
+]);
 const MAX_SIZE = 50 * 1024 * 1024;
 
 Deno.serve(async (req) => {
@@ -30,7 +37,12 @@ Deno.serve(async (req) => {
       return json({ error: `File exceeds 50MB limit` }, 400);
     }
     if (file.type && !ALLOWED_MIME.has(file.type)) {
-      return json({ error: `Unsupported file type: ${file.type}` }, 400);
+      return json(
+        {
+          error: `Unsupported file type for ${file.name}: ${file.type}. Please upload a PDF, JPG, PNG, or HEIC file.`,
+        },
+        400,
+      );
     }
 
     const admin = createClient(
