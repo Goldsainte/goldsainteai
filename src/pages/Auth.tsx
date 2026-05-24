@@ -263,6 +263,36 @@ const Auth = () => {
     
     if (error) {
       if (error.message.toLowerCase().includes("email not confirmed")) {
+        // If this email already has a submitted agent/brand application,
+        // skip the "Confirm your email" loop (which auto-triggers resend and
+        // burns through Supabase's default rate limit). Send them to the
+        // application status page instead — their application is on file
+        // and identity verification, not email confirmation, is the gate.
+        try {
+          const [{ data: agentApp }, { data: brandApp }] = await Promise.all([
+            supabase
+              .from('agent_applications')
+              .select('id, status')
+              .eq('email', email)
+              .in('status', ['pending_verification', 'verified', 'approved', 'under_review'])
+              .limit(1)
+              .maybeSingle(),
+            supabase
+              .from('brand_applications')
+              .select('id, status')
+              .eq('primary_contact_email', email)
+              .in('status', ['pending_verification', 'verified', 'approved', 'under_review'])
+              .limit(1)
+              .maybeSingle(),
+          ]);
+          if (agentApp || brandApp) {
+            setIsLoading(false);
+            navigate(`/application/status?email=${encodeURIComponent(email)}`, { replace: true });
+            return;
+          }
+        } catch (lookupErr) {
+          console.warn('Application lookup failed in signin email-not-confirmed branch:', lookupErr);
+        }
         setStep("verify-email");
         try {
           const { error: resendError } = await supabase.auth.resend({ type: "signup", email });
