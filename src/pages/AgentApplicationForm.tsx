@@ -275,32 +275,35 @@ export default function AgentApplicationForm() {
     "Corporate Incentive Travel", "Milestone Celebrations",
   ];
 
-  const handleFileUpload = async (file: File, fieldName: string, userId: string) => {
-    try {
-      const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
-      if (file.size > MAX_FILE_SIZE) {
-        toast({
-          title: "File too large",
-          description: `${file.name} is ${(file.size / 1024 / 1024).toFixed(1)}MB. Maximum is 50MB per file.`,
-          variant: "destructive",
-        });
-        return null;
-      }
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}_${fieldName}.${fileExt}`;
-      // First folder segment MUST be the authenticated user's UID to satisfy
-      // the storage RLS policy `(storage.foldername(name))[1] = auth.uid()::text`.
-      const filePath = `${userId}/agent-applications/${fileName}`;
-      const { error: uploadError } = await supabase.storage
-        .from('application-documents')
-        .upload(filePath, file);
-      if (uploadError) throw uploadError;
-      return filePath;
-    } catch (error: any) {
-      console.error('File upload error:', error);
-      toast({ title: "Upload failed", description: error.message, variant: "destructive" });
-      return null;
+  // Uploads run through a service-role edge function because, with email
+  // confirmation enabled, there is no auth session immediately after signUp()
+  // and the browser cannot satisfy the storage RLS policy. Throws on failure
+  // so the caller can block submission and keep the user on the Documents step.
+  const handleFileUpload = async (
+    file: File,
+    fieldName: string,
+    userId: string,
+    email: string,
+  ): Promise<string> => {
+    const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+    if (file.size > MAX_FILE_SIZE) {
+      throw new Error(
+        `${file.name} is ${(file.size / 1024 / 1024).toFixed(1)}MB. Maximum is 50MB per file.`,
+      );
     }
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('userId', userId);
+    fd.append('applicationEmail', email);
+    fd.append('fieldName', fieldName);
+
+    const { data, error } = await supabase.functions.invoke(
+      'upload-application-document',
+      { body: fd },
+    );
+    if (error) throw new Error(error.message || `Failed to upload ${fieldName}`);
+    if (!data?.path) throw new Error((data as any)?.error || `Failed to upload ${fieldName}`);
+    return data.path as string;
   };
 
   const saveDraftApplication = async () => {
@@ -359,22 +362,34 @@ export default function AgentApplicationForm() {
       if (!authUser?.id) {
         throw new Error("Could not establish your account session. Please sign in and retry.");
       }
-      let businessLicensePath = null;
-      let insuranceCertPath = null;
-      let govIdPath = null;
-      let headshotPath = null;
 
-      if (formData.businessLicenseFile) {
-        businessLicensePath = await handleFileUpload(formData.businessLicenseFile, 'business_license', authUser.id);
+      // All four documents are required. Verify presence before attempting
+      // uploads so we can keep the user on the Documents step with a clear
+      // message rather than producing an application with null document paths.
+      const requiredDocs: Array<{ file: File | null | undefined; field: string; label: string }> = [
+        { file: formData.businessLicenseFile, field: 'business_license', label: 'Business License' },
+        { file: formData.insuranceCertificateFile, field: 'insurance_certificate', label: 'Insurance Certificate' },
+        { file: formData.governmentIdFile, field: 'government_id', label: 'Government ID' },
+        { file: formData.professionalHeadshotFile, field: 'headshot', label: 'Professional Headshot' },
+      ];
+      const missing = requiredDocs.find((d) => !d.file);
+      if (missing) {
+        setStep(5);
+        throw new Error(`${missing.label} is required. Please upload it before continuing.`);
       }
-      if (formData.insuranceCertificateFile) {
-        insuranceCertPath = await handleFileUpload(formData.insuranceCertificateFile, 'insurance_certificate', authUser.id);
-      }
-      if (formData.governmentIdFile) {
-        govIdPath = await handleFileUpload(formData.governmentIdFile, 'government_id', authUser.id);
-      }
-      if (formData.professionalHeadshotFile) {
-        headshotPath = await handleFileUpload(formData.professionalHeadshotFile, 'headshot', authUser.id);
+
+      let businessLicensePath: string;
+      let insuranceCertPath: string;
+      let govIdPath: string;
+      let headshotPath: string;
+      try {
+        businessLicensePath = await handleFileUpload(formData.businessLicenseFile!, 'business_license', authUser.id, formData.email);
+        insuranceCertPath = await handleFileUpload(formData.insuranceCertificateFile!, 'insurance_certificate', authUser.id, formData.email);
+        govIdPath = await handleFileUpload(formData.governmentIdFile!, 'government_id', authUser.id, formData.email);
+        headshotPath = await handleFileUpload(formData.professionalHeadshotFile!, 'headshot', authUser.id, formData.email);
+      } catch (uploadErr: any) {
+        setStep(5);
+        throw new Error(uploadErr?.message || 'Document upload failed. Please try again.');
       }
 
       const extendedData = {
