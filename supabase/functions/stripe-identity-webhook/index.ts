@@ -261,11 +261,37 @@ async function updateAgentApplication(
     verificationSession;
 
   // Find application by Stripe session ID
-  const { data: application, error: fetchError } = await supabaseClient
+  let { data: application, error: fetchError } = await supabaseClient
     .from("agent_applications")
     .select("*")
     .eq("stripe_verification_session_id", sessionId)
-    .single();
+    .maybeSingle();
+
+  // Fallback: if the session id was never persisted on the row (upstream bug),
+  // try the application_id we put in Stripe session metadata.
+  if (!application) {
+    const metaAppId = (metadata as Record<string, string> | undefined)?.applicationId
+      || (metadata as Record<string, string> | undefined)?.application_id;
+    if (metaAppId) {
+      const { data: byMeta } = await supabaseClient
+        .from("agent_applications")
+        .select("*")
+        .eq("id", metaAppId)
+        .maybeSingle();
+      if (byMeta) {
+        application = byMeta;
+        // Backfill the session id so future events resolve directly.
+        await supabaseClient
+          .from("agent_applications")
+          .update({ stripe_verification_session_id: sessionId })
+          .eq("id", byMeta.id);
+        logger.info("Resolved agent application via metadata fallback", {
+          applicationId: byMeta.id,
+          sessionId,
+        });
+      }
+    }
+  }
 
   if (fetchError || !application) {
     logger.error("Agent application not found", {
@@ -420,11 +446,34 @@ async function updateBrandApplication(
     verificationSession;
 
   // Find application by Stripe session ID
-  const { data: application, error: fetchError } = await supabaseClient
+  let { data: application, error: fetchError } = await supabaseClient
     .from("brand_applications")
     .select("*")
     .eq("stripe_verification_session_id", sessionId)
-    .single();
+    .maybeSingle();
+
+  if (!application) {
+    const metaAppId = (metadata as Record<string, string> | undefined)?.applicationId
+      || (metadata as Record<string, string> | undefined)?.application_id;
+    if (metaAppId) {
+      const { data: byMeta } = await supabaseClient
+        .from("brand_applications")
+        .select("*")
+        .eq("id", metaAppId)
+        .maybeSingle();
+      if (byMeta) {
+        application = byMeta;
+        await supabaseClient
+          .from("brand_applications")
+          .update({ stripe_verification_session_id: sessionId })
+          .eq("id", byMeta.id);
+        logger.info("Resolved brand application via metadata fallback", {
+          applicationId: byMeta.id,
+          sessionId,
+        });
+      }
+    }
+  }
 
   if (fetchError || !application) {
     logger.error("Brand application not found", {
