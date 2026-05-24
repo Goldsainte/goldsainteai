@@ -86,7 +86,7 @@ const normalizeBusinessType = (value: unknown): BusinessType | "" => {
 const luxuryInputClasses = "min-h-[48px] w-full max-w-full border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 focus:ring-offset-0 rounded-lg placeholder:text-sm box-border";
 const luxurySelectClasses = "min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg";
 
-export default function AgentApplicationForm() {
+function AgentApplicationFormInner() {
   const { user, isLoading: authLoading } = useAuth();
   const location = useLocation();
   const prefillData = location.state as {
@@ -901,22 +901,6 @@ export default function AgentApplicationForm() {
     }
   };
 
-  // Auth gate: must be signed in AND email-confirmed before the application
-  // can be filled. Anyone else gets redirected back to the signup page.
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FDF9F0]">
-        <Loader2 className="h-6 w-6 animate-spin text-[#0c4d47]" />
-      </div>
-    );
-  }
-  if (!user) {
-    return <Navigate to="/apply/agent/signup" replace />;
-  }
-  if (!user.email_confirmed_at) {
-    return <Navigate to="/apply/agent/signup?unverified=1" replace />;
-  }
-
   return (
     <div className="min-h-screen bg-[#FDF9F0] px-3 sm:px-4 py-8 md:py-16 overflow-x-hidden">
       <div className="mx-auto max-w-4xl w-full">
@@ -962,4 +946,28 @@ export default function AgentApplicationForm() {
       </div>
     </div>
   );
+}
+
+// Outer gate. The form body lives in AgentApplicationFormInner and only
+// mounts AFTER we've confirmed the user is signed in and email-confirmed.
+// This guarantees no prefill effect, draft-restore prompt, or autosave
+// runs for an unauthenticated visitor — and the form never flashes.
+export default function AgentApplicationForm() {
+  const { user, isLoading: authLoading } = useAuth();
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FDF9F0]">
+        <Loader2 className="h-6 w-6 animate-spin text-[#0c4d47]" />
+      </div>
+    );
+  }
+  if (!user) {
+    return <Navigate to="/apply/agent/signup" replace />;
+  }
+  if (!user.email_confirmed_at) {
+    return <Navigate to="/apply/agent/signup?unverified=1" replace />;
+  }
+
+  return <AgentApplicationFormInner />;
 }

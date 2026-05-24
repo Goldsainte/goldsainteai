@@ -17,14 +17,14 @@ export const Footer = () => {
       links: [
         { to: "/marketplace", label: "Browse Trips" },
         { to: "/post-trip", label: "Post a Trip" },
-        { to: "/apply/agent", label: "Find a Specialist" },
+        { to: "/agents", label: "Find a Specialist" },
       ],
     },
     {
       heading: "JOIN GOLDSAINTE",
       links: [
         { to: "/auth?mode=signup&role=traveler", label: "Sign Up as a Traveler" },
-        { to: "/apply/agent", label: "Apply as a Travel Agent" },
+        { to: "/apply/agent/signup", label: "Apply as a Travel Agent" },
         { to: "/apply/brand", label: "Partner as a Brand" },
       ],
     },

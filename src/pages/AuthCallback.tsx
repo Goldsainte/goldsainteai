@@ -172,6 +172,21 @@ const AuthCallback = () => {
           // Agent selections via Google can't be auto-applied — route them to
           // the formal application flow.
           if (pendingAccountType === 'agent') {
+            // Promote profile to agent so OnboardingRouter / form gate
+            // recognize them on this and future visits. OAuth users are
+            // email-confirmed by the provider, so the form gate will let
+            // them through.
+            if (profile.account_type !== 'agent') {
+              const { error: agentUpdateError } = await supabase
+                .from('profiles')
+                .update({ account_type: 'agent' as any })
+                .eq('id', session.user.id);
+              if (agentUpdateError) {
+                console.error('Failed to set account_type=agent from pending:', agentUpdateError);
+              } else {
+                profile.account_type = 'agent';
+              }
+            }
             toast({
               title: 'Complete your agent application',
               description: 'You signed in with Google but agents need to complete a formal application.',
