@@ -85,20 +85,24 @@ Deno.serve(async (req) => {
     });
   }
 
-  // 3. Queue backlog (pending > 10 min old means dispatcher isn't draining)
-  const tenMinAgo = new Date(Date.now() - 10 * 60_000).toISOString();
-  const { count: stuckCount, error: stuckErr } = await sb
-    .from("email_send_log")
-    .select("id", { count: "exact", head: true })
-    .eq("status", "pending")
-    .lt("created_at", tenMinAgo);
+  // 3. Queue backlog — TRUE stuck count.
+  // email_send_log is append-only: a successful send leaves BOTH a 'pending'
+  // row AND a 'sent' row sharing the same message_id. Counting raw pending
+  // rows produces a false-positive every time the dispatcher works.
+  // We only flag a message as stuck if NO terminal-status row exists for it
+  // and the pending row is older than 10 minutes.
+  const { data: stuckRows, error: stuckErr } = await sb.rpc(
+    "email_infra_count_stuck_pending",
+    { _older_than_minutes: 10 },
+  );
+  const stuckCount = typeof stuckRows === "number" ? stuckRows : 0;
   checks.push({
     name: "no_stuck_pending_emails",
-    ok: !stuckErr && (stuckCount ?? 0) === 0,
+    ok: !stuckErr && stuckCount === 0,
     detail: stuckErr
       ? `query failed: ${stuckErr.message}`
-      : (stuckCount ?? 0) > 0
-      ? `${stuckCount} emails stuck in 'pending' >10min — cron may be broken`
+      : stuckCount > 0
+      ? `${stuckCount} emails truly stuck in 'pending' >10min (no sent/dlq/failed terminal row) — dispatcher may be broken`
       : undefined,
   });
 
