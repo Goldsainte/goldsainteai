@@ -930,36 +930,7 @@ function AgentApplicationFormInner() {
         return (
           <div className="space-y-8">
             <SectionHeader title="Document Upload" />
-            <p className="text-sm text-[#6B7280] -mt-4">Upload the supporting documents needed to complete your application.</p>
-
-            <div className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                {[
-                  { label: "Business License", key: "businessLicenseFile" as const },
-                  { label: "Insurance Certificate", key: "insuranceCertificateFile" as const },
-                  { label: "Government ID", key: "governmentIdFile" as const },
-                  { label: "Professional Headshot", key: "professionalHeadshotFile" as const },
-                ].map(({ label, key }) => (
-                  <div key={key}>
-                    <Label className="text-sm text-[#0a2225]">{label}</Label>
-                    <label className="mt-1 flex items-center justify-center w-full px-4 py-4 border-2 border-dashed border-[#E5DFC6] rounded-xl cursor-pointer hover:bg-[#F5EFE1]/50 transition-colors">
-                      <div className="text-center">
-                        {formData[key] ? (
-                          <p className="text-sm text-[#0c4d47] font-medium flex items-center gap-2"><CheckCircle2 className="h-4 w-4" />{formData[key]!.name}</p>
-                        ) : (
-                          <><Upload className="mx-auto h-6 w-6 text-[#C7A962]" /><p className="mt-1 text-xs text-[#6B7280]">Click to upload</p></>
-                        )}
-                      </div>
-                      <input type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) setFormData({ ...formData, [key]: file });
-                      }} />
-                    </label>
-                  </div>
-                ))}
-              </div>
-              <p className="text-xs text-[#9A9079]">PDF, JPG, or PNG accepted. Max 50MB per file.</p>
-            </div>
+            <Step10Documents formData={formData} setFormData={setFormData} />
 
             <NavButtons
               onBack={() => setStep(4)}
