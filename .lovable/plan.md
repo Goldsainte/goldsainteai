@@ -1,81 +1,44 @@
-# Re-architect: Account → Verify Email → Application
+## What's actually happening
 
-## Goal
-Stop doing `auth.signUp()` from inside the agent application. Make account creation a separate, prior step, gate the application behind email verification, and resume the application on next sign-in. Fix the email pipeline first so verification actually arrives.
+You did reach the new signup page (`/apply/agent/signup`, heading "Create your Goldsainte advisor account"), filled in your details, and clicked the button. Then you landed on the application form without ever seeing a "check your email" screen.
 
-## Step 0 — Fix email delivery (prerequisite, same change)
+The cause is **two layers stacking up**:
 
-The queue currently has **25 pending emails older than 10 minutes** — the dispatcher is not draining. Without this, no agent can pass the new gate.
+1. **Auto-confirm email is enabled on the auth project.** When that's on, `supabase.auth.signUp()` immediately returns a fully authenticated session with `email_confirmed_at` already set. No confirmation email is ever required.
+2. **`AgentSignup.tsx` (lines 38–42) has a `useEffect` that redirects any verified, signed-in user to `/apply/agent`.** It was meant to bounce *returning* verified users in — but because of #1, it also fires the instant you finish signup, so the check-email panel never renders.
 
-Actions:
-1. Run the managed setup repair (`setup_email_infra`) to recreate the vault secret + `process-email-queue` cron and refresh the service-role key binding. Safe/idempotent.
-2. Call `verify-email-infra` and require it to return `healthy: true` (vault secret present, cron active, no stuck pending, no DLQ spike) before merging.
-3. Re-deploy `auth-email-hook` so Supabase Auth routes confirmation emails through our branded queue-backed template, not Supabase's rate-limited built-in sender.
-4. Confirm in Cloud → Emails that the Send Email Hook is enabled and pointed at `auth-email-hook`.
-5. Smoke-test: sign up a throwaway address, confirm the email arrives within ~30s, and `email_send_log` shows `sent` (not `pending`/`dlq`).
+Net effect: signup → instant session → effect fires → application form. Exactly what you're seeing.
 
-If `verify-email-infra` still fails after repair, stop and surface the failing check — do not ship the reorder.
+The application form itself is the current (correct) form. It only looks "old" because you reached it via the wrong path — skipping verification.
 
-## Step 1 — New "Create agent account" page (`/apply/agent/signup`)
+## Fix
 
-New page `src/pages/AgentSignup.tsx`. Fields: first name, last name, email, phone, password, confirm password, ToS checkbox. On submit:
+### 1. Turn off auto-confirm in auth settings
+Use `configure_auth` with `auto_confirm_email: false` so Supabase actually sends the confirmation email and withholds the session until the user clicks the link.
 
-- Run existing duplicate-email guard (`isDuplicateEmailError` / `isDuplicateEmailSignupResponse` from `@/lib/auth/duplicateEmail`).
-- `supabase.auth.signUp({ email, password, options: { data: { first_name, last_name, phone, account_type: 'agent', intended_flow: 'agent_application' }, emailRedirectTo: ${origin}/apply/agent?verified=1 } })`.
-- On success show "Check your email" screen with resend button (rate-limited client-side).
-- Do **not** create an `agent_applications` row yet.
+### 2. Harden `AgentSignup.tsx` so it can't skip the check-email screen
+- After a successful `signUp()` call, **always** show the "Confirm your email" panel (set `checkEmailFor` before returning), regardless of whether a session came back.
+- Change the redirect `useEffect` so it only sends a verified user into the application when the page is loaded fresh (e.g. from a returning sign-in) — not while we're sitting on the just-submitted "check your email" panel. Concretely: skip the redirect while `checkEmailFor` is set.
+- Defensive: if `signUp()` somehow returns a session with `email_confirmed_at` already set (e.g. someone re-enables auto-confirm later), immediately call `supabase.auth.signOut()` before showing the check-email panel, so the user can't be silently logged in without verifying.
 
-Profile row: the `handle_new_user` trigger (or equivalent) should pick up `account_type='agent'` + name/phone from `raw_user_meta_data`. If it doesn't already, extend it in the migration so the profile is seeded at signup.
+### 3. Tighten the gate on `/apply/agent` (belt-and-braces)
+`AgentApplicationForm.tsx` already redirects unauth / unverified users to `/apply/agent/signup`. Keep that. Add one extra signal: if we just arrived from the signup form (e.g. `location.state.justSignedUp`), force-render the signup check-email screen even if a session exists, so we never land on the form mid-flow.
 
-## Step 2 — Email verification gate
+## Files
 
-`emailRedirectTo` lands the user on `/apply/agent?verified=1`. Supabase exchanges the token → user now has a real session. No custom verification page needed for this path (the existing `ApplicationVerificationComplete` page stays, but is only used for Stripe Identity return).
+- (auth config) `configure_auth` → `auto_confirm_email: false`
+- `src/pages/AgentSignup.tsx` — always show check-email after signup; suppress auto-redirect while check-email panel is active; sign out if signup unexpectedly returns a confirmed session
+- `src/pages/AgentApplicationForm.tsx` — keep gate; minor safety check on `email_confirmed_at`
 
-## Step 3 — Application form, authenticated only
+## End-to-end flow after the fix
 
-Refactor `src/pages/AgentApplicationForm.tsx`:
+1. Click "Apply as a Travel Agent" → `/apply/agent` → unauthenticated → redirect to `/apply/agent/signup`.
+2. Fill name / email / phone / password → "Create account & send confirmation".
+3. Supabase sends the confirmation email. Page shows the **"Confirm your email — we sent a link to …"** panel with Resend.
+4. User clicks the email link → returns to `/apply/agent?verified=1` with a real session and `email_confirmed_at` set → the application form renders, prefilled from the profile + auth metadata.
+5. Complete the application → Stripe Identity → account active.
+6. If they close the tab between steps 3 and 4: signing in later routes them straight to `/apply/agent` to resume (already wired in `postAuthRouting`).
 
-- Wrap the route in an auth + email-confirmed guard. If `!user` → redirect to `/apply/agent/signup`. If `user && !user.email_confirmed_at` → show "Verify your email to continue" with resend.
-- **Delete the `supabase.auth.signUp(...)` block** (around line 329) and all downstream "authUser may be null" handling. `userId` comes from `useAuth()` from the first render.
-- Prefill step 1 fields (first name, last name, email, phone) from `profiles` + `auth.user` — editable, but no re-typing required.
-- Document uploads continue to call the `upload-application-document` edge function; with a real session, RLS is no longer the concern, but keep the edge-function path since it's already the contract.
-- On final submit: upsert (not insert) `agent_applications` keyed by `user_id` so resuming overwrites the in-progress row instead of creating duplicates.
+## Note on existing test accounts
 
-## Step 4 — Resume-on-login routing
-
-Update `src/lib/auth/postAuthRouting.ts` and `src/components/routing/OnboardingRouter.tsx`:
-
-- For `account_type='agent'`:
-  - No `agent_applications` row → `/apply/agent` (start fresh).
-  - Row exists with status `draft` / `pending_verification` (and no Stripe session) → `/apply/agent` (resume).
-  - Row with Stripe session in progress → `/application/status?email=...`.
-  - `verified` / `approved` → `/partner`.
-- Email not yet confirmed at sign-in → `/apply/agent/signup?unverified=1` showing resend, **not** the homepage and **not** a dead-end "confirm your email" screen.
-
-## Step 5 — Schema / data
-
-Migration:
-- Make `agent_applications.user_id` `NOT NULL` and `UNIQUE` (one in-flight app per user). Backfill / drop any orphan rows first.
-- Add `status='draft'` to the allowed values if not present.
-- Extend `handle_new_user` trigger to copy `account_type`, `first_name`, `last_name`, `phone` from `raw_user_meta_data` into `profiles` when present.
-
-## Step 6 — Cleanup
-
-- Remove the in-form signup branch, the "session may not exist yet" comments, and the localStorage `agent_application_id` writes from the signup path (the URL-based identifier from the prior fix stays for the Stripe return).
-- Keep `ApplicationVerificationComplete` only for the Stripe Identity return URL.
-
-## End-to-end verification
-
-1. New email → `/apply/agent/signup` → submit → "check your email" → email arrives (queue drained) → click link → lands on `/apply/agent` already signed in, name/email/phone prefilled.
-2. Fill application, upload docs (RLS passes because `auth.uid()` is set), submit → Stripe Identity → return → `verified`.
-3. Sign out mid-application, sign back in → routed straight to `/apply/agent` with prior answers.
-4. Duplicate email at step 1 → guarded with existing duplicate-email helper.
-5. Sign in before clicking confirmation link → `/apply/agent/signup?unverified=1` with resend.
-
-## Files touched
-- new: `src/pages/AgentSignup.tsx`
-- edit: `src/pages/AgentApplicationForm.tsx` (remove signUp, add guard, prefill, upsert)
-- edit: `src/routes/AppRoutes.tsx` (add `/apply/agent/signup`)
-- edit: `src/lib/auth/postAuthRouting.ts`, `src/components/routing/OnboardingRouter.tsx`
-- new migration: `agent_applications` constraints + `handle_new_user` extension
-- ops: `setup_email_infra`, redeploy `auth-email-hook`, verify via `verify-email-infra`
+Any account you created during this session was auto-confirmed. After the fix they will still be considered verified (they have `email_confirmed_at`). To actually exercise the new flow you'll need a brand-new email address.
