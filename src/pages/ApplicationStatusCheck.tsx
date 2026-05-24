@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, CheckCircle, Clock, XCircle } from "lucide-react";
 
 export default function ApplicationStatusCheck() {
   const [searchParams] = useSearchParams();
-  const [email, setEmail] = useState("");
+  const { user, isLoading: authLoading } = useAuth();
   const [status, setStatus] = useState<{
     id: string;
     type: 'agent' | 'brand';
@@ -22,28 +22,30 @@ export default function ApplicationStatusCheck() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const checkStatus = async (emailOverride?: string) => {
-    const targetEmail = (emailOverride ?? email).trim();
-    if (!targetEmail) return;
+  const checkStatus = async () => {
+    if (!user?.email) return;
+    const targetEmail = user.email.toLowerCase().trim();
     setLoading(true);
     setError(null);
     setStatus(null);
 
     try {
-      // Check agent applications
+      // RLS restricts these queries to the signed-in user's own rows
+      // (matches on JWT email claim or user_id = auth.uid()).
       const { data: agentApp } = await supabase
         .from('agent_applications')
         .select('id, email, first_name, last_name, status, stripe_verification_status, created_at, rejection_reason, user_id')
-        .eq('email', targetEmail)
+        .or(`email.eq.${targetEmail},user_id.eq.${user.id}`)
         .order('created_at', { ascending: false })
+        .limit(1)
         .maybeSingle() as any;
 
-      // Check brand applications
       const { data: brandApp } = await supabase
         .from('brand_applications')
         .select('id, brand_name, primary_contact_email, status, stripe_verification_status, created_at, rejection_reason, user_id')
-        .eq('primary_contact_email', targetEmail)
+        .or(`primary_contact_email.eq.${targetEmail},user_id.eq.${user.id}`)
         .order('created_at', { ascending: false })
+        .limit(1)
         .maybeSingle() as any;
 
       const application = agentApp || brandApp;
@@ -54,7 +56,7 @@ export default function ApplicationStatusCheck() {
           type: agentApp ? 'agent' : 'brand',
         });
       } else {
-        setError("No application found for this email address.");
+        setError("We couldn't find an application linked to your account.");
       }
     } catch (err: any) {
       console.error(err);
@@ -64,16 +66,14 @@ export default function ApplicationStatusCheck() {
     }
   };
 
-  // Auto-load when navigated here with ?email=<address> (e.g. from the
-  // post-signin routing path).
+  // Auto-load as soon as we have an authenticated session. The ?email query
+  // param is accepted but only honored when it matches the signed-in user.
   useEffect(() => {
-    const qEmail = searchParams.get('email');
-    if (qEmail) {
-      setEmail(qEmail);
-      void checkStatus(qEmail);
-    }
+    if (authLoading) return;
+    if (!user) return;
+    void checkStatus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [authLoading, user?.id]);
 
   const getStatusBadge = (s: string) => {
     switch (s) {
@@ -90,27 +90,54 @@ export default function ApplicationStatusCheck() {
     }
   };
 
+  // Build a sign-in redirect that brings the user back here after auth, with
+  // the prefilled email (if provided) so the Auth page can pre-populate.
+  const redirectEmail = searchParams.get('email');
+  const signInHref = `/auth?redirect=${encodeURIComponent('/application/status')}${
+    redirectEmail ? `&email=${encodeURIComponent(redirectEmail)}` : ''
+  }`;
+
+  if (!authLoading && !user) {
+    return (
+      <div className="bg-[#f7f3ea] flex-1 py-16 px-6">
+        <div className="mx-auto max-w-xl">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Check Application Status</CardTitle>
+              <CardDescription>
+                Sign in with the email you used to apply to view your application status.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button asChild className="w-full">
+                <Link to={signInHref}>Sign in to view status</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-[#f7f3ea] p-6">
+    <div className="bg-[#f7f3ea] flex-1 py-12 px-6">
       <div className="mx-auto max-w-2xl space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Check Application Status</CardTitle>
+            <CardTitle className="text-2xl font-serif">Application Status</CardTitle>
             <CardDescription>
-              Enter your email to view the status of your Goldsainte application
+              Signed in as {user?.email}. Showing the application linked to your account.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex gap-2">
-              <Input
-                type="email"
-                placeholder="your.email@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && checkStatus()}
-              />
-              <Button onClick={() => checkStatus()} disabled={loading || !email}>
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Check Status"}
+            {(loading || authLoading) && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" /> Loading your application…
+              </div>
+            )}
+            <div>
+              <Button variant="outline" onClick={() => checkStatus()} disabled={loading}>
+                Refresh
               </Button>
             </div>
 
