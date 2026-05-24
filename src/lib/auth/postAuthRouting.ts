@@ -35,6 +35,9 @@ export function getPostAuthDestination(
   if (accountType === "creator" && !isProfileComplete) {
     return "/onboarding/creator";
   }
+  // Agents always resume in the application flow until the profile is complete.
+  // The application route itself handles the "email not yet verified" case
+  // by redirecting to /apply/agent/signup?unverified=1.
   if (accountType === "agent" && !isProfileComplete) {
     return "/apply/agent";
   }
