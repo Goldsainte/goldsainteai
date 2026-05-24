@@ -629,19 +629,90 @@ function AgentApplicationFormInner() {
               </div>
               <div className="md:col-span-2">
                 <Label className="text-sm font-medium text-[#0a2225]">Business Address</Label>
-                <Input value={formData.businessAddress} onChange={(e) => setFormData({ ...formData, businessAddress: e.target.value })} className={luxuryInputClasses} />
+                <Input
+                  value={formData.businessAddress}
+                  onChange={(e) => setFormData({ ...formData, businessAddress: e.target.value })}
+                  className={luxuryInputClasses}
+                  autoComplete="street-address"
+                  name="street-address"
+                  placeholder="123 Main St"
+                />
               </div>
               <div>
                 <Label className="text-sm font-medium text-[#0a2225]">City</Label>
-                <Input value={formData.businessCity} onChange={(e) => setFormData({ ...formData, businessCity: e.target.value })} className={luxuryInputClasses} />
+                <Input
+                  value={formData.businessCity}
+                  onChange={(e) => setFormData({ ...formData, businessCity: e.target.value })}
+                  className={luxuryInputClasses}
+                  autoComplete="address-level2"
+                  name="city"
+                />
               </div>
               <div>
                 <Label className="text-sm font-medium text-[#0a2225]">State</Label>
-                <Input value={formData.businessState} onChange={(e) => setFormData({ ...formData, businessState: e.target.value })} className={luxuryInputClasses} />
+                <Select
+                  value={formData.businessState}
+                  onValueChange={(value) => setFormData({ ...formData, businessState: value })}
+                >
+                  <SelectTrigger className={luxurySelectClasses} aria-label="State">
+                    <SelectValue placeholder="Select state" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px]">
+                    {US_STATES.map((s) => (
+                      <SelectItem key={s.code} value={s.code}>
+                        {s.name} ({s.code})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {/* Hidden input so browser autofill of "address-level1" can still populate the value */}
+                <input
+                  type="text"
+                  tabIndex={-1}
+                  aria-hidden="true"
+                  autoComplete="address-level1"
+                  name="state"
+                  value={formData.businessState}
+                  onChange={(e) => {
+                    const v = e.target.value.trim();
+                    if (!v) return;
+                    // Accept either "CA" or "California" from autofill
+                    const match = US_STATES.find(
+                      (s) => s.code.toLowerCase() === v.toLowerCase() || s.name.toLowerCase() === v.toLowerCase(),
+                    );
+                    if (match) setFormData({ ...formData, businessState: match.code });
+                  }}
+                  style={{ position: "absolute", width: 0, height: 0, opacity: 0, pointerEvents: "none" }}
+                />
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">ZIP Code</Label>
+                <Input
+                  value={formData.businessZip}
+                  onChange={(e) => setFormData({ ...formData, businessZip: e.target.value })}
+                  className={luxuryInputClasses}
+                  autoComplete="postal-code"
+                  name="postal-code"
+                  placeholder="10001"
+                />
               </div>
               <div>
                 <Label className="text-sm font-medium text-[#0a2225]">Years of Experience</Label>
-                <Input type="number" value={formData.yearsExperience} onChange={(e) => setFormData({ ...formData, yearsExperience: e.target.value })} className={luxuryInputClasses} />
+                <Select
+                  value={formData.yearsExperience}
+                  onValueChange={(value) => setFormData({ ...formData, yearsExperience: value })}
+                >
+                  <SelectTrigger className={luxurySelectClasses} aria-label="Years of experience">
+                    <SelectValue placeholder="Select years" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {YEARS_OPTIONS.map((y) => (
+                      <SelectItem key={y} value={y}>
+                        {y === "10+" ? "10+ years" : `${y} year${y === "1" ? "" : "s"}`}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label className="text-sm font-medium text-[#0a2225]">Website</Label>
