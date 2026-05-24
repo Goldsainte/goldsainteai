@@ -454,10 +454,33 @@ function AgentApplicationFormInner() {
         linkedinProfileUrl: formData.linkedinProfileUrl,
       };
 
-      // Use the existing in-flight application id if we have one (resume),
-      // otherwise mint a new one. We upsert by id so resuming overwrites
-      // instead of producing a second row.
-      const clientId = draftApplicationId ?? crypto.randomUUID();
+      // Resolve the canonical application id for this agent:
+      //   1) prefer an existing row owned by this user_id (one agent = one row)
+      //   2) otherwise claim a pre-auth orphan row matching this email
+      //   3) otherwise reuse a draft id we already minted, else create a new one
+      // We upsert by `id`, so once `clientId` points at the correct existing row
+      // the write becomes an UPDATE and the unique `email` constraint can't trip.
+      let clientId: string;
+      const { data: existingByUser } = await supabase
+        .from('agent_applications')
+        .select('id')
+        .eq('user_id', authUser.id)
+        .maybeSingle();
+      if (existingByUser?.id) {
+        clientId = existingByUser.id as string;
+      } else {
+        const { data: existingByEmail } = await supabase
+          .from('agent_applications')
+          .select('id, user_id')
+          .ilike('email', formData.email)
+          .maybeSingle();
+        if (existingByEmail?.id) {
+          // Claim the orphan row (user_id may be NULL from a pre-auth attempt)
+          clientId = existingByEmail.id as string;
+        } else {
+          clientId = draftApplicationId ?? crypto.randomUUID();
+        }
+      }
 
       const { error: applicationError } = await supabase
         .from('agent_applications')
