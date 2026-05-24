@@ -393,13 +393,16 @@ export default function AgentApplicationForm() {
         linkedinProfileUrl: formData.linkedinProfileUrl,
       };
 
-      const clientId = crypto.randomUUID();
+      // Use the existing in-flight application id if we have one (resume),
+      // otherwise mint a new one. We upsert by id so resuming overwrites
+      // instead of producing a second row.
+      const clientId = draftApplicationId ?? crypto.randomUUID();
 
       const { error: applicationError } = await supabase
         .from('agent_applications')
-        .insert({
+        .upsert({
           id: clientId,
-          user_id: authUser?.id ?? null,
+          user_id: authUser.id,
           first_name: formData.firstName,
           last_name: formData.lastName,
           email: formData.email,
@@ -438,7 +441,7 @@ export default function AgentApplicationForm() {
           accepted_vendor: formData.acceptedVendor,
           extended_data: extendedData,
           status: 'pending_verification',
-        });
+        }, { onConflict: 'id' });
 
       if (applicationError) throw new Error(applicationError.message || 'Failed to save application');
 
