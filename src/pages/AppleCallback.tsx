@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2 } from 'lucide-react';
+import { EditorialLoader } from '@/components/EditorialLoader';
 import { useToast } from '@/hooks/use-toast';
 
 const AppleCallback = () => {
@@ -102,14 +102,11 @@ const AppleCallback = () => {
   }, [searchParams, navigate, toast]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5">
-      <div className="text-center space-y-4">
-        <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-        <p className="text-muted-foreground">
-          {isProcessing ? 'Completing Apple sign-in...' : 'Redirecting...'}
-        </p>
-      </div>
-    </div>
+    <EditorialLoader
+      eyebrow="Apple Sign In"
+      title="One moment"
+      subtitle={isProcessing ? 'Completing Apple sign-in.' : 'Redirecting you now.'}
+    />
   );
 };
 

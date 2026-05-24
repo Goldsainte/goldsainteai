@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import logomark from "@/assets/logomark-gold.png";
+
+const SERIF = "'Cormorant Garamond', Georgia, serif";
 
 export default function ApplicationVerificationComplete() {
   const [searchParams] = useSearchParams();
@@ -73,112 +72,109 @@ export default function ApplicationVerificationComplete() {
     checkVerificationAndUpdateApplication();
   }, [applicationType]);
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FDF9F0] p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <img
-            src={logomark}
-            alt="Goldsainte"
-            className="h-12 w-auto mx-auto mb-4"
-            loading="lazy"
-          />
-          <h1 className="font-secondary text-[26px] md:text-[31px] text-[#0a2225] mb-2">
-            Verification Complete
-          </h1>
-        </div>
+  const eyebrow =
+    status === "pending"
+      ? "Verifying"
+      : status === "success"
+      ? "Verified"
+      : "Notice";
+  const headline =
+    status === "pending"
+      ? "One moment"
+      : status === "success"
+      ? applicationType === "agent"
+        ? "You're In"
+        : "Application Received"
+      : "Verification Issue";
 
-        <Card className="bg-white border border-[#E5DFC6] rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-3 font-secondary text-[#0a2225]">
-              {status === 'pending' && (
-                <>
-                  <Clock className="h-6 w-6 text-[#C7A962] animate-pulse" />
-                  Processing...
-                </>
-              )}
-              {status === 'success' && (
-                <>
-                  <CheckCircle className="h-6 w-6 text-[#0c4d47]" />
-                  Identity Verified
-                </>
-              )}
-              {status === 'error' && (
-                <>
-                  <AlertCircle className="h-6 w-6 text-red-500" />
-                  Verification Issue
-                </>
-              )}
-            </CardTitle>
-          </CardHeader>
-          
-          <CardContent className="space-y-4">
-            {status === 'pending' && (
-              <p className="text-[#6B7280]">
-                We're confirming your identity verification with Stripe...
-              </p>
-            )}
-            
-            {status === 'success' && (
-              <>
-                {applicationType === 'agent' ? (
-                  <>
-                    <p className="text-[#0a2225]">
-                      Your identity is verified and your Goldsainte advisor account is
-                      <strong> live</strong>.
-                    </p>
-                    <div className="bg-[#F5EFE1] border border-[#E5DFC6] p-4 rounded-xl">
-                      <h3 className="font-secondary text-lg text-[#0a2225] mb-2">Next steps</h3>
-                      <ul className="text-sm text-[#0a2225] space-y-2">
-                        <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />Open your advisor dashboard</li>
-                        <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />Connect Stripe in Earnings to enable payouts</li>
-                        <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />Publish your first trip in Trip Builder</li>
-                      </ul>
-                    </div>
-                    <Button
-                      onClick={() => navigate('/agent?tab=earnings')}
-                      className="w-full bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full"
-                      size="lg"
-                    >
-                      Continue to Dashboard
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-[#6B7280]">
-                      Your identity has been successfully verified. Our team will review your
-                      {' '}brand application and get back to you within 1–2 business days.
-                    </p>
-                    <Button
-                      onClick={() => navigate('/')}
-                      className="w-full bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full"
-                      size="lg"
-                    >
-                      Return to Home
-                    </Button>
-                  </>
-                )}
-              </>
-            )}
-            
-            {status === 'error' && (
-              <>
-                <p className="text-[#6B7280]">
-                  There was an issue processing your verification. Please contact our support team
-                  at support@goldsainte.com for assistance.
-                </p>
-                <Button
-                  onClick={() => navigate('/')}
-                  variant="outline"
-                  className="w-full border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full"
-                >
-                  Return to Home
-                </Button>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+  return (
+    <div className="bg-[#f7f3ea] text-[#0a2225] flex-1 py-24 px-6 selection:bg-[#c9a84c]/30">
+      <section className="w-full max-w-xl mx-auto text-center">
+        <div className="flex justify-center mb-10">
+          <div className="w-px h-16 bg-[#0a2225]" />
+        </div>
+        <span className="block uppercase tracking-[0.3em] text-[9px] font-bold mb-8 text-[#c9a84c]">
+          {eyebrow}
+        </span>
+        <h1
+          className="text-5xl md:text-6xl italic mb-10 tracking-tight leading-[0.95]"
+          style={{ fontFamily: SERIF }}
+        >
+          {headline}
+        </h1>
+
+        {status === "pending" && (
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-5 w-5 animate-spin text-[#0c4d47]" strokeWidth={1.5} />
+            <p className="text-base text-[#0a2225]/70 font-light max-w-sm">
+              We're confirming your identity with Stripe. This usually takes a few seconds.
+            </p>
+          </div>
+        )}
+
+        {status === "success" && applicationType === "agent" && (
+          <>
+            <p className="text-base text-[#0a2225]/75 font-light max-w-md mx-auto mb-12 leading-relaxed">
+              Your identity is verified and your Goldsainte advisor account is live. Three short steps remain before you can take your first booking.
+            </p>
+            <ol className="text-left max-w-sm mx-auto space-y-5 mb-14 border-l border-[#c9a84c]/40 pl-6">
+              <li>
+                <span className="block text-[9px] uppercase tracking-[0.2em] font-bold text-[#c9a84c] mb-1">Step 01</span>
+                <span className="text-base">Open your advisor dashboard</span>
+              </li>
+              <li>
+                <span className="block text-[9px] uppercase tracking-[0.2em] font-bold text-[#c9a84c] mb-1">Step 02</span>
+                <span className="text-base">Connect Stripe to enable payouts</span>
+              </li>
+              <li>
+                <span className="block text-[9px] uppercase tracking-[0.2em] font-bold text-[#c9a84c] mb-1">Step 03</span>
+                <span className="text-base">Publish your first trip in Trip Builder</span>
+              </li>
+            </ol>
+            <button
+              onClick={() => navigate("/agent?tab=earnings")}
+              className="group inline-flex items-center gap-4 border border-[#0a2225] px-12 py-5 transition-all hover:bg-[#0a2225] hover:text-[#f7f3ea]"
+            >
+              <span className="text-xs uppercase tracking-[0.2em] font-semibold">Continue to dashboard</span>
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" strokeWidth={1.5} />
+            </button>
+          </>
+        )}
+
+        {status === "success" && applicationType !== "agent" && (
+          <>
+            <p className="text-base text-[#0a2225]/75 font-light max-w-md mx-auto mb-12 leading-relaxed">
+              Your identity has been verified. Our team will review your brand application and return with a decision within one to two business days.
+            </p>
+            <Link
+              to="/application/status"
+              className="group inline-flex items-center gap-4 border border-[#0a2225] px-12 py-5 transition-all hover:bg-[#0a2225] hover:text-[#f7f3ea]"
+            >
+              <span className="text-xs uppercase tracking-[0.2em] font-semibold">View application status</span>
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" strokeWidth={1.5} />
+            </Link>
+          </>
+        )}
+
+        {status === "error" && (
+          <>
+            <p className="text-base text-[#0a2225]/75 font-light max-w-md mx-auto mb-12 leading-relaxed">
+              There was an issue processing your verification. Please contact our concierge team at{" "}
+              <a href="mailto:support@goldsainte.com" className="underline decoration-[#c9a84c] underline-offset-4">
+                support@goldsainte.com
+              </a>{" "}
+              for assistance.
+            </p>
+            <Link
+              to="/"
+              className="group inline-flex items-center gap-4 border border-[#0a2225] px-12 py-5 transition-all hover:bg-[#0a2225] hover:text-[#f7f3ea]"
+            >
+              <span className="text-xs uppercase tracking-[0.2em] font-semibold">Return home</span>
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" strokeWidth={1.5} />
+            </Link>
+          </>
+        )}
+      </section>
     </div>
   );
 }

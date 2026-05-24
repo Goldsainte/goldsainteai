@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2 } from 'lucide-react';
+import { EditorialLoader } from '@/components/EditorialLoader';
 import { AUTH_REDIRECT_STORAGE_KEY, getRedirectPathFromSearch, sanitizeRedirectPath } from '@/lib/auth/redirect';
 import { getPostAuthDestination } from '@/lib/auth/postAuthRouting';
 import { toast } from '@/hooks/use-toast';
@@ -256,12 +256,11 @@ const AuthCallback = () => {
   }, [navigate, location.hash, location.search]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-        <p className="text-muted-foreground">Completing sign in...</p>
-      </div>
-    </div>
+    <EditorialLoader
+      eyebrow="Member Portal"
+      title="One moment"
+      subtitle="Completing sign in and preparing your account."
+    />
   );
 };
 
