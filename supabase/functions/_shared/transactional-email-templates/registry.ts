@@ -31,6 +31,7 @@ import { template as adminNewTripPending } from './admin-new-trip-pending.tsx'
 import { template as identityVerificationUpdate } from './identity-verification-update.tsx'
 import { template as disputeOpened } from './dispute-opened.tsx'
 import { template as adminQueueAlert } from './admin-queue-alert.tsx'
+import { template as adminAuthEmailFailure } from './admin-auth-email-failure.tsx'
 import { template as applicationReceivedProfessional } from './application-received-professional.tsx'
 import { template as applicationApprovedProfessional } from './application-approved-professional.tsx'
 import { template as applicationDeclinedProfessional } from './application-declined-professional.tsx'
@@ -60,6 +61,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'identity-verification-update': identityVerificationUpdate,
   'dispute-opened': disputeOpened,
   'admin-queue-alert': adminQueueAlert,
+  'admin-auth-email-failure': adminAuthEmailFailure,
   'application-received-professional': applicationReceivedProfessional,
   'application-approved-professional': applicationApprovedProfessional,
   'application-declined-professional': applicationDeclinedProfessional,
