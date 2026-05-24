@@ -371,8 +371,8 @@ const Auth = () => {
     // Phone is optional for signup
 
     if (selectedAccountType === 'agent') {
-      toast({ title: "Complete Your Application", description: "You'll be redirected to the agent application form." });
-      navigate('/apply/agent', { state: { email: normalizedEmail, firstName, lastName, phone, smsOptIn } });
+      toast({ title: "Create your agent account", description: "Set up your account and verify your email before starting the application." });
+      navigate('/apply/agent/signup', { state: { email: normalizedEmail, firstName, lastName, phone, smsOptIn } });
       setIsLoading(false);
       return;
     }
