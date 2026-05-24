@@ -12,6 +12,30 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, CheckCircle2, Shield, ArrowRight, ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
+const US_STATES: { code: string; name: string }[] = [
+  { code: "AL", name: "Alabama" }, { code: "AK", name: "Alaska" }, { code: "AZ", name: "Arizona" },
+  { code: "AR", name: "Arkansas" }, { code: "CA", name: "California" }, { code: "CO", name: "Colorado" },
+  { code: "CT", name: "Connecticut" }, { code: "DE", name: "Delaware" }, { code: "DC", name: "District of Columbia" },
+  { code: "FL", name: "Florida" }, { code: "GA", name: "Georgia" }, { code: "HI", name: "Hawaii" },
+  { code: "ID", name: "Idaho" }, { code: "IL", name: "Illinois" }, { code: "IN", name: "Indiana" },
+  { code: "IA", name: "Iowa" }, { code: "KS", name: "Kansas" }, { code: "KY", name: "Kentucky" },
+  { code: "LA", name: "Louisiana" }, { code: "ME", name: "Maine" }, { code: "MD", name: "Maryland" },
+  { code: "MA", name: "Massachusetts" }, { code: "MI", name: "Michigan" }, { code: "MN", name: "Minnesota" },
+  { code: "MS", name: "Mississippi" }, { code: "MO", name: "Missouri" }, { code: "MT", name: "Montana" },
+  { code: "NE", name: "Nebraska" }, { code: "NV", name: "Nevada" }, { code: "NH", name: "New Hampshire" },
+  { code: "NJ", name: "New Jersey" }, { code: "NM", name: "New Mexico" }, { code: "NY", name: "New York" },
+  { code: "NC", name: "North Carolina" }, { code: "ND", name: "North Dakota" }, { code: "OH", name: "Ohio" },
+  { code: "OK", name: "Oklahoma" }, { code: "OR", name: "Oregon" }, { code: "PA", name: "Pennsylvania" },
+  { code: "RI", name: "Rhode Island" }, { code: "SC", name: "South Carolina" }, { code: "SD", name: "South Dakota" },
+  { code: "TN", name: "Tennessee" }, { code: "TX", name: "Texas" }, { code: "UT", name: "Utah" },
+  { code: "VT", name: "Vermont" }, { code: "VA", name: "Virginia" }, { code: "WA", name: "Washington" },
+  { code: "WV", name: "West Virginia" }, { code: "WI", name: "Wisconsin" }, { code: "WY", name: "Wyoming" },
+  { code: "PR", name: "Puerto Rico" }, { code: "VI", name: "U.S. Virgin Islands" },
+  { code: "GU", name: "Guam" }, { code: "AS", name: "American Samoa" }, { code: "MP", name: "Northern Mariana Islands" },
+];
+
+const YEARS_OPTIONS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10+"];
+
 type AgentApplicationData = {
   firstName: string;
   lastName: string;
@@ -366,6 +390,7 @@ function AgentApplicationFormInner() {
 
   const saveDraftApplication = async () => {
     setIsLoading(true);
+    setFormData((prev: any) => ({ ...prev, __documentUploadError: undefined }));
     try {
       const normalizedBusinessType = normalizeBusinessType(formData.businessType);
 
@@ -393,7 +418,7 @@ function AgentApplicationFormInner() {
       ];
       const missing = requiredDocs.find((d) => !d.file);
       if (missing) {
-        setStep(5);
+        setStep(10);
         throw new Error(`${missing.label} is required. Please upload it before continuing.`);
       }
 
@@ -407,8 +432,10 @@ function AgentApplicationFormInner() {
         govIdPath = await handleFileUpload(formData.governmentIdFile!, 'government_id', authUser.id, formData.email);
         headshotPath = await handleFileUpload(formData.professionalHeadshotFile!, 'headshot', authUser.id, formData.email);
       } catch (uploadErr: any) {
-        setStep(5);
-        throw new Error(uploadErr?.message || 'Document upload failed. Please try again.');
+        setStep(10);
+        const msg = uploadErr?.message || 'Document upload failed. Please try again.';
+        setFormData((prev: any) => ({ ...prev, __documentUploadError: msg }));
+        throw new Error(msg);
       }
 
       const extendedData = {
@@ -602,19 +629,90 @@ function AgentApplicationFormInner() {
               </div>
               <div className="md:col-span-2">
                 <Label className="text-sm font-medium text-[#0a2225]">Business Address</Label>
-                <Input value={formData.businessAddress} onChange={(e) => setFormData({ ...formData, businessAddress: e.target.value })} className={luxuryInputClasses} />
+                <Input
+                  value={formData.businessAddress}
+                  onChange={(e) => setFormData({ ...formData, businessAddress: e.target.value })}
+                  className={luxuryInputClasses}
+                  autoComplete="street-address"
+                  name="street-address"
+                  placeholder="123 Main St"
+                />
               </div>
               <div>
                 <Label className="text-sm font-medium text-[#0a2225]">City</Label>
-                <Input value={formData.businessCity} onChange={(e) => setFormData({ ...formData, businessCity: e.target.value })} className={luxuryInputClasses} />
+                <Input
+                  value={formData.businessCity}
+                  onChange={(e) => setFormData({ ...formData, businessCity: e.target.value })}
+                  className={luxuryInputClasses}
+                  autoComplete="address-level2"
+                  name="city"
+                />
               </div>
               <div>
                 <Label className="text-sm font-medium text-[#0a2225]">State</Label>
-                <Input value={formData.businessState} onChange={(e) => setFormData({ ...formData, businessState: e.target.value })} className={luxuryInputClasses} />
+                <Select
+                  value={formData.businessState}
+                  onValueChange={(value) => setFormData({ ...formData, businessState: value })}
+                >
+                  <SelectTrigger className={luxurySelectClasses} aria-label="State">
+                    <SelectValue placeholder="Select state" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px]">
+                    {US_STATES.map((s) => (
+                      <SelectItem key={s.code} value={s.code}>
+                        {s.name} ({s.code})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {/* Hidden input so browser autofill of "address-level1" can still populate the value */}
+                <input
+                  type="text"
+                  tabIndex={-1}
+                  aria-hidden="true"
+                  autoComplete="address-level1"
+                  name="state"
+                  value={formData.businessState}
+                  onChange={(e) => {
+                    const v = e.target.value.trim();
+                    if (!v) return;
+                    // Accept either "CA" or "California" from autofill
+                    const match = US_STATES.find(
+                      (s) => s.code.toLowerCase() === v.toLowerCase() || s.name.toLowerCase() === v.toLowerCase(),
+                    );
+                    if (match) setFormData({ ...formData, businessState: match.code });
+                  }}
+                  style={{ position: "absolute", width: 0, height: 0, opacity: 0, pointerEvents: "none" }}
+                />
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-[#0a2225]">ZIP Code</Label>
+                <Input
+                  value={formData.businessZip}
+                  onChange={(e) => setFormData({ ...formData, businessZip: e.target.value })}
+                  className={luxuryInputClasses}
+                  autoComplete="postal-code"
+                  name="postal-code"
+                  placeholder="10001"
+                />
               </div>
               <div>
                 <Label className="text-sm font-medium text-[#0a2225]">Years of Experience</Label>
-                <Input type="number" value={formData.yearsExperience} onChange={(e) => setFormData({ ...formData, yearsExperience: e.target.value })} className={luxuryInputClasses} />
+                <Select
+                  value={formData.yearsExperience}
+                  onValueChange={(value) => setFormData({ ...formData, yearsExperience: value })}
+                >
+                  <SelectTrigger className={luxurySelectClasses} aria-label="Years of experience">
+                    <SelectValue placeholder="Select years" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {YEARS_OPTIONS.map((y) => (
+                      <SelectItem key={y} value={y}>
+                        {y === "10+" ? "10+ years" : `${y} year${y === "1" ? "" : "s"}`}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label className="text-sm font-medium text-[#0a2225]">Website</Label>

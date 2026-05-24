@@ -1,6 +1,7 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Upload } from "lucide-react";
+import { Upload, AlertCircle } from "lucide-react";
+import { useState } from "react";
 
 interface Step10Props {
   formData: any;
@@ -9,16 +10,70 @@ interface Step10Props {
 
 const luxuryInputClasses = "mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 focus:ring-offset-0 rounded-lg placeholder:text-sm";
 
+const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'image/heif'];
+const ALLOWED_TYPES_IMAGE_ONLY = ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'image/heif'];
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+
+function validateFile(file: File, imageOnly = false): string | null {
+  if (file.size > MAX_FILE_SIZE) {
+    return `${file.name} is ${(file.size / 1024 / 1024).toFixed(1)}MB — max is 50MB.`;
+  }
+  const allowed = imageOnly ? ALLOWED_TYPES_IMAGE_ONLY : ALLOWED_TYPES;
+  // Some phones report empty type — fall back to extension check
+  const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+  const extOk = imageOnly
+    ? ['jpg', 'jpeg', 'png', 'heic', 'heif'].includes(ext)
+    : ['pdf', 'jpg', 'jpeg', 'png', 'heic', 'heif'].includes(ext);
+  if (file.type && !allowed.includes(file.type) && !extOk) {
+    return `Unsupported file: ${file.name}. Please use ${imageOnly ? 'JPG, PNG, or HEIC' : 'PDF, JPG, PNG, or HEIC'}.`;
+  }
+  if (!file.type && !extOk) {
+    return `Could not detect file type for ${file.name}. Please use ${imageOnly ? 'JPG, PNG, or HEIC' : 'PDF, JPG, PNG, or HEIC'}.`;
+  }
+  return null;
+}
+
 export const Step10Documents = ({ formData, setFormData }: Step10Props) => {
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handlePick = (fieldKey: string, imageOnly = false) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const err = validateFile(file, imageOnly);
+    if (err) {
+      setErrors((prev) => ({ ...prev, [fieldKey]: err }));
+      // clear the input so user can re-pick
+      e.target.value = '';
+      return;
+    }
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next[fieldKey];
+      return next;
+    });
+    setFormData({ ...formData, [fieldKey]: file });
+  };
+
+  const submitError: string | undefined = formData.__documentUploadError;
+
   return (
     <div className="space-y-8">
+      {submitError && (
+        <div className="rounded-xl border border-red-300 bg-red-50 p-4 flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+          <div className="text-sm text-red-800">
+            <p className="font-medium mb-1">We couldn't upload your documents</p>
+            <p>{submitError}</p>
+          </div>
+        </div>
+      )}
       <div>
         <div className="flex items-center gap-3 mb-4">
           <div className="h-8 w-1 bg-[#C7A962] rounded-full" />
           <h3 className="font-secondary text-xl md:text-2xl text-[#0a2225]">Document Uploads</h3>
         </div>
         <p className="mb-6 text-sm text-[#6B7280] ml-4">
-          Please upload the required documents. All documents must be clear and legible.
+          Please upload the required documents. Accepted formats: PDF, JPG, PNG, or HEIC (iPhone photos). Max 50MB each.
         </p>
         <div className="space-y-5">
           <div>
@@ -27,17 +82,15 @@ export const Step10Documents = ({ formData, setFormData }: Step10Props) => {
               <Input
                 id="businessLicenseFile"
                 type="file"
-                accept=".pdf,.jpg,.jpeg,.png"
+                accept=".pdf,.jpg,.jpeg,.png,.heic,.heif,application/pdf,image/*"
                 className="cursor-pointer"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    setFormData({ ...formData, businessLicenseFile: file });
-                  }
-                }}
+                onChange={handlePick('businessLicenseFile')}
               />
               {formData.businessLicenseFile && (
                 <p className="mt-2 text-xs text-[#0c4d47]">✓ {formData.businessLicenseFile.name}</p>
+              )}
+              {errors.businessLicenseFile && (
+                <p className="mt-2 text-xs text-red-600">{errors.businessLicenseFile}</p>
               )}
             </div>
           </div>
@@ -47,17 +100,15 @@ export const Step10Documents = ({ formData, setFormData }: Step10Props) => {
               <Input
                 id="insuranceCertificateFile"
                 type="file"
-                accept=".pdf,.jpg,.jpeg,.png"
+                accept=".pdf,.jpg,.jpeg,.png,.heic,.heif,application/pdf,image/*"
                 className="cursor-pointer"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    setFormData({ ...formData, insuranceCertificateFile: file });
-                  }
-                }}
+                onChange={handlePick('insuranceCertificateFile')}
               />
               {formData.insuranceCertificateFile && (
                 <p className="mt-2 text-xs text-[#0c4d47]">✓ {formData.insuranceCertificateFile.name}</p>
+              )}
+              {errors.insuranceCertificateFile && (
+                <p className="mt-2 text-xs text-red-600">{errors.insuranceCertificateFile}</p>
               )}
             </div>
           </div>
@@ -67,17 +118,15 @@ export const Step10Documents = ({ formData, setFormData }: Step10Props) => {
               <Input
                 id="governmentIdFile"
                 type="file"
-                accept=".pdf,.jpg,.jpeg,.png"
+                accept=".pdf,.jpg,.jpeg,.png,.heic,.heif,application/pdf,image/*"
                 className="cursor-pointer"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    setFormData({ ...formData, governmentIdFile: file });
-                  }
-                }}
+                onChange={handlePick('governmentIdFile')}
               />
               {formData.governmentIdFile && (
                 <p className="mt-2 text-xs text-[#0c4d47]">✓ {formData.governmentIdFile.name}</p>
+              )}
+              {errors.governmentIdFile && (
+                <p className="mt-2 text-xs text-red-600">{errors.governmentIdFile}</p>
               )}
             </div>
           </div>
@@ -87,17 +136,15 @@ export const Step10Documents = ({ formData, setFormData }: Step10Props) => {
               <Input
                 id="professionalHeadshotFile"
                 type="file"
-                accept=".jpg,.jpeg,.png"
+                accept=".jpg,.jpeg,.png,.heic,.heif,image/*"
                 className="cursor-pointer"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    setFormData({ ...formData, professionalHeadshotFile: file });
-                  }
-                }}
+                onChange={handlePick('professionalHeadshotFile', true)}
               />
               {formData.professionalHeadshotFile && (
                 <p className="mt-2 text-xs text-[#0c4d47]">✓ {formData.professionalHeadshotFile.name}</p>
+              )}
+              {errors.professionalHeadshotFile && (
+                <p className="mt-2 text-xs text-red-600">{errors.professionalHeadshotFile}</p>
               )}
             </div>
           </div>
