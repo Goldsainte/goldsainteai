@@ -475,9 +475,15 @@ const Auth = () => {
         } else if (msg.includes("failed to fetch") || msg.includes("network")) {
           title = "Connection issue";
           description = "Unable to reach our servers. Check your internet and try again.";
-        } else if (msg.includes("rate limit") || msg.includes("too many")) {
-          title = "Too many attempts";
-          description = "Please wait a minute and try again.";
+        } else if (
+          msg.includes("rate limit") ||
+          msg.includes("too many") ||
+          msg.includes("over_email_send_rate_limit") ||
+          msg.includes("email rate limit")
+        ) {
+          title = "Too many signup attempts for this email";
+          description =
+            "We've sent several confirmation emails to this address recently and our provider has paused new sends for about an hour. Please wait ~60 minutes and try again, or use a different email address.";
         } else if (msg.includes("password")) {
           title = "Password issue";
           description = error.message;
