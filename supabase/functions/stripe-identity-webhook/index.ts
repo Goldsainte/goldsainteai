@@ -21,6 +21,103 @@ const stripe = new Stripe(STRIPE_SECRET_KEY, {
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 // ============================================================================
+// IDENTITY NAME MATCHING
+// ============================================================================
+
+/**
+ * Normalize a name for comparison: lowercase, strip diacritics, drop
+ * non-letter chars, collapse whitespace.
+ */
+function normalizeName(value: string | null | undefined): string {
+  if (!value) return "";
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z\s'-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Returns true if two name parts are a reasonable match.
+ * - Equal after normalization, OR
+ * - One is a prefix of the other and the prefix is >= 3 chars
+ *   (handles "Andy" vs "Andrew", but rejects "J" vs "Jonathan").
+ */
+function namePartMatches(a: string, b: string): boolean {
+  const an = normalizeName(a);
+  const bn = normalizeName(b);
+  if (!an || !bn) return false;
+  if (an === bn) return true;
+  const short = an.length < bn.length ? an : bn;
+  const long = an.length < bn.length ? bn : an;
+  return short.length >= 3 && long.startsWith(short);
+}
+
+/**
+ * Compare the verified ID name against the expected name on the application.
+ * Last name must match strictly (after normalization). First name allows the
+ * prefix tolerance above to accommodate diminutives ("Mike"/"Michael").
+ * Middle names on the ID are ignored — we only compare the first token of
+ * each side as the "first name".
+ */
+function verifiedNameMatchesExpected(
+  verifiedFirst: string | undefined,
+  verifiedLast: string | undefined,
+  expectedFirst: string | undefined,
+  expectedLast: string | undefined,
+): { match: boolean; reason?: string } {
+  const vFirst = normalizeName(verifiedFirst).split(" ")[0] || "";
+  const vLast = normalizeName(verifiedLast).split(" ").pop() || "";
+  const eFirst = normalizeName(expectedFirst).split(" ")[0] || "";
+  const eLast = normalizeName(expectedLast).split(" ").pop() || "";
+
+  if (!vFirst || !vLast || !eFirst || !eLast) {
+    return { match: false, reason: "missing_name_on_id_or_application" };
+  }
+  if (normalizeName(vLast) !== normalizeName(eLast)) {
+    return { match: false, reason: "last_name_mismatch" };
+  }
+  if (!namePartMatches(vFirst, eFirst)) {
+    return { match: false, reason: "first_name_mismatch" };
+  }
+  return { match: true };
+}
+
+/**
+ * Stripe webhook events do NOT include `verified_outputs` by default — they
+ * must be retrieved via the API. Pull the session with verified_outputs
+ * expanded so we can run the name-match check.
+ */
+async function hydrateVerifiedOutputs(
+  session: VerificationSession,
+  logger: Logger,
+): Promise<VerificationSession> {
+  if (session.status !== "verified") return session;
+  if (session.verified_outputs?.first_name && session.verified_outputs?.last_name) {
+    return session;
+  }
+  try {
+    const hydrated = await stripe.identity.verificationSessions.retrieve(
+      session.id,
+      { expand: ["verified_outputs"] },
+    );
+    logger.info("Hydrated verification session with verified_outputs", {
+      sessionId: session.id,
+      hasOutputs: Boolean((hydrated as any).verified_outputs),
+    });
+    return hydrated as unknown as VerificationSession;
+  } catch (e: any) {
+    logger.error("Failed to hydrate verification session", {
+      sessionId: session.id,
+      error: e?.message,
+    });
+    return session;
+  }
+}
+
+// ============================================================================
 // TYPES
 // ============================================================================
 
@@ -327,6 +424,80 @@ async function updateAgentApplication(
       applicationId: application.id,
     });
 
+    // ID-name vs application-name fraud check. Stripe verifying the
+    // document only proves the document is real — not that it belongs
+    // to the person filling out the application. Reject mismatches.
+    const verifiedFirst = verified_outputs?.first_name;
+    const verifiedLast = verified_outputs?.last_name;
+    const nameCheck = verifiedNameMatchesExpected(
+      verifiedFirst,
+      verifiedLast,
+      application.first_name,
+      application.last_name,
+    );
+    if (!nameCheck.match) {
+      logger.warn("Identity verified but name does not match application", {
+        applicationId: application.id,
+        reason: nameCheck.reason,
+        verifiedFirst,
+        verifiedLast,
+        expectedFirst: application.first_name,
+        expectedLast: application.last_name,
+      });
+
+      const mismatchReport = {
+        ...verificationReport,
+        name_mismatch: {
+          reason: nameCheck.reason,
+          verified_first_name: verifiedFirst ?? null,
+          verified_last_name: verifiedLast ?? null,
+          expected_first_name: application.first_name,
+          expected_last_name: application.last_name,
+        },
+      };
+
+      const { error: rejectError } = await supabaseClient
+        .from("agent_applications")
+        .update({
+          status: "rejected",
+          stripe_verification_status: status,
+          stripe_verified_at: new Date().toISOString(),
+          stripe_verification_report: mismatchReport,
+          rejection_reason:
+            "The name on the government ID does not match the name on the application.",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", application.id);
+      if (rejectError) {
+        logger.error("Failed to write name-mismatch rejection", {
+          error: rejectError,
+        });
+        throw rejectError;
+      }
+
+      await logAuditEvent(application.id, "agent", "rejected", {
+        reason: "id_name_mismatch",
+        detail: nameCheck.reason,
+        verified_first_name: verifiedFirst ?? null,
+        verified_last_name: verifiedLast ?? null,
+        expected_first_name: application.first_name,
+        expected_last_name: application.last_name,
+      });
+
+      await sendApplicantNotification(
+        application.email,
+        `${application.first_name} ${application.last_name}`,
+        "failed",
+        "agent",
+        "The name on the government ID you uploaded does not match the name on your application. If this is a clerical issue (e.g., a maiden name or middle name), please contact support.",
+      );
+
+      logger.info("Agent application rejected for name mismatch", {
+        applicationId: application.id,
+      });
+      return; // skip provisioning
+    }
+
     // Update application
     const { error: updateError } = await supabaseClient
       .from("agent_applications")
@@ -508,6 +679,77 @@ async function updateBrandApplication(
     logger.info("Verification successful", {
       applicationId: application.id,
     });
+
+    // ID-name vs application-name fraud check. brand_applications stores
+    // a single `primary_contact_name`; split into first/last for comparison.
+    const verifiedFirst = verified_outputs?.first_name;
+    const verifiedLast = verified_outputs?.last_name;
+    const contactParts = String(application.primary_contact_name || "")
+      .trim()
+      .split(/\s+/);
+    const expectedFirst = contactParts[0] || "";
+    const expectedLast = contactParts.length > 1 ? contactParts[contactParts.length - 1] : "";
+    const nameCheck = verifiedNameMatchesExpected(
+      verifiedFirst,
+      verifiedLast,
+      expectedFirst,
+      expectedLast,
+    );
+    if (!nameCheck.match) {
+      logger.warn("Brand identity verified but name does not match application", {
+        applicationId: application.id,
+        reason: nameCheck.reason,
+        verifiedFirst,
+        verifiedLast,
+        expectedFirst,
+        expectedLast,
+      });
+      const mismatchReport = {
+        ...verificationReport,
+        name_mismatch: {
+          reason: nameCheck.reason,
+          verified_first_name: verifiedFirst ?? null,
+          verified_last_name: verifiedLast ?? null,
+          expected_contact_name: application.primary_contact_name,
+        },
+      };
+      const { error: rejectError } = await supabaseClient
+        .from("brand_applications")
+        .update({
+          status: "rejected",
+          stripe_verification_status: status,
+          stripe_verified_at: new Date().toISOString(),
+          stripe_verification_report: mismatchReport,
+          rejection_reason:
+            "The name on the government ID does not match the primary contact name on the application.",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", application.id);
+      if (rejectError) {
+        logger.error("Failed to write brand name-mismatch rejection", {
+          error: rejectError,
+        });
+        throw rejectError;
+      }
+      await logAuditEvent(application.id, "brand", "rejected", {
+        reason: "id_name_mismatch",
+        detail: nameCheck.reason,
+        verified_first_name: verifiedFirst ?? null,
+        verified_last_name: verifiedLast ?? null,
+        expected_contact_name: application.primary_contact_name,
+      });
+      await sendApplicantNotification(
+        application.primary_contact_email,
+        application.brand_name,
+        "failed",
+        "brand",
+        "The name on the government ID you uploaded does not match the primary contact name on your application.",
+      );
+      logger.info("Brand application rejected for name mismatch", {
+        applicationId: application.id,
+      });
+      return;
+    }
 
     // Update application
     const { error: updateError } = await supabaseClient
@@ -761,12 +1003,14 @@ async function processVerificationCompleted(
     logger.info("Identified as agent application", {
       applicationId: agentApp.id,
     });
-    await updateAgentApplication(sessionId, verificationSession, logger);
+    const hydrated = await hydrateVerifiedOutputs(verificationSession, logger);
+    await updateAgentApplication(sessionId, hydrated, logger);
   } else if (brandApp) {
     logger.info("Identified as brand application", {
       applicationId: brandApp.id,
     });
-    await updateBrandApplication(sessionId, verificationSession, logger);
+    const hydrated = await hydrateVerifiedOutputs(verificationSession, logger);
+    await updateBrandApplication(sessionId, hydrated, logger);
   } else if (travelerVerification) {
     logger.info("Identified as traveler verification", {
       verificationId: travelerVerification.id,
