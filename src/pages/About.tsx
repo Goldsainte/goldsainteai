@@ -944,6 +944,7 @@ const About = () => {
 
     </Accordion>
     </div>
+    </div>
   );
 };
 
