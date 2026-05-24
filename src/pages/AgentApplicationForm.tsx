@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, CheckCircle2, Shield, ArrowRight, ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Step10Documents } from "@/components/applications/steps/Step10Documents";
 
 const US_STATES: { code: string; name: string }[] = [
   { code: "AL", name: "Alabama" }, { code: "AK", name: "Alaska" }, { code: "AZ", name: "Arizona" },
@@ -78,8 +79,6 @@ type AgentApplicationData = {
   taxIdEIN: string;
   businessLicenseFile: File | null;
   insuranceCertificateFile: File | null;
-  governmentIdFile: File | null;
-  professionalHeadshotFile: File | null;
   acceptedTerms: boolean;
   acceptedPrivacy: boolean;
   acceptedVendor: boolean;
@@ -161,8 +160,6 @@ function AgentApplicationFormInner() {
     taxIdEIN: "",
     businessLicenseFile: null,
     insuranceCertificateFile: null,
-    governmentIdFile: null,
-    professionalHeadshotFile: null,
     acceptedTerms: false,
     acceptedPrivacy: false,
     acceptedVendor: false,
@@ -281,8 +278,6 @@ function AgentApplicationFormInner() {
       const {
         businessLicenseFile: _a,
         insuranceCertificateFile: _b,
-        governmentIdFile: _c,
-        professionalHeadshotFile: _d,
         ...persistable
       } = formData;
       localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(persistable));
@@ -413,26 +408,20 @@ function AgentApplicationFormInner() {
       const requiredDocs: Array<{ file: File | null | undefined; field: string; label: string }> = [
         { file: formData.businessLicenseFile, field: 'business_license', label: 'Business License' },
         { file: formData.insuranceCertificateFile, field: 'insurance_certificate', label: 'Insurance Certificate' },
-        { file: formData.governmentIdFile, field: 'government_id', label: 'Government ID' },
-        { file: formData.professionalHeadshotFile, field: 'headshot', label: 'Professional Headshot' },
       ];
       const missing = requiredDocs.find((d) => !d.file);
       if (missing) {
-        setStep(10);
+        setStep(5);
         throw new Error(`${missing.label} is required. Please upload it before continuing.`);
       }
 
       let businessLicensePath: string;
       let insuranceCertPath: string;
-      let govIdPath: string;
-      let headshotPath: string;
       try {
         businessLicensePath = await handleFileUpload(formData.businessLicenseFile!, 'business_license', authUser.id, formData.email);
         insuranceCertPath = await handleFileUpload(formData.insuranceCertificateFile!, 'insurance_certificate', authUser.id, formData.email);
-        govIdPath = await handleFileUpload(formData.governmentIdFile!, 'government_id', authUser.id, formData.email);
-        headshotPath = await handleFileUpload(formData.professionalHeadshotFile!, 'headshot', authUser.id, formData.email);
       } catch (uploadErr: any) {
-        setStep(10);
+        setStep(5);
         const msg = uploadErr?.message || 'Document upload failed. Please try again.';
         setFormData((prev: any) => ({ ...prev, __documentUploadError: msg }));
         throw new Error(msg);
@@ -488,8 +477,6 @@ function AgentApplicationFormInner() {
           insurance_coverage_amount: formData.insuranceCoverage ? parseFloat(formData.insuranceCoverage) : null,
           document_business_license: businessLicensePath,
           document_insurance_cert: insuranceCertPath,
-          document_government_id: govIdPath,
-          document_headshot: headshotPath,
           accepted_terms: formData.acceptedTerms,
           accepted_privacy: formData.acceptedPrivacy,
           accepted_vendor: formData.acceptedVendor,
@@ -943,36 +930,7 @@ function AgentApplicationFormInner() {
         return (
           <div className="space-y-8">
             <SectionHeader title="Document Upload" />
-            <p className="text-sm text-[#6B7280] -mt-4">Upload the supporting documents needed to complete your application.</p>
-
-            <div className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                {[
-                  { label: "Business License", key: "businessLicenseFile" as const },
-                  { label: "Insurance Certificate", key: "insuranceCertificateFile" as const },
-                  { label: "Government ID", key: "governmentIdFile" as const },
-                  { label: "Professional Headshot", key: "professionalHeadshotFile" as const },
-                ].map(({ label, key }) => (
-                  <div key={key}>
-                    <Label className="text-sm text-[#0a2225]">{label}</Label>
-                    <label className="mt-1 flex items-center justify-center w-full px-4 py-4 border-2 border-dashed border-[#E5DFC6] rounded-xl cursor-pointer hover:bg-[#F5EFE1]/50 transition-colors">
-                      <div className="text-center">
-                        {formData[key] ? (
-                          <p className="text-sm text-[#0c4d47] font-medium flex items-center gap-2"><CheckCircle2 className="h-4 w-4" />{formData[key]!.name}</p>
-                        ) : (
-                          <><Upload className="mx-auto h-6 w-6 text-[#C7A962]" /><p className="mt-1 text-xs text-[#6B7280]">Click to upload</p></>
-                        )}
-                      </div>
-                      <input type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) setFormData({ ...formData, [key]: file });
-                      }} />
-                    </label>
-                  </div>
-                ))}
-              </div>
-              <p className="text-xs text-[#9A9079]">PDF, JPG, or PNG accepted. Max 50MB per file.</p>
-            </div>
+            <Step10Documents formData={formData} setFormData={setFormData} />
 
             <NavButtons
               onBack={() => setStep(4)}
