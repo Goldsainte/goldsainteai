@@ -680,6 +680,77 @@ async function updateBrandApplication(
       applicationId: application.id,
     });
 
+    // ID-name vs application-name fraud check. brand_applications stores
+    // a single `primary_contact_name`; split into first/last for comparison.
+    const verifiedFirst = verified_outputs?.first_name;
+    const verifiedLast = verified_outputs?.last_name;
+    const contactParts = String(application.primary_contact_name || "")
+      .trim()
+      .split(/\s+/);
+    const expectedFirst = contactParts[0] || "";
+    const expectedLast = contactParts.length > 1 ? contactParts[contactParts.length - 1] : "";
+    const nameCheck = verifiedNameMatchesExpected(
+      verifiedFirst,
+      verifiedLast,
+      expectedFirst,
+      expectedLast,
+    );
+    if (!nameCheck.match) {
+      logger.warn("Brand identity verified but name does not match application", {
+        applicationId: application.id,
+        reason: nameCheck.reason,
+        verifiedFirst,
+        verifiedLast,
+        expectedFirst,
+        expectedLast,
+      });
+      const mismatchReport = {
+        ...verificationReport,
+        name_mismatch: {
+          reason: nameCheck.reason,
+          verified_first_name: verifiedFirst ?? null,
+          verified_last_name: verifiedLast ?? null,
+          expected_contact_name: application.primary_contact_name,
+        },
+      };
+      const { error: rejectError } = await supabaseClient
+        .from("brand_applications")
+        .update({
+          status: "rejected",
+          stripe_verification_status: status,
+          stripe_verified_at: new Date().toISOString(),
+          stripe_verification_report: mismatchReport,
+          rejection_reason:
+            "The name on the government ID does not match the primary contact name on the application.",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", application.id);
+      if (rejectError) {
+        logger.error("Failed to write brand name-mismatch rejection", {
+          error: rejectError,
+        });
+        throw rejectError;
+      }
+      await logAuditEvent(application.id, "brand", "rejected", {
+        reason: "id_name_mismatch",
+        detail: nameCheck.reason,
+        verified_first_name: verifiedFirst ?? null,
+        verified_last_name: verifiedLast ?? null,
+        expected_contact_name: application.primary_contact_name,
+      });
+      await sendApplicantNotification(
+        application.primary_contact_email,
+        application.brand_name,
+        "failed",
+        "brand",
+        "The name on the government ID you uploaded does not match the primary contact name on your application.",
+      );
+      logger.info("Brand application rejected for name mismatch", {
+        applicationId: application.id,
+      });
+      return;
+    }
+
     // Update application
     const { error: updateError } = await supabaseClient
       .from("brand_applications")
