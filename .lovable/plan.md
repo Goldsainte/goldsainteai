@@ -1,41 +1,46 @@
-# Fix signup UX bugs: stale draft prompt + cross-device verification
+# Fix Step 1 Address + Years, Diagnose Document Upload
 
-Two independent bugs from the `info@cornellfacilities.com` signup. Both are small, surgical fixes.
+## 1. Address: autofill state + browser autocomplete (Step 1)
 
-## Bug 1 — "Resume your previous draft?" shown to brand-new users
+Currently `Business Address`, `City`, `State` are free-text `<Input>`s with no `autoComplete` hints, and Zip/Country aren't even shown on Step 1 — that's why the browser can't offer to autofill anything.
 
-**Cause:** `src/pages/AgentApplicationForm.tsx` reads a single shared `localStorage` key (`agent_application_draft`) on mount and prompts to resume — regardless of which user is signed in. So any leftover draft from a previous session on that browser is offered to a brand-new account.
+Changes in `src/pages/AgentApplicationForm.tsx` Step 1 address block:
+- Add proper `autoComplete` attributes so Chrome/Safari/iOS Contacts can autofill:
+  - Address → `autoComplete="street-address"`
+  - City → `autoComplete="address-level2"`
+  - State → `autoComplete="address-level1"`
+  - Zip → `autoComplete="postal-code"` (add the missing field)
+  - Country → `autoComplete="country"` (add hidden default `US`)
+- Replace the State free-text input with a **Select** of all 50 US states + DC + territories (PR, VI, GU, AS, MP) using `<Select>` from shadcn. Two-letter codes as values, full name as label. This both standardizes the data and gives the "scroll to pick a state" experience.
+- Add the Zip input next to State so the row is Address / City / State / Zip — matches the data already collected at submit time (`business_postal_code`).
 
-**Fix:** Scope the draft to the current user.
-- Change the storage key to `agent_application_draft:<user.id>` (only known after auth loads).
-- Only check/restore the draft if a key exists for *this* user_id.
-- On logout/account switch, the other user's draft is ignored (not surfaced).
-- Migrate-or-discard: if the legacy unscoped key exists, only offer it to the user whose `email` inside the stored payload matches the signed-in profile's email; otherwise silently delete it.
+We will **not** wire up a paid Google Places / Mapbox autocomplete in this pass. Native browser autofill (driven by the correct `autoComplete` hints above) is what most users actually expect, costs nothing, and works on iOS/Android out of the box. If you later want type-ahead address completion as you type, that requires a Google Places API key (or Mapbox/Smarty) — I'll surface that as a follow-up question after this lands.
 
-This makes the prompt only appear when the *current* user truly has an in-progress draft.
+## 2. Years of Experience: 1–9 + 10+ picker
 
-## Bug 2 — "Already verified? Continue" fails when user verifies on another device
+In Step 1, replace the `Years of Experience` number `<Input>` with a shadcn `<Select>` with options `1, 2, 3, 4, 5, 6, 7, 8, 9, 10+`. Stored value stays a string; submit logic at line 449 already does `parseInt(formData.yearsExperience)` — `"10+"` would parse to `10`, which is the correct semantic for "10 or more years".
 
-**Cause:** With email confirmation enabled, `supabase.auth.signUp()` does **not** create a session until the email is confirmed. So on the desktop tab:
-- There is no session, so `supabase.auth.getUser()` returns `null`.
-- The polling loop (lines 190-234) and the "Already verified? Continue" button (lines 1003-1021) can never detect that the user clicked the link on their phone — the desktop has no token to refresh against the server.
+## 3. Document upload "can't get past it" — diagnose
 
-**Fix:** Add a tiny public edge function `check-email-verified` that takes `{ email }` and returns `{ verified: boolean }` by looking up `auth.users.email_confirmed_at` via the service role key. Then:
-- In the verify-email polling loop, if no session is present, fall back to calling this endpoint every poll cycle with the signup email.
-- In the "Already verified? Continue" button, if `getUser()` returns no confirmed user, call the same endpoint as a fallback. If it returns verified, send the user to `/auth?mode=signin` (or directly sign them in if we can) with a toast asking them to sign in once — since we have no session token from the phone we can't auto-create one on desktop, but we can stop falsely telling them they aren't verified.
+The Documents step itself just stashes the `File` object in `formData`. The actual upload fires when you click submit, going through `handleFileUpload` → `upload-application-document` edge function → `application-documents` storage bucket. There are several known failure points:
 
-The endpoint only returns a boolean, never user data, so it is safe to expose unauthenticated. Add basic rate-limit handling (return boolean even on miss — no email enumeration risk beyond what signup already exposes).
+1. **No visible error surfacing on the Documents step.** If any of the 4 uploads fails, `saveDraftApplication` throws, and the catch at line 410 routes back to `setStep(5)` — but Step 10 is the Documents step, not Step 5. So the user lands on a different page than the file pickers and sees a toast they may miss. We'll fix the step index and add an inline error banner above the upload list so the failure stays on screen.
+2. **Edge function refuses if `auth.users.email` doesn't match `formData.email` exactly** (case/whitespace). The function does `email.toLowerCase()` on the incoming side but compares against `userRes.user.email.toLowerCase()` — that part is fine. But `formData.email` is taken from Step 1 readonly input, which is populated from sessionStorage. If the user signed up with `Info@Cornellfacilities.com` and signed in as `info@cornellfacilities.com` they'd match. We'll log both sides on failure so we can confirm.
+3. **File size / type.** Limit is 50 MB and `application/pdf | image/jpeg | image/png`. iPhone uploads often produce `image/heic` which is **not** allowed and will 400 with "Unsupported file type: image/heic". This is very likely what's blocking you — phones default to HEIC. We'll either (a) accept HEIC in the allowlist and let the bucket store it, or (b) reject HEIC client-side with a clear "Please use JPG/PNG/PDF — your phone uploaded a HEIC file" message and a hint on how to switch iPhone camera format. Recommendation: do both — add HEIC to the allowlist *and* show a friendlier client-side message for anything outside the allowed set.
+4. **Bucket missing or RLS blocking.** Worth one read query to confirm `application-documents` bucket exists and edge function has service-role write access (it does via `SUPABASE_SERVICE_ROLE_KEY`).
 
-## Files touched
+### Implementation for upload fix
+- In `Step10Documents.tsx`, on each `<Input type="file">` `onChange`, validate the file type and size client-side before storing it; show a red inline error under the field if it fails.
+- In `AgentApplicationForm.tsx` line 396 and line 410, change `setStep(5)` to `setStep(10)` (the Documents step) so the user is bounced back to the actual upload UI.
+- Add a persistent error state shown at the top of Step 10 when upload fails, including the exact error from the edge function.
+- In `supabase/functions/upload-application-document/index.ts`, add `image/heic` and `image/heif` to `ALLOWED_MIME` so phone uploads work without conversion, and return a more descriptive error including the filename when the type check fails.
 
-- `src/pages/AgentApplicationForm.tsx` — scope draft key by user id, migrate legacy key safely.
-- `supabase/functions/check-email-verified/index.ts` (new) — service-role lookup of `email_confirmed_at` by email.
-- `supabase/functions/check-email-verified/deno.json` (new).
-- `supabase/config.toml` — register new function with `verify_jwt = false`.
-- `src/pages/Auth.tsx` — use the new endpoint as a fallback in both the polling effect and the "Already verified? Continue" handler; on confirmed-but-no-session, route to sign-in with prefilled email and a clear toast ("Verified on another device — please sign in here to continue").
+## Files to change
 
-## Validation
+- `src/pages/AgentApplicationForm.tsx` — Step 1 address fields (autoComplete + State select + Zip), Years select, fix step index on upload error, add error state
+- `src/components/applications/steps/Step10Documents.tsx` — client-side validation, error banner, friendlier UX
+- `supabase/functions/upload-application-document/index.ts` — allow HEIC/HEIF, better error message
 
-1. Sign up fresh on desktop with a new email; **do not** click verify on desktop. Open verification link on a second device. Within ~5s the desktop tab advances (or shows the "verified, please sign in" prompt if no session exists).
-2. Sign up as a brand-new agent in a browser that previously held a draft from another email — no "Resume previous draft?" prompt appears.
-3. Same user reloading mid-application still gets their *own* draft prompt.
+## Follow-up question
+
+After this lands, do you want **type-ahead address autocomplete** (start typing "123 Main" and get suggestions)? That requires a Google Places or Mapbox API key with billing enabled. The native browser autofill in this plan covers most users for free.
