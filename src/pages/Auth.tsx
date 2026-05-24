@@ -199,18 +199,47 @@ const Auth = () => {
       navigate('/auth/complete-profile', { replace: true });
     };
 
+    const handleVerifiedNoSession = () => {
+      if (cancelled) return;
+      cancelled = true;
+      toast({
+        title: 'Email verified on another device',
+        description: 'Please sign in here to finish setting up your profile.',
+      });
+      navigate(`/auth?mode=signin&email=${encodeURIComponent(email)}`, { replace: true });
+    };
+
     const interval = setInterval(async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user?.email_confirmed_at) {
           clearInterval(interval);
           handleVerified();
-        } else if (session?.user) {
+          return;
+        }
+        if (session?.user) {
           // Refresh the user object in case email_confirmed_at hasn't propagated to session
           const { data: { user: freshUser } } = await supabase.auth.getUser();
           if (freshUser?.email_confirmed_at) {
             clearInterval(interval);
             handleVerified();
+            return;
+          }
+        }
+        // No session (typical right after signup) or session not yet
+        // reflecting confirmation — ask the server directly whether this
+        // email was confirmed on another device.
+        if (email) {
+          const { data } = await supabase.functions.invoke('check-email-verified', {
+            body: { email },
+          });
+          if (data?.verified) {
+            clearInterval(interval);
+            if (session?.user) {
+              handleVerified();
+            } else {
+              handleVerifiedNoSession();
+            }
           }
         }
       } catch (err) {
@@ -231,7 +260,7 @@ const Auth = () => {
       clearInterval(interval);
       subscription.unsubscribe();
     };
-  }, [step, navigate, toast]);
+  }, [step, navigate, toast, email]);
 
   const handleContinueWithEmail = () => {
     if (!email.trim()) {
