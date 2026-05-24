@@ -1,69 +1,81 @@
-## Fix `ApplicationVerificationComplete.tsx` + diagnose Andre's verification
+# Re-architect: Account → Verify Email → Application
 
-### Diagnosis of your verification (answered now)
+## Goal
+Stop doing `auth.signUp()` from inside the agent application. Make account creation a separate, prior step, gate the application behind email verification, and resume the application on next sign-in. Fix the email pipeline first so verification actually arrives.
 
-Queried `agent_applications` for `andre.powelljr@gmail.com`:
+## Step 0 — Fix email delivery (prerequisite, same change)
 
-| field | value |
-|---|---|
-| id | `2e7b341c-24a5-48cf-a3ba-b00f3a974f1e` |
-| status | `pending_verification` |
-| stripe_verification_status | `null` |
-| stripe_verification_session_id | `null` |
-| stripe_verified_at | `null` |
-| rejection_reason | `null` |
-| created_at | 2026-05-24 02:22 UTC |
+The queue currently has **25 pending emails older than 10 minutes** — the dispatcher is not draining. Without this, no agent can pass the new gate.
 
-**Stripe Identity was never started for your application** — no session ID, no status, no error. The document-upload RLS failure from the previous turn blocked you before you reached the Stripe step, so the application row was never created with documents and you never hit `create-identity-verification`. This page is a bug *and* you have no Stripe failure to surface — the row exists in `pending_verification` because the upload fix landed after the form had already inserted the row on a prior attempt (or the row is the orphan from the failed flow). Either way, **Stripe didn't reject you. You never reached Stripe.** Re-run the application with the upload fix in place and you'll get a real session.
+Actions:
+1. Run the managed setup repair (`setup_email_infra`) to recreate the vault secret + `process-email-queue` cron and refresh the service-role key binding. Safe/idempotent.
+2. Call `verify-email-infra` and require it to return `healthy: true` (vault secret present, cron active, no stuck pending, no DLQ spike) before merging.
+3. Re-deploy `auth-email-hook` so Supabase Auth routes confirmation emails through our branded queue-backed template, not Supabase's rate-limited built-in sender.
+4. Confirm in Cloud → Emails that the Send Email Hook is enabled and pointed at `auth-email-hook`.
+5. Smoke-test: sign up a throwaway address, confirm the email arrives within ~30s, and `email_send_log` shows `sent` (not `pending`/`dlq`).
 
-### Fix 1 — Pass application_id through the URL (no more localStorage)
+If `verify-email-infra` still fails after repair, stop and surface the failing check — do not ship the reorder.
 
-**`create-identity-verification/index.ts`**: change `defaultReturnUrl` (line ~327) to include the application id from `metadata.applicationId`:
-```
-${frontendUrl}/application/verification-complete?type=${applicationType}&application_id=${metadata.applicationId}&vs={CHECKOUT_SESSION_ID}
-```
-Stripe Identity supports a `{VERIFICATION_SESSION_ID}` placeholder in `return_url`; use that so the page can also fall back to looking up the row by `stripe_verification_session_id` if the application_id is missing.
+## Step 1 — New "Create agent account" page (`/apply/agent/signup`)
 
-**`ApplicationVerificationComplete.tsx`**: read `application_id` from `useSearchParams` first; only fall back to localStorage. Also read `verification_session` to enable the Stripe-session fallback lookup.
+New page `src/pages/AgentSignup.tsx`. Fields: first name, last name, email, phone, password, confirm password, ToS checkbox. On submit:
 
-### Fix 2 — Distinguish all four real states
+- Run existing duplicate-email guard (`isDuplicateEmailError` / `isDuplicateEmailSignupResponse` from `@/lib/auth/duplicateEmail`).
+- `supabase.auth.signUp({ email, password, options: { data: { first_name, last_name, phone, account_type: 'agent', intended_flow: 'agent_application' }, emailRedirectTo: ${origin}/apply/agent?verified=1 } })`.
+- On success show "Check your email" screen with resend button (rate-limited client-side).
+- Do **not** create an `agent_applications` row yet.
 
-Replace the 3-state union with `'loading' | 'success' | 'pending_review' | 'failed' | 'not_found'`:
+Profile row: the `handle_new_user` trigger (or equivalent) should pick up `account_type='agent'` + name/phone from `raw_user_meta_data`. If it doesn't already, extend it in the migration so the profile is seeded at signup.
 
-- **success** → `stripe_verification_status === 'verified'` OR `status === 'verified'`
-- **failed** → `stripe_verification_status` in `('canceled','requires_input')` with `rejection_reason` present, OR `status === 'failed'`/`'rejected'`
-- **pending_review** → row exists, `stripe_verification_status` is `processing`/`pending`/null but session was started (`stripe_verification_session_id IS NOT NULL`) → show real "we're still confirming, check back shortly" copy + auto-refetch every 5s for ~30s
-- **not_found** → no application_id in URL or row not returned → distinct "We couldn't locate your application" message with a link to `/application/status`
-- Never show success for a `pending_verification` row that hasn't been verified.
+## Step 2 — Email verification gate
 
-Add one retry on the DB read after a 2s delay (webhook race), but stop collapsing every miss into `error`.
+`emailRedirectTo` lands the user on `/apply/agent?verified=1`. Supabase exchanges the token → user now has a real session. No custom verification page needed for this path (the existing `ApplicationVerificationComplete` page stays, but is only used for Stripe Identity return).
 
-### Fix 3 — Show the actual Stripe reason + retry button
+## Step 3 — Application form, authenticated only
 
-Reason source: the `stripe-identity-webhook` already writes `rejection_reason` (line 643) and stores the full Stripe `last_error` inside `stripe_verification_report` (JSON). Select both columns. Map `last_error.code` to friendly copy:
+Refactor `src/pages/AgentApplicationForm.tsx`:
 
-| code | message |
-|---|---|
-| `document_expired` | Your ID document is expired. Please upload a current one. |
-| `document_unverified_other` / `document_photo_*` | Your ID photo was unclear. Please retake it in good light. |
-| `selfie_unverified_other` / `selfie_face_mismatch` | Your selfie didn't match your ID. Please retry the selfie. |
-| `id_number_mismatch` / `name_mismatch` | The name on your ID didn't match what you entered. |
-| `consent_declined` / `device_not_supported` | Verification was canceled. You can retry from any device. |
-| _default_ | Show `rejection_reason` verbatim. |
+- Wrap the route in an auth + email-confirmed guard. If `!user` → redirect to `/apply/agent/signup`. If `user && !user.email_confirmed_at` → show "Verify your email to continue" with resend.
+- **Delete the `supabase.auth.signUp(...)` block** (around line 329) and all downstream "authUser may be null" handling. `userId` comes from `useAuth()` from the first render.
+- Prefill step 1 fields (first name, last name, email, phone) from `profiles` + `auth.user` — editable, but no re-typing required.
+- Document uploads continue to call the `upload-application-document` edge function; with a real session, RLS is no longer the concern, but keep the edge-function path since it's already the contract.
+- On final submit: upsert (not insert) `agent_applications` keyed by `user_id` so resuming overwrites the in-progress row instead of creating duplicates.
 
-Add a **"Retry verification"** primary button that calls `supabase.functions.invoke('create-identity-verification', { body: { email, applicationType, metadata: { applicationId, firstName, lastName } } })` and redirects to the returned `url`. Keep the support email as a secondary fallback link, not the primary action.
+## Step 4 — Resume-on-login routing
 
-### Files touched
+Update `src/lib/auth/postAuthRouting.ts` and `src/components/routing/OnboardingRouter.tsx`:
 
-- **edit** `src/pages/ApplicationVerificationComplete.tsx` — new state machine, URL params, error mapping, retry button
-- **edit** `supabase/functions/create-identity-verification/index.ts` — return_url carries `application_id` + `{VERIFICATION_SESSION_ID}`
+- For `account_type='agent'`:
+  - No `agent_applications` row → `/apply/agent` (start fresh).
+  - Row exists with status `draft` / `pending_verification` (and no Stripe session) → `/apply/agent` (resume).
+  - Row with Stripe session in progress → `/application/status?email=...`.
+  - `verified` / `approved` → `/partner`.
+- Email not yet confirmed at sign-in → `/apply/agent/signup?unverified=1` showing resend, **not** the homepage and **not** a dead-end "confirm your email" screen.
 
-No DB migration needed — all required columns exist.
+## Step 5 — Schema / data
 
-### Verification steps
+Migration:
+- Make `agent_applications.user_id` `NOT NULL` and `UNIQUE` (one in-flight app per user). Backfill / drop any orphan rows first.
+- Add `status='draft'` to the allowed values if not present.
+- Extend `handle_new_user` trigger to copy `account_type`, `first_name`, `last_name`, `phone` from `raw_user_meta_data` into `profiles` when present.
 
-1. Open the page directly with `?type=agent&application_id=<bad-uuid>` → shows `not_found` state (not generic error).
-2. Open with a valid `application_id` for a row in `pending_verification` with no session → shows `not_found`.
-3. Open with a real `verified` row → success.
-4. Force a `failed` row with `rejection_reason='document_expired'` (test row) → shows "Your ID document is expired" + Retry button.
-5. Open the email link in a different browser (no localStorage) → still resolves because URL carries `application_id`.
+## Step 6 — Cleanup
+
+- Remove the in-form signup branch, the "session may not exist yet" comments, and the localStorage `agent_application_id` writes from the signup path (the URL-based identifier from the prior fix stays for the Stripe return).
+- Keep `ApplicationVerificationComplete` only for the Stripe Identity return URL.
+
+## End-to-end verification
+
+1. New email → `/apply/agent/signup` → submit → "check your email" → email arrives (queue drained) → click link → lands on `/apply/agent` already signed in, name/email/phone prefilled.
+2. Fill application, upload docs (RLS passes because `auth.uid()` is set), submit → Stripe Identity → return → `verified`.
+3. Sign out mid-application, sign back in → routed straight to `/apply/agent` with prior answers.
+4. Duplicate email at step 1 → guarded with existing duplicate-email helper.
+5. Sign in before clicking confirmation link → `/apply/agent/signup?unverified=1` with resend.
+
+## Files touched
+- new: `src/pages/AgentSignup.tsx`
+- edit: `src/pages/AgentApplicationForm.tsx` (remove signUp, add guard, prefill, upsert)
+- edit: `src/routes/AppRoutes.tsx` (add `/apply/agent/signup`)
+- edit: `src/lib/auth/postAuthRouting.ts`, `src/components/routing/OnboardingRouter.tsx`
+- new migration: `agent_applications` constraints + `handle_new_user` extension
+- ops: `setup_email_infra`, redeploy `auth-email-hook`, verify via `verify-email-infra`

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,14 +11,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, CheckCircle2, Shield, ArrowRight, ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { isDuplicateEmailError, isDuplicateEmailSignupResponse } from "@/lib/auth/duplicateEmail";
 
 type AgentApplicationData = {
   firstName: string;
   lastName: string;
   email: string;
-  password: string;
-  passwordConfirm: string;
   phone: string;
   dateOfBirth: string;
   agencyName: string;
@@ -89,6 +87,7 @@ const luxuryInputClasses = "min-h-[48px] w-full max-w-full border-[#E5DFC6] bg-w
 const luxurySelectClasses = "min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg";
 
 export default function AgentApplicationForm() {
+  const { user, isLoading: authLoading } = useAuth();
   const location = useLocation();
   const prefillData = location.state as {
     email?: string;
@@ -103,8 +102,6 @@ export default function AgentApplicationForm() {
     firstName: prefillData?.firstName || "",
     lastName: prefillData?.lastName || "",
     email: prefillData?.email || "",
-    password: "",
-    passwordConfirm: "",
     phone: prefillData?.phone || "",
     dateOfBirth: "",
     agencyName: "",
@@ -154,6 +151,50 @@ export default function AgentApplicationForm() {
 
   const DRAFT_STORAGE_KEY = "agent_application_draft";
 
+  // Prefill from the authenticated user's profile + auth metadata as soon
+  // as the session is ready. Editable, but no retyping required.
+  useEffect(() => {
+    if (!user) return;
+    const meta = (user.user_metadata ?? {}) as Record<string, any>;
+    setFormData((prev) => ({
+      ...prev,
+      email: prev.email || user.email || "",
+      firstName: prev.firstName || meta.first_name || "",
+      lastName: prev.lastName || meta.last_name || "",
+      phone: prev.phone || meta.phone || meta.phone_number || "",
+    }));
+    // Hydrate from profile too (richer source if trigger has run)
+    (async () => {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("first_name, last_name, phone, email")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (!profile) return;
+      setFormData((prev) => ({
+        ...prev,
+        email: prev.email || profile.email || "",
+        firstName: prev.firstName || profile.first_name || "",
+        lastName: prev.lastName || profile.last_name || "",
+        phone: prev.phone || profile.phone || "",
+      }));
+    })();
+    // Also load any existing in-flight application for this user
+    (async () => {
+      const { data: existing } = await supabase
+        .from("agent_applications")
+        .select("id, status")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (existing?.id) {
+        setDraftApplicationId(existing.id);
+        setApplicationId(existing.id);
+      }
+    })();
+  }, [user]);
+
   // Offer to restore an earlier draft (opt-in, so a brand-new signup
   // never inherits another applicant's cached answers).
   useEffect(() => {
@@ -191,8 +232,6 @@ export default function AgentApplicationForm() {
         insuranceCertificateFile: _b,
         governmentIdFile: _c,
         professionalHeadshotFile: _d,
-        password: _p,
-        passwordConfirm: _pc,
         ...persistable
       } = formData;
       localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(persistable));
@@ -213,14 +252,6 @@ export default function AgentApplicationForm() {
       if (!formData.email?.trim()) return missing("Email");
       if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
         toast({ title: "Valid email required", variant: "destructive" });
-        return false;
-      }
-      if (!formData.password || formData.password.length < 8) {
-        toast({ title: "Password must be at least 8 characters", variant: "destructive" });
-        return false;
-      }
-      if (formData.password !== formData.passwordConfirm) {
-        toast({ title: "Passwords don't match", variant: "destructive" });
         return false;
       }
       if (!formData.phone?.trim()) return missing("Phone");
@@ -317,50 +348,11 @@ export default function AgentApplicationForm() {
       if (!formData.agencyName || !normalizedBusinessType) {
         throw new Error("Please fill in all required business information fields");
       }
-      if (!formData.password || formData.password.length < 8) {
-        throw new Error("Please set a password (at least 8 characters) in step 1");
-      }
-
-      // Ensure the applicant has an auth session BEFORE the application is
-      // persisted, so we can store user_id on agent_applications and the
-      // Identity webhook can auto-provision the live account.
-      let { data: { user: authUser } } = await supabase.auth.getUser();
-      if (!authUser) {
-        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-          email: formData.email,
-          password: formData.password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/application/verification-complete?type=agent`,
-            data: {
-              first_name: formData.firstName,
-              last_name: formData.lastName,
-              account_type: "agent",
-            },
-          },
-        });
-        if (signUpError) {
-          // Duplicate email — surface a clear, application-specific message
-          // so the agent knows to sign in and resume the application.
-          if (isDuplicateEmailError(signUpError)) {
-            throw new Error(
-              "An account with this email already exists. Please sign in first, then re-open this application to continue where you left off.",
-            );
-          }
-          throw new Error(signUpError.message);
-        }
-        // GoTrue enumeration protection returns a fake user with empty
-        // identities for duplicate emails. Treat that as duplicate too.
-        if (isDuplicateEmailSignupResponse(signUpData)) {
-          throw new Error(
-            "An account with this email already exists. Please sign in first, then re-open this application to continue where you left off.",
-          );
-        }
-        authUser = signUpData.user ?? null;
-      }
-
-      // File uploads (require authenticated user for RLS)
+      // By the time we reach this code the user is guaranteed to be authenticated
+      // and email-confirmed — the route is gated upstream. Just read the user.
+      const { data: { user: authUser } } = await supabase.auth.getUser();
       if (!authUser?.id) {
-        throw new Error("Could not establish your account session. Please sign in and retry.");
+        throw new Error("Your session expired. Please sign in and try again.");
       }
 
       // All four documents are required. Verify presence before attempting
@@ -401,13 +393,16 @@ export default function AgentApplicationForm() {
         linkedinProfileUrl: formData.linkedinProfileUrl,
       };
 
-      const clientId = crypto.randomUUID();
+      // Use the existing in-flight application id if we have one (resume),
+      // otherwise mint a new one. We upsert by id so resuming overwrites
+      // instead of producing a second row.
+      const clientId = draftApplicationId ?? crypto.randomUUID();
 
       const { error: applicationError } = await supabase
         .from('agent_applications')
-        .insert({
+        .upsert({
           id: clientId,
-          user_id: authUser?.id ?? null,
+          user_id: authUser.id,
           first_name: formData.firstName,
           last_name: formData.lastName,
           email: formData.email,
@@ -446,7 +441,7 @@ export default function AgentApplicationForm() {
           accepted_vendor: formData.acceptedVendor,
           extended_data: extendedData,
           status: 'pending_verification',
-        });
+        }, { onConflict: 'id' });
 
       if (applicationError) throw new Error(applicationError.message || 'Failed to save application');
 
@@ -555,33 +550,11 @@ export default function AgentApplicationForm() {
               </div>
               <div>
                 <Label className="text-sm font-medium text-[#0a2225]">Email *</Label>
-                <Input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className={luxuryInputClasses} />
+                <Input type="email" value={formData.email} readOnly className={`${luxuryInputClasses} bg-[#FDF9F0] cursor-not-allowed`} />
               </div>
               <div>
                 <Label className="text-sm font-medium text-[#0a2225]">Phone *</Label>
                 <Input type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className={luxuryInputClasses} />
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-[#0a2225]">Password *</Label>
-                <Input
-                  type="password"
-                  autoComplete="new-password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className={luxuryInputClasses}
-                  placeholder="At least 8 characters"
-                />
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-[#0a2225]">Confirm Password *</Label>
-                <Input
-                  type="password"
-                  autoComplete="new-password"
-                  value={formData.passwordConfirm}
-                  onChange={(e) => setFormData({ ...formData, passwordConfirm: e.target.value })}
-                  className={luxuryInputClasses}
-                  placeholder="Re-enter password"
-                />
               </div>
               <div>
                 <Label className="text-sm font-medium text-[#0a2225]">Agency Name *</Label>
@@ -927,6 +900,22 @@ export default function AgentApplicationForm() {
         return null;
     }
   };
+
+  // Auth gate: must be signed in AND email-confirmed before the application
+  // can be filled. Anyone else gets redirected back to the signup page.
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FDF9F0]">
+        <Loader2 className="h-6 w-6 animate-spin text-[#0c4d47]" />
+      </div>
+    );
+  }
+  if (!user) {
+    return <Navigate to="/apply/agent/signup" replace />;
+  }
+  if (!user.email_confirmed_at) {
+    return <Navigate to="/apply/agent/signup?unverified=1" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-[#FDF9F0] px-3 sm:px-4 py-8 md:py-16 overflow-x-hidden">
