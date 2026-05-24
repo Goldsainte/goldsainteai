@@ -1,35 +1,75 @@
-## Root cause
+## Audit results
 
-`agent_applications` has a unique constraint on `email`. One orphan row already exists for `info@cornellfacilities.com` (id `75e7e1fe…`, `user_id = NULL`, status `pending_verification`, created 2026-05-17 — predates the auth wiring). On resubmit, the form mints a new `clientId`, the upsert runs as an INSERT, the `id` doesn't collide but the `email` does, and `onConflict: 'id'` can't resolve a conflict on a column it isn't targeting.
+Table `public.agent_applications` owner column: **`user_id`** (no `agent_id` column exists).
+
+Current policies:
+
+| cmd | policy | issue |
+|---|---|---|
+| INSERT | "Anyone can submit agent application" (public, WITH CHECK true) | overly open |
+| INSERT | "Anyone can submit an agent application" (anon+authenticated, WITH CHECK true) | overly open, duplicate |
+| SELECT | "Admins can view all agent applications" | keep (rewrite via `has_role`) |
+| SELECT | "Applicants can view own application by email" (email-from-JWT OR user_id=auth.uid()) | keep user_id branch, drop email branch |
+| UPDATE | "Admins can recover stuck agent applications" | keep |
+| UPDATE | "Service role can update applications" | keep (webhooks/edge functions) |
+| DELETE | "Admins can delete agent applications" | keep |
+| **UPDATE for the owning agent** | **MISSING** | causes the current RLS error on upsert→UPDATE |
+
+This confirms the diagnosis: the upsert resolves to UPDATE, and no policy lets `auth.uid() = user_id` update their own row.
 
 ## Fix
 
-### 1. Claim the orphan row (one-time data fix)
+One migration that replaces the conflicting policies with a clean, `user_id`-keyed set.
 
-Set `user_id` on the existing row to the authenticated user's id, so future logic finds it by `user_id`. Done via `supabase--insert` UPDATE against id `75e7e1fe-adbc-4934-b056-c23e9b649b77`. (We'll fetch the auth user's id for `info@cornellfacilities.com` first.)
+### Migration SQL
 
-### 2. Add a partial unique index on `user_id`
+```sql
+-- Drop overly-open / duplicate / legacy policies
+DROP POLICY IF EXISTS "Anyone can submit agent application" ON public.agent_applications;
+DROP POLICY IF EXISTS "Anyone can submit an agent application" ON public.agent_applications;
+DROP POLICY IF EXISTS "Anyone can check agent application by email" ON public.agent_applications;
+DROP POLICY IF EXISTS "Applicants can view own application by email" ON public.agent_applications;
+DROP POLICY IF EXISTS "Admins can view all agent applications" ON public.agent_applications;
 
-Migration: `CREATE UNIQUE INDEX agent_applications_user_id_unique ON agent_applications (user_id) WHERE user_id IS NOT NULL;`
+-- Agent: SELECT own row
+CREATE POLICY "Agents can view own application"
+ON public.agent_applications
+FOR SELECT TO authenticated
+USING (auth.uid() = user_id);
 
-This makes "one agent = one application row" a real DB-level guarantee and lets us use `onConflict: 'user_id'` safely.
+-- Agent: INSERT own row (user_id must match the caller)
+CREATE POLICY "Agents can insert own application"
+ON public.agent_applications
+FOR INSERT TO authenticated
+WITH CHECK (auth.uid() = user_id);
 
-### 3. Rewrite `saveDraftApplication` lookup-then-upsert (src/pages/AgentApplicationForm.tsx, ~line 460)
+-- Agent: UPDATE own row  <-- the missing policy
+CREATE POLICY "Agents can update own application"
+ON public.agent_applications
+FOR UPDATE TO authenticated
+USING (auth.uid() = user_id)
+WITH CHECK (auth.uid() = user_id);
 
-Before the upsert:
-- Query `agent_applications` for a row matching `user_id = authUser.id` → if found, reuse its `id`.
-- Otherwise query by `email = formData.email` (case-insensitive) → if found (orphan from pre-auth attempt), reuse its `id` AND set `user_id = authUser.id` in the upsert payload so it's claimed.
-- Otherwise mint a new `clientId`.
+-- Admins: full read access via has_role (replaces inline EXISTS policy)
+CREATE POLICY "Admins can view all agent applications"
+ON public.agent_applications
+FOR SELECT TO authenticated
+USING (public.has_role(auth.uid(), 'admin'));
+```
 
-Keep `.upsert({...}, { onConflict: 'id' })` since we now always pass the correct existing id. This is robust regardless of whether the partial unique index exists, and resubmissions cleanly UPDATE the agent's single row.
+Kept as-is (already correct):
+- "Admins can recover stuck agent applications" (UPDATE, has_role admin)
+- "Service role can update applications" (UPDATE, service_role) — needed for edge functions / webhooks
+- "Admins can delete agent applications" (DELETE, can_approve_agents)
 
-### 4. Verify
+### Notes
 
-- Test resubmit with `info@cornellfacilities.com`: should UPDATE the existing row (not insert), no unique-constraint error, advance to Stripe Identity (step 6).
-- Confirm the row's `user_id` is now populated and status remains `pending_verification`.
+- No app/code changes required — `saveDraftApplication` already writes `user_id = authUser.id`, so the new UPDATE policy will pass.
+- Email-based "view by JWT email" branch is dropped: the user_id path covers every authenticated agent, and the email path was a data-exposure surface.
+- No `agent_id` column exists, so nothing to migrate from the legacy column.
 
-## Files
+### Verification
 
-- `supabase/migrations/<new>.sql` — partial unique index on `user_id`
-- `src/pages/AgentApplicationForm.tsx` — lookup-then-upsert in `saveDraftApplication`
-- Data fix: UPDATE the orphan row's `user_id` via insert tool
+After approval and migration:
+1. Submit the agent application logged in as `info@cornellfacilities.com` — should update the existing claimed row and advance to Stripe Identity (step 6).
+2. Spot-check a fresh signup: new agent → INSERT path also works under the new INSERT policy.
