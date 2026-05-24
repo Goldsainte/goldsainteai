@@ -178,6 +178,7 @@ export async function createAgentAccountFromApplication(
     createdAuthUser = true;
     log.info("Auth user created", { userId });
   }
+  } // end else (no application.user_id)
 
   // 3. Provision DB rows. Roll back the auth user iff WE created it.
   try {
