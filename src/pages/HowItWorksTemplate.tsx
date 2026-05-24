@@ -4,6 +4,8 @@ import type { LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { AvailabilityNotice } from "@/components/onboarding/AvailabilityNotice";
 
+const SERIF = "'Cormorant Garamond', Georgia, serif";
+
 export interface HowItWorksStep {
   number: string;
   icon: LucideIcon;
@@ -25,75 +27,100 @@ interface Props {
 export function HowItWorksTemplate({ eyebrow, title, subtitle, steps, finalCta, factCard, extraSection }: Props) {
   const { t } = useTranslation();
   return (
-    <main className="flex-1 bg-[#FDF9F0]">
-      <div className="mx-auto max-w-3xl px-4 sm:px-6 py-12 md:py-20">
-        <header className="text-center mb-14 md:mb-20">
-          <p className="text-xs uppercase tracking-[0.2em] text-[#C7A962] font-medium mb-4">{eyebrow}</p>
-          <h1 className="font-secondary text-3xl md:text-5xl text-[#0a2225] mb-4 text-balance">{title}</h1>
-          <p className="text-base md:text-lg text-[#6B7280] max-w-2xl mx-auto text-pretty">{subtitle}</p>
+    <main className="flex-1 bg-[#f7f3ea] text-[#0a2225] selection:bg-[#c9a84c]/30">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6 py-20 md:py-28">
+        {/* HERO */}
+        <header className="text-center mb-20 md:mb-24">
+          <div className="flex justify-center mb-10">
+            <div className="w-px h-16 bg-[#0a2225]" />
+          </div>
+          <p className="text-[9px] uppercase tracking-[0.3em] text-[#c9a84c] font-bold mb-8">{eyebrow}</p>
+          <h1
+            className="text-5xl md:text-6xl italic mb-8 tracking-tight leading-[0.95] text-balance"
+            style={{ fontFamily: SERIF }}
+          >
+            {title}
+          </h1>
+          <p className="text-base md:text-lg text-[#0a2225]/70 font-light max-w-xl mx-auto leading-relaxed text-pretty">
+            {subtitle}
+          </p>
         </header>
 
         {factCard && (
-          <div className="rounded-xl bg-white border border-[#E5DFC6] px-5 py-4 mb-10 max-w-2xl mx-auto -mt-6">
-            <div className="flex items-start gap-3">
-              {factCard.icon && <factCard.icon className="h-4 w-4 text-[#C7A962] flex-shrink-0 mt-0.5" />}
-              <p className="text-sm text-[#4a4a4a] leading-relaxed text-left">
-                {factCard.text}
-              </p>
-            </div>
+          <div className="border-l border-[#c9a84c] pl-6 py-2 mb-16 max-w-2xl mx-auto">
+            <p className="text-base italic text-[#0a2225]/80 leading-relaxed" style={{ fontFamily: SERIF }}>
+              {factCard.text}
+            </p>
           </div>
         )}
 
         <AvailabilityNotice />
 
-        <ol className="space-y-10 md:space-y-14 mx-auto max-w-2xl">
-          {steps.map((step) => {
-            const Icon = step.icon;
-            return (
-              <li key={step.number} className="grid grid-cols-[auto_1fr] gap-5 md:gap-8 items-start">
-                <div className="flex flex-col items-center gap-2">
-                  <span className="font-secondary text-2xl md:text-3xl text-[#C7A962]">{step.number}</span>
-                  <div className="h-10 w-10 rounded-full bg-white border border-[#E5DFC6] flex items-center justify-center">
-                    <Icon className="h-5 w-5 text-[#0c4d47]" />
-                  </div>
-                </div>
-                <div className="pt-1">
-                  <h2 className="font-secondary text-xl md:text-2xl text-[#0a2225] mb-2">{step.title}</h2>
-                  <p className="text-sm md:text-base text-[#4A4A4A] leading-relaxed">{step.description}</p>
-                  {step.cta && (
-                    <Link
-                      to={step.cta.to}
-                      className="inline-flex items-center gap-1.5 mt-3 text-sm font-medium text-[#0c4d47] hover:underline"
-                    >
-                      {step.cta.label} <ArrowRight className="h-3.5 w-3.5" />
-                    </Link>
-                  )}
-                </div>
-              </li>
-            );
-          })}
+        {/* STEPS */}
+        <ol className="space-y-16 md:space-y-20 mx-auto max-w-2xl mt-12">
+          {steps.map((step) => (
+            <li key={step.number} className="grid grid-cols-[auto_1fr] gap-8 md:gap-12 items-start">
+              <span
+                className="text-3xl md:text-4xl italic text-[#c9a84c] leading-none pt-2"
+                style={{ fontFamily: SERIF }}
+              >
+                {step.number}
+              </span>
+              <div className="pt-1 border-t border-[#0a2225]/10 -mt-2 pt-6">
+                <h2 className="text-2xl md:text-3xl italic text-[#0a2225] mb-4 tracking-tight" style={{ fontFamily: SERIF }}>
+                  {step.title}
+                </h2>
+                <p className="text-base text-[#0a2225]/75 leading-relaxed font-light">{step.description}</p>
+                {step.cta && (
+                  <Link
+                    to={step.cta.to}
+                    className="inline-flex items-center gap-2 mt-5 text-[10px] uppercase tracking-[0.2em] font-semibold text-[#0c4d47] border-b border-[#0c4d47] pb-1 hover:text-[#0a2225] hover:border-[#0a2225] transition-colors"
+                  >
+                    {step.cta.label}
+                    <ArrowRight className="h-3 w-3" strokeWidth={1.5} />
+                  </Link>
+                )}
+              </div>
+            </li>
+          ))}
         </ol>
 
-        {extraSection}
+        {extraSection && <div className="mt-20">{extraSection}</div>}
 
-        <div className="text-center mt-12 mb-8">
-          <p className="text-xs uppercase tracking-[0.2em] text-[#9A9384] mb-2">
+        <div className="text-center mt-20 mb-16">
+          <p className="text-[9px] uppercase tracking-[0.3em] text-[#0a2225]/40 font-bold mb-3">
             {t('howItWorks.preferToWatch', 'Prefer to watch?')}
           </p>
-          <Link to="/help/video-tour" className="inline-flex items-center gap-2 text-[#0c4d47] underline text-sm">
-            <Play className="h-4 w-4" />
+          <Link
+            to="/help/video-tour"
+            className="inline-flex items-center gap-2 text-[#0c4d47] text-sm border-b border-[#0c4d47] pb-0.5 hover:text-[#0a2225] hover:border-[#0a2225] transition-colors"
+          >
+            <Play className="h-3.5 w-3.5" strokeWidth={1.5} />
             {t('howItWorks.videoTour', 'Watch a 90-second tour of Goldsainte')}
           </Link>
         </div>
 
-        <div className="mt-16 md:mt-24 rounded-2xl bg-[#0a2225] text-white px-6 sm:px-10 py-10 md:py-14 text-center">
-          <h2 className="font-secondary text-2xl md:text-3xl mb-3">{finalCta.heading}</h2>
-          <p className="text-sm md:text-base text-white/70 max-w-xl mx-auto mb-6">{finalCta.description}</p>
+        {/* FINAL CTA */}
+        <div className="mt-20 md:mt-28 bg-[#0a2225] text-[#f7f3ea] px-8 sm:px-12 py-16 md:py-20 text-center relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-[#c9a84c]/15 rounded-full -mr-24 -mt-24 blur-3xl" />
+          <p className="relative z-10 text-[9px] uppercase tracking-[0.3em] text-[#c9a84c] font-bold mb-6">
+            Begin
+          </p>
+          <h2
+            className="relative z-10 text-4xl md:text-5xl italic mb-6 tracking-tight leading-tight"
+            style={{ fontFamily: SERIF }}
+          >
+            {finalCta.heading}
+          </h2>
+          <p className="relative z-10 text-base text-[#f7f3ea]/70 max-w-xl mx-auto mb-10 font-light leading-relaxed">
+            {finalCta.description}
+          </p>
           <Link
             to={finalCta.to}
-            className="inline-flex items-center gap-2 rounded-full bg-[#C7A962] hover:bg-[#b89852] text-[#0a2225] font-medium px-6 py-3 text-sm transition-colors"
+            className="relative z-10 group inline-flex items-center gap-4 border border-[#f7f3ea] px-12 py-5 transition-all hover:bg-[#f7f3ea] hover:text-[#0a2225]"
           >
-            {finalCta.label} <ArrowRight className="h-4 w-4" />
+            <span className="text-xs uppercase tracking-[0.2em] font-semibold">{finalCta.label}</span>
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" strokeWidth={1.5} />
           </Link>
         </div>
       </div>
