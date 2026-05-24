@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,14 +11,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, CheckCircle2, Shield, ArrowRight, ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { isDuplicateEmailError, isDuplicateEmailSignupResponse } from "@/lib/auth/duplicateEmail";
 
 type AgentApplicationData = {
   firstName: string;
   lastName: string;
   email: string;
-  password: string;
-  passwordConfirm: string;
   phone: string;
   dateOfBirth: string;
   agencyName: string;
@@ -89,6 +87,7 @@ const luxuryInputClasses = "min-h-[48px] w-full max-w-full border-[#E5DFC6] bg-w
 const luxurySelectClasses = "min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg";
 
 export default function AgentApplicationForm() {
+  const { user, isLoading: authLoading } = useAuth();
   const location = useLocation();
   const prefillData = location.state as {
     email?: string;
@@ -103,8 +102,6 @@ export default function AgentApplicationForm() {
     firstName: prefillData?.firstName || "",
     lastName: prefillData?.lastName || "",
     email: prefillData?.email || "",
-    password: "",
-    passwordConfirm: "",
     phone: prefillData?.phone || "",
     dateOfBirth: "",
     agencyName: "",
@@ -154,6 +151,50 @@ export default function AgentApplicationForm() {
 
   const DRAFT_STORAGE_KEY = "agent_application_draft";
 
+  // Prefill from the authenticated user's profile + auth metadata as soon
+  // as the session is ready. Editable, but no retyping required.
+  useEffect(() => {
+    if (!user) return;
+    const meta = (user.user_metadata ?? {}) as Record<string, any>;
+    setFormData((prev) => ({
+      ...prev,
+      email: prev.email || user.email || "",
+      firstName: prev.firstName || meta.first_name || "",
+      lastName: prev.lastName || meta.last_name || "",
+      phone: prev.phone || meta.phone || meta.phone_number || "",
+    }));
+    // Hydrate from profile too (richer source if trigger has run)
+    (async () => {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("first_name, last_name, phone, email")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (!profile) return;
+      setFormData((prev) => ({
+        ...prev,
+        email: prev.email || profile.email || "",
+        firstName: prev.firstName || profile.first_name || "",
+        lastName: prev.lastName || profile.last_name || "",
+        phone: prev.phone || profile.phone || "",
+      }));
+    })();
+    // Also load any existing in-flight application for this user
+    (async () => {
+      const { data: existing } = await supabase
+        .from("agent_applications")
+        .select("id, status")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (existing?.id) {
+        setDraftApplicationId(existing.id);
+        setApplicationId(existing.id);
+      }
+    })();
+  }, [user]);
+
   // Offer to restore an earlier draft (opt-in, so a brand-new signup
   // never inherits another applicant's cached answers).
   useEffect(() => {
@@ -191,8 +232,6 @@ export default function AgentApplicationForm() {
         insuranceCertificateFile: _b,
         governmentIdFile: _c,
         professionalHeadshotFile: _d,
-        password: _p,
-        passwordConfirm: _pc,
         ...persistable
       } = formData;
       localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(persistable));
@@ -213,14 +252,6 @@ export default function AgentApplicationForm() {
       if (!formData.email?.trim()) return missing("Email");
       if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
         toast({ title: "Valid email required", variant: "destructive" });
-        return false;
-      }
-      if (!formData.password || formData.password.length < 8) {
-        toast({ title: "Password must be at least 8 characters", variant: "destructive" });
-        return false;
-      }
-      if (formData.password !== formData.passwordConfirm) {
-        toast({ title: "Passwords don't match", variant: "destructive" });
         return false;
       }
       if (!formData.phone?.trim()) return missing("Phone");
