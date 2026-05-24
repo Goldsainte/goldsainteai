@@ -265,7 +265,7 @@ export default function AgentApplicationForm() {
     "Corporate Incentive Travel", "Milestone Celebrations",
   ];
 
-  const handleFileUpload = async (file: File, fieldName: string) => {
+  const handleFileUpload = async (file: File, fieldName: string, userId: string) => {
     try {
       const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
       if (file.size > MAX_FILE_SIZE) {
@@ -278,7 +278,9 @@ export default function AgentApplicationForm() {
       }
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}_${fieldName}.${fileExt}`;
-      const filePath = `agent-applications/${formData.email}/${fileName}`;
+      // First folder segment MUST be the authenticated user's UID to satisfy
+      // the storage RLS policy `(storage.foldername(name))[1] = auth.uid()::text`.
+      const filePath = `${userId}/agent-applications/${fileName}`;
       const { error: uploadError } = await supabase.storage
         .from('application-documents')
         .upload(filePath, file);
@@ -343,23 +345,26 @@ export default function AgentApplicationForm() {
         authUser = signUpData.user ?? null;
       }
 
-      // File uploads
+      // File uploads (require authenticated user for RLS)
+      if (!authUser?.id) {
+        throw new Error("Could not establish your account session. Please sign in and retry.");
+      }
       let businessLicensePath = null;
       let insuranceCertPath = null;
       let govIdPath = null;
       let headshotPath = null;
 
       if (formData.businessLicenseFile) {
-        businessLicensePath = await handleFileUpload(formData.businessLicenseFile, 'business_license');
+        businessLicensePath = await handleFileUpload(formData.businessLicenseFile, 'business_license', authUser.id);
       }
       if (formData.insuranceCertificateFile) {
-        insuranceCertPath = await handleFileUpload(formData.insuranceCertificateFile, 'insurance_certificate');
+        insuranceCertPath = await handleFileUpload(formData.insuranceCertificateFile, 'insurance_certificate', authUser.id);
       }
       if (formData.governmentIdFile) {
-        govIdPath = await handleFileUpload(formData.governmentIdFile, 'government_id');
+        govIdPath = await handleFileUpload(formData.governmentIdFile, 'government_id', authUser.id);
       }
       if (formData.professionalHeadshotFile) {
-        headshotPath = await handleFileUpload(formData.professionalHeadshotFile, 'headshot');
+        headshotPath = await handleFileUpload(formData.professionalHeadshotFile, 'headshot', authUser.id);
       }
 
       const extendedData = {
@@ -785,8 +790,8 @@ export default function AgentApplicationForm() {
               <h4 className="font-medium text-[#0a2225]">Legal Agreements</h4>
               {[
                 { key: "acceptedTerms" as const, label: "Terms of Service", link: "/terms" },
-                { key: "acceptedPrivacy" as const, label: "Privacy Policy", link: "/privacy" },
-                { key: "acceptedVendor" as const, label: "Agent Partnership Agreement", link: "/vendor-agreement" },
+                { key: "acceptedPrivacy" as const, label: "Privacy Policy", link: "/privacy-cookies" },
+                { key: "acceptedVendor" as const, label: "Agent Partnership Agreement", link: "/legal/agent-agreement" },
               ].map(({ key, label, link }) => (
                 <div key={key} className="flex items-start space-x-3">
                   <Checkbox
@@ -795,7 +800,7 @@ export default function AgentApplicationForm() {
                     className="data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47] mt-0.5"
                   />
                   <label className="text-sm text-[#0a2225]">
-                    I accept the <a href={link} target="_blank" className="text-[#C7A962] hover:underline">{label}</a> *
+                    I accept the <a href={link} target="_blank" rel="noopener noreferrer" className="text-[#C7A962] hover:underline">{label}</a> *
                   </label>
                 </div>
               ))}
