@@ -1,53 +1,68 @@
+## What I found
 
-## What happened
+The signup at 20:53 UTC for `info@cornellfacilities.com` (user `caea0d50-…`) DID reach Supabase Auth. The auth hook fired and returned 200 OK:
 
-Stripe resend worked — application is now `verified`, the welcome email arrived, and the user logged in. But two real bugs surfaced:
+```
+hook: https://lovable-api.com/.../backend/email-hook
+action: user_confirmation_requested
+success: true
+duration: 294ms
+```
 
-1. **404 from the email's "Open My Dashboard" link.** The template hardcodes a redirect to `/login?next=/onboarding/stripe-identity`. That route doesn't exist (the app uses `/n/*`, not `/onboarding/*`), and at this point the user has *already finished* Stripe Identity — so we shouldn't be sending them back to a KYC page anyway. They should land on the agent home.
+But unlike every previous signup for that address (5/14, 5/15, 5/24 15:32 — all logged as `pending` → `sent`), this attempt produced **zero rows in `email_send_log`**. So the auth hook accepted the request, but the email was never enqueued into the project's queue. Two real problems are colliding:
 
-2. **Auto-provisioning silently no-op'd.** Webhook logs show `"Account already provisioned for application"` with `alreadyExists: true`. The DB disagrees: `profiles.account_type='agent'` is set, but there is **no `travel_agents` row** and **no `user_roles` row** for `900acef9-…`. Root cause is in `supabase/functions/_shared/createAgentAccount.ts`:
+### Problem 1 — the auth-email-hook is on the OLD direct-send pattern
 
-   ```ts
-   if (application.user_id) {
-     return { success: true, alreadyExists: true };  // ← wrong signal
-   }
-   ```
+`supabase/functions/auth-email-hook/index.ts` still imports `@lovable.dev/email-js` and sends inline via the managed Lovable Email API. The current standard is the queue-based pattern (calls `enqueue_email` RPC → `process-email-queue` drains it → logged in `email_send_log` with retries / DLQ).
 
-   `agent_applications.user_id` is populated at signup, *before* the application is filed. So the helper short-circuits for every agent who signed up first (which is the standard flow now), skipping the `travel_agents` insert, `user_roles` insert, audit log, and welcome notification. The correct idempotency signal is the existence of a `travel_agents` row for that `user_id`.
+Consequences of being on the old pattern:
+- No queue → no automatic retries on transient failure or Mailgun rate-limit
+- No `email_send_log` row → we have no visibility when a send silently fails (which is exactly what's happening now)
+- Inconsistent with the transactional pipeline that DOES log
+
+This explains why the previous "signup" rows existed (those went through a working path) but the latest one didn't — the hook now returns 200 to Auth without producing an enqueue record we can see.
+
+### Problem 2 — Mailgun-side suppression is the most likely silent failure
+
+`info@cornellfacilities.com` has received 5 emails from us in 10 days, with multiple signup attempts. Mailgun maintains its own suppression list (bounces, complaints, "previously unsubscribed") that is **independent of our `suppressed_emails` table** (which is empty for this address). When Mailgun suppresses an address, the API returns success but never delivers — exactly the symptom here.
+
+This is not in our database; it lives in Mailgun. We can't see it from the project, but we can clear it.
 
 ## Fix
 
-### 1. Fix the false-idempotent short-circuit (root cause)
+### 1. Upgrade `auth-email-hook` to the queue-based pattern
 
-In `supabase/functions/_shared/createAgentAccount.ts`:
+Re-scaffold `auth-email-hook` so it imports `@supabase/supabase-js` and calls `supabase.rpc('enqueue_email', ...)` against the `auth_emails` pgmq queue, then redeploy it. After this, every auth email (signup, recovery, magic link) will:
+- Land in `email_send_log` with status `pending`
+- Be drained by `process-email-queue` with retries
+- Land as `sent` or `dlq` with an actual `error_message` we can read
 
-- Remove the `if (application.user_id) return alreadyExists` early-return.
-- Replace it with a check based on the `travel_agents` table: if a row with `user_id = application.user_id` already exists, return early. Otherwise, treat `application.user_id` as the resolved `userId` and proceed to step 3 (DB provisioning) — skip step 2 (auth user lookup/create) entirely, since the user is already known.
-- This makes the helper truly idempotent and self-healing: any future agent stuck in this state will be fixed on the next webhook resend or manual admin re-run.
-- Redeploy `stripe-identity-webhook` (it imports this helper).
+Custom email templates in `_shared/email-templates/` are preserved.
 
-### 2. Fix the broken email CTA destination
+### 2. Clear Mailgun suppression for `info@cornellfacilities.com`
 
-In `supabase/functions/_shared/transactional-email-templates/application-approved-professional.tsx`:
+You need to do this in the Mailgun dashboard (we can't do it from the project):
+- Mailgun → Sending → Suppressions
+- Search `info@cornellfacilities.com`
+- Remove from Bounces, Unsubscribes, and Complaints if present
 
-- Change the CTA URL from `/login?next=%2Fonboarding%2Fstripe-identity` to `/login?next=%2Fagent-dashboard` (the real agent home, gated by `RequireAgentTerms`).
-- Update the on-page copy line that says "Complete Stripe Identity verification to unlock your dashboard" — by the time this email is sent, identity is already verified. Replace that step with something accurate ("Sign in and accept the Marketplace Terms to unlock your dashboard").
-- Redeploy `send-transactional-email` so the new template is served.
+If the address shows up there, that's the root cause of the silent drop. Once removed, future sends will reach the inbox.
 
-### 3. Backfill this specific user (one-off)
+### 3. Re-test and verify
 
-Run the now-fixed provisioning helper for application `75e7e1fe-adbc-4934-b056-c23e9b649b77` to create the missing `travel_agents` and `user_roles` rows. Two equivalent ways:
+After steps 1 and 2:
+- Sign up again with that address
+- Check `email_send_log` — there should be a `pending` row within ~5s, then `sent`
+- If it goes to `dlq` instead, the `error_message` column will tell us exactly what Mailgun rejected (auth, domain, rate-limit, etc.)
 
-- Curl the `stripe-identity-webhook` retry path is messy — instead, invoke the existing `approve-application` edge function (which also calls `createAgentAccountFromApplication`) for that application id. With the fix in place it will now insert the missing rows. Easiest: do the inserts directly via a small migration / data op, mirroring exactly what the helper does (travel_agents insert + user_roles insert + application_audit_log + notification). This is safer than re-running the webhook because we control the exact values.
+### 4. Going forward
 
-### 4. Verify
+With the queue-based hook in place, "the email didn't arrive" stops being a black box. Every send produces a row with a status and an error string, so we can answer the question definitively next time instead of guessing.
 
-Re-query `travel_agents` and `user_roles` for `900acef9-…` — both should now have rows. Confirm the user can hit `/agent-dashboard` after signing in (gated by `RequireAgentTerms` — if they haven't accepted terms yet they'll be sent to the terms page, which is correct).
+## Technical notes
 
-## Technical notes / files touched
-
-- `supabase/functions/_shared/createAgentAccount.ts` — replace the user_id-based short-circuit with a `travel_agents` existence check; skip the auth-user create branch when `application.user_id` is already set.
-- `supabase/functions/_shared/transactional-email-templates/application-approved-professional.tsx` — fix CTA URL + onboarding steps copy.
-- One-off data op via migration to insert `travel_agents` + `user_roles` + audit row + notification for `user_id=900acef9-c282-4252-b95f-0088b4a215ee`.
-- Redeploy `stripe-identity-webhook` and `send-transactional-email`.
-- No schema changes. No frontend changes.
+- Files touched: `supabase/functions/auth-email-hook/index.ts` (re-scaffolded), templates in `_shared/email-templates/*.tsx` (preserved as-is)
+- Deploy: `auth-email-hook`
+- No DB schema changes — `enqueue_email` RPC and `auth_emails` pgmq queue already exist (transactional pipeline uses the same infra)
+- No frontend changes
+- Mailgun suppression clearing must be done by you in the Mailgun dashboard — not scriptable from here
