@@ -56,19 +56,28 @@ export function OnboardingRouter() {
             setDestination('/onboarding/creator');
             break;
           case 'agent': {
-            // If they already submitted an application, route to status —
-            // not back to the empty application form.
+            // Email not yet confirmed → back to signup with resend UI,
+            // never to a dead-end "verify your email" page.
+            if (!user.email_confirmed_at) {
+              setDestination('/apply/agent/signup?unverified=1');
+              break;
+            }
             const { data: agentApp } = await supabase
               .from('agent_applications')
-              .select('id, email, status')
+              .select('id, email, status, stripe_verification_session_id')
               .eq('user_id', user.id)
-              .in('status', ['pending_verification', 'verified', 'approved', 'under_review'])
               .order('created_at', { ascending: false })
               .limit(1)
               .maybeSingle();
-            if (agentApp) {
+            if (!agentApp) {
+              setDestination('/apply/agent');
+            } else if (agentApp.status === 'verified' || agentApp.status === 'approved') {
+              setDestination('/partner');
+            } else if (agentApp.stripe_verification_session_id) {
+              // Stripe Identity is in progress
               setDestination(`/application/status?email=${encodeURIComponent(agentApp.email)}`);
             } else {
+              // Application row exists but no Stripe session yet — resume the form.
               setDestination('/apply/agent');
             }
             break;
