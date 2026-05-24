@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Trophy, Star, Gift, TrendingUp, Copy, Check } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Copy, Check } from "lucide-react";
+
+const SERIF = "'Cormorant Garamond', Georgia, serif";
+const MONO = "ui-monospace, 'SF Mono', Menlo, monospace";
 
 interface LoyaltyPoints {
   points_balance: number;
@@ -33,10 +30,10 @@ interface Referral {
 }
 
 const tierConfig = {
-  bronze: { next: "silver", threshold: 2000, color: "text-orange-600", benefits: ["5% discount on services"] },
-  silver: { next: "gold", threshold: 5000, color: "text-gray-400", benefits: ["10% discount", "Priority support"] },
-  gold: { next: "platinum", threshold: 10000, color: "text-[#C7A962]", benefits: ["15% discount", "Priority matching", "Free cancellation"] },
-  platinum: { next: null, threshold: Infinity, color: "text-purple-600", benefits: ["20% discount", "Dedicated agent", "VIP support", "Exclusive deals"] },
+  bronze:   { next: "silver",   threshold: 2000,     benefits: ["5% discount on services"] },
+  silver:   { next: "gold",     threshold: 5000,     benefits: ["10% discount", "Priority support"] },
+  gold:     { next: "platinum", threshold: 10000,    benefits: ["15% discount", "Priority matching", "Free cancellation"] },
+  platinum: { next: null,       threshold: Infinity, benefits: ["20% discount", "Dedicated agent", "VIP support", "Exclusive deals"] },
 };
 
 export default function LoyaltyRewards() {
@@ -111,188 +108,201 @@ export default function LoyaltyRewards() {
 
   if (loading) {
     return (
-      <div className="container py-8 max-w-6xl">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-muted rounded w-1/4" />
-          <div className="grid gap-4 md:grid-cols-3">
-            {[...Array(3)].map((_, i) => (
-              <Card key={i}>
-                <CardHeader><div className="h-6 bg-muted rounded" /></CardHeader>
-                <CardContent><div className="h-20 bg-muted rounded" /></CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
+      <div className="bg-[#f7f3ea] flex-1 py-24 px-6">
+        <p className="text-center text-[#0a2225]/60 italic" style={{ fontFamily: SERIF }}>
+          Loading your dossier…
+        </p>
       </div>
     );
   }
 
   const currentTier = loyaltyData?.tier || "bronze";
   const config = tierConfig[currentTier as keyof typeof tierConfig];
-  const progress = config.next
-    ? ((loyaltyData?.lifetime_points || 0) / config.threshold) * 100
-    : 100;
+  const lifetime = loyaltyData?.lifetime_points || 0;
+  const progress = config.next ? Math.min(100, (lifetime / config.threshold) * 100) : 100;
 
   return (
-    <div className="container py-8 max-w-6xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <Trophy className="h-8 w-8" />
-          Loyalty & Rewards
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          Earn points and unlock exclusive benefits
-        </p>
-      </div>
-
-      {/* Tier Status */}
-      <Card className="mb-6">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className={`text-2xl ${config.color}`}>
-                {currentTier.toUpperCase()} Tier
-              </CardTitle>
-              <CardDescription>
-                {loyaltyData?.points_balance || 0} points available
-              </CardDescription>
-            </div>
-            <Trophy className={`h-12 w-12 ${config.color}`} />
+    <div className="bg-[#f7f3ea] text-[#0a2225] flex-1 py-20 px-6 selection:bg-[#c9a84c]/30">
+      <section className="w-full max-w-4xl mx-auto">
+        {/* HEADER */}
+        <header className="grid grid-cols-1 md:grid-cols-12 border-t border-b border-[#0a2225] py-8 mb-16 gap-6">
+          <div className="md:col-span-8">
+            <span className="block uppercase tracking-[0.2em] text-[10px] font-bold mb-4 text-[#c9a84c]">
+              Loyalty
+            </span>
+            <h1 className="text-4xl md:text-5xl tracking-tight" style={{ fontFamily: SERIF }}>
+              Rewards & Standing
+            </h1>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {config.next && (
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span>Progress to {config.next}</span>
-                <span>{loyaltyData?.lifetime_points || 0} / {config.threshold} points</span>
+          <div className="md:col-span-4 md:text-right flex flex-col justify-end">
+            <span className="block text-[9px] uppercase tracking-[0.2em] opacity-40 mb-1">
+              Points Balance
+            </span>
+            <span className="text-2xl italic" style={{ fontFamily: SERIF }}>
+              {(loyaltyData?.points_balance || 0).toLocaleString()}
+            </span>
+          </div>
+        </header>
+
+        {/* TIER + PROGRESS */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-20">
+          <div className="md:col-span-7">
+            <label className="block text-[9px] uppercase tracking-[0.2em] font-bold opacity-40 mb-3">
+              Current Tier
+            </label>
+            <h2 className="text-5xl italic mb-8 tracking-tight" style={{ fontFamily: SERIF }}>
+              {currentTier[0].toUpperCase() + currentTier.slice(1)}
+            </h2>
+
+            {config.next && (
+              <div className="mb-8">
+                <div className="flex justify-between text-[10px] uppercase tracking-[0.2em] font-bold opacity-60 mb-3">
+                  <span>Progress to {config.next}</span>
+                  <span style={{ fontFamily: MONO }}>{lifetime.toLocaleString()} / {config.threshold.toLocaleString()}</span>
+                </div>
+                <div className="h-px bg-[#0a2225]/15 relative">
+                  <div
+                    className="absolute inset-y-0 left-0 bg-[#c9a84c]"
+                    style={{ width: `${progress}%`, height: "1px" }}
+                  />
+                </div>
               </div>
-              <Progress value={progress} className="h-2" />
-            </div>
-          )}
-          
-          <div>
-            <p className="font-medium mb-2">Your Benefits:</p>
-            <ul className="space-y-1">
+            )}
+
+            <label className="block text-[9px] uppercase tracking-[0.2em] font-bold opacity-40 mb-4 mt-10">
+              Member Benefits
+            </label>
+            <ul className="space-y-3 border-l border-[#c9a84c]/40 pl-6">
               {config.benefits.map((benefit, i) => (
-                <li key={i} className="text-sm flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-600" />
+                <li key={i} className="text-base italic text-[#0a2225]/80" style={{ fontFamily: SERIF }}>
                   {benefit}
                 </li>
               ))}
             </ul>
           </div>
-        </CardContent>
-      </Card>
 
-      <Tabs defaultValue="earn" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="earn">Earn Points</TabsTrigger>
-          <TabsTrigger value="history">History</TabsTrigger>
-          <TabsTrigger value="referral">Referral Program</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="earn" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-3">
-            <Card>
-              <CardHeader>
-                <Star className="h-8 w-8 text-[#C7A962] mb-2" />
-                <CardTitle>Complete Bookings</CardTitle>
-                <CardDescription>Earn 100 points per booking</CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <Gift className="h-8 w-8 text-[#0c4d47] mb-2" />
-                <CardTitle>Leave Reviews</CardTitle>
-                <CardDescription>Get 50 points for each review</CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <TrendingUp className="h-8 w-8 text-green-600 mb-2" />
-                <CardTitle>Refer Friends</CardTitle>
-                <CardDescription>Earn 500 points per referral</CardDescription>
-              </CardHeader>
-            </Card>
+          <div className="md:col-span-5">
+            <div className="bg-[#0a2225] p-10 text-[#f7f3ea] relative overflow-hidden h-full">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#c9a84c]/15 rounded-full -mr-16 -mt-16 blur-3xl" />
+              <label className="relative z-10 block text-[9px] uppercase tracking-[0.3em] font-bold opacity-50 mb-8">
+                Earn Points
+              </label>
+              <ul className="relative z-10 space-y-6">
+                <li>
+                  <p className="text-2xl italic mb-1" style={{ fontFamily: SERIF }}>+100 pts</p>
+                  <p className="text-sm opacity-70">Per completed booking</p>
+                </li>
+                <li>
+                  <p className="text-2xl italic mb-1" style={{ fontFamily: SERIF }}>+50 pts</p>
+                  <p className="text-sm opacity-70">For each review you leave</p>
+                </li>
+                <li>
+                  <p className="text-2xl italic mb-1" style={{ fontFamily: SERIF }}>+500 pts</p>
+                  <p className="text-sm opacity-70">Per successful referral</p>
+                </li>
+              </ul>
+            </div>
           </div>
-        </TabsContent>
+        </div>
 
-        <TabsContent value="history" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Points History</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {transactions.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  No transactions yet
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {transactions.map((txn) => (
-                    <div key={txn.id} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div>
-                        <p className="font-medium">{txn.reason}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(txn.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <Badge variant={txn.points_amount > 0 ? "default" : "secondary"}>
-                        {txn.points_amount > 0 ? "+" : ""}{txn.points_amount} pts
-                      </Badge>
+        {/* REFERRAL */}
+        <div className="border-t border-[#0a2225]/10 pt-16 mb-20">
+          <span className="block text-[9px] uppercase tracking-[0.2em] font-bold opacity-40 mb-3">
+            Referral
+          </span>
+          <h2 className="text-3xl md:text-4xl italic mb-4 tracking-tight" style={{ fontFamily: SERIF }}>
+            Invite Friends
+          </h2>
+          <p className="text-base text-[#0a2225]/70 font-light max-w-xl mb-8">
+            Share your code and earn 500 points for each friend who completes a booking.
+          </p>
+
+          <div className="flex items-center gap-4 border-b border-[#0a2225]/30 pb-3 max-w-md">
+            <span className="flex-1 text-lg tracking-wider" style={{ fontFamily: MONO }}>
+              {referralCode}
+            </span>
+            <button
+              onClick={copyReferralLink}
+              className="text-[10px] uppercase tracking-[0.2em] font-semibold text-[#0c4d47] hover:text-[#0a2225] transition-colors flex items-center gap-2"
+            >
+              {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+              {copied ? "Copied" : "Copy link"}
+            </button>
+          </div>
+
+          <div className="mt-12">
+            <label className="block text-[9px] uppercase tracking-[0.2em] font-bold opacity-40 mb-6">
+              Your Referrals ({referrals.length})
+            </label>
+            {referrals.length === 0 ? (
+              <p className="text-base italic text-[#0a2225]/60" style={{ fontFamily: SERIF }}>
+                No referrals yet — share your link to begin.
+              </p>
+            ) : (
+              <ul className="space-y-4 max-w-2xl">
+                {referrals.map((ref) => (
+                  <li
+                    key={ref.id}
+                    className="flex items-center justify-between border-b border-[#0a2225]/10 pb-4"
+                  >
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#c9a84c] mb-1">
+                        {ref.status}
+                      </p>
+                      <p className="text-sm text-[#0a2225]/60" style={{ fontFamily: MONO }}>
+                        {new Date(ref.created_at).toLocaleDateString()}
+                      </p>
                     </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+                    {ref.status === "rewarded" && (
+                      <p className="text-lg italic" style={{ fontFamily: SERIF }}>
+                        +{ref.referrer_points_earned} pts
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
 
-        <TabsContent value="referral" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Invite Friends</CardTitle>
-              <CardDescription>
-                Share your referral code and earn 500 points for each friend who completes a booking
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex gap-2">
-                <Input value={referralCode} readOnly />
-                <Button onClick={copyReferralLink}>
-                  {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                </Button>
-              </div>
-
-              <div className="border-t pt-4">
-                <h4 className="font-medium mb-3">Your Referrals ({referrals.length})</h4>
-                {referrals.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No referrals yet</p>
-                ) : (
-                  <div className="space-y-2">
-                    {referrals.map((ref) => (
-                      <div key={ref.id} className="flex items-center justify-between p-2 border rounded">
-                        <div>
-                          <Badge>{ref.status}</Badge>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {new Date(ref.created_at).toLocaleDateString()}
-                          </p>
-                        </div>
-                        {ref.status === "rewarded" && (
-                          <Badge variant="default">+{ref.referrer_points_earned} pts</Badge>
-                        )}
-                      </div>
-                    ))}
+        {/* HISTORY */}
+        <div className="border-t border-[#0a2225]/10 pt-16">
+          <span className="block text-[9px] uppercase tracking-[0.2em] font-bold opacity-40 mb-3">
+            Ledger
+          </span>
+          <h2 className="text-3xl md:text-4xl italic mb-10 tracking-tight" style={{ fontFamily: SERIF }}>
+            Points History
+          </h2>
+          {transactions.length === 0 ? (
+            <p className="text-base italic text-[#0a2225]/60" style={{ fontFamily: SERIF }}>
+              No transactions yet.
+            </p>
+          ) : (
+            <ul className="space-y-5 max-w-2xl">
+              {transactions.map((txn) => (
+                <li
+                  key={txn.id}
+                  className="flex items-center justify-between border-b border-[#0a2225]/10 pb-4"
+                >
+                  <div>
+                    <p className="text-base mb-1">{txn.reason}</p>
+                    <p className="text-xs text-[#0a2225]/50" style={{ fontFamily: MONO }}>
+                      {new Date(txn.created_at).toLocaleDateString()}
+                    </p>
                   </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                  <p
+                    className={`text-xl italic ${txn.points_amount > 0 ? "text-[#0c4d47]" : "text-[#0a2225]/60"}`}
+                    style={{ fontFamily: SERIF }}
+                  >
+                    {txn.points_amount > 0 ? "+" : ""}
+                    {txn.points_amount} pts
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </section>
     </div>
   );
 }
