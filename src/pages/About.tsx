@@ -93,21 +93,27 @@ const About = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 md:py-12 max-w-5xl">
-      <BackButton className="mb-6" />
-      {/* Page Header */}
-      <div className="text-center mb-8 sm:mb-12">
-        <div className="flex justify-center mb-4 sm:mb-6">
-          <img 
-            src={goldsainteLogo} 
-            alt="Goldsainte" 
-            className="h-4 sm:h-6 md:h-7 w-auto"
-          loading="lazy"/>
-        </div>
-        <p className="text-xs sm:text-sm text-muted-foreground max-w-4xl mx-auto leading-relaxed px-2">
-          {t('home.hero.title')}. {t('home.hero.subtitle')}
-        </p>
-      </div>
+    <div className="bg-[#f7f3ea] text-[#0a2225] flex-1 selection:bg-[#c9a84c]/30">
+      <div className="container mx-auto px-4 sm:px-6 py-16 md:py-24 max-w-5xl">
+        <BackButton className="mb-8" />
+        {/* Editorial Hero */}
+        <header className="text-center mb-20 md:mb-24">
+          <div className="flex justify-center mb-10">
+            <div className="w-px h-16 bg-[#0a2225]" />
+          </div>
+          <span className="block uppercase tracking-[0.3em] text-[9px] font-bold mb-8 text-[#c9a84c]">
+            About Goldsainte
+          </span>
+          <h1
+            className="text-5xl md:text-6xl italic mb-8 tracking-tight leading-[0.95] text-balance"
+            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+          >
+            The Smarter Travel Marketplace
+          </h1>
+          <p className="text-base md:text-lg text-[#0a2225]/70 font-light max-w-xl mx-auto leading-relaxed text-pretty">
+            {t('home.hero.subtitle')}
+          </p>
+        </header>
 
       {/* Letter from the Founder - Main, Visible Section */}
       <Card className="mb-6 sm:mb-8 border-primary/20 shadow-lg">
