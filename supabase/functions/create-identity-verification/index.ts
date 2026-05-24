@@ -370,6 +370,49 @@ async function createVerificationSession(
       }
     }
 
+    // For agents/brands, write the session id back to the application row so
+    // the stripe-identity-webhook can locate the record on completion.
+    if (applicationType === "agent" || applicationType === "brand") {
+      const tableName =
+        applicationType === "agent" ? "agent_applications" : "brand_applications";
+      const emailField =
+        applicationType === "agent" ? "email" : "primary_contact_email";
+
+      const { data: updated, error: updateError } = await supabaseClient
+        .from(tableName)
+        .update({
+          stripe_verification_session_id: verificationSession.id,
+          stripe_verification_status: "pending",
+        })
+        .eq(emailField, email)
+        .in("status", ["pending_verification", "draft"])
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .select("id");
+
+      if (updateError) {
+        logger.error("Failed to persist verification session id on application", {
+          error: updateError,
+          email,
+          applicationType,
+          sessionId: verificationSession.id,
+        });
+        // Don't throw — surfacing the session URL still lets the user verify;
+        // but the webhook reconciliation will then fail.
+      } else if (!updated || updated.length === 0) {
+        logger.error("No matching application found to attach session id", {
+          email,
+          applicationType,
+          sessionId: verificationSession.id,
+        });
+      } else {
+        logger.info("Attached session id to application", {
+          applicationId: updated[0].id,
+          sessionId: verificationSession.id,
+        });
+      }
+    }
+
     return {
       client_secret: verificationSession.client_secret!,
       sessionId: verificationSession.id,
