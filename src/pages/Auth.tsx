@@ -891,7 +891,7 @@ const Auth = () => {
               </div>
             </div>
 
-            {(selectedAccountType === 'traveler' || selectedAccountType === 'creator') && (
+            {(selectedAccountType === 'traveler' || selectedAccountType === 'creator' || selectedAccountType === 'agent') && (
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-medium" style={{ color: '#0a2225' }}>Password</Label>
                 <Input id="password" type="password" placeholder="Create a password" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} minLength={8} />
