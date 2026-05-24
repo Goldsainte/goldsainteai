@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, CheckCircle, Clock, XCircle } from "lucide-react";
 
 export default function ApplicationStatusCheck() {
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<{
     id: string;
@@ -20,7 +22,9 @@ export default function ApplicationStatusCheck() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const checkStatus = async () => {
+  const checkStatus = async (emailOverride?: string) => {
+    const targetEmail = (emailOverride ?? email).trim();
+    if (!targetEmail) return;
     setLoading(true);
     setError(null);
     setStatus(null);
@@ -30,7 +34,7 @@ export default function ApplicationStatusCheck() {
       const { data: agentApp } = await supabase
         .from('agent_applications')
         .select('id, email, first_name, last_name, status, stripe_verification_status, created_at, rejection_reason, user_id')
-        .eq('email', email)
+        .eq('email', targetEmail)
         .order('created_at', { ascending: false })
         .maybeSingle() as any;
 
@@ -38,7 +42,7 @@ export default function ApplicationStatusCheck() {
       const { data: brandApp } = await supabase
         .from('brand_applications')
         .select('id, brand_name, primary_contact_email, status, stripe_verification_status, created_at, rejection_reason, user_id')
-        .eq('primary_contact_email', email)
+        .eq('primary_contact_email', targetEmail)
         .order('created_at', { ascending: false })
         .maybeSingle() as any;
 
@@ -59,6 +63,17 @@ export default function ApplicationStatusCheck() {
       setLoading(false);
     }
   };
+
+  // Auto-load when navigated here with ?email=<address> (e.g. from the
+  // post-signin routing path).
+  useEffect(() => {
+    const qEmail = searchParams.get('email');
+    if (qEmail) {
+      setEmail(qEmail);
+      void checkStatus(qEmail);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const getStatusBadge = (s: string) => {
     switch (s) {
@@ -94,7 +109,7 @@ export default function ApplicationStatusCheck() {
                 onChange={(e) => setEmail(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && checkStatus()}
               />
-              <Button onClick={checkStatus} disabled={loading || !email}>
+              <Button onClick={() => checkStatus()} disabled={loading || !email}>
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Check Status"}
               </Button>
             </div>

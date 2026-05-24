@@ -17,12 +17,12 @@ const corsHeaders = {
 }
 
 const EMAIL_SUBJECTS: Record<string, string> = {
-  signup: 'Confirm your email — Welcome to Goldsainte',
-  invite: "You've been invited to Goldsainte",
-  magiclink: 'Your Goldsainte sign-in link',
-  recovery: 'Reset your Goldsainte password',
-  email_change: 'Confirm your new Goldsainte email',
-  reauthentication: 'Your Goldsainte verification code',
+  signup: 'Confirm your email',
+  invite: "You've been invited",
+  magiclink: 'Your login link',
+  recovery: 'Reset your password',
+  email_change: 'Confirm your new email',
+  reauthentication: 'Your verification code',
 }
 
 // Template mapping
@@ -36,17 +36,17 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "Goldsainte"
+const SITE_NAME = "goldsainteai"
 const SENDER_DOMAIN = "notify.goldsainte.com"
 const ROOT_DOMAIN = "goldsainte.com"
-const FROM_DOMAIN = "goldsainte.com" // Domain shown in From address (may be root or sender subdomain)
+const FROM_DOMAIN = "notify.goldsainte.com" // Domain shown in From address (may be root or sender subdomain)
 
 // Sample data for preview mode ONLY (not used in actual email sending).
 // URLs are baked in at scaffold time from the project's real data.
 // The sample email uses a fixed placeholder (RFC 6761 .test TLD) so the Go backend
 // can always find-and-replace it with the actual recipient when sending test emails,
 // even if the project's domain has changed since the template was scaffolded.
-const SAMPLE_PROJECT_URL = "https://goldsainte.ai"
+const SAMPLE_PROJECT_URL = "https://goldsainteai.lovable.app"
 const SAMPLE_EMAIL = "user@example.test"
 const SAMPLE_DATA: Record<string, object> = {
   signup: {
@@ -258,7 +258,7 @@ async function handleWebhook(req: Request): Promise<Response> {
       run_id,
       message_id: messageId,
       to: payload.data.email,
-      from: `${SITE_NAME} <hello@${FROM_DOMAIN}>`,
+      from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
       sender_domain: SENDER_DOMAIN,
       subject: EMAIL_SUBJECTS[emailType] || 'Notification',
       html,
