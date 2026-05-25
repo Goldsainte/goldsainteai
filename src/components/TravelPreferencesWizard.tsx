@@ -502,8 +502,8 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
 
       {/* Step Card */}
       <div className="rounded-[24px] border border-[#E5DFC6] bg-[#FDFBF7] p-6 sm:p-8">
-        {/* Step Header */}
-        <div className="text-center mb-8">
+        {/* Step Header — left aligned to match form content below */}
+        <div className="text-left mb-8">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#F5EFE1] mb-4">
             <currentStepData.icon className="w-6 h-6 text-[#7A7151]" />
           </div>
