@@ -17,26 +17,34 @@ export default function CompleteProfile() {
       return;
     }
 
-    // Check if user already has an account type set (from signup metadata)
+    // Only skip this screen for users who have ALREADY finished setup.
+    // A fresh Google signup arrives here with account_type='traveler'
+    // (trigger default) but is_profile_complete=false and no name —
+    // they still need to pick a role and enter their identity, so we
+    // must show the form.
     async function checkExistingAccountType() {
       if (!user) return;
-      
+
       try {
         const { data: profile } = await supabase
           .from('profiles')
-          .select('account_type')
+          .select('account_type, is_profile_complete, onboarding_completed, first_name')
           .eq('id', user.id)
           .maybeSingle();
 
-        // If account type is already set, skip role selection and go directly to onboarding
-        if (profile?.account_type) {
+        const isFinished =
+          profile?.is_profile_complete === true ||
+          profile?.onboarding_completed === true ||
+          Boolean(profile?.first_name && String(profile.first_name).trim());
+
+        if (profile?.account_type && isFinished) {
           navigate('/onboarding', { replace: true });
           return;
         }
       } catch (err) {
         console.error('Error checking profile:', err);
       }
-      
+
       setCheckingProfile(false);
     }
 
