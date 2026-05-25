@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { lovable } from '@/integrations/lovable';
 import { EditorialLoader } from '@/components/EditorialLoader';
 import { AUTH_REDIRECT_STORAGE_KEY, getRedirectPathFromSearch, sanitizeRedirectPath } from '@/lib/auth/redirect';
 import { getPostAuthDestination } from '@/lib/auth/postAuthRouting';
@@ -21,30 +20,9 @@ const AuthCallback = () => {
           queryParams.get('type') === 'recovery' ||
           queryParams.has('token_hash');
 
-        // OAuth return leg: the Lovable broker redirects back to /auth/callback
-        // with a broker code/state in the URL (NOT a Supabase access_token hash).
-        // We must call lovable.auth.signInWithOAuth here so the SDK can detect
-        // the callback params, exchange them for Supabase tokens, and call
-        // supabase.auth.setSession internally. Without this, no SIGNED_IN event
-        // ever fires, the wait below times out, and we bounce to /auth.
-        //
-        // The SDK only re-initiates the OAuth round-trip if there are no
-        // callback params in the URL — on /auth/callback they're present, so
-        // it performs the exchange instead. Skip for recovery flows.
-        const hasBrokerCallback =
-          queryParams.has('code') || queryParams.has('state') || hashParams.has('access_token');
-        if (!isRecoveryFlow && hasBrokerCallback) {
-          try {
-            const oauthResult = await lovable.auth.signInWithOAuth('google', {
-              redirect_uri: `${window.location.origin}/auth/callback`,
-            });
-            if ((oauthResult as any)?.error) {
-              console.error('OAuth exchange failed:', (oauthResult as any).error);
-            }
-          } catch (err) {
-            console.error('OAuth exchange threw:', err);
-          }
-        }
+        // The Supabase client (detectSessionInUrl: true) automatically exchanges
+        // the OAuth code in the URL for a session and emits SIGNED_IN. No manual
+        // broker call needed here.
 
         // Wait for Supabase to confirm the session is ready (event-driven, with 5s fallback)
         const session = await new Promise<any>((resolve) => {
