@@ -3,16 +3,15 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 
-const FALLBACK_SUPABASE_URL = "https://placeholder.supabase.co";
-const FALLBACK_SUPABASE_KEY = "public-anon-key";
-
-// Use real env vars if present, otherwise fall back to placeholders.
-// This keeps the UI working even if Supabase is not fully configured.
-const SUPABASE_URL =
-  import.meta.env.VITE_SUPABASE_URL || FALLBACK_SUPABASE_URL;
-
-const SUPABASE_PUBLISHABLE_KEY =
-  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || FALLBACK_SUPABASE_KEY;
+// Supabase project credentials are PINNED directly here — intentionally.
+// The publishable (anon) key is designed to be public; it ships in the
+// browser bundle regardless, so hardcoding it is safe. Pinning these values
+// removes the environment-variable / build-fallback chain that caused the
+// app to connect to a non-existent "placeholder.supabase.co" host (and,
+// earlier, to send a mismatched key -> "Invalid API key"). With the values
+// pinned, the app always connects to the correct live project.
+const SUPABASE_URL = "https://ktzsgqrqvwtxlimctkaf.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_i5xwYqNzT3JOevhcl7-J3w_J2oofXm5";
 
 // Import the supabase client like this:
 //   import { supabase } from "@/integrations/supabase/client"
