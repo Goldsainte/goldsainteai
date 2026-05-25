@@ -19,6 +19,7 @@ import { AUTH_REDIRECT_STORAGE_KEY, getRedirectPathFromSearch, sanitizeRedirectP
 import { requestPasswordReset } from '@/lib/auth/requestPasswordReset';
 import { isDuplicateEmailError, isDuplicateEmailSignupResponse } from '@/lib/auth/duplicateEmail';
 import { ToastAction } from '@/components/ui/toast';
+import { lovable } from '@/integrations/lovable';
 
 const passwordSchema = z.string()
   .min(8, "Password must be at least 8 characters")
@@ -558,12 +559,9 @@ const Auth = () => {
           JSON.stringify({ accountType: selectedAccountType }),
         );
       }
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: { prompt: 'select_account' },
-        },
+      const { error } = await lovable.auth.signInWithOAuth('google', {
+        redirect_uri: `${window.location.origin}/auth/callback`,
+        extraParams: { prompt: 'select_account' },
       });
       if (error) throw error;
     } catch (error: any) {
