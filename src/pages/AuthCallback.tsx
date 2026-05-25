@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { lovable } from '@/integrations/lovable';
 import { EditorialLoader } from '@/components/EditorialLoader';
 import { AUTH_REDIRECT_STORAGE_KEY, getRedirectPathFromSearch, sanitizeRedirectPath } from '@/lib/auth/redirect';
 import { getPostAuthDestination } from '@/lib/auth/postAuthRouting';
@@ -19,6 +20,22 @@ const AuthCallback = () => {
           hashParams.get('type') === 'recovery' ||
           queryParams.get('type') === 'recovery' ||
           queryParams.has('token_hash');
+
+        // Process Lovable OAuth return-leg: the SDK reads broker tokens from
+        // the URL and calls supabase.auth.setSession internally. Without this,
+        // Supabase never sees a session and we'd bounce back to /auth.
+        if (!isRecoveryFlow) {
+          try {
+            const result = await lovable.auth.signInWithOAuth('google', {
+              redirect_uri: `${window.location.origin}/auth/callback`,
+            });
+            if (result?.error) {
+              console.error('[AuthCallback] Lovable OAuth error:', result.error);
+            }
+          } catch (err) {
+            console.warn('[AuthCallback] Lovable OAuth processing failed:', err);
+          }
+        }
 
         // Wait for Supabase to confirm the session is ready (event-driven, with 5s fallback)
         const session = await new Promise<any>((resolve) => {
