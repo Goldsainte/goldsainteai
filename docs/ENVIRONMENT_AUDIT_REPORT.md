@@ -158,7 +158,7 @@
 - [ ] **Switch to Live Mode** in Stripe Dashboard (currently using test keys)
 - [ ] **Update STRIPE_SECRET_KEY** to live key (sk_live_...)
 - [ ] **Verify webhook endpoint** points to production:
-  - Production URL: `https://ktzsgqrqvwtxlimctkaf.supabase.co/functions/v1/stripe-webhook`
+  - Production URL: `https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/stripe-webhook`
   - Current: *(check Stripe Dashboard → Developers → Webhooks)*
 - [ ] **Update webhook secret** (STRIPE_WEBHOOK_SECRET) after creating production webhook
 - [ ] **Activate Customer Portal** manually:
@@ -330,7 +330,7 @@ console.log('SITE_URL:', import.meta.env.VITE_SITE_URL || 'NOT SET');
 ### Test Edge Function Environment Variables
 ```bash
 # Test Stripe webhook secret is loaded
-curl -X POST https://ktzsgqrqvwtxlimctkaf.supabase.co/functions/v1/stripe-webhook \
+curl -X POST https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/stripe-webhook \
   -H "stripe-signature: test" \
   -d '{}'
 # Should return 400 error with "Invalid signature" (proves secret is loaded)

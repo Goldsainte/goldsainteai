@@ -64,8 +64,8 @@ The secret `STRIPE_WEBHOOK_SECRET_IDENTITY` is already configured in your Supaba
 
 **Production Endpoints:**
 ```
-Session creation: https://ktzsgqrqvwtxlimctkaf.supabase.co/functions/v1/create-identity-verification
-Webhook: https://ktzsgqrqvwtxlimctkaf.supabase.co/functions/v1/stripe-identity-webhook
+Session creation: https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/create-identity-verification
+Webhook: https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/stripe-identity-webhook
 ```
 
 **Events to Subscribe:**
@@ -205,7 +205,7 @@ STRIPE_WEBHOOK_SECRET_IDENTITY=whsec_xxxxx  # For identity webhooks ✅ CONFIGUR
 RESEND_API_KEY=re_xxxxx  # ✅ CONFIGURED
 
 # Supabase (already configured)
-SUPABASE_URL=https://ktzsgqrqvwtxlimctkaf.supabase.co
+SUPABASE_URL=https://iwdevxltjuedijrcdejs.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=xxxxx
 ```
 
