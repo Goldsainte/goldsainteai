@@ -74,7 +74,7 @@ export default defineConfig(({ mode }) => {
     react(),
     mode === "development" && componentTagger(),
     swVersionPlugin(),
-    newsroomSitemapPlugin(),
+    newsroomSitemapPlugin(env.VITE_SUPABASE_URL),
   ].filter(Boolean);
   
   // Add Sentry plugin for source map uploads in production builds
