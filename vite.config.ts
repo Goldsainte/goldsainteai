@@ -35,8 +35,8 @@ function swVersionPlugin() {
 // calling the deployed sitemap-newsroom edge function. Lovable hosting
 // does not process _redirects files, so we must materialize the sitemap
 // as a real static file under public/ for /newsroom-sitemap.xml to work.
-function newsroomSitemapPlugin() {
-  const SUPABASE_URL = "https://ktzsgqrqvwtxlimctkaf.supabase.co";
+function newsroomSitemapPlugin(supabaseUrl?: string) {
+  const SUPABASE_URL = supabaseUrl || 'https://iwdevxltjuedijrcdejs.supabase.co';
   const ENDPOINT = `${SUPABASE_URL}/functions/v1/sitemap-newsroom`;
   const OUT = path.resolve(__dirname, "public/newsroom-sitemap.xml");
 
@@ -74,7 +74,7 @@ export default defineConfig(({ mode }) => {
     react(),
     mode === "development" && componentTagger(),
     swVersionPlugin(),
-    newsroomSitemapPlugin(),
+    newsroomSitemapPlugin(env.VITE_SUPABASE_URL),
   ].filter(Boolean);
   
   // Add Sentry plugin for source map uploads in production builds
@@ -112,13 +112,12 @@ export default defineConfig(({ mode }) => {
     'import.meta.env.VITE_RELEASE_VERSION': JSON.stringify(
       env.VITE_RELEASE_VERSION || `goldsainte@${env.npm_package_version || '1.0.0'}`
     ),
-    // Supabase URL + publishable key are PINNED to the live project
-    // (ktzsgqrqvwtxlimctkaf). They MUST always be a matched pair from the
-    // same project. The publishable/anon key is safe to ship in the client
-    // bundle. Pinned (not env-resolved) so a stale env var cannot point the
-    // app at the wrong project.
-    'import.meta.env.VITE_SUPABASE_URL': JSON.stringify('https://ktzsgqrqvwtxlimctkaf.supabase.co'),
-    'import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY': JSON.stringify('sb_publishable_i5xwYqNzT3JOevhcl7-J3w_J2oofXm5'),
+    'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(
+      process.env.VITE_SUPABASE_URL ?? env.VITE_SUPABASE_URL ?? ''
+    ),
+    'import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY': JSON.stringify(
+      process.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? env.VITE_SUPABASE_PUBLISHABLE_KEY ?? ''
+    ),
     'import.meta.env.VITE_GOOGLE_MAPS_API_KEY': JSON.stringify(
       process.env.VITE_GOOGLE_MAPS_API_KEY ?? env.VITE_GOOGLE_MAPS_API_KEY ?? ''
     ),

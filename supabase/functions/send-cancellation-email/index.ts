@@ -49,7 +49,7 @@ serve(async (req) => {
         <body>
           <div class="container">
             <div class="header">
-              <img src="https://ktzsgqrqvwtxlimctkaf.supabase.co/storage/v1/object/public/assets/logo-horizontal-green.png" alt="GoldSainte" class="logo" />
+              <img src="https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/assets/logo-horizontal-green.png" alt="GoldSainte" class="logo" />
             </div>
             
             <div class="content">
