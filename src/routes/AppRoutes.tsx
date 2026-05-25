@@ -236,7 +236,8 @@ export const AppRoutes = () => (
       <Route path="/reset-password" element={<ResetPassword />} />
       {/* Smart onboarding router - redirects based on account type */}
       <Route path="/onboarding" element={<OnboardingRouter />} />
-      <Route path="/onboarding/traveler/preferences" element={<RequireAuth><TravelerPreferencesOnboardingPage /></RequireAuth>} />
+      {/* Legacy multi-step traveler wizard — replaced by streamlined Traveler Hub. Redirect any stale links. */}
+      <Route path="/onboarding/traveler/preferences" element={<Navigate to="/traveler" replace />} />
       <Route path="/onboarding/creator" element={<RequireAuth><CreatorOnboardingPage /></RequireAuth>} />
       <Route path="/brand/onboarding" element={<Navigate to="/apply/brand" replace />} />
       <Route path="/apply/brand" element={<BrandApplyPage />} />
