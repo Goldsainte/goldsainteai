@@ -35,8 +35,8 @@ function swVersionPlugin() {
 // calling the deployed sitemap-newsroom edge function. Lovable hosting
 // does not process _redirects files, so we must materialize the sitemap
 // as a real static file under public/ for /newsroom-sitemap.xml to work.
-function newsroomSitemapPlugin() {
-  const SUPABASE_URL = env.VITE_SUPABASE_URL || 'https://iwdevxltjuedijrcdejs.supabase.co';
+function newsroomSitemapPlugin(supabaseUrl?: string) {
+  const SUPABASE_URL = supabaseUrl || 'https://iwdevxltjuedijrcdejs.supabase.co';
   const ENDPOINT = `${SUPABASE_URL}/functions/v1/sitemap-newsroom`;
   const OUT = path.resolve(__dirname, "public/newsroom-sitemap.xml");
 
