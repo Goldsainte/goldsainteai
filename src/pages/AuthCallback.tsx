@@ -232,21 +232,23 @@ const AuthCallback = () => {
         // Users with completed onboarding OR is_profile_complete should NOT be redirected
         const hasCompletedOnboarding = profile.onboarding_completed === true;
         const isProfileComplete = profile.is_profile_complete === true;
-        const hasValidAccountType = profile.account_type && 
+        const hasValidAccountType = profile.account_type &&
           ['traveler', 'creator', 'agent', 'brand'].includes(profile.account_type);
+        const hasIdentityFields = Boolean(
+          (profile.first_name && String(profile.first_name).trim()) ||
+          (profile.last_name && String(profile.last_name).trim())
+        );
 
-        // Only redirect to complete-profile if:
-        // 1. No account type set, OR
-        // 2. Invalid account type AND user has not completed onboarding/profile
-        const needsCompletion = !hasValidAccountType && !hasCompletedOnboarding && !isProfileComplete;
+        // Brand-new OAuth users land here with the trigger's default
+        // (account_type='traveler', is_profile_complete=false,
+        // onboarding_completed=false) and no first/last name. Send them to
+        // the role + identity capture page so they can finish setup.
+        // Returning users with a completed profile fall through to the
+        // normal post-auth routing below.
+        const needsCompletion =
+          !hasValidAccountType ||
+          (!isProfileComplete && !hasCompletedOnboarding && !hasIdentityFields);
 
-        // For brand-new OAuth users (Google/Facebook), the trigger auto-assigns
-        // 'traveler' as a default. We previously force-redirected them to
-        // /auth/complete-profile to pick a role, which created an infinite loop
-        // when CompleteProfile saw account_type='traveler' and bounced them to
-        // /onboarding (or when the page failed to render). Instead, trust the
-        // default assignment and let the normal traveler onboarding flow run.
-        // Users can change their role later from settings.
         if (needsCompletion) {
           navigate('/auth/complete-profile', { replace: true });
           return;
