@@ -30,7 +30,7 @@ Deno.serve(async (req) => {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  // Self-lock: abort if any target email already exists.
+  // Skip users that already exist (idempotent for retry).
   const { data: existingList, error: listErr } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
   if (listErr) {
     return new Response(JSON.stringify({ error: "listUsers failed", detail: listErr.message }), {
@@ -38,20 +38,22 @@ Deno.serve(async (req) => {
     });
   }
   const existingEmails = new Set((existingList?.users ?? []).map((u) => (u.email ?? "").toLowerCase()));
-  const clash = USERS.find((u) => existingEmails.has(u.email.toLowerCase()));
-  if (clash) {
-    return new Response(JSON.stringify({ error: "Seed already ran", clash: clash.email }), {
-      status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
 
   const results: Array<Record<string, unknown>> = [];
   for (const u of USERS) {
+    if (existingEmails.has(u.email.toLowerCase())) {
+      results.push({ email: u.email, ok: true, skipped: "already exists" });
+      continue;
+    }
+    // Always create with account_type=traveler in metadata (the trigger's safe
+    // default path), then UPDATE profiles.account_type to the intended value
+    // afterwards. This avoids any edge case in handle_new_user choking on
+    // non-default metadata values.
     const { data: created, error: createErr } = await admin.auth.admin.createUser({
       email: u.email,
       password: PASSWORD,
       email_confirm: true,
-      user_metadata: { account_type: u.account_type },
+      user_metadata: { account_type: "traveler", intended_account_type: u.account_type },
     });
     if (createErr || !created?.user) {
       results.push({ email: u.email, ok: false, error: createErr?.message ?? "no user returned" });
