@@ -255,8 +255,8 @@ export default function CollectionsPage() {
               asChild
               className="rounded-full px-6 bg-[#0a2225] hover:bg-[#0a2225]/90"
             >
-              <Link to="/onboarding/traveler/preferences">
-                Set up preferences
+              <Link to="/traveler">
+                Go to your hub
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Link>
             </Button>
@@ -317,8 +317,8 @@ export default function CollectionsPage() {
               variant="outline"
               className="rounded-full px-6 border-[#E5DFC6] hover:bg-[#F6F0E4]"
             >
-              <Link to="/onboarding/traveler/preferences">
-                Update preferences
+              <Link to="/traveler">
+                Manage in your hub
               </Link>
             </Button>
           </div>
