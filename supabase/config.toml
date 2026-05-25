@@ -3,8 +3,6 @@ project_id = "iwdevxltjuedijrcdejs"
 [functions]
   [functions.accept-proposal]
     verify_jwt = true
-  [functions.seed-test-users]
-    verify_jwt = false
   [functions.og-storyboard]
     verify_jwt = false
   [functions.monitor-email-queue]
