@@ -157,13 +157,6 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
           </div>
         ) : null}
 
-        <Button
-          variant="outline"
-          className="w-full sm:w-auto border-[#E5DFC6] text-[#0a2225] hover:bg-[#F6F0E4] rounded-full"
-          asChild
-        >
-          <a href="/onboarding/traveler/preferences">Edit All Preferences</a>
-        </Button>
       </SettingsSectionCard>
 
       {/* Notifications (shared) */}

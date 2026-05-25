@@ -32,8 +32,8 @@ export function OnboardingRouter() {
 
         if (error) {
           console.error('Error fetching profile for onboarding:', error);
-          // Default to traveler preferences if we can't determine
-          setDestination('/onboarding/traveler/preferences');
+          // Safe fallback: send to Traveler Hub (legacy preferences wizard retired)
+          setDestination('/traveler');
           setIsLoading(false);
           return;
         }
@@ -99,14 +99,14 @@ export function OnboardingRouter() {
             break;
           }
           default:
-            // Fallback to traveler preferences
-            setDestination('/onboarding/traveler/preferences');
+            // Fallback to Traveler Hub
+            setDestination('/traveler');
         }
         
         setIsLoading(false);
       } catch (err) {
         console.error('Error in onboarding router:', err);
-        setDestination('/onboarding/traveler/preferences');
+        setDestination('/traveler');
         setIsLoading(false);
       }
     }
