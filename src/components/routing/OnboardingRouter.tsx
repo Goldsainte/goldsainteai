@@ -14,34 +14,60 @@ export function OnboardingRouter() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function determineDestination() {
       if (authLoading) return;
       
       if (!user) {
-        setDestination('/auth');
-        setIsLoading(false);
+        if (!cancelled) {
+          setDestination('/auth');
+          setIsLoading(false);
+        }
         return;
       }
 
       try {
-        const { data: profile, error } = await supabase
-          .from('profiles')
-          .select('account_type, onboarding_completed, is_profile_complete')
-          .eq('id', user.id)
-          .maybeSingle();
+        let profile: {
+          account_type?: string | null;
+          onboarding_completed?: boolean | null;
+          is_profile_complete?: boolean | null;
+        } | null = null;
+        let error: any = null;
+
+        for (let attempt = 0; attempt < 5; attempt += 1) {
+          const result = await supabase
+            .from('profiles')
+            .select('account_type, onboarding_completed, is_profile_complete')
+            .eq('id', user.id)
+            .maybeSingle();
+
+          profile = result.data;
+          error = result.error;
+
+          if (profile?.account_type || (error && error.code !== 'PGRST116')) {
+            break;
+          }
+
+          await new Promise((resolve) => setTimeout(resolve, 200 * (attempt + 1)));
+        }
 
         if (error) {
           console.error('Error fetching profile for onboarding:', error);
           // Safe fallback: send to Traveler Hub (legacy preferences wizard retired)
-          setDestination('/traveler');
-          setIsLoading(false);
+          if (!cancelled) {
+            setDestination('/traveler');
+            setIsLoading(false);
+          }
           return;
         }
 
         // No account type yet - send to role picker
         if (!profile?.account_type) {
-          setDestination('/auth/complete-profile');
-          setIsLoading(false);
+          if (!cancelled) {
+            setDestination('/auth/complete-profile');
+            setIsLoading(false);
+          }
           return;
         }
 
@@ -103,15 +129,22 @@ export function OnboardingRouter() {
             setDestination('/traveler');
         }
         
-        setIsLoading(false);
+        if (!cancelled) {
+          setIsLoading(false);
+        }
       } catch (err) {
         console.error('Error in onboarding router:', err);
-        setDestination('/traveler');
-        setIsLoading(false);
+        if (!cancelled) {
+          setDestination('/traveler');
+          setIsLoading(false);
+        }
       }
     }
 
     determineDestination();
+    return () => {
+      cancelled = true;
+    };
   }, [user, authLoading]);
 
   if (isLoading || authLoading) {
