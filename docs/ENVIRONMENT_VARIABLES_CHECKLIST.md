@@ -152,7 +152,7 @@ STRIPE_REFRESH_URL=https://goldsainte.com/connect/retry  # Production URL
 After deploying to production, configure these webhook endpoints in Stripe dashboard:
 
 1. **Stripe Identity Webhook:**
-   - URL: `https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/stripe-identity-webhook`
+   - URL: `https://ktzsgqrqvwtxlimctkaf.supabase.co/functions/v1/stripe-identity-webhook`
    - Events: `identity.verification_session.verified`, `identity.verification_session.requires_input`, `identity.verification_session.canceled`
    - Secret: Already configured in `STRIPE_WEBHOOK_SECRET_IDENTITY`
 
