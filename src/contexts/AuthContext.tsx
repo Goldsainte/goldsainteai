@@ -16,6 +16,8 @@ interface AuthContextType {
   isLoading: boolean;
 }
 
+const normalizeEmail = (value: string) => value.trim().toLowerCase();
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -198,8 +200,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
+      const normalizedEmail = normalizeEmail(email);
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: normalizedEmail,
         password,
       });
       
@@ -211,7 +214,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           action: 'user_login',
           entity_type: 'auth',
           entity_id: data.user.id,
-          details: { email, timestamp: new Date().toISOString() }
+          details: { email: normalizedEmail, timestamp: new Date().toISOString() }
         });
       }
 
@@ -255,15 +258,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         );
       }
 
+      const normalizedEmail = normalizeEmail(email);
       const redirectUrl = `${window.location.origin}/auth/callback`;
       
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: normalizedEmail,
         password,
         options: {
           emailRedirectTo: redirectUrl,
           data: {
-            username: username || email.split('@')[0],
+            username: username || normalizedEmail.split('@')[0],
             first_name: firstName,
             last_name: lastName,
             phone: phone,
@@ -281,8 +285,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           entity_type: 'auth',
           entity_id: data.user.id,
           details: { 
-            email, 
-            username: username || email.split('@')[0],
+            email: normalizedEmail, 
+            username: username || normalizedEmail.split('@')[0],
             account_type: accountType || 'traveler',
             timestamp: new Date().toISOString() 
           }
