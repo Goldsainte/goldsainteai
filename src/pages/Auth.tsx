@@ -559,9 +559,12 @@ const Auth = () => {
           JSON.stringify({ accountType: selectedAccountType }),
         );
       }
-      const { error } = await lovable.auth.signInWithOAuth('google', {
-        redirect_uri: `${window.location.origin}/auth/callback`,
-        extraParams: { prompt: 'select_account' },
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: { prompt: 'select_account' },
+        },
       });
       if (error) throw error;
     } catch (error: any) {
