@@ -29,7 +29,7 @@ interface DashboardStats {
 
 export default function TravelerDashboardPage() {
   const { checking, allowed } = useRequireOnboarding();
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -39,8 +39,11 @@ export default function TravelerDashboardPage() {
 
   useEffect(() => {
     async function loadDashboardData() {
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (!authUser) {
+      if (authLoading) {
+        return;
+      }
+
+      if (!user) {
         sessionStorage.setItem('returnTo', '/traveler');
         navigate("/auth?redirect=%2Ftraveler", { replace: true });
         return;
@@ -52,16 +55,16 @@ export default function TravelerDashboardPage() {
           supabase
             .from("profiles")
             .select("id, display_name, first_name, full_name, avatar_url, created_at, email")
-            .eq("id", authUser.id)
+            .eq("id", user.id)
             .single(),
           supabase
             .from("trip_requests")
             .select("id", { count: "exact", head: true })
-            .eq("user_id", authUser.id),
+            .eq("user_id", user.id),
           supabase
             .from("trip_bookings")
             .select("id", { count: "exact", head: true })
-            .eq("traveler_id", authUser.id),
+            .eq("traveler_id", user.id),
         ]);
 
         if (profileResult.data) {
@@ -80,7 +83,7 @@ export default function TravelerDashboardPage() {
     }
 
     loadDashboardData();
-  }, [navigate]);
+  }, [authLoading, user, navigate]);
 
   const handleAvatarUpdate = (newUrl: string) => {
     if (profile) {
