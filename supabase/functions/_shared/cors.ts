@@ -7,6 +7,8 @@
 const STATIC_ALLOWED = new Set<string>([
   "https://goldsainte.ai",
   "https://www.goldsainte.ai",
+  "https://goldsainte.com",
+  "https://www.goldsainte.com",
   "https://goldsainteai.lovable.app",
   "http://localhost:5173",
   "http://localhost:8080",
