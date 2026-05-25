@@ -5,7 +5,7 @@ import { Html } from 'npm:@react-email/components@0.0.22'
 
 const SITE_URL = 'https://goldsainte.ai'
 const LOGO_URL =
-  'https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/email-assets/wordmark-green-v2.png'
+  'https://ktzsgqrqvwtxlimctkaf.supabase.co/storage/v1/object/public/email-assets/wordmark-green-v2.png'
 
 const STYLES = `
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&display=swap');

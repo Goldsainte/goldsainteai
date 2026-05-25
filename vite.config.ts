@@ -36,7 +36,7 @@ function swVersionPlugin() {
 // does not process _redirects files, so we must materialize the sitemap
 // as a real static file under public/ for /newsroom-sitemap.xml to work.
 function newsroomSitemapPlugin() {
-  const SUPABASE_URL = "https://iwdevxltjuedijrcdejs.supabase.co";
+  const SUPABASE_URL = "https://ktzsgqrqvwtxlimctkaf.supabase.co";
   const ENDPOINT = `${SUPABASE_URL}/functions/v1/sitemap-newsroom`;
   const OUT = path.resolve(__dirname, "public/newsroom-sitemap.xml");
 
@@ -113,7 +113,7 @@ export default defineConfig(({ mode }) => {
       env.VITE_RELEASE_VERSION || `goldsainte@${env.npm_package_version || '1.0.0'}`
     ),
     'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(
-      process.env.VITE_SUPABASE_URL ?? env.VITE_SUPABASE_URL ?? 'https://iwdevxltjuedijrcdejs.supabase.co'
+      process.env.VITE_SUPABASE_URL ?? env.VITE_SUPABASE_URL ?? 'https://ktzsgqrqvwtxlimctkaf.supabase.co'
     ),
     'import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY': JSON.stringify(
       process.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? env.VITE_SUPABASE_PUBLISHABLE_KEY ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3ZGV2eGx0anVlZGlqcmNkZWpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxNjQ4MDEsImV4cCI6MjA3NDc0MDgwMX0.syDQQrSgkyB1MEuE-OeMpxVt6wfoH17lDjMGGEzOiBc'

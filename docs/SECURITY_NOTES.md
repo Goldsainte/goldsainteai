@@ -121,7 +121,7 @@ SELECT cron.schedule(
   '0 2 * * *',
   $$
   SELECT net.http_post(
-    url := 'https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/run-daily-maintenance',
+    url := 'https://ktzsgqrqvwtxlimctkaf.supabase.co/functions/v1/run-daily-maintenance',
     headers := '{"Authorization": "Bearer YOUR_ANON_KEY"}'::jsonb
   );
   $$

@@ -8,7 +8,7 @@
  *   '0 2 * * *', -- 2 AM UTC daily
  *   $$
  *   SELECT net.http_post(
- *     url := 'https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/run-daily-maintenance',
+ *     url := 'https://ktzsgqrqvwtxlimctkaf.supabase.co/functions/v1/run-daily-maintenance',
  *     headers := '{"Authorization": "Bearer YOUR_ANON_KEY"}'::jsonb
  *   );
  *   $$
