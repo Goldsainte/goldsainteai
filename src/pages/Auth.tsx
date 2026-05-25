@@ -33,6 +33,8 @@ type AccountType = 'traveler' | 'creator' | 'agent' | 'brand' | null;
 
 const AUTH_FLOW_STORAGE_KEY = 'goldsainte:authFlow';
 
+const normalizeEmail = (value: string) => value.trim().toLowerCase();
+
 type PersistedAuthFlow = {
   step: AuthStep;
   selectedAccountType: AccountType;
@@ -288,8 +290,12 @@ const Auth = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    const normalizedEmail = normalizeEmail(email);
+    if (normalizedEmail && normalizedEmail !== email) {
+      setEmail(normalizedEmail);
+    }
     
-    const { error } = await signIn(email, password);
+    const { error } = await signIn(normalizedEmail, password);
     
     if (error) {
       if (error.message.toLowerCase().includes("email not confirmed")) {
@@ -303,14 +309,14 @@ const Auth = () => {
             supabase
               .from('agent_applications')
               .select('id, status')
-              .eq('email', email)
+              .eq('email', normalizedEmail)
               .in('status', ['pending_verification', 'verified', 'approved', 'under_review'])
               .limit(1)
               .maybeSingle(),
             supabase
               .from('brand_applications')
               .select('id, status')
-              .eq('primary_contact_email', email)
+              .eq('primary_contact_email', normalizedEmail)
               .in('status', ['pending_verification', 'verified', 'approved', 'under_review'])
               .limit(1)
               .maybeSingle(),
@@ -325,7 +331,11 @@ const Auth = () => {
         }
         setStep("verify-email");
         try {
-          const { error: resendError } = await supabase.auth.resend({ type: "signup", email });
+          const { error: resendError } = await supabase.auth.resend({
+            type: "signup",
+            email: normalizedEmail,
+            options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+          });
           if (resendError) {
             toast({ title: "Email not confirmed", description: "We couldn't resend the confirmation email. Please try again shortly.", variant: "destructive" });
           } else {
@@ -380,7 +390,7 @@ const Auth = () => {
 
     setIsLoading(true);
     
-    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedEmail = normalizeEmail(email);
     
     if (!normalizedEmail) {
       toast({ title: "Email required", description: "Please enter your email address before creating your account.", variant: "destructive" });
@@ -520,6 +530,7 @@ const Auth = () => {
       }
 
       setStep("verify-email");
+      setEmail(normalizedEmail);
       setIsLoading(false);
       // Mark that a welcome email should be sent after the user confirms
       // their email and lands on /auth/callback for the first time.
@@ -1009,10 +1020,18 @@ const Auth = () => {
                 className="w-full h-12 rounded-full"
                 style={{ backgroundColor: '#0c4d47', color: '#E5DFC6' }}
                 onClick={async () => {
-                  if (!email) return;
+                  const normalizedEmail = normalizeEmail(email);
+                  if (!normalizedEmail) return;
                   setIsLoading(true);
                   try {
-                    const { error } = await supabase.auth.resend({ type: "signup", email });
+                    if (normalizedEmail !== email) {
+                      setEmail(normalizedEmail);
+                    }
+                    const { error } = await supabase.auth.resend({
+                      type: "signup",
+                      email: normalizedEmail,
+                      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+                    });
                     if (error) {
                       toast({ title: "Could not resend email", description: error.message, variant: "destructive" });
                     } else {
