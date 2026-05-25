@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { lovable } from '@/integrations/lovable';
 import { EditorialLoader } from '@/components/EditorialLoader';
 import { AUTH_REDIRECT_STORAGE_KEY, getRedirectPathFromSearch, sanitizeRedirectPath } from '@/lib/auth/redirect';
 import { getPostAuthDestination } from '@/lib/auth/postAuthRouting';
@@ -21,25 +20,18 @@ const AuthCallback = () => {
           queryParams.get('type') === 'recovery' ||
           queryParams.has('token_hash');
 
-        // Process Lovable OAuth return-leg: the SDK reads broker tokens from
-        // the URL and calls supabase.auth.setSession internally. Without this,
-        // Supabase never sees a session and we'd bounce back to /auth.
-        if (!isRecoveryFlow) {
-          try {
-            const result = await lovable.auth.signInWithOAuth('google', {
-              redirect_uri: `${window.location.origin}/auth/callback`,
-            });
-            if (result?.error) {
-              console.error('[AuthCallback] Lovable OAuth error:', result.error);
-            }
-          } catch (err) {
-            console.warn('[AuthCallback] Lovable OAuth processing failed:', err);
-          }
-        }
+        // OAuth return leg: the Lovable broker redirects back to /auth/callback
+        // with `#access_token=...&refresh_token=...` in the URL hash. The
+        // Supabase client is created with `detectSessionInUrl: true`, so it
+        // parses the hash and fires `SIGNED_IN` automatically — we just wait
+        // for the session below. Do NOT call lovable.auth.signInWithOAuth here:
+        // outside an iframe that SDK simply runs
+        // `window.location.href = /~oauth/initiate` and starts a brand-new
+        // OAuth round-trip, bouncing the user back to Google's account chooser.
 
         // Wait for Supabase to confirm the session is ready (event-driven, with 5s fallback)
         const session = await new Promise<any>((resolve) => {
-          const timeout = setTimeout(() => resolve(null), 5000);
+          const timeout = setTimeout(() => resolve(null), 10000);
 
           const { data: { subscription } } = supabase.auth.onAuthStateChange(
             (event, sessionData) => {
