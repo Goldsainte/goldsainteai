@@ -1,5 +1,8 @@
 project_id = "iwdevxltjuedijrcdejs"
 
+[functions.seed-test-users]
+verify_jwt = false
+
 [functions]
   [functions.accept-proposal]
     verify_jwt = true
