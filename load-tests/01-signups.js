@@ -4,7 +4,7 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { Rate } from 'k6/metrics';
 
-const SUPABASE_URL = __ENV.SUPABASE_URL || 'https://ktzsgqrqvwtxlimctkaf.supabase.co';
+const SUPABASE_URL = __ENV.SUPABASE_URL || 'https://iwdevxltjuedijrcdejs.supabase.co';
 const ANON_KEY = __ENV.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3ZGV2eGx0anVlZGlqcmNkZWpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxNjQ4MDEsImV4cCI6MjA3NDc0MDgwMX0.syDQQrSgkyB1MEuE-OeMpxVt6wfoH17lDjMGGEzOiBc';
 
 const errors = new Rate('signup_errors');

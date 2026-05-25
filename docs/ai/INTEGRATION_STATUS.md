@@ -268,7 +268,7 @@ Question 2: "What are your dates and how many people?"
 
 **Request**:
 ```bash
-curl -X POST https://ktzsgqrqvwtxlimctkaf.supabase.co/functions/v1/ai-booking-assistant \
+curl -X POST https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/ai-booking-assistant \
   -H "Content-Type: application/json" \
   -d '{
     "messages": [
@@ -287,7 +287,7 @@ curl -X POST https://ktzsgqrqvwtxlimctkaf.supabase.co/functions/v1/ai-booking-as
 
 **Request**:
 ```bash
-curl -X POST https://ktzsgqrqvwtxlimctkaf.supabase.co/functions/v1/search-hotels \
+curl -X POST https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/search-hotels \
   -H "Content-Type: application/json" \
   -d '{
     "cityCode": "XYZ",

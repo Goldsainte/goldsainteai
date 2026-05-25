@@ -2,7 +2,7 @@
 // Target: <500ms P95, <0.5% error rate, 100 concurrent users
 
 export const BASE_URL = __ENV.BASE_URL || 'http://localhost:5173';
-export const SUPABASE_URL = __ENV.SUPABASE_URL || 'https://ktzsgqrqvwtxlimctkaf.supabase.co';
+export const SUPABASE_URL = __ENV.SUPABASE_URL || 'https://iwdevxltjuedijrcdejs.supabase.co';
 export const SUPABASE_ANON_KEY = __ENV.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3ZGV2eGx0anVlZGlqcmNkZWpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxNjQ4MDEsImV4cCI6MjA3NDc0MDgwMX0.syDQQrSgkyB1MEuE-OeMpxVt6wfoH17lDjMGGEzOiBc';
 
 // Load stages for ramping up to 100 concurrent users
