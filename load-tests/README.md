@@ -22,7 +22,7 @@ preview URL.
 | Var | Default | Notes |
 | --- | --- | --- |
 | `BASE_URL` | `https://goldsainteai.lovable.app` | Storyboard + general HTTP |
-| `SUPABASE_URL` | `https://iwdevxltjuedijrcdejs.supabase.co` | Auth + checkout |
+| `SUPABASE_URL` | `https://ktzsgqrqvwtxlimctkaf.supabase.co` | Auth + checkout |
 | `SUPABASE_ANON_KEY` | (project anon key) | Required for auth |
 | `STORYBOARD_SLUG` | `sample` | Public storyboard slug to hit |
 | `TRIP_ID` | `00000000-0000-0000-0000-000000000000` | Trip used by checkout |

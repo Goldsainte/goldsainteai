@@ -784,9 +784,9 @@ USING (has_role(auth.uid(), 'admin'));
 
 ### Frontend (.env)
 ```bash
-VITE_SUPABASE_URL=https://iwdevxltjuedijrcdejs.supabase.co
+VITE_SUPABASE_URL=https://ktzsgqrqvwtxlimctkaf.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=<anon_key>
-VITE_SUPABASE_PROJECT_ID=iwdevxltjuedijrcdejs
+VITE_SUPABASE_PROJECT_ID=ktzsgqrqvwtxlimctkaf
 ```
 
 ### Backend (Supabase Secrets)
@@ -836,7 +836,7 @@ SELECT cron.schedule(
   '0 0 * * *',
   $$
   SELECT net.http_post(
-    url := 'https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/expire-jobs',
+    url := 'https://ktzsgqrqvwtxlimctkaf.supabase.co/functions/v1/expire-jobs',
     headers := '{"Authorization": "Bearer <service_role_key>"}'::jsonb
   );
   $$
@@ -848,7 +848,7 @@ SELECT cron.schedule(
   '0 1 * * *',
   $$
   SELECT net.http_post(
-    url := 'https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/update-agent-metrics',
+    url := 'https://ktzsgqrqvwtxlimctkaf.supabase.co/functions/v1/update-agent-metrics',
     headers := '{"Authorization": "Bearer <service_role_key>"}'::jsonb
   );
   $$

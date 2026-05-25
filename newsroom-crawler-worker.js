@@ -10,9 +10,9 @@
 // bot user-agents — humans continue to get the live React app.
 
 const NEWSROOM_PRERENDER =
-  "https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/newsroom-prerender";
+  "https://ktzsgqrqvwtxlimctkaf.supabase.co/functions/v1/newsroom-prerender";
 const MARKETING_PRERENDER =
-  "https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/marketing-prerender";
+  "https://ktzsgqrqvwtxlimctkaf.supabase.co/functions/v1/marketing-prerender";
 
 const NEWSROOM_ARTICLE_PATH = /^\/newsroom\/(press-releases|news)\/[^/?#]+\/?$/i;
 

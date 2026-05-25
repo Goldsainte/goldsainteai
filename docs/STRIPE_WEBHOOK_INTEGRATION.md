@@ -264,7 +264,7 @@ LIMIT 10;
 Navigate to **Developers → Webhooks** and add endpoint:
 
 ```
-https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/stripe-webhook
+https://ktzsgqrqvwtxlimctkaf.supabase.co/functions/v1/stripe-webhook
 ```
 
 ### 2. Select Events

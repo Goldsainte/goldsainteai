@@ -89,7 +89,7 @@ SELECT cron.schedule(
   'expire-old-jobs',
   '0 0 * * *',
   $$SELECT net.http_post(
-    url:='https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/expire-jobs',
+    url:='https://ktzsgqrqvwtxlimctkaf.supabase.co/functions/v1/expire-jobs',
     headers:='{"Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3ZGV2eGx0anVlZGlqcmNkZWpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxNjQ4MDEsImV4cCI6MjA3NDc0MDgwMX0.syDQQrSgkyB1MEuE-OeMpxVt6wfoH17lDjMGGEzOiBc"}'::jsonb
   );$$
 );
@@ -99,7 +99,7 @@ SELECT cron.schedule(
   'update-agent-metrics',
   '0 1 * * *',
   $$SELECT net.http_post(
-    url:='https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/update-agent-metrics',
+    url:='https://ktzsgqrqvwtxlimctkaf.supabase.co/functions/v1/update-agent-metrics',
     headers:='{"Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3ZGV2eGx0anVlZGlqcmNkZWpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxNjQ4MDEsImV4cCI6MjA3NDc0MDgwMX0.syDQQrSgkyB1MEuE-OeMpxVt6wfoH17lDjMGGEzOiBc"}'::jsonb
   );$$
 );

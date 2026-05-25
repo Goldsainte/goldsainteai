@@ -532,7 +532,7 @@ const handler = async (req: Request): Promise<Response> => {
             @import url('https://fonts.googleapis.com/css2?family=Gupter:wght@400;500;700&display=swap');
             @font-face {
               font-family: 'Chiffon';
-              src: url('https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/assets/Chiffon.otf') format('opentype');
+              src: url('https://ktzsgqrqvwtxlimctkaf.supabase.co/storage/v1/object/public/assets/Chiffon.otf') format('opentype');
             }
             body {
               font-family: 'Gupter', BlinkMacSystemFont, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -764,10 +764,10 @@ const handler = async (req: Request): Promise<Response> => {
         <body>
           <div class="container">
             <div class="header">
-              <img src="https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/assets/logo-horizontal-green.png" alt="GoldSainte" class="logo" />
+              <img src="https://ktzsgqrqvwtxlimctkaf.supabase.co/storage/v1/object/public/assets/logo-horizontal-green.png" alt="GoldSainte" class="logo" />
             </div>
             
-            <img src="https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/assets/${bookingType === 'hotel' ? 'email-hero-hotel.jpg' : 'email-hero-luxury.jpg'}" alt="${bookingType === 'hotel' ? 'Luxury Hotel' : 'Luxury Travel'}" class="hero-image" />
+            <img src="https://ktzsgqrqvwtxlimctkaf.supabase.co/storage/v1/object/public/assets/${bookingType === 'hotel' ? 'email-hero-hotel.jpg' : 'email-hero-luxury.jpg'}" alt="${bookingType === 'hotel' ? 'Luxury Hotel' : 'Luxury Travel'}" class="hero-image" />
             
             <div class="content">
               <h1>✓ Your ${bookingType} is confirmed</h1>
