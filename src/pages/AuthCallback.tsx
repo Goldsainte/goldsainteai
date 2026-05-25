@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { lovable } from '@/integrations/lovable';
 import { EditorialLoader } from '@/components/EditorialLoader';
 import { AUTH_REDIRECT_STORAGE_KEY, getRedirectPathFromSearch, sanitizeRedirectPath } from '@/lib/auth/redirect';
 import { getPostAuthDestination } from '@/lib/auth/postAuthRouting';
@@ -21,13 +22,29 @@ const AuthCallback = () => {
           queryParams.has('token_hash');
 
         // OAuth return leg: the Lovable broker redirects back to /auth/callback
-        // with `#access_token=...&refresh_token=...` in the URL hash. The
-        // Supabase client is created with `detectSessionInUrl: true`, so it
-        // parses the hash and fires `SIGNED_IN` automatically — we just wait
-        // for the session below. Do NOT call lovable.auth.signInWithOAuth here:
-        // outside an iframe that SDK simply runs
-        // `window.location.href = /~oauth/initiate` and starts a brand-new
-        // OAuth round-trip, bouncing the user back to Google's account chooser.
+        // with a broker code/state in the URL (NOT a Supabase access_token hash).
+        // We must call lovable.auth.signInWithOAuth here so the SDK can detect
+        // the callback params, exchange them for Supabase tokens, and call
+        // supabase.auth.setSession internally. Without this, no SIGNED_IN event
+        // ever fires, the wait below times out, and we bounce to /auth.
+        //
+        // The SDK only re-initiates the OAuth round-trip if there are no
+        // callback params in the URL — on /auth/callback they're present, so
+        // it performs the exchange instead. Skip for recovery flows.
+        const hasBrokerCallback =
+          queryParams.has('code') || queryParams.has('state') || hashParams.has('access_token');
+        if (!isRecoveryFlow && hasBrokerCallback) {
+          try {
+            const oauthResult = await lovable.auth.signInWithOAuth('google', {
+              redirect_uri: `${window.location.origin}/auth/callback`,
+            });
+            if ((oauthResult as any)?.error) {
+              console.error('OAuth exchange failed:', (oauthResult as any).error);
+            }
+          } catch (err) {
+            console.error('OAuth exchange threw:', err);
+          }
+        }
 
         // Wait for Supabase to confirm the session is ready (event-driven, with 5s fallback)
         const session = await new Promise<any>((resolve) => {
@@ -215,21 +232,23 @@ const AuthCallback = () => {
         // Users with completed onboarding OR is_profile_complete should NOT be redirected
         const hasCompletedOnboarding = profile.onboarding_completed === true;
         const isProfileComplete = profile.is_profile_complete === true;
-        const hasValidAccountType = profile.account_type && 
+        const hasValidAccountType = profile.account_type &&
           ['traveler', 'creator', 'agent', 'brand'].includes(profile.account_type);
+        const hasIdentityFields = Boolean(
+          (profile.first_name && String(profile.first_name).trim()) ||
+          (profile.last_name && String(profile.last_name).trim())
+        );
 
-        // Only redirect to complete-profile if:
-        // 1. No account type set, OR
-        // 2. Invalid account type AND user has not completed onboarding/profile
-        const needsCompletion = !hasValidAccountType && !hasCompletedOnboarding && !isProfileComplete;
+        // Brand-new OAuth users land here with the trigger's default
+        // (account_type='traveler', is_profile_complete=false,
+        // onboarding_completed=false) and no first/last name. Send them to
+        // the role + identity capture page so they can finish setup.
+        // Returning users with a completed profile fall through to the
+        // normal post-auth routing below.
+        const needsCompletion =
+          !hasValidAccountType ||
+          (!isProfileComplete && !hasCompletedOnboarding && !hasIdentityFields);
 
-        // For brand-new OAuth users (Google/Facebook), the trigger auto-assigns
-        // 'traveler' as a default. We previously force-redirected them to
-        // /auth/complete-profile to pick a role, which created an infinite loop
-        // when CompleteProfile saw account_type='traveler' and bounced them to
-        // /onboarding (or when the page failed to render). Instead, trust the
-        // default assignment and let the normal traveler onboarding flow run.
-        // Users can change their role later from settings.
         if (needsCompletion) {
           navigate('/auth/complete-profile', { replace: true });
           return;
