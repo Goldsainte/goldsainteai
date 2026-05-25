@@ -1,43 +1,57 @@
-# Plan
+## Goal
 
-## What I’ll fix
-1. Stop the post-login auth page and callback page from racing each other and sending a fresh Google user away before their profile state settles.
-2. Treat a brand-new Google user as an onboarding user first, not as a returning signed-in user.
-3. Route incomplete accounts to the profile creation / onboarding flow deterministically.
+One-time seed of four pre-confirmed test users via the Supabase Admin API, then lock the script so it can't be re-run.
 
-## What I found
-- The OAuth return is already reaching `/auth/callback`, so this does **not** look like a wrong Google redirect URI.
-- The backend trigger is already designed to create the profile row for new users.
-- The likely break is app-side routing: a new Google user gets a valid session, but the auth/callback/onboarding logic disagrees about where to send them, so they bounce back instead of progressing to setup.
-- There is also a mismatch in traveler handling right now: some code treats incomplete travelers as ready, which can skip the setup flow.
+## ⚠️ Heads-up before we run it
 
-## Changes
-1. **Harden `src/pages/AuthCallback.tsx`**
-   - Keep waiting for session readiness.
-   - Distinguish new/incomplete users from returning users using profile state.
-   - Send incomplete Google users directly to the right setup route instead of falling through to generic post-auth routing.
-   - Avoid fallback-to-`/auth` behavior while the profile row is still appearing.
+The `profiles.account_type` CHECK constraint (latest migration `20251116070801`) only allows:
+`personal | traveler | creator | agent | admin | business | partner`
 
-2. **Align `src/lib/auth/postAuthRouting.ts`**
-   - Make traveler routing consistent: incomplete traveler accounts should go to setup/onboarding, not to the normal signed-in destination.
-   - Preserve creator / agent / brand routing rules.
+**`brand` is NOT in that list** — inserting/updating to `'brand'` will fail with a constraint violation. Two options:
 
-3. **Fix auth-page auto-redirects in `src/pages/Auth.tsx`**
-   - Prevent the auth screen’s “already logged in” effect from stealing control during the first Google callback/setup pass.
-   - Ensure it respects incomplete profile state and sends new users to setup.
+1. **Map `brand` → `business`** for the brand-test user (closest existing type, no schema change). Recommended for a pure seed task.
+2. Add a migration that extends the CHECK to include `'brand'`. This is a schema change beyond "change nothing else."
 
-4. **Tighten onboarding handoff**
-   - Verify `CompleteProfile` / `/onboarding` behavior so a user with a default OAuth-created traveler profile still reaches the actual setup flow instead of looping.
+I'll assume option 1 unless you say otherwise.
 
-## Expected result
-- User picks Google account.
-- Account is created in the backend.
-- Profile row exists.
-- New user lands on profile creation / onboarding.
-- Returning user lands on their normal destination.
-- No more bounce back to the “One moment” screen.
+## Approach
+
+Create a one-shot edge function `seed-test-users` (service-role, JWT-not-required only for our manual `curl`) that:
+
+1. Uses `supabase.auth.admin.createUser({ email, password, email_confirm: true, user_metadata: { account_type } })` for each of the four users.
+2. The `handle_new_user` trigger inserts a `profiles` row using `raw_user_meta_data->>'account_type'` (falls back to `'traveler'`).
+3. After creation, `UPDATE profiles SET account_type = <intended>` for each user to guarantee correctness (covers the case where the trigger defaulted).
+4. Returns the four email+password pairs in the response (one-time output only — I'll relay them to you in chat).
+5. Self-locks: the function checks a `seed_locks` row (or simply checks if any of the four emails already exist in `auth.users`) and refuses to run a second time, returning 409.
+
+After you confirm the users work, I'll **delete the edge function entirely** (`supabase/functions/seed-test-users/`) so it cannot be invoked again. The self-lock is belt-and-suspenders for the brief window it exists.
+
+## Users to create
+
+| Email | Password | account_type |
+|---|---|---|
+| traveler-test@goldsainte.com | (generated, 20-char random) | traveler |
+| creator-test@goldsainte.com  | (generated, 20-char random) | creator  |
+| agent-test@goldsainte.com    | (generated, 20-char random) | agent    |
+| brand-test@goldsainte.com    | (generated, 20-char random) | business (mapped from brand) |
+
+Passwords generated server-side and returned once in the response. If you'd rather I use a fixed known password (e.g. `GoldsainteTest!2026`) for all four to make manual testing easier, say the word.
 
 ## Technical details
-- No Google Console URI change is likely needed if your current callback URI already matches and the app reaches `/auth/callback`.
-- The fix is in frontend routing/state coordination, not in Google OAuth configuration.
-- I’ll keep the existing backend profile trigger as the source of truth and only change the client-side routing logic around it.
+
+- File added: `supabase/functions/seed-test-users/index.ts` (uses `SUPABASE_SERVICE_ROLE_KEY` env, already available).
+- Invocation: I'll call it once via `supabase.functions.invoke('seed-test-users')` from the sandbox using the anon key + service role (function reads service role from env, not request).
+- Idempotency: function lists existing users, aborts if any target email is already present.
+- Cleanup step: after a successful run, I delete `supabase/functions/seed-test-users/` so the function is removed from deployment.
+- No frontend changes. No migration. No changes to `handle_new_user` or RLS.
+
+## Deliverables
+
+1. The four `email + password` pairs posted in chat.
+2. Confirmation that each `profiles.account_type` row matches the intended value (verified via a `SELECT`).
+3. Confirmation that the seed function has been deleted.
+
+## Confirm before I switch to build
+
+- OK to map `brand` → `business`? (Or do you want a migration to add `'brand'`?)
+- Random per-user passwords, or one shared known password?
