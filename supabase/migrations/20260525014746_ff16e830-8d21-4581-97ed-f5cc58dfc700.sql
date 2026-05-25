@@ -1,0 +1,1 @@
+REVOKE SELECT (email) ON public.newsroom_authors FROM anon, authenticated;
