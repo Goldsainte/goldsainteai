@@ -152,11 +152,25 @@ const AuthCallback = () => {
           const pendingAccountType = sessionStorage.getItem('pending_account_type');
           sessionStorage.removeItem('pending_account_type');
 
+          // Only apply a pending account_type override when the profile is
+          // BRAND NEW. If the user already has identity fields or has
+          // completed onboarding/profile, a stale sessionStorage value from
+          // an earlier abandoned signup must not silently change their role.
+          const profileHasIdentity = Boolean(
+            (profile.first_name && String(profile.first_name).trim()) ||
+            (profile.last_name && String(profile.last_name).trim())
+          );
+          const profileIsBrandNew =
+            profile.is_profile_complete !== true &&
+            profile.onboarding_completed !== true &&
+            !profileHasIdentity;
+
           const allowedTypes = ['traveler', 'creator', 'brand'];
           if (
             pendingAccountType &&
             allowedTypes.includes(pendingAccountType) &&
-            profile.account_type !== pendingAccountType
+            profile.account_type !== pendingAccountType &&
+            profileIsBrandNew
           ) {
             // Trigger likely defaulted account_type to 'traveler' because OAuth
             // providers don't pass our metadata. Override with the user's
@@ -175,7 +189,7 @@ const AuthCallback = () => {
 
           // Agent selections via Google can't be auto-applied — route them to
           // the formal application flow.
-          if (pendingAccountType === 'agent') {
+          if (pendingAccountType === 'agent' && profileIsBrandNew) {
             // Promote profile to agent so OnboardingRouter / form gate
             // recognize them on this and future visits. OAuth users are
             // email-confirmed by the provider, so the form gate will let
