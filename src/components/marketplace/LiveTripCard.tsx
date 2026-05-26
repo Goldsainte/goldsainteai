@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { ShareButton } from "@/components/ShareButton";
+import { TripCoverImage } from "@/components/marketplace/TripCoverImage";
 
 interface LiveTripCardProps {
   trip: {
@@ -157,8 +158,8 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
     >
       {/* Image with optional editorial signal pill */}
       <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
-        <img
-          src={trip.cover_image_url || ""}
+        <TripCoverImage
+          src={trip.cover_image_url}
           alt={trip.title}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"

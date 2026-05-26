@@ -8,6 +8,7 @@ import { HomeTestimonials } from "@/components/home/HomeTestimonials";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
+import { TripCoverImage } from "@/components/marketplace/TripCoverImage";
 
 function FeaturedTripsSection() {
   const { data: trips } = useQuery({
@@ -41,8 +42,8 @@ function FeaturedTripsSection() {
           {trips.map((trip: any) => (
             <Link key={trip.id} to={`/marketplace/trip/${trip.slug || trip.id}`} className="group space-y-2.5">
               <div className="aspect-[4/3] overflow-hidden rounded-xl md:rounded-2xl bg-[#F5F0E8]">
-                <img
-                  src={trip.cover_image_url || ""}
+                <TripCoverImage
+                  src={trip.cover_image_url}
                   alt={trip.title}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"

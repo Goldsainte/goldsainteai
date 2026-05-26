@@ -1,23 +1,27 @@
-Revert the trip cover image fallback changes from the previous step. The previous edit replaced direct `cover_image_url` usage with `getTripRequestImageUrl(destination, cover_image_url)` and added `onError` fallback handlers on 6 components. This was intended to guarantee a photo always renders, but it caused two regressions:
+## Plan: Restore Fallback Cover Images with Shared Component
 
-1. Homepage featured trip images changed (because the helper now overrides the original Unsplash URL in some cases).
-2. Marketplace "Handpicked Trips" cards may be filtered/affected by the same change.
+### Problem
+Trip, bundle, and guide cards render `<img src={cover_image_url || ""}>` — when the URL is missing or the image fails to load, the card shows a blank/broken tile.
 
-## Files to revert
+### Solution
+Create one shared component that handles the fallback consistently, then use it in all 6 card components.
 
-For each file below, restore the `<img>` element to the pre-edit state: use `trip.cover_image_url` (or equivalent field) directly as `src`, remove the `onError` handler that swaps to a fallback, restore any conditional empty-state branches that were removed, and remove the `getTripRequestImageUrl` import if no longer used.
+### Step 1 — Create shared component
+Create `src/components/marketplace/TripCoverImage.tsx`:
+- Accepts `src`, `alt`, `className`, `loading`
+- Uses `useState` to track load failure
+- Falls back to `@/assets/luxury-destinations.jpg` when `src` is falsy or `onError` fires
 
-1. `src/pages/HomePage.tsx` — `FeaturedTripsSection` image
+### Step 2 — Replace cover `<img>` tags (keeping existing className/loading/alt)
+In each file below, replace ONLY the main cover-image `<img>` element with `<TripCoverImage>`, preserving all existing props:
+1. `src/components/marketplace/TripCard.tsx`
 2. `src/components/marketplace/LiveTripCard.tsx`
-3. `src/components/marketplace/TripCard.tsx`
-4. `src/components/marketplace/BundleCard.tsx`
-5. `src/components/marketplace/ItineraryGuideCard.tsx`
-6. `src/components/TopToursCarousel.tsx`
+3. `src/components/marketplace/BundleCard.tsx`
+4. `src/components/marketplace/ItineraryGuideCard.tsx`
+5. `src/components/TopToursCarousel.tsx`
+6. `src/pages/HomePage.tsx`
 
-## Investigation note
-
-The "Handpicked Trips" tab disappearing is likely a separate issue (the query/filter on the marketplace page), not directly caused by the image edits — image fallbacks don't filter rows. After reverting, I'll verify the Handpicked tab loads. If trips are still missing post-revert, I'll inspect the marketplace query/tab component to find the real cause.
-
-## Out of scope
-
-No changes to `src/utils/tripImages.ts`, marketplace query logic, or seed data.
+### Out of scope
+- No query/data changes
+- No changes to avatars, logos, or other `<img>` elements
+- No visual redesign

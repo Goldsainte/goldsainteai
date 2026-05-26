@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Layers } from "lucide-react";
+import { TripCoverImage } from "@/components/marketplace/TripCoverImage";
 
 interface BundleCardProps {
   bundle: {
@@ -29,8 +30,8 @@ export function BundleCard({ bundle }: BundleCardProps) {
       className="group block overflow-hidden rounded-2xl border border-[#E5DFC6] bg-white transition-all hover:shadow-lg"
     >
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#F7F3EA]">
-        <img
-          src={bundle.cover_image_url || ""}
+        <TripCoverImage
+          src={bundle.cover_image_url}
           alt={bundle.title}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
