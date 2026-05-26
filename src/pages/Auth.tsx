@@ -59,7 +59,13 @@ const Auth = () => {
 
     try {
       const raw = sessionStorage.getItem(AUTH_FLOW_STORAGE_KEY);
-      return raw ? (JSON.parse(raw) as PersistedAuthFlow) : null;
+      if (!raw) return null;
+      const stored = JSON.parse(raw) as PersistedAuthFlow;
+      // Only resume verify-email flows across sessions — the account already
+      // exists at that point. For any other persisted step, ignore it so a
+      // new signup always starts fresh and passes through the account-type
+      // picker (prevents stale selectedAccountType from leaking across flows).
+      return stored?.step === 'verify-email' ? stored : null;
     } catch {
       return null;
     }

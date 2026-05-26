@@ -1,37 +1,16 @@
 ## Problem
-A user who selected "Traveler" can end up with `account_type = 'creator'` and be routed to `/onboarding/creator`. Root cause: a stale `pending_account_type` value in sessionStorage from an earlier abandoned signup is applied to a later unrelated OAuth flow.
+When a user signs up with email, a stale `selectedAccountType` can be restored from `sessionStorage` (under `AUTH_FLOW_STORAGE_KEY`). An earlier abandoned signup leaves a persisted auth flow object there; a later signup restores it and skips the account-type picker, passing the stale type into `supabase.auth.signUp` so the profile is created with the wrong `account_type`.
 
-## Changes
+## Fix (src/pages/Auth.tsx only)
 
-### 1. `src/pages/Auth.tsx` — `handleGoogleSignIn`
+In the `persistedFlow` useMemo (lines 57–66):
 
-Add an `else` branch to the existing `if (selectedAccountType)` block so that when **no** account type is selected, stale sessionStorage keys are explicitly cleared instead of left behind.
+1. Parse the stored JSON as before.
+2. After parsing, return the stored object **only if** `stored.step === 'verify-email'`.
+3. For any other step, return `null` so a new signup always starts fresh and the user passes through the account-type picker.
 
-Current code (lines 563–572):
-```
-if (selectedAccountType) {
-  sessionStorage.setItem('pending_account_type', selectedAccountType);
-  sessionStorage.setItem('pending_welcome_email', ...);
-}
-```
+No other files or logic are changed.
 
-Change to:
-```
-if (selectedAccountType) {
-  sessionStorage.setItem('pending_account_type', selectedAccountType);
-  sessionStorage.setItem('pending_welcome_email', ...);
-} else {
-  sessionStorage.removeItem('pending_account_type');
-  sessionStorage.removeItem('pending_welcome_email');
-}
-```
-
-### 2. `src/pages/AuthCallback.tsx` — pending-account-type guard
-
-Before overriding `profiles.account_type` from `pending_account_type`, check that the profile is **brand new** — i.e. `is_profile_complete !== true` AND `onboarding_completed !== true` AND no `first_name`/`last_name`.
-
-Current code (lines 151–174) unconditionally updates `account_type` if `pendingAccountType` differs. Change so the update only runs when the profile has no identity/completion markers.
-
-Apply the **same brand-new guard** to the `pendingAccountType === 'agent'` block (lines 176–200) so an existing profile is never silently promoted to agent.
-
-No other files or routing logic are touched.
+## Verification
+- A fresh email signup should always show the account-type picker first.
+- A signup where the user already clicked the confirmation link on another device (step=`verify-email`) should still resume correctly.
