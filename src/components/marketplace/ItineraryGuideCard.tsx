@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { MapPin, Clock, Download } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ShareButton } from "@/components/ShareButton";
-import { getTripRequestImageUrl } from "@/utils/tripImages";
 
 interface Guide {
   id: string;
@@ -34,15 +33,10 @@ export function ItineraryGuideCard({ guide }: { guide: Guide }) {
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-[#F5F0E8]">
         <img
-          src={getTripRequestImageUrl(guide.destination, guide.cover_image_url)}
+          src={guide.cover_image_url || ""}
           alt={guide.title}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
-          onError={(e) => {
-            const img = e.currentTarget;
-            const fallback = getTripRequestImageUrl(guide.destination, null);
-            if (img.src !== fallback) img.src = fallback;
-          }}
         />
         <div className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-[#0c4d47] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-[#E5DFC6]">
           <Download className="h-3 w-3" />

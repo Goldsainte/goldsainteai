@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { Layers } from "lucide-react";
-import { getTripRequestImageUrl } from "@/utils/tripImages";
 
 interface BundleCardProps {
   bundle: {
@@ -31,15 +30,10 @@ export function BundleCard({ bundle }: BundleCardProps) {
     >
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#F7F3EA]">
         <img
-          src={getTripRequestImageUrl(bundle.destination || bundle.title, bundle.cover_image_url)}
+          src={bundle.cover_image_url || ""}
           alt={bundle.title}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
-          onError={(e) => {
-            const img = e.currentTarget;
-            const fallback = getTripRequestImageUrl(bundle.destination || bundle.title, null);
-            if (img.src !== fallback) img.src = fallback;
-          }}
         />
         <span className="absolute left-3 top-3 rounded-full bg-[#0c4d47] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-white">
           Bundle
