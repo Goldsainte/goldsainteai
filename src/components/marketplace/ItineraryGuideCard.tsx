@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { MapPin, Clock, Download } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ShareButton } from "@/components/ShareButton";
+import { TripCoverImage } from "@/components/marketplace/TripCoverImage";
 
 interface Guide {
   id: string;
@@ -32,8 +33,8 @@ export function ItineraryGuideCard({ guide }: { guide: Guide }) {
       className="group block overflow-hidden rounded-2xl border border-[#E5DFC6] bg-white shadow-sm transition-shadow hover:shadow-md"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-[#F5F0E8]">
-        <img
-          src={guide.cover_image_url || ""}
+        <TripCoverImage
+          src={guide.cover_image_url}
           alt={guide.title}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
