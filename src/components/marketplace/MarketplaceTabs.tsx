@@ -45,7 +45,7 @@ export function MarketplaceTabs({ activeTab, onTabChange }: MarketplaceTabsProps
 
   return (
     <TooltipProvider delayDuration={300}>
-      <div className="flex justify-center w-full overflow-x-auto scrollbar-hide">
+      <div className="flex justify-center md:justify-start w-full overflow-x-auto scrollbar-hide">
         <div className="inline-flex items-center gap-0.5 sm:gap-1 rounded-full border border-[#E5DFC6] bg-white p-0.5 sm:p-1">
           {tabs.map((tab) => {
             const Icon = tab.icon;

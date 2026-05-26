@@ -562,10 +562,14 @@ export default function Marketplace() {
           />
           )}
           {activeTab === "trips" && <LiveSignalRow />}
-          <div className="mb-6 md:mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-            <MarketplaceTabs activeTab={activeTab} onTabChange={handleTabChange} />
+          <div className="mb-6 md:mb-8 flex flex-col gap-4 md:flex-row md:items-start">
+            <div className="flex-1 min-w-0">
+              <MarketplaceTabs activeTab={activeTab} onTabChange={handleTabChange} />
+            </div>
             {activeTab !== "itinerary-guides" && (
-              <MarketplaceFilters filters={filters} onFilterChange={setFilters} />
+              <div className="md:shrink-0 md:w-[200px]">
+                <MarketplaceFilters filters={filters} onFilterChange={setFilters} />
+              </div>
             )}
           </div>
 

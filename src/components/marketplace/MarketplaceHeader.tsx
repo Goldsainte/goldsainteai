@@ -1,20 +1,11 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 export function MarketplaceHeader() {
   return (
     <section className="border-b border-[#E5DFC6]/30 bg-white">
       <div className="mx-auto max-w-6xl px-4 py-6 md:py-12">
         <div className="flex flex-col gap-4 md:gap-6">
-          {/* Back link - hidden on mobile for cleaner look */}
-          <Link
-            to="/"
-            className="hidden md:inline-flex items-center gap-1.5 text-xs text-[#8D8D8D] transition hover:text-[#0a2225] -mb-2"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            <span>Back to Home</span>
-          </Link>
-
           {/* Hero content */}
           <div className="space-y-2 md:space-y-3">
             <h1 className="font-secondary text-2xl text-[#0a2225] md:text-4xl leading-tight">
