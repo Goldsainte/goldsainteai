@@ -569,6 +569,12 @@ const Auth = () => {
           'pending_welcome_email',
           JSON.stringify({ accountType: selectedAccountType }),
         );
+      } else {
+        // No type selected on this flow — clear any stale values left over
+        // from a previous abandoned signup so they can't be applied to this
+        // unrelated sign-in.
+        sessionStorage.removeItem('pending_account_type');
+        sessionStorage.removeItem('pending_welcome_email');
       }
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
