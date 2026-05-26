@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Layers } from "lucide-react";
+import { getTripRequestImageUrl } from "@/utils/tripImages";
 
 interface BundleCardProps {
   bundle: {
@@ -7,6 +8,7 @@ interface BundleCardProps {
     title: string;
     description?: string | null;
     cover_image_url?: string | null;
+    destination?: string | null;
     price: number;
     currency: string;
     trip_id?: string | null;
@@ -28,18 +30,17 @@ export function BundleCard({ bundle }: BundleCardProps) {
       className="group block overflow-hidden rounded-2xl border border-[#E5DFC6] bg-white transition-all hover:shadow-lg"
     >
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#F7F3EA]">
-        {bundle.cover_image_url ? (
-          <img
-            src={bundle.cover_image_url}
-            alt={bundle.title}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center text-[#C7A962]">
-            <Layers className="h-12 w-12" />
-          </div>
-        )}
+        <img
+          src={getTripRequestImageUrl(bundle.destination || bundle.title, bundle.cover_image_url)}
+          alt={bundle.title}
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
+          onError={(e) => {
+            const img = e.currentTarget;
+            const fallback = getTripRequestImageUrl(bundle.destination || bundle.title, null);
+            if (img.src !== fallback) img.src = fallback;
+          }}
+        />
         <span className="absolute left-3 top-3 rounded-full bg-[#0c4d47] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-white">
           Bundle
         </span>

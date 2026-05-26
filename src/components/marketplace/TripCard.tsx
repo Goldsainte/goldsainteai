@@ -1,6 +1,7 @@
 import { Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { getTripRequestImageUrl } from "@/utils/tripImages";
 
 interface TripCardProps {
   trip: {
@@ -46,17 +47,17 @@ export const TripCard = ({ trip }: TripCardProps) => {
     <div className="group overflow-hidden rounded-2xl bg-card shadow-sm ring-1 ring-border/80 transition hover:-translate-y-1 hover:shadow-lg">
       {/* Image */}
       <div className="relative h-48 w-full overflow-hidden">
-        {trip.cover_image_url ? (
-          <img
-            src={trip.cover_image_url}
-            alt={trip.title}
-            className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-          loading="lazy"/>
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-muted">
-            <span className="text-4xl">🗺️</span>
-          </div>
-        )}
+        <img
+          src={getTripRequestImageUrl(trip.destination, trip.cover_image_url)}
+          alt={trip.title}
+          className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+          loading="lazy"
+          onError={(e) => {
+            const img = e.currentTarget;
+            const fallback = getTripRequestImageUrl(trip.destination, null);
+            if (img.src !== fallback) img.src = fallback;
+          }}
+        />
         
         {/* Top badges */}
         <div className="pointer-events-none absolute inset-x-3 top-3 flex items-center justify-between">

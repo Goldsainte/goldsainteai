@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { ShareButton } from "@/components/ShareButton";
+import { getTripRequestImageUrl } from "@/utils/tripImages";
 
 interface LiveTripCardProps {
   trip: {
@@ -157,18 +158,17 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
     >
       {/* Image with optional editorial signal pill */}
       <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
-        {trip.cover_image_url ? (
-          <img
-            src={trip.cover_image_url}
-            alt={trip.title}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-          />
-        ) : (
-          <div className="h-full w-full bg-gradient-to-br from-[#C7A962]/20 via-[#E5DFC6]/30 to-[#0a2225]/10 flex items-center justify-center">
-            <MapPin className="h-8 w-8 text-[#C7A962]/40" />
-          </div>
-        )}
+        <img
+          src={getTripRequestImageUrl(trip.destination, trip.cover_image_url)}
+          alt={trip.title}
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
+          onError={(e) => {
+            const img = e.currentTarget;
+            const fallback = getTripRequestImageUrl(trip.destination, null);
+            if (img.src !== fallback) img.src = fallback;
+          }}
+        />
         {signalLabel && (
           <span className="absolute left-3 top-3 rounded-full bg-[#FDF9F0]/95 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-[#0c4d47] ring-1 ring-[#0c4d47]/20 backdrop-blur-sm">
             {signalLabel}

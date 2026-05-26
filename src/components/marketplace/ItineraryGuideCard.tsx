@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { MapPin, Clock, Download } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ShareButton } from "@/components/ShareButton";
+import { getTripRequestImageUrl } from "@/utils/tripImages";
 
 interface Guide {
   id: string;
@@ -32,18 +33,17 @@ export function ItineraryGuideCard({ guide }: { guide: Guide }) {
       className="group block overflow-hidden rounded-2xl border border-[#E5DFC6] bg-white shadow-sm transition-shadow hover:shadow-md"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-[#F5F0E8]">
-        {guide.cover_image_url ? (
-          <img
-            src={guide.cover_image_url}
-            alt={guide.title}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <Download className="h-10 w-10 text-[#C7A962]" />
-          </div>
-        )}
+        <img
+          src={getTripRequestImageUrl(guide.destination, guide.cover_image_url)}
+          alt={guide.title}
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
+          onError={(e) => {
+            const img = e.currentTarget;
+            const fallback = getTripRequestImageUrl(guide.destination, null);
+            if (img.src !== fallback) img.src = fallback;
+          }}
+        />
         <div className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-[#0c4d47] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-[#E5DFC6]">
           <Download className="h-3 w-3" />
           Digital Guide
