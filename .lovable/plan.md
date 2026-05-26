@@ -1,35 +1,23 @@
-# Always show a cover photo on trip cards
+Revert the trip cover image fallback changes from the previous step. The previous edit replaced direct `cover_image_url` usage with `getTripRequestImageUrl(destination, cover_image_url)` and added `onError` fallback handlers on 6 components. This was intended to guarantee a photo always renders, but it caused two regressions:
 
-## Problem
-Some trip cards on the Marketplace and Home page can render without a real photo:
-- When `cover_image_url` is null/empty, components show a colored gradient placeholder (e.g. `LiveTripCard`, `TripCard`, `BundleCard`, `ItineraryGuideCard`, Home `FeaturedTripsSection`).
-- When the URL is present but the image fails to load (404, broken Supabase storage path, expired CDN), there is no recovery — the broken image stays.
+1. Homepage featured trip images changed (because the helper now overrides the original Unsplash URL in some cases).
+2. Marketplace "Handpicked Trips" cards may be filtered/affected by the same change.
 
-All 33 published `packaged_trips` currently have a cover URL, but the UI must remain robust as new trips, bundles, guides, and live trips appear.
+## Files to revert
 
-## Approach
-Use the existing curated destination → Unsplash registry (`src/utils/tripImages.ts` → `getTripRequestImageUrl(destination, override)`), which already deterministically returns a travel-relevant image for any destination string.
+For each file below, restore the `<img>` element to the pre-edit state: use `trip.cover_image_url` (or equivalent field) directly as `src`, remove the `onError` handler that swaps to a fallback, restore any conditional empty-state branches that were removed, and remove the `getTripRequestImageUrl` import if no longer used.
 
-For every trip cover image on Home and Marketplace:
-1. Compute `src` as `getTripRequestImageUrl(destination, cover_image_url)` so a missing/empty `cover_image_url` falls back to a destination-matched Unsplash image instead of a gradient placeholder.
-2. Add an `onError` handler that swaps the `<img>` `src` to the destination fallback once (guarded to prevent loops) so broken URLs are recovered visually.
-3. Remove the gradient/“no cover” empty-state branches so the `<img>` is always rendered.
+1. `src/pages/HomePage.tsx` — `FeaturedTripsSection` image
+2. `src/components/marketplace/LiveTripCard.tsx`
+3. `src/components/marketplace/TripCard.tsx`
+4. `src/components/marketplace/BundleCard.tsx`
+5. `src/components/marketplace/ItineraryGuideCard.tsx`
+6. `src/components/TopToursCarousel.tsx`
 
-This is presentation-only — no schema changes, no edge-function calls, no new network dependencies (Unsplash URLs are already used elsewhere).
+## Investigation note
 
-## Files to update
-- `src/pages/HomePage.tsx` — `FeaturedTripsSection` card image.
-- `src/components/marketplace/LiveTripCard.tsx` — replace the conditional + gradient fallback with always-rendered `<img>` using the helper, add `onError`.
-- `src/components/marketplace/TripCard.tsx` — same treatment.
-- `src/components/marketplace/BundleCard.tsx` — same treatment (use `destination` if available, otherwise `title` as the key into the helper).
-- `src/components/marketplace/ItineraryGuideCard.tsx` — same treatment.
-- `src/components/TopToursCarousel.tsx` — replace inline Unsplash default with helper using `tour.destination`, add `onError`.
+The "Handpicked Trips" tab disappearing is likely a separate issue (the query/filter on the marketplace page), not directly caused by the image edits — image fallbacks don't filter rows. After reverting, I'll verify the Handpicked tab loads. If trips are still missing post-revert, I'll inspect the marketplace query/tab component to find the real cause.
 
 ## Out of scope
-- Database backfill of `cover_image_url`.
-- Storyboard / collection cards (not mentioned by user; different data model).
-- Hero/marketing sections that use hand-picked Pexels images.
 
-## Verification
-- Load `/` and `/marketplace`, confirm every card shows a photo.
-- Temporarily set a card’s `cover_image_url` to a broken URL via DevTools override and confirm the fallback kicks in via `onError`.
+No changes to `src/utils/tripImages.ts`, marketplace query logic, or seed data.
