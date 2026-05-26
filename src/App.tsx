@@ -194,7 +194,7 @@ export default function App() {
           <Sonner />
           <ConfirmDialogHost />
           <InstallAppPrompt />
-          <BrowserRouter>
+          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <ScrollToTop />
             <AuthProvider>
               <LanguageProvider>

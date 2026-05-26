@@ -1,5 +1,5 @@
 -- Create cocurated trip requests table
-CREATE TABLE public.cocurated_trip_requests (
+CREATE TABLE IF NOT EXISTS public.cocurated_trip_requests (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'assigned', 'quoted', 'booked', 'cancelled')),

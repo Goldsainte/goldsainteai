@@ -1,5 +1,5 @@
 -- Direct Messaging Tables
-CREATE TABLE public.user_conversations (
+CREATE TABLE IF NOT EXISTS public.user_conversations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -12,7 +12,7 @@ CREATE TABLE public.user_conversations (
   status TEXT DEFAULT 'active' CHECK (status IN ('active', 'archived', 'blocked'))
 );
 
-CREATE TABLE public.conversation_messages (
+CREATE TABLE IF NOT EXISTS public.conversation_messages (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   conversation_id UUID NOT NULL REFERENCES public.user_conversations(id) ON DELETE CASCADE,
   sender_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -24,7 +24,7 @@ CREATE TABLE public.conversation_messages (
 );
 
 -- Hashtags Tables
-CREATE TABLE public.hashtags (
+CREATE TABLE IF NOT EXISTS public.hashtags (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tag TEXT UNIQUE NOT NULL,
   use_count INTEGER DEFAULT 0,
@@ -32,7 +32,7 @@ CREATE TABLE public.hashtags (
   last_used_at TIMESTAMPTZ
 );
 
-CREATE TABLE public.post_hashtags (
+CREATE TABLE IF NOT EXISTS public.post_hashtags (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id UUID NOT NULL REFERENCES public.travel_posts(id) ON DELETE CASCADE,
   hashtag_id UUID NOT NULL REFERENCES public.hashtags(id) ON DELETE CASCADE,
@@ -41,14 +41,14 @@ CREATE TABLE public.post_hashtags (
 );
 
 -- Indexes for performance
-CREATE INDEX idx_user_conversations_customer ON public.user_conversations(customer_id);
-CREATE INDEX idx_user_conversations_agent ON public.user_conversations(agent_id);
-CREATE INDEX idx_user_conversations_job ON public.user_conversations(job_id);
-CREATE INDEX idx_conversation_messages_conversation ON public.conversation_messages(conversation_id);
-CREATE INDEX idx_conversation_messages_sender ON public.conversation_messages(sender_id);
-CREATE INDEX idx_hashtags_tag ON public.hashtags(tag);
-CREATE INDEX idx_post_hashtags_post ON public.post_hashtags(post_id);
-CREATE INDEX idx_post_hashtags_hashtag ON public.post_hashtags(hashtag_id);
+CREATE INDEX IF NOT EXISTS idx_user_conversations_customer ON public.user_conversations(customer_id);
+CREATE INDEX IF NOT EXISTS idx_user_conversations_agent ON public.user_conversations(agent_id);
+CREATE INDEX IF NOT EXISTS idx_user_conversations_job ON public.user_conversations(job_id);
+CREATE INDEX IF NOT EXISTS idx_conversation_messages_conversation ON public.conversation_messages(conversation_id);
+CREATE INDEX IF NOT EXISTS idx_conversation_messages_sender ON public.conversation_messages(sender_id);
+CREATE INDEX IF NOT EXISTS idx_hashtags_tag ON public.hashtags(tag);
+CREATE INDEX IF NOT EXISTS idx_post_hashtags_post ON public.post_hashtags(post_id);
+CREATE INDEX IF NOT EXISTS idx_post_hashtags_hashtag ON public.post_hashtags(hashtag_id);
 
 -- Enable realtime
 ALTER PUBLICATION supabase_realtime ADD TABLE public.user_conversations;

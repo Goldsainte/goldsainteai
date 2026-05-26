@@ -1,5 +1,5 @@
 -- Create guests table first
-CREATE TABLE public.guests (
+CREATE TABLE IF NOT EXISTS public.guests (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   email TEXT NOT NULL,
   first_name TEXT NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE public.guests (
 );
 
 -- Create bookings table (now guests table exists)
-CREATE TABLE public.bookings (
+CREATE TABLE IF NOT EXISTS public.bookings (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   booking_type TEXT NOT NULL CHECK (booking_type IN ('hotel', 'flight', 'car')),
   booking_reference TEXT,
@@ -25,7 +25,7 @@ CREATE TABLE public.bookings (
 );
 
 -- Create payments table
-CREATE TABLE public.payments (
+CREATE TABLE IF NOT EXISTS public.payments (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   booking_id UUID NOT NULL REFERENCES public.bookings(id) ON DELETE CASCADE,
   stripe_payment_intent_id TEXT,

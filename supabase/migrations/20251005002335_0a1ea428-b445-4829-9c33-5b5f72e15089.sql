@@ -61,7 +61,7 @@ USING (
 );
 
 -- Create reports/flags table
-CREATE TABLE public.user_reports (
+CREATE TABLE IF NOT EXISTS public.user_reports (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   reporter_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   reported_user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -80,10 +80,10 @@ CREATE TABLE public.user_reports (
 );
 
 -- Add indexes for performance
-CREATE INDEX idx_user_reports_reporter ON public.user_reports(reporter_id);
-CREATE INDEX idx_user_reports_reported_user ON public.user_reports(reported_user_id);
-CREATE INDEX idx_user_reports_status ON public.user_reports(status);
-CREATE INDEX idx_user_reports_severity ON public.user_reports(severity);
+CREATE INDEX IF NOT EXISTS idx_user_reports_reporter ON public.user_reports(reporter_id);
+CREATE INDEX IF NOT EXISTS idx_user_reports_reported_user ON public.user_reports(reported_user_id);
+CREATE INDEX IF NOT EXISTS idx_user_reports_status ON public.user_reports(status);
+CREATE INDEX IF NOT EXISTS idx_user_reports_severity ON public.user_reports(severity);
 
 -- RLS policies for reports
 ALTER TABLE public.user_reports ENABLE ROW LEVEL SECURITY;
@@ -109,7 +109,7 @@ TO authenticated
 USING (has_role(auth.uid(), 'admin'));
 
 -- Create agent verification requests table
-CREATE TABLE public.agent_verification_requests (
+CREATE TABLE IF NOT EXISTS public.agent_verification_requests (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   agent_id uuid NOT NULL REFERENCES public.travel_agents(id) ON DELETE CASCADE,
   verification_type text NOT NULL CHECK (verification_type IN ('identity', 'background_check', 'professional_license', 'insurance')),
@@ -126,9 +126,9 @@ CREATE TABLE public.agent_verification_requests (
 );
 
 -- Add indexes
-CREATE INDEX idx_verification_requests_agent ON public.agent_verification_requests(agent_id);
-CREATE INDEX idx_verification_requests_status ON public.agent_verification_requests(status);
-CREATE INDEX idx_verification_requests_type ON public.agent_verification_requests(verification_type);
+CREATE INDEX IF NOT EXISTS idx_verification_requests_agent ON public.agent_verification_requests(agent_id);
+CREATE INDEX IF NOT EXISTS idx_verification_requests_status ON public.agent_verification_requests(status);
+CREATE INDEX IF NOT EXISTS idx_verification_requests_type ON public.agent_verification_requests(verification_type);
 
 -- RLS policies for verification requests
 ALTER TABLE public.agent_verification_requests ENABLE ROW LEVEL SECURITY;

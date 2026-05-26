@@ -15,6 +15,6 @@ ADD COLUMN IF NOT EXISTS stripe_transfer_id TEXT,
 ADD COLUMN IF NOT EXISTS transfer_date TIMESTAMP WITH TIME ZONE,
 ADD COLUMN IF NOT EXISTS platform_fee NUMERIC DEFAULT 0;
 
--- Create index for faster payment lookups
+-- CREATE INDEX IF NOT EXISTS for faster payment lookups
 CREATE INDEX IF NOT EXISTS idx_marketplace_jobs_payment ON public.marketplace_jobs(stripe_payment_intent_id);
 CREATE INDEX IF NOT EXISTS idx_marketplace_jobs_agent_payout ON public.marketplace_jobs(assigned_agent_id, payout_processed_at);

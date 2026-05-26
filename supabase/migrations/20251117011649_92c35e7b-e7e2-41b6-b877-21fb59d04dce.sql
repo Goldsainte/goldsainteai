@@ -8,7 +8,7 @@ create table if not exists public.booking_messages (
   updated_at timestamptz not null default now()
 );
 
--- Create index for efficient queries
+-- CREATE INDEX IF NOT EXISTS for efficient queries
 create index if not exists booking_messages_booking_id_idx
   on public.booking_messages (booking_id, created_at desc);
 

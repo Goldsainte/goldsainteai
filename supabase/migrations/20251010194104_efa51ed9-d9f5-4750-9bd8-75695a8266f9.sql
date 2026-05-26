@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS public.promo_code_usage CASCADE;
 DROP TABLE IF EXISTS public.package_post_tags CASCADE;
 
 -- Create promo code tracking (simple version)
-CREATE TABLE public.promo_code_usage (
+CREATE TABLE IF NOT EXISTS public.promo_code_usage (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   promo_code TEXT NOT NULL,
   package_id UUID NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE public.promo_code_usage (
 );
 
 -- Create package post tags
-CREATE TABLE public.package_post_tags (
+CREATE TABLE IF NOT EXISTS public.package_post_tags (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id UUID NOT NULL,
   package_id UUID NOT NULL,

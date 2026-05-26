@@ -1,5 +1,5 @@
--- Create table for visa service requests
-CREATE TABLE public.visa_service_requests (
+-- CREATE TABLE IF NOT EXISTS for visa service requests
+CREATE TABLE IF NOT EXISTS public.visa_service_requests (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
@@ -50,7 +50,8 @@ BEFORE UPDATE ON public.visa_service_requests
 FOR EACH ROW
 EXECUTE FUNCTION public.update_visa_requests_updated_at();
 
--- Create index for faster lookups
-CREATE INDEX idx_visa_requests_email ON public.visa_service_requests(user_email);
-CREATE INDEX idx_visa_requests_status ON public.visa_service_requests(status);
-CREATE INDEX idx_visa_requests_created_at ON public.visa_service_requests(created_at DESC);
+-- CREATE INDEX IF NOT EXISTS for faster lookups
+CREATE INDEX IF NOT EXISTS idx_visa_requests_email ON public.visa_service_requests(user_email);
+CREATE INDEX IF NOT EXISTS idx_visa_requests_status ON public.visa_service_requests(status);
+CREATE INDEX IF NOT EXISTS idx_visa_requests_created_at ON public.visa_service_requests(created_at DESC);
+

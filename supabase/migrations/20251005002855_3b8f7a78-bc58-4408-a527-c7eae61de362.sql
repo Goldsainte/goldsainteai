@@ -1,7 +1,7 @@
 -- Phase 2: Payment & Financial Features
 
 -- Create payment milestones table
-CREATE TABLE public.payment_milestones (
+CREATE TABLE IF NOT EXISTS public.payment_milestones (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   job_id uuid NOT NULL REFERENCES public.marketplace_jobs(id) ON DELETE CASCADE,
   milestone_number integer NOT NULL,
@@ -24,8 +24,8 @@ CREATE TABLE public.payment_milestones (
 );
 
 -- Add indexes
-CREATE INDEX idx_payment_milestones_job ON public.payment_milestones(job_id);
-CREATE INDEX idx_payment_milestones_status ON public.payment_milestones(status);
+CREATE INDEX IF NOT EXISTS idx_payment_milestones_job ON public.payment_milestones(job_id);
+CREATE INDEX IF NOT EXISTS idx_payment_milestones_status ON public.payment_milestones(status);
 
 -- RLS policies for payment milestones
 ALTER TABLE public.payment_milestones ENABLE ROW LEVEL SECURITY;
@@ -67,7 +67,7 @@ USING (
 );
 
 -- Create invoices table
-CREATE TABLE public.marketplace_invoices (
+CREATE TABLE IF NOT EXISTS public.marketplace_invoices (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   invoice_number text NOT NULL UNIQUE,
   job_id uuid NOT NULL REFERENCES public.marketplace_jobs(id) ON DELETE CASCADE,
@@ -98,11 +98,11 @@ CREATE TABLE public.marketplace_invoices (
 );
 
 -- Add indexes
-CREATE INDEX idx_invoices_job ON public.marketplace_invoices(job_id);
-CREATE INDEX idx_invoices_customer ON public.marketplace_invoices(customer_id);
-CREATE INDEX idx_invoices_agent ON public.marketplace_invoices(agent_id);
-CREATE INDEX idx_invoices_status ON public.marketplace_invoices(status);
-CREATE INDEX idx_invoices_number ON public.marketplace_invoices(invoice_number);
+CREATE INDEX IF NOT EXISTS idx_invoices_job ON public.marketplace_invoices(job_id);
+CREATE INDEX IF NOT EXISTS idx_invoices_customer ON public.marketplace_invoices(customer_id);
+CREATE INDEX IF NOT EXISTS idx_invoices_agent ON public.marketplace_invoices(agent_id);
+CREATE INDEX IF NOT EXISTS idx_invoices_status ON public.marketplace_invoices(status);
+CREATE INDEX IF NOT EXISTS idx_invoices_number ON public.marketplace_invoices(invoice_number);
 
 -- RLS policies for invoices
 ALTER TABLE public.marketplace_invoices ENABLE ROW LEVEL SECURITY;
@@ -130,7 +130,7 @@ USING (
 );
 
 -- Create payment plans table
-CREATE TABLE public.payment_plans (
+CREATE TABLE IF NOT EXISTS public.payment_plans (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   job_id uuid NOT NULL REFERENCES public.marketplace_jobs(id) ON DELETE CASCADE,
   total_amount numeric NOT NULL CHECK (total_amount > 0),
@@ -151,9 +151,9 @@ CREATE TABLE public.payment_plans (
 );
 
 -- Add indexes
-CREATE INDEX idx_payment_plans_job ON public.payment_plans(job_id);
-CREATE INDEX idx_payment_plans_status ON public.payment_plans(status);
-CREATE INDEX idx_payment_plans_next_payment ON public.payment_plans(next_payment_date);
+CREATE INDEX IF NOT EXISTS idx_payment_plans_job ON public.payment_plans(job_id);
+CREATE INDEX IF NOT EXISTS idx_payment_plans_status ON public.payment_plans(status);
+CREATE INDEX IF NOT EXISTS idx_payment_plans_next_payment ON public.payment_plans(next_payment_date);
 
 -- RLS policies for payment plans
 ALTER TABLE public.payment_plans ENABLE ROW LEVEL SECURITY;
@@ -186,7 +186,7 @@ USING (
 );
 
 -- Create refund guarantees table
-CREATE TABLE public.refund_guarantees (
+CREATE TABLE IF NOT EXISTS public.refund_guarantees (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   job_id uuid NOT NULL REFERENCES public.marketplace_jobs(id) ON DELETE CASCADE,
   guarantee_type text NOT NULL CHECK (guarantee_type IN ('full_refund', 'partial_refund', 'service_credit', 'rebook_free')),
@@ -210,8 +210,8 @@ CREATE TABLE public.refund_guarantees (
 );
 
 -- Add indexes
-CREATE INDEX idx_refund_guarantees_job ON public.refund_guarantees(job_id);
-CREATE INDEX idx_refund_guarantees_status ON public.refund_guarantees(status);
+CREATE INDEX IF NOT EXISTS idx_refund_guarantees_job ON public.refund_guarantees(job_id);
+CREATE INDEX IF NOT EXISTS idx_refund_guarantees_status ON public.refund_guarantees(status);
 
 -- RLS policies for refund guarantees
 ALTER TABLE public.refund_guarantees ENABLE ROW LEVEL SECURITY;
@@ -238,7 +238,7 @@ WITH CHECK (
 );
 
 -- Add multi-currency exchange rates table
-CREATE TABLE public.currency_exchange_rates (
+CREATE TABLE IF NOT EXISTS public.currency_exchange_rates (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   from_currency text NOT NULL,
   to_currency text NOT NULL,
@@ -251,9 +251,9 @@ CREATE TABLE public.currency_exchange_rates (
 );
 
 -- Add indexes
-CREATE INDEX idx_currency_rates_from ON public.currency_exchange_rates(from_currency);
-CREATE INDEX idx_currency_rates_to ON public.currency_exchange_rates(to_currency);
-CREATE INDEX idx_currency_rates_date ON public.currency_exchange_rates(effective_date);
+CREATE INDEX IF NOT EXISTS idx_currency_rates_from ON public.currency_exchange_rates(from_currency);
+CREATE INDEX IF NOT EXISTS idx_currency_rates_to ON public.currency_exchange_rates(to_currency);
+CREATE INDEX IF NOT EXISTS idx_currency_rates_date ON public.currency_exchange_rates(effective_date);
 
 -- RLS policies for currency rates (public read)
 ALTER TABLE public.currency_exchange_rates ENABLE ROW LEVEL SECURITY;

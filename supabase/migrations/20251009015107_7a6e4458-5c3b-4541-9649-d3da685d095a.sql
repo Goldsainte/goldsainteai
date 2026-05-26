@@ -1,5 +1,5 @@
 -- Create trip_itineraries table
-CREATE TABLE public.trip_itineraries (
+CREATE TABLE IF NOT EXISTS public.trip_itineraries (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL,
   job_id UUID REFERENCES public.marketplace_jobs(id) ON DELETE SET NULL,
@@ -18,7 +18,7 @@ CREATE TABLE public.trip_itineraries (
 );
 
 -- Create itinerary_items table
-CREATE TABLE public.itinerary_items (
+CREATE TABLE IF NOT EXISTS public.itinerary_items (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   itinerary_id UUID NOT NULL REFERENCES public.trip_itineraries(id) ON DELETE CASCADE,
   day_number INTEGER NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE public.itinerary_items (
 );
 
 -- Create travel_documents table
-CREATE TABLE public.travel_documents (
+CREATE TABLE IF NOT EXISTS public.travel_documents (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   itinerary_id UUID NOT NULL REFERENCES public.trip_itineraries(id) ON DELETE CASCADE,
   user_id UUID NOT NULL,
@@ -60,7 +60,7 @@ CREATE TABLE public.travel_documents (
 );
 
 -- Create calendar_events table for agent calendar
-CREATE TABLE public.calendar_events (
+CREATE TABLE IF NOT EXISTS public.calendar_events (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   agent_id UUID NOT NULL REFERENCES public.travel_agents(id) ON DELETE CASCADE,
   event_type TEXT NOT NULL,
@@ -79,7 +79,7 @@ CREATE TABLE public.calendar_events (
 );
 
 -- Create itinerary_shares table for companion sharing
-CREATE TABLE public.itinerary_shares (
+CREATE TABLE IF NOT EXISTS public.itinerary_shares (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   itinerary_id UUID NOT NULL REFERENCES public.trip_itineraries(id) ON DELETE CASCADE,
   shared_with_email TEXT NOT NULL,
@@ -183,12 +183,12 @@ CREATE POLICY "Users can delete shares of their itineraries"
   ));
 
 -- Create indexes for performance
-CREATE INDEX idx_itinerary_items_itinerary_id ON public.itinerary_items(itinerary_id);
-CREATE INDEX idx_itinerary_items_day_number ON public.itinerary_items(day_number);
-CREATE INDEX idx_travel_documents_itinerary_id ON public.travel_documents(itinerary_id);
-CREATE INDEX idx_calendar_events_agent_id ON public.calendar_events(agent_id);
-CREATE INDEX idx_calendar_events_start_datetime ON public.calendar_events(start_datetime);
-CREATE INDEX idx_itinerary_shares_itinerary_id ON public.itinerary_shares(itinerary_id);
+CREATE INDEX IF NOT EXISTS idx_itinerary_items_itinerary_id ON public.itinerary_items(itinerary_id);
+CREATE INDEX IF NOT EXISTS idx_itinerary_items_day_number ON public.itinerary_items(day_number);
+CREATE INDEX IF NOT EXISTS idx_travel_documents_itinerary_id ON public.travel_documents(itinerary_id);
+CREATE INDEX IF NOT EXISTS idx_calendar_events_agent_id ON public.calendar_events(agent_id);
+CREATE INDEX IF NOT EXISTS idx_calendar_events_start_datetime ON public.calendar_events(start_datetime);
+CREATE INDEX IF NOT EXISTS idx_itinerary_shares_itinerary_id ON public.itinerary_shares(itinerary_id);
 
 -- Create triggers for updated_at
 CREATE TRIGGER update_trip_itineraries_updated_at

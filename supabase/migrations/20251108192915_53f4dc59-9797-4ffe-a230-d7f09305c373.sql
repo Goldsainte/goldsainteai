@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS public.flight_price_alerts (
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
--- Create index for efficient queries
+-- CREATE INDEX IF NOT EXISTS for efficient queries
 CREATE INDEX IF NOT EXISTS idx_flight_price_alerts_user_id ON public.flight_price_alerts(user_id);
 CREATE INDEX IF NOT EXISTS idx_flight_price_alerts_active ON public.flight_price_alerts(is_active) WHERE is_active = true;
 CREATE INDEX IF NOT EXISTS idx_flight_price_alerts_last_checked ON public.flight_price_alerts(last_checked_at);

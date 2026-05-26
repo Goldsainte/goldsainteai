@@ -1,5 +1,5 @@
 -- Create package disputes table
-CREATE TABLE public.package_disputes (
+CREATE TABLE IF NOT EXISTS public.package_disputes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   booking_id UUID REFERENCES public.package_bookings(id) ON DELETE CASCADE,
   package_id UUID NOT NULL,
@@ -55,11 +55,11 @@ FOR UPDATE
 TO authenticated
 USING (has_role(auth.uid(), 'admin'::app_role));
 
--- Create index for faster lookups
-CREATE INDEX idx_package_disputes_raised_by ON public.package_disputes(raised_by);
-CREATE INDEX idx_package_disputes_creator_id ON public.package_disputes(creator_id);
-CREATE INDEX idx_package_disputes_status ON public.package_disputes(status);
-CREATE INDEX idx_package_disputes_booking_id ON public.package_disputes(booking_id);
+-- CREATE INDEX IF NOT EXISTS for faster lookups
+CREATE INDEX IF NOT EXISTS idx_package_disputes_raised_by ON public.package_disputes(raised_by);
+CREATE INDEX IF NOT EXISTS idx_package_disputes_creator_id ON public.package_disputes(creator_id);
+CREATE INDEX IF NOT EXISTS idx_package_disputes_status ON public.package_disputes(status);
+CREATE INDEX IF NOT EXISTS idx_package_disputes_booking_id ON public.package_disputes(booking_id);
 
 -- Add updated_at trigger
 CREATE TRIGGER update_package_disputes_updated_at

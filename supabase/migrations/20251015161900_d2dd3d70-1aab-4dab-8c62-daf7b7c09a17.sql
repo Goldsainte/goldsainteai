@@ -1,7 +1,7 @@
 -- Phase 3: Create comprehensive promotion system tables
 
 -- Vendor promotion tiers and subscriptions
-CREATE TABLE vendor_promotion_subscriptions (
+CREATE TABLE IF NOT EXISTS vendor_promotion_subscriptions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   vendor_id UUID REFERENCES transportation_vendors(id) ON DELETE CASCADE NOT NULL,
   tier TEXT NOT NULL CHECK (tier IN ('free', 'bronze', 'silver', 'gold', 'platinum')),
@@ -18,7 +18,7 @@ CREATE TABLE vendor_promotion_subscriptions (
 );
 
 -- Promotional media library
-CREATE TABLE vendor_promotional_media (
+CREATE TABLE IF NOT EXISTS vendor_promotional_media (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   vendor_id UUID REFERENCES transportation_vendors(id) ON DELETE CASCADE NOT NULL,
   media_type TEXT NOT NULL CHECK (media_type IN ('photo', 'video', '360_tour')),
@@ -34,7 +34,7 @@ CREATE TABLE vendor_promotional_media (
 );
 
 -- Promotional packages (special deals)
-CREATE TABLE vendor_promotional_packages (
+CREATE TABLE IF NOT EXISTS vendor_promotional_packages (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   vendor_id UUID REFERENCES transportation_vendors(id) ON DELETE CASCADE NOT NULL,
   package_name TEXT NOT NULL,
@@ -59,7 +59,7 @@ CREATE TABLE vendor_promotional_packages (
 );
 
 -- Analytics tracking for promoted vendors
-CREATE TABLE vendor_promotion_analytics (
+CREATE TABLE IF NOT EXISTS vendor_promotion_analytics (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   vendor_id UUID REFERENCES transportation_vendors(id) ON DELETE CASCADE NOT NULL,
   date DATE NOT NULL,

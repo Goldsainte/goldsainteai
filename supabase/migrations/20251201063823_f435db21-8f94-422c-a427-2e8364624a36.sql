@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS public.curated_itineraries_cache (
 );
 
 -- Index for fast lookups
-CREATE INDEX idx_curated_cache_user_expires ON public.curated_itineraries_cache(user_id, expires_at);
+CREATE INDEX IF NOT EXISTS idx_curated_cache_user_expires ON public.curated_itineraries_cache(user_id, expires_at);
 
 -- Enable RLS
 ALTER TABLE public.curated_itineraries_cache ENABLE ROW LEVEL SECURITY;

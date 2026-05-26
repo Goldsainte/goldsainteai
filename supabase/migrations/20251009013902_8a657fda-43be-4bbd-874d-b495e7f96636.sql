@@ -53,9 +53,9 @@ CREATE TRIGGER update_quick_reply_templates_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION public.update_updated_at_column();
 
--- Create index for faster queries
-CREATE INDEX idx_quick_reply_templates_agent_id ON public.quick_reply_templates(agent_id);
-CREATE INDEX idx_quick_reply_templates_category ON public.quick_reply_templates(category);
+-- CREATE INDEX IF NOT EXISTS for faster queries
+CREATE INDEX IF NOT EXISTS idx_quick_reply_templates_agent_id ON public.quick_reply_templates(agent_id);
+CREATE INDEX IF NOT EXISTS idx_quick_reply_templates_category ON public.quick_reply_templates(category);
 
 -- Insert default templates (these will be available to all agents)
 -- Note: We'll create a special "system" agent or these can be copied when agents sign up
@@ -64,3 +64,4 @@ CREATE INDEX idx_quick_reply_templates_category ON public.quick_reply_templates(
 COMMENT ON TABLE public.quick_reply_templates IS 'Quick reply message templates for travel agents';
 COMMENT ON COLUMN public.quick_reply_templates.shortcut IS 'Optional keyboard shortcut for quick access';
 COMMENT ON COLUMN public.quick_reply_templates.usage_count IS 'Tracks how many times this template has been used';
+

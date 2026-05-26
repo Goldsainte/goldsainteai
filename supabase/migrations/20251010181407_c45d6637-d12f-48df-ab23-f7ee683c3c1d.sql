@@ -1,5 +1,5 @@
 -- Create package_marketing_materials table
-CREATE TABLE public.package_marketing_materials (
+CREATE TABLE IF NOT EXISTS public.package_marketing_materials (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   creator_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   package_name TEXT NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE public.package_marketing_materials (
 );
 
 -- Create itinerary_templates table
-CREATE TABLE public.itinerary_templates (
+CREATE TABLE IF NOT EXISTS public.itinerary_templates (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   creator_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   package_id UUID REFERENCES public.package_marketing_materials(id) ON DELETE CASCADE,
@@ -44,7 +44,7 @@ CREATE TABLE public.itinerary_templates (
 );
 
 -- Create template_day_items table
-CREATE TABLE public.template_day_items (
+CREATE TABLE IF NOT EXISTS public.template_day_items (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   template_id UUID NOT NULL REFERENCES public.itinerary_templates(id) ON DELETE CASCADE,
   day_number INTEGER NOT NULL,
@@ -64,7 +64,7 @@ CREATE TABLE public.template_day_items (
 );
 
 -- Create package_bookings table (for tracking customer bookings of packages)
-CREATE TABLE public.package_bookings (
+CREATE TABLE IF NOT EXISTS public.package_bookings (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   package_id UUID NOT NULL REFERENCES public.package_marketing_materials(id) ON DELETE CASCADE,
   customer_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -188,12 +188,12 @@ CREATE TRIGGER update_package_bookings_updated_at
   EXECUTE FUNCTION public.update_updated_at_column();
 
 -- Create indexes for better performance
-CREATE INDEX idx_package_materials_creator ON public.package_marketing_materials(creator_id);
-CREATE INDEX idx_package_materials_published ON public.package_marketing_materials(is_published);
-CREATE INDEX idx_package_materials_destination ON public.package_marketing_materials(destination);
-CREATE INDEX idx_itinerary_templates_creator ON public.itinerary_templates(creator_id);
-CREATE INDEX idx_itinerary_templates_package ON public.itinerary_templates(package_id);
-CREATE INDEX idx_template_items_template ON public.template_day_items(template_id);
-CREATE INDEX idx_template_items_day ON public.template_day_items(template_id, day_number);
-CREATE INDEX idx_package_bookings_customer ON public.package_bookings(customer_id);
-CREATE INDEX idx_package_bookings_package ON public.package_bookings(package_id);
+CREATE INDEX IF NOT EXISTS idx_package_materials_creator ON public.package_marketing_materials(creator_id);
+CREATE INDEX IF NOT EXISTS idx_package_materials_published ON public.package_marketing_materials(is_published);
+CREATE INDEX IF NOT EXISTS idx_package_materials_destination ON public.package_marketing_materials(destination);
+CREATE INDEX IF NOT EXISTS idx_itinerary_templates_creator ON public.itinerary_templates(creator_id);
+CREATE INDEX IF NOT EXISTS idx_itinerary_templates_package ON public.itinerary_templates(package_id);
+CREATE INDEX IF NOT EXISTS idx_template_items_template ON public.template_day_items(template_id);
+CREATE INDEX IF NOT EXISTS idx_template_items_day ON public.template_day_items(template_id, day_number);
+CREATE INDEX IF NOT EXISTS idx_package_bookings_customer ON public.package_bookings(customer_id);
+CREATE INDEX IF NOT EXISTS idx_package_bookings_package ON public.package_bookings(package_id);

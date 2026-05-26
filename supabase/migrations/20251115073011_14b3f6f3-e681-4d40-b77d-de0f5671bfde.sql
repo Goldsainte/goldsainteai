@@ -2,7 +2,7 @@
 drop table if exists public.bookings cascade;
 
 -- Core bookings table
-create table public.bookings (
+CREATE TABLE IF NOT EXISTS public.bookings (
   id uuid primary key default gen_random_uuid(),
 
   -- Relationships
@@ -59,7 +59,7 @@ using (false)
 with check (false);
 
 -- Audit trail for every status change
-create table public.booking_status_history (
+CREATE TABLE IF NOT EXISTS public.booking_status_history (
   id uuid primary key default gen_random_uuid(),
   booking_id uuid not null references public.bookings(id) on delete cascade,
   old_status text,
@@ -83,7 +83,7 @@ using (
 );
 
 -- Foundation for disputes / support
-create table public.booking_disputes (
+CREATE TABLE IF NOT EXISTS public.booking_disputes (
   id uuid primary key default gen_random_uuid(),
   booking_id uuid not null references public.bookings(id) on delete cascade,
 

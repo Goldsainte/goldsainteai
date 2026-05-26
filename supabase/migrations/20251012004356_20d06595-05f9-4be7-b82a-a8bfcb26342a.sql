@@ -1,4 +1,4 @@
--- Create table for storing Instagram access tokens
+-- CREATE TABLE IF NOT EXISTS for storing Instagram access tokens
 CREATE TABLE IF NOT EXISTS public.instagram_tokens (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,

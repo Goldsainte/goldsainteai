@@ -28,6 +28,7 @@ DROP MATERIALIZED VIEW IF EXISTS agent_leaderboard CASCADE;
 DROP TYPE IF EXISTS booking_status CASCADE;
 DROP TYPE IF EXISTS payment_status CASCADE;
 DROP TYPE IF EXISTS payout_status CASCADE;
+DROP TYPE IF EXISTS public.trip_booking_status CASCADE;
 
 CREATE TYPE booking_status AS ENUM (
   'pending',
@@ -57,11 +58,23 @@ CREATE TYPE payout_status AS ENUM (
   'reversed'
 );
 
+CREATE TYPE public.trip_booking_status AS ENUM (
+  'pending',
+  'pending_payment',
+  'deposit_pending',
+  'payment_pending',
+  'confirmed',
+  'in_progress',
+  'completed',
+  'cancelled',
+  'disputed'
+);
+
 -- ============================================================================
 -- TRAVEL AGENTS TABLE
 -- ============================================================================
 
-CREATE TABLE travel_agents (
+CREATE TABLE IF NOT EXISTS travel_agents (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL UNIQUE REFERENCES auth.users ON DELETE CASCADE,
   
@@ -100,10 +113,10 @@ CREATE TABLE travel_agents (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX idx_travel_agents_user_id ON travel_agents(user_id);
-CREATE INDEX idx_travel_agents_status ON travel_agents(status);
-CREATE INDEX idx_travel_agents_rating ON travel_agents(average_rating DESC);
-CREATE INDEX idx_travel_agents_revenue ON travel_agents(total_revenue_cents DESC);
+CREATE INDEX IF NOT EXISTS idx_travel_agents_user_id ON travel_agents(user_id);
+CREATE INDEX IF NOT EXISTS idx_travel_agents_status ON travel_agents(status);
+CREATE INDEX IF NOT EXISTS idx_travel_agents_rating ON travel_agents(average_rating DESC);
+CREATE INDEX IF NOT EXISTS idx_travel_agents_revenue ON travel_agents(total_revenue_cents DESC);
 
 ALTER TABLE travel_agents ENABLE ROW LEVEL SECURITY;
 
@@ -138,7 +151,7 @@ CREATE TRIGGER update_travel_agents_updated_at
 -- BRAND PROFILES TABLE
 -- ============================================================================
 
-CREATE TABLE brand_profiles (
+CREATE TABLE IF NOT EXISTS brand_profiles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   owner_user_id UUID NOT NULL UNIQUE REFERENCES auth.users ON DELETE CASCADE,
   
@@ -169,9 +182,9 @@ CREATE TABLE brand_profiles (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX idx_brand_profiles_owner ON brand_profiles(owner_user_id);
-CREATE INDEX idx_brand_profiles_status ON brand_profiles(status);
-CREATE INDEX idx_brand_profiles_featured ON brand_profiles(is_featured);
+CREATE INDEX IF NOT EXISTS idx_brand_profiles_owner ON brand_profiles(owner_user_id);
+CREATE INDEX IF NOT EXISTS idx_brand_profiles_status ON brand_profiles(status);
+CREATE INDEX IF NOT EXISTS idx_brand_profiles_featured ON brand_profiles(is_featured);
 
 ALTER TABLE brand_profiles ENABLE ROW LEVEL SECURITY;
 
@@ -197,7 +210,7 @@ CREATE TRIGGER update_brand_profiles_updated_at
 -- TRIP REQUESTS TABLE
 -- ============================================================================
 
-CREATE TABLE trip_requests (
+CREATE TABLE IF NOT EXISTS trip_requests (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users ON DELETE CASCADE,
   
@@ -238,11 +251,11 @@ CREATE TABLE trip_requests (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX idx_trip_requests_user_id ON trip_requests(user_id);
-CREATE INDEX idx_trip_requests_status ON trip_requests(status);
-CREATE INDEX idx_trip_requests_destination ON trip_requests(destination);
-CREATE INDEX idx_trip_requests_dates ON trip_requests(start_date, end_date);
-CREATE INDEX idx_trip_requests_created_at ON trip_requests(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_trip_requests_user_id ON trip_requests(user_id);
+CREATE INDEX IF NOT EXISTS idx_trip_requests_status ON trip_requests(status);
+CREATE INDEX IF NOT EXISTS idx_trip_requests_destination ON trip_requests(destination);
+CREATE INDEX IF NOT EXISTS idx_trip_requests_dates ON trip_requests(start_date, end_date);
+CREATE INDEX IF NOT EXISTS idx_trip_requests_created_at ON trip_requests(created_at DESC);
 
 ALTER TABLE trip_requests ENABLE ROW LEVEL SECURITY;
 
@@ -270,7 +283,7 @@ CREATE TRIGGER update_trip_requests_updated_at
 -- TRIP PROPOSALS TABLE
 -- ============================================================================
 
-CREATE TABLE trip_proposals (
+CREATE TABLE IF NOT EXISTS trip_proposals (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   trip_request_id UUID NOT NULL REFERENCES trip_requests ON DELETE CASCADE,
   proposer_id UUID NOT NULL REFERENCES auth.users ON DELETE CASCADE,
@@ -301,10 +314,10 @@ CREATE TABLE trip_proposals (
   expires_at TIMESTAMPTZ
 );
 
-CREATE INDEX idx_trip_proposals_trip_request ON trip_proposals(trip_request_id);
-CREATE INDEX idx_trip_proposals_proposer ON trip_proposals(proposer_id);
-CREATE INDEX idx_trip_proposals_status ON trip_proposals(status);
-CREATE INDEX idx_trip_proposals_created_at ON trip_proposals(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_trip_proposals_trip_request ON trip_proposals(trip_request_id);
+CREATE INDEX IF NOT EXISTS idx_trip_proposals_proposer ON trip_proposals(proposer_id);
+CREATE INDEX IF NOT EXISTS idx_trip_proposals_status ON trip_proposals(status);
+CREATE INDEX IF NOT EXISTS idx_trip_proposals_created_at ON trip_proposals(created_at DESC);
 
 ALTER TABLE trip_proposals ENABLE ROW LEVEL SECURITY;
 
@@ -330,7 +343,7 @@ CREATE TRIGGER update_trip_proposals_updated_at
 -- BOOKINGS TABLE
 -- ============================================================================
 
-CREATE TABLE bookings (
+CREATE TABLE IF NOT EXISTS bookings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   booking_number TEXT UNIQUE NOT NULL,
   
@@ -433,17 +446,17 @@ CREATE TRIGGER set_booking_number_trigger
   FOR EACH ROW
   EXECUTE FUNCTION set_booking_number();
 
-CREATE INDEX idx_bookings_number ON bookings(booking_number);
-CREATE INDEX idx_bookings_traveler ON bookings(traveler_id);
-CREATE INDEX idx_bookings_agent ON bookings(agent_id);
-CREATE INDEX idx_bookings_creator ON bookings(creator_id);
-CREATE INDEX idx_bookings_brand ON bookings(brand_id);
-CREATE INDEX idx_bookings_status ON bookings(status);
-CREATE INDEX idx_bookings_payment_status ON bookings(payment_status);
-CREATE INDEX idx_bookings_payout_status ON bookings(payout_status);
-CREATE INDEX idx_bookings_dates ON bookings(start_date, end_date);
-CREATE INDEX idx_bookings_created_at ON bookings(created_at DESC);
-CREATE INDEX idx_bookings_stripe_payment ON bookings(stripe_payment_intent_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_number ON bookings(booking_number);
+CREATE INDEX IF NOT EXISTS idx_bookings_traveler ON bookings(traveler_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_agent ON bookings(agent_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_creator ON bookings(creator_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_brand ON bookings(brand_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status);
+CREATE INDEX IF NOT EXISTS idx_bookings_payment_status ON bookings(payment_status);
+CREATE INDEX IF NOT EXISTS idx_bookings_payout_status ON bookings(payout_status);
+CREATE INDEX IF NOT EXISTS idx_bookings_dates ON bookings(start_date, end_date);
+CREATE INDEX IF NOT EXISTS idx_bookings_created_at ON bookings(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_bookings_stripe_payment ON bookings(stripe_payment_intent_id);
 
 ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
 
@@ -485,7 +498,7 @@ CREATE TRIGGER update_bookings_updated_at
 -- BOOKING MILESTONES TABLE
 -- ============================================================================
 
-CREATE TABLE booking_milestones (
+CREATE TABLE IF NOT EXISTS booking_milestones (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   booking_id UUID NOT NULL REFERENCES bookings ON DELETE CASCADE,
   
@@ -510,9 +523,9 @@ CREATE TABLE booking_milestones (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX idx_milestones_booking ON booking_milestones(booking_id);
-CREATE INDEX idx_milestones_status ON booking_milestones(status);
-CREATE INDEX idx_milestones_due_date ON booking_milestones(due_date);
+CREATE INDEX IF NOT EXISTS idx_milestones_booking ON booking_milestones(booking_id);
+CREATE INDEX IF NOT EXISTS idx_milestones_status ON booking_milestones(status);
+CREATE INDEX IF NOT EXISTS idx_milestones_due_date ON booking_milestones(due_date);
 
 ALTER TABLE booking_milestones ENABLE ROW LEVEL SECURITY;
 
@@ -532,7 +545,7 @@ CREATE POLICY "Booking participants can view milestones"
 -- REVIEWS TABLE
 -- ============================================================================
 
-CREATE TABLE reviews (
+CREATE TABLE IF NOT EXISTS reviews (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   booking_id UUID NOT NULL REFERENCES bookings ON DELETE CASCADE,
   
@@ -567,11 +580,11 @@ CREATE TABLE reviews (
   UNIQUE(booking_id, reviewer_id, reviewee_id)
 );
 
-CREATE INDEX idx_reviews_booking ON reviews(booking_id);
-CREATE INDEX idx_reviews_reviewer ON reviews(reviewer_id);
-CREATE INDEX idx_reviews_reviewee ON reviews(reviewee_id);
-CREATE INDEX idx_reviews_rating ON reviews(rating DESC);
-CREATE INDEX idx_reviews_created_at ON reviews(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_reviews_booking ON reviews(booking_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_reviewer ON reviews(reviewer_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_reviewee ON reviews(reviewee_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_rating ON reviews(rating DESC);
+CREATE INDEX IF NOT EXISTS idx_reviews_created_at ON reviews(created_at DESC);
 
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 
@@ -592,7 +605,7 @@ CREATE POLICY "Public can view published reviews"
 -- MESSAGES TABLE
 -- ============================================================================
 
-CREATE TABLE messages (
+CREATE TABLE IF NOT EXISTS messages (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   
   trip_request_id UUID REFERENCES trip_requests,
@@ -616,12 +629,12 @@ CREATE TABLE messages (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX idx_messages_trip_request ON messages(trip_request_id);
-CREATE INDEX idx_messages_booking ON messages(booking_id);
-CREATE INDEX idx_messages_sender ON messages(sender_id);
-CREATE INDEX idx_messages_receiver ON messages(receiver_id);
-CREATE INDEX idx_messages_created_at ON messages(created_at DESC);
-CREATE INDEX idx_messages_flagged ON messages(flagged_for_review) WHERE flagged_for_review = true;
+CREATE INDEX IF NOT EXISTS idx_messages_trip_request ON messages(trip_request_id);
+CREATE INDEX IF NOT EXISTS idx_messages_booking ON messages(booking_id);
+CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_id);
+CREATE INDEX IF NOT EXISTS idx_messages_receiver ON messages(receiver_id);
+CREATE INDEX IF NOT EXISTS idx_messages_created_at ON messages(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_messages_flagged ON messages(flagged_for_review) WHERE flagged_for_review = true;
 
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 
@@ -647,6 +660,8 @@ CREATE POLICY "Users can send messages"
 -- NOTIFICATIONS TABLE
 -- ============================================================================
 
+DROP TABLE IF EXISTS notifications CASCADE;
+DROP TABLE IF EXISTS public.notifications CASCADE;
 CREATE TABLE notifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users ON DELETE CASCADE,
@@ -689,10 +704,10 @@ CREATE TABLE notifications (
   expires_at TIMESTAMPTZ
 );
 
-CREATE INDEX idx_notifications_user ON notifications(user_id);
-CREATE INDEX idx_notifications_type ON notifications(type);
-CREATE INDEX idx_notifications_read ON notifications(is_read);
-CREATE INDEX idx_notifications_created_at ON notifications(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_type ON notifications(type);
+CREATE INDEX IF NOT EXISTS idx_notifications_read ON notifications(is_read);
+CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON notifications(created_at DESC);
 
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 
@@ -709,7 +724,7 @@ CREATE POLICY "Users can update own notifications"
 -- PLATFORM METRICS TABLE
 -- ============================================================================
 
-CREATE TABLE platform_metrics (
+CREATE TABLE IF NOT EXISTS platform_metrics (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   metric_date DATE NOT NULL,
   
@@ -739,12 +754,14 @@ CREATE TABLE platform_metrics (
   UNIQUE(metric_date)
 );
 
-CREATE INDEX idx_platform_metrics_date ON platform_metrics(metric_date DESC);
+CREATE INDEX IF NOT EXISTS idx_platform_metrics_date ON platform_metrics(metric_date DESC);
 
 -- ============================================================================
 -- ACTIVITY LOGS TABLE
 -- ============================================================================
 
+DROP TABLE IF EXISTS activity_logs CASCADE;
+DROP TABLE IF EXISTS public.activity_logs CASCADE;
 CREATE TABLE activity_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users,
@@ -765,10 +782,10 @@ CREATE TABLE activity_logs (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX idx_activity_logs_user ON activity_logs(user_id);
-CREATE INDEX idx_activity_logs_action ON activity_logs(action);
-CREATE INDEX idx_activity_logs_entity ON activity_logs(entity_type, entity_id);
-CREATE INDEX idx_activity_logs_created_at ON activity_logs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_user ON activity_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_action ON activity_logs(action);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_entity ON activity_logs(entity_type, entity_id);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_created_at ON activity_logs(created_at DESC);
 
 ALTER TABLE activity_logs ENABLE ROW LEVEL SECURITY;
 

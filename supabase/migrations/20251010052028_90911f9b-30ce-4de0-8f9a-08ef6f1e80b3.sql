@@ -1,7 +1,7 @@
 -- Content Moderation System
 
 -- Table to store moderation flags (AI + user reports)
-CREATE TABLE public.content_moderation_flags (
+CREATE TABLE IF NOT EXISTS public.content_moderation_flags (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   content_type TEXT NOT NULL CHECK (content_type IN ('post', 'comment', 'story', 'message', 'profile', 'bio')),
   content_id UUID NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE public.content_moderation_flags (
 );
 
 -- Table to track moderation actions taken
-CREATE TABLE public.moderation_actions (
+CREATE TABLE IF NOT EXISTS public.moderation_actions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   target_user_id UUID NOT NULL,
   action_type TEXT NOT NULL CHECK (action_type IN (
@@ -46,7 +46,7 @@ CREATE TABLE public.moderation_actions (
 );
 
 -- Blocked keywords table
-CREATE TABLE public.blocked_keywords (
+CREATE TABLE IF NOT EXISTS public.blocked_keywords (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   keyword TEXT NOT NULL UNIQUE,
   severity TEXT NOT NULL DEFAULT 'medium' CHECK (severity IN ('low', 'medium', 'high')),
@@ -58,7 +58,7 @@ CREATE TABLE public.blocked_keywords (
 );
 
 -- Community guidelines table
-CREATE TABLE public.community_guidelines (
+CREATE TABLE IF NOT EXISTS public.community_guidelines (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   content TEXT NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE public.community_guidelines (
 );
 
 -- Sensitive content labels table
-CREATE TABLE public.sensitive_content_labels (
+CREATE TABLE IF NOT EXISTS public.sensitive_content_labels (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id UUID NOT NULL,
   label_type TEXT NOT NULL CHECK (label_type IN (
@@ -160,13 +160,13 @@ ON public.sensitive_content_labels FOR ALL
 USING ((current_setting('request.jwt.claims', true)::json->>'role') = 'service_role');
 
 -- Indexes for performance
-CREATE INDEX idx_flags_content ON public.content_moderation_flags(content_type, content_id);
-CREATE INDEX idx_flags_status ON public.content_moderation_flags(status);
-CREATE INDEX idx_flags_severity ON public.content_moderation_flags(severity);
-CREATE INDEX idx_actions_user ON public.moderation_actions(target_user_id, is_active);
-CREATE INDEX idx_actions_expires ON public.moderation_actions(expires_at) WHERE is_active = true;
-CREATE INDEX idx_keywords_search ON public.blocked_keywords(keyword) WHERE is_active = true;
-CREATE INDEX idx_labels_post ON public.sensitive_content_labels(post_id);
+CREATE INDEX IF NOT EXISTS idx_flags_content ON public.content_moderation_flags(content_type, content_id);
+CREATE INDEX IF NOT EXISTS idx_flags_status ON public.content_moderation_flags(status);
+CREATE INDEX IF NOT EXISTS idx_flags_severity ON public.content_moderation_flags(severity);
+CREATE INDEX IF NOT EXISTS idx_actions_user ON public.moderation_actions(target_user_id, is_active);
+CREATE INDEX IF NOT EXISTS idx_actions_expires ON public.moderation_actions(expires_at) WHERE is_active = true;
+CREATE INDEX IF NOT EXISTS idx_keywords_search ON public.blocked_keywords(keyword) WHERE is_active = true;
+CREATE INDEX IF NOT EXISTS idx_labels_post ON public.sensitive_content_labels(post_id);
 
 -- Trigger to update timestamps
 CREATE TRIGGER update_moderation_flags_updated_at

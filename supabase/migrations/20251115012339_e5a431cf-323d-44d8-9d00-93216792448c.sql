@@ -35,5 +35,5 @@ BEFORE UPDATE ON public.creator_profiles
 FOR EACH ROW EXECUTE PROCEDURE public.handle_updated_at();
 
 -- Create indexes for performance
-CREATE INDEX idx_creator_profiles_handle ON public.creator_profiles(handle);
-CREATE INDEX idx_creator_profiles_tiktok_handle ON public.creator_profiles(tiktok_handle);
+CREATE INDEX IF NOT EXISTS idx_creator_profiles_handle ON public.creator_profiles(handle);
+CREATE INDEX IF NOT EXISTS idx_creator_profiles_tiktok_handle ON public.creator_profiles(tiktok_handle);

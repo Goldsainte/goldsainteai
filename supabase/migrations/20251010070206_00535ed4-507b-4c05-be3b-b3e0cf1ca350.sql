@@ -19,7 +19,7 @@ ADD COLUMN IF NOT EXISTS stripe_payment_intent_id TEXT,
 ADD COLUMN IF NOT EXISTS stripe_transfer_id TEXT,
 ADD COLUMN IF NOT EXISTS processed_at TIMESTAMP WITH TIME ZONE;
 
--- Create index for faster lookups
+-- CREATE INDEX IF NOT EXISTS for faster lookups
 CREATE INDEX IF NOT EXISTS idx_profiles_stripe_account ON public.profiles(stripe_account_id);
 CREATE INDEX IF NOT EXISTS idx_creator_earnings_status ON public.creator_earnings(status, user_id);
 CREATE INDEX IF NOT EXISTS idx_gift_transactions_processed ON public.gift_transactions(processed_at);

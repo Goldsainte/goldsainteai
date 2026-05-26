@@ -1,5 +1,5 @@
 -- Create trip_messages table for chat
-CREATE TABLE public.trip_messages (
+CREATE TABLE IF NOT EXISTS public.trip_messages (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   trip_id UUID NOT NULL REFERENCES public.group_trips(id) ON DELETE CASCADE,
   user_id UUID NOT NULL,
@@ -45,9 +45,9 @@ CREATE POLICY "Users can delete own messages"
   USING (user_id = auth.uid());
 
 -- Create indexes for performance
-CREATE INDEX idx_trip_messages_trip_id ON public.trip_messages(trip_id);
-CREATE INDEX idx_trip_messages_parent_id ON public.trip_messages(parent_message_id);
-CREATE INDEX idx_trip_messages_created_at ON public.trip_messages(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_trip_messages_trip_id ON public.trip_messages(trip_id);
+CREATE INDEX IF NOT EXISTS idx_trip_messages_parent_id ON public.trip_messages(parent_message_id);
+CREATE INDEX IF NOT EXISTS idx_trip_messages_created_at ON public.trip_messages(created_at DESC);
 
 -- Enable realtime
 ALTER PUBLICATION supabase_realtime ADD TABLE public.trip_messages;

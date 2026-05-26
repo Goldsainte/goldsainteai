@@ -1,6 +1,6 @@
 
 -- AUTHORS
-CREATE TABLE public.newsroom_authors (
+CREATE TABLE IF NOT EXISTS public.newsroom_authors (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   slug text UNIQUE NOT NULL,
   full_name text NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE public.newsroom_authors (
 );
 
 -- ARTICLES
-CREATE TABLE public.newsroom_articles (
+CREATE TABLE IF NOT EXISTS public.newsroom_articles (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   slug text UNIQUE NOT NULL,
   type text NOT NULL CHECK (type IN ('press_release','news','announcement')),
@@ -44,12 +44,12 @@ CREATE TABLE public.newsroom_articles (
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_newsroom_articles_published ON public.newsroom_articles(published_at DESC) WHERE status = 'published';
-CREATE INDEX idx_newsroom_articles_type ON public.newsroom_articles(type) WHERE status = 'published';
-CREATE INDEX idx_newsroom_articles_slug ON public.newsroom_articles(slug);
+CREATE INDEX IF NOT EXISTS idx_newsroom_articles_published ON public.newsroom_articles(published_at DESC) WHERE status = 'published';
+CREATE INDEX IF NOT EXISTS idx_newsroom_articles_type ON public.newsroom_articles(type) WHERE status = 'published';
+CREATE INDEX IF NOT EXISTS idx_newsroom_articles_slug ON public.newsroom_articles(slug);
 
 -- PRESS INQUIRIES
-CREATE TABLE public.press_inquiries (
+CREATE TABLE IF NOT EXISTS public.press_inquiries (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   reporter_name text NOT NULL,
   publication text NOT NULL,
@@ -63,7 +63,7 @@ CREATE TABLE public.press_inquiries (
 );
 
 -- SUBSCRIBERS
-CREATE TABLE public.newsroom_subscribers (
+CREATE TABLE IF NOT EXISTS public.newsroom_subscribers (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   email text UNIQUE NOT NULL,
   created_at timestamptz NOT NULL DEFAULT now()
@@ -118,3 +118,4 @@ CREATE POLICY "newsroom_media_admin_update" ON storage.objects FOR UPDATE
   USING (bucket_id = 'newsroom-media' AND public.has_role(auth.uid(),'admin'::app_role));
 CREATE POLICY "newsroom_media_admin_delete" ON storage.objects FOR DELETE
   USING (bucket_id = 'newsroom-media' AND public.has_role(auth.uid(),'admin'::app_role));
+

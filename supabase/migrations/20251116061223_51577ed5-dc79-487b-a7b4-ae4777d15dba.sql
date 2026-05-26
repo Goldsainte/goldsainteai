@@ -39,10 +39,10 @@ ALTER TABLE public.trip_requests
   ADD CONSTRAINT trip_requests_wants_role_check 
   CHECK (wants_role IS NULL OR wants_role IN ('creator', 'agent', 'both'));
 
--- Create index on role for faster queries
+-- CREATE INDEX IF NOT EXISTS on role for faster queries
 CREATE INDEX IF NOT EXISTS idx_profiles_role ON public.profiles(role);
 
--- Create index on destination for matching
+-- CREATE INDEX IF NOT EXISTS on destination for matching
 CREATE INDEX IF NOT EXISTS idx_trip_requests_destination ON public.trip_requests(destination);
 
 COMMENT ON COLUMN public.profiles.role IS 'User role: traveler, creator, agent, or admin';

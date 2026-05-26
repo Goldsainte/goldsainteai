@@ -1,5 +1,5 @@
 -- Create curated hotels table for fallback recommendations
-CREATE TABLE public.curated_hotels (
+CREATE TABLE IF NOT EXISTS public.curated_hotels (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   city_code TEXT NOT NULL,
   name TEXT NOT NULL,
@@ -19,8 +19,8 @@ CREATE TABLE public.curated_hotels (
 );
 
 -- Add indexes
-CREATE INDEX idx_curated_hotels_city_code ON public.curated_hotels(city_code);
-CREATE INDEX idx_curated_hotels_active ON public.curated_hotels(is_active) WHERE is_active = true;
+CREATE INDEX IF NOT EXISTS idx_curated_hotels_city_code ON public.curated_hotels(city_code);
+CREATE INDEX IF NOT EXISTS idx_curated_hotels_active ON public.curated_hotels(is_active) WHERE is_active = true;
 
 -- Enable RLS
 ALTER TABLE public.curated_hotels ENABLE ROW LEVEL SECURITY;

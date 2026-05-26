@@ -13,10 +13,10 @@ CREATE TABLE IF NOT EXISTS public.activity_logs (
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_activity_logs_user ON public.activity_logs(user_id);
-CREATE INDEX idx_activity_logs_entity ON public.activity_logs(entity_type, entity_id);
-CREATE INDEX idx_activity_logs_action ON public.activity_logs(action);
-CREATE INDEX idx_activity_logs_created ON public.activity_logs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_user ON public.activity_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_entity ON public.activity_logs(entity_type, entity_id);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_action ON public.activity_logs(action);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_created ON public.activity_logs(created_at DESC);
 
 -- RLS for activity_logs
 ALTER TABLE public.activity_logs ENABLE ROW LEVEL SECURITY;
@@ -49,8 +49,8 @@ CREATE TABLE IF NOT EXISTS public.webhook_configurations (
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_webhook_configs_user ON public.webhook_configurations(user_id);
-CREATE INDEX idx_webhook_configs_active ON public.webhook_configurations(is_active);
+CREATE INDEX IF NOT EXISTS idx_webhook_configs_user ON public.webhook_configurations(user_id);
+CREATE INDEX IF NOT EXISTS idx_webhook_configs_active ON public.webhook_configurations(is_active);
 
 -- RLS for webhook_configurations
 ALTER TABLE public.webhook_configurations ENABLE ROW LEVEL SECURITY;
@@ -74,9 +74,9 @@ CREATE TABLE IF NOT EXISTS public.webhook_delivery_logs (
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_webhook_logs_webhook ON public.webhook_delivery_logs(webhook_id);
-CREATE INDEX idx_webhook_logs_event ON public.webhook_delivery_logs(event_type);
-CREATE INDEX idx_webhook_logs_created ON public.webhook_delivery_logs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_webhook_logs_webhook ON public.webhook_delivery_logs(webhook_id);
+CREATE INDEX IF NOT EXISTS idx_webhook_logs_event ON public.webhook_delivery_logs(event_type);
+CREATE INDEX IF NOT EXISTS idx_webhook_logs_created ON public.webhook_delivery_logs(created_at DESC);
 
 -- RLS for webhook_delivery_logs
 ALTER TABLE public.webhook_delivery_logs ENABLE ROW LEVEL SECURITY;

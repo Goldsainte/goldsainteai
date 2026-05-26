@@ -18,7 +18,7 @@ ALTER TABLE public.storyboards
   ADD COLUMN IF NOT EXISTS default_pace TEXT,
   ADD COLUMN IF NOT EXISTS default_interests TEXT[];
 
--- Create index on slug for efficient lookups
+-- CREATE INDEX IF NOT EXISTS on slug for efficient lookups
 CREATE INDEX IF NOT EXISTS idx_storyboards_slug ON public.storyboards(slug);
 
 -- Create RPC function to accept a proposal and create booking

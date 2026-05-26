@@ -3,15 +3,14 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 
-// Supabase project credentials are PINNED directly here — intentionally.
-// The publishable (anon) key is designed to be public; it ships in the
-// browser bundle regardless, so hardcoding it is safe. Pinning these values
-// removes the environment-variable / build-fallback chain that caused the
-// app to connect to a non-existent "placeholder.supabase.co" host (and,
-// earlier, to send a mismatched key -> "Invalid API key"). With the values
-// pinned, the app always connects to the correct live project.
-const SUPABASE_URL = "https://ktzsgqrqvwtxlimctkaf.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_i5xwYqNzT3JOevhcl7-J3w_J2oofXm5";
+// Production credentials are used as fallbacks so the app always works in prod.
+// For local development, set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY
+// in .env.local to point at your local Supabase instance (supabase start).
+const SUPABASE_URL =
+  import.meta.env.VITE_SUPABASE_URL || "https://ktzsgqrqvwtxlimctkaf.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY =
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+  "sb_publishable_i5xwYqNzT3JOevhcl7-J3w_J2oofXm5";
 
 // Import the supabase client like this:
 //   import { supabase } from "@/integrations/supabase/client"

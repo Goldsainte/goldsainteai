@@ -2,7 +2,7 @@
 ALTER TABLE public.profiles 
 ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT;
 
--- Create index on stripe_customer_id for fast lookups
+-- CREATE INDEX IF NOT EXISTS on stripe_customer_id for fast lookups
 CREATE INDEX IF NOT EXISTS idx_profiles_stripe_customer_id 
 ON public.profiles(stripe_customer_id);
 
@@ -34,3 +34,4 @@ COMMENT ON INDEX idx_journal_articles_creator_created IS
 'Optimizes creator article management queries';
 COMMENT ON INDEX idx_journal_articles_categories IS 
 'Optimizes category-based filtering using GIN index';
+

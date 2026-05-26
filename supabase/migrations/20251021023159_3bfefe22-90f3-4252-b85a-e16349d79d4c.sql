@@ -49,6 +49,6 @@ CREATE POLICY "Creators can delete their own packages"
   FOR DELETE
   USING (auth.uid() = creator_id);
 
--- Create index for performance
-CREATE INDEX idx_travel_packages_creator ON public.travel_packages(creator_id);
-CREATE INDEX idx_travel_packages_active ON public.travel_packages(is_active) WHERE is_active = true;
+-- CREATE INDEX IF NOT EXISTS for performance
+CREATE INDEX IF NOT EXISTS idx_travel_packages_creator ON public.travel_packages(creator_id);
+CREATE INDEX IF NOT EXISTS idx_travel_packages_active ON public.travel_packages(is_active) WHERE is_active = true;

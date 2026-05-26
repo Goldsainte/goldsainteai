@@ -33,7 +33,7 @@ create table if not exists public.booking_milestones (
 
 alter table public.booking_milestones enable row level security;
 
-create policy if not exists "participants_can_view_milestones"
+create policy "participants_can_view_milestones"
 on public.booking_milestones
 for select
 using (
@@ -45,7 +45,7 @@ using (
   )
 );
 
-create policy if not exists "service_role_writes_milestones"
+create policy "service_role_writes_milestones"
 on public.booking_milestones
 for insert
 with check (auth.role() = 'service_role');
@@ -67,7 +67,7 @@ create table if not exists public.cancellation_policies (
 );
 
 alter table public.cancellation_policies enable row level security;
-create policy if not exists "policies_readable"
+create policy "policies_readable"
 on public.cancellation_policies
 for select
 using (true);
@@ -90,7 +90,7 @@ create table if not exists public.disputes (
 );
 
 alter table public.disputes enable row level security;
-create policy if not exists "participants_can_view_disputes"
+create policy "participants_can_view_disputes"
 on public.disputes
 for select
 using (
@@ -102,13 +102,15 @@ using (
   )
 );
 
-create policy if not exists "participants_can_open_disputes"
+create policy "participants_can_open_disputes"
 on public.disputes
 for insert
 with check (raised_by = auth.uid());
 
 -- Reviews
-create table if not exists public.reviews (
+drop table if exists public.reviews cascade;
+drop table if exists reviews cascade;
+create table public.reviews (
   id uuid primary key default gen_random_uuid(),
   booking_id uuid not null references public.bookings(id) on delete cascade,
   reviewer_id uuid not null references public.profiles(id),
@@ -120,7 +122,7 @@ create table if not exists public.reviews (
 );
 
 alter table public.reviews enable row level security;
-create policy if not exists "participants_can_view_reviews"
+create policy "participants_can_view_reviews"
 on public.reviews
 for select
 using (
@@ -129,30 +131,36 @@ using (
   or creator_id = auth.uid()
 );
 
-create policy if not exists "travelers_leave_reviews"
+create policy "travelers_leave_reviews"
 on public.reviews
 for insert
 with check (reviewer_id = auth.uid());
 
 -- Messaging log
-create table if not exists public.messages (
+drop table if exists public.messages cascade;
+drop table if exists messages cascade;
+create table public.messages (
   id uuid primary key default gen_random_uuid(),
   conversation_id uuid,
+  trip_request_id uuid references public.trip_requests(id) on delete cascade,
   booking_id uuid references public.bookings(id) on delete cascade,
   sender_id uuid not null references public.profiles(id),
-  recipient_id uuid references public.profiles(id),
+  receiver_id uuid references public.profiles(id),
   body text not null,
   safety_flag text,
-  created_at timestamptz not null default now()
+  is_read boolean default false,
+  read_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 
 alter table public.messages enable row level security;
-create policy if not exists "participants_can_view_messages"
+create policy "participants_can_view_messages"
 on public.messages
 for select
 using (
   sender_id = auth.uid()
-  or recipient_id = auth.uid()
+  or receiver_id = auth.uid()
   or booking_id in (
     select id from public.bookings
     where traveler_id = auth.uid()
@@ -161,7 +169,7 @@ using (
   )
 );
 
-create policy if not exists "participants_can_send_messages"
+create policy "participants_can_send_messages"
 on public.messages
 for insert
 with check (

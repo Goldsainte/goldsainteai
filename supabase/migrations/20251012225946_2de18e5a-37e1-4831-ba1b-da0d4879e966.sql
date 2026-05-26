@@ -10,7 +10,7 @@ BEGIN
   END IF;
 END $$;
 
--- Create table for interaction responses
+-- CREATE TABLE IF NOT EXISTS for interaction responses
 CREATE TABLE IF NOT EXISTS public.moment_interaction_responses (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   moment_id uuid NOT NULL REFERENCES public.moments(id) ON DELETE CASCADE,
@@ -41,7 +41,7 @@ CREATE POLICY "Moment owners can view all responses to their moments"
     )
   );
 
--- Create index for better query performance
+-- CREATE INDEX IF NOT EXISTS for better query performance
 CREATE INDEX IF NOT EXISTS idx_moment_interaction_responses_moment_id 
   ON public.moment_interaction_responses(moment_id);
 

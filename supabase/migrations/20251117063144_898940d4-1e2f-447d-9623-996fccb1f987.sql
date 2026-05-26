@@ -57,7 +57,7 @@ CREATE POLICY "Admins can view all applications"
     )
   );
 
--- Create index for lookups
+-- CREATE INDEX IF NOT EXISTS for lookups
 CREATE INDEX IF NOT EXISTS idx_agent_applications_agent_id ON agent_applications(agent_id);
 CREATE INDEX IF NOT EXISTS idx_agent_applications_verification_status ON agent_applications(verification_status);
 CREATE INDEX IF NOT EXISTS idx_profiles_agent_verification_status ON profiles(agent_verification_status) WHERE agent_verification_status IS NOT NULL;

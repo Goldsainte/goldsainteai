@@ -1,5 +1,5 @@
--- Create table to track member participation in suggestions
-CREATE TABLE public.suggestion_participants (
+-- CREATE TABLE IF NOT EXISTS to track member participation in suggestions
+CREATE TABLE IF NOT EXISTS public.suggestion_participants (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   suggestion_id UUID NOT NULL REFERENCES public.trip_suggestions(id) ON DELETE CASCADE,
   user_id UUID NOT NULL,
@@ -33,9 +33,9 @@ CREATE POLICY "Members can manage own participation"
   WITH CHECK (user_id = auth.uid());
 
 -- Create indexes
-CREATE INDEX idx_suggestion_participants_suggestion ON public.suggestion_participants(suggestion_id);
-CREATE INDEX idx_suggestion_participants_user ON public.suggestion_participants(user_id);
-CREATE INDEX idx_suggestion_participants_trip ON public.suggestion_participants(trip_id);
+CREATE INDEX IF NOT EXISTS idx_suggestion_participants_suggestion ON public.suggestion_participants(suggestion_id);
+CREATE INDEX IF NOT EXISTS idx_suggestion_participants_user ON public.suggestion_participants(user_id);
+CREATE INDEX IF NOT EXISTS idx_suggestion_participants_trip ON public.suggestion_participants(trip_id);
 
 -- Enable realtime
 ALTER PUBLICATION supabase_realtime ADD TABLE public.suggestion_participants;

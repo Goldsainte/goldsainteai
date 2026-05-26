@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS public.oauth_states (
 ALTER TABLE public.oauth_states ENABLE ROW LEVEL SECURITY;
 
 -- Add index for cleanup
-CREATE INDEX idx_oauth_states_expires_at ON public.oauth_states(expires_at);
+CREATE INDEX IF NOT EXISTS idx_oauth_states_expires_at ON public.oauth_states(expires_at);
 
 -- Create a function to cleanup expired states
 CREATE OR REPLACE FUNCTION public.cleanup_expired_oauth_states()

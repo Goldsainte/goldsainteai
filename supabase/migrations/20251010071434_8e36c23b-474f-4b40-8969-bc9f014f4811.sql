@@ -1,5 +1,5 @@
 -- Create products table for travel gear, merchandise
-CREATE TABLE public.products (
+CREATE TABLE IF NOT EXISTS public.products (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   creator_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE public.products (
 );
 
 -- Create travel packages table for pre-made itineraries
-CREATE TABLE public.travel_packages (
+CREATE TABLE IF NOT EXISTS public.travel_packages (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   creator_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE public.travel_packages (
 );
 
 -- Create affiliate links table
-CREATE TABLE public.affiliate_links (
+CREATE TABLE IF NOT EXISTS public.affiliate_links (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   creator_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   product_name TEXT NOT NULL,
@@ -56,7 +56,7 @@ CREATE TABLE public.affiliate_links (
 );
 
 -- Create affiliate clicks tracking table
-CREATE TABLE public.affiliate_clicks (
+CREATE TABLE IF NOT EXISTS public.affiliate_clicks (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   affiliate_link_id UUID NOT NULL REFERENCES public.affiliate_links(id) ON DELETE CASCADE,
   user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
@@ -69,7 +69,7 @@ CREATE TABLE public.affiliate_clicks (
 );
 
 -- Create product orders table
-CREATE TABLE public.product_orders (
+CREATE TABLE IF NOT EXISTS public.product_orders (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   buyer_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   seller_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -93,7 +93,7 @@ CREATE TABLE public.product_orders (
 );
 
 -- Create affiliate commissions table
-CREATE TABLE public.affiliate_commissions (
+CREATE TABLE IF NOT EXISTS public.affiliate_commissions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   affiliate_link_id UUID NOT NULL REFERENCES public.affiliate_links(id) ON DELETE CASCADE,
   creator_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -108,7 +108,7 @@ CREATE TABLE public.affiliate_commissions (
 );
 
 -- Create live shopping events table
-CREATE TABLE public.live_shopping_events (
+CREATE TABLE IF NOT EXISTS public.live_shopping_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   creator_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
@@ -127,7 +127,7 @@ CREATE TABLE public.live_shopping_events (
 );
 
 -- Create live shopping viewers table for tracking
-CREATE TABLE public.live_shopping_viewers (
+CREATE TABLE IF NOT EXISTS public.live_shopping_viewers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   event_id UUID NOT NULL REFERENCES public.live_shopping_events(id) ON DELETE CASCADE,
   user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
@@ -210,18 +210,18 @@ CREATE POLICY "Event hosts can view their viewers" ON public.live_shopping_viewe
   ));
 
 -- Create indexes for performance
-CREATE INDEX idx_products_creator ON public.products(creator_id);
-CREATE INDEX idx_products_active ON public.products(is_active);
-CREATE INDEX idx_packages_creator ON public.travel_packages(creator_id);
-CREATE INDEX idx_packages_active ON public.travel_packages(is_active);
-CREATE INDEX idx_affiliate_links_creator ON public.affiliate_links(creator_id);
-CREATE INDEX idx_affiliate_links_code ON public.affiliate_links(affiliate_code);
-CREATE INDEX idx_affiliate_clicks_link ON public.affiliate_clicks(affiliate_link_id);
-CREATE INDEX idx_orders_buyer ON public.product_orders(buyer_id);
-CREATE INDEX idx_orders_seller ON public.product_orders(seller_id);
-CREATE INDEX idx_commissions_creator ON public.affiliate_commissions(creator_id);
-CREATE INDEX idx_events_creator ON public.live_shopping_events(creator_id);
-CREATE INDEX idx_events_status ON public.live_shopping_events(status);
+CREATE INDEX IF NOT EXISTS idx_products_creator ON public.products(creator_id);
+CREATE INDEX IF NOT EXISTS idx_products_active ON public.products(is_active);
+CREATE INDEX IF NOT EXISTS idx_packages_creator ON public.travel_packages(creator_id);
+CREATE INDEX IF NOT EXISTS idx_packages_active ON public.travel_packages(is_active);
+CREATE INDEX IF NOT EXISTS idx_affiliate_links_creator ON public.affiliate_links(creator_id);
+CREATE INDEX IF NOT EXISTS idx_affiliate_links_code ON public.affiliate_links(affiliate_code);
+CREATE INDEX IF NOT EXISTS idx_affiliate_clicks_link ON public.affiliate_clicks(affiliate_link_id);
+CREATE INDEX IF NOT EXISTS idx_orders_buyer ON public.product_orders(buyer_id);
+CREATE INDEX IF NOT EXISTS idx_orders_seller ON public.product_orders(seller_id);
+CREATE INDEX IF NOT EXISTS idx_commissions_creator ON public.affiliate_commissions(creator_id);
+CREATE INDEX IF NOT EXISTS idx_events_creator ON public.live_shopping_events(creator_id);
+CREATE INDEX IF NOT EXISTS idx_events_status ON public.live_shopping_events(status);
 
 -- Create triggers for updated_at
 CREATE TRIGGER update_products_updated_at

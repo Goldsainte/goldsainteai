@@ -31,7 +31,7 @@ CREATE TRIGGER set_storyboard_media_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION public.handle_updated_at();
 
--- Create index for faster queries
-CREATE INDEX idx_storyboard_media_created_at ON public.storyboard_media_library(created_at DESC);
-CREATE INDEX idx_storyboard_media_destination_tags ON public.storyboard_media_library USING GIN(destination_tags);
-CREATE INDEX idx_storyboard_media_mood_tags ON public.storyboard_media_library USING GIN(mood_tags);
+-- CREATE INDEX IF NOT EXISTS for faster queries
+CREATE INDEX IF NOT EXISTS idx_storyboard_media_created_at ON public.storyboard_media_library(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_storyboard_media_destination_tags ON public.storyboard_media_library USING GIN(destination_tags);
+CREATE INDEX IF NOT EXISTS idx_storyboard_media_mood_tags ON public.storyboard_media_library USING GIN(mood_tags);

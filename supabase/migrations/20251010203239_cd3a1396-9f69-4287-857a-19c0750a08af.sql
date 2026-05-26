@@ -36,8 +36,8 @@ CREATE POLICY "Service role can manage promoted posts"
   USING ((current_setting('request.jwt.claims', true)::json->>'role')::text = 'service_role');
 
 -- Index for efficient queries
-CREATE INDEX idx_promoted_posts_active ON public.promoted_posts(status, expires_at) WHERE status = 'active';
-CREATE INDEX idx_promoted_posts_user ON public.promoted_posts(user_id);
+CREATE INDEX IF NOT EXISTS idx_promoted_posts_active ON public.promoted_posts(status, expires_at) WHERE status = 'active';
+CREATE INDEX IF NOT EXISTS idx_promoted_posts_user ON public.promoted_posts(user_id);
 
 -- Trigger for updated_at
 CREATE TRIGGER update_promoted_posts_updated_at

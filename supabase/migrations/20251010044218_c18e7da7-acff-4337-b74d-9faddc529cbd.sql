@@ -1,5 +1,5 @@
 -- Close Friends table
-CREATE TABLE public.close_friends (
+CREATE TABLE IF NOT EXISTS public.close_friends (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL,
   friend_user_id UUID NOT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE public.close_friends (
 );
 
 -- User presence/activity status table
-CREATE TABLE public.user_presence (
+CREATE TABLE IF NOT EXISTS public.user_presence (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL UNIQUE,
   status TEXT NOT NULL DEFAULT 'offline',
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS public.stories (
 );
 
 -- Story interactions (polls, questions, etc)
-CREATE TABLE public.story_interactions (
+CREATE TABLE IF NOT EXISTS public.story_interactions (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   story_id UUID NOT NULL REFERENCES public.stories(id) ON DELETE CASCADE,
   interaction_type TEXT NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE public.story_interactions (
 );
 
 -- Story interaction responses
-CREATE TABLE public.story_interaction_responses (
+CREATE TABLE IF NOT EXISTS public.story_interaction_responses (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   interaction_id UUID NOT NULL REFERENCES public.story_interactions(id) ON DELETE CASCADE,
   user_id UUID NOT NULL,

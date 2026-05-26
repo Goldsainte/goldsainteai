@@ -10,7 +10,7 @@
 
 DROP TABLE IF EXISTS agent_applications CASCADE;
 
-CREATE TABLE agent_applications (
+CREATE TABLE IF NOT EXISTS agent_applications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   
   -- Application Status (NO user_id yet - anonymous!)
@@ -92,11 +92,11 @@ CREATE TABLE agent_applications (
 );
 
 -- Indexes for performance
-CREATE INDEX idx_agent_applications_status ON agent_applications(status);
-CREATE INDEX idx_agent_applications_email ON agent_applications(email);
-CREATE INDEX idx_agent_applications_stripe_session ON agent_applications(stripe_verification_session_id);
-CREATE INDEX idx_agent_applications_submitted_at ON agent_applications(submitted_at DESC);
-CREATE INDEX idx_agent_applications_user_id ON agent_applications(user_id);
+CREATE INDEX IF NOT EXISTS idx_agent_applications_status ON agent_applications(status);
+CREATE INDEX IF NOT EXISTS idx_agent_applications_email ON agent_applications(email);
+CREATE INDEX IF NOT EXISTS idx_agent_applications_stripe_session ON agent_applications(stripe_verification_session_id);
+CREATE INDEX IF NOT EXISTS idx_agent_applications_submitted_at ON agent_applications(submitted_at DESC);
+CREATE INDEX IF NOT EXISTS idx_agent_applications_user_id ON agent_applications(user_id);
 
 -- RLS Policies
 ALTER TABLE agent_applications ENABLE ROW LEVEL SECURITY;
@@ -145,7 +145,7 @@ CREATE POLICY "Service role can update applications"
 
 DROP TABLE IF EXISTS brand_applications CASCADE;
 
-CREATE TABLE brand_applications (
+CREATE TABLE IF NOT EXISTS brand_applications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   
   -- Application Status
@@ -201,11 +201,11 @@ CREATE TABLE brand_applications (
 );
 
 -- Indexes for performance
-CREATE INDEX idx_brand_applications_status ON brand_applications(status);
-CREATE INDEX idx_brand_applications_email ON brand_applications(primary_contact_email);
-CREATE INDEX idx_brand_applications_stripe_session ON brand_applications(stripe_verification_session_id);
-CREATE INDEX idx_brand_applications_submitted_at ON brand_applications(submitted_at DESC);
-CREATE INDEX idx_brand_applications_user_id ON brand_applications(user_id);
+CREATE INDEX IF NOT EXISTS idx_brand_applications_status ON brand_applications(status);
+CREATE INDEX IF NOT EXISTS idx_brand_applications_email ON brand_applications(primary_contact_email);
+CREATE INDEX IF NOT EXISTS idx_brand_applications_stripe_session ON brand_applications(stripe_verification_session_id);
+CREATE INDEX IF NOT EXISTS idx_brand_applications_submitted_at ON brand_applications(submitted_at DESC);
+CREATE INDEX IF NOT EXISTS idx_brand_applications_user_id ON brand_applications(user_id);
 
 -- RLS Policies
 ALTER TABLE brand_applications ENABLE ROW LEVEL SECURITY;
@@ -281,9 +281,9 @@ CREATE TABLE IF NOT EXISTS application_audit_log (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX idx_audit_log_application ON application_audit_log(application_id, application_type);
-CREATE INDEX idx_audit_log_created_at ON application_audit_log(created_at DESC);
-CREATE INDEX idx_audit_log_action ON application_audit_log(action);
+CREATE INDEX IF NOT EXISTS idx_audit_log_application ON application_audit_log(application_id, application_type);
+CREATE INDEX IF NOT EXISTS idx_audit_log_created_at ON application_audit_log(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_log_action ON application_audit_log(action);
 
 ALTER TABLE application_audit_log ENABLE ROW LEVEL SECURITY;
 

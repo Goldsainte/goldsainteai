@@ -18,5 +18,5 @@ ALTER TABLE public.journal_related_articles
   CHECK (article_id <> related_article_id);
 
 -- Add GIN index for faster category filtering
-CREATE INDEX idx_journal_articles_categories_gin
+CREATE INDEX IF NOT EXISTS idx_journal_articles_categories_gin
   ON public.journal_articles USING GIN (categories);

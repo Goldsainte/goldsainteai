@@ -12,7 +12,7 @@ ADD COLUMN IF NOT EXISTS inquiry_source TEXT,
 ADD COLUMN IF NOT EXISTS ai_matched_agents UUID[],
 ADD COLUMN IF NOT EXISTS contact_info JSONB;
 
--- Create index for faster lookups
+-- CREATE INDEX IF NOT EXISTS for faster lookups
 CREATE INDEX IF NOT EXISTS idx_agent_inquiries_marketplace_job ON agent_inquiries(marketplace_job_id);
 CREATE INDEX IF NOT EXISTS idx_marketplace_jobs_inquiry_source ON marketplace_jobs(inquiry_source);
 

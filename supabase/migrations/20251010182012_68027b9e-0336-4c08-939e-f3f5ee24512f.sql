@@ -10,7 +10,7 @@ ADD COLUMN allow_resale BOOLEAN DEFAULT false,
 ADD COLUMN resale_commission_percentage NUMERIC DEFAULT 10 CHECK (resale_commission_percentage >= 0 AND resale_commission_percentage <= 100);
 
 -- Create template_usage_transactions table
-CREATE TABLE public.template_usage_transactions (
+CREATE TABLE IF NOT EXISTS public.template_usage_transactions (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   template_id UUID NOT NULL REFERENCES public.itinerary_templates(id) ON DELETE CASCADE,
   original_creator_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -27,7 +27,7 @@ CREATE TABLE public.template_usage_transactions (
 );
 
 -- Create package_resale_transactions table
-CREATE TABLE public.package_resale_transactions (
+CREATE TABLE IF NOT EXISTS public.package_resale_transactions (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   original_package_id UUID NOT NULL REFERENCES public.package_marketing_materials(id) ON DELETE CASCADE,
   original_creator_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -74,12 +74,12 @@ CREATE POLICY "Service role can manage resale transactions"
   USING (((current_setting('request.jwt.claims'::text, true))::json ->> 'role'::text) = 'service_role'::text);
 
 -- Create indexes
-CREATE INDEX idx_template_usage_original_creator ON public.template_usage_transactions(original_creator_id);
-CREATE INDEX idx_template_usage_user_creator ON public.template_usage_transactions(user_creator_id);
-CREATE INDEX idx_template_usage_template ON public.template_usage_transactions(template_id);
-CREATE INDEX idx_package_resale_original_creator ON public.package_resale_transactions(original_creator_id);
-CREATE INDEX idx_package_resale_reseller ON public.package_resale_transactions(reseller_creator_id);
-CREATE INDEX idx_package_resale_booking ON public.package_resale_transactions(booking_id);
+CREATE INDEX IF NOT EXISTS idx_template_usage_original_creator ON public.template_usage_transactions(original_creator_id);
+CREATE INDEX IF NOT EXISTS idx_template_usage_user_creator ON public.template_usage_transactions(user_creator_id);
+CREATE INDEX IF NOT EXISTS idx_template_usage_template ON public.template_usage_transactions(template_id);
+CREATE INDEX IF NOT EXISTS idx_package_resale_original_creator ON public.package_resale_transactions(original_creator_id);
+CREATE INDEX IF NOT EXISTS idx_package_resale_reseller ON public.package_resale_transactions(reseller_creator_id);
+CREATE INDEX IF NOT EXISTS idx_package_resale_booking ON public.package_resale_transactions(booking_id);
 
 -- Function to process template purchase
 CREATE OR REPLACE FUNCTION public.purchase_template_usage(

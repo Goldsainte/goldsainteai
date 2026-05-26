@@ -1,4 +1,4 @@
-CREATE TABLE public.itinerary_products (
+CREATE TABLE IF NOT EXISTS public.itinerary_products (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   creator_id uuid NOT NULL,
   title text NOT NULL,
@@ -33,5 +33,5 @@ BEFORE UPDATE ON public.itinerary_products
 FOR EACH ROW
 EXECUTE FUNCTION public.update_updated_at_column();
 
-CREATE INDEX idx_itinerary_products_creator ON public.itinerary_products(creator_id);
-CREATE INDEX idx_itinerary_products_status ON public.itinerary_products(status);
+CREATE INDEX IF NOT EXISTS idx_itinerary_products_creator ON public.itinerary_products(creator_id);
+CREATE INDEX IF NOT EXISTS idx_itinerary_products_status ON public.itinerary_products(status);

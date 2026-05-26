@@ -1,4 +1,4 @@
-CREATE TABLE public.itinerary_purchases (
+CREATE TABLE IF NOT EXISTS public.itinerary_purchases (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   buyer_id uuid REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   product_id uuid REFERENCES public.itinerary_products(id) ON DELETE CASCADE NOT NULL,
@@ -19,5 +19,5 @@ CREATE POLICY "Creators see sales of their products" ON public.itinerary_purchas
     EXISTS (SELECT 1 FROM public.itinerary_products WHERE id = product_id AND creator_id = auth.uid())
   );
 
-CREATE INDEX idx_itinerary_purchases_buyer ON public.itinerary_purchases(buyer_id);
-CREATE INDEX idx_itinerary_purchases_product ON public.itinerary_purchases(product_id);
+CREATE INDEX IF NOT EXISTS idx_itinerary_purchases_buyer ON public.itinerary_purchases(buyer_id);
+CREATE INDEX IF NOT EXISTS idx_itinerary_purchases_product ON public.itinerary_purchases(product_id);

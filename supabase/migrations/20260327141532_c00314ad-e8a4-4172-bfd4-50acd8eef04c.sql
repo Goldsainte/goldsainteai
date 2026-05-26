@@ -1,6 +1,6 @@
 
 -- Create creator_services table for Fiverr-style service packages
-CREATE TABLE public.creator_services (
+CREATE TABLE IF NOT EXISTS public.creator_services (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   creator_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   title TEXT NOT NULL,

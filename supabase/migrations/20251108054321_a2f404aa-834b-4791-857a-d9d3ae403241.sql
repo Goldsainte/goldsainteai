@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS public.ai_usage_logs (
   error_message TEXT
 );
 
--- Create index for faster queries
+-- CREATE INDEX IF NOT EXISTS for faster queries
 CREATE INDEX IF NOT EXISTS idx_ai_usage_user_date ON public.ai_usage_logs(user_id, created_at DESC);
 
 -- Enable RLS

@@ -20,8 +20,8 @@ CREATE POLICY "Service role can manage rate limits"
   USING (true)
   WITH CHECK (true);
 
--- Create index for faster lookups
-CREATE INDEX idx_rate_limits_lookup ON public.rate_limits(identifier, endpoint, window_start);
+-- CREATE INDEX IF NOT EXISTS for faster lookups
+CREATE INDEX IF NOT EXISTS idx_rate_limits_lookup ON public.rate_limits(identifier, endpoint, window_start);
 
 -- Create function to cleanup old rate limit records (older than 1 hour)
 CREATE OR REPLACE FUNCTION public.cleanup_old_rate_limits()

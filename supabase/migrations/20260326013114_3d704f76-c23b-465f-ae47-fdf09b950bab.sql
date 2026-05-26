@@ -1,4 +1,4 @@
-CREATE TABLE public.creator_social_accounts (
+CREATE TABLE IF NOT EXISTS public.creator_social_accounts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   platform TEXT NOT NULL,

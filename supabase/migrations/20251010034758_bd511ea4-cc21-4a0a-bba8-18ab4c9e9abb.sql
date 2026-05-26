@@ -2,5 +2,5 @@
 ALTER TABLE public.profiles 
 ADD COLUMN IF NOT EXISTS instagram_username text;
 
--- Create index for faster lookups
+-- CREATE INDEX IF NOT EXISTS for faster lookups
 CREATE INDEX IF NOT EXISTS idx_profiles_instagram_username ON public.profiles(instagram_username);

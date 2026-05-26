@@ -137,14 +137,14 @@ CREATE TABLE IF NOT EXISTS public.supplier_partnerships (
 );
 
 -- Indexes
-CREATE INDEX idx_suppliers_type ON public.suppliers(supplier_type);
-CREATE INDEX idx_suppliers_verification ON public.suppliers(verification_status);
-CREATE INDEX idx_suppliers_rating ON public.suppliers(rating);
-CREATE INDEX idx_supplier_reviews_supplier ON public.supplier_reviews(supplier_id);
-CREATE INDEX idx_supplier_reviews_reviewer ON public.supplier_reviews(reviewer_id);
-CREATE INDEX idx_supplier_vetting_supplier ON public.supplier_vetting(supplier_id);
-CREATE INDEX idx_supplier_partnerships_supplier ON public.supplier_partnerships(supplier_id);
-CREATE INDEX idx_supplier_partnerships_creator ON public.supplier_partnerships(creator_id);
+CREATE INDEX IF NOT EXISTS idx_suppliers_type ON public.suppliers(supplier_type);
+CREATE INDEX IF NOT EXISTS idx_suppliers_verification ON public.suppliers(verification_status);
+CREATE INDEX IF NOT EXISTS idx_suppliers_rating ON public.suppliers(rating);
+CREATE INDEX IF NOT EXISTS idx_supplier_reviews_supplier ON public.supplier_reviews(supplier_id);
+CREATE INDEX IF NOT EXISTS idx_supplier_reviews_reviewer ON public.supplier_reviews(reviewer_id);
+CREATE INDEX IF NOT EXISTS idx_supplier_vetting_supplier ON public.supplier_vetting(supplier_id);
+CREATE INDEX IF NOT EXISTS idx_supplier_partnerships_supplier ON public.supplier_partnerships(supplier_id);
+CREATE INDEX IF NOT EXISTS idx_supplier_partnerships_creator ON public.supplier_partnerships(creator_id);
 
 -- Enable RLS
 ALTER TABLE public.suppliers ENABLE ROW LEVEL SECURITY;

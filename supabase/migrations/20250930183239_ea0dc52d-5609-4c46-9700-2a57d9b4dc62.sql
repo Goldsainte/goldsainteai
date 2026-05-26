@@ -1,5 +1,5 @@
 -- Create profiles table for user data
-CREATE TABLE public.profiles (
+CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   username TEXT UNIQUE,
   avatar_url TEXT,
@@ -24,7 +24,7 @@ CREATE POLICY "Users can update their own profile"
   USING (auth.uid() = id);
 
 -- Create favorites table
-CREATE TABLE public.favorites (
+CREATE TABLE IF NOT EXISTS public.favorites (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   favorite_type TEXT NOT NULL CHECK (favorite_type IN ('flight', 'hotel', 'restaurant')),

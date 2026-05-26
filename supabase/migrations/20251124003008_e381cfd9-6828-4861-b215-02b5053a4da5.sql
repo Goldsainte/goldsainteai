@@ -7,7 +7,7 @@ ALTER TABLE agent_applications
   ADD COLUMN IF NOT EXISTS last_name TEXT,
   ADD COLUMN IF NOT EXISTS phone TEXT;
 
--- Create index on email for efficient lookups
+-- CREATE INDEX IF NOT EXISTS on email for efficient lookups
 CREATE INDEX IF NOT EXISTS idx_agent_applications_email ON agent_applications(email);
 
 -- Add email and name fields to brand_applications  

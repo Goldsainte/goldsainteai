@@ -2,7 +2,7 @@
 DROP TABLE IF EXISTS public.travel_packages CASCADE;
 
 -- Create travel_packages table
-CREATE TABLE public.travel_packages (
+CREATE TABLE IF NOT EXISTS public.travel_packages (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL,
   destination TEXT NOT NULL,

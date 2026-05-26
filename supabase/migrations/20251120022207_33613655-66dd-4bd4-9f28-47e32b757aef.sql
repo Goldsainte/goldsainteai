@@ -11,7 +11,7 @@ CREATE TYPE public.brand_engagement_type AS ENUM (
 );
 
 -- 2) Raw events table (append-only event log)
-CREATE TABLE public.brand_engagement_events (
+CREATE TABLE IF NOT EXISTS public.brand_engagement_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
   -- The brand (profile) that received the engagement
@@ -39,7 +39,7 @@ CREATE INDEX IF NOT EXISTS idx_brand_engagement_event_type_time
   ON public.brand_engagement_events (event_type, created_at);
 
 -- 3) Daily aggregate table for fast dashboard queries
-CREATE TABLE public.brand_engagement_daily_stats (
+CREATE TABLE IF NOT EXISTS public.brand_engagement_daily_stats (
   brand_profile_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   event_date DATE NOT NULL,
 
@@ -158,7 +158,7 @@ REVOKE ALL ON FUNCTION public.log_brand_engagement FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.log_brand_engagement TO anon, authenticated;
 
 -- 8) Pinterest-style brand collections
-CREATE TABLE public.brand_collections (
+CREATE TABLE IF NOT EXISTS public.brand_collections (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
   brand_profile_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,

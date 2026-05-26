@@ -6,7 +6,7 @@ ADD COLUMN IF NOT EXISTS is_discoverable BOOLEAN DEFAULT false;
 COMMENT ON COLUMN user_travel_preferences.is_discoverable IS 
 'When true, agents and creators can see this traveler''s preferences to curate matching trips';
 
--- Create index for efficient querying of discoverable travelers
+-- CREATE INDEX IF NOT EXISTS for efficient querying of discoverable travelers
 CREATE INDEX IF NOT EXISTS idx_user_travel_preferences_discoverable 
 ON user_travel_preferences(is_discoverable) 
 WHERE is_discoverable = true;

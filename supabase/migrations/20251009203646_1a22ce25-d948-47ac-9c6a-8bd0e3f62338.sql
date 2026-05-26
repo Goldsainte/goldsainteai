@@ -1,7 +1,7 @@
 -- Add conversation types and status to user_conversations table
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'user_conversations') THEN
-    CREATE TABLE public.user_conversations (
+    CREATE TABLE IF NOT EXISTS public.user_conversations (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       customer_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
       agent_id UUID REFERENCES public.travel_agents(id) ON DELETE CASCADE,
@@ -51,11 +51,11 @@ DO $$ BEGIN
         agent_id IN (SELECT id FROM public.travel_agents WHERE user_id = auth.uid())
       );
 
-    -- Create index for performance
-    CREATE INDEX idx_user_conversations_customer ON public.user_conversations(customer_id);
-    CREATE INDEX idx_user_conversations_agent ON public.user_conversations(agent_id);
-    CREATE INDEX idx_user_conversations_type ON public.user_conversations(conversation_type);
-    CREATE INDEX idx_user_conversations_status ON public.user_conversations(status);
+    -- CREATE INDEX IF NOT EXISTS for performance
+    CREATE INDEX IF NOT EXISTS idx_user_conversations_customer ON public.user_conversations(customer_id);
+    CREATE INDEX IF NOT EXISTS idx_user_conversations_agent ON public.user_conversations(agent_id);
+    CREATE INDEX IF NOT EXISTS idx_user_conversations_type ON public.user_conversations(conversation_type);
+    CREATE INDEX IF NOT EXISTS idx_user_conversations_status ON public.user_conversations(status);
   ELSE
     -- Table exists, add columns if they don't exist
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'user_conversations' AND column_name = 'conversation_type') THEN
@@ -63,7 +63,7 @@ DO $$ BEGIN
         ADD COLUMN conversation_type TEXT NOT NULL DEFAULT 'general',
         ADD CONSTRAINT valid_conversation_type CHECK (conversation_type IN ('primary', 'general', 'channel', 'request'));
       
-      CREATE INDEX idx_user_conversations_type ON public.user_conversations(conversation_type);
+      CREATE INDEX IF NOT EXISTS idx_user_conversations_type ON public.user_conversations(conversation_type);
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'user_conversations' AND column_name = 'status') THEN
@@ -71,7 +71,7 @@ DO $$ BEGIN
         ADD COLUMN status TEXT NOT NULL DEFAULT 'active',
         ADD CONSTRAINT valid_status CHECK (status IN ('active', 'pending', 'accepted', 'rejected', 'archived'));
       
-      CREATE INDEX idx_user_conversations_status ON public.user_conversations(status);
+      CREATE INDEX IF NOT EXISTS idx_user_conversations_status ON public.user_conversations(status);
     END IF;
   END IF;
 END $$;

@@ -140,13 +140,13 @@ CREATE POLICY "reviews_create_own" ON public.agent_reviews
 FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- Add indexes for better performance
-CREATE INDEX idx_marketplace_jobs_user_id ON public.marketplace_jobs(user_id);
-CREATE INDEX idx_marketplace_jobs_status ON public.marketplace_jobs(status);
-CREATE INDEX idx_marketplace_jobs_assigned_agent ON public.marketplace_jobs(assigned_agent_id);
-CREATE INDEX idx_agent_bids_job_id ON public.agent_bids(job_id);
-CREATE INDEX idx_agent_bids_agent_id ON public.agent_bids(agent_id);
-CREATE INDEX idx_marketplace_messages_job_id ON public.marketplace_messages(job_id);
-CREATE INDEX idx_agent_reviews_agent_id ON public.agent_reviews(agent_id);
+CREATE INDEX IF NOT EXISTS idx_marketplace_jobs_user_id ON public.marketplace_jobs(user_id);
+CREATE INDEX IF NOT EXISTS idx_marketplace_jobs_status ON public.marketplace_jobs(status);
+CREATE INDEX IF NOT EXISTS idx_marketplace_jobs_assigned_agent ON public.marketplace_jobs(assigned_agent_id);
+CREATE INDEX IF NOT EXISTS idx_agent_bids_job_id ON public.agent_bids(job_id);
+CREATE INDEX IF NOT EXISTS idx_agent_bids_agent_id ON public.agent_bids(agent_id);
+CREATE INDEX IF NOT EXISTS idx_marketplace_messages_job_id ON public.marketplace_messages(job_id);
+CREATE INDEX IF NOT EXISTS idx_agent_reviews_agent_id ON public.agent_reviews(agent_id);
 
 -- Add triggers for updated_at
 CREATE TRIGGER update_travel_agents_updated_at

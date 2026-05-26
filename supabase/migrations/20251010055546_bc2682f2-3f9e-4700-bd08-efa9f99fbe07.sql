@@ -97,10 +97,10 @@ CREATE POLICY "Anyone can view highlight items"
   USING (true);
 
 -- Create indexes for performance
-CREATE INDEX idx_moments_user_id ON public.moments(user_id);
-CREATE INDEX idx_moments_expires_at ON public.moments(expires_at);
-CREATE INDEX idx_moment_views_moment_id ON public.moment_views(moment_id);
-CREATE INDEX idx_moment_highlights_user_id ON public.moment_highlights(user_id);
+CREATE INDEX IF NOT EXISTS idx_moments_user_id ON public.moments(user_id);
+CREATE INDEX IF NOT EXISTS idx_moments_expires_at ON public.moments(expires_at);
+CREATE INDEX IF NOT EXISTS idx_moment_views_moment_id ON public.moment_views(moment_id);
+CREATE INDEX IF NOT EXISTS idx_moment_highlights_user_id ON public.moment_highlights(user_id);
 
 -- Function to auto-increment view count
 CREATE OR REPLACE FUNCTION increment_moment_view_count()

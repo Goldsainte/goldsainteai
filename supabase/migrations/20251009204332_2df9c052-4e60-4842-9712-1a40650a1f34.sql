@@ -22,7 +22,7 @@ DO $$ BEGIN
   END IF;
 END $$;
 
--- Create table for tagged users in posts
+-- CREATE TABLE IF NOT EXISTS for tagged users in posts
 CREATE TABLE IF NOT EXISTS public.post_user_tags (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id UUID NOT NULL REFERENCES public.travel_posts(id) ON DELETE CASCADE,
@@ -60,7 +60,7 @@ CREATE POLICY "Post owners can delete tags"
     )
   );
 
--- Create index for performance
+-- CREATE INDEX IF NOT EXISTS for performance
 CREATE INDEX IF NOT EXISTS idx_post_user_tags_post ON public.post_user_tags(post_id);
 CREATE INDEX IF NOT EXISTS idx_post_user_tags_user ON public.post_user_tags(tagged_user_id);
 CREATE INDEX IF NOT EXISTS idx_travel_posts_media_type ON public.travel_posts(media_type);

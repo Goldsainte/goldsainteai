@@ -183,11 +183,11 @@ CREATE POLICY "Users can delete their own votes"
   USING (user_id = auth.uid());
 
 -- Create indexes for performance
-CREATE INDEX idx_trip_members_trip_id ON public.trip_members(trip_id);
-CREATE INDEX idx_trip_members_user_id ON public.trip_members(user_id);
-CREATE INDEX idx_trip_suggestions_trip_id ON public.trip_suggestions(trip_id);
-CREATE INDEX idx_trip_votes_suggestion_id ON public.trip_votes(suggestion_id);
-CREATE INDEX idx_trip_votes_user_id ON public.trip_votes(user_id);
+CREATE INDEX IF NOT EXISTS idx_trip_members_trip_id ON public.trip_members(trip_id);
+CREATE INDEX IF NOT EXISTS idx_trip_members_user_id ON public.trip_members(user_id);
+CREATE INDEX IF NOT EXISTS idx_trip_suggestions_trip_id ON public.trip_suggestions(trip_id);
+CREATE INDEX IF NOT EXISTS idx_trip_votes_suggestion_id ON public.trip_votes(suggestion_id);
+CREATE INDEX IF NOT EXISTS idx_trip_votes_user_id ON public.trip_votes(user_id);
 
 -- Create function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION public.update_updated_at_column()

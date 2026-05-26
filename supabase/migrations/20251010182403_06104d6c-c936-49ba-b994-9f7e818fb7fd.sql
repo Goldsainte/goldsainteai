@@ -1,5 +1,5 @@
 -- Create creator_tiers table
-CREATE TABLE public.creator_tiers (
+CREATE TABLE IF NOT EXISTS public.creator_tiers (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   tier_name TEXT NOT NULL UNIQUE CHECK (tier_name IN ('bronze', 'silver', 'gold', 'platinum', 'diamond')),
   tier_level INTEGER NOT NULL UNIQUE,
@@ -21,7 +21,7 @@ CREATE TABLE public.creator_tiers (
 );
 
 -- Create creator_tier_memberships table
-CREATE TABLE public.creator_tier_memberships (
+CREATE TABLE IF NOT EXISTS public.creator_tier_memberships (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   current_tier TEXT NOT NULL REFERENCES public.creator_tiers(tier_name) ON DELETE RESTRICT,
@@ -35,7 +35,7 @@ CREATE TABLE public.creator_tier_memberships (
 );
 
 -- Create tier_progress_metrics table
-CREATE TABLE public.tier_progress_metrics (
+CREATE TABLE IF NOT EXISTS public.tier_progress_metrics (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   current_followers INTEGER DEFAULT 0,
@@ -53,7 +53,7 @@ CREATE TABLE public.tier_progress_metrics (
 );
 
 -- Create tier_upgrade_history table
-CREATE TABLE public.tier_upgrade_history (
+CREATE TABLE IF NOT EXISTS public.tier_upgrade_history (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   from_tier TEXT NOT NULL,
@@ -117,10 +117,10 @@ INSERT INTO public.creator_tiers (tier_name, tier_level, display_name, descripti
   20, true, true);
 
 -- Create indexes
-CREATE INDEX idx_tier_memberships_user ON public.creator_tier_memberships(user_id);
-CREATE INDEX idx_tier_memberships_tier ON public.creator_tier_memberships(current_tier);
-CREATE INDEX idx_tier_progress_user ON public.tier_progress_metrics(user_id);
-CREATE INDEX idx_tier_history_user ON public.tier_upgrade_history(user_id);
+CREATE INDEX IF NOT EXISTS idx_tier_memberships_user ON public.creator_tier_memberships(user_id);
+CREATE INDEX IF NOT EXISTS idx_tier_memberships_tier ON public.creator_tier_memberships(current_tier);
+CREATE INDEX IF NOT EXISTS idx_tier_progress_user ON public.tier_progress_metrics(user_id);
+CREATE INDEX IF NOT EXISTS idx_tier_history_user ON public.tier_upgrade_history(user_id);
 
 -- Trigger for updated_at
 CREATE TRIGGER update_creator_tiers_updated_at

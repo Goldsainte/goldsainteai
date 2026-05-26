@@ -56,13 +56,13 @@ CREATE TABLE IF NOT EXISTS public.storyboard_media_library (
 );
 
 -- Add indexes for efficient querying
-CREATE INDEX idx_media_destination_tags 
+CREATE INDEX IF NOT EXISTS idx_media_destination_tags 
 ON public.storyboard_media_library USING GIN(destination_tags);
 
-CREATE INDEX idx_media_mood_tags 
+CREATE INDEX IF NOT EXISTS idx_media_mood_tags 
 ON public.storyboard_media_library USING GIN(mood_tags);
 
-CREATE INDEX idx_media_created_at 
+CREATE INDEX IF NOT EXISTS idx_media_created_at 
 ON public.storyboard_media_library(created_at DESC);
 
 -- Enable RLS

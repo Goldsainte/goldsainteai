@@ -56,7 +56,7 @@ CREATE POLICY "Service role can insert processed payments" ON public.processed_p
 FOR INSERT
 WITH CHECK (true);
 
--- Create index for fast idempotency checks
+-- CREATE INDEX IF NOT EXISTS for fast idempotency checks
 CREATE INDEX IF NOT EXISTS idx_processed_payments_payment_intent 
 ON public.processed_payments(payment_intent_id);
 

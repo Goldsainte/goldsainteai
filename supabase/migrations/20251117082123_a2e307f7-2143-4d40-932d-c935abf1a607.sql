@@ -11,7 +11,7 @@ ALTER TABLE storyboard_items
   ADD COLUMN IF NOT EXISTS data jsonb DEFAULT '{}'::jsonb,
   ADD COLUMN IF NOT EXISTS sort_index integer DEFAULT 0;
 
--- Create index for efficient sort
+-- CREATE INDEX IF NOT EXISTS for efficient sort
 CREATE INDEX IF NOT EXISTS storyboard_items_sort_idx ON storyboard_items(storyboard_id, sort_index);
 
 -- Update RLS policies for public/shared storyboards visibility

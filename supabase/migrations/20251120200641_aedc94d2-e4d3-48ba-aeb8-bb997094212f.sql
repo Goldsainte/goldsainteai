@@ -59,6 +59,6 @@ CREATE TRIGGER update_brand_profiles_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION public.update_brand_profiles_updated_at();
 
--- Create index for faster lookups
-CREATE INDEX idx_brand_profiles_owner ON public.brand_profiles(owner_user_id);
-CREATE INDEX idx_brand_profiles_verification ON public.brand_profiles(verification_status);
+-- CREATE INDEX IF NOT EXISTS for faster lookups
+CREATE INDEX IF NOT EXISTS idx_brand_profiles_owner ON public.brand_profiles(owner_user_id);
+CREATE INDEX IF NOT EXISTS idx_brand_profiles_verification ON public.brand_profiles(verification_status);

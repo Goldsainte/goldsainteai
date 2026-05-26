@@ -299,11 +299,11 @@ CREATE POLICY "Service role full access to IP tracking"
   USING (((current_setting('request.jwt.claims'::text, true))::json ->> 'role'::text) = 'service_role'::text);
 
 -- Indexes for performance
-CREATE INDEX idx_engagement_rate_limits_user_window ON public.engagement_rate_limits(user_id, action_type, window_start);
-CREATE INDEX idx_suspicious_activity_user ON public.suspicious_activity_logs(user_id, flagged_at);
-CREATE INDEX idx_suspicious_activity_reviewed ON public.suspicious_activity_logs(reviewed, severity);
-CREATE INDEX idx_user_ip_tracking_ip ON public.user_ip_tracking(ip_address, last_seen);
-CREATE INDEX idx_account_restrictions_active ON public.account_restrictions(user_id, is_active, restricted_until);
+CREATE INDEX IF NOT EXISTS idx_engagement_rate_limits_user_window ON public.engagement_rate_limits(user_id, action_type, window_start);
+CREATE INDEX IF NOT EXISTS idx_suspicious_activity_user ON public.suspicious_activity_logs(user_id, flagged_at);
+CREATE INDEX IF NOT EXISTS idx_suspicious_activity_reviewed ON public.suspicious_activity_logs(reviewed, severity);
+CREATE INDEX IF NOT EXISTS idx_user_ip_tracking_ip ON public.user_ip_tracking(ip_address, last_seen);
+CREATE INDEX IF NOT EXISTS idx_account_restrictions_active ON public.account_restrictions(user_id, is_active, restricted_until);
 
 -- Auto-cleanup old rate limit data (keep last 7 days)
 CREATE OR REPLACE FUNCTION public.cleanup_old_rate_limits()

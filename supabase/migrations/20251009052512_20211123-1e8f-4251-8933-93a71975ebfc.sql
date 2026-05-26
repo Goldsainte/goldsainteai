@@ -1,5 +1,5 @@
 -- Create travel posts table for video content
-CREATE TABLE public.travel_posts (
+CREATE TABLE IF NOT EXISTS public.travel_posts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   video_url TEXT NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE public.travel_posts (
 );
 
 -- Create post likes table
-CREATE TABLE public.post_likes (
+CREATE TABLE IF NOT EXISTS public.post_likes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id UUID NOT NULL REFERENCES public.travel_posts(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -26,7 +26,7 @@ CREATE TABLE public.post_likes (
 );
 
 -- Create post comments table
-CREATE TABLE public.post_comments (
+CREATE TABLE IF NOT EXISTS public.post_comments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id UUID NOT NULL REFERENCES public.travel_posts(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -35,7 +35,7 @@ CREATE TABLE public.post_comments (
 );
 
 -- Create user follows table
-CREATE TABLE public.user_follows (
+CREATE TABLE IF NOT EXISTS public.user_follows (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   follower_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   following_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -45,7 +45,7 @@ CREATE TABLE public.user_follows (
 );
 
 -- Create post views tracking
-CREATE TABLE public.post_views (
+CREATE TABLE IF NOT EXISTS public.post_views (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id UUID NOT NULL REFERENCES public.travel_posts(id) ON DELETE CASCADE,
   user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
@@ -54,7 +54,7 @@ CREATE TABLE public.post_views (
 );
 
 -- Create creator earnings tracking (for future monetization)
-CREATE TABLE public.creator_earnings (
+CREATE TABLE IF NOT EXISTS public.creator_earnings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   post_id UUID REFERENCES public.travel_posts(id) ON DELETE SET NULL,
@@ -66,15 +66,15 @@ CREATE TABLE public.creator_earnings (
 );
 
 -- Create indexes for performance
-CREATE INDEX idx_travel_posts_user_id ON public.travel_posts(user_id);
-CREATE INDEX idx_travel_posts_created_at ON public.travel_posts(created_at DESC);
-CREATE INDEX idx_travel_posts_status ON public.travel_posts(status);
-CREATE INDEX idx_post_likes_post_id ON public.post_likes(post_id);
-CREATE INDEX idx_post_likes_user_id ON public.post_likes(user_id);
-CREATE INDEX idx_post_comments_post_id ON public.post_comments(post_id);
-CREATE INDEX idx_user_follows_follower ON public.user_follows(follower_id);
-CREATE INDEX idx_user_follows_following ON public.user_follows(following_id);
-CREATE INDEX idx_post_views_post_id ON public.post_views(post_id);
+CREATE INDEX IF NOT EXISTS idx_travel_posts_user_id ON public.travel_posts(user_id);
+CREATE INDEX IF NOT EXISTS idx_travel_posts_created_at ON public.travel_posts(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_travel_posts_status ON public.travel_posts(status);
+CREATE INDEX IF NOT EXISTS idx_post_likes_post_id ON public.post_likes(post_id);
+CREATE INDEX IF NOT EXISTS idx_post_likes_user_id ON public.post_likes(user_id);
+CREATE INDEX IF NOT EXISTS idx_post_comments_post_id ON public.post_comments(post_id);
+CREATE INDEX IF NOT EXISTS idx_user_follows_follower ON public.user_follows(follower_id);
+CREATE INDEX IF NOT EXISTS idx_user_follows_following ON public.user_follows(following_id);
+CREATE INDEX IF NOT EXISTS idx_post_views_post_id ON public.post_views(post_id);
 
 -- Enable RLS
 ALTER TABLE public.travel_posts ENABLE ROW LEVEL SECURITY;

@@ -3,7 +3,7 @@ ALTER TABLE public.bookings
 ADD COLUMN user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL;
 
 -- Add index for faster user booking queries
-CREATE INDEX idx_bookings_user_id ON public.bookings(user_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_user_id ON public.bookings(user_id);
 
 -- Update bookings RLS policies to allow users to view their own bookings
 DROP POLICY IF EXISTS "bookings_service_role_access" ON public.bookings;
@@ -91,4 +91,4 @@ FOR DELETE
 USING (auth.uid() = user_id);
 
 -- Add index for faster search history queries
-CREATE INDEX idx_search_history_user_id ON public.search_history(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_search_history_user_id ON public.search_history(user_id, created_at DESC);

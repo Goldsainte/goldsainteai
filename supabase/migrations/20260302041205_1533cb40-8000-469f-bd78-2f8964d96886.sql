@@ -1,5 +1,5 @@
 
-CREATE TABLE public.profile_reviews (
+CREATE TABLE IF NOT EXISTS public.profile_reviews (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   reviewer_id UUID NOT NULL,
   reviewee_id UUID NOT NULL,
@@ -22,4 +22,5 @@ CREATE POLICY "Users can delete own reviews"
   ON public.profile_reviews FOR DELETE
   USING (auth.uid() = reviewer_id);
 
-CREATE INDEX idx_profile_reviews_reviewee ON public.profile_reviews(reviewee_id);
+CREATE INDEX IF NOT EXISTS idx_profile_reviews_reviewee ON public.profile_reviews(reviewee_id);
+

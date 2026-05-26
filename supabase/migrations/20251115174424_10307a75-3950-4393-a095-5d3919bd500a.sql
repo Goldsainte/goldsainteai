@@ -2,7 +2,7 @@
 drop table if exists public.bookings cascade;
 
 -- Create new bookings table for trips
-create table public.bookings (
+CREATE TABLE IF NOT EXISTS public.bookings (
   id uuid primary key default gen_random_uuid(),
   trip_id uuid not null references public.trips(id) on delete cascade,
   traveler_id uuid not null,
@@ -20,10 +20,10 @@ create table public.bookings (
   updated_at timestamptz not null default now()
 );
 
-create index idx_bookings_trip_id on public.bookings(trip_id);
-create index idx_bookings_traveler_id on public.bookings(traveler_id);
-create index idx_bookings_agent_id on public.bookings(agent_id);
-create index idx_bookings_creator_id on public.bookings(creator_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_trip_id on public.bookings(trip_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_traveler_id on public.bookings(traveler_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_agent_id on public.bookings(agent_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_creator_id on public.bookings(creator_id);
 
 alter table public.bookings enable row level security;
 
@@ -40,7 +40,7 @@ on public.bookings for select
 using (auth.uid() = creator_id);
 
 -- Create payment_intents table
-create table public.payment_intents (
+CREATE TABLE IF NOT EXISTS public.payment_intents (
   id uuid primary key default gen_random_uuid(),
   booking_id uuid not null references public.bookings(id) on delete cascade,
   provider text not null default 'stripe',
@@ -53,7 +53,7 @@ create table public.payment_intents (
   updated_at timestamptz not null default now()
 );
 
-create index idx_payment_intents_booking_id on public.payment_intents(booking_id);
+CREATE INDEX IF NOT EXISTS idx_payment_intents_booking_id on public.payment_intents(booking_id);
 
 alter table public.payment_intents enable row level security;
 

@@ -35,6 +35,6 @@ CREATE POLICY "Users can delete their own reactions"
   FOR DELETE
   USING (auth.uid() = user_id);
 
--- Create index for faster queries
+-- CREATE INDEX IF NOT EXISTS for faster queries
 CREATE INDEX IF NOT EXISTS idx_moment_reactions_moment_id ON public.moment_reactions(moment_id);
 CREATE INDEX IF NOT EXISTS idx_moment_reactions_user_id ON public.moment_reactions(user_id);

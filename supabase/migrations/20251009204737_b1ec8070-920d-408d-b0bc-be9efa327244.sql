@@ -1,5 +1,5 @@
 -- Create post_collaborators table for collaborative posts
-CREATE TABLE public.post_collaborators (
+CREATE TABLE IF NOT EXISTS public.post_collaborators (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id UUID NOT NULL REFERENCES public.travel_posts(id) ON DELETE CASCADE,
   collaborator_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -41,9 +41,9 @@ CREATE POLICY "Post owners can delete collaboration invites"
     post_id IN (SELECT id FROM public.travel_posts WHERE user_id = auth.uid())
   );
 
--- Create index for performance
-CREATE INDEX idx_post_collaborators_post_id ON public.post_collaborators(post_id);
-CREATE INDEX idx_post_collaborators_collaborator_id ON public.post_collaborators(collaborator_id);
+-- CREATE INDEX IF NOT EXISTS for performance
+CREATE INDEX IF NOT EXISTS idx_post_collaborators_post_id ON public.post_collaborators(post_id);
+CREATE INDEX IF NOT EXISTS idx_post_collaborators_collaborator_id ON public.post_collaborators(collaborator_id);
 
 -- Notification trigger for collaboration invites
 CREATE OR REPLACE FUNCTION public.notify_collaboration_invite()

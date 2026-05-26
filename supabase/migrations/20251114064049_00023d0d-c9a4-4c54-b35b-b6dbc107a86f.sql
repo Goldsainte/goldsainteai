@@ -1,4 +1,4 @@
--- Create table for Facebook OAuth credentials
+-- CREATE TABLE IF NOT EXISTS for Facebook OAuth credentials
 CREATE TABLE IF NOT EXISTS public.facebook_signin_credentials (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   app_id TEXT NOT NULL,

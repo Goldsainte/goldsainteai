@@ -1,5 +1,5 @@
 -- Create collections table
-CREATE TABLE public.post_collections (
+CREATE TABLE IF NOT EXISTS public.post_collections (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL,
   name TEXT NOT NULL,
@@ -10,8 +10,8 @@ CREATE TABLE public.post_collections (
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
--- Create table to store which posts are in which collections
-CREATE TABLE public.collection_posts (
+-- CREATE TABLE IF NOT EXISTS to store which posts are in which collections
+CREATE TABLE IF NOT EXISTS public.collection_posts (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   collection_id UUID NOT NULL REFERENCES public.post_collections(id) ON DELETE CASCADE,
   post_id UUID NOT NULL REFERENCES public.travel_posts(id) ON DELETE CASCADE,

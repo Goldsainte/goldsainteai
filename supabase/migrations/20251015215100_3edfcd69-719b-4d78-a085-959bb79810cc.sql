@@ -1,4 +1,7 @@
 -- Insert 7 diverse test travel agents linked to verified existing users
+-- Wrapped in exception handler: seed user IDs may not exist in all environments
+DO $$
+BEGIN
 INSERT INTO public.travel_agents (
   user_id,
   agency_name,
@@ -135,3 +138,8 @@ INSERT INTO public.travel_agents (
     true
   )
 ON CONFLICT (user_id) DO NOTHING;
+EXCEPTION
+  WHEN foreign_key_violation THEN
+    -- Seed user IDs don't exist in this environment, skip silently
+    NULL;
+END $$;

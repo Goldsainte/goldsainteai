@@ -34,11 +34,11 @@ CREATE TABLE IF NOT EXISTS trip_contracts (
 );
 
 -- Add indexes for performance
-CREATE INDEX idx_trip_contracts_trip_id ON trip_contracts(trip_id);
-CREATE INDEX idx_trip_contracts_agent_id ON trip_contracts(agent_id);
-CREATE INDEX idx_trip_contracts_traveler_id ON trip_contracts(traveler_id);
-CREATE INDEX idx_trip_contracts_status ON trip_contracts(status);
-CREATE INDEX idx_trip_contracts_created_at ON trip_contracts(created_at);
+CREATE INDEX IF NOT EXISTS idx_trip_contracts_trip_id ON trip_contracts(trip_id);
+CREATE INDEX IF NOT EXISTS idx_trip_contracts_agent_id ON trip_contracts(agent_id);
+CREATE INDEX IF NOT EXISTS idx_trip_contracts_traveler_id ON trip_contracts(traveler_id);
+CREATE INDEX IF NOT EXISTS idx_trip_contracts_status ON trip_contracts(status);
+CREATE INDEX IF NOT EXISTS idx_trip_contracts_created_at ON trip_contracts(created_at);
 
 -- Enable RLS
 ALTER TABLE trip_contracts ENABLE ROW LEVEL SECURITY;

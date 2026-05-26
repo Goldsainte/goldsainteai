@@ -5,5 +5,5 @@ ADD COLUMN IF NOT EXISTS preferred_language TEXT DEFAULT 'en' CHECK (preferred_l
 -- Add comment for documentation
 COMMENT ON COLUMN public.profiles.preferred_language IS 'User''s preferred interface language (en, es, fr, de, it, pt)';
 
--- Create index for faster queries
+-- CREATE INDEX IF NOT EXISTS for faster queries
 CREATE INDEX IF NOT EXISTS idx_profiles_preferred_language ON public.profiles(preferred_language);

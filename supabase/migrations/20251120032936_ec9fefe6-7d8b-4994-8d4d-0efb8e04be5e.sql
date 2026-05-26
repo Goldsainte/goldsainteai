@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS public.trip_internal_notes (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_trip_internal_notes_trip ON public.trip_internal_notes(trip_request_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_trip_internal_notes_trip ON public.trip_internal_notes(trip_request_id, created_at DESC);
 
 ALTER TABLE public.trip_internal_notes ENABLE ROW LEVEL SECURITY;
 
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS public.trip_files (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_trip_files_trip ON public.trip_files(trip_request_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_trip_files_trip ON public.trip_files(trip_request_id, created_at DESC);
 
 ALTER TABLE public.trip_files ENABLE ROW LEVEL SECURITY;
 

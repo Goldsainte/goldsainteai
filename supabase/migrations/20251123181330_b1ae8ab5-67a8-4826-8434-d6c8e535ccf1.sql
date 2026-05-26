@@ -48,9 +48,9 @@ CREATE TABLE IF NOT EXISTS brand_applications (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX idx_brand_applications_status ON brand_applications(admin_status);
-CREATE INDEX idx_brand_applications_stripe_session ON brand_applications(stripe_verification_session_id);
-CREATE INDEX idx_brand_applications_email ON brand_applications(primary_contact_email);
+CREATE INDEX IF NOT EXISTS idx_brand_applications_status ON brand_applications(admin_status);
+CREATE INDEX IF NOT EXISTS idx_brand_applications_stripe_session ON brand_applications(stripe_verification_session_id);
+CREATE INDEX IF NOT EXISTS idx_brand_applications_email ON brand_applications(primary_contact_email);
 
 -- ============================================================================
 -- 2. UPDATE agent_applications TABLE
@@ -109,10 +109,10 @@ CREATE TABLE IF NOT EXISTS admin_users (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX idx_admin_users_user_id ON admin_users(user_id);
-CREATE INDEX idx_admin_users_agent_approval ON admin_users(can_approve_agents) 
+CREATE INDEX IF NOT EXISTS idx_admin_users_user_id ON admin_users(user_id);
+CREATE INDEX IF NOT EXISTS idx_admin_users_agent_approval ON admin_users(can_approve_agents) 
 WHERE can_approve_agents = true;
-CREATE INDEX idx_admin_users_brand_approval ON admin_users(can_approve_brands) 
+CREATE INDEX IF NOT EXISTS idx_admin_users_brand_approval ON admin_users(can_approve_brands) 
 WHERE can_approve_brands = true;
 
 -- ============================================================================

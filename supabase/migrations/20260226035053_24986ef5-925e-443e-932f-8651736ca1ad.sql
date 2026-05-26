@@ -1,6 +1,6 @@
 
 -- Create proposal_attachments table
-CREATE TABLE public.proposal_attachments (
+CREATE TABLE IF NOT EXISTS public.proposal_attachments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   proposal_id UUID REFERENCES public.trip_proposals(id) ON DELETE CASCADE,
   uploaded_by UUID NOT NULL,

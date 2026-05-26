@@ -1,5 +1,5 @@
 -- Create journal_creators table (author profiles)
-CREATE TABLE public.journal_creators (
+CREATE TABLE IF NOT EXISTS public.journal_creators (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   name TEXT NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE public.journal_creators (
 );
 
 -- Create journal_articles table (main article table)
-CREATE TABLE public.journal_articles (
+CREATE TABLE IF NOT EXISTS public.journal_articles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE public.journal_articles (
 );
 
 -- Create journal_article_blocks table (rich content blocks)
-CREATE TABLE public.journal_article_blocks (
+CREATE TABLE IF NOT EXISTS public.journal_article_blocks (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   article_id UUID REFERENCES public.journal_articles(id) ON DELETE CASCADE NOT NULL,
   block_order INTEGER NOT NULL,
@@ -50,7 +50,7 @@ CREATE TABLE public.journal_article_blocks (
 );
 
 -- Create journal_related_articles table (many-to-many relationship)
-CREATE TABLE public.journal_related_articles (
+CREATE TABLE IF NOT EXISTS public.journal_related_articles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   article_id UUID REFERENCES public.journal_articles(id) ON DELETE CASCADE NOT NULL,
   related_article_id UUID REFERENCES public.journal_articles(id) ON DELETE CASCADE NOT NULL,
@@ -58,7 +58,7 @@ CREATE TABLE public.journal_related_articles (
 );
 
 -- Create journal_analytics table (view tracking)
-CREATE TABLE public.journal_analytics (
+CREATE TABLE IF NOT EXISTS public.journal_analytics (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   article_id UUID REFERENCES public.journal_articles(id) ON DELETE CASCADE NOT NULL,
   user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
@@ -70,13 +70,13 @@ CREATE TABLE public.journal_analytics (
 );
 
 -- Create indexes for performance
-CREATE INDEX idx_journal_articles_slug ON public.journal_articles(slug);
-CREATE INDEX idx_journal_articles_status ON public.journal_articles(status);
-CREATE INDEX idx_journal_articles_publish_date ON public.journal_articles(publish_date DESC);
-CREATE INDEX idx_journal_articles_creator ON public.journal_articles(creator_id);
-CREATE INDEX idx_journal_article_blocks_article ON public.journal_article_blocks(article_id, block_order);
-CREATE INDEX idx_journal_analytics_article ON public.journal_analytics(article_id);
-CREATE INDEX idx_journal_creators_slug ON public.journal_creators(slug);
+CREATE INDEX IF NOT EXISTS idx_journal_articles_slug ON public.journal_articles(slug);
+CREATE INDEX IF NOT EXISTS idx_journal_articles_status ON public.journal_articles(status);
+CREATE INDEX IF NOT EXISTS idx_journal_articles_publish_date ON public.journal_articles(publish_date DESC);
+CREATE INDEX IF NOT EXISTS idx_journal_articles_creator ON public.journal_articles(creator_id);
+CREATE INDEX IF NOT EXISTS idx_journal_article_blocks_article ON public.journal_article_blocks(article_id, block_order);
+CREATE INDEX IF NOT EXISTS idx_journal_analytics_article ON public.journal_analytics(article_id);
+CREATE INDEX IF NOT EXISTS idx_journal_creators_slug ON public.journal_creators(slug);
 
 -- Enable Row Level Security
 ALTER TABLE public.journal_creators ENABLE ROW LEVEL SECURITY;

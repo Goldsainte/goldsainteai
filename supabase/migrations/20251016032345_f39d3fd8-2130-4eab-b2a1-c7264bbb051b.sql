@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS public.oauth_states (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_oauth_states_state ON public.oauth_states(state);
-CREATE INDEX idx_oauth_states_expires ON public.oauth_states(expires_at);
+CREATE INDEX IF NOT EXISTS idx_oauth_states_state ON public.oauth_states(state);
+CREATE INDEX IF NOT EXISTS idx_oauth_states_expires ON public.oauth_states(expires_at);
 
 -- RLS policies
 ALTER TABLE public.oauth_states ENABLE ROW LEVEL SECURITY;

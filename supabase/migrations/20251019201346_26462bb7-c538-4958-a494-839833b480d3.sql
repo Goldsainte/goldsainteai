@@ -1,5 +1,5 @@
--- Create table for Apple Sign-In credentials
-CREATE TABLE public.apple_signin_credentials (
+-- CREATE TABLE IF NOT EXISTS for Apple Sign-In credentials
+CREATE TABLE IF NOT EXISTS public.apple_signin_credentials (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   p8_key TEXT NOT NULL,

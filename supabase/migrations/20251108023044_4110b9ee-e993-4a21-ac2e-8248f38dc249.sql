@@ -1,5 +1,5 @@
 -- Create notifications table
-CREATE TABLE public.trip_notifications (
+CREATE TABLE IF NOT EXISTS public.trip_notifications (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL,
   trip_id UUID NOT NULL REFERENCES public.group_trips(id) ON DELETE CASCADE,
@@ -34,10 +34,10 @@ CREATE POLICY "Users can delete own notifications"
   USING (user_id = auth.uid());
 
 -- Create indexes
-CREATE INDEX idx_trip_notifications_user ON public.trip_notifications(user_id);
-CREATE INDEX idx_trip_notifications_trip ON public.trip_notifications(trip_id);
-CREATE INDEX idx_trip_notifications_read ON public.trip_notifications(read);
-CREATE INDEX idx_trip_notifications_created ON public.trip_notifications(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_trip_notifications_user ON public.trip_notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_trip_notifications_trip ON public.trip_notifications(trip_id);
+CREATE INDEX IF NOT EXISTS idx_trip_notifications_read ON public.trip_notifications(read);
+CREATE INDEX IF NOT EXISTS idx_trip_notifications_created ON public.trip_notifications(created_at DESC);
 
 -- Enable realtime
 ALTER PUBLICATION supabase_realtime ADD TABLE public.trip_notifications;
@@ -122,7 +122,7 @@ BEGIN
     PERFORM public.notify_trip_members(
       v_suggestion.trip_id,
       'high_votes',
-      '🔥 Popular Suggestion!',
+      'ðŸ”¥ Popular Suggestion!',
       '"' || v_suggestion.title || '" has reached 5 upvotes!',
       jsonb_build_object('suggestion_id', v_suggestion.id)
     );

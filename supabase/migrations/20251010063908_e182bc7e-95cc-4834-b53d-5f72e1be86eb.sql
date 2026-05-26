@@ -40,10 +40,10 @@ CREATE POLICY "Creators can update partnership status"
   FOR UPDATE
   USING (auth.uid() = creator_id);
 
--- Create index for faster queries
-CREATE INDEX idx_brand_partnerships_creator ON public.brand_partnerships(creator_id);
-CREATE INDEX idx_brand_partnerships_brand ON public.brand_partnerships(brand_id);
-CREATE INDEX idx_brand_partnerships_status ON public.brand_partnerships(status);
+-- CREATE INDEX IF NOT EXISTS for faster queries
+CREATE INDEX IF NOT EXISTS idx_brand_partnerships_creator ON public.brand_partnerships(creator_id);
+CREATE INDEX IF NOT EXISTS idx_brand_partnerships_brand ON public.brand_partnerships(brand_id);
+CREATE INDEX IF NOT EXISTS idx_brand_partnerships_status ON public.brand_partnerships(status);
 
 -- Create updated_at trigger
 CREATE TRIGGER update_brand_partnerships_updated_at

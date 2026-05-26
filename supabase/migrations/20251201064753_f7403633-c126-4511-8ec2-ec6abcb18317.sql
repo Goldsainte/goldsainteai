@@ -1,5 +1,5 @@
 -- Create dm_conversations table for conversation threads
-CREATE TABLE public.dm_conversations (
+CREATE TABLE IF NOT EXISTS public.dm_conversations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   participant_1 UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   participant_2 UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -17,7 +17,7 @@ CREATE TABLE public.dm_conversations (
 );
 
 -- Create direct_messages table
-CREATE TABLE public.direct_messages (
+CREATE TABLE IF NOT EXISTS public.direct_messages (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   conversation_id UUID NOT NULL REFERENCES public.dm_conversations(id) ON DELETE CASCADE,
   sender_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -33,7 +33,7 @@ CREATE TABLE public.direct_messages (
 );
 
 -- Create message_settings table for privacy controls
-CREATE TABLE public.message_settings (
+CREATE TABLE IF NOT EXISTS public.message_settings (
   user_id UUID PRIMARY KEY REFERENCES public.profiles(id) ON DELETE CASCADE,
   who_can_message TEXT DEFAULT 'everyone' CHECK (who_can_message IN ('everyone', 'verified_only', 'nobody')),
   filter_requests BOOLEAN DEFAULT TRUE,
@@ -45,14 +45,14 @@ CREATE TABLE public.message_settings (
 );
 
 -- Create indexes for performance
-CREATE INDEX idx_dm_conversations_participant_1 ON public.dm_conversations(participant_1);
-CREATE INDEX idx_dm_conversations_participant_2 ON public.dm_conversations(participant_2);
-CREATE INDEX idx_dm_conversations_status ON public.dm_conversations(status);
-CREATE INDEX idx_dm_conversations_last_message ON public.dm_conversations(last_message_at DESC);
-CREATE INDEX idx_direct_messages_conversation ON public.direct_messages(conversation_id);
-CREATE INDEX idx_direct_messages_sender ON public.direct_messages(sender_id);
-CREATE INDEX idx_direct_messages_created ON public.direct_messages(created_at DESC);
-CREATE INDEX idx_direct_messages_unread ON public.direct_messages(conversation_id, is_read) WHERE is_read = FALSE;
+CREATE INDEX IF NOT EXISTS idx_dm_conversations_participant_1 ON public.dm_conversations(participant_1);
+CREATE INDEX IF NOT EXISTS idx_dm_conversations_participant_2 ON public.dm_conversations(participant_2);
+CREATE INDEX IF NOT EXISTS idx_dm_conversations_status ON public.dm_conversations(status);
+CREATE INDEX IF NOT EXISTS idx_dm_conversations_last_message ON public.dm_conversations(last_message_at DESC);
+CREATE INDEX IF NOT EXISTS idx_direct_messages_conversation ON public.direct_messages(conversation_id);
+CREATE INDEX IF NOT EXISTS idx_direct_messages_sender ON public.direct_messages(sender_id);
+CREATE INDEX IF NOT EXISTS idx_direct_messages_created ON public.direct_messages(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_direct_messages_unread ON public.direct_messages(conversation_id, is_read) WHERE is_read = FALSE;
 
 -- Enable RLS
 ALTER TABLE public.dm_conversations ENABLE ROW LEVEL SECURITY;

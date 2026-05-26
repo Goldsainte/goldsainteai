@@ -2,7 +2,7 @@
 DROP TABLE IF EXISTS public.booking_cancellations CASCADE;
 
 -- Create booking_cancellations table
-CREATE TABLE public.booking_cancellations (
+CREATE TABLE IF NOT EXISTS public.booking_cancellations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   booking_id UUID NOT NULL REFERENCES public.trip_bookings(id) ON DELETE CASCADE,
   requested_by UUID NOT NULL,

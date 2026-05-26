@@ -1,5 +1,5 @@
 -- Create agent packages table (trips with backend pricing)
-CREATE TABLE public.agent_packages (
+CREATE TABLE IF NOT EXISTS public.agent_packages (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   agent_id UUID NOT NULL REFERENCES public.travel_agents(id) ON DELETE CASCADE,
   package_name TEXT NOT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE public.agent_packages (
 );
 
 -- Create influencer promotions table
-CREATE TABLE public.influencer_promotions (
+CREATE TABLE IF NOT EXISTS public.influencer_promotions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   package_id UUID NOT NULL REFERENCES public.agent_packages(id) ON DELETE CASCADE,
   influencer_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -63,7 +63,7 @@ CREATE TABLE public.influencer_promotions (
 );
 
 -- Create shared commission bookings table
-CREATE TABLE public.shared_commission_bookings (
+CREATE TABLE IF NOT EXISTS public.shared_commission_bookings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   package_id UUID NOT NULL REFERENCES public.agent_packages(id),
   promotion_id UUID REFERENCES public.influencer_promotions(id),
@@ -103,7 +103,7 @@ CREATE TABLE public.shared_commission_bookings (
 );
 
 -- Create commission payout requests table
-CREATE TABLE public.commission_payout_requests (
+CREATE TABLE IF NOT EXISTS public.commission_payout_requests (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   user_type TEXT NOT NULL CHECK (user_type IN ('agent', 'influencer')),
@@ -255,11 +255,11 @@ CREATE TRIGGER update_commission_payout_requests_updated_at
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
 -- Create indexes for performance
-CREATE INDEX idx_agent_packages_agent_id ON public.agent_packages(agent_id);
-CREATE INDEX idx_agent_packages_active ON public.agent_packages(is_active) WHERE is_active = true;
-CREATE INDEX idx_influencer_promotions_package ON public.influencer_promotions(package_id);
-CREATE INDEX idx_influencer_promotions_influencer ON public.influencer_promotions(influencer_id);
-CREATE INDEX idx_influencer_promotions_promo_code ON public.influencer_promotions(promo_code);
-CREATE INDEX idx_shared_bookings_package ON public.shared_commission_bookings(package_id);
-CREATE INDEX idx_shared_bookings_promotion ON public.shared_commission_bookings(promotion_id);
-CREATE INDEX idx_commission_payouts_user ON public.commission_payout_requests(user_id);
+CREATE INDEX IF NOT EXISTS idx_agent_packages_agent_id ON public.agent_packages(agent_id);
+CREATE INDEX IF NOT EXISTS idx_agent_packages_active ON public.agent_packages(is_active) WHERE is_active = true;
+CREATE INDEX IF NOT EXISTS idx_influencer_promotions_package ON public.influencer_promotions(package_id);
+CREATE INDEX IF NOT EXISTS idx_influencer_promotions_influencer ON public.influencer_promotions(influencer_id);
+CREATE INDEX IF NOT EXISTS idx_influencer_promotions_promo_code ON public.influencer_promotions(promo_code);
+CREATE INDEX IF NOT EXISTS idx_shared_bookings_package ON public.shared_commission_bookings(package_id);
+CREATE INDEX IF NOT EXISTS idx_shared_bookings_promotion ON public.shared_commission_bookings(promotion_id);
+CREATE INDEX IF NOT EXISTS idx_commission_payouts_user ON public.commission_payout_requests(user_id);

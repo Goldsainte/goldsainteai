@@ -1,5 +1,5 @@
 -- Create dispute submissions table
-CREATE TABLE public.dispute_submissions (
+CREATE TABLE IF NOT EXISTS public.dispute_submissions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id),
   name TEXT NOT NULL,

@@ -16,7 +16,7 @@ ADD COLUMN IF NOT EXISTS stripe_connect_payouts_enabled BOOLEAN DEFAULT false,
 ADD COLUMN IF NOT EXISTS stripe_connect_created_at TIMESTAMPTZ,
 ADD COLUMN IF NOT EXISTS stripe_connect_last_updated TIMESTAMPTZ;
 
--- Create index for efficient lookups
+-- CREATE INDEX IF NOT EXISTS for efficient lookups
 CREATE INDEX IF NOT EXISTS idx_agent_applications_stripe_account 
 ON agent_applications(stripe_connect_account_id) WHERE stripe_connect_account_id IS NOT NULL;
 

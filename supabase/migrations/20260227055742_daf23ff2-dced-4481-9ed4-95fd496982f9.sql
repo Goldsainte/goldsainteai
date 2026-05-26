@@ -1,6 +1,6 @@
 
 -- Track Unsplash photo usage per city to prevent duplicate covers
-CREATE TABLE public.city_image_usage (
+CREATE TABLE IF NOT EXISTS public.city_image_usage (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   city_slug TEXT NOT NULL,
   unsplash_photo_id TEXT NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE public.city_image_usage (
   UNIQUE(city_slug, unsplash_photo_id)
 );
 
-CREATE INDEX idx_city_image_city_slug ON public.city_image_usage(city_slug);
+CREATE INDEX IF NOT EXISTS idx_city_image_city_slug ON public.city_image_usage(city_slug);
 
 -- RLS: public read, service-role write
 ALTER TABLE public.city_image_usage ENABLE ROW LEVEL SECURITY;
@@ -29,3 +29,4 @@ CREATE POLICY "Service role can update city image usage"
   ON public.city_image_usage FOR UPDATE
   USING (true)
   WITH CHECK (true);
+

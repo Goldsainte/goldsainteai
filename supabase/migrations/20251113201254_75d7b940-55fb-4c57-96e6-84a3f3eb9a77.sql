@@ -1,5 +1,5 @@
 -- Create packaged_trips table for consumer marketplace
-CREATE TABLE public.packaged_trips (
+CREATE TABLE IF NOT EXISTS public.packaged_trips (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   
   -- Basic trip information
@@ -115,12 +115,12 @@ USING (
 );
 
 -- Create indexes for performance
-CREATE INDEX idx_packaged_trips_status ON public.packaged_trips(status) WHERE status = 'published';
-CREATE INDEX idx_packaged_trips_destination ON public.packaged_trips(destination);
-CREATE INDEX idx_packaged_trips_creator ON public.packaged_trips(creator_id);
-CREATE INDEX idx_packaged_trips_agent ON public.packaged_trips(agent_id);
-CREATE INDEX idx_packaged_trips_tags ON public.packaged_trips USING GIN(tags);
-CREATE INDEX idx_packaged_trips_featured ON public.packaged_trips(is_featured) WHERE is_featured = true;
+CREATE INDEX IF NOT EXISTS idx_packaged_trips_status ON public.packaged_trips(status) WHERE status = 'published';
+CREATE INDEX IF NOT EXISTS idx_packaged_trips_destination ON public.packaged_trips(destination);
+CREATE INDEX IF NOT EXISTS idx_packaged_trips_creator ON public.packaged_trips(creator_id);
+CREATE INDEX IF NOT EXISTS idx_packaged_trips_agent ON public.packaged_trips(agent_id);
+CREATE INDEX IF NOT EXISTS idx_packaged_trips_tags ON public.packaged_trips USING GIN(tags);
+CREATE INDEX IF NOT EXISTS idx_packaged_trips_featured ON public.packaged_trips(is_featured) WHERE is_featured = true;
 
 -- Create trigger for updated_at
 CREATE TRIGGER update_packaged_trips_updated_at

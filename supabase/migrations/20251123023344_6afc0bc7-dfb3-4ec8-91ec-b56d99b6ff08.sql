@@ -13,10 +13,10 @@ ADD COLUMN IF NOT EXISTS source TEXT;
 ALTER TABLE public.storyboard_items 
 ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}'::jsonb;
 
--- Create index on kind for filtering by asset type
+-- CREATE INDEX IF NOT EXISTS on kind for filtering by asset type
 CREATE INDEX IF NOT EXISTS idx_storyboard_items_kind ON public.storyboard_items(kind);
 
--- Create index on source for tracking origins
+-- CREATE INDEX IF NOT EXISTS on source for tracking origins
 CREATE INDEX IF NOT EXISTS idx_storyboard_items_source ON public.storyboard_items(source);
 
 -- Create GIN index on metadata for efficient JSONB queries

@@ -15,7 +15,7 @@ DROP CONSTRAINT IF EXISTS trip_proposals_cancellation_policy_id_fkey;
 -- Recreate cancellation_policies table properly
 DROP TABLE IF EXISTS cancellation_policies CASCADE;
 
-CREATE TABLE cancellation_policies (
+CREATE TABLE IF NOT EXISTS cancellation_policies (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   policy_name TEXT NOT NULL,

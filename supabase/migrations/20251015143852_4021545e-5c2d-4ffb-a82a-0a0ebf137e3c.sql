@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS public.suppliers CASCADE;
 -- Phase 1: Transportation Vendors Database Schema (Fixed)
 
 -- Create suppliers table (main vendor registry)
-CREATE TABLE public.suppliers (
+CREATE TABLE IF NOT EXISTS public.suppliers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   supplier_type TEXT NOT NULL CHECK (supplier_type IN ('transportation', 'hotel', 'restaurant', 'activity', 'other')),
@@ -27,7 +27,7 @@ CREATE TABLE public.suppliers (
 );
 
 -- Create transportation_vendors table
-CREATE TABLE public.transportation_vendors (
+CREATE TABLE IF NOT EXISTS public.transportation_vendors (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   supplier_id UUID REFERENCES public.suppliers(id) ON DELETE CASCADE NOT NULL UNIQUE,
   service_areas TEXT[] DEFAULT '{}',
@@ -58,7 +58,7 @@ CREATE TABLE public.transportation_vendors (
 );
 
 -- Create vendor_fleet table
-CREATE TABLE public.vendor_fleet (
+CREATE TABLE IF NOT EXISTS public.vendor_fleet (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   vendor_id UUID REFERENCES public.transportation_vendors(id) ON DELETE CASCADE NOT NULL,
   vehicle_type TEXT NOT NULL,
@@ -82,7 +82,7 @@ CREATE TABLE public.vendor_fleet (
 );
 
 -- Create vendor_drivers table
-CREATE TABLE public.vendor_drivers (
+CREATE TABLE IF NOT EXISTS public.vendor_drivers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   vendor_id UUID REFERENCES public.transportation_vendors(id) ON DELETE CASCADE NOT NULL,
   name TEXT NOT NULL,
@@ -103,7 +103,7 @@ CREATE TABLE public.vendor_drivers (
 );
 
 -- Create vendor_availability table
-CREATE TABLE public.vendor_availability (
+CREATE TABLE IF NOT EXISTS public.vendor_availability (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   vendor_id UUID REFERENCES public.transportation_vendors(id) ON DELETE CASCADE NOT NULL,
   vehicle_id UUID REFERENCES public.vendor_fleet(id) ON DELETE CASCADE,
@@ -118,7 +118,7 @@ CREATE TABLE public.vendor_availability (
 );
 
 -- Create vendor_promotions table
-CREATE TABLE public.vendor_promotions (
+CREATE TABLE IF NOT EXISTS public.vendor_promotions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   vendor_id UUID REFERENCES public.transportation_vendors(id) ON DELETE CASCADE NOT NULL,
   promotion_type TEXT NOT NULL CHECK (promotion_type IN ('promoted_vendor', 'sponsored_post', 'featured_listing', 'discount_campaign')),
@@ -145,7 +145,7 @@ CREATE TABLE public.vendor_promotions (
 );
 
 -- Create supplier_vetting table
-CREATE TABLE public.supplier_vetting (
+CREATE TABLE IF NOT EXISTS public.supplier_vetting (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   supplier_id UUID REFERENCES public.suppliers(id) ON DELETE CASCADE NOT NULL,
   vetting_status TEXT DEFAULT 'pending' CHECK (vetting_status IN ('pending', 'in_review', 'approved', 'rejected')),
@@ -163,7 +163,7 @@ CREATE TABLE public.supplier_vetting (
 );
 
 -- Create supplier_reviews table
-CREATE TABLE public.supplier_reviews (
+CREATE TABLE IF NOT EXISTS public.supplier_reviews (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   supplier_id UUID REFERENCES public.suppliers(id) ON DELETE CASCADE NOT NULL,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
@@ -305,17 +305,17 @@ CREATE POLICY "Suppliers respond to reviews"
   USING (supplier_id IN (SELECT id FROM public.suppliers WHERE user_id = auth.uid()));
 
 -- Indexes
-CREATE INDEX idx_suppliers_user ON public.suppliers(user_id);
-CREATE INDEX idx_suppliers_type ON public.suppliers(supplier_type);
-CREATE INDEX idx_suppliers_verification ON public.suppliers(verification_status);
-CREATE INDEX idx_transport_vendors_supplier ON public.transportation_vendors(supplier_id);
-CREATE INDEX idx_fleet_vendor ON public.vendor_fleet(vendor_id);
-CREATE INDEX idx_drivers_vendor ON public.vendor_drivers(vendor_id);
-CREATE INDEX idx_availability_vendor ON public.vendor_availability(vendor_id);
-CREATE INDEX idx_availability_dates ON public.vendor_availability(start_datetime, end_datetime);
-CREATE INDEX idx_promotions_vendor ON public.vendor_promotions(vendor_id);
-CREATE INDEX idx_vetting_supplier ON public.supplier_vetting(supplier_id);
-CREATE INDEX idx_reviews_supplier ON public.supplier_reviews(supplier_id);
+CREATE INDEX IF NOT EXISTS idx_suppliers_user ON public.suppliers(user_id);
+CREATE INDEX IF NOT EXISTS idx_suppliers_type ON public.suppliers(supplier_type);
+CREATE INDEX IF NOT EXISTS idx_suppliers_verification ON public.suppliers(verification_status);
+CREATE INDEX IF NOT EXISTS idx_transport_vendors_supplier ON public.transportation_vendors(supplier_id);
+CREATE INDEX IF NOT EXISTS idx_fleet_vendor ON public.vendor_fleet(vendor_id);
+CREATE INDEX IF NOT EXISTS idx_drivers_vendor ON public.vendor_drivers(vendor_id);
+CREATE INDEX IF NOT EXISTS idx_availability_vendor ON public.vendor_availability(vendor_id);
+CREATE INDEX IF NOT EXISTS idx_availability_dates ON public.vendor_availability(start_datetime, end_datetime);
+CREATE INDEX IF NOT EXISTS idx_promotions_vendor ON public.vendor_promotions(vendor_id);
+CREATE INDEX IF NOT EXISTS idx_vetting_supplier ON public.supplier_vetting(supplier_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_supplier ON public.supplier_reviews(supplier_id);
 
 -- Triggers
 CREATE TRIGGER update_suppliers_updated_at BEFORE UPDATE ON public.suppliers

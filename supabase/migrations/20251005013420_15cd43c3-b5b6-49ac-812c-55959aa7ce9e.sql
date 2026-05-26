@@ -36,8 +36,8 @@ CREATE TABLE IF NOT EXISTS public.points_transactions (
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_points_txns_user ON public.points_transactions(user_id);
-CREATE INDEX idx_points_txns_created ON public.points_transactions(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_points_txns_user ON public.points_transactions(user_id);
+CREATE INDEX IF NOT EXISTS idx_points_txns_created ON public.points_transactions(created_at DESC);
 
 -- RLS for points_transactions
 ALTER TABLE public.points_transactions ENABLE ROW LEVEL SECURITY;
@@ -65,8 +65,8 @@ CREATE TABLE IF NOT EXISTS public.promotional_codes (
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_promo_codes_code ON public.promotional_codes(code);
-CREATE INDEX idx_promo_codes_active ON public.promotional_codes(is_active);
+CREATE INDEX IF NOT EXISTS idx_promo_codes_code ON public.promotional_codes(code);
+CREATE INDEX IF NOT EXISTS idx_promo_codes_active ON public.promotional_codes(is_active);
 
 -- RLS for promotional_codes
 ALTER TABLE public.promotional_codes ENABLE ROW LEVEL SECURITY;
@@ -90,8 +90,8 @@ CREATE TABLE IF NOT EXISTS public.promo_code_usage (
   used_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_promo_usage_code ON public.promo_code_usage(promo_code_id);
-CREATE INDEX idx_promo_usage_user ON public.promo_code_usage(user_id);
+CREATE INDEX IF NOT EXISTS idx_promo_usage_code ON public.promo_code_usage(promo_code_id);
+CREATE INDEX IF NOT EXISTS idx_promo_usage_user ON public.promo_code_usage(user_id);
 
 -- RLS for promo_code_usage
 ALTER TABLE public.promo_code_usage ENABLE ROW LEVEL SECURITY;
@@ -114,9 +114,9 @@ CREATE TABLE IF NOT EXISTS public.referrals (
   UNIQUE(referrer_id, referred_id)
 );
 
-CREATE INDEX idx_referrals_referrer ON public.referrals(referrer_id);
-CREATE INDEX idx_referrals_referred ON public.referrals(referred_id);
-CREATE INDEX idx_referrals_code ON public.referrals(referral_code);
+CREATE INDEX IF NOT EXISTS idx_referrals_referrer ON public.referrals(referrer_id);
+CREATE INDEX IF NOT EXISTS idx_referrals_referred ON public.referrals(referred_id);
+CREATE INDEX IF NOT EXISTS idx_referrals_code ON public.referrals(referral_code);
 
 -- RLS for referrals
 ALTER TABLE public.referrals ENABLE ROW LEVEL SECURITY;
@@ -141,8 +141,8 @@ CREATE TABLE IF NOT EXISTS public.auto_assignment_rules (
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_auto_rules_agent ON public.auto_assignment_rules(agent_id);
-CREATE INDEX idx_auto_rules_active ON public.auto_assignment_rules(is_active);
+CREATE INDEX IF NOT EXISTS idx_auto_rules_agent ON public.auto_assignment_rules(agent_id);
+CREATE INDEX IF NOT EXISTS idx_auto_rules_active ON public.auto_assignment_rules(is_active);
 
 -- RLS for auto_assignment_rules
 ALTER TABLE public.auto_assignment_rules ENABLE ROW LEVEL SECURITY;
@@ -168,9 +168,9 @@ CREATE TABLE IF NOT EXISTS public.ai_matching_scores (
   UNIQUE(job_id, agent_id)
 );
 
-CREATE INDEX idx_ai_scores_job ON public.ai_matching_scores(job_id);
-CREATE INDEX idx_ai_scores_agent ON public.ai_matching_scores(agent_id);
-CREATE INDEX idx_ai_scores_score ON public.ai_matching_scores(match_score DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_scores_job ON public.ai_matching_scores(job_id);
+CREATE INDEX IF NOT EXISTS idx_ai_scores_agent ON public.ai_matching_scores(agent_id);
+CREATE INDEX IF NOT EXISTS idx_ai_scores_score ON public.ai_matching_scores(match_score DESC);
 
 -- RLS for ai_matching_scores
 ALTER TABLE public.ai_matching_scores ENABLE ROW LEVEL SECURITY;
@@ -203,7 +203,7 @@ CREATE TABLE IF NOT EXISTS public.custom_reports (
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_custom_reports_user ON public.custom_reports(user_id);
+CREATE INDEX IF NOT EXISTS idx_custom_reports_user ON public.custom_reports(user_id);
 
 -- RLS for custom_reports
 ALTER TABLE public.custom_reports ENABLE ROW LEVEL SECURITY;

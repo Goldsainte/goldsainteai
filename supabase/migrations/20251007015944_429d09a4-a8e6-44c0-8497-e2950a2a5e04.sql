@@ -1,5 +1,5 @@
--- Create table to track individual traveler payments in group bookings
-CREATE TABLE public.group_booking_travelers (
+-- CREATE TABLE IF NOT EXISTS to track individual traveler payments in group bookings
+CREATE TABLE IF NOT EXISTS public.group_booking_travelers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   job_id UUID NOT NULL REFERENCES public.marketplace_jobs(id) ON DELETE CASCADE,
   traveler_email TEXT NOT NULL,
@@ -65,8 +65,8 @@ USING (
 );
 
 -- Add index for faster queries
-CREATE INDEX idx_group_travelers_job_id ON public.group_booking_travelers(job_id);
-CREATE INDEX idx_group_travelers_payment_status ON public.group_booking_travelers(payment_status);
+CREATE INDEX IF NOT EXISTS idx_group_travelers_job_id ON public.group_booking_travelers(job_id);
+CREATE INDEX IF NOT EXISTS idx_group_travelers_payment_status ON public.group_booking_travelers(payment_status);
 
 -- Update trigger for updated_at
 CREATE TRIGGER update_group_booking_travelers_updated_at

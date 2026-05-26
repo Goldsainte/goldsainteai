@@ -319,10 +319,10 @@ END;
 $$;
 
 -- Create indexes for performance
-CREATE INDEX idx_customer_verifications_user_id ON public.customer_verifications(user_id);
-CREATE INDEX idx_customer_verifications_status ON public.customer_verifications(status);
-CREATE INDEX idx_agent_performance_metrics_agent_id ON public.agent_performance_metrics(agent_id);
-CREATE INDEX idx_agent_response_tracking_agent_id ON public.agent_response_tracking(agent_id);
-CREATE INDEX idx_emergency_contacts_user_id ON public.emergency_contacts(user_id);
-CREATE INDEX idx_agent_badges_agent_id ON public.agent_badges(agent_id);
-CREATE INDEX idx_agent_badges_type ON public.agent_badges(badge_type);
+CREATE INDEX IF NOT EXISTS idx_customer_verifications_user_id ON public.customer_verifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_customer_verifications_status ON public.customer_verifications(status);
+CREATE INDEX IF NOT EXISTS idx_agent_performance_metrics_agent_id ON public.agent_performance_metrics(agent_id);
+CREATE INDEX IF NOT EXISTS idx_agent_response_tracking_agent_id ON public.agent_response_tracking(agent_id);
+CREATE INDEX IF NOT EXISTS idx_emergency_contacts_user_id ON public.emergency_contacts(user_id);
+CREATE INDEX IF NOT EXISTS idx_agent_badges_agent_id ON public.agent_badges(agent_id);
+CREATE INDEX IF NOT EXISTS idx_agent_badges_type ON public.agent_badges(badge_type);

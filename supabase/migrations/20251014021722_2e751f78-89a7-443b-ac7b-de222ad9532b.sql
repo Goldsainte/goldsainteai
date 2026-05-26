@@ -1,4 +1,4 @@
--- Create table for Apple Music API credentials
+-- CREATE TABLE IF NOT EXISTS for Apple Music API credentials
 CREATE TABLE IF NOT EXISTS public.apple_music_credentials (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,

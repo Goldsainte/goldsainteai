@@ -21,10 +21,10 @@ CREATE TABLE IF NOT EXISTS public.booking_modifications (
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
--- Create index for faster queries
-CREATE INDEX idx_booking_modifications_booking_id ON public.booking_modifications(booking_id);
-CREATE INDEX idx_booking_modifications_user_id ON public.booking_modifications(user_id);
-CREATE INDEX idx_booking_modifications_status ON public.booking_modifications(status);
+-- CREATE INDEX IF NOT EXISTS for faster queries
+CREATE INDEX IF NOT EXISTS idx_booking_modifications_booking_id ON public.booking_modifications(booking_id);
+CREATE INDEX IF NOT EXISTS idx_booking_modifications_user_id ON public.booking_modifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_booking_modifications_status ON public.booking_modifications(status);
 
 -- Enable RLS
 ALTER TABLE public.booking_modifications ENABLE ROW LEVEL SECURITY;

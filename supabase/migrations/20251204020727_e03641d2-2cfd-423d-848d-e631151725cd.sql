@@ -25,5 +25,5 @@ ADD COLUMN IF NOT EXISTS ai_persona_tone text,
 ADD COLUMN IF NOT EXISTS ai_persona_audience text,
 ADD COLUMN IF NOT EXISTS travel_philosophy text;
 
--- Create index for TikTok verified creators
+-- CREATE INDEX IF NOT EXISTS for TikTok verified creators
 CREATE INDEX IF NOT EXISTS idx_profiles_tiktok_verified ON public.profiles(tiktok_verified) WHERE tiktok_verified = true;

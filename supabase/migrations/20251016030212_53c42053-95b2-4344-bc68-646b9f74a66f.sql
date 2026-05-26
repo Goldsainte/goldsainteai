@@ -1,5 +1,5 @@
 -- Create ecommerce_connections table
-CREATE TABLE public.ecommerce_connections (
+CREATE TABLE IF NOT EXISTS public.ecommerce_connections (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   creator_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   platform TEXT NOT NULL CHECK (platform IN ('shopify', 'etsy', 'amazon')),
@@ -19,8 +19,8 @@ CREATE TABLE public.ecommerce_connections (
   UNIQUE(creator_id, platform)
 );
 
-CREATE INDEX idx_ecommerce_connections_creator ON public.ecommerce_connections(creator_id);
-CREATE INDEX idx_ecommerce_connections_platform ON public.ecommerce_connections(platform);
+CREATE INDEX IF NOT EXISTS idx_ecommerce_connections_creator ON public.ecommerce_connections(creator_id);
+CREATE INDEX IF NOT EXISTS idx_ecommerce_connections_platform ON public.ecommerce_connections(platform);
 
 -- Enable RLS
 ALTER TABLE public.ecommerce_connections ENABLE ROW LEVEL SECURITY;
@@ -41,7 +41,7 @@ CREATE INDEX IF NOT EXISTS idx_products_external_id ON public.products(external_
 CREATE INDEX IF NOT EXISTS idx_products_sync_source ON public.products(sync_source);
 
 -- Create sync_history table
-CREATE TABLE public.sync_history (
+CREATE TABLE IF NOT EXISTS public.sync_history (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   connection_id UUID NOT NULL REFERENCES ecommerce_connections(id) ON DELETE CASCADE,
   started_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -55,8 +55,8 @@ CREATE TABLE public.sync_history (
   metadata JSONB DEFAULT '{}'::jsonb
 );
 
-CREATE INDEX idx_sync_history_connection ON public.sync_history(connection_id);
-CREATE INDEX idx_sync_history_started ON public.sync_history(started_at DESC);
+CREATE INDEX IF NOT EXISTS idx_sync_history_connection ON public.sync_history(connection_id);
+CREATE INDEX IF NOT EXISTS idx_sync_history_started ON public.sync_history(started_at DESC);
 
 -- Enable RLS
 ALTER TABLE public.sync_history ENABLE ROW LEVEL SECURITY;

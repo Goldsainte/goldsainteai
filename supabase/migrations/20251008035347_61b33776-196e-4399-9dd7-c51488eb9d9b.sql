@@ -1,5 +1,5 @@
 -- Create agent_inquiries table to track when users request agent contact from AI
-CREATE TABLE public.agent_inquiries (
+CREATE TABLE IF NOT EXISTS public.agent_inquiries (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id),
   guest_email TEXT,
@@ -60,10 +60,10 @@ CREATE POLICY "Users can view their own inquiries"
   TO authenticated
   USING (auth.uid() = user_id);
 
--- Create index for faster queries
-CREATE INDEX idx_agent_inquiries_status ON public.agent_inquiries(status);
-CREATE INDEX idx_agent_inquiries_created_at ON public.agent_inquiries(created_at DESC);
-CREATE INDEX idx_agent_inquiries_assigned_agent ON public.agent_inquiries(assigned_agent_id);
+-- CREATE INDEX IF NOT EXISTS for faster queries
+CREATE INDEX IF NOT EXISTS idx_agent_inquiries_status ON public.agent_inquiries(status);
+CREATE INDEX IF NOT EXISTS idx_agent_inquiries_created_at ON public.agent_inquiries(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_agent_inquiries_assigned_agent ON public.agent_inquiries(assigned_agent_id);
 
 -- Add trigger for updated_at
 CREATE TRIGGER update_agent_inquiries_updated_at

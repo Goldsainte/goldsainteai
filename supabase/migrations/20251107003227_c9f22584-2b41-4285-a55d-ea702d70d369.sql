@@ -2,7 +2,7 @@
 CREATE TYPE public.subscription_tier AS ENUM ('free', 'premium', 'enterprise');
 
 -- Create user_subscriptions table to track subscription levels
-CREATE TABLE public.user_subscriptions (
+CREATE TABLE IF NOT EXISTS public.user_subscriptions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL UNIQUE,
   tier subscription_tier NOT NULL DEFAULT 'free',

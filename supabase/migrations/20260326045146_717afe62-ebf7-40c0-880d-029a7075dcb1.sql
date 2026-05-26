@@ -5,7 +5,7 @@ ALTER TABLE public.storyboards
   ADD COLUMN IF NOT EXISTS forked_count integer NOT NULL DEFAULT 0;
 
 -- 2. Create storyboard_sections table
-CREATE TABLE public.storyboard_sections (
+CREATE TABLE IF NOT EXISTS public.storyboard_sections (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   storyboard_id uuid NOT NULL REFERENCES public.storyboards(id) ON DELETE CASCADE,
   title text NOT NULL,
@@ -44,7 +44,7 @@ ALTER TABLE public.storyboard_items
   ADD COLUMN IF NOT EXISTS bookable_product_type text;
 
 -- 4. Create storyboard_collaborators table
-CREATE TABLE public.storyboard_collaborators (
+CREATE TABLE IF NOT EXISTS public.storyboard_collaborators (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   storyboard_id uuid NOT NULL REFERENCES public.storyboards(id) ON DELETE CASCADE,
   user_id uuid NOT NULL,
