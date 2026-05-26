@@ -8,7 +8,6 @@ import { HomeTestimonials } from "@/components/home/HomeTestimonials";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
-import { getTripRequestImageUrl } from "@/utils/tripImages";
 
 function FeaturedTripsSection() {
   const { data: trips } = useQuery({
@@ -43,15 +42,10 @@ function FeaturedTripsSection() {
             <Link key={trip.id} to={`/marketplace/trip/${trip.slug || trip.id}`} className="group space-y-2.5">
               <div className="aspect-[4/3] overflow-hidden rounded-xl md:rounded-2xl bg-[#F5F0E8]">
                 <img
-                  src={getTripRequestImageUrl(trip.destination, trip.cover_image_url)}
+                  src={trip.cover_image_url || ""}
                   alt={trip.title}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
-                  onError={(e) => {
-                    const img = e.currentTarget;
-                    const fallback = getTripRequestImageUrl(trip.destination, null);
-                    if (img.src !== fallback) img.src = fallback;
-                  }}
                 />
               </div>
               <h3 className="font-secondary text-[15px] text-[#0a2225] font-medium leading-snug line-clamp-1">{trip.title}</h3>
