@@ -1,3 +1,4 @@
+import { useRef, useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 const CATEGORIES = [
@@ -201,27 +202,96 @@ export function CategoryChips({
   onCategoryChange,
   className,
 }: CategoryChipsProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const isDragging = useRef(false);
+  const dragStartX = useRef(0);
+  const dragScrollLeft = useRef(0);
+
+  const updateScrollState = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  };
+
+  useEffect(() => {
+    updateScrollState();
+    const el = scrollRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", updateScrollState, { passive: true });
+    const ro = new ResizeObserver(updateScrollState);
+    ro.observe(el);
+    return () => { el.removeEventListener("scroll", updateScrollState); ro.disconnect(); };
+  }, []);
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    isDragging.current = true;
+    dragStartX.current = e.pageX - el.offsetLeft;
+    dragScrollLeft.current = el.scrollLeft;
+    el.style.cursor = "grabbing";
+    el.style.userSelect = "none";
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging.current || !scrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    scrollRef.current.scrollLeft = dragScrollLeft.current - (x - dragStartX.current);
+  };
+
+  const stopDrag = () => {
+    if (!scrollRef.current) return;
+    isDragging.current = false;
+    scrollRef.current.style.cursor = "";
+    scrollRef.current.style.userSelect = "";
+  };
+
   return (
-    <div
-      className={cn(
-        "flex overflow-x-auto scrollbar-hide gap-2.5 py-3 -mx-4 px-4 scroll-smooth",
-        className
-      )}
-    >
-      {CATEGORIES.map((cat) => (
-        <button
-          key={cat}
-          onClick={() => onCategoryChange(cat === "All" ? "All" : cat)}
-          className={cn(
-            "whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium tracking-wide transition-all duration-200 ease-out shrink-0",
-            activeCategory === cat
-              ? "bg-[#C7A962] text-white shadow-sm scale-[1.02]"
-              : "bg-[#f7f3ea] text-[#6B7280] hover:bg-[#efeadf] hover:text-[#0a2225] hover:shadow-sm hover:-translate-y-px"
-          )}
-        >
-          {cat}
-        </button>
-      ))}
+    <div className={cn("relative -mx-4", className)}>
+      {/* Left fade */}
+      <div
+        className={cn(
+          "pointer-events-none absolute left-0 top-0 h-full w-10 z-10 transition-opacity duration-200",
+          "bg-gradient-to-r from-[#FDF9F0] to-transparent",
+          canScrollLeft ? "opacity-100" : "opacity-0"
+        )}
+      />
+      {/* Right fade */}
+      <div
+        className={cn(
+          "pointer-events-none absolute right-0 top-0 h-full w-14 z-10 transition-opacity duration-200",
+          "bg-gradient-to-l from-[#FDF9F0] to-transparent",
+          canScrollRight ? "opacity-100" : "opacity-0"
+        )}
+      />
+
+      <div
+        ref={scrollRef}
+        className="flex overflow-x-auto scrollbar-hide gap-2.5 py-3 px-4 scroll-smooth select-none"
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={stopDrag}
+        onMouseLeave={stopDrag}
+      >
+        {CATEGORIES.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => onCategoryChange(cat === "All" ? "All" : cat)}
+            className={cn(
+              "whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium tracking-wide transition-all duration-200 ease-out shrink-0",
+              activeCategory === cat
+                ? "bg-[#C7A962] text-white shadow-sm scale-[1.02]"
+                : "bg-[#f7f3ea] text-[#6B7280] hover:bg-[#efeadf] hover:text-[#0a2225] hover:shadow-sm hover:-translate-y-px"
+            )}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
