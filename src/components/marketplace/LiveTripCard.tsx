@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { ShareButton } from "@/components/ShareButton";
+import { getTripRequestImageUrl } from "@/utils/tripImages";
 
 interface LiveTripCardProps {
   trip: {
