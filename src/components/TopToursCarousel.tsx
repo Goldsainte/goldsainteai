@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { MapPin, Star, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { getTripRequestImageUrl } from "@/utils/tripImages";
 
 interface Tour {
   id: string;
@@ -39,11 +40,16 @@ export const TopToursCarousel = ({ tours }: TopToursCarouselProps) => {
             >
               <div className="relative h-[200px] sm:h-[210px] md:h-[220px] flex-shrink-0">
                 <img
-                  src={tour.coverImage || `https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80`}
+                  src={getTripRequestImageUrl(tour.destination, tour.coverImage)}
                   alt={tour.packageName}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
                   decoding="async"
+                  onError={(e) => {
+                    const img = e.currentTarget;
+                    const fallback = getTripRequestImageUrl(tour.destination, null);
+                    if (img.src !== fallback) img.src = fallback;
+                  }}
                 />
                 {tour.likelyToSellOut && (
                   <Badge className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-destructive text-destructive-foreground text-xs">
