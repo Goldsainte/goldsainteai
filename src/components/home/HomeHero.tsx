@@ -4,9 +4,9 @@ import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-import heroMainImg from "@/assets/maximilien-t-scharner-FD0Ga_KJTwM-unsplash.jpeg"; // infinity pool
-import heroSecondaryImg from "@/assets/austin-distel-riQNJpiaGgE-unsplash.jpeg"; // treehouse / hammock
-import heroTertiaryImg from "@/assets/felix-rostig-UmV2wr-Vbq8-unsplash.jpeg"; // friends hiking
+import heroMainImg from "@/assets/maximilien-t-scharner-FD0Ga_KJTwM-unsplash.webp"; // infinity pool
+import heroSecondaryImg from "@/assets/austin-distel-riQNJpiaGgE-unsplash.webp"; // treehouse / hammock
+import heroTertiaryImg from "@/assets/felix-rostig-UmV2wr-Vbq8-unsplash.webp"; // friends hiking
 
 export function HomeHero() {
   const { t } = useTranslation();

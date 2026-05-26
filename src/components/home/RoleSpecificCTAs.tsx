@@ -2,9 +2,9 @@
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 
-import travelerImage from "@/assets/home/hero-overwater-villa.jpg";
-import creatorImage from "@/assets/home/hero-amalfi-coast.jpg";
-import agentImage from "@/assets/fine-dining-hero.jpg";
+import travelerImage from "@/assets/home/hero-overwater-villa.webp";
+import creatorImage from "@/assets/home/hero-amalfi-coast.webp";
+import agentImage from "@/assets/fine-dining-hero.webp";
 
 type Pathway = {
   eyebrow: string;
@@ -31,7 +31,7 @@ const pathways: Pathway[] = [
     eyebrow: "For Travel Creators",
     title: "Turn Your Journey Into Income",
     description:
-      "Turn your travel memories, recommendations, and experiences into bookable journeys you can share and sell — powered by AI.",
+      "Turn your travel memories, recommendations, and experiences into bookable journeys you can share and sell â€” powered by AI.",
     cta: "Start Creating",
     link: "/auth?mode=signup&role=creator",
     image: creatorImage,
@@ -62,7 +62,7 @@ export function RoleSpecificCTAs() {
             Experience Goldsainte Your Way
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-[15px] md:text-base leading-relaxed text-[#5A5A5A]">
-            Whether you're planning your next adventure, sharing your travel expertise, or crafting bespoke itineraries for clients — Goldsainte connects every part of modern travel in one place.
+            Whether you're planning your next adventure, sharing your travel expertise, or crafting bespoke itineraries for clients â€” Goldsainte connects every part of modern travel in one place.
           </p>
         </div>
 
@@ -111,7 +111,7 @@ export function RoleSpecificCTAs() {
         </div>
 
         <p className="mt-12 text-center font-secondary italic text-[12px] text-[#0a2225]/55">
-          One ecosystem · Three ways to belong
+          One ecosystem Â· Three ways to belong
         </p>
       </div>
     </section>

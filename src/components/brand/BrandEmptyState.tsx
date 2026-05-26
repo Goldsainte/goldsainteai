@@ -1,5 +1,5 @@
 import React from "react";
-import emptyImage from "@/assets/brands/empty-state.jpg";
+import emptyImage from "@/assets/brands/empty-state.webp";
 import { Link } from "react-router-dom";
 
 export const BrandEmptyState = () => {

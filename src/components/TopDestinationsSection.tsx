@@ -1,8 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import veniceSunset from "@/assets/luxury-venice-sunset.jpg";
-import resortPool from "@/assets/luxury-resort-pool.jpg";
-import arcticSpa from "@/assets/luxury-arctic-spa.jpg";
+import veniceSunset from "@/assets/luxury-venice-sunset.webp";
+import resortPool from "@/assets/luxury-resort-pool.webp";
+import arcticSpa from "@/assets/luxury-arctic-spa.webp";
 
 interface Destination {
   destination: string;

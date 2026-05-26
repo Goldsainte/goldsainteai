@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import infinityPoolImage from "@/assets/luxury-infinity-pool.jpg";
+import infinityPoolImage from "@/assets/luxury-infinity-pool.webp";
 
 export const WinterSunHero = () => {
   const navigate = useNavigate();

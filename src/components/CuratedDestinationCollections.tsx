@@ -1,10 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import tropicalHideaway from "@/assets/luxury-tropical-hideaway.jpg";
-import resortPool from "@/assets/luxury-resort-pool.jpg";
-import veniceSunset from "@/assets/luxury-venice-sunset.jpg";
-import infinityPool from "@/assets/luxury-infinity-pool.jpg";
-import arcticSpa from "@/assets/luxury-arctic-spa.jpg";
+import tropicalHideaway from "@/assets/luxury-tropical-hideaway.webp";
+import resortPool from "@/assets/luxury-resort-pool.webp";
+import veniceSunset from "@/assets/luxury-venice-sunset.webp";
+import infinityPool from "@/assets/luxury-infinity-pool.webp";
+import arcticSpa from "@/assets/luxury-arctic-spa.webp";
 
 interface Collection {
   title: string;

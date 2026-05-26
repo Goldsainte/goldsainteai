@@ -1,4 +1,4 @@
-import luxuryVilla from "@/assets/luxury-destinations.jpg";
+import luxuryVilla from "@/assets/luxury-destinations.webp";
 
 export const WhyGoldsainte = () => {
   return (

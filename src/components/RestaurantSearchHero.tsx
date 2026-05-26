@@ -3,7 +3,7 @@ import { Search, SlidersHorizontal, Calendar } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import fineDiningHero from "@/assets/fine-dining-hero.jpg";
+import fineDiningHero from "@/assets/fine-dining-hero.webp";
 
 interface RestaurantSearchHeroProps {
   searchQuery: string;

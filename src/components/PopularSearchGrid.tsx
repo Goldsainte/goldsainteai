@@ -1,14 +1,14 @@
 import { Card } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
 import { useExpediaModal } from "@/contexts/ExpediaModalContext";
-import beachCabinImage from "@/assets/beach-cabin.jpg";
-import beachPicnicImage from "@/assets/beach-picnic.jpg";
-import redFlowersImage from "@/assets/red-flowers-loungers.jpg";
-import redKayakImage from "@/assets/red-kayak-beach.jpg";
-import seoulAutumnImage from "@/assets/seoul-autumn.jpg";
-import tokyoStreetImage from "@/assets/tokyo-street.jpg";
-import dubaiCityImage from "@/assets/dubai-cityscape.jpg";
-import luxuryBeachImage from "@/assets/luxury-beach.jpg";
+import beachCabinImage from "@/assets/beach-cabin.webp";
+import beachPicnicImage from "@/assets/beach-picnic.webp";
+import redFlowersImage from "@/assets/red-flowers-loungers.webp";
+import redKayakImage from "@/assets/red-kayak-beach.webp";
+import seoulAutumnImage from "@/assets/seoul-autumn.webp";
+import tokyoStreetImage from "@/assets/tokyo-street.webp";
+import dubaiCityImage from "@/assets/dubai-cityscape.webp";
+import luxuryBeachImage from "@/assets/luxury-beach.webp";
 
 export const PopularSearchGrid = () => {
   const { t } = useTranslation();

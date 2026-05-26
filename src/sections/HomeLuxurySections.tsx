@@ -12,15 +12,15 @@ import {
 } from "@/components/ui/accordion";
 
 // Real images from assets - Persona carousel images
-import santoriniStepsImg from "@/assets/santorini-steps.jpg";
-import creatorCanyonImg from "@/assets/creator-canyon-views.jpg";
-import agentPlanningImg from "@/assets/agent-travel-planning.jpg";
-import tropicalHideawayImg from "@/assets/luxury-tropical-hideaway.jpg";
+import santoriniStepsImg from "@/assets/santorini-steps.webp";
+import creatorCanyonImg from "@/assets/creator-canyon-views.webp";
+import agentPlanningImg from "@/assets/agent-travel-planning.webp";
+import tropicalHideawayImg from "@/assets/luxury-tropical-hideaway.webp";
 
 // Additional images for HowGoldsainteWorksSection
-import veniceGondolaImg from "@/assets/venice-gondola.jpg";
-import hotAirBalloonsImg from "@/assets/hot-air-balloons.jpg";
-import mountainBridgeImg from "@/assets/mountain-bridge-adventure.jpg";
+import veniceGondolaImg from "@/assets/venice-gondola.webp";
+import hotAirBalloonsImg from "@/assets/hot-air-balloons.webp";
+import mountainBridgeImg from "@/assets/mountain-bridge-adventure.webp";
 import { CreatorAIMagic } from "@/components/home/CreatorAIMagic";
 import { TravelerDiscoveryMagic } from "@/components/home/TravelerDiscoveryMagic";
 import { AgentProposalMagic } from "@/components/home/AgentProposalMagic";
@@ -127,7 +127,7 @@ const PersonaCarouselCard: React.FC<PersonaCarouselCardProps & { index: number }
             onClick={(e) => e.stopPropagation()}
             className="mt-2.5 inline-block text-[13px] font-medium text-[#F5EFE1]/80 hover:text-white hover:underline transition-colors duration-200"
           >
-            {browseLabel} →
+            {browseLabel} â†’
           </Link>
         )}
       </div>
@@ -159,7 +159,7 @@ export const BuiltForEverySideSection: React.FC = () => {
           <span className="italic">luxury travel</span>
         </h2>
         <p className="max-w-2xl text-sm md:text-base text-[#5A5A5A] mt-4 leading-relaxed font-light">
-          Each role brings something essential — travelers bring the vision, creators bring the aesthetic, agents refine the details, brands shape the experience. Goldsainte brings them together in one cinematic journey.
+          Each role brings something essential â€” travelers bring the vision, creators bring the aesthetic, agents refine the details, brands shape the experience. Goldsainte brings them together in one cinematic journey.
         </p>
       </div>
 
@@ -190,9 +190,9 @@ export const BuiltForEverySideSection: React.FC = () => {
 
       {/* Refined scroll hint for mobile with gold arrows */}
       <p className="mt-8 text-center text-[11px] uppercase tracking-[0.18em] text-[#8B8B8B] lg:hidden font-light">
-        <span className="text-[#C7A962]">←</span>
+        <span className="text-[#C7A962]">â†</span>
         <span className="mx-2">Swipe to explore</span>
-        <span className="text-[#C7A962]">→</span>
+        <span className="text-[#C7A962]">â†’</span>
       </p>
     </section>
   );
@@ -228,14 +228,14 @@ const tabsData: TabData[] = [
     intro: {
       title: "Discover trips you'll fall in love with.",
       description:
-        "Browse itineraries from trusted travel specialists and explorers, personalized in real time to your taste — and booked entirely on-platform.",
+        "Browse itineraries from trusted travel specialists and explorers, personalized in real time to your taste â€” and booked entirely on-platform.",
     },
     features: [
       {
         icon: Heart,
         title: "Handpicked Experiences",
         description:
-          "Discover trips designed by creators and certified travel experts—not generic travel templates.",
+          "Discover trips designed by creators and certified travel expertsâ€”not generic travel templates.",
       },
       {
         icon: Calendar,
@@ -265,7 +265,7 @@ const tabsData: TabData[] = [
     intro: {
       title: "Upload your camera roll. Watch Goldsainte rebuild your journey.",
       description:
-        "AI identifies destinations, restaurants, travel dates, and experiences — then assembles them into a bookable itinerary you can publish and monetize in minutes.",
+        "AI identifies destinations, restaurants, travel dates, and experiences â€” then assembles them into a bookable itinerary you can publish and monetize in minutes.",
     },
     features: [
       {
@@ -278,7 +278,7 @@ const tabsData: TabData[] = [
         icon: Zap,
         title: "Instant Itinerary Generation",
         description:
-          "Transform past trips into structured travel itineraries in minutes—not hours of manual planning.",
+          "Transform past trips into structured travel itineraries in minutesâ€”not hours of manual planning.",
       },
       {
         icon: Wallet,
@@ -302,7 +302,7 @@ const tabsData: TabData[] = [
     intro: {
       title: "Design bespoke proposals like a luxury magazine.",
       description:
-        "Curate hotels, restaurants, and experiences into elegant, white-glove proposals — delivered to verified travelers and protected on-platform.",
+        "Curate hotels, restaurants, and experiences into elegant, white-glove proposals â€” delivered to verified travelers and protected on-platform.",
     },
     features: [
       {
@@ -349,7 +349,7 @@ export const HowGoldsainteWorksSection: React.FC = () => {
   return (
     <section id="how-it-works" className="bg-[#FDF9F0] px-4 pt-10 pb-16 md:pt-14 md:pb-24 scroll-mt-16">
       <div className="mx-auto max-w-6xl">
-        {/* Section Header — mirrors TwoWaysComparison */}
+        {/* Section Header â€” mirrors TwoWaysComparison */}
         <div className="mb-12 md:mb-16 text-center">
           <span className="inline-block rounded-full border border-[#0c4d47] bg-[#0c4d47] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#bfad72] mb-4">
             How It Works
@@ -479,7 +479,7 @@ export const HowGoldsainteWorksSection: React.FC = () => {
 
         {/* Footer Note */}
         <p className="mt-10 md:mt-12 text-center text-[13px] text-[#8B8B8B] max-w-md mx-auto">
-          All communication and payments stay inside Goldsainte. No phone numbers, no side deals — just beautifully organized trips.
+          All communication and payments stay inside Goldsainte. No phone numbers, no side deals â€” just beautifully organized trips.
         </p>
       </div>
     </section>
@@ -519,7 +519,7 @@ export const TrustSafetyPaymentsSection: React.FC = () => {
   return (
     <section className="bg-[#FDF9F0] px-4 py-20 md:py-24">
       <div className="mx-auto max-w-6xl">
-        {/* Centered editorial header — matches "The Goldsainte Ecosystem" pattern */}
+        {/* Centered editorial header â€” matches "The Goldsainte Ecosystem" pattern */}
         <div className="mx-auto max-w-3xl text-center mb-10 md:mb-12">
           <p className="inline-flex rounded-full bg-[#0c4d47] px-3 py-1 text-[10px] md:text-xs font-medium uppercase tracking-[0.18em] text-[#D4C07A]">
             {t('home.trustSafety.badge')}

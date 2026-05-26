@@ -9,7 +9,7 @@ import { VoiceSelector } from "@/components/VoiceSelector";
 import TravelPreferencesWizard from "@/components/TravelPreferencesWizard";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, Check, Sparkles } from "lucide-react";
-import logomark from "@/assets/logomark-gold.png";
+import logomark from "@/assets/logomark-gold.webp";
 
 export default function AIAgentOnboarding() {
   const { user, isLoading: authLoading } = useAuth();

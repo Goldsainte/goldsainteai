@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import wordmarkGold from "@/assets/wordmark-gold.png";
+import wordmarkGold from "@/assets/wordmark-gold.webp";
 import { articlePath, fetchPublishedArticles, formatDate, EXTERNAL_PRESS, BASE_URL } from "./lib";
 import { NewsroomPageHeader } from "./ui";
 
@@ -22,7 +22,7 @@ const STATIC_NEWS: Array<{
     slug: "world-cup-reality-check",
     title: "The World Cup Reality Check: When Hype Meets the Hotel Bill",
     excerpt:
-      "Eighty percent of U.S. hotels say World Cup bookings are falling short — and the reason why reveals everything wrong with how we plan travel around hype.",
+      "Eighty percent of U.S. hotels say World Cup bookings are falling short â€” and the reason why reveals everything wrong with how we plan travel around hype.",
     published_at: "2026-05-01",
     href: "/newsroom/news/world-cup-reality-check",
   },
@@ -70,7 +70,7 @@ export default function NewsroomLanding() {
     <>
       <Helmet>
         <title>Newsroom | Goldsainte</title>
-        <meta name="description" content="Press releases, company updates, and editorial coverage from Goldsainte — the AI-powered travel marketplace." />
+        <meta name="description" content="Press releases, company updates, and editorial coverage from Goldsainte â€” the AI-powered travel marketplace." />
         <link rel="canonical" href={`${BASE_URL}/newsroom`} />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="The Goldsainte Newsroom" />
@@ -90,10 +90,10 @@ export default function NewsroomLanding() {
         })}</script>
       </Helmet>
 
-      {/* Editorial masthead — newspaper nameplate */}
+      {/* Editorial masthead â€” newspaper nameplate */}
       <section className="max-w-7xl mx-auto px-5 sm:px-6 pt-8 sm:pt-12 md:pt-24 pb-8 md:pb-16">
         <NewsroomPageHeader
-          eyebrow="Vol. 1 · The Goldsainte Press"
+          eyebrow="Vol. 1 Â· The Goldsainte Press"
           title="Newsroom"
           intro={
             <p className="max-w-2xl">
@@ -131,7 +131,7 @@ export default function NewsroomLanding() {
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/85 via-[#0a2225]/30 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6 md:p-12 max-w-4xl">
                 <span className="text-[10px] tracking-[0.25em] sm:tracking-[0.3em] uppercase text-[#C7A962] mb-2 sm:mb-3 block">
-                  Featured · {featured.type === "press_release" ? "Press Release" : featured.type}
+                  Featured Â· {featured.type === "press_release" ? "Press Release" : featured.type}
                 </span>
                 <h2 className="font-secondary text-white text-[24px] sm:text-3xl md:text-5xl leading-[1.05] tracking-tight mb-3 sm:mb-4 group-hover:text-[#FDF9F0] transition">
                   {featured.title}
@@ -171,7 +171,7 @@ export default function NewsroomLanding() {
               disabled={submitting}
               className="flex-shrink-0 px-5 sm:px-6 py-3 text-[10px] sm:text-[11px] tracking-[0.18em] sm:tracking-[0.2em] uppercase border-t sm:border-t-0 sm:border-l border-[#E5DFC6] hover:bg-[#f0ead9] disabled:opacity-50"
             >
-              {submitting ? "…" : "Subscribe"}
+              {submitting ? "â€¦" : "Subscribe"}
             </button>
           </form>
         </div>

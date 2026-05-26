@@ -1,8 +1,8 @@
 import { Users2, Globe, Star, Megaphone } from "lucide-react";
-import creatorImage from "@/assets/partners/city-services.jpg";
-import technologyImage from "@/assets/partners/technology-platform.jpg";
-import growthImage from "@/assets/partners/success-growth.jpg";
-import marketingImage from "@/assets/partners/corporate-services.jpg";
+import creatorImage from "@/assets/partners/city-services.webp";
+import technologyImage from "@/assets/partners/technology-platform.webp";
+import growthImage from "@/assets/partners/success-growth.webp";
+import marketingImage from "@/assets/partners/corporate-services.webp";
 
 const benefits = [
   {
@@ -17,7 +17,7 @@ const benefits = [
     icon: Globe,
     title: "Agent & Traveler Ecosystem",
     subtitle: "Power Professional Trip Planning",
-    description: "Certified travel agents pull your services into custom itineraries. Travelers discover you through AI-powered search and curated recommendations. Your brand appears in full trip contexts—not just isolated ride searches.",
+    description: "Certified travel agents pull your services into custom itineraries. Travelers discover you through AI-powered search and curated recommendations. Your brand appears in full trip contextsâ€”not just isolated ride searches.",
     image: technologyImage,
     imagePosition: "right" as const
   },

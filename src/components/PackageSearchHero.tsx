@@ -7,7 +7,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
-import resortPoolHero from "@/assets/luxury-resort-pool.jpg";
+import resortPoolHero from "@/assets/luxury-resort-pool.webp";
 
 interface PackageSearchHeroProps {
   searchQuery: string;

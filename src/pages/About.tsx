@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/accordion";
 import { useTranslation } from "react-i18next";
 import { BackButton } from "@/components/ui/BackButton";
-import founderImage from "@/assets/founder.jpg";
+import founderImage from "@/assets/founder.webp";
 import openaiLogo from "@/assets/OpenAI_Logo.svg";
 import goldsainteLogo from "@/assets/wordmark-green.svg";
 import primaryLogoGreen from "@/assets/primary-horizontal-logo-green.svg";
@@ -36,7 +36,7 @@ const About = () => {
         {
           icon: Map,
           title: "Personalised Proposals",
-          description: "Every proposal is a fully-priced itinerary tailored to your brief — destinations, accommodation, experiences, transfers and cancellation terms, side-by-side and easy to compare."
+          description: "Every proposal is a fully-priced itinerary tailored to your brief â€” destinations, accommodation, experiences, transfers and cancellation terms, side-by-side and easy to compare."
         }
       ]
     },
@@ -46,12 +46,12 @@ const About = () => {
         {
           icon: Inbox,
           title: "Trip Request Marketplace",
-          description: "Post a trip request once. Certified travel agents and creators submit tailored proposals you can compare side-by-side — itinerary, pricing, reviews and cancellation terms."
+          description: "Post a trip request once. Certified travel agents and creators submit tailored proposals you can compare side-by-side â€” itinerary, pricing, reviews and cancellation terms."
         },
         {
           icon: Briefcase,
           title: "Packaged Trips & Services",
-          description: "Browse ready-to-book trips and creator-led services across every region and style — from short city breaks to multi-stop, multi-week journeys."
+          description: "Browse ready-to-book trips and creator-led services across every region and style â€” from short city breaks to multi-stop, multi-week journeys."
         },
         {
           icon: CreditCard,
@@ -71,12 +71,12 @@ const About = () => {
         {
           icon: Share2,
           title: "Creator Profiles & Storefronts",
-          description: "Creators turn their audience into bookings with a public profile, storyboards, packaged trips and digital guides — all monetised in one place."
+          description: "Creators turn their audience into bookings with a public profile, storyboards, packaged trips and digital guides â€” all monetised in one place."
         },
         {
           icon: DollarSign,
           title: "Industry-Leading Payouts",
-          description: "Creators earn 85–92% commission depending on tier. Agents keep the full value of the trips they design, less a small marketplace fee. Payouts settle via Stripe Connect."
+          description: "Creators earn 85â€“92% commission depending on tier. Agents keep the full value of the trips they design, less a small marketplace fee. Payouts settle via Stripe Connect."
         },
         {
           icon: BarChart3,
@@ -86,7 +86,7 @@ const About = () => {
         {
           icon: MessageCircle,
           title: "On-Platform Messaging",
-          description: "Real-time chat between travelers, agents and creators — with notifications, attachments and a full audit trail, so every conversation stays protected."
+          description: "Real-time chat between travelers, agents and creators â€” with notifications, attachments and a full audit trail, so every conversation stays protected."
         }
       ]
     }
@@ -458,7 +458,7 @@ const About = () => {
             to="/terms" 
             className="inline-flex items-center text-primary hover:underline font-medium"
           >
-            View Full Terms of Service Document →
+            View Full Terms of Service Document â†’
           </Link>
         </div>
         
@@ -471,7 +471,7 @@ const About = () => {
             <h3 className="font-semibold text-base mb-3 text-foreground">A1-A3: Introduction</h3>
             <p className="text-sm sm:text-base text-foreground"><strong>A1:</strong> Certain terms in these Terms have specific meanings. Please refer to the Goldsainte Dictionary at the end of these Terms for clarity.</p>
             <p className="mt-2 text-sm sm:text-base text-foreground"><strong>A2:</strong> By using Goldsainte's platform or completing a booking, you agree to these Terms and their conditions, including mandatory arbitration for most disputes (see A20 for opt-out procedures) and waiver of class-action rights.</p>
-            <p className="mt-2 text-sm sm:text-base text-foreground"><strong>A3:</strong> Goldsainte Inc., registered in Delaware, USA, provides and manages the Platform, including AI-powered services, CoCurate™ packages, Travel Agent Marketplace, and creator tools. We do not provide the travel experiences themselves—service providers are solely responsible for their services.</p>
+            <p className="mt-2 text-sm sm:text-base text-foreground"><strong>A3:</strong> Goldsainte Inc., registered in Delaware, USA, provides and manages the Platform, including AI-powered services, CoCurateâ„¢ packages, Travel Agent Marketplace, and creator tools. We do not provide the travel experiences themselvesâ€”service providers are solely responsible for their services.</p>
           </div>
 
           <div>
@@ -653,7 +653,7 @@ const About = () => {
             to="/what-we-do" 
             className="inline-flex items-center text-primary hover:underline font-medium"
           >
-            View Full Service Details →
+            View Full Service Details â†’
           </Link>
         </div>
         
@@ -799,7 +799,7 @@ const About = () => {
 
         <div className="text-center mb-8">
           <h2 className="text-2xl sm:text-3xl font-semibold text-foreground mb-2">
-            Investor Relations — Goldsainte, Inc.
+            Investor Relations â€” Goldsainte, Inc.
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground">
             Redefining Luxury Travel with AI, Agents & Creators
@@ -809,10 +809,10 @@ const About = () => {
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">Our Vision</h3>
           <p className="text-sm sm:text-base text-foreground">
-            Goldsainte, Inc. is building the world's first AI-powered travel marketplace that combines real-time booking, AI trip planning, specialist matching, and creator-led experiences — all in one platform. By integrating technology, social media, and curated travel, we aim to transform how people discover, book, and experience travel.
+            Goldsainte, Inc. is building the world's first AI-powered travel marketplace that combines real-time booking, AI trip planning, specialist matching, and creator-led experiences â€” all in one platform. By integrating technology, social media, and curated travel, we aim to transform how people discover, book, and experience travel.
           </p>
           <p className="text-sm sm:text-base text-foreground mt-4">
-            Our vision is to empower travelers with personalized experiences, enable creators to monetize content meaningfully, and provide agents with dynamic opportunities — all while generating value for our shareholders.
+            Our vision is to empower travelers with personalized experiences, enable creators to monetize content meaningfully, and provide agents with dynamic opportunities â€” all while generating value for our shareholders.
           </p>
         </div>
 
@@ -863,7 +863,7 @@ const About = () => {
             <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
               <p><strong>Global Market Reach:</strong> Multi-currency, multi-language support enables international expansion.</p>
               <p><strong>Modular Ecosystem:</strong> Flights, hotels, cars, restaurants, and events can scale independently.</p>
-              <p><strong>Network Effects:</strong> Travelers attract agents; agents attract creators; creators attract travelers — creating a self-reinforcing growth loop.</p>
+              <p><strong>Network Effects:</strong> Travelers attract agents; agents attract creators; creators attract travelers â€” creating a self-reinforcing growth loop.</p>
             </div>
           </div>
 
@@ -881,7 +881,7 @@ const About = () => {
             <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
               <p><strong>Agent Commissions:</strong> Service + success fees from agent bookings.</p>
               <p><strong>Creator Partnerships:</strong> Content monetization, affiliate deals, and brand collaborations.</p>
-              <p><strong>Vendor Subscriptions:</strong> Multi-tiered plans (Bronze–Platinum) with marketing, analytics, and exposure benefits.</p>
+              <p><strong>Vendor Subscriptions:</strong> Multi-tiered plans (Bronzeâ€“Platinum) with marketing, analytics, and exposure benefits.</p>
               <p><strong>Platform Fees:</strong> Co-curated trip commissions and premium package fees.</p>
               <p><strong>Future Revenue Opportunities:</strong> Traveler subscriptions, premium listings, API/B2B offerings, and loyalty programs.</p>
             </div>
@@ -901,9 +901,9 @@ const About = () => {
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">Vision & Roadmap</h3>
           <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
-            <p><strong>Near-Term (0–6 months):</strong> AI-powered trip planning and agent matching, expanded agent and creator network, creator monetization, and dynamic pricing.</p>
-            <p><strong>Mid-Term (6–12 months):</strong> International expansion, traveler subscription tiers, B2B API launch, and predictive AI for personalized packages.</p>
-            <p><strong>Long-Term (12–24 months):</strong> White-label agency solutions, AR/VR trip previews, blockchain loyalty program, and crypto payment integration.</p>
+            <p><strong>Near-Term (0â€“6 months):</strong> AI-powered trip planning and agent matching, expanded agent and creator network, creator monetization, and dynamic pricing.</p>
+            <p><strong>Mid-Term (6â€“12 months):</strong> International expansion, traveler subscription tiers, B2B API launch, and predictive AI for personalized packages.</p>
+            <p><strong>Long-Term (12â€“24 months):</strong> White-label agency solutions, AR/VR trip previews, blockchain loyalty program, and crypto payment integration.</p>
           </div>
         </div>
 
@@ -936,7 +936,7 @@ const About = () => {
             For investor inquiries, please contact:
           </p>
           <p className="text-sm sm:text-base">
-            📧 <a href="mailto:investors@goldsainte.com" className="text-[#0c4d47] hover:underline font-medium">investors@goldsainte.com</a>
+            ðŸ“§ <a href="mailto:investors@goldsainte.com" className="text-[#0c4d47] hover:underline font-medium">investors@goldsainte.com</a>
           </p>
         </div>
       </AccordionContent>

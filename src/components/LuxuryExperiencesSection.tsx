@@ -1,10 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import tropicalHideaway from "@/assets/luxury-tropical-hideaway.jpg";
-import resortPool from "@/assets/luxury-resort-pool.jpg";
-import veniceSunset from "@/assets/luxury-venice-sunset.jpg";
-import infinityPool from "@/assets/luxury-infinity-pool.jpg";
-import arcticSpa from "@/assets/luxury-arctic-spa.jpg";
+import tropicalHideaway from "@/assets/luxury-tropical-hideaway.webp";
+import resortPool from "@/assets/luxury-resort-pool.webp";
+import veniceSunset from "@/assets/luxury-venice-sunset.webp";
+import infinityPool from "@/assets/luxury-infinity-pool.webp";
+import arcticSpa from "@/assets/luxury-arctic-spa.webp";
 
 interface LuxuryExperience {
   title: string;
@@ -96,7 +96,7 @@ export const LuxuryExperiencesSection = () => {
                   </p>
                   <div className="flex items-center gap-2 text-luxury-gold">
                     <span className="text-xs sm:text-sm tracking-wider uppercase">Explore Collection</span>
-                    <span className="transform group-hover:translate-x-2 transition-transform duration-300">→</span>
+                    <span className="transform group-hover:translate-x-2 transition-transform duration-300">â†’</span>
                   </div>
                 </div>
               </div>

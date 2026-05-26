@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { MapPin, Calendar, Heart, Star } from "lucide-react";
 import { CreatorAttribution } from "./CreatorAttribution";
-import logomark from "@/assets/logomark-gold.png";
+import logomark from "@/assets/logomark-gold.webp";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";

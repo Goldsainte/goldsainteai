@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ArrowLeft, Check, Copy } from "lucide-react";
 import { toast } from "sonner";
-import wordmarkGold from "@/assets/wordmark-gold.png";
+import wordmarkGold from "@/assets/wordmark-gold.webp";
 import {
   BASE_URL,
   articlePath,
@@ -33,7 +33,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
   });
 
   if (isLoading) {
-    return <div className="max-w-3xl mx-auto px-6 py-32 text-center text-[#0a2225]/50">Loading…</div>;
+    return <div className="max-w-3xl mx-auto px-6 py-32 text-center text-[#0a2225]/50">Loadingâ€¦</div>;
   }
   if (!article) return <Navigate to="/newsroom" replace />;
 
@@ -136,9 +136,9 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
 
         <div className="mt-4 sm:mt-5 md:mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-[12px] sm:text-[14px] text-[#0a2225]/70">
           <span>By {article.author?.full_name || "Goldsainte"}</span>
-          <span className="text-[#0a2225]/30">·</span>
+          <span className="text-[#0a2225]/30">Â·</span>
           <span>{formatDate(article.published_at)}</span>
-          <span className="text-[#0a2225]/30">·</span>
+          <span className="text-[#0a2225]/30">Â·</span>
           <span>{readMinutes} min read</span>
           <span className="inline-flex items-center bg-[#0c4d47]/10 text-[#0c4d47] px-3 py-0.5 rounded-full text-[11px] tracking-wide uppercase">
             {article.category || typeLabel}
@@ -155,7 +155,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         )}
       </article>
 
-      {/* Hero image — shown for all article types; branded fallback for press releases without one */}
+      {/* Hero image â€” shown for all article types; branded fallback for press releases without one */}
       {article.hero_image_url ? (
         <figure className="max-w-[680px] mx-auto px-5 sm:px-6 mt-8 md:mt-12 animate-fade-in">
           <img
@@ -218,7 +218,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
                 to="/newsroom/media-kit"
                 className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.25em] text-[#0c4d47] hover:text-[#0a3d39]"
               >
-                Download brand assets <span aria-hidden>→</span>
+                Download brand assets <span aria-hidden>â†’</span>
               </Link>
             </div>
             <div className="bg-[#F6F0E4] rounded-xl p-6 md:p-8">
@@ -303,7 +303,7 @@ function ShareRow({ title, url }: { title: string; url: string }) {
   const shareInstagram = async () => {
     try {
       await navigator.clipboard.writeText(`${title} ${url}`);
-      toast.success("Link copied — paste it into your Instagram story or DM");
+      toast.success("Link copied â€” paste it into your Instagram story or DM");
     } catch {
       toast.error("Could not copy link");
     }

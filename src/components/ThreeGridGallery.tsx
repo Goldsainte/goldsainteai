@@ -1,8 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
-import luxuryBeachImage from "@/assets/luxury-beach.jpg";
-import tokyoCanalImage from "@/assets/tokyo-canal-night.jpg";
-import dubaiCityImage from "@/assets/dubai-cityscape.jpg";
+import luxuryBeachImage from "@/assets/luxury-beach.webp";
+import tokyoCanalImage from "@/assets/tokyo-canal-night.webp";
+import dubaiCityImage from "@/assets/dubai-cityscape.webp";
 
 export const ThreeGridGallery = () => {
   const { t } = useTranslation();

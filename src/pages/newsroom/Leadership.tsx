@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { useQuery } from "@tanstack/react-query";
 import { fetchAuthors, BASE_URL } from "./lib";
-import signatureImage from "@/assets/newsroom/signature-andre-powell.png";
+import signatureImage from "@/assets/newsroom/signature-andre-powell.webp";
 import {
   NewsroomPageHeader,
   newsroomPageSectionClass,
@@ -16,7 +16,7 @@ const FOUNDER_BACKGROUND = [
   },
   {
     label: "Marketplace Evolution",
-    body: "Identified the gap between travel inspiration, planning, and booking — leading to Goldsainte's evolution into a global AI travel marketplace.",
+    body: "Identified the gap between travel inspiration, planning, and booking â€” leading to Goldsainte's evolution into a global AI travel marketplace.",
   },
   {
     label: "Operational Leadership",
@@ -55,7 +55,7 @@ export default function Leadership() {
       <div className={`${newsroomPageShellClass} px-5 sm:px-6 space-y-14 md:space-y-24`}>
         {/* Page header */}
         <NewsroomPageHeader
-          eyebrow="Goldsainte Newsroom · Founder"
+          eyebrow="Goldsainte Newsroom Â· Founder"
           title="The founder building the future of travel."
           intro={
             <p>
@@ -119,7 +119,7 @@ export default function Leadership() {
                     rel="noopener noreferrer"
                     className="text-[10px] uppercase tracking-[0.25em] text-[#0c4d47] hover:underline mt-5 inline-block"
                   >
-                    LinkedIn →
+                    LinkedIn â†’
                   </a>
                 )}
               </div>

@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { Home, Users, MessageCircle, BarChart3, User, LogOut } from "lucide-react";
-import logoWordmark from "@/assets/primary-horizontal-logo-gold-2.png";
+import logoWordmark from "@/assets/primary-horizontal-logo-gold-2.webp";
 import { useAuth } from "@/contexts/AuthContext";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

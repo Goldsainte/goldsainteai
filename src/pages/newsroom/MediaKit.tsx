@@ -16,22 +16,22 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import heroImage from "@/assets/newsroom/mediakit-hero.jpg";
-import signatureImage from "@/assets/newsroom/signature-andre-powell.png";
-import logomarkGold from "@/assets/newsroom/logos/logomark-gold.png";
-import logomarkGreen from "@/assets/newsroom/logos/logomark-green.png";
-import primaryHorizontalGold from "@/assets/newsroom/logos/primary-horizontal-gold.png";
-import primaryHorizontalGreen from "@/assets/newsroom/logos/primary-horizontal-green.png";
-import primaryVerticalGold from "@/assets/newsroom/logos/primary-vertical-gold.png";
-import primaryVerticalGreen from "@/assets/newsroom/logos/primary-vertical-green.png";
-import secondaryHorizontalGold from "@/assets/newsroom/logos/secondary-horizontal-gold.png";
-import secondaryHorizontalGreen from "@/assets/newsroom/logos/secondary-horizontal-green.png";
-import secondaryVerticalGold from "@/assets/newsroom/logos/secondary-vertical-gold.png";
-import secondaryVerticalGreen from "@/assets/newsroom/logos/secondary-vertical-green.png";
-import wordmarkGold from "@/assets/newsroom/logos/wordmark-gold.png";
-import wordmarkGreen from "@/assets/newsroom/logos/wordmark-green.png";
-import logomarkSealGold from "@/assets/newsroom/logos/logomark-seal-gold.png";
-import logomarkSealGreen from "@/assets/newsroom/logos/logomark-seal-green.png";
+import heroImage from "@/assets/newsroom/mediakit-hero.webp";
+import signatureImage from "@/assets/newsroom/signature-andre-powell.webp";
+import logomarkGold from "@/assets/newsroom/logos/logomark-gold.webp";
+import logomarkGreen from "@/assets/newsroom/logos/logomark-green.webp";
+import primaryHorizontalGold from "@/assets/newsroom/logos/primary-horizontal-gold.webp";
+import primaryHorizontalGreen from "@/assets/newsroom/logos/primary-horizontal-green.webp";
+import primaryVerticalGold from "@/assets/newsroom/logos/primary-vertical-gold.webp";
+import primaryVerticalGreen from "@/assets/newsroom/logos/primary-vertical-green.webp";
+import secondaryHorizontalGold from "@/assets/newsroom/logos/secondary-horizontal-gold.webp";
+import secondaryHorizontalGreen from "@/assets/newsroom/logos/secondary-horizontal-green.webp";
+import secondaryVerticalGold from "@/assets/newsroom/logos/secondary-vertical-gold.webp";
+import secondaryVerticalGreen from "@/assets/newsroom/logos/secondary-vertical-green.webp";
+import wordmarkGold from "@/assets/newsroom/logos/wordmark-gold.webp";
+import wordmarkGreen from "@/assets/newsroom/logos/wordmark-green.webp";
+import logomarkSealGold from "@/assets/newsroom/logos/logomark-seal-gold.webp";
+import logomarkSealGreen from "@/assets/newsroom/logos/logomark-seal-green.webp";
 import { newsroomPageShellClass, newsroomSectionTitleClass } from "./ui";
 
 const COLORS = [
@@ -44,24 +44,24 @@ const COLORS = [
 const BOILERPLATES = {
   short: {
     label: "Short",
-    meta: "~30 words · social, captions, citations",
+    meta: "~30 words Â· social, captions, citations",
     text: COMPANY_BOILERPLATE_SHORT,
   },
   press: {
     label: "Press",
-    meta: "~50 words · press releases, media inclusion",
+    meta: "~50 words Â· press releases, media inclusion",
     text: COMPANY_BOILERPLATE_MEDIUM,
   },
   investor: {
     label: "Investor",
-    meta: "~100 words · long-form coverage, decks, profiles",
+    meta: "~100 words Â· long-form coverage, decks, profiles",
     text: COMPANY_BOILERPLATE_LONG,
   },
   founder: {
     label: "Founder",
-    meta: "Attributed quote · op-eds, interviews, founder profiles",
+    meta: "Attributed quote Â· op-eds, interviews, founder profiles",
     text:
-      '"Modern travelers do not just want another booking engine. They want perspective, taste, and a person who actually knows the place. Goldsainte was built to bring that human craft back into travel — at the scale and speed the modern world expects." — Andre C. Powell, Jr., Founder & CEO of Goldsainte.',
+      '"Modern travelers do not just want another booking engine. They want perspective, taste, and a person who actually knows the place. Goldsainte was built to bring that human craft back into travel â€” at the scale and speed the modern world expects." â€” Andre C. Powell, Jr., Founder & CEO of Goldsainte.',
   },
 };
 
@@ -280,7 +280,7 @@ export default function MediaKit() {
         <div className="absolute inset-0 flex items-end">
           <div className="max-w-5xl mx-auto w-full px-5 sm:px-6 pb-6 sm:pb-10 md:pb-20">
             <p className="text-[9px] sm:text-[10px] tracking-[0.22em] sm:tracking-[0.32em] uppercase text-[#C7A962] mb-3 sm:mb-5">
-              Goldsainte Newsroom · Media Kit
+              Goldsainte Newsroom Â· Media Kit
             </p>
             <h1 className="font-secondary text-[28px] sm:text-[34px] md:text-5xl text-[#FDF9F0] max-w-[14ch] sm:max-w-xl md:max-w-2xl leading-[1.02] md:leading-[1.1]">
               Brand Assets &amp; Editorial Resources
@@ -315,13 +315,13 @@ export default function MediaKit() {
           <div className="grid md:grid-cols-12 gap-8 md:gap-12 items-start">
             <div className="md:col-span-4">
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
-                01 — The Kit
+                01 â€” The Kit
               </p>
             </div>
             <div className="md:col-span-8">
               <p className="font-secondary text-[24px] md:text-3xl text-[#0a2225] leading-[1.3]">
                 Everything an editor, producer, or journalist needs to write about
-                Goldsainte with accuracy and visual integrity — in one place.
+                Goldsainte with accuracy and visual integrity â€” in one place.
               </p>
               <p className="text-base text-[#0a2225]/70 mt-6 leading-relaxed max-w-2xl">
                 The materials below are pre-approved for editorial use. For interviews,
@@ -343,14 +343,14 @@ export default function MediaKit() {
         <section className={`${newsroomPageShellClass} pt-8 sm:pt-10 md:py-28`}>
           <div className="mb-12 max-w-3xl">
             <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
-              02 — Identity
+              02 â€” Identity
             </p>
             <h2 className={`${newsroomSectionTitleClass} mt-3`}>
               Logo
             </h2>
             <p className="text-base text-[#0a2225]/70 mt-4 leading-relaxed">
               The Goldsainte mark is provided in primary, secondary, wordmark, and
-              monogram configurations — each in forest green and gold. Please use
+              monogram configurations â€” each in forest green and gold. Please use
               the marks as supplied, without recoloring, distortion, or effects.
             </p>
           </div>
@@ -368,7 +368,7 @@ export default function MediaKit() {
             <button
               onClick={() => {
                 toast.promise(downloadLogoAssets(), {
-                  loading: "Preparing logo assets…",
+                  loading: "Preparing logo assetsâ€¦",
                   success: "Logo assets downloaded",
                   error: "Download failed. Please try again.",
                 });
@@ -393,7 +393,7 @@ export default function MediaKit() {
           <div className={`${newsroomPageShellClass} py-10 md:py-28`}>
             <div className="mb-12">
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
-                03 — Palette
+                03 â€” Palette
               </p>
               <h2 className={`${newsroomSectionTitleClass} mt-3`}>
                 The Goldsainte Palette
@@ -415,7 +415,7 @@ export default function MediaKit() {
         <section className={`${newsroomPageShellClass} py-10 md:py-28`}>
           <div className="mb-12">
             <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
-              04 — Typography
+              04 â€” Typography
             </p>
               <h2 className={`${newsroomSectionTitleClass} mt-3`}>
               Editorial Voice in Practice
@@ -425,7 +425,7 @@ export default function MediaKit() {
           <div className="border border-[#E5DFC6] bg-white/60 rounded-sm p-5 sm:p-8 md:p-14 space-y-10 md:space-y-12">
             <div className="space-y-3">
               <p className="text-[10px] tracking-[0.3em] uppercase text-[#0a2225]/45">
-                Eyebrow · Section label
+                Eyebrow Â· Section label
               </p>
               <p className="text-[11px] tracking-[0.32em] uppercase text-[#C7A962]">
                 The Modern Travel Marketplace
@@ -436,7 +436,7 @@ export default function MediaKit() {
 
             <div className="space-y-3">
               <p className="text-[10px] tracking-[0.3em] uppercase text-[#0a2225]/45">
-                Display headline · Serif
+                Display headline Â· Serif
               </p>
               <h3 className="font-secondary text-[30px] sm:text-4xl md:text-6xl leading-[1.05] text-[#0a2225]">
                 Travel doesn&apos;t belong to algorithms.
@@ -445,10 +445,10 @@ export default function MediaKit() {
 
             <div className="space-y-3">
               <p className="text-[10px] tracking-[0.3em] uppercase text-[#0a2225]/45">
-                Standfirst · Editorial subhead
+                Standfirst Â· Editorial subhead
               </p>
               <p className="font-secondary text-[20px] md:text-2xl leading-[1.4] text-[#0a2225]/85 max-w-2xl">
-                It belongs to the people who actually know the place — and to the
+                It belongs to the people who actually know the place â€” and to the
                 travelers willing to trust them.
               </p>
             </div>
@@ -456,7 +456,7 @@ export default function MediaKit() {
             <div className="grid md:grid-cols-2 gap-10">
               <div className="space-y-3">
                 <p className="text-[10px] tracking-[0.3em] uppercase text-[#0a2225]/45">
-                  Body · Sans
+                  Body Â· Sans
                 </p>
                 <p className="text-base leading-[1.75] text-[#0a2225]/80">
                   Goldsainte was founded on a simple instinct: the most memorable
@@ -467,11 +467,11 @@ export default function MediaKit() {
               </div>
               <div className="space-y-3">
                 <p className="text-[10px] tracking-[0.3em] uppercase text-[#0a2225]/45">
-                  Metadata · Caption
+                  Metadata Â· Caption
                 </p>
                 <p className="text-xs tracking-wide text-[#0a2225]/55 leading-relaxed">
-                  Charlotte, NC · Founded 2024 · AI-powered travel marketplace ·
-                  Vetted creators and independent agents · On-platform booking and
+                  Charlotte, NC Â· Founded 2024 Â· AI-powered travel marketplace Â·
+                  Vetted creators and independent agents Â· On-platform booking and
                   protection.
                 </p>
               </div>
@@ -498,7 +498,7 @@ export default function MediaKit() {
           <div className={`${newsroomPageShellClass} py-10 md:py-28`}>
             <div className="mb-10">
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
-                05 — Boilerplate
+                05 â€” Boilerplate
               </p>
               <h2 className={`${newsroomSectionTitleClass} mt-3`}>
                 Approved Company Language
@@ -520,7 +520,7 @@ export default function MediaKit() {
           <div className={`${newsroomPageShellClass} py-10 md:py-28`}>
             <div className="mb-12">
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
-                06 — Downloads
+                06 â€” Downloads
               </p>
               <h2 className={`${newsroomSectionTitleClass} mt-3`}>
                 Press Packs
@@ -591,7 +591,7 @@ export default function MediaKit() {
             <div className="grid md:grid-cols-12 gap-10 items-start">
               <div className="md:col-span-7 space-y-6">
                 <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
-                  07 — For the Press
+                  07 â€” For the Press
                 </p>
                 <h2 className="font-secondary text-[28px] md:text-5xl leading-[1.08] text-[#0a2225]">
                   For media inquiries, interviews, and founder commentary.
@@ -622,7 +622,7 @@ export default function MediaKit() {
                   <p className="text-[10px] tracking-[0.3em] uppercase text-[#C7A962] mb-2">
                     Headquarters
                   </p>
-                  <p>Charlotte, North Carolina · United States</p>
+                  <p>Charlotte, North Carolina Â· United States</p>
                 </div>
                 <div>
                   <p className="text-[10px] tracking-[0.3em] uppercase text-[#C7A962] mb-2">

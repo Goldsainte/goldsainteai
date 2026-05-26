@@ -1,7 +1,7 @@
 import { Home, Search, User, LogIn, LogOut, LayoutDashboard, Briefcase, ShieldCheck, TrendingUp, Info, DollarSign, Sparkles, Newspaper } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import logomark from "@/assets/logomark-gold.png";
+import logomark from "@/assets/logomark-gold.webp";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { Button } from "@/components/ui/button";

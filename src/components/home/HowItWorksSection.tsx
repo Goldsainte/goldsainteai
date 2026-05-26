@@ -1,18 +1,18 @@
 // src/components/home/HowItWorksSection.tsx
-import beachFlowersImg from "@/assets/beach-flowers.jpg";                         // beach with red flowers
-import tokyoStreetImg from "@/assets/tokyo-street.jpg";                             // Tokyo street scene
-import photographerPlaneImg from "@/assets/photographer-plane.jpg";                 // photographer with plane
-import elephantsSafariImg from "@/assets/elephants-safari.jpg";                     // elephants walking
-import snowyTravelerImg from "@/assets/erik-mclean-sG_rwogcBCw-unsplash.jpg";       // traveler in snow
-import friendsHikeImg from "@/assets/felix-rostig-UmV2wr-Vbq8-unsplash.jpeg";       // friends hiking
-import resortPoolPalmsImg from "@/assets/resort-pool-palms.jpg";                    // resort pool with palms
+import beachFlowersImg from "@/assets/beach-flowers.webp";                         // beach with red flowers
+import tokyoStreetImg from "@/assets/tokyo-street.webp";                             // Tokyo street scene
+import photographerPlaneImg from "@/assets/photographer-plane.webp";                 // photographer with plane
+import elephantsSafariImg from "@/assets/elephants-safari.webp";                     // elephants walking
+import snowyTravelerImg from "@/assets/erik-mclean-sG_rwogcBCw-unsplash.webp";       // traveler in snow
+import friendsHikeImg from "@/assets/felix-rostig-UmV2wr-Vbq8-unsplash.webp";       // friends hiking
+import resortPoolPalmsImg from "@/assets/resort-pool-palms.webp";                    // resort pool with palms
 
 const steps = [
   {
     k: "travelers",
     label: "For travelers",
     title: "Post the trip. We build the team.",
-    body: "Share your dates, budget and the TikToks, Pins or moods that inspired the trip. Goldsainte surfaces creators + agents whose style and markets actually fit you. Review proposals and storyboards, then book the one that feels right — all inside Goldsainte.",
+    body: "Share your dates, budget and the TikToks, Pins or moods that inspired the trip. Goldsainte surfaces creators + agents whose style and markets actually fit you. Review proposals and storyboards, then book the one that feels right â€” all inside Goldsainte.",
     pill: "Travelers",
   },
   {
@@ -33,7 +33,7 @@ const steps = [
     k: "ai-matching",
     label: "AI matching",
     title: "Find your perfect match, instantly.",
-    body: "Share your destination, dates, and travel style. Our AI scores thousands of creator and agent profiles in seconds, surfacing only those whose expertise, aesthetic, and markets align with your vision. No endless scrolling—just curated matches, ready to collaborate.",
+    body: "Share your destination, dates, and travel style. Our AI scores thousands of creator and agent profiles in seconds, surfacing only those whose expertise, aesthetic, and markets align with your vision. No endless scrollingâ€”just curated matches, ready to collaborate.",
     pill: "AI Matching",
   },
 ];
@@ -93,7 +93,7 @@ export function HowItWorksSection() {
 
           <div className="pt-4 text-xs text-[#8D8D8D]">
             All communication and payments stay inside Goldsainte. No phone
-            numbers, no side deals — just beautifully organized trips.
+            numbers, no side deals â€” just beautifully organized trips.
           </div>
         </div>
 

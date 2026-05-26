@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import verifiedBadgeIcon from "@/assets/verified-badge.png";
+import verifiedBadgeIcon from "@/assets/verified-badge.webp";
 import {
   Tooltip,
   TooltipContent,

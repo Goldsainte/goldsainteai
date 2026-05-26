@@ -1,7 +1,7 @@
 import { useWelcomeModal } from "@/hooks/useWelcomeModal";
 import { ArrowRight, X } from "lucide-react";
 import { Link } from "react-router-dom";
-import welcomeHeroImage from "@/assets/luxury-infinity-pool.jpg";
+import welcomeHeroImage from "@/assets/luxury-infinity-pool.webp";
 
 export function OnboardingWelcomeModal() {
   const { open, dismiss, accountType, displayName, loading } = useWelcomeModal();
