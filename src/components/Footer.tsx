@@ -149,10 +149,10 @@ export const Footer = () => {
           {legalLinks.map((l, i) => (
             <span key={l.label} className="flex items-center gap-2">
               <Link to={l.to} className={legalLinkClasses}>{l.label}</Link>
-              {i < legalLinks.length - 1 && <span className="text-[#9A9079]">Â·</span>}
+              {i < legalLinks.length - 1 && <span className="text-[#9A9079]">·</span>}
             </span>
           ))}
-          <span className="text-[#9A9079]">Â·</span>
+          <span className="text-[#9A9079]">·</span>
           <button
             type="button"
             onClick={() => window.dispatchEvent(new CustomEvent("show-install-prompt"))}
@@ -160,8 +160,8 @@ export const Footer = () => {
           >
             Install App
           </button>
-          <span className="text-[#9A9079]">Â·</span>
-          <span className="text-xs text-[#9A9079]">Â© 2026 Goldsainte AI Inc. All rights reserved.</span>
+          <span className="text-[#9A9079]">·</span>
+          <span className="text-xs text-[#9A9079]">© 2026 Goldsainte AI Inc. All rights reserved.</span>
         </div>
       </div>
     </footer>

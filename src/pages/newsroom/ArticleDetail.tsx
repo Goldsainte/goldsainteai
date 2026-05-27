@@ -136,9 +136,9 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
 
         <div className="mt-4 sm:mt-5 md:mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-[12px] sm:text-[14px] text-[#0a2225]/70">
           <span>By {article.author?.full_name || "Goldsainte"}</span>
-          <span className="text-[#0a2225]/30">Â·</span>
+          <span className="text-[#0a2225]/30">·</span>
           <span>{formatDate(article.published_at)}</span>
-          <span className="text-[#0a2225]/30">Â·</span>
+          <span className="text-[#0a2225]/30">·</span>
           <span>{readMinutes} min read</span>
           <span className="inline-flex items-center bg-[#0c4d47]/10 text-[#0c4d47] px-3 py-0.5 rounded-full text-[11px] tracking-wide uppercase">
             {article.category || typeLabel}

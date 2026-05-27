@@ -111,7 +111,7 @@ export function RoleSpecificCTAs() {
         </div>
 
         <p className="mt-12 text-center font-secondary italic text-[12px] text-[#0a2225]/55">
-          One ecosystem Â· Three ways to belong
+          One ecosystem · Three ways to belong
         </p>
       </div>
     </section>

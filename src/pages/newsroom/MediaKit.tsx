@@ -44,22 +44,22 @@ const COLORS = [
 const BOILERPLATES = {
   short: {
     label: "Short",
-    meta: "~30 words Â· social, captions, citations",
+    meta: "~30 words · social, captions, citations",
     text: COMPANY_BOILERPLATE_SHORT,
   },
   press: {
     label: "Press",
-    meta: "~50 words Â· press releases, media inclusion",
+    meta: "~50 words · press releases, media inclusion",
     text: COMPANY_BOILERPLATE_MEDIUM,
   },
   investor: {
     label: "Investor",
-    meta: "~100 words Â· long-form coverage, decks, profiles",
+    meta: "~100 words · long-form coverage, decks, profiles",
     text: COMPANY_BOILERPLATE_LONG,
   },
   founder: {
     label: "Founder",
-    meta: "Attributed quote Â· op-eds, interviews, founder profiles",
+    meta: "Attributed quote · op-eds, interviews, founder profiles",
     text:
       '"Modern travelers do not just want another booking engine. They want perspective, taste, and a person who actually knows the place. Goldsainte was built to bring that human craft back into travel â€” at the scale and speed the modern world expects." â€” Andre C. Powell, Jr., Founder & CEO of Goldsainte.',
   },
@@ -280,7 +280,7 @@ export default function MediaKit() {
         <div className="absolute inset-0 flex items-end">
           <div className="max-w-5xl mx-auto w-full px-5 sm:px-6 pb-6 sm:pb-10 md:pb-20">
             <p className="text-[9px] sm:text-[10px] tracking-[0.22em] sm:tracking-[0.32em] uppercase text-[#C7A962] mb-3 sm:mb-5">
-              Goldsainte Newsroom Â· Media Kit
+              Goldsainte Newsroom · Media Kit
             </p>
             <h1 className="font-secondary text-[28px] sm:text-[34px] md:text-5xl text-[#FDF9F0] max-w-[14ch] sm:max-w-xl md:max-w-2xl leading-[1.02] md:leading-[1.1]">
               Brand Assets &amp; Editorial Resources
@@ -425,7 +425,7 @@ export default function MediaKit() {
           <div className="border border-[#E5DFC6] bg-white/60 rounded-sm p-5 sm:p-8 md:p-14 space-y-10 md:space-y-12">
             <div className="space-y-3">
               <p className="text-[10px] tracking-[0.3em] uppercase text-[#0a2225]/45">
-                Eyebrow Â· Section label
+                Eyebrow · Section label
               </p>
               <p className="text-[11px] tracking-[0.32em] uppercase text-[#C7A962]">
                 The Modern Travel Marketplace
@@ -436,7 +436,7 @@ export default function MediaKit() {
 
             <div className="space-y-3">
               <p className="text-[10px] tracking-[0.3em] uppercase text-[#0a2225]/45">
-                Display headline Â· Serif
+                Display headline · Serif
               </p>
               <h3 className="font-secondary text-[30px] sm:text-4xl md:text-6xl leading-[1.05] text-[#0a2225]">
                 Travel doesn&apos;t belong to algorithms.
@@ -445,7 +445,7 @@ export default function MediaKit() {
 
             <div className="space-y-3">
               <p className="text-[10px] tracking-[0.3em] uppercase text-[#0a2225]/45">
-                Standfirst Â· Editorial subhead
+                Standfirst · Editorial subhead
               </p>
               <p className="font-secondary text-[20px] md:text-2xl leading-[1.4] text-[#0a2225]/85 max-w-2xl">
                 It belongs to the people who actually know the place â€” and to the
@@ -456,7 +456,7 @@ export default function MediaKit() {
             <div className="grid md:grid-cols-2 gap-10">
               <div className="space-y-3">
                 <p className="text-[10px] tracking-[0.3em] uppercase text-[#0a2225]/45">
-                  Body Â· Sans
+                  Body · Sans
                 </p>
                 <p className="text-base leading-[1.75] text-[#0a2225]/80">
                   Goldsainte was founded on a simple instinct: the most memorable
@@ -467,11 +467,11 @@ export default function MediaKit() {
               </div>
               <div className="space-y-3">
                 <p className="text-[10px] tracking-[0.3em] uppercase text-[#0a2225]/45">
-                  Metadata Â· Caption
+                  Metadata · Caption
                 </p>
                 <p className="text-xs tracking-wide text-[#0a2225]/55 leading-relaxed">
-                  Charlotte, NC Â· Founded 2024 Â· AI-powered travel marketplace Â·
-                  Vetted creators and independent agents Â· On-platform booking and
+                  Charlotte, NC · Founded 2024 · AI-powered travel marketplace ·
+                  Vetted creators and independent agents · On-platform booking and
                   protection.
                 </p>
               </div>
@@ -622,7 +622,7 @@ export default function MediaKit() {
                   <p className="text-[10px] tracking-[0.3em] uppercase text-[#C7A962] mb-2">
                     Headquarters
                   </p>
-                  <p>Charlotte, North Carolina Â· United States</p>
+                  <p>Charlotte, North Carolina · United States</p>
                 </div>
                 <div>
                   <p className="text-[10px] tracking-[0.3em] uppercase text-[#C7A962] mb-2">

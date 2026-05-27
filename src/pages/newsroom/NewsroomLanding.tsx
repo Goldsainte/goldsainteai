@@ -93,7 +93,7 @@ export default function NewsroomLanding() {
       {/* Editorial masthead â€” newspaper nameplate */}
       <section className="max-w-7xl mx-auto px-5 sm:px-6 pt-8 sm:pt-12 md:pt-24 pb-8 md:pb-16">
         <NewsroomPageHeader
-          eyebrow="Vol. 1 Â· The Goldsainte Press"
+          eyebrow="Vol. 1 · The Goldsainte Press"
           title="Newsroom"
           intro={
             <p className="max-w-2xl">
@@ -131,7 +131,7 @@ export default function NewsroomLanding() {
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/85 via-[#0a2225]/30 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6 md:p-12 max-w-4xl">
                 <span className="text-[10px] tracking-[0.25em] sm:tracking-[0.3em] uppercase text-[#C7A962] mb-2 sm:mb-3 block">
-                  Featured Â· {featured.type === "press_release" ? "Press Release" : featured.type}
+                  Featured · {featured.type === "press_release" ? "Press Release" : featured.type}
                 </span>
                 <h2 className="font-secondary text-white text-[24px] sm:text-3xl md:text-5xl leading-[1.05] tracking-tight mb-3 sm:mb-4 group-hover:text-[#FDF9F0] transition">
                   {featured.title}
