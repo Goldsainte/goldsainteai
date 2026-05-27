@@ -4,10 +4,10 @@
 
 // from here uses the same backend as src/integrations/supabase/client.ts.
 
-const CURRENT_BACKEND_URL = "https://iwdevxltjuedijrcdejs.supabase.co";
+const CURRENT_BACKEND_URL = "https://ktzsgqrqvwtxlimctkaf.supabase.co";
 
 const CURRENT_BACKEND_PUBLISHABLE_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3ZGV2eGx0anVlZGlqcmNkZWpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxNjQ4MDEsImV4cCI6MjA3NDc0MDgwMX0.syDQQrSgkyB1MEuE-OeMpxVt6wfoH17lDjMGGEzOiBc";
+  "sb_publishable_i5xwYqNzT3JOevhcl7-J3w_J2oofXm5";
 
 export const SUPABASE_URL = CURRENT_BACKEND_URL;
 
