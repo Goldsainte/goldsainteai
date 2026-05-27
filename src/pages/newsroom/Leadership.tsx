@@ -55,7 +55,7 @@ export default function Leadership() {
       <div className={`${newsroomPageShellClass} px-5 sm:px-6 space-y-14 md:space-y-24`}>
         {/* Page header */}
         <NewsroomPageHeader
-          eyebrow="Goldsainte Newsroom Â· Founder"
+          eyebrow="Goldsainte Newsroom · Founder"
           title="The founder building the future of travel."
           intro={
             <p>
