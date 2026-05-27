@@ -241,3 +241,5 @@ project_id = "ktzsgqrqvwtxlimctkaf"
     verify_jwt = false
   [functions.newsroom-prerender]
     verify_jwt = false
+  [functions.track-view]
+    verify_jwt = false
