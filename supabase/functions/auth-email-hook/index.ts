@@ -35,7 +35,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 // Configuration
 const SITE_NAME = 'Goldsainte'
 const ROOT_DOMAIN = 'goldsainte.com'
-const FROM_DOMAIN = 'notify.goldsainte.com'
+const FROM_DOMAIN = 'goldsainte.com'
 
 // Sample data for preview mode ONLY (not used in actual email sending).
 const SAMPLE_PROJECT_URL = 'https://goldsainte.ai'
@@ -239,7 +239,7 @@ async function handleSupabaseHook(req: Request): Promise<Response> {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: `Goldsainte <noreply@${FROM_DOMAIN}>`,
+        from: `Goldsainte <support@${FROM_DOMAIN}>`,
         to: [recipientEmail],
         subject: EMAIL_SUBJECTS[emailType] || 'Notification',
         html,
