@@ -12,7 +12,6 @@ import { TripFAQAccordion } from "@/components/trips/TripFAQAccordion";
 import { TripTrustFooter } from "@/components/trips/TripTrustFooter";
 import { MakeItMinePanel } from "@/components/trips/MakeItMinePanel";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getSeededTripBySlug } from "@/data/seededTrips";
 
 export default function TripDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -42,7 +41,7 @@ export default function TripDetailPage() {
 
       const { data, error } = await query.maybeSingle();
       if (error) throw error;
-      return data ?? getSeededTripBySlug(isUUID ? null : slug);
+      return data;
     },
     enabled: !!slug,
   });
