@@ -11,8 +11,8 @@ import type { Database } from "./types";
 // different databases. Hardcoding guarantees BOTH builds always connect to
 // the same project. The publishable (anon) key is public by design and
 // safe to commit.
-const SUPABASE_URL = "https://iwdevxltjuedijrcdejs.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3ZGV2eGx0anVlZGlqcmNkZWpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxNjQ4MDEsImV4cCI6MjA3NDc0MDgwMX0.syDQQrSgkyB1MEuE-OeMpxVt6wfoH17lDjMGGEzOiBc";
+const SUPABASE_URL = "https://ktzsgqrqvwtxlimctkaf.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_i5xwYqNzT3JOevhcl7-J3w_J2oofXm5";
  
 // Import the supabase client like this:
 //   import { supabase } from "@/integrations/supabase/client"
