@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { getEdgeFunctionUrl } from "@/lib/backendConfig";
 import { NewTripForYouCard } from "@/components/trips/NewTripForYouCard";
 import { InProgressTripCard } from "@/components/trips/InProgressTripCard";
 import { CompletedTripCard } from "@/components/trips/CompletedTripCard";
@@ -134,7 +135,7 @@ export default function MyTripMatchesPage() {
       }
 
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/update-trip-match-status`,
+        getEdgeFunctionUrl("update-trip-match-status"),
         {
           method: "POST",
           headers: {

@@ -3,9 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
+import { getEdgeFunctionUrl, SUPABASE_PUBLISHABLE_KEY } from '@/lib/backendConfig';
 
 type State = 'loading' | 'valid' | 'already' | 'invalid' | 'submitting' | 'done' | 'error';
 
@@ -19,8 +17,8 @@ export default function UnsubscribePage() {
     (async () => {
       try {
         const res = await fetch(
-          `${SUPABASE_URL}/functions/v1/handle-email-unsubscribe?token=${encodeURIComponent(token)}`,
-          { headers: { apikey: SUPABASE_ANON_KEY } }
+          `${getEdgeFunctionUrl('handle-email-unsubscribe')}?token=${encodeURIComponent(token)}`,
+          { headers: { apikey: SUPABASE_PUBLISHABLE_KEY } }
         );
         const data = await res.json();
         if (!res.ok) { setState('invalid'); return; }
