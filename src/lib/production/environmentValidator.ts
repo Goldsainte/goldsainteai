@@ -1,3 +1,5 @@
+import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from "@/lib/backendConfig";
+
 /**
  * Environment validation utilities for production readiness
  */
@@ -25,15 +27,15 @@ export async function validateEnvironment(): Promise<ValidationResult> {
   const checks: EnvironmentCheck[] = [
     {
       name: "Supabase URL",
-      check: () => !!import.meta.env.VITE_SUPABASE_URL,
+      check: () => !!SUPABASE_URL,
       required: true,
-      errorMessage: "VITE_SUPABASE_URL is not configured",
+      errorMessage: "Backend URL is not configured",
     },
     {
       name: "Supabase Anon Key",
-      check: () => !!import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      check: () => !!SUPABASE_PUBLISHABLE_KEY,
       required: true,
-      errorMessage: "VITE_SUPABASE_PUBLISHABLE_KEY is not configured",
+      errorMessage: "Backend publishable key is not configured",
     },
     {
       name: "Production Mode",
@@ -113,7 +115,7 @@ export async function validateEndpoints(): Promise<ValidationResult> {
   const errors: string[] = [];
   const warnings: string[] = [];
 
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseUrl = SUPABASE_URL;
   
   if (!supabaseUrl) {
     errors.push("Supabase URL not configured");
@@ -125,7 +127,7 @@ export async function validateEndpoints(): Promise<ValidationResult> {
     const response = await fetch(`${supabaseUrl}/rest/v1/`, {
       method: "GET",
       headers: {
-        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        apikey: SUPABASE_PUBLISHABLE_KEY,
       },
     });
 
