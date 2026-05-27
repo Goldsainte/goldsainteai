@@ -1,10 +1,6 @@
 // Backend project credentials — PINNED to the live project.
 
-// Previously this file pointed at an OLD, dead Supabase project
-
-// (iwdevxltjuedijrcdejs), which split the app across two databases.
-
-// It is now pinned to the correct live project so every file that imports
+// Pinned to the correct live project so every file that imports
 
 // from here uses the same backend as src/integrations/supabase/client.ts.
 
