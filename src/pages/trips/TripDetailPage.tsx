@@ -194,7 +194,7 @@ export default function TripDetailPage() {
             {/* Right Column - Booking Card (Sticky) */}
             <div className="lg:sticky lg:top-24 lg:self-start">
               <TripBookingCard
-                trip={trip}
+                trip={trip as any}
                 spotsLeft={spotsLeft}
                 depositAmount={depositAmount}
               />
