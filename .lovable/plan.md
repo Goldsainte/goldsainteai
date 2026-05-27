@@ -1,30 +1,27 @@
-## Goal
-Make Preview and Published use the same backend so:
-- Homepage Popular Trips and Featured Trips match
-- Marketplace shows all 33 published trips live
-- Custom domain and published subdomain stop calling the old backend
+## What I found
+- The **33 seeded trips are still in the database**.
+- Current count:
+  - `packaged_trips`: **33 total**
+  - `packaged_trips` with published status: **33**
+  - `travel_packages`: **0**
+- So they were **not deleted**.
+
+## Likely cause
+- The app now reads trips from **`packaged_trips`**.
+- The current homepage route is using **`src/pages/Index.tsx`**.
+- `Index.tsx` does **not render the featured trips/cards section**, so on `/` the seeded trips no longer show even though they still exist.
+- I also confirmed the legacy `travel_packages` seed path is no longer the source of truth here.
 
 ## Plan
+1. Restore the homepage trip-card section on the actual `/` page so the 33 published seeded trips are visible again.
+2. Verify the homepage is pulling from `packaged_trips` and not the legacy table.
+3. Verify the marketplace grid also shows the same published trips.
+4. Keep the image-card behavior, but make sure it does not hide records when a cover image is missing.
 
-1. Refresh the managed backend client configuration
-- Replace the stale backend reference in the generated integration so it resolves to the current backend project instead of the old `ktzsgqrqvwtxlimctkaf` project.
-- Do this through the managed integration flow rather than treating `src/integrations/supabase/client.ts` as a normal hand-edited app file.
+## Technical details
+- Database check showed: `packaged_trips_published = 33`.
+- `src/pages/Marketplace.tsx` queries `packaged_trips` with `status = 'published'`.
+- `src/pages/Index.tsx` currently renders hero/sections but no trip grid.
+- `src/pages/HomePage.tsx` does have a featured trips section, but that is not what the current `/` page is using.
 
-2. Remove fallback behavior that allows preview and published to diverge
-- Audit the app for any `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` fallback logic or production fallback assumptions.
-- Update those call sites so the app cannot silently connect to one backend in preview and another in published.
-- Keep the client import shape the same across the app.
-
-3. Validate the data path end to end
-- Confirm the backend currently has 33 published trips.
-- Verify Preview network requests hit the current backend.
-- Verify the published subdomain and custom domain also hit the current backend after the refresh.
-
-4. Recheck the affected UI surfaces
-- Compare homepage Popular Trips / Featured Trips between Preview and Published.
-- Recheck marketplace trip count and confirm the seeded published trips render live.
-
-## Technical notes
-- Root cause is a stale backend reference in the managed client/fallback path, not the marketplace query itself.
-- Right now Preview is using the current backend via environment/config, while Published falls back to the old backend, causing the mismatch.
-- Success criteria: all live URLs request data from the current backend only, with no requests to `ktzsgqrqvwtxlimctkaf`.
+If you approve, I’ll restore the visible trip cards on the live homepage and verify the marketplace listing too.
