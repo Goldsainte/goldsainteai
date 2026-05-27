@@ -2,16 +2,18 @@
 // configuration behavior, but keep the client shape the same.
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
-
-// Production credentials are used as fallbacks so the app always works in prod.
-// For local development, set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY
-// in .env.local to point at your local Supabase instance (supabase start).
-const SUPABASE_URL =
-  import.meta.env.VITE_SUPABASE_URL || "https://ktzsgqrqvwtxlimctkaf.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY =
-  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-  "sb_publishable_i5xwYqNzT3JOevhcl7-J3w_J2oofXm5";
-
+ 
+// Supabase project credentials are PINNED directly — no env-var override.
+// This is deliberate: an `import.meta.env.VITE_SUPABASE_URL || fallback`
+// pattern lets a build-time environment variable silently point a build at
+// a different project. Because Lovable's Preview and Published builds can
+// carry different env vars, that pattern causes the two sites to read from
+// different databases. Hardcoding guarantees BOTH builds always connect to
+// the same project. The publishable (anon) key is public by design and
+// safe to commit.
+const SUPABASE_URL = "https://ktzsgqrqvwtxlimctkaf.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_i5xwYqNzT3JOevhcl7-J3w_J2oofXm5";
+ 
 // Import the supabase client like this:
 //   import { supabase } from "@/integrations/supabase/client"
 export const supabase = createClient<Database>(
