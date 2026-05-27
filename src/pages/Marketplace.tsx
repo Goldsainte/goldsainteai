@@ -25,6 +25,7 @@ import { ThisWeekFooter } from "@/components/marketplace/ThisWeekFooter";
 import { ItineraryGuideCard } from "@/components/marketplace/ItineraryGuideCard";
 import { BundleCard } from "@/components/marketplace/BundleCard";
 import { BookOpen, Search } from "lucide-react";
+import { mergeSeededTrips, SEEDED_TRIP_COUNT } from "@/data/seededTrips";
 
 type Tab = "trips" | "trip-requests" | "itinerary-guides" | "bundles";
 
@@ -97,6 +98,16 @@ export default function Marketplace() {
     filters.endDate ||
     (filters.travelers && filters.travelers > 1)
   );
+
+  const shouldUseSeededFallback =
+    !filters.destination &&
+    !filters.startDate &&
+    !filters.endDate &&
+    (!filters.travelers || filters.travelers <= 1) &&
+    !filters.category &&
+    !filters.minPrice &&
+    !filters.maxPrice &&
+    !filters.sortBy;
 
   const handleClearFilters = () => {
     setFilters({ destination: "", travelers: 1 });
@@ -236,15 +247,17 @@ export default function Marketplace() {
 
   // Client-side price filter on liveTrips
   const filteredLiveTrips = useMemo(() => {
-    const combined = liveTrips ? [...liveTrips, ...extraTrips] : null;
-    if (!combined) return combined;
+    const combined = liveTrips ? [...liveTrips, ...extraTrips] : [];
+    const sourceTrips = shouldUseSeededFallback && combined.length < SEEDED_TRIP_COUNT
+      ? mergeSeededTrips(combined as any[])
+      : combined;
     const min = filters.minPrice ?? 0;
     const max = filters.maxPrice ?? 10000;
-    return (combined as any[]).filter((t) => {
+    return (sourceTrips as any[]).filter((t) => {
       const p = t.price_per_person ?? 0;
       return p >= min && p <= max;
     });
-  }, [liveTrips, extraTrips, filters.minPrice, filters.maxPrice]);
+  }, [liveTrips, extraTrips, filters.minPrice, filters.maxPrice, shouldUseSeededFallback]);
 
   // Trip Requests query — wired with search filters
   const { data: tripRequests, isLoading: isLoadingRequests } = useQuery({
