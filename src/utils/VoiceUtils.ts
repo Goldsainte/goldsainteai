@@ -1,3 +1,5 @@
+import { getEdgeFunctionUrl, SUPABASE_URL } from "@/lib/backendConfig";
+
 export class AudioRecorder {
   private stream: MediaStream | null = null;
   private audioContext: AudioContext | null = null;
@@ -172,12 +174,12 @@ export class RealtimeVoiceChat {
 
       // ---- POST SDP via Supabase relay
       // Validate environment and token before posting
-      if (!import.meta.env.VITE_SUPABASE_URL) {
-        console.error("❌ VITE_SUPABASE_URL is not set");
-        throw new Error("Voice config error: VITE_SUPABASE_URL not configured");
+      if (!SUPABASE_URL) {
+        console.error("❌ Backend URL is not set");
+        throw new Error("Voice config error: backend URL not configured");
       }
 
-      const relayUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/realtime-sdp-relay`;
+      const relayUrl = getEdgeFunctionUrl("realtime-sdp-relay");
       
       if (!EPHEMERAL_KEY || typeof EPHEMERAL_KEY !== "string" || EPHEMERAL_KEY.length < 20) {
         console.error("❌ Bad ephemeral token before SDP post (redacted)");

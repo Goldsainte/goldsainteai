@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { getEdgeFunctionUrl, SUPABASE_PUBLISHABLE_KEY } from "@/lib/backendConfig";
 import { toast } from "sonner";
 
 interface EdgeFunctionOptions {
@@ -152,12 +153,12 @@ export async function invokeStreamingEdgeFunction(
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     const response = await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${functionName}`,
+      getEdgeFunctionUrl(functionName),
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify(body),
         signal: controller.signal,

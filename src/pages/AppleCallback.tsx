@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { EditorialLoader } from '@/components/EditorialLoader';
 import { useToast } from '@/hooks/use-toast';
+import { getEdgeFunctionUrl } from '@/lib/backendConfig';
 
 const AppleCallback = () => {
   const [searchParams] = useSearchParams();
@@ -57,7 +58,7 @@ const AppleCallback = () => {
 
           // Forward to edge function
           const response = await fetch(
-            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/apple-signin-callback`,
+            getEdgeFunctionUrl('apple-signin-callback'),
             {
               method: 'POST',
               body: formData,

@@ -33,6 +33,7 @@ import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { getPublicStorageUrl } from "@/lib/backendConfig";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -695,7 +696,7 @@ export default function ProposalDetailPage() {
                         )}
                       </div>
                       <Button variant="ghost" size="xs" asChild>
-                        <a href={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/proposal-attachments/${att.file_path}`} target="_blank" rel="noopener noreferrer">
+                        <a href={getPublicStorageUrl("proposal-attachments", att.file_path)} target="_blank" rel="noopener noreferrer">
                           <Download className="h-4 w-4" />
                         </a>
                       </Button>

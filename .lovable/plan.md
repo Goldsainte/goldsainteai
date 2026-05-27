@@ -1,27 +1,30 @@
-## Plan: Restore Fallback Cover Images with Shared Component
+## Goal
+Make Preview and Published use the same backend so:
+- Homepage Popular Trips and Featured Trips match
+- Marketplace shows all 33 published trips live
+- Custom domain and published subdomain stop calling the old backend
 
-### Problem
-Trip, bundle, and guide cards render `<img src={cover_image_url || ""}>` — when the URL is missing or the image fails to load, the card shows a blank/broken tile.
+## Plan
 
-### Solution
-Create one shared component that handles the fallback consistently, then use it in all 6 card components.
+1. Refresh the managed backend client configuration
+- Replace the stale backend reference in the generated integration so it resolves to the current backend project instead of the old `ktzsgqrqvwtxlimctkaf` project.
+- Do this through the managed integration flow rather than treating `src/integrations/supabase/client.ts` as a normal hand-edited app file.
 
-### Step 1 — Create shared component
-Create `src/components/marketplace/TripCoverImage.tsx`:
-- Accepts `src`, `alt`, `className`, `loading`
-- Uses `useState` to track load failure
-- Falls back to `@/assets/luxury-destinations.jpg` when `src` is falsy or `onError` fires
+2. Remove fallback behavior that allows preview and published to diverge
+- Audit the app for any `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` fallback logic or production fallback assumptions.
+- Update those call sites so the app cannot silently connect to one backend in preview and another in published.
+- Keep the client import shape the same across the app.
 
-### Step 2 — Replace cover `<img>` tags (keeping existing className/loading/alt)
-In each file below, replace ONLY the main cover-image `<img>` element with `<TripCoverImage>`, preserving all existing props:
-1. `src/components/marketplace/TripCard.tsx`
-2. `src/components/marketplace/LiveTripCard.tsx`
-3. `src/components/marketplace/BundleCard.tsx`
-4. `src/components/marketplace/ItineraryGuideCard.tsx`
-5. `src/components/TopToursCarousel.tsx`
-6. `src/pages/HomePage.tsx`
+3. Validate the data path end to end
+- Confirm the backend currently has 33 published trips.
+- Verify Preview network requests hit the current backend.
+- Verify the published subdomain and custom domain also hit the current backend after the refresh.
 
-### Out of scope
-- No query/data changes
-- No changes to avatars, logos, or other `<img>` elements
-- No visual redesign
+4. Recheck the affected UI surfaces
+- Compare homepage Popular Trips / Featured Trips between Preview and Published.
+- Recheck marketplace trip count and confirm the seeded published trips render live.
+
+## Technical notes
+- Root cause is a stale backend reference in the managed client/fallback path, not the marketplace query itself.
+- Right now Preview is using the current backend via environment/config, while Published falls back to the old backend, causing the mismatch.
+- Success criteria: all live URLs request data from the current backend only, with no requests to `ktzsgqrqvwtxlimctkaf`.

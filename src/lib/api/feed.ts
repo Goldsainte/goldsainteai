@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { getEdgeFunctionUrl } from "@/lib/backendConfig";
 
 export type FeedCursor = { cursorCreatedAt: string; cursorId: string } | null;
 
@@ -48,9 +49,8 @@ export async function fetchFeed(
   }
 
   // Call edge function via fetch for GET support
-  const supabaseUrl = (supabase as any).supabaseUrl || import.meta.env.VITE_SUPABASE_URL;
   const response = await fetch(
-    `${supabaseUrl}/functions/v1/get-feed?${params.toString()}`,
+    `${getEdgeFunctionUrl("get-feed")}?${params.toString()}`,
     { headers }
   );
 

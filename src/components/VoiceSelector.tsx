@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Volume2, Play } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { getEdgeFunctionUrl, SUPABASE_PUBLISHABLE_KEY } from "@/lib/backendConfig";
 
 interface VoiceSelectorProps {
   selectedVoice: string;
@@ -33,13 +34,13 @@ export const VoiceSelector = ({ selectedVoice, onVoiceSelect }: VoiceSelectorPro
     
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-voice-preview`,
+        getEdgeFunctionUrl("generate-voice-preview"),
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            'Authorization': `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+            'apikey': SUPABASE_PUBLISHABLE_KEY,
           },
           body: JSON.stringify({ voice: voiceId }),
         }
