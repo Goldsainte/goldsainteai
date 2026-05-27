@@ -1,5 +1,6 @@
 import * as React from 'npm:react@18.3.1'
 import { renderAsync } from 'npm:@react-email/components@0.0.22'
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 import { SignupEmail } from '../_shared/email-templates/signup.tsx'
 import { InviteEmail } from '../_shared/email-templates/invite.tsx'
 import { MagicLinkEmail } from '../_shared/email-templates/magic-link.tsx'
@@ -37,7 +38,7 @@ const ROOT_DOMAIN = 'goldsainte.com'
 const FROM_DOMAIN = 'notify.goldsainte.com'
 
 // Sample data for preview mode ONLY (not used in actual email sending).
-const SAMPLE_PROJECT_URL = 'https://goldsainteai.lovable.app'
+const SAMPLE_PROJECT_URL = 'https://goldsainte.ai'
 const SAMPLE_EMAIL = 'user@example.test'
 const SAMPLE_DATA: Record<string, object> = {
   signup: {
@@ -71,7 +72,8 @@ const SAMPLE_DATA: Record<string, object> = {
   },
 }
 
-// Preview endpoint handler - returns rendered HTML without sending email
+// Preview endpoint handler - returns rendered HTML without sending email.
+// Used only by the email-template preview UI; it does NOT send mail.
 async function handlePreview(req: Request): Promise<Response> {
   const previewCorsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -82,7 +84,7 @@ async function handlePreview(req: Request): Promise<Response> {
     return new Response(null, { headers: previewCorsHeaders })
   }
 
-  const apiKey = Deno.env.get('LOVABLE_API_KEY')
+  const apiKey = Deno.env.get('PREVIEW_API_KEY')
   const authHeader = req.headers.get('Authorization')
 
   if (!apiKey || authHeader !== `Bearer ${apiKey}`) {
@@ -126,12 +128,19 @@ async function handlePreview(req: Request): Promise<Response> {
 // Supabase calls this function (instead of its built-in email sender) every time
 // an auth email needs to go out: signup confirmation, password reset, magic link, etc.
 //
-// Authorization: Supabase sends `Authorization: Bearer <SEND_EMAIL_HOOK_SECRET>`.
-// We verify that token matches our secret before processing anything.
+// AUTHENTICATION: Supabase signs every Send Email hook request using the
+// Standard Webhooks specification. It sends three headers — webhook-id,
+// webhook-timestamp and webhook-signature — and the request body is signed
+// with the hook secret. We MUST verify these headers with the standardwebhooks
+// library. Supabase does NOT send an "Authorization: Bearer <secret>" header,
+// so a plain bearer-token check rejects every legitimate request.
 //
-// Payload shape sent by Supabase:
+// The dashboard stores the secret as "v1,whsec_<base64>". The library expects
+// only the <base64> portion, so we strip the "v1,whsec_" prefix.
+//
+// Payload shape (after verification):
 // {
-//   "user": { "id": "...", "email": "..." },
+//   "user": { "id": "...", "email": "...", "new_email": "..." },
 //   "email_data": {
 //     "token": "6-digit OTP",
 //     "token_hash": "sha256 hash used to build the confirmation URL",
@@ -152,33 +161,35 @@ async function handleSupabaseHook(req: Request): Promise<Response> {
     )
   }
 
-  // Verify the request comes from Supabase Auth using the shared secret.
-  const authHeader = req.headers.get('Authorization')
-  if (!authHeader || authHeader !== `Bearer ${hookSecret}`) {
-    console.error('Unauthorized hook request - invalid or missing Authorization header')
+  // Read the RAW body — required for Standard Webhooks signature verification.
+  const payload = await req.text()
+  const headers = Object.fromEntries(req.headers)
+
+  // Verify the request actually came from Supabase Auth.
+  let user: { email?: string; new_email?: string }
+  let emailData: Record<string, string>
+  try {
+    const wh = new Webhook(hookSecret.replace('v1,whsec_', ''))
+    const verified = wh.verify(payload, headers) as {
+      user: { email?: string; new_email?: string }
+      email_data: Record<string, string>
+    }
+    user = verified.user
+    emailData = verified.email_data
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error('Webhook signature verification failed', { error: msg })
     return new Response(
-      JSON.stringify({ error: 'Unauthorized' }),
+      JSON.stringify({ error: 'Invalid signature' }),
       { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 
-  // Parse Supabase's hook payload.
-  let body: { user?: { email?: string }; email_data?: Record<string, string> }
-  try {
-    body = await req.json()
-  } catch (_err) {
-    return new Response(
-      JSON.stringify({ error: 'Invalid JSON body' }),
-      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
-  }
-
-  const recipientEmail = body.user?.email
-  const emailData = body.email_data
+  const recipientEmail = user?.email
   const emailType = emailData?.email_action_type
 
   if (!recipientEmail || !emailData || !emailType) {
-    console.error('Invalid hook payload - missing user.email, email_data or email_action_type', { body })
+    console.error('Invalid hook payload - missing user.email, email_data or email_action_type')
     return new Response(
       JSON.stringify({ error: 'Invalid payload' }),
       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -197,7 +208,8 @@ async function handleSupabaseHook(req: Request): Promise<Response> {
   }
 
   // Build the confirmation URL.
-  // SUPABASE_URL is auto-injected in every edge function.
+  // SUPABASE_URL is auto-injected in every edge function and points at the
+  // project this function is deployed on.
   const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
   const redirectTo = emailData.redirect_to ?? `https://${ROOT_DOMAIN}`
   const confirmationUrl = emailData.token_hash
@@ -212,13 +224,13 @@ async function handleSupabaseHook(req: Request): Promise<Response> {
     token: emailData.token,       // 6-digit OTP (used by reauthentication template)
     email: recipientEmail,
     oldEmail: recipientEmail,
-    newEmail: emailData.new_email,
+    newEmail: user.new_email,
   }
 
   const html = await renderAsync(React.createElement(EmailTemplate, templateProps))
   const text = await renderAsync(React.createElement(EmailTemplate, templateProps), { plainText: true })
 
-  // Send via Resend (same provider used throughout this project)
+  // Send via Resend (same provider used throughout this project).
   try {
     const resendResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -252,7 +264,7 @@ async function handleSupabaseHook(req: Request): Promise<Response> {
     )
   }
 
-  console.log('Auth email sent successfully', { emailType, email: recipientEmail, run_id })
+  console.log('Auth email sent successfully', { emailType, email: recipientEmail })
 
   return new Response(
     JSON.stringify({ success: true }),
