@@ -5,9 +5,13 @@ export interface SeededTrip {
   slug: string;
   title: string;
   destination: string;
+  description?: string | null;
   cover_image_url: string | null;
+  image_gallery?: string[] | null;
   price_per_person: number;
   currency: string;
+  original_price?: number | null;
+  deposit_percentage?: number | null;
   duration_days: number;
   duration_nights: number;
   max_participants: number;
@@ -18,6 +22,10 @@ export interface SeededTrip {
   available_from: string | null;
   available_until: string | null;
   tags: string[];
+  included?: string[] | null;
+  not_included?: string[] | null;
+  faqs?: Array<{ question: string; answer: string; category?: string }> | null;
+  host_tagline?: string | null;
   wishlist_count: number;
   booking_count: number;
   view_count: number;
