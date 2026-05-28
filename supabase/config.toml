@@ -181,6 +181,8 @@ project_id = "ktzsgqrqvwtxlimctkaf"
     verify_jwt = false
   [functions.stripe-webhook]
     verify_jwt = false
+  [functions.stripe-webhook-handler]
+    verify_jwt = false
   [functions.submit-job-completion]
     verify_jwt = true
   [functions.submit-transportation-vendor-application]
