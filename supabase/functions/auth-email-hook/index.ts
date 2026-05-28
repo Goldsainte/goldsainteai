@@ -1,5 +1,6 @@
 import * as React from 'npm:react@18.3.1'
 import { renderAsync } from 'npm:@react-email/components@0.0.22'
+import { Webhook } from 'npm:standardwebhooks@1.0.0'
 import { SignupEmail } from '../_shared/email-templates/signup.tsx'
 import { InviteEmail } from '../_shared/email-templates/invite.tsx'
 import { MagicLinkEmail } from '../_shared/email-templates/magic-link.tsx'
@@ -34,7 +35,9 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 // Configuration
 const SITE_NAME = 'Goldsainte'
 const ROOT_DOMAIN = 'goldsainte.com'
-const FROM_DOMAIN = 'notify.goldsainte.com'
+const FROM_DOMAIN = 'goldsainte.com'
+
+console.log('auth-email-hook module loaded')
 
 // Sample data for preview mode ONLY (not used in actual email sending).
 const SAMPLE_PROJECT_URL = 'https://goldsainteai.lovable.app'
@@ -126,8 +129,8 @@ async function handlePreview(req: Request): Promise<Response> {
 // Supabase calls this function (instead of its built-in email sender) every time
 // an auth email needs to go out: signup confirmation, password reset, magic link, etc.
 //
-// Authorization: Supabase sends `Authorization: Bearer <SEND_EMAIL_HOOK_SECRET>`.
-// We verify that token matches our secret before processing anything.
+// Verification: uses Standard Webhooks (standardwebhooks.com) via webhook-id,
+// webhook-timestamp, and webhook-signature headers sent by Supabase.
 //
 // Payload shape sent by Supabase:
 // {
@@ -152,30 +155,30 @@ async function handleSupabaseHook(req: Request): Promise<Response> {
     )
   }
 
-  // Verify the request comes from Supabase Auth using the shared secret.
-  const authHeader = req.headers.get('Authorization')
-  if (!authHeader || authHeader !== `Bearer ${hookSecret}`) {
-    console.error('Unauthorized hook request - invalid or missing Authorization header')
+  // Read raw body for signature verification (must be done before any .json() call)
+  const rawBody = await req.text()
+  const headers = Object.fromEntries(req.headers)
+
+  // Verify signature using Standard Webhooks. The secret stored as "v1,whsec_<base64>"
+  // must have the prefix stripped before being passed to the Webhook constructor.
+  const wh = new Webhook(hookSecret.replace('v1,whsec_', ''))
+  let body: { user?: { email?: string }; email_data?: Record<string, string> }
+  try {
+    body = wh.verify(rawBody, headers) as typeof body
+    console.log('Auth hook signature verified successfully')
+  } catch (err) {
+    console.error('Webhook signature verification failed:', err)
     return new Response(
       JSON.stringify({ error: 'Unauthorized' }),
       { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 
-  // Parse Supabase's hook payload.
-  let body: { user?: { email?: string }; email_data?: Record<string, string> }
-  try {
-    body = await req.json()
-  } catch (_err) {
-    return new Response(
-      JSON.stringify({ error: 'Invalid JSON body' }),
-      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
-  }
-
   const recipientEmail = body.user?.email
   const emailData = body.email_data
   const emailType = emailData?.email_action_type
+
+  console.log('Payload parsed', { emailType, recipientEmail, emailDataKeys: emailData ? Object.keys(emailData) : null })
 
   if (!recipientEmail || !emailData || !emailType) {
     console.error('Invalid hook payload - missing user.email, email_data or email_action_type', { body })
@@ -196,6 +199,8 @@ async function handleSupabaseHook(req: Request): Promise<Response> {
     )
   }
 
+  console.log('Template found, building confirmation URL')
+
   // Build the confirmation URL.
   // SUPABASE_URL is auto-injected in every edge function.
   const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
@@ -203,6 +208,8 @@ async function handleSupabaseHook(req: Request): Promise<Response> {
   const confirmationUrl = emailData.token_hash
     ? `${supabaseUrl}/auth/v1/verify?token=${emailData.token_hash}&type=${emailType}&redirect_to=${encodeURIComponent(redirectTo)}`
     : redirectTo
+
+  console.log('Rendering email template', { emailType, confirmationUrl: confirmationUrl.substring(0, 60) + '...' })
 
   const templateProps = {
     siteName: SITE_NAME,
@@ -215,8 +222,23 @@ async function handleSupabaseHook(req: Request): Promise<Response> {
     newEmail: emailData.new_email,
   }
 
-  const html = await renderAsync(React.createElement(EmailTemplate, templateProps))
-  const text = await renderAsync(React.createElement(EmailTemplate, templateProps), { plainText: true })
+  let html: string
+  let text: string
+  try {
+    html = await renderAsync(React.createElement(EmailTemplate, templateProps))
+    console.log('HTML render complete, rendering plain text')
+    text = await renderAsync(React.createElement(EmailTemplate, templateProps), { plainText: true })
+    console.log('Plain text render complete')
+  } catch (renderErr) {
+    const msg = renderErr instanceof Error ? renderErr.message : String(renderErr)
+    console.error('Email template render failed', { emailType, error: msg })
+    return new Response(
+      JSON.stringify({ error: 'Template render failed', detail: msg }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
+  }
+
+  console.log('Sending via Resend', { to: recipientEmail, subject: EMAIL_SUBJECTS[emailType] })
 
   // Send via Resend (same provider used throughout this project)
   try {
@@ -243,6 +265,7 @@ async function handleSupabaseHook(req: Request): Promise<Response> {
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
+    console.log('Resend API success', { status: resendResponse.status })
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error)
     console.error('Failed to send auth email', { error: errorMsg, emailType })
@@ -252,7 +275,7 @@ async function handleSupabaseHook(req: Request): Promise<Response> {
     )
   }
 
-  console.log('Auth email sent successfully', { emailType, email: recipientEmail, run_id })
+  console.log('Auth email sent successfully', { emailType, email: recipientEmail })
 
   return new Response(
     JSON.stringify({ success: true }),
