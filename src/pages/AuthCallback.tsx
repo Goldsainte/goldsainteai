@@ -116,7 +116,7 @@ const AuthCallback = () => {
               };
               const accountType =
                 pending.accountType || profile.account_type || 'traveler';
-             const isProfessional =
+              const isProfessional =
                 accountType === 'creator' ||
                 accountType === 'agent' ||
                 accountType === 'brand';
@@ -139,6 +139,11 @@ const AuthCallback = () => {
                     console.warn('[AuthCallback] welcome email invoke failed:', err);
                   });
               }
+            } catch (err) {
+              console.warn('[AuthCallback] could not parse pending_welcome_email:', err);
+            }
+          }
+        }
 
         // SECURITY: Only allow OAuth signups to self-assign 'traveler'.
         // Creator / agent / brand accounts require admin approval and CANNOT be
