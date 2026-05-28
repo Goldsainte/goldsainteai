@@ -44,11 +44,11 @@ export default function MyPurchasesPage() {
 
   return (
     <main className="min-h-screen bg-[#f7f3ea]">
-      <Helmet><title>My Purchases — Goldsainte</title></Helmet>
+      <Helmet><title>My Guides — Goldsainte</title></Helmet>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 md:py-14">
         <div className="w-12 h-0.5 bg-[#C7A962] mb-4" />
         <p className="font-primary text-xs uppercase tracking-[0.25em] text-[#C7A962]">Library</p>
-        <h1 className="mt-2 font-secondary text-3xl md:text-4xl text-[#0a2225]">My Purchases</h1>
+        <h1 className="mt-2 font-secondary text-3xl md:text-4xl text-[#0a2225]">My Guides</h1>
         <p className="mt-2 text-sm text-[#6B7280]">Itinerary guides you've purchased. Access them anytime.</p>
 
         <div className="mt-8">
@@ -61,7 +61,7 @@ export default function MyPurchasesPage() {
           ) : purchases.length === 0 ? (
             <div className="rounded-2xl border border-[#E5DFC6] bg-white p-10 text-center">
               <BookOpen className="mx-auto h-8 w-8 text-[#C7A962]" />
-              <h2 className="mt-3 font-secondary text-xl text-[#0a2225]">No purchases yet</h2>
+              <h2 className="mt-3 font-secondary text-xl text-[#0a2225]">No guides yet</h2>
               <p className="mt-1 text-sm text-[#6B7280]">Browse the marketplace to find itinerary guides from travel creators.</p>
               <Link
                 to="/marketplace?tab=itinerary-guides"
