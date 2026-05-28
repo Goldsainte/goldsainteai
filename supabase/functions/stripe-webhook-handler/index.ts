@@ -592,9 +592,10 @@ async function handleAccountUpdated(account: any) {
 
 async function notifyAndEmailOnBookingConfirmed(tripBookingId: string, session: any) {
   try {
+
     const { data: bookingData } = await supabaseClient
+      .from('trip_bookings')
       .select('partner_id, traveler_id, total_price, currency, metadata')
-      .select('partner_id, traveler_id, total_price, currency')
       .eq('id', tripBookingId)
       .single();
 
