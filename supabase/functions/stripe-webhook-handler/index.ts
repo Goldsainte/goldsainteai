@@ -593,7 +593,7 @@ async function handleAccountUpdated(account: any) {
 async function notifyAndEmailOnBookingConfirmed(tripBookingId: string, session: any) {
   try {
     const { data: bookingData } = await supabaseClient
-      .from('trip_bookings')
+      .select('partner_id, traveler_id, total_price, currency, metadata')
       .select('partner_id, traveler_id, total_price, currency')
       .eq('id', tripBookingId)
       .single();
@@ -635,14 +635,10 @@ async function notifyAndEmailOnBookingConfirmed(tripBookingId: string, session: 
       });
     }
 
-    // 2. Traveler confirmation email (inline via Resend to keep dependency-free)
-    const resendApiKey = Deno.env.get('RESEND_API_KEY');
-    if (!resendApiKey) {
-      console.log('RESEND_API_KEY not configured, skipping booking confirmation email');
-      return;
-    }
-
-    // Look up traveler email via auth admin
+// 2. Traveler confirmation email — routed through the branded template
+    // registry (send-transactional-email + React Email + AuthEmailLayout)
+    // so it matches every other transactional email in the system instead
+    // of the one-off inline HTML this function used to render.
     const { data: travelerUser } = await supabaseClient.auth.admin.getUserById(
       bookingData.traveler_id
     );
@@ -652,34 +648,47 @@ async function notifyAndEmailOnBookingConfirmed(tripBookingId: string, session: 
       return;
     }
 
-    const amountFmt = ((session.amount_total ?? 0) / 100).toFixed(2);
-    const currency = (session.currency || bookingData.currency || 'usd').toUpperCase();
+    // Specialist (partner) display name — best-effort. Falls back gracefully
+    // for platform-owned trips with no partner_id.
+    let specialistName: string | undefined;
+    if (bookingData.partner_id) {
+      const { data: partnerProfile } = await supabaseClient
+        .from('profiles')
+        .select('display_name, full_name')
+        .eq('id', bookingData.partner_id)
+        .maybeSingle();
+      specialistName =
+        (partnerProfile as any)?.display_name ||
+        (partnerProfile as any)?.full_name ||
+        undefined;
+    }
+    if (!specialistName) {
+      specialistName = 'the Goldsainte team';
+    }
 
-    const html = `
-      <div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;background:#f7f3ea;color:#0a2225;padding:32px;">
-        <h1 style="font-size:24px;margin:0 0 16px 0;">Your Goldsainte booking is confirmed</h1>
-        <p>Thank you — your deposit of <strong>${currency} ${amountFmt}</strong> has been received.</p>
-        <p>Booking reference: <code>${tripBookingId}</code></p>
-        <p>Your specialist will be in touch shortly to finalise your trip details.</p>
-        <p style="margin-top:32px;font-size:12px;color:#7A7151;">© ${new Date().getFullYear()} Goldsainte</p>
-      </div>
-    `;
+    // Trip name — trip-checkout-create stores this on the booking row's
+    // metadata. Falls back to a generic phrase if it's missing.
+    const tripName =
+      ((bookingData as any).metadata?.trip_title as string | undefined) ||
+      'your Goldsainte trip';
 
-    const resp = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${resendApiKey}`,
-      },
-      body: JSON.stringify({
-        from: 'Goldsainte <hello@goldsainte.com>',
-        to: [travelerEmail],
-        subject: 'Your Goldsainte booking is confirmed',
-        html,
-      }),
-    });
-    if (!resp.ok) {
-      console.error('Booking confirmation email failed', await resp.text());
+    const { error: emailErr } = await supabaseClient.functions.invoke(
+      'send-transactional-email',
+      {
+        body: {
+          templateName: 'booking-confirmation-traveler',
+          recipientEmail: travelerEmail,
+          idempotencyKey: `booking-confirmed-${tripBookingId}`,
+          templateData: {
+            bookingId: tripBookingId,
+            specialistName,
+            tripName,
+          },
+        },
+      }
+    );
+    if (emailErr) {
+      console.error('Booking confirmation email dispatch failed', emailErr);
     }
   } catch (e) {
     console.error('notifyAndEmailOnBookingConfirmed error', e);
