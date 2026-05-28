@@ -248,15 +248,6 @@ export const Header = () => {
                                 <span className="text-sm font-medium">My Purchases</span>
                               </DropdownMenuItem>
                             )}
-                            {isTraveler && (
-                              <DropdownMenuItem 
-                                onClick={() => navigate('/my-trips')} 
-                                className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                              >
-                                <Plane className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                <span className="text-sm font-medium">My Trips</span>
-                              </DropdownMenuItem>
-                            )}
                             {isAgentAccount && (
                               <DropdownMenuItem 
                                 onClick={() => navigate('/agent-trips')} 
