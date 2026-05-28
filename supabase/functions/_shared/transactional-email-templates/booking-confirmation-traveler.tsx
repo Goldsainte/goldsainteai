@@ -22,7 +22,7 @@ export const BookingConfirmationTravelerEmail = ({ bookingId, specialistName, tr
     `Pre-departure reminders will be sent automatically.`,
     `After your trip, you'll be invited to leave a private review.`
   ]}
-    cta={{ label: 'View my booking', url: `https://goldsainte.ai/traveler/bookings/${bookingId ?? ""}` }}
+    cta={{ label: 'View my booking', url: `https://goldsainte.ai/bookings/${bookingId ?? ""}` }}
   />
 )
 
