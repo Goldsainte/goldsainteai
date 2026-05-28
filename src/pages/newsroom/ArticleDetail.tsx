@@ -155,7 +155,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
         )}
       </article>
 
-      {/* Hero image â€” shown for all article types; branded fallback for press releases without one */}
+      {/* Hero image — shown for all article types; branded fallback for press releases without one */}
       {article.hero_image_url ? (
         <figure className="max-w-[680px] mx-auto px-5 sm:px-6 mt-8 md:mt-12 animate-fade-in">
           <img
@@ -303,7 +303,7 @@ function ShareRow({ title, url }: { title: string; url: string }) {
   const shareInstagram = async () => {
     try {
       await navigator.clipboard.writeText(`${title} ${url}`);
-      toast.success("Link copied â€” paste it into your Instagram story or DM");
+      toast.success("Link copied — paste it into your Instagram story or DM");
     } catch {
       toast.error("Could not copy link");
     }

@@ -22,7 +22,7 @@ const STATIC_NEWS: Array<{
     slug: "world-cup-reality-check",
     title: "The World Cup Reality Check: When Hype Meets the Hotel Bill",
     excerpt:
-      "Eighty percent of U.S. hotels say World Cup bookings are falling short â€” and the reason why reveals everything wrong with how we plan travel around hype.",
+      "Eighty percent of U.S. hotels say World Cup bookings are falling short — and the reason why reveals everything wrong with how we plan travel around hype.",
     published_at: "2026-05-01",
     href: "/newsroom/news/world-cup-reality-check",
   },
@@ -70,7 +70,7 @@ export default function NewsroomLanding() {
     <>
       <Helmet>
         <title>Newsroom | Goldsainte</title>
-        <meta name="description" content="Press releases, company updates, and editorial coverage from Goldsainte â€” the AI-powered travel marketplace." />
+        <meta name="description" content="Press releases, company updates, and editorial coverage from Goldsainte — the AI-powered travel marketplace." />
         <link rel="canonical" href={`${BASE_URL}/newsroom`} />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="The Goldsainte Newsroom" />
@@ -90,7 +90,7 @@ export default function NewsroomLanding() {
         })}</script>
       </Helmet>
 
-      {/* Editorial masthead â€” newspaper nameplate */}
+      {/* Editorial masthead — newspaper nameplate */}
       <section className="max-w-7xl mx-auto px-5 sm:px-6 pt-8 sm:pt-12 md:pt-24 pb-8 md:pb-16">
         <NewsroomPageHeader
           eyebrow="Vol. 1 · The Goldsainte Press"

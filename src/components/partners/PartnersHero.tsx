@@ -28,7 +28,7 @@ export const PartnersHero = () => {
             Join a Luxury Travel Ecosystem Designed for Modern Transportation Providers
           </p>
           <p className="text-base text-gray-200 mb-4 leading-relaxed">
-            Goldsainte connects premium black car, chauffeur, and shuttle services to a global audience of travelers, travel agents, and content creators. Your brand becomes part of fully curated travel experiencesâ€”booked through AI, recommended by creators, and powered by trusted agents.
+            Goldsainte connects premium black car, chauffeur, and shuttle services to a global audience of travelers, travel agents, and content creators. Your brand becomes part of fully curated travel experiences—booked through AI, recommended by creators, and powered by trusted agents.
           </p>
           <p className="text-sm text-gray-300 mb-8 italic">
             This isn't just another ride marketplace. It's a full-featured, intelligent ecosystem where your business gets discovered, booked, and promoted.
