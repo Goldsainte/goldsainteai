@@ -23,7 +23,7 @@ export const TripReminderEmail = ({ bookingId, daysUntil, specialistName, tripNa
     `Save the emergency concierge number to your phone.`,
     `We hope you have an extraordinary journey.`
   ]}
-    cta={{ label: 'View itinerary', url: `https://goldsainte.ai/traveler/bookings/${bookingId ?? ""}` }}
+    cta={{ label: 'View itinerary', url: `https://goldsainte.ai/bookings/${bookingId ?? ""}` }}
   />
 )
 
