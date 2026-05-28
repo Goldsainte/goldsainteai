@@ -8,7 +8,7 @@ import { RecoveryEmail } from "../_shared/email-templates/recovery.tsx";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 const SITE_NAME = "Goldsainte";
-const SENDER_DOMAIN = "notify.goldsainte.com";
+const SENDER_DOMAIN = "goldsainte.com";
 const PASSWORD_RESET_SENDER = `${SITE_NAME} <hello@${SENDER_DOMAIN}>`;
 
 function generateToken(): string {
