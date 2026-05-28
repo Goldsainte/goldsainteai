@@ -64,9 +64,9 @@ Deno.serve(async (req) => {
     if (!tripBookingId || !amountTotalCents || amountTotalCents <= 0) {
       return new Response(
         JSON.stringify({ error: "Missing or invalid payload" }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders(req), "Content-Type": "application/json" } 
+        {
+          status: 400,
+          headers: { ...corsHeaders(req), "Content-Type": "application/json" }
         }
       );
     }
@@ -85,17 +85,20 @@ Deno.serve(async (req) => {
       apiVersion: "2024-06-20",
     });
 
-    // Load booking with trip request details
+    // Load the booking. trip_requests is joined as OPTIONAL (no !inner):
+    // request-based bookings have one; marketplace (packaged-trip) bookings
+    // do not. traveler_id lets us verify ownership in the marketplace case.
     const { data: booking, error: bookingError } = await supabase
       .from("trip_bookings")
       .select(`
         id,
         trip_request_id,
         proposal_id,
+        traveler_id,
         currency,
         total_price,
         metadata,
-        trip_requests!inner (
+        trip_requests (
           id,
           user_id,
           destination,
@@ -109,32 +112,40 @@ Deno.serve(async (req) => {
       throw bookingError ?? new Error("Booking not found");
     }
 
-    if ((booking.trip_requests as any).user_id !== user.id) {
+    const tripRequest = (booking as any).trip_requests
+      ? ((booking as any).trip_requests as any)
+      : null;
+
+    // Ownership: a request-based booking is owned by the trip request's user;
+    // a marketplace booking is owned by the booking's traveler.
+    const ownerId = tripRequest?.user_id ?? (booking as any).traveler_id;
+    if (ownerId !== user.id) {
       return new Response(
         JSON.stringify({ error: "Forbidden" }),
         { status: 403, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
-    // Build descriptive line item name from trip context
-    const tripRequest = booking.trip_requests as any;
-    const sourceMetadata = tripRequest.source_metadata as any;
+    // Build a descriptive line item name from whatever trip context we have.
+    const sourceMetadata = tripRequest?.source_metadata as any;
     const collectionTitle = sourceMetadata?.collection_title;
     const brandName = sourceMetadata?.brand_name;
-    const destination = tripRequest.destination;
+    const destination = tripRequest?.destination ?? null;
 
     const lineItemName = `Goldsainte Trip${
-      collectionTitle ? ` – ${collectionTitle}` : 
-      brandName ? ` – ${brandName}` : 
+      collectionTitle ? ` – ${collectionTitle}` :
+      brandName ? ` – ${brandName}` :
       destination ? ` to ${destination}` : ""
     }`;
 
-    // Determine redirect URLs
+    // Determine redirect URLs. The caller normally supplies these explicitly;
+    // the fallback only applies if it doesn't.
     const publicSiteUrl = Deno.env.get("PUBLIC_SITE_URL") || "https://goldsainte.ai";
-    const successUrl = body.successUrl || 
-      `${publicSiteUrl}/trips/${tripRequest.id}?payment=success`;
-    const cancelUrl = body.cancelUrl || 
-      `${publicSiteUrl}/trips/${tripRequest.id}?payment=cancelled`;
+    const fallbackPath = tripRequest?.id ? `/trips/${tripRequest.id}` : "/marketplace";
+    const successUrl = body.successUrl ||
+      `${publicSiteUrl}${fallbackPath}?payment=success`;
+    const cancelUrl = body.cancelUrl ||
+      `${publicSiteUrl}${fallbackPath}?payment=cancelled`;
 
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
@@ -147,11 +158,11 @@ Deno.serve(async (req) => {
             currency: currency.toLowerCase(),
             product_data: {
               name: lineItemName,
-              description: `Trip booking for ${destination || "custom itinerary"}`,
-      metadata: {
-        trip_request_id: tripRequest.id,
-        trip_booking_id: booking.id,
-      },
+              description: `Trip booking for ${destination || "your Goldsainte trip"}`,
+              metadata: {
+                trip_request_id: tripRequest?.id ?? "",
+                trip_booking_id: booking.id,
+              },
             },
             unit_amount: amountTotalCents,
           },
@@ -163,14 +174,14 @@ Deno.serve(async (req) => {
         capture_method: "manual",
         metadata: {
           trip_booking_id: booking.id,
-          trip_request_id: tripRequest.id,
+          trip_request_id: tripRequest?.id ?? "",
           type: "trip_booking",
           ...(affiliateCode ? { affiliate_code: affiliateCode } : {}),
           ...(gclid ? { gclid } : {}),
         },
       },
       metadata: {
-        trip_request_id: tripRequest.id,
+        trip_request_id: tripRequest?.id ?? "",
         trip_booking_id: booking.id,
         proposal_id: booking.proposal_id || "",
         type: "trip_booking",
@@ -208,20 +219,20 @@ Deno.serve(async (req) => {
         paymentUrl: updated.payment_url,
         status: updated.status,
       }),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders(req), "Content-Type": "application/json" } 
+      {
+        status: 200,
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" }
       }
     );
   } catch (error) {
     console.error("trip-checkout-create error:", error);
     return new Response(
-      JSON.stringify({ 
-        error: error instanceof Error ? error.message : "Internal error" 
+      JSON.stringify({
+        error: error instanceof Error ? error.message : "Internal error"
       }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders(req), "Content-Type": "application/json" } 
+      {
+        status: 500,
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" }
       }
     );
   }
