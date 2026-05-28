@@ -21,7 +21,7 @@ export const ReviewRequestEmail = ({ bookingId, specialistName }: Props) => (
     `Specialists may respond once.`,
     `Your feedback shapes the future of our marketplace.`
   ]}
-    cta={{ label: 'Leave a review', url: `https://goldsainte.ai/traveler/bookings/${bookingId ?? ""}/review` }}
+    cta={{ label: 'Leave a review', url: `https://goldsainte.ai/bookings/${bookingId ?? ""}` }}
   />
 )
 
