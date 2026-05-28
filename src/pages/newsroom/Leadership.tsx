@@ -16,7 +16,7 @@ const FOUNDER_BACKGROUND = [
   },
   {
     label: "Marketplace Evolution",
-    body: "Identified the gap between travel inspiration, planning, and booking â€” leading to Goldsainte's evolution into a global AI travel marketplace.",
+    body: "Identified the gap between travel inspiration, planning, and booking — leading to Goldsainte's evolution into a global AI travel marketplace.",
   },
   {
     label: "Operational Leadership",

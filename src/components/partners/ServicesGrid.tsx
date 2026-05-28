@@ -45,7 +45,7 @@ export const ServicesGrid = () => {
         <div className="text-center mb-16">
           <h2 className="font-secondary text-3xl md:text-4xl font-bold mb-4">Transportation Services We Support</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Your services power complete travel experiencesâ€”not just rides, but seamless journeys integrated into curated itineraries
+            Your services power complete travel experiences—not just rides, but seamless journeys integrated into curated itineraries
           </p>
         </div>
 

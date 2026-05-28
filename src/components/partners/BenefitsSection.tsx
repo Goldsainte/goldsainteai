@@ -17,7 +17,7 @@ const benefits = [
     icon: Globe,
     title: "Agent & Traveler Ecosystem",
     subtitle: "Power Professional Trip Planning",
-    description: "Certified travel agents pull your services into custom itineraries. Travelers discover you through AI-powered search and curated recommendations. Your brand appears in full trip contextsâ€”not just isolated ride searches.",
+    description: "Certified travel agents pull your services into custom itineraries. Travelers discover you through AI-powered search and curated recommendations. Your brand appears in full trip contexts—not just isolated ride searches.",
     image: technologyImage,
     imagePosition: "right" as const
   },

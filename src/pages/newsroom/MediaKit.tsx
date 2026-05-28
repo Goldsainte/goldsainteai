@@ -61,7 +61,7 @@ const BOILERPLATES = {
     label: "Founder",
     meta: "Attributed quote · op-eds, interviews, founder profiles",
     text:
-      '"Modern travelers do not just want another booking engine. They want perspective, taste, and a person who actually knows the place. Goldsainte was built to bring that human craft back into travel â€” at the scale and speed the modern world expects." â€” Andre C. Powell, Jr., Founder & CEO of Goldsainte.',
+      '"Modern travelers do not just want another booking engine. They want perspective, taste, and a person who actually knows the place. Goldsainte was built to bring that human craft back into travel — at the scale and speed the modern world expects." — Andre C. Powell, Jr., Founder & CEO of Goldsainte.',
   },
 };
 
@@ -315,13 +315,13 @@ export default function MediaKit() {
           <div className="grid md:grid-cols-12 gap-8 md:gap-12 items-start">
             <div className="md:col-span-4">
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
-                01 â€” The Kit
+                01 — The Kit
               </p>
             </div>
             <div className="md:col-span-8">
               <p className="font-secondary text-[24px] md:text-3xl text-[#0a2225] leading-[1.3]">
                 Everything an editor, producer, or journalist needs to write about
-                Goldsainte with accuracy and visual integrity â€” in one place.
+                Goldsainte with accuracy and visual integrity — in one place.
               </p>
               <p className="text-base text-[#0a2225]/70 mt-6 leading-relaxed max-w-2xl">
                 The materials below are pre-approved for editorial use. For interviews,
@@ -343,14 +343,14 @@ export default function MediaKit() {
         <section className={`${newsroomPageShellClass} pt-8 sm:pt-10 md:py-28`}>
           <div className="mb-12 max-w-3xl">
             <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
-              02 â€” Identity
+              02 — Identity
             </p>
             <h2 className={`${newsroomSectionTitleClass} mt-3`}>
               Logo
             </h2>
             <p className="text-base text-[#0a2225]/70 mt-4 leading-relaxed">
               The Goldsainte mark is provided in primary, secondary, wordmark, and
-              monogram configurations â€” each in forest green and gold. Please use
+              monogram configurations — each in forest green and gold. Please use
               the marks as supplied, without recoloring, distortion, or effects.
             </p>
           </div>
@@ -393,7 +393,7 @@ export default function MediaKit() {
           <div className={`${newsroomPageShellClass} py-10 md:py-28`}>
             <div className="mb-12">
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
-                03 â€” Palette
+                03 — Palette
               </p>
               <h2 className={`${newsroomSectionTitleClass} mt-3`}>
                 The Goldsainte Palette
@@ -415,7 +415,7 @@ export default function MediaKit() {
         <section className={`${newsroomPageShellClass} py-10 md:py-28`}>
           <div className="mb-12">
             <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
-              04 â€” Typography
+              04 — Typography
             </p>
               <h2 className={`${newsroomSectionTitleClass} mt-3`}>
               Editorial Voice in Practice
@@ -448,7 +448,7 @@ export default function MediaKit() {
                 Standfirst · Editorial subhead
               </p>
               <p className="font-secondary text-[20px] md:text-2xl leading-[1.4] text-[#0a2225]/85 max-w-2xl">
-                It belongs to the people who actually know the place â€” and to the
+                It belongs to the people who actually know the place — and to the
                 travelers willing to trust them.
               </p>
             </div>
@@ -498,7 +498,7 @@ export default function MediaKit() {
           <div className={`${newsroomPageShellClass} py-10 md:py-28`}>
             <div className="mb-10">
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
-                05 â€” Boilerplate
+                05 — Boilerplate
               </p>
               <h2 className={`${newsroomSectionTitleClass} mt-3`}>
                 Approved Company Language
@@ -520,7 +520,7 @@ export default function MediaKit() {
           <div className={`${newsroomPageShellClass} py-10 md:py-28`}>
             <div className="mb-12">
               <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
-                06 â€” Downloads
+                06 — Downloads
               </p>
               <h2 className={`${newsroomSectionTitleClass} mt-3`}>
                 Press Packs
@@ -591,7 +591,7 @@ export default function MediaKit() {
             <div className="grid md:grid-cols-12 gap-10 items-start">
               <div className="md:col-span-7 space-y-6">
                 <p className="text-[11px] tracking-[0.28em] uppercase text-[#C7A962]">
-                  07 â€” For the Press
+                  07 — For the Press
                 </p>
                 <h2 className="font-secondary text-[28px] md:text-5xl leading-[1.08] text-[#0a2225]">
                   For media inquiries, interviews, and founder commentary.

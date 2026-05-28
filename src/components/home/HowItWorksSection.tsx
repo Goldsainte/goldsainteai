@@ -12,7 +12,7 @@ const steps = [
     k: "travelers",
     label: "For travelers",
     title: "Post the trip. We build the team.",
-    body: "Share your dates, budget and the TikToks, Pins or moods that inspired the trip. Goldsainte surfaces creators + agents whose style and markets actually fit you. Review proposals and storyboards, then book the one that feels right â€” all inside Goldsainte.",
+    body: "Share your dates, budget and the TikToks, Pins or moods that inspired the trip. Goldsainte surfaces creators + agents whose style and markets actually fit you. Review proposals and storyboards, then book the one that feels right — all inside Goldsainte.",
     pill: "Travelers",
   },
   {
@@ -33,7 +33,7 @@ const steps = [
     k: "ai-matching",
     label: "AI matching",
     title: "Find your perfect match, instantly.",
-    body: "Share your destination, dates, and travel style. Our AI scores thousands of creator and agent profiles in seconds, surfacing only those whose expertise, aesthetic, and markets align with your vision. No endless scrollingâ€”just curated matches, ready to collaborate.",
+    body: "Share your destination, dates, and travel style. Our AI scores thousands of creator and agent profiles in seconds, surfacing only those whose expertise, aesthetic, and markets align with your vision. No endless scrolling—just curated matches, ready to collaborate.",
     pill: "AI Matching",
   },
 ];
@@ -93,7 +93,7 @@ export function HowItWorksSection() {
 
           <div className="pt-4 text-xs text-[#8D8D8D]">
             All communication and payments stay inside Goldsainte. No phone
-            numbers, no side deals â€” just beautifully organized trips.
+            numbers, no side deals — just beautifully organized trips.
           </div>
         </div>
 

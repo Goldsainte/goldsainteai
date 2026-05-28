@@ -41,7 +41,7 @@ export default function BookingConfirmation() {
       setBooking(data);
       setIsLoading(false);
       // Poll until the webhook flips status out of a pending state.
-      // Max ~60s (30 * 2s) â€” covers typical Stripe webhook + 3DS latency.
+      // Max ~60s (30 * 2s) — covers typical Stripe webhook + 3DS latency.
       if (data && PENDING.has(data.status) && attempts < 30) {
         attempts += 1;
         setTimeout(fetchBooking, 2000);
@@ -111,7 +111,7 @@ export default function BookingConfirmation() {
           </div>
           <h1 className="font-secondary text-4xl mb-3 text-[#0a2225]">Almost there</h1>
           <p className="text-base text-[#4a4a4a] mb-8">
-            Your payment is being processed. We'll email you the moment it's confirmed â€” usually within a few minutes.
+            Your payment is being processed. We'll email you the moment it's confirmed — usually within a few minutes.
           </p>
           <button
             onClick={() => navigate("/my-trips")}
