@@ -116,32 +116,29 @@ const AuthCallback = () => {
               };
               const accountType =
                 pending.accountType || profile.account_type || 'traveler';
-              const isProfessional =
+             const isProfessional =
                 accountType === 'creator' ||
                 accountType === 'agent' ||
                 accountType === 'brand';
-              const templateName = isProfessional
-                ? 'welcome-professional'
-                : 'welcome-traveler';
-              const firstName =
-                pending.firstName || profile.first_name || undefined;
-              void supabase.functions
-                .invoke('send-transactional-email', {
-                  body: {
-                    templateName,
-                    recipientEmail: session.user.email,
-                    idempotencyKey: `welcome-${session.user.id}`,
-                    templateData: { name: firstName, accountType },
-                  },
-                })
-                .catch((err) => {
-                  console.warn('[AuthCallback] welcome email invoke failed:', err);
-                });
-            } catch (err) {
-              console.warn('[AuthCallback] could not parse pending_welcome_email:', err);
-            }
-          }
-        }
+              // Travelers receive their welcome from the account-type step,
+              // which always has their name. Only send the professional
+              // welcome here, to avoid sending a duplicate welcome email.
+              if (isProfessional) {
+                const firstName =
+                  pending.firstName || profile.first_name || undefined;
+                void supabase.functions
+                  .invoke('send-transactional-email', {
+                    body: {
+                      templateName: 'welcome-professional',
+                      recipientEmail: session.user.email,
+                      idempotencyKey: `welcome-${session.user.id}`,
+                      templateData: { name: firstName, accountType },
+                    },
+                  })
+                  .catch((err) => {
+                    console.warn('[AuthCallback] welcome email invoke failed:', err);
+                  });
+              }
 
         // SECURITY: Only allow OAuth signups to self-assign 'traveler'.
         // Creator / agent / brand accounts require admin approval and CANNOT be
