@@ -20,7 +20,7 @@ export const TripRequestReceivedEmail = ({ requestId }: Props) => (
     `Compare proposals side-by-side in your dashboard.`,
     `Accept the one that resonates — payment and contracts are handled on-platform.`
   ]}
-    cta={{ label: 'View my request', url: `https://goldsainte.ai/traveler/requests/${requestId ?? ""}` }}
+    cta={{ label: 'View my request', url: `https://goldsainte.ai/my-bookings` }}
   />
 )
 
