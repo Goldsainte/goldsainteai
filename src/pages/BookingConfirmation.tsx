@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { CheckCircle2, Loader2, ArrowRight, Clock, AlertCircle } from "lucide-react";
-import logomark from "@/assets/logomark-gold.webp";
+import { Loader2, Clock, AlertCircle, ArrowRight } from "lucide-react";
 import { trackPurchaseConversionOnce } from "@/lib/analytics/conversions";
 
 export default function BookingConfirmation() {
@@ -93,6 +92,14 @@ export default function BookingConfirmation() {
     }
   }, [booking]);
 
+  const bookingRef = booking?.id ? `GS-${booking.id.slice(0, 8).toUpperCase()}` : "";
+
+  const fmtCurrency = (amount: number, currency: string) =>
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency || "USD",
+    }).format(amount);
+
   if (isLoading) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-[#f7f3ea]">
@@ -101,21 +108,26 @@ export default function BookingConfirmation() {
     );
   }
 
-  if (booking && (booking.status === "deposit_pending" || booking.status === "payment_pending")) {
+  if (
+    booking &&
+    (booking.status === "deposit_pending" || booking.status === "payment_pending")
+  ) {
     return (
-      <main className="min-h-screen flex items-center justify-center px-4 py-12 bg-[#f7f3ea]">
-        <div className="w-full max-w-xl text-center">
-          <img src={logomark} alt="Goldsainte" className="h-16 w-16 mx-auto mb-8" loading="lazy" />
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6 bg-[#FDF9F0] border border-[#C7A962]/30">
+      <main className="min-h-screen bg-[#f7f3ea] px-4 sm:px-6 py-16 md:py-24">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-8 bg-[#FDF9F0] border border-[#C7A962]/30">
             <Clock className="h-10 w-10 text-[#c7a962]" />
           </div>
-          <h1 className="font-secondary text-4xl mb-3 text-[#0a2225]">Almost there</h1>
-          <p className="text-base text-[#4a4a4a] mb-8">
-            Your payment is being processed. We'll email you the moment it's confirmed — usually within a few minutes.
+          <h1 className="font-secondary text-3xl sm:text-4xl md:text-5xl leading-[1.1] text-[#0a2225] mb-4">
+            Almost there
+          </h1>
+          <p className="text-base text-[#0a2225]/70 leading-relaxed max-w-xl mx-auto mb-10">
+            Your payment is being processed. We'll email you the moment it's
+            confirmed — usually within a few minutes.
           </p>
           <button
             onClick={() => navigate("/my-trips")}
-            className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white px-7 h-12 text-sm font-medium"
+            className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white px-7 h-12 text-sm font-medium transition-colors"
           >
             View My Trips
           </button>
@@ -124,22 +136,27 @@ export default function BookingConfirmation() {
     );
   }
 
-  if (booking && (booking.status === "payment_failed" || booking.status === "cancelled")) {
+  if (
+    booking &&
+    (booking.status === "payment_failed" || booking.status === "cancelled")
+  ) {
     return (
-      <main className="min-h-screen flex items-center justify-center px-4 py-12 bg-[#f7f3ea]">
-        <div className="w-full max-w-xl text-center">
-          <img src={logomark} alt="Goldsainte" className="h-16 w-16 mx-auto mb-8" loading="lazy" />
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6 bg-[#FDECEC] border border-[#C24545]/30">
+      <main className="min-h-screen bg-[#f7f3ea] px-4 sm:px-6 py-16 md:py-24">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-8 bg-[#FDECEC] border border-[#C24545]/30">
             <AlertCircle className="h-10 w-10 text-[#C24545]" />
           </div>
-          <h1 className="font-secondary text-4xl mb-3 text-[#0a2225]">Payment didn't go through</h1>
-          <p className="text-base text-[#4a4a4a] mb-8">
-            We weren't able to complete your payment. Your card was not charged. Try again or contact our team.
+          <h1 className="font-secondary text-3xl sm:text-4xl md:text-5xl leading-[1.1] text-[#0a2225] mb-4">
+            Payment didn't go through
+          </h1>
+          <p className="text-base text-[#0a2225]/70 leading-relaxed max-w-xl mx-auto mb-10">
+            We weren't able to complete your payment. Your card was not charged.
+            Try again or contact our team.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={() => navigate(-1)}
-              className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white px-7 h-12 text-sm font-medium"
+              className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white px-7 h-12 text-sm font-medium transition-colors"
             >
               Try Again
             </button>
@@ -155,130 +172,142 @@ export default function BookingConfirmation() {
     );
   }
 
-  return (
-    <main className="min-h-screen flex items-center justify-center px-4 py-12 bg-[#f7f3ea]">
-      <div className="w-full max-w-xl">
-        <img src={logomark} alt="Goldsainte" className="h-16 w-16 mx-auto mb-8" loading="lazy"/>
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6 bg-[#0c4d47]">
-            <CheckCircle2 className="h-12 w-12 text-[#E5DFC6]" />
-          </div>
-          <h1 className="font-secondary text-4xl mb-3 text-[#0a2225]">
-            Booking Confirmed
-          </h1>
-          <p className="text-base text-[#4a4a4a]">
-            Your booking is confirmed. Your travel specialist will be in touch within 24 hours.
-          </p>
-        </div>
+  const balanceDue =
+    booking?.total_price && booking?.deposit_amount
+      ? booking.total_price - booking.deposit_amount
+      : null;
 
-        {booking && (
-          <div className="rounded-2xl border bg-white p-6 mb-8 space-y-4 border-[#E5DFC6]">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-[#7A7151]">Booking Reference</span>
-              <span className="font-mono text-sm font-semibold text-[#0a2225]">
-                {booking.id.slice(0, 8).toUpperCase()}
+  const balanceDueText =
+    balanceDue !== null
+      ? fmtCurrency(balanceDue, booking.currency)
+      : "Remaining balance";
+
+  const metaRows = [
+    { label: "Booking Reference", value: bookingRef },
+    {
+      label: "Trip Total",
+      value: booking?.total_price
+        ? fmtCurrency(booking.total_price, booking.currency)
+        : "—",
+    },
+    {
+      label: booking?.deposit_percentage
+        ? `Deposit Paid (${booking.deposit_percentage}%)`
+        : "Deposit Paid",
+      value: booking?.deposit_amount
+        ? fmtCurrency(booking.deposit_amount, booking.currency)
+        : "—",
+    },
+    {
+      label: "Balance Due",
+      value: balanceDueText,
+    },
+    {
+      label: "Status",
+      value:
+        (
+          { confirmed: "Confirmed", completed: "Completed", deposit_paid: "Deposit Paid", paid: "Paid", paid_in_full: "Paid in Full" } as Record<string, string>
+        )[booking?.status] || "Confirmed",
+    },
+  ];
+
+  const nextSteps = [
+    "Your specialist will contact you within 24 hours to confirm trip details.",
+    `Your balance of ${balanceDueText} is due before departure.`,
+    "Your itinerary and contract are saved in your dashboard.",
+    "Funds are held in escrow and released to your specialist on agreed milestones.",
+    "You can message your specialist anytime from your bookings dashboard.",
+  ];
+
+  return (
+    <main className="min-h-screen bg-[#f7f3ea] px-4 sm:px-6 pt-16 md:pt-24 pb-20 md:pb-28">
+      <div className="max-w-4xl mx-auto">
+        {/* Headline */}
+        <h1 className="font-secondary text-3xl sm:text-4xl md:text-6xl leading-[1.08] tracking-tight text-[#0a2225] mb-4">
+          Your trip is confirmed
+        </h1>
+
+        {/* Subhead */}
+        <p className="font-secondary italic text-base md:text-lg text-[#0a2225]/60 font-light leading-relaxed max-w-2xl mb-8">
+          Every detail has been arranged. We wish you an extraordinary journey.
+        </p>
+
+        {/* Dark green rule */}
+        <div className="w-full h-px bg-[#0a2225] mb-10" />
+
+        {/* Two-column metadata block */}
+        <div className="mb-14">
+          {metaRows.map((row, i) => (
+            <div
+              key={row.label}
+              className={`grid grid-cols-2 items-baseline py-3 ${
+                i < metaRows.length - 1 ? "border-b border-[#E5DFC6]" : ""
+              }`}
+            >
+              <span className="text-xs uppercase tracking-[0.18em] text-[#0a2225]/50">
+                {row.label}
+              </span>
+              <span className="text-right text-sm font-medium text-[#0a2225]">
+                {row.value}
               </span>
             </div>
-            {booking.total_price && (
-              <>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#7A7151]">Trip Total</span>
-                  <span className="text-sm font-semibold text-[#0a2225]">
-                    {new Intl.NumberFormat("en-US", {
-                      style: "currency",
-                      currency: booking.currency || "USD",
-                    }).format(booking.total_price)}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#7A7151]">Deposit Paid ({booking.deposit_percentage}%)</span>
-                  <span className="text-sm font-semibold text-[#0a2225]">
-                    {new Intl.NumberFormat("en-US", {
-                      style: "currency",
-                      currency: booking.currency || "USD",
-                    }).format(booking.deposit_amount)}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#7A7151]">Balance Due at Trip</span>
-                  <span className="text-sm font-semibold text-[#0a2225]">
-                    {new Intl.NumberFormat("en-US", {
-                      style: "currency",
-                      currency: booking.currency || "USD",
-                    }).format(booking.total_price - booking.deposit_amount)}
-                  </span>
-                </div>
-              </>
-            )}
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-[#7A7151]">Status</span>
-              <span className="text-sm font-semibold text-[#0c4d47]">Confirmed</span>
-            </div>
-          </div>
-        )}
+          ))}
+        </div>
 
-        {booking && (
-          <div className="rounded-2xl border bg-white p-6 mb-8 border-[#E5DFC6]">
-            <h3 className="font-secondary text-xl text-[#0a2225] mb-4">What happens next</h3>
-            <ol className="space-y-4">
-              {[
-                { n: 1, text: "Your specialist will contact you within 24 hours to confirm trip details." },
-                {
-                  n: 2,
-                  text: `Your balance of ${
-                    booking?.total_price && booking?.deposit_amount
-                      ? `$${(booking.total_price - booking.deposit_amount).toLocaleString()}`
-                      : "the remaining amount"
-                  } is due ${
-                    booking?.metadata?.balance_due_days
-                      ? `${booking.metadata.balance_due_days} days before departure`
-                      : "before departure"
-                  }.`,
-                },
-                { n: 3, text: "You can message your specialist directly from your bookings dashboard." },
-              ].map((step) => (
-                <li key={step.n} className="flex gap-3">
-                  <span className="flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-full bg-[#0c4d47] text-xs font-semibold text-[#E5DFC6]">
-                    {step.n}
+        {/* What happens next */}
+        <div className="mb-16">
+          <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mb-6">
+            What happens next
+          </p>
+          <ol className="space-y-4">
+            {nextSteps.map((step, i) => {
+              const roman = ["I.", "II.", "III.", "IV.", "V."][i];
+              return (
+                <li key={i} className="flex items-start gap-4">
+                  <span className="flex-shrink-0 font-secondary text-sm text-[#7A7151] mt-0.5 w-6">
+                    {roman}
                   </span>
-                  <p className="text-sm text-[#0a2225] leading-relaxed pt-0.5">{step.text}</p>
+                  <p className="text-base text-[#0a2225]/75 leading-relaxed">
+                    {step}
+                  </p>
                 </li>
-              ))}
-            </ol>
-            <button
-              onClick={() => navigate(`/my-bookings`)}
-              className="mt-5 text-sm text-[#0c4d47] underline-offset-2 hover:underline"
-            >
-              Message your specialist â†’
-            </button>
-          </div>
-        )}
+              );
+            })}
+          </ol>
+        </div>
 
-        {booking?.status === 'completed' && (
-          <div className="rounded-2xl border border-[#C7A962]/30 bg-[#FDF9F0] p-6 mb-8">
-            <h3 className="font-secondary text-xl text-[#0a2225] mb-1">How was your trip?</h3>
-            <p className="text-sm text-[#6B7280] mb-4">Your review helps other travelers and rewards outstanding specialists.</p>
+        {/* Review prompt (if completed) */}
+        {booking?.status === "completed" && (
+          <div className="border border-[#C7A962]/30 bg-[#FDF9F0] p-6 md:p-8 mb-12">
+            <h2 className="font-secondary text-xl md:text-2xl text-[#0a2225] mb-2">
+              How was your trip?
+            </h2>
+            <p className="text-sm text-[#0a2225]/60 leading-relaxed mb-5">
+              Your review helps other travelers and rewards outstanding
+              specialists.
+            </p>
             <button
               onClick={() => navigate(`/reviews/new?booking_id=${booking.id}`)}
-              className="rounded-full bg-[#0c4d47] text-white px-5 py-2 text-xs"
+              className="rounded-full bg-[#0c4d47] text-white px-6 py-2.5 text-sm font-medium"
             >
               Leave a Review
             </button>
           </div>
         )}
 
-        <div className="space-y-3">
+        {/* CTAs */}
+        <div className="space-y-4">
           <button
             onClick={() => navigate("/my-bookings")}
-            className="w-full h-12 rounded-full text-sm font-medium flex items-center justify-center gap-2 bg-[#0c4d47] text-[#E5DFC6]"
+            className="w-full h-12 rounded-full text-sm font-medium flex items-center justify-center gap-2 bg-[#0c4d47] text-[#E5DFC6] hover:bg-[#0a3d39] transition-colors"
           >
-            View My Bookings <ArrowRight className="h-4 w-4" />
+            View My Booking <ArrowRight className="h-4 w-4" />
           </button>
           <button
             onClick={() => navigate("/marketplace")}
-            className="w-full h-12 rounded-full text-sm font-medium border border-[#E5DFC6] text-[#0a2225]"
+            className="w-full text-center text-sm text-[#0a2225]/60 hover:text-[#0c4d47] transition-colors underline underline-offset-4 decoration-[#E5DFC6] hover:decoration-[#0c4d47]"
           >
-            Continue Exploring
+            Return to marketplace
           </button>
         </div>
       </div>
