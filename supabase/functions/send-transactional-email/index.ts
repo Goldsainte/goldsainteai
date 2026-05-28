@@ -1,18 +1,15 @@
 import * as React from 'npm:react@18.3.1'
 import { renderAsync } from 'npm:@react-email/components@0.0.22'
-import { sendLovableEmail } from 'npm:@lovable.dev/email-js'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 import { TEMPLATES } from '../_shared/transactional-email-templates/registry.ts'
-
-// Configuration baked in at scaffold time — do NOT change these manually.
-const SITE_NAME = 'goldsainteai'
-// SENDER_DOMAIN is the verified sender subdomain FQDN. It MUST match the
-// subdomain delegated to Lovable's nameservers — never the root domain.
-const SENDER_DOMAIN = 'notify.goldsainte.com'
+ 
+// Email sender configuration. Emails are sent via Resend — the domain used in
+// FROM_DOMAIN MUST be a verified sending domain in your Resend account.
+const SITE_NAME = 'Goldsainte'
 // FROM_DOMAIN is the domain shown in the From: header.
-const FROM_DOMAIN = 'notify.goldsainte.com'
-
+const FROM_DOMAIN = 'goldsainte.com'
+ 
 // Generate a cryptographically random 32-byte hex token
 function generateToken(): string {
   const bytes = new Uint8Array(32)
@@ -21,32 +18,32 @@ function generateToken(): string {
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('')
 }
-
+ 
 // Sends transactional / app emails (booking confirmations, welcome emails,
 // notifications, admin alerts, etc.).
 //
-// Design: the email is sent DIRECTLY via the Lovable email API. There is no
-// queue and no cron dependency. Every database call (suppression list,
-// unsubscribe token, send log) is BEST-EFFORT — wrapped so that a missing
-// table or unapplied migration logs a warning and the email still sends.
-// The send path cannot be broken by database/migration drift.
+// Design: the email is sent DIRECTLY via Resend. There is no queue and no cron
+// dependency. Every database call (suppression list, unsubscribe token, send
+// log) is BEST-EFFORT — wrapped so that a missing table or unapplied migration
+// logs a warning and the email still sends. The send path cannot be broken by
+// database/migration drift.
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
-
-  const apiKey = Deno.env.get('LOVABLE_API_KEY')
-  if (!apiKey) {
-    console.error('LOVABLE_API_KEY not configured')
+ 
+  const resendApiKey = Deno.env.get('RESEND_API_KEY')
+  if (!resendApiKey) {
+    console.error('RESEND_API_KEY not configured')
     return new Response(
       JSON.stringify({ error: 'Server configuration error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
-
+ 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
   const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-
+ 
   // Parse request body
   let templateName: string
   let recipientEmail: string
@@ -68,14 +65,14 @@ Deno.serve(async (req) => {
       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
-
+ 
   if (!templateName) {
     return new Response(
       JSON.stringify({ error: 'templateName is required' }),
       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
-
+ 
   // Look up template from registry
   const template = TEMPLATES[templateName]
   if (!template) {
@@ -87,7 +84,7 @@ Deno.serve(async (req) => {
       { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
-
+ 
   // Resolve effective recipient: template-level `to` takes precedence.
   const effectiveRecipient = template.to || recipientEmail
   if (!effectiveRecipient) {
@@ -98,16 +95,16 @@ Deno.serve(async (req) => {
       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
-
+ 
   const normalizedEmail = effectiveRecipient.toLowerCase()
-
+ 
   // Supabase client is OPTIONAL. All DB use below is best-effort — a missing
   // table or migration must never block a send.
   const supabase =
     supabaseUrl && supabaseServiceKey
       ? createClient(supabaseUrl, supabaseServiceKey)
       : null
-
+ 
   // Best-effort send-log writer. Never throws, never blocks the send.
   const safeLog = async (status: string, errorMessage?: string): Promise<void> => {
     if (!supabase) return
@@ -123,7 +120,7 @@ Deno.serve(async (req) => {
       // Logging is best-effort; ignore failures.
     }
   }
-
+ 
   // Suppression check — best-effort. If the table is missing or the query
   // errors, log a warning and continue (fail-open) rather than blocking.
   if (supabase) {
@@ -133,7 +130,7 @@ Deno.serve(async (req) => {
         .select('id')
         .eq('email', normalizedEmail)
         .maybeSingle()
-
+ 
       if (error) {
         console.warn('Suppression check unavailable — sending anyway', {
           error: error.message,
@@ -150,7 +147,7 @@ Deno.serve(async (req) => {
       console.warn('Suppression check threw — sending anyway', { error: String(e) })
     }
   }
-
+ 
   // Unsubscribe token — best-effort. Try to reuse or persist a token; if
   // storage is unavailable, fall back to an ephemeral token so the email
   // still sends.
@@ -162,7 +159,7 @@ Deno.serve(async (req) => {
         .select('token, used_at')
         .eq('email', normalizedEmail)
         .maybeSingle()
-
+ 
       if (existing && !existing.used_at) {
         unsubscribeToken = existing.token
       } else if (!existing) {
@@ -185,7 +182,7 @@ Deno.serve(async (req) => {
       })
     }
   }
-
+ 
   // Render React Email template to HTML and plain text
   const html = await renderAsync(
     React.createElement(template.component, templateData)
@@ -194,31 +191,46 @@ Deno.serve(async (req) => {
     React.createElement(template.component, templateData),
     { plainText: true }
   )
-
+ 
   // Resolve subject — supports static string or dynamic function
   const resolvedSubject =
     typeof template.subject === 'function'
       ? template.subject(templateData)
       : template.subject
-
-  // Send the email DIRECTLY. No queue, no cron.
+ 
+  // Custom EMAIL headers (passed in the Resend request body). One-click
+  // unsubscribe (RFC 8058) — best-effort, only when we know our own URL.
+  const emailHeaders: Record<string, string> = {}
+  if (supabaseUrl) {
+    emailHeaders['List-Unsubscribe'] =
+      `<${supabaseUrl}/functions/v1/handle-email-unsubscribe?token=${unsubscribeToken}>`
+    emailHeaders['List-Unsubscribe-Post'] = 'List-Unsubscribe=One-Click'
+  }
+ 
+  // Send the email DIRECTLY via Resend. No queue, no cron.
   try {
-    await sendLovableEmail(
-      {
-        message_id: messageId,
-        to: effectiveRecipient,
+    const resendRes = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${resendApiKey}`,
+        'Content-Type': 'application/json',
+        // Resend idempotency: a retry with the same key won't double-send.
+        'Idempotency-Key': idempotencyKey,
+      },
+      body: JSON.stringify({
         from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
-        sender_domain: SENDER_DOMAIN,
+        to: [effectiveRecipient],
         subject: resolvedSubject,
         html,
         text: plainText,
-        purpose: 'transactional',
-        label: templateName,
-        idempotency_key: idempotencyKey,
-        unsubscribe_token: unsubscribeToken,
-      },
-      { apiKey, sendUrl: Deno.env.get('LOVABLE_SEND_URL') }
-    )
+        ...(Object.keys(emailHeaders).length ? { headers: emailHeaders } : {}),
+      }),
+    })
+ 
+    if (!resendRes.ok) {
+      const errBody = await resendRes.text()
+      throw new Error(`Resend API ${resendRes.status}: ${errBody}`)
+    }
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error)
     console.error('Failed to send transactional email', {
@@ -232,10 +244,10 @@ Deno.serve(async (req) => {
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
-
+ 
   await safeLog('sent')
   console.log('Transactional email sent', { templateName, effectiveRecipient })
-
+ 
   return new Response(
     JSON.stringify({ success: true, sent: true }),
     { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
