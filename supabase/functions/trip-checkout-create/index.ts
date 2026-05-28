@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import Stripe from "https://esm.sh/stripe@15.11.0?target=deno";
+
 function corsHeaders(_req?: Request): Record<string, string> {
   return {
     "Access-Control-Allow-Origin": "https://goldsainte.ai",
@@ -97,6 +98,7 @@ Deno.serve(async (req) => {
         traveler_id,
         currency,
         total_price,
+        deposit_amount,
         metadata,
         trip_requests (
           id,
@@ -126,17 +128,56 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Build a descriptive line item name from whatever trip context we have.
+    // Best-effort enrichment for marketplace bookings: look up the packaged
+    // trip's title + destination so Stripe records and the customer's receipt
+    // carry real context instead of a generic "Goldsainte Trip" label.
+    let tripTitle: string | null = null;
+    let destination: string | null = tripRequest?.destination ?? null;
+
+    if (!tripRequest) {
+      const meta = ((booking as any).metadata ?? {}) as any;
+      const tripIdFromMeta = meta?.trip_id;
+      if (tripIdFromMeta) {
+        try {
+          const { data: pkg } = await supabase
+            .from("packaged_trips")
+            .select("title, destination")
+            .eq("id", tripIdFromMeta)
+            .maybeSingle();
+          if (pkg) {
+            tripTitle = (pkg as any).title ?? null;
+            destination = (pkg as any).destination ?? destination;
+          }
+        } catch (_e) {
+          // Never block checkout on enrichment failure.
+        }
+      }
+    }
+
+    // Human-friendly booking reference, shown on receipts and the Stripe
+    // dashboard so support and the customer have a short ID to quote.
+    const bookingRef = `GS-${booking.id.slice(0, 8).toUpperCase()}`;
+
+    // Build a descriptive line-item name and Stripe payment-intent description.
     const sourceMetadata = tripRequest?.source_metadata as any;
     const collectionTitle = sourceMetadata?.collection_title;
     const brandName = sourceMetadata?.brand_name;
-    const destination = tripRequest?.destination ?? null;
 
-    const lineItemName = `Goldsainte Trip${
-      collectionTitle ? ` – ${collectionTitle}` :
-      brandName ? ` – ${brandName}` :
-      destination ? ` to ${destination}` : ""
-    }`;
+    const lineItemName = tripTitle
+      ? `Goldsainte — ${tripTitle}${destination ? ` (${destination})` : ""}`
+      : `Goldsainte Trip${
+          collectionTitle ? ` — ${collectionTitle}` :
+          brandName ? ` — ${brandName}` :
+          destination ? ` to ${destination}` : ""
+        }`;
+
+    const lineItemDescription = `Deposit for ${tripTitle || "your Goldsainte trip"}${
+      destination ? ` — ${destination}` : ""
+    } • Ref ${bookingRef}`;
+
+    const piDescription = tripTitle
+      ? `${bookingRef} • ${tripTitle}${destination ? `, ${destination}` : ""} (deposit)`
+      : `${bookingRef} • Goldsainte deposit${destination ? ` — ${destination}` : ""}`;
 
     // Determine redirect URLs. The caller normally supplies these explicitly;
     // the fallback only applies if it doesn't.
@@ -147,10 +188,23 @@ Deno.serve(async (req) => {
     const cancelUrl = body.cancelUrl ||
       `${publicSiteUrl}${fallbackPath}?payment=cancelled`;
 
-    // Create Stripe Checkout Session
+    // Create Stripe Checkout Session.
+    //
+    // Two key things vs. the previous version:
+    //
+    //   1. NO `capture_method: "manual"`. A deposit due today should capture
+    //      immediately so the customer is actually charged, Stripe sends its
+    //      automatic receipt, and `payment_intent.succeeded` can fire. The
+    //      escrow / partner-payout split happens later via Stripe Connect
+    //      transfers — not by holding the customer's funds uncaptured.
+    //
+    //   2. `customer_email` is set on the session. Stripe uses this to send
+    //      the receipt and to create / link a Customer record so the payment
+    //      is searchable by email in the Stripe dashboard.
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       currency: currency.toLowerCase(),
+      customer_email: user.email,
       line_items: [
         {
           quantity: 1,
@@ -158,10 +212,11 @@ Deno.serve(async (req) => {
             currency: currency.toLowerCase(),
             product_data: {
               name: lineItemName,
-              description: `Trip booking for ${destination || "your Goldsainte trip"}`,
+              description: lineItemDescription,
               metadata: {
                 trip_request_id: tripRequest?.id ?? "",
                 trip_booking_id: booking.id,
+                booking_reference: bookingRef,
               },
             },
             unit_amount: amountTotalCents,
@@ -171,38 +226,57 @@ Deno.serve(async (req) => {
       success_url: `${successUrl}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl,
       payment_intent_data: {
-        capture_method: "manual",
+        description: piDescription,
         metadata: {
           trip_booking_id: booking.id,
           trip_request_id: tripRequest?.id ?? "",
+          booking_reference: bookingRef,
+          trip_title: tripTitle ?? "",
+          destination: destination ?? "",
           type: "trip_booking",
           ...(affiliateCode ? { affiliate_code: affiliateCode } : {}),
           ...(gclid ? { gclid } : {}),
         },
       },
       metadata: {
-        trip_request_id: tripRequest?.id ?? "",
-        trip_booking_id: booking.id,
-        proposal_id: booking.proposal_id || "",
+        // These metadata keys must match what `stripe-webhook-handler` reads
+        // in `handleCheckoutCompleted`: `type === 'trip_booking'` and
+        // `trip_booking_id` — DO NOT rename them.
         type: "trip_booking",
+        trip_booking_id: booking.id,
+        trip_request_id: tripRequest?.id ?? "",
+        proposal_id: booking.proposal_id || "",
+        booking_reference: bookingRef,
+        trip_title: tripTitle ?? "",
+        destination: destination ?? "",
         ...(affiliateCode ? { affiliate_code: affiliateCode } : {}),
         ...(gclid ? { gclid } : {}),
       },
     });
 
-    // Update booking with payment details
+    // Update booking with payment details.
+    //
+    // We intentionally do NOT overwrite `total_price` (it was set to the
+    // trip's price-per-person on insert and represents the trip cost; the
+    // deposit-charged amount lives on the Stripe payment record). We store
+    // `session.payment_intent` (a `pi_…` id) — not `session.id` (`cs_…`) —
+    // so refund / dispute lookups against `stripe_payment_intent_id` match
+    // what Stripe sends in those events.
     const { data: updated, error: updateError } = await supabase
       .from("trip_bookings")
       .update({
-        total_price: amountTotalCents,
         currency: currency.toLowerCase(),
         payment_provider: "stripe",
-        stripe_payment_intent_id: session.id,
+        stripe_payment_intent_id: (session as any).payment_intent ?? session.id,
         payment_url: session.url,
         status: "payment_pending",
         metadata: {
           ...((booking.metadata as any) || {}),
+          checkout_session_id: session.id,
           checkout_session_created_at: new Date().toISOString(),
+          booking_reference: bookingRef,
+          ...(tripTitle ? { trip_title: tripTitle } : {}),
+          ...(destination ? { destination } : {}),
         },
       })
       .eq("id", booking.id)
@@ -218,6 +292,7 @@ Deno.serve(async (req) => {
         bookingId: updated.id,
         paymentUrl: updated.payment_url,
         status: updated.status,
+        bookingReference: bookingRef,
       }),
       {
         status: 200,
