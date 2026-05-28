@@ -21,7 +21,7 @@ export const NewProposalReceivedEmail = ({ proposalId, specialistName }: Props) 
     `Accept to proceed — payment is held in escrow and released on milestones.`,
     `All communication and payment must remain on-platform per our Trust & Safety policy.`
   ]}
-    cta={{ label: 'Review proposal', url: `https://goldsainte.ai/traveler/proposals/${proposalId ?? ""}` }}
+    cta={{ label: 'Review proposal', url: `https://goldsainte.ai/proposals/${proposalId ?? ""}` }}
   />
 )
 
