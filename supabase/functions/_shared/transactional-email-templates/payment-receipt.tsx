@@ -22,7 +22,7 @@ export const PaymentReceiptEmail = ({ amount, bookingId, tripName }: Props) => (
     `Refunds, if applicable, follow the cancellation terms in your contract.`,
     `For accounting questions, contact our concierge team.`
   ]}
-    cta={{ label: 'Download receipt', url: `https://goldsainte.ai/traveler/bookings/${bookingId ?? ""}/receipt` }}
+    cta={{ label: 'Download receipt', url: `https://goldsainte.ai/bookings/${bookingId ?? ""}` }}
   />
 )
 
