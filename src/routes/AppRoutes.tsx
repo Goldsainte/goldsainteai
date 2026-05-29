@@ -3,6 +3,7 @@ import { Route, Routes, Navigate } from 'react-router-dom';
 
 import Auth from '@/pages/Auth';
 import AuthCallback from '@/pages/AuthCallback';
+import AuthVerify from '@/pages/AuthVerify';
 import UnsubscribePage from '@/pages/UnsubscribePage';
 import CompleteProfile from '@/pages/CompleteProfile';
 import ApplicationVerificationComplete from '@/pages/ApplicationVerificationComplete';
@@ -229,6 +230,7 @@ export const AppRoutes = () => (
       <Route path="/auth" element={<Auth />} />
       <Route path="/login" element={<Auth />} />
       <Route path="/signup" element={<Auth />} />
+      <Route path="/auth/verify" element={<AuthVerify />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/auth/callback/apple" element={<AppleCallback />} />
       <Route path="/auth/apple/callback" element={<AppleCallback />} />

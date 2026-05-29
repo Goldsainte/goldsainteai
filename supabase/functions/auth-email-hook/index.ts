@@ -34,8 +34,8 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 
 // Configuration
 const SITE_NAME = 'Goldsainte'
-const ROOT_DOMAIN = 'goldsainte.com'
-const FROM_DOMAIN = 'goldsainte.com'
+const ROOT_DOMAIN = 'goldsainte.ai'       // app domain — used in confirmation links
+const FROM_DOMAIN = 'goldsainte.com'     // Resend-verified sender domain
 
 // Sample data for preview mode ONLY (not used in actual email sending).
 const SAMPLE_PROJECT_URL = 'https://goldsainte.ai'
@@ -211,13 +211,15 @@ async function handleSupabaseHook(req: Request): Promise<Response> {
 
   console.log('Template found, building confirmation URL')
 
-  // Build the confirmation URL.
-  // SUPABASE_URL is auto-injected in every edge function and points at the
-  // project this function is deployed on.
-  const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
+  // Build the confirmation URL pointing to the branded domain (/auth/verify)
+  // so outbound emails show goldsainte.ai instead of the raw Supabase project URL.
+  // AuthVerify calls supabase.auth.verifyOtp() client-side with the token_hash.
   const redirectTo = emailData.redirect_to ?? `https://${ROOT_DOMAIN}`
+  // Build a branded confirmation URL. The /auth/verify page calls verifyOtp()
+  // client-side, so the raw Supabase project URL never appears in outbound emails.
+  // Pass redirect_to through so recovery flows land on /reset-password.
   const confirmationUrl = emailData.token_hash
-    ? `${supabaseUrl}/auth/v1/verify?token=${emailData.token_hash}&type=${emailType}&redirect_to=${encodeURIComponent(redirectTo)}`
+    ? `https://${ROOT_DOMAIN}/auth/verify?token=${emailData.token_hash}&type=${emailType}&redirect_to=${encodeURIComponent(redirectTo)}`
     : redirectTo
 
   console.log('Rendering email template', { emailType, confirmationUrl: confirmationUrl.substring(0, 60) + '...' })
