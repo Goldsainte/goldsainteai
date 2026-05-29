@@ -1,6 +1,6 @@
 import * as React from 'npm:react@18.3.1'
 import { renderAsync } from 'npm:@react-email/components@0.0.22'
-import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
+import { Webhook } from 'npm:standardwebhooks@1.0.0'
 import { SignupEmail } from '../_shared/email-templates/signup.tsx'
 import { InviteEmail } from '../_shared/email-templates/invite.tsx'
 import { MagicLinkEmail } from '../_shared/email-templates/magic-link.tsx'
@@ -188,6 +188,8 @@ async function handleSupabaseHook(req: Request): Promise<Response> {
   const recipientEmail = user?.email
   const emailType = emailData?.email_action_type
 
+  console.log('Payload parsed', { emailType, recipientEmail, emailDataKeys: emailData ? Object.keys(emailData) : null })
+
   if (!recipientEmail || !emailData || !emailType) {
     console.error('Invalid hook payload - missing user.email, email_data or email_action_type')
     return new Response(
@@ -207,6 +209,8 @@ async function handleSupabaseHook(req: Request): Promise<Response> {
     )
   }
 
+  console.log('Template found, building confirmation URL')
+
   // Build the confirmation URL.
   // SUPABASE_URL is auto-injected in every edge function and points at the
   // project this function is deployed on.
@@ -215,6 +219,8 @@ async function handleSupabaseHook(req: Request): Promise<Response> {
   const confirmationUrl = emailData.token_hash
     ? `${supabaseUrl}/auth/v1/verify?token=${emailData.token_hash}&type=${emailType}&redirect_to=${encodeURIComponent(redirectTo)}`
     : redirectTo
+
+  console.log('Rendering email template', { emailType, confirmationUrl: confirmationUrl.substring(0, 60) + '...' })
 
   const templateProps = {
     siteName: SITE_NAME,
@@ -227,8 +233,23 @@ async function handleSupabaseHook(req: Request): Promise<Response> {
     newEmail: user.new_email,
   }
 
-  const html = await renderAsync(React.createElement(EmailTemplate, templateProps))
-  const text = await renderAsync(React.createElement(EmailTemplate, templateProps), { plainText: true })
+  let html: string
+  let text: string
+  try {
+    html = await renderAsync(React.createElement(EmailTemplate, templateProps))
+    console.log('HTML render complete, rendering plain text')
+    text = await renderAsync(React.createElement(EmailTemplate, templateProps), { plainText: true })
+    console.log('Plain text render complete')
+  } catch (renderErr) {
+    const msg = renderErr instanceof Error ? renderErr.message : String(renderErr)
+    console.error('Email template render failed', { emailType, error: msg })
+    return new Response(
+      JSON.stringify({ error: 'Template render failed', detail: msg }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
+  }
+
+  console.log('Sending via Resend', { to: recipientEmail, subject: EMAIL_SUBJECTS[emailType] })
 
   // Send via Resend (same provider used throughout this project).
   try {
@@ -255,6 +276,7 @@ async function handleSupabaseHook(req: Request): Promise<Response> {
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
+    console.log('Resend API success', { status: resendResponse.status })
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error)
     console.error('Failed to send auth email', { error: errorMsg, emailType })
