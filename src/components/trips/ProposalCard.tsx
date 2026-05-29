@@ -106,7 +106,7 @@ export function ProposalCard({
           platform_commission: platformCommission,
           partner_payout: partnerPayout,
           currency: proposal.currency || "usd",
-          status: "draft",
+          status: "pending",
         }] as any,
         { onConflict: "trip_request_id" }
       );
