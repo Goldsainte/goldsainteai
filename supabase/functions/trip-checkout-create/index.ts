@@ -127,6 +127,49 @@ Deno.serve(async (req) => {
         { status: 403, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
+    // -------------------------------------------------------------------
+    // Contract gate: if a trip_contracts row is linked to this booking,
+    // it must be fully_executed before deposit can be paid. Bookings
+    // with no linked contract are unaffected. Fails open on query
+    // errors so contract bugs never block legitimate revenue.
+    // -------------------------------------------------------------------
+    try {
+      const { data: linkedContracts, error: contractGateError } = await supabase
+        .from("trip_contracts")
+        .select("id, status")
+        .eq("booking_id", booking.id);
+
+      if (contractGateError) {
+        console.error("Contract gate query failed:", contractGateError);
+      } else if (linkedContracts && linkedContracts.length > 0) {
+        const executed = linkedContracts.some(
+          (c: any) => c.status === "fully_executed"
+        );
+        if (!executed) {
+          const pendingContract = linkedContracts.find(
+            (c: any) => c.status === "pending_signatures" || c.status === "draft"
+          );
+          return new Response(
+            JSON.stringify({
+              error: "Contract not signed",
+              message:
+                "You must sign the trip contract before paying the deposit. Open the contract from your bookings dashboard or check your inbox for the signing link.",
+              code: "CONTRACT_NOT_EXECUTED",
+              contractId: pendingContract?.id ?? null,
+            }),
+            {
+              status: 412,
+              headers: {
+                ...corsHeaders(req),
+                "Content-Type": "application/json",
+              },
+            }
+          );
+        }
+      }
+    } catch (e) {
+      console.error("Contract gate threw:", e);
+    }
 
     // Best-effort enrichment for marketplace bookings: look up the packaged
     // trip's title + destination so Stripe records and the customer's receipt

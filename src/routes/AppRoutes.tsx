@@ -59,6 +59,7 @@ const MyTripRequestsPage = lazy(() => import('@/pages/MyTripRequestsPage'));
 const MyTripMatchesPage = lazy(() => import('@/pages/MyTripMatchesPage'));
 const TripInboxPage = lazy(() => import('@/pages/TripInboxPage'));
 const TravelerDashboardPage = lazy(() => import('@/pages/traveler/TravelerDashboardPage'));
+const ContractSignPage = lazy(() => import('@/pages/contracts/ContractSignPage'));
 const MyTripsPage = lazy(() => import('@/pages/trips/MyTripsPage'));
 const PostTripPage = lazy(() => import('@/pages/trips/PostTripPage'));
 const TripRequestDetailPageNew = lazy(() => import('@/pages/trips/TripRequestDetailPage'));
@@ -463,6 +464,14 @@ export const AppRoutes = () => (
             </RequireAgentTerms>
           </RequireAuth>
         } 
+      />
+      <Route
+        path="/contract/:contractId/sign"
+        element={
+          <RequireAuth>
+            <ContractSignPage />
+          </RequireAuth>
+        }
       />
       <Route path="/email-preview" element={<AdminGuard><EmailPreview /></AdminGuard>} />
       <Route path="/billing-dashboard" element={<RequireAuth><BillingDashboard /></RequireAuth>} />
