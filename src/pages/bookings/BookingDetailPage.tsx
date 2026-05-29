@@ -1,7 +1,7 @@
 // src/pages/bookings/BookingDetailPage.tsx
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, MessageSquare } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { BookingConversation } from "@/components/chat/BookingConversation";
 import { TripPoliciesPanel } from "@/components/trips/TripPoliciesPanel";
@@ -53,11 +53,11 @@ function humanBookingStatus(status: string) {
     case "paid_in_full":
       return "Paid in full";
     case "completed":
-      return "Trip completed";
+      return "Completed";
     case "cancelled":
       return "Cancelled";
     default:
-      return status;
+      return status.replace(/_/g, " ");
   }
 }
 
@@ -132,112 +132,115 @@ export default function BookingDetailPage() {
   const deposit = booking?.deposit_amount ?? 0;
   const balance = Math.max(0, total - deposit);
   const reference = booking ? `GS-${booking.id.slice(0, 8).toUpperCase()}` : "";
-  const title = trip?.title || trip?.destination || "Goldsainte trip booking";
+  const title = trip?.title || trip?.destination || "Goldsainte trip";
 
   return (
     <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
-      <section className="mx-auto max-w-4xl px-6 pt-12 pb-6 md:pt-16">
+      {/* Back link */}
+      <section className="mx-auto max-w-5xl px-6 pt-8 pb-2">
         <Link
           to="/my-bookings"
-          className="inline-flex items-center gap-1.5 text-xs tracking-wide text-[#0a2225]/60 hover:text-[#0a2225] transition-colors"
+          className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-[#0a2225]/50 hover:text-[#0a2225] transition-colors"
         >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Back to My Bookings
+          <ArrowLeft className="h-3 w-3" />
+          Back
         </Link>
       </section>
 
       {loading && (
-        <section className="mx-auto max-w-4xl px-6 pb-16">
-          <p className="text-sm text-[#0a2225]/50">Loading…</p>
+        <section className="mx-auto max-w-5xl px-6 pb-16 pt-6">
+          <div className="aspect-[21/9] max-h-[420px] w-full rounded-sm bg-white/40 animate-pulse" />
+          <div className="mt-8 space-y-3">
+            <div className="h-3 w-24 bg-white/50 animate-pulse" />
+            <div className="h-10 w-2/3 bg-white/50 animate-pulse" />
+          </div>
         </section>
       )}
 
       {error && !loading && (
-        <section className="mx-auto max-w-4xl px-6 pb-16">
+        <section className="mx-auto max-w-5xl px-6 pb-16 pt-6">
           <p className="text-sm text-red-700">{error}</p>
         </section>
       )}
 
       {booking && !loading && (
-        <section className="mx-auto max-w-4xl px-6 pb-20 space-y-12">
-          {/* Headline */}
-          <header className="space-y-4">
-            <p className="text-[11px] uppercase tracking-[0.22em] text-[#8D6B2F]">
-              Your booking
-            </p>
-            <h1 className="font-secondary text-3xl sm:text-4xl md:text-6xl leading-tight text-[#0a2225]">
-              {title}
-            </h1>
-            {trip?.destination && (
-              <p className="font-secondary italic text-base md:text-lg text-[#0a2225]/60">
-                {trip.destination}
-                {trip.duration_days ? ` · ${trip.duration_days} days` : ""}
-              </p>
-            )}
-          </header>
-
-          <div className="w-full h-px bg-[#0a2225]" />
-
-          {/* Cover image */}
+        <article className="mx-auto max-w-5xl px-6 pb-24 pt-4">
+          {/* Hero image — first, as the anchor */}
           {trip?.cover_image_url && (
-            <div className="overflow-hidden rounded-sm">
+            <figure className="overflow-hidden rounded-sm">
               <TripCoverImage
                 src={trip.cover_image_url}
                 alt={title}
-                className="w-full aspect-[21/9] max-h-[360px] object-cover"
+                className="w-full aspect-[21/9] max-h-[420px] object-cover"
               />
-            </div>
+            </figure>
           )}
 
-          {/* Metadata block */}
-          <div className="space-y-0">
-            <Row label="Booking reference" value={reference} mono />
-            <Row
-              label="Status"
-              value={
-                <span className="inline-flex items-center rounded-full bg-[#0c4d47] text-[#E5DFC6] px-3 py-1 text-[11px]">
-                  {humanBookingStatus(booking.status)}
-                </span>
-              }
-            />
-            <Row label="Trip total" value={formatMoney(total, currency)} />
-            <Row label="Deposit paid" value={formatMoney(deposit, currency)} />
-            <Row
-              label="Balance remaining"
-              value={formatMoney(balance, currency)}
-            />
-          </div>
+          {/* Title block */}
+          <header className={`space-y-3 ${trip?.cover_image_url ? "mt-10" : "mt-6"}`}>
+            <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+              Your journey
+            </p>
+            <h1 className="font-secondary text-3xl md:text-4xl leading-[1.05] text-[#0a2225] max-w-3xl">
+              {title}
+            </h1>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-[#0a2225]/60 pt-1">
+              {trip?.destination && (
+                <span className="font-secondary italic">{trip.destination}</span>
+              )}
+              {trip?.duration_days ? (
+                <>
+                  <span className="text-[#0a2225]/30">·</span>
+                  <span>
+                    {trip.duration_days} {trip.duration_days === 1 ? "day" : "days"}
+                  </span>
+                </>
+              ) : null}
+              <span className="text-[#0a2225]/30">·</span>
+              <span className="inline-flex items-center rounded-full bg-[#0c4d47] text-[#E5DFC6] px-2.5 py-0.5 text-[10px] uppercase tracking-[0.14em]">
+                {humanBookingStatus(booking.status)}
+              </span>
+            </div>
+          </header>
 
-          {/* Chat */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4 text-[#8D6B2F]" />
-              <p className="text-[11px] uppercase tracking-[0.22em] text-[#8D6B2F]">
-                Trip messages
+          {/* Data grid */}
+          <section className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-8 border-t border-[#E5DFC6] mt-12 pt-8">
+            <Stat label="Reference" value={reference} mono />
+            <Stat label="Trip total" value={formatMoney(total, currency)} />
+            <Stat label="Deposit paid" value={formatMoney(deposit, currency)} />
+            <Stat label="Balance remaining" value={formatMoney(balance, currency)} />
+          </section>
+
+          {/* Messages section */}
+          <section className="mt-20">
+            <header className="flex items-baseline justify-between mb-6">
+              <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                Messages
               </p>
-            </div>
-            <div className="border-t border-[#E5DFC6] pt-4">
-              <BookingConversation bookingId={booking.id} />
-            </div>
-          </div>
+              <p className="text-[10px] uppercase tracking-[0.18em] text-[#0a2225]/40">
+                Direct line to your travel professional
+              </p>
+            </header>
+            <BookingConversation bookingId={booking.id} />
+          </section>
 
-          {/* Policies */}
-          <div className="space-y-4">
-            <p className="text-[11px] uppercase tracking-[0.22em] text-[#8D6B2F]">
+          {/* Policies section */}
+          <section className="mt-20">
+            <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F] mb-6">
               Policies
             </p>
             <TripPoliciesPanel
               bookingStatus={booking.status}
               proposalPolicies={null}
             />
-          </div>
-        </section>
+          </section>
+        </article>
       )}
     </main>
   );
 }
 
-function Row({
+function Stat({
   label,
   value,
   mono,
@@ -247,15 +250,19 @@ function Row({
   mono?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 py-4 border-b border-[#E5DFC6]">
-      <span className="text-[11px] uppercase tracking-[0.18em] text-[#0a2225]/60">
+    <div className="space-y-2">
+      <p className="text-[9px] uppercase tracking-[0.24em] text-[#0a2225]/50">
         {label}
-      </span>
-      <span
-        className={`text-sm text-[#0a2225] ${mono ? "font-mono tracking-wide" : ""}`}
+      </p>
+      <p
+        className={
+          mono
+            ? "font-mono text-[13px] tracking-wide text-[#0a2225]"
+            : "font-secondary text-xl text-[#0a2225]"
+        }
       >
         {value}
-      </span>
+      </p>
     </div>
   );
 }

@@ -1,10 +1,11 @@
+
 // src/pages/MyBookingsPage.tsx
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { MapPin, Clock } from "lucide-react";
-
+ 
 type TripMeta = {
   id: string;
   title: string | null;
@@ -13,7 +14,7 @@ type TripMeta = {
   duration_days: number | null;
   price_per_person: number | null;
 };
-
+ 
 type BookingRow = {
   id: string;
   status: string;
@@ -24,9 +25,9 @@ type BookingRow = {
   metadata: any;
   trip: TripMeta | null;
 };
-
+ 
 const BOOKING_STATUSES = ["confirmed", "payment_pending", "paid_in_full", "completed"];
-
+ 
 function formatCurrency(value: number | null | undefined, currency: string | null | undefined) {
   if (value == null) return "—";
   return new Intl.NumberFormat("en-US", {
@@ -35,7 +36,7 @@ function formatCurrency(value: number | null | undefined, currency: string | nul
     minimumFractionDigits: 0,
   }).format(value);
 }
-
+ 
 function statusLabel(status: string) {
   switch (status) {
     case "confirmed":
@@ -50,19 +51,19 @@ function statusLabel(status: string) {
       return status;
   }
 }
-
+ 
 function bookingReference(id: string) {
   return `GS-${id.replace(/-/g, "").slice(0, 8).toUpperCase()}`;
 }
-
+ 
 export default function MyBookingsPage() {
   const navigate = useNavigate();
   const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [loading, setLoading] = useState(true);
-
+ 
   useEffect(() => {
     let mounted = true;
-
+ 
     async function load() {
       setLoading(true);
       const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -70,7 +71,7 @@ export default function MyBookingsPage() {
         navigate("/auth?returnTo=/my-bookings", { replace: true });
         return;
       }
-
+ 
       const { data, error } = await supabase
         .from("trip_bookings")
         .select(
@@ -79,16 +80,16 @@ export default function MyBookingsPage() {
         .eq("traveler_id", user.id)
         .in("status", BOOKING_STATUSES)
         .order("created_at", { ascending: false });
-
+ 
       if (!mounted) return;
-
+ 
       if (error) {
         console.error("[MyBookings] Failed to load bookings:", error);
         setBookings([]);
         setLoading(false);
         return;
       }
-
+ 
       const rows = (data ?? []) as any[];
       const tripIds = Array.from(
         new Set(
@@ -97,7 +98,7 @@ export default function MyBookingsPage() {
             .filter((v): v is string => typeof v === "string" && v.length > 0)
         )
       );
-
+ 
       let tripsById = new Map<string, TripMeta>();
       if (tripIds.length > 0) {
         const { data: trips, error: tripsError } = await supabase
@@ -110,7 +111,7 @@ export default function MyBookingsPage() {
           tripsById = new Map((trips ?? []).map((t: any) => [t.id, t as TripMeta]));
         }
       }
-
+ 
       const merged: BookingRow[] = rows.map((r) => ({
         id: r.id,
         status: r.status,
@@ -121,23 +122,23 @@ export default function MyBookingsPage() {
         metadata: r.metadata,
         trip: tripsById.get(r?.metadata?.trip_id) ?? null,
       }));
-
+ 
       setBookings(merged);
       setLoading(false);
     }
-
+ 
     load();
     return () => {
       mounted = false;
     };
   }, [navigate]);
-
+ 
   return (
     <>
       <Helmet>
         <title>My Bookings · Goldsainte</title>
       </Helmet>
-
+ 
       <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
         <div className="mx-auto max-w-5xl px-4 py-12">
           <header className="space-y-2">
@@ -152,7 +153,7 @@ export default function MyBookingsPage() {
               your creators and travel agents are working from.
             </p>
           </header>
-
+ 
           <section className="mt-10">
             {loading ? (
               <div className="space-y-4">
@@ -178,7 +179,7 @@ export default function MyBookingsPage() {
     </>
   );
 }
-
+ 
 function EmptyState() {
   return (
     <div className="rounded-3xl border border-[#E5DFC6] bg-white/80 px-6 py-16 text-center">
@@ -198,17 +199,17 @@ function EmptyState() {
     </div>
   );
 }
-
+ 
 function BookingCard({ booking }: { booking: BookingRow }) {
   const trip = booking.trip;
   const reference = bookingReference(booking.id);
-
+ 
   return (
     <Link
       to={`/bookings/${booking.id}`}
       className="group flex flex-col md:flex-row overflow-hidden rounded-3xl bg-white ring-1 ring-[#E5DFC6] shadow-sm hover:shadow-md transition-shadow"
     >
-      <div className="relative md:w-64 aspect-[4/3] md:aspect-auto bg-[#f0ebdd] shrink-0">
+      <div className="relative md:w-56 aspect-[16/10] md:aspect-[4/3] bg-[#f0ebdd] shrink-0">
         {trip?.cover_image_url ? (
           <img
             src={trip.cover_image_url}
@@ -222,14 +223,14 @@ function BookingCard({ booking }: { booking: BookingRow }) {
           </div>
         )}
       </div>
-
-      <div className="flex-1 p-6 flex flex-col gap-4">
+ 
+      <div className="flex-1 p-5 flex flex-col gap-3">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-[10px] uppercase tracking-[0.18em] text-[#8D6B2F]">
               {reference}
             </p>
-            <h2 className="mt-1 font-serif text-xl text-[#0a2225] line-clamp-2">
+            <h2 className="mt-1 font-serif text-lg text-[#0a2225] line-clamp-2">
               {trip?.title || "Goldsainte trip"}
             </h2>
           </div>
@@ -237,7 +238,7 @@ function BookingCard({ booking }: { booking: BookingRow }) {
             {statusLabel(booking.status)}
           </span>
         </div>
-
+ 
         <div className="flex flex-wrap items-center gap-4 text-xs text-[#4a4a4a]">
           {trip?.destination && (
             <span className="inline-flex items-center gap-1.5">
@@ -255,7 +256,7 @@ function BookingCard({ booking }: { booking: BookingRow }) {
             Booked {new Date(booking.created_at).toLocaleDateString()}
           </span>
         </div>
-
+ 
         <div className="mt-auto grid grid-cols-2 gap-4 border-t border-[#E5DFC6] pt-4">
           <div>
             <p className="text-[10px] uppercase tracking-[0.14em] text-[#8D8D8D]">
