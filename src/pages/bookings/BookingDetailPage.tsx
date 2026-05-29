@@ -180,11 +180,11 @@ export default function BookingDetailPage() {
 
           {/* Cover image */}
           {trip?.cover_image_url && (
-            <div className="overflow-hidden">
+            <div className="overflow-hidden rounded-sm">
               <TripCoverImage
                 src={trip.cover_image_url}
                 alt={title}
-                className="w-full aspect-[4/3] object-cover"
+                className="w-full aspect-[21/9] max-h-[360px] object-cover"
               />
             </div>
           )}

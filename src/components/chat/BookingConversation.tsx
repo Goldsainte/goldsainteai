@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ChatSafetyBanner } from "./ChatSafetyBanner";
 import { SendHorizontal } from "lucide-react";
-import { MarketplaceDisclaimer } from "@/components/policies/MarketplaceDisclaimer";
 
 type Message = {
   id: string;
@@ -98,8 +97,6 @@ export function BookingConversation({ bookingId }: { bookingId: string }) {
   return (
     <div className="flex flex-col h-[400px]">
       <ChatSafetyBanner />
-      
-      <MarketplaceDisclaimer size="sm" />
       
       <div className="flex-1 overflow-y-auto space-y-2 mb-3 mt-2">
         {loading && (
