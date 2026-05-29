@@ -96,6 +96,8 @@ Deno.serve(async (req) => {
         trip_request_id,
         proposal_id,
         traveler_id,
+        partner_id,
+        partner_role,
         currency,
         total_price,
         deposit_amount,
@@ -127,6 +129,45 @@ Deno.serve(async (req) => {
         { status: 403, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
+    
+    // -------------------------------------------------------------------
+    // Lazy auto-link: if a contract exists for this (traveler, agent)
+    // pair but isn't yet linked to a booking, link it now so the gate
+    // below catches it. Only links unambiguous matches (exactly one
+    // unlinked contract for the pair). Belt-and-suspenders to the SQL
+    // trigger; either path leaves the contract linked. Fails open.
+    // -------------------------------------------------------------------
+    try {
+      const travelerId  = (booking as any).traveler_id;
+      const partnerId   = (booking as any).partner_id;
+      const partnerRole = (booking as any).partner_role;
+      const partnerIsAgent = !partnerRole || partnerRole !== "creator";
+
+      if (travelerId && partnerId && partnerIsAgent) {
+        const { data: candidateContracts } = await supabase
+          .from("trip_contracts")
+          .select("id")
+          .eq("traveler_id", travelerId)
+          .eq("agent_id", partnerId)
+          .is("booking_id", null)
+          .in("status", ["draft", "pending_signatures", "fully_executed"]);
+
+        if (candidateContracts && candidateContracts.length === 1) {
+          await supabase
+            .from("trip_contracts")
+            .update({
+              booking_id: booking.id,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", candidateContracts[0].id);
+        }
+      }
+    } catch (e) {
+      console.error("Lazy contract link failed (non-fatal):", e);
+    }
+
+    // -------------------------------------------------------------------
+    // Contract gate: if a trip_contracts row is linked to this booking,
     // -------------------------------------------------------------------
     // Contract gate: if a trip_contracts row is linked to this booking,
     // it must be fully_executed before deposit can be paid. Bookings
