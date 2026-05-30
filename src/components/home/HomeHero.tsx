@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { supabaseImageUrl } from "@/lib/images";
 
 import heroMainImg from "@/assets/maximilien-t-scharner-FD0Ga_KJTwM-unsplash.webp"; // infinity pool
 import heroSecondaryImg from "@/assets/austin-distel-riQNJpiaGgE-unsplash.webp"; // treehouse / hammock
@@ -114,7 +115,7 @@ export function HomeHero() {
                   >
                     <div className="overflow-hidden rounded-xl aspect-[4/3]">
                       <img
-                        src={trip.image}
+                        src={supabaseImageUrl(trip.image, { width: 800, quality: 70 })}
                         alt={trip.title}
                         loading="lazy"
                         decoding="async"
