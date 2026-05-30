@@ -23,7 +23,7 @@ const AuthVerify = () => {
 
     const verify = async () => {
       const token_hash = searchParams.get('token') ?? searchParams.get('token_hash') ?? '';
-      const type = (searchParams.get('type') ?? 'signup') as Parameters<typeof supabase.auth.verifyOtp>[0]['type'];
+      const type = (searchParams.get('type') ?? 'signup') as any;
       const redirectTo = searchParams.get('redirect_to');
 
       if (!token_hash) {
@@ -69,7 +69,7 @@ const AuthVerify = () => {
     verify();
   }, [navigate, searchParams]);
 
-  return <EditorialLoader />;
+  return <EditorialLoader eyebrow="Verifying" title="Confirming your email…" />;
 };
 
 export default AuthVerify;
