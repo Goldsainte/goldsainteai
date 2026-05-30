@@ -1,4 +1,4 @@
-# Translation Scripts
+actions/checkout@v5# Translation Scripts
 
 This directory contains automated scripts for validating and monitoring translation files.
 
@@ -113,7 +113,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v5
         with:
           node-version: '18'
       - name: Validate translations
