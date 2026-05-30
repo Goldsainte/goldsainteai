@@ -18,7 +18,7 @@ export function HomeHero() {
     { slug: null, title: "Amalfi Coast Weekend", price: 2499, currency: "USD", image: heroTertiaryImg },
   ];
 
-  const { data: featured } = useQuery({
+  const { data: featured, isLoading } = useQuery({
     queryKey: ["hero-popular-trips"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -32,16 +32,19 @@ export function HomeHero() {
     },
   });
 
-  const popularTrips =
-    featured && featured.length >= 3
-      ? featured.slice(0, 3).map((t) => ({
-          slug: t.slug,
-          title: t.title,
-          price: t.price_per_person,
-          currency: t.currency || "USD",
-          image: t.cover_image_url,
-        }))
-      : fallbackTrips;
+ const hasFeatured = !!featured && featured.length >= 3;
+  const popularTrips = hasFeatured
+    ? featured.slice(0, 3).map((t) => ({
+        slug: t.slug,
+        title: t.title,
+        price: t.price_per_person,
+        currency: t.currency || "USD",
+        image: t.cover_image_url,
+      }))
+    : fallbackTrips;
+  // Show neutral placeholders while the real photos load, so the
+  // bundled sample images never flash in and get swapped.
+  const showSkeleton = isLoading && !hasFeatured;;
 
   const formatPrice = (price: number, currency: string) =>
     new Intl.NumberFormat("en-US", {
@@ -107,7 +110,15 @@ export function HomeHero() {
                 <span className="h-px flex-1 bg-[#E5DFC6]" />
               </div>
               <div className="grid grid-cols-3 gap-2 md:gap-3">
-                {popularTrips.map((trip) => (
+                {showSkeleton
+                  ? [0, 1, 2].map((i) => (
+                      <div key={i} className="animate-pulse">
+                        <div className="overflow-hidden rounded-xl aspect-[4/3] bg-[#E5DFC6]/60" />
+                        <div className="mt-2 h-3 w-3/4 rounded bg-[#E5DFC6]/60" />
+                        <div className="mt-1 h-2 w-1/2 rounded bg-[#E5DFC6]/50" />
+                      </div>
+                    ))
+                  : popularTrips.map((trip) => (
                   <Link
                     key={trip.title}
                     to={trip.slug ? `/marketplace/trip/${trip.slug}` : "/marketplace"}
