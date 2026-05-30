@@ -104,8 +104,16 @@ export default function AdminTripsPage() {
     }
     setUploadingId(trip.id);
     try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        throw new Error("Please sign in again and retry the upload");
+      }
+
       const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-      const path = `trips/${trip.id}/cover-${Date.now()}.${ext}`;
+      const path = `${user.id}/trips/${trip.id}/cover-${Date.now()}.${ext}`;
       const { error: upErr } = await supabase.storage
         .from("trip-assets")
         .upload(path, file, { upsert: true, cacheControl: "3600", contentType: file.type });
