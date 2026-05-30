@@ -1,4 +1,4 @@
-actions/checkout@v5name: Deploy Supabase Backend
+name: Deploy Supabase Backend
 
 # Pushes edge functions + database migrations to the production Supabase
 # project (ktzsgqrqvwtxlimctkaf) whenever backend code changes on main.
@@ -21,9 +21,9 @@ on:
   workflow_dispatch:
     inputs:
       skip_db_push:
-        description: 'Skip database migrations'
+        description: 'Run db push? Default skips it. Set to false only if you want migrations pushed.'
         required: false
-        default: 'false'
+        default: 'true'
 
 concurrency:
   group: supabase-deploy-main
@@ -52,7 +52,7 @@ jobs:
         run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
 
       - name: Push database migrations
-        if: ${{ github.event.inputs.skip_db_push != 'true' }}
+        if: ${{ github.event.inputs.skip_db_push == 'false' }}
         run: supabase db push
 
       - name: Deploy edge functions
