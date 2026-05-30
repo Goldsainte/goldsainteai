@@ -166,7 +166,7 @@ export default function ContractSignPage() {
       else setUserRole(null);
 
       // Revisions
-      const { data: revisionsData } = await supabase
+      const { data: revisionsData } = await (supabase as any)
         .from("trip_contract_revisions")
         .select("*")
         .eq("contract_id", contractId)
@@ -210,7 +210,7 @@ export default function ContractSignPage() {
 
     setSaving(true);
     try {
-      const { error } = await supabase.from("trip_contract_revisions").insert({
+      const { error } = await (supabase as any).from("trip_contract_revisions").insert({
         contract_id: contract.id,
         proposed_by: currentUserId,
         proposed_by_role: userRole,
@@ -249,7 +249,7 @@ export default function ContractSignPage() {
     if (!currentUserId) return;
     setSaving(true);
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("trip_contract_revisions")
         .update({
           status: "accepted",
@@ -281,7 +281,7 @@ export default function ContractSignPage() {
     if (!revisionToReject || !currentUserId) return;
     setSaving(true);
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("trip_contract_revisions")
         .update({
           status: "rejected",
