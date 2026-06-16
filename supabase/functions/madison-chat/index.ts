@@ -74,16 +74,34 @@ serve(async (req) => {
   try {
     const body = await req.json().catch(() => null);
 
-    if (!body || typeof body.message !== "string" || !body.userId) {
+    if (!body || typeof body.message !== "string") {
       console.error("[madison-chat] Invalid request body", body);
       return new Response(
-        JSON.stringify({ error: "message (string) and userId are required" }),
+        JSON.stringify({ error: "message (string) is required" }),
         { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } },
       );
     }
 
+    // 🔒 Derive userId from the verified JWT — never trust body.userId.
+    const authHeader = req.headers.get("Authorization") ?? "";
+    if (!authHeader.startsWith("Bearer ")) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders(req), "Content-Type": "application/json" } },
+      );
+    }
+    const { data: { user } } = await supabase.auth.getUser(
+      authHeader.replace("Bearer ", ""),
+    );
+    if (!user) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders(req), "Content-Type": "application/json" } },
+      );
+    }
+
     const message: string = body.message;
-    const userId: string = body.userId;
+    const userId: string = user.id;
 
     const wantsToTravel = detectTravelIntent(message);
     const destination = extractDestination(message);
