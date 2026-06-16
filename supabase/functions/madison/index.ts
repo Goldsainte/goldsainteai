@@ -88,16 +88,12 @@ serve(async (req) => {
   try {
     const body = await req.json().catch(() => null);
 
-    if (
-      !body ||
-      typeof body.message !== "string" ||
-      typeof body.userId !== "string"
-    ) {
+    if (!body || typeof body.message !== "string") {
       console.error("[Madison] Invalid body:", body);
       return new Response(
         JSON.stringify({
           success: false,
-          error: "message (string) and userId (string) are required",
+          error: "message (string) is required",
         }),
         {
           status: 400,
@@ -107,9 +103,33 @@ serve(async (req) => {
     }
 
     const message: string = body.message;
-    const userId: string = body.userId;
     const inputType: string = body.inputType || "text";
     const incomingConversationId: string | null = body.conversationId ?? null;
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } },
+    );
+
+    // 🔒 Derive userId from the verified JWT — never trust body.userId.
+    const authHeader = req.headers.get("Authorization") ?? "";
+    if (!authHeader.startsWith("Bearer ")) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders(req), "Content-Type": "application/json" } },
+      );
+    }
+    const { data: { user } } = await supabase.auth.getUser(
+      authHeader.replace("Bearer ", ""),
+    );
+    if (!user) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders(req), "Content-Type": "application/json" } },
+      );
+    }
+    const userId: string = user.id;
 
     console.log("[Madison] Input:", {
       message,
@@ -117,12 +137,6 @@ serve(async (req) => {
       inputType,
       conversationId: incomingConversationId,
     });
-
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      { auth: { persistSession: false } },
-    );
 
     const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
     if (!OPENAI_API_KEY) {

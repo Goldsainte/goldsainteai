@@ -97,7 +97,9 @@ Deno.serve(async (req) => {
     for (const creator of CREATORS) {
       try {
         const email = `${creator.username}@goldsainte-seed.com`;
-        const password = 'SeedCreator2025!';
+        // Random per-account password. These seed accounts are admin-managed;
+        // an admin must trigger a password reset before any account can sign in.
+        const password = `${crypto.randomUUID()}-${crypto.randomUUID()}`;
 
         // Create auth user
         const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({

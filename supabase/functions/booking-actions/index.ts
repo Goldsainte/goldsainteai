@@ -33,16 +33,34 @@ Deno.serve(async (req) => {
       auth: { persistSession: false },
     });
 
+    // 🔒 Derive userId from the verified JWT — never trust body.userId.
+    const authHeader = req.headers.get('Authorization') ?? '';
+    if (!authHeader.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } },
+      );
+    }
+    const { data: { user } } = await supabase.auth.getUser(
+      authHeader.replace('Bearer ', ''),
+    );
+    if (!user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } },
+      );
+    }
+    const userId: string = user.id;
+
     const payload = await req.json();
     const action: Action = payload.action;
-    const userId: string | undefined = payload.userId;
     const data = payload.data;
 
     console.log('booking-actions invoked:', { action, userId });
 
-    if (!action || !userId) {
+    if (!action) {
       return new Response(
-        JSON.stringify({ error: 'Missing action or userId' }),
+        JSON.stringify({ error: 'Missing action' }),
         { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
