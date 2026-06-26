@@ -215,8 +215,11 @@ serve(async (req) => {
           account_type: 'traveler',
           signup_intent: 'trip_inquiry',
           source_trip_id: tripId,
+          // first_name is safe in signup metadata (no unique constraint).
+          // phone is NOT — profiles.phone is UNIQUE, so a duplicate would make
+          // the handle_new_user trigger fail the whole signup ("Database error
+          // saving new user"). Phone is set separately, best-effort, below.
           ...(firstName ? { first_name: firstName } : {}),
-          ...(phone ? { phone } : {}),
         },
       },
     });
@@ -224,20 +227,17 @@ serve(async (req) => {
 
     const userId: string = linkData.user.id;
 
-    // Persist the optional name/phone on the traveller's profile so the
-    // specialist sees who they're talking to and the "add your name" nudge in
-    // the inbox is satisfied. Best-effort — the trigger creates the row first,
-    // and a failure here must not fail the inquiry.
-    if (firstName || phone) {
-      const profilePatch: Record<string, string> = {};
-      if (firstName) profilePatch.first_name = firstName;
-      if (phone) profilePatch.phone = phone;
-      const { error: profileErr } = await supabaseAdmin
+    // first_name is applied by the handle_new_user trigger from the signup
+    // metadata. phone has a UNIQUE constraint (profiles_phone_unique) and is
+    // optional contact info, so set it on its own and tolerate a duplicate —
+    // a phone collision must NEVER break the inquiry.
+    if (phone) {
+      const { error: phoneErr } = await supabaseAdmin
         .from('profiles')
-        .update(profilePatch)
+        .update({ phone })
         .eq('id', userId);
-      if (profileErr) {
-        console.error('profile name/phone update failed (non-fatal)', { error: profileErr.message });
+      if (phoneErr) {
+        console.warn('could not set traveller phone (likely duplicate) — skipping', { error: phoneErr.message });
       }
     }
 
