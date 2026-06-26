@@ -84,7 +84,7 @@ serve(async (req) => {
       );
     }
 
-    const { recipientId, message, conversationId } = await req.json();
+    const { recipientId, message, conversationId, tripId, tripTitle } = await req.json();
 
     if (!recipientId || !message) {
       return new Response(
@@ -176,6 +176,10 @@ serve(async (req) => {
             initiated_by: user.id,
             last_message_at: new Date().toISOString(),
             last_message_preview: filteredMessage.substring(0, 100),
+            // Optional trip context (e.g. from an "Ask a Question" inquiry) so
+            // the conversation shows "Re: <trip>" and links back to the package.
+            trip_id: tripId ?? null,
+            trip_title: tripTitle ?? null,
           })
           .select()
           .single();

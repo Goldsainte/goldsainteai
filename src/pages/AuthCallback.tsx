@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { EditorialLoader } from '@/components/EditorialLoader';
@@ -9,8 +9,15 @@ import { toast } from '@/hooks/use-toast';
 const AuthCallback = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  // Guard against React StrictMode's double-invoke (and any re-render) running
+  // the callback twice — which would convert the inquiry and post the question
+  // a second time, creating a duplicate message.
+  const ranRef = useRef(false);
 
   useEffect(() => {
+    if (ranRef.current) return;
+    ranRef.current = true;
+
     const handleAuthCallback = async () => {
       try {
         const hashParams = new URLSearchParams(location.hash.startsWith('#') ? location.hash.slice(1) : location.hash);
@@ -221,6 +228,110 @@ const AuthCallback = () => {
             navigate('/onboarding/creator', { replace: true });
             return;
           }
+        }
+
+        // ── Ask-a-Question conversion ────────────────────────────────────
+        // When a user arrives via the trip-inquiry magic link we convert their
+        // pending_inquiry into a real conversation and route them straight to
+        // it — bypassing the onboarding gate (they complete their profile later
+        // via the in-chat banner). An inquiry flow must NEVER land on the
+        // profile-completion wall, even when conversion fails.
+        const inquiryAction = queryParams.get('action');
+        const isInquiryFlow = inquiryAction === 'ask' || inquiryAction === 'open';
+
+        if (inquiryAction === 'ask') {
+          const tripParam = queryParams.get('trip');
+          try {
+            // Find the inquiry for this trip (most recent). The question is
+            // normally already sent at submit time, so the row carries a
+            // conversation_id — we just open it. Click-time creation below is a
+            // fallback for when submit-time delivery didn't happen.
+            let inquiryQuery = supabase
+              .from('pending_inquiries')
+              .select('id, question, partner_id, trip_id, trip_title, conversation_id')
+              .eq('user_id', session.user.id)
+              .order('created_at', { ascending: false })
+              .limit(1);
+            if (tripParam) inquiryQuery = inquiryQuery.eq('trip_id', tripParam);
+            const { data: inquiry } = await inquiryQuery.maybeSingle();
+
+            // Already sent on submit → just open the existing conversation.
+            if (inquiry?.conversation_id) {
+              navigate(`/messages?conversation=${inquiry.conversation_id}`, { replace: true });
+              return;
+            }
+
+            // Fallback: the inquiry has no conversation_id recorded. Prefer
+            // opening an EXISTING thread between this traveller and the
+            // responder — idempotent, never re-posts the question. Only create
+            // one (which posts the question) if none exists yet.
+            if (inquiry?.partner_id) {
+              const [pa, pb] = [session.user.id, inquiry.partner_id].sort();
+              const { data: existingConvo } = await supabase
+                .from('dm_conversations')
+                .select('id')
+                .eq('participant_1', pa)
+                .eq('participant_2', pb)
+                .maybeSingle();
+
+              if (existingConvo) {
+                await supabase
+                  .from('pending_inquiries')
+                  .update({
+                    status: 'converted',
+                    conversation_id: existingConvo.id,
+                    converted_at: new Date().toISOString(),
+                  })
+                  .eq('id', inquiry.id);
+                navigate(`/messages?conversation=${existingConvo.id}`, { replace: true });
+                return;
+              }
+
+              // No thread yet — create it via the canonical path (this posts
+              // the question once).
+              const { data: dm, error: dmErr } = await supabase.functions.invoke('send-direct-message', {
+                body: {
+                  recipientId: inquiry.partner_id,
+                  message: inquiry.question,
+                  tripId: inquiry.trip_id,
+                  tripTitle: inquiry.trip_title,
+                },
+              });
+
+              if (!dmErr && dm?.conversationId) {
+                await supabase
+                  .from('pending_inquiries')
+                  .update({
+                    status: 'converted',
+                    conversation_id: dm.conversationId,
+                    converted_at: new Date().toISOString(),
+                  })
+                  .eq('id', inquiry.id);
+
+                navigate(`/messages?conversation=${dm.conversationId}`, { replace: true });
+                return;
+              }
+              console.error('[AuthCallback] send-direct-message failed:', dmErr);
+            } else if (inquiry) {
+              // No responder on the package (e.g. a concierge trip with no
+              // creator and no CONCIERGE_USER_ID). The lead is still captured in
+              // pending_inquiries; we just can't open a conversation.
+              console.warn('[AuthCallback] inquiry has no responder — lead captured only:', inquiry.id);
+            }
+          } catch (conversionErr) {
+            console.error('[AuthCallback] inquiry conversion failed:', conversionErr);
+          }
+          // Conversion failed or no responder — still NEVER show the onboarding
+          // wall for an inquiry flow. Drop them in their inbox.
+          navigate('/messages', { replace: true });
+          return;
+        }
+
+        // Backstop: any other inquiry flow (e.g. the reply-loop action=open)
+        // must also bypass the profile-completion gate.
+        if (isInquiryFlow) {
+          navigate('/messages', { replace: true });
+          return;
         }
 
         // Users with completed onboarding OR is_profile_complete should NOT be redirected

@@ -8,6 +8,7 @@ type AccountType = "traveler" | "creator" | "agent" | "brand";
 
 interface Props {
   onComplete: () => void;
+  defaultType?: AccountType;
 }
 
 const roleOptions: { type: AccountType; title: string; description: string }[] = [
@@ -33,8 +34,8 @@ const roleOptions: { type: AccountType; title: string; description: string }[] =
   },
 ];
 
-export function AccountTypeStep({ onComplete }: Props) {
-  const [accountType, setAccountType] = useState<AccountType | null>(null);
+export function AccountTypeStep({ onComplete, defaultType }: Props) {
+  const [accountType, setAccountType] = useState<AccountType | null>(defaultType ?? null);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
@@ -118,85 +119,98 @@ export function AccountTypeStep({ onComplete }: Props) {
     <div className="space-y-6">
       {/* Section header */}
       <div className="space-y-1">
-        <h2 className="text-xl font-secondary text-[#0a2225]">
-          Tell us who you are
-        </h2>
+        <h2 className="text-xl font-secondary text-[#0a2225]">Tell us who you are</h2>
         <p className="text-sm text-[#6B7280]">
           Goldsainte works best when we understand your role in the marketplace.
         </p>
       </div>
 
-      {/* Role selection */}
-      <div className="grid grid-cols-1 gap-3">
-        {roleOptions.map((role) => (
-          <button
-            key={role.type}
-            type="button"
-            className={`w-full rounded-2xl border-2 px-5 py-4 text-left transition-all flex flex-col gap-1.5 ${
-              accountType === role.type
-                ? "border-[#C7A962] bg-[#FDF9F0]"
-                : "border-[#E5DFC6] bg-white hover:border-[#BFAD72] hover:bg-[#FDF9F0]/50"
-            }`}
-            onClick={() => setAccountType(role.type)}
-          >
-            <div className="font-secondary text-base text-[#0a2225]">{role.title}</div>
-            <div className="text-sm text-[#6B7280] leading-relaxed">
-              {role.description}
+      {/* Two-column on desktop: roles left, identity right */}
+      <div className="md:grid md:grid-cols-2 md:gap-8 space-y-6 md:space-y-0">
+
+        {/* Role selection */}
+        <div className="flex flex-col gap-3">
+          {roleOptions.map((role) => {
+            const isSelected = accountType === role.type;
+            return (
+              <button
+                key={role.type}
+                type="button"
+                className={`w-full rounded-2xl border-2 px-5 py-4 text-left transition-all flex flex-col gap-1 ${
+                  isSelected
+                    ? 'border-[#C7A962] bg-[#FDF9F0]'
+                    : 'border-[#E5DFC6] bg-white hover:border-[#BFAD72] hover:bg-[#FDF9F0]/50'
+                }`}
+                onClick={() => setAccountType(role.type)}
+              >
+                <div className="font-secondary text-base text-[#0a2225] flex items-center gap-2">
+                  {isSelected && (
+                    <span className="inline-block w-2 h-2 rounded-full bg-[#C7A962] shrink-0" />
+                  )}
+                  {role.title}
+                </div>
+                {/* Show description only for selected role to reduce noise */}
+                {isSelected && (
+                  <div className="text-sm text-[#6B7280] leading-relaxed pl-4">
+                    {role.description}
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Identity fields */}
+        <div className="flex flex-col gap-4 justify-start">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="firstName" className="text-sm font-medium text-[#0a2225]">
+                First name
+              </Label>
+              <Input
+                id="firstName"
+                placeholder="Jordan"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20 rounded-xl h-11"
+              />
             </div>
-          </button>
-        ))}
-      </div>
+            <div className="space-y-2">
+              <Label htmlFor="lastName" className="text-sm font-medium text-[#0a2225]">
+                Last name
+              </Label>
+              <Input
+                id="lastName"
+                placeholder="Smith"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20 rounded-xl h-11"
+              />
+            </div>
+          </div>
 
-      {/* Basic identity fields */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="firstName" className="text-sm font-medium text-[#0a2225]">
-            First name
-          </Label>
-          <Input
-            id="firstName"
-            placeholder="Jordan"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            className="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20 rounded-xl h-11"
-          />
+          <div className="space-y-2">
+            <Label htmlFor="phone" className="text-sm font-medium text-[#0a2225]">
+              Mobile number <span className="font-normal text-[#6B7280]">(optional)</span>
+            </Label>
+            <Input
+              id="phone"
+              placeholder="+1 (555) 000-0000"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20 rounded-xl h-11"
+            />
+            <p className="text-xs text-[#6B7280]">You can add this later from your profile settings.</p>
+          </div>
+
+          {/* Error message */}
+          {error && (
+            <p className="text-sm text-red-600 bg-red-50 px-4 py-3 rounded-xl border border-red-200" role="alert">
+              {error}
+            </p>
+          )}
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="lastName" className="text-sm font-medium text-[#0a2225]">
-            Last name
-          </Label>
-          <Input
-            id="lastName"
-            placeholder="Smith"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            className="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20 rounded-xl h-11"
-          />
-        </div>
       </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="phone" className="text-sm font-medium text-[#0a2225]">
-          Mobile number (optional)
-        </Label>
-        <Input
-          id="phone"
-          placeholder="+1 (555) 000-0000"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          className="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20 rounded-xl h-11"
-        />
-        <p className="text-xs text-[#6B7280]">
-          You can add this later from your profile settings.
-        </p>
-      </div>
-
-      {/* Error message */}
-      {error && (
-        <p className="text-sm text-red-600 bg-red-50 px-4 py-3 rounded-xl border border-red-200" role="alert">
-          {error}
-        </p>
-      )}
 
       {/* CTA Button */}
       <Button

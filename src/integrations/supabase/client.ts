@@ -11,8 +11,14 @@ import type { Database } from "./types";
 // different databases. Hardcoding guarantees BOTH builds always connect to
 // the same project. The publishable (anon) key is public by design and
 // safe to commit.
-const SUPABASE_URL = "https://ktzsgqrqvwtxlimctkaf.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_i5xwYqNzT3JOevhcl7-J3w_J2oofXm5";
+//
+// LOCAL DEVELOPMENT OVERRIDE: set VITE_SUPABASE_URL in .env.local to point
+// at local Supabase (http://127.0.0.1:54321). The override only takes effect
+// when the env var is present — production builds are unaffected.
+const SUPABASE_URL =
+  import.meta.env.VITE_SUPABASE_URL ?? "https://ktzsgqrqvwtxlimctkaf.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY =
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? "sb_publishable_i5xwYqNzT3JOevhcl7-J3w_J2oofXm5";
  
 // Import the supabase client like this:
 //   import { supabase } from "@/integrations/supabase/client"

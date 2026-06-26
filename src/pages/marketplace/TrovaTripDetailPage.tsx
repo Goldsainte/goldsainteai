@@ -514,10 +514,11 @@ export default function TrovaTripDetailPage() {
             <div className="sticky top-24">
               <TripBookingSidebar
                 tripId={trip.id}
+                tripTitle={trip.title}
                 pricePerPerson={trip.original_price || trip.price_per_person || 0}
                 currency={trip.currency || "USD"}
                 spotsAvailable={spotsAvailable || undefined}
-                hostName={trip.creator?.full_name || undefined}
+                hostName={trip.creator?.full_name || (isPlatformTrip ? "the Goldsainte Concierge team" : undefined)}
                 creatorId={trip.creator_id || undefined}
                 creatorType={trip.creator_type || "creator"}
                 agentId={trip.agent_id || undefined}

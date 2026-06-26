@@ -549,7 +549,7 @@ export default function TripRequestDetail() {
                                     .insert({
                                       customer_id: user.id,
                                       agent_id: partnerId,
-                                      conversation_type: "trip_inquiry",
+                                      conversation_type: "general",
                                       status: "active",
                                       trip_id: request?.id ?? null,
                                       trip_title: request?.destination ?? null,

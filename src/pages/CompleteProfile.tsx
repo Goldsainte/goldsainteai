@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AccountTypeStep } from '@/components/auth/AccountTypeStep';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEffect, useState } from 'react';
@@ -9,6 +9,8 @@ import { Loader2 } from 'lucide-react';
 export default function CompleteProfile() {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const action = searchParams.get('action');
   const [checkingProfile, setCheckingProfile] = useState(true);
 
   useEffect(() => {
@@ -68,7 +70,7 @@ export default function CompleteProfile() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#FDF9F0] p-4">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md md:max-w-3xl">
         {/* Header */}
         <div className="text-center mb-8">
           <img 
@@ -86,7 +88,7 @@ export default function CompleteProfile() {
 
         {/* Card */}
         <div className="bg-white border border-[#E5DFC6] rounded-3xl p-8 shadow-lg">
-          <AccountTypeStep onComplete={handleComplete} />
+          <AccountTypeStep onComplete={handleComplete} defaultType={action === 'ask' ? 'traveler' : undefined} />
         </div>
       </div>
     </div>

@@ -164,9 +164,19 @@ export function DirectMessageInbox() {
     }
   }, [searchParams, conversations, selectedConversation]);
 
-  // Scroll to bottom when new messages arrive
+  // Scroll to bottom when new messages arrive. Scroll the ScrollArea's own
+  // viewport rather than calling scrollIntoView on the window — the latter
+  // walks every scroll container outward and drags the whole page down to the
+  // composer/footer on load.
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = messagesEndRef.current;
+    if (!el) return;
+    const viewport = el.closest("[data-radix-scroll-area-viewport]") as HTMLElement | null;
+    if (viewport) {
+      viewport.scrollTo({ top: viewport.scrollHeight, behavior: "smooth" });
+    } else {
+      el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
   }, [messages]);
 
   // Mark as read when viewing conversation
@@ -176,10 +186,11 @@ export function DirectMessageInbox() {
     }
   }, [selectedConversation]);
 
-  // Auto-focus input when conversation selected
+  // Auto-focus input when conversation selected. preventScroll stops the
+  // browser from yanking the whole page down to the composer on load.
   useEffect(() => {
     if (selectedConversation && selectedConversation.status !== "request") {
-      setTimeout(() => inputRef.current?.focus(), 100);
+      setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 100);
     }
   }, [selectedConversation]);
 
@@ -303,7 +314,7 @@ export function DirectMessageInbox() {
     try {
       await manageConversation(selectedConversation.id, "accept");
       toast({ title: "Request accepted", description: "You can now message each other." });
-      setTimeout(() => inputRef.current?.focus(), 200);
+      setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 200);
     } catch (e: any) {
       // Revert
       setSelectedConversation((prev) =>
@@ -406,11 +417,11 @@ export function DirectMessageInbox() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-180px)] min-h-[500px] border border-[#E5DFC6]/60 rounded-2xl overflow-hidden bg-white shadow-sm">
+    <div className="flex h-full min-h-0 border border-[#E5DFC6]/60 rounded-2xl overflow-hidden bg-white shadow-sm">
       {/* Left Panel - Conversation List */}
       <div
         className={cn(
-          "w-full md:w-80 border-r border-[#E5DFC6]/50 flex-col bg-[#FDFBF7]",
+          "w-full md:w-80 min-h-0 border-r border-[#E5DFC6]/50 flex-col bg-[#FDFBF7]",
           selectedConversation ? "hidden md:flex" : "flex"
         )}
       >
@@ -527,7 +538,7 @@ export function DirectMessageInbox() {
       {/* Right Panel - Messages */}
       <div
         className={cn(
-          "flex-1 flex-col bg-white",
+          "flex-1 min-h-0 flex-col bg-white",
           selectedConversation ? "flex" : "hidden md:flex"
         )}
       >

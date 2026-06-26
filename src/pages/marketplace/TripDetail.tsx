@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Loader2, ArrowLeft, Star, MessageCircle } from "lucide-react";
+import { Loader2, Star, MessageCircle, Share2 } from "lucide-react";
+import { BackButton } from "@/components/ui/BackButton";
 import { useToast } from "@/hooks/use-toast";
 
 type Trip = {
@@ -195,15 +196,26 @@ export default function TripDetail() {
   return (
     <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
       <div className="mx-auto max-w-6xl px-4 py-6 md:py-8">
-        {/* Breadcrumb */}
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          className="mb-3 flex items-center gap-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="h-3 w-3" />
-          Back to marketplace
-        </button>
+        {/* Back nav + share */}
+        <div className="mb-3 flex items-center justify-between">
+          <BackButton label="Back to marketplace" to="/marketplace" />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({ title: trip.title, url: window.location.href }).catch(() => {});
+              } else {
+                navigator.clipboard.writeText(window.location.href);
+                toast({ title: 'Link copied', description: 'Trip link copied to clipboard.' });
+              }
+            }}
+            className="gap-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-full px-3"
+          >
+            <Share2 className="h-4 w-4" />
+            <span className="text-sm">Share</span>
+          </Button>
+        </div>
 
         {/* Title */}
         <h1 className="text-2xl font-semibold tracking-tight md:text-3xl text-foreground">

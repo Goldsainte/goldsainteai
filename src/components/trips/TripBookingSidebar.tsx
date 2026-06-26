@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AskQuestionDrawer } from "@/components/trips/AskQuestionDrawer";
 
 interface TripBookingSidebarProps {
   tripId: string;
@@ -41,6 +42,7 @@ export function TripBookingSidebar({
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isAskLoading, setIsAskLoading] = useState(false);
+  const [isAskDrawerOpen, setIsAskDrawerOpen] = useState(false);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -138,7 +140,8 @@ export function TripBookingSidebar({
 
   const handleAskQuestion = async () => {
     if (!user) {
-      navigate(`/auth?redirect=/marketplace/trip/${tripId}`);
+      // Open zero-friction drawer — no redirect to auth page
+      setIsAskDrawerOpen(true);
       return;
     }
 
@@ -173,7 +176,7 @@ export function TripBookingSidebar({
           .insert({
             customer_id: user.id,
             agent_id: partnerId,
-            conversation_type: "trip_inquiry",
+            conversation_type: "general",
             status: "active",
             trip_id: tripId,
             trip_title: tripTitle ?? null,
@@ -205,6 +208,7 @@ export function TripBookingSidebar({
   const displayHostName = isPlatformTrip ? "Goldsainte Concierge" : (hostName || "your host");
 
   return (
+    <>
     <div className="rounded-2xl border border-[#E5DFC6] bg-white p-6 shadow-lg">
       {/* Price */}
       <div className="text-center">
@@ -325,5 +329,15 @@ export function TripBookingSidebar({
         </div>
       </div>
     </div>
+
+    <AskQuestionDrawer
+      open={isAskDrawerOpen}
+      onOpenChange={setIsAskDrawerOpen}
+      tripId={tripId}
+      tripTitle={tripTitle}
+      hostName={hostName}
+      partnerId={partnerId ?? undefined}
+    />
+    </>
   );
 }
