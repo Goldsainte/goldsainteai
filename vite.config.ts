@@ -116,11 +116,17 @@ export default defineConfig(({ mode }) => {
     'import.meta.env.VITE_RELEASE_VERSION': JSON.stringify(
       env.VITE_RELEASE_VERSION || `goldsainte@${env.npm_package_version || '1.0.0'}`
     ),
+    // Fall back to the PUBLIC production anon URL + publishable key (same values
+    // hard-coded in src/integrations/supabase/client.ts) rather than ''. An
+    // empty string is not nullish, so a '' here defeats the client.ts ?? fallback
+    // and yields "supabaseUrl is required" whenever the build env lacks these
+    // vars (e.g. the Lovable production build). These are public, client-shipped
+    // values — safe to bake in.
     'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(
-      process.env.VITE_SUPABASE_URL ?? env.VITE_SUPABASE_URL ?? ''
+      process.env.VITE_SUPABASE_URL ?? env.VITE_SUPABASE_URL ?? 'https://ktzsgqrqvwtxlimctkaf.supabase.co'
     ),
     'import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY': JSON.stringify(
-      process.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? env.VITE_SUPABASE_PUBLISHABLE_KEY ?? ''
+      process.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? env.VITE_SUPABASE_PUBLISHABLE_KEY ?? 'sb_publishable_i5xwYqNzT3JOevhcl7-J3w_J2oofXm5'
     ),
     'import.meta.env.VITE_GOOGLE_MAPS_API_KEY': JSON.stringify(
       process.env.VITE_GOOGLE_MAPS_API_KEY ?? env.VITE_GOOGLE_MAPS_API_KEY ?? ''
