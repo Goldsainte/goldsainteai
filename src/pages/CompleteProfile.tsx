@@ -12,6 +12,9 @@ export default function CompleteProfile() {
   const [searchParams] = useSearchParams();
   const action = searchParams.get('action');
   const [checkingProfile, setCheckingProfile] = useState(true);
+  // The role the user already chose (via the signup CTA / earlier step). We
+  // pre-select it so this screen confirms identity instead of re-asking the role.
+  const [existingRole, setExistingRole] = useState<'traveler' | 'creator' | 'agent' | 'brand' | undefined>(undefined);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -33,6 +36,12 @@ export default function CompleteProfile() {
           .select('account_type, is_profile_complete, onboarding_completed, first_name')
           .eq('id', user.id)
           .maybeSingle();
+
+        // Pre-select whatever role they already have so we don't re-ask it.
+        const validRoles = ['traveler', 'creator', 'agent', 'brand'];
+        if (profile?.account_type && validRoles.includes(profile.account_type)) {
+          setExistingRole(profile.account_type as typeof existingRole);
+        }
 
         const isFinished =
           profile?.is_profile_complete === true ||
@@ -88,7 +97,7 @@ export default function CompleteProfile() {
 
         {/* Card */}
         <div className="bg-white border border-[#E5DFC6] rounded-3xl p-8 shadow-lg">
-          <AccountTypeStep onComplete={handleComplete} defaultType={action === 'ask' ? 'traveler' : undefined} />
+          <AccountTypeStep onComplete={handleComplete} defaultType={action === 'ask' ? 'traveler' : existingRole} />
         </div>
       </div>
     </div>
