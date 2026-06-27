@@ -145,61 +145,27 @@ export function TripBookingSidebar({
       return;
     }
 
-    if (isPlatformTrip) {
-      toast.success("Our concierge team will get back to you shortly!");
-      navigate("/messages");
-      return;
-    }
-
-    if (!partnerId) {
-      toast.error("Unable to contact host. Host information is missing.");
-      return;
-    }
-
     setIsAskLoading(true);
     try {
-      // Check for existing conversation
-      const { data: existing } = await supabase
-        .from("user_conversations")
-        .select("id")
-        .eq("customer_id", user.id)
-        .eq("agent_id", partnerId)
-        .limit(1)
-        .maybeSingle();
+      // Route through the canonical direct-message model the inbox reads.
+      // partnerId may be undefined for platform/concierge trips — the function
+      // resolves the responder from tripId (creator/agent/CONCIERGE_USER_ID).
+      const { data: dm, error } = await supabase.functions.invoke("send-direct-message", {
+        body: {
+          recipientId: partnerId || undefined,
+          tripId,
+          tripTitle: tripTitle ?? undefined,
+          message: `Hi! I have a question about ${tripTitle ? `"${tripTitle}"` : "this trip"}${hostName ? ` (${hostName})` : ""}. Could you tell me more?`,
+        },
+      });
 
-      let conversationId = existing?.id;
+      if (error) throw error;
+      if (!dm?.conversationId) throw new Error("No conversation returned");
 
-      if (!conversationId) {
-        // Create new conversation
-        const { data: newConvo, error: convoError } = await supabase
-          .from("user_conversations")
-          .insert({
-            customer_id: user.id,
-            agent_id: partnerId,
-            conversation_type: "general",
-            status: "active",
-            trip_id: tripId,
-            trip_title: tripTitle ?? null,
-          })
-          .select("id")
-          .single();
-
-        if (convoError) throw convoError;
-        conversationId = newConvo.id;
-
-        // Send initial message
-        await supabase.from("conversation_messages").insert([{
-          conversation_id: conversationId,
-          sender_id: user.id,
-          sender_type: "customer",
-          message_text: `Hi! I have a question about your trip${hostName ? ` hosted by ${hostName}` : ""}. Could you tell me more?`,
-        }]);
-      }
-
-      navigate(`/messages?conversation=${conversationId}`);
+      navigate(`/messages?conversation=${dm.conversationId}`);
     } catch (err: any) {
       console.error("Ask question error:", err);
-      toast.error("Failed to start conversation. Please try again.");
+      toast.error(err.message || "Failed to start conversation. Please try again.");
     } finally {
       setIsAskLoading(false);
     }

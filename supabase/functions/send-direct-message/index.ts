@@ -84,11 +84,44 @@ serve(async (req) => {
       );
     }
 
-    const { recipientId, message, conversationId, tripId, tripTitle } = await req.json();
+    let { recipientId, message, conversationId, tripId, tripTitle } = await req.json();
 
-    if (!recipientId || !message) {
+    if (!message) {
       return new Response(
-        JSON.stringify({ error: "recipientId and message are required" }),
+        JSON.stringify({ error: "message is required" }),
+        { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
+      );
+    }
+
+    // Resolve the responder from the package when the caller didn't supply one
+    // (e.g. an authed "Ask a Question" on a platform/concierge trip — the client
+    // has no responder id). Mirrors submit-trip-inquiry:
+    // creator_id → agent_id→travel_agents.user_id → CONCIERGE_USER_ID.
+    if (!recipientId && tripId) {
+      const { data: pkg } = await supabase
+        .from("packaged_trips")
+        .select("creator_id, agent_id, title")
+        .eq("id", tripId)
+        .maybeSingle();
+      if (pkg) {
+        if (!tripTitle) tripTitle = pkg.title ?? undefined;
+        if (pkg.creator_id) {
+          recipientId = pkg.creator_id;
+        } else if (pkg.agent_id) {
+          const { data: agentRow } = await supabase
+            .from("travel_agents")
+            .select("user_id")
+            .eq("id", pkg.agent_id)
+            .maybeSingle();
+          recipientId = agentRow?.user_id ?? null;
+        }
+      }
+      if (!recipientId) recipientId = Deno.env.get("CONCIERGE_USER_ID") || null;
+    }
+
+    if (!recipientId) {
+      return new Response(
+        JSON.stringify({ error: "recipientId or a resolvable tripId is required" }),
         { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }

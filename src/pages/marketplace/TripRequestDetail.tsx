@@ -535,31 +535,19 @@ export default function TripRequestDetail() {
                                 return;
                               }
                               try {
-                                const { data: existing } = await supabase
-                                  .from("user_conversations")
-                                  .select("id")
-                                  .eq("customer_id", user.id)
-                                  .eq("agent_id", partnerId)
-                                  .limit(1)
-                                  .maybeSingle();
-                                let conversationId = existing?.id;
-                                if (!conversationId) {
-                                  const { data: created, error: createErr } = await supabase
-                                    .from("user_conversations")
-                                    .insert({
-                                      customer_id: user.id,
-                                      agent_id: partnerId,
-                                      conversation_type: "general",
-                                      status: "active",
-                                      trip_id: request?.id ?? null,
-                                      trip_title: request?.destination ?? null,
-                                    })
-                                    .select("id")
-                                    .single();
-                                  if (createErr) throw createErr;
-                                  conversationId = created.id;
-                                }
-                                navigate(`/messages?conversation=${conversationId}`);
+                                // Route through the dm-model the inbox reads.
+                                // (No tripId — request.id is a trip_request, not a
+                                // packaged_trip, so it would violate the dm FK.)
+                                const { data: dm, error: dmErr } = await supabase.functions.invoke("send-direct-message", {
+                                  body: {
+                                    recipientId: partnerId,
+                                    message: `Hi! I have a question about my ${request?.destination ?? "trip"} request.`,
+                                    tripTitle: request?.destination ?? undefined,
+                                  },
+                                });
+                                if (dmErr) throw dmErr;
+                                if (!dm?.conversationId) throw new Error("No conversation returned");
+                                navigate(`/messages?conversation=${dm.conversationId}`);
                               } catch (err: any) {
                                 toast.error(err.message || "Failed to open conversation.");
                               }
