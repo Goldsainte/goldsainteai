@@ -329,18 +329,21 @@ agent sends message
   separate `notify-inquiry-reply` function): when the responder replies in an inquiry-origin thread
   (recipient has a `pending_inquiries` row, sender ≠ thread initiator), the traveller gets a
   **debounced** (~15-min burst) passwordless email; `reply-notification` template added; `action=open`
-  branch in `AuthCallback` opens the thread, no conversion. *Fast-follow:* scanner-safe links (Q1).
+  branch in `AuthCallback` opens the thread, no conversion. Scanner-safe links (Q1) ✅ done (below).
 - [x] **#2 Logged-in Ask path** ✅ — `TripBookingSidebar.handleAskQuestion` and the
   `TripRequestDetail` "Message" button now route through `send-direct-message`; the responder is
   resolved **server-side from `tripId`** (creator → agent→user_id → `CONCIERGE_USER_ID`) when the
   client has none. *(Needs `send-direct-message` redeploy.)*
-- [ ] **#3 Hardening** — captcha/Turnstile on the public drawer (Q6) + scanner-safe magic links (Q1)
-  + never-converted `auth.users` cleanup.
+- [x] **#3a Scanner-safe magic links (Q1)** ✅ — `/auth/verify` is now **click-to-complete**: the token
+  is spent only on a real button click (`AuthVerify.tsx`), so email scanners' GET-prefetch can't consume
+  it (the "link expired" failure). Covers the submit email, the reply email, and signup confirmations.
+- [ ] **#3b Hardening (remaining)** — captcha/Turnstile on the public drawer (Q6 — needs a Turnstile
+  account) + never-converted `auth.users` cleanup.
 - [ ] **F10** — `inquiry_submitted` / `inquiry_converted` analytics events.
 - [ ] **F9 / Q9** — schedule `expire_old_pending_inquiries` (pg_cron); privacy/consent note at submit.
 
 **Open-question status (2026-06-27):** Q2 ✅ (notify on submit), Q3 ✅ (`CONCIERGE_USER_ID`),
-Q7 ✅ (name + phone added). Still open: Q1, Q4, Q5, Q6, Q9 (tied to the reply loop + hardening);
+Q7 ✅ (name + phone added), Q1 ✅ (scanner-safe click-to-complete). Still open: Q4, Q5, Q6, Q9 (Q6 captcha needs Turnstile);
 Q8 — decision: **replies are web-only**, the email is notification-only; Q10 — documentation only.
 
 ---

@@ -16,6 +16,7 @@
 |--------|--------|------------------|
 | `ac74bef6` | Authed "Ask a Question" + proposal "Message" → dm-model; `send-direct-message` now resolves the responder from `tripId`. Also `HomeHero` `fetchpriority` fix. | 1) **Logged-in** "Ask a Question" on a trip page → conversation appears in the inbox. 2) **Proposal "Message"** button opens a chat. 3) **Normal in-app DM** (creator↔traveller) still works — `send-direct-message` is shared. 4) **Anonymous** Ask (drawer → magic link) still works. 5) Homepage hero renders, no `fetchPriority` console warning. |
 | `56b8b86d` | **Reply-notification loop** — a responder reply in an inquiry thread emails the traveller a passwordless link (`action=open`), debounced. Inlined into `send-direct-message` + `reply-notification` template + `AuthCallback action=open`. | 1) As the **concierge/responder**, reply in an inquiry conversation → the **traveller gets an email**; clicking it opens that thread. 2) **Debounce**: a 2nd responder reply within ~15 min sends **no** new email. 3) A reply in a **normal (non-inquiry) DM** sends **no** email. 4) Traveller replying to themselves sends no email. *(Resend = real email, not Inbucket.)* |
+| _(A3)_ | **Scanner-safe `/auth/verify`** — click-to-complete (no auto-verify on page load). | 1) Ask a question (or reply as concierge) → open the email link → it lands on a page with a **button**; clicking signs you in + opens the conversation. 2) The link still works after the email client/scanner previews it (token not pre-consumed). 3) Signup-confirmation + password-recovery links still work via the button. |
 | _(B1)_ | **Registration de-loop** — `CompleteProfile` pre-selects the existing role. | 1) Register as a **creator** (esp. via **Google**) → at "Complete Your Profile" the **Creator** role is **already selected** + name prefilled; just confirm → Continue (no re-pick). 2) Email signup with a name → does **not** hit complete-profile at all. |
 | _(B3)_ | **Creator Trips tab + first-product checklist** — `CreatorTripsTab` now lists the creator's `packaged_trips` (any status, with badge); checklist counts `pending_review`+`published`. | 1) As a **creator**, build a trip → it **appears in the Trips tab** of `/creator-dashboard` (with an "In review" badge). 2) "Publish your first product" Getting-Started item **ticks** after publishing. 3) A draft (autosave only) does **not** tick it. |
 | _(analytics)_ | **Env-driven GA4 / Clarity / GSC-Bing verification / Ads label** (`src/lib/analytics/init.ts`, `main.tsx`, CSP, `vite.config.ts`). No-op until env vars set. | 1) App loads with **no** new console/CSP errors when vars are **unset**. 2) With `VITE_GA4_MEASUREMENT_ID` + `VITE_CLARITY_PROJECT_ID` set → GA4 + `clarity.ms` scripts load (Network tab), no CSP block. 3) Existing Google Ads tag still loads. |
@@ -85,11 +86,11 @@ Assumed journey:
 2. ✅ **DONE — Logged-in "Ask a Question" + proposal "Message"** rerouted through
    `send-direct-message`; responder resolved server-side from `tripId`. *(redeploy `send-direct-message`)*
 3. **Launch hardening for public traffic.**
-   - **Bot/captcha (Q6):** the drawer is public and creates auth accounts — a press blast is a spam
-     vector. Add Turnstile + verify server-side; clean up never-converted `auth.users`.
-   - **Scanner-safe magic links (Q1):** corporate/Outlook SafeLinks prefetch the URL and can consume
-     the single-use token → "link expired". Affects the submit email and the future reply email.
-     Needs a click-to-complete landing (POST) or longer-lived token + a friendly re-issue page.
+   - ✅ **Scanner-safe magic links (Q1)** — `/auth/verify` is now **click-to-complete** (`AuthVerify.tsx`):
+     the token is spent only on a real button click, so scanner GET-prefetch can't burn it ("link expired").
+     Covers the submit email, the reply email, and signup confirmation.
+   - ⏳ **Bot/captcha (Q6):** the drawer is public and creates auth accounts. Add Turnstile + verify
+     server-side; clean up never-converted `auth.users`. *(Needs a Turnstile account — you're checking.)*
 4. **Analytics (F10):** `inquiry_submitted` / `inquiry_converted` events — measure the one press shot.
 5. **Secondary:** privacy note at submit (Q9); schedule `expire_old_pending_inquiries` via pg_cron (F9).
 
@@ -182,7 +183,7 @@ Audit (2026-06-27): only the **Google Ads** tag is wired; GA4, Clarity, GSC and 
 ### P0 — must land before press (traveller-heavy traffic)
 - [ ] **C** — Marketplace cleanup: drop the test package + dedupe destinations *(fast, high visibility)*.
 - [x] **A2** — Logged-in "Ask a Question" path ✅ *(done; needs `send-direct-message` redeploy)*.
-- [ ] **A3** — Hardening: scanner-safe magic links + captcha on the public drawer.
+- [~] **A3** — Hardening: scanner-safe magic links ✅; captcha on the public drawer ⏳ *(needs Turnstile)*.
 - [ ] **D / A4** — Analytics & SEO foundation: GA4 + Microsoft Clarity + GSC/Bing verification + sitemap,
       plus the `inquiry_submitted` / `inquiry_converted` events *(needs IDs from you — see Workstream D)*.
 - [x] **A1** — Reply-notification loop ✅ *(built on `improvements`; re-test + redeploy `send-direct-message`)*.
