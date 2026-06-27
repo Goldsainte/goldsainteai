@@ -239,6 +239,18 @@ const AuthCallback = () => {
         const inquiryAction = queryParams.get('action');
         const isInquiryFlow = inquiryAction === 'ask' || inquiryAction === 'open';
 
+        // ── Reply-loop: action=open just opens an existing conversation the
+        // user owns. RLS scopes dm_conversations to its participants, so there's
+        // nothing to convert — drop them straight into the thread.
+        if (inquiryAction === 'open') {
+          const conversationParam = queryParams.get('conversation');
+          navigate(
+            conversationParam ? `/messages?conversation=${conversationParam}` : '/messages',
+            { replace: true },
+          );
+          return;
+        }
+
         if (inquiryAction === 'ask') {
           const tripParam = queryParams.get('trip');
           try {

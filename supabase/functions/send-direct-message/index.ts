@@ -1,6 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import * as React from "npm:react@18.3.1";
+import { renderAsync } from "npm:@react-email/components@0.0.22";
+import { ReplyNotificationEmail } from "../_shared/email-templates/reply-notification.tsx";
 import { resolveAllowedOrigin } from "../_shared/cors.ts";
+
+const FROM_DOMAIN = "goldsainte.com";
 
 function corsHeaders(req?: Request): Record<string, string> {
   return {
@@ -286,6 +291,97 @@ serve(async (req) => {
       entity_id: targetConversationId,
       is_read: false,
     });
+
+    // ── Reply-notification email (inquiry-origin travellers only) ─────────────
+    // When the responder replies in an inquiry conversation, email the traveller
+    // a passwordless link back into the thread — they may not be logged in and
+    // would otherwise never see it. Best-effort, debounced, never fatal.
+    try {
+      const resendApiKey = Deno.env.get("RESEND_API_KEY");
+      // The traveller started the inquiry thread (initiated_by). Only notify when
+      // the *responder* is the one sending (recipient is that traveller).
+      const isResponderReply =
+        !!conversation &&
+        user.id !== conversation.initiated_by &&
+        recipientId === conversation.initiated_by;
+
+      if (resendApiKey && isResponderReply) {
+        // Recipient must be an inquiry-origin traveller (came via Ask-a-Question).
+        const { data: inq } = await supabase
+          .from("pending_inquiries")
+          .select("email")
+          .eq("user_id", recipientId)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        // Debounce: one email per ~15-min burst of responder messages. The
+        // just-inserted message counts as 1; a prior one in the window → skip.
+        const fifteenMinAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+        const { count: recentFromSender } = await supabase
+          .from("direct_messages")
+          .select("id", { count: "exact", head: true })
+          .eq("conversation_id", targetConversationId)
+          .eq("sender_id", user.id)
+          .gte("created_at", fifteenMinAgo);
+
+        if (inq?.email && (recentFromSender ?? 0) <= 1) {
+          const siteUrl = resolveAllowedOrigin(req);
+          const redirectTo = `${siteUrl}/auth/callback?action=open&conversation=${targetConversationId}`;
+          const { data: linkData, error: linkErr } = await supabase.auth.admin.generateLink({
+            type: "magiclink",
+            email: inq.email,
+            options: { redirectTo },
+          });
+
+          if (!linkErr && linkData) {
+            let magicLinkUrl = linkData.properties.action_link;
+            const rawUrl = new URL(magicLinkUrl);
+            const tokenHash = rawUrl.searchParams.get("token_hash") ?? rawUrl.searchParams.get("token");
+            const emailType = rawUrl.searchParams.get("type") ?? "magiclink";
+            if (tokenHash) {
+              magicLinkUrl = `${siteUrl}/auth/verify?token=${tokenHash}&type=${emailType}&redirect_to=${encodeURIComponent(redirectTo)}`;
+            }
+
+            const { data: senderProfile } = await supabase
+              .from("profiles")
+              .select("display_name, full_name")
+              .eq("id", user.id)
+              .maybeSingle();
+            const senderName = senderProfile?.display_name || senderProfile?.full_name || "Your specialist";
+            const tripTitle = conversation?.trip_title || "your trip";
+            const emailProps = {
+              senderName,
+              tripTitle,
+              preview: filteredMessage.substring(0, 240),
+              confirmationUrl: magicLinkUrl,
+            };
+
+            const html = await renderAsync(React.createElement(ReplyNotificationEmail, emailProps));
+            const text = await renderAsync(React.createElement(ReplyNotificationEmail, emailProps), { plainText: true });
+
+            const resendRes = await fetch("https://api.resend.com/emails", {
+              method: "POST",
+              headers: { Authorization: `Bearer ${resendApiKey}`, "Content-Type": "application/json" },
+              body: JSON.stringify({
+                from: `Goldsainte <support@${FROM_DOMAIN}>`,
+                to: [inq.email],
+                subject: `${senderName} replied to your question about ${tripTitle}`,
+                html,
+                text,
+              }),
+            });
+            if (!resendRes.ok) {
+              console.error("reply-notification email failed", { status: resendRes.status });
+            } else {
+              console.log("reply-notification email sent", { conversationId: targetConversationId });
+            }
+          }
+        }
+      }
+    } catch (replyErr) {
+      console.error("reply-notification (non-fatal):", replyErr instanceof Error ? replyErr.message : String(replyErr));
+    }
 
     return new Response(
       JSON.stringify({
