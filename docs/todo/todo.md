@@ -127,13 +127,52 @@ Press visitors browse the marketplace, so:
 
 ---
 
+## Workstream D — Analytics, SEO & campaign tracking
+
+Audit (2026-06-27): only the **Google Ads** tag is wired; GA4, Clarity, GSC and Bing are all missing.
+
+### Current state
+- ✅ **Google Ads** gtag (`AW-17180504737`) loads in `index.html`; `src/lib/analytics/conversions.ts`
+  fires purchase conversions — **but the conversion label is a placeholder**
+  (`REPLACE_WITH_LABEL_FROM_GOOGLE_ADS`), so **conversions aren't actually recorded yet**.
+- ❌ **GA4** — not configured (no `G-XXXX` property). The GA4 `purchase` event in `conversions.ts` is a
+  no-op until one exists. CSP already allows GA / Tag Manager.
+- ❌ **Microsoft Clarity** — not integrated.
+- ❌ **Google Search Console** — no verification (no `google-site-verification` meta).
+- ❌ **Bing Webmaster** — no verification (no `msvalidate.01` meta).
+
+### To do — code (this repo, I can do once IDs exist)
+- [ ] **GA4:** add `gtag('config','G-XXXXXXX')` alongside the Ads tag in `index.html`; fire key events
+      (`page_view` is automatic; add `inquiry_submitted` / `inquiry_converted` + `sign_up`) — folds in A4.
+- [ ] **Microsoft Clarity:** add the Clarity snippet to `index.html`; allow `https://*.clarity.ms` in
+      CSP `script-src` + `connect-src`.
+- [ ] **Search Console:** add `<meta name="google-site-verification" …>` to `index.html` (or verify via
+      DNS / GA link).
+- [ ] **Bing:** add `<meta name="msvalidate.01" …>` (or import the property from GSC).
+- [ ] **Sitemap:** confirm `https://goldsainte.ai/sitemap.xml` is served; submit to GSC + Bing.
+- [ ] **Fix the Google Ads conversion label** in `conversions.ts` (placeholder → real label, else no
+      conversions record).
+
+### To do — accounts/dashboards (you)
+- [ ] Create the **GA4 property** → copy the `G-XXXXXXX` measurement ID.
+- [ ] Create a **Microsoft Clarity** project → copy the project id.
+- [ ] Verify the property in **Google Search Console**; submit the sitemap.
+- [ ] Verify in **Bing Webmaster Tools** (import from GSC is fastest); submit the sitemap.
+- [ ] In **Google Ads**, create the conversion action → copy the real label into `conversions.ts`.
+
+> Hand me the GA4 measurement id + Clarity project id + the two verification strings and I'll wire all
+> the code in one pass (≈one small `index.html` + CSP change).
+
+---
+
 ## Next iteration — prioritised plan for Wednesday
 
 ### P0 — must land before press (traveller-heavy traffic)
 - [ ] **C** — Marketplace cleanup: drop the test package + dedupe destinations *(fast, high visibility)*.
 - [x] **A2** — Logged-in "Ask a Question" path ✅ *(done; needs `send-direct-message` redeploy)*.
 - [ ] **A3** — Hardening: scanner-safe magic links + captcha on the public drawer.
-- [ ] **A4** — Analytics events (`inquiry_submitted` / `inquiry_converted`).
+- [ ] **D / A4** — Analytics & SEO foundation: GA4 + Microsoft Clarity + GSC/Bing verification + sitemap,
+      plus the `inquiry_submitted` / `inquiry_converted` events *(needs IDs from you — see Workstream D)*.
 - [x] **A1** — Reply-notification loop ✅ *(built on `improvements`; re-test + redeploy `send-direct-message`)*.
 
 ### P1 — creator/agent experience (they register from the press too)
