@@ -46,6 +46,14 @@ RESEND_API_KEY="<your Resend API key — keep in .env.local only>"
 # that have no creator_id. See "Ask-a-Question concierge routing" below.
 # (A plain account UUID, not a credential.)
 CONCIERGE_USER_ID="c93d67d1-db67-483c-a1c7-88d75f16131d"
+
+# Analytics / SEO — each activates only when set (src/lib/analytics/init.ts). Set the
+# same vars in the Lovable production build env. See Workstream D in docs/todo/todo.md.
+# VITE_GA4_MEASUREMENT_ID="G-XXXXXXXXXX"
+# VITE_CLARITY_PROJECT_ID="xxxxxxxxxx"
+# VITE_GOOGLE_ADS_CONVERSION_LABEL="xxxxxxxx"
+# VITE_GSC_VERIFICATION="..."        # optional — GA4-link/DNS is more robust
+# VITE_BING_VERIFICATION="..."       # optional — or import the property from GSC
 ```
 
 **Production mode** (point `.env.local` at prod):

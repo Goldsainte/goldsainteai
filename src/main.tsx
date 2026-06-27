@@ -14,10 +14,15 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
 import { captureGclidFromUrl } from "@/lib/analytics/gclid";
+import { initAnalytics } from "@/lib/analytics/init";
 
 // Capture Google Ads click identifier (gclid) on landing so we can attribute
 // downstream conversions even after navigation.
 captureGclidFromUrl();
+
+// Activate GA4 / Microsoft Clarity / search-engine verification when their env
+// ids are present (safe no-op until configured).
+initAnalytics();
 
 const rootElement = document.getElementById("root");
 

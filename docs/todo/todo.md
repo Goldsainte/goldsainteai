@@ -15,7 +15,8 @@
 | Commit | Change | Areas to re-test |
 |--------|--------|------------------|
 | `ac74bef6` | Authed "Ask a Question" + proposal "Message" → dm-model; `send-direct-message` now resolves the responder from `tripId`. Also `HomeHero` `fetchpriority` fix. | 1) **Logged-in** "Ask a Question" on a trip page → conversation appears in the inbox. 2) **Proposal "Message"** button opens a chat. 3) **Normal in-app DM** (creator↔traveller) still works — `send-direct-message` is shared. 4) **Anonymous** Ask (drawer → magic link) still works. 5) Homepage hero renders, no `fetchPriority` console warning. |
-| `56b8b86d` | **Reply-notification loop** — a responder reply in an inquiry thread emails the traveller a passwordless link (`action=open`), debounced. Inlined into `send-direct-message` + `reply-notification` template + `AuthCallback action=open`. | 1) As the **concierge/responder**, reply in an inquiry conversation → the **traveller gets an email**; clicking it opens that thread. 2) **Debounce**: a 2nd responder reply within ~15 min sends **no** new email. 3) A reply in a **normal (non-inquiry) DM** sends **no** email. 4) Traveller replying to themselves sends no email. *(Needs `RESEND_API_KEY`; emails go to Inbucket locally.)* |
+| `56b8b86d` | **Reply-notification loop** — a responder reply in an inquiry thread emails the traveller a passwordless link (`action=open`), debounced. Inlined into `send-direct-message` + `reply-notification` template + `AuthCallback action=open`. | 1) As the **concierge/responder**, reply in an inquiry conversation → the **traveller gets an email**; clicking it opens that thread. 2) **Debounce**: a 2nd responder reply within ~15 min sends **no** new email. 3) A reply in a **normal (non-inquiry) DM** sends **no** email. 4) Traveller replying to themselves sends no email. *(Resend = real email, not Inbucket.)* |
+| _(analytics)_ | **Env-driven GA4 / Clarity / GSC-Bing verification / Ads label** (`src/lib/analytics/init.ts`, `main.tsx`, CSP, `vite.config.ts`). No-op until env vars set. | 1) App loads with **no** new console/CSP errors when vars are **unset**. 2) With `VITE_GA4_MEASUREMENT_ID` + `VITE_CLARITY_PROJECT_ID` set → GA4 + `clarity.ms` scripts load (Network tab), no CSP block. 3) Existing Google Ads tag still loads. |
 
 ### Regression checklist (Ask-a-Question end-to-end)
 - [ ] Anonymous: submit → email → magic link → land in conversation, **single** message (no dup), correct trip + concierge label.
@@ -141,27 +142,23 @@ Audit (2026-06-27): only the **Google Ads** tag is wired; GA4, Clarity, GSC and 
 - ❌ **Google Search Console** — no verification (no `google-site-verification` meta).
 - ❌ **Bing Webmaster** — no verification (no `msvalidate.01` meta).
 
-### To do — code (this repo, I can do once IDs exist)
-- [ ] **GA4:** add `gtag('config','G-XXXXXXX')` alongside the Ads tag in `index.html`; fire key events
-      (`page_view` is automatic; add `inquiry_submitted` / `inquiry_converted` + `sign_up`) — folds in A4.
-- [ ] **Microsoft Clarity:** add the Clarity snippet to `index.html`; allow `https://*.clarity.ms` in
-      CSP `script-src` + `connect-src`.
-- [ ] **Search Console:** add `<meta name="google-site-verification" …>` to `index.html` (or verify via
-      DNS / GA link).
-- [ ] **Bing:** add `<meta name="msvalidate.01" …>` (or import the property from GSC).
+### To do — code
+- [x] **Env-driven setup shipped** (`src/lib/analytics/init.ts` + `main.tsx` + CSP + `vite.config.ts`).
+      GA4, Clarity, GSC/Bing verification, and the Ads conversion label all activate purely by setting
+      their env var — **no further code change needed**, just the IDs below.
+- [ ] **GA4 events:** fire `inquiry_submitted` / `inquiry_converted` / `sign_up` (the A4 instrumentation;
+      `page_view` is automatic once the GA4 id is set).
 - [ ] **Sitemap:** confirm `https://goldsainte.ai/sitemap.xml` is served; submit to GSC + Bing.
-- [ ] **Fix the Google Ads conversion label** in `conversions.ts` (placeholder → real label, else no
-      conversions record).
 
-### To do — accounts/dashboards (you)
-- [ ] Create the **GA4 property** → copy the `G-XXXXXXX` measurement ID.
-- [ ] Create a **Microsoft Clarity** project → copy the project id.
-- [ ] Verify the property in **Google Search Console**; submit the sitemap.
-- [ ] Verify in **Bing Webmaster Tools** (import from GSC is fastest); submit the sitemap.
-- [ ] In **Google Ads**, create the conversion action → copy the real label into `conversions.ts`.
+### To do — accounts/dashboards (you) → then set the env var (Lovable build env + `.env.local`)
+- [ ] Create the **GA4 property** → `VITE_GA4_MEASUREMENT_ID` = `G-XXXXXXX`.
+- [ ] Create a **Clarity** project → `VITE_CLARITY_PROJECT_ID`.
+- [ ] **Google Ads** conversion action → `VITE_GOOGLE_ADS_CONVERSION_LABEL`.
+- [ ] **GSC**: verify via GA4-link/DNS (no code) *or* set `VITE_GSC_VERIFICATION`; submit sitemap.
+- [ ] **Bing**: import from GSC (no code) *or* set `VITE_BING_VERIFICATION`; submit sitemap.
 
-> Hand me the GA4 measurement id + Clarity project id + the two verification strings and I'll wire all
-> the code in one pass (≈one small `index.html` + CSP change).
+> The code is in place and env-driven — just set the vars (Lovable build env for prod, `.env.local`
+> for local) and the tags light up. No redeploy of code needed beyond a normal Lovable rebuild.
 
 ---
 

@@ -1,8 +1,10 @@
 const GOOGLE_ADS_ID = 'AW-17180504737';
-// TODO: Replace with the actual conversion label from Google Ads dashboard
-// (Conversions → New conversion action → after creating it, copy the label
-// portion of "send_to: AW-17180504737/XXXXXXXX").
-const CONVERSION_LABEL_PURCHASE = 'REPLACE_WITH_LABEL_FROM_GOOGLE_ADS';
+// Conversion label from Google Ads (Conversions → conversion action → the label
+// portion of "send_to: AW-17180504737/XXXXXXXX"). Set VITE_GOOGLE_ADS_CONVERSION_LABEL
+// in the build env; until it's set, the Ads conversion is skipped (GA4 purchase
+// still fires).
+const CONVERSION_LABEL_PURCHASE =
+  import.meta.env.VITE_GOOGLE_ADS_CONVERSION_LABEL || '';
 
 declare global {
   interface Window {
@@ -30,13 +32,15 @@ export function trackPurchaseConversion(event: PurchaseEvent): void {
     return;
   }
 
-  // Google Ads conversion
-  window.gtag('event', 'conversion', {
-    send_to: `${GOOGLE_ADS_ID}/${CONVERSION_LABEL_PURCHASE}`,
-    value: event.value,
-    currency: event.currency || 'USD',
-    transaction_id: event.transactionId,
-  });
+  // Google Ads conversion (only when a real label is configured)
+  if (CONVERSION_LABEL_PURCHASE) {
+    window.gtag('event', 'conversion', {
+      send_to: `${GOOGLE_ADS_ID}/${CONVERSION_LABEL_PURCHASE}`,
+      value: event.value,
+      currency: event.currency || 'USD',
+      transaction_id: event.transactionId,
+    });
+  }
 
   // GA4-compatible purchase event (no-op if GA4 isn't configured)
   window.gtag('event', 'purchase', {

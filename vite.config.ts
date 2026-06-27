@@ -131,6 +131,22 @@ export default defineConfig(({ mode }) => {
     'import.meta.env.VITE_GOOGLE_MAPS_API_KEY': JSON.stringify(
       process.env.VITE_GOOGLE_MAPS_API_KEY ?? env.VITE_GOOGLE_MAPS_API_KEY ?? ''
     ),
+    // Analytics / SEO — each activates only when its value is set (see src/lib/analytics/init.ts).
+    'import.meta.env.VITE_GA4_MEASUREMENT_ID': JSON.stringify(
+      process.env.VITE_GA4_MEASUREMENT_ID ?? env.VITE_GA4_MEASUREMENT_ID ?? ''
+    ),
+    'import.meta.env.VITE_CLARITY_PROJECT_ID': JSON.stringify(
+      process.env.VITE_CLARITY_PROJECT_ID ?? env.VITE_CLARITY_PROJECT_ID ?? ''
+    ),
+    'import.meta.env.VITE_GOOGLE_ADS_CONVERSION_LABEL': JSON.stringify(
+      process.env.VITE_GOOGLE_ADS_CONVERSION_LABEL ?? env.VITE_GOOGLE_ADS_CONVERSION_LABEL ?? ''
+    ),
+    'import.meta.env.VITE_GSC_VERIFICATION': JSON.stringify(
+      process.env.VITE_GSC_VERIFICATION ?? env.VITE_GSC_VERIFICATION ?? ''
+    ),
+    'import.meta.env.VITE_BING_VERIFICATION': JSON.stringify(
+      process.env.VITE_BING_VERIFICATION ?? env.VITE_BING_VERIFICATION ?? ''
+    ),
   },
     build: {
       // 'hidden' generates .map files for Sentry upload but omits the
