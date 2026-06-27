@@ -16,6 +16,7 @@
 |--------|--------|------------------|
 | `ac74bef6` | Authed "Ask a Question" + proposal "Message" → dm-model; `send-direct-message` now resolves the responder from `tripId`. Also `HomeHero` `fetchpriority` fix. | 1) **Logged-in** "Ask a Question" on a trip page → conversation appears in the inbox. 2) **Proposal "Message"** button opens a chat. 3) **Normal in-app DM** (creator↔traveller) still works — `send-direct-message` is shared. 4) **Anonymous** Ask (drawer → magic link) still works. 5) Homepage hero renders, no `fetchPriority` console warning. |
 | `56b8b86d` | **Reply-notification loop** — a responder reply in an inquiry thread emails the traveller a passwordless link (`action=open`), debounced. Inlined into `send-direct-message` + `reply-notification` template + `AuthCallback action=open`. | 1) As the **concierge/responder**, reply in an inquiry conversation → the **traveller gets an email**; clicking it opens that thread. 2) **Debounce**: a 2nd responder reply within ~15 min sends **no** new email. 3) A reply in a **normal (non-inquiry) DM** sends **no** email. 4) Traveller replying to themselves sends no email. *(Resend = real email, not Inbucket.)* |
+| _(B3)_ | **Creator Trips tab + first-product checklist** — `CreatorTripsTab` now lists the creator's `packaged_trips` (any status, with badge); checklist counts `pending_review`+`published`. | 1) As a **creator**, build a trip → it **appears in the Trips tab** of `/creator-dashboard` (with an "In review" badge). 2) "Publish your first product" Getting-Started item **ticks** after publishing. 3) A draft (autosave only) does **not** tick it. |
 | _(analytics)_ | **Env-driven GA4 / Clarity / GSC-Bing verification / Ads label** (`src/lib/analytics/init.ts`, `main.tsx`, CSP, `vite.config.ts`). No-op until env vars set. | 1) App loads with **no** new console/CSP errors when vars are **unset**. 2) With `VITE_GA4_MEASUREMENT_ID` + `VITE_CLARITY_PROJECT_ID` set → GA4 + `clarity.ms` scripts load (Network tab), no CSP block. 3) Existing Google Ads tag still loads. |
 
 ### Regression checklist (Ask-a-Question end-to-end)
@@ -115,7 +116,13 @@ which fights the premium positioning the studio is selling creators on.
 
 ### B3. First product end-to-end
 The "first product" onboarding step must create a real trip that appears in the **Trips tab** of
-`/creator-dashboard`. Verify the create → publish → list path works and fix breaks.
+`/creator-dashboard`.
+- ✅ **Trips tab now lists trips** — `CreatorTripsTab` was a stub (no query); it now queries
+  `packaged_trips` by `creator_id` (all statuses) with a Draft / In review / Live badge.
+- ✅ **Checklist** "Publish your first product" now counts submitted trips (`pending_review` +
+  `published`) — was `published`-only, so it never ticked (creator trips go to review).
+- ⏳ **Open product decision:** trips go to `pending_review` (admin approval) before they're publicly
+  bookable. Decide auto-approve / fast-track vs manual review for the launch.
 
 ---
 
@@ -175,7 +182,7 @@ Audit (2026-06-27): only the **Google Ads** tag is wired; GA4, Clarity, GSC and 
 ### P1 — creator/agent experience (they register from the press too)
 - [ ] **B1** — Simplify the registration flow.
 - [ ] **B2** — Creator dashboard width + serif section headers + intro/body legibility.
-- [ ] **B3** — First product onboarding → creates a trip → shows in Trips tab.
+- [x] **B3** — First product → shows in Trips tab ✅ *(Trips-tab query + checklist fix; auto-approve-vs-review decision still open)*.
 
 ### P2 — secondary / after launch
 - [ ] **A5** — Privacy note at submit; schedule the inquiry-expire pg_cron job.

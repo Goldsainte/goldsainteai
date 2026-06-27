@@ -212,9 +212,11 @@ export function GettingStartedChecklist({ userId, role }: Props) {
           stats.tripRequests = trCount || 0;
           stats.savedTrips = wlCount || 0;
         } else if (role === "creator") {
+          // "Published" here means submitted — a trip is sent to admin review as
+          // 'pending_review', so count that too (not draft, which autosaves).
           const [{ count: tCount }, { count: gCount }] = await Promise.all([
-            client.from("packaged_trips").select("id", { count: "exact", head: true }).eq("creator_id", userId).eq("status", "published"),
-            client.from("itinerary_products").select("id", { count: "exact", head: true }).eq("creator_id", userId).eq("status", "published"),
+            client.from("packaged_trips").select("id", { count: "exact", head: true }).eq("creator_id", userId).in("status", ["pending_review", "published"]),
+            client.from("itinerary_products").select("id", { count: "exact", head: true }).eq("creator_id", userId).in("status", ["pending_review", "published"]),
           ]);
           stats.trips = tCount || 0;
           stats.guides = gCount || 0;
