@@ -325,9 +325,11 @@ agent sends message
 - [x] Prod build fallback for `VITE_SUPABASE_*` (fixed the "supabaseUrl is required" white screen).
 
 **Remaining:**
-- [ ] **#1 Agent-reply notification loop** — `notify-inquiry-reply` (fires on a **responder
-  `direct_messages` insert** in an inquiry-origin thread, debounced) + `reply-notification` email +
-  `action=open` branch in `AuthCallback` + DB trigger/hook. *(Trigger is on `direct_messages`.)*
+- [x] **#1 Agent-reply notification loop** ✅ — built **inline in `send-direct-message`** (simpler than a
+  separate `notify-inquiry-reply` function): when the responder replies in an inquiry-origin thread
+  (recipient has a `pending_inquiries` row, sender ≠ thread initiator), the traveller gets a
+  **debounced** (~15-min burst) passwordless email; `reply-notification` template added; `action=open`
+  branch in `AuthCallback` opens the thread, no conversion. *Fast-follow:* scanner-safe links (Q1).
 - [x] **#2 Logged-in Ask path** ✅ — `TripBookingSidebar.handleAskQuestion` and the
   `TripRequestDetail` "Message" button now route through `send-direct-message`; the responder is
   resolved **server-side from `tripId`** (creator → agent→user_id → `CONCIERGE_USER_ID`) when the

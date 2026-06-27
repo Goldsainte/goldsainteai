@@ -15,6 +15,7 @@
 | Commit | Change | Areas to re-test |
 |--------|--------|------------------|
 | `ac74bef6` | Authed "Ask a Question" + proposal "Message" → dm-model; `send-direct-message` now resolves the responder from `tripId`. Also `HomeHero` `fetchpriority` fix. | 1) **Logged-in** "Ask a Question" on a trip page → conversation appears in the inbox. 2) **Proposal "Message"** button opens a chat. 3) **Normal in-app DM** (creator↔traveller) still works — `send-direct-message` is shared. 4) **Anonymous** Ask (drawer → magic link) still works. 5) Homepage hero renders, no `fetchPriority` console warning. |
+| `56b8b86d` | **Reply-notification loop** — a responder reply in an inquiry thread emails the traveller a passwordless link (`action=open`), debounced. Inlined into `send-direct-message` + `reply-notification` template + `AuthCallback action=open`. | 1) As the **concierge/responder**, reply in an inquiry conversation → the **traveller gets an email**; clicking it opens that thread. 2) **Debounce**: a 2nd responder reply within ~15 min sends **no** new email. 3) A reply in a **normal (non-inquiry) DM** sends **no** email. 4) Traveller replying to themselves sends no email. *(Needs `RESEND_API_KEY`; emails go to Inbucket locally.)* |
 
 ### Regression checklist (Ask-a-Question end-to-end)
 - [ ] Anonymous: submit → email → magic link → land in conversation, **single** message (no dup), correct trip + concierge label.
@@ -74,13 +75,10 @@ Assumed journey:
   so authed travellers' questions show in the inbox. *(needs `send-direct-message` redeploy)*
 
 ### ⏳ Remaining
-1. **Reply-notification loop — the big one (flow is still one-way).**
-   When the concierge replies, the traveller has no idea; conversations die after the first message.
-   - `notify-inquiry-reply` edge function (fires on a responder `direct_messages` insert in an
-     inquiry-origin conversation, debounced).
-   - `reply-notification` email template ("[Concierge] replied… open conversation").
-   - `action=open` branch in `AuthCallback` (open an existing conversation, no re-conversion).
-   - DB trigger / message-send hook to invoke it.
+1. ✅ **BUILT — Reply-notification loop** (inlined into `send-direct-message`, not a separate
+   `notify-inquiry-reply` function). Responder reply in an inquiry thread → debounced (~15-min burst)
+   passwordless email → `action=open` opens the thread; `reply-notification` template added.
+   **Re-test (see top); redeploy `send-direct-message`.** *Fast-follow:* scanner-safe magic links (Q1).
 2. ✅ **DONE — Logged-in "Ask a Question" + proposal "Message"** rerouted through
    `send-direct-message`; responder resolved server-side from `tripId`. *(redeploy `send-direct-message`)*
 3. **Launch hardening for public traffic.**
@@ -136,7 +134,7 @@ Press visitors browse the marketplace, so:
 - [x] **A2** — Logged-in "Ask a Question" path ✅ *(done; needs `send-direct-message` redeploy)*.
 - [ ] **A3** — Hardening: scanner-safe magic links + captcha on the public drawer.
 - [ ] **A4** — Analytics events (`inquiry_submitted` / `inquiry_converted`).
-- [ ] **A1** — Reply-notification loop *(biggest build; makes the channel two-way — schedule early)*.
+- [x] **A1** — Reply-notification loop ✅ *(built on `improvements`; re-test + redeploy `send-direct-message`)*.
 
 ### P1 — creator/agent experience (they register from the press too)
 - [ ] **B1** — Simplify the registration flow.
