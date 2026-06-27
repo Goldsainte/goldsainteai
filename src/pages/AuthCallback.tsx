@@ -5,6 +5,7 @@ import { EditorialLoader } from '@/components/EditorialLoader';
 import { AUTH_REDIRECT_STORAGE_KEY, getRedirectPathFromSearch, sanitizeRedirectPath } from '@/lib/auth/redirect';
 import { getPostAuthDestination } from '@/lib/auth/postAuthRouting';
 import { toast } from '@/hooks/use-toast';
+import { trackEvent } from '@/lib/analytics/events';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -123,6 +124,7 @@ const AuthCallback = () => {
               };
               const accountType =
                 pending.accountType || profile.account_type || 'traveler';
+              trackEvent('sign_up', { account_type: accountType });
               const isProfessional =
                 accountType === 'creator' ||
                 accountType === 'agent' ||
@@ -269,6 +271,7 @@ const AuthCallback = () => {
 
             // Already sent on submit → just open the existing conversation.
             if (inquiry?.conversation_id) {
+              trackEvent('inquiry_converted', { trip_id: inquiry.trip_id, conversation_id: inquiry.conversation_id });
               navigate(`/messages?conversation=${inquiry.conversation_id}`, { replace: true });
               return;
             }
@@ -295,6 +298,7 @@ const AuthCallback = () => {
                     converted_at: new Date().toISOString(),
                   })
                   .eq('id', inquiry.id);
+                trackEvent('inquiry_converted', { trip_id: inquiry.trip_id, conversation_id: existingConvo.id });
                 navigate(`/messages?conversation=${existingConvo.id}`, { replace: true });
                 return;
               }
@@ -320,6 +324,7 @@ const AuthCallback = () => {
                   })
                   .eq('id', inquiry.id);
 
+                trackEvent('inquiry_converted', { trip_id: inquiry.trip_id, conversation_id: dm.conversationId });
                 navigate(`/messages?conversation=${dm.conversationId}`, { replace: true });
                 return;
               }

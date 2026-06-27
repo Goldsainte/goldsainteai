@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AskQuestionDrawer } from "@/components/trips/AskQuestionDrawer";
+import { trackEvent } from "@/lib/analytics/events";
 
 interface TripBookingSidebarProps {
   tripId: string;
@@ -162,6 +163,8 @@ export function TripBookingSidebar({
       if (error) throw error;
       if (!dm?.conversationId) throw new Error("No conversation returned");
 
+      trackEvent("inquiry_submitted", { trip_id: tripId, trip_title: tripTitle, method: "authed" });
+      trackEvent("inquiry_converted", { trip_id: tripId, conversation_id: dm.conversationId });
       navigate(`/messages?conversation=${dm.conversationId}`);
     } catch (err: any) {
       console.error("Ask question error:", err);

@@ -146,8 +146,8 @@ Audit (2026-06-27): only the **Google Ads** tag is wired; GA4, Clarity, GSC and 
 - [x] **Env-driven setup shipped** (`src/lib/analytics/init.ts` + `main.tsx` + CSP + `vite.config.ts`).
       GA4, Clarity, GSC/Bing verification, and the Ads conversion label all activate purely by setting
       their env var — **no further code change needed**, just the IDs below.
-- [ ] **GA4 events:** fire `inquiry_submitted` / `inquiry_converted` / `sign_up` (the A4 instrumentation;
-      `page_view` is automatic once the GA4 id is set).
+- [x] **GA4 events** (A4): `inquiry_submitted` / `inquiry_converted` / `sign_up` fired via
+      `src/lib/analytics/events.ts` (no-op until the GA4 id is set). `page_view` is automatic.
 - [ ] **Sitemap:** confirm `https://goldsainte.ai/sitemap.xml` is served; submit to GSC + Bing.
 
 ### To do — accounts/dashboards (you) → then set the env var (Lovable build env + `.env.local`)

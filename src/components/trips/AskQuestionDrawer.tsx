@@ -12,6 +12,7 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { CheckCircle2, Loader2 } from "lucide-react";
+import { trackEvent } from "@/lib/analytics/events";
 
 interface AskQuestionDrawerProps {
   open: boolean;
@@ -107,6 +108,7 @@ export function AskQuestionDrawer({
         throw error;
       }
 
+      trackEvent("inquiry_submitted", { trip_id: tripId, trip_title: tripTitle, method: "magic_link" });
       setDrawerState("sent");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Something went wrong. Please try again.";
