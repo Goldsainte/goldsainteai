@@ -112,14 +112,11 @@ Traced (2026-06-27):
 ### B2. Creator dashboard layout & fonts — polish (reviewed)
 `/creator-dashboard` reads slightly thin / "admin panel" and is **narrower than the rest of the app**,
 which fights the premium positioning the studio is selling creators on.
-- [ ] **Match width:** `max-w-5xl` → **`max-w-6xl`** in [CreatorDashboard.tsx](../../src/pages/CreatorDashboard.tsx)
-      (marketplace already uses `max-w-6xl`).
-- [ ] **Promote section headers:** in-tab titles like "Photos, Videos & Reels" / "Social Accounts"
-      `text-sm font-semibold` (sans) → **`text-lg md:text-xl font-secondary`** (the serif already used
-      for "Welcome, Creator"). Biggest "feels premium" win.
-- [ ] **Un-cramp the intro:** the "Welcome, Creator" subtitle `text-sm …/60 max-w-md` →
-      `text-base …/70 max-w-xl`.
-- [ ] **Lift body legibility:** muted `text-sm …/65` body copy → `text-[15px] …/70`.
+- [x] **Match width:** `max-w-5xl` → `max-w-6xl` in `CreatorDashboard.tsx` (matches the marketplace).
+- [x] **Promote section headers:** Portfolio tab "Photos, Videos & Reels" / "Social Accounts" → serif
+      `text-lg md:text-xl font-secondary` (+ their descriptions `text-xs` → `text-sm`).
+- [x] **Un-cramp the intro:** "Welcome, Creator" subtitle → `text-base …/70 max-w-xl`.
+- [x] **Lift body legibility:** footer/body `text-sm …/65` → `text-[15px] …/70`.
 - Leave alone (intentional editorial style): the `text-[10px]` uppercase eyebrows, the
       `text-[28px] md:text-4xl` H1.
 
@@ -190,7 +187,7 @@ Audit (2026-06-27): only the **Google Ads** tag is wired; GA4, Clarity, GSC and 
 
 ### P1 — creator/agent experience (they register from the press too)
 - [x] **B1** — De-loop registration ✅ *(complete-profile pre-selects the chosen role; #1 metadata already in place)*.
-- [ ] **B2** — Creator dashboard width + serif section headers + intro/body legibility.
+- [x] **B2** — Creator dashboard width + serif section headers + intro/body legibility ✅.
 - [x] **B3** — First product → shows in Trips tab ✅ *(Trips-tab query + checklist fix; auto-approve-vs-review decision still open)*.
 
 ### P2 — secondary / after launch
