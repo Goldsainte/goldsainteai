@@ -188,9 +188,10 @@ export default function CreatorOnboardingPage() {
         .update(updateData)
         .eq("id", user.id);
       toast.success("Progress saved! You can finish onboarding anytime from your dashboard.");
-      // Route back into the wizard — useRequireOnboarding would otherwise bounce
-      // an incomplete creator off the dashboard and create a redirect loop.
-      navigate("/onboarding/creator?resume=1");
+      // Skip = leave onboarding for now. /creator-dashboard is guarded only by
+      // RequireAuth (no onboarding-completion gate); it shows a "complete your
+      // profile" banner + Getting Started checklist so they can finish later.
+      navigate("/creator-dashboard");
     } catch (error) {
       console.error("Error saving partial progress:", error);
       toast.error("Failed to save progress.");
