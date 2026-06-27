@@ -1,9 +1,18 @@
 # Ask a Question — Zero-Friction Inquiry Flow (Spec)
 
-> **Status:** Option B (zero-friction lead capture) is **implemented** on branch `ask-aquestion`.
-> This document now tracks (a) the target experience, (b) bugs found in testing on
-> 2026-06-05, and (c) the next piece to build: the **agent-reply notification loop**.
-> The original auth-redirect analysis (Option A) is preserved at the bottom as an appendix.
+> **Status (updated 2026-06-27): shipped to production and working.** The inquiry flow now creates
+> the conversation **on submit** (send-on-submit), server-side, in the `dm_conversations` /
+> `direct_messages` model the inbox actually reads; routes to the package creator/agent or a
+> `CONCIERGE_USER_ID` fallback; and emails the traveller a passwordless link into the thread.
+> **F1–F8 and F11 are resolved** (F11 differently than first written). **Remaining:** the agent-reply
+> notification loop, the logged-in Ask path, launch hardening (captcha + scanner-safe links), and
+> analytics. See the checklist at the bottom.
+>
+> ⚠️ **Correction to the original spec:** the inbox does **not** read `user_conversations` /
+> `conversation_messages` (what F1/F11 assumed). It reads `dm_conversations` / `direct_messages` via
+> the `get-conversations` function. The real fix was routing the conversion through
+> `send-direct-message`, **not** changing `conversation_type`. The 2026-06-05 bug analysis below is
+> kept for history; see "Implementation checklist" for what actually shipped.
 
 ---
 
@@ -75,7 +84,11 @@ no role picker, no onboarding.
 | `submit-trip-inquiry` edge function (magic link + Resend) | `supabase/functions/submit-trip-inquiry/index.ts` | ✅ (`verify_jwt=false`) |
 | Branded inquiry email template | `supabase/functions/_shared/email-templates/trip-inquiry.tsx` | ✅ |
 | `/auth/verify` passwordless landing | `src/pages/AuthVerify.tsx` | ✅ |
-| `action=ask` conversion in AuthCallback | `src/pages/AuthCallback.tsx:226-301` | ⚠️ built but fragile (see bugs) |
+| Conversation **created on submit** (send-on-submit) in `dm_conversations`/`direct_messages` | `submit-trip-inquiry/index.ts` | ✅ |
+| `action=ask` in AuthCallback — opens the existing thread (idempotent), never the profile gate | `src/pages/AuthCallback.tsx` | ✅ |
+| Responder resolution (creator → agent→user_id → `partnerId` → `CONCIERGE_USER_ID`) | `submit-trip-inquiry/index.ts` | ✅ |
+| Trip context on the conversation (`trip_id`/`trip_title`) | `send-direct-message/index.ts` | ✅ |
+| Optional first-name + phone (phone best-effort, tolerates `profiles_phone_unique`) | `AskQuestionDrawer.tsx` + `submit-trip-inquiry` | ✅ |
 | Progressive "add your name" banner | `src/pages/MessagesPage.tsx` | ✅ |
 | Inquiry-origin tagging (`signup_intent: 'trip_inquiry'`) | `submit-trip-inquiry` user_metadata | ✅ |
 
@@ -234,8 +247,10 @@ gate (see F1).
 log directly — passwordless.
 
 ### Trigger
-A new `conversation_messages` row authored by the **agent/specialist** (not the customer) in
-a conversation whose customer is an inquiry-origin traveller.
+A new **`direct_messages`** row authored by the **responder** (not the customer) in a
+`dm_conversations` thread whose other participant is an inquiry-origin traveller. *(The original
+text said `conversation_messages`/`user_conversations` — superseded by the dm-model; see the
+status note at the top.)*
 
 ### Flow
 ```
@@ -280,26 +295,51 @@ agent sends message
 
 ## Implementation checklist
 
-**Fixes (make the current flow actually reach the chat):**
-- [ ] F11 — Replace invalid `conversation_type:'trip_inquiry'` with `'general'`/`'primary'` (+ `status:'active'`) at all 3 call sites; stop swallowing the insert error. **Root cause of the empty inbox — do first.**
-- [ ] Flow — Instant sign-in on submit (return magic-link token, client `verifyOtp`) + captcha/rate-limit + unverified-email handling. See "Flow re-assessment".
-- [ ] F1 — Exempt `action=ask`/`action=open` from the profile-completion gate in `AuthCallback`; make conversion robust (service-role `convert-inquiry`); match inquiry by `trip`.
-- [ ] F2 — Move conversion + status update server-side (or add scoped UPDATE RLS); stop swallowing errors.
-- [ ] F3 — Notify the specialist on inquiry submit (pending Q2).
-- [ ] F4 — Pass `tripTitle={trip.title}` in `TrovaTripDetailPage`.
-- [ ] F5 — Host-name fallback for concierge trips.
-- [ ] F6 — Remove arrow from email subject; redeploy `submit-trip-inquiry` from `main`.
-- [ ] F7 — Route concierge/platform inquiries to a concierge assignee (pending Q3).
-- [ ] F8 — Env-drive `ROOT_DOMAIN` / link origin.
-- [ ] F9 — Schedule `expire_old_pending_inquiries` via pg_cron.
-- [ ] F10 — Add `inquiry_submitted` / `inquiry_converted` analytics events.
+> Updated **2026-06-27**. Most "Fixes" shipped; the architecture evolved to **send-on-submit** + the
+> **`dm_conversations`** model, so several items were resolved differently than first written.
 
-**New (agent-reply loop):**
-- [ ] `notify-inquiry-reply` edge function (debounce + fresh magic link + Resend).
-- [ ] DB trigger / message-send hook to invoke it on agent messages.
-- [ ] `reply-notification` email template.
-- [ ] `action=open` branch in `AuthCallback` (open existing conversation, no conversion).
-- [ ] Scanner-safe link handling + expired-link recovery page (Q1, Q5).
+**Fixes — DONE (shipped to prod):**
+- [x] **F11 — root cause was the *wrong tables*, not `conversation_type`.** The inbox reads
+  `dm_conversations`/`direct_messages` (via `get-conversations`); the conversion now goes through
+  `send-direct-message`. ⚠️ The **logged-in** call sites (`TripBookingSidebar`, `TripRequestDetail`)
+  still write to `user_conversations` → see Remaining #2.
+- [x] **Flow — send-on-submit.** Conversation + question are created server-side at submit (service
+  role), so the lead never depends on the click. The magic link just opens the existing thread.
+- [x] **F1** — `action=ask` exempt from the profile gate; matched by `trip`; idempotent (opens the
+  existing thread, never re-posts); StrictMode double-fire guarded.
+- [x] **F2** — conversion + `status='converted'` done server-side (service role) on submit.
+- [x] **F3** — responder notified on submit; lead delivered without the click.
+- [x] **F4** — `tripTitle` passed + resolved server-side from the package.
+- [x] **F5** — concierge label "the Goldsainte Concierge team" (client + server fallback).
+- [x] **F6** — subject reframed ("Your question is on its way to …"); arrow removed.
+- [x] **F7** — concierge routing: `creator_id` → `agent_id`→`travel_agents.user_id` → client
+  `partnerId` → `CONCIERGE_USER_ID` secret (set in prod).
+- [x] **F8** — origin-driven magic links (`resolveAllowedOrigin`).
+
+**Also shipped (not in the original list):**
+- [x] Optional first-name + phone on the drawer; phone set **best-effort** so the
+  `profiles_phone_unique` collision can't break signup ("Database error saving new user").
+- [x] Email reframed end-to-end ("on its way / open the conversation") — honest copy.
+- [x] Inbox layout: viewport-fit, internal scroll, no page-jump; backdrop-safe drawer; `fetchpriority`.
+- [x] Duplicate-message guard (mark converted immediately + idempotent callback).
+- [x] Prod build fallback for `VITE_SUPABASE_*` (fixed the "supabaseUrl is required" white screen).
+
+**Remaining:**
+- [ ] **#1 Agent-reply notification loop** — `notify-inquiry-reply` (fires on a **responder
+  `direct_messages` insert** in an inquiry-origin thread, debounced) + `reply-notification` email +
+  `action=open` branch in `AuthCallback` + DB trigger/hook. *(Trigger is on `direct_messages`.)*
+- [x] **#2 Logged-in Ask path** ✅ — `TripBookingSidebar.handleAskQuestion` and the
+  `TripRequestDetail` "Message" button now route through `send-direct-message`; the responder is
+  resolved **server-side from `tripId`** (creator → agent→user_id → `CONCIERGE_USER_ID`) when the
+  client has none. *(Needs `send-direct-message` redeploy.)*
+- [ ] **#3 Hardening** — captcha/Turnstile on the public drawer (Q6) + scanner-safe magic links (Q1)
+  + never-converted `auth.users` cleanup.
+- [ ] **F10** — `inquiry_submitted` / `inquiry_converted` analytics events.
+- [ ] **F9 / Q9** — schedule `expire_old_pending_inquiries` (pg_cron); privacy/consent note at submit.
+
+**Open-question status (2026-06-27):** Q2 ✅ (notify on submit), Q3 ✅ (`CONCIERGE_USER_ID`),
+Q7 ✅ (name + phone added). Still open: Q1, Q4, Q5, Q6, Q9 (tied to the reply loop + hardening);
+Q8 — decision: **replies are web-only**, the email is notification-only; Q10 — documentation only.
 
 ---
 

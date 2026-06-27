@@ -1,0 +1,1 @@
+- polish the layout for the creator tabs ![creator tabs](image-2.png) I t should work good on mobile and look good on desktop
