@@ -16,6 +16,7 @@
 |--------|--------|------------------|
 | `ac74bef6` | Authed "Ask a Question" + proposal "Message" → dm-model; `send-direct-message` now resolves the responder from `tripId`. Also `HomeHero` `fetchpriority` fix. | 1) **Logged-in** "Ask a Question" on a trip page → conversation appears in the inbox. 2) **Proposal "Message"** button opens a chat. 3) **Normal in-app DM** (creator↔traveller) still works — `send-direct-message` is shared. 4) **Anonymous** Ask (drawer → magic link) still works. 5) Homepage hero renders, no `fetchPriority` console warning. |
 | `56b8b86d` | **Reply-notification loop** — a responder reply in an inquiry thread emails the traveller a passwordless link (`action=open`), debounced. Inlined into `send-direct-message` + `reply-notification` template + `AuthCallback action=open`. | 1) As the **concierge/responder**, reply in an inquiry conversation → the **traveller gets an email**; clicking it opens that thread. 2) **Debounce**: a 2nd responder reply within ~15 min sends **no** new email. 3) A reply in a **normal (non-inquiry) DM** sends **no** email. 4) Traveller replying to themselves sends no email. *(Resend = real email, not Inbucket.)* |
+| _(B4)_ | **Creator surfaces polish** — tab scrollbar hidden, welcome modal above the nav, profile fonts. | 1) `/creator-dashboard` tab strip has **no OS scrollbar**; tabs still scroll. 2) First load: the welcome modal sits **above** the green nav (top not clipped). 3) `/creators/<id>`: ABOUT bio reads larger; "Member since" legible. |
 | _(A3)_ | **Scanner-safe `/auth/verify`** — click-to-complete (no auto-verify on page load). | 1) Ask a question (or reply as concierge) → open the email link → it lands on a page with a **button**; clicking signs you in + opens the conversation. 2) The link still works after the email client/scanner previews it (token not pre-consumed). 3) Signup-confirmation + password-recovery links still work via the button. |
 | _(B1)_ | **Registration de-loop** — `CompleteProfile` pre-selects the existing role. | 1) Register as a **creator** (esp. via **Google**) → at "Complete Your Profile" the **Creator** role is **already selected** + name prefilled; just confirm → Continue (no re-pick). 2) Email signup with a name → does **not** hit complete-profile at all. |
 | _(B3)_ | **Creator Trips tab + first-product checklist** — `CreatorTripsTab` now lists the creator's `packaged_trips` (any status, with badge); checklist counts `pending_review`+`published`. | 1) As a **creator**, build a trip → it **appears in the Trips tab** of `/creator-dashboard` (with an "In review" badge). 2) "Publish your first product" Getting-Started item **ticks** after publishing. 3) A draft (autosave only) does **not** tick it. |
@@ -130,6 +131,19 @@ The "first product" onboarding step must create a real trip that appears in the 
 - ⏳ **Open product decision:** trips go to `pending_review` (admin approval) before they're publicly
   bookable. Decide auto-approve / fast-track vs manual review for the launch.
 
+### B4. Creator surfaces polish (from `next.md`)
+- ✅ **Tab strip scrollbar** — `/creator-dashboard` tabs showed an always-visible OS scrollbar + a
+  stray vertical bar. Hidden the native scrollbar (`overflow-y-hidden [scrollbar-width:none]
+  [&::-webkit-scrollbar]:hidden`); tabs still scroll (trackpad/swipe, active tab scrolls into view).
+  Mobile already uses a `Select` dropdown.
+- ✅ **Welcome modal under the nav** — `OnboardingWelcomeModal` rendered at `z-50` (same as the sticky
+  header) so the nav covered its top. Now **portaled to `document.body` at `z-[100]`**.
+- ✅ **"Skip for now" / "A space reserved…" — kept secondary (decision):** they must not compete with
+  the primary CTA. Only bumped "Skip" `text-[12px]` → `text-sm` for tappability; the italic caption
+  stays small (intentional editorial flourish).
+- ✅ **Public profile fonts** — ABOUT bio `text-base/lg` → `text-lg/xl` (the creator's voice gets
+  presence); "Member since" meta `text-xs` → `text-sm`. Pills/eyebrows left as intentional secondary.
+
 ---
 
 ## Workstream C — Marketplace data hygiene (quick, high-visibility)
@@ -189,6 +203,7 @@ Audit (2026-06-27): only the **Google Ads** tag is wired; GA4, Clarity, GSC and 
 - [x] **B1** — De-loop registration ✅ *(complete-profile pre-selects the chosen role; #1 metadata already in place)*.
 - [x] **B2** — Creator dashboard width + serif section headers + intro/body legibility ✅.
 - [x] **B3** — First product → shows in Trips tab ✅ *(Trips-tab query + checklist fix; auto-approve-vs-review decision still open)*.
+- [x] **B4** — Creator surfaces polish: tab scrollbar hidden, welcome-modal z-index, profile fonts ✅.
 
 ### P2 — secondary / after launch
 - [ ] **A5** — Privacy note at submit; schedule the inquiry-expire pg_cron job.

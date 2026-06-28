@@ -264,7 +264,7 @@ export default function CreatorDashboard() {
               </SelectContent>
             </Select>
           ) : (
-            <TabsList className="w-full bg-transparent border-b border-[#0a2225]/15 rounded-none h-11 justify-start gap-0 flex p-0 overflow-x-auto">
+            <TabsList className="w-full bg-transparent border-b border-[#0a2225]/15 rounded-none h-11 justify-start gap-0 flex p-0 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {TAB_KEYS.map((key) => (
                 <TabsTrigger key={key} value={key} className={tabTriggerClass}>
                   {TAB_LABELS[key]}

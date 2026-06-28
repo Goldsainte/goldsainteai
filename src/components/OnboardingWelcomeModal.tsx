@@ -1,6 +1,7 @@
 import { useWelcomeModal } from "@/hooks/useWelcomeModal";
 import { ArrowRight, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { createPortal } from "react-dom";
 import welcomeHeroImage from "@/assets/luxury-infinity-pool.webp";
 
 export function OnboardingWelcomeModal() {
@@ -51,8 +52,8 @@ export function OnboardingWelcomeModal() {
     primaryCta = { label: "Open your partner console", href: "/partner" };
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0a2225]/70 backdrop-blur-sm px-4 py-6">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0a2225]/70 backdrop-blur-sm px-4 py-6">
       <div className="relative w-full max-w-md max-h-[92vh] overflow-y-auto rounded-[28px] bg-[#f7f3ea] shadow-[0_30px_80px_-20px_rgba(10,34,37,0.45)] text-[#0a2225]">
         {/* Close */}
         <button
@@ -112,7 +113,7 @@ export function OnboardingWelcomeModal() {
             <button
               type="button"
               onClick={dismiss}
-              className="block w-full text-center text-[12px] text-[#0a2225]/50 hover:text-[#0a2225] transition-colors"
+              className="block w-full text-center text-sm text-[#0a2225]/55 hover:text-[#0a2225] transition-colors"
             >
               Skip for now
             </button>
@@ -122,6 +123,7 @@ export function OnboardingWelcomeModal() {
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
