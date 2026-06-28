@@ -151,6 +151,11 @@ The "first product" onboarding step must create a real trip that appears in the 
 - ✅ **Header focus outline** — the green nav's profile (`Header.tsx`) + bell (`NotificationBell`)
   buttons showed a harsh dark focus box (shadcn `ring-ring`+offset / browser default). Replaced with a
   soft on-brand `focus-visible:ring-[#C7A962]` (no offset) — kills the box, keeps keyboard a11y.
+- ✅ **Home Base autocomplete** (`/onboarding/creator`, commit `657c70b1`) — `GoogleCityAutocomplete`
+  (Google Places, `VITE_GOOGLE_MAPS_API_KEY`, `(cities)`) replaces the plain Home Base input; selecting
+  a city saves to `profiles.home_base`. **Graceful plain-text fallback when the key is unset** — so it
+  shows **no suggestions until `VITE_GOOGLE_MAPS_API_KEY` is set** in `.env.local` (local) / Lovable
+  build env (prod), then restart dev. *(image-5 "bost" with no dropdown = the fallback, not a bug.)*
 
 #### Profile vs landing-page review (acted on)
 Same palette/type as the landing page, but flatter/sparser. Implemented:

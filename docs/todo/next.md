@@ -1,1 +1,7 @@
-- polish the layout for the creator tabs ![creator tabs](image-2.png) I t should work good on mobile and look good on desktop
+# Next — scratchpad
+
+> All previous items (creator tabs, welcome-modal z-index, profile fonts/layout, header focus outline,
+> Home Base autocomplete) are **done** and recorded in [todo.md](todo.md) → Workstream B4. Add new
+> items here; they get triaged into todo.md.
+
+_(empty — add the next batch)_
