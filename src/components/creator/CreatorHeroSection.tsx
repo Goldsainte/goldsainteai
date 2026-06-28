@@ -13,6 +13,8 @@ interface CreatorHeroSectionProps {
   reviewCount: number;
   tripsCompleted: number | null;
   clientsServed: number | null;
+  specialties?: string[];
+  responseTimeText?: string | null;
   isVerified?: boolean;
   isOwnProfile?: boolean;
   targetUserId?: string;
@@ -30,6 +32,8 @@ export function CreatorHeroSection({
   reviewCount,
   tripsCompleted,
   clientsServed,
+  specialties = [],
+  responseTimeText,
   isVerified = true,
   isOwnProfile,
   targetUserId,
@@ -40,6 +44,7 @@ export function CreatorHeroSection({
   const hasStats = (tripsCompleted ?? 0) > 0 || (clientsServed ?? 0) > 0;
   const isGenericTitle = !title || title === "Travel Designer";
   const showCompleteNudge = Boolean(isOwnProfile && (isGenericTitle || !location));
+  const showTrustPanel = Boolean(responseTimeText) || specialties.length > 0;
 
   return (
     <section className="relative w-full">
@@ -65,9 +70,10 @@ export function CreatorHeroSection({
         )}
       </div>
 
-      {/* Floating profile card overlay */}
+      {/* Floating profile card overlay + at-a-glance panel */}
       <div className="relative mx-auto max-w-5xl px-4">
-        <div className="relative -mt-24 md:-mt-32 bg-white rounded-2xl border border-[#E5DFC6] shadow-lg p-6 md:p-8 max-w-lg">
+        <div className="relative -mt-24 md:-mt-32 flex flex-col md:flex-row md:items-start gap-5">
+          <div className="bg-white rounded-2xl border border-[#E5DFC6] shadow-lg p-6 md:p-8 w-full max-w-lg">
           {/* Avatar + Name */}
           <div className="flex items-start gap-5">
             <div className="relative shrink-0">
@@ -148,6 +154,34 @@ export function CreatorHeroSection({
               <p className="font-primary text-xs text-[#6B7280] leading-relaxed">
                 Add your specialty and home base to help travelers find you.
               </p>
+            </div>
+          )}
+          </div>
+
+          {/* At-a-glance trust panel (desktop) — fills the hero's right side */}
+          {showTrustPanel && (
+            <div className="hidden md:flex flex-col gap-5 rounded-2xl border border-[#E5DFC6] bg-white/85 backdrop-blur-sm shadow-lg p-6 flex-1 self-start">
+              {responseTimeText && (
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.22em] text-[#C7A962]">Response time</p>
+                  <p className="mt-1.5 text-sm font-medium text-[#0a2225]">{responseTimeText}</p>
+                </div>
+              )}
+              {specialties.length > 0 && (
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.22em] text-[#C7A962]">Specialties</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {specialties.slice(0, 6).map((s) => (
+                      <span
+                        key={s}
+                        className="rounded-full border border-[#E5DFC6] bg-[#FDF9F0] px-2.5 py-1 text-xs text-[#0a2225]"
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -152,6 +152,19 @@ The "first product" onboarding step must create a real trip that appears in the 
   buttons showed a harsh dark focus box (shadcn `ring-ring`+offset / browser default). Replaced with a
   soft on-brand `focus-visible:ring-[#C7A962]` (no offset) — kills the box, keeps keyboard a11y.
 
+#### Profile vs landing-page review (acted on)
+Same palette/type as the landing page, but flatter/sparser. Implemented:
+- ✅ **#1 Hero trust panel** — the cover hero wasted ~⅔ of its width; added a desktop "at-a-glance"
+  panel (response time + specialties) beside the identity card. Gracefully hidden when the creator has
+  neither (so the empty test profile shows no change — it activates for filled profiles).
+- ✅ **#2 Tighter rhythm** — content sections `py-16 md:py-20` → `py-12 md:py-16` (less cavernous).
+- ✅ **#3 Curated Journeys** — the profile now fetches the creator's **published `packaged_trips`** and
+  renders a card grid linking to `/marketplace/trip/<slug>`. Previously the page only surfaced guides +
+  TikTok, so a creator's actual bookable products never showed. Hidden when there are no live packages.
+- ⏸️ **#4 De-emphasise "NEW DESIGNER" for visitors** — not done (you didn't select it).
+> Note: #1 + #3 only render with real data (specialties / response time / published trips). To see them
+> on Creator 001, give it a specialty + a published trip package; otherwise only #2 is visible.
+
 ---
 
 ## Workstream C — Marketplace data hygiene (quick, high-visibility)

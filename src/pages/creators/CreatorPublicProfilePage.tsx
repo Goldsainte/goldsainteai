@@ -92,6 +92,7 @@ export default function CreatorPublicProfilePage() {
   const [avgRating, setAvgRating] = useState<number | null>(null);
   const [reviewCount, setReviewCount] = useState<number>(0);
   const [guides, setGuides] = useState<Array<{ id: string; title: string; destination: string; duration_days: number; price: number; currency: string; cover_image_url: string | null }>>([]);
+  const [trips, setTrips] = useState<Array<{ id: string; title: string | null; slug: string | null; destination: string | null; cover_image_url: string | null; price_per_person: number | null }>>([]);
 
   useEffect(() => {
     if (!id) return;
@@ -144,17 +145,27 @@ export default function CreatorPublicProfilePage() {
     })();
   }, [id, user, reviewRefreshKey]);
 
-  // Fetch published itinerary guides for this creator
+  // Fetch this creator's published itinerary guides + bookable trip packages
   useEffect(() => {
     if (!id) return;
     (async () => {
-      const { data } = await supabase
-        .from("itinerary_products")
-        .select("id, title, destination, duration_days, price, currency, cover_image_url")
-        .eq("creator_id", id)
-        .eq("status", "published")
-        .order("created_at", { ascending: false });
-      setGuides((data as any) || []);
+      const [guidesRes, tripsRes] = await Promise.all([
+        supabase
+          .from("itinerary_products")
+          .select("id, title, destination, duration_days, price, currency, cover_image_url")
+          .eq("creator_id", id)
+          .eq("status", "published")
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("packaged_trips")
+          .select("id, title, slug, destination, cover_image_url, price_per_person")
+          .eq("creator_id", id)
+          .eq("status", "published")
+          .order("created_at", { ascending: false })
+          .limit(6),
+      ]);
+      setGuides((guidesRes.data as any) || []);
+      setTrips((tripsRes.data as any) || []);
     })();
   }, [id]);
 
@@ -304,6 +315,8 @@ export default function CreatorPublicProfilePage() {
           reviewCount={reviewCount}
           tripsCompleted={creatorData?.trips_completed ?? null}
           clientsServed={creatorData?.clients_served ?? null}
+          specialties={specialties}
+          responseTimeText={responseTimeText}
           isVerified
           isOwnProfile={isOwnProfile}
           targetUserId={isOwnProfile ? undefined : creator.id}
@@ -313,6 +326,59 @@ export default function CreatorPublicProfilePage() {
 
         {/* Spacer after hero card overlap */}
         <div className="h-8 md:h-12" />
+
+        {/* ─── Curated Journeys (bookable trip packages) ─── */}
+        {trips.length > 0 && (
+          <div className="bg-[#FDF9F0]">
+            <div className="mx-auto max-w-5xl px-4 py-12 md:py-16">
+              <SectionLabel>Curated Journeys</SectionLabel>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {trips.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => navigate(`/marketplace/trip/${t.slug ?? t.id}`)}
+                    className="group text-left rounded-2xl bg-white border border-[#E5DFC6] overflow-hidden hover:border-[#C7A962]/60 hover:shadow-md transition flex flex-col"
+                  >
+                    <div className="aspect-[4/3] bg-[#F6F0E4] overflow-hidden">
+                      {t.cover_image_url ? (
+                        <img
+                          src={t.cover_image_url}
+                          alt={t.title ?? "Trip"}
+                          className="h-full w-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="h-full w-full bg-[#E5DFC6]" />
+                      )}
+                    </div>
+                    <div className="p-4 flex-1 flex flex-col">
+                      <h3 className="font-secondary text-lg text-[#0a2225] leading-snug line-clamp-2">
+                        {t.title || "Untitled journey"}
+                      </h3>
+                      {t.destination && (
+                        <p className="text-xs text-[#6B7280] mt-1">{t.destination}</p>
+                      )}
+                      <div className="mt-auto pt-3 flex items-center justify-between">
+                        {t.price_per_person != null ? (
+                          <span className="text-sm text-[#0a2225]">
+                            <span className="text-[#6B7280] text-xs">from </span>
+                            ${Number(t.price_per_person).toFixed(0)}
+                            <span className="text-[#6B7280] text-xs"> / person</span>
+                          </span>
+                        ) : (
+                          <span />
+                        )}
+                        <span className="inline-flex items-center gap-1 text-xs text-[#0c4d47] font-medium">
+                          View <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ─── Recent TikTok Videos ─── */}
         {creator.featured_tiktok_videos && creator.featured_tiktok_videos.length > 0 && (
@@ -326,7 +392,7 @@ export default function CreatorPublicProfilePage() {
         {/* ─── Itinerary Guides ─── */}
         {guides.length > 0 && (
           <div className="bg-[#FDF9F0]">
-            <div className="mx-auto max-w-5xl px-4 py-16 md:py-20">
+            <div className="mx-auto max-w-5xl px-4 py-12 md:py-16">
               <SectionLabel>Itinerary Guides</SectionLabel>
               <div className="space-y-3">
                 {guides.map((g) => (
@@ -361,7 +427,7 @@ export default function CreatorPublicProfilePage() {
 
         {/* ─── 3. SERVICES — Clarity Layer (Fiverr) ─── */}
         <div className="bg-[#FDF9F0]">
-          <div className="mx-auto max-w-5xl px-4 py-16 md:py-20">
+          <div className="mx-auto max-w-5xl px-4 py-12 md:py-16">
             <SectionLabel>Custom Services</SectionLabel>
             <CreatorServicesSection
               creatorId={creator.id}
@@ -373,7 +439,7 @@ export default function CreatorPublicProfilePage() {
         {/* ─── 4. REVIEWS — Proof Layer ─── */}
         {(reviewCount > 0 || (!authLoading && user && user.id !== creator.id)) && (
           <div className="bg-white">
-            <div className="mx-auto max-w-5xl px-4 py-16 md:py-20">
+            <div className="mx-auto max-w-5xl px-4 py-12 md:py-16">
               <div className="flex items-center justify-between mb-8">
                 <SectionLabel>Reviews</SectionLabel>
                 {!authLoading && user && user.id !== creator.id && (
@@ -412,7 +478,7 @@ export default function CreatorPublicProfilePage() {
 
         {/* ─── 5. ABOUT — Positioning Layer ─── */}
         <div className="bg-[#FDF9F0]">
-          <div className="mx-auto max-w-5xl px-4 py-16 md:py-20">
+          <div className="mx-auto max-w-5xl px-4 py-12 md:py-16">
             <SectionLabel>About</SectionLabel>
             <CreatorAboutSection
               bio={bio}
