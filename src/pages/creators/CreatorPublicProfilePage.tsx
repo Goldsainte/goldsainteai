@@ -14,7 +14,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -233,45 +232,56 @@ export default function CreatorPublicProfilePage() {
             </button>
             <div className="flex items-center gap-2">
               {isOwnProfile ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      aria-label="Profile options"
-                      className="font-primary border-[#E5DFC6] text-[#0a2225] rounded-full h-9 w-9 p-0"
-                    >
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="font-primary w-52 bg-white border-[#E5DFC6]">
-                    <DropdownMenuItem onClick={() => navigate("/creator-dashboard?tab=portfolio")}>
-                      <Settings className="h-3.5 w-3.5 mr-2" /> Edit profile
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        const url = creator.username
-                          ? `https://goldsainte.ai/@${creator.username}`
-                          : `https://goldsainte.ai/creators/${creator.id}`;
-                        navigator.clipboard.writeText(url);
-                        toast.success("Profile link copied");
-                      }}
-                    >
-                      <Link2 className="h-3.5 w-3.5 mr-2" /> Copy profile link
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => {
-                        // Always use the canonical /creators/:id route — the @username
-                        // redirector can 404 if the username record is missing or cased
-                        // differently in the profiles table.
-                        window.open(`/creators/${creator.id}`, "_blank", "noopener,noreferrer");
-                      }}
-                    >
-                      <Eye className="h-3.5 w-3.5 mr-2" /> Public preview
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <>
+                  <span
+                    className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-[#F5F0E0] px-3 py-1 text-[11px] text-[#6B7280]"
+                    title="This is how travelers see your profile."
+                  >
+                    <Eye className="h-3 w-3" /> Owner view
+                  </span>
+                  <Button
+                    onClick={() => navigate("/creator-dashboard?tab=portfolio")}
+                    variant="outline"
+                    size="sm"
+                    className="font-primary border-[#E5DFC6] text-[#0a2225] rounded-full h-9"
+                  >
+                    <Settings className="h-3.5 w-3.5 mr-1.5" /> Edit profile
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        aria-label="More options"
+                        className="font-primary border-[#E5DFC6] text-[#0a2225] rounded-full h-9 w-9 p-0"
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="font-primary w-52 bg-white border-[#E5DFC6]">
+                      <DropdownMenuItem
+                        onClick={() => {
+                          const url = creator.username
+                            ? `https://goldsainte.ai/@${creator.username}`
+                            : `https://goldsainte.ai/creators/${creator.id}`;
+                          navigator.clipboard.writeText(url);
+                          toast.success("Profile link copied");
+                        }}
+                      >
+                        <Link2 className="h-3.5 w-3.5 mr-2" /> Copy profile link
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          // Canonical /creators/:id route — the @username redirector
+                          // can 404 if the username record is missing/mis-cased.
+                          window.open(`/creators/${creator.id}`, "_blank", "noopener,noreferrer");
+                        }}
+                      >
+                        <Eye className="h-3.5 w-3.5 mr-2" /> Public preview
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
               ) : (
                 <ShareButton
                   url={creator.username ? `/@${creator.username}/shop` : `/creators/${creator.id}`}
@@ -282,24 +292,6 @@ export default function CreatorPublicProfilePage() {
             </div>
           </div>
         </div>
-
-        {/* Owner banner (only visible to profile owner) */}
-        {isOwnProfile && (
-          <div className="border-b border-[#E5DFC6]/60 bg-[#F5F0E0]/60">
-            <div className="mx-auto max-w-5xl px-4 py-2.5 flex items-center justify-between gap-3 flex-wrap">
-              <p className="font-primary text-xs text-[#6B7280]">
-                <span className="font-medium text-[#0a2225]">Owner view</span>
-                <span className="hidden sm:inline"> · This is how travelers see your profile.</span>
-              </p>
-              <button
-                onClick={() => navigate("/creator-dashboard?tab=portfolio")}
-                className="font-primary text-xs font-medium text-[#0c4d47] hover:text-[#0a3d39] underline-offset-2 hover:underline"
-              >
-                Edit profile
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* ─── 1. HERO — Trust Layer ─── */}
         <CreatorHeroSection

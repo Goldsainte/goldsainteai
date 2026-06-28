@@ -143,6 +143,11 @@ The "first product" onboarding step must create a real trip that appears in the 
   stays small (intentional editorial flourish).
 - ✅ **Public profile fonts** — ABOUT bio `text-base/lg` → `text-lg/xl` (the creator's voice gets
   presence); "Member since" meta `text-xs` → `text-sm`. Pills/eyebrows left as intentional secondary.
+- ✅ **Public profile top-nav consolidated** — `/creators/<id>` had **3 stacked bars** (global nav +
+  Back bar + Owner banner) with a **duplicated "Edit profile"**. Merged into **one** bar:
+  Back · "Owner view" chip · single **Edit profile** · ··· (copy link / public preview). Removed the
+  redundant strip + the dup; content sits higher. *(Optional follow-up: overlay Back/··· on the hero
+  for a fully content-forward look.)*
 
 ---
 
