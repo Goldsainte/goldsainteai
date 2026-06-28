@@ -148,9 +148,12 @@ The "first product" onboarding step must create a real trip that appears in the 
   Back · "Owner view" chip · single **Edit profile** · ··· (copy link / public preview). Removed the
   redundant strip + the dup; content sits higher. *(Optional follow-up: overlay Back/··· on the hero
   for a fully content-forward look.)*
-- ✅ **Header focus outline** — the green nav's profile (`Header.tsx`) + bell (`NotificationBell`)
-  buttons showed a harsh dark focus box (shadcn `ring-ring`+offset / browser default). Replaced with a
-  soft on-brand `focus-visible:ring-[#C7A962]` (no offset) — kills the box, keeps keyboard a11y.
+- ✅ **Focus outline (app-wide)** — root cause was the global `--ring` token being **black**
+  (`index.css:229`), so **every** shadcn button's focus ring was a dark box (e.g. the profile-toolbar
+  `···`, image-7). Set `--ring` → **brand gold (`42 47% 58%`)** — softens every focus ring app-wide.
+  The two top-bar icon buttons (profile + bell) still re-showed a ring after a Radix menu closed (focus
+  returns to the trigger, image-6), so they now use a **background cue** (`focus-visible:bg-…`, ring-0)
+  instead of a ring — no lingering box, keyboard nav still gets a visible state.
 - ✅ **Home Base autocomplete** (`/onboarding/creator`, commit `657c70b1`) — `GoogleCityAutocomplete`
   (Google Places, `VITE_GOOGLE_MAPS_API_KEY`, `(cities)`) replaces the plain Home Base input; selecting
   a city saves to `profiles.home_base`. **Graceful plain-text fallback when the key is unset** — so it
