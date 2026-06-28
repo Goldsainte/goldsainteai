@@ -155,10 +155,14 @@ The "first product" onboarding step must create a real trip that appears in the 
   returns to the trigger, image-6), so they now use a **background cue** (`focus-visible:bg-…`, ring-0)
   instead of a ring — no lingering box, keyboard nav still gets a visible state.
 - ✅ **Home Base autocomplete** (`/onboarding/creator`, commit `657c70b1`) — `GoogleCityAutocomplete`
-  (Google Places, `VITE_GOOGLE_MAPS_API_KEY`, `(cities)`) replaces the plain Home Base input; selecting
-  a city saves to `profiles.home_base`. **Graceful plain-text fallback when the key is unset** — so it
-  shows **no suggestions until `VITE_GOOGLE_MAPS_API_KEY` is set** in `.env.local` (local) / Lovable
-  build env (prod), then restart dev. *(image-5 "bost" with no dropdown = the fallback, not a bug.)*
+  (Google Places, `(cities)`) replaces the plain Home Base input; selecting a city saves to
+  `profiles.home_base`. Graceful plain-text fallback when no key is set.
+  - 🐞 **Env-var name mismatch (fixed)** — components read `VITE_GOOGLE_MAPS_API_KEY`, but `.env.example`
+    + the env validator document **`VITE_GOOGLE_PLACES_API_KEY`** (what the user set). Components now read
+    `VITE_GOOGLE_PLACES_API_KEY` **first**, falling back to `VITE_GOOGLE_MAPS_API_KEY`
+    (`GoogleCityAutocomplete` + `DestinationAutocomplete`); added the Places key to the vite.config
+    `define` block (for prod) + a dev `console.warn` when neither is set. One Google key (Places API +
+    Maps JS) covers both.
 
 #### Profile vs landing-page review (acted on)
 Same palette/type as the landing page, but flatter/sparser. Implemented:

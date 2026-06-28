@@ -60,12 +60,14 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
 
     const loadGoogleMaps = async () => {
       try {
-        const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-        
+        const apiKey =
+          import.meta.env.VITE_GOOGLE_PLACES_API_KEY ||
+          import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
         // Validate API key exists
         if (!apiKey) {
-          console.error("VITE_GOOGLE_MAPS_API_KEY is not configured");
-          setError("Destination search is not configured. Please add VITE_GOOGLE_MAPS_API_KEY.");
+          console.error("VITE_GOOGLE_PLACES_API_KEY is not configured");
+          setError("Destination search is not configured. Please add VITE_GOOGLE_PLACES_API_KEY.");
           return;
         }
         

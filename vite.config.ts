@@ -131,6 +131,11 @@ export default defineConfig(({ mode }) => {
     'import.meta.env.VITE_GOOGLE_MAPS_API_KEY': JSON.stringify(
       process.env.VITE_GOOGLE_MAPS_API_KEY ?? env.VITE_GOOGLE_MAPS_API_KEY ?? ''
     ),
+    // Places autocomplete key (documented name in .env.example). Components read
+    // this first, then fall back to VITE_GOOGLE_MAPS_API_KEY.
+    'import.meta.env.VITE_GOOGLE_PLACES_API_KEY': JSON.stringify(
+      process.env.VITE_GOOGLE_PLACES_API_KEY ?? env.VITE_GOOGLE_PLACES_API_KEY ?? ''
+    ),
     // Analytics / SEO — each activates only when its value is set (see src/lib/analytics/init.ts).
     'import.meta.env.VITE_GA4_MEASUREMENT_ID': JSON.stringify(
       process.env.VITE_GA4_MEASUREMENT_ID ?? env.VITE_GA4_MEASUREMENT_ID ?? ''

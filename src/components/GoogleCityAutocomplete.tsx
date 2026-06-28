@@ -5,9 +5,10 @@ import { MapPin } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-// NOTE: this is the GOOGLE Places single-value city field (uses
-// VITE_GOOGLE_MAPS_API_KEY). For the free OpenStreetMap/Nominatim multi-purpose
-// version used by the marketplace search bars, see ./CityAutocomplete.tsx.
+// NOTE: this is the GOOGLE Places single-value city field. Reads
+// VITE_GOOGLE_PLACES_API_KEY (the name documented in .env.example) and falls
+// back to VITE_GOOGLE_MAPS_API_KEY. For the free OpenStreetMap/Nominatim version
+// used by the marketplace search bars, see ./CityAutocomplete.tsx.
 
 interface GoogleCityAutocompleteProps {
   value: string;
@@ -46,8 +47,16 @@ export function GoogleCityAutocomplete({
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-      if (!apiKey) return;
+      const apiKey =
+        import.meta.env.VITE_GOOGLE_PLACES_API_KEY ||
+        import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      if (!apiKey) {
+        if (import.meta.env.DEV)
+          console.warn(
+            "GoogleCityAutocomplete: no Google key found (VITE_GOOGLE_PLACES_API_KEY / VITE_GOOGLE_MAPS_API_KEY) — Home Base stays a plain text input.",
+          );
+        return;
+      }
       try {
         if (!optionsSet) {
           setOptions({ key: apiKey, v: "weekly" });
