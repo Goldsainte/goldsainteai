@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { GoogleCityAutocomplete } from "@/components/GoogleCityAutocomplete";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
@@ -513,11 +514,12 @@ export default function CreatorOnboardingPage() {
 
                   <div>
                     <Label className="text-[#0a2225] font-medium">Home Base *</Label>
-                    <Input
+                    <GoogleCityAutocomplete
                       value={homeBase}
-                      onChange={(e) => setHomeBase(e.target.value)}
+                      onChange={setHomeBase}
                       placeholder="City, Country"
-                      className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
+                      className="mt-2"
+                      inputClassName="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
                     />
                   </div>
                 </div>

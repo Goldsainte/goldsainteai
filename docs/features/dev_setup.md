@@ -47,6 +47,10 @@ RESEND_API_KEY="<your Resend API key — keep in .env.local only>"
 # (A plain account UUID, not a credential.)
 CONCIERGE_USER_ID="c93d67d1-db67-483c-a1c7-88d75f16131d"
 
+# Google Maps / Places — powers maps + city autocomplete (creator "Home Base", search bars).
+# Set the same value in the Lovable production build env.
+# VITE_GOOGLE_MAPS_API_KEY="AIza..."
+
 # Analytics / SEO — each activates only when set (src/lib/analytics/init.ts). Set the
 # same vars in the Lovable production build env. See Workstream D in docs/todo/todo.md.
 # VITE_GA4_MEASUREMENT_ID="G-XXXXXXXXXX"
