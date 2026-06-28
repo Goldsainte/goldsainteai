@@ -148,6 +148,9 @@ The "first product" onboarding step must create a real trip that appears in the 
   Back · "Owner view" chip · single **Edit profile** · ··· (copy link / public preview). Removed the
   redundant strip + the dup; content sits higher. *(Optional follow-up: overlay Back/··· on the hero
   for a fully content-forward look.)*
+- ✅ **Header focus outline** — the green nav's profile (`Header.tsx`) + bell (`NotificationBell`)
+  buttons showed a harsh dark focus box (shadcn `ring-ring`+offset / browser default). Replaced with a
+  soft on-brand `focus-visible:ring-[#C7A962]` (no offset) — kills the box, keeps keyboard a11y.
 
 ---
 
