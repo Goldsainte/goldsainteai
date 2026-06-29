@@ -1,13 +1,13 @@
 # Next — scratchpad
 
-> All previous items (creator tabs, welcome-modal z-index, profile fonts/layout, header focus outline,
-> Home Base autocomplete) are **done** and recorded in [todo.md](todo.md) → Workstream B4. Add new
-> items here; they get triaged into todo.md.
+> Triaged items live in [todo.md](todo.md). Add new items here; they get moved into todo.md.
 >
-> Latest done (recorded in B4):
-> - Focus border on top-menu + secondary toolbar buttons → global `--ring` set to brand gold; top-bar
->   icon buttons use a background cue instead of a ring (no lingering box after a menu closes).
-> - Home Base autocomplete: not a bug — needs a **full dev-server restart** after setting
->   `VITE_GOOGLE_MAPS_API_KEY` in `.env.local` (vite.config bakes it via `define` at server start).
+> Latest moved:
+> - Primary Destinations (Step 3) → Google Places multi-select, optional ✅ (todo.md B5a).
+> - Step 4 "Portfolio" removal → audited, **pending partner decision** (todo.md B5b).
+> - Creator dashboard tabs (image-9) → scrollbar fix landed; follow-ups = overflow fade + IA
+>   consolidation (todo.md B6).
 
-_(empty — add the next batch)_
+_(active)_
+- regarding the creator dashboard ![getting started for creator](image-10.png) the getting started
+  items, are they linked with the actual profile? Please check that once more.

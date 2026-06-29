@@ -212,7 +212,30 @@ Wizard is **5 steps**: 1) About You · 2) Social Profile · 3) Your Niche · 4) 
   them at DB defaults until a settings screen exists.
 - Recommendation: remove the whole step (5→4); brand/pricing default for launch (secondary / brand-funnel,
   not traveller-facing); add a settings home post-launch.
-- ⏳ **Awaiting decisions** (step-4 scope; Primary Destinations required-vs-optional) before implementing.
+- ✅ **(a) Primary Destinations** done (see above). **(b) Step-4 removal** — pending: user checking with
+  partner. Audit conclusion stands: removing Step 4 loses nothing the app reads (brand-alignment +
+  pricing blocks are write-only dead data; cover/photos live in the Portfolio tab).
+
+### B6. Creator dashboard tabs — follow-up (from `next.md`, image-9)
+The B4 scrollbar fix worked (no OS scrollbar). Remaining critical-thinking notes:
+- ⚠️ **Overflow discoverability** — 11 tabs still overflow (`CONTENT` / `EARNINGS` / `SETTINGS`
+  off-screen); with the scrollbar hidden the only cue is the clipped "EA…" at the edge. Add a subtle
+  **right-edge fade** (+ optional chevron) shown only when the strip overflows. *(Low-risk; offered.)*
+- 💭 **IA load** — 11 top-level tabs is heavy for non-technical influencers. Consider consolidating
+  (groups or a "More" overflow menu) — larger change, **post-launch**.
+
+### B7. Getting-Started checklist linkage audit (from `next.md`, image-10)
+Audited the 6 **creator** items in `GettingStartedChecklist.tsx` — only **2 of 6** reflect real state:
+- #2 Connect payout (`stripe_*account_id`) ✅ · #3 Publish product (trips/guides count) ✅.
+- ⚠️ **#1 Complete profile** — checks `has_completed_creator_onboarding` (set only on the **final**
+  onboarding submit, line 325), not the photo/bio/niches the copy promises. Fill the fields but hit
+  *Skip* → stays unchecked. **Fix:** check `avatar_url && bio && creator_niches?.length`.
+- ❌ **#4 Share profile** — checks `creator_avg_views > 10` (imported TikTok metric, unrelated to
+  sharing). **Fix:** complete-on-action (flag when they click *View my profile* / copy link).
+- ❌ **#6 Set notifications** — `!!notification_preferences` is non-null by default → false-positive ✓.
+  **Fix:** require a real change, or leave (harmless).
+- ⚠️ **#5 Review tax** — `() => false`, never completes → checklist can never reach 6/6 / auto-hide.
+- ⏳ Implement #1 + #4 (clear bugs); #5/#6 optional — **pending user go-ahead**.
 
 ---
 
