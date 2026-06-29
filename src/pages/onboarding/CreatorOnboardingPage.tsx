@@ -176,6 +176,12 @@ export default function CreatorOnboardingPage() {
     loadExistingProfile();
   }, [user]);
 
+  // Scroll to the top when the wizard step changes — steps vary in length, so the
+  // next step should start at the top (covers Continue, Back, and indicator clicks).
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentStep]);
+
   const handleSkip = async () => {
     try {
       if (!user) return;
