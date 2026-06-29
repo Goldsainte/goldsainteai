@@ -248,6 +248,11 @@ Audited the 6 **creator** items in `GettingStartedChecklist.tsx` — only **2 of
 - ↪️ **#6 Set notifications** — left as-is (`!!notification_preferences`); harmless false-positive.
 - ↪️ **#5 Review tax** — left informational (`() => false`); the checklist is still dismissable via ✕.
   *(If we want it to reach 6/6 / auto-hide, make #5 complete-on-click too — small follow-up.)*
+- ✅ **Banner ↔ checklist wording collision** — the dashboard's bottom banner *also* said "Complete your
+  creator profile" but keyed on `has_completed_creator_onboarding` (wizard finished), so it contradicted
+  the now-content-based checklist item (filled profile → checklist ✓ but banner still showing). Reworded
+  the banner → **"Finish setting up your studio / Complete onboarding — including the creator terms…"** so
+  the two surfaces track **distinct** milestones (profile *content* vs *finished wizard + legal*).
 
 ---
 

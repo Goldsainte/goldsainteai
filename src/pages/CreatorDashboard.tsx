@@ -234,8 +234,8 @@ export default function CreatorDashboard() {
             <div className="flex items-start sm:items-center gap-3 min-w-0">
               <AlertCircle className="w-5 h-5 text-[#0c4d47] flex-shrink-0 mt-0.5 sm:mt-0" />
               <div className="min-w-0">
-                <p className="font-secondary text-base text-[#0a2225]">Complete your creator profile</p>
-                <p className="text-sm text-[#0a2225]/65">Finish onboarding to unlock all features and start earning commissions.</p>
+                <p className="font-secondary text-base text-[#0a2225]">Finish setting up your studio</p>
+                <p className="text-sm text-[#0a2225]/65">Complete onboarding — including the creator terms — to unlock all features and start earning commissions.</p>
               </div>
             </div>
             <Link
