@@ -681,11 +681,12 @@ export default function CreatorOnboardingPage() {
                 <div>
                   <DestinationAutocomplete
                     label="Primary Destinations"
-                    helperText="Regions you know best — optional."
-                    placeholder="Start typing a city or region…"
+                    helperText="Countries, regions, or cities you know best — optional."
+                    placeholder="Start typing a country, region, or city…"
                     value={destinations}
                     onChange={setDestinations}
                     maxSelections={10}
+                    types={["(regions)"]}
                     inputClassName="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
                   />
                 </div>

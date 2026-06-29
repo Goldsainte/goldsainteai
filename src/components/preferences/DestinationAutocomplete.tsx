@@ -16,6 +16,11 @@ type DestinationAutocompleteProps = {
   className?: string;
   /** classes for the text input, to match the surrounding form */
   inputClassName?: string;
+  /**
+   * Google Places autocomplete type collection. Default `["(cities)"]` (cities only).
+   * Use `["(regions)"]` to also include countries + regions/states.
+   */
+  types?: string[];
 };
 
 type Suggestion = {
@@ -44,6 +49,7 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
   maxSelections = 12,
   className,
   inputClassName,
+  types = ["(cities)"],
 }) => {
   const [googleReady, setGoogleReady] = useState(false);
   const [input, setInput] = useState("");
@@ -56,6 +62,10 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
   const sessionTokenRef =
     useRef<google.maps.places.AutocompleteSessionToken | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  // Keep the latest `types` readable inside the fetch effect without making it a
+  // dependency (callers may pass an inline array → would otherwise refetch every render).
+  const typesRef = useRef(types);
+  typesRef.current = types;
 
   // Load Google Maps JS API once
   useEffect(() => {
@@ -123,7 +133,7 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
     autocompleteServiceRef.current.getPlacePredictions(
       {
         input: debouncedInput,
-        types: ["(cities)"],
+        types: typesRef.current,
         sessionToken: sessionTokenRef.current || undefined,
       },
       (predictions, status) => {

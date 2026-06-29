@@ -203,6 +203,9 @@ Wizard is **5 steps**: 1) About You · 2) Social Profile · 3) Your Niche · 4) 
   with a live `n/10` count. Added an `inputClassName` prop and matched the onboarding input style
   (`border-[#E5DFC6]` + gold focus + `rounded-xl`). Made the field **optional** (`canProceed` case 2 no
   longer requires `destinations`; label `*` removed). `DestinationAutocompleteNominatim` no longer used here.
+  - ✅ **Countries/regions now included** — was `types: ["(cities)"]` (cities only, so "Greece"/"Italy"
+    didn't appear). Added a `types` prop (default `["(cities)"]`) and pass `["(regions)"]` for Primary
+    Destinations → countries + regions/states + cities. Traveler-prefs usage keeps the cities default.
 
 **(b) Step 4 — "Portfolio" — remove to cut friction.**
 - Longest, densest step and **entirely optional**: cover image, featured photos, content gallery,
