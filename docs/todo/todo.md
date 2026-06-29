@@ -232,15 +232,15 @@ The B4 scrollbar fix worked (no OS scrollbar). Remaining critical-thinking notes
 ### B7. Getting-Started checklist linkage audit (from `next.md`, image-10)
 Audited the 6 **creator** items in `GettingStartedChecklist.tsx` — only **2 of 6** reflect real state:
 - #2 Connect payout (`stripe_*account_id`) ✅ · #3 Publish product (trips/guides count) ✅.
-- ⚠️ **#1 Complete profile** — checks `has_completed_creator_onboarding` (set only on the **final**
-  onboarding submit, line 325), not the photo/bio/niches the copy promises. Fill the fields but hit
-  *Skip* → stays unchecked. **Fix:** check `avatar_url && bio && creator_niches?.length`.
-- ❌ **#4 Share profile** — checks `creator_avg_views > 10` (imported TikTok metric, unrelated to
-  sharing). **Fix:** complete-on-action (flag when they click *View my profile* / copy link).
-- ❌ **#6 Set notifications** — `!!notification_preferences` is non-null by default → false-positive ✓.
-  **Fix:** require a real change, or leave (harmless).
-- ⚠️ **#5 Review tax** — `() => false`, never completes → checklist can never reach 6/6 / auto-hide.
-- ⏳ Implement #1 + #4 (clear bugs); #5/#6 optional — **pending user go-ahead**.
+- ✅ **#1 Complete profile** — now checks **real content** (`avatar_url && bio && creator_niches?.length`)
+  instead of the `has_completed_creator_onboarding` wizard flag, so a filled profile ticks even if the
+  creator hit *Skip* on the last onboarding step.
+- ✅ **#4 Share profile** — was `creator_avg_views > 10` (imported TikTok metric). Now **completes when
+  the creator opens their public profile** (clicking *View my profile* sets `gs_shared_profile_<id>` in
+  localStorage + ticks immediately; persisted across reloads, like the marketplace-browse item).
+- ↪️ **#6 Set notifications** — left as-is (`!!notification_preferences`); harmless false-positive.
+- ↪️ **#5 Review tax** — left informational (`() => false`); the checklist is still dismissable via ✕.
+  *(If we want it to reach 6/6 / auto-hide, make #5 complete-on-click too — small follow-up.)*
 
 ---
 
