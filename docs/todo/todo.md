@@ -206,6 +206,10 @@ Wizard is **5 steps**: 1) About You · 2) Social Profile · 3) Your Niche · 4) 
   - ✅ **Countries/regions now included** — was `types: ["(cities)"]` (cities only, so "Greece"/"Italy"
     didn't appear). Added a `types` prop (default `["(cities)"]`) and pass `["(regions)"]` for Primary
     Destinations → countries + regions/states + cities. Traveler-prefs usage keeps the cities default.
+  - ✅ **Selected-chip restyle** — the chips were tiny `text-[11px]` in puffy muted-grey badges with a
+    detached `×`. Rebuilt as on-brand pills (`bg-[#F6F0E4]` + `E5DFC6` border, `text-[13px]` medium, a
+    gold `MapPin`, asymmetric `pl-3 pr-1.5` padding, and a proper round `×` hit-target). Dropped the
+    `Badge` dependency.
 
 **(b) Step 4 — "Portfolio" — remove to cut friction.**
 - Longest, densest step and **entirely optional**: cover image, featured photos, content gallery,
