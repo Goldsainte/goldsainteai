@@ -257,11 +257,17 @@ Audited the 6 **creator** items in `GettingStartedChecklist.tsx` — only **2 of
 ---
 
 ## Workstream C — Marketplace data hygiene (quick, high-visibility)
-Press visitors browse the marketplace, so:
-- [ ] **Remove the live test package** `zzz-test-deposit-flow` ("TEST — Deposit Flow (delete me)").
-- [ ] **De-duplicate destination listings** — several appear twice with different slugs
-      (cape-town / cape-town-winelands, santorini ×3, kyoto ×2, amalfi-coast ×2, patagonia ×2,
-      bali ×2, marrakech ×2, swiss-alps ×2). Decide which to keep, archive the rest.
+Press visitors browse the marketplace. **Audited live data 2026-06-29** (33 published trips).
+- ✅ **Ready-to-run script:** [`marketplace_cleanup.sql`](marketplace_cleanup.sql) (preview → archive → verify;
+  archive = reversible, removes from public marketplace since it queries `status='published'`).
+- **7 duplicate stubs** (0 bookings, single-digit views, each with a richer high-booking sibling) → archive:
+  `amalfi-coast`, `bali`, `cape-town`, `kyoto`, `marrakech`, `patagonia`, `santorini` (keep the
+  descriptive-slug siblings, e.g. `kyoto-cultural-immersion` = 234 bookings).
+- ⚠️ **`swiss-alps`** is the **only** Swiss Alps listing (solo empty stub, **not** a dup) — excluded from
+  the dedup; decide separately (leave / replace / archive via the SQL's §4).
+- ✅ **Test package** `zzz-test-deposit-flow` is **not in the published set** (already gone / unpublished);
+  the SQL archives it defensively if it still exists.
+- [ ] **YOU: run `marketplace_cleanup.sql` in the prod Supabase SQL editor.**
 
 ---
 
