@@ -210,11 +210,16 @@ Wizard is **5 steps**: 1) About You · 2) Social Profile · 3) Your Niche · 4) 
 - Cover + photos are **already editable in the dashboard Portfolio tab** → safe to drop from onboarding.
   **Brand alignment + pricing model have NO other edit surface** (set only here) → dropping them leaves
   them at DB defaults until a settings screen exists.
-- Recommendation: remove the whole step (5→4); brand/pricing default for launch (secondary / brand-funnel,
-  not traveller-facing); add a settings home post-launch.
-- ✅ **(a) Primary Destinations** done (see above). **(b) Step-4 removal** — pending: user checking with
-  partner. Audit conclusion stands: removing Step 4 loses nothing the app reads (brand-alignment +
-  pricing blocks are write-only dead data; cover/photos live in the Portfolio tab).
+- ✅ **(b) Step 4 HIDDEN (reversible)** — gated behind `SHOW_PORTFOLIO_STEP = false` in
+  `CreatorOnboardingPage.tsx` (wizard now 5→4 steps). All of Step 4's JSX, state, and save fields stay
+  intact; flip the flag to `true` to restore instantly. Step indices are derived from the flag
+  (`STANDARDS_STEP_INDEX = STEPS.length-1`), and `canProceed` was made index-aware. Audit conclusion
+  stands: hiding it loses nothing the app reads (brand-alignment + pricing are write-only dead data;
+  cover/photos live in the dashboard Portfolio tab).
+- 📌 **TODO — decide after partner tests the 4-step flow:** completely **remove** Step 4, or
+  **re-do/improve** it (e.g., a slim cover-image prompt in an existing step + move brand/pricing to a
+  future Settings screen if they ever become real features). Partner to report anything important now
+  missing.
 
 ### B6. Creator dashboard tabs — follow-up (from `next.md`, image-9)
 The B4 scrollbar fix worked (no OS scrollbar). Remaining critical-thinking notes:

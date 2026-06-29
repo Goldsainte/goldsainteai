@@ -26,13 +26,21 @@ import {
   ArrowRight
 } from "lucide-react";
 
+// Step 4 (Portfolio) is HIDDEN for the press launch — see todo.md B5b. It was the
+// longest, all-optional step and its brand/pricing fields are read nowhere yet.
+// Flip this to `true` to restore it: the step's JSX, state, and save fields all
+// stay intact behind this flag (nothing was deleted).
+const SHOW_PORTFOLIO_STEP = false;
 const STEPS = [
   { title: "About You", icon: User },
   { title: "Social Profile", icon: Globe },
   { title: "Your Niche", icon: Sparkles },
-  { title: "Portfolio", icon: Image },
+  ...(SHOW_PORTFOLIO_STEP ? [{ title: "Portfolio", icon: Image }] : []),
   { title: "Standards", icon: Shield },
 ];
+// Step indices shift when Portfolio is hidden, so derive them from the flag.
+const PORTFOLIO_STEP_INDEX = 3;
+const STANDARDS_STEP_INDEX = SHOW_PORTFOLIO_STEP ? 4 : 3;
 
 const TRAVEL_NICHES = [
   { value: "luxury", label: "Luxury & Ultra-Luxury", description: "5-star resorts, private villas, exclusive experiences" },
@@ -214,30 +222,33 @@ export default function CreatorOnboardingPage() {
   };
 
   const canProceed = () => {
-    switch (currentStep) {
-      case 0:
-        return displayName.trim().length > 0 && bio.trim().length > 0 && homeBase.trim().length > 0;
-      case 1:
-        if (primaryPlatform.length === 0) return false;
-        if (primaryPlatform === "tiktok") return tiktokHandle.trim().length > 0;
-        if (primaryPlatform === "instagram") return instagramHandle.trim().length > 0;
-        if (primaryPlatform === "youtube") return website.trim().length > 0;
-        if (primaryPlatform === "multi")
-          return (
-            tiktokHandle.trim().length > 0 ||
-            instagramHandle.trim().length > 0 ||
-            website.trim().length > 0
-          );
-        return true;
-      case 2:
-        return selectedNiches.length > 0; // destinations optional
-      case 3:
-        return true; // All optional
-      case 4:
-        return acceptsTransparency && acceptsSafetyPolicy && tosAccepted && privacyAccepted && creatorAgreementAccepted;
-      default:
-        return true;
+    // Index-aware (the Portfolio step may be hidden — see SHOW_PORTFOLIO_STEP).
+    if (currentStep === 0) {
+      return displayName.trim().length > 0 && bio.trim().length > 0 && homeBase.trim().length > 0;
     }
+    if (currentStep === 1) {
+      if (primaryPlatform.length === 0) return false;
+      if (primaryPlatform === "tiktok") return tiktokHandle.trim().length > 0;
+      if (primaryPlatform === "instagram") return instagramHandle.trim().length > 0;
+      if (primaryPlatform === "youtube") return website.trim().length > 0;
+      if (primaryPlatform === "multi")
+        return (
+          tiktokHandle.trim().length > 0 ||
+          instagramHandle.trim().length > 0 ||
+          website.trim().length > 0
+        );
+      return true;
+    }
+    if (currentStep === 2) {
+      return selectedNiches.length > 0; // destinations optional
+    }
+    if (SHOW_PORTFOLIO_STEP && currentStep === PORTFOLIO_STEP_INDEX) {
+      return true; // Portfolio — all optional
+    }
+    if (currentStep === STANDARDS_STEP_INDEX) {
+      return acceptsTransparency && acceptsSafetyPolicy && tosAccepted && privacyAccepted && creatorAgreementAccepted;
+    }
+    return true;
   };
 
   const handleNext = () => {
@@ -681,8 +692,8 @@ export default function CreatorOnboardingPage() {
               </div>
             )}
 
-            {/* ── Step 4: Your Portfolio (all optional) ── */}
-            {currentStep === 3 && (
+            {/* ── Step 4: Your Portfolio (all optional) — HIDDEN behind SHOW_PORTFOLIO_STEP ── */}
+            {SHOW_PORTFOLIO_STEP && currentStep === PORTFOLIO_STEP_INDEX && (
               <div className="space-y-8">
                 <div className="text-center mb-8">
                   <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Your Portfolio</h2>
@@ -815,8 +826,8 @@ export default function CreatorOnboardingPage() {
               </div>
             )}
 
-            {/* ── Step 5: Standards & Legal ── */}
-            {currentStep === 4 && (
+            {/* ── Step 5: Standards & Legal (index 3 when Portfolio is hidden) ── */}
+            {currentStep === STANDARDS_STEP_INDEX && (
               <div className="space-y-6">
                 <div className="text-center mb-8">
                   <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Standards & Legal</h2>
