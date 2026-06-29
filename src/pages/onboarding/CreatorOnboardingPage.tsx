@@ -560,12 +560,12 @@ export default function CreatorOnboardingPage() {
                       {(primaryPlatform === "tiktok") && <span className="text-[#0c4d47]"> *</span>}
                     </Label>
                     <div className="relative mt-2">
-                      <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#7A7151]">@</span>
+                      <span className="pointer-events-none absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-[#7A7151]">@</span>
                       <Input
                         value={tiktokHandle}
                         onChange={(e) => setTiktokHandle(e.target.value.replace(/^@+/, ""))}
                         placeholder="yourhandle"
-                        className="pl-7 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
+                        className="pl-7 sm:pl-9 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
                       />
                     </div>
                   </div>
@@ -575,12 +575,12 @@ export default function CreatorOnboardingPage() {
                       {(primaryPlatform === "instagram") && <span className="text-[#0c4d47]"> *</span>}
                     </Label>
                     <div className="relative mt-2">
-                      <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#7A7151]">@</span>
+                      <span className="pointer-events-none absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-[#7A7151]">@</span>
                       <Input
                         value={instagramHandle}
                         onChange={(e) => setInstagramHandle(e.target.value.replace(/^@+/, ""))}
                         placeholder="yourhandle"
-                        className="pl-7 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
+                        className="pl-7 sm:pl-9 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
                       />
                     </div>
                   </div>
