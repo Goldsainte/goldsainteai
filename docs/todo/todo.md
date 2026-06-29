@@ -164,6 +164,20 @@ The "first product" onboarding step must create a real trip that appears in the 
     `define` block (for prod) + a dev `console.warn` when neither is set. One Google key (Places API +
     Maps JS) covers both.
 
+#### Social handle normalization (acted on)
+Handles were stored raw — incl. a leading `@`, which the `@yourhandle` placeholder *invited* — but the
+profile link-builders assume a **bare** handle, so a stored `@` produced **broken links**
+(`tiktok.com/@@x`, `instagram.com/@x`) and a doubled `@x` display.
+- ✅ New **`src/lib/socialHandles.ts`** (`normalizeHandle` / `atHandle` / `socialUrl`) — single source of
+  truth: strips `@`, whitespace and pasted profile URLs to a bare handle, and builds per-platform URLs
+  (TikTok adds `@`, IG/YouTube don't).
+- ✅ Applied **defensively at render** — `AgentPublicProfilePage`, `CreatorMediaGallery` — which repairs
+  any existing `@…`/full-URL rows **with no migration**.
+- ✅ **On save + load** in creator onboarding (`normalizeHandle`); the two handle inputs now show a fixed
+  grey `@` adornment so creators type the bare handle (zero ambiguity).
+- ↪️ *Follow-up (optional):* the settings editors (`CreatorSocialAccountsEditor`, `CreatorSettingsPage`)
+  still store full URLs — links render fine (the builders normalize), but their stored format differs.
+
 #### Profile vs landing-page review (acted on)
 Same palette/type as the landing page, but flatter/sparser. Implemented:
 - ✅ **#1 Hero trust panel** — the cover hero wasted ~⅔ of its width; added a desktop "at-a-glance"

@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GoogleCityAutocomplete } from "@/components/GoogleCityAutocomplete";
+import { normalizeHandle } from "@/lib/socialHandles";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
@@ -146,8 +147,8 @@ export default function CreatorOnboardingPage() {
       if (data.bio) setBio(data.bio);
       if (data.home_base) setHomeBase(data.home_base);
       if (data.primary_platform) setPrimaryPlatform(data.primary_platform);
-      if (data.tiktok_handle) setTiktokHandle(data.tiktok_handle);
-      if (data.instagram_handle) setInstagramHandle(data.instagram_handle);
+      if (data.tiktok_handle) setTiktokHandle(normalizeHandle(data.tiktok_handle));
+      if (data.instagram_handle) setInstagramHandle(normalizeHandle(data.instagram_handle));
       if (data.website) setWebsite(data.website);
       if (data.creator_niches?.length) setSelectedNiches(data.creator_niches);
       if (data.content_style_tags?.length) setSelectedStyles(data.content_style_tags);
@@ -283,8 +284,8 @@ export default function CreatorOnboardingPage() {
           home_base: homeBase || null,
           cover_image_url: coverImageUrl || null,
           primary_platform: primaryPlatform || null,
-          tiktok_handle: tiktokHandle || null,
-          instagram_handle: instagramHandle || null,
+          tiktok_handle: normalizeHandle(tiktokHandle) || null,
+          instagram_handle: normalizeHandle(instagramHandle) || null,
           website: website || null,
           creator_niches: selectedNiches,
           content_style_tags: selectedStyles,
@@ -558,24 +559,30 @@ export default function CreatorOnboardingPage() {
                       TikTok Handle
                       {(primaryPlatform === "tiktok") && <span className="text-[#0c4d47]"> *</span>}
                     </Label>
-                    <Input
-                      value={tiktokHandle}
-                      onChange={(e) => setTiktokHandle(e.target.value)}
-                      placeholder="@yourhandle"
-                      className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
-                    />
+                    <div className="relative mt-2">
+                      <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#7A7151]">@</span>
+                      <Input
+                        value={tiktokHandle}
+                        onChange={(e) => setTiktokHandle(e.target.value.replace(/^@+/, ""))}
+                        placeholder="yourhandle"
+                        className="pl-7 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
+                      />
+                    </div>
                   </div>
                   <div>
                     <Label className="text-[#0a2225] font-medium">
                       Instagram Handle
                       {(primaryPlatform === "instagram") && <span className="text-[#0c4d47]"> *</span>}
                     </Label>
-                    <Input
-                      value={instagramHandle}
-                      onChange={(e) => setInstagramHandle(e.target.value)}
-                      placeholder="@yourhandle"
-                      className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
-                    />
+                    <div className="relative mt-2">
+                      <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#7A7151]">@</span>
+                      <Input
+                        value={instagramHandle}
+                        onChange={(e) => setInstagramHandle(e.target.value.replace(/^@+/, ""))}
+                        placeholder="yourhandle"
+                        className="pl-7 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
+                      />
+                    </div>
                   </div>
                 </div>
 
