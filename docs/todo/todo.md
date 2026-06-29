@@ -191,6 +191,29 @@ Same palette/type as the landing page, but flatter/sparser. Implemented:
 > Note: #1 + #3 only render with real data (specialties / response time / published trips). To see them
 > on Creator 001, give it a specialty + a published trip package; otherwise only #2 is visible.
 
+### B5. Creator-onboarding friction (from `next.md`) — assessment, **pending decisions**
+Wizard is **5 steps**: 1) About You · 2) Social Profile · 3) Your Niche · 4) Portfolio · 5) Standards
+(Stripe + legal). Two issues raised; reduce friction for non-technical influencers.
+
+**(a) Step 3 — "Primary Destinations" clunky — ✅ DONE.**
+- Was `DestinationAutocompleteNominatim` (free OpenStreetMap) — frequently showed **"Can't reach
+  suggestions"** (rate-limits / CORS), with a pin icon overlapping the placeholder + heavy border.
+- ✅ Swapped to **Google Places multi-select** (`DestinationAutocomplete`, on `VITE_GOOGLE_PLACES_API_KEY`)
+  → reliable suggestions, no "Can't reach" fallback. The `MapPin` now sits beside the label (no overlap),
+  with a live `n/10` count. Added an `inputClassName` prop and matched the onboarding input style
+  (`border-[#E5DFC6]` + gold focus + `rounded-xl`). Made the field **optional** (`canProceed` case 2 no
+  longer requires `destinations`; label `*` removed). `DestinationAutocompleteNominatim` no longer used here.
+
+**(b) Step 4 — "Portfolio" — remove to cut friction.**
+- Longest, densest step and **entirely optional**: cover image, featured photos, content gallery,
+  **brand-tier prefs, preferred hotel brands, aesthetic style, pricing model**.
+- Cover + photos are **already editable in the dashboard Portfolio tab** → safe to drop from onboarding.
+  **Brand alignment + pricing model have NO other edit surface** (set only here) → dropping them leaves
+  them at DB defaults until a settings screen exists.
+- Recommendation: remove the whole step (5→4); brand/pricing default for launch (secondary / brand-funnel,
+  not traveller-facing); add a settings home post-launch.
+- ⏳ **Awaiting decisions** (step-4 scope; Primary Destinations required-vs-optional) before implementing.
+
 ---
 
 ## Workstream C — Marketplace data hygiene (quick, high-visibility)

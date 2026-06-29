@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { LuxuryStepIndicator } from "@/components/onboarding/LuxuryStepIndicator";
 import { LuxurySelectionCard } from "@/components/onboarding/LuxurySelectionCard";
 import { ProfilePhotoUploader } from "@/pages/traveler/components/ProfilePhotoUploader";
-import { DestinationAutocompleteNominatim } from "@/components/preferences/DestinationAutocompleteNominatim";
+import { DestinationAutocomplete } from "@/components/preferences/DestinationAutocomplete";
 import { FeaturedPhotosUploader } from "@/components/onboarding/FeaturedPhotosUploader";
 import { CreatorMediaUploader, type MediaEntry } from "@/components/creator/CreatorMediaUploader";
 import { BrandAlignmentSelector } from "@/components/onboarding/BrandAlignmentSelector";
@@ -230,7 +230,7 @@ export default function CreatorOnboardingPage() {
           );
         return true;
       case 2:
-        return selectedNiches.length > 0 && destinations.length > 0;
+        return selectedNiches.length > 0; // destinations optional
       case 3:
         return true; // All optional
       case 4:
@@ -668,13 +668,14 @@ export default function CreatorOnboardingPage() {
                 </div>
 
                 <div>
-                  <Label className="text-[#0a2225] font-medium mb-3 block">
-                    Primary Destinations * <span className="text-[#6B7280] font-normal">(regions you know best)</span>
-                  </Label>
-                  <DestinationAutocompleteNominatim
+                  <DestinationAutocomplete
+                    label="Primary Destinations"
+                    helperText="Regions you know best — optional."
+                    placeholder="Start typing a city or region…"
                     value={destinations}
                     onChange={setDestinations}
                     maxSelections={10}
+                    inputClassName="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
                   />
                 </div>
               </div>

@@ -14,6 +14,8 @@ type DestinationAutocompleteProps = {
   onChange: (value: string[]) => void;
   maxSelections?: number;
   className?: string;
+  /** classes for the text input, to match the surrounding form */
+  inputClassName?: string;
 };
 
 type Suggestion = {
@@ -41,6 +43,7 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
   onChange,
   maxSelections = 12,
   className,
+  inputClassName,
 }) => {
   const [googleReady, setGoogleReady] = useState(false);
   const [input, setInput] = useState("");
@@ -197,7 +200,7 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
           value={input}
           disabled={!googleReady || value.length >= maxSelections}
           onChange={(e) => setInput(e.target.value)}
-          className="h-11"
+          className={cn("h-11", inputClassName)}
         />
 
         {error && (
