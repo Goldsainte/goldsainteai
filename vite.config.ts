@@ -133,10 +133,10 @@ export default defineConfig(({ mode }) => {
     ),
     // Analytics / SEO — each activates only when its value is set (see src/lib/analytics/init.ts).
     'import.meta.env.VITE_GA4_MEASUREMENT_ID': JSON.stringify(
-      process.env.VITE_GA4_MEASUREMENT_ID ?? env.VITE_GA4_MEASUREMENT_ID ?? ''
+      process.env.VITE_GA4_MEASUREMENT_ID ?? env.VITE_GA4_MEASUREMENT_ID ?? 'G-9LFLZ9T3LS'
     ),
     'import.meta.env.VITE_CLARITY_PROJECT_ID': JSON.stringify(
-      process.env.VITE_CLARITY_PROJECT_ID ?? env.VITE_CLARITY_PROJECT_ID ?? ''
+      process.env.VITE_CLARITY_PROJECT_ID ?? env.VITE_CLARITY_PROJECT_ID ?? 'xezjy77yv0'
     ),
     'import.meta.env.VITE_GOOGLE_ADS_CONVERSION_LABEL': JSON.stringify(
       process.env.VITE_GOOGLE_ADS_CONVERSION_LABEL ?? env.VITE_GOOGLE_ADS_CONVERSION_LABEL ?? ''
