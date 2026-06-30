@@ -1,5 +1,5 @@
 import { Home, Search, User, LogIn, LogOut, LayoutDashboard, Briefcase, ShieldCheck, TrendingUp, Info, DollarSign, Sparkles, Newspaper } from "lucide-react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import logomark from "@/assets/logomark-gold.webp";
 import { useAuth } from "@/contexts/AuthContext";
@@ -46,14 +46,8 @@ const bottomItems = [
 export function AppSidebar() {
   const { open } = useSidebar();
   const { user, signOut } = useAuth();
-  const { isAdmin, isAgent } = useUserRole();
-  const navigate = useNavigate();
-
-  // Account type helpers
-  const accountType = ((user as any)?.user_metadata?.account_type as string | undefined)?.toLowerCase() ?? null;
-  const isCreator = accountType === "creator";
-  const isAgentAccount = accountType === "agent";
-  const isBrand = accountType === "brand";
+  const { isAdmin, isAgent, isCreator, isBrand } = useUserRole();
+  const isAgentAccount = isAgent;
 
   const shouldShowItem = (item: NavItem): boolean => {
     if (item.authRequired && !user) return false;
