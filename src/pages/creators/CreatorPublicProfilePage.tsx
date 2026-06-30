@@ -328,6 +328,7 @@ export default function CreatorPublicProfilePage() {
           profileUserId={creator.id}
           onProfileUpdated={fetchProfile}
           memberSince={creator.created_at ?? null}
+          followerCount={creator.creator_followers}
         />
 
         {/* Spacer after hero card overlap */}
