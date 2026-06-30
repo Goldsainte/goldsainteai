@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ArrowRight } from 'lucide-react';
+import logomark from '@/assets/logomark-gold.png';
 
 /**
  * /auth/verify — passwordless confirmation landing (click-to-complete).
@@ -86,19 +87,25 @@ const AuthVerify = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f7f3ea] px-4">
-      <div className="w-full max-w-md rounded-3xl border border-[#E5DFC6] bg-white p-8 text-center shadow-sm">
-        <p className="text-[10px] uppercase tracking-[0.28em] text-[#0c4d47]/70">Goldsainte</p>
-        <h1 className="mt-3 font-secondary text-2xl text-[#0a2225]">{headline}</h1>
-        <p className="mx-auto mt-2 max-w-xs text-sm text-[#6B7280]">{subline}</p>
+    <div className="min-h-screen flex items-center justify-center bg-[#FDF9F0] px-4 py-10">
+      <div className="w-full max-w-md rounded-[28px] border border-[#E5DFC6] bg-white p-8 sm:p-10 text-center shadow-[0_24px_70px_-30px_rgba(10,34,37,0.4)]">
+        <img src={logomark} alt="Goldsainte" className="mx-auto h-12 w-auto" />
+
+        {/* Gold accent divider */}
+        <div className="mx-auto mt-5 h-px w-12 bg-gradient-to-r from-transparent via-[#C7A962] to-transparent" />
+
+        <h1 className="mt-5 font-secondary text-[26px] sm:text-[28px] leading-tight text-[#0a2225]">
+          {headline}
+        </h1>
+        <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-[#6B7280]">{subline}</p>
 
         {error ? (
-          <div className="mt-6 space-y-4">
+          <div className="mt-7 space-y-4">
             <p className="text-sm text-red-600" role="alert">{error}</p>
             <button
               type="button"
               onClick={() => navigate('/marketplace', { replace: true })}
-              className="inline-flex items-center justify-center rounded-full border border-[#0c4d47] px-6 py-3 text-sm font-semibold text-[#0c4d47] hover:bg-[#0c4d47]/5"
+              className="inline-flex items-center justify-center rounded-full border border-[#0c4d47] px-6 py-3 text-sm font-medium text-[#0c4d47] hover:bg-[#0c4d47]/5 transition-colors"
             >
               Browse trips
             </button>
@@ -108,7 +115,7 @@ const AuthVerify = () => {
             type="button"
             onClick={handleContinue}
             disabled={verifying}
-            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-6 py-3 text-sm font-semibold text-[#E5DFC6] hover:bg-[#073331] disabled:opacity-60"
+            className="group mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-6 py-3.5 text-sm font-medium text-[#f7f3ea] hover:bg-[#0a2225] transition-colors disabled:opacity-60"
           >
             {verifying ? (
               <>
@@ -116,7 +123,10 @@ const AuthVerify = () => {
                 Signing you in…
               </>
             ) : (
-              ctaLabel
+              <>
+                {ctaLabel}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </>
             )}
           </button>
         )}

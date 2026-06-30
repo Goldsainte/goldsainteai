@@ -195,7 +195,7 @@ export const Header = () => {
                           className="h-12 w-12 min-h-[48px] min-w-[48px] hover:bg-[#BFAD72] rounded-full border border-border shadow-sm transition-all duration-300 group touch-manipulation focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:bg-[#BFAD72]"
                           aria-label="Menu"
                         >
-                          <User className="h-6 w-6 text-[#BFAD72] group-hover:text-white transition-colors" />
+                          <User className="h-6 w-6 text-[#BFAD72] group-hover:text-[#0a2225] group-focus-visible:text-[#0a2225] transition-colors" />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent 
@@ -442,7 +442,7 @@ export const Header = () => {
                       aria-label="Menu"
                       data-tour="navigation"
                     >
-                      <User className="h-6 w-6 text-[#BFAD72] group-hover:text-white transition-colors" />
+                      <User className="h-6 w-6 text-[#BFAD72] group-hover:text-[#0a2225] group-focus-visible:text-[#0a2225] transition-colors" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent 

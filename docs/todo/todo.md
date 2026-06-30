@@ -389,16 +389,17 @@ resolved responder exists before using it (else concierge). **Backend (edge fns;
 Message-bubble text breaks awkwardly. Use `break-words` / `overflow-wrap: anywhere` (not `break-all`) and
 drop any `truncate` on the bubble. **Frontend** (`DirectMessageInbox` bubble CSS). *(pairs with E3.)*
 
-### E12. Hovered top-menu icon invisible (item 19, image-25) — **FE — REGRESSION (mine)**
-My focus fix added `focus-visible:bg-[#BFAD72]` to the header profile button, but the `User` icon is
-`text-[#BFAD72]` and only turns white on `group-hover` — so on **focus** the tan icon sits on the tan bg →
-invisible. **Fix:** add `group-focus-visible:text-white` to the icon (Header.tsx:198,445). Trivial.
+### E12. Hovered top-menu icon invisible (item 19, image-25) — ✅ **DONE (FE — fixed my regression)**
+The `User` icon turned **white** on hover (low contrast on the tan `#BFAD72` bg) and **stayed tan** on
+focus (invisible). Now `group-hover:text-[#0a2225] group-focus-visible:text-[#0a2225]` — a dark icon on
+both hover **and** focus = proper contrast (Header.tsx, both buttons). *(frontend → Lovable rebuild)*
 
-### E13. "Remove the email-confirm click screen" (item 20, image-26) — **FE — DECISION: keep**
-That screen is the **scanner-safe `/auth/verify`** click-to-complete page (A3). Removing it
-**re-introduces the "link expired" bug** — email security scanners GET-prefetch the link and burn the
-one-time token; the single button spends it only on a real click. **Recommend: keep** (it's protection,
-not a meaningless step). No action.
+### E13. Email-confirm click screen — **kept (A3 protection) + ✅ POLISHED** (item 20, image-26)
+That screen is the **scanner-safe `/auth/verify`** click-to-complete page (A3) — removing it re-introduces
+the "link expired" bug (scanners GET-prefetch and burn the one-time token; the button spends it only on a
+real click). So we **kept** it and **polished it to brand** instead: real `logomark-gold` logo (not plain
+text), gold accent divider, brand serif heading `text-[26px]/[28px]`, cream `#FDF9F0` bg, and an
+`OnboardingWelcomeModal`-style green CTA with an arrow. *(frontend → Lovable rebuild)*
 
 ### E14. Published trip → marketplace 404 when status flipped in DB (item 21) — **BE / RLS**
 `7-days-in-jordan` is **not anon-visible at all** (even unfiltered) → flipping `status` to `published`
