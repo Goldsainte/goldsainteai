@@ -7,4 +7,22 @@
   <url><loc>https://goldsainte.ai/newsroom/editorial-policy</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://goldsainte.ai/newsroom/press-contact</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://goldsainte.ai/newsroom/archive</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url>
+    <loc>https://goldsainte.ai/newsroom/news/state-of-the-modern-travel-marketplace</loc>
+    <lastmod>2026-05-18T05:45:51.937Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://goldsainte.ai/newsroom/news/why-we-built-goldsainte</loc>
+    <lastmod>2026-05-18T05:45:51.937Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://goldsainte.ai/newsroom/press-releases/goldsainte-launches-ai-powered-travel-marketplace</loc>
+    <lastmod>2026-05-18T15:31:14.722Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
