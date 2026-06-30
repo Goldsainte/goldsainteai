@@ -30,10 +30,33 @@ function addVerificationMeta(name: string, content: string) {
   document.head.appendChild(meta);
 }
 
+// Only run analytics on the real production host(s). This excludes localhost AND
+// any Lovable preview/staging domain in one shot, so dev/preview traffic never
+// pollutes GA4 / Clarity (important for clean press numbers).
+const PRODUCTION_HOSTS = new Set([
+  "goldsainte.ai",
+  "www.goldsainte.ai",
+  "goldsainte.com",
+  "www.goldsainte.com",
+]);
+
+function isProductionHost(): boolean {
+  return typeof window !== "undefined" && PRODUCTION_HOSTS.has(window.location.hostname);
+}
+
 let initialised = false;
 
 export function initAnalytics(): void {
   if (initialised || typeof window === "undefined") return;
+
+  // Skip localhost + Lovable preview/staging so their hits never land in GA4/Clarity.
+  if (!isProductionHost()) {
+    if (import.meta.env.DEV) {
+      console.info(`[analytics] disabled on non-production host: ${window.location.hostname}`);
+    }
+    return;
+  }
+
   initialised = true;
 
   // Direct `import.meta.env.X` access so Vite's define-replacement applies.
