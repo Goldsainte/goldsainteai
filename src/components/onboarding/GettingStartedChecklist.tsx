@@ -11,6 +11,7 @@ interface ChecklistData {
   savedTrips?: number;
   trips?: number;
   guides?: number;
+  draftTripId?: string | null;
   profileViews?: number;
   publishedTrips?: number;
   proposalsSent?: number;
@@ -22,7 +23,7 @@ interface ChecklistItem {
   label: string;
   description: string;
   cta: {
-    label: string;
+    label: string | ((d: ChecklistData) => string);
     to: string | ((d: ChecklistData) => string);
     event?: string;
   };
@@ -105,7 +106,11 @@ const CREATOR_ITEMS: ChecklistItem[] = [
     id: "create-content",
     label: "Publish your first product",
     description: "Create a trip package or sell a digital itinerary guide.",
-    cta: { label: "Get started", to: "/trip-builder" },
+    cta: {
+      // Resume the creator's existing draft if they have one, else start fresh.
+      label: (d) => (d.draftTripId ? "Resume draft" : "Get started"),
+      to: (d) => (d.draftTripId ? `/trip-builder?edit=${d.draftTripId}` : "/trip-builder"),
+    },
     isComplete: (d) => (d.trips || 0) > 0 || (d.guides || 0) > 0,
   },
   {
@@ -226,12 +231,15 @@ export function GettingStartedChecklist({ userId, role }: Props) {
         } else if (role === "creator") {
           // "Published" here means submitted — a trip is sent to admin review as
           // 'pending_review', so count that too (not draft, which autosaves).
-          const [{ count: tCount }, { count: gCount }] = await Promise.all([
+          const [{ count: tCount }, { count: gCount }, { data: draft }] = await Promise.all([
             client.from("packaged_trips").select("id", { count: "exact", head: true }).eq("creator_id", userId).in("status", ["pending_review", "published"]),
             client.from("itinerary_products").select("id", { count: "exact", head: true }).eq("creator_id", userId).in("status", ["pending_review", "published"]),
+            // Most recent draft, so "Publish your first product" can resume it.
+            client.from("packaged_trips").select("id").eq("creator_id", userId).eq("status", "draft").order("updated_at", { ascending: false }).limit(1).maybeSingle(),
           ]);
           stats.trips = tCount || 0;
           stats.guides = gCount || 0;
+          stats.draftTripId = draft?.id ?? null;
           stats.profileViews = profile?.creator_avg_views || 0;
         } else if (role === "agent") {
           const [{ count: ptCount }, { count: pCount }] = await Promise.all([
@@ -291,6 +299,7 @@ export function GettingStartedChecklist({ userId, role }: Props) {
         {items.map((item) => {
           const done = item.isComplete(data);
           const to = typeof item.cta.to === "function" ? item.cta.to(data) : item.cta.to;
+          const ctaLabel = typeof item.cta.label === "function" ? item.cta.label(data) : item.cta.label;
           return (
             <li key={item.id} className="flex items-start gap-4 px-5 sm:px-6 py-4">
               <div className={`flex-shrink-0 mt-0.5 h-6 w-6 rounded-full border flex items-center justify-center ${done ? "bg-[#0c4d47] border-[#0c4d47]" : "border-[#E5DFC6] bg-white"}`}>
@@ -313,7 +322,7 @@ export function GettingStartedChecklist({ userId, role }: Props) {
                     }}
                     className="flex-shrink-0 inline-flex items-center gap-1 text-xs sm:text-sm font-medium text-[#0c4d47] hover:underline whitespace-nowrap"
                   >
-                    {item.cta.label}
+                    {ctaLabel}
                     <ChevronRight className="h-3.5 w-3.5" />
                   </button>
                 ) : (
@@ -332,7 +341,7 @@ export function GettingStartedChecklist({ userId, role }: Props) {
                     }}
                     className="flex-shrink-0 inline-flex items-center gap-1 text-xs sm:text-sm font-medium text-[#0c4d47] hover:underline whitespace-nowrap"
                   >
-                    {item.cta.label}
+                    {ctaLabel}
                     <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 )

@@ -442,11 +442,12 @@ when a Stripe onboarding was started but **charges aren't enabled**. Over-report
 check `stripe_charges_enabled` / `payouts_enabled` (the real "ready" signal) — one source of truth (see
 E9 / F4). Frontend.
 
-### F3. "Publish your first product" — open existing draft + strike when pending (item 15) — **FE**
-- The "Get started" CTA always opens a **new** trip-builder; it should **resume the creator's existing
-  draft** if one exists.
-- A trip in `pending_review` should **strike** the item (B3/B7 already count `pending_review` — verify it
-  actually ticks). Frontend (checklist CTA target + completion).
+### F3. "Publish your first product" — resume draft + strike when pending (item 15) — ✅ **DONE (FE)**
+- ✅ The checklist now fetches the creator's **most recent draft** (`packaged_trips status='draft'`, latest
+  `updated_at`); the CTA **resumes it** (`/trip-builder?edit=<id>`, label → **"Resume draft"**) when one
+  exists, else opens a fresh builder ("Get started"). Made `cta.label` support a function too.
+- ☑️ **Strike-when-pending already works** — `isComplete` counts `pending_review`+`published` (B3/B7), so a
+  submitted trip ticks the item. Verified. *(frontend → Lovable rebuild)*
 
 ### F4. Stripe Connect flow broken — **tangled: 3 mechanisms** (item 16, image-22/23) — **FE + BE + PARTNER**
 Traced — the creator has **three** different connect paths calling **different** edge functions:
