@@ -27,6 +27,8 @@ interface CreatorHeroSectionProps {
   profileUserId?: string;
   /** Called after a successful avatar or cover photo upload so the parent can refetch. */
   onProfileUpdated?: () => void;
+  /** ISO date string (e.g. profiles.created_at) — shown as "Member since {year}". */
+  memberSince?: string | null;
 }
 
 export function CreatorHeroSection({
@@ -48,6 +50,7 @@ export function CreatorHeroSection({
   fallbackCoverUrl,
   profileUserId,
   onProfileUpdated,
+  memberSince,
 }: CreatorHeroSectionProps) {
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
   const [coverModalOpen, setCoverModalOpen] = useState(false);
@@ -56,7 +59,8 @@ export function CreatorHeroSection({
   const hasStats = (tripsCompleted ?? 0) > 0 || (clientsServed ?? 0) > 0;
   const isGenericTitle = !title || title === "Travel Designer";
   const showCompleteNudge = Boolean(isOwnProfile && (isGenericTitle || !location));
-  const showTrustPanel = Boolean(responseTimeText) || specialties.length > 0;
+  const memberSinceYear = memberSince ? new Date(memberSince).getFullYear() : null;
+  const showTrustPanel = Boolean(responseTimeText) || specialties.length > 0 || Boolean(memberSinceYear);
   const canEdit = Boolean(isOwnProfile && profileUserId);
 
   return (
@@ -191,13 +195,19 @@ export function CreatorHeroSection({
           )}
           </div>
 
-          {/* At-a-glance trust panel (desktop) — fills the hero's right side */}
+          {/* At-a-glance trust panel — was desktop-only, now visible on mobile too (stacks below the card) */}
           {showTrustPanel && (
-            <div className="hidden md:flex flex-col gap-5 rounded-2xl border border-[#E5DFC6] bg-white/85 backdrop-blur-sm shadow-lg p-6 flex-1 self-start">
+            <div className="flex flex-col gap-5 rounded-2xl border border-[#E5DFC6] bg-white/85 backdrop-blur-sm shadow-lg p-6 flex-1 self-start">
               {responseTimeText && (
                 <div>
                   <p className="text-[10px] uppercase tracking-[0.22em] text-[#C7A962]">Response time</p>
                   <p className="mt-1.5 text-sm font-medium text-[#0a2225]">{responseTimeText}</p>
+                </div>
+              )}
+              {memberSinceYear && (
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.22em] text-[#C7A962]">Member since</p>
+                  <p className="mt-1.5 text-sm font-medium text-[#0a2225]">{memberSinceYear}</p>
                 </div>
               )}
               {specialties.length > 0 && (
