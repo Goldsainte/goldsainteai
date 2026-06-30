@@ -295,8 +295,8 @@ Audit (2026-06-27): only the **Google Ads** tag is wired; GA4, Clarity, GSC and 
 - [ ] **Sitemap:** confirm `https://goldsainte.ai/sitemap.xml` is served; submit to GSC + Bing.
 
 ### To do — accounts/dashboards (you) → then set the env var (Lovable build env + `.env.local`)
-- [x] Create the **GA4 property** → `VITE_GA4_MEASUREMENT_ID` = `G-9LFLZ9T3LS` ✅ (baked in vite.config, live).
-- [x] Create a **Clarity** project → `VITE_CLARITY_PROJECT_ID` = `xezjy77yv0` ✅ (baked, live).
+- [x] Create the **GA4 property** → `VITE_GA4_MEASUREMENT_ID` = `G-9LFLZ9T3LS` ✅ **verified live** (tested on prod).
+- [x] Create a **Clarity** project → `VITE_CLARITY_PROJECT_ID` = `xezjy77yv0` ✅ **verified live** (tested on prod).
 - [ ] **Google Ads** conversion action → `VITE_GOOGLE_ADS_CONVERSION_LABEL`.
 - [ ] **GSC**: verify via GA4-link/DNS (no code) *or* set `VITE_GSC_VERIFICATION`; submit sitemap.
 - [ ] **Bing**: import from GSC (no code) *or* set `VITE_BING_VERIFICATION`; submit sitemap.
@@ -346,6 +346,35 @@ bare `<img>` with **no resize / srcset / sizes / modern format** → a 192px car
   Pro plan)*; (2) `srcset` + `sizes`; (3) **eager + `fetchpriority="high"`** for the first above-fold row,
   lazy below; (4) compress/downscale covers at **upload** (≤~1600px WebP). Big first-impression win for press.
 - ❓ Is **image transformation** enabled on the Supabase plan? (Decides whether #1 is available now.)
+
+### E6. Creator lands on the marketplace after login, not their studio — **UX bug** (item 13)
+`getPostAuthDestination` (`postAuthRouting.ts:52-53`) routes complete creators/agents to `/partner`
+(lands on `/marketplace?tab=trips`). A travel creator's home should be `/creator-dashboard` (Proposals /
+Trips / Earnings / Performance live there), not the consumer marketplace.
+- **Fix:** route creators → `/creator-dashboard`.
+- ❓ Clarify `/partner` vs `/creator-dashboard` (route duplication — which is canonical?).
+
+### E7. Trip image upload → RLS error — **bug, BLOCKER** (item 14, image-16)
+`TripImageUploader` uploads to `trip-assets/trip-images/<file>` — the path is **not prefixed with the
+user id**, but the `trip-assets` RLS INSERT policy requires first folder = `auth.uid()` (working cover
+uploads use `<userId>/trips/…`). → "new row violates row-level security policy." Breaks trip cover +
+gallery upload entirely.
+- **Fix:** prefix the path with `${user.id}/` (e.g. `${user.id}/trip-images/<file>`). Check the gallery
+  uploader for the same flat path. Contained, ~3 lines. **High priority.**
+
+### E8. Create-trip page header too big / empty — **polish** (item 15, image-18)
+The trip-builder uses the editorial "Edit Trip by Goldsainte AI" hero (eyebrow pill + big serif title +
+marketing subtitle + Preview) — eats ~⅓ of the viewport before the form. It's a **workspace**, not a
+landing page.
+- **Fix:** compact to a standard dashboard header (tight Back + title + Preview/Save bar; drop the eyebrow
+  + marketing subtitle; form starts higher). Match other dashboard pages.
+
+### E9. Stripe "not linked" on submit-for-review vs "connected" in profile — **bug + product** (item 16, image-17/19)
+- **Inconsistency:** submit-for-review gate checks `stripe_charges_enabled` (DB col, `TripBuilderPage:112`);
+  the profile shows **live** Stripe status — so a stale DB col → "connected" in profile but "not linked" on
+  submit. **Fix:** one source of truth (both read the live status / a reliably-synced field).
+- ❓ **Product:** should submit-**for-review** require Stripe at all? Trips go to **admin review** before
+  going live; Stripe only needed to charge/payout. **Recommend** gating **publish/go-live**, not review.
 
 ---
 
