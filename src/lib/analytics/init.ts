@@ -16,8 +16,8 @@
 
 declare global {
   interface Window {
-    gtag?: (...args: unknown[]) => void;
-    dataLayer?: unknown[];
+    gtag?: (...args: any[]) => void;
+    dataLayer?: any[];
     clarity?: (...args: unknown[]) => void;
   }
 }
