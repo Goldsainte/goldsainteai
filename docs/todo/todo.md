@@ -338,15 +338,19 @@ Timestamps were `text-[10px]` faint. Bumped: inbox-list "1 minute ago" → `text
 (darker), bubble `HH:mm` → `text-[11px]`. *(More typography passes possible later, but the legibility
 complaint is resolved.)*
 
-### E4. Landing image loading — **perf, High** (assessment only; no code yet)
-Covers are **full-res Supabase Storage originals** (`/object/public/…cover-*.jpg`); `TripCoverImage` is a
-bare `<img>` with **no resize / srcset / sizes / modern format** → a 192px card downloads a multi-MB JPEG.
-`loading="lazy"` on the near-fold popular row defers + deprioritizes it.
-- **Recommend:** (1) resized images via Supabase **render/image transform**
-  (`/storage/v1/render/image/public/…?width=600&quality=70&resize=cover` + WebP) *(needs transform feature /
-  Pro plan)*; (2) `srcset` + `sizes`; (3) **eager + `fetchpriority="high"`** for the first above-fold row,
-  lazy below; (4) compress/downscale covers at **upload** (≤~1600px WebP). Big first-impression win for press.
-- ❓ Is **image transformation** enabled on the Supabase plan? (Decides whether #1 is available now.)
+### E4. Landing image loading — ✅ **DONE (perf, High)**
+✅ **Transform IS enabled** (tested live: a cover via `/render/image/public/…?width=200&quality=60` is
+**61 KB vs 4.2 MB** for the `/object/public` original — ~68×). The transform helpers already existed
+(`src/lib/images.ts` → `supabaseImageUrl` + `supabaseSrcSet`) but **weren't wired in**.
+- ✅ **`TripCoverImage`** now serves the resized render-URL + a `srcSet` `[width, width×2]` (default
+  `width=600`, quality 70, `resize=cover`) + `sizes`; on error it falls back to the original, then the
+  bundled default. This cascades to **every** consumer — marketplace cards, homepage **Featured Trips**,
+  trip-detail, creator Curated Journeys — so a card drops from ~4 MB to ~60 KB.
+- Above-fold: `HomeHero` already uses `fetchPriority="high"`; Featured Trips is below the fold so `lazy`
+  is correct. Added a `fetchPriority` prop to `TripCoverImage` for future above-fold use.
+- ↪️ *Follow-up (optional):* the Curated-Journeys grid I hand-rolled in `CreatorPublicProfilePage` + the
+  trip-detail hero use raw `<img>` — apply `supabaseImageUrl` there too when touched. Also compress at
+  upload so originals aren't 4 MB.
 
 ### E6. Creator lands on the marketplace after login, not their studio — **UX bug** (item 13)
 `getPostAuthDestination` (`postAuthRouting.ts:52-53`) routes complete creators/agents to `/partner`
