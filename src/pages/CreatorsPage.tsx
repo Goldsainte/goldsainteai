@@ -118,8 +118,6 @@ export default function CreatorsPage() {
   );
   const navigate = useNavigate();
   const { user } = useAuth();
-  const accountType = ((user as any)?.user_metadata?.account_type as string | undefined)?.toLowerCase() ?? null;
-  
 
   useEffect(() => {
     async function loadCreators() {
