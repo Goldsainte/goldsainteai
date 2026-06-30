@@ -1,9 +1,9 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { usePanelStore } from "@/stores/panelStore";
 import { Home, Search, MessageCircle, Bell, BarChart3, User2, Store, PlaneTakeoff, Sparkles, FileText } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
+import { useUserRole } from "@/hooks/useUserRole";
 
 const itemCls = "flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-muted/60 text-base";
 
@@ -28,12 +28,8 @@ export default function LeftNav() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { unreadCount } = useUnreadMessageCount();
-  
-  const accountType = 
-    ((user as any)?.user_metadata?.account_type as string | undefined)?.toLowerCase() ?? null;
-  const isCreator = accountType === "creator";
-  const isAgentAccount = accountType === "agent";
-  const isBrand = accountType === "brand";
+  // Live from the database (profiles.account_type / user_roles), not stale auth signup metadata.
+  const { isCreator, isAgent: isAgentAccount } = useUserRole();
 
   return (
     <div className="h-screen flex flex-col py-4">
@@ -76,13 +72,10 @@ export default function LeftNav() {
         )}
         
         <NavItemBtn onClick={() => {
-          supabase.auth.getUser().then(({ data: { user: u } }) => {
-            if (!u) return;
-            const at = ((u as any)?.user_metadata?.account_type as string | undefined)?.toLowerCase();
-            if (at === 'creator') window.location.href = `/creator/${u.id}`;
-            else if (at === 'agent') navigate('/agent-dashboard');
-            else navigate('/traveler');
-          });
+          if (!user) return;
+          if (isCreator) navigate(`/creators/${user.id}`);
+          else if (isAgentAccount) navigate('/agent-dashboard');
+          else navigate('/traveler');
         }}><User2 className="w-6 h-6" /> Profile</NavItemBtn>
       </nav>
     </div>
