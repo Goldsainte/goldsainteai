@@ -6,6 +6,7 @@ import { getMyPartnerPipeline } from "@/services/partnerPipelineService";
 import { getMyEarningsSummary } from "@/services/earningsService";
 import { Sparkles, FileText, DollarSign, Video, ArrowRight } from "lucide-react";
 import { useRequireOnboarding } from "@/hooks/useRequireOnboarding";
+import { useUserRole } from "@/hooks/useUserRole";
 
 export default function PartnerConsolePage() {
   const { checking, allowed } = useRequireOnboarding();
@@ -17,7 +18,8 @@ export default function PartnerConsolePage() {
   const [earnings, setEarnings] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [accountType, setAccountType] = useState<string | null>(null);
+  // Live from the database (profiles.account_type), not stale auth signup metadata.
+  const { isCreator } = useUserRole();
 
   useEffect(() => {
     let cancelled = false;
@@ -32,10 +34,6 @@ export default function PartnerConsolePage() {
         navigate("/auth?returnTo=/partner", { replace: true });
         return;
       }
-
-      const type =
-        (user.user_metadata?.account_type as string | undefined) ?? null;
-      setAccountType(type);
 
       try {
         const [pipe, earn] = await Promise.all([
@@ -131,7 +129,7 @@ export default function PartnerConsolePage() {
             <SummaryCard
               icon={<Video className="h-4 w-4 text-[#C7A962]" />}
               label={
-                accountType === "creator"
+                isCreator
                   ? "Storyboard tasks"
                   : "Trips needing details"
               }
