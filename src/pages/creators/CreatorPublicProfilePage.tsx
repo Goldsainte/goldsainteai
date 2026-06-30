@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { ArrowLeft, PenLine, LogIn, Settings, Plus, ArrowRight, MoreHorizontal, Link2, Eye } from "lucide-react";
+import { ArrowLeft, PenLine, LogIn, Settings, Plus, ArrowRight, MoreHorizontal, Link2, Eye, Compass } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ReviewsList } from "@/components/profile/ReviewsList";
 import { WriteReviewModal } from "@/components/profile/WriteReviewModal";
@@ -327,10 +327,41 @@ export default function CreatorPublicProfilePage() {
           fallbackCoverUrl={coverImageFallback}
           profileUserId={creator.id}
           onProfileUpdated={fetchProfile}
+          memberSince={creator.created_at ?? null}
         />
 
         {/* Spacer after hero card overlap */}
         <div className="h-8 md:h-12" />
+
+        {/* ─── Empty portfolio state (owner only, nothing published yet) ─── */}
+        {isOwnProfile && trips.length === 0 && guides.length === 0 && (
+          <div className="bg-[#FDF9F0]">
+            <div className="mx-auto max-w-5xl px-4 pb-12 md:pb-16">
+              <div className="rounded-2xl border border-dashed border-[#E5DFC6] bg-white/60 p-10 text-center">
+                <Compass className="h-7 w-7 text-[#C7A962] mx-auto mb-3" />
+                <h3 className="font-secondary text-xl text-[#0a2225] mb-1.5">No published work yet</h3>
+                <p className="text-sm text-[#6B7280] max-w-sm mx-auto mb-5">
+                  Package a trip or build an itinerary guide to start filling this space — it's the first thing travelers see.
+                </p>
+                <div className="flex items-center justify-center gap-3 flex-wrap">
+                  <Button
+                    onClick={() => navigate("/trip-builder")}
+                    className="font-primary bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-6 h-10 text-sm font-medium"
+                  >
+                    Package a trip
+                  </Button>
+                  <Button
+                    onClick={() => navigate("/itinerary-builder")}
+                    variant="outline"
+                    className="font-primary border-[#E5DFC6] text-[#0a2225] rounded-full px-6 h-10 text-sm font-medium"
+                  >
+                    Build a guide
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ─── Curated Journeys (bookable trip packages) ─── */}
         {trips.length > 0 && (
