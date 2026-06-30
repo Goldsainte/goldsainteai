@@ -920,7 +920,7 @@ function ConversationItem({
                 {conversation.otherParticipant.displayName}
               </span>
               {conversation.lastMessageAt && (
-                <span className="text-[10px] text-[#9CA3AF] whitespace-nowrap">
+                <span className="text-[11px] text-[#6B7280] whitespace-nowrap">
                   {formatDistanceToNow(new Date(conversation.lastMessageAt), { addSuffix: true })}
                 </span>
               )}
@@ -1051,13 +1051,13 @@ function MessageBubble({
         </button>
       )}
       <div
-        className={`max-w-[70%] rounded-[1.25rem] px-4 py-3 ${
+        className={`w-fit max-w-[70%] rounded-[1.25rem] px-4 py-3 ${
           isSelf
             ? "bg-[#E8DCC8] text-[#0a2225]"
             : "bg-[#F6F0E4] text-[#0a2225] border border-[#E5DFC6]/40"
         }`}
       >
-        <p className="text-sm whitespace-pre-wrap leading-relaxed text-[#0a2225]">
+        <p className="text-sm whitespace-pre-wrap break-words leading-relaxed text-[#0a2225]">
           {renderTextWithMentions(message.body, () => {}).map((part, idx) =>
             typeof part === "string" ? (
               <span key={idx}>{part}</span>
@@ -1077,7 +1077,7 @@ function MessageBubble({
           )}
         </p>
         <div className={`flex items-center gap-1 mt-1.5 ${isSelf ? "justify-end" : "justify-start"}`}>
-          <span className="text-[10px] text-[#9CA3AF]">
+          <span className="text-[11px] text-[#9CA3AF]">
             {format(new Date(message.created_at), "HH:mm")}
           </span>
           {isSelf && (

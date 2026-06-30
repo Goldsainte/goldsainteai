@@ -328,14 +328,15 @@ Four items from live testing. All legit; verdicts + plans below.
 Check was `text-green-600` (bright emerald); the "Got it" button is `bg-primary`. Recoloured the check to
 `text-primary` so they share the same token (guaranteed match).
 
-### E5. Dialog close-button focus box — **minor** (image-15)
-Radix auto-focuses the dialog's close `×` on open, so the (now-gold) `focus-visible` ring shows as a box
-(e.g. "Message Settings"). Same family as the B4 header-button fix — soften the close button in
-`src/components/ui/dialog.tsx` to a background cue (or `focus-visible:ring-0`) so there's no lingering box.
+### E5. Dialog close-button focus box — ✅ **DONE** (image-15)
+Radix auto-focuses the dialog's close `×` on open → a lingering gold box. Softened the close button in
+`src/components/ui/dialog.tsx`: `rounded-full p-1`, `focus-visible:ring-0`, and a subtle
+`hover/focus-visible:bg-[#E5DFC6]/60` background cue (no ring box; keyboard nav still visible).
 
-### E3. Messages layout & fonts polish — **minor, traveler-facing** (image-13)
-Timestamps ("1 minute ago") tiny/low-contrast; review tab + body typography vs the landing font system.
-Small pass on `DirectMessageInbox` (timestamp legibility + font consistency).
+### E3. Messages layout & fonts polish — ✅ **DONE** (image-13)
+Timestamps were `text-[10px]` faint. Bumped: inbox-list "1 minute ago" → `text-[11px] text-[#6B7280]`
+(darker), bubble `HH:mm` → `text-[11px]`. *(More typography passes possible later, but the legibility
+complaint is resolved.)*
 
 ### E4. Landing image loading — **perf, High** (assessment only; no code yet)
 Covers are **full-res Supabase Storage originals** (`/object/public/…cover-*.jpg`); `TripCoverImage` is a
@@ -385,9 +386,10 @@ If a package's `creator_id`/`agent_id` points at a user not in `profiles`, the r
 fall back to `CONCIERGE_USER_ID`. Harden `submit-trip-inquiry` + `send-direct-message` to verify the
 resolved responder exists before using it (else concierge). **Backend (edge fns; needs redeploy).**
 
-### E11. Messages break words mid-word / truncate (item 18, image-24) — **FE**
-Message-bubble text breaks awkwardly. Use `break-words` / `overflow-wrap: anywhere` (not `break-all`) and
-drop any `truncate` on the bubble. **Frontend** (`DirectMessageInbox` bubble CSS). *(pairs with E3.)*
+### E11. Messages break words mid-word (item 18, image-24) — ✅ **DONE**
+Root cause: the bubble was `max-w-[70%]` with **no `w-fit`**, so as a flex item it collapsed to
+*min-content* — rendering "Yes you can" one word per line. Added `w-fit` (sizes to content up to 70%, so
+short messages stay on one line; long ones wrap normally) + `break-words` for long URLs. `DirectMessageInbox`.
 
 ### E12. Hovered top-menu icon invisible (item 19, image-25) — ✅ **DONE (FE — fixed my regression)**
 The `User` icon turned **white** on hover (low contrast on the tan `#BFAD72` bg) and **stayed tan** on
