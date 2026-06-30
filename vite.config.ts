@@ -129,12 +129,12 @@ export default defineConfig(({ mode }) => {
       process.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? env.VITE_SUPABASE_PUBLISHABLE_KEY ?? 'sb_publishable_i5xwYqNzT3JOevhcl7-J3w_J2oofXm5'
     ),
     'import.meta.env.VITE_GOOGLE_MAPS_API_KEY': JSON.stringify(
-      process.env.VITE_GOOGLE_MAPS_API_KEY ?? env.VITE_GOOGLE_MAPS_API_KEY ?? ''
+      process.env.VITE_GOOGLE_MAPS_API_KEY ?? env.VITE_GOOGLE_MAPS_API_KEY ?? process.env.GOOGLE_API_KEY ?? env.GOOGLE_API_KEY ?? ''
     ),
     // Places autocomplete key (documented name in .env.example). Components read
     // this first, then fall back to VITE_GOOGLE_MAPS_API_KEY.
     'import.meta.env.VITE_GOOGLE_PLACES_API_KEY': JSON.stringify(
-      process.env.VITE_GOOGLE_PLACES_API_KEY ?? env.VITE_GOOGLE_PLACES_API_KEY ?? ''
+      process.env.VITE_GOOGLE_PLACES_API_KEY ?? env.VITE_GOOGLE_PLACES_API_KEY ?? process.env.GOOGLE_API_KEY ?? env.GOOGLE_API_KEY ?? ''
     ),
     // Analytics / SEO — each activates only when its value is set (see src/lib/analytics/init.ts).
     'import.meta.env.VITE_GA4_MEASUREMENT_ID': JSON.stringify(
