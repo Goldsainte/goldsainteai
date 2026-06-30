@@ -193,16 +193,30 @@ export function CreatorSettingsTab() {
         <p className="text-sm text-[#6B7280]">
           Edit your public creator profile, display name, and personal details.
         </p>
-        <Button
-          asChild
-          variant="outline"
-          className="w-full sm:w-auto border-[#E5DFC6] text-[#0a2225] hover:bg-[#F6F0E4] rounded-full"
-        >
-          <Link to="/travel-settings">
-            <ExternalLink className="h-4 w-4 mr-2" />
-            Edit Profile
-          </Link>
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            asChild
+            variant="outline"
+            className="w-full sm:w-auto border-[#E5DFC6] text-[#0a2225] hover:bg-[#F6F0E4] rounded-full"
+          >
+            <Link to="/travel-settings">
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Edit Profile
+            </Link>
+          </Button>
+          {userId && (
+            <Button
+              asChild
+              variant="outline"
+              className="w-full sm:w-auto border-[#E5DFC6] text-[#0a2225] hover:bg-[#F6F0E4] rounded-full"
+            >
+              <Link to={`/creators/${userId}`}>
+                <ExternalLink className="h-4 w-4 mr-2" />
+                View Public Profile
+              </Link>
+            </Button>
+          )}
+        </div>
       </SettingsSectionCard>
 
       {/* Payouts & Stripe Connect */}
