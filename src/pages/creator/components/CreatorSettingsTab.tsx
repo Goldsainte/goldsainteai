@@ -157,9 +157,19 @@ export function CreatorSettingsTab() {
   const handleConnectStripe = async () => {
     setLoadingStripe(true);
     try {
-      const { data, error } = await supabase.functions.invoke(
-        "create-creator-stripe-account",
-      );
+      // Use the real Stripe Connect function (same one the Earnings tab uses).
+      // The old "create-creator-stripe-account" never existed → "no edge function".
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        toast.error("Please sign in to connect payouts");
+        return;
+      }
+      const { data, error } = await supabase.functions.invoke("stripe-connect-link", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+        body: { origin: window.location.origin },
+      });
       if (error) throw error;
       if (data?.url) window.location.href = data.url;
     } catch (e: any) {

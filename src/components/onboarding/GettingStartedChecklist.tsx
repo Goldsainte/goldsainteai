@@ -100,7 +100,7 @@ const CREATOR_ITEMS: ChecklistItem[] = [
     description: "Set up Stripe Connect to receive commissions on bookings and guide sales.",
     cta: { label: "Connect Stripe", to: "/creator-dashboard?tab=earnings", event: "start-stripe-onboarding" },
     isComplete: (d) =>
-      !!(d.profile?.stripe_connect_account_id || d.profile?.stripe_account_id),
+      !!(d.profile?.stripe_charges_enabled || d.profile?.stripe_payouts_enabled || d.profile?.stripe_connect_payouts_enabled),
   },
   {
     id: "create-content",
@@ -154,7 +154,7 @@ const AGENT_ITEMS: ChecklistItem[] = [
     description: "Set up Stripe Connect so you can receive payments from travelers.",
     cta: { label: "Connect Stripe", to: "/agent-dashboard?tab=earnings", event: "start-stripe-onboarding" },
     isComplete: (d) =>
-      !!(d.profile?.stripe_connect_account_id || d.profile?.stripe_account_id),
+      !!(d.profile?.stripe_charges_enabled || d.profile?.stripe_payouts_enabled || d.profile?.stripe_connect_payouts_enabled),
   },
   {
     id: "publish-trip",
