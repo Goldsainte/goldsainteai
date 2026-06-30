@@ -314,16 +314,23 @@ Four items from live testing. All legit; verdicts + plans below.
 `submit-trip-inquiry` sets only `first_name` metadata — **no `display_name`** — so the inbox falls to
 "Unknown." The concierge side also shows "Unknown / Traveler" (its profile `display_name` is null + wrong
 `account_type`).
-- **Fix (code):** `get-conversations` → select + fall back
-  `display_name || full_name || first_name || "Traveler"`. Defensive → repairs existing convos, no migration.
-- **Fix (flow):** set `display_name = first_name` on the inquiry signup (`submit-trip-inquiry`); give the
-  **concierge profile** `display_name = "Goldsainte Concierge"` + correct `account_type`.
-- ❓ **Decision:** modal is **first-name-only by design** (low friction) — keep it (recommended) + fix
-  display, or add a last-name field?
-- 🔎 Investigate: provenance of `last_name = "question"` (likely `handle_new_user`); why concierge role = "Traveler".
+- ✅ **Fix (code, `e4233cf7`):** `get-conversations` now selects `full_name`+`first_name` and falls back
+  `display_name || full_name || first_name || role-label`. Repairs existing convos, no migration. **⚠️ Needs redeploy.**
+- ✅ **Fix (flow, `e4233cf7`):** `submit-trip-inquiry` sets `display_name = first_name` on the inquiry signup
+  (only when null, so existing names aren't clobbered). **⚠️ Needs redeploy.**
+- ☑️ **Decision:** keep the modal **first-name-only** (user confirmed) — no last-name field.
+- [ ] **Data (you):** give the concierge a name so travellers see "Goldsainte Concierge" (not a role label):
+  `update profiles set display_name='Goldsainte Concierge' where id='c93d67d1-db67-483c-a1c7-88d75f16131d' and (display_name is null or display_name='');`
+- 🔎 Optional/cosmetic: trace the spurious `last_name = "question"` (likely `handle_new_user`) — low priority.
 
-### E2. "Question sent" modal — check-mark green ≠ button green — **trivial** (image-11)
-Success check is bright emerald; "Got it" is brand green `#0c4d47`. Recolor the check to the brand green.
+### E2. "Question sent" modal — check-mark green ≠ button green — ✅ **DONE** (`e4233cf7`, image-11)
+Check was `text-green-600` (bright emerald); the "Got it" button is `bg-primary`. Recoloured the check to
+`text-primary` so they share the same token (guaranteed match).
+
+### E5. Dialog close-button focus box — **minor** (image-15)
+Radix auto-focuses the dialog's close `×` on open, so the (now-gold) `focus-visible` ring shows as a box
+(e.g. "Message Settings"). Same family as the B4 header-button fix — soften the close button in
+`src/components/ui/dialog.tsx` to a background cue (or `focus-visible:ring-0`) so there's no lingering box.
 
 ### E3. Messages layout & fonts polish — **minor, traveler-facing** (image-13)
 Timestamps ("1 minute ago") tiny/low-contrast; review tab + body typography vs the landing font system.
