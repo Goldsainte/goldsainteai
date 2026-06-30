@@ -348,9 +348,10 @@ complaint is resolved.)*
   trip-detail, creator Curated Journeys — so a card drops from ~4 MB to ~60 KB.
 - Above-fold: `HomeHero` already uses `fetchPriority="high"`; Featured Trips is below the fold so `lazy`
   is correct. Added a `fetchPriority` prop to `TripCoverImage` for future above-fold use.
-- ↪️ *Follow-up (optional):* the Curated-Journeys grid I hand-rolled in `CreatorPublicProfilePage` + the
-  trip-detail hero use raw `<img>` — apply `supabaseImageUrl` there too when touched. Also compress at
-  upload so originals aren't 4 MB.
+- 📌 **DO LATER (post-launch, parked):** the Curated-Journeys grid in `CreatorPublicProfilePage` + the
+  trip-detail hero use raw `<img>` — apply `supabaseImageUrl`/`supabaseSrcSet` there too. And compress
+  covers at **upload** (≤~1600px) so the stored originals aren't 4 MB. *(Core landing/marketplace win is
+  already shipped via `TripCoverImage`; these are incremental.)*
 
 ### E6. Creator lands on the marketplace after login, not their studio — **UX bug** (item 13)
 `getPostAuthDestination` (`postAuthRouting.ts:52-53`) routes complete creators/agents to `/partner`
@@ -447,15 +448,22 @@ E9 / F4). Frontend.
 - A trip in `pending_review` should **strike** the item (B3/B7 already count `pending_review` — verify it
   actually ticks). Frontend (checklist CTA target + completion).
 
-### F4. Stripe Connect flow broken — entry point + edge function (item 16, image-22/23) — **FE + BE**
-- **FE:** "Connect payouts" (Earnings tab) routes to `/creator-dashboard?tab=earnings`, but the actual
-  connect UI is on the **Settings** tab → dead end. And **two** components exist
-  (`CreatorStripeOnboarding` → `stripe-connect-link`; `StripeConnectOnboarding` → `stripe-connect-onboarding`)
-  invoking different functions. **Consolidate** to one connect entry + component.
-- **BE:** clicking connect → "we don't have an edge function." The functions **exist in the repo**
-  (`stripe-connect-onboarding`, `stripe-connect-link`, `creator-stripe-onboarding`, …) → likely **not
-  deployed** to prod (or the wrong one invoked). **Verify deployment** of the invoked function.
-- Root of F2 + E9 (Stripe never actually connects). Creator blocker for **payouts**, not for submitting.
+### F4. Stripe Connect flow broken — **tangled: 3 mechanisms** (item 16, image-22/23) — **FE + BE + PARTNER**
+Traced — the creator has **three** different connect paths calling **different** edge functions:
+- **Earnings tab** (`CreatorEarningsTab` → `CreatorStripeOnboarding`) → **`stripe-connect-link`**.
+- **Settings tab** (`CreatorSettingsTab.handleConnectStripe`) → **`create-creator-stripe-account`** ← the
+  one the user clicked → "no edge function" (not deployed / errors).
+- **Agent dashboard** (`StripeConnectOnboarding`) → **`stripe-connect-onboarding`**.
+- The checklist "Connect Stripe" CTA points at `/creator-dashboard?tab=earnings` (the Earnings path).
+- **FE fix:** consolidate to **one** creator connect entry + component + function (drop the Settings
+  duplicate, or point it at the Earnings one).
+- **BE:** confirm which functions are actually **deployed** (`supabase functions list`) — `create-creator-
+  stripe-account` is the failing one.
+- ⚠️ **PARTNER decision:** is creator **payout / Stripe Connect a launch requirement** or post-launch?
+  (Creators have no bookings during the press, so payouts aren't immediately needed.) And is our **Stripe
+  Connect platform actually configured** in the Stripe dashboard? — even a deployed function fails if
+  Connect isn't set up. If deferred: hide the connect buttons + "Payouts coming soon" so there's no broken
+  error. Root of F2 + E9.
 
 ---
 
