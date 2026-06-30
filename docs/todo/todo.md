@@ -351,30 +351,34 @@ bare `<img>` with **no resize / srcset / sizes / modern format** → a 192px car
 `getPostAuthDestination` (`postAuthRouting.ts:52-53`) routes complete creators/agents to `/partner`
 (lands on `/marketplace?tab=trips`). A travel creator's home should be `/creator-dashboard` (Proposals /
 Trips / Earnings / Performance live there), not the consumer marketplace.
-- **Fix:** route creators → `/creator-dashboard`.
-- ❓ Clarify `/partner` vs `/creator-dashboard` (route duplication — which is canonical?).
+- ✅ **DONE (`6a254a5d`):** creators → `/creator-dashboard`, agents → `/agent-dashboard` (`postAuthRouting.ts`). *(frontend → Lovable rebuild)*
+- ☑️ `/creator-dashboard` confirmed canonical. **Follow-up:** re-assess `/partner`'s purpose (it just redirects to the marketplace).
 
 ### E7. Trip image upload → RLS error — **bug, BLOCKER** (item 14, image-16)
 `TripImageUploader` uploads to `trip-assets/trip-images/<file>` — the path is **not prefixed with the
 user id**, but the `trip-assets` RLS INSERT policy requires first folder = `auth.uid()` (working cover
 uploads use `<userId>/trips/…`). → "new row violates row-level security policy." Breaks trip cover +
 gallery upload entirely.
-- **Fix:** prefix the path with `${user.id}/` (e.g. `${user.id}/trip-images/<file>`). Check the gallery
-  uploader for the same flat path. Contained, ~3 lines. **High priority.**
+- ✅ **DONE (`6a254a5d`):** `TripImageUploader` path is now `${user.id}/trip-images/<file>` — used by the
+  trip-builder **cover + gallery**, so both are fixed. *(frontend → Lovable rebuild)*
+- 🔎 **Latent (separate, storyboards):** `StoryboardPhotoUploader` + `DesignEditorModal` use the same
+  flat path (`storyboard-uploads/<file>`) → same RLS bug for that feature. Fix when storyboards are touched.
 
 ### E8. Create-trip page header too big / empty — **polish** (item 15, image-18)
 The trip-builder uses the editorial "Edit Trip by Goldsainte AI" hero (eyebrow pill + big serif title +
 marketing subtitle + Preview) — eats ~⅓ of the viewport before the form. It's a **workspace**, not a
 landing page.
-- **Fix:** compact to a standard dashboard header (tight Back + title + Preview/Save bar; drop the eyebrow
-  + marketing subtitle; form starts higher). Match other dashboard pages.
+- ✅ **DONE (`6a254a5d`):** compact header — standard `BackButton` row + a tight title/`Saved`/Preview bar;
+  dropped the gold line, "Trip Builder" pill, the "by Goldsainte AI" flourish, and the marketing subtitle.
+  Title is now `New Trip` / `Edit Trip`. Form starts ~⅓ higher. *(frontend → Lovable rebuild)*
 
 ### E9. Stripe "not linked" on submit-for-review vs "connected" in profile — **bug + product** (item 16, image-17/19)
-- **Inconsistency:** submit-for-review gate checks `stripe_charges_enabled` (DB col, `TripBuilderPage:112`);
-  the profile shows **live** Stripe status — so a stale DB col → "connected" in profile but "not linked" on
-  submit. **Fix:** one source of truth (both read the live status / a reliably-synced field).
-- ❓ **Product:** should submit-**for-review** require Stripe at all? Trips go to **admin review** before
-  going live; Stripe only needed to charge/payout. **Recommend** gating **publish/go-live**, not review.
+- ✅ **DONE (`6a254a5d`, user: gate at publish not review):** removed the Stripe gate from
+  `TripBuilderPage` submission. A "publish" maps to `pending_review` (admin review) → the trip isn't live,
+  so Stripe isn't required to submit. This also **resolves the inconsistency** (the stale
+  `stripe_charges_enabled` no longer blocks while the profile shows "connected"). *(frontend → Lovable rebuild)*
+- 🔎 **Follow-up:** when we add a real **go-live** gate (admin approval / first payout), use **one**
+  Stripe-status source of truth so the profile and the gate always agree.
 
 ---
 
