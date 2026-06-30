@@ -380,6 +380,75 @@ landing page.
 - 🔎 **Follow-up:** when we add a real **go-live** gate (admin approval / first payout), use **one**
   Stripe-status source of truth so the profile and the gate always agree.
 
+### E10. Package creator/agent isn't a real DB user → fall back to concierge (item 17) — **BE**
+If a package's `creator_id`/`agent_id` points at a user not in `profiles`, the responder resolution should
+fall back to `CONCIERGE_USER_ID`. Harden `submit-trip-inquiry` + `send-direct-message` to verify the
+resolved responder exists before using it (else concierge). **Backend (edge fns; needs redeploy).**
+
+### E11. Messages break words mid-word / truncate (item 18, image-24) — **FE**
+Message-bubble text breaks awkwardly. Use `break-words` / `overflow-wrap: anywhere` (not `break-all`) and
+drop any `truncate` on the bubble. **Frontend** (`DirectMessageInbox` bubble CSS). *(pairs with E3.)*
+
+### E12. Hovered top-menu icon invisible (item 19, image-25) — **FE — REGRESSION (mine)**
+My focus fix added `focus-visible:bg-[#BFAD72]` to the header profile button, but the `User` icon is
+`text-[#BFAD72]` and only turns white on `group-hover` — so on **focus** the tan icon sits on the tan bg →
+invisible. **Fix:** add `group-focus-visible:text-white` to the icon (Header.tsx:198,445). Trivial.
+
+### E13. "Remove the email-confirm click screen" (item 20, image-26) — **FE — DECISION: keep**
+That screen is the **scanner-safe `/auth/verify`** click-to-complete page (A3). Removing it
+**re-introduces the "link expired" bug** — email security scanners GET-prefetch the link and burn the
+one-time token; the single button spends it only on a real click. **Recommend: keep** (it's protection,
+not a meaningless step). No action.
+
+### E14. Published trip → marketplace 404 when status flipped in DB (item 21) — **BE / RLS**
+`7-days-in-jordan` is **not anon-visible at all** (even unfiltered) → flipping `status` to `published`
+**directly in the DB** doesn't satisfy the anon `packaged_trips` SELECT policy (it needs more than
+`status='published'` — likely an approval/visibility flag the normal admin-publish sets). **Verify** the
+RLS policy + what admin-approval writes. The normal review→approve flow probably works; DB-only flips
+won't. **Backend / RLS.**
+
+### E15. Logged-out → `/marketplace` bounces to the confirm-email gate (item 22, image-27) — **FE — VERIFY (press-critical)**
+A mid-signup creator (pending confirmation) hitting `/marketplace` after "logout" was bounced to the
+`/auth` confirm-email screen + an "email verified on another device" toast — a stale pending-signup
+state / incomplete logout. The marketplace is **public**, so **a clean logged-out user MUST browse it
+freely**. ⚠️ **Verify a fresh logged-out session can open `/marketplace`** — if not, it's press-blocking
+(travellers can't browse). **Frontend** (auth state / route guard).
+
+---
+
+## Workstream F — Travel-creator onboarding & studio (client review 2, 2026-06-30)
+> Creator-onboarding items, separated per request. **FE** = frontend, **BE** = backend.
+> Secondary audience (creators) — most are **post-launch**; F4 is the real broken flow but **not
+> press-blocking** (Stripe isn't required to submit-for-review, per E9).
+
+### F1. "Complete your profile" message persists after completing it (item 13, image-20) — **FE**
+The Getting-Started "Complete your creator profile" item / studio banner still shows after the profile is
+filled. The checklist item checks **content** (avatar+bio+niches, B7) while the **banner** keys on
+`has_completed_creator_onboarding` (full wizard) — so a content-complete creator who skipped the final
+wizard step still sees the banner. **Verify which surface** + align the "complete" definition. Frontend.
+
+### F2. "Connect your payout account" struck out but Stripe NOT connected (item 14, image-21) — **FE**
+Getting-Started #2 checks `stripe_connect_account_id || stripe_account_id` (ID exists) → marks done even
+when a Stripe onboarding was started but **charges aren't enabled**. Over-reports "connected." **Fix:**
+check `stripe_charges_enabled` / `payouts_enabled` (the real "ready" signal) — one source of truth (see
+E9 / F4). Frontend.
+
+### F3. "Publish your first product" — open existing draft + strike when pending (item 15) — **FE**
+- The "Get started" CTA always opens a **new** trip-builder; it should **resume the creator's existing
+  draft** if one exists.
+- A trip in `pending_review` should **strike** the item (B3/B7 already count `pending_review` — verify it
+  actually ticks). Frontend (checklist CTA target + completion).
+
+### F4. Stripe Connect flow broken — entry point + edge function (item 16, image-22/23) — **FE + BE**
+- **FE:** "Connect payouts" (Earnings tab) routes to `/creator-dashboard?tab=earnings`, but the actual
+  connect UI is on the **Settings** tab → dead end. And **two** components exist
+  (`CreatorStripeOnboarding` → `stripe-connect-link`; `StripeConnectOnboarding` → `stripe-connect-onboarding`)
+  invoking different functions. **Consolidate** to one connect entry + component.
+- **BE:** clicking connect → "we don't have an edge function." The functions **exist in the repo**
+  (`stripe-connect-onboarding`, `stripe-connect-link`, `creator-stripe-onboarding`, …) → likely **not
+  deployed** to prod (or the wrong one invoked). **Verify deployment** of the invoked function.
+- Root of F2 + E9 (Stripe never actually connects). Creator blocker for **payouts**, not for submitting.
+
 ---
 
 ## Next iteration — prioritised plan for Wednesday
