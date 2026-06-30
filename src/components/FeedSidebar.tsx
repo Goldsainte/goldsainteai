@@ -6,20 +6,15 @@ import { NotificationCenter } from "@/components/NotificationCenter";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useUserRole } from "@/hooks/useUserRole";
 
 export function FeedSidebar() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
-
-  // Gate sidebar for creators only
-  const accountType = 
-    ((user as any)?.user_metadata?.account_type as string | undefined)?.toLowerCase() ?? null;
-  const isCreator = accountType === "creator";
-
-  // Don't render sidebar for non-creators
-  if (!isCreator) return null;
+  // Live from the database (profiles.account_type), not stale auth signup metadata.
+  const { isCreator } = useUserRole();
 
   useEffect(() => {
     if (user) {
@@ -55,6 +50,12 @@ export function FeedSidebar() {
         : "font-normal hover:bg-muted/50"
     }`;
 
+  // Don't render sidebar for non-creators. This must come AFTER every hook
+  // call above (Rules of Hooks) — isCreator now resolves asynchronously from
+  // the database, so an early return before the hooks would change hook
+  // order between renders once the role check completes.
+  if (!isCreator) return null;
+
   return (
     <aside className="w-60 h-screen sticky top-0 border-r border-border bg-background flex flex-col px-3 py-8">
       {/* Logo */}
@@ -83,7 +84,7 @@ export function FeedSidebar() {
         <button
           onClick={async () => {
             const { data: { user } } = await supabase.auth.getUser();
-            if (user) navigate(`/creator/${user.id}`);
+            if (user) navigate(`/creators/${user.id}`);
           }}
           className={getNavClass({ isActive: false })}
         >
