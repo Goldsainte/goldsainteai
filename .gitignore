@@ -28,3 +28,7 @@ supabase/.branches
 *.njsproj
 *.sln
 *.sw?
+
+# Personal planning working copy — not shared via repo (partner tracks their own)
+docs/todo/todo.md
+docs/todo/next.md
