@@ -279,9 +279,10 @@ Audit (2026-06-27): only the **Google Ads** tag is wired; GA4, Clarity, GSC and 
 - ✅ **Google Ads** gtag (`AW-17180504737`) loads in `index.html`; `src/lib/analytics/conversions.ts`
   fires purchase conversions — **but the conversion label is a placeholder**
   (`REPLACE_WITH_LABEL_FROM_GOOGLE_ADS`), so **conversions aren't actually recorded yet**.
-- ❌ **GA4** — not configured (no `G-XXXX` property). The GA4 `purchase` event in `conversions.ts` is a
-  no-op until one exists. CSP already allows GA / Tag Manager.
-- ❌ **Microsoft Clarity** — not integrated.
+- ✅ **GA4** — configured (`G-9LFLZ9T3LS`, baked in `vite.config.ts`) and **live in prod**. Only runs on
+  the production host (`init.ts` host guard) so localhost/preview don't pollute it. CSP allows the
+  regional `*.google-analytics.com` collect endpoints.
+- ✅ **Microsoft Clarity** — integrated (`xezjy77yv0`, baked in `vite.config.ts`); **live in prod** (same host guard).
 - ❌ **Google Search Console** — no verification (no `google-site-verification` meta).
 - ❌ **Bing Webmaster** — no verification (no `msvalidate.01` meta).
 
@@ -294,8 +295,8 @@ Audit (2026-06-27): only the **Google Ads** tag is wired; GA4, Clarity, GSC and 
 - [ ] **Sitemap:** confirm `https://goldsainte.ai/sitemap.xml` is served; submit to GSC + Bing.
 
 ### To do — accounts/dashboards (you) → then set the env var (Lovable build env + `.env.local`)
-- [ ] Create the **GA4 property** → `VITE_GA4_MEASUREMENT_ID` = `G-XXXXXXX`.
-- [ ] Create a **Clarity** project → `VITE_CLARITY_PROJECT_ID`.
+- [x] Create the **GA4 property** → `VITE_GA4_MEASUREMENT_ID` = `G-9LFLZ9T3LS` ✅ (baked in vite.config, live).
+- [x] Create a **Clarity** project → `VITE_CLARITY_PROJECT_ID` = `xezjy77yv0` ✅ (baked, live).
 - [ ] **Google Ads** conversion action → `VITE_GOOGLE_ADS_CONVERSION_LABEL`.
 - [ ] **GSC**: verify via GA4-link/DNS (no code) *or* set `VITE_GSC_VERIFICATION`; submit sitemap.
 - [ ] **Bing**: import from GSC (no code) *or* set `VITE_BING_VERIFICATION`; submit sitemap.
@@ -351,12 +352,12 @@ bare `<img>` with **no resize / srcset / sizes / modern format** → a 192px car
 ## Next iteration — prioritised plan for Wednesday
 
 ### P0 — must land before press (traveller-heavy traffic)
-- [ ] **C** — Marketplace cleanup: drop the test package + dedupe destinations *(fast, high visibility)*.
-- [x] **A2** — Logged-in "Ask a Question" path ✅ *(done; needs `send-direct-message` redeploy)*.
+- [~] **C** — Marketplace cleanup: `marketplace_cleanup.sql` **ready** ✅; **you run it in prod** to drop the dups.
+- [x] **A2** — Logged-in "Ask a Question" path ✅ *(merged to `main` + deployed)*.
 - [~] **A3** — Hardening: scanner-safe magic links ✅; captcha on the public drawer ⏳ *(needs Turnstile)*.
-- [ ] **D / A4** — Analytics & SEO foundation: GA4 + Microsoft Clarity + GSC/Bing verification + sitemap,
-      plus the `inquiry_submitted` / `inquiry_converted` events *(needs IDs from you — see Workstream D)*.
-- [x] **A1** — Reply-notification loop ✅ *(built on `improvements`; re-test + redeploy `send-direct-message`)*.
+- [~] **D / A4** — GA4 + Clarity **live in prod** ✅ + `inquiry_*` / `sign_up` events shipped ✅;
+      **remaining:** GSC/Bing verification + sitemap submission.
+- [x] **A1** — Reply-notification loop ✅ *(merged to `main` + deployed)*.
 
 ### P1 — creator/agent experience (they register from the press too)
 - [x] **B1** — De-loop registration ✅ *(complete-profile pre-selects the chosen role; #1 metadata already in place)*.
