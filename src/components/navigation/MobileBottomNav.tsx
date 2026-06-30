@@ -1,23 +1,19 @@
 import { Store, PlaneTakeoff, Luggage, User } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 
 export function MobileBottomNav() {
   const { user } = useAuth();
-  const accountType = (user?.user_metadata?.account_type as string | undefined)?.toLowerCase();
-  const postTripTo = (accountType === "agent" || accountType === "creator") ? "/trip-builder" : "/post-trip";
+  // Live from the database (profiles.account_type / user_roles), not stale auth signup metadata.
+  const { isCreator, isAgent } = useUserRole();
+  const postTripTo = (isAgent || isCreator) ? "/trip-builder" : "/post-trip";
 
   const getProfileRoute = () => {
     if (!user) return "/auth";
-    const accountType = user.user_metadata?.account_type;
-    switch (accountType) {
-      case "creator":
-        return `/creators/${user.id}`;
-      case "agent":
-        return `/agents/${user.id}`;
-      default:
-        return "/traveler";
-    }
+    if (isCreator) return `/creators/${user.id}`;
+    if (isAgent) return `/agents/${user.id}`;
+    return "/traveler";
   };
 
   const navItems = [
