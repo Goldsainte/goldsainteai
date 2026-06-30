@@ -142,7 +142,7 @@ export function AskQuestionDrawer({
       >
         {drawerState === "sent" ? (
           <div className="flex flex-col items-center gap-3 py-6 text-center">
-            <CheckCircle2 className="h-12 w-12 text-green-600" />
+            <CheckCircle2 className="h-12 w-12 text-primary" />
             <SheetTitle className="text-xl font-semibold">Question sent</SheetTitle>
             <p className="text-sm text-muted-foreground max-w-xs">
               Your question's on its way to {displayName}. They'll reply right here in your

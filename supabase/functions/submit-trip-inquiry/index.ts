@@ -241,6 +241,20 @@ serve(async (req) => {
       }
     }
 
+    // Give the new traveller a display_name so they show by name in the inbox
+    // (most UI reads display_name first). Only when it's currently empty, so we
+    // never clobber an existing user's fuller name. Best-effort.
+    if (firstName) {
+      const { error: nameErr } = await supabaseAdmin
+        .from('profiles')
+        .update({ display_name: firstName })
+        .eq('id', userId)
+        .is('display_name', null);
+      if (nameErr) {
+        console.warn('could not set traveller display_name — skipping', { error: nameErr.message });
+      }
+    }
+
     // Rewrite the generated link through our branded /auth/verify page so the
     // user sees goldsainte.ai in their inbox instead of the raw Supabase URL.
     let magicLinkUrl = linkData.properties.action_link;

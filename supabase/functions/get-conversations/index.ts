@@ -45,10 +45,10 @@ serve(async (req) => {
       .select(`
         *,
         participant_1_profile:profiles!dm_conversations_participant_1_fkey(
-          id, display_name, avatar_url, account_type, is_verified
+          id, display_name, full_name, first_name, avatar_url, account_type, is_verified
         ),
         participant_2_profile:profiles!dm_conversations_participant_2_fkey(
-          id, display_name, avatar_url, account_type, is_verified
+          id, display_name, full_name, first_name, avatar_url, account_type, is_verified
         )
       `)
       .or(`participant_1.eq.${user.id},participant_2.eq.${user.id}`)
@@ -81,7 +81,18 @@ serve(async (req) => {
         tripTitle: conv.trip_title ?? null,
         otherParticipant: {
           id: otherParticipant?.id,
-          displayName: otherParticipant?.display_name || "Unknown",
+          // Fall back through name fields before a generic role label — inquiry
+          // travellers only have first_name (no display_name), which otherwise
+          // rendered as "Unknown". Repairs existing conversations with no migration.
+          displayName:
+            otherParticipant?.display_name ||
+            otherParticipant?.full_name ||
+            otherParticipant?.first_name ||
+            (otherParticipant?.account_type === "creator"
+              ? "Creator"
+              : otherParticipant?.account_type === "agent"
+              ? "Travel Agent"
+              : "Traveler"),
           avatarUrl: otherParticipant?.avatar_url,
           accountType: otherParticipant?.account_type,
           isVerified: otherParticipant?.is_verified,
