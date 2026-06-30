@@ -3,7 +3,7 @@ import { useNavigate, Link, Navigate, useSearchParams } from "react-router-dom";
 import { invokeWithAuth } from "@/lib/supabaseHelpers";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, ExternalLink } from "lucide-react";
 import { GettingStartedChecklist } from "@/components/onboarding/GettingStartedChecklist";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -209,20 +209,31 @@ export default function CreatorDashboard() {
     <main className="min-h-screen bg-[#f7f3ea] pb-24 lg:pb-0 text-[#0a2225]">
       <div className="mx-auto max-w-6xl px-5 sm:px-8 pt-8 md:pt-16 pb-12">
         {/* Editorial header */}
-        <header className="mb-8 md:mb-10">
-          <p className="text-[10px] md:text-[11px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
-            The Atelier
-          </p>
-          <h1 className="mt-2 md:mt-3 font-secondary text-[28px] leading-tight md:text-4xl text-[#0a2225]">
-            {loading ? "Welcome" : `Welcome, ${displayName.split(" ")[0]}`}
-          </h1>
-          <p className="mt-2 text-base text-[#0a2225]/70 max-w-xl">
-            Your studio for shaping trip proposals, packaging journeys, and growing what you earn on-platform.
-          </p>
-          {profile?.creator_tier && (
-            <div className="mt-4">
-              <TierBadge tier={profile.creator_tier} size="md" />
-            </div>
+        <header className="mb-8 md:mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+          <div>
+            <p className="text-[10px] md:text-[11px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
+              The Atelier
+            </p>
+            <h1 className="mt-2 md:mt-3 font-secondary text-[28px] leading-tight md:text-4xl text-[#0a2225]">
+              {loading ? "Welcome" : `Welcome, ${displayName.split(" ")[0]}`}
+            </h1>
+            <p className="mt-2 text-base text-[#0a2225]/70 max-w-xl">
+              Your studio for shaping trip proposals, packaging journeys, and growing what you earn on-platform.
+            </p>
+            {profile?.creator_tier && (
+              <div className="mt-4">
+                <TierBadge tier={profile.creator_tier} size="md" />
+              </div>
+            )}
+          </div>
+          {user && (
+            <Link
+              to={`/creators/${user.id}`}
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-[#0c4d47]/25 px-5 py-2.5 text-sm font-medium text-[#0a2225] hover:bg-white transition-colors whitespace-nowrap shrink-0"
+            >
+              <ExternalLink className="w-4 h-4" />
+              View public profile
+            </Link>
           )}
         </header>
 
