@@ -48,9 +48,14 @@ export function getPostAuthDestination(
     return "/auth/complete-profile";
   }
 
-  // Fully onboarded → role-based home
-  if (accountType === "creator" || accountType === "agent") {
-    return "/partner";
+  // Fully onboarded → role-based home (their own studio/console, NOT the consumer
+  // marketplace). `/partner` currently redirects to the marketplace — pending a
+  // re-assessment of its purpose — so route each role to its canonical dashboard.
+  if (accountType === "creator") {
+    return "/creator-dashboard";
+  }
+  if (accountType === "agent") {
+    return "/agent-dashboard";
   }
 
   if (accountType === "brand") {

@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Compass, Eye, Loader2, Image as ImageIcon, MapPin } from "lucide-react";
+import { Eye, Loader2, Image as ImageIcon, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { TripBuilderForm, type TripBuilderFormHandle } from "@/components/trips/TripBuilderForm";
 import { BackButton } from "@/components/ui/BackButton";
@@ -101,26 +101,13 @@ export default function TripBuilderPage() {
         resubmitNotice = "Your trip is already in review — we'll update the submission.";
       }
 
-      // Gate publishing on Stripe account for creators
-      if (status === "published" && isCreator) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("stripe_charges_enabled")
-          .eq("id", user.id)
-          .maybeSingle();
+      // No Stripe gate on submission: a "publish" action maps to `pending_review`
+      // (admin review, below) — the trip does NOT go live here, so Stripe is not
+      // required to submit. Payout setup is enforced at go-live / first payout
+      // instead; creators are nudged via the Earnings tab + Getting-Started checklist.
+      // (This also avoids the stale-`stripe_charges_enabled` mismatch where the
+      // profile showed Stripe connected but submission said "not linked".)
 
-        if (!(profile as any)?.stripe_charges_enabled) {
-          toast.error("Finish Stripe payout verification to unlock publishing. You can save drafts in the meantime.", {
-            action: {
-              label: "Open Earnings",
-              onClick: () => navigate("/creator-dashboard?tab=earnings"),
-            },
-          });
-          setSaving(false);
-          return null;
-        }
-      }
-      
       const slug = formData.slug || generateSlug(formData.title);
 
       // Map "published" submissions to "pending_review" — admin approves to go live.
@@ -283,54 +270,36 @@ export default function TripBuilderPage() {
 
   return (
     <div className="min-h-screen bg-[#FDF9F0]">
-      {/* Editorial Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-16">
-        {/* Back button - own row */}
-        <div className="mb-6">
+      {/* Compact workspace header — Back row + a tight title/actions bar */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-5 pb-4 md:pt-6 md:pb-5">
+        <div className="mb-3">
           <BackButton to={isAgent ? "/agent-dashboard" : "/creator-dashboard"} />
         </div>
 
-        {/* Gold accent line */}
-        <div className="w-16 h-0.5 bg-[#C7A962] mb-6" />
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-baseline gap-3 min-w-0">
+            <h1 className="font-secondary text-xl sm:text-2xl text-[#0a2225] tracking-tight truncate">
+              {editId ? "Edit Trip" : "New Trip"}
+            </h1>
+            {lastSaved && (
+              <span className="text-xs text-[#9A9384] shrink-0">
+                Saved {formatDistanceToNow(lastSaved)} ago
+              </span>
+            )}
+          </div>
 
-        {/* Pill badge */}
-        <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 border border-[#E5DFC6] mb-4">
-          <Compass className="h-4 w-4 text-[#C7A962]" />
-          <span className="text-sm font-medium text-[#6B7280] tracking-wide">
-            Trip Builder
-          </span>
-        </div>
-
-        {/* Large serif title with italic brand */}
-        <h1 className="font-secondary text-2xl sm:text-3xl md:text-4xl text-[#0a2225] tracking-tight">
-          {editId ? "Edit Trip" : "Trip Builder"} by <em>Goldsainte AI</em>
-        </h1>
-
-        {lastSaved && (
-          <p className="mt-2 text-xs text-[#9A9384]">
-            Saved {formatDistanceToNow(lastSaved)} ago
-          </p>
-        )}
-
-        {/* Descriptive caption */}
-        <p className="mt-3 text-[#6B7280] text-base max-w-xl leading-relaxed">
-          Create ready-to-book experiences for the marketplace. 
-          Your curated trips inspire travelers and earn you commissions.
-        </p>
-
-        {/* Preview button for edit mode */}
-        {editId && (
-          <div className="mt-6">
-            <Button 
-              variant="outline" 
-              onClick={handlePreview} 
-              className="rounded-full px-6 border-[#E5DFC6] hover:bg-white"
+          {editId && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handlePreview}
+              className="rounded-full border-[#E5DFC6] hover:bg-white shrink-0"
             >
               <Eye className="h-4 w-4 mr-2" />
               Preview Trip
             </Button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Form + live preview */}

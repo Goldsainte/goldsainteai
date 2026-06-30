@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { ImagePlus, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
@@ -12,6 +13,7 @@ interface TripImageUploaderProps {
 }
 
 export function TripImageUploader({ currentUrl, onUpload, label, compact }: TripImageUploaderProps) {
+  const { user } = useAuth();
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -31,13 +33,20 @@ export function TripImageUploader({ currentUrl, onUpload, label, compact }: Trip
       return;
     }
 
+    if (!user) {
+      toast.error("Please sign in to upload images");
+      return;
+    }
+
     try {
       setUploading(true);
 
-      // Generate unique filename
+      // Generate unique filename. The path MUST start with the user's id — the
+      // trip-assets bucket RLS policy requires (storage.foldername(name))[1] =
+      // auth.uid(), so a flat "trip-images/…" path is rejected as a policy violation.
       const fileExt = file.name.split(".").pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-      const filePath = `trip-images/${fileName}`;
+      const filePath = `${user.id}/trip-images/${fileName}`;
 
       // Upload to Supabase storage
       const { data, error } = await supabase.storage
