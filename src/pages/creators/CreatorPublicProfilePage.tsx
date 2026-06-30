@@ -96,8 +96,12 @@ export default function CreatorPublicProfilePage() {
 
   useEffect(() => {
     if (!id) return;
-    (async () => {
-      const [profileRes, creatorProfileRes, reviewsRes] = await Promise.all([
+    fetchProfile();
+  }, [id, user, reviewRefreshKey]);
+
+  const fetchProfile = async () => {
+    if (!id) return;
+    const [profileRes, creatorProfileRes, reviewsRes] = await Promise.all([
         supabase
           .from("profiles")
           .select(
@@ -142,8 +146,7 @@ export default function CreatorPublicProfilePage() {
       }
 
       setLoading(false);
-    })();
-  }, [id, user, reviewRefreshKey]);
+  };
 
   // Fetch this creator's published itinerary guides + bookable trip packages
   useEffect(() => {
@@ -322,6 +325,8 @@ export default function CreatorPublicProfilePage() {
           targetUserId={isOwnProfile ? undefined : creator.id}
           onRequestTrip={handleRequestTrip}
           fallbackCoverUrl={coverImageFallback}
+          profileUserId={creator.id}
+          onProfileUpdated={fetchProfile}
         />
 
         {/* Spacer after hero card overlap */}
