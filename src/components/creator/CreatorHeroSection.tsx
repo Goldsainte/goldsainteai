@@ -1,6 +1,9 @@
-import { BadgeCheck, Star, MapPin, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { BadgeCheck, Star, MapPin, Sparkles, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FollowButton from "@/components/FollowButton";
+import { ProfilePhotoModal } from "@/components/ProfilePhotoModal";
+import { CoverPhotoModal } from "@/components/CoverPhotoModal";
 import wordmark from "@/assets/wordmark-green.svg";
 
 interface CreatorHeroSectionProps {
@@ -20,6 +23,10 @@ interface CreatorHeroSectionProps {
   targetUserId?: string;
   onRequestTrip: () => void;
   fallbackCoverUrl?: string | null;
+  /** Required when isOwnProfile is true — lets the edit controls know whose row to update. */
+  profileUserId?: string;
+  /** Called after a successful avatar or cover photo upload so the parent can refetch. */
+  onProfileUpdated?: () => void;
 }
 
 export function CreatorHeroSection({
@@ -39,12 +46,18 @@ export function CreatorHeroSection({
   targetUserId,
   onRequestTrip,
   fallbackCoverUrl,
+  profileUserId,
+  onProfileUpdated,
 }: CreatorHeroSectionProps) {
+  const [avatarModalOpen, setAvatarModalOpen] = useState(false);
+  const [coverModalOpen, setCoverModalOpen] = useState(false);
+
   const heroImage = coverImageUrl || fallbackCoverUrl || null;
   const hasStats = (tripsCompleted ?? 0) > 0 || (clientsServed ?? 0) > 0;
   const isGenericTitle = !title || title === "Travel Designer";
   const showCompleteNudge = Boolean(isOwnProfile && (isGenericTitle || !location));
   const showTrustPanel = Boolean(responseTimeText) || specialties.length > 0;
+  const canEdit = Boolean(isOwnProfile && profileUserId);
 
   return (
     <section className="relative w-full">
@@ -68,6 +81,16 @@ export function CreatorHeroSection({
             <div className="absolute inset-0 bg-gradient-to-t from-[#F7F3EA] via-transparent to-transparent" />
           </div>
         )}
+        {canEdit && (
+          <button
+            type="button"
+            onClick={() => setCoverModalOpen(true)}
+            className="absolute top-4 right-4 inline-flex items-center gap-1.5 rounded-full bg-[#0a2225]/60 backdrop-blur-sm border border-white/30 px-3.5 py-2 text-xs font-medium text-white hover:bg-[#0a2225]/80 transition-colors"
+          >
+            <Camera className="h-3.5 w-3.5" />
+            {heroImage ? "Edit cover photo" : "Add cover photo"}
+          </button>
+        )}
       </div>
 
       {/* Floating profile card overlay + at-a-glance panel */}
@@ -88,6 +111,16 @@ export function CreatorHeroSection({
                 <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5">
                   <BadgeCheck className="h-5 w-5 text-[#C7A962]" />
                 </div>
+              )}
+              {canEdit && (
+                <button
+                  type="button"
+                  onClick={() => setAvatarModalOpen(true)}
+                  aria-label="Edit profile photo"
+                  className="absolute -bottom-1 -left-1 h-7 w-7 flex items-center justify-center rounded-full bg-[#0a2225] border-2 border-white text-white hover:bg-[#0c4d47] transition-colors"
+                >
+                  <Camera className="h-3.5 w-3.5" />
+                </button>
               )}
             </div>
 
@@ -186,6 +219,25 @@ export function CreatorHeroSection({
           )}
         </div>
       </div>
+
+      {canEdit && profileUserId && (
+        <>
+          <ProfilePhotoModal
+            open={avatarModalOpen}
+            onOpenChange={setAvatarModalOpen}
+            userId={profileUserId}
+            currentAvatarUrl={avatarUrl}
+            onSuccess={() => onProfileUpdated?.()}
+          />
+          <CoverPhotoModal
+            open={coverModalOpen}
+            onOpenChange={setCoverModalOpen}
+            userId={profileUserId}
+            currentCoverUrl={coverImageUrl}
+            onSuccess={() => onProfileUpdated?.()}
+          />
+        </>
+      )}
     </section>
   );
 }
