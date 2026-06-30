@@ -29,6 +29,7 @@ interface CreatorHeroSectionProps {
   onProfileUpdated?: () => void;
   /** ISO date string (e.g. profiles.created_at) — shown as "Member since {year}". */
   memberSince?: string | null;
+  followerCount?: number | null;
 }
 
 export function CreatorHeroSection({
@@ -51,17 +52,25 @@ export function CreatorHeroSection({
   profileUserId,
   onProfileUpdated,
   memberSince,
+  followerCount,
 }: CreatorHeroSectionProps) {
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
   const [coverModalOpen, setCoverModalOpen] = useState(false);
 
   const heroImage = coverImageUrl || fallbackCoverUrl || null;
-  const hasStats = (tripsCompleted ?? 0) > 0 || (clientsServed ?? 0) > 0;
   const isGenericTitle = !title || title === "Travel Designer";
   const showCompleteNudge = Boolean(isOwnProfile && (isGenericTitle || !location));
   const memberSinceYear = memberSince ? new Date(memberSince).getFullYear() : null;
-  const showTrustPanel = Boolean(responseTimeText) || specialties.length > 0 || Boolean(memberSinceYear);
   const canEdit = Boolean(isOwnProfile && profileUserId);
+
+  const formatCount = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1).replace(/\.0$/, "")}k` : `${n}`);
+
+  const stats = [
+    { label: "Response time", value: responseTimeText || "New" },
+    { label: "Trips designed", value: tripsCompleted != null ? `${tripsCompleted}` : "0" },
+    { label: "Member since", value: memberSinceYear ? `${memberSinceYear}` : "—" },
+    { label: "Followers", value: followerCount != null && followerCount > 0 ? formatCount(followerCount) : "—" },
+  ];
 
   return (
     <section className="relative w-full">
@@ -97,136 +106,111 @@ export function CreatorHeroSection({
         )}
       </div>
 
-      {/* Floating profile card overlay + at-a-glance panel */}
+      {/* Floating profile card overlay */}
       <div className="relative mx-auto max-w-5xl px-4">
-        <div className="relative -mt-24 md:-mt-32 flex flex-col md:flex-row md:items-start gap-5">
-          <div className="bg-white rounded-2xl border border-[#E5DFC6] shadow-lg p-6 md:p-8 w-full max-w-lg">
-          {/* Avatar + Name */}
-          <div className="flex items-start gap-5">
-            <div className="relative shrink-0">
-              <div className="h-20 w-20 md:h-24 md:w-24 rounded-full ring-[3px] ring-[#C7A962] overflow-hidden bg-[#E5DFC6]">
-                <img
-                  src={avatarUrl || "/placeholder.svg"}
-                  alt={name}
-                  className="h-full w-full object-cover"
-                loading="lazy"/>
-              </div>
-              {isVerified && (
-                <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5">
-                  <BadgeCheck className="h-5 w-5 text-[#C7A962]" />
+        <div className="relative -mt-24 md:-mt-32">
+          <div className="bg-white rounded-2xl border border-[#E5DFC6] shadow-lg p-6 md:p-8 w-full max-w-2xl">
+            {/* Avatar + Name */}
+            <div className="flex items-start gap-5">
+              <div className="relative shrink-0">
+                <div className="h-20 w-20 md:h-24 md:w-24 rounded-full ring-[3px] ring-[#C7A962] overflow-hidden bg-[#E5DFC6]">
+                  <img
+                    src={avatarUrl || "/placeholder.svg"}
+                    alt={name}
+                    className="h-full w-full object-cover"
+                  loading="lazy"/>
                 </div>
-              )}
-              {canEdit && (
-                <button
-                  type="button"
-                  onClick={() => setAvatarModalOpen(true)}
-                  aria-label="Edit profile photo"
-                  className="absolute -bottom-1 -left-1 h-7 w-7 flex items-center justify-center rounded-full bg-[#0a2225] border-2 border-white text-white hover:bg-[#0c4d47] transition-colors"
-                >
-                  <Camera className="h-3.5 w-3.5" />
-                </button>
-              )}
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <h1 className="font-secondary text-xl md:text-2xl text-[#0a2225] leading-tight truncate">
-                {name}
-              </h1>
-              <p className="text-sm text-[#6B7280] mt-0.5">{title}</p>
-              {location && (
-                <p className="text-xs text-[#9CA3AF] mt-1 flex items-center gap-1">
-                  <MapPin className="h-3 w-3" />
-                  {location}
-                </p>
-              )}
-
-              {/* Rating + Stats */}
-              <div className="flex items-center gap-4 mt-3 flex-wrap">
-                {avgRating != null ? (
-                  <span className="flex items-center gap-1 text-sm text-[#0a2225] font-medium">
-                    <Star className="h-3.5 w-3.5 fill-[#C7A962] text-[#C7A962]" />
-                    {avgRating.toFixed(1)}
-                    <span className="text-[#9CA3AF] font-normal">({reviewCount})</span>
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-[#F5F0E0] px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide text-[#7A7151]">
-                    <Sparkles className="h-3 w-3" />
-                    New designer
-                  </span>
+                {isVerified && (
+                  <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5">
+                    <BadgeCheck className="h-5 w-5 text-[#C7A962]" />
+                  </div>
                 )}
-                {hasStats && (
-                  <>
-                    {(tripsCompleted ?? 0) > 0 && (
-                      <span className="text-xs text-[#6B7280]">
-                        <span className="font-semibold text-[#0a2225]">{tripsCompleted}</span> trips
-                      </span>
-                    )}
-                    {(clientsServed ?? 0) > 0 && (
-                      <span className="text-xs text-[#6B7280]">
-                        <span className="font-semibold text-[#0a2225]">{clientsServed}</span> clients
-                      </span>
-                    )}
-                  </>
+                {canEdit && (
+                  <button
+                    type="button"
+                    onClick={() => setAvatarModalOpen(true)}
+                    aria-label="Edit profile photo"
+                    className="absolute -bottom-1 -left-1 h-6 w-6 flex items-center justify-center rounded-full bg-[#0a2225] border-2 border-white text-white hover:bg-[#0c4d47] transition-colors"
+                  >
+                    <Camera className="h-3 w-3" />
+                  </button>
                 )}
               </div>
-            </div>
-          </div>
 
-          {/* CTAs */}
-          <div className="flex items-center gap-3 mt-6">
-            <Button
-              onClick={onRequestTrip}
-              className="font-primary bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-8 h-11 text-sm font-medium shadow-sm flex-1 md:flex-none"
-            >
-              Request a Trip
-            </Button>
-            {!isOwnProfile && targetUserId && (
-              <FollowButton targetUserId={targetUserId} />
+              <div className="min-w-0 flex-1">
+                <h1 className="font-secondary text-xl md:text-2xl text-[#0a2225] leading-tight truncate">
+                  {name}
+                </h1>
+                <p className="text-sm text-[#6B7280] mt-0.5">{title}</p>
+                {location && (
+                  <p className="text-xs text-[#9CA3AF] mt-1 flex items-center gap-1">
+                    <MapPin className="h-3 w-3" />
+                    {location}
+                  </p>
+                )}
+
+                <div className="flex items-center gap-3 mt-3 flex-wrap">
+                  {avgRating != null ? (
+                    <span className="flex items-center gap-1 text-sm text-[#0a2225] font-medium">
+                      <Star className="h-3.5 w-3.5 fill-[#C7A962] text-[#C7A962]" />
+                      {avgRating.toFixed(1)}
+                      <span className="text-[#9CA3AF] font-normal">({reviewCount})</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#FBF4E2] to-[#F1E2BB] border border-[#E6CF94] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#8A7136]">
+                      <Sparkles className="h-3 w-3" />
+                      New designer
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {specialties.length > 0 && (
+              <div className="mt-5 flex flex-wrap gap-1.5">
+                {specialties.slice(0, 6).map((s) => (
+                  <span
+                    key={s}
+                    className="rounded-full border border-[#E5DFC6] bg-[#FDF9F0] px-2.5 py-1 text-xs text-[#0a2225]"
+                  >
+                    {s}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* At-a-glance stat strip */}
+            <div className="mt-6 pt-5 border-t border-[#E5DFC6] grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {stats.map((s) => (
+                <div key={s.label}>
+                  <p className="font-secondary text-lg text-[#0a2225]">{s.value}</p>
+                  <p className="text-[10px] uppercase tracking-[0.16em] text-[#9CA3AF] mt-0.5">{s.label}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* CTAs */}
+            <div className="flex items-center gap-3 mt-6">
+              <Button
+                onClick={onRequestTrip}
+                className="font-primary bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-8 h-11 text-sm font-medium shadow-sm flex-1 md:flex-none"
+              >
+                Request a Trip
+              </Button>
+              {!isOwnProfile && targetUserId && (
+                <FollowButton targetUserId={targetUserId} />
+              )}
+            </div>
+
+            {showCompleteNudge && (
+              <div className="mt-5 flex items-start gap-2 rounded-xl border border-[#E5DFC6] bg-[#FDF9F0] px-3.5 py-2.5">
+                <Sparkles className="h-3.5 w-3.5 text-[#C7A962] mt-0.5 shrink-0" />
+                <p className="font-primary text-xs text-[#6B7280] leading-relaxed">
+                  Add your specialty and home base to help travelers find you.
+                </p>
+              </div>
             )}
           </div>
-
-          {showCompleteNudge && (
-            <div className="mt-5 flex items-start gap-2 rounded-xl border border-[#E5DFC6] bg-[#FDF9F0] px-3.5 py-2.5">
-              <Sparkles className="h-3.5 w-3.5 text-[#C7A962] mt-0.5 shrink-0" />
-              <p className="font-primary text-xs text-[#6B7280] leading-relaxed">
-                Add your specialty and home base to help travelers find you.
-              </p>
-            </div>
-          )}
-          </div>
-
-          {/* At-a-glance trust panel — was desktop-only, now visible on mobile too (stacks below the card) */}
-          {showTrustPanel && (
-            <div className="flex flex-col gap-5 rounded-2xl border border-[#E5DFC6] bg-white/85 backdrop-blur-sm shadow-lg p-6 flex-1 self-start">
-              {responseTimeText && (
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.22em] text-[#C7A962]">Response time</p>
-                  <p className="mt-1.5 text-sm font-medium text-[#0a2225]">{responseTimeText}</p>
-                </div>
-              )}
-              {memberSinceYear && (
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.22em] text-[#C7A962]">Member since</p>
-                  <p className="mt-1.5 text-sm font-medium text-[#0a2225]">{memberSinceYear}</p>
-                </div>
-              )}
-              {specialties.length > 0 && (
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.22em] text-[#C7A962]">Specialties</p>
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {specialties.slice(0, 6).map((s) => (
-                      <span
-                        key={s}
-                        className="rounded-full border border-[#E5DFC6] bg-[#FDF9F0] px-2.5 py-1 text-xs text-[#0a2225]"
-                      >
-                        {s}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </div>
 
