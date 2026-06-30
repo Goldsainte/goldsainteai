@@ -381,10 +381,11 @@ landing page.
 - 🔎 **Follow-up:** when we add a real **go-live** gate (admin approval / first payout), use **one**
   Stripe-status source of truth so the profile and the gate always agree.
 
-### E10. Package creator/agent isn't a real DB user → fall back to concierge (item 17) — **BE**
-If a package's `creator_id`/`agent_id` points at a user not in `profiles`, the responder resolution should
-fall back to `CONCIERGE_USER_ID`. Harden `submit-trip-inquiry` + `send-direct-message` to verify the
-resolved responder exists before using it (else concierge). **Backend (edge fns; needs redeploy).**
+### E10. Package creator/agent isn't a real DB user → fall back to concierge (item 17) — ✅ **DONE (BE)**
+Both `submit-trip-inquiry` + `send-direct-message` now **verify the package-resolved responder exists in
+`profiles`** before using it; if it's an orphan id, they fall back to `CONCIERGE_USER_ID`. The check only
+runs on the *package-resolved* responder (not caller-supplied recipients), so normal DMs aren't slowed.
+**⚠️ Edge functions — needs redeploy (push to `main`).**
 
 ### E11. Messages break words mid-word (item 18, image-24) — ✅ **DONE**
 Root cause: the bubble was `max-w-[70%]` with **no `w-fit`**, so as a flex item it collapsed to

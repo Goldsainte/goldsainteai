@@ -175,6 +175,22 @@ serve(async (req) => {
     }
 
     responderId = responderId ?? partnerId ?? conciergeUserId;
+
+    // E10: a package may reference a creator/agent id that no longer exists in
+    // profiles. If the resolved responder isn't a real user, fall back to the
+    // concierge inbox so the inquiry still reaches a human (and the conversation
+    // doesn't point at a non-existent participant).
+    if (responderId && responderId !== conciergeUserId) {
+      const { data: responderProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('id')
+        .eq('id', responderId)
+        .maybeSingle();
+      if (!responderProfile) {
+        console.warn('resolved responder not found in profiles — using concierge', { responderId });
+        responderId = conciergeUserId;
+      }
+    }
     console.log('resolved inquiry responder', { tripId, responderId, fromPackage: !!pkg });
 
     // ── Dedup: one pending inquiry per email+trip ─────────────────────────

@@ -121,7 +121,22 @@ serve(async (req) => {
           recipientId = agentRow?.user_id ?? null;
         }
       }
-      if (!recipientId) recipientId = Deno.env.get("CONCIERGE_USER_ID") || null;
+      // E10: the package may reference a creator/agent id that no longer exists —
+      // verify the resolved responder is a real user, else drop to the concierge
+      // fallback below so the message still reaches a human.
+      const conciergeId = Deno.env.get("CONCIERGE_USER_ID") || null;
+      if (recipientId && recipientId !== conciergeId) {
+        const { data: rp } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("id", recipientId)
+          .maybeSingle();
+        if (!rp) {
+          console.warn("package responder not found in profiles — using concierge", { recipientId });
+          recipientId = null;
+        }
+      }
+      if (!recipientId) recipientId = conciergeId;
     }
 
     if (!recipientId) {
