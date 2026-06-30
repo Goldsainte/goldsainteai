@@ -35,11 +35,10 @@ serve(async (req) => {
       .from('profiles')
       .select('stripe_account_id, payout_schedule')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
     if (profileError) throw profileError;
 
-    if (!profile.stripe_account_id) {
       return new Response(
         JSON.stringify({ 
           connected: false,
