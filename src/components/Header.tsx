@@ -26,7 +26,7 @@ export const Header = () => {
   const location = useLocation();
   const { user, signOut } = useAuth();
   const { toast } = useToast();
-  const { isAdmin } = useUserRole();
+  const { isAdmin, isCreator, isAgent: isAgentAccount, isBrand } = useUserRole();
   const isMobile = useIsMobile();
   
   
@@ -37,11 +37,7 @@ export const Header = () => {
   const [profileName, setProfileName] = useState<string | null>(null);
   const { openModal: openExpediaModal } = useExpediaModal();
   const { unreadCount: unreadMessageCount } = useUnreadMessageCount();
-  const accountType = ((user as any)?.user_metadata?.account_type as string | undefined)?.toLowerCase() ?? null;
-  const isTraveler = !accountType || accountType === "traveler";
-  const isCreator = accountType === "creator";
-  const isAgentAccount = accountType === "agent";
-  const isBrand = accountType === "brand";
+  const isTraveler = !isCreator && !isAgentAccount && !isBrand;
   const primaryBookingsPath = "/my-bookings";
   // Travelers use /post-trip to request a custom trip from agents.
   // Creators/agents have a dedicated "Create Trip Package" item that points
@@ -137,7 +133,7 @@ export const Header = () => {
   };
 
   const getProfilePath = () => {
-    if (isCreator) return `/creator/${user?.id}`;
+    if (isCreator) return `/creators/${user?.id}`;
     if (isAgentAccount) return '/agent-dashboard';
     return '/traveler';
   };
