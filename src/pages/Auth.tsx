@@ -14,7 +14,7 @@ import logomark from '@/assets/logomark-gold.png';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { AccountTypeStep } from '@/components/auth/AccountTypeStep';
-import { getPostAuthDestination } from '@/lib/auth/postAuthRouting';
+import { getPostAuthDestination, resolvePostAuthDestination } from '@/lib/auth/postAuthRouting';
 import { AUTH_REDIRECT_STORAGE_KEY, getRedirectPathFromSearch, sanitizeRedirectPath } from '@/lib/auth/redirect';
 import { requestPasswordReset } from '@/lib/auth/requestPasswordReset';
 import { isDuplicateEmailError, isDuplicateEmailSignupResponse } from '@/lib/auth/duplicateEmail';
@@ -372,16 +372,12 @@ const Auth = () => {
         const storedRedirect = typeof window !== 'undefined'
           ? sanitizeRedirectPath(sessionStorage.getItem(AUTH_REDIRECT_STORAGE_KEY))
           : null;
-        const destination = redirectTarget ?? storedRedirect;
-        if (destination) {
-          if (typeof window !== 'undefined') sessionStorage.removeItem(AUTH_REDIRECT_STORAGE_KEY);
-          navigate(destination, { replace: true });
-          return;
-        }
-        const postAuthPath = getPostAuthDestination(
+        if (typeof window !== 'undefined') sessionStorage.removeItem(AUTH_REDIRECT_STORAGE_KEY);
+        const postAuthPath = resolvePostAuthDestination(
           profile?.account_type ?? null,
           profile?.onboarding_completed ?? false,
-          profile?.is_profile_complete ?? false
+          profile?.is_profile_complete ?? false,
+          redirectTarget ?? storedRedirect
         );
         navigate(postAuthPath, { replace: true });
         return;
