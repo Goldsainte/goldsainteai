@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { EditorialLoader } from '@/components/EditorialLoader';
 import { AUTH_REDIRECT_STORAGE_KEY, getRedirectPathFromSearch, sanitizeRedirectPath } from '@/lib/auth/redirect';
-import { getPostAuthDestination } from '@/lib/auth/postAuthRouting';
+import { resolvePostAuthDestination } from '@/lib/auth/postAuthRouting';
 import { toast } from '@/hooks/use-toast';
 import { trackEvent } from '@/lib/analytics/events';
 
@@ -382,21 +382,17 @@ const AuthCallback = () => {
           ? sanitizeRedirectPath(sessionStorage.getItem(AUTH_REDIRECT_STORAGE_KEY))
           : null;
 
-        // If we have an explicit redirect, respect that
-        if (redirectFromQuery || storedRedirect) {
-          const destination = redirectFromQuery ?? storedRedirect ?? '/marketplace';
-          if (typeof window !== 'undefined') {
-            sessionStorage.removeItem(AUTH_REDIRECT_STORAGE_KEY);
-          }
-          navigate(destination, { replace: true });
-          return;
+        // Honour an explicit deep-link redirect, but a generic landing (e.g.
+        // /marketplace from a signup CTA / stored "return here") must NOT override a
+        // creator/agent's studio home — resolvePostAuthDestination handles that.
+        if (typeof window !== 'undefined') {
+          sessionStorage.removeItem(AUTH_REDIRECT_STORAGE_KEY);
         }
-
-        // Use centralized routing logic for default destinations
-        const path = getPostAuthDestination(
+        const path = resolvePostAuthDestination(
           profile.account_type,
           profile.onboarding_completed,
-          profile.is_profile_complete
+          profile.is_profile_complete,
+          redirectFromQuery ?? storedRedirect
         );
 
         if (typeof window !== 'undefined') {

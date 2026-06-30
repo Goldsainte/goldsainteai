@@ -67,6 +67,31 @@ export function getPostAuthDestination(
 }
 
 /**
+ * Generic landing pages that must NOT override a role's home after login. A blanket
+ * `/marketplace` redirect (e.g. from a signup CTA or a stored "return here") should
+ * still send a creator to their studio — not back to the consumer marketplace.
+ */
+const GENERIC_LANDING_PATHS = new Set(["/", "/marketplace", "/traveler"]);
+
+/**
+ * Resolve the post-auth destination: honour an explicit redirect ONLY when it's a
+ * meaningful deep link (e.g. the trip/checkout the user was trying to reach);
+ * otherwise fall back to the role-based home. Keeps "return where I was" working
+ * while ensuring creators/agents land on their dashboard.
+ */
+export function resolvePostAuthDestination(
+  accountType: string | null | undefined,
+  onboardingCompleted: boolean | undefined,
+  isProfileComplete: boolean | undefined,
+  redirect?: string | null
+): string {
+  if (redirect && !GENERIC_LANDING_PATHS.has(redirect.split("?")[0])) {
+    return redirect;
+  }
+  return getPostAuthDestination(accountType, onboardingCompleted, isProfileComplete);
+}
+
+/**
  * Check if user needs onboarding based on their profile state
  */
 export function needsOnboarding(profile: {
