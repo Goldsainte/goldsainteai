@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -32,9 +33,11 @@ export default function CollectionsPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [wasCached, setWasCached] = useState(false);
 
-  // Route guard: redirect non-travelers away from Collections
-  const accountType = (user as any)?.user_metadata?.account_type?.toLowerCase();
-  if (accountType === 'creator' || accountType === 'agent' || accountType === 'brand') {
+  // Route guard: redirect non-travelers away from Collections.
+  // Waits for the role check to finish before deciding, so we don't
+  // briefly redirect (or briefly fail to redirect) on a stale first render.
+  const { isCreator, isAgent, isBrand, loading: roleLoading } = useUserRole();
+  if (!roleLoading && (isCreator || isAgent || isBrand)) {
     return <Navigate to="/partner" replace />;
   }
 
