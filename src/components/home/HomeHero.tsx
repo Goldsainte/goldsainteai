@@ -159,7 +159,7 @@ export function HomeHero() {
                       alt={t('home.hero.infinityPool')}
                       className="h-full w-full object-cover"
                       loading="eager"
-                      fetchpriority="high"
+                      fetchPriority="high"
                       decoding="async"
                     />
                   </div>
@@ -171,7 +171,7 @@ export function HomeHero() {
                       alt={t('home.hero.treehouseHammock')}
                       className="h-full w-full object-cover"
                       loading="eager"
-                      fetchpriority="high"
+                      fetchPriority="high"
                       decoding="async"
                     />
                   </div>
@@ -181,7 +181,7 @@ export function HomeHero() {
                       alt={t('home.hero.friendsHiking')}
                       className="h-full w-full object-cover"
                       loading="eager"
-                      fetchpriority="high"
+                      fetchPriority="high"
                       decoding="async"
                     />
                   </div>

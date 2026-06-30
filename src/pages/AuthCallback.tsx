@@ -260,7 +260,7 @@ const AuthCallback = () => {
             // normally already sent at submit time, so the row carries a
             // conversation_id — we just open it. Click-time creation below is a
             // fallback for when submit-time delivery didn't happen.
-            let inquiryQuery = supabase
+            let inquiryQuery = (supabase as any)
               .from('pending_inquiries')
               .select('id, question, partner_id, trip_id, trip_title, conversation_id')
               .eq('user_id', session.user.id)
@@ -290,7 +290,7 @@ const AuthCallback = () => {
                 .maybeSingle();
 
               if (existingConvo) {
-                await supabase
+                await (supabase as any)
                   .from('pending_inquiries')
                   .update({
                     status: 'converted',
@@ -315,7 +315,7 @@ const AuthCallback = () => {
               });
 
               if (!dmErr && dm?.conversationId) {
-                await supabase
+                await (supabase as any)
                   .from('pending_inquiries')
                   .update({
                     status: 'converted',
