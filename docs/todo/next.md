@@ -2,10 +2,10 @@
 
 > Triaged items live in [todo.md](todo.md). Add new items here; they get moved into todo.md.
 >
-> Fully triaged (nothing pending here):
-> - Primary Destinations (Step 3) → Google Places multi-select, optional ✅ (todo.md B5a).
-> - Step 4 "Portfolio" removal → audited, **pending partner decision** (todo.md B5b).
-> - Creator dashboard tabs (image-9) → scrollbar fixed; follow-ups logged (todo.md B6).
-> - Getting-Started checklist linkage (image-10) → audited, fixes proposed (todo.md B7).
+> Latest moved (→ todo.md Workstream E, 2026-06-30):
+> - E1 "Unknown" user in messages (name resolution) — bug, awaiting first-name-only decision.
+> - E2 "Question sent" modal check-green ≠ button green — trivial.
+> - E3 Messages layout/fonts polish.
+> - E4 Landing image loading — assessed; awaiting Supabase image-transform plan answer.
 
 _(empty — add the next batch)_

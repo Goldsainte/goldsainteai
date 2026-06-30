@@ -305,6 +305,42 @@ Audit (2026-06-27): only the **Google Ads** tag is wired; GA4, Clarity, GSC and 
 
 ---
 
+## Workstream E — Client review batch (2026-06-30, post-deploy)
+Four items from live testing. All legit; verdicts + plans below.
+
+### E1. Inbox shows "Unknown" for the inquiry traveler — **bug, High** (image-13/14)
+`get-conversations` resolves the other party as `display_name || "Unknown"` (line 84) and only selects
+`display_name`. The Ask-a-Question modal collects **first name only** (`AskQuestionDrawer`), and
+`submit-trip-inquiry` sets only `first_name` metadata — **no `display_name`** — so the inbox falls to
+"Unknown." The concierge side also shows "Unknown / Traveler" (its profile `display_name` is null + wrong
+`account_type`).
+- **Fix (code):** `get-conversations` → select + fall back
+  `display_name || full_name || first_name || "Traveler"`. Defensive → repairs existing convos, no migration.
+- **Fix (flow):** set `display_name = first_name` on the inquiry signup (`submit-trip-inquiry`); give the
+  **concierge profile** `display_name = "Goldsainte Concierge"` + correct `account_type`.
+- ❓ **Decision:** modal is **first-name-only by design** (low friction) — keep it (recommended) + fix
+  display, or add a last-name field?
+- 🔎 Investigate: provenance of `last_name = "question"` (likely `handle_new_user`); why concierge role = "Traveler".
+
+### E2. "Question sent" modal — check-mark green ≠ button green — **trivial** (image-11)
+Success check is bright emerald; "Got it" is brand green `#0c4d47`. Recolor the check to the brand green.
+
+### E3. Messages layout & fonts polish — **minor, traveler-facing** (image-13)
+Timestamps ("1 minute ago") tiny/low-contrast; review tab + body typography vs the landing font system.
+Small pass on `DirectMessageInbox` (timestamp legibility + font consistency).
+
+### E4. Landing image loading — **perf, High** (assessment only; no code yet)
+Covers are **full-res Supabase Storage originals** (`/object/public/…cover-*.jpg`); `TripCoverImage` is a
+bare `<img>` with **no resize / srcset / sizes / modern format** → a 192px card downloads a multi-MB JPEG.
+`loading="lazy"` on the near-fold popular row defers + deprioritizes it.
+- **Recommend:** (1) resized images via Supabase **render/image transform**
+  (`/storage/v1/render/image/public/…?width=600&quality=70&resize=cover` + WebP) *(needs transform feature /
+  Pro plan)*; (2) `srcset` + `sizes`; (3) **eager + `fetchpriority="high"`** for the first above-fold row,
+  lazy below; (4) compress/downscale covers at **upload** (≤~1600px WebP). Big first-impression win for press.
+- ❓ Is **image transformation** enabled on the Supabase plan? (Decides whether #1 is available now.)
+
+---
+
 ## Next iteration — prioritised plan for Wednesday
 
 ### P0 — must land before press (traveller-heavy traffic)
