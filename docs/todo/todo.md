@@ -407,12 +407,12 @@ not a meaningless step). No action.
 RLS policy + what admin-approval writes. The normal review→approve flow probably works; DB-only flips
 won't. **Backend / RLS.**
 
-### E15. Logged-out → `/marketplace` bounces to the confirm-email gate (item 22, image-27) — **FE — VERIFY (press-critical)**
-A mid-signup creator (pending confirmation) hitting `/marketplace` after "logout" was bounced to the
-`/auth` confirm-email screen + an "email verified on another device" toast — a stale pending-signup
-state / incomplete logout. The marketplace is **public**, so **a clean logged-out user MUST browse it
-freely**. ⚠️ **Verify a fresh logged-out session can open `/marketplace`** — if not, it's press-blocking
-(travellers can't browse). **Frontend** (auth state / route guard).
+### E15. Logged-out → `/marketplace` bounces to the confirm-email gate (item 22, image-27) — **FE — edge case (NOT press-blocking)**
+✅ **Checked:** `/marketplace` is a **public route** (`AppRoutes.tsx:259`, no `RequireAuth`) — a clean
+logged-out user browses it fine, so the **press audience is safe**. The bounce is a **stale pending-signup
+state**: the user started signup, didn't confirm, "logged out" without clearing the pending-confirmation
+state, so a top-level effect re-shows the `/auth` confirm-email screen + "verified on another device"
+toast. **Fix later:** clear the pending-signup/auth state fully on logout. Frontend, low priority.
 
 ---
 
