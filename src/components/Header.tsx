@@ -192,7 +192,7 @@ export const Header = () => {
                         <Button 
                           variant="ghost" 
                           size="icon"
-                          className="h-12 w-12 min-h-[48px] min-w-[48px] hover:bg-[#BFAD72] rounded-full border border-border shadow-sm transition-all duration-300 group touch-manipulation"
+                          className="h-12 w-12 min-h-[48px] min-w-[48px] hover:bg-[#BFAD72] rounded-full border border-border shadow-sm transition-all duration-300 group touch-manipulation focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:bg-[#BFAD72]"
                           aria-label="Menu"
                         >
                           <User className="h-6 w-6 text-[#BFAD72] group-hover:text-white transition-colors" />
@@ -438,7 +438,7 @@ export const Header = () => {
                     <Button 
                       variant="ghost" 
                       size="icon"
-                      className="h-12 w-12 min-h-[48px] min-w-[48px] sm:h-12 sm:w-12 hover:bg-[#BFAD72] rounded-full border border-border shadow-sm transition-all duration-300 group touch-manipulation"
+                      className="h-12 w-12 min-h-[48px] min-w-[48px] sm:h-12 sm:w-12 hover:bg-[#BFAD72] rounded-full border border-border shadow-sm transition-all duration-300 group touch-manipulation focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:bg-[#BFAD72]"
                       aria-label="Menu"
                       data-tour="navigation"
                     >

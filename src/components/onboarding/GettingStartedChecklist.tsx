@@ -14,7 +14,7 @@ interface ChecklistData {
   profileViews?: number;
   publishedTrips?: number;
   proposalsSent?: number;
-  activity?: { has_browsed_marketplace?: boolean };
+  activity?: { has_browsed_marketplace?: boolean; has_shared_profile?: boolean };
 }
 
 interface ChecklistItem {
@@ -85,7 +85,13 @@ const CREATOR_ITEMS: ChecklistItem[] = [
     label: "Complete your creator profile",
     description: "Add a photo, bio, and your niches so travelers can discover you.",
     cta: { label: "Complete profile", to: "/onboarding/creator" },
-    isComplete: (d) => !!d.profile?.has_completed_creator_onboarding,
+    // Reflect the actual profile content the copy promises (photo + bio + niches),
+    // not just the "finished the wizard" flag — so a filled profile ticks even if
+    // the creator hit "Skip" on the last onboarding step.
+    isComplete: (d) =>
+      !!d.profile?.avatar_url &&
+      !!d.profile?.bio &&
+      (d.profile?.creator_niches?.length || 0) > 0,
   },
   {
     id: "connect-stripe",
@@ -107,7 +113,9 @@ const CREATOR_ITEMS: ChecklistItem[] = [
     label: "Share your creator profile",
     description: "Your public profile is your storefront. Share it on TikTok and Instagram.",
     cta: { label: "View my profile", to: (d) => `/creators/${d.profile?.id || ""}` },
-    isComplete: (d) => (d.profileViews || 0) > 10,
+    // "creator_avg_views > 10" was an imported TikTok metric unrelated to sharing.
+    // Complete when the creator opens their public profile (the share/preview action).
+    isComplete: (d) => !!d.activity?.has_shared_profile,
   },
   {
     id: "review-tax-info",
@@ -195,12 +203,16 @@ export function GettingStartedChecklist({ userId, role }: Props) {
           .maybeSingle();
 
         const browsedKey = `visited_marketplace_${userId}`;
+        const sharedKey = `gs_shared_profile_${userId}`;
         const stats: ChecklistData = {
           profile,
           activity: {
             has_browsed_marketplace:
               typeof window !== "undefined" &&
               localStorage.getItem(browsedKey) === "true",
+            has_shared_profile:
+              typeof window !== "undefined" &&
+              localStorage.getItem(sharedKey) === "true",
           },
         };
 
@@ -307,6 +319,17 @@ export function GettingStartedChecklist({ userId, role }: Props) {
                 ) : (
                   <Link
                     to={to}
+                    onClick={() => {
+                      // "Share your creator profile" completes when they open it.
+                      if (item.id === "share-profile") {
+                        localStorage.setItem(`gs_shared_profile_${userId}`, "true");
+                        setData((prev) =>
+                          prev
+                            ? { ...prev, activity: { ...prev.activity, has_shared_profile: true } }
+                            : prev,
+                        );
+                      }
+                    }}
                     className="flex-shrink-0 inline-flex items-center gap-1 text-xs sm:text-sm font-medium text-[#0c4d47] hover:underline whitespace-nowrap"
                   >
                     {item.cta.label}

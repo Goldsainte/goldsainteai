@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { atHandle, socialUrl } from "@/lib/socialHandles";
 import { Film, ExternalLink, Instagram, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -96,12 +97,12 @@ export function CreatorMediaGallery({
           <p className="text-sm text-[#6B7280]">
             Follow{" "}
             <a
-              href={`https://instagram.com/${instagramHandle}`}
+              href={socialUrl("instagram", instagramHandle) ?? undefined}
               target="_blank"
               rel="noopener noreferrer"
               className="font-medium text-[#0c4d47] hover:underline"
             >
-              @{instagramHandle}
+              {atHandle(instagramHandle)}
             </a>{" "}
             on Instagram
           </p>

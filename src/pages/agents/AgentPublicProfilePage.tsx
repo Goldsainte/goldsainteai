@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { ArrowLeft, PenLine } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { atHandle, socialUrl } from "@/lib/socialHandles";
 import { ProfileHero } from "@/components/profile/ProfileHero";
 import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
 import { ProfileTripsGrid } from "@/components/profile/ProfileTripsGrid";
@@ -125,15 +126,15 @@ export default function AgentPublicProfilePage() {
   const socialLinks = [
     agent.tiktok_handle && {
       platform: "TikTok",
-      handle: agent.tiktok_handle,
-      url: `https://www.tiktok.com/@${agent.tiktok_handle}`,
+      handle: atHandle(agent.tiktok_handle),
+      url: socialUrl("tiktok", agent.tiktok_handle),
     },
     agent.instagram_handle && {
       platform: "Instagram",
-      handle: agent.instagram_handle,
-      url: `https://www.instagram.com/${agent.instagram_handle}`,
+      handle: atHandle(agent.instagram_handle),
+      url: socialUrl("instagram", agent.instagram_handle),
     },
-  ].filter(Boolean) as { platform: string; handle: string; url: string }[];
+  ].filter((l) => l && l.url) as { platform: string; handle: string; url: string }[];
 
   const displayName =
     details?.agency_name || agent.full_name || "Travel Agent";

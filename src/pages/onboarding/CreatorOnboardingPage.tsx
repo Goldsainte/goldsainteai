@@ -2,13 +2,15 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { GoogleCityAutocomplete } from "@/components/GoogleCityAutocomplete";
+import { normalizeHandle } from "@/lib/socialHandles";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { LuxuryStepIndicator } from "@/components/onboarding/LuxuryStepIndicator";
 import { LuxurySelectionCard } from "@/components/onboarding/LuxurySelectionCard";
 import { ProfilePhotoUploader } from "@/pages/traveler/components/ProfilePhotoUploader";
-import { DestinationAutocompleteNominatim } from "@/components/preferences/DestinationAutocompleteNominatim";
+import { DestinationAutocomplete } from "@/components/preferences/DestinationAutocomplete";
 import { FeaturedPhotosUploader } from "@/components/onboarding/FeaturedPhotosUploader";
 import { CreatorMediaUploader, type MediaEntry } from "@/components/creator/CreatorMediaUploader";
 import { BrandAlignmentSelector } from "@/components/onboarding/BrandAlignmentSelector";
@@ -24,13 +26,21 @@ import {
   ArrowRight
 } from "lucide-react";
 
+// Step 4 (Portfolio) is HIDDEN for the press launch — see todo.md B5b. It was the
+// longest, all-optional step and its brand/pricing fields are read nowhere yet.
+// Flip this to `true` to restore it: the step's JSX, state, and save fields all
+// stay intact behind this flag (nothing was deleted).
+const SHOW_PORTFOLIO_STEP = false;
 const STEPS = [
   { title: "About You", icon: User },
   { title: "Social Profile", icon: Globe },
   { title: "Your Niche", icon: Sparkles },
-  { title: "Portfolio", icon: Image },
+  ...(SHOW_PORTFOLIO_STEP ? [{ title: "Portfolio", icon: Image }] : []),
   { title: "Standards", icon: Shield },
 ];
+// Step indices shift when Portfolio is hidden, so derive them from the flag.
+const PORTFOLIO_STEP_INDEX = 3;
+const STANDARDS_STEP_INDEX = SHOW_PORTFOLIO_STEP ? 4 : 3;
 
 const TRAVEL_NICHES = [
   { value: "luxury", label: "Luxury & Ultra-Luxury", description: "5-star resorts, private villas, exclusive experiences" },
@@ -145,8 +155,8 @@ export default function CreatorOnboardingPage() {
       if (data.bio) setBio(data.bio);
       if (data.home_base) setHomeBase(data.home_base);
       if (data.primary_platform) setPrimaryPlatform(data.primary_platform);
-      if (data.tiktok_handle) setTiktokHandle(data.tiktok_handle);
-      if (data.instagram_handle) setInstagramHandle(data.instagram_handle);
+      if (data.tiktok_handle) setTiktokHandle(normalizeHandle(data.tiktok_handle));
+      if (data.instagram_handle) setInstagramHandle(normalizeHandle(data.instagram_handle));
       if (data.website) setWebsite(data.website);
       if (data.creator_niches?.length) setSelectedNiches(data.creator_niches);
       if (data.content_style_tags?.length) setSelectedStyles(data.content_style_tags);
@@ -165,6 +175,12 @@ export default function CreatorOnboardingPage() {
     }
     loadExistingProfile();
   }, [user]);
+
+  // Scroll to the top when the wizard step changes — steps vary in length, so the
+  // next step should start at the top (covers Continue, Back, and indicator clicks).
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentStep]);
 
   const handleSkip = async () => {
     try {
@@ -188,9 +204,10 @@ export default function CreatorOnboardingPage() {
         .update(updateData)
         .eq("id", user.id);
       toast.success("Progress saved! You can finish onboarding anytime from your dashboard.");
-      // Route back into the wizard — useRequireOnboarding would otherwise bounce
-      // an incomplete creator off the dashboard and create a redirect loop.
-      navigate("/onboarding/creator?resume=1");
+      // Skip = leave onboarding for now. /creator-dashboard is guarded only by
+      // RequireAuth (no onboarding-completion gate); it shows a "complete your
+      // profile" banner + Getting Started checklist so they can finish later.
+      navigate("/creator-dashboard");
     } catch (error) {
       console.error("Error saving partial progress:", error);
       toast.error("Failed to save progress.");
@@ -211,30 +228,33 @@ export default function CreatorOnboardingPage() {
   };
 
   const canProceed = () => {
-    switch (currentStep) {
-      case 0:
-        return displayName.trim().length > 0 && bio.trim().length > 0 && homeBase.trim().length > 0;
-      case 1:
-        if (primaryPlatform.length === 0) return false;
-        if (primaryPlatform === "tiktok") return tiktokHandle.trim().length > 0;
-        if (primaryPlatform === "instagram") return instagramHandle.trim().length > 0;
-        if (primaryPlatform === "youtube") return website.trim().length > 0;
-        if (primaryPlatform === "multi")
-          return (
-            tiktokHandle.trim().length > 0 ||
-            instagramHandle.trim().length > 0 ||
-            website.trim().length > 0
-          );
-        return true;
-      case 2:
-        return selectedNiches.length > 0 && destinations.length > 0;
-      case 3:
-        return true; // All optional
-      case 4:
-        return acceptsTransparency && acceptsSafetyPolicy && tosAccepted && privacyAccepted && creatorAgreementAccepted;
-      default:
-        return true;
+    // Index-aware (the Portfolio step may be hidden — see SHOW_PORTFOLIO_STEP).
+    if (currentStep === 0) {
+      return displayName.trim().length > 0 && bio.trim().length > 0 && homeBase.trim().length > 0;
     }
+    if (currentStep === 1) {
+      if (primaryPlatform.length === 0) return false;
+      if (primaryPlatform === "tiktok") return tiktokHandle.trim().length > 0;
+      if (primaryPlatform === "instagram") return instagramHandle.trim().length > 0;
+      if (primaryPlatform === "youtube") return website.trim().length > 0;
+      if (primaryPlatform === "multi")
+        return (
+          tiktokHandle.trim().length > 0 ||
+          instagramHandle.trim().length > 0 ||
+          website.trim().length > 0
+        );
+      return true;
+    }
+    if (currentStep === 2) {
+      return selectedNiches.length > 0; // destinations optional
+    }
+    if (SHOW_PORTFOLIO_STEP && currentStep === PORTFOLIO_STEP_INDEX) {
+      return true; // Portfolio — all optional
+    }
+    if (currentStep === STANDARDS_STEP_INDEX) {
+      return acceptsTransparency && acceptsSafetyPolicy && tosAccepted && privacyAccepted && creatorAgreementAccepted;
+    }
+    return true;
   };
 
   const handleNext = () => {
@@ -281,8 +301,8 @@ export default function CreatorOnboardingPage() {
           home_base: homeBase || null,
           cover_image_url: coverImageUrl || null,
           primary_platform: primaryPlatform || null,
-          tiktok_handle: tiktokHandle || null,
-          instagram_handle: instagramHandle || null,
+          tiktok_handle: normalizeHandle(tiktokHandle) || null,
+          instagram_handle: normalizeHandle(instagramHandle) || null,
           website: website || null,
           creator_niches: selectedNiches,
           content_style_tags: selectedStyles,
@@ -512,11 +532,12 @@ export default function CreatorOnboardingPage() {
 
                   <div>
                     <Label className="text-[#0a2225] font-medium">Home Base *</Label>
-                    <Input
+                    <GoogleCityAutocomplete
                       value={homeBase}
-                      onChange={(e) => setHomeBase(e.target.value)}
+                      onChange={setHomeBase}
                       placeholder="City, Country"
-                      className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
+                      className="mt-2"
+                      inputClassName="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
                     />
                   </div>
                 </div>
@@ -555,24 +576,30 @@ export default function CreatorOnboardingPage() {
                       TikTok Handle
                       {(primaryPlatform === "tiktok") && <span className="text-[#0c4d47]"> *</span>}
                     </Label>
-                    <Input
-                      value={tiktokHandle}
-                      onChange={(e) => setTiktokHandle(e.target.value)}
-                      placeholder="@yourhandle"
-                      className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
-                    />
+                    <div className="relative mt-2">
+                      <span className="pointer-events-none absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-[#7A7151]">@</span>
+                      <Input
+                        value={tiktokHandle}
+                        onChange={(e) => setTiktokHandle(e.target.value.replace(/^@+/, ""))}
+                        placeholder="yourhandle"
+                        className="pl-7 sm:pl-9 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
+                      />
+                    </div>
                   </div>
                   <div>
                     <Label className="text-[#0a2225] font-medium">
                       Instagram Handle
                       {(primaryPlatform === "instagram") && <span className="text-[#0c4d47]"> *</span>}
                     </Label>
-                    <Input
-                      value={instagramHandle}
-                      onChange={(e) => setInstagramHandle(e.target.value)}
-                      placeholder="@yourhandle"
-                      className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
-                    />
+                    <div className="relative mt-2">
+                      <span className="pointer-events-none absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-[#7A7151]">@</span>
+                      <Input
+                        value={instagramHandle}
+                        onChange={(e) => setInstagramHandle(e.target.value.replace(/^@+/, ""))}
+                        placeholder="yourhandle"
+                        className="pl-7 sm:pl-9 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -658,20 +685,22 @@ export default function CreatorOnboardingPage() {
                 </div>
 
                 <div>
-                  <Label className="text-[#0a2225] font-medium mb-3 block">
-                    Primary Destinations * <span className="text-[#6B7280] font-normal">(regions you know best)</span>
-                  </Label>
-                  <DestinationAutocompleteNominatim
+                  <DestinationAutocomplete
+                    label="Primary Destinations"
+                    helperText="Countries, regions, or cities you know best — optional."
+                    placeholder="Start typing a country, region, or city…"
                     value={destinations}
                     onChange={setDestinations}
                     maxSelections={10}
+                    types={["(regions)"]}
+                    inputClassName="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
                   />
                 </div>
               </div>
             )}
 
-            {/* ── Step 4: Your Portfolio (all optional) ── */}
-            {currentStep === 3 && (
+            {/* ── Step 4: Your Portfolio (all optional) — HIDDEN behind SHOW_PORTFOLIO_STEP ── */}
+            {SHOW_PORTFOLIO_STEP && currentStep === PORTFOLIO_STEP_INDEX && (
               <div className="space-y-8">
                 <div className="text-center mb-8">
                   <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Your Portfolio</h2>
@@ -804,8 +833,8 @@ export default function CreatorOnboardingPage() {
               </div>
             )}
 
-            {/* ── Step 5: Standards & Legal ── */}
-            {currentStep === 4 && (
+            {/* ── Step 5: Standards & Legal (index 3 when Portfolio is hidden) ── */}
+            {currentStep === STANDARDS_STEP_INDEX && (
               <div className="space-y-6">
                 <div className="text-center mb-8">
                   <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Standards & Legal</h2>

@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { setOptions, importLibrary } from "@googlemaps/js-api-loader";
 import { X, MapPin } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 type DestinationAutocompleteProps = {
@@ -14,6 +13,13 @@ type DestinationAutocompleteProps = {
   onChange: (value: string[]) => void;
   maxSelections?: number;
   className?: string;
+  /** classes for the text input, to match the surrounding form */
+  inputClassName?: string;
+  /**
+   * Google Places autocomplete type collection. Default `["(cities)"]` (cities only).
+   * Use `["(regions)"]` to also include countries + regions/states.
+   */
+  types?: string[];
 };
 
 type Suggestion = {
@@ -41,6 +47,8 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
   onChange,
   maxSelections = 12,
   className,
+  inputClassName,
+  types = ["(cities)"],
 }) => {
   const [googleReady, setGoogleReady] = useState(false);
   const [input, setInput] = useState("");
@@ -53,6 +61,10 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
   const sessionTokenRef =
     useRef<google.maps.places.AutocompleteSessionToken | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  // Keep the latest `types` readable inside the fetch effect without making it a
+  // dependency (callers may pass an inline array → would otherwise refetch every render).
+  const typesRef = useRef(types);
+  typesRef.current = types;
 
   // Load Google Maps JS API once
   useEffect(() => {
@@ -60,12 +72,14 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
 
     const loadGoogleMaps = async () => {
       try {
-        const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-        
+        const apiKey =
+          import.meta.env.VITE_GOOGLE_PLACES_API_KEY ||
+          import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
         // Validate API key exists
         if (!apiKey) {
-          console.error("VITE_GOOGLE_MAPS_API_KEY is not configured");
-          setError("Destination search is not configured. Please add VITE_GOOGLE_MAPS_API_KEY.");
+          console.error("VITE_GOOGLE_PLACES_API_KEY is not configured");
+          setError("Destination search is not configured. Please add VITE_GOOGLE_PLACES_API_KEY.");
           return;
         }
         
@@ -118,7 +132,7 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
     autocompleteServiceRef.current.getPlacePredictions(
       {
         input: debouncedInput,
-        types: ["(cities)"],
+        types: typesRef.current,
         sessionToken: sessionTokenRef.current || undefined,
       },
       (predictions, status) => {
@@ -195,7 +209,7 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
           value={input}
           disabled={!googleReady || value.length >= maxSelections}
           onChange={(e) => setInput(e.target.value)}
-          className="h-11"
+          className={cn("h-11", inputClassName)}
         />
 
         {error && (
@@ -230,20 +244,21 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
       {value.length > 0 && (
         <div className="flex flex-wrap gap-2 pt-1">
           {value.map((destination) => (
-            <Badge
+            <span
               key={destination}
-              variant="secondary"
-              className="rounded-full px-3 py-1 text-[11px] flex items-center gap-1"
+              className="inline-flex items-center gap-1 rounded-full border border-[#E5DFC6] bg-[#F6F0E4] py-1 pl-3 pr-1.5 text-[13px] font-medium leading-none text-[#0a2225]"
             >
+              <MapPin className="h-3.5 w-3.5 shrink-0 text-[#C7A962]" />
               {destination}
               <button
                 type="button"
-                className="ml-1 hover:text-destructive transition-colors"
+                aria-label={`Remove ${destination}`}
+                className="inline-flex h-5 w-5 items-center justify-center rounded-full text-[#6B7280] transition-colors hover:bg-[#E5DFC6] hover:text-[#0a2225]"
                 onClick={() => handleRemoveDestination(destination)}
               >
-                <X className="w-3 h-3" />
+                <X className="h-3.5 w-3.5" />
               </button>
-            </Badge>
+            </span>
           ))}
         </div>
       )}

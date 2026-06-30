@@ -207,7 +207,7 @@ export default function CreatorDashboard() {
 
   return (
     <main className="min-h-screen bg-[#f7f3ea] pb-24 lg:pb-0 text-[#0a2225]">
-      <div className="mx-auto max-w-5xl px-5 sm:px-8 pt-8 md:pt-16 pb-12">
+      <div className="mx-auto max-w-6xl px-5 sm:px-8 pt-8 md:pt-16 pb-12">
         {/* Editorial header */}
         <header className="mb-8 md:mb-10">
           <p className="text-[10px] md:text-[11px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
@@ -216,7 +216,7 @@ export default function CreatorDashboard() {
           <h1 className="mt-2 md:mt-3 font-secondary text-[28px] leading-tight md:text-4xl text-[#0a2225]">
             {loading ? "Welcome" : `Welcome, ${displayName.split(" ")[0]}`}
           </h1>
-          <p className="mt-2 text-sm text-[#0a2225]/60 max-w-md">
+          <p className="mt-2 text-base text-[#0a2225]/70 max-w-xl">
             Your studio for shaping trip proposals, packaging journeys, and growing what you earn on-platform.
           </p>
           {profile?.creator_tier && (
@@ -234,8 +234,8 @@ export default function CreatorDashboard() {
             <div className="flex items-start sm:items-center gap-3 min-w-0">
               <AlertCircle className="w-5 h-5 text-[#0c4d47] flex-shrink-0 mt-0.5 sm:mt-0" />
               <div className="min-w-0">
-                <p className="font-secondary text-base text-[#0a2225]">Complete your creator profile</p>
-                <p className="text-sm text-[#0a2225]/65">Finish onboarding to unlock all features and start earning commissions.</p>
+                <p className="font-secondary text-base text-[#0a2225]">Finish setting up your studio</p>
+                <p className="text-sm text-[#0a2225]/65">Complete onboarding — including the creator terms — to unlock all features and start earning commissions.</p>
               </div>
             </div>
             <Link
@@ -264,7 +264,7 @@ export default function CreatorDashboard() {
               </SelectContent>
             </Select>
           ) : (
-            <TabsList className="w-full bg-transparent border-b border-[#0a2225]/15 rounded-none h-11 justify-start gap-0 flex p-0 overflow-x-auto">
+            <TabsList className="w-full bg-transparent border-b border-[#0a2225]/15 rounded-none h-11 justify-start gap-0 flex p-0 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {TAB_KEYS.map((key) => (
                 <TabsTrigger key={key} value={key} className={tabTriggerClass}>
                   {TAB_LABELS[key]}
@@ -331,7 +331,7 @@ export default function CreatorDashboard() {
               <h3 className="mt-3 font-secondary text-xl text-[#0a2225]">
                 Browse open trip requests
               </h3>
-              <p className="mt-2 text-sm text-[#0a2225]/65 leading-relaxed">
+              <p className="mt-2 text-[15px] text-[#0a2225]/70 leading-relaxed">
                 See what travelers are dreaming up and send a tailored proposal to win the brief.
               </p>
               <Link
@@ -348,7 +348,7 @@ export default function CreatorDashboard() {
               <h3 className="mt-3 font-secondary text-xl text-[#0a2225]">
                 Build something to sell
               </h3>
-              <p className="mt-2 text-sm text-[#0a2225]/65 leading-relaxed">
+              <p className="mt-2 text-[15px] text-[#0a2225]/70 leading-relaxed">
                 Turn your taste into bookable trips and digital guides — published in minutes, sold on-platform.
               </p>
               <Link
@@ -365,7 +365,7 @@ export default function CreatorDashboard() {
               <h3 className="mt-3 font-secondary text-xl text-[#0a2225]">
                 How creators earn on Goldsainte
               </h3>
-              <p className="mt-2 text-sm text-[#0a2225]/65 leading-relaxed">
+              <p className="mt-2 text-[15px] text-[#0a2225]/70 leading-relaxed">
                 A short guide to proposals, payouts, fees and how the marketplace splits work.
               </p>
               <Link

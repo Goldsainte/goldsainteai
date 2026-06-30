@@ -26,7 +26,7 @@ export function CreatorAboutSection({
     <div className="max-w-2xl">
       {/* Travel philosophy */}
       {bio && (
-        <p className="font-primary text-base md:text-lg italic text-[#4a4a4a] leading-relaxed mb-6">
+        <p className="font-primary text-lg md:text-xl italic text-[#4a4a4a] leading-relaxed mb-6">
           "{bio}"
         </p>
       )}
@@ -60,7 +60,7 @@ export function CreatorAboutSection({
       )}
 
       {/* Meta line */}
-      <div className="flex items-center gap-4 text-xs text-[#9CA3AF]">
+      <div className="flex items-center gap-4 text-sm text-[#9CA3AF]">
         {memberYear && <span>Member since {memberYear}</span>}
         {responseTimeText && (
           <>
