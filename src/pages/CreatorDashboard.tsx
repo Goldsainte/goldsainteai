@@ -3,7 +3,13 @@ import { useNavigate, Link, Navigate, useSearchParams } from "react-router-dom";
 import { invokeWithAuth } from "@/lib/supabaseHelpers";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { AlertCircle, ExternalLink } from "lucide-react";
+import { AlertCircle, ExternalLink, ChevronDown, Settings as SettingsIcon } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { GettingStartedChecklist } from "@/components/onboarding/GettingStartedChecklist";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -82,7 +88,6 @@ export default function CreatorDashboard() {
   useCreatorTierWatcher();
   
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "overview");
 
   const onboardingIncomplete = profile && !profile.has_completed_creator_onboarding;
 
@@ -173,7 +178,10 @@ export default function CreatorDashboard() {
 
   const displayName = profile?.display_name || profile?.first_name || profile?.full_name || "Creator";
 
-  const TAB_KEYS = [
+  // Leaf tabs are the actual content panels — every existing deep link
+  // (?tab=portfolio, ?tab=earnings, ?tab=settings, etc.) targets one of these
+  // and must keep working unchanged.
+  const LEAF_KEYS = [
     "overview",
     "proposals",
     "trips",
@@ -186,24 +194,109 @@ export default function CreatorDashboard() {
     "earnings",
     "settings",
   ] as const;
-  type TabKey = (typeof TAB_KEYS)[number];
+  type LeafKey = (typeof LEAF_KEYS)[number];
 
-  const TAB_LABELS: Record<TabKey, string> = {
-    overview: "Studio",
-    proposals: "Proposals",
-    trips: "Trips",
-    portfolio: "Portfolio",
-    guides: "Guides",
-    services: "Services",
-    performance: "Performance",
-    affiliate: "Affiliate",
-    content: "Content",
-    earnings: "Earnings",
-    settings: "Settings",
+  // Top-level groups condense the 11 flat tabs down to 5 visible pills,
+  // matching how Airbnb/most mature platforms keep primary nav short and
+  // push secondary items (here: Settings) into a "More" menu.
+  type GroupKey = "overview" | "pipeline" | "catalog" | "growth" | "earnings";
+  const GROUPS: { key: GroupKey; label: string; children: { key: LeafKey; label: string }[] }[] = [
+    { key: "overview", label: "Studio", children: [{ key: "overview", label: "Studio" }] },
+    {
+      key: "pipeline",
+      label: "Pipeline",
+      children: [
+        { key: "proposals", label: "Proposals" },
+        { key: "trips", label: "Trips" },
+      ],
+    },
+    {
+      key: "catalog",
+      label: "Catalog",
+      children: [
+        { key: "portfolio", label: "Portfolio" },
+        { key: "guides", label: "Guides" },
+        { key: "services", label: "Services" },
+      ],
+    },
+    {
+      key: "growth",
+      label: "Growth",
+      children: [
+        { key: "performance", label: "Performance" },
+        { key: "affiliate", label: "Affiliate" },
+        { key: "content", label: "Content" },
+      ],
+    },
+    { key: "earnings", label: "Earnings", children: [{ key: "earnings", label: "Earnings" }] },
+  ];
+
+  const LEAF_TO_GROUP = GROUPS.reduce((acc, group) => {
+    group.children.forEach((child) => { acc[child.key] = group.key; });
+    return acc;
+  }, {} as Record<Exclude<LeafKey, "settings">, GroupKey>);
+
+  const requestedLeaf = (searchParams.get("tab") as LeafKey) || "overview";
+  const initialIsSettings = requestedLeaf === "settings";
+  const initialLeaf: LeafKey = initialIsSettings
+    ? "settings"
+    : LEAF_TO_GROUP[requestedLeaf as Exclude<LeafKey, "settings">]
+    ? requestedLeaf
+    : "overview";
+
+  const [activeGroup, setActiveGroupState] = useState<GroupKey>(
+    initialIsSettings ? "overview" : LEAF_TO_GROUP[initialLeaf as Exclude<LeafKey, "settings">] ?? "overview"
+  );
+  const [activeLeaf, setActiveLeaf] = useState<LeafKey>(initialLeaf);
+
+  const handleGroupChange = (groupKey: string) => {
+    const group = GROUPS.find((g) => g.key === groupKey);
+    if (!group) return;
+    setActiveGroupState(group.key);
+    setActiveLeaf(group.children[0].key);
+  };
+
+  const renderLeaf = (leaf: LeafKey) => {
+    switch (leaf) {
+      case "overview":
+        return <CreatorOverviewTab stats={stats} loading={loading} />;
+      case "proposals":
+        return <CreatorProposalsTab />;
+      case "trips":
+        return <CreatorTripsTab />;
+      case "portfolio":
+        return <CreatorPortfolioTab />;
+      case "guides":
+        return <CreatorGuidesTab />;
+      case "services":
+        return user?.id ? <CreatorServicesSection creatorId={user.id} isOwnProfile={true} creatorTier={profile?.creator_tier} /> : null;
+      case "performance":
+        return (
+          <div className="space-y-6">
+            <TierBenefitsCard tier={profile?.creator_tier} />
+            <CreatorPerformanceTab role="creator" />
+          </div>
+        );
+      case "affiliate":
+        return <CreatorAffiliateTab />;
+      case "content":
+        return <CreatorContentToolsTab />;
+      case "earnings":
+        return <CreatorEarningsTab />;
+      case "settings":
+        return <CreatorSettingsTab />;
+    }
   };
 
   const tabTriggerClass =
     "rounded-none h-11 border-b border-transparent data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#0a2225]/55 text-[11px] uppercase tracking-[0.28em] font-medium px-5 whitespace-nowrap flex-shrink-0 transition-colors";
+
+  const subPillClass = (active: boolean) =>
+    `rounded-full border px-4 py-1.5 text-[11px] uppercase tracking-[0.2em] font-medium transition-colors ${
+      active
+        ? "bg-[#0c4d47] border-[#0c4d47] text-white"
+        : "bg-white border-[#E5DFC6] text-[#0a2225]/60 hover:border-[#0c4d47]/40"
+    }`;
 
   return (
     <main className="min-h-screen bg-[#f7f3ea] pb-24 lg:pb-0 text-[#0a2225]">
@@ -260,77 +353,90 @@ export default function CreatorDashboard() {
 
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-10 mt-2">
-          {isMobile ? (
-            <Select value={activeTab} onValueChange={setActiveTab}>
-              <SelectTrigger className="w-full bg-transparent border-[#0a2225]/15 rounded-full h-11 px-5 text-sm font-medium text-[#0a2225]">
-                <SelectValue>{TAB_LABELS[(activeTab as TabKey) ?? "overview"] ?? "Studio"}</SelectValue>
-              </SelectTrigger>
-              <SelectContent className="bg-[#f7f3ea] border-[#0a2225]/15 rounded-xl">
-                {TAB_KEYS.map((key) => (
-                  <SelectItem key={key} value={key} className="py-3">
-                    {TAB_LABELS[key]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          ) : (
-            <TabsList className="w-full bg-transparent border-b border-[#0a2225]/15 rounded-none h-11 justify-start gap-0 flex p-0 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {TAB_KEYS.map((key) => (
-                <TabsTrigger key={key} value={key} className={tabTriggerClass}>
-                  {TAB_LABELS[key]}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          )}
-
-          <TabsContent value="overview" className="mt-0">
-            <CreatorOverviewTab stats={stats} loading={loading} />
-          </TabsContent>
-
-          <TabsContent value="proposals" className="mt-0">
-            <CreatorProposalsTab />
-          </TabsContent>
-
-          <TabsContent value="trips" className="mt-0">
-            <CreatorTripsTab />
-          </TabsContent>
-
-          <TabsContent value="portfolio" className="mt-0">
-            <CreatorPortfolioTab />
-          </TabsContent>
-
-          <TabsContent value="guides" className="mt-0">
-            <CreatorGuidesTab />
-          </TabsContent>
-
-          <TabsContent value="services" className="mt-0">
-            {user?.id && <CreatorServicesSection creatorId={user.id} isOwnProfile={true} creatorTier={profile?.creator_tier} />}
-          </TabsContent>
-
-          <TabsContent value="performance" className="mt-0">
-            <div className="space-y-6">
-              <TierBenefitsCard tier={profile?.creator_tier} />
-              <CreatorPerformanceTab role="creator" />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="affiliate" className="mt-0">
-            <CreatorAffiliateTab />
-          </TabsContent>
-
-          <TabsContent value="content" className="mt-0">
-            <CreatorContentToolsTab />
-          </TabsContent>
-
-          <TabsContent value="earnings" className="mt-0">
-            <CreatorEarningsTab />
-          </TabsContent>
-
-          <TabsContent value="settings" className="mt-0">
+        {activeLeaf === "settings" ? (
+          <div className="space-y-6 mt-2">
+            <button
+              onClick={() => { setActiveLeaf("overview"); setActiveGroupState("overview"); }}
+              className="text-xs uppercase tracking-[0.2em] font-medium text-[#0a2225]/60 hover:text-[#0c4d47] transition-colors"
+            >
+              ← Back to Studio
+            </button>
             <CreatorSettingsTab />
-          </TabsContent>
-        </Tabs>
+          </div>
+        ) : (
+          <Tabs value={activeGroup} onValueChange={handleGroupChange} className="space-y-10 mt-2">
+            {isMobile ? (
+              <div className="flex items-center gap-2">
+                <Select value={activeGroup} onValueChange={handleGroupChange}>
+                  <SelectTrigger className="flex-1 bg-transparent border-[#0a2225]/15 rounded-full h-11 px-5 text-sm font-medium text-[#0a2225]">
+                    <SelectValue>{GROUPS.find((g) => g.key === activeGroup)?.label ?? "Studio"}</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#f7f3ea] border-[#0a2225]/15 rounded-xl">
+                    {GROUPS.map((group) => (
+                      <SelectItem key={group.key} value={group.key} className="py-3">
+                        {group.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="h-11 w-11 flex items-center justify-center rounded-full border border-[#0a2225]/15 text-[#0a2225]/70 hover:bg-white transition-colors shrink-0">
+                      <SettingsIcon className="w-4 h-4" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="bg-[#f7f3ea] border-[#0a2225]/15">
+                    <DropdownMenuItem onClick={() => setActiveLeaf("settings")}>
+                      Settings
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            ) : (
+              <div className="w-full border-b border-[#0a2225]/15 flex items-center justify-between">
+                <TabsList className="bg-transparent rounded-none h-11 justify-start gap-0 flex p-0 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  {GROUPS.map((group) => (
+                    <TabsTrigger key={group.key} value={group.key} className={tabTriggerClass}>
+                      {group.label}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.28em] font-medium text-[#0a2225]/55 hover:text-[#0a2225] transition-colors px-5 h-11 shrink-0">
+                      More <ChevronDown className="w-3.5 h-3.5" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="bg-white border-[#E5DFC6]">
+                    <DropdownMenuItem onClick={() => setActiveLeaf("settings")} className="gap-2">
+                      <SettingsIcon className="w-4 h-4" /> Settings
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            )}
+
+            {GROUPS.map((group) => (
+              <TabsContent key={group.key} value={group.key} className="mt-0">
+                {group.children.length > 1 && (
+                  <div className="mb-6 flex flex-wrap gap-2">
+                    {group.children.map((child) => (
+                      <button
+                        key={child.key}
+                        type="button"
+                        onClick={() => setActiveLeaf(child.key)}
+                        className={subPillClass(activeLeaf === child.key)}
+                      >
+                        {child.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {activeGroup === group.key && renderLeaf(activeLeaf)}
+              </TabsContent>
+            ))}
+          </Tabs>
+        )}
 
         {/* Editorial footer */}
         <footer className="mt-16 pt-10 border-t border-[#0a2225]/10">
