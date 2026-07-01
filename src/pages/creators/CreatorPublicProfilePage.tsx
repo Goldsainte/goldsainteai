@@ -8,6 +8,7 @@ import { WriteReviewModal } from "@/components/profile/WriteReviewModal";
 import { CreatorHeroSection } from "@/components/creator/CreatorHeroSection";
 import { CreatorServicesSection } from "@/components/creator/CreatorServicesSection";
 import { CreatorAboutSection } from "@/components/creator/CreatorAboutSection";
+import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -332,6 +333,18 @@ export default function CreatorPublicProfilePage() {
 
         {/* Spacer after hero card overlap */}
         <div className="h-8 md:h-12" />
+
+        {/* ─── Photo/video portfolio — was built but never wired into this page ─── */}
+        <div className="bg-[#FDF9F0]">
+          <div className="mx-auto max-w-5xl px-4 pb-8 md:pb-12">
+            <CreatorMediaGallery
+              creatorId={creator.id}
+              fallbackPhotos={creator.featured_photos}
+              instagramHandle={creator.instagram_handle}
+              isOwnProfile={isOwnProfile}
+            />
+          </div>
+        </div>
 
         {/* ─── Empty portfolio state (owner only, nothing published yet) ─── */}
         {isOwnProfile && trips.length === 0 && guides.length === 0 && (
