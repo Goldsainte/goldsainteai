@@ -3,6 +3,7 @@ import { Clock, ChevronRight, Plus, PenLine, Star, CirclePlus, MoreVertical, Pen
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { AddServiceDialog } from "./AddServiceDialog";
+import { TIER_COMMISSION, type CreatorTier } from "./TierBadge";
 import { toast } from "sonner";
 
 type ServiceTier = "custom_itinerary" | "full_trip_design" | "add_on";
@@ -28,6 +29,8 @@ interface Service {
 interface Props {
   creatorId: string;
   isOwnProfile?: boolean;
+  /** Real value from profiles.creator_tier — drives the accurate "you keep X%" line. Defaults to bronze if absent. */
+  creatorTier?: CreatorTier | string | null;
 }
 
 const TIER_CONFIG: Record<ServiceTier, { label: string; icon: any; badge: string; cta: string }> = {
@@ -62,13 +65,16 @@ function formatPrice(cents: number, currency: string) {
   }).format(cents / 100);
 }
 
-export function CreatorServicesSection({ creatorId, isOwnProfile }: Props) {
+export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier }: Props) {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editService, setEditService] = useState<Service | null>(null);
   const [pendingTier, setPendingTier] = useState<ServiceTier | null>(null);
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
+
+  const safeTier: CreatorTier = (creatorTier && creatorTier in TIER_COMMISSION ? creatorTier : "bronze") as CreatorTier;
+  const youKeepPct = 100 - TIER_COMMISSION[safeTier];
 
   const fetchServices = useCallback(async () => {
     const { data } = await supabase
@@ -100,7 +106,6 @@ export function CreatorServicesSection({ creatorId, isOwnProfile }: Props) {
   }
 
   if (loading) return null;
-  if (services.length === 0 && !isOwnProfile) return null;
 
   // Group by tier
   const grouped = TIER_ORDER.reduce<Record<ServiceTier, Service[]>>((acc, t) => {
@@ -109,6 +114,16 @@ export function CreatorServicesSection({ creatorId, isOwnProfile }: Props) {
   }, {} as any);
 
   const hasAny = services.length > 0;
+
+  if (!hasAny && !isOwnProfile) {
+    return (
+      <div className="rounded-2xl border border-[#E5DFC6] bg-[#FDF9F0] px-6 py-8 text-center">
+        <p className="text-sm text-[#6B7280]">
+          This creator hasn't listed custom services yet — check back soon, or send a trip request above.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -259,8 +274,11 @@ export function CreatorServicesSection({ creatorId, isOwnProfile }: Props) {
               <li><strong className="text-[#0a2225]">Full Trip Design</strong> — End-to-end trip planning with bookings, restaurant recs, and revisions.</li>
               <li><strong className="text-[#0a2225]">Add-On</strong> — Short extras like a 30-minute planning call or restaurant list for an existing trip.</li>
             </ul>
-            <p className="text-xs text-[#9A9384] mb-8">
+            <p className="text-xs text-[#9A9384] mb-3">
               Looking to sell a downloadable guide instead? <a href="/itinerary-builder" className="underline text-[#0c4d47]">Use the Itinerary Builder</a>.
+            </p>
+            <p className="text-xs font-medium text-[#0c4d47] mb-8">
+              You set your own prices — you keep {youKeepPct}% of every booking, paid the moment work is delivered.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
