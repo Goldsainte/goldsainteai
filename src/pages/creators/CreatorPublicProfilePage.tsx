@@ -65,6 +65,8 @@ interface CreatorProfile {
   last_seen_at: string | null;
   website: string | null;
   created_at?: string | null;
+  creator_tier?: string | null;
+  is_verified?: boolean | null;
 }
 
 interface CreatorProfileData {
@@ -105,7 +107,7 @@ export default function CreatorPublicProfilePage() {
         supabase
           .from("profiles")
           .select(
-            "id, username, featured_tiktok_videos, full_name, display_name, avatar_url, bio, location, tiktok_handle, instagram_handle, creator_niches, creator_avg_views, creator_followers, featured_photos, cover_image_url, content_style_tags, destinations_focus_tags, travel_philosophy, last_seen_at, website, created_at"
+            "id, username, featured_tiktok_videos, full_name, display_name, avatar_url, bio, location, tiktok_handle, instagram_handle, creator_niches, creator_avg_views, creator_followers, featured_photos, cover_image_url, content_style_tags, destinations_focus_tags, travel_philosophy, last_seen_at, website, created_at, creator_tier, is_verified"
           )
           .eq("id", id)
           .maybeSingle(),
@@ -224,8 +226,6 @@ export default function CreatorPublicProfilePage() {
 
   const handleRequestTrip = () => navigate(`/post-trip?fromCreator=${creator.id}`);
 
-  const coverImageFallback = creator.featured_photos?.[0] || creator.avatar_url || null;
-
   return (
     <>
       <Helmet>
@@ -311,7 +311,6 @@ export default function CreatorPublicProfilePage() {
         <CreatorHeroSection
           name={displayName}
           avatarUrl={creator.avatar_url}
-          coverImageUrl={creator.cover_image_url}
           title={positioningTitle}
           location={creator.location}
           avgRating={avgRating}
@@ -320,15 +319,15 @@ export default function CreatorPublicProfilePage() {
           clientsServed={creatorData?.clients_served ?? null}
           specialties={specialties}
           responseTimeText={responseTimeText}
-          isVerified
+          isVerified={Boolean(creator.is_verified)}
           isOwnProfile={isOwnProfile}
           targetUserId={isOwnProfile ? undefined : creator.id}
           onRequestTrip={handleRequestTrip}
-          fallbackCoverUrl={coverImageFallback}
           profileUserId={creator.id}
           onProfileUpdated={fetchProfile}
           memberSince={creator.created_at ?? null}
           followerCount={creator.creator_followers}
+          creatorTier={creator.creator_tier}
         />
 
         {/* Spacer after hero card overlap */}
@@ -469,6 +468,7 @@ export default function CreatorPublicProfilePage() {
             <CreatorServicesSection
               creatorId={creator.id}
               isOwnProfile={isOwnProfile}
+              creatorTier={creator.creator_tier}
             />
           </div>
         </div>
