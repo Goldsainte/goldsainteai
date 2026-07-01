@@ -175,18 +175,16 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) reset(); onOpenChange(v); }}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto p-0">
-        <div className="px-6 pt-6">
-          <DialogHeader>
-            <DialogTitle className="font-secondary text-xl text-[#0a2225]">
-              {isEdit ? "Edit Service" : "Add a Service"}
-            </DialogTitle>
-          </DialogHeader>
-        </div>
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="font-secondary text-xl text-[#0a2225]">
+            {isEdit ? "Edit Service" : "Add a Service"}
+          </DialogTitle>
+        </DialogHeader>
 
         {/* Tier selection gates entry into the wizard */}
         {!tier && !isEdit && (
-          <div className="grid grid-cols-2 gap-3 px-6 pb-6 pt-2">
+          <div className="grid grid-cols-2 gap-3 pt-2">
             {TIERS.map((t) => (
               <button
                 key={t.value}
@@ -204,7 +202,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
         {tier && (
           <>
             {/* Stepper */}
-            <div className="px-6 pb-4">
+            <div className="pb-2">
               {selectedTier && (
                 <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border mb-4 ${selectedTier.color}`}>
                   <selectedTier.icon className="h-3.5 w-3.5" />
@@ -243,7 +241,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
               </div>
             </div>
 
-            <div className="px-6 pb-2 space-y-4">
+            <div className="space-y-4">
               {/* STEP 0: Overview */}
               {step === 0 && (
                 <>
@@ -434,7 +432,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
             </div>
 
             {/* Footer nav */}
-            <div className="flex items-center justify-between px-6 py-4 mt-2 border-t border-[#E5DFC6]">
+            <div className="flex items-center justify-between -mx-6 px-6 pt-4 pb-1 mt-2 border-t border-[#E5DFC6]">
               <Button
                 type="button"
                 variant="outline"
