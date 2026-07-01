@@ -16,6 +16,7 @@ export const Footer = () => {
       heading: "EXPLORE",
       links: [
         { to: "/marketplace", label: "Browse Trips" },
+        { to: "/creators", label: "Browse Creators" },
         { to: "/post-trip", label: "Post a Trip" },
         { to: "/agents", label: "Find a Specialist" },
       ],
