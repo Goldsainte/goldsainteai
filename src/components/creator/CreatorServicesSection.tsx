@@ -24,6 +24,8 @@ interface Service {
   file_url: string | null;
   delivery_time_option: string | null;
   revisions: number | null;
+  requirements: string[];
+  faq: { question: string; answer: string }[];
 }
 
 interface Props {
@@ -79,7 +81,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier }:
   const fetchServices = useCallback(async () => {
     const { data } = await supabase
       .from("creator_services")
-      .select("id, title, description, starting_price_cents, currency, delivery_days, includes, cover_image_url, service_tier, trip_days, has_priority_support, duration_minutes, file_url, delivery_time_option, revisions")
+      .select("id, title, description, starting_price_cents, currency, delivery_days, includes, cover_image_url, service_tier, trip_days, has_priority_support, duration_minutes, file_url, delivery_time_option, revisions, requirements, faq")
       .eq("creator_id", creatorId)
       .eq("is_active", true)
       .order("sort_order", { ascending: true });
@@ -90,6 +92,8 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier }:
         includes: Array.isArray(s.includes) ? s.includes : [],
         service_tier: s.service_tier || "custom_itinerary",
         has_priority_support: s.has_priority_support || false,
+        requirements: Array.isArray(s.requirements) ? s.requirements : [],
+        faq: Array.isArray(s.faq) ? s.faq : [],
       }))
     );
     setLoading(false);
@@ -246,6 +250,30 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier }:
                               </li>
                             ))}
                           </ul>
+                        )}
+
+                        {/* Requirements — what the traveler will be asked for at booking */}
+                        {service.requirements.length > 0 && (
+                          <p className="mt-3 text-xs text-[#9CA3AF]">
+                            Collects {service.requirements.length} detail{service.requirements.length > 1 ? "s" : ""} from you at booking
+                          </p>
+                        )}
+
+                        {/* FAQ — native disclosure, no extra state needed */}
+                        {service.faq.length > 0 && (
+                          <details className="mt-3 group">
+                            <summary className="text-sm font-medium text-[#0c4d47] cursor-pointer list-none flex items-center gap-1">
+                              FAQ ({service.faq.length}) <ChevronRight className="h-3.5 w-3.5 transition-transform group-open:rotate-90" />
+                            </summary>
+                            <div className="mt-2 space-y-2.5">
+                              {service.faq.map((item, i) => (
+                                <div key={i}>
+                                  <p className="text-xs font-semibold text-[#0a2225]">{item.question}</p>
+                                  <p className="text-xs text-[#6B7280] mt-0.5">{item.answer}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </details>
                         )}
 
                         <button className="mt-4 text-sm font-medium text-[#0c4d47] flex items-center gap-1 hover:gap-2 transition-all">
