@@ -35,6 +35,9 @@ const PRESET_REQUIREMENTS = [
   "Accommodation preferences",
 ];
 
+// Matches the mockup's .field input styling exactly: cream bg, tan border, 10px radius
+const FIELD_CLASS = "bg-[#FDF9F0] border-[#E5DFC6] rounded-[10px] focus-visible:ring-[#0c4d47]/30";
+
 export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, editService, initialTier }: Props) {
   const isEdit = !!editService;
   const [tier, setTier] = useState<ServiceTier | null>(editService?.service_tier || initialTier || null);
@@ -42,14 +45,12 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
   const [step, setStep] = useState(0);
   const STEPS = ["Overview", "Pricing", "Requirements", "Description"];
 
-  // Sync tier when dialog opens with a new initialTier (e.g. from empty-state cards)
   useEffect(() => {
     if (open && !isEdit) {
       setTier(initialTier || null);
     }
   }, [open, initialTier, isEdit]);
 
-  // Form fields
   const [title, setTitle] = useState(editService?.title || "");
   const [description, setDescription] = useState(editService?.description || "");
   const [price, setPrice] = useState(editService ? String(editService.starting_price_cents / 100) : "");
@@ -173,9 +174,12 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
     else handleSave();
   }
 
+  // Progress fraction for the connecting line overlay (0 at step 0, 1 at the last step)
+  const progressPct = STEPS.length > 1 ? (step / (STEPS.length - 1)) * 100 : 0;
+
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) reset(); onOpenChange(v); }}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:w-full sm:max-w-[560px] max-h-[90vh] overflow-y-auto border-[#E5DFC6] rounded-2xl">
         <DialogHeader>
           <DialogTitle className="font-secondary text-xl text-[#0a2225]">
             {isEdit ? "Edit Service" : "Add a Service"}
@@ -201,61 +205,73 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
 
         {tier && (
           <>
-            {/* Stepper */}
-            <div className="pb-2">
-              {selectedTier && (
-                <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border mb-4 ${selectedTier.color}`}>
-                  <selectedTier.icon className="h-3.5 w-3.5" />
-                  {selectedTier.label}
-                  {!isEdit && (
-                    <button onClick={() => setTier(null)} className="ml-1 opacity-60 hover:opacity-100">
-                      <X className="h-3 w-3" />
-                    </button>
-                  )}
-                </div>
-              )}
-              <div className="flex items-center">
+            {selectedTier && (
+              <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border w-fit ${selectedTier.color}`}>
+                <selectedTier.icon className="h-3.5 w-3.5" />
+                {selectedTier.label}
+                {!isEdit && (
+                  <button onClick={() => setTier(null)} className="ml-1 opacity-60 hover:opacity-100">
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Stepper — single absolute-positioned line under the dots, avoids flex/margin alignment fragility */}
+            <div className="pb-1">
+              <div className="relative flex items-start justify-between mt-5">
+                {/* background line: insets = half a dot-column width, so it spans exactly dot-center to dot-center */}
+                <div
+                  className="absolute top-[13px] h-0.5 bg-[#E5DFC6]"
+                  style={{ left: `${50 / STEPS.length}%`, right: `${50 / STEPS.length}%` }}
+                />
+                <div
+                  className="absolute top-[13px] h-0.5 bg-[#C7A962] transition-all duration-300"
+                  style={{
+                    left: `${50 / STEPS.length}%`,
+                    width: `${(100 - 100 / STEPS.length) * (progressPct / 100)}%`,
+                  }}
+                />
                 {STEPS.map((label, i) => (
-                  <div key={label} className="flex items-center flex-1 last:flex-none">
-                    <div className="flex flex-col items-center">
-                      <div
-                        className={`h-6 w-6 rounded-full flex items-center justify-center text-[11px] font-bold transition-colors ${
-                          i === step
-                            ? "bg-[#0c4d47] text-white"
-                            : i < step
-                            ? "bg-[#C7A962] text-[#0a2225]"
-                            : "bg-[#E5DFC6] text-[#9CA3AF]"
-                        }`}
-                      >
-                        {i < step ? <Check className="h-3.5 w-3.5" /> : i + 1}
-                      </div>
-                      <span className={`text-[9px] font-semibold uppercase tracking-wide mt-1 ${i === step ? "text-[#0c4d47]" : "text-[#9CA3AF]"}`}>
-                        {label}
-                      </span>
+                  <div key={label} className="relative z-10 flex min-w-0 flex-col items-center" style={{ width: `${100 / STEPS.length}%` }}>
+                    <div
+                      className={`h-[26px] w-[26px] rounded-full flex items-center justify-center text-[11px] font-bold transition-colors ${
+                        i === step
+                          ? "bg-[#0c4d47] text-white"
+                          : i < step
+                          ? "bg-[#C7A962] text-[#0a2225]"
+                          : "bg-[#E5DFC6] text-[#9CA3AF]"
+                      }`}
+                    >
+                      {i < step ? <Check className="h-3.5 w-3.5" /> : i + 1}
                     </div>
-                    {i < STEPS.length - 1 && (
-                      <div className={`flex-1 h-0.5 mx-1 mb-4 ${i < step ? "bg-[#C7A962]" : "bg-[#E5DFC6]"}`} />
-                    )}
+                    <span
+                      className={`text-[9.5px] font-semibold uppercase tracking-wide mt-[5px] text-center ${
+                        i === step ? "text-[#0c4d47]" : "text-[#9CA3AF]"
+                      }`}
+                    >
+                      {label}
+                    </span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 pt-1">
               {/* STEP 0: Overview */}
               {step === 0 && (
                 <>
                   <div>
                     <label className="text-xs font-medium text-[#6B7280] mb-1 block">Title *</label>
-                    <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Custom Italy Itinerary" />
+                    <Input className={FIELD_CLASS} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Custom Italy Itinerary" />
                   </div>
                   <div>
                     <label className="text-xs font-medium text-[#6B7280] mb-1 block">Description</label>
-                    <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Brief description of this service" rows={3} />
+                    <Textarea className={FIELD_CLASS} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Brief description of this service" rows={3} />
                   </div>
                   <div>
                     <label className="text-xs font-medium text-[#6B7280] mb-1 block">Price (USD) *</label>
-                    <Input type="number" min="0" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="99" />
+                    <Input className={FIELD_CLASS} type="number" min="0" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="99" />
                   </div>
                 </>
               )}
@@ -271,7 +287,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                           <select
                             value={deliveryOption}
                             onChange={(e) => setDeliveryOption(e.target.value)}
-                            className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                            className={`w-full h-10 px-3 text-sm border ${FIELD_CLASS}`}
                           >
                             {DELIVERY_OPTIONS.map((o) => (
                               <option key={o} value={o}>{o}</option>
@@ -280,12 +296,12 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                         </div>
                         <div>
                           <label className="text-xs font-medium text-[#6B7280] mb-1 block">Trip Days</label>
-                          <Input type="number" min="1" value={tripDays} onChange={(e) => setTripDays(e.target.value)} placeholder="7" />
+                          <Input className={FIELD_CLASS} type="number" min="1" value={tripDays} onChange={(e) => setTripDays(e.target.value)} placeholder="7" />
                         </div>
                       </div>
                       <div>
                         <label className="text-xs font-medium text-[#6B7280] mb-1 block">Revisions Included</label>
-                        <Input type="number" min="0" value={revisions} onChange={(e) => setRevisions(e.target.value)} placeholder="2" />
+                        <Input className={FIELD_CLASS} type="number" min="0" value={revisions} onChange={(e) => setRevisions(e.target.value)} placeholder="2" />
                       </div>
                     </>
                   )}
@@ -296,7 +312,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                         type="checkbox"
                         checked={hasPriority}
                         onChange={(e) => setHasPriority(e.target.checked)}
-                        className="rounded border-[#E5DFC6]"
+                        className="rounded border-[#E5DFC6] accent-[#0c4d47]"
                       />
                       <span className="text-[#0a2225]">Priority Support included</span>
                     </label>
@@ -305,7 +321,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                   {tier === "add_on" && (
                     <div>
                       <label className="text-xs font-medium text-[#6B7280] mb-1 block">Duration (minutes)</label>
-                      <Input type="number" min="1" value={durationMinutes} onChange={(e) => setDurationMinutes(e.target.value)} placeholder="30" />
+                      <Input className={FIELD_CLASS} type="number" min="1" value={durationMinutes} onChange={(e) => setDurationMinutes(e.target.value)} placeholder="30" />
                     </div>
                   )}
 
@@ -331,7 +347,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                           type="checkbox"
                           checked={requirements.includes(label)}
                           onChange={() => toggleRequirement(label)}
-                          className="rounded border-[#E5DFC6]"
+                          className="rounded border-[#E5DFC6] accent-[#0c4d47]"
                         />
                         <span className="text-[#0a2225]">{label}</span>
                       </label>
@@ -354,13 +370,13 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                   )}
                   <div className="flex gap-2">
                     <Input
+                      className={`flex-1 ${FIELD_CLASS}`}
                       value={customRequirement}
                       onChange={(e) => setCustomRequirement(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addCustomRequirement())}
                       placeholder="Add a custom question…"
-                      className="flex-1"
                     />
-                    <Button type="button" variant="outline" size="sm" onClick={addCustomRequirement} className="shrink-0 border-[#E5DFC6]">
+                    <Button type="button" variant="outline" size="sm" onClick={addCustomRequirement} className="shrink-0 border-[#E5DFC6] rounded-[10px]">
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
@@ -385,13 +401,13 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                     </div>
                     <div className="flex gap-2">
                       <Input
+                        className={`flex-1 ${FIELD_CLASS}`}
                         value={newInclude}
                         onChange={(e) => setNewInclude(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addInclude())}
                         placeholder="e.g. Day-by-day itinerary"
-                        className="flex-1"
                       />
-                      <Button type="button" variant="outline" size="sm" onClick={addInclude} className="shrink-0 border-[#E5DFC6]">
+                      <Button type="button" variant="outline" size="sm" onClick={addInclude} className="shrink-0 border-[#E5DFC6] rounded-[10px]">
                         <Plus className="h-4 w-4" />
                       </Button>
                     </div>
@@ -402,13 +418,15 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                     <p className="text-xs text-[#9CA3AF] mb-2">Answer common questions before they're asked.</p>
                     <div className="space-y-3 mb-2">
                       {faq.map((item, i) => (
-                        <div key={i} className="rounded-lg border border-[#E5DFC6] bg-[#FDF9F0] p-3 space-y-2">
+                        <div key={i} className="rounded-[10px] border border-[#E5DFC6] bg-[#FDF9F0] p-3 space-y-2">
                           <Input
+                            className="bg-white border-[#E5DFC6] rounded-[10px]"
                             value={item.question}
                             onChange={(e) => updateFaqItem(i, "question", e.target.value)}
                             placeholder="Question"
                           />
                           <Textarea
+                            className="bg-white border-[#E5DFC6] rounded-[10px]"
                             value={item.answer}
                             onChange={(e) => updateFaqItem(i, "answer", e.target.value)}
                             placeholder="Answer"
@@ -423,7 +441,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                         </div>
                       ))}
                     </div>
-                    <Button type="button" variant="outline" size="sm" onClick={addFaqItem} className="w-full border-[#E5DFC6]">
+                    <Button type="button" variant="outline" size="sm" onClick={addFaqItem} className="w-full border-[#E5DFC6] rounded-[10px]">
                       <Plus className="h-4 w-4 mr-1" /> Add FAQ item
                     </Button>
                   </div>
