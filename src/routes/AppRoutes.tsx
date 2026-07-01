@@ -32,6 +32,7 @@ const AdminDisputesPage = lazy(() => import('@/pages/admin/AdminDisputesPage'));
 const AdminHomePage = lazy(() => import('@/pages/admin/AdminHomePage'));
 const AdminTripsPage = lazy(() => import('@/pages/admin/AdminTripsPage'));
 const AdminWaitlistPage = lazy(() => import('@/pages/admin/AdminWaitlistPage'));
+const SeedConciergeDesks = lazy(() => import('@/pages/admin/SeedConciergeDesks'));
 const AdminEmailDLQPage = lazy(() => import('@/pages/admin/AdminEmailDLQPage'));
 const AdminUsersPage = lazy(() => import('@/pages/admin/AdminUsersPage'));
 
@@ -502,6 +503,7 @@ export const AppRoutes = () => (
       <Route path="/journal/:slug" element={<JournalArticle />} />
       <Route path="/escrow-timeline" element={<RequireAuth><EscrowTimelineDashboard /></RequireAuth>} />
       <Route path="/activity-logs" element={<AdminGuard><ActivityLogs /></AdminGuard>} />
+      <Route path="/admin/seed-concierge-desks" element={<AdminGuard><SeedConciergeDesks /></AdminGuard>} />
       <Route path="/customer-verification" element={<RequireAuth><CustomerVerification /></RequireAuth>} />
       <Route path="/emergency-contacts" element={<RequireAuth><EmergencyContacts /></RequireAuth>} />
       <Route path="/earnings" element={<RequireAuth><EarningsDashboard /></RequireAuth>} />
