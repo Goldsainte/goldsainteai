@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { Clock, ChevronRight, Plus, PenLine, Star, CirclePlus, MoreVertical, Pencil, Trash2, Shield } from "lucide-react";
+import { Clock, ChevronRight, Plus, PenLine, Star, CirclePlus, MoreVertical, Pencil, Trash2, Shield, Wallet, CalendarCheck, Tag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { AddServiceDialog } from "./AddServiceDialog";
@@ -263,8 +263,8 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier }:
         /* Empty state: clear intro + tier picker */
         <div>
           <div className="mb-6 max-w-2xl">
-            <h3 className="font-secondary text-2xl text-[#0a2225] mb-3">
-              Offer custom services from your profile
+            <h3 className="font-secondary text-2xl md:text-[28px] text-[#0a2225] mb-3">
+              Turn your taste into income
             </h3>
             <p className="text-sm text-[#6B7280] leading-relaxed mb-2">
               Beyond selling fixed itinerary guides, you can offer personalised services that travelers request directly from your profile. You get paid when work is delivered.
@@ -274,13 +274,36 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier }:
               <li><strong className="text-[#0a2225]">Full Trip Design</strong> — End-to-end trip planning with bookings, restaurant recs, and revisions.</li>
               <li><strong className="text-[#0a2225]">Add-On</strong> — Short extras like a 30-minute planning call or restaurant list for an existing trip.</li>
             </ul>
-            <p className="text-xs text-[#9A9384] mb-3">
+            <p className="text-xs text-[#9A9384] mb-6">
               Looking to sell a downloadable guide instead? <a href="/itinerary-builder" className="underline text-[#0c4d47]">Use the Itinerary Builder</a>.
             </p>
-            <p className="text-xs font-medium text-[#0c4d47] mb-8">
-              You set your own prices — you keep {youKeepPct}% of every booking, paid the moment work is delivered.
-            </p>
           </div>
+
+          {/* Trust strip — one real number (your actual tier commission), two true policy statements. No invented figures. */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-[#E5DFC6] border border-[#E5DFC6] rounded-2xl overflow-hidden mb-8">
+            <div className="bg-white px-6 py-5">
+              <div className="flex items-center gap-2 mb-1.5">
+                <Wallet className="h-4 w-4 text-[#0c4d47]" />
+                <p className="text-2xl font-bold text-[#0c4d47]">{youKeepPct}%</p>
+              </div>
+              <p className="text-xs text-[#6B7280]">You keep on every booking</p>
+            </div>
+            <div className="bg-white px-6 py-5">
+              <div className="flex items-center gap-2 mb-1.5">
+                <CalendarCheck className="h-4 w-4 text-[#0c4d47]" />
+                <p className="text-base font-semibold text-[#0a2225]">Paid on delivery</p>
+              </div>
+              <p className="text-xs text-[#6B7280]">Not just on request</p>
+            </div>
+            <div className="bg-white px-6 py-5">
+              <div className="flex items-center gap-2 mb-1.5">
+                <Tag className="h-4 w-4 text-[#0c4d47]" />
+                <p className="text-base font-semibold text-[#0a2225]">You set the price</p>
+              </div>
+              <p className="text-xs text-[#6B7280]">Full control, no fixed rates</p>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {TIERS.map((t) => {
               const T = t;
