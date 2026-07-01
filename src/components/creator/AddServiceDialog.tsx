@@ -26,6 +26,15 @@ const TIERS: { value: ServiceTier; label: string; desc: string; icon: any; color
 
 const DELIVERY_OPTIONS = ["2 days", "3 days", "5 days", "7 days", "14 days"];
 
+const PRESET_REQUIREMENTS = [
+  "Travel dates",
+  "Number of travelers",
+  "Budget range",
+  "Must-see destinations or activities",
+  "Dietary restrictions",
+  "Accommodation preferences",
+];
+
 export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, editService, initialTier }: Props) {
   const isEdit = !!editService;
   const [tier, setTier] = useState<ServiceTier | null>(editService?.service_tier || initialTier || null);
@@ -50,6 +59,9 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
   const [fileUrl, setFileUrl] = useState(editService?.file_url || "");
   const [includes, setIncludes] = useState<string[]>(editService?.includes || []);
   const [newInclude, setNewInclude] = useState("");
+  const [requirements, setRequirements] = useState<string[]>(editService?.requirements || []);
+  const [customRequirement, setCustomRequirement] = useState("");
+  const [faq, setFaq] = useState<{ question: string; answer: string }[]>(editService?.faq || []);
 
   function reset() {
     setTier(null);
@@ -64,6 +76,9 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
     setFileUrl("");
     setIncludes([]);
     setNewInclude("");
+    setRequirements([]);
+    setCustomRequirement("");
+    setFaq([]);
   }
 
   async function handleSave() {
@@ -88,6 +103,8 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
       has_priority_support: tier === "full_trip_design" ? hasPriority : false,
       duration_minutes: tier === "add_on" ? (parseInt(durationMinutes) || null) : null,
       file_url: null,
+      requirements: requirements.length > 0 ? requirements : [],
+      faq: faq.filter((f) => f.question.trim() && f.answer.trim()),
     };
 
     let error;
@@ -114,6 +131,31 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
       setIncludes([...includes, newInclude.trim()]);
       setNewInclude("");
     }
+  }
+
+  function toggleRequirement(label: string) {
+    setRequirements((prev) =>
+      prev.includes(label) ? prev.filter((r) => r !== label) : [...prev, label]
+    );
+  }
+
+  function addCustomRequirement() {
+    if (customRequirement.trim() && !requirements.includes(customRequirement.trim())) {
+      setRequirements([...requirements, customRequirement.trim()]);
+      setCustomRequirement("");
+    }
+  }
+
+  function addFaqItem() {
+    setFaq([...faq, { question: "", answer: "" }]);
+  }
+
+  function updateFaqItem(index: number, field: "question" | "answer", value: string) {
+    setFaq(faq.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
+  }
+
+  function removeFaqItem(index: number) {
+    setFaq(faq.filter((_, i) => i !== index));
   }
 
   const selectedTier = TIERS.find((t) => t.value === tier);
@@ -246,6 +288,88 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
+            </div>
+
+            {/* Requirements — collected from the traveler automatically at booking */}
+            <div>
+              <label className="text-xs font-medium text-[#6B7280] mb-1 block">
+                What You'll Need From the Traveler
+              </label>
+              <p className="text-xs text-[#9CA3AF] mb-2">
+                Collected automatically when they book, before you start work.
+              </p>
+              <div className="space-y-1.5 mb-2">
+                {PRESET_REQUIREMENTS.map((label) => (
+                  <label key={label} className="flex items-center gap-2 text-sm cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={requirements.includes(label)}
+                      onChange={() => toggleRequirement(label)}
+                      className="rounded border-[#E5DFC6]"
+                    />
+                    <span className="text-[#0a2225]">{label}</span>
+                  </label>
+                ))}
+              </div>
+              {requirements.filter((r) => !PRESET_REQUIREMENTS.includes(r)).length > 0 && (
+                <div className="space-y-1.5 mb-2">
+                  {requirements
+                    .filter((r) => !PRESET_REQUIREMENTS.includes(r))
+                    .map((item) => (
+                      <div key={item} className="flex items-center gap-2 text-sm text-[#0a2225]">
+                        <Check className="h-3.5 w-3.5 text-[#C7A962] shrink-0" />
+                        <span className="flex-1">{item}</span>
+                        <button onClick={() => toggleRequirement(item)} className="text-[#9CA3AF] hover:text-red-500">
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                </div>
+              )}
+              <div className="flex gap-2">
+                <Input
+                  value={customRequirement}
+                  onChange={(e) => setCustomRequirement(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addCustomRequirement())}
+                  placeholder="Add a custom question…"
+                  className="flex-1"
+                />
+                <Button type="button" variant="outline" size="sm" onClick={addCustomRequirement} className="shrink-0 border-[#E5DFC6]">
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* FAQ */}
+            <div>
+              <label className="text-xs font-medium text-[#6B7280] mb-1 block">FAQ</label>
+              <p className="text-xs text-[#9CA3AF] mb-2">Answer common questions before they're asked.</p>
+              <div className="space-y-3 mb-2">
+                {faq.map((item, i) => (
+                  <div key={i} className="rounded-lg border border-[#E5DFC6] bg-[#FDF9F0] p-3 space-y-2">
+                    <Input
+                      value={item.question}
+                      onChange={(e) => updateFaqItem(i, "question", e.target.value)}
+                      placeholder="Question"
+                    />
+                    <Textarea
+                      value={item.answer}
+                      onChange={(e) => updateFaqItem(i, "answer", e.target.value)}
+                      placeholder="Answer"
+                      rows={2}
+                    />
+                    <button
+                      onClick={() => removeFaqItem(i)}
+                      className="text-xs font-medium text-red-500 hover:text-red-600"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <Button type="button" variant="outline" size="sm" onClick={addFaqItem} className="w-full border-[#E5DFC6]">
+                <Plus className="h-4 w-4 mr-1" /> Add FAQ item
+              </Button>
             </div>
 
             {/* Save */}
