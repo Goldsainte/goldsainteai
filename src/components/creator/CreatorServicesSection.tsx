@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { Clock, ChevronRight, Plus, PenLine, Star, CirclePlus, MoreVertical, Pencil, Trash2, Shield, Wallet, CalendarCheck, Tag } from "lucide-react";
+import { Clock, ChevronRight, Plus, PenLine, Star, CirclePlus, MoreVertical, Pencil, Trash2, Shield, Wallet, CalendarCheck, Tag, Check, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { AddServiceDialog } from "./AddServiceDialog";
@@ -266,15 +266,10 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier }:
             <h3 className="font-secondary text-2xl md:text-[28px] text-[#0a2225] mb-3">
               Turn your taste into income
             </h3>
-            <p className="text-sm text-[#6B7280] leading-relaxed mb-2">
-              Beyond selling fixed itinerary guides, you can offer personalised services that travelers request directly from your profile. You get paid when work is delivered.
+            <p className="text-sm text-[#6B7280] leading-relaxed mb-6">
+              Beyond selling fixed itinerary guides, you can offer personalised services that travelers request directly from your profile. You get paid when work is delivered — choose a tier below to get started.
             </p>
-            <ul className="text-sm text-[#6B7280] leading-relaxed mb-6 space-y-1">
-              <li><strong className="text-[#0a2225]">Custom Itinerary</strong> — A traveler shares their dates and style, you design a one-of-one day-by-day plan.</li>
-              <li><strong className="text-[#0a2225]">Full Trip Design</strong> — End-to-end trip planning with bookings, restaurant recs, and revisions.</li>
-              <li><strong className="text-[#0a2225]">Add-On</strong> — Short extras like a 30-minute planning call or restaurant list for an existing trip.</li>
-            </ul>
-            <p className="text-xs text-[#9A9384] mb-6">
+            <p className="text-xs text-[#9A9384]">
               Looking to sell a downloadable guide instead? <a href="/itinerary-builder" className="underline text-[#0c4d47]">Use the Itinerary Builder</a>.
             </p>
           </div>
@@ -304,24 +299,52 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier }:
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {TIERS.map((t) => {
               const T = t;
+              const isFlagship = Boolean(t.tag);
               return (
-                <button
+                <div
                   key={t.value}
-                  onClick={() => { setEditService(null); setPendingTier(t.value); setDialogOpen(true); }}
-                  className="rounded-xl border border-[#E5DFC6] bg-white p-5 text-left hover:border-[#C7A962]/60 hover:shadow-md transition-all group"
+                  className={`relative flex flex-col rounded-2xl bg-white p-6 transition-all hover:shadow-lg hover:-translate-y-0.5 ${
+                    isFlagship ? "border-2 border-[#C7A962] shadow-md" : "border border-[#E5DFC6]"
+                  }`}
                 >
-                  <div className={`inline-flex items-center justify-center h-10 w-10 rounded-full mb-3 ${TIER_CONFIG[t.value].badge}`}>
-                    <T.icon className="h-5 w-5" />
+                  {t.tag && (
+                    <span className="absolute -top-3 left-6 bg-[#C7A962] text-[#0a2225] text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+                      {t.tag}
+                    </span>
+                  )}
+
+                  <div
+                    className={`inline-flex items-center justify-center h-12 w-12 rounded-xl mb-4 ${TIER_CONFIG[t.value].badge}`}
+                  >
+                    <T.icon className="h-6 w-6" />
                   </div>
-                  <p className="font-secondary text-base text-[#0a2225] mb-1">{t.label}</p>
-                  <p className="text-xs text-[#6B7280] leading-relaxed mb-4">{t.desc}</p>
-                  <span className="inline-flex items-center gap-1 text-xs font-medium text-[#0c4d47] group-hover:gap-2 transition-all">
-                    <Plus className="h-3.5 w-3.5" /> Create {t.label.toLowerCase()}
-                  </span>
-                </button>
+
+                  <p className="font-secondary text-xl text-[#0a2225] mb-1">{t.label}</p>
+                  <p className="text-xs text-[#9CA3AF] mb-4">{t.desc}</p>
+
+                  <ul className="space-y-2.5 mb-6 flex-1">
+                    {t.features.map((feature, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-[#6B7280]">
+                        <Check className="h-3.5 w-3.5 text-[#0c4d47] mt-0.5 shrink-0" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button
+                    onClick={() => { setEditService(null); setPendingTier(t.value); setDialogOpen(true); }}
+                    className={`flex items-center justify-center gap-1.5 w-full rounded-full py-2.5 text-sm font-semibold transition-all ${
+                      isFlagship
+                        ? "bg-[#0c4d47] text-white hover:bg-[#0a3d39]"
+                        : "border border-[#0c4d47] text-[#0c4d47] hover:bg-[#0c4d47] hover:text-white"
+                    }`}
+                  >
+                    Create {t.label.toLowerCase()} <ArrowRight className="h-3.5 w-3.5" />
+                  </button>
+                </div>
               );
             })}
           </div>
@@ -343,7 +366,38 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier }:
 
 // Re-export TIERS for empty state usage
 const TIERS = [
-  { value: "custom_itinerary" as ServiceTier, label: "Custom Itinerary", desc: "Personalized day-by-day plans", icon: PenLine },
-  { value: "full_trip_design" as ServiceTier, label: "Full Trip Design", desc: "Premium end-to-end planning", icon: Star },
-  { value: "add_on" as ServiceTier, label: "Add-On", desc: "Optional extras & calls", icon: CirclePlus },
+  {
+    value: "custom_itinerary" as ServiceTier,
+    label: "Custom Itinerary",
+    desc: "Personalized day-by-day plans",
+    icon: PenLine,
+    features: [
+      "Day-by-day plan matched to their dates and style",
+      "Delivered as a personal digital itinerary",
+      "Revisions included until it's right",
+    ],
+  },
+  {
+    value: "full_trip_design" as ServiceTier,
+    label: "Full Trip Design",
+    desc: "Premium end-to-end planning",
+    icon: Star,
+    tag: "Most comprehensive",
+    features: [
+      "End-to-end planning, including bookings",
+      "Restaurant and experience recommendations",
+      "Priority support available for travelers",
+    ],
+  },
+  {
+    value: "add_on" as ServiceTier,
+    label: "Add-On",
+    desc: "Optional extras & calls",
+    icon: CirclePlus,
+    features: [
+      "Fast-turnaround, focused help",
+      "Planning calls, lists, or quick advice",
+      "Built for travelers with an existing trip",
+    ],
+  },
 ];
