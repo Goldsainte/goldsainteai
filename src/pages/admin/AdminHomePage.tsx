@@ -171,6 +171,19 @@ export default function AdminHomePage() {
           </div>
         )}
       </section>
+
+      <section className="mx-auto max-w-6xl mt-8">
+        <Link
+          to="/admin/seed-concierge-desks"
+          className="flex items-center justify-between rounded-2xl border border-[#E5DFC6] bg-white/90 px-6 py-4 shadow-sm transition hover:shadow-lg"
+        >
+          <div>
+            <p className="text-sm font-semibold">Create Goldsainte Concierge desks</p>
+            <p className="text-[12px] text-[#4a4a4a] mt-1">One-time setup: 10 regional creator profiles, honestly labeled.</p>
+          </div>
+          <ArrowRight className="h-4 w-4 text-[#0c4d47]" />
+        </Link>
+      </section>
     </main>
   );
 }
