@@ -83,6 +83,16 @@ p {
   max-width: 85ch;
 }
 
+/* When a paragraph sits inside a centered layout (text-center), the
+   max-width above shrinks its box but the default margin:0 leaves it
+   flush-left instead of recentering — making it visually misaligned with
+   a wider sibling heading above it. Scoped to .text-center specifically so
+   normal left-aligned body paragraphs elsewhere are untouched. */
+.text-center p {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 /* Reduce motion for accessibility */
 @media (prefers-reduced-motion: reduce) {
   *,
