@@ -349,8 +349,8 @@ export default function CreatorsPage() {
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
       <input
         type="text"
-        placeholder="Search creators by destination, vibe, or handle"
-        className="w-full rounded-full border border-[#E5DFC6] bg-white px-4 py-2.5 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50 sm:w-72"
+        placeholder="Search by destination, vibe, or handle"
+        className="w-full rounded-full border border-[#E5DFC6] bg-white px-4 py-2.5 text-xs text-[#0a2225] placeholder:text-[#0a2225]/40 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50 sm:w-80"
         value={filters.search}
         onChange={(event) =>
           setFilters((prev) => ({ ...prev, search: event.target.value }))
@@ -424,7 +424,7 @@ export default function CreatorsPage() {
 
                 <div className="mt-4 flex flex-wrap gap-2 text-[11px]">
                   {creator.followers != null && (
-                    <span className="rounded-full bg-[#f7f3ea] px-3 py-1 text-[#0a2225]">
+                    <span className="rounded-full bg-[#f7f3ea] px-3 py-1 text-[#0a2225] slashed-zero tabular-nums">
                       {creator.followers.toLocaleString()} followers
                     </span>
                   )}
