@@ -3,13 +3,11 @@ import { BadgeCheck, Star, MapPin, Sparkles, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FollowButton from "@/components/FollowButton";
 import { ProfilePhotoModal } from "@/components/ProfilePhotoModal";
-import { CoverPhotoModal } from "@/components/CoverPhotoModal";
-import wordmark from "@/assets/wordmark-green.svg";
+import { TierBadge, type CreatorTier } from "@/components/creator/TierBadge";
 
 interface CreatorHeroSectionProps {
   name: string;
   avatarUrl: string | null;
-  coverImageUrl: string | null;
   title: string; // positioning e.g. "Luxury Europe Travel Designer"
   location: string | null;
   avgRating: number | null;
@@ -18,46 +16,44 @@ interface CreatorHeroSectionProps {
   clientsServed: number | null;
   specialties?: string[];
   responseTimeText?: string | null;
+  /** Real value from profiles.is_verified — do not hardcode true. */
   isVerified?: boolean;
   isOwnProfile?: boolean;
   targetUserId?: string;
   onRequestTrip: () => void;
-  fallbackCoverUrl?: string | null;
   /** Required when isOwnProfile is true — lets the edit controls know whose row to update. */
   profileUserId?: string;
-  /** Called after a successful avatar or cover photo upload so the parent can refetch. */
+  /** Called after a successful avatar upload so the parent can refetch. */
   onProfileUpdated?: () => void;
   /** ISO date string (e.g. profiles.created_at) — shown as "Member since {year}". */
   memberSince?: string | null;
   followerCount?: number | null;
+  /** Real value from profiles.creator_tier — renders the actual Bronze/Silver/Gold/Platinum badge. */
+  creatorTier?: CreatorTier | string | null;
 }
 
 export function CreatorHeroSection({
   name,
   avatarUrl,
-  coverImageUrl,
   title,
   location,
   avgRating,
   reviewCount,
   tripsCompleted,
-  clientsServed,
   specialties = [],
   responseTimeText,
-  isVerified = true,
+  isVerified = false,
   isOwnProfile,
   targetUserId,
   onRequestTrip,
-  fallbackCoverUrl,
   profileUserId,
   onProfileUpdated,
   memberSince,
   followerCount,
+  creatorTier,
 }: CreatorHeroSectionProps) {
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
-  const [coverModalOpen, setCoverModalOpen] = useState(false);
 
-  const heroImage = coverImageUrl || fallbackCoverUrl || null;
   const isGenericTitle = !title || title === "Travel Designer";
   const showCompleteNudge = Boolean(isOwnProfile && (isGenericTitle || !location));
   const memberSinceYear = memberSince ? new Date(memberSince).getFullYear() : null;
@@ -74,123 +70,67 @@ export function CreatorHeroSection({
 
   return (
     <section className="relative w-full">
-      {/* Full-width destination hero image (or branded fallback) */}
-      <div className="relative h-[360px] md:h-[520px] w-full overflow-hidden">
-        {heroImage ? (
-          <>
-            <img
-              src={heroImage}
-              alt={`${name}'s destination`}
-              className="absolute inset-0 h-full w-full object-cover"
-              loading="lazy"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-          </>
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-b from-[#F5EFE0] via-[#F7F3EA] to-[#EDE4CC]">
-            <div className="absolute inset-0 flex items-center justify-center opacity-[0.08]">
-              <img src={wordmark} alt="" className="w-[60%] max-w-[420px]" />
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#F7F3EA] via-transparent to-transparent" />
-          </div>
-        )}
-        {canEdit && (
-          <button
-            type="button"
-            onClick={() => setCoverModalOpen(true)}
-            className="absolute top-4 right-4 inline-flex items-center gap-1.5 rounded-full bg-[#0a2225]/60 backdrop-blur-sm border border-white/30 px-3.5 py-2 text-xs font-medium text-white hover:bg-[#0a2225]/80 transition-colors"
-          >
-            <Camera className="h-3.5 w-3.5" />
-            {heroImage ? "Edit cover photo" : "Add cover photo"}
-          </button>
-        )}
-      </div>
-
-      {/* Floating profile card overlay */}
-      <div className="relative mx-auto max-w-5xl px-4">
-        <div className="relative -mt-24 md:-mt-32">
-          <div className="bg-white rounded-2xl border border-[#E5DFC6] shadow-lg p-6 md:p-8 w-full max-w-2xl">
-            {/* Avatar + Name */}
-            <div className="flex items-start gap-5">
-              <div className="relative shrink-0">
-                <div className="h-20 w-20 md:h-24 md:w-24 rounded-full ring-[3px] ring-[#C7A962] overflow-hidden bg-[#E5DFC6]">
-                  <img
-                    src={avatarUrl || "/placeholder.svg"}
-                    alt={name}
-                    className="h-full w-full object-cover"
-                  loading="lazy"/>
-                </div>
-                {isVerified && (
-                  <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5">
-                    <BadgeCheck className="h-5 w-5 text-[#C7A962]" />
-                  </div>
-                )}
-                {canEdit && (
-                  <button
-                    type="button"
-                    onClick={() => setAvatarModalOpen(true)}
-                    aria-label="Edit profile photo"
-                    className="absolute -bottom-1 -left-1 h-6 w-6 flex items-center justify-center rounded-full bg-[#0a2225] border-2 border-white text-white hover:bg-[#0c4d47] transition-colors"
-                  >
-                    <Camera className="h-3 w-3" />
-                  </button>
-                )}
+      <div className="mx-auto max-w-5xl px-4 pt-8 md:pt-12">
+        <div className="bg-white rounded-2xl border border-[#E5DFC6] shadow-lg p-6 md:p-8">
+          {/* Top row: avatar + name/badges + actions */}
+          <div className="flex flex-col md:flex-row md:items-center gap-5">
+            <div className="relative shrink-0">
+              <div className="h-20 w-20 md:h-24 md:w-24 rounded-2xl ring-2 ring-[#C7A962] overflow-hidden bg-[#E5DFC6]">
+                <img
+                  src={avatarUrl || "/placeholder.svg"}
+                  alt={name}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
               </div>
-
-              <div className="min-w-0 flex-1">
-                <h1 className="font-secondary text-xl md:text-2xl text-[#0a2225] leading-tight truncate">
-                  {name}
-                </h1>
-                <p className="text-sm text-[#6B7280] mt-0.5">{title}</p>
-                {location && (
-                  <p className="text-xs text-[#9CA3AF] mt-1 flex items-center gap-1">
-                    <MapPin className="h-3 w-3" />
-                    {location}
-                  </p>
-                )}
-
-                <div className="flex items-center gap-3 mt-3 flex-wrap">
-                  {avgRating != null ? (
-                    <span className="flex items-center gap-1 text-sm text-[#0a2225] font-medium">
-                      <Star className="h-3.5 w-3.5 fill-[#C7A962] text-[#C7A962]" />
-                      {avgRating.toFixed(1)}
-                      <span className="text-[#9CA3AF] font-normal">({reviewCount})</span>
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#FBF4E2] to-[#F1E2BB] border border-[#E6CF94] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#8A7136]">
-                      <Sparkles className="h-3 w-3" />
-                      New designer
-                    </span>
-                  )}
+              {isVerified && (
+                <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5">
+                  <BadgeCheck className="h-5 w-5 text-[#C7A962]" />
                 </div>
-              </div>
+              )}
+              {canEdit && (
+                <button
+                  type="button"
+                  onClick={() => setAvatarModalOpen(true)}
+                  aria-label="Edit profile photo"
+                  className="absolute -bottom-1 -left-1 h-6 w-6 flex items-center justify-center rounded-full bg-[#0a2225] border-2 border-white text-white hover:bg-[#0c4d47] transition-colors"
+                >
+                  <Camera className="h-3 w-3" />
+                </button>
+              )}
             </div>
 
-            {specialties.length > 0 && (
-              <div className="mt-5 flex flex-wrap gap-1.5">
-                {specialties.slice(0, 6).map((s) => (
-                  <span
-                    key={s}
-                    className="rounded-full border border-[#E5DFC6] bg-[#FDF9F0] px-2.5 py-1 text-xs text-[#0a2225]"
-                  >
-                    {s}
+            <div className="min-w-0 flex-1">
+              <h1 className="font-secondary text-xl md:text-2xl text-[#0a2225] leading-tight flex items-center gap-2">
+                {name}
+                {isVerified && <BadgeCheck className="h-4.5 w-4.5 text-[#0c4d47] shrink-0" />}
+              </h1>
+              <p className="text-sm text-[#6B7280] mt-0.5">{title}</p>
+              {location && (
+                <p className="text-xs text-[#9CA3AF] mt-1 flex items-center gap-1">
+                  <MapPin className="h-3 w-3" />
+                  {location}
+                </p>
+              )}
+
+              <div className="flex items-center gap-2 mt-3 flex-wrap">
+                {avgRating != null ? (
+                  <span className="flex items-center gap-1 text-sm text-[#0a2225] font-medium">
+                    <Star className="h-3.5 w-3.5 fill-[#C7A962] text-[#C7A962]" />
+                    {avgRating.toFixed(1)}
+                    <span className="text-[#9CA3AF] font-normal">({reviewCount})</span>
                   </span>
-                ))}
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#FBF4E2] to-[#F1E2BB] border border-[#E6CF94] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#8A7136]">
+                    <Sparkles className="h-3 w-3" />
+                    New designer
+                  </span>
+                )}
+                {creatorTier && <TierBadge tier={creatorTier} size="md" />}
               </div>
-            )}
-
-            {/* At-a-glance stat strip */}
-            <div className="mt-6 pt-5 border-t border-[#E5DFC6] grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {stats.map((s) => (
-                <div key={s.label}>
-                  <p className="font-secondary text-lg text-[#0a2225]">{s.value}</p>
-                  <p className="text-[10px] uppercase tracking-[0.16em] text-[#9CA3AF] mt-0.5">{s.label}</p>
-                </div>
-              ))}
             </div>
 
-            {/* CTAs */}
-            <div className="flex items-center gap-3 mt-6">
+            <div className="flex items-center gap-3 shrink-0">
               <Button
                 onClick={onRequestTrip}
                 className="font-primary bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-8 h-11 text-sm font-medium shadow-sm flex-1 md:flex-none"
@@ -201,36 +141,50 @@ export function CreatorHeroSection({
                 <FollowButton targetUserId={targetUserId} />
               )}
             </div>
-
-            {showCompleteNudge && (
-              <div className="mt-5 flex items-start gap-2 rounded-xl border border-[#E5DFC6] bg-[#FDF9F0] px-3.5 py-2.5">
-                <Sparkles className="h-3.5 w-3.5 text-[#C7A962] mt-0.5 shrink-0" />
-                <p className="font-primary text-xs text-[#6B7280] leading-relaxed">
-                  Add your specialty and home base to help travelers find you.
-                </p>
-              </div>
-            )}
           </div>
+
+          {specialties.length > 0 && (
+            <div className="mt-5 flex flex-wrap gap-1.5">
+              {specialties.slice(0, 6).map((s) => (
+                <span
+                  key={s}
+                  className="rounded-full border border-[#E5DFC6] bg-[#FDF9F0] px-2.5 py-1 text-xs text-[#0a2225]"
+                >
+                  {s}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* At-a-glance stats — one consistent card treatment, not color-coded per stat */}
+          <div className="mt-6 pt-6 border-t border-[#E5DFC6] grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {stats.map((s) => (
+              <div key={s.label} className="rounded-2xl border border-[#E5DFC6] bg-[#FDF9F0] px-4 py-3.5">
+                <p className="font-bold text-xl text-[#0a2225]">{s.value}</p>
+                <p className="text-[11px] text-[#9CA3AF] mt-0.5 font-medium">{s.label}</p>
+              </div>
+            ))}
+          </div>
+
+          {showCompleteNudge && (
+            <div className="mt-5 flex items-start gap-2 rounded-xl border border-[#E5DFC6] bg-[#FDF9F0] px-3.5 py-2.5">
+              <Sparkles className="h-3.5 w-3.5 text-[#C7A962] mt-0.5 shrink-0" />
+              <p className="font-primary text-xs text-[#6B7280] leading-relaxed">
+                Add your specialty and home base to help travelers find you.
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
       {canEdit && profileUserId && (
-        <>
-          <ProfilePhotoModal
-            open={avatarModalOpen}
-            onOpenChange={setAvatarModalOpen}
-            userId={profileUserId}
-            currentAvatarUrl={avatarUrl}
-            onSuccess={() => onProfileUpdated?.()}
-          />
-          <CoverPhotoModal
-            open={coverModalOpen}
-            onOpenChange={setCoverModalOpen}
-            userId={profileUserId}
-            currentCoverUrl={coverImageUrl}
-            onSuccess={() => onProfileUpdated?.()}
-          />
-        </>
+        <ProfilePhotoModal
+          open={avatarModalOpen}
+          onOpenChange={setAvatarModalOpen}
+          userId={profileUserId}
+          currentAvatarUrl={avatarUrl}
+          onSuccess={() => onProfileUpdated?.()}
+        />
       )}
     </section>
   );
