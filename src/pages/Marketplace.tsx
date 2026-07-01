@@ -16,7 +16,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { BackButton } from "@/components/ui/BackButton";
 import { useUserRole } from "@/hooks/useUserRole";
 import { toast } from "sonner";
-import { CategoryChips } from "@/components/ui/CategoryChips";
 import { LiveSignalRow } from "@/components/marketplace/LiveSignalRow";
 import { QuietlyActiveFooter } from "@/components/marketplace/QuietlyActiveFooter";
 import { ForYouRow } from "@/components/marketplace/ForYouRow";
@@ -538,28 +537,6 @@ export default function Marketplace() {
         <MarketplaceSearch onSearch={handleSearch} filters={filters} onClearFilters={handleClearFilters} />
 
         <div className="mx-auto max-w-6xl px-4 py-4 md:py-8">
-          {/* Category discovery chips */}
-          {activeTab === "trips" && (
-          <CategoryChips
-            activeCategory={filters.category || "All"}
-            onCategoryChange={(cat) => {
-              const CATEGORY_TO_FILTER: Record<string, string> = {
-                "Luxury Escapes": "Luxury",
-                "Solo Travel": "Solo Travel",
-                "City Energy": "City breaks",
-                "Nature & Adventure": "Adventure",
-                "Wellness & Reset": "Wellness",
-                "Group Trips": "Family",
-                "Food & Culture": "Design-led",
-              };
-              setFilters((prev) => ({
-                ...prev,
-                category: cat === "All" ? undefined : (CATEGORY_TO_FILTER[cat] || cat),
-              }));
-            }}
-            className="mb-4"
-          />
-          )}
           {activeTab === "trips" && <LiveSignalRow />}
           <div className="mb-6 md:mb-8 flex flex-col gap-4 md:flex-row md:items-start">
             <div className="flex-1 min-w-0">
