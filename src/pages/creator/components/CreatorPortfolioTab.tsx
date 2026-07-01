@@ -16,6 +16,21 @@ export function CreatorPortfolioTab() {
 
   const [originalMediaIds, setOriginalMediaIds] = useState<string[]>([]);
   const [originalSocialIds, setOriginalSocialIds] = useState<string[]>([]);
+  const [dirty, setDirty] = useState(false);
+
+  // Warn before leaving the page with unsaved uploads/edits — uploading
+  // alone only stages changes locally; nothing persists until "Save
+  // Portfolio" is clicked, so a stray refresh or navigation silently
+  // discards everything without this.
+  useEffect(() => {
+    if (!dirty) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [dirty]);
 
   useEffect(() => {
     if (!user) return;
@@ -129,6 +144,7 @@ export function CreatorPortfolioTab() {
       setOriginalSocialIds((socialRefresh.data || []).map((r: any) => r.id));
 
       toast.success("Portfolio saved");
+      setDirty(false);
     } catch (err) {
       console.error("Save error:", err);
       toast.error("Failed to save portfolio");
@@ -156,7 +172,7 @@ export function CreatorPortfolioTab() {
         <CreatorMediaUploader
           userId={user?.id || ""}
           media={media}
-          onMediaChange={setMedia}
+          onMediaChange={(m) => { setMedia(m); setDirty(true); }}
           maxItems={12}
         />
       </div>
@@ -167,11 +183,16 @@ export function CreatorPortfolioTab() {
         <p className="text-sm text-[#6B7280] mb-4">
           Add your social profiles and follower counts. This builds credibility and helps travelers trust your expertise.
         </p>
-        <CreatorSocialAccountsEditor accounts={socials} onChange={setSocials} />
+        <CreatorSocialAccountsEditor accounts={socials} onChange={(s) => { setSocials(s); setDirty(true); }} />
       </div>
 
       {/* Save */}
-      <div className="flex justify-end">
+      <div className="flex items-center justify-end gap-3">
+        {dirty && (
+          <p className="text-xs text-[#C7A962] font-medium">
+            Unsaved changes — click Save Portfolio or they'll be lost
+          </p>
+        )}
         <Button
           onClick={handleSave}
           disabled={saving}
