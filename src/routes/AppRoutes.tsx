@@ -95,6 +95,7 @@ const TripBuilderPage = lazy(() => import('@/pages/TripBuilderPage'));
 const ItineraryBuilderPage = lazy(() => import('@/pages/ItineraryBuilderPage'));
 const ItineraryGuidePage = lazy(() => import('@/pages/ItineraryGuidePage'));
 const MyPurchasesPage = lazy(() => import('@/pages/MyPurchasesPage'));
+const CreatorsPage = lazy(() => import('@/pages/CreatorsPage'));
 // CreatorProfilePage removed — /creator/:id now redirects to /creators/:id
 const CreatorRedirect = lazy(() => import('@/pages/redirects/CreatorRedirect'));
 const MessagesPage = lazy(() => import('@/pages/MessagesPage'));
@@ -181,7 +182,7 @@ export const AppRoutes = () => (
       <Route path="/@:username/shop" element={<ShopPage />} />
       <Route path="/bundle/:id" element={<BundleDetailPage />} />
       <Route path="/bundle-builder" element={<BundleBuilder />} />
-      <Route path="/creators" element={<Navigate to="/marketplace" replace />} />
+      <Route path="/creators" element={<CreatorsPage />} />
       <Route path="/creators/:id" element={<CreatorPublicProfilePage />} />
       <Route path="/agents" element={<Navigate to="/marketplace" replace />} />
       <Route path="/agents/:id" element={<AgentPublicProfilePage />} />
