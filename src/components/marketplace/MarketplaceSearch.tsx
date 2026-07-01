@@ -173,7 +173,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters }: Marketp
     <section className="border-b border-[#E5DFC6]/30 bg-white">
       <div className="mx-auto max-w-4xl px-4 py-4 md:py-6">
         {/* Desktop search bar */}
-        <div className="flex flex-col sm:flex-row gap-3 rounded-2xl border border-[#E5DFC6] bg-white p-3 shadow-sm sm:items-center sm:divide-x sm:divide-[#E5DFC6]/30">
+        <div className="hidden md:flex md:items-center md:divide-x md:divide-[#E5DFC6]/30 gap-3 rounded-2xl border border-[#E5DFC6] bg-white p-3 shadow-sm">
           {/* Where */}
           <div className="flex min-w-0 flex-1 flex-col gap-1.5 px-3">
             <label className="text-[10px] font-semibold uppercase tracking-wider text-[#8D8D8D]">
