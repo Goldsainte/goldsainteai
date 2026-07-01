@@ -305,7 +305,7 @@ export default function CreatorDashboard() {
           </TabsContent>
 
           <TabsContent value="services" className="mt-0">
-            {user?.id && <CreatorServicesSection creatorId={user.id} isOwnProfile={true} />}
+            {user?.id && <CreatorServicesSection creatorId={user.id} isOwnProfile={true} creatorTier={profile?.creator_tier} />}
           </TabsContent>
 
           <TabsContent value="performance" className="mt-0">
