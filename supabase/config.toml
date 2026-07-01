@@ -39,8 +39,6 @@ project_id = "ktzsgqrqvwtxlimctkaf"
     verify_jwt = true
   [functions.clear-search-cache]
     verify_jwt = true
-  [functions.clear-seeded-data]
-    verify_jwt = false
   [functions.compute-proposal-insights]
     verify_jwt = false
   [functions.create-agent-application-stripe-account]
@@ -154,8 +152,6 @@ project_id = "ktzsgqrqvwtxlimctkaf"
   [functions.search-destinations]
     verify_jwt = false
   [functions.search-hotels]
-    verify_jwt = false
-  [functions.seed-content-creators]
     verify_jwt = false
   [functions.submit-dispute]
     verify_jwt = false
