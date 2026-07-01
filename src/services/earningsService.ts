@@ -257,15 +257,18 @@ export async function getPartnerBookingEarnings(role: "creator" | "agent"): Prom
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) throw new Error("Not authenticated");
 
-  const column = role === "creator" ? "creator_id" : "agent_id";
-  const amountColumn = role === "creator"
-    ? "creator_payout_cents"
-    : "agent_payout_cents";
-
+  // Reads from earnings_ledger — the table your Stripe webhook actually writes
+  // to on payment confirmation. The previous version of this function read
+  // bookings.creator_payout_cents / agent_payout_cents, which nothing in the
+  // codebase ever writes to, so it always showed $0 regardless of real
+  // earnings. earnings_ledger.amount is stored in dollars, not cents, so it's
+  // converted to cents here to keep the existing UI (which expects cents)
+  // working unchanged.
   const { data, error } = await supabase
-    .from("bookings")
-    .select(`id, status, payout_status, payout_paid_at, currency, created_at, ${amountColumn}`)
-    .eq(column, user.id)
+    .from("earnings_ledger")
+    .select("id, booking_id, amount, currency, status, created_at, updated_at, bookings(status)")
+    .eq("user_id", user.id)
+    .eq("role", role)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -274,20 +277,20 @@ export async function getPartnerBookingEarnings(role: "creator" | "agent"): Prom
   }
 
   const bookings: PartnerEarningBooking[] = (data || []).map((row: any) => ({
-    id: row.id,
-    status: row.status,
-    payout_status: row.payout_status,
-    payout_paid_at: row.payout_paid_at,
+    id: row.booking_id,
+    status: row.bookings?.status || "unknown",
+    payout_status: row.status,
+    payout_paid_at: row.status === "paid" ? row.updated_at : null,
     currency: row.currency,
     created_at: row.created_at,
-    amount_cents: Number(row[amountColumn] || 0),
+    amount_cents: Math.round(Number(row.amount || 0) * 100),
   }));
 
   let pending = 0;
   let released = 0;
 
   bookings.forEach((booking) => {
-    if (booking.payout_status === "completed" || booking.payout_paid_at) {
+    if (booking.payout_status === "paid") {
       released += booking.amount_cents;
     } else {
       pending += booking.amount_cents;
