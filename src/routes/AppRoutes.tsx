@@ -30,6 +30,7 @@ const AdminCreatorsPage = lazy(() => import('@/pages/admin/AdminCreatorsPage'));
 const AdminBookingsPage = lazy(() => import('@/pages/admin/AdminBookingsPage'));
 const AdminDisputesPage = lazy(() => import('@/pages/admin/AdminDisputesPage'));
 const AdminHomePage = lazy(() => import('@/pages/admin/AdminHomePage'));
+const AdminGuidesPage = lazy(() => import('@/pages/admin/AdminGuidesPage'));
 const AdminTripsPage = lazy(() => import('@/pages/admin/AdminTripsPage'));
 const AdminWaitlistPage = lazy(() => import('@/pages/admin/AdminWaitlistPage'));
 const SeedConciergeDesks = lazy(() => import('@/pages/admin/SeedConciergeDesks'));
@@ -529,6 +530,7 @@ export const AppRoutes = () => (
       <Route path="/admin/bookings" element={<AdminGuard><AdminBookingsPage /></AdminGuard>} />
       <Route path="/admin/disputes" element={<AdminGuard><AdminDisputesPage /></AdminGuard>} />
       <Route path="/admin/trips" element={<AdminGuard><AdminTripsPage /></AdminGuard>} />
+      <Route path="/admin/guides" element={<AdminGuard><AdminGuidesPage /></AdminGuard>} />
       <Route path="/admin/waitlist" element={<AdminGuard><AdminWaitlistPage /></AdminGuard>} />
       <Route path="/admin/email-dlq" element={<AdminGuard><AdminEmailDLQPage /></AdminGuard>} />
       <Route path="/admin/newsroom" element={<AdminGuard><AdminNewsroomList /></AdminGuard>} />
