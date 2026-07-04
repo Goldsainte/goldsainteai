@@ -75,6 +75,9 @@ export default function PostTripPage() {
   // Direct-request: read fromCreator / agentId from URL or sessionStorage
   const [preferredCreatorId, setPreferredCreatorId] = useState<string | null>(null);
   const [preferredAgentId, setPreferredAgentId] = useState<string | null>(null);
+  // travel_agents.id is NOT a user id — notifications must target the agent's
+  // auth account, resolved from travel_agents.user_id.
+  const [preferredAgentUserId, setPreferredAgentUserId] = useState<string | null>(null);
   const [preferredName, setPreferredName] = useState<string | null>(null);
 
   useEffect(() => {
@@ -93,8 +96,15 @@ export default function PostTripPage() {
       setPreferredAgentId(agentId);
       setWantsRole("agent");
       sessionStorage.setItem("goldsainte:agentId", agentId);
-      supabase.from("profiles").select("display_name").eq("id", agentId).maybeSingle().then(({ data }) => {
-        if (data?.display_name) setPreferredName(data.display_name);
+      // The agent profile page passes the display name in the URL; use it
+      // directly. agentId is travel_agents.id (not a user id), so name
+      // fallback and the notification target both come from travel_agents,
+      // which is publicly readable for active agents.
+      const agentNameParam = searchParams.get("agentName");
+      if (agentNameParam) setPreferredName(agentNameParam);
+      supabase.from("travel_agents").select("agency_name, user_id").eq("id", agentId).maybeSingle().then(({ data }) => {
+        if (!agentNameParam && data?.agency_name) setPreferredName(data.agency_name);
+        if (data?.user_id) setPreferredAgentUserId(data.user_id);
       });
     }
   }, [searchParams]);
@@ -265,7 +275,7 @@ export default function PostTripPage() {
       // Goldsainte Concierge desks (whose emails route to the team inbox)
       // learn about direct requests. Fire-and-forget: a notification failure
       // should not break a successfully posted trip.
-      const notifyUserId = preferredCreatorId || preferredAgentId;
+      const notifyUserId = preferredCreatorId || preferredAgentUserId;
       if (notifyUserId && insertedTrip?.id) {
         try {
           const { data: notifyResult, error: notifyError } = await supabase.functions.invoke("send-notification", {
