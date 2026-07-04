@@ -16,6 +16,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { TikTokCarousel } from "@/components/TikTokEmbed";
@@ -229,6 +237,43 @@ export default function CreatorPublicProfilePage() {
 
   const handleRequestTrip = () => navigate(`/post-trip?fromCreator=${creator.id}`);
 
+  // ── Direct message composer ──
+  const [messageOpen, setMessageOpen] = useState(false);
+  const [messageText, setMessageText] = useState("");
+  const [messageSending, setMessageSending] = useState(false);
+
+  const handleOpenMessage = () => {
+    if (!user) {
+      navigate(`/login?redirect=${encodeURIComponent(`/creators/${id}`)}`);
+      return;
+    }
+    setMessageOpen(true);
+  };
+
+  const handleSendMessage = async () => {
+    const text = messageText.trim();
+    if (!text || !creator) return;
+    setMessageSending(true);
+    try {
+      // send-direct-message finds-or-creates the conversation server-side
+      // and enforces block/privacy settings. Same path the rest of the DM
+      // system uses.
+      const { error } = await supabase.functions.invoke("send-direct-message", {
+        body: { recipientId: creator.id, message: text },
+      });
+      if (error) throw error;
+      setMessageOpen(false);
+      setMessageText("");
+      toast.success(`Message sent to ${creator.display_name || "the creator"}.`, {
+        action: { label: "Open Messages", onClick: () => navigate("/messages") },
+      });
+    } catch (err: any) {
+      toast.error(err?.message || "Could not send the message.");
+    } finally {
+      setMessageSending(false);
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -326,12 +371,50 @@ export default function CreatorPublicProfilePage() {
           isOwnProfile={isOwnProfile}
           targetUserId={isOwnProfile ? undefined : creator.id}
           onRequestTrip={handleRequestTrip}
+          onMessage={isOwnProfile ? undefined : handleOpenMessage}
           profileUserId={creator.id}
           onProfileUpdated={fetchProfile}
           memberSince={creator.created_at ?? null}
           followerCount={creator.creator_followers}
           creatorTier={creator.creator_tier}
         />
+
+        <Dialog open={messageOpen} onOpenChange={setMessageOpen}>
+          <DialogContent className="bg-[#FDF9F0] border-[#E5DFC6] sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="font-secondary text-[#0a2225]">
+                Message {creator.display_name || "this creator"}
+              </DialogTitle>
+              <DialogDescription className="text-[#6B7280]">
+                Starts a private conversation. Replies land in your Messages.
+              </DialogDescription>
+            </DialogHeader>
+            <Textarea
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
+              placeholder="Hi! I'd love to talk about..."
+              rows={5}
+              maxLength={2000}
+              className="bg-white border-[#E5DFC6] text-[#0a2225] placeholder:text-[#9CA3AF]"
+            />
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setMessageOpen(false)}
+                className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#f7f3ea] rounded-full"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSendMessage}
+                disabled={messageSending || !messageText.trim()}
+                className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-6"
+              >
+                {messageSending ? "Sending…" : "Send message"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Spacer after hero card overlap */}
         <div className="h-8 md:h-12" />
