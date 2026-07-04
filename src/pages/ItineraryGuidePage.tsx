@@ -65,6 +65,9 @@ export default function ItineraryGuidePage() {
   const [creator, setCreator] = useState<CreatorMini | null>(null);
   const [loading, setLoading] = useState(true);
   const [checkingOut, setCheckingOut] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [downloadsUsed, setDownloadsUsed] = useState<number | null>(null);
+  const PDF_DOWNLOAD_LIMIT = 1; // keep in sync with the download-guide-pdf function
 
   useEffect(() => {
     if (!id) return;
@@ -116,17 +119,59 @@ export default function ItineraryGuidePage() {
     if (!user || !id) return;
     supabase
       .from("itinerary_purchases")
-      .select("id")
+      .select("id, pdf_downloads")
       .eq("buyer_id", user.id)
       .eq("product_id", id)
       .maybeSingle()
       .then(({ data }) => {
-        if (data) setHasPurchased(true);
+        if (data) {
+          setHasPurchased(true);
+          setDownloadsUsed((data as any).pdf_downloads ?? 0);
+        }
       });
   }, [user, id]);
 
   const isOwner = !!user && !!guide && guide.creator_id === user.id;
   const unlocked = previewMode ? false : (hasPurchased || isOwner || isAdmin);
+
+  const handleDownloadPdf = async () => {
+    if (!guide) return;
+    setDownloading(true);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess?.session?.access_token;
+      if (!token) throw new Error("Please sign in again to download.");
+      // Binary responses need raw fetch; supabase-js invoke() JSON-parses.
+      const base = (supabase as any).supabaseUrl ?? "";
+      const res = await fetch(`${base}/functions/v1/download-guide-pdf`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ productId: guide.id }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error || "Download failed.");
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${guide.title.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      if (!isOwner && !isAdmin) setDownloadsUsed((n) => (n ?? 0) + 1);
+      toast.success("Your personalized guide PDF is downloading — save it somewhere safe.");
+    } catch (e: any) {
+      toast.error(e?.message || "Could not download the PDF.");
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   const handleCheckout = async () => {
     if (!guide) return;
@@ -236,6 +281,25 @@ export default function ItineraryGuidePage() {
             <p className="text-sm text-[#0a2225]">
               You've unlocked this guide! The full itinerary is now visible below.
             </p>
+          </div>
+        )}
+        {(hasPurchased || isOwner || isAdmin) && guide && (
+          <div className="mb-6 flex flex-wrap items-center gap-3 rounded-2xl border border-[#E5DFC6] bg-white px-4 py-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-[#0a2225]">Your PDF copy</p>
+              <p className="text-xs text-[#6B7280] mt-0.5">
+                {isOwner || isAdmin
+                  ? "Proof copy — watermarked, not counted."
+                  : `Personalized & watermarked to you · for saving and printing · ${Math.max(0, PDF_DOWNLOAD_LIMIT - (downloadsUsed ?? 0))} of ${PDF_DOWNLOAD_LIMIT} download${PDF_DOWNLOAD_LIMIT === 1 ? "" : "s"} remaining`}
+              </p>
+            </div>
+            <Button
+              onClick={handleDownloadPdf}
+              disabled={downloading || (!isOwner && !isAdmin && (downloadsUsed ?? 0) >= PDF_DOWNLOAD_LIMIT)}
+              className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white px-5 shrink-0"
+            >
+              {downloading ? "Preparing…" : (!isOwner && !isAdmin && (downloadsUsed ?? 0) >= PDF_DOWNLOAD_LIMIT) ? "Limit reached" : "Download PDF"}
+            </Button>
           </div>
         )}
 
