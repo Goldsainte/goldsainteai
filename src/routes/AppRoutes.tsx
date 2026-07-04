@@ -99,6 +99,7 @@ const MyPurchasesPage = lazy(() => import('@/pages/MyPurchasesPage'));
 const CreatorsPage = lazy(() => import('@/pages/CreatorsPage'));
 // CreatorProfilePage removed — /creator/:id now redirects to /creators/:id
 const CreatorRedirect = lazy(() => import('@/pages/redirects/CreatorRedirect'));
+const ItineraryGuideRedirect = lazy(() => import('@/pages/redirects/ItineraryGuideRedirect'));
 const MessagesPage = lazy(() => import('@/pages/MessagesPage'));
 // TravelerDashboardPage import moved to line 68
 const PartnerConsolePage = lazy(() => import('@/pages/partner/PartnerConsolePage'));
@@ -429,6 +430,8 @@ export const AppRoutes = () => (
         )}
       />
       <Route path="/itinerary-guide/:id" element={<ItineraryGuidePage />} />
+      {/* legacy plural path — old marketplace/affiliate links */}
+      <Route path="/itinerary-guides/:id" element={<ItineraryGuideRedirect />} />
       <Route path="/my-purchases" element={<RequireAuth><MyPurchasesPage /></RequireAuth>} />
       <Route path="/storyboards" element={<Navigate to="/marketplace" replace />} />
       <Route path="/storyboards/new" element={<Navigate to="/marketplace" replace />} />
