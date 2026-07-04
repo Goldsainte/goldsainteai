@@ -29,7 +29,7 @@ export function ItineraryGuideCard({ guide }: { guide: Guide }) {
 
   return (
     <Link
-      to={`/itinerary-guides/${guide.id}`}
+      to={`/itinerary-guide/${guide.id}`}
       className="group block overflow-hidden rounded-2xl border border-[#E5DFC6] bg-white shadow-sm transition-shadow hover:shadow-md"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-[#F5F0E8]">
