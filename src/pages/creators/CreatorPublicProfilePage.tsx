@@ -305,7 +305,7 @@ export default function CreatorPublicProfilePage() {
                     onClick={() => navigate("/creator-dashboard?tab=portfolio")}
                     variant="outline"
                     size="sm"
-                    className="font-primary border-[#E5DFC6] text-[#0a2225] rounded-full h-9"
+                    className="border-[#E5DFC6] text-[#0a2225] rounded-full h-9"
                   >
                     <Settings className="h-3.5 w-3.5 mr-1.5" /> Edit profile
                   </Button>
@@ -315,7 +315,7 @@ export default function CreatorPublicProfilePage() {
                         variant="outline"
                         size="sm"
                         aria-label="More options"
-                        className="font-primary border-[#E5DFC6] text-[#0a2225] rounded-full h-9 w-9 p-0"
+                        className="border-[#E5DFC6] text-[#0a2225] rounded-full h-9 w-9 p-0"
                       >
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
@@ -444,14 +444,14 @@ export default function CreatorPublicProfilePage() {
                 <div className="flex items-center justify-center gap-3 flex-wrap">
                   <Button
                     onClick={() => navigate("/trip-builder")}
-                    className="font-primary bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-6 h-10 text-sm font-medium"
+                    className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-6 h-10 text-sm font-medium"
                   >
                     Package a trip
                   </Button>
                   <Button
                     onClick={() => navigate("/itinerary-builder")}
                     variant="outline"
-                    className="font-primary border-[#E5DFC6] text-[#0a2225] rounded-full px-6 h-10 text-sm font-medium"
+                    className="border-[#E5DFC6] text-[#0a2225] rounded-full px-6 h-10 text-sm font-medium"
                   >
                     Build a guide
                   </Button>
@@ -639,7 +639,7 @@ export default function CreatorPublicProfilePage() {
                 </p>
                 <Button
                   onClick={handleRequestTrip}
-                  className="font-primary bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-10 h-12 text-sm font-medium shadow-sm"
+                  className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-10 h-12 text-sm font-medium shadow-sm"
                 >
                   Request a Trip
                 </Button>
