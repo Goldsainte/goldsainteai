@@ -137,7 +137,7 @@ export function CreatorHeroSection({
             <div className="flex items-center gap-3 shrink-0">
               <Button
                 onClick={onRequestTrip}
-                className="font-primary bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-8 h-11 text-sm font-medium shadow-sm flex-1 md:flex-none"
+                className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-8 h-11 text-sm font-medium shadow-sm flex-1 md:flex-none"
               >
                 Request a Trip
               </Button>
@@ -145,7 +145,7 @@ export function CreatorHeroSection({
                 <Button
                   onClick={onMessage}
                   variant="outline"
-                  className="font-primary border-[#E5DFC6] text-[#0a2225] hover:bg-[#f7f3ea] rounded-full px-6 h-11 text-sm font-medium flex-1 md:flex-none"
+                  className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#f7f3ea] rounded-full px-6 h-11 text-sm font-medium flex-1 md:flex-none"
                 >
                   Message
                 </Button>
