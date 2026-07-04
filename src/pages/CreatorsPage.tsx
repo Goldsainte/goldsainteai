@@ -123,8 +123,12 @@ export default function CreatorsPage() {
   useEffect(() => {
     async function loadCreators() {
       setLoading(true);
+      // profiles is RLS-locked to own-row reads (2026-05-09 hardening), so a
+      // direct query returns nothing here. creator_directory is the public
+      // window view over creator rows. Cast: the view isn't in the generated
+      // types; its columns mirror profiles, so we borrow that typing.
       const { data, error } = await supabase
-        .from("profiles")
+        .from("creator_directory" as unknown as "profiles")
         .select(
           `
             id,
@@ -145,8 +149,7 @@ export default function CreatorsPage() {
             full_name,
             username
           `
-        )
-        .eq("account_type", "creator");
+        );
 
       if (!error && data) {
         setCreators(data.map(mapProfileToCreator));
