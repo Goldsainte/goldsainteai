@@ -105,8 +105,10 @@ export default function CreatorPublicProfilePage() {
   const fetchProfile = async () => {
     if (!id) return;
     const [profileRes, creatorProfileRes, reviewsRes] = await Promise.all([
+        // profiles is RLS-locked to own-row reads; creator_directory is the
+        // public window view (columns mirror profiles, hence the type borrow).
         supabase
-          .from("profiles")
+          .from("creator_directory" as unknown as "profiles")
           .select(
             "id, username, featured_tiktok_videos, full_name, display_name, avatar_url, bio, location, tiktok_handle, instagram_handle, creator_niches, creator_avg_views, creator_followers, featured_photos, cover_image_url, content_style_tags, destinations_focus_tags, travel_philosophy, last_seen_at, website, created_at, creator_tier, is_verified"
           )
