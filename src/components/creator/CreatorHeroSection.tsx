@@ -21,6 +21,9 @@ interface CreatorHeroSectionProps {
   isOwnProfile?: boolean;
   targetUserId?: string;
   onRequestTrip: () => void;
+  /** When provided (and not own profile), renders a Message button that opens
+   *  a direct-message composer. */
+  onMessage?: () => void;
   /** Required when isOwnProfile is true — lets the edit controls know whose row to update. */
   profileUserId?: string;
   /** Called after a successful avatar upload so the parent can refetch. */
@@ -46,6 +49,7 @@ export function CreatorHeroSection({
   isOwnProfile,
   targetUserId,
   onRequestTrip,
+  onMessage,
   profileUserId,
   onProfileUpdated,
   memberSince,
@@ -137,6 +141,15 @@ export function CreatorHeroSection({
               >
                 Request a Trip
               </Button>
+              {!isOwnProfile && onMessage && (
+                <Button
+                  onClick={onMessage}
+                  variant="outline"
+                  className="font-primary border-[#E5DFC6] text-[#0a2225] hover:bg-[#f7f3ea] rounded-full px-6 h-11 text-sm font-medium flex-1 md:flex-none"
+                >
+                  Message
+                </Button>
+              )}
               {!isOwnProfile && targetUserId && (
                 <FollowButton targetUserId={targetUserId} />
               )}
