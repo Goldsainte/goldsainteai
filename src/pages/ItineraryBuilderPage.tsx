@@ -12,6 +12,7 @@ import { TripImageUploader } from "@/components/trips/TripImageUploader";
 import { ArrayFieldEditor } from "@/components/trips/ArrayFieldEditor";
 import { Loader2, Plus, X, Save, Send, BookOpen, Eye } from "lucide-react";
 import { toast } from "sonner";
+import { confirmDialog } from "@/components/ui/confirm-dialog";
 
 const CURRENCIES = ["USD", "EUR", "GBP", "AUD", "CAD"];
 
@@ -207,14 +208,26 @@ export default function ItineraryBuilderPage() {
         .eq("id", user.id)
         .maybeSingle();
       if (!(profile as any)?.stripe_charges_enabled) {
-        toast.error("Finish Stripe payout verification to unlock publishing. You can save drafts in the meantime.", {
-          action: {
-            label: "Open Earnings",
-            onClick: () => navigate("/creator-dashboard?tab=earnings"),
-          },
+        const goSetup = await confirmDialog({
+          title: "Stripe payout verification required",
+          description:
+            "Goldsainte reviews every guide before it goes live, and we can only approve (and pay out) guides from accounts with verified Stripe payouts. Finish payout verification in Earnings, then publish — your draft is safe in the meantime.",
+          confirmText: "Open payout setup",
+          cancelText: "Keep editing",
         });
+        if (goSetup) navigate("/creator-dashboard?tab=earnings");
         return;
       }
+
+      // Make the review step explicit before anything is submitted.
+      const proceed = await confirmDialog({
+        title: "Submit for Goldsainte review?",
+        description:
+          "Publishing sends this guide to the Goldsainte team for approval. It goes live to travelers once approved — typically within 24 hours — and you'll be notified.",
+        confirmText: "Submit for review",
+        cancelText: "Keep editing",
+      });
+      if (!proceed) return;
     }
     if (!form.title.trim() || !form.destination.trim() || !form.price) {
       toast.error("Title, destination and price are required.");
@@ -235,6 +248,7 @@ export default function ItineraryBuilderPage() {
         days: days as any,
         status: persistedStatus,
       };
+      let savedId: string | null = editId;
       if (editId) {
         const { error } = await supabase
           .from("itinerary_products")
@@ -242,10 +256,34 @@ export default function ItineraryBuilderPage() {
           .eq("id", editId);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("itinerary_products").insert(payload);
+        const { data: inserted, error } = await supabase
+          .from("itinerary_products")
+          .insert(payload)
+          .select("id")
+          .single();
         if (error) throw error;
+        savedId = inserted?.id ?? null;
       }
-      toast.success(status === "published" ? "Guide submitted for review" : "Draft saved");
+      if (status === "published") {
+        // In-app admin notifications + email ping to the review inbox
+        // (best-effort — a notification hiccup never blocks submission).
+        const savedGuideId = savedId;
+        if (savedGuideId) {
+          (supabase as any)
+            .rpc("notify_admins_guide_pending_review", {
+              _guide_id: savedGuideId,
+              _guide_title: form.title || "Untitled guide",
+            })
+            .then(({ error }: any) => {
+              if (error) console.error("Admin notification failed:", error);
+            });
+        }
+        toast.success(
+          "Your guide has been submitted for review. We typically review within 24 hours and will notify you when it's live."
+        );
+      } else {
+        toast.success("Draft saved");
+      }
       navigate("/creator-dashboard");
     } catch (e: any) {
       toast.error("Failed to save: " + e.message);
@@ -303,7 +341,7 @@ export default function ItineraryBuilderPage() {
   return (
     <div className="min-h-screen bg-[#FDF9F0]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 md:py-16">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-4 flex items-center justify-between">
           <BackButton to="/creator-dashboard" />
           {!editId && (
             <button
@@ -314,6 +352,12 @@ export default function ItineraryBuilderPage() {
               Change template
             </button>
           )}
+        </div>
+
+        <div className="mb-6 rounded-2xl border border-[#C7A962]/40 bg-[#C7A962]/10 px-4 py-3 text-sm text-[#0a2225] leading-relaxed">
+          <span className="font-medium">How publishing works:</span> guides are reviewed by
+          Goldsainte before going live — typically within 24 hours — and Stripe payout
+          verification must be complete before a guide can be approved. Drafts save anytime.
         </div>
         <div className="w-16 h-0.5 bg-[#C7A962] mb-6" />
         <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 border border-[#E5DFC6] mb-4">
