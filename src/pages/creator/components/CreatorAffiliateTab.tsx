@@ -36,7 +36,7 @@ function genCode() {
 function buildShareUrl(p: Product, code: string): string {
   const origin = "https://goldsainte.ai";
   if (p.kind === "trip") return `${origin}/marketplace/trip/${p.slug || p.id}?ref=${code}`;
-  return `${origin}/itinerary-guides/${p.id}?ref=${code}`;
+  return `${origin}/itinerary-guide/${p.id}?ref=${code}`;
 }
 
 export function CreatorAffiliateTab() {
