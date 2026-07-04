@@ -274,6 +274,11 @@ export default function TripBuilderPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-5 pb-4 md:pt-6 md:pb-5">
         <div className="mb-3">
           <BackButton to={isAgent ? "/agent-dashboard" : "/creator-dashboard"} />
+          <div className="mt-4 rounded-2xl border border-[#C7A962]/40 bg-[#C7A962]/10 px-4 py-3 text-sm text-[#0a2225] leading-relaxed">
+            <span className="font-medium">How publishing works:</span> trips are reviewed by
+            Goldsainte before going live — typically within 24 hours — and Stripe payout
+            verification must be complete before a trip can be approved. Drafts save anytime.
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
