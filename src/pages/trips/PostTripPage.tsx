@@ -84,7 +84,9 @@ export default function PostTripPage() {
       setPreferredCreatorId(fromCreator);
       setWantsRole("creator");
       sessionStorage.setItem("goldsainte:fromCreator", fromCreator);
-      supabase.from("profiles").select("display_name").eq("id", fromCreator).maybeSingle().then(({ data }) => {
+      // profiles is RLS-locked to own-row reads; creator_directory is the
+      // public window over creator rows (type borrowed from profiles).
+      supabase.from("creator_directory" as unknown as "profiles").select("display_name").eq("id", fromCreator).maybeSingle().then(({ data }) => {
         if (data?.display_name) setPreferredName(data.display_name);
       });
     } else if (agentId) {
@@ -255,19 +257,34 @@ export default function PostTripPage() {
         .single();
       if (insertError) throw insertError;
 
-      // Send notification to preferred creator/agent
+      // Notify the chosen creator/agent. This MUST go through the
+      // send-notification edge function: RLS (correctly) forbids browsers
+      // from inserting notifications for other users, so the previous direct
+      // insert here failed silently and creators never heard about requests.
+      // priority "high" also queues an EMAIL to the recipient — which is how
+      // Goldsainte Concierge desks (whose emails route to the team inbox)
+      // learn about direct requests. Fire-and-forget: a notification failure
+      // should not break a successfully posted trip.
       const notifyUserId = preferredCreatorId || preferredAgentId;
       if (notifyUserId && insertedTrip?.id) {
-        await supabase.from("notifications").insert({
-          user_id: notifyUserId,
-          type: "direct_trip_request",
-          title: "New Direct Trip Request",
-          message: `You received a direct trip request for ${destination}`,
-          action_url: `/marketplace/request/${insertedTrip.id}`,
-          entity_type: "trip_request",
-          entity_id: insertedTrip.id,
-          is_read: false,
-        });
+        try {
+          const { data: notifyResult, error: notifyError } = await supabase.functions.invoke("send-notification", {
+            body: {
+              userId: notifyUserId,
+              title: "New Direct Trip Request",
+              body: `You received a direct trip request for ${destination}`,
+              type: "direct_trip_request",
+              priority: "high",
+              actionUrl: `/marketplace/request/${insertedTrip.id}`,
+              entityType: "trip_request",
+              entityId: insertedTrip.id,
+            },
+          });
+          if (notifyError) console.error("send-notification failed:", notifyError);
+          else if (notifyResult?.errors) console.error("send-notification channel errors:", notifyResult.errors);
+        } catch (notifyErr) {
+          console.error("send-notification threw:", notifyErr);
+        }
       }
 
       // Clean up sessionStorage for direct-request params
