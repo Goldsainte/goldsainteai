@@ -12,7 +12,7 @@ export default function SeedConciergeDesks() {
     setLoading(true);
     setResult(null);
     try {
-      const { data, error } = await supabase.functions.invoke("seed-concierge-desks");
+      const { data, error } = await supabase.functions.invoke("smooth-service");
       if (error) throw error;
       setResult(data);
       toast.success(data?.message || "Done");
