@@ -105,6 +105,15 @@ export default function CreatorPublicProfilePage() {
   const [guides, setGuides] = useState<Array<{ id: string; title: string; destination: string; duration_days: number; price: number; currency: string; cover_image_url: string | null }>>([]);
   const [trips, setTrips] = useState<Array<{ id: string; title: string | null; slug: string | null; destination: string | null; cover_image_url: string | null; price_per_person: number | null }>>([]);
 
+  // ── Direct message composer state ──
+  // MUST live up here with the other hooks: this component has early returns
+  // (loading / not-found) below, and hooks declared after those returns crash
+  // with React error #310 ("rendered more hooks than during the previous
+  // render") the moment loading flips to false.
+  const [messageOpen, setMessageOpen] = useState(false);
+  const [messageText, setMessageText] = useState("");
+  const [messageSending, setMessageSending] = useState(false);
+
   useEffect(() => {
     if (!id) return;
     fetchProfile();
@@ -236,11 +245,6 @@ export default function CreatorPublicProfilePage() {
     : null;
 
   const handleRequestTrip = () => navigate(`/post-trip?fromCreator=${creator.id}`);
-
-  // ── Direct message composer ──
-  const [messageOpen, setMessageOpen] = useState(false);
-  const [messageText, setMessageText] = useState("");
-  const [messageSending, setMessageSending] = useState(false);
 
   const handleOpenMessage = () => {
     if (!user) {
