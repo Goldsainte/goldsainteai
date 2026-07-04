@@ -58,6 +58,9 @@ export default function ItineraryGuidePage() {
   useTrackView("product", id);
   const { user } = useAuth();
   const [hasPurchased, setHasPurchased] = useState(false);
+  // Admins review guides without purchasing (requires the 2026-07-04 admin
+  // RLS policies on itinerary_products for the fetch itself).
+  const [isAdmin, setIsAdmin] = useState(false);
   const [guide, setGuide] = useState<Guide | null>(null);
   const [creator, setCreator] = useState<CreatorMini | null>(null);
   const [loading, setLoading] = useState(true);
@@ -73,8 +76,17 @@ export default function ItineraryGuidePage() {
         .eq("id", id)
         .maybeSingle();
       if (data) {
-        // Allow if published or owned by viewer (preview)
-        if (data.status === "published" || (user && data.creator_id === user.id)) {
+        // Allow if published, owned by the viewer, or the viewer is an admin
+        // (admins review pending guides without purchasing).
+        let adminViewer = false;
+        if (user && data.status !== "published" && data.creator_id !== user.id) {
+          const { data: roleRows } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", user.id);
+          adminViewer = !!roleRows?.some((r) => r.role === "admin");
+        }
+        if (data.status === "published" || (user && data.creator_id === user.id) || adminViewer) {
           const g = { ...data, days: (Array.isArray(data.days) ? data.days : []) as Day[] } as Guide;
           setGuide(g);
           const { data: prof } = await supabase
@@ -90,6 +102,17 @@ export default function ItineraryGuidePage() {
   }, [id, user?.id]);
 
   useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .then(({ data }) => {
+        if (data?.some((r) => r.role === "admin")) setIsAdmin(true);
+      });
+  }, [user?.id]);
+
+  useEffect(() => {
     if (!user || !id) return;
     supabase
       .from("itinerary_purchases")
@@ -103,7 +126,7 @@ export default function ItineraryGuidePage() {
   }, [user, id]);
 
   const isOwner = !!user && !!guide && guide.creator_id === user.id;
-  const unlocked = previewMode ? false : (hasPurchased || isOwner);
+  const unlocked = previewMode ? false : (hasPurchased || isOwner || isAdmin);
 
   const handleCheckout = async () => {
     if (!guide) return;
@@ -201,6 +224,12 @@ export default function ItineraryGuidePage() {
       )}
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 md:py-14">
+        {isAdmin && !hasPurchased && !isOwner && (
+          <div className="mb-6 rounded-2xl border border-[#C7A962]/40 bg-[#C7A962]/10 px-4 py-3 text-sm text-[#0a2225]">
+            <span className="font-medium">Admin preview</span> — full content shown for review;
+            travelers see days beyond the first locked until purchase.
+          </div>
+        )}
         {hasPurchased && (
           <div className="mb-6 rounded-xl border border-[#0c4d47]/30 bg-[#0c4d47]/5 px-4 py-3 flex items-start gap-3">
             <CheckCircle2 className="h-5 w-5 text-[#0c4d47] mt-0.5" />
