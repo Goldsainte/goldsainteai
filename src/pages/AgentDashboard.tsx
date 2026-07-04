@@ -28,6 +28,7 @@ import { PaymentMilestonesManager } from "@/components/PaymentMilestonesManager"
 import { InvoiceGenerator } from "@/components/InvoiceGenerator";
 import { AgentCreatorCollabs } from "@/components/AgentCreatorCollabs";
 import { BackButton } from "@/components/ui/BackButton";
+import { CreatorGuidesTab } from "@/pages/creator/components/CreatorGuidesTab";
 import { GettingStartedChecklist } from "@/components/onboarding/GettingStartedChecklist";
 import { CreatorPerformanceTab } from "./creator/components/CreatorPerformanceTab";
 import { Link } from "react-router-dom";
@@ -441,6 +442,7 @@ export default function AgentDashboard() {
               <TabsTrigger value="available" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Available Jobs ({jobs.length})</TabsTrigger>
               <TabsTrigger value="my-bids" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">My Bids ({myBids.length})</TabsTrigger>
               <TabsTrigger value="creator-collabs" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Creator Collabs ({collabRequests.length})</TabsTrigger>
+              <TabsTrigger value="guides" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Guides</TabsTrigger>
               <TabsTrigger value="analytics" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Analytics</TabsTrigger>
              <TabsTrigger value="performance" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Performance</TabsTrigger>
               <TabsTrigger value="availability" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Availability</TabsTrigger>
@@ -449,6 +451,12 @@ export default function AgentDashboard() {
             </TabsList>
             <div className="pointer-events-none absolute right-0 top-0 h-11 w-12 bg-gradient-to-l from-[#FDF9F0] to-transparent md:hidden" />
           </div>
+
+          <TabsContent value="guides">
+            {/* Same guides studio creators use — itinerary_products is scoped
+                per-user by RLS, so agents author and sell their own guides. */}
+            <CreatorGuidesTab />
+          </TabsContent>
 
           <TabsContent value="available">
             <AgentAvailableJobsTab
