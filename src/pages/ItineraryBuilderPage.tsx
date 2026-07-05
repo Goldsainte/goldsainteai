@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -128,6 +129,7 @@ const GUIDE_TEMPLATES: GuideTemplate[] = [
 
 export default function ItineraryBuilderPage() {
   const { user } = useAuth();
+  const { hasCreatorAccess } = useUserRole();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const editId = searchParams.get("edit");
@@ -208,14 +210,20 @@ export default function ItineraryBuilderPage() {
         .eq("id", user.id)
         .maybeSingle();
       if (!(profile as any)?.stripe_charges_enabled) {
+        // Agents can't enter /creator-dashboard (it redirects non-creators to
+        // /traveler) — their payout card lives on the agent Guides tab.
+        const setupPath = hasCreatorAccess
+          ? "/creator-dashboard?tab=earnings"
+          : "/agent-dashboard?tab=guides";
+        const setupWhere = hasCreatorAccess ? "in Earnings" : "on your Guides tab";
         const goSetup = await confirmDialog({
           title: "Stripe payout verification required",
           description:
-            "Goldsainte reviews every guide before it goes live, and we can only approve (and pay out) guides from accounts with verified Stripe payouts. Finish payout verification in Earnings, then publish — your draft is safe in the meantime.",
+            `Goldsainte reviews every guide before it goes live, and we can only approve (and pay out) guides from accounts with verified Stripe payouts. Finish payout verification ${setupWhere}, then publish — your draft is safe in the meantime.`,
           confirmText: "Open payout setup",
           cancelText: "Keep editing",
         });
-        if (goSetup) navigate("/creator-dashboard?tab=earnings");
+        if (goSetup) navigate(setupPath);
         return;
       }
 
