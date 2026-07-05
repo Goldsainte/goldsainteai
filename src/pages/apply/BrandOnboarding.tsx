@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -54,14 +54,14 @@ interface UploadedDocument {
 }
 
 const BRAND_TYPES = [
+  { value: 'Tour Operator', label: 'Tour Operator' },
+  { value: 'Experience Brand', label: 'Experience Brand' },
   { value: 'Hotel', label: 'Hotel' },
   { value: 'Resort', label: 'Resort' },
   { value: 'Villa / Home', label: 'Villa / Vacation Home' },
   { value: 'Boutique Stay', label: 'Boutique Stay' },
   { value: 'Restaurant / Bar', label: 'Restaurant / Bar' },
-  { value: 'Experience Brand', label: 'Experience Brand' },
   { value: 'Retail / Design Brand', label: 'Retail / Design Brand' },
-  { value: 'Tour Operator', label: 'Tour Operator' },
   { value: 'Transportation', label: 'Transportation Service' },
   { value: 'Other', label: 'Other' }
 ];
@@ -114,6 +114,13 @@ const luxurySelectTriggerClasses = "min-h-[48px] border-[#E5DFC6] bg-white focus
 
 export default function BrandOnboarding() {
   const navigate = useNavigate();
+  const location = useLocation();
+  useEffect(() => {
+    if (location.pathname.includes("tour-operator")) {
+      setFormData((prev) => (prev.brandType ? prev : { ...prev, brandType: "Tour Operator" }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [verificationStatus, setVerificationStatus] = useState<'idle' | 'pending' | 'success' | 'failed'>('idle');
@@ -125,7 +132,7 @@ export default function BrandOnboarding() {
     primaryContactEmail: '',
     primaryContactPhone: '',
     brandName: '',
-    brandType: '',
+    brandType: '',  // preselected to 'Tour Operator' via effect when arriving at /apply/tour-operator
     bio: '',
     website: '',
     businessAddress: '',
@@ -135,6 +142,8 @@ export default function BrandOnboarding() {
     businessPostalCode: '',
     taxId: '',
     regions: [],
+    capacityMin: '',
+    capacityMax: '',
     cities: [],
     styleTags: [],
     priceRange: '',
@@ -303,6 +312,8 @@ export default function BrandOnboarding() {
         business_postal_code: formData.businessPostalCode,
         tax_id: formData.taxId,
         regions: formData.regions,
+        capacity_min: formData.capacityMin ? parseInt(formData.capacityMin) : null,
+        capacity_max: formData.capacityMax ? parseInt(formData.capacityMax) : null,
         cities: formData.cities,
         style_tags: formData.styleTags,
         price_range: formData.priceRange,
@@ -646,6 +657,43 @@ export default function BrandOnboarding() {
               </div>
             </div>
 
+            {/* Tour operations (conditional for tour operators) */}
+            {formData.brandType === 'Tour Operator' && (
+              <div className="border-t border-[#E5DFC6] pt-6">
+                <Label className="font-medium text-[#0a2225]">Tour operations</Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                  <div>
+                    <Label htmlFor="capacityMin" className="text-sm text-[#4a4a4a]">Typical group size — minimum</Label>
+                    <Input
+                      id="capacityMin"
+                      type="number"
+                      min={1}
+                      value={formData.capacityMin}
+                      onChange={(e) => setFormData(prev => ({ ...prev, capacityMin: e.target.value }))}
+                      placeholder="e.g. 2"
+                      className="mt-1 border-[#E5DFC6]"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="capacityMax" className="text-sm text-[#4a4a4a]">Typical group size — maximum</Label>
+                    <Input
+                      id="capacityMax"
+                      type="number"
+                      min={1}
+                      value={formData.capacityMax}
+                      onChange={(e) => setFormData(prev => ({ ...prev, capacityMax: e.target.value }))}
+                      placeholder="e.g. 12"
+                      className="mt-1 border-[#E5DFC6]"
+                    />
+                  </div>
+                </div>
+                <p className="mt-2 text-xs text-[#9CA3AF]">
+                  Licenses and insurance documents can be attached in the documents step — approved
+                  operators can publish bookable tours directly to the marketplace.
+                </p>
+              </div>
+            )}
+
             {/* Amenities (conditional for accommodations) */}
             {['Hotel', 'Resort', 'Villa / Home', 'Boutique Stay'].includes(formData.brandType) && (
               <div className="border-t border-[#E5DFC6] pt-6">
@@ -839,10 +887,11 @@ export default function BrandOnboarding() {
       <div className="mx-auto max-w-4xl">
         <div className="mb-10 text-center">
           <h1 className="mb-4 font-secondary text-[26px] md:text-[31px] lg:text-[36px] text-[#0a2225]">
-            List Your Brand on <em>Goldsainte</em>
+            Become a <em>Goldsainte</em> Tour Operator
           </h1>
           <p className="text-base text-[#6B7280] max-w-2xl mx-auto leading-relaxed">
-            Join an exclusive collection of design-led hotels, residences, and experience brands.
+            List your tours in the Goldsainte marketplace and reach travelers worldwide.
+            Hotels, experience brands, and other partners are welcome to apply here too.
           </p>
 
           <div className="flex items-center justify-center gap-2 mt-8">
