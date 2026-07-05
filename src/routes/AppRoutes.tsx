@@ -246,7 +246,10 @@ export const AppRoutes = () => (
       {/* Legacy multi-step traveler wizard — replaced by streamlined Traveler Hub. Redirect any stale links. */}
       <Route path="/onboarding/traveler/preferences" element={<Navigate to="/traveler" replace />} />
       <Route path="/onboarding/creator" element={<RequireAuth><CreatorOnboardingPage /></RequireAuth>} />
-      <Route path="/brand/onboarding" element={<Navigate to="/apply/brand" replace />} />
+      <Route path="/brand/onboarding" element={<Navigate to="/apply/tour-operator" replace />} />
+      {/* Tour operators are the primary partner audience; /apply/brand stays as
+          a legacy alias into the same (reworked) application. */}
+      <Route path="/apply/tour-operator" element={<BrandApplyPage />} />
       <Route path="/apply/brand" element={<BrandApplyPage />} />
       
       <Route path="/ai-agent-setup" element={<RequireAuth><AIAgentOnboarding /></RequireAuth>} />
