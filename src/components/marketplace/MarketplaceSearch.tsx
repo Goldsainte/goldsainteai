@@ -199,7 +199,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters }: Marketp
   return (
     <section
       ref={sectionRef}
-      className="sticky top-0 z-40 border-b border-[#E5DFC6]/30 bg-white/95 backdrop-blur-sm"
+      className="sticky top-14 sm:top-16 md:top-20 z-40 border-b border-[#E5DFC6]/30 bg-white/95 backdrop-blur-sm"
     >
       <div className="mx-auto max-w-4xl px-4 py-4 md:py-6">
         {/* Desktop collapsed pill — expands into the full bar */}
